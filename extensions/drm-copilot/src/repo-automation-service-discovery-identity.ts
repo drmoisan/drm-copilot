@@ -9,7 +9,9 @@
  */
 
 import type { DiscoveryAuthorityProvider } from "./discovery-authority-provider";
+import { consumeToolAuthorizationByBinding } from "./discovery-authorization";
 import type { DiscoveryRuntimeInvocation } from "./discovery-runtime";
+import type { ConsumeDiscoveryToolAuthorizationInput } from "./repo-automation-service-discovery-types";
 
 /** The complete trusted identity set of a host-principal invocation. */
 export type HostInvocationOptions = Readonly<
@@ -56,4 +58,42 @@ export function invocationOptions(
   invocationRef: string | undefined,
 ): HostInvocationOptions | Record<never, never> {
   return invocationRef === undefined ? {} : hostInvocationOptions(authority());
+}
+
+/**
+ * Consume the one-use native authorization of one controlled tool call.
+ *
+ * The trusted binding is the provider's host, session and agent identity with
+ * the request's invocation reference, and the protected activation envelope
+ * of the workspace; nothing in the tool input selects it. Returns the consumed
+ * record's reference, which the gate forwards to the runtime request.
+ */
+export function consumeHostToolAuthorization(
+  authority: DiscoveryAuthorityProvider,
+  input: ConsumeDiscoveryToolAuthorizationInput,
+): string {
+  const identity = hostInvocationOptions(authority);
+  const location = authority.location(input.workspaceRoot);
+  const envelope = authority.activation(location).envelope();
+  return consumeToolAuthorizationByBinding({
+    location,
+    io: authority.io,
+    request: {
+      tool: input.tool,
+      operation: input.operation,
+      inputs: input.inputs,
+      invocationRef: input.invocationRef,
+    },
+    trusted: {
+      workspace: envelope.workspace,
+      identity: {
+        host: identity.hostName,
+        session_id: identity.sessionId,
+        agent_id: identity.authorId,
+        role: identity.agentRole,
+        invocation_id: input.invocationRef,
+      },
+    },
+    now: authority.now(),
+  }).authorizationRef;
 }

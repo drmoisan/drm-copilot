@@ -37,9 +37,13 @@ import {
   prepareDiscoveryAgentOperation,
   projectDoctorCapability,
 } from "./repo-automation-service-discovery-agent";
-import { invocationOptions } from "./repo-automation-service-discovery-identity";
+import {
+  consumeHostToolAuthorization,
+  invocationOptions,
+} from "./repo-automation-service-discovery-identity";
 import type {
   ConfigureDiscoveryWorkspaceInput,
+  ConsumeDiscoveryToolAuthorizationInput,
   CreateDiscoveryArtifactInput,
   DiscoveryGrantedInput,
   FinalizeDiscoveryAgentInput,
@@ -109,6 +113,13 @@ export class DiscoveryServiceBase {
   /** Role context reported by the trusted provider, or null for a root principal. */
   discoveryRole(): string | null {
     return this.authorityProvider?.agent?.role ?? null;
+  }
+
+  /** Consume the one-use native grant of one controlled call; the MCP gate's seam. */
+  consumeDiscoveryToolAuthorization(
+    input: ConsumeDiscoveryToolAuthorizationInput,
+  ): string {
+    return consumeHostToolAuthorization(this.authority, input);
   }
 
   private get authority(): DiscoveryAuthorityProvider {

@@ -8,14 +8,100 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
+import { invocationDirectory } from "../src/discovery-authority-paths";
 import {
+  AUTHORIZATIONS_PARTITION,
+  computeInputDigest,
+  decodeToolAuthorization,
+} from "../src/discovery-authorization";
+import {
+  consumeHostToolAuthorization,
   hostInvocationOptions,
   invocationOptions,
 } from "../src/repo-automation-service-discovery-identity";
-import { seeded } from "./discovery-invocation-test-support";
+import { vectors } from "./discovery-authorization-test-support";
+import {
+  LOCATION,
+  seeded,
+  WORKSPACE,
+} from "./discovery-invocation-test-support";
 import { provider } from "./repo-automation-service-discovery-test-support";
 
 const AGENT = { agentId: "agent-alpha", role: "legacy-parity-analyst" };
+const INVOCATION_REF = "invocation-0123456789abcdef0001";
+const READ_INPUT = {
+  workspace_root: WORKSPACE.workspace_root,
+  read_operation: "list",
+  paths: ["src"],
+  invocation_ref: INVOCATION_REF,
+};
+const RECORD_PATH = `${invocationDirectory(LOCATION, "session-alpha", INVOCATION_REF)}/${AUTHORIZATIONS_PARTITION}/authz-alpha.json`;
+
+/** An issued grant bound to the provider's workspace, identity and the read call. */
+function issuedGrant() {
+  return {
+    ...vectors.records.issued,
+    workspace: WORKSPACE,
+    identity: {
+      host: "codex",
+      session_id: "session-alpha",
+      agent_id: AGENT.agentId,
+      role: AGENT.role,
+      invocation_id: INVOCATION_REF,
+    },
+    tool: "read_discovery_source" as const,
+    operation: "read-source",
+    input_sha256: computeInputDigest(
+      "read_discovery_source",
+      "read-source",
+      READ_INPUT,
+    ),
+    invocation_ref: INVOCATION_REF,
+  };
+}
+
+describe("consumeHostToolAuthorization", () => {
+  it("consumes the grant bound to the provider identity and the request", () => {
+    const io = seeded();
+    io.files.set(RECORD_PATH, JSON.stringify(issuedGrant()));
+    const authority = provider(io, {
+      agent: AGENT,
+      now: () => new Date("2026-10-22T12:01:00Z"),
+    });
+
+    const reference = consumeHostToolAuthorization(authority, {
+      workspaceRoot: WORKSPACE.workspace_root,
+      tool: "read_discovery_source",
+      operation: "read-source",
+      inputs: READ_INPUT,
+      invocationRef: INVOCATION_REF,
+    });
+
+    expect(reference).toBe(vectors.records.issued.authorization_ref);
+    expect(decodeToolAuthorization(io.files.get(RECORD_PATH)!).state).toBe(
+      "consumed",
+    );
+    expect(io.files.has(`${RECORD_PATH}.consumed`)).toBe(true);
+  });
+
+  it("refuses without an agent identity and without a grant", () => {
+    const io = seeded();
+    const input = {
+      workspaceRoot: WORKSPACE.workspace_root,
+      tool: "read_discovery_source",
+      operation: "read-source",
+      inputs: READ_INPUT,
+      invocationRef: INVOCATION_REF,
+    };
+
+    expect(() => consumeHostToolAuthorization(provider(io), input)).toThrow(
+      "DISCOVERY_AGENT_IDENTITY_REQUIRED",
+    );
+    expect(() =>
+      consumeHostToolAuthorization(provider(io, { agent: AGENT }), input),
+    ).toThrow("No native authorization exists");
+  });
+});
 
 describe("hostInvocationOptions", () => {
   it("returns the host principal with the trusted agent, session, host and role", () => {

@@ -23,6 +23,7 @@ import type {
 import type { DiscoveryServiceResult } from "./discovery-service-types";
 import type {
   ConfigureDiscoveryWorkspaceInput,
+  ConsumeDiscoveryToolAuthorizationInput,
   CreateDiscoveryArtifactInput,
   FinalizeDiscoveryAgentInput,
   FinalizedReceiptSummary,
@@ -273,4 +274,12 @@ export interface RepoAutomationService {
    * the local-user root. Root-only tools are refused when a role is present.
    */
   discoveryRole?(): string | null;
+  /**
+   * Consume the one-use native authorization bound to a controlled tool call
+   * of the discovery agent this service runs for; returns its reference. Only
+   * the MCP gate calls it, and only for a non-null discovery role.
+   */
+  consumeDiscoveryToolAuthorization?(
+    input: ConsumeDiscoveryToolAuthorizationInput,
+  ): string;
 }

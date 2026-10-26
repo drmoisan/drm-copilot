@@ -307,7 +307,14 @@ describe("discovery tool dispatch", () => {
       },
     );
 
-    it("still allows diagnostics, bounded reads and artifact replacement", async () => {
+    it("still allows diagnostics, bounded reads and artifact replacement under a consumed grant", async () => {
+      // Controlled calls of a role consume one native grant each (P12-T4 gate)
+      // and carry its reference; doctor is not controlled and needs none.
+      const invocationRef = "invocation-0123456789abcdef0001";
+      const authorizationRef = "authz-alpha-0000000000000001";
+      service.consumeDiscoveryToolAuthorization!.mockReturnValue(
+        authorizationRef,
+      );
       service.runDiscoveryDoctor.mockResolvedValue(
         success("run_discovery_doctor"),
       );
@@ -330,7 +337,12 @@ describe("discovery tool dispatch", () => {
         (
           await dispatchRepoAutomationTool(
             "read_discovery_source",
-            { workspace_root: WS, read_operation: "list", paths: ["src"] },
+            {
+              workspace_root: WS,
+              read_operation: "list",
+              paths: ["src"],
+              invocation_ref: invocationRef,
+            },
             service,
           )
         ).ok,
@@ -346,11 +358,33 @@ describe("discovery tool dispatch", () => {
               input_path: "b",
               expected_sha256: null,
               update_action: "replace",
+              invocation_ref: invocationRef,
             },
             service,
           )
         ).ok,
       ).toBe(true);
+      expect(service.consumeDiscoveryToolAuthorization).toHaveBeenCalledTimes(
+        2,
+      );
+      expect(service.readDiscoverySource).toHaveBeenCalledWith(
+        expect.objectContaining({ invocationRef, authorizationRef }),
+      );
+      expect(service.updateDiscoveryArtifact).toHaveBeenCalledWith(
+        expect.objectContaining({ invocationRef, authorizationRef }),
+      );
+    });
+
+    it("refuses a controlled call that names no invocation before the service", async () => {
+      const result = await dispatchRepoAutomationTool(
+        "read_discovery_source",
+        { workspace_root: WS, read_operation: "list", paths: ["src"] },
+        service,
+      );
+      expect(result.ok).toBe(false);
+      expect(result.summary).toContain("invocation_ref");
+      expect(service.readDiscoverySource).not.toHaveBeenCalled();
+      expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
     });
 
     it("denies decision approval to a role", async () => {

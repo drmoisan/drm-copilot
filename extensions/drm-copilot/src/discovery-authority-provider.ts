@@ -11,12 +11,11 @@
 import { randomBytes } from "node:crypto";
 import * as os from "node:os";
 
+import { ActivationStore, type ProtectedEnvelope } from "./discovery-authority";
 import {
-  ActivationStore,
-  type AuthorityStoreIO,
-  createNodeAuthorityStoreIO,
-  type ProtectedEnvelope,
-} from "./discovery-authority";
+  type AuthorizationStoreIO,
+  createNodeAuthorizationStoreIO,
+} from "./discovery-authorization";
 import {
   type AuthorityLocation,
   type AuthorityPlatform,
@@ -42,7 +41,8 @@ export interface DiscoveryAuthorityProvider {
   readonly context: PrepareContext;
   /** Agent identity when this service runs for a discovery specialist. */
   readonly agent: DiscoveryAgentContext | null;
-  readonly io: AuthorityStoreIO;
+  /** Protected store seam with directory listing for one-use authorizations. */
+  readonly io: AuthorizationStoreIO;
   readonly reader: InputBytesReader;
   readonly writer: Omit<ReceiptWriter, "kind" | "host">;
   /** Host-pinned configuration and hook hashes an attestation must reproduce. */
@@ -69,7 +69,7 @@ export interface NodeAuthorityProviderOptions {
   readonly env?: Readonly<Record<string, string | undefined>>;
   readonly platform?: NodeJS.Platform;
   readonly homedir?: string;
-  readonly io?: AuthorityStoreIO;
+  readonly io?: AuthorizationStoreIO;
   readonly reader?: InputBytesReader;
   readonly now?: () => Date;
   readonly nonce?: () => string;
@@ -113,7 +113,7 @@ export function createNodeDiscoveryAuthorityProvider(
   const env = options.env ?? process.env;
   const platform = options.platform ?? process.platform;
   const homedir = options.homedir ?? os.homedir();
-  const io = options.io ?? createNodeAuthorityStoreIO();
+  const io = options.io ?? createNodeAuthorizationStoreIO();
   const nonce = options.nonce ?? (() => randomBytes(16).toString("hex"));
   const agentId = env[DISCOVERY_ENVIRONMENT_KEYS.agentId];
   const agentRole = env[DISCOVERY_ENVIRONMENT_KEYS.agentRole];

@@ -52,6 +52,19 @@ export class MemoryStoreIO implements AuthorityStoreIO {
     this.directories.add(path);
   }
 
+  /** Immediate entry names under `directory`, sorted; `[]` when none exist. */
+  listEntries(directory: string): string[] {
+    this.operations.push(`list ${directory}`);
+    const prefix = `${directory}/`;
+    return [...this.files.keys()]
+      .filter(
+        (entry) =>
+          entry.startsWith(prefix) && !entry.slice(prefix.length).includes("/"),
+      )
+      .map((entry) => entry.slice(prefix.length))
+      .sort();
+  }
+
   /** Paths of every write-type operation recorded so far. */
   writtenPaths(): string[] {
     return this.operations

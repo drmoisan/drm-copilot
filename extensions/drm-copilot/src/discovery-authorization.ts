@@ -106,7 +106,26 @@ export function authorizationsDirectory(
   return `${invocation}/${AUTHORIZATIONS_PARTITION}`;
 }
 
+/** Tool request fields shared by the request-id and the binding consumers. */
+export type BoundToolRequest = Omit<ControlledToolRequest, "requestId"> & {
+  /** Protected invocation the caller's tool call is bound to. */
+  readonly invocationRef: string;
+};
+
 function validateRequest(request: ControlledToolRequest): string {
+  if (!isText(request.requestId, CORRELATION_ID)) {
+    throw refuse(
+      "AUTHORIZATION_REQUEST_INVALID",
+      "Request id must be a correlation identifier.",
+    );
+  }
+  return validateControlledRequest(request);
+}
+
+/** Validate the tool, operation and inputs of a controlled request; return the digest. */
+function validateControlledRequest(
+  request: Omit<ControlledToolRequest, "requestId">,
+): string {
   rejectCallerAuthorityClaims(request.inputs, "Tool request inputs");
   if (request.inputs !== null && typeof request.inputs === "object") {
     const claimed = CALLER_IDENTITY_KEYS.filter((key) =>
@@ -118,12 +137,6 @@ function validateRequest(request: ControlledToolRequest): string {
         `Caller identity fields are not accepted in tool inputs: ${claimed.join(", ")}`,
       );
     }
-  }
-  if (!isText(request.requestId, CORRELATION_ID)) {
-    throw refuse(
-      "AUTHORIZATION_REQUEST_INVALID",
-      "Request id must be a correlation identifier.",
-    );
   }
   // Operation routing: root-only operations are refused before any lookup so
   // no record, however shaped, can admit them; unknown names are refused next.
@@ -247,6 +260,142 @@ export function consumeToolAuthorization(
       "Authorization was issued for a different tool, operation or input.",
     );
   }
+  const instant = now.getTime();
+  if (!(
+    Date.parse(record.issued_at) <= instant &&
+    instant < Date.parse(record.expires_at)
+  )) {
+    throw refuse(
+      "AUTHORIZATION_EXPIRED",
+      "Authorization is outside its validity window.",
+    );
+  }
+  consume(io, path, record, now);
+  return {
+    authorizationRef: record.authorization_ref,
+    inputSha256: digest,
+    path,
+    record: { ...record, state: "consumed", consumed_at: now.toISOString() },
+  };
+}
+
+export interface ConsumeByBindingOptions {
+  readonly location: AuthorityLocation;
+  readonly io: AuthorizationStoreIO;
+  readonly request: BoundToolRequest;
+  /** Host-verified binding; `identity.invocation_id` is the request's invocation. */
+  readonly trusted: TrustedBinding;
+  readonly now: Date;
+}
+
+/** The four identity fields a one-use record must share with the trusted process. */
+const BINDING_IDENTITY_KEYS: ReadonlyArray<keyof NativeIdentity> = [
+  "host",
+  "session_id",
+  "agent_id",
+  "role",
+];
+
+function sameIdentity(left: NativeIdentity, right: NativeIdentity): boolean {
+  return BINDING_IDENTITY_KEYS.every((key) => left[key] === right[key]);
+}
+
+/**
+ * Admit one controlled tool call by its trusted binding rather than a caller
+ * request id.
+ *
+ * The MCP layer holds the raw tool input the native PreToolUse adapter
+ * digested but no correlation id, so the live issued, unlatched records of the
+ * invocation named by the trusted session and the request's `invocation_ref`
+ * are filtered down to those whose identity binds the trusted host, session,
+ * agent id and role and whose tool, operation and input digest equal the
+ * request. Exactly one must remain; it is then checked against its validity
+ * window and latched exactly as {@link consumeToolAuthorization}. Each refusal
+ * class is distinct so a replay (`AUTHORIZATION_CONSUMED`) is never reported as
+ * a missing grant.
+ */
+export function consumeToolAuthorizationByBinding(
+  options: ConsumeByBindingOptions,
+): ConsumedAuthorization {
+  const { location, io, request, trusted, now } = options;
+  const digest = validateControlledRequest(request);
+  if (
+    !isText(request.invocationRef, CORRELATION_ID) ||
+    trusted.identity.invocation_id !== request.invocationRef
+  ) {
+    throw refuse(
+      "AUTHORIZATION_REQUEST_INVALID",
+      "Invocation reference must name the trusted invocation of this process.",
+    );
+  }
+  const directory = authorizationsDirectory(location, trusted.identity);
+  const records: { path: string; record: ToolAuthorizationRecord }[] = [];
+  // Every JSON entry of the invocation partition is decoded strictly.
+  for (const name of io.listEntries(directory)) {
+    if (!name.endsWith(".json")) {
+      continue;
+    }
+    const path = `${directory}/${name}`;
+    const text = io.readText(path);
+    if (text !== null) {
+      records.push({ path, record: decodeToolAuthorization(text) });
+    }
+  }
+  if (records.length === 0) {
+    throw refuse(
+      "AUTHORIZATION_MISSING",
+      `No native authorization exists for invocation ${request.invocationRef}.`,
+    );
+  }
+  // Staged filtering names the first binding that fails for this request.
+  const identityBound = records.filter(({ record }) =>
+    sameIdentity(record.identity, trusted.identity),
+  );
+  if (identityBound.length === 0) {
+    throw refuse(
+      "AUTHORIZATION_IDENTITY",
+      "No authorization of this invocation is bound to the trusted identity.",
+    );
+  }
+  const workspaceBound = identityBound.filter(({ record }) =>
+    sameBinding({ ...record.workspace }, { ...trusted.workspace }),
+  );
+  if (workspaceBound.length === 0) {
+    throw refuse(
+      "AUTHORIZATION_WORKSPACE",
+      "Authorization is bound to another workspace or profile.",
+    );
+  }
+  const bound = workspaceBound.filter(
+    ({ record }) =>
+      record.tool === request.tool &&
+      record.operation === request.operation &&
+      record.input_sha256 === digest,
+  );
+  if (bound.length === 0) {
+    throw refuse(
+      "AUTHORIZATION_INPUT",
+      "No authorization was issued for this tool, operation and input.",
+    );
+  }
+  const live = bound.filter(
+    ({ path, record }) =>
+      record.state === "issued" &&
+      io.readText(`${path}${CONSUMED_LATCH_SUFFIX}`) === null,
+  );
+  if (live.length === 0) {
+    throw refuse(
+      "AUTHORIZATION_CONSUMED",
+      "The matching authorization was already consumed or revoked.",
+    );
+  }
+  if (live.length > 1) {
+    throw refuse(
+      "AUTHORIZATION_AMBIGUOUS",
+      `${String(live.length)} issued authorizations match this tool call.`,
+    );
+  }
+  const { path, record } = live[0]!;
   const instant = now.getTime();
   if (!(
     Date.parse(record.issued_at) <= instant &&

@@ -22,6 +22,7 @@
     "lines": 90,
     "branches": 75
   },
+  "./src/mcp-discovery-authorization-gate.ts": { "lines": 90, "branches": 75 },
   "./src/mcp-discovery-authority-tool-definitions.ts": {
     "lines": 85,
     "branches": 75

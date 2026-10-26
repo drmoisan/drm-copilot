@@ -195,6 +195,9 @@ export async function finalizeDiscoveryAgentOperation(
         mode: "agent-output",
         workspaceRoot: input.workspaceRoot,
         invocationRef: input.invocationRef,
+        ...(input.authorizationRef === undefined
+          ? {}
+          : { authorizationRef: input.authorizationRef }),
         ...(input.profilePath === undefined
           ? {}
           : { profilePath: input.profilePath }),

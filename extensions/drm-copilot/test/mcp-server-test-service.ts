@@ -40,6 +40,9 @@ export type MockService = jest.Mocked<RepoAutomationService> & {
   transitionPreparedOrchestration?: jest.MockedFunction<
     NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
   >;
+  consumeDiscoveryToolAuthorization?: jest.MockedFunction<
+    NonNullable<RepoAutomationService["consumeDiscoveryToolAuthorization"]>
+  >;
 };
 
 /** Create a fully mocked MCP service while retaining optional handoff seams. */
@@ -88,6 +91,10 @@ export function createMockService(): MockService {
     readDiscoverySource: jest.fn(),
     prepareDiscoveryAgent: jest.fn(),
     finalizeDiscoveryAgent: jest.fn(),
+    consumeDiscoveryToolAuthorization:
+      jest.fn<
+        NonNullable<RepoAutomationService["consumeDiscoveryToolAuthorization"]>
+      >(),
   };
 }
 

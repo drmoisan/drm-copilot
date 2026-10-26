@@ -118,6 +118,18 @@ export interface PrepareDiscoveryAgentInput extends DiscoveryWorkspaceInput {
 export interface FinalizeDiscoveryAgentInput extends DiscoveryWorkspaceInput {
   readonly invocationRef: string;
   readonly requestId: string;
+  /** One-use authorization the MCP gate consumed for this finalize call. */
+  readonly authorizationRef?: string;
+}
+
+/** One controlled tool call the MCP gate asks the service to admit. */
+export interface ConsumeDiscoveryToolAuthorizationInput {
+  readonly workspaceRoot: string;
+  readonly tool: string;
+  readonly operation: string;
+  /** The raw tool input exactly as received; the digest covers it verbatim. */
+  readonly inputs: Readonly<Record<string, unknown>>;
+  readonly invocationRef: string;
 }
 
 /** Launchable deployment returned by prepare; never a grant by itself. */
