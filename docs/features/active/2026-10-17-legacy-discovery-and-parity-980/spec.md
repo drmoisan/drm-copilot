@@ -3,8 +3,8 @@
 - **Issue:** #980
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-17T22-38
-- **Status:** Draft
+- **Last Updated:** 2026-10-26T02-54
+- **Status:** Implemented on `feature/legacy-discovery-and-parity-980`; executor reconciliation complete with one escalated installed-host blocker (see `completion-report.md`); independent review and exact-head CI pending
 - **Version:** 0.1
 
 ## Overview
@@ -690,18 +690,18 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 
 **Core framework**
 
-- [ ] A reusable legacy discovery and parity framework exists in `drm-copilot`.
-- [ ] Core content contains no TaskMaster- or TMW-specific behavior.
+- [x] A reusable legacy discovery and parity framework exists in `drm-copilot`.
+- [x] Core content contains no TaskMaster- or TMW-specific behavior.
 - [x] Configuration is loaded from a local domain profile.
-- [ ] Repositories not using discovery remain unaffected.
+- [x] Repositories not using discovery remain unaffected.
 
 **Agents and skills**
 
-- [ ] All required generic agents are implemented and validated.
-- [ ] All required generic skills are implemented and validated.
-- [ ] Agents cannot write outside authorized paths.
+- [x] All required generic agents are implemented and validated.
+- [x] All required generic skills are implemented and validated.
+- [x] Agents cannot write outside authorized paths.
 - [ ] Every new agent has a SubagentStop output validator.
-- [ ] Agent and skill assets are available across supported ecosystems.
+- [x] Agent and skill assets are available across supported ecosystems.
 
 **Schemas and artifacts**
 
@@ -723,18 +723,18 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 
 - [x] Individual artifact validators exist.
 - [x] A complete validation command exists.
-- [ ] Blocking failures return nonzero exit codes.
+- [x] Blocking failures return nonzero exit codes.
 - [x] Markdown and JSON reports are generated.
 - [x] Completion checks coverage, evidence, unresolved behavior, acceptance scenarios, and configured platform dimensions.
 
 **Hooks**
 
-- [ ] Verified claims require evidence.
-- [ ] Unknown behavior requires an unresolved-behavior record.
-- [ ] Passed runtime scenarios require runtime evidence.
-- [ ] Completion fails for in-scope components without disposition.
-- [ ] Required platform dimensions cannot remain unspecified.
-- [ ] Implementation planning can be gated on discovery completion.
+- [x] Verified claims require evidence.
+- [x] Unknown behavior requires an unresolved-behavior record.
+- [x] Passed runtime scenarios require runtime evidence.
+- [x] Completion fails for in-scope components without disposition.
+- [x] Required platform dimensions cannot remain unspecified.
+- [x] Implementation planning can be gated on discovery completion.
 
 **Analyzers**
 
@@ -747,20 +747,20 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 
 **CLI, extension, and MCP**
 
-- [ ] Python is the authoritative implementation layer.
-- [ ] CLI commands are documented and tested.
-- [ ] MCP exposes appropriate discovery functions.
-- [ ] VS Code commands/wrappers are added where justified.
-- [ ] Wrappers do not duplicate business logic.
-- [ ] Workspace path safety is enforced.
+- [x] Python is the authoritative implementation layer.
+- [x] CLI commands are documented and tested.
+- [x] MCP exposes appropriate discovery functions.
+- [x] VS Code commands/wrappers are added where justified.
+- [x] Wrappers do not duplicate business logic.
+- [x] Workspace path safety is enforced.
 
 **Cross-ecosystem publishing**
 
-- [ ] Canonical assets publish correctly to Claude Code.
-- [ ] Canonical assets publish correctly to Codex.
-- [ ] Canonical assets publish correctly to GitHub Copilot.
-- [ ] Publishing/conversion validation covers the assets.
-- [ ] Generated outputs contain no unsupported references.
+- [x] Canonical assets publish correctly to Claude Code.
+- [x] Canonical assets publish correctly to Codex.
+- [x] Canonical assets publish correctly to GitHub Copilot.
+- [x] Publishing/conversion validation covers the assets.
+- [x] Generated outputs contain no unsupported references.
 
 **Acceptance scenarios**
 
@@ -772,44 +772,44 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 
 **Documentation**
 
-- [ ] Architecture and ownership boundaries are documented.
-- [ ] A consumer setup guide exists.
-- [ ] Schema/status semantics are documented.
-- [ ] Extension-versus-local placement is documented.
-- [ ] A source/target repository workflow is documented.
-- [ ] TaskMaster/TMW appear only in a separated example/case study.
+- [x] Architecture and ownership boundaries are documented.
+- [x] A consumer setup guide exists.
+- [x] Schema/status semantics are documented.
+- [x] Extension-versus-local placement is documented.
+- [x] A source/target repository workflow is documented.
+- [x] TaskMaster/TMW appear only in a separated example/case study.
 
 **Quality**
 
-- [ ] Applicable Python quality gates pass.
-- [ ] Applicable TypeScript quality gates pass.
-- [ ] Applicable PowerShell quality gates pass.
-- [ ] Applicable C# quality gates pass for any C# additions.
-- [ ] All tests pass.
+- [x] Applicable Python quality gates pass.
+- [x] Applicable TypeScript quality gates pass.
+- [x] Applicable PowerShell quality gates pass.
+- [x] Applicable C# quality gates pass for any C# additions.
+- [x] All tests pass.
 - [ ] Feature review reports no blocking defects.
-- [ ] Evidence is stored in canonical feature evidence locations.
-- [ ] Documentation and generated customization outputs are current.
+- [x] Evidence is stored in canonical feature evidence locations.
+- [x] Documentation and generated customization outputs are current.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
+- [x] Acceptance criteria documented and mapped to tests or demos
 - [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
 - [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
-- [ ] Schema and version validation: valid/invalid synthetic artifacts, required fields, invalid enums, protected core fields, and supported domain extensions.
-- [ ] Cross-artifact validation: duplicate IDs, broken references, source contracts, revision pins/staleness, conflicting decisions, unresolved-versus-verified behavior, and missing evidence.
-- [ ] Completion gates: undispositioned coverage, exclusion rationale, unknown/contradictory records, runtime pass evidence, required scenarios, configured dimensions, and planning prerequisites.
-- [ ] Initialization: first run, repeat run, dry-run, conflicts, no overwrite, neutral templates, and successful initialized-structure validation.
-- [ ] Analyzers: repository/.NET/C# synthetic fixtures, facts versus inference, source references, deterministic ordering, exclusions, plugins, and read-only operation.
-- [ ] Reports: coverage/parity/completion structural assertions or intentional snapshots, counts, blockers, warnings, next actions, and consistent Markdown/JSON.
-- [ ] Scenario generation: stable feature/scenario IDs, evidence/decision linkage, platform tags, conditional offline/mobile tags, and pending unresolved expectations.
-- [ ] Agent and hook validation: authorized output roots, production mutation denial, per-agent SubagentStop, missing/malformed profile fail-closed behavior, and inactive-repository compatibility.
-- [ ] CLI/API examples: noninteractive initialization/inventory/artifact creation/evidence linking/individual and complete validation/reporting/scenario generation, actionable errors, and nonzero blocking exits.
-- [ ] Integration: thin MCP and VS Code wrappers, authoritative Python invocation, workspace path traversal/symlink safety, and cross-platform paths/line endings.
-- [ ] Publishing: canonical-source conversion/push-down representation for Claude Code/Codex/Copilot, bundle parity, hook/templates coverage, and unsupported-reference rejection.
+- [x] Schema and version validation: valid/invalid synthetic artifacts, required fields, invalid enums, protected core fields, and supported domain extensions.
+- [x] Cross-artifact validation: duplicate IDs, broken references, source contracts, revision pins/staleness, conflicting decisions, unresolved-versus-verified behavior, and missing evidence.
+- [x] Completion gates: undispositioned coverage, exclusion rationale, unknown/contradictory records, runtime pass evidence, required scenarios, configured dimensions, and planning prerequisites.
+- [x] Initialization: first run, repeat run, dry-run, conflicts, no overwrite, neutral templates, and successful initialized-structure validation.
+- [x] Analyzers: repository/.NET/C# synthetic fixtures, facts versus inference, source references, deterministic ordering, exclusions, plugins, and read-only operation.
+- [x] Reports: coverage/parity/completion structural assertions or intentional snapshots, counts, blockers, warnings, next actions, and consistent Markdown/JSON.
+- [x] Scenario generation: stable feature/scenario IDs, evidence/decision linkage, platform tags, conditional offline/mobile tags, and pending unresolved expectations.
+- [x] Agent and hook validation: authorized output roots, production mutation denial, per-agent SubagentStop, missing/malformed profile fail-closed behavior, and inactive-repository compatibility.
+- [x] CLI/API examples: noninteractive initialization/inventory/artifact creation/evidence linking/individual and complete validation/reporting/scenario generation, actionable errors, and nonzero blocking exits.
+- [x] Integration: thin MCP and VS Code wrappers, authoritative Python invocation, workspace path traversal/symlink safety, and cross-platform paths/line endings.
+- [x] Publishing: canonical-source conversion/push-down representation for Claude Code/Codex/Copilot, bundle parity, hook/templates coverage, and unsupported-reference rejection.
 - [ ] Applicable complete language/repository quality loops, coverage and isolation checks, and final full feature review.

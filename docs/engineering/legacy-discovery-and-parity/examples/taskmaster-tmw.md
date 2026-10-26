@@ -20,6 +20,13 @@ against the published artifacts before installation:
 | `drm-copilot` VS Code extension | 1.1.22 | Install the VSIX; it registers the `drmCopilotMcpProvider` MCP server. |
 | `@danmoisan/drm-copilot-mcp` | 1.1.22 | `npx @danmoisan/drm-copilot-mcp` from the agent client's MCP configuration. |
 
+Known limit of this release, recorded in the feature handoff: the installed runtime cannot
+mint a completion receipt (`finalize_discovery_agent` and agent-scoped `read_discovery_source`
+are refused), so the agent-driven steps that end in a finalized receipt are unavailable
+until a host-principal service composition ships; the console operations (`validate-all`,
+reports, `snapshot-export`, `snapshot-import`) and the native start, tool and stop controls
+behave as documented.
+
 ## Interpreter
 
 There is no separate interpreter setting. The gateway client selects the workspace `.venv`

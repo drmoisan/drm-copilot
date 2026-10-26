@@ -517,7 +517,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Include one PASS, FAIL, or justified N/A row for every template checklist item, requirements/AC traceability, source-authority separation, installed proof, native grants, all existing asserting tests, evidence completeness, and architecture/file-size/isolation/coverage checks.
   - Acceptance: No FAIL or unverified blocking row remains; every correction is tested through the affected full loop before the self-review is rewritten.
 
-- [ ] [P11-T10] Reconcile acceptance evidence and the publication handoff.
+- [x] [P11-T10] Reconcile acceptance evidence and the publication handoff.
   - Files and behavior: Update FEATURE/{requirements-traceability,spec,user-story,issue,handoff,completion-report}.md and DOC/examples/taskmaster-tmw.md using verified task/QA evidence only; write FEATURE/evidence/qa-gates/acceptance-criteria-status.<timestamp>.md.
   - Tests and proof: Map each of AC-01–AC-66 and D01–D22 to exact implementing task/artifact/test evidence, account separately for seven DoD and twelve seeded conditions, record conditional C# applicability, actual package versions/digests, known analyzer/host limits, backward compatibility, and exact remaining local consumer work.
   - Acceptance: Every verified criterion is individually checked without text changes; review/CI-dependent criteria remain explicitly pending until their own gates pass, and the report does not claim feature completion prematurely.

@@ -2,8 +2,8 @@
 
 - Issue: #980
 - Owner: drmoisan
-- Status: Draft
-- Last Updated: 2026-10-17T22-38
+- Status: Implemented on `feature/legacy-discovery-and-parity-980`; executor reconciliation complete with one escalated installed-host blocker (see `completion-report.md`); independent review and exact-head CI pending
+- Last Updated: 2026-10-26T02-54
 
 ## Story Statement
 
@@ -43,16 +43,16 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 ## Acceptance Criteria
 
 ### Core framework
-- [ ] A reusable legacy discovery and parity framework exists in `drm-copilot`.
-- [ ] Core content contains no TaskMaster- or TMW-specific behavior.
+- [x] A reusable legacy discovery and parity framework exists in `drm-copilot`.
+- [x] Core content contains no TaskMaster- or TMW-specific behavior.
 - [x] Configuration is loaded from a local domain profile.
-- [ ] Repositories not using discovery remain unaffected.
+- [x] Repositories not using discovery remain unaffected.
 ### Agents and skills
-- [ ] All required generic agents are implemented and validated.
-- [ ] All required generic skills are implemented and validated.
-- [ ] Agents cannot write outside authorized paths.
+- [x] All required generic agents are implemented and validated.
+- [x] All required generic skills are implemented and validated.
+- [x] Agents cannot write outside authorized paths.
 - [ ] Every new agent has a SubagentStop output validator.
-- [ ] Agent and skill assets are available across supported ecosystems.
+- [x] Agent and skill assets are available across supported ecosystems.
 ### Schemas and artifacts
 - [x] All required schemas exist and are versioned.
 - [x] Valid examples pass validation.
@@ -68,16 +68,16 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 ### Validation and reporting
 - [x] Individual artifact validators exist.
 - [x] A complete validation command exists.
-- [ ] Blocking failures return nonzero exit codes.
+- [x] Blocking failures return nonzero exit codes.
 - [x] Markdown and JSON reports are generated.
 - [x] Completion checks coverage, evidence, unresolved behavior, acceptance scenarios, and configured platform dimensions.
 ### Hooks
-- [ ] Verified claims require evidence.
-- [ ] Unknown behavior requires an unresolved-behavior record.
-- [ ] Passed runtime scenarios require runtime evidence.
-- [ ] Completion fails for in-scope components without disposition.
-- [ ] Required platform dimensions cannot remain unspecified.
-- [ ] Implementation planning can be gated on discovery completion.
+- [x] Verified claims require evidence.
+- [x] Unknown behavior requires an unresolved-behavior record.
+- [x] Passed runtime scenarios require runtime evidence.
+- [x] Completion fails for in-scope components without disposition.
+- [x] Required platform dimensions cannot remain unspecified.
+- [x] Implementation planning can be gated on discovery completion.
 ### Analyzers
 - [x] A generic repository/project inventory analyzer exists.
 - [x] At least one meaningful C#/.NET analyzer exists.
@@ -86,18 +86,18 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [x] Facts are distinguished from inference.
 - [x] Analyzer fixtures and tests exist.
 ### CLI, extension, and MCP
-- [ ] Python is the authoritative implementation layer.
-- [ ] CLI commands are documented and tested.
-- [ ] MCP exposes appropriate discovery functions.
-- [ ] VS Code commands/wrappers are added where justified.
-- [ ] Wrappers do not duplicate business logic.
-- [ ] Workspace path safety is enforced.
+- [x] Python is the authoritative implementation layer.
+- [x] CLI commands are documented and tested.
+- [x] MCP exposes appropriate discovery functions.
+- [x] VS Code commands/wrappers are added where justified.
+- [x] Wrappers do not duplicate business logic.
+- [x] Workspace path safety is enforced.
 ### Cross-ecosystem publishing
-- [ ] Canonical assets publish correctly to Claude Code.
-- [ ] Canonical assets publish correctly to Codex.
-- [ ] Canonical assets publish correctly to GitHub Copilot.
-- [ ] Publishing/conversion validation covers the assets.
-- [ ] Generated outputs contain no unsupported references.
+- [x] Canonical assets publish correctly to Claude Code.
+- [x] Canonical assets publish correctly to Codex.
+- [x] Canonical assets publish correctly to GitHub Copilot.
+- [x] Publishing/conversion validation covers the assets.
+- [x] Generated outputs contain no unsupported references.
 ### Acceptance scenarios
 - [x] Confirmed contracts generate linked acceptance scenarios.
 - [x] Platform-mode tags are supported.
@@ -105,21 +105,21 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [x] Unresolved behavior does not become a false expected result.
 - [x] Scenarios preserve contract and decision traceability.
 ### Documentation
-- [ ] Architecture and ownership boundaries are documented.
-- [ ] A consumer setup guide exists.
-- [ ] Schema/status semantics are documented.
-- [ ] Extension-versus-local placement is documented.
-- [ ] A source/target repository workflow is documented.
-- [ ] TaskMaster/TMW appear only in a separated example/case study.
+- [x] Architecture and ownership boundaries are documented.
+- [x] A consumer setup guide exists.
+- [x] Schema/status semantics are documented.
+- [x] Extension-versus-local placement is documented.
+- [x] A source/target repository workflow is documented.
+- [x] TaskMaster/TMW appear only in a separated example/case study.
 ### Quality
-- [ ] Applicable Python quality gates pass.
-- [ ] Applicable TypeScript quality gates pass.
-- [ ] Applicable PowerShell quality gates pass.
-- [ ] Applicable C# quality gates pass for any C# additions.
-- [ ] All tests pass.
+- [x] Applicable Python quality gates pass.
+- [x] Applicable TypeScript quality gates pass.
+- [x] Applicable PowerShell quality gates pass.
+- [x] Applicable C# quality gates pass for any C# additions.
+- [x] All tests pass.
 - [ ] Feature review reports no blocking defects.
-- [ ] Evidence is stored in canonical feature evidence locations.
-- [ ] Documentation and generated customization outputs are current.
+- [x] Evidence is stored in canonical feature evidence locations.
+- [x] Documentation and generated customization outputs are current.
 
 
 ## Non-Goals

@@ -310,3 +310,7 @@ Specification handoff: [spec.md](spec.md) records the detailed decisions; [user-
 - [ ] Delegate detailed specification and user story, then atomic planning and validation-only preflight before task-by-task execution.
 - [ ] Complete implementation, quality gates, acceptance-criteria check-off, feature review, evidence, and lifecycle completion validation.
 - [ ] Deliver a concise final implementation summary with architectural decisions, added files/components, commands, supported ecosystems, quality results, limitations, compatibility impact, exact publishing/push-down steps, exact TaskMaster-local artifacts, exact TMW-local artifacts, and unresolved follow-on work.
+
+## Execution status (executor reconciliation, 2026-10-26)
+
+The authoritative acceptance criteria live in `spec.md` and `user-story.md` (66 each); the early-draft list above is not tracked. After the executor reconciliation (plan task P11-T10) 64 of 66 criteria are checked in each source; the two unchecked criteria depend on the installed completion-receipt path (the Python runtime has no host-principal service composition, escalated in `completion-report.md` and `handoff.md`) and on the pending independent feature review. Executor-verified quality, contract, isolation and installed-runtime evidence is indexed in `requirements-traceability.md`; no feature completion is claimed.

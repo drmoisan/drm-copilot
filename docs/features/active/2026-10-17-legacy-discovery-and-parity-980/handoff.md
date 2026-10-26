@@ -10,14 +10,33 @@ every repository-specific value below is a placeholder their owners resolve loca
 
 | Artifact | Version | SHA-256 | Evidence |
 |---|---|---|---|
-| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`) | 2.0.0 | `0389c099b612c905340cad1adfd33d67142b7396a21d829de69344725f07661e` | `evidence/other/discovery-wheel-build.2026-10-22T18-49.md` |
-| `drm-copilot.vsix` (extension) | 1.1.22 | `d7ad4748cd8936cc4f35d065958987d503085f24e9e32df98d8b150cef6a4ee7` | `evidence/other/discovery-host-packages.2026-10-22T18-42.md` |
-| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `3681c32cf89a3f8e9a01768e4ffa67d886bbe79d651052cc64ab9ac763464218` | `evidence/other/discovery-host-packages.2026-10-22T18-42.md` |
+| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`; runtime identity build `41962c07af41d7d073b4f85755b3b8131892c1ebb728f9c083869f4fe77a0a0d`, policy `22ea1fc0d8481000e0706006dbf26480c82024651b66b68ea6779db37e3168dc`) | 2.0.0 | `19e7dd456d854f02503cbfe36cc1b175b1582ee25ce0506beff4c2977121ccdd` | `evidence/qa-gates/discovery-installed-runtime.2026-10-23T14-13.md`, `evidence/qa-gates/p11t8-packaging-closure.2026-10-26T02-42.md` |
+| `drm-copilot.vsix` (extension) | 1.1.22 | `a3bf8eedd136b8fe23911e259d232d4eccd1a4db3b3aa58f829f0f132acbd52a` | `evidence/qa-gates/discovery-installed-runtime.2026-10-23T14-13.md`, `evidence/qa-gates/p11t8-packaging-closure.2026-10-26T02-42.md` |
+| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `1e1709064ff100e3972738397f8ea1ea6e1690932bf91535b099aa42166eae2a` | `evidence/qa-gates/discovery-installed-runtime.2026-10-23T14-13.md`, `evidence/qa-gates/p11t8-packaging-closure.2026-10-26T02-42.md` |
 
-The digests are those of the artifacts built at the recorded commits during this feature;
-a rebuild after further commits produces new digests, and the published artifacts must be
-re-digested and the table updated at release time. The final independent installation
-proof is P11-T7.
+The digests are those of the artifacts built from the final sources of the feature branch
+during P11-T7 and inspected in P11-T8; they supersede the P10-T2 and P10-T3 digests
+(`evidence/other/discovery-host-packages.2026-10-22T18-42.md`,
+`evidence/other/discovery-wheel-build.2026-10-22T18-49.md`), which were built before the
+installed-host repairs of P11-T7. A rebuild after further commits produces new digests, and
+the published artifacts must be re-digested and the table updated at release time. The
+independent installation proof is P11-T7 (`discovery-installed-runtime.2026-10-23T14-13.md`,
+`discovery-native-capabilities.2026-10-23T13-49.md`).
+
+## Known installed-host limit (blocker carried from P11-T7 and P11-T9)
+
+The installed Python runtime provides only the `local-user` principal: `service._local`
+refuses `prepare-agent`, `finalize-agent`, agent-output mode and every invocation or
+authorization reference, and `installed_local_io` rejects the `host` principal. As a
+consequence `finalize_discovery_agent` and agent-scoped `read_discovery_source` fail on
+every installed host, no completion receipt (`validation-receipt`) can be minted, and a
+discovery specialist's stop is always blocked with "not finalized through
+finalize_discovery_agent". The native start, tool and stop controls still fail closed as
+observed in P11-T7; the receipt-accepting stop and the stale-receipt block are proven only by
+the in-process suites. Step 6 and step 7 below therefore cannot be completed through
+discovery agents until a host-principal service composition ships; the console path
+(`validate-all`, reports, `snapshot-export`, `snapshot-import`) is unaffected. This is an
+explicit open item for the next plan, not a consumer task.
 
 ## Publication prerequisites
 
