@@ -106,6 +106,30 @@ Describe 'New-FileSizeBaseline' {
         $second.Json | Should -BeExactly $first.Json
     }
 
+    It 'counts a blob whose last element is empty like the logical line count (<Name>)' -ForEach @(
+        @{ Name = '800 text lines plus a final empty element'; TextLines = 800; Trailing = @(''); ExpectedCount = 801; Baselined = $true }
+        @{ Name = '801 text lines'; TextLines = 801; Trailing = @(); ExpectedCount = 801; Baselined = $true }
+        @{ Name = 'a single empty element'; TextLines = 0; Trailing = @(''); ExpectedCount = 1; Baselined = $false }
+        @{ Name = 'an empty element array'; TextLines = 0; Trailing = @(); ExpectedCount = 0; Baselined = $false }
+    ) {
+        # Arrange
+        $textElements = if ($TextLines -gt 0) { Get-FakeTreeText -LineCount $TextLines } else { @() }
+        $elements = @($textElements + $Trailing)
+        $tree = @{ 'scripts/blob-row.ps1' = $elements }
+        $invoker = Get-FakeGitInvoker -Tree $tree -Calls $script:Calls
+        $onDiskText = if ($elements.Count -eq 0) { '' } else { ($elements -join "`n") + "`n" }
+
+        # Act
+        $result = New-FileSizeBaseline -Ref 'abc123' -GitInvoker $invoker -Writer $script:Writer
+
+        # Assert
+        Get-FileSizeLogicalLineCount -Content $onDiskText | Should -Be $ExpectedCount
+        $result.Files.ContainsKey('scripts/blob-row.ps1') | Should -Be $Baselined
+        if ($Baselined) {
+            $result.Files['scripts/blob-row.ps1'] | Should -Be $ExpectedCount
+        }
+    }
+
     It 'throws when git fails on call <FailOn>' -ForEach @(
         @{ FailOn = 1; Message = '*git ls-tree -r --name-only abc123 failed with exit code 128*' }
         @{ FailOn = 2; Message = '*git cat-file blob abc123:scripts/at-limit.py failed*' }

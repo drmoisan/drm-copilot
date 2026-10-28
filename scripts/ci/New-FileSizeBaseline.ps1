@@ -4,8 +4,9 @@
 
 .DESCRIPTION
     Lists the tracked files at -Ref with 'git ls-tree -r --name-only <Ref>', keeps the files the
-    shared policy module covers, reads each covered blob at the ref, counts its logical lines with
-    Get-FileSizeLogicalLineCount, keeps the files above the 800-line hard limit, and writes the
+    shared policy module covers, reads each covered blob at the ref, counts its logical lines as
+    the number of lines git returns for the blob (the on-disk equivalent of the logical line rule
+    in Get-FileSizeLogicalLineCount), keeps the files above the 800-line hard limit, and writes the
     canonical baseline JSON (ordinal key order, two-space indent, LF, trailing newline). Running it
     twice at the same ref yields byte-identical output.
 
@@ -137,7 +138,10 @@ function New-FileSizeBaseline {
     foreach ($path in $tracked) {
         if (-not (Test-FileSizeCoveredPath -RelativePath $path)) { continue }
         $blobLines = Invoke-FileSizeBaselineGit -GitInvoker $GitInvoker -GitArgs @('cat-file', 'blob', "$($Ref):$path")
-        $count = Get-FileSizeLogicalLineCount -Content ($blobLines -join "`n")
+        # Count the native element array. Joining the elements with LF is not used because a final
+        # empty element makes the joined text end in LF, which Get-FileSizeLogicalLineCount
+        # subtracts as a terminator, leaving the count one short of the on-disk line count.
+        $count = @($blobLines).Count
         if ($count -gt $hardLimit) {
             $files[$path] = $count
         }
