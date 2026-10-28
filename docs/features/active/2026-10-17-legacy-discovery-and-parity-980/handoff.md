@@ -10,18 +10,19 @@ every repository-specific value below is a placeholder their owners resolve loca
 
 | Artifact | Version | SHA-256 | Evidence |
 |---|---|---|---|
-| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`; runtime identity build `41962c07af41d7d073b4f85755b3b8131892c1ebb728f9c083869f4fe77a0a0d`, policy `22ea1fc0d8481000e0706006dbf26480c82024651b66b68ea6779db37e3168dc`) | 2.0.0 | `19e7dd456d854f02503cbfe36cc1b175b1582ee25ce0506beff4c2977121ccdd` | `evidence/qa-gates/discovery-installed-runtime.2026-10-23T14-13.md`, `evidence/qa-gates/p11t8-packaging-closure.2026-10-26T02-42.md` |
-| `drm-copilot.vsix` (extension) | 1.1.22 | `a3bf8eedd136b8fe23911e259d232d4eccd1a4db3b3aa58f829f0f132acbd52a` | `evidence/qa-gates/discovery-installed-runtime.2026-10-23T14-13.md`, `evidence/qa-gates/p11t8-packaging-closure.2026-10-26T02-42.md` |
-| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `1e1709064ff100e3972738397f8ea1ea6e1690932bf91535b099aa42166eae2a` | `evidence/qa-gates/discovery-installed-runtime.2026-10-23T14-13.md`, `evidence/qa-gates/p11t8-packaging-closure.2026-10-26T02-42.md` |
+| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`; runtime identity build `a4a41346b85867ec445687575c1e94ba7d5478631e81965d272d51051b222b95`, policy version 2, policy `7428cac9564b87547857631946c45493e9d6b70ddeadbdd7b1dcdf537304f276`) | 2.0.0 | `59652fe9ab2c3dc475be9c8c7e35b099fe2d3a0d2db0fae308a007f777c7136f` | `evidence/other/discovery-wheel-build.2026-10-28T13-21.md` |
+| `drm-copilot.vsix` (extension) | 1.1.22 | `834cb08195301399242742d06fd19496e406f761757546a4e17e5d47eb9a9b48` | `evidence/other/discovery-host-packages.2026-10-28T13-21.md` |
+| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `1bebefbc5899149e461d6fefb39d1369844ae2256584ca23265da4fb56e2b01c` | `evidence/other/discovery-host-packages.2026-10-28T13-21.md` |
 
-The digests are those of the artifacts built from the final sources of the feature branch
-during P11-T7 and inspected in P11-T8; they supersede the P10-T2 and P10-T3 digests
-(`evidence/other/discovery-host-packages.2026-10-22T18-42.md`,
-`evidence/other/discovery-wheel-build.2026-10-22T18-49.md`), which were built before the
-installed-host repairs of P11-T7. A rebuild after further commits produces new digests, and
-the published artifacts must be re-digested and the table updated at release time. The
-independent installation proof is P11-T7 (`discovery-installed-runtime.2026-10-23T14-13.md`,
-`discovery-native-capabilities.2026-10-23T13-49.md`).
+The digests are those of the artifacts rebuilt from the Phase 12 sources in P12-T11; they
+supersede the P11-T7/P11-T8 digests (wheel `19e7dd45…`, VSIX `a3bf8eed…`, npm `1e170906…`),
+which were built before the host-principal completion path landed. The wheel's resource
+manifest now carries 40 entries, including `schemas/discovery/v2/start-attestation.schema.json`,
+and the runtime policy version advanced from 1 to 2 with the Phase 12 request rules. A rebuild
+after further commits produces new digests, and the published artifacts must be re-digested
+and the table updated at release time. The installed-host proof for these artifacts is P12-T12
+(the lexicographically greatest `evidence/qa-gates/discovery-installed-runtime.*.md` and
+`discovery-native-capabilities.*.md`); the earlier P11-T7 proof covered the previous build.
 
 ## Known installed-host limit (blocker carried from P11-T7 and P11-T9)
 

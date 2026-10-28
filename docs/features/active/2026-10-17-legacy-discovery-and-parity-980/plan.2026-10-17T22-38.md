@@ -597,7 +597,7 @@ Protected partition layout, shared with ES/discovery-authority-paths.ts and CL/D
   - Tests and proof: No assertion changes (Set N); `main` keeps resolving `Path`, `RealSyncFileSystem` and `AgenticSyncer` from the `agentic_sync` namespace so the monkeypatched tests pass unchanged; the `ROOT_FOLDERS` import in DT/push_down_copilot_customizations.py is unchanged. Run DTTEST/test_push_down_copilot_customizations*.py, both push-down resource and pack-manifest contract suites and DTTEST/test_quality_tiers_contract_classification.py.
   - Acceptance: Every file named here is under 500 physical lines, the three production modules each measure at least 85% lines and 75% branches, and the publication contract suites are unchanged and green.
 
-- [ ] [P12-T11] Rebuild and re-verify the distributables (FEATURE/evidence/other/).
+- [x] [P12-T11] Rebuild and re-verify the distributables (FEATURE/evidence/other/).
   - Files and behavior: Rebuild the wheel (P10-T3 procedure) and the VSIX and npm packages (P10-T2 procedure) from the Phase 12 sources under SCRATCH; update the digests and `## Built artifacts` in FEATURE/handoff.md; write FEATURE/evidence/other/discovery-wheel-build.<timestamp>.md and discovery-host-packages.<timestamp>.md.
   - Tests and proof: Rerun PT/test_package_contract.py, DTTEST/test_build_discovery_runtime.py, PT/test_resources.py (the new schema resource), ET/packaging/discovery-resources.test.ts and ET/packaging/mcp-server-prepack.test.ts; record exact versions following the existing release procedure.
   - Acceptance: The evidence records the rebuilt artifact digests and versions, the resource manifest includes the new schema, and no Python business logic is copied into the host packages.
