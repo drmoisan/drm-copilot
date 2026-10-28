@@ -21,7 +21,13 @@
     row depends on a root-level artifacts/ tree in the executing worktree.
 
     Rows whose subject is the orchestrator-state preflight mock only the summary-existence
-    seam Get-PrContextArtifactExistence, because their resolved worktree holds no summary. No
+    seam Get-PrContextArtifactExistence, because their resolved worktree holds no summary.
+
+    The current-branch fallback seam Get-PrAuthorCurrentBranch (issue #989) is mocked to $null
+    for the whole file. R2, R5, and the genuine-absence row run a command with no target signal
+    through the real resolution seam; without the mock the fallback would read the branch of
+    the checkout running the suite, and Set-LiveTopology could then place that branch in a
+    fixture worktree and change the deny. No
     row mocks Get-PrAuthorReceiptContent, Get-PrBodyFileBytes, or
     Get-PrContextSummaryLastWriteUtc, and no row supplies the context-existence flag to the
     bypass-reason function directly; entering through the production entrypoint is what
@@ -110,6 +116,7 @@ BeforeAll {
     }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Mock Get-PrAuthorCurrentBranch { $null }
 }
 
 Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
