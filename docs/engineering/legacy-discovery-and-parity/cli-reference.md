@@ -56,8 +56,8 @@ are reachable only through the gateway because they require a host principal.
 | `import_discovery_inventory` | root | Import an extension result manifest. |
 | `migrate_discovery_artifacts` | root | Migrate version 1 artifacts to version 2. |
 | `run_discovery_doctor` | any | Read-only runtime, activation and capability diagnostics. |
-| `prepare_discovery_agent` | root | Prepare a constrained invocation for one skill and return the launchable deployment. |
-| `finalize_discovery_agent` | controlled | Validate the invocation's required outputs and mint the protected receipt. |
+| `prepare_discovery_agent` | root | Prepare a constrained invocation for one skill and return the launchable deployment. Input: `workspace_root`, `skill_id`, `selected_ids`, `paths`, `expected_outputs` (rows of `artifact_kind`, `id`, `path`, `format`, `expected_sha256`), `execution_context`, `complexity`, optional `orchestration_complexity_ceiling` and `profile_path`. Runs the root `prepare-agent` baseline and writes the five protected records. |
+| `finalize_discovery_agent` | controlled | Validate the invocation's required outputs and mint the protected receipt. Input: `workspace_root`, `invocation_ref`, optional `request_id` (a discovery agent omits it; the consumed authorization reference is recorded) and `profile_path`. |
 
 ## VS Code commands
 
@@ -78,6 +78,27 @@ prefix) wrap the corresponding MCP tools.
 `completion-report`, `generate-acceptance`, `snapshot-export`, `snapshot-import`,
 `import-inventory`, `migrate`, `doctor`, `read-source`, `prepare-agent`, `finalize-agent`.
 Modes: `structural`, `agent-output`, `discovery-complete`, `parity-complete`, `planning`.
+
+### Gateway module options
+
+`python -I -m drm_copilot_discovery.gateway` reads one `service-request` document on stdin
+and writes one `service-result` on stdout. Each option is accepted once; no module,
+interpreter, shell or program option exists.
+
+| Option | `--principal local-user` | `--principal host` |
+|---|---|---|
+| `--workspace-root <absolute>` | required | required |
+| `--repository-id <id>` | optional; without it the Git repository is derived from the activated profile | same |
+| `--author-id <id>` | optional local author identity (default `local-user`) | required: the started agent's id |
+| `--session-id <id>`, `--host-name <claude-code\|codex\|github-copilot>`, `--agent-role <role>` | refused | all three required |
+
+A request that reaches the engine as `local-user` with an `invocation_ref`, an
+`authorization_ref`, `agent-output` mode or `finalize-agent` is refused `SERVICE_AUTHORITY`
+(exit 3); `--principal host` with a missing identity option, an unknown principal or a
+relative root is refused `SERVICE_REQUEST` (exit 2) before the request is read. Protected
+records that fail to bind are `SERVICE_AUTHORITY` (exit 3) and a drifted baseline is
+`SERVICE_BASELINE` (exit 3); see [`enforcement.md`](enforcement.md) (`## Host-principal
+path`).
 
 ## Operator scripts
 

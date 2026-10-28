@@ -79,6 +79,40 @@ Add the module under `drm_copilot_discovery/analyzer/`, register its identifier 
 read-only and bounded, and cover it in `tests/discovery_runtime/`. Optional adapters that
 depend on a platform go under `analyzer/optional/` and are imported only after consent.
 
+## Installed-host smoke of the agent path
+
+The host-principal path is proven only against installed packages running as real
+processes, never against the checkout. The sequence, with its pinning suites:
+
+1. Build the wheel and both host packages (above), install the wheel into an isolated
+   `-I -m venv` interpreter and the npm tarball into an issue-scoped prefix, and push the
+   host layouts from the installed resources. Record the three digests and the installed
+   runtime identity (`dev.discovery.doctor`).
+2. Probe each host (`discovery-capability-probe.ps1`) against the installed identity; a
+   wheel rebuild changes the identity, so re-probe after every rebuild.
+3. Per host, in sequence: `prepare_discovery_agent` once (five protected files), the start
+   hook under the root environment, `read_discovery_source` and `create_discovery_artifact`
+   through the tool gate and the MCP server, `finalize_discovery_agent` (receipt `pass`,
+   `output_valid` true), the stop hook under the root environment (allowed), one input edit
+   and the stop again (blocked with the stale-inputs reason), a replayed controlled call
+   (`AUTHORIZATION_CONSUMED`), the gateway as `local-user` for `finalize-agent`
+   (`SERVICE_AUTHORITY`, exit 3) and as `host` without session identity (exit 2). Revert
+   the input edit before the next host's prepare, or its create fails
+   `REVISION_SOURCE_CHANGED` against the inventory pins; give each attempt its own feature
+   id and agent id.
+4. Any defect found is repaired with a test in the same change and the affected packages are
+   rebuilt before the final round on each host. The in-process suites that pin the path:
+   `tests/discovery_runtime/test_service_host_admission.py`,
+   `test_service_finalization.py`, `test_public_host_workflow.py`,
+   `test_agent_output_manifest.py`, `test_gateway_host*.py`;
+   `extensions/drm-copilot/test/discovery-host-workflow.test.ts`,
+   `discovery-authorization.binding.test.ts`, `discovery-finalization*.test.ts`;
+   `tests/scripts/claude-lib/discovery-validation/DiscoveryAuthorization.Tests.ps1` and
+   `DiscoveryStart.Tests.ps1`.
+5. Remove the smoke workspace's protected partition and the Codex routing attestations after
+   the evidence is recorded; the hooks resolve the store from the platform folder, not from
+   an environment override.
+
 ## Verification before release
 
 The toolchain loop applies per language (Black, Ruff, Pyright, pytest; Prettier, ESLint,

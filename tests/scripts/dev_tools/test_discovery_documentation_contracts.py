@@ -342,6 +342,57 @@ def test_handoff_reconciles_the_built_artifacts() -> None:
         assert phrase in text
 
 
+def test_host_principal_path_is_documented() -> None:
+    """The enforcement, reference and architecture pages describe the agent path.
+
+    The route, its protected records, the gateway host options and every refusal
+    class the gateway client and the engine emit on that path must be named.
+    """
+
+    enforcement = page("enforcement.md")
+    assert "## Host-principal path" in enforcement
+    for record in (
+        "baseline-result.json",
+        "required-outputs.json",
+        "model-receipt.json",
+        "topology-receipt.json",
+        "start-attestation.json",
+    ):
+        assert f"`{record}`" in enforcement, f"{record} is not documented"
+    gateway_client = read(
+        "extensions/drm-copilot/src/discovery-finalization.ts"
+    ) + read("extensions/drm-copilot/src/discovery-authorization-record.ts")
+    # Every finalization and authorization refusal code the client defines is named.
+    codes = re.findall(r'"((?:FINALIZATION|AUTHORIZATION)_[A-Z_]+)"', gateway_client)
+    assert len(set(codes)) >= 20
+    for code in sorted(set(codes)):
+        assert f"`{code}`" in enforcement, f"refusal class {code} is not documented"
+    for code in (
+        "SERVICE_AUTHORITY",
+        "SERVICE_BASELINE",
+        "SERVICE_MODE",
+        "SERVICE_REQUEST",
+    ):
+        assert f"`{code}`" in enforcement, f"engine refusal {code} is not documented"
+    reference = page("cli-reference.md")
+    assert "### Gateway module options" in reference
+    for option in ("--author-id", "--session-id", "--host-name", "--agent-role"):
+        assert f"`{option}" in reference, f"gateway option {option} is not documented"
+    assert "optional `request_id`" in flat("cli-reference.md")
+    assert "gateway_host.py" in page("architecture.md")
+
+
+def test_handoff_carries_no_stale_installed_host_limit() -> None:
+    """The handoff describes the proven agent path and no receipt-path blocker."""
+
+    feature = REPO_ROOT / "docs" / "features" / "active"
+    text = next(iter(sorted(feature.glob("*-980/handoff.md")))).read_text("utf-8")
+    assert "## Known installed-host limit" not in text
+    assert "## Installed-host agent path" in text
+    assert "no completion receipt" not in text
+    assert "AUTHORIZATION_CONSUMED" in text
+
+
 def test_no_checkout_is_required() -> None:
     """Onboarding states that no asset must be copied from this repository."""
 

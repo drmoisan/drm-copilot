@@ -26,20 +26,33 @@ and the table updated at release time. The installed-host proof for these artifa
 (the lexicographically greatest `evidence/qa-gates/discovery-installed-runtime.*.md` and
 `discovery-native-capabilities.*.md`); the earlier P11-T7 proof covered the previous build.
 
-## Known installed-host limit (blocker carried from P11-T7 and P11-T9)
+## Installed-host agent path (proven in P12-T12; closes the P11-T7 blocker)
 
-The installed Python runtime provides only the `local-user` principal: `service._local`
-refuses `prepare-agent`, `finalize-agent`, agent-output mode and every invocation or
-authorization reference, and `installed_local_io` rejects the `host` principal. As a
-consequence `finalize_discovery_agent` and agent-scoped `read_discovery_source` fail on
-every installed host, no completion receipt (`validation-receipt`) can be minted, and a
-discovery specialist's stop is always blocked with "not finalized through
-finalize_discovery_agent". The native start, tool and stop controls still fail closed as
-observed in P11-T7; the receipt-accepting stop and the stale-receipt block are proven only by
-the in-process suites. Step 6 and step 7 below therefore cannot be completed through
-discovery agents until a host-principal service composition ships; the console path
-(`validate-all`, reports, `snapshot-export`, `snapshot-import`) is unaffected. This is an
-explicit open item for the next plan, not a consumer task.
+The installed runtime now carries both principals. The root prepares a specialist through
+`prepare_discovery_agent`: the Python `prepare-agent` route pins the pre-invocation baseline
+as `local-user`, and the gateway client writes the five protected records
+(`invocation.json`, `baseline-result.json`, `required-outputs.json`, `model-receipt.json`,
+`topology-receipt.json`). The native start hook attests the launch, the tool gate records a
+one-use `tool-authorization` per admitted controlled call, and the gateway client consumes
+that grant by binding before it runs the Python gateway with `--principal host` and the
+agent's `--author-id`, `--session-id`, `--host-name` and `--agent-role`. The host
+composition verifies every protected record, replays the pinned baseline and admits the
+request; `finalize_discovery_agent` runs the `finalize-agent` route, and the gateway client
+mints the `agent-output` `validation-receipt` that the stop hook accepts. Observed on Claude
+Code, Codex and the Copilot Local harness against the shipped digests above
+(`evidence/qa-gates/discovery-native-capabilities.2026-10-28T15-06.md`): prepare, attested
+start, agent-scoped `read_discovery_source`, granted `create_discovery_artifact`, finalize
+`pass` with `output_valid` true, the stop allowed with that receipt, the stop blocked after
+an input edit, a replayed controlled call denied `AUTHORIZATION_CONSUMED`, `finalize-agent`
+as `local-user` refused `SERVICE_AUTHORITY` (exit 3) and an unattributed host principal
+refused at exit 2. `docs/engineering/legacy-discovery-and-parity/enforcement.md`
+(`## Host-principal path`) describes the route, the records and every refusal class.
+
+What remains for the consumers is the work itself, not a framework gap: step 6 and step 7
+below can be run through discovery agents or through the console path (`validate-all`,
+reports, `snapshot-export`, `snapshot-import`), and each attempt needs its own prepared
+invocation (one prepared invocation admits one start; a second prepare for the same
+specialist in one session makes the start ambiguous and is denied).
 
 ## Publication prerequisites
 

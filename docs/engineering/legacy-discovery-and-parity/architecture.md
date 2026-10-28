@@ -50,7 +50,14 @@ depends only on PyYAML, jsonschema, referencing and lxml. It contains:
 
 - the service (`service.py` and the `service_*` modules), which executes the thirty fixed
   operations listed in [`cli-reference.md`](cli-reference.md) over captured, hash-pinned
-  inputs and never over live caller-selected code;
+  inputs and never over live caller-selected code; the root `prepare-agent` route
+  (`service_preparation.py`) pins the pre-invocation baseline and the `finalize-agent` route
+  (`service_finalization.py`) reports an invocation's exact outputs, with host grants derived
+  only from consumed authorizations (`operation_grants.py`);
+- the two gateway compositions: `gateway_local.py` for the `local-user` principal and
+  `gateway_host.py` for the `host` principal, which verifies the protected records
+  (`protected_records.py`) and replays the pinned baseline (`gateway_host_baseline.py`)
+  before any operation runs;
 - validation (`validation.py`, `validation_operation.py`, `schema_validation.py`) in the
   five modes `structural`, `agent-output`, `discovery-complete`, `parity-complete` and
   `planning`;
@@ -151,3 +158,18 @@ discovery agent. Root-only operations (`init`, `configure`, `snapshot-*`, `impor
 receipts: a `native-root` identity may hold `structural`, `discovery-complete`,
 `parity-complete` or `planning` receipts; a `discovery-agent` identity holds only
 `agent-output` receipts, which the stop validation consumes.
+
+The gateway module composes one of two port sets from its fixed options. `--principal
+local-user` (optionally `--author-id`) composes `installed_local_io`, which refuses every
+host marker: an invocation or authorization reference, `agent-output` mode or
+`finalize-agent` is `SERVICE_AUTHORITY` at exit 3. `--principal host` with `--author-id`
+(the agent id), `--session-id`, `--host-name` and `--agent-role` composes the host port set,
+which reads the protected partition the native hooks and the gateway client wrote, verifies
+the invocation, start attestation, capability attestation, authorization and the protected
+baseline record (`baseline-result.json`, the verbatim `prepare-agent` result the root pinned),
+reconstructs that baseline from the current capture and returns a `host` authority bound to
+the invocation with grants derived from the consumed authorization. The host port set never
+writes to the store and never returns a `local-user` authority. Receipts are minted only by
+the gateway client after the engine's `finalize-agent` result is verified; the engine itself
+mints nothing. [`enforcement.md`](enforcement.md) (`## Host-principal path`) lists each
+step and its refusal classes.
