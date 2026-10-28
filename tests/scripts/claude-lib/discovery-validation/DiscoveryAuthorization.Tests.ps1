@@ -209,7 +209,9 @@ Describe 'Get-DiscoveryPreToolDecision' {
         $record.identity.agent_id | Should -Be 'agent-alpha'
         $record.identity.role | Should -Be 'legacy-parity-analyst'
         $record.identity.invocation_id | Should -Be 'invocation-alpha'
-        $record.invocation_ref | Should -Be 'invocation-alpha-000000000001'
+        # The grant references the invocation id the request carries, not the record id;
+        # the runtime binding compares the two (installed-host defect, P12-T12).
+        $record.invocation_ref | Should -Be 'invocation-alpha'
         $record.start_attestation_ref | Should -Be 'attestation-alpha-00000000001'
         $record.capability_ref | Should -Be 'capability-alpha-000000000001'
         $record.workspace.profile_sha256 | Should -Be $script:GateProfileSha256

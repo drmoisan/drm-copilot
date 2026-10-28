@@ -142,6 +142,26 @@ describe("consumeToolAuthorizationByBinding admission", () => {
     expect(attemptBound(io)).toBe("AUTHORIZATION_CONSUMED");
   });
 
+  it("consumes the current grant beside an expired one issued for the same call", () => {
+    // A tool call retried after its first grant expired has two issued records;
+    // the expired one is not live and must not make the retry ambiguous.
+    const io = store({
+      "stale.json": {
+        ...vectors.records.expired,
+        id: "authz-stale",
+        request_id: vectors.records.issued.request_id,
+        tool: vectors.records.issued.tool,
+        operation: vectors.records.issued.operation,
+        input_sha256: vectors.records.issued.input_sha256,
+      },
+      "fresh.json": vectors.records.issued,
+    });
+
+    expect(attemptBound(io)).toBe("ADMITTED");
+    expect(io.files.has(`${DIRECTORY}/fresh.json.consumed`)).toBe(true);
+    expect(io.files.has(`${DIRECTORY}/stale.json.consumed`)).toBe(false);
+  });
+
   it("refuses an expired grant and a grant not yet valid", () => {
     expect(
       attemptBound(store({ "d.json": vectors.records.expired }), {

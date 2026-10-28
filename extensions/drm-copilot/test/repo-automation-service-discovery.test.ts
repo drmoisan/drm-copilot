@@ -465,4 +465,30 @@ describe("discovery request composition", () => {
       "requirements-reconciler",
     );
   });
+
+  it("reads the agent role from the lazily created provider before any other call", () => {
+    // On an installed host the MCP gate asks for the role before the first
+    // protected operation creates the provider; the role must come from the
+    // process environment then, or every discovery agent is treated as root.
+    const keys = [
+      "DRM_DISCOVERY_AGENT_ID",
+      "DRM_DISCOVERY_AGENT_ROLE",
+    ] as const;
+    const saved = keys.map((key) => [key, process.env[key]] as const);
+    process.env["DRM_DISCOVERY_AGENT_ID"] = "agent-env";
+    process.env["DRM_DISCOVERY_AGENT_ROLE"] = "legacy-parity-analyst";
+    try {
+      expect(
+        service(new FakeLauncher(successOutcome())).discoveryRole?.(),
+      ).toBe("legacy-parity-analyst");
+    } finally {
+      for (const [key, value] of saved) {
+        if (value === undefined) {
+          delete process.env[key];
+        } else {
+          process.env[key] = value;
+        }
+      }
+    }
+  });
 });

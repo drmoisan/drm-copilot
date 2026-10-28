@@ -294,11 +294,12 @@ export const DISCOVERY_AUTHORITY_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition>
           },
           request_id: {
             type: "string",
-            description: "Caller correlation identifier for this request.",
+            description:
+              "Correlation identifier recorded on the receipt. A discovery agent omits it: the host gate's consumed authorization reference is used, and a caller-supplied identity field is refused.",
           },
           profile_path: profilePath,
         },
-        required: ["workspace_root", "invocation_ref", "request_id"],
+        required: ["workspace_root", "invocation_ref"],
         additionalProperties: false,
       },
     },

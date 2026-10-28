@@ -83,6 +83,16 @@ def _binding_findings(
     }
     local = cast("JsonObject", document["repository"])
     role = cast("JsonObject", document["system"])["role"]
+    # The local checkout joins the repository graph through its own role, so a
+    # repositories entry reusing its id would duplicate one role list downstream.
+    for index, repository in enumerate(
+        cast("tuple[JsonObject, ...]", document["repositories"])
+    ):
+        if repository["id"] == local["id"]:
+            problem(
+                f"/repositories/{index}/id",
+                f"Repository identifier duplicates the local checkout: {local['id']}",
+            )
     # Every client must point to a target declaration or the local target/combined ID.
     for index, client in enumerate(cast("tuple[JsonObject, ...]", document["clients"])):
         target = cast("str", client["target_repository"])

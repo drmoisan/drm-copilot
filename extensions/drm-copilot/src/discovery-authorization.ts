@@ -389,23 +389,27 @@ export function consumeToolAuthorizationByBinding(
       "The matching authorization was already consumed or revoked.",
     );
   }
-  if (live.length > 1) {
-    throw refuse(
-      "AUTHORIZATION_AMBIGUOUS",
-      `${String(live.length)} issued authorizations match this tool call.`,
-    );
-  }
-  const { path, record } = live[0]!;
+  // A grant outside its validity window is not live: a re-issued grant after a
+  // timeout must remain consumable beside the expired one it replaces.
   const instant = now.getTime();
-  if (!(
-    Date.parse(record.issued_at) <= instant &&
-    instant < Date.parse(record.expires_at)
-  )) {
+  const current = live.filter(
+    ({ record }) =>
+      Date.parse(record.issued_at) <= instant &&
+      instant < Date.parse(record.expires_at),
+  );
+  if (current.length === 0) {
     throw refuse(
       "AUTHORIZATION_EXPIRED",
       "Authorization is outside its validity window.",
     );
   }
+  if (current.length > 1) {
+    throw refuse(
+      "AUTHORIZATION_AMBIGUOUS",
+      `${String(current.length)} issued authorizations match this tool call.`,
+    );
+  }
+  const { path, record } = current[0]!;
   consume(io, path, record, now);
   return {
     authorizationRef: record.authorization_ref,

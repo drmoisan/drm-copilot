@@ -318,7 +318,7 @@ export function resolveFinalizeDiscoveryAgentToolInput(
       args["invocation_ref"],
       "invocation_ref",
     ),
-    requestId: normalizeRequiredText(args["request_id"], "request_id"),
+    requestId: normalizeOptionalText(args["request_id"], "request_id"),
     authorizationRef: normalizeOptionalText(
       args["authorization_ref"],
       "authorization_ref",

@@ -394,6 +394,22 @@ describe("resolveFinalizeDiscoveryAgentToolInput", () => {
       }),
     ).toThrow(/invocation_ref/);
   });
+
+  it("accepts a gated agent call without request_id and keeps the forwarded authorization", () => {
+    // The native hook and the MCP gate refuse caller identity fields, so an
+    // agent's finalize carries no request_id; the gate forwards authorization_ref.
+    expect(
+      resolveFinalizeDiscoveryAgentToolInput({
+        workspace_root: WS,
+        invocation_ref: "invocation-alpha",
+        authorization_ref: "authz-alpha-0000000000000001",
+      }),
+    ).toEqual({
+      workspaceRoot: WS,
+      invocationRef: "invocation-alpha",
+      authorizationRef: "authz-alpha-0000000000000001",
+    });
+  });
 });
 
 describe("role policy", () => {

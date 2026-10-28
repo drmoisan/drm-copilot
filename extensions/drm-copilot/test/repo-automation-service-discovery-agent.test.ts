@@ -260,6 +260,50 @@ describe("finalizeDiscoveryAgent", () => {
     ).rejects.toThrow("FINALIZATION_IDENTITY_UNAVAILABLE");
     expect(launcher.captures).toHaveLength(0);
   });
+
+  it("correlates a gated finalize by its consumed authorization when no request_id is supplied", async () => {
+    // The native hook and the MCP gate refuse caller identity fields such as
+    // request_id, so the agent's finalize arrives with the forwarded grant only.
+    const scene = scenario();
+    const launcher = new FakeLauncher(successOutcome(finalizeResult(scene)));
+    const authority = provider(scene.io, {
+      agent: { agentId: "agent-alpha", role: scene.role },
+      reader: scene.reader,
+      activation: () => FINAL_ACTIVATION,
+    });
+    const result = await service(launcher, authority).finalizeDiscoveryAgent({
+      workspaceRoot: WS.workspace_root,
+      invocationRef: scene.invocationId,
+      authorizationRef: "authz-alpha-0000000000000001",
+    });
+    expect(launcher.request()).toMatchObject({
+      authorization_ref: "authz-alpha-0000000000000001",
+    });
+    const receipt = JSON.parse(scene.io.files.get(result.artifacts![0]!)!) as {
+      identity: { request_id: string };
+    };
+    expect(receipt.identity.request_id).toBe("authz-alpha-0000000000000001");
+    expect(result.receipt?.validation_result).toBe("pass");
+  });
+
+  it("refuses a finalize that carries neither a request_id nor a consumed authorization", async () => {
+    const scene = scenario();
+    const launcher = new FakeLauncher(successOutcome(finalizeResult(scene)));
+    await expect(
+      service(
+        launcher,
+        provider(scene.io, {
+          agent: { agentId: "agent-alpha", role: scene.role },
+          reader: scene.reader,
+          activation: () => FINAL_ACTIVATION,
+        }),
+      ).finalizeDiscoveryAgent({
+        workspaceRoot: WS.workspace_root,
+        invocationRef: scene.invocationId,
+      }),
+    ).rejects.toThrow("FINALIZATION_REQUEST_INVALID");
+    expect(launcher.captures).toHaveLength(0);
+  });
 });
 
 describe("agent operations with explicit host options", () => {

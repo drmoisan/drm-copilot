@@ -112,7 +112,9 @@ export class DiscoveryServiceBase {
 
   /** Role context reported by the trusted provider, or null for a root principal. */
   discoveryRole(): string | null {
-    return this.authorityProvider?.agent?.role ?? null;
+    // The provider is created lazily; reading the field before the first
+    // protected operation would report every discovery agent as root.
+    return this.authority.agent?.role ?? null;
   }
 
   /** Consume the one-use native grant of one controlled call; the MCP gate's seam. */

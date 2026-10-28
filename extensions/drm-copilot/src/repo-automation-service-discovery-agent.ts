@@ -184,6 +184,15 @@ export async function finalizeDiscoveryAgentOperation(
       "FINALIZATION_IDENTITY_UNAVAILABLE: finalize_discovery_agent requires the trusted discovery agent identity of this process.",
     );
   }
+  // A gated agent call cannot carry request_id (the native hook and the MCP gate
+  // refuse caller identity fields), so the consumed one-use grant correlates the
+  // receipt; a call with neither value has no trustworthy correlation.
+  const requestId = input.requestId ?? input.authorizationRef;
+  if (requestId === undefined) {
+    throw new Error(
+      "FINALIZATION_REQUEST_INVALID: finalize_discovery_agent needs a host-consumed authorization reference or a request_id.",
+    );
+  }
   // The finalize request runs under the host principal with the trusted
   // agent, session, host and role values; the runtime never sees local-user here.
   const result = await invokeDiscoveryRuntime(
@@ -222,7 +231,7 @@ export async function finalizeDiscoveryAgentOperation(
       role: authority.agent.role,
       invocation_id: input.invocationRef,
     },
-    requestId: input.requestId,
+    requestId,
     result,
     writer: authority.writer,
     now: authority.now(),

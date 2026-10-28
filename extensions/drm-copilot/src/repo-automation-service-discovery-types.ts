@@ -117,7 +117,8 @@ export interface PrepareDiscoveryAgentInput extends DiscoveryWorkspaceInput {
 
 export interface FinalizeDiscoveryAgentInput extends DiscoveryWorkspaceInput {
   readonly invocationRef: string;
-  readonly requestId: string;
+  /** Receipt correlation id; absent for a gated agent call, which uses the consumed grant. */
+  readonly requestId?: string;
   /** One-use authorization the MCP gate consumed for this finalize call. */
   readonly authorizationRef?: string;
 }

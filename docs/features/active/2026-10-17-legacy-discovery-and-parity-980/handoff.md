@@ -10,13 +10,15 @@ every repository-specific value below is a placeholder their owners resolve loca
 
 | Artifact | Version | SHA-256 | Evidence |
 |---|---|---|---|
-| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`; runtime identity build `a4a41346b85867ec445687575c1e94ba7d5478631e81965d272d51051b222b95`, policy version 2, policy `7428cac9564b87547857631946c45493e9d6b70ddeadbdd7b1dcdf537304f276`) | 2.0.0 | `59652fe9ab2c3dc475be9c8c7e35b099fe2d3a0d2db0fae308a007f777c7136f` | `evidence/other/discovery-wheel-build.2026-10-28T13-21.md` |
-| `drm-copilot.vsix` (extension) | 1.1.22 | `834cb08195301399242742d06fd19496e406f761757546a4e17e5d47eb9a9b48` | `evidence/other/discovery-host-packages.2026-10-28T13-21.md` |
-| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `1bebefbc5899149e461d6fefb39d1369844ae2256584ca23265da4fb56e2b01c` | `evidence/other/discovery-host-packages.2026-10-28T13-21.md` |
+| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`; runtime identity build `2b7d5215b1dd41cdea87424fedb7c7b0f1b25697989675d1ee87bcf832db3b4d`, policy version 2, policy `aa2349b3f387f27175c27e9a2de9477b50490ce5ba03345b3054b412ffe48958`) | 2.0.0 | `dca943beac79dab5486cd27adbd96ca3d207d755d73af8e8068aee728e10c096` | `evidence/qa-gates/discovery-installed-runtime.2026-10-28T15-06.md` (build sequence in `evidence/other/discovery-wheel-build.2026-10-28T13-21.md`) |
+| `drm-copilot.vsix` (extension) | 1.1.22 | `bc33e8055b35742d115e6f2a58c08928b3cef423379cf98a9ca56574c36381ce` | `evidence/qa-gates/discovery-installed-runtime.2026-10-28T15-06.md` (build sequence in `evidence/other/discovery-host-packages.2026-10-28T13-21.md`) |
+| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `7cc66e5e08a9bbff710c51d5234a30a6851761f2b0042c041b5cfe0737d9a40b` | `evidence/qa-gates/discovery-installed-runtime.2026-10-28T15-06.md` (build sequence in `evidence/other/discovery-host-packages.2026-10-28T13-21.md`) |
 
-The digests are those of the artifacts rebuilt from the Phase 12 sources in P12-T11; they
-supersede the P11-T7/P11-T8 digests (wheel `19e7dd45…`, VSIX `a3bf8eed…`, npm `1e170906…`),
-which were built before the host-principal completion path landed. The wheel's resource
+The digests are those of the artifacts rebuilt in P12-T12 after the installed-host repairs,
+following the P12-T11 build sequence; they supersede the P12-T11 digests (wheel `59652fe9…`,
+VSIX `834cb081…`, npm `1bebefbc…`) and the P11-T7/P11-T8 digests (wheel `19e7dd45…`, VSIX
+`a3bf8eed…`, npm `1e170906…`), which were built before the host-principal completion path
+landed and before its installed-host repairs. The wheel's resource
 manifest now carries 40 entries, including `schemas/discovery/v2/start-attestation.schema.json`,
 and the runtime policy version advanced from 1 to 2 with the Phase 12 request rules. A rebuild
 after further commits produces new digests, and the published artifacts must be re-digested

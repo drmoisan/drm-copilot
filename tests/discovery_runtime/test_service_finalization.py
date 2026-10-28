@@ -26,7 +26,11 @@ from tests.discovery_runtime.test_service import service_plan as service_plan
 from tests.discovery_runtime.test_service_publication import seed_contract
 
 if TYPE_CHECKING:
-    from drm_copilot_discovery.service_contracts import DiscoveryResult
+    import pytest
+    from drm_copilot_discovery.service_contracts import (
+        DiscoveryResult,
+        ServiceAuthority,
+    )
 
     from tests.discovery_runtime.test_service import MemoryService
 
@@ -241,4 +245,28 @@ def test_local_user_finalize_remains_refused(service_io: MemoryService) -> None:
     assert result.exit_code == 3 and result.findings[0].code == "SERVICE_AUTHORITY"
     assert result.input_manifest is None and result.artifacts == ()
     assert result.summary["invocation_ref"] is None
+
+
+def test_a_provider_permission_refusal_is_an_authority_failure(
+    service_io: MemoryService, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A provider that refuses the principal is reported as SERVICE_AUTHORITY.
+
+    The installed local composition raises PermissionError for finalize-agent;
+    that refusal must not be classified as a store I/O fault. monkeypatch
+    (pytest.MonkeyPatch) restores the memory host's authorize seam afterwards.
+    """
+    host = MemoryHostService(service_io, grants=CONTRACT_GRANTS)
+
+    def refuse(request: object, *, baseline: object) -> ServiceAuthority:
+        """Model the installed local composition refusing a host-only request."""
+        raise PermissionError("Request has no local-user authority")
+
+    monkeypatch.setattr(host, "authorize", refuse)
+
+    result = invoke_host(host, "finalize-agent")
+
+    assert result.exit_code == 3 and result.findings[0].code == "SERVICE_AUTHORITY"
+    assert result.summary["message"] == "Operation could not start."
+    assert host.writer_calls == 0
     assert host.writer_calls == 0

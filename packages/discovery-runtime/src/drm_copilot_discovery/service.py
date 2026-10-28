@@ -40,6 +40,7 @@ from drm_copilot_discovery.snapshot_io import SnapshotIO
 
 if TYPE_CHECKING:
     from drm_copilot_discovery.analyzer.registry import InventoryRegistry
+    from drm_copilot_discovery.mutation_plan import CapturedWorkspace
     from drm_copilot_discovery.repository_reader import RepositoryReader
     from drm_copilot_discovery.service_contracts import (
         Clock,
@@ -163,6 +164,26 @@ def _authority(authority: ServiceAuthority, request: ServiceRequest) -> None:
         raise OperationFailure("SERVICE_AUTHORITY", exit_code=3)
 
 
+def _authorize(
+    io: ServiceIO, request: ServiceRequest, *, baseline: CapturedWorkspace | None
+) -> ServiceAuthority:
+    """Authenticate request through io and admit the result; fail with exit 3.
+
+    io (ServiceIO) is the trusted provider; request (ServiceRequest) the parsed
+    operation; baseline (CapturedWorkspace | None) the capture the provider may
+    scope against. Returns the admitted ServiceAuthority. A provider that refuses
+    the principal with PermissionError (the installed local composition does so
+    for host-only requests such as finalize-agent) is reported as
+    SERVICE_AUTHORITY rather than as a store I/O fault. No I/O occurs here.
+    """
+    try:
+        authority = io.authorize(request, baseline=baseline)
+    except PermissionError as error:
+        raise OperationFailure("SERVICE_AUTHORITY", exit_code=3) from error
+    _authority(authority, request)
+    return authority
+
+
 def _invocation_id(authority: ServiceAuthority) -> str | None:
     """Return the invocation id bound to authority, or None for a root principal."""
     return None if authority.invocation is None else authority.invocation.invocation_id
@@ -191,8 +212,7 @@ def _context(
         or repository_reader is not initialization.repository
     ):
         raise OperationFailure("SERVICE_PROVIDER", exit_code=3)
-    authority = io.authorize(request, baseline=None)
-    _authority(authority, request)
+    authority = _authorize(io, request, baseline=None)
     now = clock()
     if type(now) is not datetime or now.tzinfo is None or now.utcoffset() is None:
         raise OperationFailure("SERVICE_CLOCK", exit_code=3)
@@ -236,8 +256,7 @@ def _context(
             )
 
             baseline = pin_inventory_sources(baseline, repository_reader)
-        selected = io.authorize(request, baseline=baseline)
-        _authority(selected, request)
+        selected = _authorize(io, request, baseline=baseline)
         # Both authorizations must name the same principal identity and invocation.
         if selected.author_or_agent != authority.author_or_agent or _invocation_id(
             selected

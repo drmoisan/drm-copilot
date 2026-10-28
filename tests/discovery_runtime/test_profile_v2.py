@@ -259,6 +259,20 @@ def test_duplicate_ids_are_rejected_even_when_other_record_fields_differ(
         parse_profile_v2(json.dumps(document))
 
 
+def test_repository_entry_cannot_reuse_the_local_checkout_identifier() -> None:
+    """The local checkout is a graph member by role; a second declaration of its
+    id would duplicate one role list, so it is a typed profile finding.
+    """
+    document = profile_document()
+    local_id = cast("str", as_object(document["repository"])["id"])
+    cast("list[dict[str, object]]", document["repositories"])[0]["id"] = local_id
+
+    with pytest.raises(ProfileError, match="duplicates the local checkout") as error:
+        parse_profile_v2(json.dumps(document))
+    assert error.value.findings[0].code == "PROFILE_BINDING"
+    assert error.value.findings[0].pointer == "/repositories/0/id"
+
+
 @pytest.mark.parametrize("target", ("missing", "source-example"))
 def test_clients_require_a_declared_target_repository(target: str) -> None:
     """A source or unknown repository cannot silently become a target."""

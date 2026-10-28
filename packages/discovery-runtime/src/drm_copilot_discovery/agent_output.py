@@ -333,13 +333,9 @@ class _OutputRules:
         paths = tuple(str(row.get("path")) for _, row in rows)
         if len(paths) != len(set(paths)):
             self.add("OUTPUT_DUPLICATE", "Required outputs contain duplicate paths.")
-        if not any(
-            row.get("artifact_kind") == "required-output-manifest" for _, row in rows
-        ):
-            self.add(
-                "OUTPUT_MANIFEST",
-                "The exact output set must include its stored manifest.",
-            )
+        # The required-output manifest is the host-protected record the caller
+        # verified before building this context; a workspace copy is optional and,
+        # when a row declares one, `output` requires it to equal that record.
         if self.invocation.role == "migration-coverage-reviewer" and not any(
             row.get("artifact_kind") in REPORT_KINDS and row.get("format") == "json"
             for _, row in rows
