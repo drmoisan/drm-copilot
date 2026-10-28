@@ -209,7 +209,7 @@ Seeded from issue:
 - [x] AC5: The `TARGET_WORKTREE_NOT_DERIVABLE` message names the exact accepted forms for `gh pr edit` and `gh pr create` and states that `--head` is not valid for edit.
 - [x] AC6: `agents/pr-author.md` allows `Bash(gh pr view *)`; the allowlist hook permits `gh pr view <N> --json closingIssuesReferences,body` and no other `gh pr view` form with write effect; allowlist tests cover the new entry.
 - [x] AC7: `skills/pr-author/SKILL.md` and the agent require running `gh pr view <N> --json closingIssuesReferences,body` after every create or edit and reporting the closing references found.
-- [ ] AC8: Every change is mirrored under `extensions/drm-copilot/resources/` and the `.agents`/`.codex` parallel surfaces as the contract tests require, and the seven-stage toolchain passes.
+- [x] AC8: Every change is mirrored under `extensions/drm-copilot/resources/` and the `.agents`/`.codex` parallel surfaces as the contract tests require, and the seven-stage toolchain passes.
 
 Interpretation notes for AC8: the contract tests require Claude bundle mirroring only. The `.agents` pr-author pair receives an optional AC2 parity sentence; no `.codex` change is made. AC3 is satisfied by the new Agent PreToolUse check and its Pester suite, not by static prose tests alone.
 
@@ -234,7 +234,7 @@ Interpretation notes for AC8: the contract tests require Claude bundle mirroring
 
 
 ## Acceptance Criteria
-- [ ] Repro steps now produce the expected behavior in all documented environments.
+- [x] Repro steps now produce the expected behavior in all documented environments.
 - [x] Regression test(s) added and passing (list file path and test name).
 - [x] Edge cases and invalid inputs are handled with correct errors or fallbacks.
 - [x] No unintended behavior changes outside the defined scope.
