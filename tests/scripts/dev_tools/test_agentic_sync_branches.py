@@ -16,7 +16,10 @@ from typing import TYPE_CHECKING
 import pytest
 
 from scripts.dev_tools import agentic_sync
-from tests.scripts.dev_tools.test_agentic_sync import InMemorySyncFileSystem, MemoryFile
+from tests.scripts.dev_tools.agentic_sync_test_support import (
+    InMemorySyncFileSystem,
+    MemoryFile,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
