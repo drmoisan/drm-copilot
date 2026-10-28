@@ -11,6 +11,7 @@
 
       - git log ...            and git rev-parse ...        (no git global option)
       - gh pr create ...       and gh pr edit ...           (no gh global option)
+      - gh pr view <N> --json closingIssuesReferences,body  (exactly these six tokens, issue #989)
       - sha256sum artifacts/pr_body_<N>.md                  (only as the whole command)
       - date -u [+<format>]                                 (only as the whole command)
 
@@ -41,7 +42,7 @@ $script:PrAuthorAllowlistWrapperWords = @(
     'sh', 'bash', 'zsh', 'dash', 'ksh', 'pwsh', 'powershell', 'eval', 'xargs',
     'env', 'timeout', 'time', 'command', 'nohup'
 )
-$script:PrAuthorAllowlistFormText = 'git log, git rev-parse, gh pr create, gh pr edit, sha256sum artifacts/pr_body_<N>.md, date -u [+<format>]'
+$script:PrAuthorAllowlistFormText = 'git log, git rev-parse, gh pr create, gh pr edit, gh pr view <N> --json closingIssuesReferences,body, sha256sum artifacts/pr_body_<N>.md, date -u [+<format>]'
 
 function Test-PrAuthorAllowlistForm {
     <#
@@ -69,7 +70,12 @@ function Test-PrAuthorAllowlistForm {
             return ($Token.Count -ge 2 -and @('log', 'rev-parse') -ccontains $Token[1])
         }
         'gh' {
-            return ($Token.Count -ge 3 -and $Token[1] -ceq 'pr' -and @('create', 'edit') -ccontains $Token[2])
+            if ($Token.Count -ge 3 -and $Token[1] -ceq 'pr' -and @('create', 'edit') -ccontains $Token[2]) {
+                return $true
+            }
+            # The read-only closing-reference verification form, matched exactly (issue #989).
+            return ($Token.Count -eq 6 -and $Token[1] -ceq 'pr' -and $Token[2] -ceq 'view' -and $Token[3] -cmatch '^\d+$' -and
+                $Token[4] -ceq '--json' -and $Token[5] -ceq 'closingIssuesReferences,body')
         }
         'sha256sum' {
             return ($IsWholeCommand -and $Token.Count -eq 2 -and $Token[1] -cmatch '^artifacts/pr_body_\d+\.md$')

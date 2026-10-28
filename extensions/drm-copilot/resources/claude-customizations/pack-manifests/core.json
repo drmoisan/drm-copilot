@@ -55,6 +55,7 @@
     ".claude/hooks/enforce-powershell-batch-budget.ps1",
     ".claude/hooks/enforce-pr-author-command-allowlist.ps1",
     ".claude/hooks/enforce-pr-author-skill.artifact-root.ps1",
+    ".claude/hooks/enforce-pr-author-skill.current-branch.ps1",
     ".claude/hooks/enforce-pr-author-skill.docs-only.ps1",
     ".claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1",
     ".claude/hooks/enforce-pr-author-skill.ps1",

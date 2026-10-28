@@ -202,13 +202,13 @@ Seeded from issue:
 
 ### Acceptance Criteria
 
-- [ ] AC1: The orchestrate skill and `agents/orchestrator.md` require the pr-author delegation prompt to carry `Author-asserted autoclose issues: #<issue-num>`, omitted only when the checkpoint has no `issue-num` or the run is a child of an epic whose integration PR owns the closing keyword.
-- [ ] AC2: `skills/pr-author/SKILL.md` states that an issue named as author-asserted in the delegation prompt is a valid source for `- Closes #NNN` even when the PR context lists no verified autoclose issues, and that `- None` is correct only when neither list has an entry.
-- [ ] AC3: A test or validator check fails when an orchestrated run's pr-author delegation omits the author-asserted line while the checkpoint has an `issue-num`.
-- [ ] AC4: When a `gh pr create` or `gh pr edit` command carries no branch or issue signal, the PreToolUse hook derives the target from the current worktree's checked-out branch and applies the existing checks to that item; a detached HEAD or unreadable branch keeps the NoTarget deny.
-- [ ] AC5: The `TARGET_WORKTREE_NOT_DERIVABLE` message names the exact accepted forms for `gh pr edit` and `gh pr create` and states that `--head` is not valid for edit.
-- [ ] AC6: `agents/pr-author.md` allows `Bash(gh pr view *)`; the allowlist hook permits `gh pr view <N> --json closingIssuesReferences,body` and no other `gh pr view` form with write effect; allowlist tests cover the new entry.
-- [ ] AC7: `skills/pr-author/SKILL.md` and the agent require running `gh pr view <N> --json closingIssuesReferences,body` after every create or edit and reporting the closing references found.
+- [x] AC1: The orchestrate skill and `agents/orchestrator.md` require the pr-author delegation prompt to carry `Author-asserted autoclose issues: #<issue-num>`, omitted only when the checkpoint has no `issue-num` or the run is a child of an epic whose integration PR owns the closing keyword.
+- [x] AC2: `skills/pr-author/SKILL.md` states that an issue named as author-asserted in the delegation prompt is a valid source for `- Closes #NNN` even when the PR context lists no verified autoclose issues, and that `- None` is correct only when neither list has an entry.
+- [x] AC3: A test or validator check fails when an orchestrated run's pr-author delegation omits the author-asserted line while the checkpoint has an `issue-num`.
+- [x] AC4: When a `gh pr create` or `gh pr edit` command carries no branch or issue signal, the PreToolUse hook derives the target from the current worktree's checked-out branch and applies the existing checks to that item; a detached HEAD or unreadable branch keeps the NoTarget deny.
+- [x] AC5: The `TARGET_WORKTREE_NOT_DERIVABLE` message names the exact accepted forms for `gh pr edit` and `gh pr create` and states that `--head` is not valid for edit.
+- [x] AC6: `agents/pr-author.md` allows `Bash(gh pr view *)`; the allowlist hook permits `gh pr view <N> --json closingIssuesReferences,body` and no other `gh pr view` form with write effect; allowlist tests cover the new entry.
+- [x] AC7: `skills/pr-author/SKILL.md` and the agent require running `gh pr view <N> --json closingIssuesReferences,body` after every create or edit and reporting the closing references found.
 - [ ] AC8: Every change is mirrored under `extensions/drm-copilot/resources/` and the `.agents`/`.codex` parallel surfaces as the contract tests require, and the seven-stage toolchain passes.
 
 Interpretation notes for AC8: the contract tests require Claude bundle mirroring only. The `.agents` pr-author pair receives an optional AC2 parity sentence; no `.codex` change is made. AC3 is satisfied by the new Agent PreToolUse check and its Pester suite, not by static prose tests alone.
@@ -235,13 +235,13 @@ Interpretation notes for AC8: the contract tests require Claude bundle mirroring
 
 ## Acceptance Criteria
 - [ ] Repro steps now produce the expected behavior in all documented environments.
-- [ ] Regression test(s) added and passing (list file path and test name).
-- [ ] Edge cases and invalid inputs are handled with correct errors or fallbacks.
-- [ ] No unintended behavior changes outside the defined scope.
-- [ ] Required logs/telemetry updated and validated (if applicable).
-- [ ] Performance constraints met or explicitly waived with rationale.
-- [ ] Full toolchain pass completed (format → lint → type-check → test).
-- [ ] Docs/config references updated to match the new behavior.
+- [x] Regression test(s) added and passing (list file path and test name).
+- [x] Edge cases and invalid inputs are handled with correct errors or fallbacks.
+- [x] No unintended behavior changes outside the defined scope.
+- [x] Required logs/telemetry updated and validated (if applicable).
+- [x] Performance constraints met or explicitly waived with rationale.
+- [x] Full toolchain pass completed (format → lint → type-check → test).
+- [x] Docs/config references updated to match the new behavior.
 
 ## Risks & Mitigations
 - Technical or operational risks:

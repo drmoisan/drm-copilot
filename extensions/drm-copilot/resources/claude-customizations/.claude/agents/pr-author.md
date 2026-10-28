@@ -11,6 +11,7 @@ tools:
   - "Bash(git rev-parse *)"
   - "Bash(gh pr create *)"
   - "Bash(gh pr edit *)"
+  - "Bash(gh pr view *)"
   - "Bash(sha256sum *)"
   - "Bash(date *)"
   - "Write(/artifacts/**)"
@@ -78,9 +79,22 @@ the SHA-256 receipt.
 
 The `enforce-pr-author-command-allowlist.ps1` PreToolUse hook registered in this agent's frontmatter
 evaluates every Bash segment and denies anything outside the allowed forms (`git log`,
-`git rev-parse`, `gh pr create`, `gh pr edit`, and, each as a single command,
+`git rev-parse`, `gh pr create`, `gh pr edit`, exactly
+`gh pr view <N> --json closingIssuesReferences,body`, and, each as a single command,
 `sha256sum artifacts/pr_body_<N>.md` and `date -u +%Y-%m-%dT%H:%M:%SZ`) with
-`PR_AUTHOR_COMMAND_NOT_ALLOWED:`.
+`PR_AUTHOR_COMMAND_NOT_ALLOWED:`. The `Bash(gh pr view *)` tool entry grants the command class;
+the hook narrows it to that one read-only form.
+
+## Closing-Reference Verification
+
+Run `gh pr view <N> --json closingIssuesReferences,body` as a single command (no chaining, no
+extra flags) after every `gh pr create` or `gh pr edit` you issue, where `<N>` is the pull request
+number. Report the closing issue numbers that `closingIssuesReferences` lists, and report any
+mismatch with the author-asserted list: an author-asserted issue that GitHub does not list as
+closing, or a closing issue that no source named. An issue named on the delegation-prompt line
+`Author-asserted autoclose issues: #NNN` is a valid `- Closes #NNN` source even when the PR
+context lists no verified autoclose issues; the `pr-author` skill section
+`## Issue/PR Reference Rules` lists every source.
 
 ## Final Output Requirement
 
@@ -109,14 +123,25 @@ outside that enumeration. Do not invent issue or PR numbers.
 ## Required `--head` on `gh pr create` (issue #687)
 
 Every `gh pr create` command this agent issues MUST carry an explicit
-`--head <branch>` naming the branch the pull request is opened from.
+`--head <branch>` naming the branch the pull request is opened from, for example
+`gh pr create --head <branch> --body-file artifacts/pr_body_<N>.md`.
 
 This is what makes the call's target derivable. `enforce-pr-author-skill.ps1` resolves the
 worktree the call pertains to from the command text, and validates the orchestrator checkpoint
 belonging to that worktree. Without `--head`, `gh pr create` infers its head branch from the
-current checkout and the command carries no signal at all, so the gate denies with
-`TARGET_WORKTREE_NOT_DERIVABLE` rather than validating against whichever checkpoint occupies the
-session root, which in a parallel or epic topology belongs to a different item.
+current checkout and the command carries no signal at all, so the gate falls back to the branch
+checked out in its own working directory (issue #989) and denies with
+`TARGET_WORKTREE_NOT_DERIVABLE` when that checkout is detached or unreadable, rather than
+validating against whichever checkpoint occupies the session root, which in a parallel or epic
+topology belongs to a different item.
 
 Pass `--head` even when the branch is the current one: the gate resolves it to the session root
 and behaves exactly as before, and the command stays correct if it is ever replayed elsewhere.
+
+`gh pr edit` takes no head-branch flag, and --head is not valid for gh pr edit. Name the target of
+an edit in one of two ways:
+
+- Run `gh pr edit <N> --body-file artifacts/pr_body_<N>.md` from the item worktree. The gate
+  derives the branch from that worktree's checkout.
+- When running outside the item worktree, append the shell comment `# branch: <branch>` to the
+  command, and pass the absolute canonical body path beneath the item worktree.

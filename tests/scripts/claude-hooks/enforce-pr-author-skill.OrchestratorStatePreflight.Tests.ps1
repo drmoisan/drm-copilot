@@ -88,6 +88,11 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
         # mocked. The command names no feature folder, file path, or branch, so it resolves
         # NoTarget and the gate now refuses to answer from the session root's checkpoint. The
         # ORCHESTRATOR_STATE_PREFLIGHT_FAILED path is covered by the mocked cases above.
+        # Issue #989: a no-signal command now falls back to the current checkout's branch. The
+        # child process cannot use a Pester mock, so the inner script redefines
+        # Get-PrAuthorCurrentBranch to return $null after the dot-source; otherwise the row would
+        # read the real branch, which differs between a named local branch and a detached CI
+        # checkout.
         It 'blocks gh pr create --body-file end-to-end in a real pwsh process (exit 0, deny, TARGET_WORKTREE_NOT_DERIVABLE)' {
             # Spawns a real, separate pwsh process. Dot-sources the hook (bypassing its entrypoint
             # guard) and points the context-artifact seam at a real, permanently-existing file
@@ -107,6 +112,7 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
                 $env:CLAUDE_TOOL_INPUT = '{"tool_name":"Bash","tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
                 $innerScript = @'
 . '{0}'
+function Get-PrAuthorCurrentBranch {{ return $null }}
 $script:PrContextArtifactPath = '{0}'
 $script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
 try {{
