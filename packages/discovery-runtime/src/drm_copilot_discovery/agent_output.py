@@ -310,8 +310,13 @@ class _OutputRules:
             before, after = old.get(identity), new.get(identity)
             selectors = {identity}
             for item in (before, after):
-                if item is not None:
-                    selectors.add(str(item.get("feature_id", item.get("component_id"))))
+                if item is None:
+                    continue
+                selectors.add(str(item.get("feature_id", item.get("component_id"))))
+                # Unresolved questions and ledger components link their features
+                # through feature_refs, so a selected feature also selects them.
+                for _, reference in object_rows(item.get("feature_refs")):
+                    selectors.add(str(reference.get("id")))
             if before != after and not selectors.intersection(
                 self.invocation.selected_ids
             ):

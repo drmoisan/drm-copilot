@@ -229,6 +229,7 @@ class OperationContext:
         validation: Literal["pass", "fail"] | None = None,
         source_reads: tuple[JsonObject, ...] | None = None,
         verify_inputs: bool = True,
+        invocation_ref: str | None = None,
     ) -> DiscoveryResult:
         """Return a bounded DiscoveryResult from typed findings/effects/counters.
 
@@ -237,7 +238,9 @@ class OperationContext:
         blockers; explicit exit 3 preserves interrupted effects. Resource errors
         propagate before serialization. verify_inputs (bool) is False only for
         failure packaging of actual prior observations, never fresh authority.
-        No publication or authority is created.
+        invocation_ref (str | None) is the verified invocation id a finalize
+        result reports; it is never a receipt. No publication or authority is
+        created.
         """
         # Output accounting is independent so a failed operation can report its limit.
         output = ReportBudget(self.limits)
@@ -269,7 +272,7 @@ class OperationContext:
             "counts": tuple({"name": key, "value": value} for key, value in counts),
             "validation_result": validation,
             "receipt_ref": None,
-            "invocation_ref": None,
+            "invocation_ref": invocation_ref,
         }
         if source_reads is not None:
             summary["source_reads"] = source_reads

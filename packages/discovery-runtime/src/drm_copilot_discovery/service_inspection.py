@@ -245,6 +245,11 @@ def inspect_request(context: OperationContext) -> DiscoveryResult:
 
         # The root baseline route reads the configured capture and never writes.
         return prepare_agent(context)
+    if operation == "finalize-agent":
+        from drm_copilot_discovery.service_finalization import finalize_agent
+
+        # The host route validates the delivered outputs and never writes or mints.
+        return finalize_agent(context)
     if operation == "doctor":
         from drm_copilot_discovery.doctor import CapabilityObserving, inspect_doctor
 

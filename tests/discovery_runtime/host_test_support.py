@@ -26,6 +26,7 @@ if TYPE_CHECKING:
         RuntimeIdentity,
         ServiceRequest,
     )
+    from drm_copilot_discovery.snapshot import DiscoverySnapshot
     from drm_copilot_discovery.source_read_models import ReadSelection
 
     from tests.discovery_runtime.test_service import MemoryService
@@ -36,8 +37,19 @@ INVOCATION_ID = "invocation-alpha"
 AUTHORIZATION_REF = "protected-alpha-00000001"
 
 
-def output_rows(grants: tuple[WriteGrant, ...]) -> tuple[JsonObject, ...]:
-    """Project grants (tuple[WriteGrant, ...]) into required-output rows."""
+def output_rows(
+    grants: tuple[WriteGrant, ...], baseline: DiscoverySnapshot | None = None
+) -> tuple[JsonObject, ...]:
+    """Project grants (tuple[WriteGrant, ...]) into required-output rows.
+
+    baseline (DiscoverySnapshot | None) supplies the pinned prior digest of a
+    granted path that already exists; absent paths and a None baseline pin None.
+    """
+    digests = (
+        {file.path: file.sha256 for file in baseline.manifest.files}
+        if baseline is not None
+        else {}
+    )
     return tuple(
         bounded_object(
             {
@@ -45,7 +57,7 @@ def output_rows(grants: tuple[WriteGrant, ...]) -> tuple[JsonObject, ...]:
                 "id": grant.artifact_id,
                 "path": grant.path,
                 "format": "yaml" if grant.path.endswith((".yaml", ".yml")) else "json",
-                "expected_sha256": None,
+                "expected_sha256": digests.get(grant.path),
             },
             limits=ParseLimits(),
         )
@@ -71,8 +83,13 @@ class MemoryHostService:
         agent_id: str = AGENT_ID,
         role: str = ROLE,
         invocation_id: str = INVOCATION_ID,
+        review_mode: str | None = None,
     ) -> None:
-        """Capture the prepared baseline and build the verified invocation context."""
+        """Capture the prepared baseline and build the verified invocation context.
+
+        review_mode (str | None) is the reviewer's requested gate mode; existing
+        granted paths pin their captured digest as the row's expected_sha256.
+        """
         self.service, self.grants = service, grants
         self.agent_id, self.role = agent_id, role
         self.principal: Literal["local-user", "host"] = "host"
@@ -105,7 +122,7 @@ class MemoryHostService:
             "invocation_id": invocation_id,
             "workspace": workspace,
             "role": role,
-            "outputs": output_rows(grants),
+            "outputs": output_rows(grants, captured.snapshot),
             "manifest_sha256": "0" * 64,
         }
         document = bounded_object(manifest, limits=ParseLimits())
@@ -117,6 +134,7 @@ class MemoryHostService:
             workspace=workspace,
             required_outputs=bounded_object(manifest, limits=ParseLimits()),
             selected_ids=tuple(grant.artifact_id for grant in grants),
+            review_mode=review_mode,
         )
 
     @property
