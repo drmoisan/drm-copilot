@@ -2,12 +2,14 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 <#
 .SYNOPSIS
-    Pester tests for the enforce-pr-author-command-allowlist.ps1 PreToolUse hook (T-ALLOW, AL-01 to AL-37).
+    Pester tests for the enforce-pr-author-command-allowlist.ps1 PreToolUse hook (T-ALLOW, AL-01 to AL-49).
 
 .DESCRIPTION
     The hook limits the pr-author subagent's Bash calls to git log, git rev-parse,
-    gh pr create, gh pr edit, and, each as the whole command, sha256sum of a canonical
-    body file and date -u. AL-33 to AL-35 are static checks over .claude/agents/pr-author.md
+    gh pr create, gh pr edit, the exact closing-reference verification form
+    gh pr view <N> --json closingIssuesReferences,body (issue #989), and, each as the whole
+    command, sha256sum of a canonical body file and date -u. AL-39 to AL-49 pin the
+    gh pr view form: only the exact six-token shape is allowed. AL-33 to AL-35 are static checks over .claude/agents/pr-author.md
     and .claude/skills/pr-author/SKILL.md: the frontmatter registers the hook, and every
     command form the receipt procedure names is allowed by it.
 
@@ -28,6 +30,7 @@ BeforeDiscovery {
         @{ Id = 'AL-08'; Command = 'date -u +%Y-%m-%dT%H:%M:%SZ' }
         @{ Id = 'AL-09'; Command = 'date -u' }
         @{ Id = 'AL-10'; Command = 'git rev-parse HEAD && git log -1 --format=%H' }
+        @{ Id = 'AL-39'; Command = 'gh pr view 5 --json closingIssuesReferences,body' }
     )
     $script:DenyRows = @(
         @{ Id = 'AL-11'; Command = 'git log -1 --format=%H && sha256sum artifacts/pr_body_5.md && date -u +%Y-%m-%dT%H:%M:%SZ' }
@@ -51,6 +54,15 @@ BeforeDiscovery {
         @{ Id = 'AL-29'; Command = 'FOO=1 git log' }
         @{ Id = 'AL-30'; Command = 'git log $X' }
         @{ Id = 'AL-31'; Command = 'sha256sum artifacts/pr_body_5.md; date -u +%Y-%m-%dT%H:%M:%SZ' }
+        @{ Id = 'AL-40'; Command = 'gh pr view 5' }
+        @{ Id = 'AL-41'; Command = 'gh pr view 5 --web' }
+        @{ Id = 'AL-42'; Command = 'gh pr view 5 --json body' }
+        @{ Id = 'AL-43'; Command = 'gh pr view 5 --json closingIssuesReferences,body --jq .number' }
+        @{ Id = 'AL-44'; Command = 'gh pr view --json closingIssuesReferences,body' }
+        @{ Id = 'AL-45'; Command = 'gh pr view abc --json closingIssuesReferences,body' }
+        @{ Id = 'AL-46'; Command = 'gh -R owner/repo pr view 5 --json closingIssuesReferences,body' }
+        @{ Id = 'AL-47'; Command = 'gh pr view 5 --json closingIssuesReferences,body > out.json' }
+        @{ Id = 'AL-48'; Command = 'gh pr view 5 --json body,closingIssuesReferences' }
     )
 }
 
@@ -179,5 +191,12 @@ Describe 'enforce-pr-author-command-allowlist.ps1 (issue #824)' {
 
         $whole | Should -BeFalse
         $partial | Should -BeFalse
+    }
+
+    It 'AL-49 names the gh pr view verification form in the allowed-forms sentence of a deny' -Tag 'Issue989' {
+        $reason = Get-PrAuthorCommandAllowlistReason -CommandText 'gh pr view 5'
+
+        $reason | Should -BeLike 'PR_AUTHOR_COMMAND_NOT_ALLOWED: *'
+        $reason.Contains('gh pr view <N> --json closingIssuesReferences,body') | Should -BeTrue -Because $reason
     }
 }
