@@ -195,15 +195,26 @@ def request(
     )
 
 
-def host_case(service: MemoryService) -> HostCase:
-    """Prepare a real baseline, then write a coherent protected partition."""
-    service.disk.store.put(EXISTING_OUTPUT, EXISTING_BYTES)
+def host_case(
+    service: MemoryService, *, outputs: list[Document] | None = None
+) -> HostCase:
+    """Prepare a real baseline, then write a coherent protected partition.
+
+    outputs (list[Document] | None) are the required-output rows the root
+    prepares; None seeds the default new and existing feature contracts.
+    """
     service.disk.store.put(SOURCE, b"public class Order {}\n")
     service.repository.files[SOURCE] = service.disk.store.files[SOURCE]
-    outputs: list[Document] = [
-        output_row(NEW_OUTPUT, "feature-alpha", None),
-        output_row(EXISTING_OUTPUT, "feature-beta", sha256(EXISTING_BYTES).hexdigest()),
-    ]
+    # The default rows pin one absent and one existing contract; a caller that
+    # supplies rows has already seeded the workspace they describe.
+    if outputs is None:
+        service.disk.store.put(EXISTING_OUTPUT, EXISTING_BYTES)
+        outputs = [
+            output_row(NEW_OUTPUT, "feature-alpha", None),
+            output_row(
+                EXISTING_OUTPUT, "feature-beta", sha256(EXISTING_BYTES).hexdigest()
+            ),
+        ]
     prepared = invoke(
         service,
         "prepare-agent",
