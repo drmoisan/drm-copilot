@@ -50,12 +50,12 @@ Today the 500 limit is mechanically checked only by file-scoped Pester assertion
 
 ## Acceptance Criteria
 
-- [ ] AC1: Policy text in every authoritative and mirrored surface states a three-tier policy (500 guidance, 700 advisory Warning, 800 hard block) and keeps the existing exemption list.
-- [ ] AC2: No gate fails for a file between 500 and 800 lines; `feature-review` reports files at or above 700 lines as non-blocking Warning findings.
-- [ ] AC3: A CI/Pester check fails for any file over 800 lines that is not on the baseline list, and for any baselined file that grows.
-- [ ] AC4: A PreToolUse hook denies a Write or Edit that leaves a covered file above 800 lines, with a message naming the tiers and the split requirement; baselined files may shrink or stay equal.
-- [ ] AC5: Every existing test, hook, validator, and document that hard-codes the 500-line limit is updated or confirmed unaffected.
-- [ ] AC6: The baseline list is generated deterministically from the repository at the merge base and is reviewable.
+- [x] AC1: Policy text in every authoritative and mirrored surface states a three-tier policy (500 guidance, 700 advisory Warning, 800 hard block) and keeps the existing exemption list.
+- [x] AC2: No gate fails for a file between 500 and 800 lines; `feature-review` reports files at or above 700 lines as non-blocking Warning findings.
+- [x] AC3: A CI/Pester check fails for any file over 800 lines that is not on the baseline list, and for any baselined file that grows.
+- [x] AC4: A PreToolUse hook denies a Write or Edit that leaves a covered file above 800 lines, with a message naming the tiers and the split requirement; baselined files may shrink or stay equal.
+- [x] AC5: Every existing test, hook, validator, and document that hard-codes the 500-line limit is updated or confirmed unaffected.
+- [x] AC6: The baseline list is generated deterministically from the repository at the merge base and is reviewable.
 - [ ] AC7: All mirrors and bundle copies pass the contract tests, and the seven-stage toolchain passes.
 
 ## Non-Goals

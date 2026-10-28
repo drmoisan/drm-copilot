@@ -7,7 +7,7 @@ metadata:
 ---
 
 - [Policy requirements are not optional gaps](feedback_policy_compliance_not_optional.md) — never frame skipped policy requirements as "known gaps" or defer them; comply before reporting completion.
-- [test-files-count-against-500-cap](feedback_test_files_count_against_500_cap.md) — the 500-line file cap applies to test files too; QA must scan changed/created production AND test files.
+- [test-files-count-against-500-cap](feedback_test_files_count_against_500_cap.md) — the tiered file-size policy applies to test files too; QA must scan changed/created production AND test files.
 - [every-change-through-lifecycle](feedback_every_change_through_lifecycle.md) — every change, including small tooling changes, goes through issue promotion, an active feature folder, and feature-review before commit.
 - [remediation-plan-em-dash-required](feedback_remediation_plan_em_dash_required.md) — the plan validator rejects any token between "Phase N" and the em-dash; only `### Phase N — <Title>` passes.
 - [branch-base-check-unmerged-pr-deps](feedback_branch_base_check_unmerged_pr_deps.md) — verify required symbols/files exist on the chosen branch base; if they only exist in an open PR, stack or merge first.

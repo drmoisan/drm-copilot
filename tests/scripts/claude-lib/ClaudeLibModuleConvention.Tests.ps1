@@ -11,7 +11,8 @@
     Set-StrictMode -Version Latest, an explicit -ErrorAction Stop on every
     column-0 load-time Import-Module statement, the fixed convention sentence in
     the leading comment-based-help block, non-leakage of the module-scope
-    preference into the caller scope, and the 500-line file limit.
+    preference into the caller scope, and the shared file-size hard limit (800
+    lines, from Get-FileSizePolicyLimit in the file-size-policy module).
 
     The module list is discovered from disk with Get-ChildItem -Recurse and is
     never restated, so a module added later cannot escape the convention. Files
@@ -38,7 +39,15 @@ BeforeAll {
     $script:ConventionToken = 'imports its siblings with -ErrorAction Stop'
     $script:ImportStatementPrefix = 'Import-Module'
     $script:ImportGuardToken = '-ErrorAction Stop'
-    $script:MaximumModuleLine = 500
+
+    # The general size gate uses the shared policy hard limit, so this suite and the
+    # repository gate apply one limit to .psm1 files rather than two competing ones.
+    Import-Module -Name (Join-Path $script:LibraryRoot 'file-size-policy/FileSizePolicy.psm1') -Force -ErrorAction Stop
+    $script:MaximumModuleLine = (Get-FileSizePolicyLimit).HardLimit
+}
+
+AfterAll {
+    Remove-Module -Name FileSizePolicy -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Claude library module conventions' {
@@ -120,7 +129,7 @@ Describe 'Claude library module conventions' {
         $ErrorActionPreference | Should -Be $before
     }
 
-    It 'keeps every claude library module within the five hundred line limit' {
+    It 'keeps every claude library module within the shared hard file-size limit' {
         # Arrange / Act: count physical lines per module. Measure-Object -Line
         # counts non-empty lines only and would under-report a module at the cap.
         $offender = @()
@@ -131,7 +140,8 @@ Describe 'Claude library module conventions' {
             }
         }
 
-        # Assert: the repository caps a production file at 500 lines.
+        # Assert: the tiered file-size policy blocks a production file above its
+        # hard limit (800 lines); the 500 and 700 tiers are guidance only.
         $offender | Should -BeNullOrEmpty
     }
 }

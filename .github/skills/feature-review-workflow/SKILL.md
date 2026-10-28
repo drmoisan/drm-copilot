@@ -154,6 +154,14 @@ Always apply:
 - `feature-audit.<timestamp>.md`
   - contains the five required major sections listed above
 
+## File Size Advisory
+
+The tiered file-size policy (section 4, Module & File Structure, in `.github/instructions/general-code-change.instructions.md`) sets a 500-line guidance tier, a 700-line advisory tier, and an 800-line hard limit. Measure the logical line count of every added or modified covered file in the branch diff. Covered files have one of the extensions `.py`, `.ps1`, `.psm1`, `.ts`, `.tsx`, `.js`, `.cjs`, `.mjs`, `.cs`, `.sh`, or `.bats` and are not under a build, cache, dependency, virtual-environment, or `docs` directory. A logical line count splits the content on line terminators, and a trailing terminator does not add a line; it equals `@(Get-Content -LiteralPath <path>).Count`. Do not use `wc -l` or `Measure-Object -Line`.
+
+- Report each covered file at or above 700 lines as a non-blocking `Warning` row in the Findings Table of `code-review.<timestamp>.md`, naming the file and its line count. Do not write the Warning to `remediation-inputs.<timestamp>.md`, and do not give it a remediation severity label.
+- Report a covered file above 800 lines that has no entry in `config/file-size-baseline.json`, and any added or increased entry in `config/file-size-baseline.json`, as a blocking policy finding.
+- Produce no finding for the 500-line guidance tier.
+
 ## Constraints
 
 - Prefer check-only commands.

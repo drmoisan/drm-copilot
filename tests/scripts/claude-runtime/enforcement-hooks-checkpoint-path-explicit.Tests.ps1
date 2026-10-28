@@ -150,15 +150,16 @@ Describe 'enforcement hooks supply the checkpoint path explicitly' {
         $offender | Should -BeNullOrEmpty
     }
 
-    It 'the orchestrator-state module stays within the 500-line file cap' {
-        # Arrange: the orchestrator-state module, whose size the repository's 500-line
-        # file cap in .claude/rules/general-code-change.md constrains.
+    It 'the orchestrator-state module stays within its pinned 500-line bound' {
+        # Arrange: the orchestrator-state module. This row pins a per-file bound of 500
+        # lines, stricter than the 800-line hard limit of the tiered file-size policy in
+        # .claude/rules/general-code-change.md; 500 is that policy's guidance tier.
         $modulePath = Join-Path $script:RepoRoot '.claude/lib/orchestrator-state/OrchestratorState.psm1'
 
         # Act
         $lineCount = @(Get-Content -LiteralPath $modulePath).Count
 
-        # Assert: the count is bounded by the cap rather than pinned to one value, so an
+        # Assert: the count is bounded rather than pinned to one value, so an
         # edit that keeps the module within policy passes. The lower bound rejects a missing
         # or empty file, which would otherwise satisfy the cap without measuring anything.
         $lineCount | Should -BeGreaterThan 0

@@ -8,7 +8,8 @@
 # `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, but the Claude pair is
 # only compared as decoded text, which cannot detect a byte-order-mark or line-ending
 # difference. These cases compare real SHA256 hashes across all four copies and keep each
-# copy under the repository's 500-line cap. They read the four files only: no temporary
+# copy within a pinned per-file bound of 500 lines, stricter than the 800-line hard limit
+# of the tiered file-size policy. They read the four files only: no temporary
 # file, no child process, and no network access.
 
 Describe 'enforce-orchestration-preimplementation-gate-helpers.ps1 surface parity (issue #671)' {
@@ -41,14 +42,14 @@ Describe 'enforce-orchestration-preimplementation-gate-helpers.ps1 surface parit
         $distinctHashes.Count | Should -Be 1 -Because "the four copies must publish without drift: $($paths -join ', ')"
     }
 
-    It 'keeps every surface copy of the helpers module under the 500-line cap' {
+    It 'keeps every surface copy of the helpers module within its pinned 500-line bound' {
         # Arrange
         $paths = $script:HelpersPaths
 
         # Act and Assert
         foreach ($path in $paths) {
             (Get-Content -LiteralPath $path).Count |
-                Should -BeLessOrEqual 500 -Because "$path must stay within the repository file-size limit"
+                Should -BeLessOrEqual 500 -Because "$path must stay within its pinned per-file bound of 500 lines"
         }
     }
 }

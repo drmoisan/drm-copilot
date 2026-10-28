@@ -25,7 +25,7 @@ Apply in this sequence:
 ## Execution Rules
 
 - Remediate the entire scope to add/adjust robust docstrings and intent comments for loops, branches, and multi-step blocks; avoid low-value narration.
-- Keep modules cohesive, under 500 lines, strongly typed; avoid `Any` unless justified.
+- Keep modules cohesive, within the tiered file-size policy of `general-code-change.instructions.md`, strongly typed; avoid `Any` unless justified.
 - Maintain encoding/EOL and ASCII unless the file already uses Unicode.
 - Do not pause for approval or clarification once scope is set; continue across turns if needed until fully compliant.
 

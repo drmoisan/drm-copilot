@@ -64,6 +64,8 @@
     ".codex/hooks/enforce-completion-consistency.ps1",
     ".codex/hooks/enforce-completion-helpers.ps1",
     ".codex/hooks/enforce-evidence-locations.ps1",
+    ".codex/hooks/enforce-file-size-limit.ps1",
+    ".codex/hooks/file-size-policy.ps1",
     ".codex/hooks/enforce-orchestration-preimplementation-gate.ps1",
     ".codex/hooks/enforce-powershell-batch-budget.ps1",
     ".codex/hooks/enforce-promotion-mcp-only.ps1",

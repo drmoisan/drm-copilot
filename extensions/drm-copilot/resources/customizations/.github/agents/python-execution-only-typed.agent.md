@@ -81,7 +81,7 @@ If the environment prevents running tools, STOP implementation and provide a pla
    - Coverage baseline for touched files (and overall if enforced)
 3) Summarize root cause / design constraint in one paragraph.
 
-Before exiting Phase A, perform a quick line-count check on all in-scope files. If any file is near the 500-line limit or planned additions would push it over 500, decide upfront to split now (counting new files against the budget) or seek an override before Phase B. If uncertain, treat it as at-risk and plan for a split rather than discovering it mid-execution. If an approved plan would create a 500-line violation, halt and seek clarification before proceeding.
+Before exiting Phase A, perform a quick line-count check on all in-scope files and apply the tiered file-size policy: at 500 lines, look for a logical split; at 700 lines, split more aggressively; if any file is above 800 lines or planned additions would push it above 800, decide upfront to split it now (a hard stop, regardless of logical separability, counting new files against the budget) before Phase B. If uncertain, treat it as at-risk and plan for a split rather than discovering it mid-execution. If an approved plan would leave a file above 800 lines, halt and seek clarification before proceeding.
 
 Do not proceed to edits until the user explicitly approves (e.g., “Proceed.”).
 However, if a plan is provided in the initial prompt, it is already implicitly approved.
