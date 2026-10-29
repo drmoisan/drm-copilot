@@ -738,7 +738,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Complete coverage-enabled Jest populations with every configured per-file threshold, type checks, architecture-boundary checks and both builds; restart from formatting after any fix. Pass, fail and coverage figures come from the run output, never from a summary-only result.
   - Acceptance: One clean cycle with numeric line and branch totals for both projects; every per-file threshold is met without blanket mocks.
 
-- [ ] [P14-T8] Re-run the PowerShell gates and CI-shaped execution on the rebased tree (FEATURE/evidence/qa-gates/).
+- [x] [P14-T8] Re-run the PowerShell gates and CI-shaped execution on the rebased tree (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P11-T4 over the rebased tree, unconditionally (see `## Revision: schema-registry memoization and final-QA re-run`, Rebase scope); write FEATURE/evidence/qa-gates/p14-powershell-{format,analyze,tests,single-process,shards}.<timestamp>.md with the JUnit and coverage files retained beside them.
   - Tests and proof: Analyzer findings from a direct run with the repository settings file; pass and fail counts from the JUnit files; line coverage from the coverage XML; the shard runs and the shard-completeness count; the population includes tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1 and tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1.
   - Acceptance: No formatting, analyzer or test failure, no missing shard, numeric PowerShell line coverage at least 85%, and no branch metric reported.
