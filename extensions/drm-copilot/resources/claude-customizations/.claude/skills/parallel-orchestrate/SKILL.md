@@ -576,7 +576,8 @@ repeat: a substep whose outcome already holds is skipped. The five substeps run 
    `git add -- docs/features/parallel/<slug>/parallel-status.md docs/features/potential/promoted/<promoted-file>.md`
    and
    `git commit -m "docs(parallel): close run <slug>" -- docs/features/parallel/<slug>/parallel-status.md docs/features/potential/promoted/<promoted-file>.md`,
-   in which every pathspec begins with `docs/features/` or `artifacts/orchestration/`. Never use
+   in which every pathspec begins with `docs/features/`. The `artifacts/` tree is gitignored, so Run
+   Closing never stages it. Never use
    `git add -A` or `git add .`, and never stage a `docs/features/active/<item>/` folder: each item
    folder lands through that item's own pull request. Before pushing, require that
    `git diff --name-only origin/main...HEAD` lists only `docs/` paths; when it lists any other

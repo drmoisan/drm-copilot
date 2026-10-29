@@ -21,8 +21,8 @@
       for the removal target, and Get-EpicWorktreeGateDenyDiagnostics, which builds the
       diagnostics clause of the final deny from two read results without reading any
       file (issue #851).
-    - The import guard for WorktreeRunRecordPath.psm1 and Get-EpicWorktreeGateBaseRoot,
-      which pairs the main checkout root with a read's own root so a relative recorded
+    - The import guard for WorktreeRunRecordPath.psm1, whose Get-WorktreeRunRecordBaseRoot
+      pairs the main checkout root with a read's own root so a relative recorded
       worktree_path is compared through the shared matcher (issue #995).
 
 .NOTES
@@ -132,34 +132,6 @@ function Read-EpicWorktreeGateRunCheckpoint {
     }
 }
 
-function Get-EpicWorktreeGateBaseRoot {
-    <#
-    .SYNOPSIS
-        Return the base roots a relative recorded worktree_path is joined to (issue #995).
-    .DESCRIPTION
-        Pure. The main checkout root and the root that holds the checkpoint a read
-        resolved, with blank entries dropped.
-    .PARAMETER MainRoot
-        The main checkout root, or $null when none was derived.
-    .PARAMETER Read
-        A Read-EpicWorktreeGateRunCheckpoint result, or $null.
-    .OUTPUTS
-        System.String[]
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]], [object[]])]
-    param(
-        [AllowNull()][AllowEmptyString()][string] $MainRoot,
-        [AllowNull()] $Read
-    )
-
-    $readRoot = $null
-    if ($null -ne $Read -and $null -ne $Read.Target -and @($Read.Target.PSObject.Properties.Name) -contains 'WorktreeRoot') {
-        $readRoot = [string] $Read.Target.WorktreeRoot
-    }
-    return , [string[]] @(@($MainRoot, $readRoot) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-}
-
 function Find-EpicWorktreeGateParallelItemRecord {
     <#
     .SYNOPSIS
@@ -253,7 +225,7 @@ function Get-EpicWorktreeGateDenyDiagnostics {
             $recordText = 'checkpoint absent or unparseable'
         }
         else {
-            $baseRoot = Get-EpicWorktreeGateBaseRoot -MainRoot $MainRoot -Read $read
+            $baseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $MainRoot -Read $read
             $record = if ($kind -eq 'epic') {
                 Find-EpicWorktreeFeatureRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath -BaseRoot $baseRoot
             }

@@ -140,6 +140,22 @@ Describe 'epic worktree-removal gate with a relative worktree_path record' {
         $decision.hookSpecificOutput.permissionDecisionReason.StartsWith('EPIC_WORKTREE_REMOVAL_BLOCKED') | Should -BeTrue
     }
 
+    It 'RE2b denies the epic-feature branch when <Label>' -ForEach @(
+        @{ Label = 'the relative record has merge_status pr_open'; Status = 'pr_open' }
+        @{ Label = 'the relative record has merge_status worktree_created'; Status = 'worktree_created' }
+        @{ Label = 'the relative record has no merge_status'; Status = $null }
+    ) {
+        # Arrange
+        Set-RelativeTopology -Epic @{ '/synthetic-worktrees/planning' = (Get-RunCheckpointText -Kind epic -WorktreePath $script:Relative -MergeStatus $Status) }
+
+        # Act
+        $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-RemovalPayload -Command "git worktree remove $($script:Target)")
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason.StartsWith('EPIC_WORKTREE_REMOVAL_BLOCKED') | Should -BeTrue
+    }
+
     It 'RE3 denies when the same merged relative parallel record is held in both live roots (ambiguous)' {
         # Arrange
         $text = Get-RunCheckpointText -Kind parallel -WorktreePath $script:Relative -MergeStatus 'merged'
@@ -168,5 +184,16 @@ Describe 'epic worktree-removal gate with a relative worktree_path record' {
 
         # Assert
         $diagnostics | Should -Match "parallel run OtherWorktree .*merge_status 'pr_open'"
+    }
+
+    It 'RE5 finds no parallel item record for <Label>' -ForEach @(
+        @{ Label = 'a null checkpoint'; Checkpoint = $null; Path = '/synthetic-worktrees/main/.claude/worktrees/agent-x' }
+        @{ Label = 'a blank target path'; Checkpoint = ('{"items":[{"worktree_path":"/synthetic-worktrees/main/.claude/worktrees/agent-x"}]}' | ConvertFrom-Json); Path = '' }
+    ) {
+        # Arrange / Act
+        $record = Find-EpicWorktreeGateParallelItemRecord -Checkpoint $Checkpoint -WorktreePath $Path -BaseRoot @($script:Main)
+
+        # Assert
+        $record | Should -BeNullOrEmpty
     }
 }

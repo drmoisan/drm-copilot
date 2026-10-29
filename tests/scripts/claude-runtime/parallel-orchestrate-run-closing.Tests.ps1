@@ -10,7 +10,7 @@
     For each skill copy, the ### Run Closing section (up to the next heading of level three
     or higher) must name every closing-step token, and ## Completion Requirements must name
     Run Closing. Every backticked git add or git commit span in the skill section must stage
-    or commit only literal paths under docs/features/ or artifacts/orchestration/; the only
+    or commit only literal paths under docs/features/; the only
     permitted git add -A or git add . spans are those inside a sentence that opens a
     prohibition with the word Never.
 
@@ -36,7 +36,10 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:AllowedPathPrefixes = @('docs/features/', 'artifacts/orchestration/')
+    $script:AllowedPathPrefixes = @('docs/features/')
+
+    # The staging sentence names the removed artifacts/orchestration/ alternative (issue #995).
+    $script:RemovedAlternativePattern = 'or\s+`artifacts/orchestration/`'
 
     # The text of one heading's section, up to the next heading of the same or a higher
     # level, or $null when the heading is absent.
@@ -122,7 +125,15 @@ Describe 'parallel-orchestrate skill Run Closing (<Copy> copy)' -ForEach $script
         $completion.Contains('Run Closing') | Should -BeTrue
     }
 
-    It 'RC4 stages and commits only literal docs/features/ or artifacts/orchestration/ paths (AC-11)' {
+    It 'RC5 does not offer artifacts/orchestration/ as a staging pathspec alternative' {
+        # Arrange: collapse whitespace so a wrapped sentence cannot hide the alternative.
+        $collapsed = ($script:Section -replace '\s+', ' ')
+
+        # Act / Assert
+        $collapsed | Should -Not -Match $script:RemovedAlternativePattern -Because 'artifacts/ is gitignored and Run Closing never stages it'
+    }
+
+    It 'RC4 stages and commits only literal docs/features/ paths (AC-11)' {
         # Arrange
         $spans = @([regex]::Matches($script:Section, '`(?<span>git (add|commit)[^`]*)`') | ForEach-Object { $_.Groups['span'].Value })
         $sentences = @($script:Section -split '(?<=[.!?])\s+')
@@ -171,5 +182,13 @@ Describe 'parallel-orchestrator agent Run Closing (<Copy> copy)' -ForEach $scrip
         $completion = Get-MarkdownSection -Text $script:Text -Heading '## Completion Requirements'
         $completion | Should -Not -BeNullOrEmpty
         $completion.Contains('Run Closing') | Should -BeTrue
+    }
+
+    It 'RA5 does not offer artifacts/orchestration/ as a staging pathspec alternative' {
+        # Arrange: collapse whitespace so a wrapped sentence cannot hide the alternative.
+        $collapsed = ($script:Section -replace '\s+', ' ')
+
+        # Act / Assert
+        $collapsed | Should -Not -Match $script:RemovedAlternativePattern -Because 'artifacts/ is gitignored and Run Closing never stages it'
     }
 }

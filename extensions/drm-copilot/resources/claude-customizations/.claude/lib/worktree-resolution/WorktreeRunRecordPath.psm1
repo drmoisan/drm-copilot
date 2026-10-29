@@ -15,7 +15,9 @@
     nothing, so it can never name the main checkout or a path outside it.
 
 .NOTES
-    PowerShell 7+. The two comparison functions are pure. Get-WorktreeRunMainCheckoutRoot
+    PowerShell 7+. Exports Test-WorktreeRunPathEqual, Test-WorktreeRunRecordedPathMatchesTarget,
+    Get-WorktreeRunRecordBaseRoot, and Get-WorktreeRunMainCheckoutRoot. The two comparison
+    functions and Get-WorktreeRunRecordBaseRoot are pure. Get-WorktreeRunMainCheckoutRoot
     reads the filesystem only through its siblings' seams (Get-WorktreeItemLiveRoot and
     Get-WorktreeResolutionGitEntryKind). Mirrored byte-identically.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
@@ -121,6 +123,35 @@ function Test-WorktreeRunRecordedPathMatchesTarget {
     return $false
 }
 
+function Get-WorktreeRunRecordBaseRoot {
+    <#
+    .SYNOPSIS
+        Return the base roots a relative recorded worktree_path is joined to.
+    .DESCRIPTION
+        Pure. The main checkout root and the root that holds the checkpoint a read
+        resolved (Read.Target.WorktreeRoot), with blank entries dropped. Every gate
+        passes the result to Test-WorktreeRunRecordedPathMatchesTarget as -BaseRoot.
+    .PARAMETER MainRoot
+        The main checkout root, or $null when none was derived.
+    .PARAMETER Read
+        A run-checkpoint read result carrying Target.WorktreeRoot, or $null.
+    .OUTPUTS
+        System.String[]
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]], [object[]])]
+    param(
+        [AllowNull()][AllowEmptyString()][string] $MainRoot,
+        [AllowNull()] $Read
+    )
+
+    $readRoot = $null
+    if ($null -ne $Read -and @($Read.PSObject.Properties.Name) -contains 'Target' -and $null -ne $Read.Target -and @($Read.Target.PSObject.Properties.Name) -contains 'WorktreeRoot') {
+        $readRoot = [string] $Read.Target.WorktreeRoot
+    }
+    return , [string[]] @(@($MainRoot, $readRoot) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+}
+
 function Get-WorktreeRunMainCheckoutRoot {
     <#
     .SYNOPSIS
@@ -150,4 +181,5 @@ function Get-WorktreeRunMainCheckoutRoot {
 Export-ModuleMember -Function `
     Test-WorktreeRunPathEqual, `
     Test-WorktreeRunRecordedPathMatchesTarget, `
+    Get-WorktreeRunRecordBaseRoot, `
     Get-WorktreeRunMainCheckoutRoot

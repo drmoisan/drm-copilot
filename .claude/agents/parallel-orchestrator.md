@@ -335,8 +335,9 @@ substeps, in order:
    the path and refusal reason, and continue.
 2. **Final status.** Regenerate `docs/features/parallel/<slug>/parallel-status.md`.
 3. **Run documents.** Stage the run folder and the promoted lifecycle files created for the run by
-   literal path, with every `git add` and `git commit` pathspec beginning `docs/features/` or
-   `artifacts/orchestration/`. Never use `git add -A` or `git add .`, and never stage a
+   literal path, with every `git add` and `git commit` pathspec beginning `docs/features/`. The
+   `artifacts/` tree is gitignored, so Run Closing never stages it. Never use `git add -A` or
+   `git add .`, and never stage a
    `docs/features/active/<item>/` folder. Require that `git diff --name-only origin/main...HEAD`
    lists only `docs/` paths, otherwise stop and report without forcing or splitting the branch.
    Push, delegate the pull request to `Agent(pr-author)` with a `branch:` label, merge it with

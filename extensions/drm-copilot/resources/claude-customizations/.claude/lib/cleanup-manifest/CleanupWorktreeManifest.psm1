@@ -358,6 +358,14 @@ function Test-CleanupManifestCheckpointCoversPath {
         the gate's existing deny. Reusing the gates' merge_status predicate here
         would reopen the one path by which the manifest could widen what the gates
         protect.
+
+        Case rule: a record covers the target when the shared matcher holds on the
+        inputs as given, or holds on the same inputs lower-cased with the invariant
+        culture. This keeps the exclusion at parity with
+        Find-CleanupWorktreeManifestRemovalRecord, which ignores case for every path,
+        so a record that differs from the target only by case still blocks the
+        manifest branch. The shared matcher itself stays ordinal for single-slash
+        POSIX paths because the gates' allow lookups must remain fail-closed.
     .PARAMETER Checkpoint
         Parsed checkpoint object, or $null when absent or unreadable.
     .PARAMETER RecordArrayName
@@ -399,6 +407,8 @@ function Test-CleanupManifestCheckpointCoversPath {
         return $false
     }
 
+    $lowerBaseRoot = [string[]] @(@($BaseRoot) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.ToLowerInvariant() })
+
     # Every record is compared through the shared matcher, so a relative record covers
     # the absolute target it names under a base root, and an unsafe one covers nothing.
     foreach ($record in @($Checkpoint.PSObject.Properties[$RecordArrayName].Value)) {
@@ -409,7 +419,14 @@ function Test-CleanupManifestCheckpointCoversPath {
         if ($recordProperties -notcontains 'worktree_path') {
             continue
         }
-        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$record.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
+        $recordedPath = [string]$record.worktree_path
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath $recordedPath -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
+            return $true
+        }
+        # Case-insensitive parity with Find-CleanupWorktreeManifestRemovalRecord: the same
+        # inputs lower-cased with the invariant culture, so the exclusion is never narrower
+        # than the manifest lookup it guards.
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath $recordedPath.ToLowerInvariant() -TargetPath $WorktreePath.ToLowerInvariant() -BaseRoot $lowerBaseRoot) {
             return $true
         }
     }

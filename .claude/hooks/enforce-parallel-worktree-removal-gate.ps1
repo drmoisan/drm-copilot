@@ -217,34 +217,6 @@ function Find-ParallelWorktreeItemRecord {
     return $null
 }
 
-function Get-ParallelWorktreeGateBaseRoot {
-    <#
-    .SYNOPSIS
-        Return the base roots a relative recorded worktree_path is joined to (issue #995).
-    .DESCRIPTION
-        Pure. The main checkout root and the root that holds the checkpoint a read
-        resolved, with blank entries dropped.
-    .PARAMETER MainRoot
-        The main checkout root, or $null when none was derived.
-    .PARAMETER Read
-        A Read-ParallelWorktreeGateRunCheckpoint result, or $null.
-    .OUTPUTS
-        System.String[]
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]], [object[]])]
-    param(
-        [AllowNull()][AllowEmptyString()][string] $MainRoot,
-        [AllowNull()] $Read
-    )
-
-    $readRoot = $null
-    if ($null -ne $Read -and $null -ne $Read.Target -and @($Read.Target.PSObject.Properties.Name) -contains 'WorktreeRoot') {
-        $readRoot = [string] $Read.Target.WorktreeRoot
-    }
-    return , [string[]] @(@($MainRoot, $readRoot) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-}
-
 function Test-ParallelWorktreeRemovalAllowed {
     <#
     .SYNOPSIS
@@ -390,8 +362,8 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     # A relative record is joined to the main checkout root and to the root holding the
     # checkpoint read (issue #995); the main root is derived once per target.
     $mainRoot = Get-WorktreeRunMainCheckoutRoot -SessionRoot (Get-Location).Path
-    $parallelBaseRoot = Get-ParallelWorktreeGateBaseRoot -MainRoot $mainRoot -Read $parallelRead
-    $epicBaseRoot = Get-ParallelWorktreeGateBaseRoot -MainRoot $mainRoot -Read $epicRead
+    $parallelBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $parallelRead
+    $epicBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $epicRead
 
     $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $itemRecord) {

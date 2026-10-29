@@ -372,8 +372,8 @@ function Get-EpicWorktreeRemovalTargetDenial {
     # A relative record is joined to the main checkout root and to the root holding the
     # checkpoint read (issue #995); the main root is derived once per target.
     $mainRoot = Get-WorktreeRunMainCheckoutRoot -SessionRoot (Get-Location).Path
-    $epicBaseRoot = Get-EpicWorktreeGateBaseRoot -MainRoot $mainRoot -Read $epicRead
-    $parallelBaseRoot = Get-EpicWorktreeGateBaseRoot -MainRoot $mainRoot -Read $parallelRead
+    $epicBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $epicRead
+    $parallelBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $parallelRead
 
     $featureRecord = Find-EpicWorktreeFeatureRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $epicBaseRoot
     if (Test-EpicWorktreeRemovalAllowed -FeatureRecord $featureRecord) {

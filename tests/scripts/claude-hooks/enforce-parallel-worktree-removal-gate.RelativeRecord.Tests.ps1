@@ -27,6 +27,8 @@
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    # The shipped epic read seam, captured before the baseline mock below replaces it by name.
+    $script:ShippedCheckpointReader = ${function:Get-ParallelWorktreeRemovalGateEpicCheckpointContent}
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1')).Path -ErrorAction Stop
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
@@ -155,5 +157,30 @@ Describe 'parallel worktree-removal gate with a relative worktree_path record' {
         # Assert
         $record | Should -Not -BeNullOrEmpty
         $record.feature_folder | Should -Be 'child-a'
+    }
+
+    It 'RP5 returns no text from the shipped epic checkpoint reader when the checkpoint file is absent' {
+        # Arrange: the file-system probe is mocked, so no file is read.
+        Mock -CommandName Test-Path -MockWith { $false }
+        Mock -CommandName Get-Content -MockWith { 'unexpected' }
+
+        # Act
+        $text = & $script:ShippedCheckpointReader -Path '/synthetic-worktrees/planning/artifacts/orchestration/epic-orchestrator-state.json'
+
+        # Assert
+        $text | Should -BeNullOrEmpty
+        Should -Invoke -CommandName Get-Content -Times 0 -Exactly
+    }
+
+    It 'RP6 returns the checkpoint text from the shipped epic checkpoint reader when the file is present' {
+        # Arrange: both the probe and the read are mocked, so no file is read.
+        Mock -CommandName Test-Path -MockWith { $true }
+        Mock -CommandName Get-Content -MockWith { '{"route_id":"epic"}' }
+
+        # Act
+        $text = & $script:ShippedCheckpointReader -Path '/synthetic-worktrees/planning/artifacts/orchestration/epic-orchestrator-state.json'
+
+        # Assert
+        $text | Should -Be '{"route_id":"epic"}'
     }
 }

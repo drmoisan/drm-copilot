@@ -233,10 +233,70 @@ Describe 'Get-WorktreeRunMainCheckoutRoot' {
     }
 }
 
-Describe 'WorktreeRunRecordPath module exports' {
-    It 'X1 exports exactly the three record-path functions' {
+Describe 'Get-WorktreeRunRecordBaseRoot' {
+    It 'B1 returns the main root and the read root when both are present' {
         # Arrange
-        $expected = @('Get-WorktreeRunMainCheckoutRoot', 'Test-WorktreeRunPathEqual', 'Test-WorktreeRunRecordedPathMatchesTarget')
+        $read = [pscustomobject]@{ Target = [pscustomobject]@{ WorktreeRoot = '/synthetic-worktrees/planning' } }
+
+        # Act
+        $roots = Get-WorktreeRunRecordBaseRoot -MainRoot $script:Main -Read $read
+
+        # Assert
+        $roots | Should -Be @('/synthetic-worktrees/main', '/synthetic-worktrees/planning')
+    }
+
+    It 'B2 returns only the main root when no read is supplied' {
+        # Arrange / Act
+        $roots = Get-WorktreeRunRecordBaseRoot -MainRoot $script:Main -Read $null
+
+        # Assert
+        @($roots).Count | Should -Be 1
+        $roots[0] | Should -Be '/synthetic-worktrees/main'
+    }
+
+    It 'B3 returns only the read root for <Label> main root' -ForEach @(
+        @{ Label = 'a null'; Main = $null }
+        @{ Label = 'a blank'; Main = '  ' }
+    ) {
+        # Arrange
+        $read = [pscustomobject]@{ Target = [pscustomobject]@{ WorktreeRoot = '/synthetic-worktrees/planning' } }
+
+        # Act
+        $roots = Get-WorktreeRunRecordBaseRoot -MainRoot $Main -Read $read
+
+        # Assert
+        @($roots).Count | Should -Be 1
+        $roots[0] | Should -Be '/synthetic-worktrees/planning'
+    }
+
+    It 'B3b ignores a read whose <Label>' -ForEach @(
+        @{ Label = 'Target is absent'; Read = [pscustomobject]@{ Other = 1 } }
+        @{ Label = 'Target is null'; Read = [pscustomobject]@{ Target = $null } }
+        @{ Label = 'Target has no WorktreeRoot'; Read = [pscustomobject]@{ Target = [pscustomobject]@{ Status = 'Unresolved' } } }
+    ) {
+        # Arrange / Act
+        $roots = Get-WorktreeRunRecordBaseRoot -MainRoot $script:Main -Read $Read
+
+        # Assert
+        @($roots).Count | Should -Be 1
+        $roots[0] | Should -Be '/synthetic-worktrees/main'
+    }
+
+    It 'B4 returns an empty string array, not null, when neither root is present' {
+        # Arrange / Act
+        $roots = Get-WorktreeRunRecordBaseRoot -MainRoot $null -Read $null
+
+        # Assert
+        $null -ne $roots | Should -BeTrue -Because 'the comma operator preserves the empty array'
+        $roots -is [string[]] | Should -BeTrue
+        $roots.Count | Should -Be 0
+    }
+}
+
+Describe 'WorktreeRunRecordPath module exports' {
+    It 'X1 exports exactly the four record-path functions' {
+        # Arrange
+        $expected = @('Get-WorktreeRunMainCheckoutRoot', 'Get-WorktreeRunRecordBaseRoot', 'Test-WorktreeRunPathEqual', 'Test-WorktreeRunRecordedPathMatchesTarget')
 
         # Act
         $exported = @((Get-Module -Name WorktreeRunRecordPath | Select-Object -First 1).ExportedFunctions.Keys | Sort-Object)
