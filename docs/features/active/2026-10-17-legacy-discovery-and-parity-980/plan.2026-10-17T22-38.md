@@ -657,7 +657,7 @@ Protected partition layout, shared with ES/discovery-authority-paths.ts and CL/D
   - Tests and proof: Actual analyzer, JUnit and coverage files, never MCP summaries.
   - Acceptance: Either a clean PowerShell loop with numeric line coverage or a recorded proof that no PowerShell path changed since the verified run.
 
-- [ ] [P13-T4] Verify coverage deltas for every Phase 12 file (FEATURE/evidence/qa-gates/).
+- [x] [P13-T4] Verify coverage deltas for every Phase 12 file (FEATURE/evidence/qa-gates/).
   - Files and behavior: Write FEATURE/evidence/qa-gates/p13-coverage-comparison.<timestamp>.md from the P13-T1/P13-T2 artifacts and the Phase 12 changed-file inventory.
   - Tests and proof: Per-file baseline, final and delta for every Python and TypeScript file Phase 12 added or changed, including the agentic_sync split modules and the new Python test-support module's production dependencies; new files at least 90% lines; branch at least 75%; no regression on changed lines; no exclusion or threshold weakening.
   - Acceptance: Every Phase 12 production file has numeric measurements meeting the floors; a missing measurement fails the gate.
@@ -743,12 +743,12 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Analyzer findings from a direct run with the repository settings file; pass and fail counts from the JUnit files; line coverage from the coverage XML; the shard runs and the shard-completeness count; the population includes tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1 and tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1.
   - Acceptance: No formatting, analyzer or test failure, no missing shard, numeric PowerShell line coverage at least 85%, and no branch metric reported.
 
-- [ ] [P14-T9] Record before and after registry cost and suite durations (FEATURE/evidence/other/).
+- [x] [P14-T9] Record before and after registry cost and suite durations (FEATURE/evidence/other/).
   - Files and behavior: Repeat the P14-T1 profile on the corrected tree to SCRATCH/issue-980-p14-hot-after.prof and summarize it with the same helper; sum the PT testcase times and counts from SCRATCH/issue-980-p14-junit.xml with SCRATCH/issue-980-p14-junit-durations.py; take the full-run after value from the P14-T6 tests record. Write FEATURE/evidence/other/p14-registry-timing.<timestamp>.md with one before/after table for the profiled test (`_registry` calls, `SchemaCatalog.__post_init__` calls, `_registry` cumulative seconds, total seconds), the PT suite (seconds and testcase count, with the before source stated by P14-T1) and the full Python run (seconds).
   - Tests and proof: The two profiles use the same command without coverage; the PT suite and full-run figures come from coverage-mode runs (P13-T1 before, P14-T6 after), so each compared pair uses one mode. A pair whose before value is orchestrator-reported is labelled as such, and the after suite figure is still measured.
   - Acceptance: In the after profile the `_registry` call count equals the `SchemaCatalog.__post_init__` call count; the after `_registry` cumulative seconds and the after full-run seconds are each lower than their before values; every figure names its source artifact.
 
-- [ ] [P14-T10] Verify coverage deltas for the Phase 12 population and the catalog correction, discharging [P13-T4] (FEATURE/evidence/qa-gates/).
+- [x] [P14-T10] Verify coverage deltas for the Phase 12 population and the catalog correction, discharging [P13-T4] (FEATURE/evidence/qa-gates/).
   - Files and behavior: Write FEATURE/evidence/qa-gates/p14-coverage-comparison.<timestamp>.md from SCRATCH/issue-980-p14-coverage.json, the P14-T7 coverage output and the P0-T2 and P0-T3 baselines, over the P13-T4 population (every Python and TypeScript production file Phase 12 added or changed, including the agentic_sync split modules) plus R/catalog.py.
   - Tests and proof: Per file: baseline, final and delta for lines and branches; new files at least 90% lines; every file at least 85% lines and 75% branches; no regression on changed lines; every changed line of R/catalog.py covered. No exclusion and no threshold change.
   - Acceptance: Every listed file has numeric measurements meeting the floors and a missing measurement fails the gate; [P13-T4] and this task are checked together.
