@@ -71,7 +71,7 @@ Describe 'Copilot discovery-pre-tool.ps1' {
         $store = Get-StartStore -HostName 'github-copilot'
         $store['ReadBytes'] = Get-StartProfileReader -HostName 'github-copilot'
         $decision = Get-CopilotDecision -Json (Get-GateEnvelope -HostName 'github-copilot' -ToolName 'mcp__drm-copilot__read_discovery_source' -ToolInput ([ordered]@{ paths = @('src'); invocation_ref = 'invocation-alpha' }) -AgentType 'legacy-parity-analyst-c3') -Store $store
-        $decision.permissionDecision | Should -Be 'allow' -Because $decision.permissionDecisionReason
+        $decision.permissionDecision | Should -Be 'allow' -Because ($decision | ConvertTo-Json -Compress)
         $store.Writes.Count | Should -Be 2
         ($store.Files["$($script:GateInvocationDirectory)/invocation.json"] | ConvertFrom-Json).state | Should -Be 'started'
     }

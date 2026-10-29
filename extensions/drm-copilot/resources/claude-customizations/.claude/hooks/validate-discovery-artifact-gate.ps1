@@ -5,9 +5,9 @@
 .DESCRIPTION
     Invoked by the Claude Code SubagentStop hook under the existing broad
     generic-agent matcher group. The hook reads the SubagentStop envelope through
-    the shared envelope helper (subagentstop-envelope.ps1), derives the trusted
-    launch context from the envelope session and the DRM_DISCOVERY_* values the
-    native host adapter placed in the environment, and takes its decision from the
+    the shared envelope helper (subagentstop-envelope.ps1), derives the stopping
+    principal from the payload alone (session, the host-assigned agent_id and
+    agent_type, and the literal parent root), and takes its decision from the
     shared DiscoveryStop module:
 
     - a stop whose agent type is not a discovery specialist is allowed, so the
@@ -49,16 +49,15 @@ function Invoke-DiscoveryArtifactGateValidation {
     .SYNOPSIS
         Reads the SubagentStop envelope and returns an Ok/Message validation result for a discovery stop.
     .DESCRIPTION
-        Every seam defaults to the real host (process environment, platform state
-        roots, protected store, workspace bytes) and is injectable so tests run over
-        in-memory values. A recorded dependency failure blocks before the envelope is
-        read. The result also carries the shared outcome Code for diagnostics.
+        Every seam defaults to the real host (platform state roots, protected
+        store, workspace bytes) and is injectable so tests run over in-memory
+        values. A recorded dependency failure blocks before the envelope is read.
+        The result also carries the shared outcome Code for diagnostics.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
         [AllowNull()] [AllowEmptyString()] [string] $InputText,
-        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadBytes = $null
@@ -70,13 +69,12 @@ function Invoke-DiscoveryArtifactGateValidation {
 
     # Seams resolve only after the dependency check so a missing module blocks
     # instead of raising while a default is evaluated.
-    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryStartStore }
 
     $normalized = ConvertFrom-DiscoveryHostEnvelope -HostName 'claude-code' -Envelope $envelope.Envelope
     $parameters = @{
-        Normalized = $normalized; Environment = $EnvironmentValues; HostEnvironment = $HostEnvironment
+        Normalized = $normalized; HostEnvironment = $HostEnvironment
         AssistantText = [string]$envelope.AssistantText; StopHookActive = [bool]$envelope.StopHookActive; Store = $Store
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }

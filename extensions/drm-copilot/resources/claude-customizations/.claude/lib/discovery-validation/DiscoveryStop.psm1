@@ -219,8 +219,7 @@ function Get-DiscoveryStopDecision {
         Decides one SubagentStop event for a native discovery adapter.
     .DESCRIPTION
         Order: envelope anomalies block; a non-discovery agent type is skipped; a
-        missing agent identity, a launching process that is itself a specialist or
-        an unattributed principal blocks; the activation must be active; exactly one
+        missing agent identity in the payload blocks; the activation must be active; exactly one
         started or finalized invocation must bind this agent; the invocation must be
         finalized with a completion receipt that passes Get-DiscoveryReceiptMismatch;
         finally the final text must state the explicit result the receipt proves.
@@ -233,7 +232,6 @@ function Get-DiscoveryStopDecision {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory = $true)][pscustomobject]$Normalized,
-        [Parameter(Mandatory = $true)][hashtable]$Environment,
         [Parameter(Mandatory = $true)][hashtable]$HostEnvironment,
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$AssistantText = '',
         [Parameter(Mandatory = $false)][bool]$StopHookActive = $false,
@@ -241,7 +239,7 @@ function Get-DiscoveryStopDecision {
         [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadBytes = $null
     )
 
-    $outcome = Get-DiscoveryStopVerdict -Normalized $Normalized -Environment $Environment -HostEnvironment $HostEnvironment `
+    $outcome = Get-DiscoveryStopVerdict -Normalized $Normalized -HostEnvironment $HostEnvironment `
         -AssistantText $AssistantText -Store $Store -ReadBytes $ReadBytes
     if ($outcome.Decision -eq 'block' -and $StopHookActive -and $outcome.Code -ne 'ENVELOPE') {
         return Get-DiscoveryStopOutcome -Decision 'allow' -Code 'CONTINUED' -Reason "$($outcome.Reason) (a continuation was already requested; the protected receipts remain authoritative)" -Receipt $outcome.Receipt -Invocation $outcome.Invocation
@@ -258,7 +256,6 @@ function Get-DiscoveryStopVerdict {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory = $true)][pscustomobject]$Normalized,
-        [Parameter(Mandatory = $true)][hashtable]$Environment,
         [Parameter(Mandatory = $true)][hashtable]$HostEnvironment,
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$AssistantText = '',
         [Parameter(Mandatory = $true)][hashtable]$Store,
@@ -273,18 +270,12 @@ function Get-DiscoveryStopVerdict {
     if ($null -eq $role) {
         return Get-DiscoveryStopOutcome -Decision 'skip' -Code 'NOT_DISCOVERY_AGENT' -Reason 'the stopping agent is not a discovery specialist; the ordinary stop validation applies'
     }
-    $agentId = [string]$Normalized.AgentId
-    if ($agentId -notmatch $script:CorrelationIdPattern) {
+    # The principal (host, session, parent, agent) comes from the stop payload alone.
+    $principal = Get-DiscoveryTrustedPrincipal -Normalized $Normalized
+    if ($null -eq $principal.AgentId) {
         return Get-DiscoveryStopOutcome -Decision 'block' -Code 'IDENTITY' -Reason 'the native stop event carries no agent identifier for the discovery specialist'
     }
-    if (-not [string]::IsNullOrWhiteSpace([string]$Environment['DRM_DISCOVERY_AGENT_ID']) -or -not [string]::IsNullOrWhiteSpace([string]$Environment['DRM_DISCOVERY_AGENT_ROLE'])) {
-        return Get-DiscoveryStopOutcome -Decision 'block' -Code 'NESTED' -Reason "discovery specialist $agentType was launched by an attested discovery agent; nested specialists have no stop authority"
-    }
-    $principal = Get-DiscoveryTrustedPrincipal -Normalized $Normalized -Environment $Environment
-    if (-not $principal.Attributed -or $null -eq $principal.ParentAgentId) {
-        $reason = $(if ($null -ne $principal.Reason) { $principal.Reason } else { 'the native host attested no parent agent for this launch' })
-        return Get-DiscoveryStopOutcome -Decision 'block' -Code 'IDENTITY' -Reason "the stop could not be attributed: $reason"
-    }
+    $agentId = $principal.AgentId
     if ([string]::IsNullOrWhiteSpace([string]$Normalized.Cwd)) {
         return Get-DiscoveryStopOutcome -Decision 'block' -Code 'WORKSPACE' -Reason 'the native event carries no workspace directory'
     }

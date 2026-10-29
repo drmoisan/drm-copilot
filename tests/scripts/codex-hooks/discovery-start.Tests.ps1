@@ -104,6 +104,17 @@ Describe 'Codex discovery start attestation' {
         (Invoke-CodexModelRoutingDecision -PayloadRaw '{"agent_type":"legacy-parity-analyst-c3","model":"gpt-6.1-sol"}' -AttestationRaw ($attestation | ConvertTo-Json -Compress -Depth 5)).hookSpecificOutput.permissionDecision | Should -Be 'deny'
     }
 
+    It 'observes two prepared invocations as AMBIGUOUS with a non-blocking start output and no attestation write' {
+        $store = Get-StartStore -HostName 'codex' -SecondInvocation
+        $attestation = Get-CodexStartAttestation -Store $store
+        $attestation.discovery_code | Should -Be 'AMBIGUOUS' -Because $attestation.discovery_reason
+        $store.Writes.Count | Should -Be 0
+        $output = Get-CodexDiscoveryStartCommandOutput -Attestation $attestation -AttestationPath 'memory/a.json' | ConvertFrom-Json
+        $output.systemMessage | Should -BeLike 'DISCOVERY_START_ATTESTATION_BLOCKED:*2 prepared invocations*'
+        @($output.PSObject.Properties.Name) | Should -Not -Contain 'continue'
+        @($output.PSObject.Properties.Name) | Should -Not -Contain 'decision'
+    }
+
     It 'records a profile read failure as a rejected attestation' {
         Mock Get-CodexAgentProfileAttestation { throw 'profile missing' }
         $attestation = Get-CodexStartAttestation -AgentProfile $null

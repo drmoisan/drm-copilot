@@ -4,21 +4,27 @@
 
 .DESCRIPTION
     Invoked by the Codex PreToolUse hook. The hook reads the Codex envelope from
-    stdin, derives the trusted principal from the envelope session and the
-    DRM_DISCOVERY_* values the native host adapter placed in the environment, and
-    takes its decision from the shared DiscoveryAuthorization module (published
-    under .codex/lib/discovery-validation, or read from .claude/lib when this
-    repository hosts itself):
+    stdin, derives the trusted principal from the payload alone (session, the
+    host-assigned agent_id and agent_type when the payload carries them, and the
+    literal parent root), and takes its decision from the shared
+    DiscoveryAuthorization module (published under .codex/lib/discovery-validation,
+    or read from .claude/lib when this repository hosts itself):
 
-    - a process without an attested discovery agent allows silently (no stdout),
-      so root and ordinary sessions keep the behavior of their other gates;
+    - a root call (no agent_id) of prepare_discovery_agent, run_discovery_doctor or
+      a controlled discovery tool is allowed with a one-use root grant the MCP
+      server consumes; every other root call and every call of an agent that is
+      not a discovery specialist allows silently (no stdout), so ordinary
+      sessions keep the behavior of their other gates;
+    - a sentinel envelope is observed for the capability probe and never granted;
     - a discovery specialist may use read-only native tools and the controlled
       discovery MCP tools only; shell, exec and evaluation tools, generic
       apply_patch/Write/Edit mutations, nested agents, foreign MCP servers,
       root-only discovery operations and caller-supplied identity fields are denied
       before execution with a PreToolUse deny decision at exit 0;
-    - an admitted controlled call is bound to the agent's started protected
-      invocation and recorded as one short-lived, one-use tool-authorization.
+    - every controlled call must name the specialist's started invocation through
+      invocation_ref and is recorded as one short-lived, one-use tool-authorization;
+      the Codex SubagentStart attestation binds the prepared invocation, and the
+      gate's first-call binding reports PROFILE when no start attested the agent.
 
     An envelope the hook cannot read is a hard failure: the reason goes to stderr
     and the hook exits 2. Dependency failures deny with the
@@ -71,6 +77,10 @@ function Import-DiscoveryGateSelfHostedModule {
     try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
     try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
     try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryToolRouting.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryToolRouting.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryRootGrant.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryRootGrant.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryObservation.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryObservation.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryStart.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStart.psm1' -ErrorRecord $_ }
     try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
 }
 
@@ -80,6 +90,10 @@ if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/discovery-validation
     try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
     try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
     try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryToolRouting.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryToolRouting.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryRootGrant.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryRootGrant.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryObservation.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryObservation.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStart.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStart.psm1' -ErrorRecord $_ }
     try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
 } else {
     Import-DiscoveryGateSelfHostedModule
@@ -116,7 +130,6 @@ function Invoke-DiscoveryArtifactGateDecision {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$ToolInputRaw,
-        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][nullable[datetime]]$Now = $null,
@@ -127,14 +140,13 @@ function Invoke-DiscoveryArtifactGateDecision {
 
     # Seams resolve only after the dependency check so a missing module denies
     # instead of raising while a default is evaluated.
-    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryDefaultStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
     if ([string]::IsNullOrEmpty($Nonce)) { $Nonce = Get-DiscoveryAuthorizationNonce }
 
     $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'codex' -Text $ToolInputRaw
-    return Get-DiscoveryPreToolDecision -Normalized $normalized -Environment $EnvironmentValues -HostEnvironment $HostEnvironment `
+    return Get-DiscoveryPreToolDecision -Normalized $normalized -HostEnvironment $HostEnvironment `
         -HandlerSha256 (Get-DiscoveryGateHandlerSha256) -Store $Store -Now $Now -Nonce $Nonce
 }
 

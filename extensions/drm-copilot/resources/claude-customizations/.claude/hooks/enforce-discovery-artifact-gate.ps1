@@ -4,20 +4,25 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook. The hook reads the PreToolUse
-    envelope, derives the trusted principal from the envelope session and the
-    DRM_DISCOVERY_* values the native host adapter placed in the environment, and
-    takes its decision from the shared DiscoveryAuthorization module:
+    envelope, derives the trusted principal from the payload alone (session, the
+    host-assigned agent_id and agent_type, and the literal parent root), and takes
+    its decision from the shared DiscoveryAuthorization module:
 
-    - a process without an attested discovery agent is allowed, so root and
-      ordinary sessions keep the behavior of their other gates;
+    - a root call (no agent_id) of prepare_discovery_agent, run_discovery_doctor or
+      a controlled discovery tool is allowed with a one-use root grant the MCP
+      server consumes; every other root call and every call of an agent that is
+      not a discovery specialist is allowed, so ordinary sessions keep the
+      behavior of their other gates;
+    - a sentinel envelope is observed for the capability probe and never granted;
     - a discovery specialist may use read-only native tools and the controlled
       discovery MCP tools only; shell, terminal, exec and evaluation tools, generic
       Write/Edit/apply_patch mutations, nested agents, foreign MCP servers,
       root-only discovery operations and caller-supplied identity fields are denied
       before execution;
-    - an admitted controlled call is bound to the agent's started protected
-      invocation and recorded as one short-lived, one-use tool-authorization in the
-      protected store, which the gateway consumes exactly once.
+    - the specialist's first controlled call binds the single prepared invocation
+      of its session, parent and agent type; every controlled call must name that
+      invocation through invocation_ref and is recorded as one short-lived, one-use
+      tool-authorization in the protected store, which the gateway consumes exactly once.
 
     Envelope anomalies and dependency failures deny with the
     DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix. The hook performs no validation of
@@ -37,6 +42,10 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/Discov
 try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryToolRouting.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryToolRouting.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryRootGrant.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryRootGrant.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryObservation.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryObservation.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStart.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStart.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
 
 $script:DiscoveryGateReasonPrefix = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
@@ -62,16 +71,14 @@ function Invoke-DiscoveryArtifactGateDecision {
     .SYNOPSIS
         Parses the PreToolUse envelope and returns the allow-or-deny decision for a discovery agent.
     .DESCRIPTION
-        Every seam defaults to the real host (process environment, platform state
-        roots, protected store, clock, nonce) and is injectable so tests run over
-        in-memory values. A recorded dependency failure denies before the envelope
-        is read.
+        Every seam defaults to the real host (platform state roots, protected
+        store, clock, nonce) and is injectable so tests run over in-memory values.
+        A recorded dependency failure denies before the envelope is read.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$ToolInputRaw,
-        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][nullable[datetime]]$Now = $null,
@@ -82,14 +89,13 @@ function Invoke-DiscoveryArtifactGateDecision {
 
     # Seams resolve only after the dependency check so a missing module denies
     # instead of raising while a default is evaluated.
-    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryDefaultStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
     if ([string]::IsNullOrEmpty($Nonce)) { $Nonce = Get-DiscoveryAuthorizationNonce }
 
     $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text $ToolInputRaw
-    $outcome = Get-DiscoveryPreToolDecision -Normalized $normalized -Environment $EnvironmentValues -HostEnvironment $HostEnvironment `
+    $outcome = Get-DiscoveryPreToolDecision -Normalized $normalized -HostEnvironment $HostEnvironment `
         -HandlerSha256 (Get-DiscoveryGateHandlerSha256) -Store $Store -Now $Now -Nonce $Nonce
     return ConvertTo-DiscoveryPreToolHookOutput -Outcome $outcome -ReasonPrefix $script:DiscoveryGateReasonPrefix
 }
