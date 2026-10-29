@@ -4,20 +4,24 @@
 
 .DESCRIPTION
     Registered through .github/hooks/*.json. The hook reads the Copilot start
-    envelope from stdin (camelCase keys, snake_case accepted), derives the trusted
-    launch context from the envelope session and the DRM_DISCOVERY_* values the
-    native host adapter placed in the environment, and takes its decision from the
-    shared DiscoveryStart module under .claude/lib/discovery-validation:
+    envelope from stdin (camelCase keys, snake_case accepted), derives the launch
+    context from the payload alone (session, the agent identity when the harness
+    supplies one, and parentAgentId or the literal parent root), and takes its
+    decision from the shared DiscoveryStart module under
+    .claude/lib/discovery-validation. The start is observational: the Copilot
+    harness does not let a subagentStart hook prevent the agent from running, and
+    its subagentStart payload carries no agent identifier, so the binding normally
+    completes at the specialist's first controlled tool call.
 
     - a start whose agent type is not a discovery specialist produces no output;
-    - a discovery specialist is attested only when exactly one prepared
-      discovery-invocation in the protected store binds this host, session, parent
-      and agent type and the activation, deployment, agent profile hash and
-      capability pins agree; the start-attestation is recorded and the invocation
-      moves to started;
+    - a discovery specialist is attested when the payload carries its agent
+      identifier and exactly one prepared discovery-invocation in the protected
+      store binds this host, session, parent and agent type and the activation,
+      deployment, agent profile hash and capability pins agree; the
+      start-attestation is recorded and the invocation moves to started;
     - a start that cannot be attested writes the DISCOVERY_START_ATTESTATION_BLOCKED:
-      reason as the SubagentStart system message; the PreToolUse adapter then denies
-      every grant because no started invocation exists.
+      reason as the SubagentStart system message; the PreToolUse adapter then binds
+      the prepared invocation at the first controlled call or denies every grant.
 
     A helper that fails to load and an envelope that cannot be read write the reason
     to stderr at exit 2; the hook never fails open. No orchestrator checkpoint is
@@ -80,7 +84,6 @@ function Invoke-DiscoveryAgentStartDecision {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw,
-        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][nullable[datetime]]$Now = $null,
@@ -94,7 +97,6 @@ function Invoke-DiscoveryAgentStartDecision {
     }
     # Seams resolve only after the dependency check so a missing module denies
     # instead of raising while a default is evaluated.
-    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryStartStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
@@ -102,7 +104,7 @@ function Invoke-DiscoveryAgentStartDecision {
 
     $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'github-copilot' -Text $PayloadRaw
     $parameters = @{
-        Normalized = $normalized; Environment = $EnvironmentValues; HostEnvironment = $HostEnvironment
+        Normalized = $normalized; HostEnvironment = $HostEnvironment
         HandlerSha256 = (Get-DiscoveryStartHandlerSha256); Store = $Store; Now = $Now; Nonce = $Nonce
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }
@@ -119,7 +121,7 @@ function Invoke-DiscoveryAgentStartEntryPoint {
     param([Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw)
 
     $outcome = Invoke-DiscoveryAgentStartDecision -PayloadRaw $PayloadRaw
-    if ($outcome.Decision -ne 'deny') { return 0 }
+    if ($outcome.Decision -notin @('deny', 'observe')) { return 0 }
     if ($outcome.Code -in @('ENVELOPE', 'DEPENDENCY')) {
         [Console]::Error.WriteLine("$($script:DiscoveryStartReasonPrefix) $($outcome.Reason)")
         return 2

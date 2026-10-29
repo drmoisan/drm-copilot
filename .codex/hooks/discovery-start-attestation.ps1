@@ -77,7 +77,6 @@ function Get-CodexDiscoveryStartAttestation {
         [Parameter(Mandatory)] $Payload,
         [Parameter(Mandatory)][string] $RepositoryRoot,
         [Parameter(Mandatory)][datetimeoffset] $Now,
-        [AllowNull()][hashtable] $EnvironmentValues = $null,
         [AllowNull()][hashtable] $HostEnvironment = $null,
         [AllowNull()][hashtable] $Store = $null,
         [AllowNull()][string] $Nonce = $null,
@@ -97,14 +96,14 @@ function Get-CodexDiscoveryStartAttestation {
         try { $AgentProfile = Get-CodexAgentProfileAttestation -RepositoryRoot $RepositoryRoot -AgentType $agentType } catch { $profileValidationError = [string]$_ }
     }
     $sharedProfile = $(if ($null -ne $AgentProfile) { ConvertTo-CodexSharedAgentProfile -AgentProfile $AgentProfile } else { $null })
+    # The principal comes from the payload alone: Codex supplies no parent identifier, so the parent is the literal root.
     $normalized = [pscustomobject]@{
-        HostName = 'codex'; Event = 'SubagentStart'; SessionId = [string]$Payload.session_id; AgentId = $agentId; AgentType = $agentType
+        HostName = 'codex'; Event = 'SubagentStart'; SessionId = [string]$Payload.session_id; AgentId = $agentId; AgentType = $agentType; ParentAgentId = $null
         ToolName = $null; ToolInput = $null; Cwd = $RepositoryRoot; ToolUseId = $null; Anomaly = $null
     }
     if ([string]::IsNullOrWhiteSpace($normalized.SessionId)) { $normalized.Anomaly = 'MissingSessionId' }
     $handlerSha256 = $(if (Test-Path -LiteralPath $HandlerPath -PathType Leaf) { Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes($HandlerPath)) } else { '0' * 64 })
     $parameters = @{ Normalized = $normalized; HandlerSha256 = $handlerSha256; Now = $Now.UtcDateTime; ActualModel = $model }
-    $parameters['Environment'] = $(if ($null -ne $EnvironmentValues) { $EnvironmentValues } else { Get-DiscoveryHostEnvironmentValueTable })
     $parameters['HostEnvironment'] = $(if ($null -ne $HostEnvironment) { $HostEnvironment } else { Get-DiscoveryTrustedHostEnvironment })
     if ($null -ne $Store) { $parameters['Store'] = $Store }
     if (-not [string]::IsNullOrEmpty($Nonce)) { $parameters['Nonce'] = $Nonce }

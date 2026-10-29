@@ -8,10 +8,12 @@
 .DESCRIPTION
     Proves the discovery agent grammar, the per-host agent-profile readers, the started
     transition of a protected invocation record, prepared-invocation binding and the full
-    SubagentStart decision over an in-memory protected store: receipt kind, trusted
+    SubagentStart decision over an in-memory protected store: receipt kind, payload
     parent/session, exact role/model/effort/profile hash, schema/runtime/build and
-    capability pins, missing or wrong receipts, mirror tampering, nested launch, and the
-    unchanged ordinary and epic starts. No file, process, network or clock is touched.
+    capability pins, missing or wrong receipts, mirror tampering, and the unchanged
+    ordinary and epic starts. The start is observational: a binding that cannot
+    complete is observed with its code and never claims to block the host. No file,
+    process, network or clock is touched.
 #>
 
 BeforeAll {
@@ -31,7 +33,6 @@ BeforeAll {
         [OutputType([pscustomobject])]
         param(
             [Parameter(Mandatory = $false)][AllowNull()][string]$Json = (Get-StartEnvelope),
-            [Parameter(Mandatory = $false)][hashtable]$Environment = (Get-StartEnvironment),
             [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StartStore),
             [Parameter(Mandatory = $false)][AllowNull()][pscustomobject]$AgentProfile = (Get-StartProfile),
             [Parameter(Mandatory = $false)][AllowNull()][string]$ActualModel = 'gpt-6.1-sol',
@@ -40,7 +41,7 @@ BeforeAll {
         )
         $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text $Json
         $parameters = @{
-            Normalized = $normalized; Environment = $Environment; HostEnvironment = $script:GateHostEnvironment; HandlerSha256 = ('9' * 64)
+            Normalized = $normalized; HostEnvironment = $script:GateHostEnvironment; HandlerSha256 = ('9' * 64)
             Store = $Store; Now = $script:GateNow; Nonce = $script:GateNonce; ActualModel = $ActualModel; ActualReasoningEffort = $ActualReasoningEffort
         }
         if ($null -ne $AgentProfile) { $parameters['AgentProfile'] = $AgentProfile }
@@ -149,7 +150,7 @@ Describe 'record primitives' {
 
 Describe 'prepared invocation binding' {
     BeforeAll {
-        $script:Principal = Get-DiscoveryTrustedPrincipal -Normalized (ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text (Get-StartEnvelope)) -Environment (Get-StartEnvironment)
+        $script:Principal = Get-DiscoveryTrustedPrincipal -Normalized (ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text (Get-StartEnvelope))
     }
 
     It 'finds exactly the prepared record bound to this host, session, parent and agent type' {
@@ -188,66 +189,73 @@ Describe 'start decision' {
         $store.Writes.Count | Should -Be 0
     }
 
-    It 'denies <Name> with code <Code> and writes nothing' -ForEach @(
-        @{ Name = 'an unreadable envelope'; Code = 'ENVELOPE'; Json = '{'; Environment = $null; Store = $null }
-        @{ Name = 'a start without an agent identifier'; Code = 'IDENTITY'; Json = $null; AgentId = ''; Environment = $null; Store = $null }
-        @{ Name = 'a nested launch by an attested specialist'; Code = 'NESTED'; Json = $null; Environment = @{ Nested = $true }; Store = $null }
-        @{ Name = 'a launch without a trusted parent'; Code = 'IDENTITY'; Json = $null; Environment = @{ NoParent = $true }; Store = $null }
-        @{ Name = 'an envelope from another host'; Code = 'IDENTITY'; Json = $null; Environment = @{ HostName = 'codex' }; Store = $null }
-        @{ Name = 'a start without a workspace directory'; Code = 'WORKSPACE'; Json = $null; Cwd = ''; Environment = $null; Store = $null }
-        @{ Name = 'a missing activation'; Code = 'ACTIVATION'; Json = $null; Environment = $null; Store = @{ NoActivation = $true } }
-        @{ Name = 'a deactivated workspace'; Code = 'ACTIVATION'; Json = $null; Environment = $null; Store = @{ ActivationAction = 'deactivate' } }
-        @{ Name = 'a missing prepared invocation'; Code = 'NO_INVOCATION'; Json = $null; Environment = $null; Store = @{ NoInvocation = $true } }
-        @{ Name = 'an invocation prepared for another parent'; Code = 'NO_INVOCATION'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ parent_agent_id = 'root-beta' } } }
-        @{ Name = 'an invocation prepared for another session'; Code = 'NO_INVOCATION'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ session_id = 'session-beta' } } }
-        @{ Name = 'a receipt of another kind'; Code = 'NO_INVOCATION'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ artifact_kind = 'validation-receipt' } } }
-        @{ Name = 'two prepared invocations'; Code = 'AMBIGUOUS'; Json = $null; Environment = $null; Store = @{ SecondInvocation = $true } }
-        @{ Name = 'a record with production writes'; Code = 'RECEIPT'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ production_write_count = 1 } } }
-        @{ Name = 'a record of another schema version'; Code = 'RECEIPT'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ schema_version = '1.0.0' } } }
-        @{ Name = 'a role that differs from the agent type'; Code = 'ROLE'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ role = 'requirements-reconciler' } } }
-        @{ Name = 'an actual model that differs from the deployment'; Code = 'MODEL'; Json = $null; ActualModel = 'gpt-6-astra'; Environment = $null; Store = $null }
-        @{ Name = 'a profile effort that differs from the deployment'; Code = 'EFFORT'; Json = $null; ActualReasoningEffort = 'medium'; Environment = $null; Store = $null }
-        @{ Name = 'an agent profile naming another agent'; Code = 'PROFILE'; Json = $null; ProfileOverrides = @{ ProfileName = 'legacy-parity-analyst-c1' }; Environment = $null; Store = $null }
-        @{ Name = 'an agent profile without a hash'; Code = 'PROFILE'; Json = $null; ProfileOverrides = @{ ProfileSha256 = 'none' }; Environment = $null; Store = $null }
-        @{ Name = 'a domain profile hash from another activation'; Code = 'BINDING'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ workspace = [ordered]@{ workspace_root = 'C:/Users/Example/Repos/Workspace'; workspace_sha256 = '77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6'; profile_path = 'docs/migration/discovery/domain-profile.yaml'; profile_sha256 = ('0' * 64) } } } }
-        @{ Name = 'a schema version outside the activation'; Code = 'BINDING'; Json = $null; Environment = $null; Store = @{ InvocationOverrides = @{ runtime = [ordered]@{ package_version = '2.0.0'; schema_version = '3.0.0'; build_sha256 = ('b' * 64); policy_version = '2.0.0'; policy_sha256 = ('c' * 64) } } } }
-        @{ Name = 'a missing capability attestation'; Code = 'CAPABILITY'; Json = $null; Environment = $null; Store = @{ NoCapability = $true } }
-        @{ Name = 'a capability attestation for another reference'; Code = 'CAPABILITY'; Json = $null; Environment = $null; Store = @{ CapabilityOverrides = @{ attestation_ref = 'capability-beta' } } }
-        @{ Name = 'an unsupported capability attestation'; Code = 'CAPABILITY'; Json = $null; Environment = $null; Store = @{ CapabilityOverrides = @{ status = 'unsupported' } } }
-        @{ Name = 'an expired capability attestation'; Code = 'CAPABILITY'; Json = $null; Environment = $null; Store = @{ CapabilityOverrides = @{ expires_at = '2026-10-22T11:59:59Z' } } }
-        @{ Name = 'a capability attestation of another session'; Code = 'CAPABILITY'; Json = $null; Environment = $null; Store = @{ CapabilityOverrides = @{ session_id = 'session-beta' } } }
-        @{ Name = 'a build pin that differs from the capability'; Code = 'RUNTIME'; Json = $null; Environment = $null; Store = @{ RuntimeOverrides = @{ build_sha256 = ('1' * 64) } } }
-        @{ Name = 'a capability runtime missing a pin'; Code = 'RUNTIME'; Json = $null; Environment = $null; Store = @{ CapabilityOverrides = @{ runtime = [ordered]@{ package_version = '2.0.0' } } } }
+    It 'observes <Name> with code <Code> and writes nothing' -ForEach @(
+        @{ Name = 'an unreadable envelope'; Code = 'ENVELOPE'; Json = '{'; Store = $null }
+        @{ Name = 'a start without an agent identifier'; Code = 'IDENTITY'; Json = $null; AgentId = ''; Store = $null }
+        @{ Name = 'a start without a workspace directory'; Code = 'WORKSPACE'; Json = $null; Cwd = ''; Store = $null }
+        @{ Name = 'a missing activation'; Code = 'ACTIVATION'; Json = $null; Store = @{ NoActivation = $true } }
+        @{ Name = 'a deactivated workspace'; Code = 'ACTIVATION'; Json = $null; Store = @{ ActivationAction = 'deactivate' } }
+        @{ Name = 'a missing prepared invocation'; Code = 'NO_INVOCATION'; Json = $null; Store = @{ NoInvocation = $true } }
+        @{ Name = 'an invocation prepared for another parent'; Code = 'NO_INVOCATION'; Json = $null; Store = @{ InvocationOverrides = @{ parent_agent_id = 'root-beta' } } }
+        @{ Name = 'an invocation prepared for another session'; Code = 'NO_INVOCATION'; Json = $null; Store = @{ InvocationOverrides = @{ session_id = 'session-beta' } } }
+        @{ Name = 'an envelope from another host'; Code = 'NO_INVOCATION'; Json = $null; Store = @{ HostName = 'codex' } }
+        @{ Name = 'a receipt of another kind'; Code = 'NO_INVOCATION'; Json = $null; Store = @{ InvocationOverrides = @{ artifact_kind = 'validation-receipt' } } }
+        @{ Name = 'two prepared invocations'; Code = 'AMBIGUOUS'; Json = $null; Store = @{ SecondInvocation = $true } }
+        @{ Name = 'a record with production writes'; Code = 'RECEIPT'; Json = $null; Store = @{ InvocationOverrides = @{ production_write_count = 1 } } }
+        @{ Name = 'a record of another schema version'; Code = 'RECEIPT'; Json = $null; Store = @{ InvocationOverrides = @{ schema_version = '1.0.0' } } }
+        @{ Name = 'a role that differs from the agent type'; Code = 'ROLE'; Json = $null; Store = @{ InvocationOverrides = @{ role = 'requirements-reconciler' } } }
+        @{ Name = 'an actual model that differs from the deployment'; Code = 'MODEL'; Json = $null; ActualModel = 'gpt-6-astra'; Store = $null }
+        @{ Name = 'a profile effort that differs from the deployment'; Code = 'EFFORT'; Json = $null; ActualReasoningEffort = 'medium'; Store = $null }
+        @{ Name = 'an agent profile naming another agent'; Code = 'PROFILE'; Json = $null; ProfileOverrides = @{ ProfileName = 'legacy-parity-analyst-c1' }; Store = $null }
+        @{ Name = 'an agent profile without a hash'; Code = 'PROFILE'; Json = $null; ProfileOverrides = @{ ProfileSha256 = 'none' }; Store = $null }
+        @{ Name = 'a domain profile hash from another activation'; Code = 'BINDING'; Json = $null; Store = @{ InvocationOverrides = @{ workspace = [ordered]@{ workspace_root = 'C:/Users/Example/Repos/Workspace'; workspace_sha256 = '77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6'; profile_path = 'docs/migration/discovery/domain-profile.yaml'; profile_sha256 = ('0' * 64) } } } }
+        @{ Name = 'a schema version outside the activation'; Code = 'BINDING'; Json = $null; Store = @{ InvocationOverrides = @{ runtime = [ordered]@{ package_version = '2.0.0'; schema_version = '3.0.0'; build_sha256 = ('b' * 64); policy_version = '2.0.0'; policy_sha256 = ('c' * 64) } } } }
+        @{ Name = 'a missing capability attestation'; Code = 'CAPABILITY'; Json = $null; Store = @{ NoCapability = $true } }
+        @{ Name = 'a capability attestation for another reference'; Code = 'CAPABILITY'; Json = $null; Store = @{ CapabilityOverrides = @{ attestation_ref = 'capability-beta' } } }
+        @{ Name = 'an unsupported capability attestation'; Code = 'CAPABILITY'; Json = $null; Store = @{ CapabilityOverrides = @{ status = 'unsupported' } } }
+        @{ Name = 'an expired capability attestation'; Code = 'CAPABILITY'; Json = $null; Store = @{ CapabilityOverrides = @{ expires_at = '2026-10-22T11:59:59Z' } } }
+        @{ Name = 'a capability attestation of another session'; Code = 'CAPABILITY'; Json = $null; Store = @{ CapabilityOverrides = @{ session_id = 'session-beta' } } }
+        @{ Name = 'a build pin that differs from the capability'; Code = 'RUNTIME'; Json = $null; Store = @{ RuntimeOverrides = @{ build_sha256 = ('1' * 64) } } }
+        @{ Name = 'a capability runtime missing a pin'; Code = 'RUNTIME'; Json = $null; Store = @{ CapabilityOverrides = @{ runtime = [ordered]@{ package_version = '2.0.0' } } } }
     ) {
         $envelopeParameters = @{}
         if (Get-Variable -Name AgentId -ErrorAction SilentlyContinue) { $envelopeParameters['AgentId'] = $AgentId }
         if (Get-Variable -Name Cwd -ErrorAction SilentlyContinue) { $envelopeParameters['Cwd'] = $Cwd }
         $json = $(if ($null -ne $Json) { $Json } else { Get-StartEnvelope @envelopeParameters })
-        $environment = $(if ($null -ne $Environment) { Get-StartEnvironment @Environment } else { Get-StartEnvironment })
         $store = $(if ($null -ne $Store) { Get-StartStore @Store } else { Get-StartStore })
-        $outcomeParameters = @{ Json = $json; Environment = $environment; Store = $store }
+        $outcomeParameters = @{ Json = $json; Store = $store }
         if (Get-Variable -Name ActualModel -ErrorAction SilentlyContinue) { $outcomeParameters['ActualModel'] = $ActualModel }
         if (Get-Variable -Name ActualReasoningEffort -ErrorAction SilentlyContinue) { $outcomeParameters['ActualReasoningEffort'] = $ActualReasoningEffort }
         if (Get-Variable -Name ProfileOverrides -ErrorAction SilentlyContinue) { $outcomeParameters['AgentProfile'] = Get-StartProfile -Overrides $ProfileOverrides }
         $outcome = Get-StartOutcome @outcomeParameters
-        $outcome.Decision | Should -Be 'deny' -Because $Name
+        $outcome.Decision | Should -Be 'observe' -Because $Name
         $outcome.Code | Should -Be $Code -Because $outcome.Reason
         $store.Writes.Count | Should -Be 0
         $store.Replacements.Count | Should -Be 0
         $store.Reads | Should -Not -Contain $script:StartMirrorPath
     }
 
-    It 'denies a profile the host cannot read and never consults the mirror' {
+    It 'observes a profile the host cannot read and never consults the mirror' {
         $store = Get-StartStore
         $outcome = Get-StartOutcome -Store $store -AgentProfile $null -ActualModel $null -ActualReasoningEffort $null -ReadBytes (Get-StartProfileReader -Text $null)
+        $outcome.Decision | Should -Be 'observe'
         $outcome.Code | Should -Be 'PROFILE'
         $outcome.Reason | Should -BeLike '*does not exist*'
         $store.Reads | Should -Not -Contain $script:StartMirrorPath
     }
 
-    It 'denies a Markdown profile whose declared model differs from the deployment when the host exposes no model' {
+    It 'observes a Markdown profile whose declared model differs from the deployment when the host exposes no model' {
         $reader = Get-StartProfileReader -Text "---`nname: legacy-parity-analyst-c3`nmodel: other-model`n---`n"
         (Get-StartOutcome -AgentProfile $null -ActualModel $null -ActualReasoningEffort $null -ReadBytes $reader).Code | Should -Be 'MODEL'
+    }
+
+    It 'attests a start whose Copilot payload carries the parent it was prepared under' {
+        $store = Get-StartStore -HostName 'github-copilot' -InvocationOverrides @{ parent_agent_id = 'parent-alpha' }
+        $json = Get-StartEnvelope -HostName 'github-copilot' -ParentAgentId 'parent-alpha'
+        $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'github-copilot' -Text $json
+        $outcome = Get-DiscoveryStartDecision -Normalized $normalized -HostEnvironment $script:GateHostEnvironment -HandlerSha256 ('9' * 64) -Store $store -Now $script:GateNow -Nonce $script:GateNonce -AgentProfile (Get-StartProfile -HostName 'github-copilot') -ActualModel 'gpt-6.1-sol' -ActualReasoningEffort 'high'
+        $outcome.Decision | Should -Be 'attest' -Because $outcome.Reason
+        ($store.Files[$outcome.AttestationPath] | ConvertFrom-Json).parent_agent_id | Should -Be 'parent-alpha'
     }
 
     It 'attests the start, records the attestation exclusively and moves the invocation to started' {
@@ -263,7 +271,7 @@ Describe 'start decision' {
         $attestation.artifact_kind | Should -Be 'start-attestation'
         $attestation.start_attestation_ref | Should -Be 'start-0123456789abcdef0123'
         $attestation.invocation_ref | Should -Be 'invocation-alpha'
-        $attestation.parent_agent_id | Should -Be 'root-alpha'
+        $attestation.parent_agent_id | Should -Be 'root'
         $attestation.agent_id | Should -Be 'agent-alpha'
         $attestation.agent_type | Should -Be 'legacy-parity-analyst-c3'
         $attestation.role | Should -Be 'legacy-parity-analyst'
@@ -300,19 +308,22 @@ Describe 'start decision' {
         Import-Module (Join-Path $script:RepoRoot '.claude/lib/discovery-validation/DiscoveryAuthorization.psm1') -Force
         $store = Get-StartStore
         (Get-StartOutcome -Store $store).Decision | Should -Be 'attest'
-        $principal = Get-DiscoveryTrustedPrincipal -Normalized (ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text (Get-GateEnvelope -ToolName 'Read' -ToolInput @{})) -Environment (Get-GateEnvironment)
+        $principal = Get-DiscoveryTrustedPrincipal -Normalized (ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text (Get-GateEnvelope -ToolName 'Read' -ToolInput @{}))
         (Find-DiscoveryAgentInvocation -Location $script:GateLocation -Principal $principal -Store $store).Record.invocation_id | Should -Be 'invocation-alpha'
     }
 }
 
 Describe 'hook output rendering' {
-    It 'stays silent for a skipped or attested start and reports a denied start' {
+    It 'stays silent for a skipped or attested start and reports an observed start without a blocking field' {
         $prefix = 'DISCOVERY_START_ATTESTATION_BLOCKED:'
         ConvertTo-DiscoveryStartHookOutput -Outcome ([pscustomobject]@{ Decision = 'skip'; Code = 'NOT_DISCOVERY_AGENT'; Reason = 'r' }) -ReasonPrefix $prefix | Should -BeNullOrEmpty
         ConvertTo-DiscoveryStartHookOutput -Outcome ([pscustomobject]@{ Decision = 'attest'; Code = 'ATTESTED'; Reason = 'r' }) -ReasonPrefix $prefix | Should -BeNullOrEmpty
-        $output = ConvertTo-DiscoveryStartHookOutput -Outcome ([pscustomobject]@{ Decision = 'deny'; Code = 'NO_INVOCATION'; Reason = 'no prepared invocation' }) -ReasonPrefix $prefix
+        $output = ConvertTo-DiscoveryStartHookOutput -Outcome ([pscustomobject]@{ Decision = 'observe'; Code = 'NO_INVOCATION'; Reason = 'no prepared invocation' }) -ReasonPrefix $prefix
         $output.systemMessage | Should -Be "$prefix no prepared invocation"
         $output.hookSpecificOutput.hookEventName | Should -Be 'SubagentStart'
-        $output.hookSpecificOutput.additionalContext | Should -BeLike "$prefix no discovery tool grant is active*"
+        $output.hookSpecificOutput.additionalContext | Should -BeLike "$prefix the start was not attested at launch*"
+        @($output.Keys) | Should -Not -Contain 'continue'
+        @($output.Keys) | Should -Not -Contain 'decision'
+        @($output.hookSpecificOutput.Keys) | Should -Not -Contain 'permissionDecision'
     }
 }

@@ -32,14 +32,13 @@ BeforeAll {
         [OutputType([pscustomobject])]
         param(
             [Parameter(Mandatory = $false)][AllowNull()][string]$Json = (Get-StopEnvelope),
-            [Parameter(Mandatory = $false)][hashtable]$Environment = (Get-StartEnvironment),
             [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StopStore),
             [Parameter(Mandatory = $false)][hashtable]$Workspace = (Get-StopWorkspace),
             [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Text = 'Inventory recorded. Result: PASS',
             [Parameter(Mandatory = $false)][bool]$StopHookActive = $false
         )
         $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text $Json
-        return Get-DiscoveryStopDecision -Normalized $normalized -Environment $Environment -HostEnvironment $script:GateHostEnvironment `
+        return Get-DiscoveryStopDecision -Normalized $normalized -HostEnvironment $script:GateHostEnvironment `
             -AssistantText $Text -StopHookActive $StopHookActive -Store $Store -ReadBytes (Get-StopByteReader -Workspace $Workspace)
     }
 }
@@ -91,30 +90,29 @@ Describe 'stop decision for every role' {
 
 Describe 'stop decision refusals' {
     It 'blocks <Name> with code <Code>' -ForEach @(
-        @{ Name = 'an unreadable envelope'; Code = 'ENVELOPE'; Json = '{'; Store = @{}; Environment = @{} }
-        @{ Name = 'a stop without an agent identifier'; Code = 'IDENTITY'; AgentId = ''; Store = @{}; Environment = @{} }
-        @{ Name = 'a nested specialist'; Code = 'NESTED'; Store = @{}; Environment = @{ Nested = $true } }
-        @{ Name = 'a stop without a trusted parent'; Code = 'IDENTITY'; Store = @{}; Environment = @{ NoParent = $true } }
-        @{ Name = 'a stop from another session'; Code = 'IDENTITY'; SessionId = 'session-beta'; Store = @{}; Environment = @{} }
-        @{ Name = 'a stop without a workspace directory'; Code = 'WORKSPACE'; Cwd = ''; Store = @{}; Environment = @{} }
-        @{ Name = 'a deactivated workspace'; Code = 'ACTIVATION'; Store = @{ ActivationAction = 'deactivate' }; Environment = @{} }
-        @{ Name = 'a specialist without a protected invocation'; Code = 'NO_INVOCATION'; Store = @{ NoInvocation = $true }; Environment = @{} }
-        @{ Name = 'an invocation bound to another agent'; Code = 'NO_INVOCATION'; Store = @{ InvocationOverrides = @{ agent_id = 'agent-beta' } }; Environment = @{} }
-        @{ Name = 'a specialist that never finalized'; Code = 'NOT_FINALIZED'; Store = @{ State = 'started' }; Environment = @{} }
-        @{ Name = 'a role that differs from the agent type'; Code = 'ROLE'; Store = @{ InvocationOverrides = @{ role = 'requirements-reconciler' } }; Environment = @{} }
-        @{ Name = 'a missing completion receipt'; Code = 'RECEIPT'; Store = @{ NoReceipt = $true }; Environment = @{} }
-        @{ Name = 'a receipt of another kind'; Code = 'RECEIPT'; Store = @{ ReceiptOverrides = @{ artifact_kind = 'capability-attestation' } }; Environment = @{} }
-        @{ Name = 'a receipt for a root gate mode'; Code = 'GATE'; Store = @{ ReceiptOverrides = @{ mode = 'discovery-complete' } }; Environment = @{} }
-        @{ Name = 'a receipt for another session'; Code = 'IDENTITY'; Store = @{ IdentityOverrides = @{ session_id = 'session-beta' } }; Environment = @{} }
-        @{ Name = 'a receipt for another role'; Code = 'IDENTITY'; Store = @{ IdentityOverrides = @{ role = 'requirements-reconciler' } }; Environment = @{} }
-        @{ Name = 'a receipt for the root principal'; Code = 'IDENTITY'; Store = @{ IdentityOverrides = @{ kind = 'native-root' } }; Environment = @{} }
-        @{ Name = 'a receipt not written by the gateway'; Code = 'FORGED'; Store = @{ WriterOverrides = @{ kind = 'workspace-copy' } }; Environment = @{} }
-        @{ Name = 'a receipt bound to another workspace'; Code = 'BINDING'; Store = @{ ReceiptOverrides = @{ workspace = [ordered]@{ workspace_root = 'C:/Users/Example/Repos/Other'; workspace_sha256 = ('1' * 64); profile_path = 'docs/migration/discovery/domain-profile.yaml'; profile_sha256 = ('2' * 64) } } }; Environment = @{} }
-        @{ Name = 'a receipt issued before the activation changed'; Code = 'STALE_ACTIVATION'; Store = @{ ReceiptOverrides = @{ activation_sha256 = ('3' * 64) } }; Environment = @{} }
-        @{ Name = 'a receipt with another build pin'; Code = 'RUNTIME'; Store = @{ ReceiptOverrides = @{ runtime = [ordered]@{ package_version = '2.0.0'; schema_version = '2.0.0'; build_sha256 = ('4' * 64); policy_version = '2.0.0'; policy_sha256 = ('c' * 64) } } }; Environment = @{} }
-        @{ Name = 'a receipt without the required-output manifest'; Code = 'OUTPUTS'; Store = @{ ReceiptOverrides = @{ required_outputs = [ordered]@{ manifest_sha256 = ('5' * 64); outputs = @() } } }; Environment = @{} }
-        @{ Name = 'a receipt whose outputs are not valid'; Code = 'OUTPUT_INVALID'; Store = @{ ReceiptOverrides = @{ output_valid = $false } }; Environment = @{} }
-        @{ Name = 'a receipt with an invalid input manifest'; Code = 'RECEIPT'; Store = @{ ReceiptOverrides = @{ input_manifest = [ordered]@{ entries = @() } } }; Environment = @{} }
+        @{ Name = 'an unreadable envelope'; Code = 'ENVELOPE'; Json = '{'; Store = @{} }
+        @{ Name = 'a stop without an agent identifier'; Code = 'IDENTITY'; AgentId = ''; Store = @{} }
+        @{ Name = 'a stop from another session'; Code = 'NO_INVOCATION'; SessionId = 'session-beta'; Store = @{} }
+        @{ Name = 'a stop without a workspace directory'; Code = 'WORKSPACE'; Cwd = ''; Store = @{} }
+        @{ Name = 'a deactivated workspace'; Code = 'ACTIVATION'; Store = @{ ActivationAction = 'deactivate' } }
+        @{ Name = 'a specialist without a protected invocation'; Code = 'NO_INVOCATION'; Store = @{ NoInvocation = $true } }
+        @{ Name = 'an invocation bound to another agent'; Code = 'NO_INVOCATION'; Store = @{ InvocationOverrides = @{ agent_id = 'agent-beta' } } }
+        @{ Name = 'an invocation prepared under another parent'; Code = 'NO_INVOCATION'; Store = @{ InvocationOverrides = @{ parent_agent_id = 'root-beta' } } }
+        @{ Name = 'a specialist that never finalized'; Code = 'NOT_FINALIZED'; Store = @{ State = 'started' } }
+        @{ Name = 'a role that differs from the agent type'; Code = 'ROLE'; Store = @{ InvocationOverrides = @{ role = 'requirements-reconciler' } } }
+        @{ Name = 'a missing completion receipt'; Code = 'RECEIPT'; Store = @{ NoReceipt = $true } }
+        @{ Name = 'a receipt of another kind'; Code = 'RECEIPT'; Store = @{ ReceiptOverrides = @{ artifact_kind = 'capability-attestation' } } }
+        @{ Name = 'a receipt for a root gate mode'; Code = 'GATE'; Store = @{ ReceiptOverrides = @{ mode = 'discovery-complete' } } }
+        @{ Name = 'a receipt for another session'; Code = 'IDENTITY'; Store = @{ IdentityOverrides = @{ session_id = 'session-beta' } } }
+        @{ Name = 'a receipt for another role'; Code = 'IDENTITY'; Store = @{ IdentityOverrides = @{ role = 'requirements-reconciler' } } }
+        @{ Name = 'a receipt for the root principal'; Code = 'IDENTITY'; Store = @{ IdentityOverrides = @{ kind = 'native-root' } } }
+        @{ Name = 'a receipt not written by the gateway'; Code = 'FORGED'; Store = @{ WriterOverrides = @{ kind = 'workspace-copy' } } }
+        @{ Name = 'a receipt bound to another workspace'; Code = 'BINDING'; Store = @{ ReceiptOverrides = @{ workspace = [ordered]@{ workspace_root = 'C:/Users/Example/Repos/Other'; workspace_sha256 = ('1' * 64); profile_path = 'docs/migration/discovery/domain-profile.yaml'; profile_sha256 = ('2' * 64) } } } }
+        @{ Name = 'a receipt issued before the activation changed'; Code = 'STALE_ACTIVATION'; Store = @{ ReceiptOverrides = @{ activation_sha256 = ('3' * 64) } } }
+        @{ Name = 'a receipt with another build pin'; Code = 'RUNTIME'; Store = @{ ReceiptOverrides = @{ runtime = [ordered]@{ package_version = '2.0.0'; schema_version = '2.0.0'; build_sha256 = ('4' * 64); policy_version = '2.0.0'; policy_sha256 = ('c' * 64) } } } }
+        @{ Name = 'a receipt without the required-output manifest'; Code = 'OUTPUTS'; Store = @{ ReceiptOverrides = @{ required_outputs = [ordered]@{ manifest_sha256 = ('5' * 64); outputs = @() } } } }
+        @{ Name = 'a receipt whose outputs are not valid'; Code = 'OUTPUT_INVALID'; Store = @{ ReceiptOverrides = @{ output_valid = $false } } }
+        @{ Name = 'a receipt with an invalid input manifest'; Code = 'RECEIPT'; Store = @{ ReceiptOverrides = @{ input_manifest = [ordered]@{ entries = @() } } } }
     ) {
         $envelopeParameters = @{}
         foreach ($name in @('AgentId', 'SessionId', 'Cwd')) {
@@ -123,7 +121,7 @@ Describe 'stop decision refusals' {
         }
         $json = $(if (Get-Variable -Name Json -ErrorAction SilentlyContinue) { $Json } else { Get-StopEnvelope @envelopeParameters })
         $store = Get-StopStore @Store
-        $outcome = Get-StopOutcome -Json $json -Environment (Get-StartEnvironment @Environment) -Store $store
+        $outcome = Get-StopOutcome -Json $json -Store $store
         $outcome.Decision | Should -Be 'block' -Because $Name
         $outcome.Code | Should -Be $Code -Because $outcome.Reason
         $store.Reads | Should -Not -Contain $script:StartMirrorPath
@@ -182,7 +180,7 @@ Describe 'stop decision refusals' {
     }
 
     It 'binds exactly one invocation and reports two as ambiguous' {
-        $found = Find-DiscoveryAgentInvocationForStop -Location $script:GateLocation -Principal (Get-DiscoveryTrustedPrincipal -Normalized (ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text (Get-StopEnvelope)) -Environment (Get-StartEnvironment)) -AgentType 'legacy-parity-analyst-c3' -AgentId 'agent-alpha' -Store (Get-StopStore)
+        $found = Find-DiscoveryAgentInvocationForStop -Location $script:GateLocation -Principal (Get-DiscoveryTrustedPrincipal -Normalized (ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text (Get-StopEnvelope))) -AgentType 'legacy-parity-analyst-c3' -AgentId 'agent-alpha' -Store (Get-StopStore)
         $found.Count | Should -Be 1
         $found.Directory | Should -Be $script:GateInvocationDirectory
         (Get-StopOutcome -Store (Get-StopStore -SecondInvocation)).Code | Should -Be 'AMBIGUOUS'

@@ -4,9 +4,9 @@
 
 .DESCRIPTION
     Registered through .github/hooks/*.json. The hook reads the Copilot stop
-    envelope from stdin (camelCase keys, snake_case accepted), derives the trusted
-    launch context from the envelope session and the DRM_DISCOVERY_* values the
-    native host adapter placed in the environment, and takes its decision from the
+    envelope from stdin (camelCase keys, snake_case accepted), derives the stopping
+    principal from the payload alone (session, agentId and agentType, and
+    parentAgentId or the literal parent root), and takes its decision from the
     shared DiscoveryStop module under .claude/lib/discovery-validation:
 
     - a stop whose agent type is not a discovery specialist writes nothing;
@@ -59,7 +59,6 @@ function Invoke-DiscoveryAgentStopDecision {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw,
-        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadBytes = $null
@@ -69,7 +68,6 @@ function Invoke-DiscoveryAgentStopDecision {
         $first = $script:DiscoveryStopDependencyFailures[0]
         return [pscustomobject]@{ Decision = 'block'; Code = 'DEPENDENCY'; Reason = "the dependency '$($first.Name)' failed to load ($($first.Message)); the gate fails closed."; Receipt = $null; Invocation = $null }
     }
-    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryStartStore }
 
@@ -87,7 +85,7 @@ function Invoke-DiscoveryAgentStopDecision {
         }
     }
     $parameters = @{
-        Normalized = $normalized; Environment = $EnvironmentValues; HostEnvironment = $HostEnvironment
+        Normalized = $normalized; HostEnvironment = $HostEnvironment
         AssistantText = $assistantText; StopHookActive = $stopHookActive; Store = $Store
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }

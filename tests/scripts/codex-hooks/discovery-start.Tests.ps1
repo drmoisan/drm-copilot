@@ -8,8 +8,9 @@
     .codex/hooks/record-subagent-routing-attestation.ps1 and its focused helper
     discovery-start-attestation.ps1 are dot-sourced in-process; the shared discovery modules
     resolve to .claude/lib because this repository publishes .codex/lib only into
-    destinations. The protected store, environment, clock and nonce are injected from the
-    shared fixtures; the Codex authority writer and the generated profile reader are mocked.
+    destinations. The protected store, clock and nonce are injected from the shared
+    fixtures and the identity comes from the payload; the Codex authority writer and the
+    generated profile reader are mocked.
     No file, process, network or clock is touched.
 #>
 
@@ -37,10 +38,9 @@ Describe 'Codex discovery start attestation' {
             param(
                 [pscustomobject]$Payload = (Get-CodexStartPayload),
                 [hashtable]$Store = (Get-StartStore -HostName 'codex'),
-                [hashtable]$Environment = (Get-StartEnvironment -HostName 'codex'),
                 [AllowNull()]$AgentProfile = ([pscustomobject]$script:CodexProfile)
             )
-            $parameters = @{ Payload = $Payload; RepositoryRoot = $script:GateWorkspaceRoot; Now = $script:Now; EnvironmentValues = $Environment; HostEnvironment = $script:GateHostEnvironment; Store = $Store; Nonce = $script:GateNonce }
+            $parameters = @{ Payload = $Payload; RepositoryRoot = $script:GateWorkspaceRoot; Now = $script:Now; HostEnvironment = $script:GateHostEnvironment; Store = $Store; Nonce = $script:GateNonce }
             if ($null -ne $AgentProfile) { $parameters['AgentProfile'] = $AgentProfile }
             return Get-CodexDiscoveryStartAttestation @parameters
         }
@@ -89,13 +89,13 @@ Describe 'Codex discovery start attestation' {
     }
 
     It 'rejects <Name> as <Code> and the model gate then denies the agent' -ForEach @(
-        @{ Name = 'a model that differs from the deployment'; Code = 'MODEL'; Payload = @{ Model = 'gpt-6-astra' }; Store = @{}; Environment = @{} }
-        @{ Name = 'a missing prepared invocation'; Code = 'NO_INVOCATION'; Payload = @{}; Store = @{ NoInvocation = $true }; Environment = @{} }
-        @{ Name = 'a nested launch'; Code = 'NESTED'; Payload = @{}; Store = @{}; Environment = @{ Nested = $true } }
-        @{ Name = 'a capability attestation with another build'; Code = 'RUNTIME'; Payload = @{}; Store = @{ RuntimeOverrides = @{ build_sha256 = ('1' * 64) } }; Environment = @{} }
+        @{ Name = 'a model that differs from the deployment'; Code = 'MODEL'; Payload = @{ Model = 'gpt-6-astra' }; Store = @{} }
+        @{ Name = 'a missing prepared invocation'; Code = 'NO_INVOCATION'; Payload = @{}; Store = @{ NoInvocation = $true } }
+        @{ Name = 'two prepared invocations'; Code = 'AMBIGUOUS'; Payload = @{}; Store = @{ SecondInvocation = $true } }
+        @{ Name = 'a capability attestation with another build'; Code = 'RUNTIME'; Payload = @{}; Store = @{ RuntimeOverrides = @{ build_sha256 = ('1' * 64) } } }
     ) {
         $store = Get-StartStore -HostName 'codex' @Store
-        $attestation = Get-CodexStartAttestation -Payload (Get-CodexStartPayload @Payload) -Store $store -Environment (Get-StartEnvironment -HostName 'codex' @Environment)
+        $attestation = Get-CodexStartAttestation -Payload (Get-CodexStartPayload @Payload) -Store $store
         $attestation.routing_valid | Should -BeFalse
         $attestation.discovery_code | Should -Be $Code -Because $attestation.discovery_reason
         $attestation.enforcement_marker | Should -Be 'DISCOVERY_START_ATTESTATION_BLOCKED'

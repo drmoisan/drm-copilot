@@ -6,8 +6,9 @@
     Per-role output validation tests for the Claude Code discovery SubagentStop adapter (issue #980).
 .DESCRIPTION
     .claude/hooks/validate-discovery-artifact-gate.ps1 is dot-sourced in-process; the
-    environment table, host roots, protected store and workspace bytes are injected from the
-    shared gate, start and stop fixtures, so no file, process, network or clock is touched.
+    host roots, protected store and workspace bytes are injected from the shared gate,
+    start and stop fixtures and the identity comes from the payload fixture, so no file,
+    process, network or clock is touched.
     Every role's stop result is derived from its protected invocation and receipt; the final
     message never grants authority.
 #>
@@ -24,11 +25,10 @@ Describe 'validate-discovery-artifact-gate.ps1 per-role output validation' {
         function Invoke-Stop {
             param(
                 [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Json = (Get-StopEnvelope),
-                [Parameter(Mandatory = $false)][hashtable]$Environment = (Get-StartEnvironment),
                 [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StopStore),
                 [Parameter(Mandatory = $false)][hashtable]$Workspace = (Get-StopWorkspace)
             )
-            return Invoke-DiscoveryArtifactGateValidation -InputText $Json -EnvironmentValues $Environment -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader -Workspace $Workspace)
+            return Invoke-DiscoveryArtifactGateValidation -InputText $Json -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader -Workspace $Workspace)
         }
     }
 

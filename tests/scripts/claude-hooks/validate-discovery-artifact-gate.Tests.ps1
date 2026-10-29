@@ -26,7 +26,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
                 [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Json,
                 [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StopStore)
             )
-            return Invoke-DiscoveryArtifactGateValidation -InputText $Json -EnvironmentValues (Get-StartEnvironment) -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader)
+            return Invoke-DiscoveryArtifactGateValidation -InputText $Json -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader)
         }
 
         function Invoke-DiscoveryStdinEntry {
@@ -118,10 +118,8 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             # The & route runs the hook in its own script scope, where $script: no longer
             # names this file and module-internal callers do not see this scope, so every
             # mocked value is built here and bound into the mock bodies as closures.
-            $environmentValues = Get-StartEnvironment
             $gateHostEnvironment = $script:GateHostEnvironment
             $storeWithoutReceipt = Get-StopStore -NoReceipt
-            Mock Get-DiscoveryHostEnvironmentValueTable { $environmentValues }.GetNewClosure()
             Mock Get-DiscoveryTrustedHostEnvironment { $gateHostEnvironment }.GetNewClosure()
             Mock Get-DiscoveryStartStore { $storeWithoutReceipt }.GetNewClosure()
             $result = Invoke-DiscoveryStdinEntry -Stdin (Get-StopEnvelope)

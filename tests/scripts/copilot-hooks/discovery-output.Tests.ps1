@@ -24,7 +24,7 @@ Describe 'discovery-agent-stop.ps1 (GitHub Copilot)' {
                 [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Json = (Get-StopEnvelope -HostName 'github-copilot'),
                 [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StopStore -HostName 'github-copilot')
             )
-            return Invoke-DiscoveryAgentStopDecision -PayloadRaw $Json -EnvironmentValues (Get-StartEnvironment -HostName 'github-copilot') -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader)
+            return Invoke-DiscoveryAgentStopDecision -PayloadRaw $Json -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader)
         }
 
         function Invoke-CopilotStopEntryPoint {
@@ -73,7 +73,6 @@ Describe 'discovery-agent-stop.ps1 (GitHub Copilot)' {
         }
 
         It 'writes the block decision for a specialist whose invocation never finalized' {
-            Mock Get-DiscoveryHostEnvironmentValueTable { Get-StartEnvironment -HostName 'github-copilot' }
             Mock Get-DiscoveryTrustedHostEnvironment { $script:GateHostEnvironment }
             Mock Get-DiscoveryStartStore { Get-StopStore -HostName 'github-copilot' -State 'started' }
             $result = Invoke-CopilotStopEntryPoint -PayloadRaw (Get-StopEnvelope -HostName 'github-copilot')

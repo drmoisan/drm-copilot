@@ -5,7 +5,7 @@
     Helper-module import-failure proofs for enforce-discovery-artifact-gate.ps1 (issue #980).
 
 .DESCRIPTION
-    The native authorization adapter guards every helper import (HookPayload.psm1 and the five
+    The native authorization adapter guards every helper import (HookPayload.psm1 and the nine
     discovery-validation modules) through the shared dependency guard, so a load failure denies
     every request with DISCOVERY_ARTIFACT_GATE_BLOCKED: naming the dependency, before the payload
     is read. Each row runs against the repository copy and the bundle mirror.
@@ -27,6 +27,10 @@ BeforeDiscovery {
         @{ Leaf = 'DiscoveryAuthority.psm1' }
         @{ Leaf = 'DiscoveryPayload.psm1' }
         @{ Leaf = 'DiscoveryToolRouting.psm1' }
+        @{ Leaf = 'DiscoveryStartRecord.psm1' }
+        @{ Leaf = 'DiscoveryRootGrant.psm1' }
+        @{ Leaf = 'DiscoveryObservation.psm1' }
+        @{ Leaf = 'DiscoveryStart.psm1' }
         @{ Leaf = 'DiscoveryAuthorization.psm1' }
     )
 }

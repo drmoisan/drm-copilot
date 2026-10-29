@@ -4,20 +4,20 @@
 
 .DESCRIPTION
     Invoked by the Claude Code SubagentStart hook. The hook reads the start envelope,
-    derives the trusted launch context from the envelope session and the
-    DRM_DISCOVERY_* values the native host adapter placed in the environment, and
-    takes its decision from the shared DiscoveryStart module:
+    derives the launch context from the payload alone (session, the host-assigned
+    agent_id and agent_type, and the literal parent root), and takes its decision
+    from the shared DiscoveryStart module. The start is observational: Claude Code
+    does not let a SubagentStart hook prevent the agent from running.
 
     - a start whose agent type is not a discovery specialist is left to the
       ordinary and epic attestation path and produces no output;
-    - a discovery specialist is attested only when the protected store holds
-      exactly one prepared discovery-invocation bound to this host, session,
-      parent and agent type, the activation, deployment, agent profile hash and
-      capability pins agree, and the launching process is not itself a specialist;
-      the start-attestation is recorded and the invocation moves to started;
+    - a discovery specialist is attested when the protected store holds exactly one
+      prepared discovery-invocation bound to this host, session, parent and agent
+      type and the activation, deployment, agent profile hash and capability pins
+      agree; the start-attestation is recorded and the invocation moves to started;
     - a start that cannot be attested writes the DISCOVERY_START_ATTESTATION_BLOCKED:
-      reason as the SubagentStart system message; the PreToolUse adapter then denies
-      every grant because no started invocation exists.
+      reason as the SubagentStart system message; the PreToolUse adapter then binds
+      the prepared invocation at the first controlled call or denies every grant.
 
     No orchestrator checkpoint is read or written. An envelope the hook cannot read
     and a dependency that fails to load write the reason to stderr at exit 2
@@ -61,7 +61,7 @@ function Invoke-DiscoveryAgentStartDecision {
     .SYNOPSIS
         Parses the SubagentStart envelope and returns the shared start outcome.
     .DESCRIPTION
-        Returns the outcome object (Decision skip, deny or attest; Code; Reason;
+        Returns the outcome object (Decision skip, observe or attest; Code; Reason;
         Attestation; AttestationPath; Invocation). Every seam defaults to the real
         host and is injectable so tests run over in-memory values. A recorded
         dependency failure denies before the envelope is read.
@@ -70,7 +70,6 @@ function Invoke-DiscoveryAgentStartDecision {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw,
-        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][nullable[datetime]]$Now = $null,
@@ -84,7 +83,6 @@ function Invoke-DiscoveryAgentStartDecision {
 
     # Seams resolve only after the dependency check so a missing module denies
     # instead of raising while a default is evaluated.
-    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryStartStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
@@ -92,7 +90,7 @@ function Invoke-DiscoveryAgentStartDecision {
 
     $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text $PayloadRaw
     $parameters = @{
-        Normalized = $normalized; Environment = $EnvironmentValues; HostEnvironment = $HostEnvironment
+        Normalized = $normalized; HostEnvironment = $HostEnvironment
         HandlerSha256 = (Get-DiscoveryStartHandlerSha256); Store = $Store; Now = $Now; Nonce = $Nonce
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }
@@ -105,15 +103,15 @@ function Invoke-DiscoveryAgentStartEntryPoint {
         Reads one SubagentStart payload, writes the hook output and returns the process exit code.
     .DESCRIPTION
         An unreadable envelope or a dependency failure writes its reason to stderr
-        and returns 2. A denied start writes the SubagentStart output JSON to stdout
-        and returns 0. A skipped or attested start writes nothing and returns 0.
+        and returns 2. An observed (unattested) start writes the SubagentStart output
+        JSON to stdout and returns 0. A skipped or attested start writes nothing and returns 0.
     #>
     [CmdletBinding()]
     [OutputType([int])]
     param([Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw)
 
     $outcome = Invoke-DiscoveryAgentStartDecision -PayloadRaw $PayloadRaw
-    if ($outcome.Decision -ne 'deny') { return 0 }
+    if ($outcome.Decision -notin @('deny', 'observe')) { return 0 }
     if ($outcome.Code -in @('ENVELOPE', 'DEPENDENCY')) {
         [Console]::Error.WriteLine("$($script:DiscoveryStartReasonPrefix) $($outcome.Reason)")
         return 2

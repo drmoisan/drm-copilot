@@ -24,10 +24,9 @@ Describe 'Codex validate-discovery-agent-output.ps1' {
         function Get-CodexStopOutcome {
             param(
                 [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Json = (Get-StopEnvelope -HostName 'codex'),
-                [Parameter(Mandatory = $false)][hashtable]$Environment = (Get-StartEnvironment -HostName 'codex'),
                 [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StopStore -HostName 'codex')
             )
-            return Invoke-DiscoveryAgentOutputDecision -PayloadRaw $Json -EnvironmentValues $Environment -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader)
+            return Invoke-DiscoveryAgentOutputDecision -PayloadRaw $Json -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes (Get-StopByteReader)
         }
 
         function Invoke-CodexStopEntryPoint {
@@ -99,7 +98,6 @@ Describe 'Codex validate-discovery-agent-output.ps1' {
         }
 
         It 'requests a continuation for a specialist without a receipt and ends the stop once continued' {
-            Mock Get-DiscoveryHostEnvironmentValueTable { Get-StartEnvironment -HostName 'codex' }
             Mock Get-DiscoveryTrustedHostEnvironment { $script:GateHostEnvironment }
             Mock Get-DiscoveryStartStore { Get-StopStore -HostName 'codex' -NoReceipt }
             $first = Invoke-CodexStopEntryPoint -PayloadRaw (Get-StopEnvelope -HostName 'codex')

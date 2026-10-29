@@ -6,10 +6,10 @@
     Behavioral tests for the Claude Code native discovery SubagentStart adapter (issue #980).
 .DESCRIPTION
     .claude/hooks/record-discovery-agent-start.ps1 is dot-sourced in-process; every seam
-    (environment table, host roots, protected store, clock, nonce, profile bytes) is
-    injected from the shared gate and start fixtures, so no file, process, network or
-    clock is touched. Ordinary and epic starts stay silent; a discovery start is attested
-    against its protected invocation or reported with the
+    (host roots, protected store, clock, nonce, profile bytes) is injected from the
+    shared gate and start fixtures and the identity comes from the payload fixture, so
+    no file, process, network or clock is touched. Ordinary and epic starts stay silent;
+    a discovery start is attested against its protected invocation or observed with the
     DISCOVERY_START_ATTESTATION_BLOCKED: prefix; no orchestrator checkpoint is touched.
 #>
 
@@ -24,11 +24,10 @@ Describe 'record-discovery-agent-start.ps1' {
         function Invoke-Start {
             param(
                 [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Json = (Get-StartEnvelope),
-                [Parameter(Mandatory = $false)][hashtable]$Environment = (Get-StartEnvironment),
                 [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StartStore),
                 [Parameter(Mandatory = $false)][scriptblock]$ReadBytes = (Get-StartProfileReader)
             )
-            return Invoke-DiscoveryAgentStartDecision -PayloadRaw $Json -EnvironmentValues $Environment -HostEnvironment $script:GateHostEnvironment -Store $Store -Now $script:GateNow -Nonce $script:GateNonce -ReadBytes $ReadBytes
+            return Invoke-DiscoveryAgentStartDecision -PayloadRaw $Json -HostEnvironment $script:GateHostEnvironment -Store $Store -Now $script:GateNow -Nonce $script:GateNonce -ReadBytes $ReadBytes
         }
 
         function Invoke-StartEntryPoint {
@@ -60,8 +59,10 @@ Describe 'record-discovery-agent-start.ps1' {
         $store.Writes.Count | Should -Be 0
     }
 
-    It 'denies an unreadable envelope with the ENVELOPE code' {
-        (Invoke-Start -Json '{not-json').Code | Should -Be 'ENVELOPE'
+    It 'observes an unreadable envelope with the ENVELOPE code' {
+        $outcome = Invoke-Start -Json '{not-json'
+        $outcome.Decision | Should -Be 'observe'
+        $outcome.Code | Should -Be 'ENVELOPE'
     }
 
     It 'attests a discovery start against the protected invocation and never reads the mirror' {
@@ -79,20 +80,20 @@ Describe 'record-discovery-agent-start.ps1' {
         @($store.Reads | Where-Object { $_ -like 'artifacts/orchestration/*' -or $_ -like '*/artifacts/orchestration/*' }).Count | Should -Be 0
     }
 
-    It 'denies <Name> with code <Code>' -ForEach @(
-        @{ Name = 'a nested launch'; Code = 'NESTED'; Environment = @{ Nested = $true }; Store = @{} }
-        @{ Name = 'a start without a prepared invocation'; Code = 'NO_INVOCATION'; Environment = @{}; Store = @{ NoInvocation = $true } }
-        @{ Name = 'a tampered profile hash in the invocation'; Code = 'BINDING'; Environment = @{}; Store = @{ InvocationOverrides = @{ workspace = [ordered]@{ workspace_root = 'C:/Users/Example/Repos/Workspace'; workspace_sha256 = '77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6'; profile_path = 'docs/migration/discovery/domain-profile.yaml'; profile_sha256 = ('0' * 64) } } } }
-        @{ Name = 'a capability attestation with other runtime pins'; Code = 'RUNTIME'; Environment = @{}; Store = @{ RuntimeOverrides = @{ policy_sha256 = ('2' * 64) } } }
+    It 'observes <Name> with code <Code> and writes nothing' -ForEach @(
+        @{ Name = 'a start without a prepared invocation'; Code = 'NO_INVOCATION'; Store = @{ NoInvocation = $true } }
+        @{ Name = 'two prepared invocations'; Code = 'AMBIGUOUS'; Store = @{ SecondInvocation = $true } }
+        @{ Name = 'a tampered profile hash in the invocation'; Code = 'BINDING'; Store = @{ InvocationOverrides = @{ workspace = [ordered]@{ workspace_root = 'C:/Users/Example/Repos/Workspace'; workspace_sha256 = '77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6'; profile_path = 'docs/migration/discovery/domain-profile.yaml'; profile_sha256 = ('0' * 64) } } } }
+        @{ Name = 'a capability attestation with other runtime pins'; Code = 'RUNTIME'; Store = @{ RuntimeOverrides = @{ policy_sha256 = ('2' * 64) } } }
     ) {
         $store = Get-StartStore @Store
-        $outcome = Invoke-Start -Environment (Get-StartEnvironment @Environment) -Store $store
-        $outcome.Decision | Should -Be 'deny'
+        $outcome = Invoke-Start -Store $store
+        $outcome.Decision | Should -Be 'observe'
         $outcome.Code | Should -Be $Code -Because $outcome.Reason
         $store.Writes.Count | Should -Be 0
     }
 
-    It 'denies a profile the workspace does not hold' {
+    It 'observes a profile the workspace does not hold' {
         (Invoke-Start -ReadBytes (Get-StartProfileReader -Text $null)).Code | Should -Be 'PROFILE'
     }
 
@@ -105,15 +106,13 @@ Describe 'record-discovery-agent-start.ps1' {
         }
 
         It 'stays silent for an ordinary start' {
-            Mock Get-DiscoveryHostEnvironmentValueTable { Get-StartEnvironment }
             $result = Invoke-StartEntryPoint -PayloadRaw (Get-StartEnvelope -AgentType 'atomic-planner')
             $result.ExitCode | Should -Be 0
             $result.Stdout | Should -BeNullOrEmpty
             $result.Stderr | Should -BeNullOrEmpty
         }
 
-        It 'writes the blocked system message for a discovery start without an invocation' {
-            Mock Get-DiscoveryHostEnvironmentValueTable { Get-StartEnvironment }
+        It 'writes the observed system message for a discovery start without an invocation' {
             Mock Get-DiscoveryTrustedHostEnvironment { $script:GateHostEnvironment }
             Mock Get-DiscoveryStartStore { Get-StartStore -NoInvocation }
             $result = Invoke-StartEntryPoint -PayloadRaw (Get-StartEnvelope)
@@ -121,6 +120,18 @@ Describe 'record-discovery-agent-start.ps1' {
             $output = $result.Stdout | ConvertFrom-Json
             $output.systemMessage | Should -BeLike 'DISCOVERY_START_ATTESTATION_BLOCKED:*no prepared protected invocation*'
             $output.hookSpecificOutput.hookEventName | Should -Be 'SubagentStart'
+        }
+
+        It 'observes two prepared invocations as AMBIGUOUS at exit 0 without writing an attestation' {
+            $store = Get-StartStore -SecondInvocation
+            Mock Get-DiscoveryTrustedHostEnvironment { $script:GateHostEnvironment }
+            Mock Get-DiscoveryStartStore { $store }.GetNewClosure()
+            $result = Invoke-StartEntryPoint -PayloadRaw (Get-StartEnvelope)
+            $result.ExitCode | Should -Be 0
+            $output = $result.Stdout | ConvertFrom-Json
+            $output.systemMessage | Should -BeLike 'DISCOVERY_START_ATTESTATION_BLOCKED:*2 prepared invocations*'
+            @($output.PSObject.Properties.Name) | Should -Not -Contain 'continue'
+            $store.Writes.Count | Should -Be 0
         }
     }
 }

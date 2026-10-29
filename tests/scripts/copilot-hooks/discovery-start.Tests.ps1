@@ -21,11 +21,10 @@ Describe 'discovery-agent-start.ps1 (GitHub Copilot)' {
         function Invoke-CopilotStart {
             param(
                 [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Json = (Get-StartEnvelope -HostName 'github-copilot'),
-                [Parameter(Mandatory = $false)][hashtable]$Environment = (Get-StartEnvironment -HostName 'github-copilot'),
                 [Parameter(Mandatory = $false)][hashtable]$Store = (Get-StartStore -HostName 'github-copilot'),
                 [Parameter(Mandatory = $false)][scriptblock]$ReadBytes = (Get-StartProfileReader -HostName 'github-copilot')
             )
-            return Invoke-DiscoveryAgentStartDecision -PayloadRaw $Json -EnvironmentValues $Environment -HostEnvironment $script:GateHostEnvironment -Store $Store -Now $script:GateNow -Nonce $script:GateNonce -ReadBytes $ReadBytes
+            return Invoke-DiscoveryAgentStartDecision -PayloadRaw $Json -HostEnvironment $script:GateHostEnvironment -Store $Store -Now $script:GateNow -Nonce $script:GateNonce -ReadBytes $ReadBytes
         }
 
         function Invoke-CopilotStartEntryPoint {
@@ -67,12 +66,26 @@ Describe 'discovery-agent-start.ps1 (GitHub Copilot)' {
         $store.Reads | Should -Not -Contain $script:StartMirrorPath
     }
 
-    It 'denies a Copilot start whose invocation is bound to the Claude host' {
-        (Invoke-CopilotStart -Store (Get-StartStore -HostName 'claude-code')).Code | Should -Be 'NO_INVOCATION'
+    It 'observes a Copilot start whose invocation is bound to the Claude host' {
+        $outcome = Invoke-CopilotStart -Store (Get-StartStore -HostName 'claude-code')
+        $outcome.Decision | Should -Be 'observe'
+        $outcome.Code | Should -Be 'NO_INVOCATION'
     }
 
-    It 'denies a nested launch and an unsupported capability' {
-        (Invoke-CopilotStart -Environment (Get-StartEnvironment -HostName 'github-copilot' -Nested)).Code | Should -Be 'NESTED'
+    It 'observes a start without an agent identifier, which the first controlled call binds instead' {
+        $store = Get-StartStore -HostName 'github-copilot'
+        $outcome = Invoke-CopilotStart -Json (Get-StartEnvelope -HostName 'github-copilot' -AgentId $null) -Store $store
+        $outcome.Decision | Should -Be 'observe'
+        $outcome.Code | Should -Be 'IDENTITY'
+        $store.Writes.Count | Should -Be 0
+    }
+
+    It 'observes two prepared invocations and an unsupported capability' {
+        $store = Get-StartStore -HostName 'github-copilot' -SecondInvocation
+        $outcome = Invoke-CopilotStart -Store $store
+        $outcome.Decision | Should -Be 'observe'
+        $outcome.Code | Should -Be 'AMBIGUOUS'
+        $store.Writes.Count | Should -Be 0
         (Invoke-CopilotStart -Store (Get-StartStore -HostName 'github-copilot' -CapabilityOverrides @{ status = 'unsupported' })).Code | Should -Be 'CAPABILITY'
     }
 
@@ -83,13 +96,22 @@ Describe 'discovery-agent-start.ps1 (GitHub Copilot)' {
             $result.Stderr | Should -BeLike 'DISCOVERY_START_ATTESTATION_BLOCKED:*'
         }
 
-        It 'writes the blocked system message for a discovery start without an activation' {
-            Mock Get-DiscoveryHostEnvironmentValueTable { Get-StartEnvironment -HostName 'github-copilot' }
+        It 'writes the observed system message for a discovery start without an activation' {
             Mock Get-DiscoveryTrustedHostEnvironment { $script:GateHostEnvironment }
             Mock Get-DiscoveryStartStore { Get-StartStore -HostName 'github-copilot' -NoActivation }
             $result = Invoke-CopilotStartEntryPoint -PayloadRaw (Get-StartEnvelope -HostName 'github-copilot')
             $result.ExitCode | Should -Be 0
             ($result.Stdout | ConvertFrom-Json).systemMessage | Should -BeLike 'DISCOVERY_START_ATTESTATION_BLOCKED:*not active*'
+        }
+
+        It 'observes two prepared invocations as AMBIGUOUS at exit 0 without writing an attestation' {
+            $store = Get-StartStore -HostName 'github-copilot' -SecondInvocation
+            Mock Get-DiscoveryTrustedHostEnvironment { $script:GateHostEnvironment }
+            Mock Get-DiscoveryStartStore { $store }.GetNewClosure()
+            $result = Invoke-CopilotStartEntryPoint -PayloadRaw (Get-StartEnvelope -HostName 'github-copilot')
+            $result.ExitCode | Should -Be 0
+            ($result.Stdout | ConvertFrom-Json).systemMessage | Should -BeLike 'DISCOVERY_START_ATTESTATION_BLOCKED:*2 prepared invocations*'
+            $store.Writes.Count | Should -Be 0
         }
 
         It 'stays silent for an ordinary start' {

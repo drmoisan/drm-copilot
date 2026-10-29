@@ -68,7 +68,7 @@ function Get-GateInvocationText {
         invocation_id         = 'invocation-alpha'
         host                  = $HostName
         session_id            = 'session-alpha'
-        parent_agent_id       = 'root-alpha'
+        parent_agent_id       = 'root'
         agent_id              = 'agent-alpha'
         role                  = 'legacy-parity-analyst'
         state                 = 'started'

@@ -46,7 +46,7 @@ function Get-StartRuntime {
 function Get-StartInvocationText {
     <#
     .SYNOPSIS
-        Returns a prepared discovery-invocation record text for AgentType under parent root-alpha.
+        Returns a prepared discovery-invocation record text for AgentType under the literal parent root.
     #>
     [CmdletBinding()]
     [OutputType([string])]

@@ -47,7 +47,7 @@ function Get-DiscoveryStartOutcome {
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
-        [Parameter(Mandatory = $true)][ValidateSet('skip', 'deny', 'attest')][string]$Decision,
+        [Parameter(Mandatory = $true)][ValidateSet('skip', 'deny', 'observe', 'attest')][string]$Decision,
         [Parameter(Mandatory = $true)][string]$Code,
         [Parameter(Mandatory = $true)][string]$Reason,
         [Parameter(Mandatory = $false)][AllowNull()][object]$Attestation = $null,
@@ -319,14 +319,18 @@ function Get-DiscoveryStartDecision {
     .SYNOPSIS
         Decides one SubagentStart event for a native discovery adapter.
     .DESCRIPTION
-        Order: envelope anomalies deny; a non-discovery agent type is skipped (the
-        existing ordinary and epic attestation applies); a missing host agent
-        identifier, a launching process that is itself an attested specialist, or an
-        unattributed principal without a trusted parent denies; the protected
-        activation must be active; exactly one prepared invocation must be bound to
-        this host, session, parent and agent type; the record, deployment, agent
-        profile and capability must agree; then the attestation is written
-        exclusively and the invocation record moves to `started`.
+        The start is observational: no host lets a SubagentStart hook prevent the
+        agent from running, so the decision records the attestation when it can and
+        reports why it could not otherwise; the PreToolUse gate completes the
+        binding at the first controlled call. Order: a non-discovery agent type is
+        skipped (the existing ordinary and epic attestation applies); an envelope
+        anomaly, a missing host agent identifier, an inactive activation, zero or
+        several prepared invocations for this host, session, parent and agent type,
+        or a record, deployment, agent-profile or capability disagreement yields
+        `observe` with the same codes the gate uses; otherwise the attestation is
+        written exclusively, the invocation record moves to `started` and the
+        decision is `attest`. The principal (host, session, parent, agent) comes
+        from the hook payload alone.
     .PARAMETER AgentProfile
         The host's agent profile reading (ProfilePath, ProfileSha256, ProfileName,
         ProfileModel, ProfileReasoningEffort). When omitted the Markdown profile under
@@ -334,13 +338,12 @@ function Get-DiscoveryStartDecision {
     .PARAMETER Store
         Seams ReadText, ListEntries, WriteText, ReplaceText; defaults to the real filesystem.
     .OUTPUTS
-        [pscustomobject] Decision, Code, Reason, Attestation, AttestationPath, Invocation.
+        [pscustomobject] Decision (skip, observe or attest), Code, Reason, Attestation, AttestationPath, Invocation, Directory.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory = $true)][pscustomobject]$Normalized,
-        [Parameter(Mandatory = $true)][hashtable]$Environment,
         [Parameter(Mandatory = $true)][hashtable]$HostEnvironment,
         [Parameter(Mandatory = $true)][string]$HandlerSha256,
         [Parameter(Mandatory = $false)][hashtable]$Store = (Get-DiscoveryStartStore),
@@ -353,42 +356,36 @@ function Get-DiscoveryStartDecision {
     )
 
     if ($null -ne $Normalized.Anomaly) {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'ENVELOPE' -Reason ('payload anomaly - ' + (Get-DiscoveryPayloadAnomalyReason -Code $Normalized.Anomaly) + '. The start attestation fails closed on an envelope it cannot read.')
+        return Get-DiscoveryStartOutcome -Decision 'observe' -Code 'ENVELOPE' -Reason ('payload anomaly - ' + (Get-DiscoveryPayloadAnomalyReason -Code $Normalized.Anomaly) + '. The start attestation cannot read this envelope.')
     }
     $agentType = [string]$Normalized.AgentType
     $role = Get-DiscoveryAgentRole -AgentType $agentType
     if ($null -eq $role) {
         return Get-DiscoveryStartOutcome -Decision 'skip' -Code 'NOT_DISCOVERY_AGENT' -Reason 'the started agent is not a discovery specialist; the ordinary start attestation applies'
     }
-    $agentId = [string]$Normalized.AgentId
-    if ($agentId -notmatch $script:CorrelationIdPattern) {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'IDENTITY' -Reason 'the native start event carries no agent identifier for the discovery specialist'
-    }
-    # A specialist that launches another specialist cannot expand authority.
-    if (-not [string]::IsNullOrWhiteSpace([string]$Environment['DRM_DISCOVERY_AGENT_ID']) -or -not [string]::IsNullOrWhiteSpace([string]$Environment['DRM_DISCOVERY_AGENT_ROLE'])) {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'NESTED' -Reason "discovery specialist $agentType was launched by an attested discovery agent; nested specialists are not attested"
-    }
-    $principal = Get-DiscoveryTrustedPrincipal -Normalized $Normalized -Environment $Environment
-    if (-not $principal.Attributed -or $null -eq $principal.ParentAgentId) {
-        $reason = $(if ($null -ne $principal.Reason) { $principal.Reason } else { 'the native host attested no parent agent for this launch' })
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'IDENTITY' -Reason "the launch context could not be attributed: $reason"
+    $principal = Get-DiscoveryTrustedPrincipal -Normalized $Normalized
+    if ($null -eq $principal.AgentId) {
+        return Get-DiscoveryStartOutcome -Decision 'observe' -Code 'IDENTITY' -Reason 'the native start event carries no agent identifier for the discovery specialist; the first controlled tool call binds the prepared invocation instead'
     }
     if ([string]::IsNullOrWhiteSpace([string]$Normalized.Cwd)) {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'WORKSPACE' -Reason 'the native event carries no workspace directory'
+        return Get-DiscoveryStartOutcome -Decision 'observe' -Code 'WORKSPACE' -Reason 'the native event carries no workspace directory'
     }
     try {
         $location = Resolve-DiscoveryAuthorityLocation -WorkspaceRoot ([string]$Normalized.Cwd) -Platform $HostEnvironment.Platform `
             -UserHome $HostEnvironment.UserHome -LocalAppData $HostEnvironment.LocalAppData -XdgStateHome $HostEnvironment.XdgStateHome
     } catch {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'WORKSPACE' -Reason $_.Exception.Message
+        return Get-DiscoveryStartOutcome -Decision 'observe' -Code 'WORKSPACE' -Reason $_.Exception.Message
     }
     $activation = Read-DiscoveryActivationState -Location $location -ReadText $Store.ReadText
     if ($activation.Status -ne 'active') {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'ACTIVATION' -Reason "discovery is not active for this workspace ($($activation.Status): $($activation.Reason))"
+        return Get-DiscoveryStartOutcome -Decision 'observe' -Code 'ACTIVATION' -Reason "discovery is not active for this workspace ($($activation.Status): $($activation.Reason))"
     }
-    return Start-DiscoveryPreparedInvocation -Location $location -Principal $principal -AgentId $agentId -AgentType $agentType -Activation $activation.Record `
+    $started = Start-DiscoveryPreparedInvocation -Location $location -Principal $principal -AgentId $principal.AgentId -AgentType $agentType -Activation $activation.Record `
         -WorkspaceRoot ([string]$Normalized.Cwd) -Store $Store -HandlerSha256 $HandlerSha256 -Now $Now -Nonce $Nonce `
         -AgentProfile $AgentProfile -ActualModel $ActualModel -ActualReasoningEffort $ActualReasoningEffort -ReadBytes $ReadBytes
+    # The start hook cannot block a host; a binding that did not complete is observed with its code.
+    if ($started.Decision -eq 'deny') { $started.Decision = 'observe' }
+    return $started
 }
 
 function Get-DiscoveryAuthorizationNonceText {
@@ -410,10 +407,11 @@ function ConvertTo-DiscoveryStartHookOutput {
     .SYNOPSIS
         Renders a start outcome as the SubagentStart hook output, or $null when the hook stays silent.
     .DESCRIPTION
-        A skipped or attested start produces no output. A denied start cannot stop the
-        host from running the agent, so the output carries the reason as a system
-        message and instructs the agent not to act; the PreToolUse adapter then denies
-        every grant because no started invocation exists.
+        A skipped or attested start produces no output. An observed start carries
+        the reason as a system message with the attestation prefix and tells the
+        agent that its first controlled discovery call binds the prepared
+        invocation; the output never carries a blocking field, because no host lets
+        a SubagentStart hook prevent the agent from running.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -422,12 +420,12 @@ function ConvertTo-DiscoveryStartHookOutput {
         [Parameter(Mandatory = $true)][string]$ReasonPrefix
     )
 
-    if ($Outcome.Decision -ne 'deny') { return $null }
+    if ($Outcome.Decision -ne 'observe') { return $null }
     return [ordered]@{
         systemMessage      = "$ReasonPrefix $($Outcome.Reason)"
         hookSpecificOutput = [ordered]@{
             hookEventName     = 'SubagentStart'
-            additionalContext = "$ReasonPrefix no discovery tool grant is active for this agent. Do not read or mutate state; report the blocked start and stop."
+            additionalContext = "$ReasonPrefix the start was not attested at launch. The first controlled discovery tool call binds the prepared invocation; every other tool is denied until then."
         }
     }
 }

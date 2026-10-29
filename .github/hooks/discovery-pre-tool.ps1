@@ -5,18 +5,24 @@
 .DESCRIPTION
     Registered through .github/hooks/*.json. The hook reads the Copilot PreToolUse
     envelope from stdin (camelCase keys, snake_case accepted), derives the trusted
-    principal from the envelope session and the DRM_DISCOVERY_* values the native
-    host adapter placed in the environment, and takes its decision from the shared
-    DiscoveryAuthorization module under .claude/lib/discovery-validation:
+    principal from the payload alone (session, agentId and agentType when the
+    harness supplies them, and parentAgentId or the literal parent root), and
+    takes its decision from the shared DiscoveryAuthorization module under
+    .claude/lib/discovery-validation:
 
-    - a process without an attested discovery agent is allowed, so ordinary
-      sessions keep their behavior;
+    - a root call (no agentId) of prepare_discovery_agent, run_discovery_doctor or
+      a controlled discovery tool is allowed with a one-use root grant the MCP
+      server consumes; every other root call and every call of an agent that is
+      not a discovery specialist is allowed, so ordinary sessions keep their behavior;
+    - a sentinel envelope is observed for the capability probe and never granted;
     - a discovery specialist may use read-only native tools and the controlled
       discovery MCP tools only; shell, terminal, exec and evaluation tools, generic
       file mutations, nested agents, foreign MCP servers, root-only discovery
       operations and caller-supplied identity fields are denied before execution;
-    - an admitted controlled call is bound to the agent's started protected
-      invocation and recorded as one short-lived, one-use tool-authorization.
+    - the specialist's first controlled call binds the single prepared invocation
+      of its session, parent and agent type (the Copilot subagentStart payload
+      carries no agent identifier); every controlled call must name that invocation
+      through invocation_ref and is recorded as one short-lived, one-use tool-authorization.
 
     A helper that fails to load and an envelope that cannot be read both deny with
     the DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix; the hook never fails open.
@@ -47,7 +53,7 @@ function Add-DiscoveryGateDependencyFailure {
     [void]$script:DiscoveryGateDependencyFailures.Add([pscustomobject]@{ Name = $Name; Message = $message })
 }
 
-foreach ($moduleName in @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryPayload.psm1', 'DiscoveryToolRouting.psm1', 'DiscoveryAuthorization.psm1')) {
+foreach ($moduleName in @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryPayload.psm1', 'DiscoveryToolRouting.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryRootGrant.psm1', 'DiscoveryObservation.psm1', 'DiscoveryStart.psm1', 'DiscoveryAuthorization.psm1')) {
     try { Import-Module (Join-Path $PSScriptRoot "../../.claude/lib/discovery-validation/$moduleName") -Force -Global -ErrorAction Stop } catch { Add-DiscoveryGateDependencyFailure -Name $moduleName -ErrorRecord $_ }
 }
 
@@ -78,7 +84,6 @@ function Invoke-DiscoveryPreToolDecision {
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$ToolInputRaw,
-        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][nullable[datetime]]$Now = $null,
@@ -97,14 +102,13 @@ function Invoke-DiscoveryPreToolDecision {
     }
     # Seams resolve only after the dependency check so a missing module denies
     # instead of raising while a default is evaluated.
-    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryDefaultStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
     if ([string]::IsNullOrEmpty($Nonce)) { $Nonce = Get-DiscoveryAuthorizationNonce }
 
     $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'github-copilot' -Text $ToolInputRaw
-    $outcome = Get-DiscoveryPreToolDecision -Normalized $normalized -Environment $EnvironmentValues -HostEnvironment $HostEnvironment `
+    $outcome = Get-DiscoveryPreToolDecision -Normalized $normalized -HostEnvironment $HostEnvironment `
         -HandlerSha256 (Get-DiscoveryGateHandlerSha256) -Store $Store -Now $Now -Nonce $Nonce
     return ConvertTo-DiscoveryPreToolHookOutput -Outcome $outcome -ReasonPrefix $script:DiscoveryGateReasonPrefix
 }
