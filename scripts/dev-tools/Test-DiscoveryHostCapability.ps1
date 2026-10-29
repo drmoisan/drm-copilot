@@ -9,8 +9,13 @@
     capability-attestation-shaped JSON it produced and exits with its verdict:
     0 supported, 1 unsupported, 2 when the host is unknown or its probe is absent
     (a missing, disabled or unsupported host is a failure, never a pass). The
-    probe never invokes Python or a shell; the sentinel runs through the host's
-    in-process adapter decision.
+    probe never invokes Python or a shell and makes no in-process sentinel
+    decision: attribution is proved only from the host observations the native
+    PreToolUse gate recorded while the discovery-capability-sentinel agent ran.
+
+.PARAMETER SessionId
+    The host session in which the sentinel agent ran. A supported result requires
+    it; the default session holds no observations and is reported unsupported.
 
 .PARAMETER HostName
     claude-code, codex or github-copilot.

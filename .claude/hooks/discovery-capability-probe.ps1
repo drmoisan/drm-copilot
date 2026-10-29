@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Claude Code capability probe for discovery agents: observes registration, handler hashes and the denied sentinel.
+    Claude Code capability probe for discovery agents: observes registration, handler hashes and the recorded sentinel observations.
 
 .DESCRIPTION
     Not an event hook. The gateway doctor and the operator script
@@ -8,14 +8,15 @@
     whether this workspace's Claude Code host provides the required discovery
     controls: the SubagentStart, PreToolUse and SubagentStop handlers registered in
     .claude/settings.json for the four discovery agents and the controlled tools,
-    their current hashes, and a harmless forbidden-operation sentinel that the
-    PreToolUse adapter decision must deny. The result is a
-    capability-attestation-shaped JSON document on stdout whose status is derived
-    from the observations; exit 0 when supported, 1 when unsupported.
+    their current hashes, and the host observations the PreToolUse gate recorded
+    while the discovery-capability-sentinel agent ran in session SessionId. The
+    result is a capability-attestation-shaped JSON document on stdout whose status
+    is derived from the observations; exit 0 when supported, 1 when unsupported.
+    A session without observations (including the default session) is unsupported.
 
 .NOTES
-    Issue #980. Requires PowerShell 7+. Invokes NO external process; the sentinel
-    runs through the adapter's in-process decision function, never through a shell.
+    Issue #980. Requires PowerShell 7+. Invokes NO external process and makes no
+    in-process sentinel decision; attribution is proved only from real host payloads.
 #>
 [CmdletBinding()]
 param(
@@ -80,18 +81,10 @@ function Invoke-DiscoveryCapabilityProbe {
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryDefaultStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
-    $sentinel = {
-        param([string]$EnvelopeJson, [hashtable]$Environment)
-        $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $EnvelopeJson -EnvironmentValues $Environment
-        $text = $decision | ConvertTo-Json -Compress -Depth 5
-        $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
-        $code = $(if ($reason -like '*shell, terminal, exec and evaluation tools are not available*') { 'SHELL' } else { 'OTHER' })
-        return [pscustomobject]@{ Decision = [string]$decision.hookSpecificOutput.permissionDecision; Code = $code; Text = $text }
-    }
     $parameters = @{
         HostName = 'claude-code'; WorkspaceRoot = $WorkspaceRoot; SessionId = $SessionId; Nonce = $Nonce; WorkspaceTrusted = $WorkspaceTrusted; Now = $Now
         Runtime = (Get-DiscoveryProbeRuntime -RuntimeJson $RuntimeJson -WorkspaceRoot $WorkspaceRoot -ConfigurationPath '.claude/settings.json')
-        SentinelDecision = $sentinel; HostEnvironment = $HostEnvironment; Store = $Store
+        HostEnvironment = $HostEnvironment; Store = $Store
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }
     $observation = Get-DiscoveryCapabilityObservation @parameters
