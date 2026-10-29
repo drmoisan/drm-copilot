@@ -662,7 +662,7 @@ Protected partition layout, shared with ES/discovery-authority-paths.ts and CL/D
   - Tests and proof: Per-file baseline, final and delta for every Python and TypeScript file Phase 12 added or changed, including the agentic_sync split modules and the new Python test-support module's production dependencies; new files at least 90% lines; branch at least 75%; no regression on changed lines; no exclusion or threshold weakening.
   - Acceptance: Every Phase 12 production file has numeric measurements meeting the floors; a missing measurement fails the gate.
 
-- [ ] [P13-T5] Repeat isolation runs for the Phase 12 suites (FEATURE/evidence/regression-testing/).
+- [x] [P13-T5] Repeat isolation runs for the Phase 12 suites (FEATURE/evidence/regression-testing/).
   - Files and behavior: Write FEATURE/evidence/regression-testing/p13-isolation.<timestamp>.md and per-run records.
   - Tests and proof: Seeded shuffled Jest run with the seed recorded; reversed-order single-process run of every Python test module Phase 12 added or changed; when P13-T3 ran the PowerShell loop, shuffled touched Pester file order with at least three recorded seeds, otherwise the record states that no Pester suite changed.
   - Acceptance: Every order passes; any order dependence is fixed on both sides and the affected loop repeated.
@@ -753,7 +753,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Per file: baseline, final and delta for lines and branches; new files at least 90% lines; every file at least 85% lines and 75% branches; no regression on changed lines; every changed line of R/catalog.py covered. No exclusion and no threshold change.
   - Acceptance: Every listed file has numeric measurements meeting the floors and a missing measurement fails the gate; [P13-T4] and this task are checked together.
 
-- [ ] [P14-T11] Repeat the isolation runs on the final tree, discharging [P13-T5] (FEATURE/evidence/regression-testing/).
+- [x] [P14-T11] Repeat the isolation runs on the final tree, discharging [P13-T5] (FEATURE/evidence/regression-testing/).
   - Files and behavior: Write FEATURE/evidence/regression-testing/p14-isolation.<timestamp>.md and one per-run record for each run below.
   - Tests and proof: A seeded shuffled Jest run in extensions/drm-copilot with the seed recorded; a reversed-order single-process Pytest run of every Python test module Phase 12 added or changed plus PT/test_catalog.py, PT/test_schema_validation.py and DTTEST/test_execution_environment_brief_contracts.py, with the module order recorded; a seeded shuffled file-order run of the Pester suites listed in the lexicographically greatest FEATURE/evidence/regression-testing/p13-isolation-pester-seeds.*.md plus tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1, with at least three seeds and each seed and file order recorded.
   - Acceptance: Every order passes; an order dependence is fixed on both sides, the affected loop among P14-T6 through P14-T8 is repeated, and every seed is re-run; [P13-T5] and this task are checked together.
