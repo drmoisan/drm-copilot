@@ -33,6 +33,46 @@ const WORKSPACE_ROOT = "C:/workspace";
 const SHA = "a".repeat(64);
 let spawnedProcesses: MockChildProcess[] = [];
 
+/** Process environment keys that carry the trusted discovery agent identity. */
+const IDENTITY_KEYS = [
+  "DRM_DISCOVERY_AGENT_ID",
+  "DRM_DISCOVERY_AGENT_ROLE",
+  "DRM_DISCOVERY_HOST",
+  "DRM_DISCOVERY_SESSION_ID",
+] as const;
+
+/**
+ * Run `body` with the identity keys set to `values` (an absent key is removed)
+ * and restore every key afterwards, so no test leaks process environment.
+ */
+async function withIdentityEnvironment(
+  values: Partial<Record<(typeof IDENTITY_KEYS)[number], string>>,
+  body: () => Promise<void>,
+): Promise<void> {
+  const saved = IDENTITY_KEYS.map((key) => [key, process.env[key]] as const);
+  // Apply the requested identity: set supplied keys and clear the others.
+  for (const key of IDENTITY_KEYS) {
+    const value = values[key];
+    if (value === undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = value;
+    }
+  }
+  try {
+    await body();
+  } finally {
+    // Restore the exact prior environment, including keys that were absent.
+    for (const [key, value] of saved) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
 function stdinRequest(callIndex = 0): Record<string, unknown> {
   const child = spawnedProcesses[callIndex];
   if (child === undefined || child.stdin.written.length !== 1) {
@@ -68,16 +108,26 @@ describe("discovery artifact commands", () => {
   });
 
   it("createDiscoveryArtifact direct invocation drafts a feature contract under a grant", async () => {
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.createDiscoveryArtifact",
+    await withIdentityEnvironment(
+      {
+        DRM_DISCOVERY_AGENT_ID: "agent-alpha",
+        DRM_DISCOVERY_AGENT_ROLE: "legacy-parity-analyst",
+        DRM_DISCOVERY_HOST: "claude-code",
+        DRM_DISCOVERY_SESSION_ID: "session-alpha",
+      },
+      async () => {
+        const handler = activateAndGetHandler(
+          "drmCopilotExtension.createDiscoveryArtifact",
+        );
+        await handler({
+          artifact_kind: "feature-contract",
+          feature_id: "orders.export",
+          name: "Order export",
+          invocation_ref: "invocation-alpha-0000000001",
+          write: true,
+        });
+      },
     );
-    await handler({
-      artifact_kind: "feature-contract",
-      feature_id: "orders.export",
-      name: "Order export",
-      invocation_ref: "invocation-alpha-0000000001",
-      write: true,
-    });
     expect(stdinRequest()).toMatchObject({
       operation: "new-contract",
       mode: "agent-output",
@@ -85,8 +135,44 @@ describe("discovery artifact commands", () => {
       invocation_ref: "invocation-alpha-0000000001",
       inputs: { feature_id: "orders.export", name: "Order export" },
     });
+    const args = (
+      childProcessMock.spawn.mock.calls[0] as [string, string[]]
+    )[1];
+    expect(
+      args.slice(args.indexOf("--principal"), args.indexOf("--principal") + 2),
+    ).toEqual(["--principal", "host"]);
+    expect(args).toEqual(
+      expect.arrayContaining([
+        "--author-id",
+        "agent-alpha",
+        "--session-id",
+        "session-alpha",
+        "--host-name",
+        "claude-code",
+        "--agent-role",
+        "legacy-parity-analyst",
+      ]),
+    );
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(showInputBoxMock).not.toHaveBeenCalled();
+  });
+
+  it("createDiscoveryArtifact refuses a granted draft from a process without a trusted agent identity", async () => {
+    await withIdentityEnvironment({}, async () => {
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.createDiscoveryArtifact",
+      );
+      await expect(
+        handler({
+          artifact_kind: "feature-contract",
+          feature_id: "orders.export",
+          name: "Order export",
+          invocation_ref: "invocation-alpha-0000000001",
+          write: true,
+        }),
+      ).rejects.toThrow("DISCOVERY_AGENT_IDENTITY_REQUIRED");
+    });
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
   it("createDiscoveryArtifact interactive invocation prompts per draft kind", async () => {

@@ -182,11 +182,16 @@ describe("discovery tool definitions", () => {
         "complexity",
       ],
     ],
-    [
-      "finalize_discovery_agent",
-      ["workspace_root", "invocation_ref", "request_id"],
-    ],
+    // request_id is optional: a discovery agent omits it and the receipt
+    // correlation comes from the host gate's consumed authorization reference.
+    ["finalize_discovery_agent", ["workspace_root", "invocation_ref"]],
   ])("%s requires exactly %j", (name, required) => {
     expect(definition(name).inputSchema.required).toEqual(required);
+  });
+
+  it("finalize_discovery_agent still declares request_id as an optional string property", () => {
+    const properties = definition("finalize_discovery_agent").inputSchema
+      .properties as Record<string, { type?: string } | undefined>;
+    expect(properties["request_id"]?.type).toBe("string");
   });
 });
