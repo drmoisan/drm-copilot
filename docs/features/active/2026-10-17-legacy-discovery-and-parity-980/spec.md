@@ -700,7 +700,7 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 - [x] All required generic agents are implemented and validated.
 - [x] All required generic skills are implemented and validated.
 - [x] Agents cannot write outside authorized paths.
-- [ ] Every new agent has a SubagentStop output validator.
+- [x] Every new agent has a SubagentStop output validator.
 - [x] Agent and skill assets are available across supported ecosystems.
 
 **Schemas and artifacts**
@@ -793,7 +793,7 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 ## Definition of Done
 
 - [x] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
+- [x] Behavior matches acceptance criteria in all documented environments
 - [x] Tests updated/added (unit/integration as applicable)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, docs/features/active/... links)

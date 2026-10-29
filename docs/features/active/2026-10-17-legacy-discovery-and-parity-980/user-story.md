@@ -51,7 +51,7 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [x] All required generic agents are implemented and validated.
 - [x] All required generic skills are implemented and validated.
 - [x] Agents cannot write outside authorized paths.
-- [ ] Every new agent has a SubagentStop output validator.
+- [x] Every new agent has a SubagentStop output validator.
 - [x] Agent and skill assets are available across supported ecosystems.
 ### Schemas and artifacts
 - [x] All required schemas exist and are versioned.
