@@ -15,6 +15,8 @@ CONTROL_KINDS = (
     "capability-attestation",
     "tool-authorization",
     "start-attestation",
+    "root-grant",
+    "host-observation",
 )
 OPAQUE_REFERENCE = "protected-alpha-00000001"
 START_ATTESTATION_REFERENCE = "start-0123456789abcdef0123"
@@ -279,6 +281,40 @@ def control_fixture(kind: str) -> dict[str, object]:
                 "event_id": "event-alpha",
                 "handler_sha256": HASH,
             },
+        )
+    elif kind == "root-grant":
+        document.update(
+            grant_ref=OPAQUE_REFERENCE,
+            host="codex",
+            session_id="session-alpha",
+            parent_agent_id="root",
+            tool="prepare_discovery_agent",
+            operation="prepare-agent",
+            input_sha256=HASH,
+            tool_use_id="tool-use-alpha",
+            handler_sha256=HASH,
+            issued_at=STAMP,
+            expires_at="2026-01-01T00:05:00Z",
+            state="issued",
+        )
+    elif kind == "host-observation":
+        document.update(
+            observation_ref=OPAQUE_REFERENCE,
+            host="codex",
+            session_id="session-alpha",
+            agent_id="agent-sentinel",
+            agent_type="discovery-capability-sentinel",
+            parent_agent_id="root",
+            tool_name="mcp__drm-copilot__discovery_capability_sentinel",
+            tool_use_id_present=True,
+            decision="allow",
+            code="SENTINEL",
+            handler_sha256=HASH,
+            observed_at=STAMP,
+            tool="discovery_capability_sentinel",
+            input_sha256=HASH,
+            expires_at="2026-01-01T00:05:00Z",
+            state="issued",
         )
     elif kind == "validation-receipt":
         document.update(

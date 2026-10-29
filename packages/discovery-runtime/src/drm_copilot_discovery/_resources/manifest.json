@@ -117,6 +117,11 @@
       "size": 10173
     },
     {
+      "path": "schemas/discovery/v2/host-observation.schema.json",
+      "sha256": "b3fb881adcabf255bc5e27bc9f2aab54643aeb806e1d83fef1d55a8920b4a14d",
+      "size": 2707
+    },
+    {
       "path": "schemas/discovery/v2/implementation-record.schema.json",
       "sha256": "0e1f156b06ad957c802d0dad5a31a8ae1f327a6ff6f482250fff99c8a4532070",
       "size": 3911
@@ -150,6 +155,11 @@
       "path": "schemas/discovery/v2/required-output-manifest.schema.json",
       "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d",
       "size": 2901
+    },
+    {
+      "path": "schemas/discovery/v2/root-grant.schema.json",
+      "sha256": "cd61540dc9db406548ae7485565b3698899e8d3c9946f6aaf77a2dbbf9cbe508",
+      "size": 3261
     },
     {
       "path": "schemas/discovery/v2/runtime-characterization-scenario.schema.json",

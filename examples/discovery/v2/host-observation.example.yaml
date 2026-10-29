@@ -1,0 +1,24 @@
+# Synthetic host observation written by a native PreToolUse adapter for a payload
+# it attributed to the capability sentinel agent calling the sentinel MCP tool.
+# The trailing four fields are the one-use sentinel grant the tool consumes.
+# Values are illustrative; a copy of this file never establishes authority.
+$schema: urn:drm-copilot:discovery:2.0.0:host-observation
+schema_version: 2.0.0
+artifact_kind: host-observation
+id: observation-0123456789abcdef0123
+observation_ref: observation-0123456789abcdef0123
+host: claude-code
+session_id: session-alpha
+agent_id: agent-sentinel-alpha
+agent_type: discovery-capability-sentinel
+parent_agent_id: root
+tool_name: mcp__drm-copilot__discovery_capability_sentinel
+tool_use_id_present: true
+decision: allow
+code: SENTINEL
+handler_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+observed_at: "2026-01-01T00:00:00Z"
+tool: discovery_capability_sentinel
+input_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+expires_at: "2026-01-01T00:05:00Z"
+state: issued
