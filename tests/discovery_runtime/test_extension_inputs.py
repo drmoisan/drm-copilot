@@ -370,19 +370,15 @@ def test_manifest_hash_excludes_only_root_checksum_and_preserves_authored_arrays
     )
 
 
-@pytest.mark.parametrize("conflict", [False, True])
-def test_repository_roles_retain_pins_and_reject_conflicting_local_identity(
-    analyzer_catalog: SchemaCatalog, conflict: bool
-) -> None:
-    """Retain sorted role pins while rejecting a second revision for the local ID.
+def test_repository_roles_retain_related_pins(analyzer_catalog: SchemaCatalog) -> None:
+    """Retain the sorted related-target pin beside the local source pin.
 
-    analyzer_catalog (SchemaCatalog), conflict (bool) choose valid or conflicting
-    related metadata. Returns None; assertions enforce immutable role identity.
+    analyzer_catalog (SchemaCatalog) supplies trusted schemas. Returns None;
+    assertions enforce immutable role identity.
     """
-    initial = capture_case(analyzer_catalog)
     related: list[dict[str, object]] = [
         {
-            "id": initial.profile.repository.id if conflict else "related-target",
+            "id": "related-target",
             "role": "modernization-target",
             "revision": "b" * 40,
             "snapshot_manifest": None,
@@ -390,11 +386,38 @@ def test_repository_roles_retain_pins_and_reject_conflicting_local_identity(
         }
     ]
     capture = capture_case(analyzer_catalog, repositories=related)
-    if conflict:
-        with pytest.raises(ValueError, match="conflicting identities"):
-            subject.extension_input_projection(capture)
-    else:
-        value = subject.extension_input_projection(capture)
-        assert value["target_repositories"] == (
-            row(id="related-target", revision="b" * 40),
-        )
+
+    value = subject.extension_input_projection(capture)
+
+    assert value["target_repositories"] == (
+        row(id="related-target", revision="b" * 40),
+    )
+
+
+def test_repository_roles_reject_a_conflicting_local_identity(
+    analyzer_catalog: SchemaCatalog, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A second revision for the local id is refused by the projection itself.
+
+    The profile refuses a related entry that reuses the local checkout id at
+    construction (`PROFILE_BINDING`), so the projection's own guard is reached
+    only through the pin seam; monkeypatch (pytest.MonkeyPatch) replaces that
+    seam with conflicting pins to prove the guard holds independently.
+    """
+    capture = capture_case(analyzer_catalog)
+    local = RepositoryIdentity(
+        id=capture.profile.repository.id, revision=capture.profile.repository.revision
+    )
+    conflicting = RepositoryIdentity(id=local.id, revision="b" * 40)
+
+    def conflicting_pins(
+        profile: object,
+    ) -> tuple[tuple[RepositoryIdentity, ...], tuple[RepositoryIdentity, ...]]:
+        """Return the local pin as a source and its conflicting revision as a target."""
+        assert profile is capture.profile
+        return (local,), (conflicting,)
+
+    monkeypatch.setattr(subject, "repository_pins", conflicting_pins)
+
+    with pytest.raises(ValueError, match="conflicting identities"):
+        subject.extension_input_projection(capture)
