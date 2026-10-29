@@ -21,6 +21,10 @@
  *     Pure logic only. No I/O, no clock, no randomness, no input mutation.
  */
 import {
+  FEATURE_FOLDER_TOOL,
+  featureFolderRecordErrors,
+} from "./orchestrator-state-feature-folder-record";
+import {
   BUG_PROMOTION_ENTRY_TOOL,
   FEATURE_PROMOTION_ENTRY_TOOL,
 } from "./orchestrator-state-promotion-tools";
@@ -47,12 +51,14 @@ export const VERIFIED_VIA_VALUES: ReadonlySet<string> = new Set([
 
 /**
  * The closed set of tools an adoption record may waive: the issue-creation
- * tool and the two promotion-type-specific promotion-entry tools.
+ * tool, the two promotion-type-specific promotion-entry tools, and the
+ * feature-folder tool, which also requires a valid `feature_folder_record`.
  */
 export const WAIVABLE_TOOLS: ReadonlySet<string> = new Set([
   POTENTIAL_TO_ISSUE_TOOL,
   FEATURE_PROMOTION_ENTRY_TOOL,
   BUG_PROMOTION_ENTRY_TOOL,
+  FEATURE_FOLDER_TOOL,
 ]);
 
 const PROMOTION_ENTRY_TOOLS: ReadonlySet<string> = new Set([
@@ -316,6 +322,8 @@ export function resolveIssueAdoption(
       Object.prototype.hasOwnProperty.call(adoption, "potential_record"),
     ),
   );
+  // Rules 10 and 11a-11e run under the same rule-8 shape gate as rule 9.
+  errors.push(...featureFolderRecordErrors(adoption, state, waived));
 
   if (errors.length > 0) {
     return { errors, waivedTools: new Set<string>() };

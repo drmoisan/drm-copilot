@@ -47,6 +47,7 @@ When the GitHub issue already exists (it was transferred, filed before orchestra
 1. Verify the issue read-only with `gh issue view`, a `gh api` GET request, or a GitHub MCP issue read, and use its number as `${issue-num}`.
 2. Record a top-level `issue_adoption` object in the orchestrator checkpoint (`issue_num`, `issue_url`, `origin`, `verified_via`, `verified_at`, `evidence`, `waived_tools`, and, when a promotion-entry tool is waived, `potential_record`). For that waiver `potential_record` is required when `origin` is `epic_decomposition`, optional when `origin` is `transferred` or `filed_before_orchestration`, and validated whenever it is present. A valid record waives the `potential_to_issue` receipt requirement at completion.
 3. `delegation_receipts.promotion.issue` may be omitted, because no promotion receipt exists for an adopted issue.
+4. When the item's feature folder was already created and committed before this run, do not call `new_active_feature_folder` a second time. Confirm the folder read-only (`git cat-file -t HEAD:<feature-folder>` prints `tree`), list `new_active_feature_folder` in `waived_tools`, and record `issue_adoption.feature_folder_record` with `path` equal to the checkpoint `feature-folder`, `verified_via` (`git_cat_file_head` or `git_ls_tree_head`), `verified_at`, and `evidence`. The Claude stop hook re-checks that `HEAD` holds the folder.
 
 The field rules, the closed set of waivable tools, and the fail-closed behavior are defined in `.claude/rules/orchestrator-state.md` under `## Invariants (issue_adoption object)`.
 

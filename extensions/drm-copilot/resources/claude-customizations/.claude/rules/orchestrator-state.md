@@ -261,9 +261,11 @@ These invariants apply only when a checkpoint contains a top-level `issue_adopti
 
 Honest disclosure: the validators perform no network I/O. They cannot confirm that the issue exists, so `evidence` and `verified_via` are an auditable declaration of the read-only verification the orchestrator performed, not proof of it. This matches the `standalone_merge_authorizations` precedent above: the record is a policy-level declaration, not a security control.
 
+The `feature_folder_record` is likewise declaration-only in every validator: the Python, TypeScript, and PowerShell validators perform no file-system or git access, so the validator checks, the MCP `validate_orchestration_artifacts` path, the Python CLI, and Codex gates cannot confirm that the folder exists or is committed. The folder is probed only under the Claude `SubagentStop` hook `.claude/hooks/validate-orchestrator-output.ps1`, through `.claude/hooks/validate-orchestrator-output-feature-folder.ps1`: when an `orchestrator-state` checkpoint waives `new_active_feature_folder` and passes the routing contract, the hook re-checks the checkpoint `feature-folder` against the path pattern and runs `git -C <worktree root> cat-file -t HEAD:<feature-folder>`. It allows only exit code 0 with the output `tree`; any other outcome blocks with `ROUTING_CONTRACT_BLOCKED: Checkpoint feature-folder is not committed in HEAD: <feature-folder>.`, which the subagent can repair. The probe proves only that `HEAD` of the run worktree holds a tree at that path at stop time; it does not prove which tool created the folder or that its contents are correct.
+
 ## Invariants (issue_adoption object)
 
-The object has the shape `{ issue_num, issue_url, origin, verified_via, verified_at, evidence, waived_tools, potential_record? }`.
+The object has the shape `{ issue_num, issue_url, origin, verified_via, verified_at, evidence, waived_tools, potential_record?, feature_folder_record? }`.
 
 | Field | Rule |
 | --- | --- |
@@ -275,6 +277,7 @@ The object has the shape `{ issue_num, issue_url, origin, verified_via, verified
 | `evidence` | A string with non-whitespace content. |
 | `waived_tools` | A non-empty list of non-blank tool names that includes `potential_to_issue`. |
 | `potential_record` | When waiving a promotion-entry tool: required when `origin` is `epic_decomposition`, optional when `origin` is `transferred` or `filed_before_orchestration`, and validated whenever it is present (a path under `docs/features/potential/` ending in `.md`). |
+| `feature_folder_record` | Required when `waived_tools` includes `new_active_feature_folder`, and validated whenever it is an object: `{ path, verified_via, verified_at, evidence }`, where `path` is a folder under `docs/features/active/` equal to the checkpoint `feature-folder`, `verified_via` is `git_cat_file_head` or `git_ls_tree_head`, `verified_at` is present, and `evidence` is a non-empty string. |
 
 The rules run in this order, and their errors accumulate:
 
@@ -287,12 +290,19 @@ The rules run in this order, and their errors accumulate:
 7. `evidence` must be a non-empty string.
 8. `waived_tools` must be a non-empty list of non-blank strings; otherwise no further rule-8 or rule-9 check runs. Each entry, in list order, receives the first applicable error of: listed more than once; not in the closed waivable set; not required by the selected route after promotion-type resolution; already holding a successful MCP receipt. The list must include `potential_to_issue`.
 9. Only when the rule-8 shape check passed: each distinct waived promotion-entry tool (`new_potential_entry` or `new_potential_bug_entry`) requires a valid `potential_record`, except that rule 9 reports nothing when `origin` is `transferred` or `filed_before_orchestration` and the `potential_record` key is absent. A present `potential_record`, including `null`, is always validated.
+10. Only when the rule-8 shape check passed: when `waived_tools` includes `new_active_feature_folder` and `feature_folder_record` is absent or not an object (including `null`), the error is `Checkpoint issue_adoption.feature_folder_record must be an object when waiving new_active_feature_folder.`
+11. Only when the rule-8 shape check passed: whenever `feature_folder_record` is an object, waived or not, its fields are checked in this order, and the errors accumulate:
+    - 11a. `path` must be a string that fully matches `^docs/features/active/[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*$`, so dot segments, empty segments, a trailing slash, backslashes, drive letters, glob characters, and a leading `-` are rejected: `Checkpoint issue_adoption.feature_folder_record.path must be a folder path under docs/features/active/ without dot segments or a trailing slash.`
+    - 11b. Only when `path` passed 11a: the checkpoint `feature-folder` must be the identical string; an absent, non-string, or different value yields `Checkpoint issue_adoption.feature_folder_record.path must equal the checkpoint feature-folder.`
+    - 11c. `verified_via` must be `git_cat_file_head` or `git_ls_tree_head`: `Checkpoint issue_adoption.feature_folder_record.verified_via must be one of git_cat_file_head, git_ls_tree_head.`
+    - 11d. `verified_at` must be present; absent, `null`, and blank strings are rejected: `Checkpoint issue_adoption.feature_folder_record.verified_at must be present.`
+    - 11e. `evidence` must be a non-empty string: `Checkpoint issue_adoption.feature_folder_record.evidence must be a non-empty string.`
 
-The closed waivable set is `potential_to_issue`, `new_potential_entry`, and `new_potential_bug_entry`. `new_active_feature_folder`, `collect_pr_context`, `validate_orchestration_artifacts`, and every other tool can never be waived. All comparisons are ordinal and case-sensitive.
+The closed waivable set is `potential_to_issue`, `new_potential_entry`, `new_potential_bug_entry`, and `new_active_feature_folder`; `new_active_feature_folder` is waived only together with a valid `feature_folder_record`. `collect_pr_context`, `validate_orchestration_artifacts`, and every other tool can never be waived. All comparisons are ordinal and case-sensitive.
 
 A lifecycle record moved to `docs/features/potential/promoted/` satisfies the `potential_record` path rule, because the rule checks only the `docs/features/potential/` prefix and the `.md` suffix and does not check that the file exists.
 
-Fail-closed behavior: any adoption error waives nothing, so each missing receipt is still reported as `Checkpoint missing successful MCP receipt: <tool>.`. Adoption errors are placed after the receipt-loop errors and before the `local_execution_overrides` errors. The waiver affects only receipt presence: the declared `required_mcp_tools` equality check with the routing matrix is unchanged, so a checkpoint must still declare every route tool it waives.
+Fail-closed behavior: any adoption error waives nothing, so each missing receipt is still reported as `Checkpoint missing successful MCP receipt: <tool>.`. Adoption errors are placed after the receipt-loop errors and before the `local_execution_overrides` errors. Rule 10 and rule 11 errors follow the rule 9 errors in the adoption error list, so a checkpoint that waives `new_active_feature_folder` without a valid record reports the missing-receipt line for each unreceipted required tool first, in `required_mcp_tools` order, and the rule 10 or rule 11 error after them. The waiver affects only receipt presence: the declared `required_mcp_tools` equality check with the routing matrix is unchanged, so a checkpoint must still declare every route tool it waives.
 
 ## Enforcement
 
@@ -305,4 +315,4 @@ Fail-closed behavior: any adoption error waives nothing, so each missing receipt
 - The standalone-merge authorization invariants are enforced by the `PreToolUse` merge gate (`.claude/hooks/enforce-epic-merge-gate.ps1` with its dot-sourced helpers file, and `.codex/hooks/enforce-epic-merge-gate.ps1`) at merge time. The Python checkpoint validator
   does not currently validate standalone_merge_authorizations
   entries; adding that check is recorded as follow-up FU-3.
-- The `issue_adoption` invariants are enforced at completion by the routing-contract check in all three runtimes: `scripts/dev_tools/_orchestrator_state_issue_adoption.py` (Python authority), `extensions/drm-copilot/src/lib/validate/orchestrator-state-issue-adoption.ts`, and `.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1`, with byte-identical error strings pinned by the shared corpus under `tests/fixtures/orchestrator_state_issue_adoption/`.
+- The `issue_adoption` invariants are enforced at completion by the routing-contract check in all three runtimes: `scripts/dev_tools/_orchestrator_state_issue_adoption.py` (Python authority), `extensions/drm-copilot/src/lib/validate/orchestrator-state-issue-adoption.ts`, and `.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1`, with byte-identical error strings pinned by the shared corpus under `tests/fixtures/orchestrator_state_issue_adoption/`. Rules 10 and 11 live in the record modules `scripts/dev_tools/_orchestrator_state_feature_folder_record.py`, `extensions/drm-copilot/src/lib/validate/orchestrator-state-feature-folder-record.ts`, and `.claude/lib/orchestrator-state/OrchestratorStateFeatureFolderRecord.psm1`. The `HEAD` probe for a waived `new_active_feature_folder` lives in the hook sibling `.claude/hooks/validate-orchestrator-output-feature-folder.ps1`, loaded by `.claude/hooks/validate-orchestrator-output.ps1`.

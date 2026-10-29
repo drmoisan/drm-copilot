@@ -17,9 +17,11 @@ from __future__ import annotations
 from tests.scripts.dev_tools.orchestrator_state_issue_adoption_test_support import (
     E4,
     E8INCLUDE,
+    E10,
     LARGE_BUG_TOOLS,
     LARGE_TOOLS,
     REMEDIATION_TOOLS,
+    SUCCESSFUL_WITHOUT_FOLDER,
     VALID_RECORD,
     build_adoption,
     build_state,
@@ -41,8 +43,8 @@ PREPARATION_BUG_TOOLS = (
 # --- AC-8: the closed waivable set -----------------------------------------
 
 
-def test_waiving_new_active_feature_folder_is_rejected() -> None:
-    """new_active_feature_folder is outside the waivable set."""
+def test_waiving_new_active_feature_folder_without_record_reports_rule_10() -> None:
+    """new_active_feature_folder is waivable, but only with a feature_folder_record."""
 
     # Arrange
     adoption = build_adoption(
@@ -50,12 +52,12 @@ def test_waiving_new_active_feature_folder_is_rejected() -> None:
     )
 
     # Act
-    result = run_resolver(build_state(adoption))
+    result = run_resolver(
+        build_state(adoption), successful_tools=SUCCESSFUL_WITHOUT_FOLDER
+    )
 
     # Assert
-    assert result.errors == (
-        non_waivable_tool_error("new_active_feature_folder"),
-    ), f"unexpected errors: {result.errors}"
+    assert result.errors == (E10,), f"unexpected errors: {result.errors}"
     assert result.waived_tools == frozenset()
 
 

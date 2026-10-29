@@ -4,7 +4,9 @@ Purpose:
     Hold the route tool lists, expected message strings, message builders,
     fixed-grid value tuples, and checkpoint builders used by
     ``test_orchestrator_state_issue_adoption.py`` and
-    ``test_orchestrator_state_issue_adoption_waivers.py``.
+    ``test_orchestrator_state_issue_adoption_waivers.py``, plus the
+    ``feature_folder_record`` builders used by
+    ``test_orchestrator_state_issue_adoption_feature_folder.py``.
 
 Responsibilities:
     Provide the resolved ``required_mcp_tools`` lists of the ``large``,
@@ -185,3 +187,97 @@ def run_resolver(
         required_mcp_tools=required_mcp_tools,
         successful_tools=successful_tools,
     )
+
+
+# --- Issue #992: feature_folder_record messages and builders -----------------
+
+FEATURE_FOLDER = "docs/features/active/2026-09-29-sample-feature-509"
+FEATURE_FOLDER_TOOL = "new_active_feature_folder"
+# Successful receipts of an adopted checkpoint whose feature folder was created
+# before the run: the folder tool holds no receipt.
+SUCCESSFUL_WITHOUT_FOLDER: frozenset[str] = frozenset(
+    {"collect_pr_context", "validate_orchestration_artifacts"}
+)
+
+E10 = (
+    "Checkpoint issue_adoption.feature_folder_record must be an object when waiving "
+    "new_active_feature_folder."
+)
+E11A = (
+    "Checkpoint issue_adoption.feature_folder_record.path must be a folder path under "
+    "docs/features/active/ without dot segments or a trailing slash."
+)
+E11B = (
+    "Checkpoint issue_adoption.feature_folder_record.path must equal the checkpoint "
+    "feature-folder."
+)
+E11C = (
+    "Checkpoint issue_adoption.feature_folder_record.verified_via must be one of "
+    "git_cat_file_head, git_ls_tree_head."
+)
+E11D = "Checkpoint issue_adoption.feature_folder_record.verified_at must be present."
+E11E = (
+    "Checkpoint issue_adoption.feature_folder_record.evidence must be a non-empty "
+    "string."
+)
+
+# Sentinel default of build_folder_adoption: a valid record, distinct from an
+# explicit None, which a test passes to exercise a null record.
+_VALID_FOLDER_RECORD = object()
+
+
+def build_feature_folder_record(**overrides: object) -> dict[str, object]:
+    """Return a valid feature_folder_record for FEATURE_FOLDER with field overrides."""
+
+    record: dict[str, object] = {
+        "path": FEATURE_FOLDER,
+        "verified_via": "git_cat_file_head",
+        "verified_at": "2026-09-29T15:20:00Z",
+        "evidence": f"git cat-file -t HEAD:{FEATURE_FOLDER} printed tree",
+    }
+    record.update(overrides)
+    return record
+
+
+def build_folder_adoption(
+    record: object = _VALID_FOLDER_RECORD, *, include_record: bool = True
+) -> dict[str, object]:
+    """Return an adoption that waives the folder tool and carries the given record.
+
+    Args:
+        record (object): The ``feature_folder_record`` value; defaults to a
+            valid record.
+        include_record (bool): False omits the ``feature_folder_record`` key.
+
+    Returns:
+        dict[str, object]: The adoption record.
+    """
+
+    fields: dict[str, object] = {
+        "waived_tools": ["potential_to_issue", FEATURE_FOLDER_TOOL],
+    }
+    if include_record:
+        fields["feature_folder_record"] = (
+            build_feature_folder_record() if record is _VALID_FOLDER_RECORD else record
+        )
+    return build_adoption(**fields)
+
+
+def build_folder_state(
+    adoption: object,
+    *,
+    feature_folder: object = FEATURE_FOLDER,
+    include_folder: bool = True,
+) -> dict[str, object]:
+    """Return a minimal checkpoint with a ``feature-folder`` key and the adoption."""
+
+    state = build_state(adoption)
+    if include_folder:
+        state["feature-folder"] = feature_folder
+    return state
+
+
+def run_folder_resolver(state: dict[str, object]) -> IssueAdoptionResult:
+    """Run the resolver on the large route with no folder-tool receipt."""
+
+    return run_resolver(state, successful_tools=SUCCESSFUL_WITHOUT_FOLDER)

@@ -263,7 +263,12 @@ carries exactly these five elements.
    with origin `filed_before_orchestration` unless the issue was transferred, waiving
    `potential_to_issue` and the promotion-entry tool for the checkpoint's promotion-type. When a
    lifecycle record for the item exists under `docs/features/potential/promoted/`, the child cites
-   it as `potential_record`.
+   it as `potential_record`. The preparation child already created and committed the item's feature
+   folder, so the prompt also instructs the execution child not to call
+   `new_active_feature_folder`, to confirm the folder read-only
+   (`git cat-file -t HEAD:<feature-folder>` prints `tree`), to add `new_active_feature_folder` to
+   `waived_tools`, and to record `issue_adoption.feature_folder_record` with `path` equal to the
+   checkpoint `feature-folder`, `verified_via` `git_cat_file_head`, `verified_at`, and `evidence`.
 5. The model-budget marker line `model_budget.fable_policy: <disabled|available|preferred>.`
 
 Spawn parameters, passed on the `Agent` call and never written into the prompt text:

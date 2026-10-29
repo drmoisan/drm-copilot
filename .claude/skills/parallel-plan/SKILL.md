@@ -140,7 +140,9 @@ the model-budget marker line, and is omitted for a potential-entry item, whose c
 The line carries no mode marker, no digits, and no active feature-folder path, so hook target
 resolution and mode classification are unchanged. The preparation checkpoint does not carry over
 to execution, so the execution child records its own adoption (see
-`.claude/skills/parallel-orchestrate/SKILL.md`, kickoff element 4).
+`.claude/skills/parallel-orchestrate/SKILL.md`, kickoff element 4). Because the preparation child
+creates and commits the feature folder, the execution child's adoption also waives
+`new_active_feature_folder` and records `feature_folder_record` for that committed folder.
 
 **No edit to shared surfaces.** No edit is made to `.claude/skills/orchestrate/SKILL.md` or to
 `config/orchestration-routing.json`, including the `preparation` route. The route mechanism is

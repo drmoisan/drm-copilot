@@ -329,13 +329,20 @@ describe("resolveIssueAdoption rejects malformed records (AC-7)", () => {
 });
 
 describe("resolveIssueAdoption enforces the closed waivable set (AC-8)", () => {
-  it("rejects waiving the feature-folder tool", () => {
+  it("reports rule 10 when waiving the feature-folder tool without a record", () => {
     const record = adoption({
       waived_tools: ["potential_to_issue", "new_active_feature_folder"],
     });
-    expect(resolve(stateWith(record)).errors).toEqual([
-      e8cannot("new_active_feature_folder"),
+    const result = resolve(
+      stateWith(record),
+      "large",
+      LARGE_TOOLS,
+      new Set(["collect_pr_context", "validate_orchestration_artifacts"]),
+    );
+    expect(result.errors).toEqual([
+      "Checkpoint issue_adoption.feature_folder_record must be an object when waiving new_active_feature_folder.",
     ]);
+    expect(waived(result)).toEqual([]);
   });
 
   it("rejects waiving the artifact-validation tool", () => {

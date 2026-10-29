@@ -268,10 +268,10 @@ Describe 'Issue adoption rejects malformed records (AC-7)' {
 
 Describe 'Issue adoption enforces the closed waivable set (AC-8)' {
 
-    It 'rejects waiving the feature-folder tool' {
+    It 'reports rule 10 when waiving the feature-folder tool without a record' {
         $adoption = Get-AdoptionRecord -Override @{ waived_tools = @('potential_to_issue', 'new_active_feature_folder') }
-        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption)
-        Join-Text $result.Errors | Should -BeExactly (Get-E8Cannot -Tool 'new_active_feature_folder')
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption) -Successful @('collect_pr_context', 'validate_orchestration_artifacts')
+        Join-Text $result.Errors | Should -BeExactly 'Checkpoint issue_adoption.feature_folder_record must be an object when waiving new_active_feature_folder.'
         @($result.WaivedTools).Count | Should -Be 0
     }
 
