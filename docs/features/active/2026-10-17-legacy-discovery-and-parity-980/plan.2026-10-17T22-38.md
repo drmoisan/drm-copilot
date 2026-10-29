@@ -823,12 +823,12 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
 
 ### Phase 15 — Remediation cycle 1: host identity from hook payloads
 
-- [ ] [P15-T1] Record the remediation baseline and the cycle decisions (FEATURE/evidence/remediation-baseline/).
+- [x] [P15-T1] Record the remediation baseline and the cycle decisions (FEATURE/evidence/remediation-baseline/).
   - Files and behavior: Re-read the policy files in the `policy-compliance-order` sequence, the four review artifacts and the research; write FEATURE/evidence/remediation-baseline/phase15-instructions-read.<timestamp>.md listing the files read, the policy order and the eight decisions of the revision section; record the head state (`git status --porcelain` empty, the branch name `feature/legacy-discovery-and-parity-980`, and the merge base of origin/main and HEAD as the scope anchor); record the gate figures the review verified (Python 96.70% lines and 93.62% branches, PowerShell 93.28% lines, TypeScript unverified) as the remediation baseline with their source artifacts.
   - Tests and proof: None run; this task writes evidence only.
   - Acceptance: The artifact has `Timestamp:`, `Command:`, `EXIT_CODE: 0` and `Output Summary:`; it lists every file read and every decision; no implementation has preceded it.
 
-- [ ] [P15-T2] Remove the evidence-location residue (artifacts/coverage/issue-980-p7t3-coverage.json).
+- [x] [P15-T2] Remove the evidence-location residue (artifacts/coverage/issue-980-p7t3-coverage.json).
   - Files and behavior: Delete artifacts/coverage/issue-980-p7t3-coverage.json and artifacts/coverage/issue-980-p7t3-devtools-coverage.json (gitignored, untracked, outside the branch diff; their content is superseded by the P14-T10 comparison, so nothing is moved). Run `poetry run python scripts/dev_tools/validate_evidence_locations.py --root .` and write FEATURE/evidence/qa-gates/p15-evidence-locations.<timestamp>.md.
   - Tests and proof: The validator output and `git ls-files` for both paths.
   - Acceptance: `EXIT_CODE: 0`; the record states both deleted paths and that `git ls-files` prints nothing for either.
