@@ -29,17 +29,20 @@ $ErrorActionPreference = 'Stop'
 # Import the shared checkpoint-value primitives, resolved relative to this
 # module's directory so the import travels with the pushed-down pack.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateFeatureFolderRecord.psm1') -Force -ErrorAction Stop
 
 $script:ISSUE_ADOPTION_KEY = 'issue_adoption'
 $script:POTENTIAL_TO_ISSUE_TOOL = 'potential_to_issue'
 $script:FEATURE_PROMOTION_ENTRY_TOOL = 'new_potential_entry'
 $script:BUG_PROMOTION_ENTRY_TOOL = 'new_potential_bug_entry'
+$script:FEATURE_FOLDER_TOOL = 'new_active_feature_folder'
 $script:ORIGIN_VALUES = [string[]]@('transferred', 'filed_before_orchestration', 'epic_decomposition')
 $script:VERIFIED_VIA_VALUES = [string[]]@('gh_issue_view', 'gh_api_get', 'github_mcp_issue_read')
 
-# The closed set of tools an adoption record may waive: the issue-creation tool
-# and the two promotion-type-specific promotion-entry tools.
-$script:WAIVABLE_TOOLS = [string[]]@($script:POTENTIAL_TO_ISSUE_TOOL, $script:FEATURE_PROMOTION_ENTRY_TOOL, $script:BUG_PROMOTION_ENTRY_TOOL)
+# The closed set of tools an adoption record may waive: the issue-creation tool,
+# the two promotion-type-specific promotion-entry tools, and the feature-folder
+# tool, which also requires a valid feature_folder_record (rules 10 and 11).
+$script:WAIVABLE_TOOLS = [string[]]@($script:POTENTIAL_TO_ISSUE_TOOL, $script:FEATURE_PROMOTION_ENTRY_TOOL, $script:BUG_PROMOTION_ENTRY_TOOL, $script:FEATURE_FOLDER_TOOL)
 $script:PROMOTION_ENTRY_TOOLS = [string[]]@($script:FEATURE_PROMOTION_ENTRY_TOOL, $script:BUG_PROMOTION_ENTRY_TOOL)
 $script:POTENTIAL_RECORD_PREFIX = 'docs/features/potential/'
 $script:POTENTIAL_RECORD_SUFFIX = '.md'
@@ -379,6 +382,8 @@ function Get-OrchestratorStateIssueAdoptionResult {
     $recordMember = Get-CheckpointObjectMember -Owner $adoption -Name 'potential_record'
     $origin = (Get-CheckpointObjectMember -Owner $adoption -Name 'origin').Value
     $errors.AddRange([string[]]@(Get-AdoptionPotentialRecordError -WaivedTool $waived.Value -PotentialRecord $recordMember.Value -Origin $origin -RecordPresent $recordMember.Present))
+    # Rules 10 and 11a-11e run under the same rule-8 shape gate as rule 9.
+    $errors.AddRange([string[]]@(Get-OrchestratorStateFeatureFolderRecordError -Adoption $adoption -State $State -WaivedTool $waived.Value))
 
     if ($errors.Count -gt 0) {
         return @{ Errors = $errors.ToArray(); WaivedTools = [string[]]@() }

@@ -25,7 +25,9 @@
     ambiguous, or mismatched target blocks with ORCHESTRATOR_CHECKPOINT_UNRESOLVED:
     before any checkpoint is read. For epic-orchestrator-state, the Layer 2 wave-barrier
     ordering check (OrchestratorStateEpicWaveBarrier.psm1, issue #840) runs after the
-    routing dispatch passes.
+    routing dispatch passes. For orchestrator-state, the adopted feature-folder probe
+    (validate-orchestrator-output-feature-folder.ps1, issue #992) runs after the routing
+    dispatch passes, and only when the checkpoint waives new_active_feature_folder.
 
 .NOTES
     Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
@@ -61,6 +63,10 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/Orchestr
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+# Imported after the completion modules without -Force, so the instance they already loaded through
+# the adoption module stays the one in use (issue #992).
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateFeatureFolderRecord.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateFeatureFolderRecord.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-feature-folder.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-feature-folder.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
 $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
@@ -194,7 +200,10 @@ function Invoke-OrchestratorOutputValidation {
         [string] $SessionRoot = (Get-Location).Path,
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $RoutingInvoker
+        [scriptblock] $RoutingInvoker,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $FeatureFolderGitInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
@@ -205,6 +214,7 @@ function Invoke-OrchestratorOutputValidation {
         $agentOutput = $envelope.AssistantText
         $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot }
         if ($PSBoundParameters.ContainsKey('RoutingInvoker')) { $blockArguments['RoutingInvoker'] = $RoutingInvoker }
+        if ($PSBoundParameters.ContainsKey('FeatureFolderGitInvoker')) { $blockArguments['FeatureFolderGitInvoker'] = $FeatureFolderGitInvoker }
         $decision = Get-OrchestratorOutputBlockDecision @blockArguments
     }
     if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
@@ -235,7 +245,10 @@ function Get-OrchestratorOutputBlockDecision {
         [string] $SessionRoot = (Get-Location).Path,
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $RoutingInvoker
+        [scriptblock] $RoutingInvoker,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $FeatureFolderGitInvoker
     )
 
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
@@ -320,6 +333,15 @@ function Get-OrchestratorOutputBlockDecision {
             return @{ Ok = $false; Repairable = $true; Message = "MODEL_ROUTING_BLOCKED: $($routingResult.ErrorText)" }
         }
         return @{ Ok = $false; Repairable = $true; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
+    }
+
+    # Issue #992: a waived new_active_feature_folder must name a folder committed in HEAD of the run
+    # worktree. The validators only see the declared record, so the hook probes git once.
+    if ($ArtifactType -eq 'orchestrator-state') {
+        $folderArgs = @{ Checkpoint = $checkpoint; WorktreeRoot = [string]$resolution.WorktreeRoot }
+        if ($PSBoundParameters.ContainsKey('FeatureFolderGitInvoker') -and $null -ne $FeatureFolderGitInvoker) { $folderArgs['GitInvoker'] = $FeatureFolderGitInvoker }
+        $folderDecision = Get-OrchestratorOutputFeatureFolderDecision @folderArgs
+        if (-not $folderDecision.Ok) { return @{ Ok = $false; Repairable = $folderDecision.Repairable; Message = $folderDecision.Message } }
     }
 
     # Layer 2 (issue #840): the epic checkpoint only, after the routing dispatch passes,

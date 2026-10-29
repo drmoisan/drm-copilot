@@ -1,10 +1,11 @@
 {
   "name": "waives-new-active-feature-folder",
-  "notes": "new_active_feature_folder is outside the closed waivable set.",
+  "notes": "Waiving new_active_feature_folder without a feature_folder_record fails rule 10, so nothing is waived.",
   "checkpoint": {
     "route_id": "large",
     "promotion-type": "feature",
     "issue-num": "509",
+    "feature-folder": "docs/features/active/2026-09-29-sample-feature-509",
     "required_agents": [
       "task-researcher",
       "prd-feature",
@@ -87,11 +88,6 @@
         "evidence": "e"
       },
       {
-        "tool": "new_active_feature_folder",
-        "ok": true,
-        "evidence": "e"
-      },
-      {
         "tool": "collect_pr_context",
         "ok": true,
         "evidence": "e"
@@ -119,6 +115,7 @@
   },
   "expected_errors": [
     "Checkpoint missing successful MCP receipt: potential_to_issue.",
-    "Checkpoint issue_adoption.waived_tools names a tool that cannot be waived: new_active_feature_folder."
+    "Checkpoint missing successful MCP receipt: new_active_feature_folder.",
+    "Checkpoint issue_adoption.feature_folder_record must be an object when waiving new_active_feature_folder."
   ]
 }

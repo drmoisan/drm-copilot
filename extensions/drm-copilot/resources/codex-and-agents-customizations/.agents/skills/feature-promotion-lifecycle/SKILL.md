@@ -83,7 +83,7 @@ Lifecycle guardrails:
 
 4) Create the potential entry through `mcp__drm-copilot__new_potential_entry` or `mcp__drm-copilot__new_potential_bug_entry`.
 
-5) Promote the potential document through `mcp__drm-copilot__potential_to_issue` with the selected `${work-mode}` and capture the numeric `${issue-num}`. When the issue already exists, do not call `potential_to_issue`; verify the issue read-only and record `issue_adoption` with the existing number as `${issue-num}`.
+5) Promote the potential document through `mcp__drm-copilot__potential_to_issue` with the selected `${work-mode}` and capture the numeric `${issue-num}`. When the issue already exists, do not call `potential_to_issue`; verify the issue read-only and record `issue_adoption` with the existing number as `${issue-num}`. When the feature folder for that issue was also created and committed before this run, do not call `new_active_feature_folder` again in step 7; waive it in `issue_adoption.waived_tools` and record `issue_adoption.feature_folder_record` (`path` equal to `${feature-folder}`, `verified_via`, `verified_at`, `evidence`) after confirming the folder is in `HEAD`.
 
 6) Rename the branch to the final branch:
 - `${final-branch}`

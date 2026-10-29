@@ -70,7 +70,10 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the
    checkpoint's promotion-type. When a lifecycle record for the item exists under
    docs/features/potential/promoted/, cite it as potential_record.` The line is omitted for a
-   potential-entry item, whose child promotes it.
+   potential-entry item, whose child promotes it. The preparation child creates and commits the
+   item's feature folder, so the item's later execution child records `feature_folder_record` for
+   that committed folder instead of calling `new_active_feature_folder` again, per
+   `/parallel-orchestrate` kickoff element 4.
 
 3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the scheduling
    entry point Get-BlastRadiusConflictEdge from the destination-runtime PowerShell port

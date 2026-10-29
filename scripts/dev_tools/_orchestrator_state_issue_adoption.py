@@ -6,7 +6,8 @@ Purpose:
     orchestration started. A valid record waives the successful-receipt
     requirement for ``potential_to_issue`` and, optionally, for the checkpoint's
     promotion-entry tool, because an adopted issue never passes through those
-    MCP tools.
+    MCP tools. With a valid ``feature_folder_record`` it also waives
+    ``new_active_feature_folder`` for a feature folder created before the run.
 
 Usage:
     Call ``resolve_issue_adoption`` with the parsed checkpoint, the selected
@@ -33,6 +34,10 @@ import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
+from scripts.dev_tools._orchestrator_state_feature_folder_record import (
+    FEATURE_FOLDER_TOOL,
+    feature_folder_record_errors,
+)
 from scripts.dev_tools._orchestrator_state_promotion_tools import (
     BUG_PROMOTION_ENTRY_TOOL,
     FEATURE_PROMOTION_ENTRY_TOOL,
@@ -59,10 +64,16 @@ ORIGIN_VALUES: frozenset[str] = frozenset(
 VERIFIED_VIA_VALUES: frozenset[str] = frozenset(
     {"gh_issue_view", "gh_api_get", "github_mcp_issue_read"}
 )
-# The closed set of tools an adoption record may waive: the issue-creation tool
-# and the two promotion-type-specific promotion-entry tools.
+# The closed set of tools an adoption record may waive: the issue-creation tool,
+# the two promotion-type-specific promotion-entry tools, and the feature-folder
+# tool, which also requires a valid feature_folder_record (rules 10 and 11).
 WAIVABLE_TOOLS: frozenset[str] = frozenset(
-    {POTENTIAL_TO_ISSUE_TOOL, FEATURE_PROMOTION_ENTRY_TOOL, BUG_PROMOTION_ENTRY_TOOL}
+    {
+        POTENTIAL_TO_ISSUE_TOOL,
+        FEATURE_PROMOTION_ENTRY_TOOL,
+        BUG_PROMOTION_ENTRY_TOOL,
+        FEATURE_FOLDER_TOOL,
+    }
 )
 PROMOTION_ENTRY_TOOLS: tuple[str, ...] = (
     FEATURE_PROMOTION_ENTRY_TOOL,
@@ -346,6 +357,8 @@ def resolve_issue_adoption(
                 record_present="potential_record" in adoption,
             )
         )
+        # Rules 10 and 11a-11e run under the same rule-8 shape gate as rule 9.
+        errors.extend(feature_folder_record_errors(adoption, state, waived))
 
     if errors or waived is None:
         return IssueAdoptionResult(errors=tuple(errors), waived_tools=frozenset())

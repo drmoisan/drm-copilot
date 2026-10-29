@@ -105,6 +105,10 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/orchestrator-state-feature-folder-record.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-routing.ts": {
       lines: 85,
       branches: 75,
