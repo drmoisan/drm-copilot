@@ -34,6 +34,7 @@ const DISCOVERY_TOOL_NAMES = [
   "read_discovery_source",
   "prepare_discovery_agent",
   "finalize_discovery_agent",
+  "discovery_capability_sentinel",
 ] as const;
 
 function findRepoDefinition(name: string) {
@@ -53,7 +54,7 @@ describe("discovery MCP tool definitions", () => {
     );
 
     expect(definitionNames).toEqual([...REPO_AUTOMATION_TOOLS]);
-    expect(definitionNames.slice(-18)).toEqual([...DISCOVERY_TOOL_NAMES]);
+    expect(definitionNames.slice(-19)).toEqual([...DISCOVERY_TOOL_NAMES]);
   });
 
   it.each(DISCOVERY_TOOL_NAMES)(

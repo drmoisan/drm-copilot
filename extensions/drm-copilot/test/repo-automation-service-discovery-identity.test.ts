@@ -1,7 +1,8 @@
 /**
- * Prove the host-principal identity options come only from the trusted
- * authority provider and that a bound request without an agent identity is
- * refused instead of being downgraded to local-user.
+ * Prove the host-principal identity options come only from the one-use
+ * authorization the gate consumed for the request's invocation, and that a
+ * bound request without a consumed record is refused instead of being
+ * downgraded to local-user.
  */
 
 import { describe, expect, it, jest } from "@jest/globals";
@@ -11,7 +12,7 @@ jest.mock("vscode", () => ({}), { virtual: true });
 import { invocationDirectory } from "../src/discovery-authority-paths";
 import {
   AUTHORIZATIONS_PARTITION,
-  computeInputDigest,
+  type ConsumedAuthorization,
   decodeToolAuthorization,
 } from "../src/discovery-authorization";
 import {
@@ -19,8 +20,18 @@ import {
   hostInvocationOptions,
   invocationOptions,
 } from "../src/repo-automation-service-discovery-identity";
-import { vectors } from "./discovery-authorization-test-support";
+import { refusalCode } from "./discovery-authorization-test-support";
 import {
+  AGENT_ID,
+  AGENT_ROLE,
+  AUTHORIZATION_REF,
+  issueAuthorization,
+  type PreparedStore,
+  preparedStore,
+  startedStore,
+} from "./discovery-grant-test-support";
+import {
+  CONTEXT,
   LOCATION,
   seeded,
   WORKSPACE,
@@ -35,176 +46,162 @@ import {
   service,
 } from "./repo-automation-service-discovery-test-support";
 
-const AGENT = { agentId: "agent-alpha", role: "legacy-parity-analyst" };
-const INVOCATION_REF = "invocation-0123456789abcdef0001";
-const READ_INPUT = {
-  workspace_root: WORKSPACE.workspace_root,
-  read_operation: "list",
-  paths: ["src"],
-  invocation_ref: INVOCATION_REF,
-};
-const RECORD_PATH = `${invocationDirectory(LOCATION, "session-alpha", INVOCATION_REF)}/${AUTHORIZATIONS_PARTITION}/authz-alpha.json`;
+const CONSUME_AT = new Date("2026-10-22T12:01:00Z");
 
-/** An issued grant bound to the provider's workspace, identity and the read call. */
-function issuedGrant() {
+function readInput(invocationRef: string) {
   return {
-    ...vectors.records.issued,
-    workspace: WORKSPACE,
-    identity: {
-      host: "codex",
-      session_id: "session-alpha",
-      agent_id: AGENT.agentId,
-      role: AGENT.role,
-      invocation_id: INVOCATION_REF,
-    },
-    tool: "read_discovery_source" as const,
-    operation: "read-source",
-    input_sha256: computeInputDigest(
-      "read_discovery_source",
-      "read-source",
-      READ_INPUT,
-    ),
-    invocation_ref: INVOCATION_REF,
+    workspace_root: WORKSPACE.workspace_root,
+    read_operation: "list",
+    paths: ["src"],
+    invocation_ref: invocationRef,
   };
 }
 
+function consumeInput(invocationRef: string) {
+  return {
+    workspaceRoot: WORKSPACE.workspace_root,
+    tool: "read_discovery_source",
+    operation: "read-source",
+    inputs: readInput(invocationRef),
+    invocationRef,
+  };
+}
+
+/** A started invocation holding one issued grant for its read call. */
+function granted(): PreparedStore {
+  const store = startedStore();
+  issueAuthorization(store.io, {
+    invocationId: store.invocationId,
+    tool: "read_discovery_source",
+    operation: "read-source",
+    inputs: readInput(store.invocationId),
+  });
+  return store;
+}
+
+function recordPath(store: PreparedStore): string {
+  return `${invocationDirectory(LOCATION, CONTEXT.sessionId, store.invocationId)}/${AUTHORIZATIONS_PARTITION}/${AUTHORIZATION_REF}.json`;
+}
+
+function consume(store: PreparedStore): ConsumedAuthorization {
+  return consumeHostToolAuthorization(
+    provider(store.io, { now: () => CONSUME_AT }),
+    consumeInput(store.invocationId),
+  );
+}
+
 describe("consumeHostToolAuthorization", () => {
-  it("consumes the grant bound to the provider identity and the request", () => {
-    const io = seeded();
-    io.files.set(RECORD_PATH, JSON.stringify(issuedGrant()));
-    const authority = provider(io, {
-      agent: AGENT,
-      now: () => new Date("2026-10-22T12:01:00Z"),
-    });
+  it("consumes the grant bound to the started invocation and returns its identity", () => {
+    const store = granted();
 
-    const reference = consumeHostToolAuthorization(authority, {
-      workspaceRoot: WORKSPACE.workspace_root,
-      tool: "read_discovery_source",
-      operation: "read-source",
-      inputs: READ_INPUT,
-      invocationRef: INVOCATION_REF,
-    });
+    const consumed = consume(store);
 
-    expect(reference).toBe(vectors.records.issued.authorization_ref);
-    expect(decodeToolAuthorization(io.files.get(RECORD_PATH)!).state).toBe(
-      "consumed",
-    );
-    expect(io.files.has(`${RECORD_PATH}.consumed`)).toBe(true);
+    expect(consumed.authorizationRef).toBe(AUTHORIZATION_REF);
+    expect(consumed.identity).toEqual({
+      host: CONTEXT.host,
+      session_id: CONTEXT.sessionId,
+      agent_id: AGENT_ID,
+      role: AGENT_ROLE,
+      invocation_id: store.invocationId,
+    });
+    expect(
+      decodeToolAuthorization(store.io.files.get(recordPath(store))!).state,
+    ).toBe("consumed");
+    expect(store.io.files.has(`${recordPath(store)}.consumed`)).toBe(true);
   });
 
-  it("refuses without an agent identity and without a grant", () => {
-    const io = seeded();
-    const input = {
-      workspaceRoot: WORKSPACE.workspace_root,
+  it("refuses when the invocation has not started and when no invocation exists", () => {
+    const prepared = preparedStore();
+    issueAuthorization(prepared.io, {
+      invocationId: prepared.invocationId,
       tool: "read_discovery_source",
       operation: "read-source",
-      inputs: READ_INPUT,
-      invocationRef: INVOCATION_REF,
-    };
+      inputs: readInput(prepared.invocationId),
+    });
 
-    expect(() => consumeHostToolAuthorization(provider(io), input)).toThrow(
-      "DISCOVERY_AGENT_IDENTITY_REQUIRED",
-    );
-    expect(() =>
-      consumeHostToolAuthorization(provider(io, { agent: AGENT }), input),
-    ).toThrow("No native authorization exists");
+    expect(refusalCode(() => consume(prepared))).toBe("AUTHORIZATION_IDENTITY");
+    expect(
+      refusalCode(() =>
+        consumeHostToolAuthorization(
+          provider(seeded()),
+          consumeInput("invocation-0123456789abcdef0001"),
+        ),
+      ),
+    ).toBe("AUTHORIZATION_MISSING");
   });
 });
 
 describe("service consumeDiscoveryToolAuthorization", () => {
-  const input = {
-    workspaceRoot: WORKSPACE.workspace_root,
-    tool: "read_discovery_source",
-    operation: "read-source",
-    inputs: READ_INPUT,
-    invocationRef: INVOCATION_REF,
-  };
-
-  it("consumes the bound grant through the service's trusted provider", () => {
-    const io = seeded();
-    io.files.set(RECORD_PATH, JSON.stringify(issuedGrant()));
+  it("consumes the bound grant through the service without launching the runtime", () => {
+    const store = granted();
     const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
     const subject = service(
       launcher,
-      provider(io, {
-        agent: AGENT,
-        now: () => new Date("2026-10-22T12:01:00Z"),
-      }),
+      provider(store.io, { now: () => CONSUME_AT }),
     );
 
-    const reference = subject.consumeDiscoveryToolAuthorization?.(input);
+    const reference = subject.consumeDiscoveryToolAuthorization!(
+      consumeInput(store.invocationId),
+    );
 
-    expect(reference).toBe(vectors.records.issued.authorization_ref);
-    expect(io.files.has(`${RECORD_PATH}.consumed`)).toBe(true);
+    expect(reference).toBe(AUTHORIZATION_REF);
+    expect(store.io.files.has(`${recordPath(store)}.consumed`)).toBe(true);
     expect(launcher.captures).toHaveLength(0);
   });
 
-  it("refuses through the service when the provider has no agent identity", () => {
+  it("refuses through the service when no invocation binds the reference", () => {
     const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
     const subject = service(launcher, provider(seeded()));
 
-    expect(() => subject.consumeDiscoveryToolAuthorization?.(input)).toThrow(
-      "DISCOVERY_AGENT_IDENTITY_REQUIRED",
-    );
+    expect(() =>
+      subject.consumeDiscoveryToolAuthorization!(
+        consumeInput("invocation-0123456789abcdef0001"),
+      ),
+    ).toThrow("No protected invocation");
     expect(launcher.captures).toHaveLength(0);
   });
 });
 
 describe("hostInvocationOptions", () => {
-  it("returns the host principal with the trusted agent, session, host and role", () => {
-    const authority = provider(seeded(), { agent: AGENT });
+  it("returns the host principal with the consumed record's agent, session, host and role", () => {
+    const consumed = consume(granted());
 
-    const options = hostInvocationOptions(authority);
-
-    expect(options).toEqual({
+    expect(hostInvocationOptions(consumed)).toEqual({
       principal: "host",
-      authorId: "agent-alpha",
-      sessionId: "session-alpha",
-      hostName: "codex",
-      agentRole: "legacy-parity-analyst",
+      authorId: AGENT_ID,
+      sessionId: CONTEXT.sessionId,
+      hostName: CONTEXT.host,
+      agentRole: AGENT_ROLE,
     });
-  });
-
-  it("refuses a process without a trusted agent identity", () => {
-    const authority = provider(seeded());
-
-    expect(() => hostInvocationOptions(authority)).toThrow(
-      "DISCOVERY_AGENT_IDENTITY_REQUIRED",
-    );
   });
 });
 
 describe("invocationOptions", () => {
-  it("returns no identity for a root request without consulting the provider", () => {
-    let consulted = 0;
-
-    const options = invocationOptions(() => {
-      consulted += 1;
-      return provider(seeded(), { agent: AGENT });
-    }, undefined);
-
-    expect(options).toEqual({});
-    expect(consulted).toBe(0);
+  it("returns no identity for a root request", () => {
+    expect(invocationOptions(undefined, undefined)).toEqual({});
   });
 
-  it("returns the host identity for a request bound to an invocation", () => {
-    const options = invocationOptions(
-      () => provider(seeded(), { agent: AGENT }),
-      "invocation-alpha-0000000001",
-    );
+  it("returns the host identity for a request bound to the consumed invocation", () => {
+    const store = granted();
+    const consumed = consume(store);
 
-    expect(options).toMatchObject({
+    expect(invocationOptions(consumed, store.invocationId)).toMatchObject({
       principal: "host",
-      authorId: "agent-alpha",
+      authorId: AGENT_ID,
     });
   });
 
-  it("refuses a bound request without a trusted agent identity", () => {
+  it("refuses a bound request without a consumed record", () => {
     expect(() =>
-      invocationOptions(
-        () => provider(seeded()),
-        "invocation-alpha-0000000001",
-      ),
-    ).toThrow("DISCOVERY_AGENT_IDENTITY_REQUIRED");
+      invocationOptions(undefined, "invocation-0123456789abcdef0001"),
+    ).toThrow("DISCOVERY_HOST_BINDING_REQUIRED");
+  });
+
+  it("refuses a consumed record that binds another invocation", () => {
+    const consumed = consume(granted());
+
+    expect(() =>
+      invocationOptions(consumed, "invocation-other-000000001"),
+    ).toThrow("AUTHORIZATION_IDENTITY");
   });
 });

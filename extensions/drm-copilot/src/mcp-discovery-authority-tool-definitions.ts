@@ -12,10 +12,11 @@ import { SYSTEM_ROLES } from "./mcp-tool-inputs-discovery";
 
 /**
  * Tool definitions for the root-authority and agent-lifecycle discovery tools:
- * configure, transfer, import, migrate, doctor, read, prepare and finalize.
- * Root-only tools are denied to discovery roles at dispatch; no tool accepts
- * an identity, a capability assertion, a receipt destination or a success
- * claim. Enums are drawn from the authority input resolver constants.
+ * configure, transfer, import, migrate, doctor, read, prepare, finalize and the
+ * capability sentinel. Prepare and every controlled root call consume the root
+ * grant the native host gate issued; no tool accepts an identity, a capability
+ * assertion, a receipt destination or a success claim. Enums are drawn from the
+ * authority input resolver constants.
  */
 
 const profilePath = {
@@ -300,6 +301,19 @@ export const DISCOVERY_AUTHORITY_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition>
           profile_path: profilePath,
         },
         required: ["workspace_root", "invocation_ref"],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: "discovery_capability_sentinel",
+      description:
+        "Consume the one-use sentinel observation the native host gate recorded for this call and report whether the host attributed it to the capability sentinel agent. Evidence only; it grants nothing and never fails a call.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspace_root: workspaceRootProperty,
+        },
+        required: ["workspace_root"],
         additionalProperties: false,
       },
     },

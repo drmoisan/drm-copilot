@@ -1,15 +1,18 @@
 /**
- * Admit controlled discovery tool calls of a discovery role by consuming the
- * one-use native authorization the host's PreToolUse adapter issued.
+ * Admit controlled discovery tool calls by consuming the one-use record the
+ * host's PreToolUse adapter issued for exactly this call.
  *
  * The native adapter digests the raw tool input exactly as the agent sent it,
  * so only this MCP layer, which still holds that raw input, can locate and
- * consume the matching grant. The gate derives the controlled operation from
- * the tool and its input with the adapter's rules, refuses a caller-supplied
- * `authorization_ref`, asks the service to consume the grant bound to the
- * trusted identity and the request's `invocation_ref`, and forwards the
- * consumed record's reference into the handler input. A root process (no
- * discovery role) bypasses the gate and reads no authorization record.
+ * consume the matching record. The gate derives the controlled operation from
+ * the tool and its input with the adapter's rules and refuses caller-supplied
+ * `authorization_ref` or `root_grant_ref`. A call carrying `invocation_ref` is
+ * a specialist call: the service consumes the tool authorization bound to that
+ * invocation and the consumed reference travels in the handler input. A call
+ * without `invocation_ref` is a root call: the service consumes the root grant
+ * for the tool, operation and digest and forwards its reference. Neither path
+ * falls back to an unverified principal; without a record the call is refused
+ * before the handler runs.
  */
 
 import {
@@ -19,7 +22,6 @@ import {
   DiscoveryAuthorizationError,
   TOOL_OPERATIONS,
 } from "./discovery-authorization-record";
-import { isDiscoveryRole } from "./mcp-tool-inputs-discovery-authority";
 import type { RepoAutomationService } from "./repo-automation-service-contract";
 
 /** `artifact_type` values of validate_discovery_artifacts and their operations. */
@@ -45,6 +47,11 @@ const REPORT_TYPES: ReadonlyArray<string> = [
   "coverage",
   "parity",
   "completion",
+];
+/** Record references only the host gate and this layer may set. */
+const GATE_SUPPLIED_KEYS: ReadonlyArray<string> = [
+  "authorization_ref",
+  "root_grant_ref",
 ];
 
 export function isControlledTool(name: string): name is ControlledTool {
@@ -112,27 +119,35 @@ export function deriveControlledOperation(
   }
 }
 
+/** Re-raise a consumer refusal so the MCP summary names its code. */
+function withCode(error: unknown): unknown {
+  if (
+    error instanceof DiscoveryAuthorizationError &&
+    !error.message.startsWith(error.code)
+  ) {
+    return refuse(error.code, error.message);
+  }
+  return error;
+}
+
 /**
  * Admit one controlled tool call and return the input the handler resolves.
  *
- * For a root process the raw input is returned unchanged and no store is read.
- * For a discovery role the call must carry `invocation_ref` and `workspace_root`
- * and must not carry `authorization_ref`; the service consumes the grant bound
- * to the trusted identity, the derived operation and the raw input digest, and
- * the returned input carries the consumed `authorization_ref`.
+ * The call must carry `workspace_root` and must not carry `authorization_ref`
+ * or `root_grant_ref`. With `invocation_ref` the service consumes the tool
+ * authorization bound to that invocation and the returned input carries the
+ * consumed `authorization_ref`; without it the service consumes the root grant
+ * for the derived operation and raw input digest and the returned input carries
+ * `root_grant_ref`.
  *
- * @throws DiscoveryAuthorizationError on every refusal; a refusal leaves the
- *   grant untouched and the handler is never invoked.
+ * @throws DiscoveryAuthorizationError on every refusal; a refusal leaves every
+ *   record untouched and the handler is never invoked.
  */
 export function admitControlledToolCall(
   tool: ControlledTool,
   rawInput: unknown,
   service: RepoAutomationService,
 ): unknown {
-  const role = service.discoveryRole?.() ?? null;
-  if (!isDiscoveryRole(role)) {
-    return rawInput;
-  }
   if (
     rawInput === null ||
     typeof rawInput !== "object" ||
@@ -144,24 +159,20 @@ export function admitControlledToolCall(
     );
   }
   const inputs = rawInput as Readonly<Record<string, unknown>>;
-  if (Object.prototype.hasOwnProperty.call(inputs, "authorization_ref")) {
+  const supplied = GATE_SUPPLIED_KEYS.filter((key) =>
+    Object.prototype.hasOwnProperty.call(inputs, key),
+  );
+  if (supplied.length > 0) {
     throw refuse(
       "AUTHORIZATION_REQUEST_INVALID",
-      "authorization_ref is supplied by the host gate, never by the caller.",
-    );
-  }
-  const invocationRef = inputs["invocation_ref"];
-  if (typeof invocationRef !== "string" || invocationRef.length === 0) {
-    throw refuse(
-      "AUTHORIZATION_REQUEST_INVALID",
-      `${tool} requires invocation_ref for discovery role ${role}.`,
+      `${supplied.join(", ")} is supplied by the host gate, never by the caller.`,
     );
   }
   const workspaceRoot = inputs["workspace_root"];
   if (typeof workspaceRoot !== "string" || workspaceRoot.trim().length === 0) {
     throw refuse(
       "AUTHORIZATION_REQUEST_INVALID",
-      `${tool} requires workspace_root for discovery role ${role}.`,
+      `${tool} requires workspace_root.`,
     );
   }
   const operation = deriveControlledOperation(tool, inputs);
@@ -171,30 +182,50 @@ export function admitControlledToolCall(
       `The operation of ${tool} could not be derived from its input.`,
     );
   }
-  if (service.consumeDiscoveryToolAuthorization === undefined) {
+  const invocationRef = inputs["invocation_ref"];
+  // Routing: a present invocation_ref names a specialist's started invocation;
+  // its absence makes this a root call that needs the root grant of the hook.
+  if (invocationRef !== undefined) {
+    if (typeof invocationRef !== "string" || invocationRef.length === 0) {
+      throw refuse(
+        "AUTHORIZATION_REQUEST_INVALID",
+        `${tool} invocation_ref must be a non-empty string.`,
+      );
+    }
+    if (service.consumeDiscoveryToolAuthorization === undefined) {
+      throw refuse(
+        "AUTHORIZATION_MISSING",
+        "This service cannot consume native tool authorizations.",
+      );
+    }
+    try {
+      const authorizationRef = service.consumeDiscoveryToolAuthorization({
+        workspaceRoot,
+        tool,
+        operation,
+        inputs,
+        invocationRef,
+      });
+      return { ...inputs, authorization_ref: authorizationRef };
+    } catch (error) {
+      throw withCode(error);
+    }
+  }
+  if (service.consumeDiscoveryRootGrant === undefined) {
     throw refuse(
-      "AUTHORIZATION_MISSING",
-      "This service cannot consume native tool authorizations.",
+      "DISCOVERY_HOST_BINDING_REQUIRED",
+      "This service cannot consume native root grants.",
     );
   }
-  let authorizationRef: string;
   try {
-    authorizationRef = service.consumeDiscoveryToolAuthorization({
+    const rootGrantRef = service.consumeDiscoveryRootGrant({
       workspaceRoot,
       tool,
       operation,
       inputs,
-      invocationRef,
     });
+    return { ...inputs, root_grant_ref: rootGrantRef };
   } catch (error) {
-    // The consumer's refusal keeps its code; the MCP summary must name it too.
-    if (
-      error instanceof DiscoveryAuthorizationError &&
-      !error.message.startsWith(error.code)
-    ) {
-      throw refuse(error.code, error.message);
-    }
-    throw error;
+    throw withCode(error);
   }
-  return { ...inputs, authorization_ref: authorizationRef };
 }

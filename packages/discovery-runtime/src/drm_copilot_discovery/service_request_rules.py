@@ -156,6 +156,7 @@ CONTROLLED_OPERATIONS = frozenset(
         "parity-report",
         "profile",
         "read-source",
+        "sentinel",
         "update-artifact",
         "validate-all",
         "validate-coverage-ledger",

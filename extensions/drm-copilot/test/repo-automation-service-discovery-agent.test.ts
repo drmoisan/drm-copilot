@@ -1,11 +1,12 @@
 /**
- * Prove the service-level prepare and finalize flows run through the injected
- * authority provider and the fixed runtime.
+ * Prove the service-level prepare flow runs through the injected authority
+ * provider, the root grant of the host gate and the fixed runtime.
  *
- * Prepare pins the pre-invocation baseline and the runtime identity through a
- * recorded root `prepare-agent` request before persisting protected bindings;
- * finalize runs `finalize-agent` for the invocation and mints the receipt.
- * Host options are forwarded verbatim.
+ * Prepare consumes the root grant of the call, pins the pre-invocation
+ * baseline and the runtime identity through a recorded root `prepare-agent`
+ * request before persisting protected bindings. Host options are forwarded
+ * verbatim. The finalize flow is proved in
+ * `repo-automation-service-discovery-agent.finalize.test.ts`.
  */
 
 import { describe, expect, it, jest } from "@jest/globals";
@@ -14,12 +15,7 @@ jest.mock("vscode", () => ({}), { virtual: true });
 
 import { invocationDirectory } from "../src/discovery-authority-paths";
 import { BASELINE_RESULT_FILE } from "../src/discovery-invocation";
-import {
-  ACTIVATION as FINAL_ACTIVATION,
-  result as finalizeResult,
-  scenario,
-  WS,
-} from "./discovery-finalization-test-support";
+import { issueRootGrant, rootGrantPath } from "./discovery-grant-test-support";
 import {
   baselineResult,
   capability,
@@ -27,6 +23,7 @@ import {
   RUNTIME,
   seeded,
 } from "./discovery-invocation-test-support";
+import type { MemoryStoreIO } from "./discovery-store-test-helpers";
 import {
   buildServiceResult,
   FakeLauncher,
@@ -39,6 +36,26 @@ import {
   WS_ROOT,
 } from "./repo-automation-service-discovery-test-support";
 
+/** The raw MCP input of the prepare call; the root grant is bound to its digest. */
+const PREPARE_RAW = {
+  workspace_root: WS_ROOT,
+  skill_id: "inventory-legacy-system",
+};
+/** Seed the root grant the native gate issued for the prepare call. */
+function prepareGranted(io: MemoryStoreIO): MemoryStoreIO {
+  issueRootGrant(io, {
+    tool: "prepare_discovery_agent",
+    operation: "prepare-agent",
+    inputs: PREPARE_RAW,
+  });
+  return io;
+}
+
+/** Keys added to the store since `before`. */
+function added(io: MemoryStoreIO, before: ReadonlySet<string>): string[] {
+  return [...io.files.keys()].filter((key) => !before.has(key));
+}
+
 describe("prepareDiscoveryAgent", () => {
   const expectedOutputs = [
     {
@@ -49,7 +66,7 @@ describe("prepareDiscoveryAgent", () => {
       expected_sha256: null,
     },
   ];
-  const request = {
+  const unobserved = {
     workspaceRoot: WS_ROOT,
     skillId: "inventory-legacy-system",
     selectedIds: ["legacy-crm"],
@@ -58,9 +75,10 @@ describe("prepareDiscoveryAgent", () => {
     executionContext: "standalone",
     complexity: "C2",
   };
+  const request = { ...unobserved, toolInputs: PREPARE_RAW };
 
-  it("pins the baseline through prepare-agent, persists protected bindings and returns the deployment", async () => {
-    const io = seeded();
+  it("consumes the root grant, pins the baseline through prepare-agent, persists protected bindings and returns the deployment", async () => {
+    const io = prepareGranted(seeded());
     const baseline = baselineResult();
     const launcher = new FakeLauncher(successOutcome(baseline));
     const result = await service(launcher, provider(io)).prepareDiscoveryAgent(
@@ -112,11 +130,60 @@ describe("prepareDiscoveryAgent", () => {
       `${directory}/required-outputs.json`,
       `${directory}/${BASELINE_RESULT_FILE}`,
     ]);
-    expect(io.files.has(`${directory}/invocation.json`)).toBe(true);
+    // The launch context is the consumed grant's host, session and parent.
+    const record = JSON.parse(
+      io.files.get(`${directory}/invocation.json`)!,
+    ) as {
+      host: string;
+      session_id: string;
+      parent_agent_id: string;
+    };
+    expect(record).toMatchObject({
+      host: "codex",
+      session_id: "session-alpha",
+      parent_agent_id: "root-alpha",
+    });
+    expect(io.files.has(`${rootGrantPath()}.consumed`)).toBe(true);
     expect(io.files.get(`${directory}/${BASELINE_RESULT_FILE}`)).toBe(
       `${JSON.stringify(baseline, null, 2)}\n`,
     );
     expect(result.summary).toContain("legacy-parity-analyst");
+  });
+
+  it.each([
+    ["without the raw tool input", unobserved, false],
+    ["without a root grant for the call", request, false],
+    ["with a root grant for another call", request, true],
+  ])(
+    "refuses a prepare %s before any runtime launch or protected write",
+    async (_label, input, foreignGrant) => {
+      const io = seeded();
+      if (foreignGrant) {
+        issueRootGrant(io, {
+          tool: "prepare_discovery_agent",
+          operation: "prepare-agent",
+          inputs: { ...PREPARE_RAW, skill_id: "extract-feature-contract" },
+        });
+      }
+      const before = new Set(io.files.keys());
+      const launcher = new FakeLauncher(successOutcome(baselineResult()));
+      await expect(
+        service(launcher, provider(io)).prepareDiscoveryAgent(input),
+      ).rejects.toThrow("DISCOVERY_HOST_BINDING_REQUIRED");
+      expect(launcher.captures).toHaveLength(0);
+      expect(added(io, before)).toEqual([]);
+    },
+  );
+
+  it("refuses a replayed root grant as consumed", async () => {
+    const io = prepareGranted(seeded());
+    const launcher = new FakeLauncher(successOutcome(baselineResult()));
+    const subject = service(launcher, provider(io));
+    await subject.prepareDiscoveryAgent(request);
+    await expect(subject.prepareDiscoveryAgent(request)).rejects.toThrow(
+      "AUTHORIZATION_CONSUMED",
+    );
+    expect(launcher.captures).toHaveLength(1);
   });
 
   it.each([
@@ -151,18 +218,22 @@ describe("prepareDiscoveryAgent", () => {
       buildServiceResult({ operation: "doctor", runtime: RUNTIME }),
       "DISCOVERY_PREPARE_BASELINE_FAILED",
     ],
-  ])("refuses %s before touching the store", async (_label, outcome, code) => {
-    const io = seeded();
-    const before = io.writtenPaths().length;
-    const launcher = new FakeLauncher(successOutcome(outcome));
-    await expect(
-      service(launcher, provider(io)).prepareDiscoveryAgent(request),
-    ).rejects.toThrow(code);
-    expect(io.writtenPaths()).toHaveLength(before);
-  });
+  ])(
+    "refuses %s before any protected write beyond the consumed grant latch",
+    async (_label, outcome, code) => {
+      const io = prepareGranted(seeded());
+      const before = new Set(io.files.keys());
+      const launcher = new FakeLauncher(successOutcome(outcome));
+      await expect(
+        service(launcher, provider(io)).prepareDiscoveryAgent(request),
+      ).rejects.toThrow(code);
+      // The one-use grant is spent by the attempt; nothing protected is written.
+      expect(added(io, before)).toEqual([`${rootGrantPath()}.consumed`]);
+    },
+  );
 
   it("names the blocking finding codes in the baseline refusal", async () => {
-    const io = seeded();
+    const io = prepareGranted(seeded());
     const launcher = new FakeLauncher(
       successOutcome(
         baselineResult({
@@ -189,7 +260,7 @@ describe("prepareDiscoveryAgent", () => {
   });
 
   it("refuses an unsupported capability through the protected store", async () => {
-    const io = seeded(capability({ status: "unsupported" }));
+    const io = prepareGranted(seeded(capability({ status: "unsupported" })));
     const launcher = new FakeLauncher(successOutcome(baselineResult()));
     await expect(
       service(launcher, provider(io)).prepareDiscoveryAgent(request),
@@ -197,118 +268,18 @@ describe("prepareDiscoveryAgent", () => {
   });
 });
 
-describe("finalizeDiscoveryAgent", () => {
-  it("runs finalize-agent for the invocation and mints the receipt", async () => {
-    const scene = scenario();
-    const launcher = new FakeLauncher(successOutcome(finalizeResult(scene)));
-    const authority = provider(scene.io, {
-      agent: { agentId: "agent-alpha", role: scene.role },
-      reader: scene.reader,
-      activation: () => FINAL_ACTIVATION,
-    });
-    const result = await service(launcher, authority).finalizeDiscoveryAgent({
-      workspaceRoot: WS.workspace_root,
-      invocationRef: scene.invocationId,
-      requestId: "request-finalize",
-    });
-    expect(launcher.request()).toMatchObject({
-      operation: "finalize-agent",
-      mode: "agent-output",
-      invocation_ref: scene.invocationId,
-      workspace_root: WS.workspace_root,
-    });
-    // Finalize runs under the host principal with the trusted identity set,
-    // never as local-user (P12-T3 transport).
-    expect(launcher.single().args.slice(-10)).toEqual([
-      "--principal",
-      "host",
-      "--author-id",
-      "agent-alpha",
-      "--session-id",
-      "session-alpha",
-      "--host-name",
-      "codex",
-      "--agent-role",
-      scene.role,
-    ]);
-    expect(result.tool).toBe("finalize_discovery_agent");
-    expect(result.receipt).toMatchObject({
-      validation_result: "pass",
-      output_valid: true,
-      planning_authorized: true,
-    });
-    expect(result.receipt?.receipt_ref).toMatch(/^receipt-[0-9a-f]{64}$/u);
-    expect(result.artifacts?.[0]).toContain("/receipts/");
-    expect(result.discovery).toEqual(finalizeResult(scene));
-  });
-
-  it("refuses to finalize without a trusted agent identity", async () => {
-    const scene = scenario();
-    const launcher = new FakeLauncher(successOutcome(finalizeResult(scene)));
-    await expect(
-      service(
-        launcher,
-        provider(scene.io, {
-          reader: scene.reader,
-          activation: () => FINAL_ACTIVATION,
-        }),
-      ).finalizeDiscoveryAgent({
-        workspaceRoot: WS.workspace_root,
-        invocationRef: scene.invocationId,
-        requestId: "request-finalize",
-      }),
-    ).rejects.toThrow("FINALIZATION_IDENTITY_UNAVAILABLE");
-    expect(launcher.captures).toHaveLength(0);
-  });
-
-  it("correlates a gated finalize by its consumed authorization when no request_id is supplied", async () => {
-    // The native hook and the MCP gate refuse caller identity fields such as
-    // request_id, so the agent's finalize arrives with the forwarded grant only.
-    const scene = scenario();
-    const launcher = new FakeLauncher(successOutcome(finalizeResult(scene)));
-    const authority = provider(scene.io, {
-      agent: { agentId: "agent-alpha", role: scene.role },
-      reader: scene.reader,
-      activation: () => FINAL_ACTIVATION,
-    });
-    const result = await service(launcher, authority).finalizeDiscoveryAgent({
-      workspaceRoot: WS.workspace_root,
-      invocationRef: scene.invocationId,
-      authorizationRef: "authz-alpha-0000000000000001",
-    });
-    expect(launcher.request()).toMatchObject({
-      authorization_ref: "authz-alpha-0000000000000001",
-    });
-    const receipt = JSON.parse(scene.io.files.get(result.artifacts![0]!)!) as {
-      identity: { request_id: string };
-    };
-    expect(receipt.identity.request_id).toBe("authz-alpha-0000000000000001");
-    expect(result.receipt?.validation_result).toBe("pass");
-  });
-
-  it("refuses a finalize that carries neither a request_id nor a consumed authorization", async () => {
-    const scene = scenario();
-    const launcher = new FakeLauncher(successOutcome(finalizeResult(scene)));
-    await expect(
-      service(
-        launcher,
-        provider(scene.io, {
-          agent: { agentId: "agent-alpha", role: scene.role },
-          reader: scene.reader,
-          activation: () => FINAL_ACTIVATION,
-        }),
-      ).finalizeDiscoveryAgent({
-        workspaceRoot: WS.workspace_root,
-        invocationRef: scene.invocationId,
-      }),
-    ).rejects.toThrow("FINALIZATION_REQUEST_INVALID");
-    expect(launcher.captures).toHaveLength(0);
-  });
-});
-
 describe("agent operations with explicit host options", () => {
   it("forwards the interpreter, invocation id, profile and ceiling to the prepare flow", async () => {
+    const raw = {
+      workspace_root: WS_ROOT,
+      skill_id: "review-discovery-coverage",
+    };
     const io = seeded();
+    issueRootGrant(io, {
+      tool: "prepare_discovery_agent",
+      operation: "prepare-agent",
+      inputs: raw,
+    });
     const launcher = new FakeLauncher(successOutcome(baselineResult()));
     const result = await service(launcher, provider(io)).prepareDiscoveryAgent({
       workspaceRoot: WS_ROOT,
@@ -330,6 +301,7 @@ describe("agent operations with explicit host options", () => {
       executionContext: "epic_execution_child",
       complexity: "C3",
       orchestrationComplexityCeiling: "C4",
+      toolInputs: raw,
     });
     expect(launcher.single().executable).toBe("C:/custom/python.exe");
     // The ceiling steers TypeScript routing only; the Python request matrix does not admit it.
@@ -355,38 +327,6 @@ describe("agent operations with explicit host options", () => {
     });
     expect(output.appendLine).toHaveBeenCalledWith(
       expect.stringContaining("[prepare-custom]"),
-    );
-  });
-
-  it("forwards the interpreter, invocation id and profile to the finalize flow", async () => {
-    const scene = scenario();
-    const launcher = new FakeLauncher(successOutcome(finalizeResult(scene)));
-    const authority = provider(scene.io, {
-      agent: { agentId: "agent-alpha", role: scene.role },
-      reader: scene.reader,
-      activation: () => FINAL_ACTIVATION,
-    });
-    const result = await service(launcher, authority).finalizeDiscoveryAgent({
-      workspaceRoot: WS.workspace_root,
-      invocationId: "finalize-custom",
-      interpreter: "C:/custom/python.exe",
-      profilePath: WS.profile_path,
-      invocationRef: scene.invocationId,
-      requestId: "request-finalize",
-    });
-    expect(launcher.single().executable).toBe("C:/custom/python.exe");
-    expect(launcher.request()).toMatchObject({ profile_path: WS.profile_path });
-    expect(launcher.single().args).toEqual(
-      expect.arrayContaining([
-        "--principal",
-        "host",
-        "--agent-role",
-        scene.role,
-      ]),
-    );
-    expect(result.receipt?.planning_authorized).toBe(true);
-    expect(output.appendLine).toHaveBeenCalledWith(
-      expect.stringContaining("[finalize-custom]"),
     );
   });
 });

@@ -47,7 +47,8 @@
         "run_discovery_scenario_generation",
         "run_discovery_report",
         "validate_discovery_artifacts",
-        "finalize_discovery_agent"
+        "finalize_discovery_agent",
+        "discovery_capability_sentinel"
       ]
     },
     "operation": {
@@ -73,7 +74,8 @@
         "completion-report",
         "generate-acceptance",
         "read-source",
-        "finalize-agent"
+        "finalize-agent",
+        "sentinel"
       ]
     },
     "input_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},

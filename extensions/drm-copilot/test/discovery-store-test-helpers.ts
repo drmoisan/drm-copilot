@@ -52,23 +52,28 @@ export class MemoryStoreIO implements AuthorityStoreIO {
     this.directories.add(path);
   }
 
-  /** Immediate entry names under `directory`, sorted; `[]` when none exist. */
+  /**
+   * Immediate entry names under `directory`, files and sub-directories alike,
+   * sorted and unique; `[]` when none exist. This mirrors `readdirSync`, which
+   * the Node adapter uses, so a scan of `sessions/` sees each partition.
+   */
   listEntries(directory: string): string[] {
     this.operations.push(`list ${directory}`);
     const prefix = `${directory}/`;
-    return [...this.files.keys()]
-      .filter(
-        (entry) =>
-          entry.startsWith(prefix) && !entry.slice(prefix.length).includes("/"),
-      )
-      .map((entry) => entry.slice(prefix.length))
-      .sort();
+    const names = new Set(
+      [...this.files.keys()]
+        .filter((entry) => entry.startsWith(prefix))
+        .map((entry) => entry.slice(prefix.length).split("/")[0]!),
+    );
+    return [...names].sort();
   }
 
-  /** Paths of every write-type operation recorded so far. */
+  /** Paths of every write-type operation recorded so far; reads and listings are not writes. */
   writtenPaths(): string[] {
     return this.operations
-      .filter((entry) => !entry.startsWith("read "))
+      .filter(
+        (entry) => !entry.startsWith("read ") && !entry.startsWith("list "),
+      )
       .map((entry) => entry.split(" ")[1]!);
   }
 }

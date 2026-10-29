@@ -1,17 +1,24 @@
 /**
- * Agent-lifecycle operations of the shared discovery service: prepare and
- * finalize.
+ * Agent-lifecycle operations of the shared discovery service: prepare,
+ * finalize and the doctor capability projection.
  *
- * Both wrap the protected-store modules around one runtime call. Prepare pins
- * the pre-invocation baseline and the installed runtime identity through the
- * root `prepare-agent` route before routing and persisting bindings; finalize
- * obtains the authoritative `finalize-agent` result before minting the
- * receipt. Trusted identity comes only from the injected
- * {@link DiscoveryAuthorityProvider}.
+ * Each wraps the protected-store modules around one runtime call. Prepare
+ * consumes the root grant the native gate issued for the root call, pins the
+ * pre-invocation baseline and the installed runtime identity through the root
+ * `prepare-agent` route, then routes and persists bindings; finalize obtains
+ * the authoritative `finalize-agent` result under the identity of the consumed
+ * one-use authorization before minting the receipt. Host, session, parent and
+ * agent values come only from those consumed records; the injected
+ * {@link DiscoveryAuthorityProvider} supplies the store, clock and nonce.
  */
 
 import type { CommandOutput } from "./command-runtime";
 import type { DiscoveryAuthorityProvider } from "./discovery-authority-provider";
+import type { ConsumedAuthorization } from "./discovery-authorization";
+import {
+  DiscoveryAuthorizationError,
+  refuse,
+} from "./discovery-authorization-record";
 import {
   assessSessionCapability,
   missingContextAssessment,
@@ -20,14 +27,21 @@ import {
 import { finalizeDiscoveryInvocation } from "./discovery-finalization";
 import { prepareDiscoveryInvocation } from "./discovery-invocation";
 import {
+  type ConsumedRootGrant,
+  consumeRootGrant,
+} from "./discovery-root-grant";
+import {
   type DiscoveryRuntimeDependencies,
   invokeDiscoveryRuntime,
 } from "./discovery-runtime";
+import { consumeSentinelGrant } from "./discovery-sentinel";
 import type { RepoAutomationExecutionResult } from "./repo-automation-service-contract";
 import { hostInvocationOptions } from "./repo-automation-service-discovery-identity";
 import type {
+  DiscoveryCapabilitySentinelInput,
   FinalizeDiscoveryAgentInput,
   PrepareDiscoveryAgentInput,
+  RunDiscoveryDoctorInput,
 } from "./repo-automation-service-discovery-types";
 
 export interface DiscoveryAgentOperationDeps {
@@ -37,35 +51,114 @@ export interface DiscoveryAgentOperationDeps {
 }
 
 /**
+ * Consume the root grant of a root call when the raw tool input is known.
+ *
+ * Returns null when the call carries no raw input (an extension command, which
+ * no host gate observed) or when no usable grant exists; doctor treats null as
+ * `context-missing`, prepare refuses.
+ */
+function consumeOptionalRootGrant(
+  authority: DiscoveryAuthorityProvider,
+  workspaceRoot: string,
+  tool: string,
+  operation: string,
+  toolInputs: Readonly<Record<string, unknown>> | undefined,
+): ConsumedRootGrant | null {
+  if (toolInputs === undefined) {
+    return null;
+  }
+  try {
+    return consumeRootGrant({
+      location: authority.location(workspaceRoot),
+      io: authority.io,
+      tool,
+      operation,
+      inputs: toolInputs,
+      now: authority.now(),
+    });
+  } catch (error) {
+    // Every authorization refusal means no grant admits this call; other
+    // failures (store I/O outside the seam's contract) propagate.
+    if (error instanceof DiscoveryAuthorizationError) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+/**
+ * Consume the one-use sentinel grant the host gate recorded for this call and
+ * report what the host observed. The result is evidence the capability probe
+ * reads from the same records; it grants nothing and never fails the call.
+ */
+export function discoveryCapabilitySentinelOperation(
+  authority: DiscoveryAuthorityProvider,
+  input: DiscoveryCapabilitySentinelInput,
+): RepoAutomationExecutionResult {
+  const observation = consumeSentinelGrant({
+    location: authority.location(input.workspaceRoot),
+    io: authority.io,
+    inputs: input.toolInputs,
+    now: authority.now(),
+  });
+  return {
+    tool: "discovery_capability_sentinel",
+    workspaceRoot: input.workspaceRoot,
+    summary: observation.observed
+      ? `The host gate observed this sentinel call ${observation.agentIdPresent === true ? "with" : "without"} an agent identity.`
+      : "No host observation matches this sentinel call.",
+    sentinel: {
+      observed: observation.observed,
+      observation_ref: observation.observationRef,
+      agent_id_present: observation.agentIdPresent,
+      agent_type: observation.agentType,
+    },
+  };
+}
+
+/**
  * Project the session's host capability into a `doctor` result.
  *
  * The runtime cannot see the protected attestation, so the gateway replaces
  * its generic enforcement warning with the verified finding or one warning
  * per deficiency. Results without a discovery payload pass through unchanged.
- * A process without a trusted host session answers `context-missing` before
+ * The host and session come from the root grant the native gate issued for
+ * this doctor call; without a grant doctor answers `context-missing` before
  * any protected path is resolved, so doctor stays diagnostic everywhere.
  */
 export function projectDoctorCapability(
   authority: DiscoveryAuthorityProvider,
-  workspaceRoot: string,
+  input: RunDiscoveryDoctorInput,
   result: RepoAutomationExecutionResult,
 ): RepoAutomationExecutionResult {
   if (result.discovery === undefined) {
     return result;
   }
-  const missing = missingContextAssessment(authority.context);
-  if (missing !== null) {
+  const grant = consumeOptionalRootGrant(
+    authority,
+    input.workspaceRoot,
+    "run_discovery_doctor",
+    "doctor",
+    input.toolInputs,
+  );
+  const context =
+    grant === null ? null : { host: grant.host, sessionId: grant.sessionId };
+  const missing = missingContextAssessment(context);
+  if (missing !== null || context === null) {
     return {
       ...result,
-      discovery: projectCapabilityDiagnostics(result.discovery, missing),
+      discovery: projectCapabilityDiagnostics(
+        result.discovery,
+        missing ?? missingContextAssessment(null)!,
+      ),
     };
   }
-  const location = authority.location(workspaceRoot);
+  const location = authority.location(input.workspaceRoot);
   const assessment = assessSessionCapability({
     location,
     io: authority.io,
     activation: authority.activation(location),
-    context: authority.context,
+    context,
     runtime: result.discovery.runtime,
     ...(authority.capabilityPins === undefined
       ? {}
@@ -79,19 +172,36 @@ export function projectDoctorCapability(
 }
 
 /**
- * Prepare a constrained invocation: pin the pre-invocation baseline and the
- * installed runtime identity through the root `prepare-agent` route, then
- * route and persist protected bindings before returning the exact deployment.
+ * Prepare a constrained invocation: consume the root grant of this call, pin
+ * the pre-invocation baseline and the installed runtime identity through the
+ * root `prepare-agent` route, then route and persist protected bindings before
+ * returning the exact deployment.
  *
- * The runtime checks every expected output against the configured capture; a
- * non-ok result is refused before any protected write so a drifted or
- * misplaced output can never become an invocation baseline.
+ * The grant is consumed first, so a prepare the host gate did not observe
+ * launches no runtime and writes nothing. The runtime checks every expected
+ * output against the configured capture; a non-ok result is refused before any
+ * protected write so a drifted or misplaced output can never become an
+ * invocation baseline.
  */
 export async function prepareDiscoveryAgentOperation(
   deps: DiscoveryAgentOperationDeps,
   input: PrepareDiscoveryAgentInput,
 ): Promise<RepoAutomationExecutionResult> {
   const { authority } = deps;
+  if (input.toolInputs === undefined) {
+    throw refuse(
+      "DISCOVERY_HOST_BINDING_REQUIRED",
+      "DISCOVERY_HOST_BINDING_REQUIRED: prepare_discovery_agent requires the root grant the native host gate issued for this call; no grant can be consumed without the raw tool input.",
+    );
+  }
+  const grant = consumeRootGrant({
+    location: authority.location(input.workspaceRoot),
+    io: authority.io,
+    tool: "prepare_discovery_agent",
+    operation: "prepare-agent",
+    inputs: input.toolInputs,
+    now: authority.now(),
+  });
   const baseline = await invokeDiscoveryRuntime(
     deps.output,
     {
@@ -132,7 +242,13 @@ export async function prepareDiscoveryAgentOperation(
     location,
     io: authority.io,
     activation: authority.activation(location),
-    context: authority.context,
+    // The launch context is the consumed grant's; a root grant names no role.
+    context: {
+      host: grant.host,
+      sessionId: grant.sessionId,
+      parentAgentId: grant.parentAgentId,
+      parentRole: null,
+    },
     request: {
       skill_id: input.skillId,
       selected_ids: input.selectedIds,
@@ -172,29 +288,32 @@ export async function prepareDiscoveryAgentOperation(
 
 /**
  * Finalize the calling agent's output: obtain the authoritative
- * `finalize-agent` result, then mint the protected receipt.
+ * `finalize-agent` result under the consumed authorization's identity, then
+ * mint the protected receipt.
+ *
+ * `consumed` is the one-use record the MCP gate consumed for this finalize
+ * call; without it there is no trusted identity and the call is refused.
  */
 export async function finalizeDiscoveryAgentOperation(
   deps: DiscoveryAgentOperationDeps,
   input: FinalizeDiscoveryAgentInput,
+  consumed: ConsumedAuthorization | undefined,
 ): Promise<RepoAutomationExecutionResult> {
   const { authority } = deps;
-  if (authority.agent === null) {
+  if (
+    consumed === undefined ||
+    consumed.identity.invocation_id !== input.invocationRef
+  ) {
     throw new Error(
-      "FINALIZATION_IDENTITY_UNAVAILABLE: finalize_discovery_agent requires the trusted discovery agent identity of this process.",
+      "FINALIZATION_IDENTITY_UNAVAILABLE: finalize_discovery_agent requires the one-use authorization the host gate issued for this invocation; its identity is never taken from the request or the process.",
     );
   }
   // A gated agent call cannot carry request_id (the native hook and the MCP gate
   // refuse caller identity fields), so the consumed one-use grant correlates the
-  // receipt; a call with neither value has no trustworthy correlation.
-  const requestId = input.requestId ?? input.authorizationRef;
-  if (requestId === undefined) {
-    throw new Error(
-      "FINALIZATION_REQUEST_INVALID: finalize_discovery_agent needs a host-consumed authorization reference or a request_id.",
-    );
-  }
-  // The finalize request runs under the host principal with the trusted
-  // agent, session, host and role values; the runtime never sees local-user here.
+  // receipt.
+  const requestId = input.requestId ?? consumed.authorizationRef;
+  // The finalize request runs under the host principal with the consumed
+  // record's agent, session, host and role; the runtime never sees local-user here.
   const result = await invokeDiscoveryRuntime(
     deps.output,
     {
@@ -204,9 +323,7 @@ export async function finalizeDiscoveryAgentOperation(
         mode: "agent-output",
         workspaceRoot: input.workspaceRoot,
         invocationRef: input.invocationRef,
-        ...(input.authorizationRef === undefined
-          ? {}
-          : { authorizationRef: input.authorizationRef }),
+        authorizationRef: consumed.authorizationRef,
         ...(input.profilePath === undefined
           ? {}
           : { profilePath: input.profilePath }),
@@ -214,7 +331,7 @@ export async function finalizeDiscoveryAgentOperation(
       ...(input.interpreter === undefined
         ? {}
         : { interpreter: input.interpreter }),
-      ...hostInvocationOptions(authority),
+      ...hostInvocationOptions(consumed),
     },
     deps.runtime,
   );
@@ -224,13 +341,7 @@ export async function finalizeDiscoveryAgentOperation(
     io: authority.io,
     reader: authority.reader,
     activation: authority.activation(location),
-    identity: {
-      host: authority.context.host,
-      session_id: authority.context.sessionId,
-      agent_id: authority.agent.agentId,
-      role: authority.agent.role,
-      invocation_id: input.invocationRef,
-    },
+    identity: consumed.identity,
     requestId,
     result,
     writer: authority.writer,

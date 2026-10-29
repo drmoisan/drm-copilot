@@ -1,7 +1,9 @@
 /**
  * Shared fixtures for the service-level discovery suites: a buffered output,
  * a service factory over an in-memory launcher, and an authority provider
- * built from the P8-T4 invocation fixtures.
+ * built from the P8-T4 invocation fixtures. The provider carries no identity;
+ * identity reaches the service only through the one-use records the
+ * `discovery-grant-test-support` helpers seed.
  */
 
 import { jest } from "@jest/globals";
@@ -12,7 +14,6 @@ import { createRepoAutomationService } from "../src/repo-automation-service";
 import { WRITER } from "./discovery-finalization-test-support";
 import {
   ACTIVATION,
-  CONTEXT,
   LOCATION,
   NOW,
   WORKSPACE,
@@ -44,8 +45,6 @@ export function provider(
   overrides: Partial<DiscoveryAuthorityProvider> = {},
 ): DiscoveryAuthorityProvider {
   return {
-    context: CONTEXT,
-    agent: null,
     io,
     reader: new MemoryInputReader(),
     writer: WRITER,

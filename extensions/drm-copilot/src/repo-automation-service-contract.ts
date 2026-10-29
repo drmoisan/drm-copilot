@@ -23,7 +23,9 @@ import type {
 import type { DiscoveryServiceResult } from "./discovery-service-types";
 import type {
   ConfigureDiscoveryWorkspaceInput,
+  ConsumeDiscoveryRootGrantInput,
   ConsumeDiscoveryToolAuthorizationInput,
+  DiscoveryCapabilitySentinelInput,
   CreateDiscoveryArtifactInput,
   FinalizeDiscoveryAgentInput,
   FinalizedReceiptSummary,
@@ -34,6 +36,7 @@ import type {
   PreparedInvocationSummary,
   ReadDiscoverySourceInput,
   RunDiscoveryDoctorInput,
+  SentinelObservationSummary,
   TransferDiscoverySnapshotInput,
   UpdateDiscoveryArtifactInput,
 } from "./repo-automation-service-discovery-types";
@@ -81,6 +84,8 @@ export interface RepoAutomationExecutionResult {
   readonly invocation?: PreparedInvocationSummary;
   /** Protected receipt summary; present only on finalize_discovery_agent. */
   readonly receipt?: FinalizedReceiptSummary;
+  /** Sentinel tool observation; evidence for the capability probe only. */
+  readonly sentinel?: SentinelObservationSummary;
 }
 
 export interface WorkspaceExecutionInput {
@@ -270,16 +275,24 @@ export interface RepoAutomationService {
     input: FinalizeDiscoveryAgentInput,
   ): Promise<RepoAutomationExecutionResult>;
   /**
-   * Trusted discovery role of the principal this service runs for, or null for
-   * the local-user root. Root-only tools are refused when a role is present.
-   */
-  discoveryRole?(): string | null;
-  /**
-   * Consume the one-use native authorization bound to a controlled tool call
-   * of the discovery agent this service runs for; returns its reference. Only
-   * the MCP gate calls it, and only for a non-null discovery role.
+   * Consume the one-use native authorization bound to the started invocation a
+   * controlled tool call names through `invocation_ref`; returns its reference.
+   * Only the MCP gate calls it, and only for a call carrying `invocation_ref`.
    */
   consumeDiscoveryToolAuthorization?(
     input: ConsumeDiscoveryToolAuthorizationInput,
   ): string;
+  /**
+   * Consume the one-use root grant the native host gate issued for a root call
+   * (no `invocation_ref`) of a controlled tool; returns its reference. Only the
+   * MCP gate calls it.
+   */
+  consumeDiscoveryRootGrant?(input: ConsumeDiscoveryRootGrantInput): string;
+  /**
+   * Consume the one-use sentinel grant the native host gate recorded for a
+   * capability sentinel call and report what the host observed.
+   */
+  discoveryCapabilitySentinel?(
+    input: DiscoveryCapabilitySentinelInput,
+  ): Promise<RepoAutomationExecutionResult>;
 }

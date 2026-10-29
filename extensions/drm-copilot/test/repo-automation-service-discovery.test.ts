@@ -1,6 +1,6 @@
 /**
  * Prove the shared service composes one closed v2 request per discovery
- * operation and reports the trusted role context.
+ * operation and takes every host identity from a consumed one-use record.
  *
  * The runtime is an in-memory launcher that records the stdin request; no
  * Python process, filesystem or network is touched.
@@ -10,10 +10,18 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
-import { DiscoveryAuthorityError } from "../src/discovery-authority";
+import type { ControlledTool } from "../src/discovery-authorization";
 import type { RepoAutomationService } from "../src/repo-automation-service";
-import { projectDoctorCapability } from "../src/repo-automation-service-discovery-agent";
-import { CONTEXT, RUNTIME, seeded } from "./discovery-invocation-test-support";
+import {
+  AGENT_ID,
+  AGENT_ROLE,
+  AUTHORIZATION_REF,
+  issueAuthorization,
+  issueRootGrant,
+  ROOT_GRANT_REF,
+  startedStore,
+} from "./discovery-grant-test-support";
+import { seeded } from "./discovery-invocation-test-support";
 import {
   buildServiceResult,
   FakeLauncher,
@@ -25,7 +33,20 @@ import {
   WS_ROOT,
 } from "./repo-automation-service-discovery-test-support";
 
-const AGENT = { agentId: "agent-alpha", role: "requirements-reconciler" };
+/** The invocation `startedStore()` prepares with the fixture nonce. */
+const INVOCATION_ID = "invocation-0123456789abcdef0001";
+/** The raw MCP input the gate digested for a bound call; any object serves. */
+const RAW = { workspace_root: WS_ROOT, call: "bound" };
+const DOCTOR_RAW = { workspace_root: WS_ROOT };
+const BOUND_TOOLS: Readonly<Record<string, ControlledTool>> = {
+  "new-contract": "create_discovery_artifact",
+  "read-source": "read_discovery_source",
+};
+
+interface Grant {
+  readonly invocationId: string;
+  readonly authorizationRef: string;
+}
 
 describe("discovery request composition", () => {
   it.each([
@@ -49,14 +70,14 @@ describe("discovery request composition", () => {
     ],
     [
       "new-contract under a grant",
-      (svc: RepoAutomationService) =>
+      (svc: RepoAutomationService, grant: Grant) =>
         svc.createDiscoveryArtifact({
           workspaceRoot: WS_ROOT,
           artifactKind: "feature-contract",
           featureId: "orders",
           name: "Orders",
-          invocationRef: "invocation-alpha-0000000001",
-          authorizationRef: "authz-alpha-000000000000001",
+          invocationRef: grant.invocationId,
+          authorizationRef: grant.authorizationRef,
           write: true,
         }),
       {
@@ -65,8 +86,8 @@ describe("discovery request composition", () => {
         write: true,
         dry_run: false,
         inputs: { feature_id: "orders", name: "Orders" },
-        invocation_ref: "invocation-alpha-0000000001",
-        authorization_ref: "authz-alpha-000000000000001",
+        invocation_ref: INVOCATION_ID,
+        authorization_ref: AUTHORIZATION_REF,
       },
     ],
     [
@@ -204,7 +225,7 @@ describe("discovery request composition", () => {
     ],
     [
       "read-source search as an agent",
-      (svc: RepoAutomationService) =>
+      (svc: RepoAutomationService, grant: Grant) =>
         svc.readDiscoverySource({
           workspaceRoot: WS_ROOT,
           readOperation: "search",
@@ -212,14 +233,15 @@ describe("discovery request composition", () => {
           query: "Order",
           regex: true,
           maxBytes: 2048,
-          invocationRef: "invocation-alpha-0000000001",
+          invocationRef: grant.invocationId,
+          authorizationRef: grant.authorizationRef,
           mode: "agent-output",
         }),
       {
         operation: "read-source",
         mode: "agent-output",
-        invocation_ref: "invocation-alpha-0000000001",
-        authorization_ref: null,
+        invocation_ref: INVOCATION_ID,
+        authorization_ref: AUTHORIZATION_REF,
         inputs: {
           read_operation: "search",
           paths: ["src"],
@@ -231,16 +253,36 @@ describe("discovery request composition", () => {
     ],
   ])("composes the %s request", async (_label, call, expected) => {
     const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
-    // A request bound to a protected invocation runs for a discovery agent and
-    // must reach the runtime as host; every other request stays local-user.
+    // A request bound to a protected invocation runs under the identity of the
+    // authorization the gate consumed for it; every other request stays local-user.
+    const operation = (expected as Record<string, unknown>)[
+      "operation"
+    ] as string;
     const bound =
       typeof (expected as Record<string, unknown>)["invocation_ref"] ===
       "string";
-    const result = await call(
-      bound
-        ? service(launcher, provider(seeded(), { agent: AGENT }))
-        : service(launcher),
-    );
+    let subject = service(launcher);
+    let grant: Grant = { invocationId: "", authorizationRef: "" };
+    if (bound) {
+      const started = startedStore();
+      const tool = BOUND_TOOLS[operation]!;
+      issueAuthorization(started.io, {
+        invocationId: started.invocationId,
+        tool,
+        operation,
+        inputs: RAW,
+      });
+      subject = service(launcher, provider(started.io));
+      const authorizationRef = subject.consumeDiscoveryToolAuthorization!({
+        workspaceRoot: WS_ROOT,
+        tool,
+        operation,
+        inputs: RAW,
+        invocationRef: started.invocationId,
+      });
+      grant = { invocationId: started.invocationId, authorizationRef };
+    }
+    const result = await call(subject, grant);
     expect(launcher.request()).toMatchObject(expected);
     expect(launcher.single().cwd).toBe(WS_ROOT);
     const args = launcher.single().args;
@@ -249,13 +291,13 @@ describe("discovery request composition", () => {
         "--principal",
         "host",
         "--author-id",
-        AGENT.agentId,
+        AGENT_ID,
         "--session-id",
         "session-alpha",
         "--host-name",
         "codex",
         "--agent-role",
-        AGENT.role,
+        AGENT_ROLE,
       ]);
     } else {
       expect(args).toEqual(
@@ -278,7 +320,7 @@ describe("discovery request composition", () => {
           artifactKind: "feature-contract",
           featureId: "orders",
           name: "Orders",
-          invocationRef: "invocation-alpha-0000000001",
+          invocationRef: INVOCATION_ID,
         }),
     ],
     [
@@ -291,7 +333,8 @@ describe("discovery request composition", () => {
           inputPath: "b",
           expectedSha256: null,
           updateAction: "replace",
-          invocationRef: "invocation-alpha-0000000001",
+          invocationRef: INVOCATION_ID,
+          authorizationRef: "authz-never-consumed-000000001",
         }),
     ],
     [
@@ -303,7 +346,7 @@ describe("discovery request composition", () => {
           artifactId: "f",
           evidencePath: "e.json",
           expectedSha256: "a".repeat(64),
-          invocationRef: "invocation-alpha-0000000001",
+          invocationRef: INVOCATION_ID,
         }),
     ],
     [
@@ -313,182 +356,80 @@ describe("discovery request composition", () => {
           workspaceRoot: WS_ROOT,
           readOperation: "list",
           paths: ["src"],
-          invocationRef: "invocation-alpha-0000000001",
+          invocationRef: INVOCATION_ID,
           mode: "agent-output",
         }),
     ],
   ])(
-    "refuses a %s request bound to an invocation without a trusted agent identity",
+    "refuses a %s request bound to an invocation without a consumed authorization",
     async (_label, call) => {
       const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
-      await expect(call(service(launcher, provider(seeded())))).rejects.toThrow(
-        "DISCOVERY_AGENT_IDENTITY_REQUIRED",
-      );
+      await expect(
+        call(service(launcher, provider(startedStore().io))),
+      ).rejects.toThrow("DISCOVERY_HOST_BINDING_REQUIRED");
       // Refused before any process launch; nothing is downgraded to local-user.
       expect(launcher.captures).toHaveLength(0);
     },
   );
 
-  describe("doctor capability projection", () => {
-    const unavailable = {
-      code: "DISCOVERY_ENFORCEMENT_UNAVAILABLE",
-      severity: "warning" as const,
-      artifact_path: null,
-      pointer: "/summary/deployment",
-      related_ids: [],
-      related_paths: [],
-      message: "Native discovery capability has not been verified.",
-      next_action: "Install and verify a supported native capability provider.",
+  it("hands a consumed authorization to exactly one request", async () => {
+    const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
+    const started = startedStore();
+    issueAuthorization(started.io, {
+      invocationId: started.invocationId,
+      tool: "read_discovery_source",
+      operation: "read-source",
+      inputs: RAW,
+    });
+    const subject = service(launcher, provider(started.io));
+    const authorizationRef = subject.consumeDiscoveryToolAuthorization!({
+      workspaceRoot: WS_ROOT,
+      tool: "read_discovery_source",
+      operation: "read-source",
+      inputs: RAW,
+      invocationRef: started.invocationId,
+    });
+    const input = {
+      workspaceRoot: WS_ROOT,
+      readOperation: "list" as const,
+      paths: ["src"],
+      invocationRef: started.invocationId,
+      authorizationRef,
+      mode: "agent-output" as const,
     };
-    const doctor = (runtime: typeof RUNTIME | null = RUNTIME) =>
-      new FakeLauncher(
-        successOutcome(
-          buildServiceResult({
-            operation: "doctor",
-            runtime,
-            findings: [unavailable],
-          }),
-        ),
-      );
-    const codes = (result: {
-      discovery?: {
-        findings: ReadonlyArray<{ code: string; message: string }>;
-      };
-    }) =>
-      result.discovery?.findings.map(
-        (finding) => `${finding.code} ${finding.message}`,
-      ) ?? [];
-
-    it("projects the lazily created host provider without an injected one", async () => {
-      // Production never injects a provider, so the doctor must still project the
-      // session capability; outside a discovery host session that is the exact
-      // context-missing deficiency, reported before any protected path is resolved.
-      const saved = {
-        host: process.env["DRM_DISCOVERY_HOST"],
-        session: process.env["DRM_DISCOVERY_SESSION_ID"],
-      };
-      delete process.env["DRM_DISCOVERY_HOST"];
-      delete process.env["DRM_DISCOVERY_SESSION_ID"];
-      try {
-        const result = await service(doctor()).runDiscoveryDoctor({
-          workspaceRoot: WS_ROOT,
-        });
-        expect(codes(result)).toEqual([
-          `${unavailable.code} Native discovery capability is unavailable (context-missing): no trusted session context was supplied by the host.`,
-        ]);
-      } finally {
-        if (saved.host !== undefined)
-          process.env["DRM_DISCOVERY_HOST"] = saved.host;
-        if (saved.session !== undefined) {
-          process.env["DRM_DISCOVERY_SESSION_ID"] = saved.session;
-        }
-      }
-    });
-
-    it("reports a verified capability from the protected attestation", async () => {
-      const result = await service(
-        doctor(),
-        provider(seeded()),
-      ).runDiscoveryDoctor({ workspaceRoot: WS_ROOT });
-      expect(codes(result)).toEqual([
-        expect.stringContaining(
-          "DISCOVERY_ENFORCEMENT_VERIFIED Native discovery capability verified by attestation attestation-alpha",
-        ),
-      ]);
-    });
-
-    it.each([
-      ["a missing attestation", seeded(null), {}, "(attestation-missing)"],
-      [
-        "no trusted session context",
-        seeded(),
-        { context: { ...CONTEXT, sessionId: "" } },
-        "(context-missing)",
-      ],
-      [
-        "an unreadable activation",
-        seeded(),
-        {
-          activation: () => ({
-            envelope: () => {
-              throw new DiscoveryAuthorityError(
-                "ACTIVATION_INACTIVE",
-                "inactive",
-              );
-            },
-          }),
-        },
-        "(activation-unavailable)",
-      ],
-    ])(
-      "explains %s as a deficiency warning",
-      async (_label, io, overrides, text) => {
-        const result = await service(
-          doctor(),
-          provider(io, overrides),
-        ).runDiscoveryDoctor({ workspaceRoot: WS_ROOT });
-        expect(codes(result)).toEqual([
-          expect.stringContaining(
-            `DISCOVERY_ENFORCEMENT_UNAVAILABLE Native discovery capability is unavailable ${text}`,
-          ),
-        ]);
-        expect(io.writtenPaths()).toEqual([]);
-      },
+    await subject.readDiscoverySource(input);
+    await expect(subject.readDiscoverySource(input)).rejects.toThrow(
+      "DISCOVERY_HOST_BINDING_REQUIRED",
     );
-
-    it("names a runtime without identity and passes through results without a discovery payload", async () => {
-      const result = await service(
-        doctor(null),
-        provider(seeded()),
-      ).runDiscoveryDoctor({ workspaceRoot: WS_ROOT });
-      expect(codes(result)).toEqual([
-        expect.stringContaining("(runtime-mismatch)"),
-      ]);
-      const bare = {
-        tool: "run_discovery_doctor" as const,
-        workspaceRoot: WS_ROOT,
-        summary: "none",
-      };
-      expect(projectDoctorCapability(provider(seeded()), WS_ROOT, bare)).toBe(
-        bare,
-      );
-    });
+    expect(launcher.captures).toHaveLength(1);
   });
 
-  it("reports no role without an authority provider and the agent role with one", () => {
+  it("consumes a root grant through the service seam exactly once", () => {
     const launcher = new FakeLauncher(successOutcome());
-    expect(service(launcher).discoveryRole?.()).toBeNull();
-    const withAgent = provider(seeded(), {
-      agent: { agentId: "agent-alpha", role: "requirements-reconciler" },
+    const io = seeded();
+    issueRootGrant(io, {
+      tool: "read_discovery_source",
+      operation: "read-source",
+      inputs: DOCTOR_RAW,
     });
-    expect(service(launcher, withAgent).discoveryRole?.()).toBe(
-      "requirements-reconciler",
+    const subject = service(launcher, provider(io));
+    const input = {
+      workspaceRoot: WS_ROOT,
+      tool: "read_discovery_source",
+      operation: "read-source",
+      inputs: DOCTOR_RAW,
+    };
+    expect(subject.consumeDiscoveryRootGrant!(input)).toBe(ROOT_GRANT_REF);
+    expect(() => subject.consumeDiscoveryRootGrant!(input)).toThrow(
+      "AUTHORIZATION_CONSUMED",
     );
+    expect(launcher.captures).toHaveLength(0);
   });
 
-  it("reads the agent role from the lazily created provider before any other call", () => {
-    // On an installed host the MCP gate asks for the role before the first
-    // protected operation creates the provider; the role must come from the
-    // process environment then, or every discovery agent is treated as root.
-    const keys = [
-      "DRM_DISCOVERY_AGENT_ID",
-      "DRM_DISCOVERY_AGENT_ROLE",
-    ] as const;
-    const saved = keys.map((key) => [key, process.env[key]] as const);
-    process.env["DRM_DISCOVERY_AGENT_ID"] = "agent-env";
-    process.env["DRM_DISCOVERY_AGENT_ROLE"] = "legacy-parity-analyst";
-    try {
-      expect(
-        service(new FakeLauncher(successOutcome())).discoveryRole?.(),
-      ).toBe("legacy-parity-analyst");
-    } finally {
-      for (const [key, value] of saved) {
-        if (value === undefined) {
-          delete process.env[key];
-        } else {
-          process.env[key] = value;
-        }
-      }
-    }
+  it("exposes no role or identity of its own", () => {
+    const subject = service(new FakeLauncher(successOutcome()));
+    expect("discoveryRole" in subject).toBe(false);
+    expect(Object.keys(provider(seeded()))).not.toContain("agent");
+    expect(Object.keys(provider(seeded()))).not.toContain("context");
   });
 });

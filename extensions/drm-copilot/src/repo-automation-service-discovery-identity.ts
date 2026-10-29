@@ -1,15 +1,19 @@
 /**
- * Derive the trusted outer identity of a host-principal runtime invocation.
+ * Derive the outer identity of a host-principal runtime invocation from the
+ * one-use authorization the MCP gate consumed for it.
  *
  * Every request that carries a protected invocation reference runs under the
- * `host` principal with the agent id, session id, host name and agent role the
- * injected {@link DiscoveryAuthorityProvider} verified. Request data never
- * supplies these values, and a process without a trusted agent identity is
+ * `host` principal with the agent id, session id, host name and role the
+ * consumed `tool-authorization` record binds, which the native hook took from
+ * its own payload. The server process holds no identity: request data never
+ * supplies these values, and a bound request without a consumed record is
  * refused rather than downgraded to the `local-user` principal.
  */
 
 import type { DiscoveryAuthorityProvider } from "./discovery-authority-provider";
-import { consumeToolAuthorizationByBinding } from "./discovery-authorization";
+import type { ConsumedAuthorization } from "./discovery-authorization";
+import { consumeToolAuthorizationByBinding } from "./discovery-authorization-binding";
+import { refuse } from "./discovery-authorization-record";
 import type { DiscoveryRuntimeInvocation } from "./discovery-runtime";
 import type { ConsumeDiscoveryToolAuthorizationInput } from "./repo-automation-service-discovery-types";
 
@@ -23,56 +27,63 @@ export type HostInvocationOptions = Readonly<
   >
 >;
 
-/**
- * Return the host-principal options for the agent this process serves.
- *
- * @throws Error `DISCOVERY_AGENT_IDENTITY_REQUIRED` when the provider reports
- *   no trusted agent identity; the caller must not fall back to `local-user`.
- */
+/** Return the host-principal options the consumed record's identity names. */
 export function hostInvocationOptions(
-  authority: DiscoveryAuthorityProvider,
+  consumed: ConsumedAuthorization,
 ): HostInvocationOptions {
-  if (authority.agent === null) {
-    throw new Error(
-      "DISCOVERY_AGENT_IDENTITY_REQUIRED: a request bound to a protected invocation requires the trusted discovery agent identity of this process; it is never run as local-user.",
-    );
-  }
   return {
     principal: "host",
-    authorId: authority.agent.agentId,
-    sessionId: authority.context.sessionId,
-    hostName: authority.context.host,
-    agentRole: authority.agent.role,
+    authorId: consumed.identity.agent_id,
+    sessionId: consumed.identity.session_id,
+    hostName: consumed.identity.host,
+    agentRole: consumed.identity.role,
   };
 }
 
 /**
- * Select the outer identity for one request: host options when the request is
- * bound to a protected invocation, none for a root request.
+ * Select the outer identity for one request: host options from the consumed
+ * record when the request is bound to a protected invocation, none for a root
+ * request.
  *
- * The provider is resolved lazily so a root request never constructs the
- * production provider or reads the process environment.
+ * @throws DiscoveryAuthorizationError `DISCOVERY_HOST_BINDING_REQUIRED` when a
+ *   bound request has no consumed record, or `AUTHORIZATION_IDENTITY` when the
+ *   consumed record names another invocation; the caller never falls back to
+ *   `local-user`.
  */
 export function invocationOptions(
-  authority: () => DiscoveryAuthorityProvider,
+  consumed: ConsumedAuthorization | undefined,
   invocationRef: string | undefined,
 ): HostInvocationOptions | Record<never, never> {
-  return invocationRef === undefined ? {} : hostInvocationOptions(authority());
+  if (invocationRef === undefined) {
+    return {};
+  }
+  if (consumed === undefined) {
+    throw refuse(
+      "DISCOVERY_HOST_BINDING_REQUIRED",
+      `DISCOVERY_HOST_BINDING_REQUIRED: a request bound to invocation ${invocationRef} requires the one-use authorization the host gate issued for it; it is never run as local-user.`,
+    );
+  }
+  if (consumed.identity.invocation_id !== invocationRef) {
+    throw refuse(
+      "AUTHORIZATION_IDENTITY",
+      `AUTHORIZATION_IDENTITY: the consumed authorization binds invocation ${consumed.identity.invocation_id}, not ${invocationRef}.`,
+    );
+  }
+  return hostInvocationOptions(consumed);
 }
 
 /**
  * Consume the one-use native authorization of one controlled tool call.
  *
- * The trusted binding is the provider's host, session and agent identity with
- * the request's invocation reference, and the protected activation envelope
- * of the workspace; nothing in the tool input selects it. Returns the consumed
- * record's reference, which the gate forwards to the runtime request.
+ * The request's `invocation_ref` selects the invocation partition and the
+ * protected activation envelope supplies the workspace binding; nothing in the
+ * tool input supplies an identity. Returns the consumed record, whose identity
+ * the service carries into the runtime request.
  */
 export function consumeHostToolAuthorization(
   authority: DiscoveryAuthorityProvider,
   input: ConsumeDiscoveryToolAuthorizationInput,
-): string {
-  const identity = hostInvocationOptions(authority);
+): ConsumedAuthorization {
   const location = authority.location(input.workspaceRoot);
   const envelope = authority.activation(location).envelope();
   return consumeToolAuthorizationByBinding({
@@ -84,16 +95,7 @@ export function consumeHostToolAuthorization(
       inputs: input.inputs,
       invocationRef: input.invocationRef,
     },
-    trusted: {
-      workspace: envelope.workspace,
-      identity: {
-        host: identity.hostName,
-        session_id: identity.sessionId,
-        agent_id: identity.authorId,
-        role: identity.agentRole,
-        invocation_id: input.invocationRef,
-      },
-    },
+    workspace: envelope.workspace,
     now: authority.now(),
-  }).authorizationRef;
+  });
 }

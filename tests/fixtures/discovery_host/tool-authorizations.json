@@ -47,6 +47,9 @@
     ],
     "finalize_discovery_agent": [
       "finalize-agent"
+    ],
+    "discovery_capability_sentinel": [
+      "sentinel"
     ]
   },
   "controlled_operations": [
@@ -71,7 +74,8 @@
     "completion-report",
     "generate-acceptance",
     "read-source",
-    "finalize-agent"
+    "finalize-agent",
+    "sentinel"
   ],
   "root_only_operations": [
     "init",

@@ -13,8 +13,8 @@ import {
   resolveValidateDiscoveryArtifactsToolInput,
 } from "../mcp-tool-inputs-discovery";
 import {
-  isDiscoveryRole,
   resolveConfigureDiscoveryWorkspaceToolInput,
+  resolveDiscoveryCapabilitySentinelToolInput,
   resolveFinalizeDiscoveryAgentToolInput,
   resolveImportDiscoveryInventoryToolInput,
   resolveMigrateDiscoveryArtifactsToolInput,
@@ -45,9 +45,10 @@ function handler<TInput>(
 }
 
 /**
- * Build a handler for a controlled tool: a discovery role must consume its
- * one-use native authorization before the input is resolved, and the consumed
- * reference travels in the resolved input; a root process passes straight through.
+ * Build a handler for a controlled tool: the one-use record the host gate
+ * issued for this call (a tool authorization for a call carrying
+ * `invocation_ref`, a root grant otherwise) is consumed before the input is
+ * resolved, and the consumed reference travels in the resolved input.
  */
 function controlled<TInput>(
   tool: ControlledTool,
@@ -106,19 +107,21 @@ export const handleCreateDiscoveryArtifact = controlled(
 );
 
 /**
- * Decision approval is a root action; a discovery role may only replace. The
- * role check precedes the authorization gate so a forbidden approval is named
- * as such and consumes no grant.
+ * Decision approval is a root action; a call bound to a protected invocation
+ * (a specialist's call) may only replace. The check precedes the authorization
+ * gate so a forbidden approval is named as such and consumes no record.
  */
 export const handleUpdateDiscoveryArtifact: Handler = async (
   rawInput,
   service,
 ) => {
   const input = resolveUpdateDiscoveryArtifactToolInput(rawInput);
-  const role = service.discoveryRole?.() ?? null;
-  if (input.updateAction === "approve-decision" && isDiscoveryRole(role)) {
+  if (
+    input.updateAction === "approve-decision" &&
+    input.invocationRef !== undefined
+  ) {
     throw new Error(
-      `DISCOVERY_ROLE_DENIED: approve-decision is a root-only update and is not available to the ${role} role.`,
+      `DISCOVERY_ROOT_ONLY: approve-decision is a root-only update and is not available to a call bound to invocation ${input.invocationRef}.`,
     );
   }
   const admitted = admitControlledToolCall(
@@ -166,3 +169,22 @@ export const handleFinalizeDiscoveryAgent = controlled(
   resolveFinalizeDiscoveryAgentToolInput,
   (service, input) => service.finalizeDiscoveryAgent(input),
 );
+
+/**
+ * The sentinel tool consumes the one-use sentinel grant the host gate recorded
+ * for this call and reports what the host observed; it is never gated by an
+ * authorization or a root grant, because the observation is its evidence.
+ */
+export const handleDiscoveryCapabilitySentinel: Handler = async (
+  rawInput,
+  service,
+) => {
+  if (service.discoveryCapabilitySentinel === undefined) {
+    throw new Error(
+      "DISCOVERY_SENTINEL_UNAVAILABLE: this service cannot consume sentinel observations.",
+    );
+  }
+  return service.discoveryCapabilitySentinel(
+    resolveDiscoveryCapabilitySentinelToolInput(rawInput),
+  );
+};

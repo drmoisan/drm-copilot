@@ -90,7 +90,21 @@ export interface MigrateDiscoveryArtifactsInput extends DiscoveryWorkspaceInput 
   readonly dryRun?: boolean;
 }
 
-export type RunDiscoveryDoctorInput = DiscoveryWorkspaceInput;
+/**
+ * The raw tool input exactly as the MCP client sent it. The host gate digested
+ * this object when it issued the call's one-use record, so the service consumes
+ * that record by the same digest; a call without it (an extension command) has
+ * no record to consume.
+ */
+export type RawToolInputs = Readonly<Record<string, unknown>>;
+
+export interface RunDiscoveryDoctorInput extends DiscoveryWorkspaceInput {
+  readonly toolInputs?: RawToolInputs;
+}
+
+export interface DiscoveryCapabilitySentinelInput extends DiscoveryWorkspaceInput {
+  readonly toolInputs: RawToolInputs;
+}
 
 export interface ReadDiscoverySourceInput extends DiscoveryWorkspaceInput {
   readonly readOperation: "list" | "read" | "search";
@@ -113,6 +127,8 @@ export interface PrepareDiscoveryAgentInput extends DiscoveryWorkspaceInput {
   readonly executionContext: string;
   readonly complexity: string;
   readonly orchestrationComplexityCeiling?: string;
+  /** Required to consume the root grant; absent only for an unobserved caller. */
+  readonly toolInputs?: RawToolInputs;
 }
 
 export interface FinalizeDiscoveryAgentInput extends DiscoveryWorkspaceInput {
@@ -131,6 +147,23 @@ export interface ConsumeDiscoveryToolAuthorizationInput {
   /** The raw tool input exactly as received; the digest covers it verbatim. */
   readonly inputs: Readonly<Record<string, unknown>>;
   readonly invocationRef: string;
+}
+
+/** One controlled root call the MCP gate asks the service to admit. */
+export interface ConsumeDiscoveryRootGrantInput {
+  readonly workspaceRoot: string;
+  readonly tool: string;
+  readonly operation: string;
+  /** The raw tool input exactly as received; the digest covers it verbatim. */
+  readonly inputs: RawToolInputs;
+}
+
+/** What the sentinel tool observed; evidence for the capability probe only. */
+export interface SentinelObservationSummary {
+  readonly observed: boolean;
+  readonly observation_ref: string | null;
+  readonly agent_id_present: boolean | null;
+  readonly agent_type: string | null;
 }
 
 /** Launchable deployment returned by prepare; never a grant by itself. */

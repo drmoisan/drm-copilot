@@ -41,6 +41,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "read_discovery_source",
   "prepare_discovery_agent",
   "finalize_discovery_agent",
+  "discovery_capability_sentinel",
 ] as const;
 
 export type RepoAutomationToolName = (typeof REPO_AUTOMATION_TOOLS)[number];

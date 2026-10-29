@@ -263,20 +263,22 @@ export function assessProtectedCapability(options: {
 }
 
 /**
- * Return the `context-missing` assessment when the host supplied no trusted
- * session, or null when a host and session are both present.
+ * Return the `context-missing` assessment when no root grant supplied a host
+ * and session (`context` is null or incomplete), or null when both are present.
  *
- * Callers check this before resolving any protected path, so a process that
- * was not launched by a discovery host answers without touching the store.
+ * Callers check this before resolving any protected path, so a call the native
+ * host gate did not observe answers without touching the store.
  */
-export function missingContextAssessment(context: {
-  readonly host: string;
-  readonly sessionId: string;
-}): CapabilityAssessment | null {
-  if (context.host === "" || context.sessionId === "") {
+export function missingContextAssessment(
+  context: {
+    readonly host: string;
+    readonly sessionId: string;
+  } | null,
+): CapabilityAssessment | null {
+  if (context === null || context.host === "" || context.sessionId === "") {
     return unavailable(
       "context-missing",
-      "no trusted session context was supplied by the host",
+      "no root grant of the native host gate supplied a session context for this call",
     );
   }
   return null;

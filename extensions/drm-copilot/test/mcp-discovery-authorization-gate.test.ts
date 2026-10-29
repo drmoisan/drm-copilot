@@ -1,8 +1,9 @@
 /**
- * Prove the MCP authorization gate: a discovery role's controlled tool call
- * consumes exactly one native grant and carries its reference into the
- * handler input, a root process bypasses the gate without any store read, and
- * the controlled operation set equals the pinned fixture.
+ * Prove the MCP authorization gate: a controlled call carrying `invocation_ref`
+ * consumes exactly one native tool authorization and carries its reference into
+ * the handler input, a controlled call without it consumes exactly one root
+ * grant and carries that reference, neither path reaches the handler without a
+ * record, and the controlled operation set equals the pinned fixture.
  */
 
 import * as fs from "node:fs";
@@ -28,26 +29,21 @@ import {
 import { dispatchRepoAutomationTool } from "../src/mcp-tools";
 import type { RepoAutomationService } from "../src/repo-automation-service";
 import { FIXTURE_DIRECTORY } from "./discovery-authorization-test-support";
-import { createMockService, type MockService } from "./mcp-server-test-service";
+import {
+  createMockService,
+  MOCK_ROOT_GRANT_REF,
+  type MockService,
+} from "./mcp-server-test-service";
 
 const WS = "C:/workspace";
 const INVOCATION_REF = "invocation-0123456789abcdef0001";
 const AUTHORIZATION_REF = "authz-alpha-0000000000000001";
-const READ_INPUT = {
+const ROOT_READ_INPUT = {
   workspace_root: WS,
   read_operation: "list",
   paths: ["src"],
-  invocation_ref: INVOCATION_REF,
 };
-
-function roleService(
-  role: string | null = "legacy-parity-analyst",
-): MockService {
-  const service = createMockService();
-  (service as { discoveryRole?: () => string | null }).discoveryRole = () =>
-    role;
-  return service;
-}
+const READ_INPUT = { ...ROOT_READ_INPUT, invocation_ref: INVOCATION_REF };
 
 function codeOf(action: () => unknown): string {
   try {
@@ -59,6 +55,14 @@ function codeOf(action: () => unknown): string {
     throw error;
   }
   return "ADMITTED";
+}
+
+function refusing(
+  code: "AUTHORIZATION_CONSUMED" | "DISCOVERY_HOST_BINDING_REQUIRED",
+) {
+  return () => {
+    throw new DiscoveryAuthorizationError(code, `${code} raised by the seam`);
+  };
 }
 
 afterEach(() => {
@@ -74,8 +78,9 @@ describe("controlled operation set", () => {
       ),
     ) as { controlled_operations: string[] };
     expect([...CONTROLLED_OPERATIONS]).toEqual(fixture.controlled_operations);
-    expect(CONTROLLED_TOOLS).toHaveLength(11);
+    expect(CONTROLLED_TOOLS).toHaveLength(12);
     expect(CONTROLLED_TOOLS.every((tool) => isControlledTool(tool))).toBe(true);
+    expect(isControlledTool("discovery_capability_sentinel")).toBe(true);
     expect(isControlledTool("run_discovery_doctor")).toBe(false);
   });
 });
@@ -90,6 +95,7 @@ describe("deriveControlledOperation", () => {
     ["link_discovery_evidence", {}, "link-evidence"],
     ["run_discovery_scenario_generation", {}, "generate-acceptance"],
     ["finalize_discovery_agent", {}, "finalize-agent"],
+    ["discovery_capability_sentinel", {}, "sentinel"],
     [
       "create_discovery_artifact",
       { artifact_kind: "feature-contract" },
@@ -139,23 +145,9 @@ describe("deriveControlledOperation", () => {
   );
 });
 
-describe("admitControlledToolCall", () => {
-  it("returns the raw input unchanged for a root process without consulting the store", () => {
+describe("admitControlledToolCall for a specialist call (invocation_ref present)", () => {
+  it("consumes the grant bound to the invocation and forwards its reference", () => {
     const service = createMockService();
-    const rawInput = { ...READ_INPUT };
-
-    const admitted = admitControlledToolCall(
-      "read_discovery_source",
-      rawInput,
-      service,
-    );
-
-    expect(admitted).toBe(rawInput);
-    expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
-  });
-
-  it("consumes the bound grant for a role and forwards its reference", () => {
-    const service = roleService();
     service.consumeDiscoveryToolAuthorization!.mockReturnValue(
       AUTHORIZATION_REF,
     );
@@ -177,10 +169,11 @@ describe("admitControlledToolCall", () => {
       inputs: READ_INPUT,
       invocationRef: INVOCATION_REF,
     });
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
   });
 
   it("digests the raw input as received, including fields the resolver drops", () => {
-    const service = roleService();
+    const service = createMockService();
     service.consumeDiscoveryToolAuthorization!.mockReturnValue(
       AUTHORIZATION_REF,
     );
@@ -198,6 +191,108 @@ describe("admitControlledToolCall", () => {
     );
   });
 
+  it("refuses an empty invocation_ref before any consumption", () => {
+    const service = createMockService();
+
+    expect(
+      codeOf(() =>
+        admitControlledToolCall(
+          "read_discovery_source",
+          { ...ROOT_READ_INPUT, invocation_ref: "" },
+          service,
+        ),
+      ),
+    ).toBe("AUTHORIZATION_REQUEST_INVALID");
+    expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when the service has no authorization seam", () => {
+    const service = createMockService() as RepoAutomationService & {
+      consumeDiscoveryToolAuthorization?: unknown;
+    };
+    delete service.consumeDiscoveryToolAuthorization;
+
+    expect(
+      codeOf(() =>
+        admitControlledToolCall("read_discovery_source", READ_INPUT, service),
+      ),
+    ).toBe("AUTHORIZATION_MISSING");
+  });
+
+  it("propagates the consumer's refusal so a replay is reported as consumed", () => {
+    const service = createMockService();
+    service.consumeDiscoveryToolAuthorization!.mockImplementation(
+      refusing("AUTHORIZATION_CONSUMED"),
+    );
+
+    expect(
+      codeOf(() =>
+        admitControlledToolCall("read_discovery_source", READ_INPUT, service),
+      ),
+    ).toBe("AUTHORIZATION_CONSUMED");
+  });
+});
+
+describe("admitControlledToolCall for a root call (invocation_ref absent)", () => {
+  it("consumes the root grant for the tool, operation and digest and forwards its reference", () => {
+    const service = createMockService();
+
+    const admitted = admitControlledToolCall(
+      "read_discovery_source",
+      ROOT_READ_INPUT,
+      service,
+    );
+
+    expect(admitted).toEqual({
+      ...ROOT_READ_INPUT,
+      root_grant_ref: MOCK_ROOT_GRANT_REF,
+    });
+    expect(service.consumeDiscoveryRootGrant).toHaveBeenCalledWith({
+      workspaceRoot: WS,
+      tool: "read_discovery_source",
+      operation: "read-source",
+      inputs: ROOT_READ_INPUT,
+    });
+    expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
+  });
+
+  it("refuses when no root grant was issued and never falls back to an unverified root", () => {
+    const service = createMockService();
+    service.consumeDiscoveryRootGrant!.mockImplementation(
+      refusing("DISCOVERY_HOST_BINDING_REQUIRED"),
+    );
+
+    expect(
+      codeOf(() =>
+        admitControlledToolCall(
+          "read_discovery_source",
+          ROOT_READ_INPUT,
+          service,
+        ),
+      ),
+    ).toBe("DISCOVERY_HOST_BINDING_REQUIRED");
+  });
+
+  it("fails closed when the service has no root grant seam", () => {
+    const service = createMockService() as RepoAutomationService & {
+      consumeDiscoveryRootGrant?: unknown;
+    };
+    delete service.consumeDiscoveryRootGrant;
+
+    expect(
+      codeOf(() =>
+        admitControlledToolCall(
+          "read_discovery_source",
+          ROOT_READ_INPUT,
+          service,
+        ),
+      ),
+    ).toBe("DISCOVERY_HOST_BINDING_REQUIRED");
+  });
+});
+
+describe("admitControlledToolCall refusals before any consumption", () => {
   it.each([
     ["a non-object input", "text", "AUTHORIZATION_REQUEST_INVALID"],
     [
@@ -206,8 +301,8 @@ describe("admitControlledToolCall", () => {
       "AUTHORIZATION_REQUEST_INVALID",
     ],
     [
-      "a missing invocation_ref",
-      { workspace_root: WS, read_operation: "list", paths: ["src"] },
+      "a caller-supplied root_grant_ref",
+      { ...ROOT_READ_INPUT, root_grant_ref: MOCK_ROOT_GRANT_REF },
       "AUTHORIZATION_REQUEST_INVALID",
     ],
     [
@@ -219,8 +314,8 @@ describe("admitControlledToolCall", () => {
       },
       "AUTHORIZATION_REQUEST_INVALID",
     ],
-  ])("refuses %s before any consumption", (_label, rawInput, code) => {
-    const service = roleService();
+  ])("refuses %s", (_label, rawInput, code) => {
+    const service = createMockService();
 
     expect(
       codeOf(() =>
@@ -228,10 +323,11 @@ describe("admitControlledToolCall", () => {
       ),
     ).toBe(code);
     expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
   });
 
-  it("refuses an underivable operation before any consumption", () => {
-    const service = roleService();
+  it("refuses an underivable operation", () => {
+    const service = createMockService();
 
     expect(
       codeOf(() =>
@@ -247,49 +343,26 @@ describe("admitControlledToolCall", () => {
       ),
     ).toBe("AUTHORIZATION_OPERATION_UNKNOWN");
     expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
-  });
-
-  it("fails closed when the service has no consumption seam", () => {
-    const service = roleService() as RepoAutomationService & {
-      consumeDiscoveryToolAuthorization?: unknown;
-    };
-    delete service.consumeDiscoveryToolAuthorization;
-
-    expect(
-      codeOf(() =>
-        admitControlledToolCall("read_discovery_source", READ_INPUT, service),
-      ),
-    ).toBe("AUTHORIZATION_MISSING");
-  });
-
-  it("propagates the consumer's refusal so a replay is reported as consumed", () => {
-    const service = roleService();
-    service.consumeDiscoveryToolAuthorization!.mockImplementation(() => {
-      throw new DiscoveryAuthorizationError(
-        "AUTHORIZATION_CONSUMED",
-        "already consumed",
-      );
-    });
-
-    expect(
-      codeOf(() =>
-        admitControlledToolCall("read_discovery_source", READ_INPUT, service),
-      ),
-    ).toBe("AUTHORIZATION_CONSUMED");
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
   });
 });
 
 describe("controlled tool dispatch through the gate", () => {
-  it("forwards the consumed reference into the resolved service input", async () => {
-    const service = roleService();
-    service.consumeDiscoveryToolAuthorization!.mockReturnValue(
-      AUTHORIZATION_REF,
-    );
+  function readService(): MockService {
+    const service = createMockService();
     service.readDiscoverySource.mockResolvedValue({
       tool: "read_discovery_source",
       workspaceRoot: WS,
       summary: "read",
     });
+    return service;
+  }
+
+  it("forwards the consumed authorization reference into the resolved service input", async () => {
+    const service = readService();
+    service.consumeDiscoveryToolAuthorization!.mockReturnValue(
+      AUTHORIZATION_REF,
+    );
 
     const result = await dispatchRepoAutomationTool(
       "read_discovery_source",
@@ -308,7 +381,7 @@ describe("controlled tool dispatch through the gate", () => {
   });
 
   it("forwards the consumed reference to finalize", async () => {
-    const service = roleService();
+    const service = createMockService();
     service.consumeDiscoveryToolAuthorization!.mockReturnValue(
       AUTHORIZATION_REF,
     );
@@ -335,21 +408,11 @@ describe("controlled tool dispatch through the gate", () => {
     );
   });
 
-  it("refuses the second call with the same input as consumed and never reaches the service", async () => {
-    const service = roleService();
+  it("refuses the second specialist call with the same input as consumed and never reaches the service", async () => {
+    const service = readService();
     service
       .consumeDiscoveryToolAuthorization!.mockReturnValueOnce(AUTHORIZATION_REF)
-      .mockImplementationOnce(() => {
-        throw new DiscoveryAuthorizationError(
-          "AUTHORIZATION_CONSUMED",
-          "Authorization was already consumed.",
-        );
-      });
-    service.readDiscoverySource.mockResolvedValue({
-      tool: "read_discovery_source",
-      workspaceRoot: WS,
-      summary: "read",
-    });
+      .mockImplementationOnce(refusing("AUTHORIZATION_CONSUMED"));
 
     const first = await dispatchRepoAutomationTool(
       "read_discovery_source",
@@ -368,24 +431,42 @@ describe("controlled tool dispatch through the gate", () => {
     expect(service.readDiscoverySource).toHaveBeenCalledTimes(1);
   });
 
-  it("lets a root process call controlled tools without any authorization read", async () => {
-    const service = createMockService();
-    service.readDiscoverySource.mockResolvedValue({
-      tool: "read_discovery_source",
-      workspaceRoot: WS,
-      summary: "read",
-    });
+  it("admits a root call through its root grant and runs it without an authorization reference", async () => {
+    const service = readService();
 
     const result = await dispatchRepoAutomationTool(
       "read_discovery_source",
-      { workspace_root: WS, read_operation: "list", paths: ["src"] },
+      ROOT_READ_INPUT,
       service,
     );
 
     expect(result.ok).toBe(true);
+    expect(service.consumeDiscoveryRootGrant).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tool: "read_discovery_source",
+        operation: "read-source",
+      }),
+    );
     expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
     expect(service.readDiscoverySource).toHaveBeenCalledWith(
       expect.not.objectContaining({ authorizationRef: expect.anything() }),
     );
+  });
+
+  it("refuses a root call without a live root grant before any runtime launch", async () => {
+    const service = readService();
+    service.consumeDiscoveryRootGrant!.mockImplementation(
+      refusing("DISCOVERY_HOST_BINDING_REQUIRED"),
+    );
+
+    const result = await dispatchRepoAutomationTool(
+      "read_discovery_source",
+      ROOT_READ_INPUT,
+      service,
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.summary).toContain("DISCOVERY_HOST_BINDING_REQUIRED");
+    expect(service.readDiscoverySource).not.toHaveBeenCalled();
   });
 });

@@ -59,6 +59,10 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     readDiscoverySource: jest.fn(),
     prepareDiscoveryAgent: jest.fn(),
     finalizeDiscoveryAgent: jest.fn(),
+    // A controlled root call consumes a root grant; the mock issues one.
+    consumeDiscoveryRootGrant: jest
+      .fn<NonNullable<RepoAutomationService["consumeDiscoveryRootGrant"]>>()
+      .mockReturnValue("grant-0123456789abcdef0123"),
   };
 }
 
@@ -285,15 +289,18 @@ describe("discovery dispatch failure and validation mapping", () => {
     expect(result.summary).toMatch(/artifact_path/);
   });
 
-  it("rejects an out-of-enum report_type before touching the service", async () => {
+  it("rejects an out-of-enum report_type before touching the service or any record", async () => {
     const result = await dispatchRepoAutomationTool(
       "run_discovery_report",
       { workspace_root: WORKSPACE_ROOT, report_type: "bogus", input_path: "m" },
       service,
     );
 
+    // The gate derives the controlled operation before the resolver runs, so an
+    // unknown report type is refused as an underivable operation.
     expect(service.runDiscoveryReport).not.toHaveBeenCalled();
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
     expect(result.ok).toBe(false);
-    expect(result.summary).toMatch(/report type/);
+    expect(result.summary).toMatch(/AUTHORIZATION_OPERATION_UNKNOWN/);
   });
 });

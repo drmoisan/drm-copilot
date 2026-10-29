@@ -62,6 +62,10 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     readDiscoverySource: jest.fn(),
     prepareDiscoveryAgent: jest.fn(),
     finalizeDiscoveryAgent: jest.fn(),
+    // A controlled root call consumes a root grant; the mock issues one.
+    consumeDiscoveryRootGrant: jest
+      .fn<NonNullable<RepoAutomationService["consumeDiscoveryRootGrant"]>>()
+      .mockReturnValue("grant-0123456789abcdef0123"),
   };
 }
 

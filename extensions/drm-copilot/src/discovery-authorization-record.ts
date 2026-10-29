@@ -26,9 +26,15 @@ export type ControlledTool =
   | "run_discovery_scenario_generation"
   | "run_discovery_report"
   | "validate_discovery_artifacts"
-  | "finalize_discovery_agent";
+  | "finalize_discovery_agent"
+  | "discovery_capability_sentinel";
 
-/** Operations each controlled tool may be authorized for; the union is the enum. */
+/**
+ * Operations each controlled tool may be authorized for; the union is the enum.
+ * The sentinel tool is listed so the native gate and the server agree on its
+ * operation name; the gate routes it to an observation, never to an
+ * authorization or a root grant.
+ */
 export const TOOL_OPERATIONS: Readonly<
   Record<ControlledTool, ReadonlyArray<string>>
 > = {
@@ -59,6 +65,7 @@ export const TOOL_OPERATIONS: Readonly<
     "validate-all",
   ],
   finalize_discovery_agent: ["finalize-agent"],
+  discovery_capability_sentinel: ["sentinel"],
 };
 export const CONTROLLED_TOOLS: ReadonlyArray<string> =
   Object.keys(TOOL_OPERATIONS);
@@ -85,7 +92,11 @@ export const CALLER_IDENTITY_KEYS: ReadonlyArray<string> = [
   "role",
   "session_id",
 ];
-const HOSTS: ReadonlyArray<string> = ["claude-code", "codex", "github-copilot"];
+export const HOSTS: ReadonlyArray<string> = [
+  "claude-code",
+  "codex",
+  "github-copilot",
+];
 const ROLES: ReadonlyArray<string> = [
   "legacy-parity-analyst",
   "runtime-characterization-analyst",
@@ -114,14 +125,15 @@ export const AUTHORIZATION_RECORD_KEYS: ReadonlyArray<string> = [
   "workspace",
   "writer",
 ];
-const SHA256 = /^[0-9a-f]{64}$/u;
+export const SHA256 = /^[0-9a-f]{64}$/u;
 export const CORRELATION_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/u;
 const OPAQUE_REFERENCE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/u;
-const IDENTIFIER = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/u;
+export const IDENTIFIER = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/u;
 const TIMESTAMP =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u;
 
 export type DiscoveryAuthorizationCode =
+  | "DISCOVERY_HOST_BINDING_REQUIRED"
   | "AUTHORIZATION_REQUEST_INVALID"
   | "AUTHORIZATION_INPUT_INVALID"
   | "AUTHORIZATION_OPERATION_UNKNOWN"
@@ -264,11 +276,13 @@ export function isText(
   );
 }
 
-function isReference(value: unknown): value is string {
+/** Opaque protected-record reference: at least sixteen reference characters. */
+export function isReference(value: unknown): value is string {
   return isText(value, OPAQUE_REFERENCE) && (value as string).length >= 16;
 }
 
-function isTimestamp(value: unknown): value is string {
+/** Schema timestamp: RFC 3339 shape that `Date.parse` accepts. */
+export function isTimestamp(value: unknown): value is string {
   return (
     typeof value === "string" &&
     TIMESTAMP.test(value) &&

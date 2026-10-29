@@ -58,6 +58,7 @@ are reachable only through the gateway because they require a host principal.
 | `run_discovery_doctor` | any | Read-only runtime, activation and capability diagnostics. |
 | `prepare_discovery_agent` | root | Prepare a constrained invocation for one skill and return the launchable deployment. Input: `workspace_root`, `skill_id`, `selected_ids`, `paths`, `expected_outputs` (rows of `artifact_kind`, `id`, `path`, `format`, `expected_sha256`), `execution_context`, `complexity`, optional `orchestration_complexity_ceiling` and `profile_path`. Runs the root `prepare-agent` baseline and writes the five protected records. |
 | `finalize_discovery_agent` | controlled | Validate the invocation's required outputs and mint the protected receipt. Input: `workspace_root`, `invocation_ref`, optional `request_id` (a discovery agent omits it; the consumed authorization reference is recorded) and `profile_path`. |
+| `discovery_capability_sentinel` | sentinel | Consume the one-use sentinel observation the native host gate recorded for this call and report whether the host attributed it to the capability sentinel agent. Input: `workspace_root`. Evidence for the capability probe only; it grants nothing and never fails the call. |
 
 ## VS Code commands
 

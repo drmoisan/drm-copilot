@@ -5,8 +5,12 @@
  * fixed installed runtime through the operation adapters; no schema, coverage,
  * parity or approval semantics are computed here. Prepare and finalize add the
  * protected-store steps around the runtime call through an injected
- * {@link DiscoveryAuthorityProvider}. The extension and the standalone MCP
- * server both use this one implementation.
+ * {@link DiscoveryAuthorityProvider}. The service holds no identity: a request
+ * bound to a protected invocation runs under the identity of the one-use
+ * authorization the MCP gate consumed for it, and a root call of prepare,
+ * doctor or a controlled tool is admitted by the root grant the native hook
+ * issued. The extension and the standalone MCP server both use this one
+ * implementation.
  */
 
 import type { CommandOutput } from "./command-runtime";
@@ -14,6 +18,8 @@ import {
   createNodeDiscoveryAuthorityProvider,
   type DiscoveryAuthorityProvider,
 } from "./discovery-authority-provider";
+import type { ConsumedAuthorization } from "./discovery-authorization";
+import { consumeRootGrant } from "./discovery-root-grant";
 import type { DiscoveryRuntimeDependencies } from "./discovery-runtime";
 import type { DiscoveryRequestInputs } from "./discovery-service-types";
 import {
@@ -33,6 +39,7 @@ import {
 } from "./repo-automation-execute-discovery";
 import type { RepoAutomationExecutionResult } from "./repo-automation-service-contract";
 import {
+  discoveryCapabilitySentinelOperation,
   finalizeDiscoveryAgentOperation,
   prepareDiscoveryAgentOperation,
   projectDoctorCapability,
@@ -43,8 +50,10 @@ import {
 } from "./repo-automation-service-discovery-identity";
 import type {
   ConfigureDiscoveryWorkspaceInput,
+  ConsumeDiscoveryRootGrantInput,
   ConsumeDiscoveryToolAuthorizationInput,
   CreateDiscoveryArtifactInput,
+  DiscoveryCapabilitySentinelInput,
   DiscoveryGrantedInput,
   FinalizeDiscoveryAgentInput,
   ImportDiscoveryInventoryInput,
@@ -103,6 +112,8 @@ export class DiscoveryServiceBase {
   protected readonly discoveryOutput: CommandOutput;
   private readonly runtime: DiscoveryRuntimeDependencies;
   private authorityProvider: DiscoveryAuthorityProvider | undefined;
+  /** Records the gate consumed, keyed by reference, each handed out once. */
+  private readonly consumed = new Map<string, ConsumedAuthorization>();
 
   constructor(output: CommandOutput, deps: DiscoveryServiceDeps = {}) {
     this.discoveryOutput = output;
@@ -110,18 +121,36 @@ export class DiscoveryServiceBase {
     this.authorityProvider = deps.authority;
   }
 
-  /** Role context reported by the trusted provider, or null for a root principal. */
-  discoveryRole(): string | null {
-    // The provider is created lazily; reading the field before the first
-    // protected operation would report every discovery agent as root.
-    return this.authority.agent?.role ?? null;
-  }
-
-  /** Consume the one-use native grant of one controlled call; the MCP gate's seam. */
+  /**
+   * Consume the one-use native grant bound to the invocation a controlled call
+   * names; the MCP gate's seam. The consumed record is kept for the request
+   * that carries its reference, so the runtime call takes that identity.
+   */
   consumeDiscoveryToolAuthorization(
     input: ConsumeDiscoveryToolAuthorizationInput,
   ): string {
-    return consumeHostToolAuthorization(this.authority, input);
+    const consumed = consumeHostToolAuthorization(this.authority, input);
+    this.consumed.set(consumed.authorizationRef, consumed);
+    return consumed.authorizationRef;
+  }
+
+  /** Consume the root grant of one controlled root call; the MCP gate's seam. */
+  consumeDiscoveryRootGrant(input: ConsumeDiscoveryRootGrantInput): string {
+    return consumeRootGrant({
+      location: this.authority.location(input.workspaceRoot),
+      io: this.authority.io,
+      tool: input.tool,
+      operation: input.operation,
+      inputs: input.inputs,
+      now: this.authority.now(),
+    }).rootGrantRef;
+  }
+
+  /** Consume the sentinel grant recorded for this call and report the observation. */
+  async discoveryCapabilitySentinel(
+    input: DiscoveryCapabilitySentinelInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return discoveryCapabilitySentinelOperation(this.authority, input);
   }
 
   private get authority(): DiscoveryAuthorityProvider {
@@ -129,13 +158,31 @@ export class DiscoveryServiceBase {
     return this.authorityProvider;
   }
 
+  /** Hand out the consumed record a request references exactly once. */
+  private takeConsumed(
+    authorizationRef: string | undefined,
+  ): ConsumedAuthorization | undefined {
+    if (authorizationRef === undefined) {
+      return undefined;
+    }
+    const consumed = this.consumed.get(authorizationRef);
+    this.consumed.delete(authorizationRef);
+    return consumed;
+  }
+
   /**
-   * Outer identity for one request: the trusted host set when the request is
-   * bound to a protected invocation, none for a root request. A bound request
-   * without a trusted agent identity is refused, never run as local-user.
+   * Outer identity for one request: the consumed authorization's identity when
+   * the request is bound to a protected invocation, none for a root request. A
+   * bound request without a consumed record is refused, never run as local-user.
    */
-  private identity(invocationRef: string | undefined) {
-    return invocationOptions(() => this.authority, invocationRef);
+  private identity(input: {
+    readonly invocationRef?: string;
+    readonly authorizationRef?: string;
+  }) {
+    return invocationOptions(
+      this.takeConsumed(input.authorizationRef),
+      input.invocationRef,
+    );
   }
 
   async validateDiscoveryArtifacts(
@@ -239,7 +286,7 @@ export class DiscoveryServiceBase {
         ),
       },
       this.runtime,
-      this.identity(input.invocationRef),
+      this.identity(input),
     );
   }
 
@@ -265,7 +312,7 @@ export class DiscoveryServiceBase {
         ]),
       },
       this.runtime,
-      this.identity(input.invocationRef),
+      this.identity(input),
     );
   }
 
@@ -287,7 +334,7 @@ export class DiscoveryServiceBase {
         ]),
       },
       this.runtime,
-      this.identity(input.invocationRef),
+      this.identity(input),
     );
   }
 
@@ -373,11 +420,11 @@ export class DiscoveryServiceBase {
       { operation: "doctor" },
       this.runtime,
     );
-    // The same lazily created trusted provider that prepares agents describes
-    // the host capability, so a production service with no injected provider
-    // still projects the session's protected attestation (or the exact
-    // deficiency) instead of leaving the runtime's generic warning in place.
-    return projectDoctorCapability(this.authority, input.workspaceRoot, result);
+    // The same lazily created provider that prepares agents describes the host
+    // capability from the root grant of this call, so a production service with
+    // no injected provider still projects the session's protected attestation
+    // (or the exact deficiency) instead of leaving the runtime's generic warning.
+    return projectDoctorCapability(this.authority, input, result);
   }
 
   async readDiscoverySource(
@@ -407,7 +454,7 @@ export class DiscoveryServiceBase {
         ]),
       },
       this.runtime,
-      this.identity(input.invocationRef),
+      this.identity(input),
     );
   }
 
@@ -434,6 +481,7 @@ export class DiscoveryServiceBase {
         authority: this.authority,
       },
       input,
+      this.takeConsumed(input.authorizationRef),
     );
   }
 }

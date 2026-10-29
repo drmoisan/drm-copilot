@@ -5,12 +5,16 @@
  * for one permitted purpose-built tool call. The record is keyed by the caller
  * request id (a correlation key, never authority) and bound to the exact
  * normalized tool/operation/input digest, the protected workspace binding and
- * the trusted native identity of the invocation. This module finds the unique
+ * the native identity the host payload carried. This module finds the unique
  * unconsumed record for a controlled request, verifies every binding, and
- * consumes it exactly once through an exclusive latch. Zero or ambiguous
- * matches, replays, expired grants, foreign workspaces or identities, root-only
- * operations and caller-supplied identity or authority claims are rejected.
- * The record codec and digest live in `discovery-authorization-record.ts`.
+ * consumes it exactly once through an exclusive latch. The MCP server holds no
+ * identity of its own: {@link consumeToolAuthorizationByBinding} resolves the
+ * invocation partition from the request's `invocation_ref` alone, requires the
+ * record identity to equal the started invocation's, and returns that identity
+ * for the runtime call. Zero or ambiguous matches, replays, expired grants,
+ * foreign workspaces or identities, root-only operations and caller-supplied
+ * identity or authority claims are rejected. The record codec and digest live
+ * in `discovery-authorization-record.ts`.
  */
 
 import * as nodeFs from "node:fs";
@@ -85,6 +89,8 @@ export interface ConsumedAuthorization {
   readonly inputSha256: string;
   readonly path: string;
   readonly record: ToolAuthorizationRecord;
+  /** Identity the consumed record binds; the runtime call carries exactly this. */
+  readonly identity: NativeIdentity;
 }
 
 /** Store seam: the authority seam plus directory listing. */
@@ -123,7 +129,7 @@ function validateRequest(request: ControlledToolRequest): string {
 }
 
 /** Validate the tool, operation and inputs of a controlled request; return the digest. */
-function validateControlledRequest(
+export function validateControlledRequest(
   request: Omit<ControlledToolRequest, "requestId">,
 ): string {
   rejectCallerAuthorityClaims(request.inputs, "Tool request inputs");
@@ -169,7 +175,8 @@ function validateControlledRequest(
   return computeInputDigest(request.tool, request.operation, request.inputs);
 }
 
-function sameBinding(
+/** True when every member of `left` equals the same member of `right`. */
+export function sameBinding(
   left: Record<string, string>,
   right: Record<string, string>,
 ): boolean {
@@ -276,151 +283,12 @@ export function consumeToolAuthorization(
     inputSha256: digest,
     path,
     record: { ...record, state: "consumed", consumed_at: now.toISOString() },
-  };
-}
-
-export interface ConsumeByBindingOptions {
-  readonly location: AuthorityLocation;
-  readonly io: AuthorizationStoreIO;
-  readonly request: BoundToolRequest;
-  /** Host-verified binding; `identity.invocation_id` is the request's invocation. */
-  readonly trusted: TrustedBinding;
-  readonly now: Date;
-}
-
-/** The four identity fields a one-use record must share with the trusted process. */
-const BINDING_IDENTITY_KEYS: ReadonlyArray<keyof NativeIdentity> = [
-  "host",
-  "session_id",
-  "agent_id",
-  "role",
-];
-
-function sameIdentity(left: NativeIdentity, right: NativeIdentity): boolean {
-  return BINDING_IDENTITY_KEYS.every((key) => left[key] === right[key]);
-}
-
-/**
- * Admit one controlled tool call by its trusted binding rather than a caller
- * request id.
- *
- * The MCP layer holds the raw tool input the native PreToolUse adapter
- * digested but no correlation id, so the live issued, unlatched records of the
- * invocation named by the trusted session and the request's `invocation_ref`
- * are filtered down to those whose identity binds the trusted host, session,
- * agent id and role and whose tool, operation and input digest equal the
- * request. Exactly one must remain; it is then checked against its validity
- * window and latched exactly as {@link consumeToolAuthorization}. Each refusal
- * class is distinct so a replay (`AUTHORIZATION_CONSUMED`) is never reported as
- * a missing grant.
- */
-export function consumeToolAuthorizationByBinding(
-  options: ConsumeByBindingOptions,
-): ConsumedAuthorization {
-  const { location, io, request, trusted, now } = options;
-  const digest = validateControlledRequest(request);
-  if (
-    !isText(request.invocationRef, CORRELATION_ID) ||
-    trusted.identity.invocation_id !== request.invocationRef
-  ) {
-    throw refuse(
-      "AUTHORIZATION_REQUEST_INVALID",
-      "Invocation reference must name the trusted invocation of this process.",
-    );
-  }
-  const directory = authorizationsDirectory(location, trusted.identity);
-  const records: { path: string; record: ToolAuthorizationRecord }[] = [];
-  // Every JSON entry of the invocation partition is decoded strictly.
-  for (const name of io.listEntries(directory)) {
-    if (!name.endsWith(".json")) {
-      continue;
-    }
-    const path = `${directory}/${name}`;
-    const text = io.readText(path);
-    if (text !== null) {
-      records.push({ path, record: decodeToolAuthorization(text) });
-    }
-  }
-  if (records.length === 0) {
-    throw refuse(
-      "AUTHORIZATION_MISSING",
-      `No native authorization exists for invocation ${request.invocationRef}.`,
-    );
-  }
-  // Staged filtering names the first binding that fails for this request.
-  const identityBound = records.filter(({ record }) =>
-    sameIdentity(record.identity, trusted.identity),
-  );
-  if (identityBound.length === 0) {
-    throw refuse(
-      "AUTHORIZATION_IDENTITY",
-      "No authorization of this invocation is bound to the trusted identity.",
-    );
-  }
-  const workspaceBound = identityBound.filter(({ record }) =>
-    sameBinding({ ...record.workspace }, { ...trusted.workspace }),
-  );
-  if (workspaceBound.length === 0) {
-    throw refuse(
-      "AUTHORIZATION_WORKSPACE",
-      "Authorization is bound to another workspace or profile.",
-    );
-  }
-  const bound = workspaceBound.filter(
-    ({ record }) =>
-      record.tool === request.tool &&
-      record.operation === request.operation &&
-      record.input_sha256 === digest,
-  );
-  if (bound.length === 0) {
-    throw refuse(
-      "AUTHORIZATION_INPUT",
-      "No authorization was issued for this tool, operation and input.",
-    );
-  }
-  const live = bound.filter(
-    ({ path, record }) =>
-      record.state === "issued" &&
-      io.readText(`${path}${CONSUMED_LATCH_SUFFIX}`) === null,
-  );
-  if (live.length === 0) {
-    throw refuse(
-      "AUTHORIZATION_CONSUMED",
-      "The matching authorization was already consumed or revoked.",
-    );
-  }
-  // A grant outside its validity window is not live: a re-issued grant after a
-  // timeout must remain consumable beside the expired one it replaces.
-  const instant = now.getTime();
-  const current = live.filter(
-    ({ record }) =>
-      Date.parse(record.issued_at) <= instant &&
-      instant < Date.parse(record.expires_at),
-  );
-  if (current.length === 0) {
-    throw refuse(
-      "AUTHORIZATION_EXPIRED",
-      "Authorization is outside its validity window.",
-    );
-  }
-  if (current.length > 1) {
-    throw refuse(
-      "AUTHORIZATION_AMBIGUOUS",
-      `${String(current.length)} issued authorizations match this tool call.`,
-    );
-  }
-  const { path, record } = current[0]!;
-  consume(io, path, record, now);
-  return {
-    authorizationRef: record.authorization_ref,
-    inputSha256: digest,
-    path,
-    record: { ...record, state: "consumed", consumed_at: now.toISOString() },
+    identity: record.identity,
   };
 }
 
 /** Latch exclusively, then rewrite the record as consumed. */
-function consume(
+export function consume(
   io: AuthorizationStoreIO,
   path: string,
   record: ToolAuthorizationRecord,

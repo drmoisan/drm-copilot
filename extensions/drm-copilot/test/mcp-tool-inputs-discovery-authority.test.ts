@@ -11,12 +11,12 @@ import { describe, expect, it } from "@jest/globals";
 import {
   COMPLEXITY_BANDS,
   CONFIGURATION_ACTIONS,
-  discoveryRoleDeniedMessage,
   EXECUTION_CONTEXTS,
   isDiscoveryRole,
   isRootOnlyDiscoveryTool,
   READ_OPERATIONS,
   resolveConfigureDiscoveryWorkspaceToolInput,
+  resolveDiscoveryCapabilitySentinelToolInput,
   resolveFinalizeDiscoveryAgentToolInput,
   resolveImportDiscoveryInventoryToolInput,
   resolveMigrateDiscoveryArtifactsToolInput,
@@ -218,15 +218,16 @@ describe("resolveMigrateDiscoveryArtifactsToolInput", () => {
 });
 
 describe("resolveRunDiscoveryDoctorToolInput", () => {
-  it("accepts only the workspace and optional profile", () => {
-    expect(
-      resolveRunDiscoveryDoctorToolInput({
-        workspace_root: WS,
-        profile_path: "p.yaml",
-      }),
-    ).toEqual({ workspaceRoot: WS, profilePath: "p.yaml" });
+  it("resolves the workspace and optional profile and keeps the raw input for the root grant digest", () => {
+    const raw = { workspace_root: WS, profile_path: "p.yaml" };
+    expect(resolveRunDiscoveryDoctorToolInput(raw)).toEqual({
+      workspaceRoot: WS,
+      profilePath: "p.yaml",
+      toolInputs: raw,
+    });
     expect(resolveRunDiscoveryDoctorToolInput({}, "D:/fallback")).toEqual({
       workspaceRoot: "D:/fallback",
+      toolInputs: {},
     });
   });
 });
@@ -335,13 +336,9 @@ describe("resolvePrepareDiscoveryAgentToolInput", () => {
     complexity: "C2",
   };
 
-  it("normalizes the prepare request and pins the routing enums", () => {
-    expect(
-      resolvePrepareDiscoveryAgentToolInput({
-        ...base,
-        orchestration_complexity_ceiling: "C3",
-      }),
-    ).toEqual({
+  it("normalizes the prepare request, keeps the raw input for the root grant digest and pins the routing enums", () => {
+    const raw = { ...base, orchestration_complexity_ceiling: "C3" };
+    expect(resolvePrepareDiscoveryAgentToolInput(raw)).toEqual({
       workspaceRoot: WS,
       skillId: "inventory-legacy-system",
       selectedIds: ["legacy-crm"],
@@ -350,6 +347,7 @@ describe("resolvePrepareDiscoveryAgentToolInput", () => {
       executionContext: "standalone",
       complexity: "C2",
       orchestrationComplexityCeiling: "C3",
+      toolInputs: raw,
     });
     expect([...SKILL_IDS]).toEqual([...DISCOVERY_SKILL_IDS]);
     expect([...EXECUTION_CONTEXTS]).toEqual([
@@ -431,13 +429,21 @@ describe("role policy", () => {
     expect(isDiscoveryRole(null)).toBe(false);
     expect(isDiscoveryRole(undefined)).toBe(false);
     expect(isDiscoveryRole("native-root")).toBe(false);
+  });
+});
+
+describe("resolveDiscoveryCapabilitySentinelToolInput", () => {
+  it("keeps the raw tool input beside the workspace so the sentinel grant digest can be recomputed", () => {
+    const raw = { workspace_root: WS };
+    expect(resolveDiscoveryCapabilitySentinelToolInput(raw)).toEqual({
+      workspaceRoot: WS,
+      toolInputs: raw,
+    });
     expect(
-      discoveryRoleDeniedMessage(
-        "prepare_discovery_agent",
-        "legacy-parity-analyst",
-      ),
-    ).toBe(
-      "DISCOVERY_ROLE_DENIED: prepare_discovery_agent is a root-only operation and is not available to the legacy-parity-analyst role.",
+      resolveDiscoveryCapabilitySentinelToolInput({}, "D:/fallback"),
+    ).toEqual({ workspaceRoot: "D:/fallback", toolInputs: {} });
+    expect(() => resolveDiscoveryCapabilitySentinelToolInput("text")).toThrow(
+      "object",
     );
   });
 });

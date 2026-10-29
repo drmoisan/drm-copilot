@@ -1,233 +1,262 @@
 /**
- * Prove one-use authorization consumption by trusted binding: the MCP gate
- * holds the raw tool input but no caller request id, so the grant is located
- * through the trusted session, the request's invocation reference and the
- * exact tool, operation and input digest.
+ * Prove one-use authorization consumption by invocation reference: the MCP
+ * server holds the raw tool input but no caller request id and no identity of
+ * its own, so the request's `invocation_ref` selects the started invocation
+ * across every session, the record identity must equal that invocation's, and
+ * the exact tool, operation and input digest select the grant.
  */
 
+import { invocationDirectory } from "../src/discovery-authority-paths";
 import {
-  authorizationsDirectory,
-  consumeToolAuthorizationByBinding,
+  type ControlledTool,
   decodeToolAuthorization,
   type ToolAuthorizationRecord,
-  type TrustedBinding,
 } from "../src/discovery-authorization";
+import { consumeToolAuthorizationByBinding } from "../src/discovery-authorization-binding";
 import {
-  LOCATION,
-  MemoryAuthorizationIO,
-  NOW,
   refusalCode,
   REORDERED,
-  seeded,
-  SORTED,
   UNSORTED,
-  vectors,
 } from "./discovery-authorization-test-support";
+import {
+  AGENT_ID,
+  AGENT_ROLE,
+  AUTHORIZATION_REF,
+  issueAuthorization,
+  type PreparedStore,
+  preparedStore,
+  startedStore,
+} from "./discovery-grant-test-support";
+import {
+  CONTEXT,
+  LOCATION,
+  WORKSPACE,
+} from "./discovery-invocation-test-support";
+import type { MemoryStoreIO } from "./discovery-store-test-helpers";
 
-/** The request's invocation reference names the partition the grants live in. */
-const INVOCATION_REF = vectors.records.issued.invocation_ref;
-const BOUND: TrustedBinding = {
-  workspace: vectors.workspace,
-  identity: { ...vectors.identity, invocation_id: INVOCATION_REF },
-};
-const DIRECTORY = authorizationsDirectory(LOCATION, BOUND.identity);
+const NOW = new Date("2026-10-22T12:01:00Z");
+const TOOL = UNSORTED!.tool as ControlledTool;
+const OPERATION = UNSORTED!.operation;
+const INPUTS = UNSORTED!.inputs;
 
-function store(
-  entries: Record<string, ToolAuthorizationRecord | string> = {
-    "authz-alpha.json": vectors.records.issued,
-  },
-): MemoryAuthorizationIO {
-  return seeded(entries, DIRECTORY);
+/** A started invocation holding one issued grant for the vector call. */
+function granted(
+  overrides: Partial<Parameters<typeof issueAuthorization>[1]> = {},
+): PreparedStore & { ref: string } {
+  const store = startedStore();
+  const ref = issueAuthorization(store.io, {
+    invocationId: store.invocationId,
+    tool: TOOL,
+    operation: OPERATION,
+    inputs: INPUTS,
+    ...overrides,
+  });
+  return { ...store, ref };
 }
 
-function attemptBound(
-  io: MemoryAuthorizationIO,
+function latches(io: MemoryStoreIO): string[] {
+  return [...io.files.keys()].filter((key) => key.endsWith(".consumed"));
+}
+
+function attempt(
+  store: PreparedStore,
   overrides: {
     tool?: string;
     operation?: string;
     inputs?: unknown;
     invocationRef?: string;
-    trusted?: TrustedBinding;
+    workspace?: ToolAuthorizationRecord["workspace"];
     now?: Date;
   } = {},
 ): string {
   return refusalCode(() =>
     consumeToolAuthorizationByBinding({
       location: LOCATION,
-      io,
+      io: store.io,
       request: {
-        tool: overrides.tool ?? UNSORTED!.tool,
-        operation: overrides.operation ?? UNSORTED!.operation,
-        inputs: overrides.inputs ?? UNSORTED!.inputs,
-        invocationRef: overrides.invocationRef ?? INVOCATION_REF,
+        tool: overrides.tool ?? TOOL,
+        operation: overrides.operation ?? OPERATION,
+        inputs: overrides.inputs ?? INPUTS,
+        invocationRef: overrides.invocationRef ?? store.invocationId,
       },
-      trusted: overrides.trusted ?? BOUND,
+      workspace: overrides.workspace ?? WORKSPACE,
       now: overrides.now ?? NOW,
     }),
   );
 }
 
 describe("consumeToolAuthorizationByBinding admission", () => {
-  it("consumes the unique grant bound to the identity, tool, operation and input", () => {
-    const io = store();
+  it("consumes the unique grant of the started invocation and returns its identity", () => {
+    const store = granted();
 
     const result = consumeToolAuthorizationByBinding({
       location: LOCATION,
-      io,
+      io: store.io,
       request: {
-        tool: UNSORTED!.tool,
-        operation: UNSORTED!.operation,
-        inputs: UNSORTED!.inputs,
-        invocationRef: INVOCATION_REF,
+        tool: TOOL,
+        operation: OPERATION,
+        inputs: INPUTS,
+        invocationRef: store.invocationId,
       },
-      trusted: BOUND,
+      workspace: WORKSPACE,
       now: NOW,
     });
 
-    expect(result.authorizationRef).toBe(
-      vectors.records.issued.authorization_ref,
-    );
-    expect(result.inputSha256).toBe(SORTED!.input_sha256);
+    expect(result.authorizationRef).toBe(AUTHORIZATION_REF);
+    expect(result.identity).toEqual({
+      host: CONTEXT.host,
+      session_id: CONTEXT.sessionId,
+      agent_id: AGENT_ID,
+      role: AGENT_ROLE,
+      invocation_id: store.invocationId,
+    });
     expect(result.record.state).toBe("consumed");
-    expect(decodeToolAuthorization(io.files.get(result.path)!)).toEqual(
+    expect(decodeToolAuthorization(store.io.files.get(result.path)!)).toEqual(
       result.record,
     );
-    expect(io.files.has(`${result.path}.consumed`)).toBe(true);
+    expect(store.io.files.has(`${result.path}.consumed`)).toBe(true);
     // The second call with the same input finds the latched record and is refused.
-    expect(attemptBound(io)).toBe("AUTHORIZATION_CONSUMED");
+    expect(attempt(store)).toBe("AUTHORIZATION_CONSUMED");
   });
 
-  it("ignores grants issued for other requests in the same invocation", () => {
-    const other = {
-      ...vectors.records.issued,
-      id: "authz-other",
-      request_id: "request-other",
+  it("ignores grants issued for other calls of the same invocation", () => {
+    const store = granted();
+    issueAuthorization(store.io, {
+      invocationId: store.invocationId,
+      tool: "run_discovery_dotnet_analyzer",
       operation: "inventory",
-      tool: "run_discovery_dotnet_analyzer" as const,
-    };
-    const io = store({
-      "other.json": other,
-      "authz-alpha.json": vectors.records.issued,
+      inputs: INPUTS,
+      ref: "authz-other-0000000000000001",
     });
 
-    expect(attemptBound(io)).toBe("ADMITTED");
+    expect(attempt(store)).toBe("ADMITTED");
+    const directory = `${invocationDirectory(LOCATION, CONTEXT.sessionId, store.invocationId)}/authorizations`;
     expect(
-      decodeToolAuthorization(io.files.get(`${DIRECTORY}/other.json`)!).state,
+      decodeToolAuthorization(
+        store.io.files.get(`${directory}/authz-other-0000000000000001.json`)!,
+      ).state,
     ).toBe("issued");
   });
 
   it("refuses two live grants for the same call as ambiguous without consuming", () => {
-    const io = store({
-      "a.json": vectors.records.issued,
-      "b.json": { ...vectors.records.issued, id: "authz-alpha-two" },
+    const store = granted();
+    issueAuthorization(store.io, {
+      invocationId: store.invocationId,
+      tool: TOOL,
+      operation: OPERATION,
+      inputs: INPUTS,
+      ref: "authz-alpha-0000000000000002",
     });
 
-    expect(attemptBound(io)).toBe("AUTHORIZATION_AMBIGUOUS");
-    expect(io.operations).toEqual([]);
+    expect(attempt(store)).toBe("AUTHORIZATION_AMBIGUOUS");
+    expect(latches(store.io)).toEqual([]);
   });
 
   it.each([
-    ["a consumed record", vectors.records.consumed],
-    ["a revoked record", vectors.records.revoked],
-  ])("refuses %s as consumed", (_label, record) => {
-    expect(attemptBound(store({ "x.json": record }))).toBe(
-      "AUTHORIZATION_CONSUMED",
-    );
+    [
+      "a consumed record",
+      { state: "consumed", consumed_at: "2026-10-22T12:00:30Z" },
+    ],
+    ["a revoked record", { state: "revoked" }],
+  ] as const)("refuses %s as consumed", (_label, record) => {
+    expect(attempt(granted({ record }))).toBe("AUTHORIZATION_CONSUMED");
   });
 
   it("treats a latched record as consumed even when it still reads issued", () => {
-    const io = store();
-    io.files.set(`${DIRECTORY}/authz-alpha.json.consumed`, "{}\n");
+    const store = granted();
+    const directory = `${invocationDirectory(LOCATION, CONTEXT.sessionId, store.invocationId)}/authorizations`;
+    store.io.files.set(
+      `${directory}/${AUTHORIZATION_REF}.json.consumed`,
+      "{}\n",
+    );
 
-    expect(attemptBound(io)).toBe("AUTHORIZATION_CONSUMED");
+    expect(attempt(store)).toBe("AUTHORIZATION_CONSUMED");
   });
 
   it("consumes the current grant beside an expired one issued for the same call", () => {
     // A tool call retried after its first grant expired has two issued records;
     // the expired one is not live and must not make the retry ambiguous.
-    const io = store({
-      "stale.json": {
-        ...vectors.records.expired,
-        id: "authz-stale",
-        request_id: vectors.records.issued.request_id,
-        tool: vectors.records.issued.tool,
-        operation: vectors.records.issued.operation,
-        input_sha256: vectors.records.issued.input_sha256,
+    const store = granted();
+    issueAuthorization(store.io, {
+      invocationId: store.invocationId,
+      tool: TOOL,
+      operation: OPERATION,
+      inputs: INPUTS,
+      ref: "authz-stale-0000000000000001",
+      record: {
+        issued_at: "2026-10-22T11:00:00Z",
+        expires_at: "2026-10-22T11:05:00Z",
       },
-      "fresh.json": vectors.records.issued,
     });
 
-    expect(attemptBound(io)).toBe("ADMITTED");
-    expect(io.files.has(`${DIRECTORY}/fresh.json.consumed`)).toBe(true);
-    expect(io.files.has(`${DIRECTORY}/stale.json.consumed`)).toBe(false);
+    expect(attempt(store)).toBe("ADMITTED");
+    expect(latches(store.io)).toHaveLength(1);
+    expect(latches(store.io)[0]).toContain(AUTHORIZATION_REF);
   });
 
   it("refuses an expired grant and a grant not yet valid", () => {
-    expect(
-      attemptBound(store({ "d.json": vectors.records.expired }), {
-        inputs: UNSORTED!.inputs,
-      }),
-    ).toBe("AUTHORIZATION_EXPIRED");
-    expect(
-      attemptBound(store(), { now: new Date("2026-10-22T11:59:59Z") }),
-    ).toBe("AUTHORIZATION_EXPIRED");
-    expect(
-      attemptBound(store(), { now: new Date("2026-10-22T12:05:00Z") }),
-    ).toBe("AUTHORIZATION_EXPIRED");
+    expect(attempt(granted(), { now: new Date("2026-10-22T11:58:59Z") })).toBe(
+      "AUTHORIZATION_EXPIRED",
+    );
+    expect(attempt(granted(), { now: new Date("2026-10-22T12:30:00Z") })).toBe(
+      "AUTHORIZATION_EXPIRED",
+    );
   });
 });
 
 describe("consumeToolAuthorizationByBinding refusals", () => {
-  it("reports missing when the invocation holds no grant at all", () => {
-    expect(attemptBound(new MemoryAuthorizationIO())).toBe(
+  it("reports missing when no session holds the invocation", () => {
+    const store = granted();
+    expect(attempt(store, { invocationRef: "invocation-other-000001" })).toBe(
       "AUTHORIZATION_MISSING",
     );
-    expect(
-      attemptBound(store(), { invocationRef: "invocation-other-000001" }),
-    ).toBe("AUTHORIZATION_REQUEST_INVALID");
-  });
-
-  it("refuses an invocation reference that is not the trusted invocation", () => {
-    const trusted = {
-      ...BOUND,
-      identity: { ...BOUND.identity, invocation_id: "invocation-other-000001" },
-    };
-    expect(attemptBound(store(), { trusted })).toBe(
+    expect(attempt(store, { invocationRef: "not a correlation id" })).toBe(
       "AUTHORIZATION_REQUEST_INVALID",
     );
   });
 
-  it.each([
-    ["agent id", { agent_id: "agent-beta" }],
-    ["role", { role: "requirements-reconciler" }],
-    ["host", { host: "codex" }],
-  ])(
-    "refuses a grant whose %s differs from the trusted identity",
-    (_label, change) => {
-      const trusted = { ...BOUND, identity: { ...BOUND.identity, ...change } };
-      const io = store();
+  it("refuses an invocation that is prepared but not started: no agent is bound yet", () => {
+    const store = preparedStore();
+    issueAuthorization(store.io, {
+      invocationId: store.invocationId,
+      tool: TOOL,
+      operation: OPERATION,
+      inputs: INPUTS,
+    });
 
-      expect(attemptBound(io, { trusted })).toBe("AUTHORIZATION_IDENTITY");
-      expect(io.operations).toEqual([]);
+    expect(attempt(store)).toBe("AUTHORIZATION_IDENTITY");
+    expect(latches(store.io)).toEqual([]);
+  });
+
+  it("refuses an invocation reference that two sessions both hold as ambiguous", () => {
+    const store = granted();
+    const own = `${invocationDirectory(LOCATION, CONTEXT.sessionId, store.invocationId)}/invocation.json`;
+    const foreign = `${invocationDirectory(LOCATION, "session-beta", store.invocationId)}/invocation.json`;
+    store.io.files.set(foreign, store.io.files.get(own)!);
+
+    expect(attempt(store)).toBe("AUTHORIZATION_AMBIGUOUS");
+    expect(latches(store.io)).toEqual([]);
+  });
+
+  it.each([
+    ["agent id", { agentId: "agent-beta" }],
+    ["role", { role: "requirements-reconciler" }],
+    ["host", { host: "claude-code" }],
+  ])(
+    "refuses a grant whose %s differs from the started invocation",
+    (_label, change) => {
+      const store = granted(change);
+
+      expect(attempt(store)).toBe("AUTHORIZATION_IDENTITY");
+      expect(latches(store.io)).toEqual([]);
     },
   );
 
-  it("looks only in the trusted session's partition, so another session finds nothing", () => {
-    const trusted = {
-      ...BOUND,
-      identity: { ...BOUND.identity, session_id: "session-beta" },
-    };
-    const io = store();
-
-    expect(attemptBound(io, { trusted })).toBe("AUTHORIZATION_MISSING");
-    expect(io.operations).toEqual([]);
-  });
-
   it("refuses a grant bound to another workspace or profile", () => {
-    const foreign = { ...vectors.workspace, profile_sha256: "0".repeat(64) };
-    expect(
-      attemptBound(store(), { trusted: { ...BOUND, workspace: foreign } }),
-    ).toBe("AUTHORIZATION_WORKSPACE");
+    const foreign = { ...WORKSPACE, profile_sha256: "0".repeat(64) };
+    expect(attempt(granted(), { workspace: foreign })).toBe(
+      "AUTHORIZATION_WORKSPACE",
+    );
   });
 
   it.each([
@@ -237,24 +266,21 @@ describe("consumeToolAuthorizationByBinding refusals", () => {
   ])(
     "refuses %s as an input mismatch without consuming",
     (_label, overrides) => {
-      const io = store();
+      const store = granted();
 
-      expect(attemptBound(io, overrides)).toBe("AUTHORIZATION_INPUT");
-      expect(io.operations).toEqual([]);
+      expect(attempt(store, overrides)).toBe("AUTHORIZATION_INPUT");
+      expect(latches(store.io)).toEqual([]);
     },
   );
 
   it("refuses another operation of the same tool as an input mismatch", () => {
-    const io = store({
-      "c.json": {
-        ...vectors.records.issued,
-        tool: "create_discovery_artifact",
-        operation: "new-contract",
-      },
+    const store = granted({
+      tool: "create_discovery_artifact",
+      operation: "new-contract",
     });
 
     expect(
-      attemptBound(io, {
+      attempt(store, {
         tool: "create_discovery_artifact",
         operation: "new-scenario",
       }),
@@ -267,30 +293,40 @@ describe("consumeToolAuthorizationByBinding refusals", () => {
     ["exec", "AUTHORIZATION_OPERATION_UNKNOWN"],
     ["read-source", "AUTHORIZATION_TOOL_OPERATION"],
   ])("refuses operation %s before any lookup", (operation, code) => {
-    const io = store();
-    expect(attemptBound(io, { operation })).toBe(code);
-    expect(io.operations).toEqual([]);
+    const store = granted();
+    const listed = store.io.operations.length;
+    expect(attempt(store, { operation })).toBe(code);
+    expect(store.io.operations).toHaveLength(listed);
   });
 
   it("refuses caller identity and authority claims in the raw input", () => {
     expect(
-      attemptBound(store(), {
+      attempt(granted(), {
         inputs: { ...UNSORTED!.inputs, role: "native-root" },
       }),
     ).toBe("AUTHORIZATION_REQUEST_INVALID");
     expect(
-      attemptBound(store(), {
+      attempt(granted(), {
         inputs: { ...UNSORTED!.inputs, authorization_ref: "x".repeat(20) },
       }),
     ).toBe("AUTHORITY_CLAIM_REJECTED");
   });
 
   it("rejects a malformed record in the partition instead of skipping it", () => {
-    const io = store({
-      "authz-alpha.json": vectors.records.issued,
-      "junk.json": "{",
-    });
-    expect(attemptBound(io)).toBe("AUTHORIZATION_RECORD_INVALID");
-    expect(io.operations).toEqual([]);
+    const store = granted();
+    const directory = `${invocationDirectory(LOCATION, CONTEXT.sessionId, store.invocationId)}/authorizations`;
+    store.io.files.set(`${directory}/junk.json`, "{");
+
+    expect(attempt(store)).toBe("AUTHORIZATION_RECORD_INVALID");
+    expect(latches(store.io)).toEqual([]);
+  });
+
+  it("rejects a malformed invocation record instead of attributing the call", () => {
+    const store = granted();
+    const path = `${invocationDirectory(LOCATION, CONTEXT.sessionId, store.invocationId)}/invocation.json`;
+    store.io.files.set(path, "{}");
+
+    expect(attempt(store)).toBe("AUTHORIZATION_RECORD_INVALID");
+    expect(latches(store.io)).toEqual([]);
   });
 });

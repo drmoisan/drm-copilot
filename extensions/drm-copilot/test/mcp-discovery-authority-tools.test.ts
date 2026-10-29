@@ -2,9 +2,10 @@
  * Shared MCP operation contract for the discovery tools: dispatch and
  * transport agreement.
  *
- * Dispatch must route each tool to its service method, refuse root-only tools
- * for a discovery role before resolving input, pass the typed payloads through,
- * and surface `text`, `structuredContent` and `isError` that agree.
+ * Dispatch must route each tool to its service method, pass the typed payloads
+ * through, and surface `text`, `structuredContent` and `isError` that agree.
+ * The one-use host records the gate consumes are proved in
+ * `mcp-discovery-authority-tools.gate.test.ts`.
  */
 
 import {
@@ -22,9 +23,9 @@ jest.mock("vscode", () => ({ window: { createTerminal: jest.fn() } }), {
   virtual: true,
 });
 
+import { DiscoveryAuthorizationError } from "../src/discovery-authorization";
 import { DISCOVERY_TOOL_DEFINITIONS } from "../src/mcp-discovery-tool-definitions";
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
-import { ROOT_ONLY_DISCOVERY_TOOLS } from "../src/mcp-tool-inputs-discovery-authority";
 import { dispatchRepoAutomationTool } from "../src/mcp-tools";
 import type { RepoAutomationExecutionResult } from "../src/repo-automation-service";
 import type { RepoAutomationToolName } from "../src/repo-automation-tool-names";
@@ -142,7 +143,12 @@ describe("discovery tool dispatch", () => {
         inputPath: "legacy.yaml",
       },
     ],
-    ["run_discovery_doctor", {}, "runDiscoveryDoctor", {}],
+    [
+      "run_discovery_doctor",
+      {},
+      "runDiscoveryDoctor",
+      { toolInputs: { workspace_root: WS } },
+    ],
     [
       "read_discovery_source",
       { read_operation: "list", paths: ["src"] },
@@ -167,6 +173,15 @@ describe("discovery tool dispatch", () => {
         expectedOutputs: [{ artifact_kind: "inventory-snapshot" }],
         executionContext: "standalone",
         complexity: "C2",
+        toolInputs: {
+          workspace_root: WS,
+          skill_id: "inventory-legacy-system",
+          selected_ids: ["a"],
+          paths: ["src"],
+          expected_outputs: [{ artifact_kind: "inventory-snapshot" }],
+          execution_context: "standalone",
+          complexity: "C2",
+        },
       },
     ],
     [
@@ -281,135 +296,6 @@ describe("discovery tool dispatch", () => {
     expect(result.summary).toMatch(/direction/);
     expect(service.transferDiscoverySnapshot).not.toHaveBeenCalled();
   });
-
-  describe("with a discovery role context", () => {
-    beforeEach(() => {
-      (service as { discoveryRole?: () => string | null }).discoveryRole = () =>
-        "legacy-parity-analyst";
-    });
-
-    it.each(ROOT_ONLY_DISCOVERY_TOOLS.map((tool) => [tool]))(
-      "denies the root-only tool %s without resolving input",
-      async (tool) => {
-        const result = await dispatchRepoAutomationTool(
-          tool,
-          { workspace_root: WS },
-          service,
-        );
-        expect(result.ok).toBe(false);
-        expect(result.summary).toContain("DISCOVERY_ROLE_DENIED");
-        expect(result.summary).toContain(tool);
-        for (const method of Object.values(service)) {
-          if (typeof method === "function" && "mock" in method) {
-            expect(method).not.toHaveBeenCalled();
-          }
-        }
-      },
-    );
-
-    it("still allows diagnostics, bounded reads and artifact replacement under a consumed grant", async () => {
-      // Controlled calls of a role consume one native grant each (P12-T4 gate)
-      // and carry its reference; doctor is not controlled and needs none.
-      const invocationRef = "invocation-0123456789abcdef0001";
-      const authorizationRef = "authz-alpha-0000000000000001";
-      service.consumeDiscoveryToolAuthorization!.mockReturnValue(
-        authorizationRef,
-      );
-      service.runDiscoveryDoctor.mockResolvedValue(
-        success("run_discovery_doctor"),
-      );
-      service.readDiscoverySource.mockResolvedValue(
-        success("read_discovery_source"),
-      );
-      service.updateDiscoveryArtifact.mockResolvedValue(
-        success("update_discovery_artifact"),
-      );
-      expect(
-        (
-          await dispatchRepoAutomationTool(
-            "run_discovery_doctor",
-            { workspace_root: WS },
-            service,
-          )
-        ).ok,
-      ).toBe(true);
-      expect(
-        (
-          await dispatchRepoAutomationTool(
-            "read_discovery_source",
-            {
-              workspace_root: WS,
-              read_operation: "list",
-              paths: ["src"],
-              invocation_ref: invocationRef,
-            },
-            service,
-          )
-        ).ok,
-      ).toBe(true);
-      expect(
-        (
-          await dispatchRepoAutomationTool(
-            "update_discovery_artifact",
-            {
-              workspace_root: WS,
-              artifact_kind: "feature-contract",
-              artifact_path: "a",
-              input_path: "b",
-              expected_sha256: null,
-              update_action: "replace",
-              invocation_ref: invocationRef,
-            },
-            service,
-          )
-        ).ok,
-      ).toBe(true);
-      expect(service.consumeDiscoveryToolAuthorization).toHaveBeenCalledTimes(
-        2,
-      );
-      expect(service.readDiscoverySource).toHaveBeenCalledWith(
-        expect.objectContaining({ invocationRef, authorizationRef }),
-      );
-      expect(service.updateDiscoveryArtifact).toHaveBeenCalledWith(
-        expect.objectContaining({ invocationRef, authorizationRef }),
-      );
-    });
-
-    it("refuses a controlled call that names no invocation before the service", async () => {
-      const result = await dispatchRepoAutomationTool(
-        "read_discovery_source",
-        { workspace_root: WS, read_operation: "list", paths: ["src"] },
-        service,
-      );
-      expect(result.ok).toBe(false);
-      expect(result.summary).toContain("invocation_ref");
-      expect(service.readDiscoverySource).not.toHaveBeenCalled();
-      expect(service.consumeDiscoveryToolAuthorization).not.toHaveBeenCalled();
-    });
-
-    it("denies decision approval to a role", async () => {
-      const result = await dispatchRepoAutomationTool(
-        "update_discovery_artifact",
-        {
-          workspace_root: WS,
-          artifact_kind: "product-decision",
-          artifact_path: "a",
-          input_path: "b",
-          expected_sha256: SHA,
-          update_action: "approve-decision",
-          artifact_id: "d",
-          approval_owner: "o",
-          approval_evidence_refs: ["e"],
-        },
-        service,
-      );
-      expect(result.ok).toBe(false);
-      expect(result.summary).toContain(
-        "approve-decision is a root-only update",
-      );
-      expect(service.updateDiscoveryArtifact).not.toHaveBeenCalled();
-    });
-  });
 });
 
 describe("discovery tools over the MCP transport", () => {
@@ -460,11 +346,15 @@ describe("discovery tools over the MCP transport", () => {
       tool: "run_discovery_doctor",
     });
 
-    (service as { discoveryRole?: () => string | null }).discoveryRole = () =>
-      "requirements-reconciler";
+    service.consumeDiscoveryRootGrant!.mockImplementation(() => {
+      throw new DiscoveryAuthorizationError(
+        "DISCOVERY_HOST_BINDING_REQUIRED",
+        "no root grant",
+      );
+    });
     const denied = await client.callTool({
-      name: "prepare_discovery_agent",
-      arguments: { workspace_root: WS },
+      name: "read_discovery_source",
+      arguments: { workspace_root: WS, read_operation: "list", paths: ["src"] },
     });
     const deniedText = (
       denied.content as Array<{ type: string; text: string }>
@@ -473,10 +363,10 @@ describe("discovery tools over the MCP transport", () => {
     expect(JSON.parse(deniedText.text)).toEqual(denied.structuredContent);
     expect(denied.structuredContent).toMatchObject({
       ok: false,
-      tool: "prepare_discovery_agent",
+      tool: "read_discovery_source",
     });
     expect((denied.structuredContent as { summary: string }).summary).toContain(
-      "DISCOVERY_ROLE_DENIED",
+      "DISCOVERY_HOST_BINDING_REQUIRED",
     );
   });
 });

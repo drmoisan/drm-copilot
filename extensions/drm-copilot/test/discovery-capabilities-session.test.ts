@@ -20,6 +20,7 @@ import {
   DISCOVERY_ENFORCEMENT_UNAVAILABLE,
   DISCOVERY_ENFORCEMENT_VERIFIED,
   isCallerCapabilityClaim,
+  missingContextAssessment,
   projectCapabilityDiagnostics,
 } from "../src/discovery-capabilities";
 import {
@@ -101,6 +102,13 @@ describe("assessProtectedCapability and caller claims", () => {
     expect(
       kind({ ...base, context: { host: "codex", sessionId: "" } }),
     ).toEqual(["context-missing"]);
+    // A call without a root grant supplies no context at all; the deficiency is the same.
+    expect(missingContextAssessment(null)).toEqual(
+      missingContextAssessment({ host: "", sessionId: "session-alpha" }),
+    );
+    expect(
+      missingContextAssessment({ host: "codex", sessionId: "session-alpha" }),
+    ).toBeNull();
     expect(kind({ ...base, runtime: null })).toEqual(["runtime-mismatch"]);
     const inactive = {
       envelope: () => {

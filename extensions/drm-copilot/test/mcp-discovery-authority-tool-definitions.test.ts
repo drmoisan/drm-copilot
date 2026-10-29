@@ -66,13 +66,13 @@ function enumOf(name: string, property: string): string[] | undefined {
 }
 
 describe("discovery tool definitions", () => {
-  it("advertises all eighteen discovery tools in union order", () => {
+  it("advertises all nineteen discovery tools in union order", () => {
     const start = REPO_AUTOMATION_TOOLS.indexOf("validate_discovery_artifacts");
     expect(DISCOVERY_TOOL_DEFINITIONS.map((entry) => entry.name)).toEqual(
       REPO_AUTOMATION_TOOLS.slice(start),
     );
-    expect(DISCOVERY_TOOL_DEFINITIONS).toHaveLength(18);
-    expect(REPO_AUTOMATION_TOOLS).toHaveLength(42);
+    expect(DISCOVERY_TOOL_DEFINITIONS).toHaveLength(19);
+    expect(REPO_AUTOMATION_TOOLS).toHaveLength(43);
   });
 
   it.each(
@@ -185,6 +185,7 @@ describe("discovery tool definitions", () => {
     // request_id is optional: a discovery agent omits it and the receipt
     // correlation comes from the host gate's consumed authorization reference.
     ["finalize_discovery_agent", ["workspace_root", "invocation_ref"]],
+    ["discovery_capability_sentinel", ["workspace_root"]],
   ])("%s requires exactly %j", (name, required) => {
     expect(definition(name).inputSchema.required).toEqual(required);
   });

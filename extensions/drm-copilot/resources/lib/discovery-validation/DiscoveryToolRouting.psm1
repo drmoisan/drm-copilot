@@ -39,6 +39,8 @@ $script:ControlledToolOperations = [ordered]@{
     run_discovery_report              = @('coverage-report', 'parity-report', 'completion-report')
     validate_discovery_artifacts      = @('profile', 'validate-profile', 'validate-feature-contract', 'validate-coverage-ledger', 'validate-runtime-scenario', 'validate-parity-matrix', 'validate-unspecified-behavior', 'validate-product-decision', 'validate-evidence-reference', 'validate-decisions', 'validate-all')
     finalize_discovery_agent          = @('finalize-agent')
+    # The sentinel tool is listed so the gate and the server agree on its operation; the gate routes it to an observation, never to a grant.
+    discovery_capability_sentinel     = @('sentinel')
 }
 $script:RootOnlyOperations = @('init', 'configure', 'snapshot-export', 'snapshot-import', 'import-inventory', 'migrate', 'doctor', 'prepare-agent')
 $script:RootOnlyTools = @('run_discovery_init', 'configure_discovery_workspace', 'prepare_discovery_agent', 'run_discovery_doctor', 'transfer_discovery_snapshot', 'import_discovery_inventory', 'migrate_discovery_artifacts')

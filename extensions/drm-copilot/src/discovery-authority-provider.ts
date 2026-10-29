@@ -1,11 +1,15 @@
 /**
- * Supply the trusted host context and protected-store adapters the discovery
- * agent lifecycle operations (prepare, finalize) consume.
+ * Supply the protected-store adapters, clock and nonce the discovery agent
+ * lifecycle operations (prepare, finalize, doctor, controlled calls) consume.
  *
- * The provider is the only place production wiring reads the process
- * environment, platform and clock for discovery authority. Everything it
- * returns is injectable so the service can be tested with in-memory stores and
- * fixed identities; nothing in a request can substitute for these values.
+ * The provider is the only place production wiring reads the platform, the
+ * state-directory environment and the clock for discovery authority. It
+ * exposes no identity: host, session, parent and agent values come only from
+ * the one-use records the native hooks wrote (root grants, tool authorizations
+ * and host observations), which the service consumes through this provider's
+ * store seam. Everything here is injectable so the service can be tested with
+ * in-memory stores and fixed clocks; nothing in a request can substitute for
+ * these values.
  */
 
 import { randomBytes } from "node:crypto";
@@ -28,20 +32,9 @@ import {
   createNodeInputReader,
   type InputBytesReader,
 } from "./discovery-input-manifest";
-import type { PrepareContext } from "./discovery-invocation";
-
-/** Host-verified identity of the agent the current process serves, if any. */
-export interface DiscoveryAgentContext {
-  readonly agentId: string;
-  readonly role: string;
-}
 
 export interface DiscoveryAuthorityProvider {
-  /** Trusted root launch context (host, session, parent agent, parent role). */
-  readonly context: PrepareContext;
-  /** Agent identity when this service runs for a discovery specialist. */
-  readonly agent: DiscoveryAgentContext | null;
-  /** Protected store seam with directory listing for one-use authorizations. */
+  /** Protected store seam with directory listing for one-use records. */
   readonly io: AuthorizationStoreIO;
   readonly reader: InputBytesReader;
   readonly writer: Omit<ReceiptWriter, "kind" | "host">;
@@ -53,14 +46,8 @@ export interface DiscoveryAuthorityProvider {
   nonce(): string;
 }
 
-/** Environment keys the native host adapters populate for the gateway. */
+/** Environment keys the provider reads; both locate the user state directory. */
 export const DISCOVERY_ENVIRONMENT_KEYS = {
-  host: "DRM_DISCOVERY_HOST",
-  sessionId: "DRM_DISCOVERY_SESSION_ID",
-  parentAgentId: "DRM_DISCOVERY_PARENT_AGENT_ID",
-  parentRole: "DRM_DISCOVERY_PARENT_ROLE",
-  agentId: "DRM_DISCOVERY_AGENT_ID",
-  agentRole: "DRM_DISCOVERY_AGENT_ROLE",
   localAppData: "LOCALAPPDATA",
   xdgStateHome: "XDG_STATE_HOME",
 } as const;
@@ -115,19 +102,7 @@ export function createNodeDiscoveryAuthorityProvider(
   const homedir = options.homedir ?? os.homedir();
   const io = options.io ?? createNodeAuthorizationStoreIO();
   const nonce = options.nonce ?? (() => randomBytes(16).toString("hex"));
-  const agentId = env[DISCOVERY_ENVIRONMENT_KEYS.agentId];
-  const agentRole = env[DISCOVERY_ENVIRONMENT_KEYS.agentRole];
   return {
-    context: {
-      host: env[DISCOVERY_ENVIRONMENT_KEYS.host] ?? "",
-      sessionId: env[DISCOVERY_ENVIRONMENT_KEYS.sessionId] ?? "",
-      parentAgentId: env[DISCOVERY_ENVIRONMENT_KEYS.parentAgentId] ?? "",
-      parentRole: env[DISCOVERY_ENVIRONMENT_KEYS.parentRole] ?? null,
-    },
-    agent:
-      agentId !== undefined && agentRole !== undefined
-        ? { agentId, role: agentRole }
-        : null,
     io,
     reader: options.reader ?? createNodeInputReader(),
     writer: options.writer ?? {

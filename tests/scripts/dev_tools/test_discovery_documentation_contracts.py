@@ -200,7 +200,7 @@ def test_cli_reference_lists_every_discovery_mcp_tool_and_command() -> None:
     reference = page("cli-reference.md")
     for tool in tools:
         assert f"`{tool}`" in reference, f"MCP tool {tool} is not documented"
-    assert len(tools) == 18
+    assert len(tools) == 19
     manifest = json.loads(read("extensions/drm-copilot/package.json"))
     commands = sorted(
         entry["command"]

@@ -193,8 +193,8 @@
     },
     {
       "path": "schemas/discovery/v2/tool-authorization.schema.json",
-      "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8",
-      "size": 4288
+      "sha256": "13a2f49e06770302dd202aef62c17895f541c9169db8daf30fdeab44594f7675",
+      "size": 4349
     },
     {
       "path": "schemas/discovery/v2/unspecified-behavior-collection.schema.json",

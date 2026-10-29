@@ -23,6 +23,7 @@ import {
 import type { RepoAutomationToolName } from "./repo-automation-tool-names";
 import type {
   ConfigureDiscoveryWorkspaceInput,
+  DiscoveryCapabilitySentinelInput,
   FinalizeDiscoveryAgentInput,
   ImportDiscoveryInventoryInput,
   MigrateDiscoveryArtifactsInput,
@@ -33,13 +34,15 @@ import type {
 } from "./repo-automation-service-discovery-types";
 
 /**
- * Enum constants, role-denial policy and input resolvers for the root-authority
- * and agent-lifecycle discovery tools (configure, transfer, import, migrate,
- * doctor, read, prepare, finalize).
+ * Enum constants and input resolvers for the root-authority and
+ * agent-lifecycle discovery tools (configure, transfer, import, migrate,
+ * doctor, read, prepare, finalize, sentinel).
  *
- * Root-only tools are refused at dispatch when the service reports a discovery
- * role context; the diagnostic `run_discovery_doctor` and the bounded
- * `read_discovery_source` remain available to roles.
+ * Root-only tools carry no identity in their input. Prepare, doctor and the
+ * sentinel keep the raw tool input beside the resolved fields (`toolInputs`),
+ * because the service consumes the host gate's one-use record by the digest of
+ * exactly that input; the service, not the caller, decides what the record
+ * admits.
  */
 export const CONFIGURATION_ACTIONS = ["activate", "deactivate"] as const;
 export const TRANSFER_DIRECTIONS = ["export", "import"] as const;
@@ -68,14 +71,6 @@ export function isDiscoveryRole(
   role: string | null | undefined,
 ): role is string {
   return typeof role === "string" && DISCOVERY_ROLES.includes(role);
-}
-
-/** Message for a root-only tool invoked by a discovery role. */
-export function discoveryRoleDeniedMessage(
-  tool: RepoAutomationToolName,
-  role: string,
-): string {
-  return `DISCOVERY_ROLE_DENIED: ${tool} is a root-only operation and is not available to the ${role} role.`;
 }
 
 export function resolveConfigureDiscoveryWorkspaceToolInput(
@@ -198,10 +193,22 @@ export function resolveRunDiscoveryDoctorToolInput(
   rawInput: unknown,
   fallbackWorkspaceRoot?: string,
 ): RunDiscoveryDoctorInput {
-  return resolveDiscoveryWorkspaceInput(
-    asToolArgumentObject(rawInput),
-    fallbackWorkspaceRoot,
-  );
+  const args = asToolArgumentObject(rawInput);
+  return {
+    ...resolveDiscoveryWorkspaceInput(args, fallbackWorkspaceRoot),
+    toolInputs: args,
+  };
+}
+
+export function resolveDiscoveryCapabilitySentinelToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): DiscoveryCapabilitySentinelInput {
+  const args = asToolArgumentObject(rawInput);
+  return {
+    ...resolveDiscoveryWorkspaceInput(args, fallbackWorkspaceRoot),
+    toolInputs: args,
+  };
 }
 
 export function resolveReadDiscoverySourceToolInput(
@@ -304,6 +311,7 @@ export function resolvePrepareDiscoveryAgentToolInput(
       "orchestration_complexity_ceiling",
       COMPLEXITY_BANDS,
     ),
+    toolInputs: args,
   });
 }
 

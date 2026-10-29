@@ -15,9 +15,9 @@ import * as path from "node:path";
 import { invocationDirectory } from "../src/discovery-authority-paths";
 import {
   authorizationsDirectory,
-  consumeToolAuthorizationByBinding,
   type ToolAuthorizationRecord,
 } from "../src/discovery-authorization";
+import { consumeToolAuthorizationByBinding } from "../src/discovery-authorization-binding";
 import { computeInputDigest } from "../src/discovery-authorization-record";
 import { finalizeDiscoveryInvocation } from "../src/discovery-finalization";
 import { requireCurrentReceipt } from "../src/discovery-finalization";
@@ -55,6 +55,7 @@ import {
   RUNTIME,
   seeded,
 } from "./discovery-invocation-test-support";
+import { startInvocation } from "./discovery-grant-test-support";
 import { digestOf, MemoryInputReader } from "./discovery-store-test-helpers";
 import { buildServiceResult } from "./discovery-test-helpers";
 
@@ -151,7 +152,8 @@ describe("discovery host workflow", () => {
       role: prepared.record.role,
       invocation_id: invocationId,
     };
-    const trusted = { workspace: WS, identity };
+    // The native start hook binds the agent; the gate then consumes by invocation_ref.
+    startInvocation(io, invocationId, VECTORS.identity.agent_id);
     const grant = VECTORS.authorizations["read-source"]!;
     const record: ToolAuthorizationRecord = {
       ...authorizationVectors.records.issued,
@@ -235,7 +237,7 @@ describe("discovery host workflow", () => {
         inputs: READ_INPUT,
         invocationRef: invocationId,
       },
-      trusted,
+      workspace: WS,
       now: CONSUME_AT,
     });
     const replay = refusalCode(() =>
@@ -248,7 +250,7 @@ describe("discovery host workflow", () => {
           inputs: READ_INPUT,
           invocationRef: invocationId,
         },
-        trusted,
+        workspace: WS,
         now: CONSUME_AT,
       }),
     );

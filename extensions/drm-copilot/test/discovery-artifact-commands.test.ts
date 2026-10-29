@@ -33,46 +33,6 @@ const WORKSPACE_ROOT = "C:/workspace";
 const SHA = "a".repeat(64);
 let spawnedProcesses: MockChildProcess[] = [];
 
-/** Process environment keys that carry the trusted discovery agent identity. */
-const IDENTITY_KEYS = [
-  "DRM_DISCOVERY_AGENT_ID",
-  "DRM_DISCOVERY_AGENT_ROLE",
-  "DRM_DISCOVERY_HOST",
-  "DRM_DISCOVERY_SESSION_ID",
-] as const;
-
-/**
- * Run `body` with the identity keys set to `values` (an absent key is removed)
- * and restore every key afterwards, so no test leaks process environment.
- */
-async function withIdentityEnvironment(
-  values: Partial<Record<(typeof IDENTITY_KEYS)[number], string>>,
-  body: () => Promise<void>,
-): Promise<void> {
-  const saved = IDENTITY_KEYS.map((key) => [key, process.env[key]] as const);
-  // Apply the requested identity: set supplied keys and clear the others.
-  for (const key of IDENTITY_KEYS) {
-    const value = values[key];
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
-  try {
-    await body();
-  } finally {
-    // Restore the exact prior environment, including keys that were absent.
-    for (const [key, value] of saved) {
-      if (value === undefined) {
-        delete process.env[key];
-      } else {
-        process.env[key] = value;
-      }
-    }
-  }
-}
-
 function stdinRequest(callIndex = 0): Record<string, unknown> {
   const child = spawnedProcesses[callIndex];
   if (child === undefined || child.stdin.written.length !== 1) {
@@ -107,32 +67,23 @@ describe("discovery artifact commands", () => {
     }
   });
 
-  it("createDiscoveryArtifact direct invocation drafts a feature contract under a grant", async () => {
-    await withIdentityEnvironment(
-      {
-        DRM_DISCOVERY_AGENT_ID: "agent-alpha",
-        DRM_DISCOVERY_AGENT_ROLE: "legacy-parity-analyst",
-        DRM_DISCOVERY_HOST: "claude-code",
-        DRM_DISCOVERY_SESSION_ID: "session-alpha",
-      },
-      async () => {
-        const handler = activateAndGetHandler(
-          "drmCopilotExtension.createDiscoveryArtifact",
-        );
-        await handler({
-          artifact_kind: "feature-contract",
-          feature_id: "orders.export",
-          name: "Order export",
-          invocation_ref: "invocation-alpha-0000000001",
-          write: true,
-        });
-      },
+  it("createDiscoveryArtifact direct invocation drafts a feature contract as a structural root request", async () => {
+    // An extension command is a root call that no host gate observed; it carries
+    // no invocation reference and runs under the local-user principal.
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.createDiscoveryArtifact",
     );
+    await handler({
+      artifact_kind: "feature-contract",
+      feature_id: "orders.export",
+      name: "Order export",
+      write: true,
+    });
     expect(stdinRequest()).toMatchObject({
       operation: "new-contract",
-      mode: "agent-output",
+      mode: "structural",
       write: true,
-      invocation_ref: "invocation-alpha-0000000001",
+      invocation_ref: null,
       inputs: { feature_id: "orders.export", name: "Order export" },
     });
     const args = (
@@ -140,38 +91,27 @@ describe("discovery artifact commands", () => {
     )[1];
     expect(
       args.slice(args.indexOf("--principal"), args.indexOf("--principal") + 2),
-    ).toEqual(["--principal", "host"]);
-    expect(args).toEqual(
-      expect.arrayContaining([
-        "--author-id",
-        "agent-alpha",
-        "--session-id",
-        "session-alpha",
-        "--host-name",
-        "claude-code",
-        "--agent-role",
-        "legacy-parity-analyst",
-      ]),
-    );
+    ).toEqual(["--principal", "local-user"]);
+    expect(args).not.toContain("--session-id");
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(showInputBoxMock).not.toHaveBeenCalled();
   });
 
-  it("createDiscoveryArtifact refuses a granted draft from a process without a trusted agent identity", async () => {
-    await withIdentityEnvironment({}, async () => {
-      const handler = activateAndGetHandler(
-        "drmCopilotExtension.createDiscoveryArtifact",
-      );
-      await expect(
-        handler({
-          artifact_kind: "feature-contract",
-          feature_id: "orders.export",
-          name: "Order export",
-          invocation_ref: "invocation-alpha-0000000001",
-          write: true,
-        }),
-      ).rejects.toThrow("DISCOVERY_AGENT_IDENTITY_REQUIRED");
-    });
+  it("createDiscoveryArtifact refuses a granted draft when no host gate consumed an authorization for it", async () => {
+    // The extension process holds no identity; a request bound to an invocation
+    // is admitted only through a consumed one-use record, which no command has.
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.createDiscoveryArtifact",
+    );
+    await expect(
+      handler({
+        artifact_kind: "feature-contract",
+        feature_id: "orders.export",
+        name: "Order export",
+        invocation_ref: "invocation-alpha-0000000001",
+        write: true,
+      }),
+    ).rejects.toThrow("DISCOVERY_HOST_BINDING_REQUIRED");
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 

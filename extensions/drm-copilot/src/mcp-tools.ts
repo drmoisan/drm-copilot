@@ -42,6 +42,7 @@ import { handleResolveExecuteHardLockPrompt } from "./mcp-handlers/resolve-execu
 import {
   handleConfigureDiscoveryWorkspace,
   handleCreateDiscoveryArtifact,
+  handleDiscoveryCapabilitySentinel,
   handleFinalizeDiscoveryAgent,
   handleImportDiscoveryInventory,
   handleLinkDiscoveryEvidence,
@@ -59,15 +60,11 @@ import {
   handleUpdateDiscoveryArtifact,
   handleValidateDiscoveryArtifacts,
 } from "./mcp-handlers/discovery-handlers";
-import {
-  discoveryRoleDeniedMessage,
-  isDiscoveryRole,
-  isRootOnlyDiscoveryTool,
-} from "./mcp-tool-inputs-discovery-authority";
 import type {
   DiscoveryServiceResult,
   FinalizedReceiptSummary,
   PreparedInvocationSummary,
+  SentinelObservationSummary,
 } from "./repo-automation-service-discovery-types";
 import { handleRenderSubagentTree } from "./mcp-handlers/render-subagent-tree-handler";
 import {
@@ -111,6 +108,7 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly discovery?: DiscoveryServiceResult;
   readonly invocation?: PreparedInvocationSummary;
   readonly receipt?: FinalizedReceiptSummary;
+  readonly sentinel?: SentinelObservationSummary;
 }
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -165,6 +163,7 @@ function toMcpToolResult(
       ? {}
       : { invocation: result.invocation }),
     ...(result.receipt === undefined ? {} : { receipt: result.receipt }),
+    ...(result.sentinel === undefined ? {} : { sentinel: result.sentinel }),
   };
 }
 
@@ -206,17 +205,6 @@ export async function dispatchRepoAutomationTool(
   service: RepoAutomationService,
 ): Promise<RepoAutomationMcpToolResult> {
   const workspaceRoot = inferWorkspaceRoot(rawInput);
-
-  // Root-only discovery tools are refused for a trusted discovery role before
-  // any input is resolved; the role comes from the service, never the request.
-  const role = service.discoveryRole?.() ?? null;
-  if (isRootOnlyDiscoveryTool(toolName) && isDiscoveryRole(role)) {
-    return toFailureToolResult(
-      toolName,
-      workspaceRoot,
-      new Error(discoveryRoleDeniedMessage(toolName, role)),
-    );
-  }
 
   try {
     switch (toolName) {
@@ -446,6 +434,12 @@ export async function dispatchRepoAutomationTool(
       case "finalize_discovery_agent": {
         return toMcpToolResult(
           await handleFinalizeDiscoveryAgent(rawInput, service),
+        );
+      }
+
+      case "discovery_capability_sentinel": {
+        return toMcpToolResult(
+          await handleDiscoveryCapabilitySentinel(rawInput, service),
         );
       }
     }
