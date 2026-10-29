@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, cast
 
 from drm_copilot_discovery.findings import validate_finding_path
@@ -263,12 +263,15 @@ class SchemaCatalog:
     """Hold the complete immutable schema set; expose fresh validator inputs.
 
     Prefer load_catalog to bind installed hashes before construction. The catalog
-    verifies identities, metaschemas and complete local reference closure, then
-    creates isolated validators on request. No network or writes are performed.
+    verifies identities, metaschemas and complete local reference closure once at
+    construction; validators are created per call over the shared registry. No
+    network or writes are performed.
     """
 
     documents: tuple[tuple[str, JsonObject], ...]
     extensions: tuple[ExtensionSchema, ...] = ()
+    # Built once by __post_init__; excluded from init, equality, hashing and repr.
+    _shared_registry: Registry[Schema] = field(init=False, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         """Require every fixed schema identity and prohibit injected alternatives."""
@@ -294,8 +297,13 @@ class SchemaCatalog:
         namespaces = [item.namespace for item in self.extensions]
         if len(set(namespaces)) != len(namespaces):
             raise CatalogError("Extension schema namespaces must be unique")
-        # Validate closure eagerly, including references in currently unused branches.
-        self.registry()
+        # Validate closure eagerly, including references in currently unused branches,
+        # and keep the verified registry so later validations do not rebuild it.
+        object.__setattr__(
+            self,
+            "_shared_registry",
+            _registry(self.documents + self.extension_documents(), self.extensions),
+        )
 
     def schema(self, *, expected_kind: str, expected_version: str) -> dict[str, object]:
         """Resolve a trusted artifact kind and exact version, never an artifact URI."""
@@ -343,8 +351,16 @@ class SchemaCatalog:
         return tuple(documents)
 
     def registry(self) -> Registry[Schema]:
-        """Create isolated offline resolution state for each validator invocation."""
-        return _registry(self.documents + self.extension_documents(), self.extensions)
+        """Return the shared offline registry built and verified once at construction.
+
+        Sharing is safe because referencing.Registry is immutable: lookups and
+        resource additions return new registries or resolvers and never change
+        this one. No build, I/O or verification is performed by this call.
+
+        Returns:
+            Registry[Schema]: the catalog's verified registry, identical per call.
+        """
+        return self._shared_registry
 
 
 def load_catalog(

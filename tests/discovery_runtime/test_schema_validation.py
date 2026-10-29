@@ -376,3 +376,46 @@ def test_error_pointers_escape_arbitrary_domain_keys() -> None:
 
     assert not result.ok
     assert result.findings[0].pointer == "/extensions/example.review/a~1b~0c"
+
+
+def test_repeated_validations_through_one_catalog_are_independent() -> None:
+    """One catalog validates a sequence of documents with no state carried between.
+
+    The result of each validation equals the result for the same text through a
+    fresh catalog, and the registry resolves unchanged schema contents afterwards.
+    No object identity is asserted, so the test holds whether or not the catalog
+    shares one registry across validations.
+    """
+    catalog = load_catalog()
+    invalid = control_fixture("activation")
+    del invalid["enabled"]
+    texts = (
+        json.dumps(invalid),
+        json.dumps(control_fixture("activation")),
+        json.dumps(invalid),
+    )
+    before = catalog.registry().resolver().lookup(V2_URN + "activation").contents
+
+    # Validate the invalid, valid, invalid sequence through the same catalog.
+    shared = [
+        validate_document(
+            text, expected_kind="activation", expected_version="2.0.0", catalog=catalog
+        )
+        for text in texts
+    ]
+    # Validate each text again through its own freshly loaded catalog.
+    fresh = [
+        validate_document(
+            text,
+            expected_kind="activation",
+            expected_version="2.0.0",
+            catalog=load_catalog(),
+        )
+        for text in texts
+    ]
+    after = catalog.registry().resolver().lookup(V2_URN + "activation").contents
+
+    assert shared == fresh
+    assert shared[0] == shared[2] and not shared[0].ok
+    assert shared[1].ok
+    assert after == before
