@@ -41,6 +41,7 @@ _REQUIRED_HEADINGS = (
     "## Preflight Defect Classes the Validator Cannot See",
     "## Evidence and Documentation Rules",
     "## Coverage and File-Size Gates",
+    "## Test Runtime",
     "## Test Isolation Checks",
 )
 _REQUIRED_CONTEXTS = (
@@ -449,3 +450,28 @@ def test_brief_test_isolation_requires_seeded_pester_shuffle() -> None:
 
     # Assert
     assert missing == [], f"Test Isolation Checks lacks {missing}"
+
+
+def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> None:
+    """The runtime section diagnoses and fixes repeated work before any sharding."""
+
+    # Arrange
+    section = _section("## Test Runtime")
+
+    # Act
+    missing = _missing(
+        section,
+        (
+            "--junitxml",
+            "cProfile",
+            "pstats",
+            "built once per owning instance",
+            "its own copy",
+            "wall-clock time only",
+            "-p <module>",
+            "PYTHONPATH",
+        ),
+    )
+
+    # Assert
+    assert missing == [], f"Test Runtime lacks {missing}"
