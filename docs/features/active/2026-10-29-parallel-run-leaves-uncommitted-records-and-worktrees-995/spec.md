@@ -210,7 +210,7 @@ Recorded at execution of `plan.2026-10-29T05-58.md`:
 - [x] Line coverage is at least 85% for each changed or added PowerShell file, read from `artifacts/pester/powershell-coverage.xml`.
 - [x] The local toolchain passes in a single pass (format, lint, Pester suites named in Test Strategy, including three seeded shuffled runs and one single-process full run recorded under `evidence/regression-testing/`).
 - [x] Docs and config references (`parallel-orchestration.md` line describing the parallel allow branch, the stale agent-memory note) match the new behavior.
-- [ ] (pending-CI) The Pester suites named in Test Strategy pass in CI on the pull request head, with `ci_gate.conclusion` `success` and `ci_gate.head_sha` equal to the final PR head. This criterion is verified and checked off by the item's own orchestrator run at S9, not before CI has run.
+- [x] (CI verified on head f99f0bca0568674cd66e4a80fd4e5c86ea301be4, PR #998) The Pester suites named in Test Strategy pass in CI on the pull request head, with `ci_gate.conclusion` `success` and `ci_gate.head_sha` equal to the final PR head. This criterion is verified and checked off by the item's own orchestrator run at S9, not before CI has run.
 
 ### Acceptance Criteria Evidence
 Criteria are numbered AC-1 through AC-20 in list order. Paths are relative to this feature folder.
@@ -233,7 +233,7 @@ Criteria are numbered AC-1 through AC-20 in list order. Paths are relative to th
 - AC-17: `evidence/qa-gates/coverage-comparison.2026-10-29T11-41.md`.
 - AC-18: `evidence/qa-gates/poshqc-format.2026-10-29T11-21.md`, `evidence/qa-gates/pssa.2026-10-29T11-21.md`, `evidence/qa-gates/pester-coverage.2026-10-29T11-40.md` (fresh single-process full run), `evidence/regression-testing/isolation.2026-10-29T11-44.md` (three seeded shuffled runs).
 - AC-19: `.claude/rules/parallel-orchestration.md` `## Enforcement` bullet names `Test-WorktreeRunRecordedPathMatchesTarget` (`evidence/qa-gates/python-contracts.2026-10-29T11-41.md`, test_claude_rules_frontmatter.py); the agent-memory note was updated in the executing checkout only, because `.claude/agent-memory/` is ignored by git (see `## Implementation Deviations`).
-- AC-20: pending CI; checked off by the item's own orchestrator run at S9.
+- AC-20: CI on PR #998 passed every check on head f99f0bca0568674cd66e4a80fd4e5c86ea301be4 (`gh pr checks 998` reported no failing or pending check); checked off by the item's own orchestrator run at S9.
 
 ## Risks & Mitigations
 - Technical or operational risks:
