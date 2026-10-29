@@ -4,13 +4,13 @@
 
 .DESCRIPTION
     The SubagentStart adapters of Claude Code, Codex and GitHub Copilot share these
-    primitives: the discovery agent-type grammar (four roles with an optional
-    complexity suffix), the per-host agent profile location and its Markdown
-    front-matter reader, UTC instant coercion for record timestamps, the started
-    transition of a protected invocation record (System.Text.Json preserves every
-    untouched value verbatim), the `start-attestation` record and the real
-    filesystem store seams. Nothing here reads an environment value or decides;
-    the decision lives in DiscoveryStart.psm1.
+    primitives: the per-host agent profile location and its Markdown front-matter
+    reader, UTC instant coercion for record timestamps, the started transition of
+    a protected invocation record (System.Text.Json preserves every untouched
+    value verbatim), the `start-attestation` record and the real filesystem store
+    seams. The discovery agent-type grammar lives in DiscoveryPayload.psm1
+    (`Get-DiscoveryAgentRole`). Nothing here reads an environment value or
+    decides; the decision lives in DiscoveryStart.psm1.
 
 .NOTES
     Issue #980. Compatible with PowerShell 7+. Depends only on the sibling
@@ -25,30 +25,11 @@ Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -ErrorAction St
 
 $script:StartAttestationSchema = 'urn:drm-copilot:discovery:2.0.0:start-attestation'
 $script:StartAttestationFile = 'start-attestation.json'
-$script:DiscoveryAgentTypePattern = '^(?<role>legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer)(?:-c(?:1|2|3|4|3-elevated))?$'
 # Where each host keeps the generated specialist profile the root launches.
 $script:AgentProfileLayout = @{
     'claude-code'    = @{ Directory = '.claude/agents'; Suffix = '.md' }
     'codex'          = @{ Directory = '.codex/agents'; Suffix = '.toml' }
     'github-copilot' = @{ Directory = '.github/agents'; Suffix = '.agent.md' }
-}
-
-function Get-DiscoveryAgentRole {
-    <#
-    .SYNOPSIS
-        Returns the discovery role named by a native agent type, or $null for any other agent.
-    .DESCRIPTION
-        `legacy-parity-analyst-c3` and `legacy-parity-analyst` both name the
-        legacy-parity-analyst role; the comparison is case-sensitive.
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$AgentType)
-
-    if ([string]::IsNullOrWhiteSpace($AgentType)) { return $null }
-    $match = [regex]::Match($AgentType, $script:DiscoveryAgentTypePattern)
-    if (-not $match.Success) { return $null }
-    return $match.Groups['role'].Value
 }
 
 function Get-DiscoveryAgentProfilePath {
@@ -305,7 +286,6 @@ function Get-DiscoveryStartAttestationFileName {
 }
 
 Export-ModuleMember -Function `
-    Get-DiscoveryAgentRole, `
     Get-DiscoveryAgentProfilePath, `
     ConvertFrom-DiscoveryMarkdownProfile, `
     Read-DiscoveryAgentProfile, `

@@ -6,9 +6,10 @@
     Dot-sourced by the DiscoveryAuthorization module suite and by the Claude, Codex and
     Copilot hook suites. Builds an in-memory protected store (activation record,
     started invocation record) keyed to the shared cross-runtime fixtures, the
-    attested environment table, the trusted host environment, and host-shaped
-    PreToolUse envelopes. Every store operation is a seam over a hashtable; no file,
-    process, network or clock is touched.
+    trusted host environment, and host-shaped PreToolUse envelopes that carry the
+    payload identity (agent id, agent type, parent) the gate attributes. Every
+    store operation is a seam over a hashtable; no file, process, network or
+    clock is touched.
 #>
 
 Set-StrictMode -Version Latest
@@ -23,30 +24,6 @@ $script:GateNonce = '0123456789abcdef0123'
 $script:GateHostEnvironment = @{ Platform = 'windows'; UserHome = 'C:/Users/Example'; LocalAppData = 'C:/Users/Example/AppData/Local'; XdgStateHome = $null }
 $script:GateLocation = Resolve-DiscoveryAuthorityLocation -WorkspaceRoot $script:GateWorkspaceRoot -Platform 'windows' -UserHome 'C:/Users/Example' -LocalAppData 'C:/Users/Example/AppData/Local'
 $script:GateInvocationDirectory = Get-DiscoveryInvocationDirectory -Location $script:GateLocation -SessionId 'session-alpha' -InvocationId 'invocation-alpha'
-
-function Get-GateEnvironment {
-    <#
-    .SYNOPSIS
-        Returns the attested DRM_DISCOVERY_* table for host HostName, optionally without an agent.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $false)][string]$HostName = 'claude-code',
-        [Parameter(Mandatory = $false)][switch]$NoAgent
-    )
-
-    $table = @{
-        DRM_DISCOVERY_HOST            = $HostName
-        DRM_DISCOVERY_SESSION_ID      = 'session-alpha'
-        DRM_DISCOVERY_PARENT_AGENT_ID = 'root-alpha'
-        DRM_DISCOVERY_PARENT_ROLE     = $null
-        DRM_DISCOVERY_AGENT_ID        = 'agent-alpha'
-        DRM_DISCOVERY_AGENT_ROLE      = 'legacy-parity-analyst'
-    }
-    if ($NoAgent) { $table['DRM_DISCOVERY_AGENT_ID'] = $null; $table['DRM_DISCOVERY_AGENT_ROLE'] = $null }
-    return $table
-}
 
 function Get-GateActivationText {
     <#
@@ -154,7 +131,12 @@ function Get-GateStore {
 function Get-GateEnvelope {
     <#
     .SYNOPSIS
-        Builds a host-shaped PreToolUse envelope JSON for ToolName with ToolInput.
+        Builds a host-shaped PreToolUse envelope JSON for ToolName with ToolInput and the payload identity.
+    .DESCRIPTION
+        The defaults describe the specialist agent-alpha (legacy-parity-analyst) with
+        no parent field. Pass -AgentId $null -AgentType $null for a root envelope;
+        each of AgentId, AgentType and ParentAgentId is emitted only when non-null,
+        using the host's key spelling.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -164,13 +146,25 @@ function Get-GateEnvelope {
         [Parameter(Mandatory = $false)][AllowNull()][object]$ToolInput = @{},
         [Parameter(Mandatory = $false)][string]$SessionId = 'session-alpha',
         [Parameter(Mandatory = $false)][string]$Event = 'PreToolUse',
-        [Parameter(Mandatory = $false)][AllowNull()][string]$Cwd = $script:GateWorkspaceRoot
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Cwd = $script:GateWorkspaceRoot,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$AgentId = 'agent-alpha',
+        [Parameter(Mandatory = $false)][AllowNull()][string]$AgentType = 'legacy-parity-analyst',
+        [Parameter(Mandatory = $false)][AllowNull()][string]$ParentAgentId = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$ToolUseId = 'tool-use-alpha'
     )
 
     if ($HostName -eq 'github-copilot') {
-        $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = $Event; toolName = $ToolName; toolInput = $ToolInput; cwd = $Cwd; toolUseId = 'tool-use-alpha' }
+        $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = $Event; toolName = $ToolName; toolInput = $ToolInput; cwd = $Cwd }
+        if ($null -ne $ToolUseId) { $envelope['toolUseId'] = $ToolUseId }
+        if ($null -ne $AgentId) { $envelope['agentId'] = $AgentId }
+        if ($null -ne $AgentType) { $envelope['agentType'] = $AgentType }
+        if ($null -ne $ParentAgentId) { $envelope['parentAgentId'] = $ParentAgentId }
     } else {
-        $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = $Event; tool_name = $ToolName; tool_input = $ToolInput; cwd = $Cwd; tool_use_id = 'tool-use-alpha' }
+        $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = $Event; tool_name = $ToolName; tool_input = $ToolInput; cwd = $Cwd }
+        if ($null -ne $ToolUseId) { $envelope['tool_use_id'] = $ToolUseId }
+        if ($null -ne $AgentId) { $envelope['agent_id'] = $AgentId }
+        if ($null -ne $AgentType) { $envelope['agent_type'] = $AgentType }
+        if ($null -ne $ParentAgentId) { $envelope['parent_agent_id'] = $ParentAgentId }
     }
     return ($envelope | ConvertTo-Json -Compress -Depth 8)
 }

@@ -3,22 +3,24 @@
     Host event-envelope normalization and trusted principal attribution for discovery hooks.
 
 .DESCRIPTION
-    Claude Code, Codex and the GitHub Copilot local harness deliver hook events as
-    JSON envelopes with host-specific key spellings. This module normalizes each
-    supported envelope into one shape (host, event, session, agent, tool name,
-    tool input, working directory) and derives the trusted principal from the
-    attested host context: the envelope's session plus the `DRM_DISCOVERY_*`
-    values the native host adapter places in the process environment. Identity
-    never comes from caller arguments or tool input; when the attested context is
-    missing or contradicts the envelope the principal is unattributed and the
-    calling hook fails closed.
+    Claude Code, Codex and the GitHub Copilot harness deliver hook events as JSON
+    envelopes with host-specific key spellings. This module normalizes each
+    supported envelope into one shape (host, event, session, agent, parent, tool
+    name, tool input, working directory) and derives the trusted principal from
+    the payload alone: the host is fixed by which hook file runs, the session is
+    the envelope session, a specialist is an envelope that carries an `agent_id`
+    with a discovery `agent_type`, the root is an envelope without `agent_id`,
+    and the parent is the envelope parent when the host supplies one, else the
+    literal `root`. Identity never comes from caller arguments, tool input or the
+    process environment; when the envelope carries an anomaly the principal is
+    unattributed and the calling hook fails closed.
 
     Malformed envelopes are typed anomalies, never silent nulls, so a hook can emit
     one deny reason per contract leg that drifted.
 
 .NOTES
     Issue #980. Compatible with PowerShell 7+. No filesystem access, no subprocess,
-    no network, no wall-clock read.
+    no network, no wall-clock read, no environment read.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -26,21 +28,20 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $script:SupportedHosts = @('claude-code', 'codex', 'github-copilot')
-$script:EnvironmentKeys = @{
-    Host          = 'DRM_DISCOVERY_HOST'
-    SessionId     = 'DRM_DISCOVERY_SESSION_ID'
-    ParentAgentId = 'DRM_DISCOVERY_PARENT_AGENT_ID'
-    ParentRole    = 'DRM_DISCOVERY_PARENT_ROLE'
-    AgentId       = 'DRM_DISCOVERY_AGENT_ID'
-    AgentRole     = 'DRM_DISCOVERY_AGENT_ROLE'
-}
+$script:RootParentAgentId = 'root'
+# Identifier grammar shared with the sibling modules: one leading alphanumeric,
+# then alphanumerics, dot, underscore, colon or hyphen.
+$script:CorrelationIdPattern = '^[A-Za-z0-9][A-Za-z0-9._:-]*$'
+# The four discovery roles with their optional Codex complexity suffix.
+$script:DiscoveryAgentTypePattern = '^(?<role>legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer)(?:-c(?:1|2|3|4|3-elevated))?$'
 # Per-host envelope key spellings, most specific first. Claude Code and Codex use
-# snake_case; the Copilot local harness uses camelCase and may fall back to
-# snake_case for fields it shares with the Claude shape.
+# snake_case; the Copilot harness uses camelCase and may fall back to snake_case
+# for fields it shares with the Claude shape. Only Copilot documents a parent
+# identifier; the snake_case spelling is read on every host.
 $script:EnvelopeKeys = @{
-    'claude-code'    = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type'); ToolUseId = @('tool_use_id') }
-    'codex'          = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type'); ToolUseId = @('tool_use_id') }
-    'github-copilot' = @{ SessionId = @('sessionId', 'session_id'); Event = @('hookEventName', 'hook_event_name'); ToolName = @('toolName', 'tool_name'); ToolInput = @('toolInput', 'tool_input'); Cwd = @('cwd'); AgentId = @('agentId', 'agent_id'); AgentType = @('agentType', 'agent_type'); ToolUseId = @('toolUseId', 'tool_use_id') }
+    'claude-code'    = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type'); ToolUseId = @('tool_use_id'); ParentAgentId = @('parent_agent_id') }
+    'codex'          = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type'); ToolUseId = @('tool_use_id'); ParentAgentId = @('parent_agent_id') }
+    'github-copilot' = @{ SessionId = @('sessionId', 'session_id'); Event = @('hookEventName', 'hook_event_name'); ToolName = @('toolName', 'tool_name'); ToolInput = @('toolInput', 'tool_input'); Cwd = @('cwd'); AgentId = @('agentId', 'agent_id'); AgentType = @('agentType', 'agent_type'); ToolUseId = @('toolUseId', 'tool_use_id'); ParentAgentId = @('parentAgentId', 'parent_agent_id') }
 }
 $script:AnomalyReasonText = @{
     'EmptyEnvelope'      = 'the hook received no envelope object'
@@ -106,17 +107,36 @@ function Test-DiscoverySupportedHost {
     return $script:SupportedHosts -contains $HostName
 }
 
+function Get-DiscoveryAgentRole {
+    <#
+    .SYNOPSIS
+        Returns the discovery role named by a native agent type, or $null for any other agent.
+    .DESCRIPTION
+        `legacy-parity-analyst-c3` and `legacy-parity-analyst` both name the
+        legacy-parity-analyst role; the comparison is case-sensitive. The agent
+        type is the payload `agent_type` the host reports for the running agent.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$AgentType)
+
+    if ([string]::IsNullOrWhiteSpace($AgentType)) { return $null }
+    $match = [regex]::Match($AgentType, $script:DiscoveryAgentTypePattern)
+    if (-not $match.Success) { return $null }
+    return $match.Groups['role'].Value
+}
+
 function ConvertFrom-DiscoveryHostEnvelope {
     <#
     .SYNOPSIS
         Normalizes one host event envelope into the shared discovery shape.
     .DESCRIPTION
         Returns an object with HostName, Event, SessionId, AgentId, AgentType,
-        ToolName, ToolInput, Cwd, ToolUseId and Anomaly. Anomaly is $null for a usable envelope
-        or one of EmptyEnvelope, UnsupportedHost, MissingSessionId, MissingEvent and
-        NonObjectToolInput (a PreToolUse event whose tool input is absent or not an
-        object). Property-level absence in a well-formed tool input is not an
-        anomaly; that is each hook's own scope filter.
+        ParentAgentId, ToolName, ToolInput, Cwd, ToolUseId and Anomaly. Anomaly is
+        $null for a usable envelope or one of EmptyEnvelope, UnsupportedHost,
+        MissingSessionId, MissingEvent and NonObjectToolInput (a PreToolUse event
+        whose tool input is absent or not an object). Property-level absence in a
+        well-formed tool input is not an anomaly; that is each hook's own scope filter.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -126,7 +146,7 @@ function ConvertFrom-DiscoveryHostEnvelope {
     )
 
     $result = [ordered]@{
-        HostName = $HostName; Event = $null; SessionId = $null; AgentId = $null; AgentType = $null
+        HostName = $HostName; Event = $null; SessionId = $null; AgentId = $null; AgentType = $null; ParentAgentId = $null
         ToolName = $null; ToolInput = $null; Cwd = $null; ToolUseId = $null; Anomaly = $null
     }
     # Decision order: host support, envelope presence, then the trusted fields
@@ -148,6 +168,7 @@ function ConvertFrom-DiscoveryHostEnvelope {
     $result.Cwd = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.Cwd
     $result.AgentId = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.AgentId
     $result.AgentType = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.AgentType
+    $result.ParentAgentId = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.ParentAgentId
     $result.ToolUseId = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.ToolUseId
     if ($result.SessionId -isnot [string] -or [string]::IsNullOrWhiteSpace($result.SessionId)) {
         $result.Anomaly = 'MissingSessionId'
@@ -186,100 +207,70 @@ function ConvertFrom-DiscoveryHostPayloadText {
     return ConvertFrom-DiscoveryHostEnvelope -HostName $HostName -Envelope $envelope
 }
 
-function Get-DiscoveryAttestedValue {
+function Get-DiscoveryPayloadIdentifier {
     <#
     .SYNOPSIS
-        Returns a non-blank attested environment value from Table, or $null.
+        Returns Value as a string when it is a non-blank string matching the identifier grammar, else $null.
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)][hashtable]$Table,
-        [Parameter(Mandatory = $true)][string]$Key
-    )
+    param([Parameter(Mandatory = $false)][AllowNull()][object]$Value)
 
-    if ($Table.ContainsKey($Key) -and -not [string]::IsNullOrWhiteSpace([string]$Table[$Key])) { return [string]$Table[$Key] }
-    return $null
+    if ($Value -isnot [string] -or [string]::IsNullOrWhiteSpace($Value)) { return $null }
+    if ($Value -notmatch $script:CorrelationIdPattern) { return $null }
+    return [string]$Value
 }
 
 function Get-DiscoveryTrustedPrincipal {
     <#
     .SYNOPSIS
-        Derives the trusted principal from a normalized envelope and the attested host environment.
+        Derives the trusted principal from a normalized envelope alone.
     .DESCRIPTION
-        The native host adapter places DRM_DISCOVERY_HOST, DRM_DISCOVERY_SESSION_ID,
-        DRM_DISCOVERY_PARENT_AGENT_ID, DRM_DISCOVERY_PARENT_ROLE and, for a
-        discovery specialist, DRM_DISCOVERY_AGENT_ID and DRM_DISCOVERY_AGENT_ROLE in
-        the environment. The principal is attributed only when the envelope carries
-        no anomaly, the attested host equals the envelope host, and the attested
-        session equals the envelope session. Agent identity is reported only when
-        both agent values are present; a role asserted without an identity is
-        ignored. Nothing in tool input can supply any of these values.
-    .PARAMETER Environment
-        Hashtable of environment values (tests pass it explicitly; the default reads
-        the process environment for the six keys).
+        The host is the adapter that received the envelope and the session is the
+        envelope session. An envelope without `agent_id` is the root of its
+        session (IsRoot). An envelope whose `agent_id` matches the identifier
+        grammar and whose `agent_type` names a discovery role is a specialist, and
+        AgentId and Role are set; every other agent leaves both null. ParentAgentId
+        is the envelope parent when the host supplies a valid one, else the literal
+        `root`. The principal is attributed for every anomaly-free envelope, which
+        always carries a session; an anomalous envelope is unattributed with the
+        anomaly reason. Nothing in tool input or the process environment supplies
+        any of these values.
     .OUTPUTS
-        [pscustomobject] HostName, SessionId, ParentAgentId, ParentRole, AgentId,
-        Role, Attributed, Reason.
+        [pscustomobject] HostName, SessionId, ParentAgentId, AgentId, Role, IsRoot,
+        Attributed, Reason.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
-    param(
-        [Parameter(Mandatory = $true)][pscustomobject]$Normalized,
-        [Parameter(Mandatory = $false)][hashtable]$Environment = (Get-DiscoveryHostEnvironmentValueTable)
-    )
+    param([Parameter(Mandatory = $true)][pscustomobject]$Normalized)
 
-    $attestedHost = Get-DiscoveryAttestedValue -Table $Environment -Key $script:EnvironmentKeys.Host
-    $attestedSession = Get-DiscoveryAttestedValue -Table $Environment -Key $script:EnvironmentKeys.SessionId
-    $agentId = Get-DiscoveryAttestedValue -Table $Environment -Key $script:EnvironmentKeys.AgentId
-    $agentRole = Get-DiscoveryAttestedValue -Table $Environment -Key $script:EnvironmentKeys.AgentRole
+    $agentId = Get-DiscoveryPayloadIdentifier -Value $Normalized.AgentId
+    $role = $(if ($Normalized.AgentType -is [string]) { Get-DiscoveryAgentRole -AgentType $Normalized.AgentType } else { $null })
+    $parent = Get-DiscoveryPayloadIdentifier -Value $Normalized.ParentAgentId
+    $isSpecialist = ($null -ne $agentId) -and ($null -ne $role)
     $principal = [ordered]@{
         HostName      = $Normalized.HostName
         SessionId     = $Normalized.SessionId
-        ParentAgentId = Get-DiscoveryAttestedValue -Table $Environment -Key $script:EnvironmentKeys.ParentAgentId
-        ParentRole    = Get-DiscoveryAttestedValue -Table $Environment -Key $script:EnvironmentKeys.ParentRole
-        AgentId       = $(if ($null -ne $agentId -and $null -ne $agentRole) { $agentId } else { $null })
-        Role          = $(if ($null -ne $agentId -and $null -ne $agentRole) { $agentRole } else { $null })
+        ParentAgentId = $(if ($null -ne $parent) { $parent } else { $script:RootParentAgentId })
+        AgentId       = $(if ($isSpecialist) { $agentId } else { $null })
+        Role          = $(if ($isSpecialist) { $role } else { $null })
+        IsRoot        = ($null -eq $Normalized.AgentId)
         Attributed    = $false
         Reason        = $null
     }
-    # Attribution requires an anomaly-free envelope whose host and session match
-    # the attested context exactly; any gap leaves the principal unattributed.
+    # Attribution requires an anomaly-free envelope; an anomaly carries its reason.
     if ($null -ne $Normalized.Anomaly) {
         $principal.Reason = Get-DiscoveryPayloadAnomalyReason -Code $Normalized.Anomaly
-    } elseif ($null -eq $attestedHost -or $null -eq $attestedSession) {
-        $principal.Reason = 'the native host did not attest a discovery host and session for this process'
-    } elseif ($attestedHost -ne $Normalized.HostName) {
-        $principal.Reason = "the attested host '$attestedHost' differs from the envelope host '$($Normalized.HostName)'"
-    } elseif ($attestedSession -ne $Normalized.SessionId) {
-        $principal.Reason = 'the attested session differs from the envelope session'
     } else {
         $principal.Attributed = $true
     }
     return [pscustomobject]$principal
 }
 
-function Get-DiscoveryHostEnvironmentValueTable {
-    <#
-    .SYNOPSIS
-        Reads the six DRM_DISCOVERY_* process environment values into a hashtable.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param()
-
-    $values = @{}
-    # Only the documented keys are read; nothing else in the environment is trusted.
-    foreach ($key in $script:EnvironmentKeys.Values) {
-        $values[$key] = [System.Environment]::GetEnvironmentVariable($key)
-    }
-    return $values
-}
-
 Export-ModuleMember -Function `
     Test-DiscoverySupportedHost, `
+    Get-DiscoveryAgentRole, `
     ConvertFrom-DiscoveryHostEnvelope, `
     ConvertFrom-DiscoveryHostPayloadText, `
     Get-DiscoveryTrustedPrincipal, `
-    Get-DiscoveryHostEnvironmentValueTable, `
     Get-DiscoveryPayloadAnomalyReason

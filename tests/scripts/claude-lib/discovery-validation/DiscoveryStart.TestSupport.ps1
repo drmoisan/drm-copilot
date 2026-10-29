@@ -269,41 +269,33 @@ function Get-StartStore {
 function Get-StartEnvelope {
     <#
     .SYNOPSIS
-        Builds a host-shaped SubagentStart envelope JSON for AgentType.
+        Builds a host-shaped SubagentStart envelope JSON for AgentType with the payload identity.
+    .DESCRIPTION
+        AgentId, AgentType and ParentAgentId are each emitted only when non-null,
+        using the host's key spelling; a null ParentAgentId means the host supplies
+        no parent and the principal's parent is the literal `root`.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory = $false)][string]$HostName = 'claude-code',
-        [Parameter(Mandatory = $false)][string]$AgentType = $script:StartAgentType,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$AgentType = $script:StartAgentType,
         [Parameter(Mandatory = $false)][AllowNull()][string]$AgentId = 'agent-alpha',
+        [Parameter(Mandatory = $false)][AllowNull()][string]$ParentAgentId = $null,
         [Parameter(Mandatory = $false)][string]$SessionId = 'session-alpha',
         [Parameter(Mandatory = $false)][AllowNull()][string]$Cwd = $script:GateWorkspaceRoot
     )
 
     if ($HostName -eq 'github-copilot') {
-        $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = 'SubagentStart'; agentId = $AgentId; agentType = $AgentType; cwd = $Cwd }
+        $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = 'SubagentStart'; cwd = $Cwd }
+        if ($null -ne $AgentId) { $envelope['agentId'] = $AgentId }
+        if ($null -ne $AgentType) { $envelope['agentType'] = $AgentType }
+        if ($null -ne $ParentAgentId) { $envelope['parentAgentId'] = $ParentAgentId }
     } else {
-        $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = 'SubagentStart'; agent_id = $AgentId; agent_type = $AgentType; cwd = $Cwd; transcript_path = 'transcripts/agent-alpha.jsonl' }
+        $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = 'SubagentStart'; cwd = $Cwd; transcript_path = 'transcripts/agent-alpha.jsonl' }
+        if ($null -ne $AgentId) { $envelope['agent_id'] = $AgentId }
+        if ($null -ne $AgentType) { $envelope['agent_type'] = $AgentType }
+        if ($null -ne $ParentAgentId) { $envelope['parent_agent_id'] = $ParentAgentId }
     }
     return ($envelope | ConvertTo-Json -Compress -Depth 4)
-}
-
-function Get-StartEnvironment {
-    <#
-    .SYNOPSIS
-        Returns the attested parent-launch environment (host, session, parent; no agent) for HostName.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $false)][string]$HostName = 'claude-code',
-        [Parameter(Mandatory = $false)][switch]$Nested,
-        [Parameter(Mandatory = $false)][switch]$NoParent
-    )
-
-    $table = Get-GateEnvironment -HostName $HostName -NoAgent
-    if ($Nested) { $table['DRM_DISCOVERY_AGENT_ID'] = 'agent-outer'; $table['DRM_DISCOVERY_AGENT_ROLE'] = 'legacy-parity-analyst' }
-    if ($NoParent) { $table['DRM_DISCOVERY_PARENT_AGENT_ID'] = $null }
-    return $table
 }
