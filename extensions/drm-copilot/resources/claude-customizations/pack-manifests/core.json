@@ -6,6 +6,7 @@
     ".claude/agents/atomic-executor.md",
     ".claude/agents/atomic-planner.md",
     ".claude/agents/commit-message.md",
+    ".claude/agents/discovery-capability-sentinel.md",
     ".claude/agents/epic-orchestrator.md",
     ".claude/agents/epic-planner.md",
     ".claude/agents/epic-review.md",

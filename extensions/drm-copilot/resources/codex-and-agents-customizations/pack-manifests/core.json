@@ -173,6 +173,7 @@
     ".codex/agents/runtime-characterization-analyst.toml",
     ".codex/agents/requirements-reconciler.toml",
     ".codex/agents/migration-coverage-reviewer.toml",
+    ".codex/agents/discovery-capability-sentinel.toml",
     ".codex/agents/legacy-parity-analyst-c1.toml",
     ".codex/agents/legacy-parity-analyst-c2.toml",
     ".codex/agents/legacy-parity-analyst-c3.toml",

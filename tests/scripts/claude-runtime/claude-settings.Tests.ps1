@@ -113,7 +113,9 @@ Describe "claude-settings" {
 
         $tool = @($settings.hooks.PreToolUse | Where-Object { ($_.hooks | ForEach-Object { $_.command }) -match 'enforce-discovery-artifact-gate\.ps1' })
         $tool.Count | Should -Be 1
-        foreach ($name in @('Bash', 'Write', 'Edit', 'Agent', 'mcp__drm-copilot__run_discovery_repo_inventory')) { $name | Should -Match $tool[0].matcher }
+        foreach ($name in @('Bash', 'Write', 'Edit', 'Agent', 'mcp__drm-copilot__run_discovery_repo_inventory', 'mcp__drm-copilot__discovery_capability_sentinel')) { $name | Should -Match $tool[0].matcher }
+        # The sentinel agent is not a discovery role: no SubagentStart or SubagentStop matcher names it.
+        foreach ($entry in @($settings.hooks.SubagentStart) + @($settings.hooks.SubagentStop)) { 'discovery-capability-sentinel' | Should -Not -Match "^($($entry.matcher))$" }
 
         $planning = @($settings.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Agent' })
         @($planning[0].hooks.command) | Should -Contain 'pwsh -NoProfile -File .claude/hooks/enforce-discovery-planning-gate.ps1'

@@ -113,6 +113,7 @@ The repository-canonical bounded workers are the Claude project agents committed
 | `.github/agents/csharp-atomic-planning.agent.md` | No committed project-scoped runtime target | Planning specialization omitted in favor of the generic planner plus mirrored skills |
 | `.github/agents/csharp-orchestrator.agent.md` | No committed project-scoped runtime target | Main-thread orchestration remains centralized; no nested C# orchestrator worker |
 | `.github/agents/csharp-typed-engineer.agent.md` | `.claude/agents/csharp-typed-engineer.md` | Project-scoped C# implementation worker |
+| `.github/agents/discovery-capability-sentinel.agent.md` | `.claude/agents/discovery-capability-sentinel.md` | Capability-probe worker launched by the root to record host hook observations; tools are the sentinel MCP tool and one shell command the gate denies |
 | `.github/agents/epic-review.agent.md` | `.claude/agents/epic-review.md` | Project-scoped epic review worker with wrapper skill support |
 | `.github/agents/expert-nextjs-developer.agent.md` | No project-scoped runtime target | Personal or library-only framework persona |
 | `.github/agents/expert-react-frontend-engineer.agent.md` | No project-scoped runtime target | Personal or library-only framework persona |
