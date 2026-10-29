@@ -43,7 +43,7 @@ function Add-DiscoveryPlanningDependencyFailure {
     [void]$script:DiscoveryPlanningDependencyFailures.Add([pscustomobject]@{ Name = $Name; Message = $message })
 }
 
-foreach ($moduleName in @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryManifest.psm1', 'DiscoveryPayload.psm1', 'DiscoveryAuthorization.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryPlanning.psm1')) {
+foreach ($moduleName in @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryManifest.psm1', 'DiscoveryPayload.psm1', 'DiscoveryToolRouting.psm1', 'DiscoveryAuthorization.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryPlanning.psm1')) {
     try { Import-Module (Join-Path $PSScriptRoot "../../.claude/lib/discovery-validation/$moduleName") -Force -Global -ErrorAction Stop } catch { Add-DiscoveryPlanningDependencyFailure -Name $moduleName -ErrorRecord $_ }
 }
 

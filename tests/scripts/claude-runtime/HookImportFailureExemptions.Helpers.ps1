@@ -36,7 +36,7 @@ function Get-HookImportFailureExemption {
         Justification = 'D3: an absent .codex/scripts/epic-child-launch-contract.ps1 is a skip; a present file that fails to load is a guarded dependency failure.'
     }
     [pscustomobject]@{
-        Id = 'D4'; Kind = 'Design'; Surface = 'codex'; HandlerFile = @('.codex/hooks/enforce-discovery-artifact-gate.ps1', '.codex/hooks/enforce-discovery-planning-gate.ps1', '.codex/hooks/validate-discovery-agent-output.ps1'); Leaf = @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryManifest.psm1', 'DiscoveryPayload.psm1', 'DiscoveryAuthorization.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryStart.psm1', 'DiscoveryStop.psm1', 'DiscoveryPlanning.psm1')
+        Id = 'D4'; Kind = 'Design'; Surface = 'codex'; HandlerFile = @('.codex/hooks/enforce-discovery-artifact-gate.ps1', '.codex/hooks/enforce-discovery-planning-gate.ps1', '.codex/hooks/validate-discovery-agent-output.ps1'); Leaf = @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryManifest.psm1', 'DiscoveryPayload.psm1', 'DiscoveryToolRouting.psm1', 'DiscoveryAuthorization.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryStart.psm1', 'DiscoveryStop.psm1', 'DiscoveryPlanning.psm1')
         Justification = 'D4 (#980): the Codex discovery hooks import the shared helpers from the published .codex/lib layout through guarded direct edges; when that layout is absent (this repository hosts itself) the same helpers are imported at load time from .claude/lib through the same guarded recorder, so a helper that fails to load in either layout denies with the hook prefix before any payload is read.'
     }
     $handlers = @(

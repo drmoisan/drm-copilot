@@ -47,7 +47,7 @@ function Add-DiscoveryGateDependencyFailure {
     [void]$script:DiscoveryGateDependencyFailures.Add([pscustomobject]@{ Name = $Name; Message = $message })
 }
 
-foreach ($moduleName in @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryPayload.psm1', 'DiscoveryAuthorization.psm1')) {
+foreach ($moduleName in @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryPayload.psm1', 'DiscoveryToolRouting.psm1', 'DiscoveryAuthorization.psm1')) {
     try { Import-Module (Join-Path $PSScriptRoot "../../.claude/lib/discovery-validation/$moduleName") -Force -Global -ErrorAction Stop } catch { Add-DiscoveryGateDependencyFailure -Name $moduleName -ErrorRecord $_ }
 }
 

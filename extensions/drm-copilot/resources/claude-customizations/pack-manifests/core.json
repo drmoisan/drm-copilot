@@ -197,6 +197,7 @@
     ".claude/lib/discovery-validation/DiscoveryEncoding.psm1",
     ".claude/lib/discovery-validation/DiscoveryManifest.psm1",
     ".claude/lib/discovery-validation/DiscoveryPayload.psm1",
+    ".claude/lib/discovery-validation/DiscoveryToolRouting.psm1",
     ".claude/lib/discovery-validation/DiscoveryStart.psm1",
     ".claude/lib/discovery-validation/DiscoveryStartRecord.psm1",
     ".claude/lib/discovery-validation/DiscoveryStop.psm1",

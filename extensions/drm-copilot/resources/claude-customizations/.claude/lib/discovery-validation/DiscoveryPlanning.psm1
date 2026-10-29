@@ -37,6 +37,7 @@ Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -ErrorAction St
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryAuthority.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryManifest.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryPayload.psm1') -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'DiscoveryToolRouting.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryAuthorization.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryStartRecord.psm1') -ErrorAction Stop
 
