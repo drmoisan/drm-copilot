@@ -155,13 +155,13 @@ Describe 'Bundled Codex PreToolUse hooks run from the bundle location (issue #69
         $script:PreToolUseRegistrations = @($script:Registrations | Where-Object Event -EQ 'PreToolUse')
     }
 
-    It 'derives 17 PreToolUse hooks and excludes 4 non-PreToolUse registrations from the bundle config' {
+    It 'derives 18 PreToolUse hooks and excludes 4 non-PreToolUse registrations from the bundle config' {
         $allHooks = @($script:Registrations | ForEach-Object HookName | Sort-Object -Unique)
         $preToolUseHooks = @($script:PreToolUseRegistrations | ForEach-Object HookName | Sort-Object -Unique)
         $excludedHooks = @($allHooks | Where-Object { $_ -notin $preToolUseHooks } | Sort-Object)
 
-        $allHooks.Count | Should -Be 21
-        $preToolUseHooks.Count | Should -Be 17
+        $allHooks.Count | Should -Be 22
+        $preToolUseHooks.Count | Should -Be 18
         $excludedHooks | Should -Be @($script:ExpectedExcludedHooks | Sort-Object)
         ($preToolUseHooks.Count + $excludedHooks.Count) | Should -Be $allHooks.Count
         foreach ($name in $preToolUseHooks) {
@@ -191,7 +191,7 @@ Describe 'Bundled Codex PreToolUse hooks run from the bundle location (issue #69
             }
         }
 
-        $invocations | Should -Be 41
+        $invocations | Should -Be 43
         $failures -join "`n" | Should -BeNullOrEmpty -Because 'every bundled hook must allow a benign admitted payload from the bundle location'
     }
 

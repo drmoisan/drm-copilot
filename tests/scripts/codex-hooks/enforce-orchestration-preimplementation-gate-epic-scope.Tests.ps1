@@ -21,7 +21,8 @@
     call passes -CheckpointRaw, so the single-feature fallback never reads the per-feature
     checkpoint from disk. No row creates a file or changes the working directory.
 
-    The structural rows pin the 500-line cap, bundle parity, and the absence of any
+    The structural rows pin a per-file bound of 500 lines (stricter than the 800-line hard
+    limit of the tiered file-size policy), bundle parity, and the absence of any
     interpreter invocation (issue #707, decisions D15 and D16).
 #>
 
@@ -434,8 +435,8 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
             $bundleCount = @(Get-Content -LiteralPath $bundlePath).Count
 
             # Assert
-            $repositoryCount | Should -BeLessOrEqual 500 -Because 'the repository copy stays inside the 500-line cap'
-            $bundleCount | Should -BeLessOrEqual 500 -Because 'the bundle copy stays inside the 500-line cap'
+            $repositoryCount | Should -BeLessOrEqual 500 -Because 'the repository copy stays inside its pinned per-file bound of 500 lines'
+            $bundleCount | Should -BeLessOrEqual 500 -Because 'the bundle copy stays inside its pinned per-file bound of 500 lines'
         }
 
         It 'keeps <File> byte-identical to its bundle copy' -ForEach @(

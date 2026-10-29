@@ -40,7 +40,7 @@ Use these sections in this order:
 8. **Risks and Mitigations** — realistic risks with mitigations and rollback notes
 9. **Review Guide** — suggested order, noisy mechanical moves, large diffs
 10. **Follow-ups** — known TODOs, deferred cleanup, next PRs
-11. **GitHub Auto-close** — `- Closes #NNN` only from verified autoclose lists; do not invent issue numbers
+11. **GitHub Auto-close** — `- Closes #NNN` from the three sources in Issue/PR Reference Rules (the PR-context "Issues to autoclose" list, the PR-context "Author-asserted autoclose issues" list, and an issue named as author-asserted in the delegation prompt); `- None` only when no source has an entry; do not invent issue numbers
 
 ## Output Artifact
 
@@ -74,22 +74,52 @@ writes and the `gh pr create` / `gh pr edit --body-file` handoff.
 
 ## Issue/PR Reference Rules
 
-- Only mention an issue/PR number if it appears verbatim in the provided context.
+- Only mention an issue/PR number if it appears verbatim in the provided context or in the delegation prompt.
 - Do not treat PR numbers as issues.
-- Auto-close bullets must use exactly `- Closes #NNN` format, sourced only from "Issues to autoclose" or "Author-asserted autoclose issues."
-- If GitHub validation is unavailable/unverified, do not emit `Closes`; use the fallback `None` bullet.
+- Auto-close bullets must use exactly `- Closes #NNN` format. Three sources are valid:
+  1. the PR-context "Issues to autoclose" list;
+  2. the PR-context "Author-asserted autoclose issues" list (rendered from the PR Intent);
+  3. an issue named as author-asserted in the delegation prompt, on the line
+     `Author-asserted autoclose issues: #NNN`. This source is valid even when the PR context
+     lists no verified autoclose issues.
+- Emit the fallback `- None` bullet only when no source has an entry.
+- GitHub validation applies to the two PR-context lists: if it is unavailable or unverified for
+  an entry on those lists, do not emit `Closes` for that entry. An issue named as author-asserted
+  in the delegation prompt is emitted without that validation; the closing-reference
+  verification below confirms it after the pull request exists.
+
+## Closing-Reference Verification
+
+The pr-author agent MUST run `gh pr view <N> --json closingIssuesReferences,body` as a single
+command (no chaining, no extra flags) after every `gh pr create` or `gh pr edit` it issues, where
+`<N>` is the pull request number. It reports the closing issue numbers that
+`closingIssuesReferences` lists, and reports any mismatch with the author-asserted list: an
+author-asserted issue that GitHub does not list as closing, or a closing issue that no source
+named. The command is read-only, and this exact form is the only pull-request view form the
+agent's allowlist hook permits.
 
 ## Required `--head` on `gh pr create` (issue #687)
 
 Every `gh pr create` command this agent issues MUST carry an explicit
-`--head <branch>` naming the branch the pull request is opened from.
+`--head <branch>` naming the branch the pull request is opened from, for example
+`gh pr create --head <branch> --body-file artifacts/pr_body_<N>.md`.
 
 This is what makes the call's target derivable. `enforce-pr-author-skill.ps1` resolves the
 worktree the call pertains to from the command text, and validates the orchestrator checkpoint
 belonging to that worktree. Without `--head`, `gh pr create` infers its head branch from the
-current checkout and the command carries no signal at all, so the gate denies with
-`TARGET_WORKTREE_NOT_DERIVABLE` rather than validating against whichever checkpoint occupies the
-session root, which in a parallel or epic topology belongs to a different item.
+current checkout and the command carries no signal at all, so the gate falls back to the branch
+checked out in its own working directory (issue #989) and denies with
+`TARGET_WORKTREE_NOT_DERIVABLE` when that checkout is detached or unreadable, rather than
+validating against whichever checkpoint occupies the session root, which in a parallel or epic
+topology belongs to a different item.
 
 Pass `--head` even when the branch is the current one: the gate resolves it to the session root
 and behaves exactly as before, and the command stays correct if it is ever replayed elsewhere.
+
+`gh pr edit` takes no head-branch flag, and --head is not valid for gh pr edit. Name the target of
+an edit in one of two ways:
+
+- Run `gh pr edit <N> --body-file artifacts/pr_body_<N>.md` from the item worktree. The gate
+  derives the branch from that worktree's checkout.
+- When running outside the item worktree, append the shell comment `# branch: <branch>` to the
+  command, and pass the absolute canonical body path beneath the item worktree.

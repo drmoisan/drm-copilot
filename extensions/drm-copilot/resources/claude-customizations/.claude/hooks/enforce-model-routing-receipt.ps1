@@ -40,6 +40,13 @@
     delegation prompt to a receipt-gated subagent type carries the canonical issue
     number line and a `branch:` label naming the item's branch.
 
+    Author-asserted autoclose line (issue #989): for subagent `pr-author` only, once the
+    per-feature receipt is confirmed, a checkpoint that records an `issue-num` and whose
+    `epic_mode` is not true requires the prompt line
+    `Author-asserted autoclose issues: #<issue-num>` at the start of a line. Its absence denies
+    with the AUTHOR_ASSERTED_AUTOCLOSE_MISSING sub-code (Get-ModelRoutingAuthorAssertedReason).
+    The epic-scope path is not subject to this rule.
+
 .NOTES
     Compatible with PowerShell 7+. Read-only presence-gating deterrent.
 #>
@@ -198,6 +205,42 @@ function Get-ModelRoutingTargetCheckpointResolution {
     }
 }
 
+function Get-ModelRoutingAuthorAssertedReason {
+    <#
+    .SYNOPSIS
+        Return the deny reason for a pr-author delegation that omits the author-asserted line, or $null.
+    .DESCRIPTION
+        Returns $null when the checkpoint records no usable issue-num, when it carries an
+        epic_mode property whose value is true (an epic child whose integration PR owns the
+        closing keyword), or when a prompt line starts with 'Author-asserted autoclose issues:'
+        and names '#<issue-num>' later on that line with no digit after the number. Property
+        presence is tested first because strict mode throws on a missing property.
+    .PARAMETER Checkpoint
+        The resolved per-feature checkpoint object.
+    .PARAMETER PromptText
+        The delegation prompt.
+    .OUTPUTS
+        System.String or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][AllowNull()] $Checkpoint,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $PromptText
+    )
+
+    $names = @($Checkpoint.PSObject.Properties.Name)
+    $issue = if ($names -contains 'issue-num') { ConvertTo-WorktreeItemIssueNumber -Value $Checkpoint.'issue-num' } else { $null }
+    if ($null -eq $issue -or ($names -contains 'epic_mode' -and $Checkpoint.epic_mode -eq $true)) {
+        return $null
+    }
+    $line = "Author-asserted autoclose issues: #$issue"
+    if ([regex]::IsMatch($PromptText, '(?m)^Author-asserted autoclose issues:[^\r\n]*#' + $issue + '(?!\d)')) {
+        return $null
+    }
+    return "MODEL_ROUTING_RECEIPT_BLOCKED: AUTHOR_ASSERTED_AUTOCLOSE_MISSING: the checkpoint records issue-num $issue, so the Agent(pr-author) delegation prompt must carry the line '$line' so the PR body emits '- Closes #$issue'. Add that line on its own line, or omit it only for an epic child (epic_mode true)."
+}
+
 function Invoke-ModelRoutingReceiptDecision {
     <#
     .SYNOPSIS
@@ -274,6 +317,11 @@ function Invoke-ModelRoutingReceiptDecision {
 
     $checkpoint = Get-ModelRoutingCheckpoint -CheckpointPath $resolution.CheckpointPath
     if (Test-ModelRoutingReceiptPresent -Checkpoint $checkpoint -Subagent $subagent) {
+        # Issue #989: the pr-author delegation names the item's issue as author-asserted.
+        $authorAssertedReason = if ($subagent -eq 'pr-author') { Get-ModelRoutingAuthorAssertedReason -Checkpoint $checkpoint -PromptText $prompt } else { $null }
+        if ($authorAssertedReason) {
+            return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = $authorAssertedReason } }
+        }
         return $allow
     }
 

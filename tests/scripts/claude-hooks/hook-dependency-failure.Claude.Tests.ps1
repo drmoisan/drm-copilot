@@ -80,6 +80,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'           = 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
             '.claude/hooks/enforce-evidence-locations.ps1'                   = 'EVIDENCE_LOCATION_BLOCKED:'
             '.claude/hooks/enforce-feature-folder-order.ps1'                 = 'FEATURE_FOLDER_ORDER_BLOCKED:'
+            '.claude/hooks/enforce-file-size-limit.ps1'                      = 'FILE_SIZE_LIMIT_BLOCKED:'
             '.claude/hooks/enforce-mermaid-validation.ps1'                   = 'MERMAID_VALIDATION_BLOCKED:'
             '.claude/hooks/enforce-model-routing-receipt.ps1'                = 'MODEL_ROUTING_RECEIPT_BLOCKED:'
             '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1' = 'PREIMPLEMENTATION_GATE_BLOCKED:'

@@ -159,7 +159,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 | Requirement | Status | Evidence |
 |------------|--------|----------|
 | **Cohesive modules** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe the purpose and cohesion of each module/file. Note organization strategy.] |
-| **Under 500 lines** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report line counts for all files. Note any exceptions and justifications.] |
+| **At or below the 800-line hard limit** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report logical line counts for all covered files. FAIL for a file above 800 lines without a `config/file-size-baseline.json` entry, a baselined file that grew, or an added or increased baseline entry. Note each file at or above 700 lines as a non-blocking Warning. Note any exceptions.] |
 | **Public vs internal** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe the public API surface. Note how internals are hidden.] |
 | **No circular dependencies** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe the dependency graph. Confirm no circular dependencies exist.] |
 
@@ -253,7 +253,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Cohesive and under 500 lines** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report file line counts. Confirm all under limit.] |
+| **Cohesive and at or below the 800-line hard limit** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report logical line counts. FAIL for a file above 800 lines without a baseline entry or a baselined file that grew. Note each file at or above 700 lines as a non-blocking Warning.] |
 | **Approved verbs** | [✅/❌/N/A] [PASS/FAIL/N/A] | [List all function names and confirm verbs are approved.] |
 | **Comment why** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe commenting approach. Confirm focus on rationale.] |
 
@@ -285,7 +285,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 |------------|--------|----------|
 | **Portable shebang** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm `#!/usr/bin/env bash` or `#!/bin/bash` used.] |
 | **Error handling** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of `set -e`, `set -u`, `set -o pipefail`, error traps.] |
-| **Under 500 lines** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report file line counts.] |
+| **At or below the 800-line hard limit** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report logical line counts. FAIL for a file above 800 lines without a baseline entry or a baselined file that grew. Note each file at or above 700 lines as a non-blocking Warning.] |
 
 ---
 
@@ -424,7 +424,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 | Average Time per Test | [X]ms | [✅/❌] Fast/Slow |
 | Discovery Time | [X]ms | [✅/❌] |
 | Functions/Classes Tested | [N]/[M] ([X]%) | [✅/❌] |
-| Test File Size | [N] lines | [✅/❌] Maintainable |
+| Test File Size | [N] logical lines | [✅/❌] PASS at or below 800 lines, FAIL above 800 without a baseline entry; note a non-blocking Warning at or above 700 lines |
 | Code Coverage (if applicable) | [X]% lines, [Y]% branches | [✅/❌] |
 
 ---

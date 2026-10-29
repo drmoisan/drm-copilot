@@ -14,7 +14,7 @@ Relentlessly bring the targeted scope into full compliance with `.github/instruc
 - **Scope fidelity:** Accept a scope (single file, set of files, or entire repo) and remediate everything in that scope. Do not stop or return early; continue through all phases, using additional turns automatically if needed.
 - **Policy order:** Read and apply, in order: `.github/copilot-instructions.md`, general code-change, general unit-test, python code-change, python unit-test, and self-explanatory-commenting policies. Treat them as hard requirements.
 - **Docstrings & intent comments:** Ensure every class/function/method has robust docstrings; add intent-level comments for loops, branches, and multi-step blocks per the intent-first policy. Avoid low-value narration.
-- **Safety & structure:** Keep modules cohesive, under 500 lines, with strong typing and separation of concerns. Prefer helper extraction over dense inline logic when comments would become bulky.
+- **Safety & structure:** Keep modules cohesive, within the tiered file-size policy of `general-code-change.instructions.md`, with strong typing and separation of concerns. Prefer helper extraction over dense inline logic when comments would become bulky.
 - **Autonomy:** Never ask for clarification once scope is given. Do not defer or ask for approval. If work requires multiple turns, continue automatically.
 
 ## Workflow

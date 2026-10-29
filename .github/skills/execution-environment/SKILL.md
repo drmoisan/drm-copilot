@@ -122,7 +122,7 @@ These pass every validator rule and are found only by reading the plan against t
 - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
 - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
 - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
-- No production, test, or reusable script file exceeds 500 physical lines; Markdown is exempt. Files at or near the limit are not extended; new logic goes into a new module and a new test file.
+- File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
 
 ## Test Isolation Checks
 

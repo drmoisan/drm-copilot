@@ -9,7 +9,7 @@
 > 2. Replace all placeholders with concrete branch, file, test, and evidence details.
 > 3. Keep the sections that apply to the reviewed scope and delete inapplicable language subsections.
 > 4. Base all findings on verified evidence: diff inspection, toolchain output, coverage data, and feature-folder artifacts.
-> 5. Use severity labels consistently: `Blocker`, `Major`, `Minor`, `Nit`, `Info`.
+> 5. Use severity labels consistently: `Blocker`, `Major`, `Minor`, `Nit`, `Info`, `Warning`. `Warning` is the non-blocking file-size advisory for a covered file at or above 700 logical lines; it names the file and its line count and is never carried into remediation inputs.
 > 6. End with a clear readiness recommendation that matches the actual findings.
 >
 > **When to use:**
@@ -52,8 +52,8 @@
 
 | Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
 |---|---|---|---|---|---|---|
-| [Blocker/Major/Minor/Nit/Info] | `[path]` | `[line range / section / n/a]` | [Concrete issue] | [Concrete corrective action or note] | [Why it matters] | [Command output, artifact path, or inspected file reference] |
-| [Blocker/Major/Minor/Nit/Info] | `[path]` | `[line range / section / n/a]` | [Concrete issue] | [Concrete corrective action or note] | [Why it matters] | [Command output, artifact path, or inspected file reference] |
+| [Blocker/Major/Minor/Nit/Info/Warning] | `[path]` | `[line range / section / n/a]` | [Concrete issue] | [Concrete corrective action or note] | [Why it matters] | [Command output, artifact path, or inspected file reference] |
+| [Blocker/Major/Minor/Nit/Info/Warning] | `[path]` | `[line range / section / n/a]` | [Concrete issue] | [Concrete corrective action or note] | [Why it matters] | [Command output, artifact path, or inspected file reference] |
 
 [If applicable, add a short line such as `No Blockers or Major findings.`]
 

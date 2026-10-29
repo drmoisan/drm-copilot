@@ -190,7 +190,11 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
         }
     }
 
-    It 'keeps hook, config, and agent files within the 500-line limit' {
+    It 'keeps hook, config, and agent files within the shared hard file-size limit' {
+        # The general size gate uses the hard limit of the tiered file-size policy from the
+        # Codex twin, so it does not compete with the repository gate at a stricter bound.
+        . (Join-Path $script:RepoRoot '.codex/hooks/file-size-policy.ps1')
+        $hardLimit = (Get-FileSizePolicyLimit).HardLimit
         $files = @(
             Get-ChildItem (Join-Path $script:RepoRoot '.codex/hooks') -Filter '*.ps1' -File
             Get-ChildItem (Join-Path $script:RepoRoot '.codex/scripts') -Filter '*.ps1' -File
@@ -199,7 +203,7 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
         )
         foreach ($file in $files) {
             (Get-Content -LiteralPath $file.FullName).Count |
-                Should -BeLessOrEqual 500 -Because $file.FullName
+                Should -BeLessOrEqual $hardLimit -Because $file.FullName
         }
     }
 }

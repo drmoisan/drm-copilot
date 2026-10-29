@@ -27,9 +27,10 @@
 
 .NOTES
     Compatible with PowerShell 7+. Dependencies are in-repository only: the command parsers
-    and worktree-resolution modules loaded below, and the artifact-root and docs-only siblings.
-    No PowerShell Gallery module is required.
-    The docs-only sibling runs the git executable at call time (issue #901).
+    and worktree-resolution modules loaded below, and the artifact-root, docs-only, and
+    current-branch siblings. No PowerShell Gallery module is required.
+    The docs-only sibling runs the git executable at call time (issue #901), and so does the
+    current-branch sibling when a call carries no target signal (issue #989).
 #>
 [CmdletBinding()]
 param()
@@ -56,6 +57,8 @@ Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeRead
 . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.artifact-root.ps1')
 # Docs-only exemption from the orchestrator-state preflight (issue #901).
 . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.docs-only.ps1')
+# Current-branch target derivation and the no-target guidance text (issue #989).
+. (Join-Path $PSScriptRoot 'enforce-pr-author-skill.current-branch.ps1')
 
 function Resolve-PrAuthorWorktreeTarget {
     <#
@@ -67,7 +70,8 @@ function Resolve-PrAuthorWorktreeTarget {
         directly would depend on the machine's live worktrees and would pass or fail
         according to what other sessions happen to have checked out, which the repository's
         determinism policy forbids. Mocking here lets a test state the resolution outcome it
-        is exercising and nothing else.
+        is exercising and nothing else. A NoTarget result for a command with no signal passes
+        through Resolve-PrAuthorCurrentBranchTarget, which re-resolves the current branch (#989).
     .OUTPUTS
         The target result object from Resolve-WorktreeItemTarget.
     #>
@@ -77,7 +81,8 @@ function Resolve-PrAuthorWorktreeTarget {
         [string] $CommandText
     )
 
-    return (Resolve-WorktreeItemTarget -Text $CommandText -SessionRoot (Get-Location).Path)
+    $target = Resolve-WorktreeItemTarget -Text $CommandText -SessionRoot (Get-Location).Path
+    return (Resolve-PrAuthorCurrentBranchTarget -CommandText $CommandText -Target $target)
 }
 
 function Get-PrAuthorTargetCheckpointResolution {
@@ -91,10 +96,10 @@ function Get-PrAuthorTargetCheckpointResolution {
           SessionRoot   -> that worktree's own checkpoint, composed absolutely.
           OtherWorktree -> that worktree's own checkpoint, composed the same way.
           NoTarget      -> deny, carrying the code Get-WorktreeResolutionNoTargetReasonCode
-                           returns. pr-author passes --head on every gh pr create, so a call
-                           reaching here omitted the explicit target; the remedy is to supply
-                           it, never to fall back to whichever checkpoint occupies the
-                           session root.
+                           returns. The call named no target and no branch could be derived
+                           from the current checkout; the remedy text from
+                           Get-PrAuthorTargetGuidanceText names the accepted forms, and the
+                           gate never falls back to the session root's checkpoint.
           Ambiguous     -> deny, carrying the code
                            Get-WorktreeResolutionAmbiguityReasonCode returns.
 
@@ -125,7 +130,7 @@ function Get-PrAuthorTargetCheckpointResolution {
             return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null; WorktreeRoot = $target.WorktreeRoot; Status = $target.Status }
         }
         default {
-            $reason = "$($target.ReasonCode): $($target.Detail) The pr-author gate will not validate this call against the session root's checkpoint, because that checkpoint may belong to a different item. Pass --head <branch> on the gh pr create command so the call names its own target."
+            $reason = "$($target.ReasonCode): $($target.Detail) The pr-author gate will not validate this call against the session root's checkpoint, because that checkpoint may belong to a different item. $(Get-PrAuthorTargetGuidanceText)"
             return [ordered]@{ CheckpointPath = $null; Reason = $reason; WorktreeRoot = $null; Status = $target.Status }
         }
     }

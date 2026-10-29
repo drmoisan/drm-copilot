@@ -3,7 +3,7 @@
 
 <#
 .SYNOPSIS
-    PreToolUse deny-schema contract test for all 15 PreToolUse hooks.
+    PreToolUse deny-schema contract test for all 16 PreToolUse hooks.
 
 .DESCRIPTION
     For each PreToolUse-registered hook this test dot-sources the hook (using its
@@ -17,7 +17,7 @@
 
     This is the in-repo proving artifact for the root-cause invariant: Claude
     honors a PreToolUse deny only when the hook emits the hookSpecificOutput
-    schema. The contract is enforced once per hook (15 assertion blocks).
+    schema. The contract is enforced once per hook (16 assertion blocks).
 
     Each hook is dot-sourced inside its own It block so the imported functions
     are scoped to that test and do not collide across hooks (several hooks define
@@ -29,7 +29,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Injected seam stubs mirror the production scriptblock signatures for testing')]
 param()
 
-Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
+Describe 'PreToolUse deny-schema contract (all 16 hooks)' {
     BeforeAll {
         $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks").Path
 
@@ -95,6 +95,12 @@ Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
     It 'enforce-evidence-locations.ps1 emits a PreToolUse deny shape' {
         . (Join-Path $script:HookRoot 'enforce-evidence-locations.ps1')
         $decision = Get-EvidenceLocationBlockDecision -FilePath 'artifacts/baselines/example.md'
+        Assert-PreToolUseDenyShape -Decision $decision
+    }
+
+    It 'enforce-file-size-limit.ps1 emits a PreToolUse deny shape' {
+        . (Join-Path $script:HookRoot 'enforce-file-size-limit.ps1')
+        $decision = Get-FileSizeLimitBlockDecision -Reason "FILE_SIZE_LIMIT_BLOCKED: 'scripts/example.py' would have 801 logical lines"
         Assert-PreToolUseDenyShape -Decision $decision
     }
 

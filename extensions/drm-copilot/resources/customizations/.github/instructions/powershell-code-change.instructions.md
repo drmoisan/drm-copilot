@@ -58,7 +58,7 @@ If you encounter any conflicting instructions, **halt and notify the user.**
 
 ## 3. Structure, Naming, and Comments
 
-- Keep scripts **cohesive and under 500 lines** (matches general policy).
+- Keep scripts **cohesive** and within the tiered file-size policy of `general-code-change.instructions.md` (section 4, Module & File Structure).
 - Use approved verbs and descriptive nouns for functions (PSScriptAnalyzer will enforce).
 - Prefer modules/helpers over copy-paste between scripts; share common logic in dedicated helper functions.
 - Comment **why** for non-obvious patterns (e.g., rule suppressions, compatibility shims), not what.

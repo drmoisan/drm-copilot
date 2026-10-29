@@ -16,6 +16,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
             'check-powershell-test-purity.ps1',
             'enforce-powershell-batch-budget.ps1',
             'enforce-evidence-locations.ps1',
+            'enforce-file-size-limit.ps1',
             'enforce-checkpoint-monotonic.ps1',
             'enforce-completion-consistency.ps1'
         )
@@ -27,7 +28,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         # excluded from the stdin-read assertion and from every process-level
         # invocation loop, because they define functions only and are never
         # executed as a hook process.
-        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1', 'enforce-batch-budget-route.ps1', 'feature-folder-resolution.ps1', 'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1', 'enforce-orchestration-preimplementation-gate-targets.ps1', 'hook-dependency-guard.ps1', 'feature-review-coverage-thresholds.ps1')
+        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1', 'enforce-batch-budget-route.ps1', 'feature-folder-resolution.ps1', 'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1', 'enforce-orchestration-preimplementation-gate-targets.ps1', 'hook-dependency-guard.ps1', 'feature-review-coverage-thresholds.ps1', 'file-size-policy.ps1')
         $script:StaticCheckNames = @($script:AllHookNames) + @($script:SharedModuleNames)
         $script:CorePackManifestPath = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
         # Issue #707 (D10): load the gate so its epic-scope read is mocked for every in-process row.
@@ -178,12 +179,15 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         $badOrderPatch = "*** Begin Patch`n*** Add File: artifacts/orchestration/orchestrator-state.json`n+$badOrder`n*** End Patch"
         $badCompletion = '{"next_step":"complete","completed_steps":["S12_complete"]}'
         $badCompletionPatch = "*** Begin Patch`n*** Add File: artifacts/orchestration/orchestrator-state.json`n+$badCompletion`n*** End Patch"
+        $oversizeLines = (1..801 | ForEach-Object { "+value_$_ = $_" }) -join "`n"
+        $badFileSizePatch = "*** Begin Patch`n*** Add File: scripts/example.py`n$oversizeLines`n*** End Patch"
         $cases = @(
             @{ Name = 'validate-bash.ps1'; Payload = ConvertTo-CodexPreToolPayload -ToolName 'Bash' -ToolInput @{ command = 'git reset --hard' }; Marker = 'git reset --hard' },
             @{ Name = 'enforce-promotion-mcp-only.ps1'; Payload = ConvertTo-CodexPreToolPayload -ToolName 'Bash' -ToolInput @{ command = 'gh issue create --title bad' }; Marker = 'PROMOTION_MCP_ONLY_BLOCKED' },
             @{ Name = 'check-python-test-purity.ps1'; Payload = ConvertTo-CodexPatchPayload -Patch $badPythonPatch; Marker = 'tempfile usage forbidden' },
             @{ Name = 'check-powershell-test-purity.ps1'; Payload = ConvertTo-CodexPatchPayload -Patch $badPowerShellPatch; Marker = 'Start-Sleep forbidden' },
             @{ Name = 'enforce-evidence-locations.ps1'; Payload = ConvertTo-CodexPatchPayload -Patch $badEvidencePatch; Marker = 'EVIDENCE_LOCATION_BLOCKED' },
+            @{ Name = 'enforce-file-size-limit.ps1'; Payload = ConvertTo-CodexPatchPayload -Patch $badFileSizePatch; Marker = 'FILE_SIZE_LIMIT_BLOCKED' },
             @{ Name = 'enforce-checkpoint-monotonic.ps1'; Payload = ConvertTo-CodexPatchPayload -Patch $badOrderPatch; Marker = 'CHECKPOINT_ORDER_BLOCKED' },
             @{ Name = 'enforce-completion-consistency.ps1'; Payload = ConvertTo-CodexPatchPayload -Patch $badCompletionPatch; Marker = 'COMPLETION_CONSISTENCY_BLOCKED' }
         )

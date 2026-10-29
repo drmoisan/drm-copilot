@@ -77,6 +77,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             '.codex/hooks/enforce-epic-wave-barrier.ps1'                    = 'EPIC_WAVE_BARRIER_BLOCKED:'
             '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'           = 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
             '.codex/hooks/enforce-evidence-locations.ps1'                   = 'EVIDENCE_LOCATION_BLOCKED:'
+            '.codex/hooks/enforce-file-size-limit.ps1'                      = 'FILE_SIZE_LIMIT_BLOCKED:'
             '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1' = 'PREIMPLEMENTATION_GATE_BLOCKED:'
             '.codex/hooks/enforce-powershell-batch-budget.ps1'              = 'POWERSHELL_LARGE_PATH_REQUIRED:'
             '.codex/hooks/enforce-promotion-mcp-only.ps1'                   = 'PROMOTION_MCP_ONLY_BLOCKED:'

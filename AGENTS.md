@@ -52,7 +52,10 @@ Run the full toolchain in this exact order and repeat until all steps pass in a 
 
 ## File Size Limit
 
-- No production code, test code, or reusable script file may exceed **500 lines**.
+- File size follows three tiers for production code, test code, and reusable script files, counted in logical lines (a trailing line terminator does not add a line):
+  - **500 lines (guidance):** look for a logical way to divide the file into multiple files, provided the parts can be separated logically. No gate fails at this tier.
+  - **700 lines (advisory):** look for a split more aggressively. Reviewers and `feature-review` report a non-blocking Warning for a file at or above 700 lines. No gate fails at this tier.
+  - **Above 800 lines (hard block):** split the file regardless of logical separability. The repository CI check and the PreToolUse hook block a file of 801 lines or more; a file of exactly 800 lines passes. Legacy files above 800 lines are listed in `config/file-size-baseline.json` and may shrink (with the entry tightened) or stay the same size, but may not grow.
 - Exceptions: temporary throwaway scripts created and deleted within an agent session; raw text fixtures for language-processing test data; Markdown documentation files.
 
 ## Error Handling and Logging

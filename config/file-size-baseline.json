@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "hardLimit": 800,
+  "files": {
+    "scripts/dev_tools/agentic_sync.py": 819
+  }
+}
