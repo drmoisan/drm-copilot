@@ -8,18 +8,18 @@
     (`.claude/settings.json`, `.codex/config.toml` or `.github/hooks/discovery.json`),
     confirms that the start, tool and stop handlers are registered for the four
     discovery agent names and the controlled tools, hashes the configuration and
-    every handler, and runs the harmless forbidden-operation sentinel through the
-    host's own PreToolUse adapter decision: an attested specialist attempting a
-    shell command that must be denied and never executed. The result is a
-    `capability-attestation`-shaped document whose status is derived, never
-    supplied: `supported` requires every control, every handler and a denied
-    sentinel with protected denial evidence. A caller Boolean or repository text
-    cannot substitute for these observations; the gateway alone writes the
-    protected attestation.
+    every handler, and reads the host observations the native PreToolUse gate
+    recorded while the discovery-capability-sentinel agent ran: a consumed sentinel
+    tool call that carried the agent identity, and the denied sentinel shell command
+    from the same agent. The result is a `capability-attestation`-shaped document
+    whose status is derived, never supplied: `supported` requires every control,
+    every handler and observation evidence for attribution and the denied sentinel.
+    No in-process decision, caller Boolean or repository text can substitute for
+    these observations; the gateway alone writes the protected attestation.
 
 .NOTES
     Issue #980. Compatible with PowerShell 7+. Depends only on the sibling
-    DiscoveryEncoding, DiscoveryAuthority and DiscoveryPayload modules.
+    DiscoveryEncoding, DiscoveryAuthority, DiscoveryPayload and DiscoveryObservation modules.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -29,6 +29,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryAuthority.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryPayload.psm1') -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'DiscoveryObservation.psm1') -ErrorAction Stop
 
 $script:CapabilitySchema = 'urn:drm-copilot:discovery:2.0.0:capability-attestation'
 $script:CapabilityAttestationFile = 'capability-attestation.json'
@@ -79,26 +80,102 @@ function Get-DiscoverySentinelEnvelope {
     return ($envelope | ConvertTo-Json -Compress -Depth 4)
 }
 
-function Get-DiscoverySentinelEnvironment {
+function ConvertTo-DiscoveryObservationInstant {
     <#
     .SYNOPSIS
-        Returns the attested DRM_DISCOVERY_* table under which the sentinel runs as a probe specialist.
+        Returns a UTC instant from a parsed observation timestamp (string or DateTime), or $null when unreadable.
     #>
     [CmdletBinding()]
-    [OutputType([hashtable])]
+    [OutputType([datetime])]
+    param([Parameter(Mandatory = $false)][AllowNull()][object]$Value)
+
+    if ($Value -is [datetime]) { return $Value.ToUniversalTime() }
+    $parsed = [datetime]::MinValue
+    $styles = [System.Globalization.DateTimeStyles]::AssumeUniversal -bor [System.Globalization.DateTimeStyles]::AdjustToUniversal
+    if ($Value -is [string] -and [datetime]::TryParseExact($Value, "yyyy-MM-dd'T'HH:mm:ss'Z'", [System.Globalization.CultureInfo]::InvariantCulture, $styles, [ref]$parsed)) { return $parsed }
+    return $null
+}
+
+function Get-DiscoverySessionObservation {
+    <#
+    .SYNOPSIS
+        Reads every parseable host-observation record of the session from the protected store.
+    .DESCRIPTION
+        Entries that cannot be read or parsed are skipped; an absent directory yields
+        an empty list. Records are returned as hashtables keyed by the schema names.
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
     param(
-        [Parameter(Mandatory = $true)][string]$HostName,
+        [Parameter(Mandatory = $true)][pscustomobject]$Location,
         [Parameter(Mandatory = $true)][string]$SessionId,
-        [Parameter(Mandatory = $true)][string]$SentinelId
+        [Parameter(Mandatory = $true)][hashtable]$Store
     )
 
-    return @{
-        DRM_DISCOVERY_HOST            = $HostName
-        DRM_DISCOVERY_SESSION_ID      = $SessionId
-        DRM_DISCOVERY_PARENT_AGENT_ID = "root-$SentinelId"
-        DRM_DISCOVERY_PARENT_ROLE     = $null
-        DRM_DISCOVERY_AGENT_ID        = "probe-$SentinelId"
-        DRM_DISCOVERY_AGENT_ROLE      = 'legacy-parity-analyst'
+    $directory = Get-DiscoveryObservationDirectory -Location $Location -SessionId $SessionId
+    $names = @()
+    try { $names = @(Invoke-DiscoveryStoreSeam -Seam $Store.ListEntries -Arguments @($directory)) } catch { $names = @() }
+    $records = [System.Collections.Generic.List[object]]::new()
+    # Each entry is one observation file; unreadable or non-object entries carry no evidence.
+    foreach ($name in @($names | Where-Object { $_ -is [string] -and $_.EndsWith('.json') })) {
+        try {
+            $text = Invoke-DiscoveryStoreSeam -Seam $Store.ReadText -Arguments @("$directory/$name")
+            $record = $(if ($null -ne $text) { ConvertFrom-Json -InputObject $text -AsHashtable -Depth 8 } else { $null })
+        } catch { $record = $null }
+        if ($record -is [hashtable] -and [string]$record['artifact_kind'] -eq 'host-observation') { $records.Add($record) }
+    }
+    return $records.ToArray()
+}
+
+function Get-DiscoveryObservationEvidence {
+    <#
+    .SYNOPSIS
+        Derives trusted_attribution and forbidden_tools_denied from the session's host observations.
+    .DESCRIPTION
+        trusted_attribution holds only for a consumed sentinel-tool observation that
+        carries a non-empty agent_id, the sentinel agent type, the hash of the
+        registered tool handler and an observed_at within TtlSeconds of Now.
+        forbidden_tools_denied holds only for a SHELL deny observation from the same
+        agent_id. Every rejected or missing observation yields one deficiency message.
+    .OUTPUTS
+        [pscustomobject] TrustedAttribution, ForbiddenDenied, Deficiencies, SentinelRef, ShellRef.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]]$Observations,
+        [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyString()][string]$ToolHandlerSha256,
+        [Parameter(Mandatory = $true)][datetime]$Now,
+        [Parameter(Mandatory = $true)][int]$TtlSeconds
+    )
+
+    $deficiencies = [System.Collections.Generic.List[object]]::new()
+    $accepted = $null
+    $candidates = @($Observations | Where-Object { [string]$_['code'] -ceq 'SENTINEL' -and [string]$_['tool'] -ceq 'discovery_capability_sentinel' })
+    if ($candidates.Count -eq 0) { $deficiencies.Add([pscustomobject]@{ Control = 'trusted_attribution'; Message = 'no sentinel tool observation was recorded for this session' }) }
+    # Each sentinel-tool observation must pass every check; the first that does supplies the attributed agent.
+    foreach ($candidate in $candidates) {
+        $reference = [string]$candidate['observation_ref']
+        $observedAt = ConvertTo-DiscoveryObservationInstant -Value $candidate['observed_at']
+        $problem = $null
+        if ([string]::IsNullOrWhiteSpace([string]$candidate['agent_id']) -or [string]$candidate['agent_type'] -cne 'discovery-capability-sentinel') { $problem = 'carries no sentinel agent identity' }
+        elseif ([string]$candidate['state'] -cne 'consumed') { $problem = "was not consumed by the sentinel tool (state $([string]$candidate['state']))" }
+        elseif ([string]::IsNullOrEmpty($ToolHandlerSha256) -or [string]$candidate['handler_sha256'] -cne $ToolHandlerSha256) { $problem = 'was recorded by a tool handler whose hash differs from the registered handler' }
+        elseif ($null -eq $observedAt -or ($Now.ToUniversalTime() - $observedAt).TotalSeconds -gt $TtlSeconds -or $observedAt -gt $Now.ToUniversalTime()) { $problem = 'is stale' }
+        if ($null -eq $problem) { if ($null -eq $accepted) { $accepted = $candidate } }
+        else { $deficiencies.Add([pscustomobject]@{ Control = 'trusted_attribution'; Message = "sentinel observation $reference $problem" }) }
+    }
+    $shell = $null
+    if ($null -ne $accepted) {
+        $shell = @($Observations | Where-Object { [string]$_['code'] -ceq 'SHELL' -and [string]$_['decision'] -ceq 'deny' -and [string]$_['agent_id'] -ceq [string]$accepted['agent_id'] }) | Select-Object -First 1
+    }
+    if ($null -eq $shell) { $deficiencies.Add([pscustomobject]@{ Control = 'forbidden_tools_denied'; Message = 'no SHELL deny observation from the attributed sentinel agent was recorded' }) }
+    return [pscustomobject]@{
+        TrustedAttribution = ($null -ne $accepted)
+        ForbiddenDenied    = ($null -ne $shell)
+        Deficiencies       = @($deficiencies)
+        SentinelRef        = $(if ($null -ne $accepted) { [string]$accepted['observation_ref'] } else { $null })
+        ShellRef           = $(if ($null -ne $shell) { [string]$shell['observation_ref'] } else { $null })
     }
 }
 
@@ -185,14 +262,13 @@ function Get-DiscoveryCapabilityObservation {
         Controls: hooks_enabled (the registration file is present and parseable and
         names a discovery handler), start_event, tool_event and stop_event (the
         handler is registered for the discovery agents or controlled tools and its
-        file exists), trusted_attribution and forbidden_tools_denied (the sentinel
-        decision attributed the probe specialist and denied the shell command with
-        code SHELL), workspace_trusted (supplied by the host probe, which the host
-        only runs inside a trusted workspace). The protected activation supplies the
-        workspace binding; without one the status is unsupported.
-    .PARAMETER SentinelDecision
-        Script block `param([string]$EnvelopeJson, [hashtable]$Environment)` returning
-        an object with Decision (allow or deny), Code and Text (the decision JSON).
+        file exists), trusted_attribution and forbidden_tools_denied (proved only
+        from the session's host observations recorded by the native PreToolUse gate
+        while the capability sentinel agent ran; see Get-DiscoveryObservationEvidence),
+        workspace_trusted (supplied by the host probe, which the host only runs inside
+        a trusted workspace). The protected activation supplies the workspace binding;
+        without one the status is unsupported. A session without observations is
+        unsupported, so a supported result requires the session the sentinel ran in.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -202,7 +278,6 @@ function Get-DiscoveryCapabilityObservation {
         [Parameter(Mandatory = $true)][string]$SessionId,
         [Parameter(Mandatory = $true)][string]$Nonce,
         [Parameter(Mandatory = $true)][System.Collections.IDictionary]$Runtime,
-        [Parameter(Mandatory = $true)][scriptblock]$SentinelDecision,
         [Parameter(Mandatory = $true)][hashtable]$HostEnvironment,
         [Parameter(Mandatory = $false)][hashtable]$Store = (Get-DiscoveryDefaultStore),
         [Parameter(Mandatory = $false)][bool]$WorkspaceTrusted = $true,
@@ -241,20 +316,23 @@ function Get-DiscoveryCapabilityObservation {
         }
     }
     $controls['hooks_enabled'] = $registration.Parsed -and ($handlers.Count -gt 0)
-    $sentinelId = "sentinel-$Nonce"
-    $envelope = Get-DiscoverySentinelEnvelope -HostName $HostName -SessionId $SessionId -SentinelId $sentinelId -WorkspaceRoot $WorkspaceRoot
-    $environment = Get-DiscoverySentinelEnvironment -HostName $HostName -SessionId $SessionId -SentinelId $sentinelId
-    try { $decision = & $SentinelDecision $envelope $environment } catch { $decision = [pscustomobject]@{ Decision = 'unavailable'; Code = 'ERROR'; Text = [string]$_.Exception.Message } }
-    $denied = ($null -ne $decision) -and ([string]$decision.Decision -eq 'deny')
-    $controls['forbidden_tools_denied'] = $denied
-    $controls['trusted_attribution'] = $denied -and ([string]$decision.Code -eq 'SHELL')
-    $probe = [ordered]@{
-        sentinel_id  = $sentinelId
-        result       = $(if ($denied) { 'denied' } elseif ($null -ne $decision -and [string]$decision.Decision -eq 'allow') { 'allowed' } else { 'unavailable' })
-        evidence_ref = $(if ($denied) { 'probe-' + (Get-DiscoverySha256Hex -Text ([string]$decision.Text)) } else { $null })
-    }
     # The workspace binding comes from the protected activation, never from the caller.
     $location = Resolve-DiscoveryAuthorityLocation -WorkspaceRoot $WorkspaceRoot -Platform $HostEnvironment.Platform -UserHome $HostEnvironment.UserHome -LocalAppData $HostEnvironment.LocalAppData -XdgStateHome $HostEnvironment.XdgStateHome
+    # Attribution and the forbidden-tool deny are proved only from what the gate observed for the sentinel agent.
+    $toolHandler = @($handlers | Where-Object { $_['event'] -eq 'tool' }) | Select-Object -First 1
+    $observations = @(Get-DiscoverySessionObservation -Location $location -SessionId $SessionId -Store $Store)
+    $evidence = Get-DiscoveryObservationEvidence -Observations $observations -ToolHandlerSha256 $(if ($null -ne $toolHandler) { [string]$toolHandler['sha256'] } else { $null }) -Now $Now -TtlSeconds $TtlSeconds
+    $controls['trusted_attribution'] = $evidence.TrustedAttribution
+    $controls['forbidden_tools_denied'] = $evidence.ForbiddenDenied
+    $denied = $evidence.TrustedAttribution -and $evidence.ForbiddenDenied
+    $probe = [ordered]@{
+        sentinel_id  = $(if ($null -ne $evidence.SentinelRef) { $evidence.SentinelRef } else { "sentinel-$Nonce" })
+        result       = $(if ($denied) { 'denied' } else { 'unavailable' })
+        evidence_ref = $(if ($denied) { $evidence.ShellRef } else { $null })
+    }
+    foreach ($deficiency in $evidence.Deficiencies) {
+        $findings.Add([ordered]@{ code = 'DISCOVERY_ENFORCEMENT_UNAVAILABLE'; severity = 'error'; artifact_path = $null; pointer = '/controls'; related_ids = @(); related_paths = @(); message = "Native control $($deficiency.Control) is not proved: $($deficiency.Message)."; next_action = 'Run the discovery-capability-sentinel agent in this session, then re-run the capability probe with the same session.' })
+    }
     $activation = Read-DiscoveryActivationState -Location $location -ReadText $Store.ReadText
     $workspace = [ordered]@{ workspace_root = $location.Workspace; workspace_sha256 = $location.WorkspaceSha256; profile_path = 'config/discovery.json'; profile_sha256 = ('0' * 64) }
     if ($activation.Status -eq 'active') {
@@ -269,7 +347,7 @@ function Get-DiscoveryCapabilityObservation {
     foreach ($lifecycle in $script:HandlerEvents) {
         if (-not ($handlers | Where-Object { $_['event'] -eq $lifecycle })) { $findings.Add([ordered]@{ code = 'DISCOVERY_ENFORCEMENT_UNAVAILABLE'; severity = 'error'; artifact_path = $null; pointer = '/handlers'; related_ids = @(); related_paths = @(); message = "No $lifecycle hook handler was observed."; next_action = 'Install and register the discovery hook handlers and re-run the capability probe.' }) }
     }
-    if (-not $denied) { $findings.Add([ordered]@{ code = 'DISCOVERY_ENFORCEMENT_UNAVAILABLE'; severity = 'error'; artifact_path = $null; pointer = '/probe'; related_ids = @(); related_paths = @(); message = "Sentinel $sentinelId was $($probe['result']) by the native hook."; next_action = 'Confirm the native hook denies forbidden operations and records protected evidence.' }) }
+    if (-not $denied) { $findings.Add([ordered]@{ code = 'DISCOVERY_ENFORCEMENT_UNAVAILABLE'; severity = 'error'; artifact_path = $null; pointer = '/probe'; related_ids = @(); related_paths = @(); message = "Sentinel $($probe['sentinel_id']) has no attributed denial in the recorded host observations."; next_action = 'Confirm the native hook denies forbidden operations and records protected evidence.' }) }
     $stamp = $Now.ToUniversalTime()
     return [ordered]@{
         '$schema'            = $script:CapabilitySchema
@@ -330,7 +408,8 @@ function Write-DiscoveryCapabilityAttestation {
 Export-ModuleMember -Function `
     Get-DiscoverySentinelRequest, `
     Get-DiscoverySentinelEnvelope, `
-    Get-DiscoverySentinelEnvironment, `
+    Get-DiscoverySessionObservation, `
+    Get-DiscoveryObservationEvidence, `
     Get-DiscoveryHostRegistration, `
     Test-DiscoveryHandlerRegistered, `
     Get-DiscoveryCapabilityObservation, `

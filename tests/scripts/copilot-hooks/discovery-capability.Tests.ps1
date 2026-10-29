@@ -7,8 +7,9 @@
 .DESCRIPTION
     .github/hooks/discovery-capability-probe.ps1 is dot-sourced in-process; the registration and
     handler bytes are the repository's real files served under the fixture workspace root and the
-    sentinel runs through the real Copilot PreToolUse adapter decision. No file is written and no
-    process, network or clock is touched.
+    protected store holds the host observations the Copilot PreToolUse gate recorded for the
+    capability sentinel agent (seeded through the shared fixtures). Attribution is proved only
+    from those records. No file is written and no process, network or clock is touched.
 #>
 
 Describe 'discovery-capability-probe.ps1 (GitHub Copilot)' {
@@ -35,25 +36,47 @@ Describe 'discovery-capability-probe.ps1 (GitHub Copilot)' {
         }
 
         function Invoke-Probe {
-            param([scriptblock]$Reader = (Get-RepoReader), [bool]$Trusted = $true, [hashtable]$Store = (Get-GateStore -HostName 'github-copilot'))
+            param([scriptblock]$Reader = (Get-RepoReader), [bool]$Trusted = $true, [hashtable]$Store = (Add-GateSentinelObservation -Store (Get-GateStore -HostName 'github-copilot') -HostName 'github-copilot'))
             return Invoke-DiscoveryCapabilityProbe -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $script:GateNonce -WorkspaceTrusted $Trusted -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes $Reader -Now $script:GateNow
         }
+
+        function Get-FindingText { param([System.Collections.IDictionary]$Observation) return (@($Observation['findings'] | ForEach-Object { $_['message'] }) -join ' | ') }
     }
 
     It 'persists the observation as the protected session capability attestation' {
-        $store = Get-GateStore -HostName 'github-copilot'
+        $store = Add-GateSentinelObservation -Store (Get-GateStore -HostName 'github-copilot') -HostName 'github-copilot'
         $observation = Invoke-Probe -Store $store
         $path = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/capability-attestation.json"
         @($store.Writes) | Should -Be @($path)
         (ConvertFrom-Json -InputObject $store.Files[$path] -Depth 16).attestation_ref | Should -Be $observation['attestation_ref']
     }
 
-    It 'observes the registered Copilot handlers from discovery.json and denies the sentinel through the real adapter' {
+    It 'observes the registered Copilot handlers from discovery.json and proves attribution from the recorded sentinel observation pair' {
         $observation = Invoke-Probe
-        $observation['status'] | Should -Be 'supported' -Because (($observation['findings'] | ForEach-Object { $_['message'] }) -join '; ')
+        $observation['status'] | Should -Be 'supported' -Because (Get-FindingText -Observation $observation)
         $observation['host'] | Should -Be 'github-copilot'
         @($observation['handlers'] | ForEach-Object { $_['path'] } | Sort-Object) | Should -Be @('.github/hooks/discovery-agent-start.ps1', '.github/hooks/discovery-agent-stop.ps1', '.github/hooks/discovery-pre-tool.ps1')
-        $observation['probe']['evidence_ref'] | Should -Match '^probe-[0-9a-f]{64}$'
+        $observation['controls']['trusted_attribution'] | Should -BeTrue
+        $observation['controls']['forbidden_tools_denied'] | Should -BeTrue
+        $observation['probe']['result'] | Should -Be 'denied'
+        $observation['probe']['sentinel_id'] | Should -Be 'observation-tool-alpha'
+        $observation['probe']['evidence_ref'] | Should -Be 'observation-shell-alpha'
+    }
+
+    It 'reports unsupported naming <Control> for <Name>' -ForEach @(
+        @{ Name = 'a session with no observation'; Seed = @{ NoTool = $true; NoShell = $true }; Control = 'trusted_attribution'; Text = 'no sentinel tool observation' }
+        @{ Name = 'a session with no observation'; Seed = @{ NoTool = $true; NoShell = $true }; Control = 'forbidden_tools_denied'; Text = 'no SHELL deny observation' }
+        @{ Name = 'an observation without agent_id'; Seed = @{ Tool = @{ agent_id = $null; agent_type = $null } }; Control = 'trusted_attribution'; Text = 'carries no sentinel agent identity' }
+        @{ Name = 'a stale observation'; Seed = @{ Tool = @{ observed_at = '2026-10-22T10:00:00Z' } }; Control = 'trusted_attribution'; Text = 'is stale' }
+        @{ Name = 'a handler-hash mismatch'; Seed = @{ Tool = @{ handler_sha256 = ('f' * 64) } }; Control = 'trusted_attribution'; Text = 'hash differs' }
+        @{ Name = 'an unconsumed sentinel grant'; Seed = @{ Tool = @{ state = 'issued' } }; Control = 'trusted_attribution'; Text = 'was not consumed' }
+    ) {
+        $observation = Invoke-Probe -Store (Add-GateSentinelObservation -Store (Get-GateStore -HostName 'github-copilot') -HostName 'github-copilot' @Seed)
+        $observation['status'] | Should -Be 'unsupported' -Because $Name
+        $observation['controls'][$Control] | Should -BeFalse
+        Get-FindingText -Observation $observation | Should -BeLike "*Native control $Control is not proved:*$Text*"
+        $observation['probe']['result'] | Should -Be 'unavailable'
+        $observation['probe']['evidence_ref'] | Should -BeNullOrEmpty
     }
 
     It 'reports unsupported when Workspace Trust is not granted or the registration file is absent' {

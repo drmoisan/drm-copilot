@@ -7,8 +7,11 @@
 .DESCRIPTION
     .codex/hooks/discovery-capability-probe.ps1 is dot-sourced in-process; the registration and
     handler bytes are the repository's real files served under the fixture workspace root and the
-    sentinel runs through the real Codex PreToolUse adapter decision. The registration rows read
-    .codex/config.toml directly. No file is written and no process, network or clock is touched.
+    protected store holds the host observations the Codex PreToolUse gate recorded for the
+    capability sentinel agent (seeded through the shared fixtures). Whether Codex places agent_id
+    on a PreToolUse payload is observed, never assumed: an observation without it is unsupported.
+    The registration rows read .codex/config.toml directly. No file is written and no process,
+    network or clock is touched.
 #>
 
 Describe 'discovery-capability-probe.ps1 (Codex)' {
@@ -38,9 +41,11 @@ Describe 'discovery-capability-probe.ps1 (Codex)' {
         }
 
         function Invoke-Probe {
-            param([scriptblock]$Reader = (Get-RepoReader), [hashtable]$Store = (Get-GateStore -HostName 'codex'))
+            param([scriptblock]$Reader = (Get-RepoReader), [hashtable]$Store = (Add-GateSentinelObservation -Store (Get-GateStore -HostName 'codex') -HostName 'codex'))
             return Invoke-DiscoveryCapabilityProbe -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $script:GateNonce -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes $Reader -Now $script:GateNow
         }
+
+        function Get-FindingText { param([System.Collections.IDictionary]$Observation) return (@($Observation['findings'] | ForEach-Object { $_['message'] }) -join ' | ') }
     }
 
     It 'resolves the shared capability module to this repository when no published .codex/lib exists' {
@@ -50,13 +55,32 @@ Describe 'discovery-capability-probe.ps1 (Codex)' {
         (Get-Command Get-DiscoveryCapabilityObservation).Source | Should -Be 'DiscoveryCapability'
     }
 
-    It 'observes the registered Codex handlers and denies the sentinel through the real adapter' {
+    It 'observes the registered Codex handlers and proves attribution from the recorded sentinel observation pair' {
         $observation = Invoke-Probe
-        $observation['status'] | Should -Be 'supported' -Because (($observation['findings'] | ForEach-Object { $_['message'] }) -join '; ')
+        $observation['status'] | Should -Be 'supported' -Because (Get-FindingText -Observation $observation)
         $observation['host'] | Should -Be 'codex'
         @($observation['handlers'] | ForEach-Object { $_['path'] } | Sort-Object) | Should -Be @('.codex/hooks/enforce-discovery-artifact-gate.ps1', '.codex/hooks/record-subagent-routing-attestation.ps1', '.codex/hooks/validate-discovery-agent-output.ps1')
-        $observation['probe']['result'] | Should -Be 'denied'
         $observation['controls']['trusted_attribution'] | Should -BeTrue
+        $observation['controls']['forbidden_tools_denied'] | Should -BeTrue
+        $observation['probe']['result'] | Should -Be 'denied'
+        $observation['probe']['sentinel_id'] | Should -Be 'observation-tool-alpha'
+        $observation['probe']['evidence_ref'] | Should -Be 'observation-shell-alpha'
+    }
+
+    It 'reports unsupported naming <Control> for <Name>' -ForEach @(
+        @{ Name = 'a session with no observation'; Seed = @{ NoTool = $true; NoShell = $true }; Control = 'trusted_attribution'; Text = 'no sentinel tool observation' }
+        @{ Name = 'a session with no observation'; Seed = @{ NoTool = $true; NoShell = $true }; Control = 'forbidden_tools_denied'; Text = 'no SHELL deny observation' }
+        @{ Name = 'a Codex-shaped observation without agent_id'; Seed = @{ Tool = @{ agent_id = $null; agent_type = $null } }; Control = 'trusted_attribution'; Text = 'carries no sentinel agent identity' }
+        @{ Name = 'a stale observation'; Seed = @{ Tool = @{ observed_at = '2026-10-22T10:00:00Z' } }; Control = 'trusted_attribution'; Text = 'is stale' }
+        @{ Name = 'a handler-hash mismatch'; Seed = @{ Tool = @{ handler_sha256 = ('f' * 64) } }; Control = 'trusted_attribution'; Text = 'hash differs' }
+        @{ Name = 'an unconsumed sentinel grant'; Seed = @{ Tool = @{ state = 'issued' } }; Control = 'trusted_attribution'; Text = 'was not consumed' }
+    ) {
+        $observation = Invoke-Probe -Store (Add-GateSentinelObservation -Store (Get-GateStore -HostName 'codex') -HostName 'codex' @Seed)
+        $observation['status'] | Should -Be 'unsupported' -Because $Name
+        $observation['controls'][$Control] | Should -BeFalse
+        Get-FindingText -Observation $observation | Should -BeLike "*Native control $Control is not proved:*$Text*"
+        $observation['probe']['result'] | Should -Be 'unavailable'
+        $observation['probe']['evidence_ref'] | Should -BeNullOrEmpty
     }
 
     It 'reports unsupported when the config omits the stop registration' {
@@ -66,7 +90,7 @@ Describe 'discovery-capability-probe.ps1 (Codex)' {
     }
 
     It 'persists the observation as the protected session capability attestation' {
-        $store = Get-GateStore -HostName 'codex'
+        $store = Add-GateSentinelObservation -Store (Get-GateStore -HostName 'codex') -HostName 'codex'
         $observation = Invoke-Probe -Store $store
         $path = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/capability-attestation.json"
         @($store.Writes) | Should -Be @($path)

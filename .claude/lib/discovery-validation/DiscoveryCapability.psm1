@@ -86,7 +86,7 @@ function ConvertTo-DiscoveryObservationInstant {
         Returns a UTC instant from a parsed observation timestamp (string or DateTime), or $null when unreadable.
     #>
     [CmdletBinding()]
-    [OutputType([nullable[datetime]])]
+    [OutputType([datetime])]
     param([Parameter(Mandatory = $false)][AllowNull()][object]$Value)
 
     if ($Value -is [datetime]) { return $Value.ToUniversalTime() }

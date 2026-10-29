@@ -50,34 +50,9 @@ BeforeAll {
         }.GetNewClosure()
     }
 
-    $script:ToolHandlers = @{ 'claude-code' = '.claude/hooks/enforce-discovery-artifact-gate.ps1'; 'codex' = '.codex/hooks/enforce-discovery-artifact-gate.ps1'; 'github-copilot' = '.github/hooks/discovery-pre-tool.ps1' }
-
-    function Add-SentinelObservation {
-        # Seeds the session's observation pair: the consumed sentinel tool call and the denied sentinel shell command.
-        param([hashtable]$Store, [string]$HostName = 'claude-code', [hashtable]$Tool = @{}, [switch]$NoTool, [switch]$NoShell)
-        $directory = Get-DiscoveryObservationDirectory -Location $script:GateLocation -SessionId 'session-alpha'
-        $handlerSha256 = Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:RepoRoot $script:ToolHandlers[$HostName])))
-        $common = [ordered]@{
-            '$schema' = 'urn:drm-copilot:discovery:2.0.0:host-observation'; schema_version = '2.0.0'; artifact_kind = 'host-observation'; host = $HostName; session_id = 'session-alpha'
-            agent_id = 'agent-sentinel'; agent_type = 'discovery-capability-sentinel'; parent_agent_id = 'root'; tool_use_id_present = $true; handler_sha256 = $handlerSha256; observed_at = '2026-10-22T11:59:00Z'
-        }
-        if (-not $NoTool) {
-            $record = [ordered]@{} + $common
-            $record['id'] = 'observation-tool-alpha'; $record['observation_ref'] = 'observation-tool-alpha'; $record['tool_name'] = 'mcp__drm-copilot__discovery_capability_sentinel'
-            $record['decision'] = 'allow'; $record['code'] = 'SENTINEL'; $record['tool'] = 'discovery_capability_sentinel'; $record['input_sha256'] = ('d' * 64); $record['expires_at'] = '2026-10-22T12:04:00Z'; $record['state'] = 'consumed'
-            foreach ($key in $Tool.Keys) { $record[$key] = $Tool[$key] }
-            $Store.Files["$directory/observation-tool-alpha.json"] = ($record | ConvertTo-Json -Depth 4)
-        }
-        if (-not $NoShell) {
-            $record = [ordered]@{} + $common
-            $record['id'] = 'observation-shell-alpha'; $record['observation_ref'] = 'observation-shell-alpha'; $record['tool_name'] = 'Bash'; $record['decision'] = 'deny'; $record['code'] = 'SHELL'
-            $Store.Files["$directory/observation-shell-alpha.json"] = ($record | ConvertTo-Json -Depth 4)
-        }
-        return $Store
-    }
-
+    # The sentinel observation pair is seeded by Add-GateSentinelObservation from DiscoveryGate.TestSupport.ps1, shared with the host probe suites.
     function Get-Observation {
-        param([string]$HostName = 'claude-code', [scriptblock]$Reader = (Get-ProbeReader), [hashtable]$Store = (Add-SentinelObservation -Store (Get-GateStore -HostName $HostName) -HostName $HostName), [bool]$Trusted = $true)
+        param([string]$HostName = 'claude-code', [scriptblock]$Reader = (Get-ProbeReader), [hashtable]$Store = (Add-GateSentinelObservation -Store (Get-GateStore -HostName $HostName) -HostName $HostName), [bool]$Trusted = $true)
         return Get-DiscoveryCapabilityObservation -HostName $HostName -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $script:GateNonce -Runtime $script:Runtime `
             -HostEnvironment $script:GateHostEnvironment -Store $Store -WorkspaceTrusted $Trusted -Now $script:GateNow -ReadBytes $Reader
     }
@@ -131,7 +106,8 @@ Describe 'sentinel' {
         $normalized.ToolInput.command | Should -Be (Get-DiscoverySentinelRequest -SentinelId 'sentinel-1')
         $normalized.ToolInput.command | Should -BeLike 'drm-copilot discovery capability probe sentinel-1:*must be denied*never executed'
         $normalized.ToolInput.command.StartsWith((Get-DiscoverySentinelCommandPrefix)) | Should -BeTrue
-        (Get-Command -Module DiscoveryCapability).Name | Should -Not -Contain 'Get-DiscoverySentinelEnvironment'
+        # The module fabricates no sentinel identity table: every attribution input comes from recorded host observations.
+        @((Get-Command -Module DiscoveryCapability).Name | Where-Object { $_ -like '*SentinelEnvironment*' }) | Should -BeNullOrEmpty
     }
 }
 
@@ -145,7 +121,7 @@ Describe 'observation evidence' {
         @{ HostName = 'claude-code'; Name = 'an unconsumed sentinel grant'; Seed = @{ Tool = @{ state = 'issued' } }; Control = 'trusted_attribution'; Text = 'was not consumed' }
         @{ HostName = 'claude-code'; Name = 'a shell deny from another agent'; Seed = @{ NoShell = $true }; Control = 'forbidden_tools_denied'; Text = 'no SHELL deny observation' }
     ) {
-        $store = Add-SentinelObservation -Store (Get-GateStore -HostName $HostName) -HostName $HostName @Seed
+        $store = Add-GateSentinelObservation -Store (Get-GateStore -HostName $HostName) -HostName $HostName @Seed
         $observation = Get-Observation -HostName $HostName -Store $store
         $observation['status'] | Should -Be 'unsupported'
         $observation['controls'][$Control] | Should -BeFalse
@@ -155,10 +131,10 @@ Describe 'observation evidence' {
     }
 
     It 'accepts a later valid observation when an earlier sentinel observation is rejected' {
-        $store = Add-SentinelObservation -Store (Get-GateStore) -Tool @{ observation_ref = 'observation-tool-beta'; id = 'observation-tool-beta'; state = 'issued' }
-        $store = Add-SentinelObservation -Store $store -NoShell
+        $store = Add-GateSentinelObservation -Store (Get-GateStore) -Tool @{ observation_ref = 'observation-tool-beta'; id = 'observation-tool-beta'; state = 'issued' }
+        $store = Add-GateSentinelObservation -Store $store -NoShell
         $evidence = Get-DiscoveryObservationEvidence -Observations (Get-DiscoverySessionObservation -Location $script:GateLocation -SessionId 'session-alpha' -Store $store) `
-            -ToolHandlerSha256 (Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:RepoRoot $script:ToolHandlers['claude-code'])))) -Now $script:GateNow -TtlSeconds 3600
+            -ToolHandlerSha256 (Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:RepoRoot $script:GateToolHandlers['claude-code'])))) -Now $script:GateNow -TtlSeconds 3600
         $evidence.TrustedAttribution | Should -BeTrue
         $evidence.SentinelRef | Should -Be 'observation-tool-alpha'
         @($evidence.Deficiencies).Count | Should -Be 0
@@ -176,7 +152,7 @@ Describe 'observation evidence' {
 
     It 'reports a future-dated or unreadable timestamp as stale' {
         foreach ($stamp in @('2026-10-22T12:30:00Z', 'not-a-time')) {
-            $store = Add-SentinelObservation -Store (Get-GateStore) -Tool @{ observed_at = $stamp }
+            $store = Add-GateSentinelObservation -Store (Get-GateStore) -Tool @{ observed_at = $stamp }
             Get-FindingText -Observation (Get-Observation -Store $store) | Should -BeLike '*is stale*'
         }
     }
@@ -213,7 +189,7 @@ Describe 'capability observation' {
     }
 
     It 'reports unsupported without a protected activation and never takes a caller capability claim' {
-        $observation = Get-Observation -Store (Add-SentinelObservation -Store (Get-GateStore -NoActivation))
+        $observation = Get-Observation -Store (Add-GateSentinelObservation -Store (Get-GateStore -NoActivation))
         $observation['status'] | Should -Be 'unsupported'
         ($observation['findings'] | ForEach-Object { $_['message'] }) -join ' ' | Should -BeLike '*No active protected activation*'
         $observation['probe']['result'] | Should -Be 'denied'
@@ -228,7 +204,7 @@ Describe 'capability attestation persistence' {
 
         function Write-Attestation {
             param([hashtable]$Store, [string]$Nonce = $script:GateNonce)
-            if (-not @($Store.Files.Keys | Where-Object { $_ -like '*/observations/*' })) { [void](Add-SentinelObservation -Store $Store) }
+            if (-not @($Store.Files.Keys | Where-Object { $_ -like '*/observations/*' })) { [void](Add-GateSentinelObservation -Store $Store) }
             $observation = Get-DiscoveryCapabilityObservation -HostName 'claude-code' -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $Nonce -Runtime $script:Runtime `
                 -HostEnvironment $script:GateHostEnvironment -Store $Store -WorkspaceTrusted $true -Now $script:GateNow -ReadBytes (Get-ProbeReader)
             $path = Write-DiscoveryCapabilityAttestation -Observation $observation -WorkspaceRoot $script:GateWorkspaceRoot -HostEnvironment $script:GateHostEnvironment -Store $Store

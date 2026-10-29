@@ -6,10 +6,11 @@
     Behavioral tests for the Claude Code discovery capability probe (issue #980).
 .DESCRIPTION
     .claude/hooks/discovery-capability-probe.ps1 is dot-sourced in-process; the registration and
-    handler bytes are the repository's real files served under the fixture workspace root, the
-    protected store and host roots come from the shared fixtures, and the sentinel runs through
-    the real PreToolUse adapter decision. No file is written, no process, network or clock is
-    touched, and the sentinel command is never executed.
+    handler bytes are the repository's real files served under the fixture workspace root, and the
+    protected store holds the host observations the PreToolUse gate recorded for the capability
+    sentinel agent (seeded through the shared fixtures). Attribution is proved only from those
+    records: a missing, identity-less, stale, unconsumed or hash-mismatched observation is
+    unsupported. No file is written and no process, network or clock is touched.
 #>
 
 Describe 'discovery-capability-probe.ps1 (Claude Code)' {
@@ -36,19 +37,24 @@ Describe 'discovery-capability-probe.ps1 (Claude Code)' {
         }
 
         function Invoke-Probe {
-            param([scriptblock]$Reader = (Get-RepoReader), [hashtable]$Store = (Get-GateStore), [bool]$Trusted = $true)
+            param([scriptblock]$Reader = (Get-RepoReader), [hashtable]$Store = (Add-GateSentinelObservation -Store (Get-GateStore)), [bool]$Trusted = $true)
             return Invoke-DiscoveryCapabilityProbe -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $script:GateNonce -WorkspaceTrusted $Trusted -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes $Reader -Now $script:GateNow
         }
+
+        function Get-FindingText { param([System.Collections.IDictionary]$Observation) return (@($Observation['findings'] | ForEach-Object { $_['message'] }) -join ' | ') }
     }
 
-    It 'observes the registered Claude handlers, hashes them and denies the sentinel through the real adapter' {
+    It 'observes the registered Claude handlers, hashes them and proves attribution from the recorded sentinel observation pair' {
         $observation = Invoke-Probe
-        $observation['status'] | Should -Be 'supported' -Because (($observation['findings'] | ForEach-Object { $_['message'] }) -join '; ')
+        $observation['status'] | Should -Be 'supported' -Because (Get-FindingText -Observation $observation)
         $observation['host'] | Should -Be 'claude-code'
         @($observation['handlers'] | ForEach-Object { $_['path'] } | Sort-Object) | Should -Be @('.claude/hooks/enforce-discovery-artifact-gate.ps1', '.claude/hooks/record-discovery-agent-start.ps1', '.claude/hooks/validate-discovery-artifact-gate.ps1')
         $observation['configuration_sha256'] | Should -Be (Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:RepoRoot '.claude/settings.json'))))
-        $observation['probe']['result'] | Should -Be 'denied'
         $observation['controls']['trusted_attribution'] | Should -BeTrue
+        $observation['controls']['forbidden_tools_denied'] | Should -BeTrue
+        $observation['probe']['result'] | Should -Be 'denied'
+        $observation['probe']['sentinel_id'] | Should -Be 'observation-tool-alpha'
+        $observation['probe']['evidence_ref'] | Should -Be 'observation-shell-alpha'
         $observation['runtime']['build_sha256'] | Should -Match '^[0-9a-f]{64}$'
     }
 
@@ -68,12 +74,28 @@ Describe 'discovery-capability-probe.ps1 (Claude Code)' {
         $observation['runtime']['policy_version'] | Should -BeOfType [int]
     }
 
+    It 'reports unsupported naming <Control> for <Name>' -ForEach @(
+        @{ Name = 'a session with no observation'; Seed = @{ NoTool = $true; NoShell = $true }; Control = 'trusted_attribution'; Text = 'no sentinel tool observation' }
+        @{ Name = 'a session with no observation'; Seed = @{ NoTool = $true; NoShell = $true }; Control = 'forbidden_tools_denied'; Text = 'no SHELL deny observation' }
+        @{ Name = 'an observation without agent_id'; Seed = @{ Tool = @{ agent_id = $null; agent_type = $null } }; Control = 'trusted_attribution'; Text = 'carries no sentinel agent identity' }
+        @{ Name = 'a stale observation'; Seed = @{ Tool = @{ observed_at = '2026-10-22T10:00:00Z' } }; Control = 'trusted_attribution'; Text = 'is stale' }
+        @{ Name = 'a handler-hash mismatch'; Seed = @{ Tool = @{ handler_sha256 = ('f' * 64) } }; Control = 'trusted_attribution'; Text = 'hash differs' }
+        @{ Name = 'an unconsumed sentinel grant'; Seed = @{ Tool = @{ state = 'issued' } }; Control = 'trusted_attribution'; Text = 'was not consumed' }
+    ) {
+        $observation = Invoke-Probe -Store (Add-GateSentinelObservation -Store (Get-GateStore) @Seed)
+        $observation['status'] | Should -Be 'unsupported' -Because $Name
+        $observation['controls'][$Control] | Should -BeFalse
+        Get-FindingText -Observation $observation | Should -BeLike "*Native control $Control is not proved:*$Text*"
+        $observation['probe']['result'] | Should -Be 'unavailable'
+        $observation['probe']['evidence_ref'] | Should -BeNullOrEmpty
+    }
+
     It 'reports unsupported when the workspace has no protected activation' {
-        (Invoke-Probe -Store (Get-GateStore -NoActivation))['status'] | Should -Be 'unsupported'
+        (Invoke-Probe -Store (Add-GateSentinelObservation -Store (Get-GateStore -NoActivation)))['status'] | Should -Be 'unsupported'
     }
 
     It 'persists the observation as the protected session capability attestation' {
-        $store = Get-GateStore
+        $store = Add-GateSentinelObservation -Store (Get-GateStore)
         $observation = Invoke-Probe -Store $store
         $path = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/capability-attestation.json"
         @($store.Writes) | Should -Be @($path)

@@ -170,6 +170,53 @@ function Get-GateEnvelope {
     return ($envelope | ConvertTo-Json -Compress -Depth 8)
 }
 
+$script:GateRepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
+# The registered PreToolUse handler of each host; the gate records the hash of its own bytes and the probe hashes the same file.
+$script:GateToolHandlers = @{ 'claude-code' = '.claude/hooks/enforce-discovery-artifact-gate.ps1'; 'codex' = '.codex/hooks/enforce-discovery-artifact-gate.ps1'; 'github-copilot' = '.github/hooks/discovery-pre-tool.ps1' }
+
+function Add-GateSentinelObservation {
+    <#
+    .SYNOPSIS
+        Seeds session-alpha's sentinel observation pair into Store and returns the store.
+    .DESCRIPTION
+        The pair is what the native PreToolUse gate records while the capability sentinel
+        agent runs: the consumed sentinel tool call (observation-tool-alpha, with the
+        one-use grant fields) and the denied sentinel shell command (observation-shell-alpha),
+        both attributed to agent-sentinel and carrying the hash of the repository's registered
+        tool handler for HostName. Tool overrides fields of the tool observation; NoTool and
+        NoShell omit a record. Records are placed directly in Files, so Writes is unchanged.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)][hashtable]$Store,
+        [Parameter(Mandatory = $false)][string]$HostName = 'claude-code',
+        [Parameter(Mandatory = $false)][hashtable]$Tool = @{},
+        [Parameter(Mandatory = $false)][switch]$NoTool,
+        [Parameter(Mandatory = $false)][switch]$NoShell
+    )
+
+    $directory = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/observations"
+    $handlerSha256 = Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:GateRepoRoot $script:GateToolHandlers[$HostName])))
+    $common = [ordered]@{
+        '$schema' = 'urn:drm-copilot:discovery:2.0.0:host-observation'; schema_version = '2.0.0'; artifact_kind = 'host-observation'; host = $HostName; session_id = 'session-alpha'
+        agent_id = 'agent-sentinel'; agent_type = 'discovery-capability-sentinel'; parent_agent_id = 'root'; tool_use_id_present = $true; handler_sha256 = $handlerSha256; observed_at = '2026-10-22T11:59:00Z'
+    }
+    if (-not $NoTool) {
+        $record = [ordered]@{} + $common
+        $record['id'] = 'observation-tool-alpha'; $record['observation_ref'] = 'observation-tool-alpha'; $record['tool_name'] = 'mcp__drm-copilot__discovery_capability_sentinel'
+        $record['decision'] = 'allow'; $record['code'] = 'SENTINEL'; $record['tool'] = 'discovery_capability_sentinel'; $record['input_sha256'] = ('d' * 64); $record['expires_at'] = '2026-10-22T12:04:00Z'; $record['state'] = 'consumed'
+        foreach ($key in $Tool.Keys) { $record[$key] = $Tool[$key] }
+        $Store.Files["$directory/observation-tool-alpha.json"] = ($record | ConvertTo-Json -Depth 4)
+    }
+    if (-not $NoShell) {
+        $record = [ordered]@{} + $common
+        $record['id'] = 'observation-shell-alpha'; $record['observation_ref'] = 'observation-shell-alpha'; $record['tool_name'] = 'Bash'; $record['decision'] = 'deny'; $record['code'] = 'SHELL'
+        $Store.Files["$directory/observation-shell-alpha.json"] = ($record | ConvertTo-Json -Depth 4)
+    }
+    return $Store
+}
+
 function Get-GateInventoryInput {
     <#
     .SYNOPSIS

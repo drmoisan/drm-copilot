@@ -8,7 +8,9 @@
     The operator script is run through the & route with the console streams redirected, so its default
     RunProbe seam dot-sources the real host probe and the script tail writes the document and exits with
     the verdict. The protected store and the trusted host environment are mocked to the in-memory
-    fixtures, so no file is written and no process, network or clock is touched.
+    fixtures, which hold no host observation for the probed session, so every host reports unsupported
+    naming trusted_attribution and forbidden_tools_denied. No file is written and no process, network
+    or clock is touched.
 #>
 
 Describe 'Test-DiscoveryHostCapability.ps1 entry point' {
@@ -50,7 +52,7 @@ Describe 'Test-DiscoveryHostCapability.ps1 entry point' {
         ($result.Stdout | ConvertFrom-Json).status | Should -Be 'unsupported'
     }
 
-    It 'dot-sources the <HostName> probe through the default seam for the hosting repository and exits with its verdict' -ForEach @(
+    It 'dot-sources the <HostName> probe through the default seam and reports a session without observations unsupported' -ForEach @(
         @{ HostName = 'claude-code' }
         @{ HostName = 'codex' }
         @{ HostName = 'github-copilot' }
@@ -61,9 +63,14 @@ Describe 'Test-DiscoveryHostCapability.ps1 entry point' {
         Mock Get-DiscoveryDefaultStore { $probeStore }.GetNewClosure()
         $result = Invoke-ScriptEntry -Arguments @{ HostName = $HostName; SessionId = 'session-alpha'; RuntimeJson = '{"build_sha256":"b","package_version":"2.0.0","policy_sha256":"p","policy_version":"1","schema_version":"2.0.0"}' }
         $result.Thrown | Should -BeNullOrEmpty
-        $result.ExitCode | Should -BeIn @(0, 1)
+        $result.ExitCode | Should -Be 1
         $document = $result.Stdout | ConvertFrom-Json
-        $document.status | Should -BeIn @('supported', 'unsupported')
+        $document.status | Should -Be 'unsupported'
+        # No in-process sentinel decision stands in for the host: without recorded observations both controls are unproved.
+        $messages = @($document.findings | ForEach-Object { [string]$_.message }) -join ' | '
+        $messages | Should -BeLike '*Native control trusted_attribution is not proved:*'
+        $messages | Should -BeLike '*Native control forbidden_tools_denied is not proved:*'
+        $document.controls.trusted_attribution | Should -BeFalse
         ([string]$document.workspace.workspace_root -replace '\\', '/') | Should -Be ($script:RepoRoot -replace '\\', '/')
     }
 }

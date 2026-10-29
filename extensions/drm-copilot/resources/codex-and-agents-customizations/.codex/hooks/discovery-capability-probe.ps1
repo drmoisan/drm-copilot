@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Codex capability probe for discovery agents: observes registration, handler hashes and the denied sentinel.
+    Codex capability probe for discovery agents: observes registration, handler hashes and the recorded sentinel observations.
 
 .DESCRIPTION
     Not an event hook. The gateway doctor and the operator script
@@ -8,12 +8,15 @@
     whether this workspace's Codex host provides the required discovery controls:
     the SubagentStart, PreToolUse and SubagentStop handlers registered in
     .codex/config.toml for the four discovery agents and the controlled tools, their
-    current hashes, and a harmless forbidden-operation sentinel that the PreToolUse
-    adapter decision must deny. The result is a capability-attestation-shaped JSON
-    document on stdout; exit 0 when supported, 1 when unsupported.
+    current hashes, and the host observations the PreToolUse gate recorded while the
+    discovery-capability-sentinel agent ran in session SessionId. The result is a
+    capability-attestation-shaped JSON document on stdout; exit 0 when supported, 1
+    when unsupported. A session without observations, or whose sentinel observation
+    carries no agent_id, is unsupported.
 
 .NOTES
-    Issue #980. Requires PowerShell 7+. Invokes NO external process.
+    Issue #980. Requires PowerShell 7+. Invokes NO external process and makes no
+    in-process sentinel decision.
 #>
 [CmdletBinding()]
 param(
@@ -73,15 +76,10 @@ function Invoke-DiscoveryCapabilityProbe {
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryDefaultStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
-    $sentinel = {
-        param([string]$EnvelopeJson, [hashtable]$Environment)
-        $outcome = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $EnvelopeJson -EnvironmentValues $Environment
-        return [pscustomobject]@{ Decision = [string]$outcome.Decision; Code = [string]$outcome.Code; Text = ($outcome | Select-Object Decision, Code, Reason | ConvertTo-Json -Compress -Depth 4) }
-    }
     $parameters = @{
         HostName = 'codex'; WorkspaceRoot = $WorkspaceRoot; SessionId = $SessionId; Nonce = $Nonce; WorkspaceTrusted = $WorkspaceTrusted; Now = $Now
         Runtime = (Get-DiscoveryProbeRuntime -RuntimeJson $RuntimeJson -WorkspaceRoot $WorkspaceRoot)
-        SentinelDecision = $sentinel; HostEnvironment = $HostEnvironment; Store = $Store
+        HostEnvironment = $HostEnvironment; Store = $Store
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }
     $observation = Get-DiscoveryCapabilityObservation @parameters

@@ -7,15 +7,17 @@
     scripts/dev-tools/Test-DiscoveryHostCapability.ps1 run this probe to observe
     whether this workspace's Copilot local harness provides the required discovery
     controls: the SubagentStart, PreToolUse and SubagentStop handlers registered in
-    .github/hooks/discovery.json, their current hashes, and a harmless
-    forbidden-operation sentinel that the PreToolUse adapter decision must deny.
-    Workspace Trust and enabled hooks are host requirements the harness enforces
-    before running any hook; the caller reports them through -WorkspaceTrusted.
-    The result is a capability-attestation-shaped JSON document on stdout; exit 0
-    when supported, 1 when unsupported.
+    .github/hooks/discovery.json, their current hashes, and the host observations
+    the PreToolUse gate recorded while the discovery-capability-sentinel agent ran
+    in session SessionId. Workspace Trust and enabled hooks are host requirements
+    the harness enforces before running any hook; the caller reports them through
+    -WorkspaceTrusted. The result is a capability-attestation-shaped JSON document
+    on stdout; exit 0 when supported, 1 when unsupported. A session without
+    observations is unsupported.
 
 .NOTES
-    Issue #980. Requires PowerShell 7+. Invokes NO external process.
+    Issue #980. Requires PowerShell 7+. Invokes NO external process and makes no
+    in-process sentinel decision.
 #>
 [CmdletBinding()]
 param(
@@ -75,18 +77,10 @@ function Invoke-DiscoveryCapabilityProbe {
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryDefaultStore }
     if ($null -eq $Now) { $Now = [datetime]::UtcNow }
-    $sentinel = {
-        param([string]$EnvelopeJson, [hashtable]$Environment)
-        $decision = Invoke-DiscoveryPreToolDecision -ToolInputRaw $EnvelopeJson -EnvironmentValues $Environment
-        $text = $decision | ConvertTo-Json -Compress -Depth 5
-        $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
-        $code = $(if ($reason -like '*shell, terminal, exec and evaluation tools are not available*') { 'SHELL' } else { 'OTHER' })
-        return [pscustomobject]@{ Decision = [string]$decision.hookSpecificOutput.permissionDecision; Code = $code; Text = $text }
-    }
     $parameters = @{
         HostName = 'github-copilot'; WorkspaceRoot = $WorkspaceRoot; SessionId = $SessionId; Nonce = $Nonce; WorkspaceTrusted = $WorkspaceTrusted; Now = $Now
         Runtime = (Get-DiscoveryProbeRuntime -RuntimeJson $RuntimeJson -WorkspaceRoot $WorkspaceRoot)
-        SentinelDecision = $sentinel; HostEnvironment = $HostEnvironment; Store = $Store
+        HostEnvironment = $HostEnvironment; Store = $Store
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }
     $observation = Get-DiscoveryCapabilityObservation @parameters
