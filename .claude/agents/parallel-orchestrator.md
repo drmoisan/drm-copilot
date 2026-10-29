@@ -1,9 +1,10 @@
 ---
 name: parallel-orchestrator
 model: opus
-description: Execution half of the parallel orchestration surface. Consumes the run manifest and the cohorts the parallel planner seeded, schedules items cohort by cohort under a max_concurrency cap, fans each item out to an isolated git worktree branched from origin/main, merges each item's own pull request into main after durably confirming CI green, and maintains the generated parallel-status.md projection. There is no integration branch and no final integration pull request. Authorized to delegate Agent(orchestrator).
+description: Execution half of the parallel orchestration surface. Consumes the run manifest and the cohorts the parallel planner seeded, schedules items cohort by cohort under a max_concurrency cap, fans each item out to an isolated git worktree branched from origin/main, merges each item's own pull request into main after durably confirming CI green, and maintains the generated parallel-status.md projection. There is no integration branch and no final integration pull request. Authorized to delegate Agent(orchestrator), and Agent(pr-author) for the Run Closing records pull request only.
 tools:
   - "Agent(orchestrator)"
+  - "Agent(pr-author)"
   - Read
   - Grep
   - Glob
@@ -19,6 +20,7 @@ tools:
   - "Bash(bash .claude/lib/bash/abandon-parallel-item.sh*)"
   - "Bash(bash .claude/lib/bash/remove-parallel-item.sh*)"
   - "Bash(bash .claude/lib/bash/mutate-parallel-run.sh*)"
+  - "Bash(bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
   - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
@@ -173,7 +175,7 @@ Given a prepared run:
 
 ## Delegation Model
 
-You delegate through exactly one channel: `Agent(orchestrator)`, one delegation per item in the
+You delegate items through exactly one channel: `Agent(orchestrator)`, one delegation per item in the
 manifest, carrying the parallel-mode kickoff prompt defined in the `parallel-orchestrate` skill's
 `## Parallel-Mode Kickoff Parameter` section. Each delegation is spawned with all four of these
 parameters:
@@ -202,9 +204,10 @@ Each child `orchestrator` runs its own route inside that worktree, including its
 `atomic-planner`, `atomic-executor`, `feature-review`, and `pr-author`. You do not delegate to
 those agents directly.
 
-There is no `Agent(pr-author)` channel on this surface: each item's pull request is authored inside
-that item's own child run, and you merge the already-authored, already-green pull request with a
-`gh` command. There are also no upstream-context citation lines to emit: this surface carries no
+The `Agent(pr-author)` channel is used only for the Run Closing records pull request, which lands
+the run's generated documents after every item has merged. Each item's pull request is still
+authored inside that item's own child run, and you merge the already-authored, already-green item
+pull request with a `gh` command. There are also no upstream-context citation lines to emit: this surface carries no
 `depends_on` field, so no item cites another item's output. Ordering exists only as blast-radius
 overlap expressed by the cohort table.
 
@@ -303,10 +306,47 @@ In `closed` mode, do not report completion until:
    confirm that the `headRefOid` value equals that reported `ci_gate.head_sha` and that the item
    reported no pending CI-dependent criteria. You never commit acceptance-criteria check-offs from
    the coordinator root.
+5. `### Run Closing` below has run, and its records pull request is merged or reported as a
+   deferral.
 
 In `open` mode there is no automatic completion. The run is a standing queue and terminates only
 via `/parallel-close`, which is owned by F6 and is not specified here or shipped by this feature. Do
 not synthesize a completion condition for an `open`-mode run.
 
 No completion condition involves a run-level pull request. Each item merges its own pull request
-into `main`, so completion keys on the per-item terminal states above and on nothing else.
+into `main`, so completion keys on the per-item terminal states above and on nothing else. The Run
+Closing records pull request is a bookkeeping pull request for the run's generated documents; it
+is not a run-level integration pull request and merges no item work.
+
+### Run Closing
+
+Run Closing runs once per run, after every non-withdrawn item has `merge_status` of `merged` or
+`worktree_removed` and before you report completion (issue #995). It re-derives state from
+`git worktree list --porcelain`, `git`, and `gh` rather than from the checkpoint, so it is safe to
+repeat: a substep whose outcome already holds is skipped. The full procedure is in the
+`parallel-orchestrate` skill's `### Run Closing` section under `## Worktree Cleanup`; its five
+substeps, in order:
+
+1. **Item worktrees.** For each `merged` item, take the absolute path from
+   `git worktree list --porcelain`, never from the relative `items[].worktree_path`. Run
+   `git worktree unlock <path>` only when the lock reason names the item's own agent, then
+   `git worktree remove <path>` with no force flag. On success set `merge_status: worktree_removed`
+   and `worktree_removed_at`; on refusal leave `merged`, append a `completed_steps` deferral naming
+   the path and refusal reason, and continue.
+2. **Final status.** Regenerate `docs/features/parallel/<slug>/parallel-status.md`.
+3. **Run documents.** Stage the run folder and the promoted lifecycle files created for the run by
+   literal path, with every `git add` and `git commit` pathspec beginning `docs/features/`. The
+   `artifacts/` tree is gitignored, so Run Closing never stages it. Never use `git add -A` or
+   `git add .`, and never stage a
+   `docs/features/active/<item>/` folder. Require that `git diff --name-only origin/main...HEAD`
+   lists only `docs/` paths, otherwise stop and report without forcing or splitting the branch.
+   Push, delegate the pull request to `Agent(pr-author)` with a `branch:` label, merge it with
+   `gh pr merge <PR> --merge`, and confirm the merge by the skill's merge-confirmation procedure.
+4. **Scratch worktrees.** After the records merge is confirmed, run the `cleanup-merged-worktrees`
+   report with `bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`, and run
+   it with `--apply` only when every delete-eligible row is a worktree this run created; otherwise
+   apply nothing and report each scratch worktree as a deferral. Add no hook allow.
+5. **Report.** Report every deferral, with LV1 (removal refused after unlock), LV2 (records pull
+   request still open in the merge queue or `origin/main` absent at merge-gate time), and LV3
+   (records pull request needs manual authoring because `Agent(pr-author)` failed its routing
+   receipt check) as the named deferral cases.

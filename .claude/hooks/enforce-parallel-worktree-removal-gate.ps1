@@ -46,6 +46,8 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWor
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
+# Shared recorded-path matcher and main-checkout-root seam (issue #995).
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
@@ -170,7 +172,10 @@ function Find-ParallelWorktreeItemRecord {
         Name of the record array to scan. Defaults to 'items', the parallel
         checkpoint's array, so every existing caller is unchanged; the epic branch
         added for issue #688 passes 'features'. Parameterized rather than duplicated
-        so both topologies share one path-normalization implementation.
+        so both topologies share one path-comparison implementation.
+    .PARAMETER BaseRoot
+        Optional. The roots a relative recorded worktree_path is joined to (issue #995).
+        With none, a relative record matches nothing.
     .OUTPUTS
         System.Object or $null
     #>
@@ -183,7 +188,11 @@ function Find-ParallelWorktreeItemRecord {
         [string] $WorktreePath,
 
         [ValidateNotNullOrEmpty()]
-        [string] $RecordArrayName = 'items'
+        [string] $RecordArrayName = 'items',
+
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [string[]] $BaseRoot = @()
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -194,17 +203,14 @@ function Find-ParallelWorktreeItemRecord {
         return $null
     }
 
-    $normalizedTarget = ($WorktreePath -replace '\\', '/').TrimEnd('/')
-
-    # Scan every recorded item for a worktree_path that matches the removal target;
-    # path separators are normalized so Windows- and POSIX-style paths compare equal.
+    # Scan every recorded item for a worktree_path that names the removal target through
+    # the shared matcher (separator style, trailing slash, case rule, relative join).
     foreach ($item in @($Checkpoint.$RecordArrayName)) {
         $itemProps = @($item.PSObject.Properties.Name)
         if ($itemProps -notcontains 'worktree_path') {
             continue
         }
-        $normalizedItemPath = (([string]$item.worktree_path) -replace '\\', '/').TrimEnd('/')
-        if ($normalizedItemPath -eq $normalizedTarget) {
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
             return $item
         }
     }
@@ -353,8 +359,13 @@ function Get-ParallelWorktreeRemovalTargetDenial {
         }
     }
     $checkpoint = $parallelRead.Checkpoint
+    # A relative record is joined to the main checkout root and to the root holding the
+    # checkpoint read (issue #995); the main root is derived once per target.
+    $mainRoot = Get-WorktreeRunMainCheckoutRoot -SessionRoot (Get-Location).Path
+    $parallelBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $parallelRead
+    $epicBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $epicRead
 
-    $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath
+    $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $itemRecord) {
         return $null
     }
@@ -371,7 +382,7 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     # $null, which yields no record, which is not allowed.
     $epicCheckpoint = $epicRead.Checkpoint
 
-    $featureRecord = Find-ParallelWorktreeItemRecord -Checkpoint $epicCheckpoint -WorktreePath $worktreePath -RecordArrayName 'features'
+    $featureRecord = Find-ParallelWorktreeItemRecord -Checkpoint $epicCheckpoint -WorktreePath $worktreePath -RecordArrayName 'features' -BaseRoot $epicBaseRoot
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $featureRecord) {
         return $null
     }
@@ -386,7 +397,7 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     # reaches the unchanged deny below. This gate defines only the parallel checkpoint
     # seam and has no epic-checkpoint seam, so its exclusion covers the items array
     # only; the epic gate covers the features array with its own exclusion.
-    if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath $worktreePath) -and
+    if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot) -and
         (Test-CleanupWorktreeManifestAuthorizesRemoval -WorktreePath $worktreePath)) {
         return $null
     }

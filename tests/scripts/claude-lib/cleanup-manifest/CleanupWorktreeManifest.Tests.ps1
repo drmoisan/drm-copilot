@@ -148,5 +148,62 @@ Describe 'CleanupWorktreeManifest' {
             # exists to close.
             $isCovered | Should -BeTrue
         }
+
+        It 'reports coverage for a relative checkpoint record joined to a base root (issue #995)' {
+            # Arrange: a parallel checkpoint recording the target relative to the main
+            # checkout, as an isolated item worktree is recorded.
+            $checkpoint = '{"items":[{"worktree_path":".claude/worktrees/agent-0f1c2d","merge_status":"pr_open"}]}' | ConvertFrom-Json
+
+            # Act: supply the main checkout root as a base root.
+            $isCovered = Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath 'C:/repos/main/.claude/worktrees/agent-0f1c2d' -BaseRoot @('C:/repos/main')
+
+            # Assert: the relative record covers the absolute target, so the manifest
+            # branch cannot authorize a removal the checkpoint protects.
+            $isCovered | Should -BeTrue
+        }
+
+        It 'does not report coverage for an unsafe .. relative checkpoint record (issue #995)' {
+            # Arrange: a relative record that would climb out of the base root.
+            $checkpoint = '{"items":[{"worktree_path":"..","merge_status":"pr_open"}]}' | ConvertFrom-Json
+
+            # Act: the target is the parent of the base root, the path the record names.
+            $isCovered = Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath 'C:/repos' -BaseRoot @('C:/repos/main')
+
+            # Assert: an unsafe relative record matches nothing.
+            $isCovered | Should -BeFalse
+        }
+
+        It 'CM-case1: a POSIX checkpoint record differing from the target only by case covers the target' {
+            # Arrange: a rooted POSIX record and a target that differ only by letter case.
+            $checkpoint = '{"items":[{"worktree_path":"/synthetic/Worktrees/Agent-X","merge_status":"pr_open"}]}' | ConvertFrom-Json
+
+            # Act: no base root is supplied.
+            $isCovered = Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath '/synthetic/worktrees/agent-x'
+
+            # Assert: the coverage exclusion is case-insensitive, matching the manifest lookup.
+            $isCovered | Should -BeTrue -Because 'the exclusion must not be narrower than the case-insensitive manifest lookup'
+        }
+
+        It 'CM-case2: a relative checkpoint record differing from the target only by case covers the target' {
+            # Arrange: a relative record and a target under the base root that differ only by case.
+            $checkpoint = '{"items":[{"worktree_path":".claude/Worktrees/Agent-X","merge_status":"pr_open"}]}' | ConvertFrom-Json
+
+            # Act: supply the main checkout root as a base root.
+            $isCovered = Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath '/synthetic/main/.claude/worktrees/agent-x' -BaseRoot @('/synthetic/main')
+
+            # Assert: the relative record covers the case-variant absolute target.
+            $isCovered | Should -BeTrue
+        }
+
+        It 'CM-case3: a checkpoint record whose name differs by more than case does not cover the target' {
+            # Arrange: a rooted POSIX record naming a different agent directory.
+            $checkpoint = '{"items":[{"worktree_path":"/synthetic/Worktrees/Agent-X","merge_status":"pr_open"}]}' | ConvertFrom-Json
+
+            # Act: the target differs in the agent name, not only in case.
+            $isCovered = Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath '/synthetic/worktrees/agent-y'
+
+            # Assert: lower-casing does not make different names equal.
+            $isCovered | Should -BeFalse
+        }
     }
 }

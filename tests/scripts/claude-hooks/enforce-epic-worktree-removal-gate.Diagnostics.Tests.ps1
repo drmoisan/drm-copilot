@@ -31,6 +31,9 @@ BeforeAll {
     Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
     Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    # No main checkout root is modelled, so no row reads the real repository (issue #995).
+    Mock Get-WorktreeRunMainCheckoutRoot { $null }
+    Mock Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution { $null }
     $libRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution").Path
     Import-Module (Join-Path $libRoot 'WorktreeRunResolution.psm1')
     Import-Module (Join-Path $libRoot 'WorktreeTargetResolution.psm1')

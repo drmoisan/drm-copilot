@@ -71,6 +71,9 @@ Describe 'enforce-epic-worktree-removal-gate issue #824 decisions' {
         . (Join-Path $script:RepoRoot '.claude/hooks/enforce-epic-worktree-removal-gate.ps1')
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        # No main checkout root is modelled, so no row reads the real repository (issue #995).
+        Mock Get-WorktreeRunMainCheckoutRoot { $null }
+        Mock Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution { $null }
         Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex'
         $script:P = '/repo/worktrees/item-a-101'
         $script:Q = '/repo/worktrees/item-b-102'

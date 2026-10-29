@@ -26,8 +26,9 @@
     before either checkpoint is read.
 
     Both branches key on the worktree PATH because the command names a path, and both
-    normalize separators and trim a trailing slash on each side of the comparison, so
-    Windows- and POSIX-style paths compare equal. Path is also why the two branches are
+    compare through Test-WorktreeRunRecordedPathMatchesTarget (issue #995), so Windows-
+    and POSIX-style paths compare equal and a relative record is joined to the main
+    checkout root and the checkpoint's own root. Path is also why the two branches are
     mutually exclusive in practice: an epic run and a parallel run allocate worktrees
     under distinct per-run, per-item paths, so a path recorded in one checkpoint is not a
     path recorded in the other, and adding branch 2 cannot widen what branch 1 authorizes.
@@ -121,6 +122,8 @@ function Find-EpicWorktreeFeatureRecord {
         Parsed epic checkpoint, or $null when absent/unreadable.
     .PARAMETER WorktreePath
         The target worktree path extracted from the command text.
+    .PARAMETER BaseRoot
+        Optional. The roots a relative recorded worktree_path is joined to (issue #995).
     .OUTPUTS
         System.Object or $null
     #>
@@ -130,7 +133,9 @@ function Find-EpicWorktreeFeatureRecord {
         $Checkpoint,
 
         [AllowNull()]
-        [string] $WorktreePath
+        [string] $WorktreePath,
+
+        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @()
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -141,17 +146,14 @@ function Find-EpicWorktreeFeatureRecord {
         return $null
     }
 
-    $normalizedTarget = ($WorktreePath -replace '\\', '/').TrimEnd('/')
-
-    # Scan every recorded feature for a worktree_path that matches the removal target;
-    # path separators are normalized so Windows- and POSIX-style paths compare equal.
+    # Scan every recorded feature for a worktree_path that names the removal target
+    # through the shared matcher (separator, trailing slash, case rule, relative join).
     foreach ($feature in @($Checkpoint.features)) {
         $featureProps = @($feature.PSObject.Properties.Name)
         if ($featureProps -notcontains 'worktree_path') {
             continue
         }
-        $normalizedFeaturePath = (([string]$feature.worktree_path) -replace '\\', '/').TrimEnd('/')
-        if ($normalizedFeaturePath -eq $normalizedTarget) {
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$feature.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
             return $feature
         }
     }
@@ -198,6 +200,8 @@ function Test-ParallelCheckpointAllowsWorktreeRemoval {
         Parsed parallel-orchestrator checkpoint, or $null when absent/unreadable.
     .PARAMETER WorktreePath
         The target worktree path extracted from the command text.
+    .PARAMETER BaseRoot
+        Optional. The roots a relative recorded worktree_path is joined to (issue #995).
     .OUTPUTS
         System.Boolean
     #>
@@ -208,7 +212,9 @@ function Test-ParallelCheckpointAllowsWorktreeRemoval {
         $Checkpoint,
 
         [AllowNull()]
-        [string] $WorktreePath
+        [string] $WorktreePath,
+
+        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @()
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -224,10 +230,8 @@ function Test-ParallelCheckpointAllowsWorktreeRemoval {
         return $false
     }
 
-    $normalizedTarget = ($WorktreePath -replace '\\', '/').TrimEnd('/')
-
-    # Scan every recorded item for a worktree_path that matches the removal target;
-    # path separators are normalized exactly as the epic branch normalizes them.
+    # Scan every recorded item for a worktree_path that names the removal target through
+    # the same shared matcher the epic branch uses.
     foreach ($item in @($Checkpoint.items)) {
         if ($null -eq $item) {
             continue
@@ -236,8 +240,7 @@ function Test-ParallelCheckpointAllowsWorktreeRemoval {
         if ($itemProps -notcontains 'worktree_path') {
             continue
         }
-        $normalizedItemPath = (([string]$item.worktree_path) -replace '\\', '/').TrimEnd('/')
-        if ($normalizedItemPath -ne $normalizedTarget) {
+        if (-not (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot)) {
             continue
         }
         if ($itemProps -notcontains 'merge_status') {
@@ -366,14 +369,19 @@ function Get-EpicWorktreeRemovalTargetDenial {
         }
     }
     $checkpoint = $epicRead.Checkpoint
+    # A relative record is joined to the main checkout root and to the root holding the
+    # checkpoint read (issue #995); the main root is derived once per target.
+    $mainRoot = Get-WorktreeRunMainCheckoutRoot -SessionRoot (Get-Location).Path
+    $epicBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $epicRead
+    $parallelBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $parallelRead
 
-    $featureRecord = Find-EpicWorktreeFeatureRecord -Checkpoint $checkpoint -WorktreePath $worktreePath
+    $featureRecord = Find-EpicWorktreeFeatureRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $epicBaseRoot
     if (Test-EpicWorktreeRemovalAllowed -FeatureRecord $featureRecord) {
         return $null
     }
 
     $parallelCheckpoint = $parallelRead.Checkpoint
-    if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath) {
+    if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot) {
         return $null
     }
 
@@ -387,8 +395,8 @@ function Get-EpicWorktreeRemovalTargetDenial {
     # the unchanged deny below. That exclusion is the only path by which the manifest
     # could widen what the gates protect, which is why it is required rather than
     # advisory, and why it is evaluated before the manifest predicate.
-    if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'features' -WorktreePath $worktreePath) -and
-        -not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $parallelCheckpoint -RecordArrayName 'items' -WorktreePath $worktreePath) -and
+    if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'features' -WorktreePath $worktreePath -BaseRoot $epicBaseRoot) -and
+        -not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $parallelCheckpoint -RecordArrayName 'items' -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot) -and
         (Test-CleanupWorktreeManifestAuthorizesRemoval -WorktreePath $worktreePath)) {
         return $null
     }
@@ -400,7 +408,7 @@ function Get-EpicWorktreeRemovalTargetDenial {
     if ($epicRead.Target.Status -eq 'NoTarget' -and $parallelRead.Target.Status -eq 'NoTarget') {
         $prefix = "$($epicRead.Target.ReasonCode): $($epicRead.Target.Detail). "
     }
-    $diagnostics = Get-EpicWorktreeGateDenyDiagnostics -EpicRead $epicRead -ParallelRead $parallelRead -WorktreePath $worktreePath
+    $diagnostics = Get-EpicWorktreeGateDenyDiagnostics -EpicRead $epicRead -ParallelRead $parallelRead -WorktreePath $worktreePath -MainRoot $mainRoot
     return Get-EpicWorktreeGateBlockDecision -Reason ('EPIC_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal. " + $diagnostics)
 }
 

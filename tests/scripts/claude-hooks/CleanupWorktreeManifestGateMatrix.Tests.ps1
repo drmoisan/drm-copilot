@@ -206,10 +206,24 @@ BeforeDiscovery {
         }
     )
 
+    # The relative-record pin (issue #995). The manifest body is the Windows-separator
+    # allow case's shape with the target re-pointed under a main checkout; the checkpoint
+    # records that target relative to the main checkout with the unsafe status pr_open, so
+    # condition 10 must exclude the manifest branch and the gate must deny.
+    $script:RelativeRecordCases = @(
+        @{
+            Case       = 'a checkpoint records the target relatively with merge_status pr_open'
+            Body       = (Get-CleanupManifestBodyForRecord -Override @{ worktree_path = '"/repo/.claude/worktrees/agent-x"' })
+            Command    = 'git worktree remove /repo/.claude/worktrees/agent-x'
+            MainRoot   = '/repo'
+            Checkpoint = '{"route_id":"parallel","items":[{"issue_num":101,"worktree_path":".claude/worktrees/agent-x","merge_status":"pr_open"}]}'
+        }
+    )
+
     # Fill the two optional per-case fields so every case carries the full variable
     # set the It bodies bind. A case that needs a different clock or command states it
     # explicitly above and is left alone here.
-    foreach ($case in ($script:DenyCases + $script:AllowCases + $script:PreservedFilesCases + $script:DuplicateCases)) {
+    foreach ($case in ($script:DenyCases + $script:AllowCases + $script:PreservedFilesCases + $script:DuplicateCases + $script:RelativeRecordCases)) {
         if (-not $case.ContainsKey('Clock')) { $case.Clock = $script:StandardClock }
         if (-not $case.ContainsKey('Command')) { $case.Command = $script:StandardCommand }
     }
@@ -229,6 +243,9 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 manifest fail-closed matrix' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        # No main checkout root is modelled, so no row reads the real repository (issue #995).
+        Mock Get-WorktreeRunMainCheckoutRoot { $null }
+        Mock Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution { $null }
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1").Path -Force
         Mock Get-CleanupWorktreeManifestContent -ModuleName CleanupWorktreeManifest { $null }
         Mock Resolve-EpicWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
@@ -280,6 +297,19 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 manifest fail-closed matrix' {
         Mock -CommandName Get-CleanupWorktreeManifestContent -ModuleName 'CleanupWorktreeManifest' -MockWith ([scriptblock]::Create($Body))
         (Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $payload).hookSpecificOutput.permissionDecision | Should -Be 'allow'
     }
+
+    It 'denies the relative-record case when <Case>' -ForEach $script:RelativeRecordCases {
+        Mock -CommandName Get-CleanupWorktreeManifestContent -ModuleName 'CleanupWorktreeManifest' -MockWith ([scriptblock]::Create($Body))
+        Mock -CommandName Get-CleanupWorktreeManifestUtcNow -ModuleName 'CleanupWorktreeManifest' -MockWith ([scriptblock]::Create($Clock))
+        $checkpointText = $Checkpoint
+        $mainRoot = $MainRoot
+        Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $checkpointText }.GetNewClosure()
+        if (Get-Command -Name Get-WorktreeRunMainCheckoutRoot -ErrorAction SilentlyContinue) { Mock -CommandName Get-WorktreeRunMainCheckoutRoot -MockWith { $mainRoot }.GetNewClosure() }
+        $payload = @{ tool_input = @{ command = $Command } } | ConvertTo-Json -Compress
+        $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $payload
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'EPIC_WORKTREE_REMOVAL_BLOCKED*'
+    }
 }
 
 Describe 'enforce-parallel-worktree-removal-gate.ps1 manifest fail-closed matrix' {
@@ -295,6 +325,9 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1 manifest fail-closed matrix
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        # No main checkout root is modelled, so no row reads the real repository (issue #995).
+        Mock Get-WorktreeRunMainCheckoutRoot { $null }
+        Mock Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution { $null }
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1").Path -Force
         Mock Get-CleanupWorktreeManifestContent -ModuleName CleanupWorktreeManifest { $null }
         Mock Resolve-ParallelWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
@@ -341,5 +374,18 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1 manifest fail-closed matrix
         (Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $payload).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         Mock -CommandName Get-CleanupWorktreeManifestContent -ModuleName 'CleanupWorktreeManifest' -MockWith ([scriptblock]::Create($Body))
         (Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $payload).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    }
+
+    It 'denies the relative-record case when <Case>' -ForEach $script:RelativeRecordCases {
+        Mock -CommandName Get-CleanupWorktreeManifestContent -ModuleName 'CleanupWorktreeManifest' -MockWith ([scriptblock]::Create($Body))
+        Mock -CommandName Get-CleanupWorktreeManifestUtcNow -ModuleName 'CleanupWorktreeManifest' -MockWith ([scriptblock]::Create($Clock))
+        $checkpointText = $Checkpoint
+        $mainRoot = $MainRoot
+        Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { $checkpointText }.GetNewClosure()
+        if (Get-Command -Name Get-WorktreeRunMainCheckoutRoot -ErrorAction SilentlyContinue) { Mock -CommandName Get-WorktreeRunMainCheckoutRoot -MockWith { $mainRoot }.GetNewClosure() }
+        $payload = @{ tool_input = @{ command = $Command } } | ConvertTo-Json -Compress
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $payload
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED*'
     }
 }
