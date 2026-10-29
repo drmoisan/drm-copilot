@@ -263,8 +263,7 @@ function ConvertTo-DiscoveryToolAuthorizationRecord {
         tool                  = $Tool
         operation             = $Operation
         input_sha256          = $InputSha256
-        # The reference names the invocation itself, as the request's invocation_ref,
-        # the start attestation and the runtime binding do; the record id is not it.
+        # Names the invocation itself (as invocation_ref and the start attestation do), never the record id.
         invocation_ref        = [string]$Invocation.invocation_id
         start_attestation_ref = [string]$Invocation.start_attestation_ref
         capability_ref        = [string]$Invocation.capability_ref
