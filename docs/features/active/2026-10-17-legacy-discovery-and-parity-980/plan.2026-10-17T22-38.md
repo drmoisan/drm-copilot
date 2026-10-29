@@ -614,17 +614,17 @@ Protected partition layout, shared with ES/discovery-authority-paths.ts and CL/D
 
 ### Phase 13 — Final verification re-run, self-review, and handoff refresh
 
-- [ ] [P13-T1] Repeat the Python formatting, lint, type and full coverage loop (FEATURE/evidence/qa-gates/).
+- [x] [P13-T1] Repeat the Python formatting, lint, type and full coverage loop (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P11-T2 over the final tree; write FEATURE/evidence/qa-gates/p13-python-{format,lint,types,tests}.<timestamp>.md with numeric line and branch coverage.
   - Tests and proof: Restart at formatting after any fix or failure; one clean pass over the complete Python population.
   - Acceptance: Zero formatter, lint, type or test failures; repository line coverage at least 85% and branch coverage at least 75%.
 
-- [ ] [P13-T2] Repeat both TypeScript quality loops and builds (FEATURE/evidence/qa-gates/).
+- [x] [P13-T2] Repeat both TypeScript quality loops and builds (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P11-T3 over the final tree; write FEATURE/evidence/qa-gates/p13-typescript-{root,extension}-{format,lint,types,tests,architecture,build}.<timestamp>.md.
   - Tests and proof: Complete coverage-enabled Jest populations with the new per-file thresholds, type checks, architecture-boundary checks and both builds; restart from formatting after any fix.
   - Acceptance: One clean cycle; every new module meets its configured per-file threshold without blanket mocks.
 
-- [ ] [P13-T3] Repeat the PowerShell gates when PowerShell changed after P11-T4 (FEATURE/evidence/qa-gates/).
+- [x] [P13-T3] Repeat the PowerShell gates when PowerShell changed after P11-T4 (FEATURE/evidence/qa-gates/).
   - Files and behavior: Determine whether any PowerShell production, test or script path was changed by a commit later than the `Timestamp` of the lexicographically greatest FEATURE/evidence/qa-gates/powershell-tests.*.md. If so, run the P11-T4 loop and CI-shaped runs and write p13-powershell-{format,analyze,tests,single-process,shards}.<timestamp>.md; otherwise this task's authorized skip branch applies and FEATURE/evidence/qa-gates/p13-powershell-unchanged.<timestamp>.md records the empty changed-path list and the P11-T4 artifacts it relies on.
   - Tests and proof: Actual analyzer, JUnit and coverage files, never MCP summaries.
   - Acceptance: Either a clean PowerShell loop with numeric line coverage or a recorded proof that no PowerShell path changed since the verified run.

@@ -10,12 +10,19 @@ Purpose:
 
 from __future__ import annotations
 
+import importlib.util
+import sys
+import types
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 
-from scripts.dev_tools import agentic_sync
+from scripts.dev_tools import (
+    agentic_sync,
+    agentic_sync_artifacts,
+    agentic_sync_filesystem,
+)
 from tests.scripts.dev_tools.agentic_sync_test_support import (
     InMemorySyncFileSystem,
     MemoryFile,
@@ -226,3 +233,63 @@ def test_main_forwards_the_forced_direction_flag(
 
     assert agentic_sync.main(["/left", "/right", flag]) == 0
     assert force_direction() == expected
+
+
+def _load_agentic_sync_copy() -> types.ModuleType:
+    """Execute agentic_sync.py as a fresh, unregistered module and return it.
+
+    The import block runs against whatever sys.modules holds at call time, so a
+    test can model the bundled layout without touching the real module object.
+    """
+    spec = importlib.util.spec_from_file_location(
+        "agentic_sync_layout_probe", agentic_sync.__file__
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_bundled_layout_imports_the_split_modules_from_dev_tools(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Without the scripts package the synchronizer imports from dev_tools."""
+    # A None entry makes the scripts-package import raise ModuleNotFoundError
+    # named for that module; the dev_tools names resolve to the real modules.
+    monkeypatch.setitem(sys.modules, "scripts.dev_tools.agentic_sync_artifacts", None)
+    monkeypatch.setitem(sys.modules, "dev_tools", types.ModuleType("dev_tools"))
+    monkeypatch.setitem(
+        sys.modules, "dev_tools.agentic_sync_artifacts", agentic_sync_artifacts
+    )
+    monkeypatch.setitem(
+        sys.modules, "dev_tools.agentic_sync_filesystem", agentic_sync_filesystem
+    )
+
+    module = _load_agentic_sync_copy()
+
+    assert module.SyncSummary is agentic_sync_artifacts.SyncSummary
+    assert module.RealSyncFileSystem is agentic_sync_filesystem.RealSyncFileSystem
+
+
+class _MissingDependencyFinder:
+    """Meta path finder that reports a third-party dependency as missing."""
+
+    def find_spec(
+        self, fullname: str, path: object = None, target: object = None
+    ) -> None:
+        """Raise for the artifacts module as if one of its imports were absent."""
+        if fullname == "scripts.dev_tools.agentic_sync_artifacts":
+            raise ModuleNotFoundError("No module named 'yaml'", name="yaml")
+
+
+def test_a_missing_third_party_dependency_is_not_masked_by_the_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Only a missing scripts package selects the fallback; other errors propagate."""
+    monkeypatch.delitem(sys.modules, "scripts.dev_tools.agentic_sync_artifacts")
+    monkeypatch.setattr(sys, "meta_path", [_MissingDependencyFinder(), *sys.meta_path])
+
+    with pytest.raises(ModuleNotFoundError) as error:
+        _load_agentic_sync_copy()
+
+    assert error.value.name == "yaml"

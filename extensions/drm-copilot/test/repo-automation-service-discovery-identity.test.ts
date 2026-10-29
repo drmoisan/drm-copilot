@@ -25,7 +25,15 @@ import {
   seeded,
   WORKSPACE,
 } from "./discovery-invocation-test-support";
-import { provider } from "./repo-automation-service-discovery-test-support";
+import {
+  buildServiceResult,
+  FakeLauncher,
+  successOutcome,
+} from "./discovery-test-helpers";
+import {
+  provider,
+  service,
+} from "./repo-automation-service-discovery-test-support";
 
 const AGENT = { agentId: "agent-alpha", role: "legacy-parity-analyst" };
 const INVOCATION_REF = "invocation-0123456789abcdef0001";
@@ -100,6 +108,45 @@ describe("consumeHostToolAuthorization", () => {
     expect(() =>
       consumeHostToolAuthorization(provider(io, { agent: AGENT }), input),
     ).toThrow("No native authorization exists");
+  });
+});
+
+describe("service consumeDiscoveryToolAuthorization", () => {
+  const input = {
+    workspaceRoot: WORKSPACE.workspace_root,
+    tool: "read_discovery_source",
+    operation: "read-source",
+    inputs: READ_INPUT,
+    invocationRef: INVOCATION_REF,
+  };
+
+  it("consumes the bound grant through the service's trusted provider", () => {
+    const io = seeded();
+    io.files.set(RECORD_PATH, JSON.stringify(issuedGrant()));
+    const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
+    const subject = service(
+      launcher,
+      provider(io, {
+        agent: AGENT,
+        now: () => new Date("2026-10-22T12:01:00Z"),
+      }),
+    );
+
+    const reference = subject.consumeDiscoveryToolAuthorization?.(input);
+
+    expect(reference).toBe(vectors.records.issued.authorization_ref);
+    expect(io.files.has(`${RECORD_PATH}.consumed`)).toBe(true);
+    expect(launcher.captures).toHaveLength(0);
+  });
+
+  it("refuses through the service when the provider has no agent identity", () => {
+    const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
+    const subject = service(launcher, provider(seeded()));
+
+    expect(() => subject.consumeDiscoveryToolAuthorization?.(input)).toThrow(
+      "DISCOVERY_AGENT_IDENTITY_REQUIRED",
+    );
+    expect(launcher.captures).toHaveLength(0);
   });
 });
 

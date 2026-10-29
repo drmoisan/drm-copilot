@@ -46,6 +46,11 @@ if TYPE_CHECKING:
     from tests.discovery_runtime.test_gateway_factory import FactoryCase
     from tests.discovery_runtime.test_service import MemoryService
 
+# An absolute root on every platform (a bare "/workspace" is not absolute on
+# Windows), so the refusal rows reach the identity checks rather than the
+# absolute-root check; no file under it is read.
+WORKSPACE = Path(__file__).resolve().parent.as_posix()
+
 
 def test_installed_host_io_composes_the_real_store_for_the_principal(
     factory_case: FactoryCase,
@@ -148,10 +153,10 @@ def test_main_composes_the_host_ports_from_the_complete_identity(
 @pytest.mark.parametrize(
     "arguments",
     [
-        ["--workspace-root", "/workspace", "--principal", "host"],
+        ["--workspace-root", WORKSPACE, "--principal", "host"],
         [
             "--workspace-root",
-            "/workspace",
+            WORKSPACE,
             "--principal",
             "host",
             "--author-id",
@@ -163,7 +168,7 @@ def test_main_composes_the_host_ports_from_the_complete_identity(
         ],
         [
             "--workspace-root",
-            "/workspace",
+            WORKSPACE,
             "--principal",
             "host",
             "--session-id",
@@ -175,7 +180,7 @@ def test_main_composes_the_host_ports_from_the_complete_identity(
         ],
         [
             "--workspace-root",
-            "/workspace",
+            WORKSPACE,
             "--principal",
             "local-user",
             "--session-id",
@@ -183,7 +188,7 @@ def test_main_composes_the_host_ports_from_the_complete_identity(
         ],
         [
             "--workspace-root",
-            "/workspace",
+            WORKSPACE,
             "--principal",
             "local-user",
             "--host-name",
@@ -191,16 +196,16 @@ def test_main_composes_the_host_ports_from_the_complete_identity(
         ],
         [
             "--workspace-root",
-            "/workspace",
+            WORKSPACE,
             "--principal",
             "local-user",
             "--agent-role",
             ROLE,
         ],
-        ["--workspace-root", "/workspace", "--principal", "host", "--author-id", ""],
+        ["--workspace-root", WORKSPACE, "--principal", "host", "--author-id", ""],
         [
             "--workspace-root",
-            "/workspace",
+            WORKSPACE,
             "--principal",
             "host",
             "--author-id",

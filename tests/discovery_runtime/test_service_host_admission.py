@@ -240,6 +240,26 @@ def test_host_authority_without_invocation_is_refused(
     assert host.writer_calls == 0 and result.input_manifest is None
 
 
+def test_provider_value_that_is_not_a_service_authority_is_refused(
+    service_io: MemoryService, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A provider that returns anything but a ServiceAuthority is never admitted."""
+    host = MemoryHostService(service_io, grants=CONTRACT_GRANTS)
+
+    def forged(request: object, *, baseline: object) -> object:
+        """Return a look-alike value instead of a ServiceAuthority."""
+        return {"principal": "host", "author_or_agent": host.agent_id}
+
+    monkeypatch.setattr(host, "authorize", forged)
+
+    result = invoke_host(
+        host, "new-contract", {"feature_id": "feature", "name": "Feature"}, write=True
+    )
+
+    assert result.exit_code == 3 and result.findings[0].code == "SERVICE_AUTHORITY"
+    assert host.writer_calls == 0 and result.input_manifest is None
+
+
 def test_local_user_behavior_is_unchanged(service_io: MemoryService) -> None:
     """The same memory service still refuses host markers under local-user rules."""
     host = MemoryHostService(service_io, grants=CONTRACT_GRANTS)
