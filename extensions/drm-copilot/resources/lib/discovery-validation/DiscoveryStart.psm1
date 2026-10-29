@@ -52,10 +52,93 @@ function Get-DiscoveryStartOutcome {
         [Parameter(Mandatory = $true)][string]$Reason,
         [Parameter(Mandatory = $false)][AllowNull()][object]$Attestation = $null,
         [Parameter(Mandatory = $false)][AllowNull()][string]$AttestationPath = $null,
-        [Parameter(Mandatory = $false)][AllowNull()][object]$Invocation = $null
+        [Parameter(Mandatory = $false)][AllowNull()][object]$Invocation = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Directory = $null
     )
 
-    return [pscustomobject]@{ Decision = $Decision; Code = $Code; Reason = $Reason; Attestation = $Attestation; AttestationPath = $AttestationPath; Invocation = $Invocation }
+    return [pscustomobject]@{ Decision = $Decision; Code = $Code; Reason = $Reason; Attestation = $Attestation; AttestationPath = $AttestationPath; Invocation = $Invocation; Directory = $Directory }
+}
+
+function Start-DiscoveryPreparedInvocation {
+    <#
+    .SYNOPSIS
+        Binds one agent to the single prepared invocation of its session, parent and agent type, and starts it.
+    .DESCRIPTION
+        Shared by the SubagentStart adapters and by the PreToolUse gate's first
+        controlled call. Exactly one prepared invocation must match (zero:
+        NO_INVOCATION; several: AMBIGUOUS); the record, deployment, agent profile
+        and capability must agree; then the start attestation is written exclusively
+        and the invocation record moves to `started`. The agent profile is read
+        through the Store's `ReadAgentProfile` seam when present (hosts with
+        non-Markdown profiles), else through ReadBytes under WorkspaceRoot.
+    .OUTPUTS
+        [pscustomobject] Decision (deny or attest), Code, Reason, Attestation,
+        AttestationPath, Invocation (the started record) and Directory.
+    #>
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][pscustomobject]$Location,
+        [Parameter(Mandatory = $true)][pscustomobject]$Principal,
+        [Parameter(Mandatory = $true)][string]$AgentId,
+        [Parameter(Mandatory = $true)][string]$AgentType,
+        [Parameter(Mandatory = $true)][pscustomobject]$Activation,
+        [Parameter(Mandatory = $true)][string]$WorkspaceRoot,
+        [Parameter(Mandatory = $true)][hashtable]$Store,
+        [Parameter(Mandatory = $true)][string]$HandlerSha256,
+        [Parameter(Mandatory = $true)][datetime]$Now,
+        [Parameter(Mandatory = $true)][string]$Nonce,
+        [Parameter(Mandatory = $false)][AllowNull()][pscustomobject]$AgentProfile = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$ActualModel = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$ActualReasoningEffort = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadBytes = $null
+    )
+
+    $found = Find-DiscoveryPreparedInvocation -Location $Location -Principal $Principal -AgentType $AgentType -Store $Store
+    if ($found.Count -eq 0) {
+        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'NO_INVOCATION' -Reason "no prepared protected invocation binds agent type $AgentType to parent $($Principal.ParentAgentId) in this session"
+    }
+    if ($found.Count -gt 1) {
+        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'AMBIGUOUS' -Reason "$($found.Count) prepared invocations bind agent type $AgentType in this session; the start cannot be attributed to one"
+    }
+    $record = $found.Record
+    if ($null -eq $AgentProfile) {
+        try {
+            # Profile source order: the host's own reader seam, else the Markdown reader over ReadBytes.
+            if ($Store.ContainsKey('ReadAgentProfile')) {
+                $AgentProfile = Invoke-DiscoveryStoreSeam -Seam $Store.ReadAgentProfile -Arguments @($Principal.HostName, $AgentType, $WorkspaceRoot)
+            } else {
+                $readParameters = @{ HostName = $Principal.HostName; AgentType = $AgentType; WorkspaceRoot = $WorkspaceRoot }
+                if ($null -ne $ReadBytes) { $readParameters['ReadBytes'] = $ReadBytes }
+                elseif ($Store.ContainsKey('ReadBytes')) { $readParameters['ReadBytes'] = $Store.ReadBytes }
+                $AgentProfile = Read-DiscoveryAgentProfile @readParameters
+            }
+        } catch {
+            return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'PROFILE' -Reason "the agent profile could not be read: $($_.Exception.Message)"
+        }
+    }
+    $mismatch = Get-DiscoveryDeploymentMismatch -Record $record -Activation $Activation -Location $Location -AgentType $AgentType `
+        -AgentProfile $AgentProfile -ActualModel $ActualModel -ActualReasoningEffort $ActualReasoningEffort
+    if ($null -ne $mismatch) { return Get-DiscoveryStartOutcome -Decision 'deny' -Code $mismatch.Code -Reason $mismatch.Reason }
+    $mismatch = Get-DiscoveryCapabilityMismatch -Location $Location -Principal $Principal -Record $record -Store $Store -Now $Now
+    if ($null -ne $mismatch) { return Get-DiscoveryStartOutcome -Decision 'deny' -Code $mismatch.Code -Reason $mismatch.Reason }
+    $attestation = ConvertTo-DiscoveryStartAttestationRecord -Principal $Principal -AgentId $AgentId -AgentType $AgentType -Record $record -AgentProfile $AgentProfile `
+        -ActualModel $ActualModel -ActualReasoningEffort $ActualReasoningEffort -HandlerSha256 $HandlerSha256 -Now $Now -Nonce $Nonce
+    $path = "$($found.Directory)/$(Get-DiscoveryStartAttestationFileName)"
+    if (-not $PSCmdlet.ShouldProcess($path, 'write start attestation')) {
+        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'STORE' -Reason 'the start attestation write was not confirmed'
+    }
+    try {
+        # The attestation is the exclusive latch; the record transition follows it.
+        Invoke-DiscoveryStoreSeam -Seam $Store.WriteText -Arguments @($path, (($attestation | ConvertTo-Json -Depth 8) + "`n"))
+        $startedText = ConvertTo-DiscoveryStartedInvocationText -Text $found.Text -AgentId $AgentId -StartAttestationRef ([string]$attestation['start_attestation_ref'])
+        Invoke-DiscoveryStoreSeam -Seam $Store.ReplaceText -Arguments @("$($found.Directory)/invocation.json", $startedText)
+    } catch {
+        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'STORE' -Reason "the start attestation could not be recorded: $($_.Exception.Message)"
+    }
+    $started = ConvertFrom-Json -InputObject $startedText -Depth 16
+    return Get-DiscoveryStartOutcome -Decision 'attest' -Code 'ATTESTED' -Reason "attested $AgentType as $($record.role) for invocation $($record.invocation_id)" `
+        -Attestation $attestation -AttestationPath $path -Invocation $started -Directory $found.Directory
 }
 
 function Read-DiscoveryStoreJson {
@@ -303,40 +386,9 @@ function Get-DiscoveryStartDecision {
     if ($activation.Status -ne 'active') {
         return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'ACTIVATION' -Reason "discovery is not active for this workspace ($($activation.Status): $($activation.Reason))"
     }
-    $found = Find-DiscoveryPreparedInvocation -Location $location -Principal $principal -AgentType $agentType -Store $Store
-    if ($found.Count -eq 0) {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'NO_INVOCATION' -Reason "no prepared protected invocation binds agent type $agentType to parent $($principal.ParentAgentId) in this session"
-    }
-    if ($found.Count -gt 1) {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'AMBIGUOUS' -Reason "$($found.Count) prepared invocations bind agent type $agentType in this session; the start cannot be attributed to one"
-    }
-    $record = $found.Record
-    if ($null -eq $AgentProfile) {
-        try {
-            $readParameters = @{ HostName = $principal.HostName; AgentType = $agentType; WorkspaceRoot = [string]$Normalized.Cwd }
-            if ($null -ne $ReadBytes) { $readParameters['ReadBytes'] = $ReadBytes }
-            $AgentProfile = Read-DiscoveryAgentProfile @readParameters
-        } catch {
-            return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'PROFILE' -Reason "the agent profile could not be read: $($_.Exception.Message)"
-        }
-    }
-    $mismatch = Get-DiscoveryDeploymentMismatch -Record $record -Activation $activation.Record -Location $location -AgentType $agentType `
-        -AgentProfile $AgentProfile -ActualModel $ActualModel -ActualReasoningEffort $ActualReasoningEffort
-    if ($null -ne $mismatch) { return Get-DiscoveryStartOutcome -Decision 'deny' -Code $mismatch.Code -Reason $mismatch.Reason }
-    $mismatch = Get-DiscoveryCapabilityMismatch -Location $location -Principal $principal -Record $record -Store $Store -Now $Now
-    if ($null -ne $mismatch) { return Get-DiscoveryStartOutcome -Decision 'deny' -Code $mismatch.Code -Reason $mismatch.Reason }
-    $attestation = ConvertTo-DiscoveryStartAttestationRecord -Principal $principal -AgentId $agentId -AgentType $agentType -Record $record -AgentProfile $AgentProfile `
-        -ActualModel $ActualModel -ActualReasoningEffort $ActualReasoningEffort -HandlerSha256 $HandlerSha256 -Now $Now -Nonce $Nonce
-    $path = "$($found.Directory)/$(Get-DiscoveryStartAttestationFileName)"
-    try {
-        # The attestation is the exclusive latch; the record transition follows it.
-        Invoke-DiscoveryStoreSeam -Seam $Store.WriteText -Arguments @($path, (($attestation | ConvertTo-Json -Depth 8) + "`n"))
-        $startedText = ConvertTo-DiscoveryStartedInvocationText -Text $found.Text -AgentId $agentId -StartAttestationRef ([string]$attestation['start_attestation_ref'])
-        Invoke-DiscoveryStoreSeam -Seam $Store.ReplaceText -Arguments @("$($found.Directory)/invocation.json", $startedText)
-    } catch {
-        return Get-DiscoveryStartOutcome -Decision 'deny' -Code 'STORE' -Reason "the start attestation could not be recorded: $($_.Exception.Message)"
-    }
-    return Get-DiscoveryStartOutcome -Decision 'attest' -Code 'ATTESTED' -Reason "attested $agentType as $role for invocation $($record.invocation_id)" -Attestation $attestation -AttestationPath $path -Invocation $record
+    return Start-DiscoveryPreparedInvocation -Location $location -Principal $principal -AgentId $agentId -AgentType $agentType -Activation $activation.Record `
+        -WorkspaceRoot ([string]$Normalized.Cwd) -Store $Store -HandlerSha256 $HandlerSha256 -Now $Now -Nonce $Nonce `
+        -AgentProfile $AgentProfile -ActualModel $ActualModel -ActualReasoningEffort $ActualReasoningEffort -ReadBytes $ReadBytes
 }
 
 function Get-DiscoveryAuthorizationNonceText {
@@ -384,6 +436,7 @@ Export-ModuleMember -Function `
     Find-DiscoveryPreparedInvocation, `
     Get-DiscoveryDeploymentMismatch, `
     Get-DiscoveryCapabilityMismatch, `
+    Start-DiscoveryPreparedInvocation, `
     Get-DiscoveryStartDecision, `
     Get-DiscoveryAuthorizationNonceText, `
     ConvertTo-DiscoveryStartHookOutput

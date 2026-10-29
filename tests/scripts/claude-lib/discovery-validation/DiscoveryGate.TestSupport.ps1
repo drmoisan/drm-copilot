@@ -153,18 +153,19 @@ function Get-GateEnvelope {
         [Parameter(Mandatory = $false)][AllowNull()][string]$ToolUseId = 'tool-use-alpha'
     )
 
+    # A [string] parameter renders $null as ''; either means the host omitted the field.
     if ($HostName -eq 'github-copilot') {
         $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = $Event; toolName = $ToolName; toolInput = $ToolInput; cwd = $Cwd }
-        if ($null -ne $ToolUseId) { $envelope['toolUseId'] = $ToolUseId }
-        if ($null -ne $AgentId) { $envelope['agentId'] = $AgentId }
-        if ($null -ne $AgentType) { $envelope['agentType'] = $AgentType }
-        if ($null -ne $ParentAgentId) { $envelope['parentAgentId'] = $ParentAgentId }
+        if (-not [string]::IsNullOrEmpty($ToolUseId)) { $envelope['toolUseId'] = $ToolUseId }
+        if (-not [string]::IsNullOrEmpty($AgentId)) { $envelope['agentId'] = $AgentId }
+        if (-not [string]::IsNullOrEmpty($AgentType)) { $envelope['agentType'] = $AgentType }
+        if (-not [string]::IsNullOrEmpty($ParentAgentId)) { $envelope['parentAgentId'] = $ParentAgentId }
     } else {
         $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = $Event; tool_name = $ToolName; tool_input = $ToolInput; cwd = $Cwd }
-        if ($null -ne $ToolUseId) { $envelope['tool_use_id'] = $ToolUseId }
-        if ($null -ne $AgentId) { $envelope['agent_id'] = $AgentId }
-        if ($null -ne $AgentType) { $envelope['agent_type'] = $AgentType }
-        if ($null -ne $ParentAgentId) { $envelope['parent_agent_id'] = $ParentAgentId }
+        if (-not [string]::IsNullOrEmpty($ToolUseId)) { $envelope['tool_use_id'] = $ToolUseId }
+        if (-not [string]::IsNullOrEmpty($AgentId)) { $envelope['agent_id'] = $AgentId }
+        if (-not [string]::IsNullOrEmpty($AgentType)) { $envelope['agent_type'] = $AgentType }
+        if (-not [string]::IsNullOrEmpty($ParentAgentId)) { $envelope['parent_agent_id'] = $ParentAgentId }
     }
     return ($envelope | ConvertTo-Json -Compress -Depth 8)
 }

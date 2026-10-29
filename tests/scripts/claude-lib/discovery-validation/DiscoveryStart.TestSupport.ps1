@@ -83,7 +83,7 @@ function Get-StartInvocationText {
         }
         host                   = $HostName
         session_id             = 'session-alpha'
-        parent_agent_id        = 'root-alpha'
+        parent_agent_id        = 'root'
         agent_id               = $null
         role                   = $script:StartRole
         skill_id               = 'inventory-legacy-system'
@@ -239,7 +239,9 @@ function Get-StartStore {
         Reads        = [System.Collections.Generic.List[string]]::new()
         Writes       = [System.Collections.Generic.List[string]]::new()
         Replacements = [System.Collections.Generic.List[string]]::new()
+        Directories  = [System.Collections.Generic.List[string]]::new()
     }
+    $store['EnsureDirectory'] = { param([string]$Directory) $store.Directories.Add($Directory) }.GetNewClosure()
     $store['ReadText'] = {
         param([string]$Path)
         $store.Reads.Add($Path)
@@ -286,16 +288,17 @@ function Get-StartEnvelope {
         [Parameter(Mandatory = $false)][AllowNull()][string]$Cwd = $script:GateWorkspaceRoot
     )
 
+    # A [string] parameter renders $null as ''; either means the host omitted the field.
     if ($HostName -eq 'github-copilot') {
         $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = 'SubagentStart'; cwd = $Cwd }
-        if ($null -ne $AgentId) { $envelope['agentId'] = $AgentId }
-        if ($null -ne $AgentType) { $envelope['agentType'] = $AgentType }
-        if ($null -ne $ParentAgentId) { $envelope['parentAgentId'] = $ParentAgentId }
+        if (-not [string]::IsNullOrEmpty($AgentId)) { $envelope['agentId'] = $AgentId }
+        if (-not [string]::IsNullOrEmpty($AgentType)) { $envelope['agentType'] = $AgentType }
+        if (-not [string]::IsNullOrEmpty($ParentAgentId)) { $envelope['parentAgentId'] = $ParentAgentId }
     } else {
         $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = 'SubagentStart'; cwd = $Cwd; transcript_path = 'transcripts/agent-alpha.jsonl' }
-        if ($null -ne $AgentId) { $envelope['agent_id'] = $AgentId }
-        if ($null -ne $AgentType) { $envelope['agent_type'] = $AgentType }
-        if ($null -ne $ParentAgentId) { $envelope['parent_agent_id'] = $ParentAgentId }
+        if (-not [string]::IsNullOrEmpty($AgentId)) { $envelope['agent_id'] = $AgentId }
+        if (-not [string]::IsNullOrEmpty($AgentType)) { $envelope['agent_type'] = $AgentType }
+        if (-not [string]::IsNullOrEmpty($ParentAgentId)) { $envelope['parent_agent_id'] = $ParentAgentId }
     }
     return ($envelope | ConvertTo-Json -Compress -Depth 4)
 }
