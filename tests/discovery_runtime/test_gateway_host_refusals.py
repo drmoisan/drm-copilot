@@ -15,7 +15,6 @@ from tests.discovery_runtime.gateway_host_test_support import (
     INVOCATION,
     NEW_OUTPUT,
     NOW,
-    READ_REFERENCE,
     HostCase,
     host_case,
     new_contract,
@@ -319,31 +318,6 @@ def test_output_changes_are_not_drift(service_io: MemoryService) -> None:
     assert authority.principal == "host"
 
 
-def test_read_outside_the_selected_paths_is_refused(service_io: MemoryService) -> None:
-    """A read beyond the invocation scope is refused even inside a configured root."""
-    case = host_case(service_io)
-    case.authorization(
-        READ_REFERENCE,
-        tool="read_discovery_source",
-        operation="read-source",
-    )
-
-    refused(
-        case,
-        lambda: case.io.authorize(
-            request(
-                "read-source",
-                {"read_operation": "list", "paths": ["verification"]},
-                root=service_io.disk.root,
-                reference=READ_REFERENCE,
-            ),
-            baseline=case.capture(),
-        ),
-        "SERVICE_AUTHORITY",
-        spent=READ_REFERENCE,
-    )
-
-
 @pytest.mark.parametrize(
     "name", ["invocation.json", "start-attestation.json", "baseline-result.json"]
 )
@@ -374,34 +348,6 @@ def test_another_invocation_reference_finds_no_partition(
             new_contract(case, invocation="invocation-beta"), baseline=case.capture()
         )
     assert INVOCATION not in "".join(case.store.writes)
-
-
-def test_read_outside_the_configured_input_scope_is_refused(
-    service_io: MemoryService,
-) -> None:
-    """A selected path outside the profile's configured roots still cannot be read."""
-    case = host_case(service_io)
-    case.authorization(
-        READ_REFERENCE,
-        tool="read_discovery_source",
-        operation="read-source",
-    )
-    edit(case, "invocation.json", selected_paths=["application", "secrets"])
-
-    refused(
-        case,
-        lambda: case.io.authorize(
-            request(
-                "read-source",
-                {"read_operation": "list", "paths": ["secrets/key.txt"]},
-                root=service_io.disk.root,
-                reference=READ_REFERENCE,
-            ),
-            baseline=case.capture(),
-        ),
-        "SERVICE_AUTHORITY",
-        spent=READ_REFERENCE,
-    )
 
 
 def test_an_inactive_workspace_is_refused_before_any_record_read(

@@ -24,6 +24,7 @@ from drm_copilot_discovery.gateway_host_baseline import (
     reconstruct_baseline,
     required_rows,
 )
+from drm_copilot_discovery.gateway_host_reads import select_reads
 from drm_copilot_discovery.gateway_host_store import InstalledHostStore
 from drm_copilot_discovery.gateway_local import (
     installed_activation,
@@ -47,7 +48,6 @@ from drm_copilot_discovery.protected_records import (
 )
 from drm_copilot_discovery.service_contracts import ServiceAuthority
 from drm_copilot_discovery.service_request_rules import CONTROLLED_OPERATIONS
-from drm_copilot_discovery.source_read_models import ReadGrant, ReadSelection
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -63,6 +63,7 @@ if TYPE_CHECKING:
         RuntimeIdentity,
         ServiceRequest,
     )
+    from drm_copilot_discovery.source_read_models import ReadSelection
 
 SESSION_PARTITION = "sessions"
 INVOCATION_PARTITION = "invocations"
@@ -327,35 +328,22 @@ class HostServiceIO:
     ) -> ReadSelection:
         """Return the read grants for request within the invocation's selected paths.
 
-        Every requested path must equal or lie beneath a `selected_paths` entry
-        and resolve through PathPolicy.resolve_read; otherwise the refusal is raised.
+        Every requested path must equal or lie beneath a `selected_paths` entry,
+        resolve through PathPolicy.resolve_read, cross no symlink or reparse
+        point and resolve inside the selection (gateway_host_reads.select_reads);
+        otherwise the refusal is raised. The metadata seam supplies the stamps.
         """
-        selected = cast("tuple[str, ...]", invocation.get("selected_paths", ()))
-        paths = cast("tuple[str, ...]", request.inputs.get("paths", ()))
         policy = PathPolicy(
             capture.snapshot.profile,
             workspace_root=capture.workspace_root,
             metadata=self.initialization.metadata,
         )
-        grants: list[ReadGrant] = []
-        # Each requested path needs both the invocation scope and configured read scope.
-        for path in paths:
-            if not any(
-                path == root or path.startswith(root + "/") for root in selected
-            ):
-                raise refusal("The read is outside the invocation's selected paths.")
-            try:
-                target = policy.resolve_read(path)
-            except PathPolicyError as error:
-                raise refusal(
-                    "The read is outside the configured input scope."
-                ) from error
-            grants.append(
-                ReadGrant(
-                    path=path, directory=target.observations[-1].kind == "directory"
-                )
-            )
-        return ReadSelection(grants=tuple(grants))
+        return select_reads(
+            paths=cast("tuple[str, ...]", request.inputs.get("paths", ())),
+            selected=cast("tuple[str, ...]", invocation.get("selected_paths", ())),
+            workspace_root=capture.workspace_root,
+            resolve=policy.resolve_read,
+        )
 
     def authorize(
         self, request: ServiceRequest, *, baseline: CapturedWorkspace | None
