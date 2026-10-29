@@ -90,6 +90,14 @@ Describe 'Codex file-size policy twin behavior' {
         Test-FileSizeCoveredPath -RelativePath $Path | Should -Be $Expected
     }
 
+    It 'exposes the <Segment> excluded directory name' -ForEach $script:FileSizeExcludedSegmentCases {
+        Get-FileSizeExcludedSegment | Should -Contain $Segment
+    }
+
+    It 'exposes exactly the fixture count of excluded directory names' -ForEach @(@{ ExpectedCount = $script:FileSizeExcludedSegmentCases.Count }) {
+        @(Get-FileSizeExcludedSegment).Count | Should -Be $ExpectedCount
+    }
+
     It 'excludes a file under the <Segment> directory' -ForEach $script:FileSizeExcludedSegmentCases {
         Test-FileSizeCoveredPath -RelativePath "lib/$Segment/tool.ps1" | Should -BeFalse
     }

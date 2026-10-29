@@ -17,7 +17,8 @@
     Covered files are identified by an extension allowlist; every other file
     (Markdown, JSON, YAML, TOML, text fixtures) is outside the policy. Paths under
     fixed build, cache, dependency, documentation, and virtual-environment
-    directory names, and paths under .claude/worktrees/, are not covered.
+    directory names, and paths under .claude/worktrees/, are not covered. The excluded
+    directory names are defined once, in Get-FileSizeExcludedSegment.
 
     Every function is pure: no filesystem, process, network, environment, or clock
     access. Callers supply the content, the paths, and the recorded sizes. The
@@ -46,6 +47,26 @@ function Get-FileSizePolicyLimit {
         Advisory  = 700
         HardLimit = 800
     }
+}
+
+function Get-FileSizeExcludedSegment {
+    <#
+    .SYNOPSIS
+        Return the directory names excluded from the file-size policy.
+    .DESCRIPTION
+        A path with any of these names as a directory segment is not covered. This
+        function is the single source of the excluded names: Test-FileSizeCoveredPath
+        and the repository gate traversal both read it. Each call returns a new array.
+    .OUTPUTS
+        System.String[].
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param()
+
+    return [string[]]@('.git', 'node_modules', 'artifacts', 'coverage', 'dist', 'out', 'virtual', 'docs',
+        'build', '.venv', 'venv', 'env', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox',
+        '.nox', 'htmlcov', '.vscode-test')
 }
 
 function Get-FileSizeLogicalLineCount {
@@ -199,9 +220,7 @@ function Test-FileSizeCoveredPath {
     }
 
     $allowedExtension = @('.py', '.ps1', '.psm1', '.ts', '.tsx', '.js', '.cjs', '.mjs', '.cs', '.sh', '.bats')
-    $excludedSegment = @('.git', 'node_modules', 'artifacts', 'coverage', 'dist', 'out', 'virtual', 'docs',
-        'build', '.venv', 'venv', 'env', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox',
-        '.nox', 'htmlcov', '.vscode-test')
+    $excludedSegment = @(Get-FileSizeExcludedSegment)
 
     $normalized = $RelativePath.Replace('\', '/')
     if ($normalized.StartsWith('.claude/worktrees/')) {
@@ -411,5 +430,5 @@ function Get-FileSizeHookDecision {
 }
 
 Export-ModuleMember -Function Get-FileSizePolicyLimit, Get-FileSizeLogicalLineCount, Get-FileSizeTier,
-ConvertTo-FileSizeRelativePath, Test-FileSizeCoveredPath, Compare-FileSizeBaselineEntry,
+Get-FileSizeExcludedSegment, ConvertTo-FileSizeRelativePath, Test-FileSizeCoveredPath, Compare-FileSizeBaselineEntry,
 Resolve-FileSizeEditContent, Get-FileSizeHookDecision

@@ -72,6 +72,39 @@ Describe 'Get-FileSizeTier' {
     }
 }
 
+Describe 'Get-FileSizeExcludedSegment' {
+    It 'includes the <Segment> directory name' -ForEach $script:FileSizeExcludedSegmentCases {
+        Get-FileSizeExcludedSegment | Should -Contain $Segment
+    }
+
+    It 'returns exactly the fixture count' -ForEach @(@{ ExpectedCount = $script:FileSizeExcludedSegmentCases.Count }) {
+        @(Get-FileSizeExcludedSegment).Count | Should -Be $ExpectedCount
+    }
+
+    It 'returns a fresh array on each call' {
+        # Arrange
+        $first = @(Get-FileSizeExcludedSegment)
+        $expected = $first[0]
+
+        # Act: mutate the first result, then request the list again.
+        $first[0] = 'mutated'
+        $second = @(Get-FileSizeExcludedSegment)
+
+        # Assert
+        $second[0] | Should -BeExactly $expected
+    }
+
+    It 'makes Test-FileSizeCoveredPath exclude every returned name' {
+        # Arrange
+        $names = @(Get-FileSizeExcludedSegment)
+
+        # Act / Assert
+        foreach ($name in $names) {
+            Test-FileSizeCoveredPath -RelativePath "src/$name/tool.py" | Should -BeFalse -Because "'$name' is excluded"
+        }
+    }
+}
+
 Describe 'Test-FileSizeCoveredPath' {
     It 'reports <Path> as covered = <Expected>' -ForEach $script:FileSizeCoveredPathCases {
         Test-FileSizeCoveredPath -RelativePath $Path | Should -Be $Expected

@@ -40,6 +40,26 @@ function Get-FileSizePolicyLimit {
     }
 }
 
+function Get-FileSizeExcludedSegment {
+    <#
+    .SYNOPSIS
+        Return the directory names excluded from the file-size policy.
+    .DESCRIPTION
+        A path with any of these names as a directory segment is not covered. This
+        function is the single source of the excluded names: Test-FileSizeCoveredPath
+        and the repository gate traversal both read it. Each call returns a new array.
+    .OUTPUTS
+        System.String[].
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param()
+
+    return [string[]]@('.git', 'node_modules', 'artifacts', 'coverage', 'dist', 'out', 'virtual', 'docs',
+        'build', '.venv', 'venv', 'env', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox',
+        '.nox', 'htmlcov', '.vscode-test')
+}
+
 function Get-FileSizeLogicalLineCount {
     <#
     .SYNOPSIS
@@ -191,9 +211,7 @@ function Test-FileSizeCoveredPath {
     }
 
     $allowedExtension = @('.py', '.ps1', '.psm1', '.ts', '.tsx', '.js', '.cjs', '.mjs', '.cs', '.sh', '.bats')
-    $excludedSegment = @('.git', 'node_modules', 'artifacts', 'coverage', 'dist', 'out', 'virtual', 'docs',
-        'build', '.venv', 'venv', 'env', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox',
-        '.nox', 'htmlcov', '.vscode-test')
+    $excludedSegment = @(Get-FileSizeExcludedSegment)
 
     $normalized = $RelativePath.Replace('\', '/')
     if ($normalized.StartsWith('.claude/worktrees/')) {

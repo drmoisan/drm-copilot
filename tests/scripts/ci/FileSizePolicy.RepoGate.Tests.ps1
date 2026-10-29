@@ -7,8 +7,8 @@
 
 .DESCRIPTION
     Discovers every covered file on disk under the repository root with a traversal that does
-    not descend into excluded directories (the excluded names of Test-FileSizeCoveredPath and
-    .claude/worktrees/), counts each file's logical lines with Get-FileSizeLogicalLineCount,
+    not descend into excluded directories (the names returned by Get-FileSizeExcludedSegment,
+    the single source shared with Test-FileSizeCoveredPath, and .claude/worktrees/), counts each file's logical lines with Get-FileSizeLogicalLineCount,
     reads config/file-size-baseline.json with Get-Content, and applies the strict ratchet with
     Get-FileSizeRatchetViolation:
 
@@ -26,10 +26,8 @@ BeforeAll {
     Import-Module -Name (Join-Path $script:RepoRoot '.claude/lib/file-size-policy/FileSizePolicy.psm1') -Force -ErrorAction Stop
     Import-Module -Name (Join-Path $script:RepoRoot 'scripts/ci/FileSizeBaseline.psm1') -Force -ErrorAction Stop
 
-    # Directory names never descended into; a file below one is never covered.
-    $script:ExcludedDirectory = @('.git', 'node_modules', 'artifacts', 'coverage', 'dist', 'out', 'virtual', 'docs',
-        'build', '.venv', 'venv', 'env', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox',
-        '.nox', 'htmlcov', '.vscode-test')
+    # Directory names never descended into; a file below one is never covered. The module is the single source.
+    $script:ExcludedDirectory = @(Get-FileSizeExcludedSegment)
 
     # Breadth-first traversal from the root. Returns repository-relative forward-slash paths of
     # the covered files and skips excluded directories and .claude/worktrees without entering them.
@@ -76,6 +74,23 @@ Describe 'File-size policy repository gate' {
         # Assert: an empty or truncated discovery would make the ratchet vacuous.
         $script:CoveredPath.Count | Should -BeGreaterThan 0
         $script:CoveredPath | Should -Contain '.claude/lib/file-size-policy/FileSizePolicy.psm1'
+    }
+
+    It 'discovers no covered file below an excluded directory name' {
+        # Arrange
+        $excluded = @(Get-FileSizeExcludedSegment)
+        $offender = [System.Collections.Generic.List[string]]::new()
+
+        # Act: every segment except the last is a directory name.
+        foreach ($path in $script:CoveredPath) {
+            $segment = @($path.Split('/'))
+            for ($index = 0; $index -lt ($segment.Count - 1); $index++) {
+                if ($excluded -ccontains $segment[$index]) { $offender.Add($path) }
+            }
+        }
+
+        # Assert
+        $offender.Count | Should -Be 0 -Because "covered paths below an excluded directory: $($offender -join ', ')"
     }
 
     It 'parses the baseline with the policy hard limit' {
