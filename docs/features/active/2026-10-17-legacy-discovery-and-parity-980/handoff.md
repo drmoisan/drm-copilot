@@ -10,21 +10,26 @@ every repository-specific value below is a placeholder their owners resolve loca
 
 | Artifact | Version | SHA-256 | Evidence |
 |---|---|---|---|
-| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`; runtime identity build `2b7d5215b1dd41cdea87424fedb7c7b0f1b25697989675d1ee87bcf832db3b4d`, policy version 2, policy `aa2349b3f387f27175c27e9a2de9477b50490ce5ba03345b3054b412ffe48958`) | 2.0.0 | `dca943beac79dab5486cd27adbd96ca3d207d755d73af8e8068aee728e10c096` | `evidence/qa-gates/discovery-installed-runtime.2026-10-28T15-06.md` (build sequence in `evidence/other/discovery-wheel-build.2026-10-28T13-21.md`) |
-| `drm-copilot.vsix` (extension) | 1.1.22 | `bc33e8055b35742d115e6f2a58c08928b3cef423379cf98a9ca56574c36381ce` | `evidence/qa-gates/discovery-installed-runtime.2026-10-28T15-06.md` (build sequence in `evidence/other/discovery-host-packages.2026-10-28T13-21.md`) |
-| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `7cc66e5e08a9bbff710c51d5234a30a6851761f2b0042c041b5cfe0737d9a40b` | `evidence/qa-gates/discovery-installed-runtime.2026-10-28T15-06.md` (build sequence in `evidence/other/discovery-host-packages.2026-10-28T13-21.md`) |
+| `drm_copilot_discovery-2.0.0-py3-none-any.whl` (built to `dist/discovery/`; runtime identity build `dc7bff83fb56a7867826bae2adcd54e295beacd5b87cbfe31eaac051c764522d`, policy version 2, policy `d73c68cd04e18dee0d4d26a29d0cea8a34b8ed21bbd054baecf37952987d72b9`) | 2.0.0 | `566679a0a929837d0c9145e0d6a2ca86da1e4b68fdcc3c3412427c274406131a` | `evidence/qa-gates/discovery-installed-runtime.2026-10-29T12-26.md` (build sequence in `evidence/other/discovery-wheel-build.2026-10-29T12-26.md`) |
+| `drm-copilot.vsix` (extension) | 1.1.22 | `efe92788da4fe743f4ee46f41edc38407c11e4f5de1e7085fc5dcc22dad73fbc` | `evidence/qa-gates/discovery-installed-runtime.2026-10-29T12-26.md` (build sequence in `evidence/other/discovery-host-packages.2026-10-29T12-26.md`) |
+| `danmoisan-drm-copilot-mcp-1.1.22.tgz` (`@danmoisan/drm-copilot-mcp`) | 1.1.22 | `ca38e6fb63a2295c2d40c7a3bfcd32d3f69575fa0fe6ce67f37283899d36dbca` | `evidence/qa-gates/discovery-installed-runtime.2026-10-29T12-26.md` (build sequence in `evidence/other/discovery-host-packages.2026-10-29T12-26.md`) |
 
-The digests are those of the artifacts rebuilt in P12-T12 after the installed-host repairs,
-following the P12-T11 build sequence; they supersede the P12-T11 digests (wheel `59652fe9…`,
+The digests are those of the artifacts rebuilt in P14-T12 from the final tree, after the
+schema-registry correction (the registry is built and verified once per catalog) and the
+rebase onto main; they supersede the P12-T12 digests (wheel `dca943be…`, VSIX `bc33e805…`,
+npm `7cc66e5e…`), the P12-T11 digests (wheel `59652fe9…`,
 VSIX `834cb081…`, npm `1bebefbc…`) and the P11-T7/P11-T8 digests (wheel `19e7dd45…`, VSIX
-`a3bf8eed…`, npm `1e170906…`), which were built before the host-principal completion path
-landed and before its installed-host repairs. The wheel's resource
+`a3bf8eed…`, npm `1e170906…`). The P12-T12 native host controls were not repeated for the
+P14-T12 build because Phase 14 changes no TypeScript, PowerShell, hook or adapter file; the
+rationale is recorded in `evidence/qa-gates/discovery-installed-runtime.2026-10-29T12-26.md`. The wheel's resource
 manifest now carries 40 entries, including `schemas/discovery/v2/start-attestation.schema.json`,
 and the runtime policy version advanced from 1 to 2 with the Phase 12 request rules. A rebuild
 after further commits produces new digests, and the published artifacts must be re-digested
-and the table updated at release time. The installed-host proof for these artifacts is P12-T12
-(the lexicographically greatest `evidence/qa-gates/discovery-installed-runtime.*.md` and
-`discovery-native-capabilities.*.md`); the earlier P11-T7 proof covered the previous build.
+and the table updated at release time. The installed-runtime proof for these artifacts is
+P14-T12 (the lexicographically greatest `evidence/qa-gates/discovery-installed-runtime.*.md`);
+the native host-control proof is P12-T12 (the lexicographically greatest
+`evidence/qa-gates/discovery-native-capabilities.*.md`), which covers host-side code unchanged
+since that build; the earlier P11-T7 proof covered a previous build.
 
 ## Installed-host agent path (proven in P12-T12; closes the P11-T7 blocker)
 
