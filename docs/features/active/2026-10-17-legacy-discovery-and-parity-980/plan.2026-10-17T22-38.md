@@ -733,7 +733,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Restart at formatting after any fix or failure. The format record quotes the Black summary containing "would be left unchanged" and no "would reformat" line; the lint record quotes "All checks passed!"; the types record quotes "0 errors". The tests record carries the pytest summary line with its wall-clock seconds and the JSON report's line and branch totals and percentages.
   - Acceptance: One clean pass with zero formatter, lint, type or test failures; repository line coverage at least 85% and branch coverage at least 75%; the threshold gate exits 0.
 
-- [ ] [P14-T7] Re-run both TypeScript quality loops and builds on the rebased tree (FEATURE/evidence/qa-gates/).
+- [x] [P14-T7] Re-run both TypeScript quality loops and builds on the rebased tree (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P13-T2 over the rebased tree; write FEATURE/evidence/qa-gates/p14-typescript-{root,extension}-{format,lint,types,tests,architecture,build}.<timestamp>.md.
   - Tests and proof: Complete coverage-enabled Jest populations with every configured per-file threshold, type checks, architecture-boundary checks and both builds; restart from formatting after any fix. Pass, fail and coverage figures come from the run output, never from a summary-only result.
   - Acceptance: One clean cycle with numeric line and branch totals for both projects; every per-file threshold is met without blanket mocks.
