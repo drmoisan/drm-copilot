@@ -20,6 +20,11 @@
          entry whose merge_status == "ci_green". A parallel run always names an explicit PR
          number (each item merges from its own isolated worktree), so a bare command with no
          PR number cannot satisfy this branch.
+     3b. Green-CI standalone path (issue #997): the command names an explicit PR number, no
+         epic or parallel checkpoint records that number or the item worktree, the per-feature
+         checkpoint records step9_status == "passed", ci_gate.conclusion == "success", and a
+         pr_gate.pr_number equal to it, and the live PR head equals ci_gate.head_sha. The
+         dot-sourced enforce-epic-merge-gate-green-ci.ps1 implements this branch.
       4. Standalone path (issue #670), evaluated last: the command names an explicit PR
          number and one of the three checkpoints above carries a
          standalone_merge_authorizations record whose pr_number equals it, whose fields are
@@ -29,15 +34,20 @@
     Otherwise the command is denied with reason EPIC_MERGE_GATE_BLOCKED; a denial from
     condition 4 also carries a standalone reason code after that token. A missing or
     unreadable checkpoint in any branch fails closed (denies). A standalone (non-epic,
-    non-parallel) run never satisfies conditions 1-3, so its only route to a merge is an
-    explicit, PR-specific, session-bound record under condition 4; a bare command with no
-    PR number never satisfies condition 4, and a blanket flag is rejected rather than read.
+    non-parallel) run never satisfies conditions 1-3; it merges through the green-CI branch
+    3b or through an explicit, PR-specific, session-bound record under condition 4. A bare
+    command with no PR number satisfies neither, and a blanket flag is rejected rather than
+    read. A 3b decline after its live-head lookup appends a GREEN_CI_* code to the deny.
     Trigger scope (issue #952): every merge method (--merge/-m, --squash/-s, --rebase/-r), --auto,
     --admin, and a bare gh pr merge are gated alike, because under a merge queue each spelling
     enqueues the pull request; only a pure --disable-auto is out of scope. The predicate and the
     PR selector reader live in enforce-epic-merge-gate-command.ps1.
 
-    Design decision: branches 1-4 trust the on-disk checkpoint and never call gh. Issue #927
+    Design decision: branches 1-4 trust the on-disk checkpoint and never call gh. The green-CI
+    branch makes at most one bounded gh pr view call, only after its pure stages A to C pass.
+    Its parallel exclusion is best-effort: the Parallel mode: true marker is in the delegation
+    prompt, not in a Bash payload, so a parallel child that no checkpoint records yet is not
+    excluded mechanically (residual window; see enforce-epic-merge-gate-green-ci.ps1). Issue #927
     adds a docs-only branch after branch 4 fails, only for an explicit PR number whose item,
     epic, and parallel targets are all NoTarget (no checkpoint records the PR): it calls
     Get-DocsOnlyMergeExemption (hook-docs-only-diff.ps1), which runs gh pr view and git in the
@@ -86,6 +96,8 @@ try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-resolution.ps1') } cat
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-command.ps1' -ErrorRecord $_ }
 # Shared docs-only diff classification and the merge-side docs-only exemption (issue #927).
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
+# Green-CI standalone merge branch: pure checks, the live-head seam, and the stage orchestrator (issue #997).
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-green-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-green-ci.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -376,6 +388,10 @@ function Invoke-EpicMergeGateDecision {
         return Get-EpicMergeGateAllowDecision
     }
 
+    # Branch 3b (issue #997): a standalone run whose checkpoint records a green S9 gate merges its own PR.
+    $greenCi = Get-EpicMergeGateGreenCiDecision -CommandText $commandText -CommandPrNumber $commandPrNumber -ChildCheckpoint $childCheckpoint -ItemTarget $itemTarget -EpicTarget $epicTarget -ParallelTarget $parallelTarget -SessionRoot $sessionRoot
+    if ($greenCi.Allowed) { return Get-EpicMergeGateAllowDecision }
+
     # Branch 4, evaluated last and only for an explicit PR number: a PR-specific standalone
     # authorization record bound to the live session. Its deny keeps the gate token first.
     if ($null -ne $commandPrNumber) {
@@ -397,10 +413,10 @@ function Invoke-EpicMergeGateDecision {
         # three details precede the standalone reason (issue #850).
         $unresolved = Get-EpicMergeGateUnresolvedReason -ItemTarget $itemTarget -EpicTarget $epicTarget -ParallelTarget $parallelTarget
         $prefix = if ($unresolved) { $unresolved + '; ' } else { '' }
-        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message + $docsOnlySuffix)
+        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message + $docsOnlySuffix + $greenCi.Suffix)
     }
 
-    return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: a pull-request merge or merge-queue enqueue (gh pr merge with any method, --auto, or --admin, or a gh api merge or enqueue mutation) requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'
+    return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: a pull-request merge or merge-queue enqueue (gh pr merge with any method, --auto, or --admin, or a gh api merge or enqueue mutation) requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green", or a standalone per-feature checkpoint (epic_mode absent or false, no parallel marker) with step9_status == "passed", ci_gate.conclusion == "success", pr_gate.pr_number equal to the explicit PR number, and ci_gate.head_sha equal to the live pull-request head. No checkpoint satisfied this gate.'
 }
 
 function Invoke-EpicMergeGateEntryPoint {
