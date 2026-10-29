@@ -158,6 +158,18 @@ Describe 'enforce-epic-merge-gate green-CI decision (issue #997)' {
             $result.Decision | Should -Be 'deny'
             $result.Reason.Contains('GREEN_CI_MATCH_HEAD_MISMATCH') | Should -BeTrue -Because $result.Reason
         }
+
+        It 'declines a --match-head-commit with no value with GREEN_CI_MATCH_HEAD_MISMATCH (issue #997)' {
+            # Arrange
+            Set-GreenCiCheckpoint -Json (New-GreenCiDecisionJson)
+
+            # Act
+            $result = Invoke-GreenCiDecision -Command 'gh pr merge 42 --merge --match-head-commit'
+
+            # Assert
+            $result.Decision | Should -Be 'deny'
+            $result.Reason.Contains('GREEN_CI_MATCH_HEAD_MISMATCH') | Should -BeTrue -Because $result.Reason
+        }
     }
 
     Context 'checkpoint and item-target declines' {
@@ -252,6 +264,7 @@ Describe 'enforce-epic-merge-gate green-CI decision (issue #997)' {
             @{ Case = 'inline environment prefix'; Command = 'GH_REPO=o/r gh pr merge 42 --merge' }
             @{ Case = '--auto'; Command = 'gh pr merge 42 --auto --merge' }
             @{ Case = 'gh api merge mutation'; Command = 'gh api -X PUT repos/o/r/pulls/42/merge' }
+            @{ Case = '--admin'; Command = 'gh pr merge 42 --merge --admin' }
         ) {
             # Arrange
             Set-GreenCiCheckpoint -Json (New-GreenCiDecisionJson)
@@ -262,6 +275,34 @@ Describe 'enforce-epic-merge-gate green-CI decision (issue #997)' {
             # Assert
             $result.Decision | Should -Be 'deny' -Because "command: $Command"
             Should -Invoke Get-EpicMergeGateLivePrHeadSha -Times 0 -Exactly
+        }
+
+        It 'declines --admin combined with a valid green checkpoint and falls through to the existing standalone-authorization deny (issue #997)' {
+            # Arrange
+            Set-GreenCiCheckpoint -Json (New-GreenCiDecisionJson)
+
+            # Act
+            $result = Invoke-GreenCiDecision -Command 'gh pr merge 42 --merge --admin'
+
+            # Assert
+            $result.Decision | Should -Be 'deny'
+            $result.Reason | Should -BeLike 'EPIC_MERGE_GATE_BLOCKED: STANDALONE_MERGE_AUTHORIZATION_ABSENT*'
+            $result.Reason.Contains('GREEN_CI') | Should -BeFalse -Because $result.Reason
+            Should -Invoke Get-EpicMergeGateLivePrHeadSha -Times 0 -Exactly
+        }
+
+        It 'still allows <Method> with a valid green checkpoint (issue #997)' -ForEach @(
+            @{ Method = '--squash' }
+            @{ Method = '--rebase' }
+        ) {
+            # Arrange
+            Set-GreenCiCheckpoint -Json (New-GreenCiDecisionJson)
+
+            # Act
+            $result = Invoke-GreenCiDecision -Command "gh pr merge 42 $Method"
+
+            # Assert
+            $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
         }
     }
 

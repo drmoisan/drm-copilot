@@ -16,7 +16,8 @@
       B. No epic or parallel run checkpoint records the PR number (both run targets NoTarget),
          and no parallel run checkpoint records the item worktree as a parallel item.
       C. The command is one structural gh pr merge with no chain, wrapper, inline environment
-         prefix, -R or --repo, /pull/ URL selector, or --auto (Get-DocsOnlyMergeShapeViolation).
+         prefix, -R or --repo, /pull/ URL selector, or --auto (Get-DocsOnlyMergeShapeViolation),
+         and carries no --admin flag (declined silently).
       D. gh pr view <PR> --json headRefOid returns a well-formed head (one bounded call).
       E. The live head equals ci_gate.head_sha, and --match-head-commit, when present, equals it.
     Stages A to C decline silently, so every existing deny text is unchanged for a non-green
@@ -261,6 +262,7 @@ function Get-EpicMergeGateGreenCiDecision {
     <#
     .SYNOPSIS
         Evaluate stages A to E of the green-CI branch and return Allowed and a deny suffix.
+        Stage C declines silently a command that carries --admin.
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .PARAMETER CommandPrNumber
@@ -298,6 +300,8 @@ function Get-EpicMergeGateGreenCiDecision {
     if (-not (Test-EpicMergeGateGreenCiNoRunRecord -EpicTarget $EpicTarget -ParallelTarget $ParallelTarget -WorktreeRoot ([string]$ItemTarget.WorktreeRoot))) { return $silent }
     # Stage C: a single structural gh pr merge naming the PR, with no repository or auto override.
     if ($null -ne (Get-DocsOnlyMergeShapeViolation -CommandText $CommandText -PrNumber $CommandPrNumber)) { return $silent }
+    # --admin bypasses branch protection, so a green checkpoint must not authorize it.
+    if (Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--admin') { return $silent }
 
     # Stage D: the only process call, made after every pure stage passed.
     $liveHead = Get-EpicMergeGateLivePrHeadSha -PrNumber $CommandPrNumber -WorktreeRoot $SessionRoot

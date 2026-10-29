@@ -259,7 +259,7 @@ Field checks 3 through 9 run in the fixed order `pr_url`, `issue_num`, `branch_n
 
 A standalone run (neither an epic child nor a parallel item) merges its own pull request at S9 step 7 of `.claude/skills/orchestrate/SKILL.md` without an authorization record. The merge gate evaluates this green-CI condition after its parallel condition and before the `standalone_merge_authorizations` condition, and allows the merge only when all of the following hold:
 
-1. The command is a single structural `gh pr merge` naming an explicit pull request number, with no chain, wrapper, inline environment prefix, `-R` or `--repo`, `/pull/` URL selector, or `--auto`.
+1. The command is a single structural `gh pr merge` naming an explicit pull request number, with no chain, wrapper, inline environment prefix, `-R` or `--repo`, `/pull/` URL selector, `--auto`, or `--admin`.
 2. Exactly one live worktree's per-feature checkpoint records that number, and no epic or parallel checkpoint records the number or that worktree's path.
 3. The per-feature checkpoint has `epic_mode` absent, `null`, or JSON `false`; carries no `parallel_mode: true` and no non-blank `parallel_slug`; records `step9_status` exactly `passed` and `ci_gate.conclusion` exactly `success`; records `pr_gate.pr_number` as a JSON integer equal to the command number (an authorization record does not substitute); records `ci_gate.head_sha` as a lowercase 40 or 64 character object id; and, when `pr_gate.head_sha` is present and not `null`, records it equal to `ci_gate.head_sha`.
 4. The live pull-request head from one bounded `gh pr view` call equals `ci_gate.head_sha`, and a `--match-head-commit` value, when present, equals the live head.

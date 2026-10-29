@@ -251,7 +251,7 @@ carries exactly these five elements.
    The prompt also instructs the child to record top-level `parallel_mode: true` and
    `parallel_slug: <slug>` in its first per-feature checkpoint write (issue #997). Both keys are
    unvalidated; the merge gate's green-CI branch declines a checkpoint that carries either, so a
-   parallel child cannot merge its own pull request through that branch.
+   parallel child that records them cannot merge its own pull request through that branch; the exclusion is best-effort when the keys are omitted.
 2. The item's active feature folder path, written literally as `docs/features/active/<basename>`.
    The child needs it for its own operation, and F7's Layer 1 hook resolves the target item by
    scanning the prompt for exactly that path shape, so the path is emitted as a bare path token.
