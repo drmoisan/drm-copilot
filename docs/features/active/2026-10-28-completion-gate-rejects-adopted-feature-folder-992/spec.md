@@ -255,13 +255,13 @@ Each criterion is observable through a named test, command, file, or CI result. 
 - [x] AC-19 (manual probe confirmation): One local run shows `git cat-file -t HEAD:<path>` printing `tree` for a committed feature folder and failing for an untracked one; the command, exit codes, and output are recorded under `<FEATURE>/evidence/`.
 - [x] AC-20 (full toolchain): The full seven-stage toolchain (format, lint, type check, architecture-boundary tests, unit tests, contract and schema checks, integration tests) passes in a single pass for the Python, TypeScript, and PowerShell surfaces touched.
 - [x] AC-21 (repro, local): With a checkpoint that adopts an existing, committed feature folder and records a valid `feature_folder_record`, the Claude stop hook allows DONE without a `new_active_feature_folder` receipt; with the folder absent from HEAD, or with no record, it still blocks. Verified by the hook Pester suite and the Python CLI `--require-complete` run on the corresponding fixture.
-- [ ] AC-22 (CI, pending-CI): CI on the PR head is green for every required check, including the Python, Jest, and Pester jobs, the Linux hook-suite job, the push-down and manifest suites, and the shuffle guards. This criterion cannot be verified before the pull request exists. It stays unchecked and is listed as pending-CI until the item's own orchestrator run checks it off at S9, after `ci_gate.conclusion` is `success` and with `ci_gate.head_sha` equal to the final PR head.
+- [x] AC-22 (CI verified on PR #999: every check passed on head 90f446e953eddaa40f8501f136df889a15d50e87): CI on the PR head is green for every required check, including the Python, Jest, and Pester jobs, the Linux hook-suite job, the push-down and manifest suites, and the shuffle guards. This criterion cannot be verified before the pull request exists. It stays unchecked and is listed as pending-CI until the item's own orchestrator run checks it off at S9, after `ci_gate.conclusion` is `success` and with `ci_gate.head_sha` equal to the final PR head.
 
 ### Acceptance Criteria Evidence
 
 Clarification for AC-2 (ordering): at the resolver level (`resolve_issue_adoption`, `resolveIssueAdoption`, `Get-OrchestratorStateIssueAdoptionResult`), waiving the tool without a record yields exactly the rule-10 string. At the routing-contract level (the shared corpus), adoption errors follow the receipt-loop errors, so the reworked `waives-new-active-feature-folder.json` lists `Checkpoint missing successful MCP receipt: potential_to_issue.` and `Checkpoint missing successful MCP receipt: new_active_feature_folder.` first and the rule-10 string after them. The implementation follows this order in all three runtimes.
 
-AC-22 is pending-CI: it stays unchecked until the item's own orchestrator run confirms at S9 that `ci_gate.conclusion` is `success` on the final PR head.
+AC-22 was checked off by the item's own orchestrator run at S9: `gh pr checks 999` reported no failing or pending check on head 90f446e953eddaa40f8501f136df889a15d50e87, and a re-run on the final PR head follows this commit.
 
 | AC | Evidence (under `evidence/`) |
 | --- | --- |
