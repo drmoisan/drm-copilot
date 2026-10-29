@@ -9,6 +9,7 @@ from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
 import pytest
+from drm_copilot_discovery import catalog as catalog_module
 from drm_copilot_discovery.catalog import (
     DIALECT,
     V1_KINDS,
@@ -27,7 +28,16 @@ from drm_copilot_discovery.resources import read_resource, render_resource_manif
 from referencing.exceptions import Unresolvable
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from _pytest.monkeypatch import MonkeyPatch
+    from referencing import Registry
+    from referencing.jsonschema import Schema
+
+    _RegistryBuilder = Callable[
+        [tuple[tuple[str, JsonObject], ...], tuple[ExtensionSchema, ...]],
+        Registry[Schema],
+    ]
 
 
 def _extension(schema: dict[str, object], **overrides: object) -> ExtensionSchema:
@@ -277,3 +287,67 @@ def test_extension_cannot_change_dialect_identity_or_escape_its_document(
     """Pinned bytes remain untrusted schema content and receive full closure checks."""
     with pytest.raises(CatalogError, match=message):
         load_catalog(extensions=(_extension(schema),))
+
+
+def _count_registry_builds(monkeypatch: MonkeyPatch) -> list[int]:
+    """Wrap the module registry builder with a delegating call counter.
+
+    Args:
+        monkeypatch (MonkeyPatch): restores the real builder after the test.
+
+    Returns:
+        list[int]: a one-element counter incremented on every registry build.
+    """
+    original = cast("_RegistryBuilder", vars(catalog_module)["_registry"])
+    calls = [0]
+
+    def counting(
+        documents: tuple[tuple[str, JsonObject], ...],
+        extensions: tuple[ExtensionSchema, ...],
+    ) -> Registry[Schema]:
+        """Count one build and delegate to the real builder unchanged."""
+        calls[0] += 1
+        return original(documents, extensions)
+
+    monkeypatch.setattr("drm_copilot_discovery.catalog._registry", counting)
+    return calls
+
+
+def test_registry_is_built_once_per_catalog(monkeypatch: MonkeyPatch) -> None:
+    """Construction builds and verifies the registry once; later calls reuse it."""
+    calls = _count_registry_builds(monkeypatch)
+    catalog = load_catalog()
+
+    # Repeated requests model one validation per document through the same catalog.
+    registries = [catalog.registry() for _ in range(3)]
+
+    assert calls[0] == 1, f"registry built {calls[0]} times for one catalog"
+    # Every request must return the one registry built at construction.
+    assert all(registry is registries[0] for registry in registries)
+
+
+def test_distinct_catalogs_do_not_share_a_registry(monkeypatch: MonkeyPatch) -> None:
+    """Each catalog value, including a replaced copy, owns its own built registry."""
+    first = load_catalog()
+    second = load_catalog()
+    calls = _count_registry_builds(monkeypatch)
+
+    copied = replace(first, documents=first.documents)
+    builds_for_copy = calls[0]
+
+    assert first.registry() is not second.registry()
+    assert builds_for_copy == 1
+    assert copied.registry() is not first.registry()
+
+
+def test_extension_registry_is_scoped_to_its_catalog() -> None:
+    """An extension identity resolves only through the catalog that pinned it."""
+    extension = _extension({"type": "string"})
+    extended = load_catalog(extensions=(extension,))
+    plain = load_catalog()
+
+    resolved = extended.registry().resolver().lookup(extension.identifier)
+
+    assert resolved.contents == {"$schema": DIALECT, "type": "string"}
+    with pytest.raises(Unresolvable):
+        plain.registry().resolver().lookup(extension.identifier)
