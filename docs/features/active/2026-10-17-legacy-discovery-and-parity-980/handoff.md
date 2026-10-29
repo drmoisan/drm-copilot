@@ -59,6 +59,15 @@ reports, `snapshot-export`, `snapshot-import`), and each attempt needs its own p
 invocation (one prepared invocation admits one start; a second prepare for the same
 specialist in one session makes the start ambiguous and is denied).
 
+## Delivery status (executor handoff, P14-T16)
+
+Every plan task is checked with canonical proof (`evidence/qa-gates/p14-handoff-validation.*.md`,
+lexicographically greatest). The final gates ran on the corrected tree, rebased onto main, in
+Phase 14; `completion-report.md` lists them. Not yet done, and not claimed: the independent
+feature review (AC-64 "Feature review reports no blocking defects.", the seeded condition for
+the final full feature review, deliverable D20) and exact-head CI on the pull request the
+orchestrator opens. No open blocker remains from the executor's side.
+
 ## Publication prerequisites
 
 1. The feature branch has passed review, the full QA pass and the orchestration completion

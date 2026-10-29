@@ -682,7 +682,7 @@ Protected partition layout, shared with ES/discovery-authority-paths.ts and CL/D
   - Tests and proof: One PASS, FAIL or justified N/A row per checklist item; the two previously failing rows cite P12-T12 and P13-T6 evidence. A FAIL row is fixed, the affected P13-T1 through P13-T6 loop is repeated, and the self-review is rewritten before this task completes.
   - Acceptance: The new self-review has zero FAIL rows and no unverified blocking row; [P11-T9] and this task are checked together, and only then.
 
-- [ ] [P13-T9] Return the refreshed executor handoff (FEATURE/handoff.md).
+- [x] [P13-T9] Return the refreshed executor handoff (FEATURE/handoff.md).
   - Files and behavior: Finalize this plan's task state, FEATURE/completion-report.md and FEATURE/handoff.md; write FEATURE/evidence/qa-gates/p13-handoff-validation.<timestamp>.md.
   - Tests and proof: Validate the plan and the orchestrator checkpoint, confirm each checked task names existing canonical proof, and list the remaining review- and CI-dependent items for the orchestrator continuation below.
   - Acceptance: The handoff is internally consistent, names no open blocker, and claims no completion for the independent review or exact-head CI.
@@ -778,7 +778,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: One PASS, FAIL or justified N/A row per checklist item. The two rows that failed in the first self-review cite P12-T12 and P14-T13 evidence; a row covers the catalog correction (shared-registry safety record, P14-T2 and P14-T3 tests, P14-T9 timing); a row covers the decision not to repeat the native host controls in P14-T12; a row covers the P14-T5 brief update (six-copy byte identity, no consuming-product name, contract suites). A FAIL row is fixed, the affected loop among P14-T6 through P14-T8 and every later dependent Phase 14 task are repeated, and the self-review is rewritten before this task completes.
   - Acceptance: The new self-review has zero FAIL rows and no unverified blocking row; [P11-T9], [P13-T8] and this task are checked together, and only then.
 
-- [ ] [P14-T16] Return the refreshed executor handoff, discharging [P13-T9] (FEATURE/handoff.md).
+- [x] [P14-T16] Return the refreshed executor handoff, discharging [P13-T9] (FEATURE/handoff.md).
   - Files and behavior: Re-execute [P13-T9]: finalize this plan's task state, FEATURE/completion-report.md and FEATURE/handoff.md; write FEATURE/evidence/qa-gates/p14-handoff-validation.<timestamp>.md.
   - Tests and proof: Validate the plan and the orchestrator checkpoint; confirm each checked task names existing canonical proof, including each discharged Phase 13 task and its Phase 14 discharging task; list the remaining review- and CI-dependent items for the orchestrator continuation below.
   - Acceptance: The handoff is internally consistent, names no open blocker, cites Phase 14 evidence for every final gate, and claims no completion for the independent review or exact-head CI; [P13-T9] and this task are checked together.

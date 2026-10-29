@@ -51,9 +51,15 @@ The two blockers the first self-review escalated (`evidence/qa-gates/self-review
 - Host limits: Codex ordinary-agent starts replayed with a reused agent id collide on the exclusive routing attestation (pre-existing ordinary hook behavior); the Python doctor under the `local-user` principal reports native capability as unavailable by contract, and the host doctor projects the session attestation.
 - Package versions: wheel 2.0.0, extension and npm package 1.1.22; digests in `handoff.md` (`## Built artifacts`).
 
-## Executor handoff
+## Executor handoff (P14-T16)
 
-Finalized by P14-T16 below.
+- Plan state: all 122 tasks of `plan.2026-10-17T22-38.md` are checked. P13-T4 to P13-T9 and P11-T9 are checked together with their Phase 14 discharging tasks (P14-T10, P14-T11, P14-T13, P14-T14, P14-T15, P14-T16), as the plan's revision section prescribes. The plan validates through the installed MCP validator and the branch-current Python CLI. The orchestrator checkpoint validates through both; it records tasks through P11-T11, and recording Phases 12 to 14 is the orchestrator's step. A proof check confirms that every checked task names at least one existing canonical artifact, and that each discharged task is checked only with its discharging task (`evidence/qa-gates/p14-handoff-validation.*.md`).
+- Baseline references: `evidence/baseline/python-tests.2026-10-18T03-51.md`, `typescript-root-tests.2026-10-18T03-55.md`, `typescript-extension-tests.2026-10-18T03-58.md`, `powershell-tests.2026-10-18T04-21.md`, `p14-registry-timing-before.2026-10-29T10-18.md`.
+- Final references: `evidence/qa-gates/p14-python-{format,lint,types,tests}.2026-10-29T12-45.md`; `p14-typescript-{root,extension}-{format,lint,types,tests,architecture,build}.2026-10-29T10-50.md`; `p14-powershell-{format,analyze,tests,single-process,shards}.2026-10-29T12-14.md`; `p14-coverage-comparison.2026-10-29T12-45.md`; `p14-repository-contracts.2026-10-29T12-49.md` with its eight command-step records; `discovery-installed-runtime.2026-10-29T12-26.md`; `evidence/regression-testing/p14-isolation.2026-10-29T12-23.md`; `evidence/other/p14-registry-timing.2026-10-29T12-45.md`.
+- Self-review: `evidence/qa-gates/self-review.2026-10-29T12-53.md` (121 rows, 0 FAIL).
+- Acceptance: `evidence/qa-gates/acceptance-criteria-status.2026-10-29T12-51.md` (65 of 66 per source).
+- Remaining review- and CI-dependent items: AC-64 "Feature review reports no blocking defects.", the seeded condition for the final full feature review, deliverable D20, and exact-head CI on the pull request the orchestrator opens (no pull request was opened by the executor).
+- Observation for the orchestrator: the checkpoint's evidence entries for P1-T4, P1-T5 and P1-T6 name paths that are not on disk. Those tasks are proven by their `requirements-traceability.md` links, which resolve (`evidence/regression-testing/p1t{4,5,6}-executor-verification.*.md`).
 
 ## Remaining local consumer work
 
