@@ -185,10 +185,13 @@ function Get-DiscoveryHostRegistration {
         Parses a host registration text into event entries (Event, Matcher, Command).
     .DESCRIPTION
         Claude settings and Copilot hook files are JSON: an event maps to groups
-        (`matcher` plus `hooks[]`) or directly to hook objects. The Codex file is TOML
-        scanned line by line: a `[[hooks.<Event>]]` table starts a group, `matcher`
-        sets its regex and each `command` names a handler. Parsed is $false when the
-        text cannot be read as the host's format.
+        (`matcher` plus `hooks[]`) or directly to hook objects. A hook object names
+        its handler through `powershell`, `bash` or `command`, read in that order, so
+        the documented Copilot shape (`version` 1 with `powershell` and `bash`) and
+        the Claude `command` shape both parse. The Codex file is TOML scanned line by
+        line: a `[[hooks.<Event>]]` table starts a group, `matcher` sets its regex and
+        each `command` names a handler. Parsed is $false when the text cannot be read
+        as the host's format.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -221,9 +224,13 @@ function Get-DiscoveryHostRegistration {
             $matcher = $(if ($null -ne $item.PSObject.Properties['matcher']) { [string]$item.matcher } else { $null })
             $hooks = $(if ($null -ne $item.PSObject.Properties['hooks']) { @($item.hooks) } else { @($item) })
             foreach ($hook in $hooks) {
-                if ($hook -is [System.Management.Automation.PSCustomObject] -and $null -ne $hook.PSObject.Properties['command']) {
-                    $entries.Add([pscustomobject]@{ Event = $eventProperty.Name; Matcher = $matcher; Command = [string]$hook.command })
+                if ($hook -isnot [System.Management.Automation.PSCustomObject]) { continue }
+                # The first present handler key wins: the Copilot shape names powershell and bash, the Claude shape names command.
+                $command = $null
+                foreach ($key in @('powershell', 'bash', 'command')) {
+                    if ($null -ne $hook.PSObject.Properties[$key] -and -not [string]::IsNullOrWhiteSpace([string]$hook.$key)) { $command = [string]$hook.$key; break }
                 }
+                if ($null -ne $command) { $entries.Add([pscustomobject]@{ Event = $eventProperty.Name; Matcher = $matcher; Command = $command }) }
             }
         }
     }

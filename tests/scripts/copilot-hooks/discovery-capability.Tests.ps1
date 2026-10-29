@@ -86,17 +86,26 @@ Describe 'discovery-capability-probe.ps1 (GitHub Copilot)' {
         $observation['controls']['hooks_enabled'] | Should -BeFalse
     }
 
-    It 'registers the four Copilot hooks with Windows command variants and no Claude matcher' {
-        $registration = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.github/hooks/discovery.json') | ConvertFrom-Json
+    It 'registers the four Copilot hooks in the documented version-1 shape with powershell and bash commands and no Claude matcher' {
+        $text = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.github/hooks/discovery.json')
+        $text | Should -BeLike '*"version": 1*'
+        $text | Should -Not -BeLike '*"windows"*'
+        $registration = $text | ConvertFrom-Json
+        $registration.version | Should -Be 1
         @($registration.hooks.PSObject.Properties.Name | Sort-Object) | Should -Be @('PreToolUse', 'SubagentStart', 'SubagentStop')
         $hooks = @($registration.hooks.PSObject.Properties | ForEach-Object { $_.Value })
         $hooks.Count | Should -Be 4
         foreach ($hook in $hooks) {
+            @($hook.PSObject.Properties.Name | Sort-Object) | Should -Be @('bash', 'powershell', 'timeout', 'type')
             $hook.type | Should -Be 'command'
-            $hook.command | Should -BeLike 'pwsh -NoProfile -File .github/hooks/*.ps1'
-            $hook.windows | Should -Be $hook.command
-            @($hook.PSObject.Properties.Name) | Should -Not -Contain 'matcher'
-            Test-Path -LiteralPath (Join-Path $script:RepoRoot ($hook.command -replace '^pwsh -NoProfile -File ', '')) | Should -BeTrue
+            $hook.powershell | Should -BeLike 'pwsh -NoProfile -File .github/hooks/*.ps1'
+            $hook.bash | Should -Be $hook.powershell
+            Test-Path -LiteralPath (Join-Path $script:RepoRoot ($hook.powershell -replace '^pwsh -NoProfile -File ', '')) | Should -BeTrue
         }
+        # The capability probe reads the same shape: every handler resolves through the powershell key.
+        $parsed = Get-DiscoveryHostRegistration -HostName 'github-copilot' -ConfigurationText $text
+        $parsed.Parsed | Should -BeTrue
+        @($parsed.Entries).Count | Should -Be 4
+        @($parsed.Entries | ForEach-Object { $_.Command } | Sort-Object -Unique) | Should -Be @($hooks | ForEach-Object { $_.powershell } | Sort-Object -Unique)
     }
 }

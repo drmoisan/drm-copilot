@@ -87,6 +87,18 @@ Describe 'host registration parsing' {
         Test-DiscoveryHandlerRegistered -Registration $registration -Event $Event -HandlerName $Handler -Admitted $admitted | Should -BeTrue
     }
 
+    It 'reads a Copilot hook command from powershell, then bash, then the legacy command key' {
+        $versioned = '{"version":1,"hooks":{"PreToolUse":[{"type":"command","powershell":"pwsh -NoProfile -File .github/hooks/a.ps1","bash":"pwsh -NoProfile -File .github/hooks/b.ps1","timeout":30}]}}'
+        $bashOnly = '{"version":1,"hooks":{"PreToolUse":[{"type":"command","bash":"pwsh -NoProfile -File .github/hooks/b.ps1"}]}}'
+        $legacy = '{"hooks":{"PreToolUse":[{"type":"command","command":"pwsh -NoProfile -File .github/hooks/c.ps1","windows":"pwsh -NoProfile -File .github/hooks/w.ps1"}]}}'
+        $blank = '{"version":1,"hooks":{"PreToolUse":[{"type":"command","powershell":"","bash":"pwsh -NoProfile -File .github/hooks/b.ps1"}]}}'
+        (Get-DiscoveryHostRegistration -HostName 'github-copilot' -ConfigurationText $versioned).Entries[0].Command | Should -Be 'pwsh -NoProfile -File .github/hooks/a.ps1'
+        (Get-DiscoveryHostRegistration -HostName 'github-copilot' -ConfigurationText $bashOnly).Entries[0].Command | Should -Be 'pwsh -NoProfile -File .github/hooks/b.ps1'
+        (Get-DiscoveryHostRegistration -HostName 'github-copilot' -ConfigurationText $legacy).Entries[0].Command | Should -Be 'pwsh -NoProfile -File .github/hooks/c.ps1'
+        (Get-DiscoveryHostRegistration -HostName 'github-copilot' -ConfigurationText $blank).Entries[0].Command | Should -Be 'pwsh -NoProfile -File .github/hooks/b.ps1'
+        @((Get-DiscoveryHostRegistration -HostName 'github-copilot' -ConfigurationText '{"version":1,"hooks":{"PreToolUse":[{"type":"command","timeout":30}]}}').Entries).Count | Should -Be 0
+    }
+
     It 'rejects a handler whose matcher excludes an agent and reports unparseable text' {
         $registration = Get-DiscoveryHostRegistration -HostName 'claude-code' -ConfigurationText '{"hooks":{"SubagentStop":[{"matcher":"atomic-planner","hooks":[{"type":"command","command":"pwsh x.ps1"}]}]}}'
         Test-DiscoveryHandlerRegistered -Registration $registration -Event 'SubagentStop' -HandlerName 'x.ps1' -Admitted @('legacy-parity-analyst') | Should -BeFalse
