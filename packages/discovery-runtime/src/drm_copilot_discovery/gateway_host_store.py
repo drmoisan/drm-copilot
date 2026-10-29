@@ -1,8 +1,10 @@
-"""Read the protected host authority store through bounded, read-only seams.
+"""Read the protected host authority store through bounded seams and latch dispatch.
 
 The host gateway consumes protected records that the native adapters wrote. This
-module defines the read-only seam it reads through and the installed filesystem
-implementation of that seam. Nothing here writes, creates or latches an entry.
+module defines the seam it reads through and the installed filesystem
+implementation of that seam. The only write is the exclusive `.used` latch the
+gateway creates beside the consumed authorization it dispatches, so the same grant
+is dispatched once; nothing here modifies, replaces or removes an entry.
 """
 
 from __future__ import annotations
@@ -11,10 +13,11 @@ from pathlib import Path
 from typing import Protocol
 
 RECORD_BYTE_LIMIT = 16777216
+USED_LATCH_TEXT = "{}\n"
 
 
 class HostStoreIO(Protocol):
-    """Read-only seams over the protected authority store; nothing here writes."""
+    """Protected authority store seams: bounded reads and one exclusive latch."""
 
     def read_text(self, path: str) -> str | None:
         """Return the UTF-8 text at path, or None when the entry does not exist."""
@@ -28,13 +31,18 @@ class HostStoreIO(Protocol):
         """Return whether an entry exists at path without reading it."""
         ...
 
+    def create_exclusive(self, path: str) -> None:
+        """Create the latch at path exclusively; raise FileExistsError when present."""
+        ...
+
 
 class InstalledHostStore:
-    """Read the protected store through bounded filesystem reads; never write.
+    """Read the protected store through bounded filesystem reads; latch dispatch once.
 
     Each method inspects one host path chosen by the gateway from the trusted
     registry location, never from request JSON. Reads are bounded by
-    RECORD_BYTE_LIMIT; no method creates, modifies or removes an entry.
+    RECORD_BYTE_LIMIT; the only write is the exclusive `.used` latch of
+    create_exclusive, and no method modifies, replaces or removes an entry.
     """
 
     def read_text(self, path: str) -> str | None:
@@ -63,3 +71,13 @@ class InstalledHostStore:
     def exists(self, path: str) -> bool:
         """Return whether path (str) names an existing entry; reads metadata only."""
         return Path(path).exists()
+
+    def create_exclusive(self, path: str) -> None:
+        """Create the `.used` latch at path (str) with mode `x`; one dispatch wins.
+
+        Raises FileExistsError when the latch exists, which the gateway reports as
+        an already dispatched grant; other OSError values propagate. Writes one
+        small fixed text and never touches the record beside it.
+        """
+        with Path(path).open("x", encoding="utf-8") as handle:
+            handle.write(USED_LATCH_TEXT)

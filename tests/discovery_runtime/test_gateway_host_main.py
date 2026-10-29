@@ -21,6 +21,7 @@ from tests.discovery_runtime.gateway_host_test_support import (
     AGENT,
     FIXTURE,
     HOST,
+    NOW,
     ROLE,
     SESSION,
     host_case,
@@ -65,6 +66,7 @@ def test_installed_host_io_composes_the_real_store_for_the_principal(
         host_name=HOST,
         agent_id=AGENT,
         agent_role=ROLE,
+        clock=lambda: NOW,
     )
 
     assert isinstance(host.activation, ActivationStore)
@@ -146,87 +148,125 @@ def test_main_composes_the_host_ports_from_the_complete_identity(
             "host_name": HOST,
             "agent_id": AGENT,
             "agent_role": ROLE,
+            "clock": gateway.utc_now,
         }
     ]
 
 
 @pytest.mark.parametrize(
-    "arguments",
+    "arguments,message",
     [
-        ["--workspace-root", WORKSPACE, "--principal", "host"],
-        [
-            "--workspace-root",
-            WORKSPACE,
-            "--principal",
-            "host",
-            "--author-id",
-            AGENT,
-            "--session-id",
-            SESSION,
-            "--host-name",
-            HOST,
-        ],
-        [
-            "--workspace-root",
-            WORKSPACE,
-            "--principal",
-            "host",
-            "--session-id",
-            SESSION,
-            "--host-name",
-            HOST,
-            "--agent-role",
-            ROLE,
-        ],
-        [
-            "--workspace-root",
-            WORKSPACE,
-            "--principal",
-            "local-user",
-            "--session-id",
-            SESSION,
-        ],
-        [
-            "--workspace-root",
-            WORKSPACE,
-            "--principal",
-            "local-user",
-            "--host-name",
-            HOST,
-        ],
-        [
-            "--workspace-root",
-            WORKSPACE,
-            "--principal",
-            "local-user",
-            "--agent-role",
-            ROLE,
-        ],
-        ["--workspace-root", WORKSPACE, "--principal", "host", "--author-id", ""],
-        [
-            "--workspace-root",
-            WORKSPACE,
-            "--principal",
-            "host",
-            "--author-id",
-            AGENT,
-            "--session-id",
-            SESSION,
-            "--host-name",
-            HOST,
-            "--agent-role",
-            ROLE,
-            "--repository-id",
-            "r",
-            "--extra",
-            "x",
-        ],
+        (
+            ["--workspace-root", WORKSPACE, "--principal", "host"],
+            gateway.OPTION_HOST_REFUSED,
+        ),
+        (
+            [
+                "--workspace-root",
+                WORKSPACE,
+                "--principal",
+                "host",
+                "--author-id",
+                AGENT,
+                "--session-id",
+                SESSION,
+                "--host-name",
+                HOST,
+            ],
+            gateway.OPTION_HOST_REFUSED,
+        ),
+        (
+            [
+                "--workspace-root",
+                WORKSPACE,
+                "--principal",
+                "host",
+                "--session-id",
+                SESSION,
+                "--host-name",
+                HOST,
+                "--agent-role",
+                ROLE,
+            ],
+            gateway.OPTION_HOST_REFUSED,
+        ),
+        (
+            [
+                "--workspace-root",
+                WORKSPACE,
+                "--principal",
+                "local-user",
+                "--session-id",
+                SESSION,
+            ],
+            gateway.OPTION_LOCAL_REFUSED,
+        ),
+        (
+            [
+                "--workspace-root",
+                WORKSPACE,
+                "--principal",
+                "local-user",
+                "--host-name",
+                HOST,
+            ],
+            gateway.OPTION_LOCAL_REFUSED,
+        ),
+        (
+            [
+                "--workspace-root",
+                WORKSPACE,
+                "--principal",
+                "local-user",
+                "--agent-role",
+                ROLE,
+            ],
+            gateway.OPTION_LOCAL_REFUSED,
+        ),
+        (
+            ["--workspace-root", WORKSPACE, "--principal", "host", "--author-id", ""],
+            gateway.OPTION_UNKNOWN_REFUSED,
+        ),
+        (
+            [
+                "--workspace-root",
+                WORKSPACE,
+                "--principal",
+                "host",
+                "--author-id",
+                AGENT,
+                "--session-id",
+                SESSION,
+                "--host-name",
+                HOST,
+                "--agent-role",
+                ROLE,
+                "--repository-id",
+                "r",
+                "--extra",
+                "x",
+            ],
+            gateway.OPTION_SHAPE_REFUSED,
+        ),
+        (
+            ["--workspace-root", WORKSPACE, "--principal", "host", "--extra"],
+            gateway.OPTION_SHAPE_REFUSED,
+        ),
+        (["--principal", "host"], gateway.OPTION_REQUIRED_REFUSED),
+        (
+            ["--workspace-root", "workspace", "--principal", "host"],
+            gateway.OPTION_ROOT_REFUSED,
+        ),
+        (
+            ["--workspace-root", WORKSPACE, "--principal", "service"],
+            gateway.OPTION_ROOT_REFUSED,
+        ),
     ],
 )
 def test_main_refuses_incomplete_or_misplaced_host_identity(
-    monkeypatch: pytest.MonkeyPatch, arguments: list[str]
+    monkeypatch: pytest.MonkeyPatch, arguments: list[str], message: str
 ) -> None:
-    """An incomplete host identity or a host marker on local-user exits 2 before I/O."""
+    """Each incomplete or misplaced option table exits 2 before I/O with its reason."""
     calls: list[str] = []
 
     def record(root: str, repository_id: str | None) -> None:
@@ -240,7 +280,11 @@ def test_main_refuses_incomplete_or_misplaced_host_identity(
         arguments, stdin=io.BytesIO(REQUEST), stdout=output, stderr=errors
     )
 
-    assert code == 2 and json.loads(output.getvalue())["exit_code"] == 2
+    document = json.loads(output.getvalue())
+    assert code == 2 and document["exit_code"] == 2
+    # The emitted finding names the check that refused this row and no other.
+    assert [finding["message"] for finding in document["findings"]] == [message]
+    assert document["findings"][0]["code"] == "SERVICE_REQUEST"
     assert calls == []
 
 

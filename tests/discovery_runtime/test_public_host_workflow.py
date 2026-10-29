@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, cast
 from drm_copilot_discovery.analyzer.registry import InstalledInventoryRegistry
 from drm_copilot_discovery.configuration import DEFAULT_PROFILE
 from drm_copilot_discovery.draft_contracts import ContractDraft, contract_changes
+from drm_copilot_discovery.gateway_host import HostServiceIO
 from drm_copilot_discovery.models import JsonObject, ParseLimits, canonical_json
 from drm_copilot_discovery.mutation_io import capture_workspace
 from drm_copilot_discovery.report_models import bounded_object
@@ -28,6 +29,7 @@ from drm_copilot_discovery.service import execute
 from tests.discovery_runtime.gateway_host_test_support import (
     INVOCATION,
     NEW_OUTPUT,
+    NOW,
     SOURCE,
     HostCase,
     host_case,
@@ -77,6 +79,18 @@ def reference(name: str) -> str:
     return AUTHORIZATIONS[name]["authorization_ref"]
 
 
+def fresh_process(case: HostCase, service_io: MemoryService) -> HostServiceIO:
+    """Return a new host composition over the case's partition, as a new process has."""
+    return HostServiceIO(
+        activation=service_io.activation,
+        repository=service_io.repository,
+        principal=case.io.principal,
+        store=case.store,
+        clock=lambda: NOW,
+        runtime_identity=service_io.runtime_identity,
+    )
+
+
 def run(
     case: HostCase,
     operation: str,
@@ -84,12 +98,14 @@ def run(
     *,
     authorization: str,
     write: bool = False,
+    io: HostServiceIO | None = None,
 ) -> DiscoveryResult:
     """Execute operation as the host principal through the real service.
 
     The request names the partition's invocation and the given authorization;
     the clock and analyzer registry are the deterministic ones every memory
-    suite uses. No file, process or network is involved.
+    suite uses. io (HostServiceIO | None) replaces the case's composition when a
+    later gateway process is simulated. No file, process or network is involved.
     """
     request: dict[str, object] = {
         "$schema": "urn:drm-copilot:discovery:2.0.0:service-request",
@@ -110,7 +126,7 @@ def run(
     }
     return execute(
         bounded_object(request, limits=ParseLimits()),
-        io=case.io,
+        io=case.io if io is None else io,
         repository_reader=case.service.repository,
         clock=lambda: datetime(2026, 10, 20, tzinfo=timezone.utc),
         analyzer_registry=InstalledInventoryRegistry(),
@@ -266,8 +282,26 @@ def test_host_workflow_completes_and_refuses_drift_and_unconsumed_grants(
     assert statuses[flow.manifest_path] == final["artifact_status"]["new_output"]
     assert statuses[flow.beta_path] == final["artifact_status"]["existing_output"]
     assert statuses[QUESTIONS] == final["artifact_status"]["existing_output"]
-    # The host writer published the new output; the protected store saw no write.
-    assert NEW_OUTPUT in store.files and case.store.writes == []
+    # The host writer published the new output; the protected store saw exactly
+    # one `.used` latch per dispatched grant and nothing else.
+    spent = [
+        case.used_latch(reference(name))
+        for name in ("read-source", "new-contract", "update-artifact", "finalize-agent")
+    ]
+    assert NEW_OUTPUT in store.files and case.store.writes == spent
+
+    # Refusal: another gateway process cannot dispatch a latched grant again.
+    replayed = run(
+        case,
+        "read-source",
+        {"read_operation": "read", "paths": [SOURCE]},
+        authorization=reference("read-source"),
+        io=fresh_process(case, service_io),
+    )
+    assert replayed.exit_code == refusals["replayed-authorization"]["exit_code"]
+    assert replayed.findings[0].code == refusals["replayed-authorization"]["code"]
+    assert "already dispatched" in replayed.findings[0].message
+    assert case.store.writes == spent
 
     # Refusal: a present but unconsumed grant admits nothing.
     case.authorization(
@@ -297,4 +331,4 @@ def test_host_workflow_completes_and_refuses_drift_and_unconsumed_grants(
     )
     assert drifted.exit_code == refusals["baseline-drift"]["exit_code"]
     assert drifted.findings[0].code == refusals["baseline-drift"]["code"]
-    assert case.store.writes == []
+    assert case.store.writes == spent

@@ -42,7 +42,8 @@
   ],
   "python_refusals": [
     { "name": "unconsumed-authorization", "code": "SERVICE_AUTHORITY", "exit_code": 3 },
-    { "name": "baseline-drift", "code": "SERVICE_BASELINE", "exit_code": 3 }
+    { "name": "baseline-drift", "code": "SERVICE_BASELINE", "exit_code": 3 },
+    { "name": "replayed-authorization", "code": "SERVICE_AUTHORITY", "exit_code": 3 }
   ],
   "host_transitions": [
     { "name": "prepare", "protected_files": 5 },

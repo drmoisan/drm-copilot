@@ -6,7 +6,7 @@ import json
 from typing import TYPE_CHECKING
 
 import pytest
-from drm_copilot_discovery.gateway_host import CONSUMED_LATCH_SUFFIX
+from drm_copilot_discovery.gateway_host import CONSUMED_LATCH_SUFFIX, HostServiceIO
 from drm_copilot_discovery.operations import OperationFailure
 from drm_copilot_discovery.service_contracts import ServiceRequest
 
@@ -14,6 +14,7 @@ from tests.discovery_runtime.gateway_host_test_support import (
     EXISTING_OUTPUT,
     INVOCATION,
     NEW_OUTPUT,
+    NOW,
     READ_REFERENCE,
     HostCase,
     host_case,
@@ -88,14 +89,28 @@ def add_input(case: HostCase) -> None:
     case.service.disk.store.put("proposals/new-input.md", b"# new\n")
 
 
-def refused(case: HostCase, action: Callable[[], object], code: str) -> None:
-    """Assert action raises the exit-3 failure with code and leaves no effect."""
+def refused(
+    case: HostCase,
+    action: Callable[[], object],
+    code: str,
+    *,
+    spent: str | None = None,
+) -> None:
+    """Assert action raises the exit-3 failure with code and leaves no effect.
+
+    spent (str | None) names the grant whose `.used` latch is the one expected
+    store write: a refusal after the grant was accepted (drift, scope, a later
+    record) has spent the one-use grant, while a refusal of the grant itself
+    writes nothing.
+    """
     before = dict(case.service.disk.store.files)
     with pytest.raises(OperationFailure) as caught:
         action()
     assert caught.value.exit_code == 3
     assert [finding.code for finding in caught.value.findings] == [code]
-    assert case.store.writes == [] and case.service.disk.store.files == before
+    expected_writes = [] if spent is None else [case.used_latch(spent)]
+    assert case.store.writes == expected_writes
+    assert case.service.disk.store.files == before
     assert case.service.writer_calls == 0
 
 
@@ -151,6 +166,10 @@ AUTHORITY_CASES: list[tuple[Callable[[HostCase], None], str]] = [
 ]
 
 
+# Reasons raised by records the gateway reads after it accepted and latched the grant.
+SPENT_AFTER_GRANT = frozenset({"not an ok prepare-agent result"})
+
+
 @pytest.mark.parametrize("mutate,reason", AUTHORITY_CASES)
 def test_every_protected_record_binding_refuses_before_dispatch(
     service_io: MemoryService,
@@ -161,11 +180,65 @@ def test_every_protected_record_binding_refuses_before_dispatch(
     case = host_case(service_io)
     mutate(case)
 
+    # The baseline result is decoded after the grant was accepted and latched;
+    # every other record is checked before the grant, which stays unspent.
     refused(
         case,
         lambda: case.io.authorize(new_contract(case), baseline=case.capture()),
         "SERVICE_AUTHORITY",
+        spent=OPAQUE_REFERENCE if reason in SPENT_AFTER_GRANT else None,
     )
+
+
+def test_a_second_dispatch_of_the_same_grant_is_refused(
+    service_io: MemoryService,
+) -> None:
+    """The `.used` latch of the first dispatch refuses a later process's replay."""
+    case = host_case(service_io)
+    case.io.authorize(new_contract(case), baseline=case.capture())
+    latch = case.used_latch(OPAQUE_REFERENCE)
+    assert case.store.writes == [latch]
+    # The same process re-authorizes its own dispatch after capture; a new
+    # gateway process over the same partition is the replay.
+    case.io.authorize(new_contract(case), baseline=case.capture())
+    assert case.store.writes == [latch]
+    replay = HostServiceIO(
+        activation=service_io.activation,
+        repository=service_io.repository,
+        principal=case.io.principal,
+        store=case.store,
+        clock=lambda: NOW,
+        runtime_identity=service_io.runtime_identity,
+    )
+
+    with pytest.raises(OperationFailure) as caught:
+        replay.authorize(new_contract(case), baseline=case.capture())
+
+    assert caught.value.exit_code == 3
+    assert [finding.code for finding in caught.value.findings] == ["SERVICE_AUTHORITY"]
+    assert "already dispatched by the runtime" in caught.value.findings[0].message
+    # The replay created nothing: the one latch of the first dispatch remains.
+    assert case.store.writes == [latch]
+    assert case.service.writer_calls == 0
+
+
+def test_an_expired_grant_is_refused_before_any_read(
+    service_io: MemoryService,
+) -> None:
+    """A grant whose expiry is at or before the clock is refused and never latched."""
+    case = host_case(service_io)
+    edit_authorization(case, expires_at="2026-01-01T00:00:45Z")
+
+    with pytest.raises(OperationFailure) as caught:
+        case.io.authorize(new_contract(case), baseline=None)
+
+    assert caught.value.exit_code == 3
+    assert [finding.code for finding in caught.value.findings] == ["SERVICE_AUTHORITY"]
+    assert "expired before dispatch" in caught.value.findings[0].message
+    # No latch, no later record read, no capture and no dispatch follow the refusal.
+    assert case.store.writes == []
+    assert not any(path.endswith("baseline-result.json") for path in case.store.reads)
+    assert case.service.writer_calls == 0
 
 
 def test_unknown_authorization_reference_is_refused(service_io: MemoryService) -> None:
@@ -226,10 +299,12 @@ def test_non_output_input_drift_is_refused_as_baseline_drift(
     case = host_case(service_io)
     mutate(case)
 
+    # Drift is detected after the grant was accepted, so the one-use grant is spent.
     refused(
         case,
         lambda: case.io.authorize(new_contract(case), baseline=case.capture()),
         "SERVICE_BASELINE",
+        spent=OPAQUE_REFERENCE,
     )
 
 
@@ -265,6 +340,7 @@ def test_read_outside_the_selected_paths_is_refused(service_io: MemoryService) -
             baseline=case.capture(),
         ),
         "SERVICE_AUTHORITY",
+        spent=READ_REFERENCE,
     )
 
 
@@ -280,7 +356,11 @@ def test_a_missing_protected_record_raises_an_io_failure(
 
     with pytest.raises(OSError, match="unavailable"):
         case.io.authorize(new_contract(case), baseline=case.capture())
-    assert case.store.writes == [] and case.service.writer_calls == 0
+    # The baseline result is read after the grant was accepted and latched.
+    spent = (
+        [case.used_latch(OPAQUE_REFERENCE)] if name == "baseline-result.json" else []
+    )
+    assert case.store.writes == spent and case.service.writer_calls == 0
 
 
 def test_another_invocation_reference_finds_no_partition(
@@ -320,6 +400,7 @@ def test_read_outside_the_configured_input_scope_is_refused(
             baseline=case.capture(),
         ),
         "SERVICE_AUTHORITY",
+        spent=READ_REFERENCE,
     )
 
 

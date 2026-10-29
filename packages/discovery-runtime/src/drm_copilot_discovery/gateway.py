@@ -92,8 +92,15 @@ def _execute(
     )
 
 
+FAILURE_MESSAGE = "The discovery request could not be completed."
+
+
 def _failure(
-    *, code: str, exit_code: Literal[2, 3], value: JsonObject | None = None
+    *,
+    code: str,
+    exit_code: Literal[2, 3],
+    value: JsonObject | None = None,
+    message: str = FAILURE_MESSAGE,
 ) -> DiscoveryResult:
     """Return a fixed empty failure; retain only recognized enums from value.
 
@@ -102,8 +109,10 @@ def _failure(
 
     code (str): fixed gateway failure code. exit_code
     (Literal[2, 3]): selected supported outcome code. value (JsonObject | None):
-    optional parsed JSON context. Returns DiscoveryResult with
-    null runtime/manifest and no effects; invalid trusted values raise ValueError.
+    optional parsed JSON context. message (str): one of the gateway's fixed
+    finding messages; never text taken from the arguments or the request.
+    Returns DiscoveryResult with null runtime/manifest and no effects; invalid
+    trusted values raise ValueError.
     """
     context = dict(value.members) if value is not None and len(value) <= 16 else {}
     operation = context.get("operation")
@@ -121,7 +130,7 @@ def _failure(
             Finding(
                 code=code,
                 pointer="/runtime" if exit_code == 3 else "/",
-                message="The discovery request could not be completed.",
+                message=message,
                 next_action="Check the request and repair the runtime if needed.",
             ),
         ),
@@ -302,7 +311,7 @@ def main(
     output, errors = stdout or sys.stdout, stderr or sys.stderr
     arguments = tuple(sys.argv[1:] if argv is None else argv)
     options = _parse_options(arguments)
-    if options is not None:
+    if not isinstance(options, str):
         root = options["--workspace-root"]
         try:
             # Without an explicit id the activated profile's Git repository is bound.
@@ -322,66 +331,94 @@ def main(
             stdin=stdin or sys.stdin.buffer,
             stdout=output,
             stderr=errors,
-            create_io=lambda: _compose_io(options, root, repository),
+            create_io=lambda: _compose_io(options, root, repository, utc_now),
             repository_reader=repository,
-            clock=lambda: datetime.now(timezone.utc),
+            clock=utc_now,
             analyzer_registry=InstalledInventoryRegistry(),
         )
     return _emit(
-        _failure(code="SERVICE_REQUEST", exit_code=2), stdout=output, stderr=errors
+        _failure(code="SERVICE_REQUEST", exit_code=2, message=options),
+        stdout=output,
+        stderr=errors,
     )
 
 
 _HOST_OPTIONS = ("--author-id", "--session-id", "--host-name", "--agent-role")
 _OPTION_CEILING = 14
+# Fixed option refusals; none echoes an argument, so no caller text is disclosed.
+OPTION_SHAPE_REFUSED = "The outer option table is malformed."
+OPTION_UNKNOWN_REFUSED = "An outer option is unknown, repeated or empty."
+OPTION_REQUIRED_REFUSED = "The outer options require --workspace-root and --principal."
+OPTION_ROOT_REFUSED = (
+    "The workspace root must be absolute and the principal local-user or host."
+)
+OPTION_HOST_REFUSED = (
+    "The host principal requires --author-id, --session-id, --host-name and "
+    "--agent-role."
+)
+OPTION_LOCAL_REFUSED = (
+    "The local-user principal admits no session, host or role option."
+)
 
 
-def _parse_options(arguments: tuple[str, ...]) -> dict[str, str] | None:
-    """Return the validated fixed option table for arguments, or None when invalid.
+def utc_now() -> datetime:
+    """Return the current aware UTC instant; the gateway's only clock read."""
+    return datetime.now(timezone.utc)
+
+
+def _parse_options(arguments: tuple[str, ...]) -> dict[str, str] | str:
+    """Return the validated fixed option table for arguments, or the fixed refusal.
 
     arguments (tuple[str, ...]) is the outer argument sequence. The table admits
     --workspace-root, --principal, --repository-id, --author-id, --session-id,
     --host-name and --agent-role once each, requires an absolute root and a known
     principal, requires the four identity options with principal host and refuses
-    the session, host and role options with principal local-user. No I/O occurs.
+    the session, host and role options with principal local-user. Returns the
+    option table, or one of the fixed OPTION_*_REFUSED messages (str) naming the
+    first check that failed. No I/O occurs.
     """
     allowed = {"--workspace-root", "--principal", "--repository-id", *_HOST_OPTIONS}
     options: dict[str, str] = {}
     if len(arguments) > _OPTION_CEILING or len(arguments) % 2:
-        return None
+        return OPTION_SHAPE_REFUSED
     # A finite exact option table prevents request-selected command execution.
     for index in range(0, len(arguments), 2):
         key, value = arguments[index], arguments[index + 1]
         if key not in allowed or key in options or not value:
-            return None
+            return OPTION_UNKNOWN_REFUSED
         options[key] = value
     if "--workspace-root" not in options or "--principal" not in options:
-        return None
+        return OPTION_REQUIRED_REFUSED
     principal = options["--principal"]
     if not Path(options["--workspace-root"]).is_absolute() or principal not in (
         "local-user",
         "host",
     ):
-        return None
+        return OPTION_ROOT_REFUSED
     supplied = tuple(option for option in _HOST_OPTIONS if option in options)
     # The host principal travels with its complete identity; local-user never
     # carries a session, host or role marker.
     if principal == "host" and supplied != _HOST_OPTIONS:
-        return None
+        return OPTION_HOST_REFUSED
     if principal == "local-user" and set(supplied) - {"--author-id"}:
-        return None
+        return OPTION_LOCAL_REFUSED
     return options
 
 
 def _compose_io(
-    options: dict[str, str], root: str, repository: RepositoryReader | None
+    options: dict[str, str],
+    root: str,
+    repository: RepositoryReader | None,
+    clock: Clock,
 ) -> ServiceIO:
     """Compose the installed ports for the validated options; perform host reads only.
 
     options (dict[str, str]) is the parsed fixed table; root (str) the absolute
-    workspace; repository (RepositoryReader | None) the bound reader. Returns the
-    local-user composition, or the host composition carrying the agent id,
-    session, host and role; installed_local_io keeps refusing the host principal.
+    workspace; repository (RepositoryReader | None) the bound reader; clock
+    (Clock) the gateway's UTC clock the host composition compares grants with.
+    Returns the local-user composition, or the host composition carrying the
+    agent id, session, host and role; installed_local_io keeps refusing the host
+    principal.
     """
     if options["--principal"] == "host":
         return installed_host_io(
@@ -391,6 +428,7 @@ def _compose_io(
             host_name=options["--host-name"],
             agent_id=options["--author-id"],
             agent_role=options["--agent-role"],
+            clock=clock,
         )
     return installed_local_io(
         root, repository, "local-user", options.get("--author-id", "local-user")

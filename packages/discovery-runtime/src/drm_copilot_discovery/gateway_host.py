@@ -5,9 +5,10 @@ role) and the request's invocation reference to the protected partition the
 native adapters wrote, verifies every record through ``protected_records``,
 reconstructs the pre-invocation baseline the root pinned, and returns a ``host``
 ServiceAuthority bound to that invocation. It reads the protected store through
-injected seams, never writes to it, never returns a local-user authority, and
-refuses every incomplete, mismatched, stale, replayed or unverifiable request
-with exit 3.
+injected seams and writes only the exclusive `.used` latch beside the consumed
+authorization it dispatches, so a grant is dispatched once; it never returns a
+local-user authority, and refuses every incomplete, mismatched, expired, stale,
+replayed or unverifiable request with exit 3.
 """
 
 from __future__ import annotations
@@ -57,7 +58,11 @@ if TYPE_CHECKING:
     from drm_copilot_discovery.gateway_host_store import HostStoreIO
     from drm_copilot_discovery.mutation_plan import CapturedWorkspace
     from drm_copilot_discovery.repository_reader import RepositoryReader
-    from drm_copilot_discovery.service_contracts import RuntimeIdentity, ServiceRequest
+    from drm_copilot_discovery.service_contracts import (
+        Clock,
+        RuntimeIdentity,
+        ServiceRequest,
+    )
 
 SESSION_PARTITION = "sessions"
 INVOCATION_PARTITION = "invocations"
@@ -67,6 +72,7 @@ START_ATTESTATION_FILE = "start-attestation.json"
 BASELINE_RESULT_FILE = "baseline-result.json"
 CAPABILITY_ATTESTATION_FILE = "capability-attestation.json"
 CONSUMED_LATCH_SUFFIX = ".consumed"
+USED_LATCH_SUFFIX = ".used"
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -115,10 +121,12 @@ class HostServiceIO:
     """Bind one trusted host principal to verified protected records and local ports.
 
     Construct from the trusted ActivationStore, the exact RepositoryReader, the
-    verified principal and a read-only store seam. Reads of the protected
+    verified principal, the store seam and the clock. Reads of the protected
     partition happen only inside authorize; the writer recaptures through the
-    same bound ports as the local composition. Nothing here writes a receipt or a
-    protected record, and no path constructs a local-user authority.
+    same bound ports as the local composition. The only protected write is the
+    exclusive `.used` latch beside the consumed authorization a dispatch admits;
+    nothing here writes a receipt or a record, and no path constructs a
+    local-user authority.
     """
 
     def __init__(
@@ -128,6 +136,7 @@ class HostServiceIO:
         repository: RepositoryReader | None,
         principal: HostPrincipal,
         store: HostStoreIO,
+        clock: Clock,
         runtime_identity: Callable[[], RuntimeIdentity] = load_build_identity,
     ) -> None:
         """Bind trusted ports and principal; return None without I/O.
@@ -135,12 +144,16 @@ class HostServiceIO:
         activation (ActivationStore): trusted activation store. repository
         (RepositoryReader | None): exact optional reader. principal
         (HostPrincipal): host, session, agent id and role the host verified.
-        store (HostStoreIO): read-only protected store seams. runtime_identity
+        store (HostStoreIO): protected store seams. clock (Clock): injected aware
+        UTC instant the grant validity is compared with. runtime_identity
         (Callable[[], RuntimeIdentity]): verified installed identity provider.
         """
-        self.principal, self.store = principal, store
+        self.principal, self.store, self._clock = principal, store, clock
         self._activation, self._runtime_identity = activation, runtime_identity
         self._verified: set[str] = set()
+        # Grants this process latched: the service authorizes one request before
+        # and after capture, and both authorizations are the same dispatch.
+        self._dispatched: set[str] = set()
         self._initialization = InitializationIO(
             workspace_root=activation.location.workspace,
             catalog=activation.catalog,
@@ -217,7 +230,9 @@ class HostServiceIO:
         binding (WorkspaceBinding) is the activation selection. Reads the
         invocation, start attestation, session capability, the consumed
         authorization named by the request and the pinned baseline result through
-        the store seams, each validated and bound by protected_records. Any
+        the store seams, each validated and bound by protected_records, and
+        creates the exclusive `.used` latch beside the authorization as soon as
+        it is accepted, before any further read, capture or dispatch. Any
         refusal propagates as exit 3; a missing record raises OSError.
         """
         runtime = self.runtime_identity()
@@ -257,11 +272,17 @@ class HostServiceIO:
         # The grant must be an actual partition entry, never a path the request spells.
         if name not in self.store.list_entries(authorizations):
             raise refusal("No authorization record exists for the referenced grant.")
+        used = f"{authorizations}/{name}{USED_LATCH_SUFFIX}"
+        # A latch this process created belongs to the current dispatch; any other
+        # latch is a grant another process already dispatched.
+        latched_here = reference in self._dispatched
         decode_authorization(
             self._record(f"{authorizations}/{name}"),
             latch_present=self.store.exists(
                 f"{authorizations}/{name}{CONSUMED_LATCH_SUFFIX}"
             ),
+            now=self._clock(),
+            used_latch_present=self.store.exists(used) and not latched_here,
             invocation=invocation,
             identity=identity,
             operation=request.operation,
@@ -269,6 +290,15 @@ class HostServiceIO:
             catalog=catalog,
             limits=limits,
         )
+        # The accepted grant is latched at once; a concurrent dispatch loses here.
+        if not latched_here:
+            try:
+                self.store.create_exclusive(used)
+            except FileExistsError as error:
+                raise refusal(
+                    "The authorization was already dispatched by the runtime."
+                ) from error
+            self._dispatched.add(reference)
         baseline = decode_baseline_result(
             self._record(f"{directory}/{BASELINE_RESULT_FILE}"),
             runtime=runtime,
@@ -340,7 +370,8 @@ class HostServiceIO:
         principal host, the trusted agent id, the reconstructed InvocationContext,
         one WriteGrant per required output and a read selection for read-source.
         Raises OperationFailure (exit 3) for every refusal and OSError for an
-        unreadable record; no write and no local-user authority is produced.
+        unreadable record; the only write is the `.used` latch of the admitted
+        grant, and no local-user authority is produced.
         """
         if (
             request.mode != "agent-output"
@@ -439,16 +470,17 @@ def installed_host_io(
     host_name: str,
     agent_id: str,
     agent_role: str,
+    clock: Clock,
 ) -> HostServiceIO:
     """Compose the installed host ports from trusted outer gateway options.
 
     root (str) must be an absolute canonical workspace; repository
     (RepositoryReader | None) is the exact optional reader; session_id,
     host_name, agent_id and agent_role (str) are the host-verified principal the
-    gateway received as fixed options. Each request's `invocation_ref` is bound
-    at authorize time. Returns HostServiceIO; invalid roots raise ValueError and
-    resolution or catalog failures propagate. Reads installed metadata and
-    creates no file.
+    gateway received as fixed options; clock (Clock) is the gateway's UTC clock.
+    Each request's `invocation_ref` is bound at authorize time. Returns
+    HostServiceIO; invalid roots raise ValueError and resolution or catalog
+    failures propagate. Reads installed metadata and creates no file.
     """
     activation = installed_activation(
         installed_location(root),
@@ -462,4 +494,5 @@ def installed_host_io(
             host=host_name, session_id=session_id, agent_id=agent_id, role=agent_role
         ),
         store=InstalledHostStore(),
+        clock=clock,
     )

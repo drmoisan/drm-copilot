@@ -11,6 +11,7 @@ distinct reason; no decoder returns a partial authority value or writes.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from drm_copilot_discovery.findings import Finding
@@ -259,10 +260,24 @@ def decode_capability_attestation(
     return document
 
 
+def _instant(value: object) -> datetime | None:
+    """Return the aware instant of a schema timestamp (str), or None when unreadable."""
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    # A timestamp without an offset is not a schema timestamp and binds nothing.
+    return parsed if parsed.tzinfo is not None else None
+
+
 def decode_authorization(
     content: bytes,
     *,
     latch_present: bool,
+    now: datetime,
+    used_latch_present: bool,
     invocation: JsonObject,
     identity: TrustedIdentity,
     operation: str,
@@ -272,11 +287,14 @@ def decode_authorization(
 ) -> JsonObject:
     """Validate and bind one consumed `tool-authorization` record to the request.
 
-    latch_present (bool) reports whether the exclusive `.consumed` latch exists.
-    The record must carry authorization_ref, be `consumed` with a stamp and a
-    latch, authorize operation (str) for the invocation, bind the trusted
-    identity and the invocation's workspace, start attestation and capability.
-    Returns the validated JsonObject or raises the refusal.
+    latch_present (bool) reports whether the exclusive `.consumed` latch exists;
+    now (datetime) is the injected aware instant the grant is compared with;
+    used_latch_present (bool) reports whether the runtime's exclusive `.used`
+    latch already exists. The record must carry authorization_ref, be `consumed`
+    with a stamp and a latch, be unexpired at now, not yet dispatched, authorize
+    operation (str) for the invocation, bind the trusted identity and the
+    invocation's workspace, start attestation and capability. Returns the
+    validated JsonObject or raises the refusal.
     """
     document = _decode(
         content,
@@ -293,6 +311,12 @@ def decode_authorization(
         or not latch_present
     ):
         raise refusal("The authorization has not been consumed by the host gate.")
+    # A grant is dispatched once and only inside its validity window.
+    expires = _instant(document.get("expires_at"))
+    if expires is None or expires <= now:
+        raise refusal("The authorization expired before dispatch.")
+    if used_latch_present:
+        raise refusal("The authorization was already dispatched by the runtime.")
     if document.get("operation") != operation:
         raise refusal("The authorization was issued for another operation.")
     if document.get("invocation_ref") != invocation.get("invocation_id"):

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, cast
 
 import pytest
@@ -37,6 +38,8 @@ if TYPE_CHECKING:
     from drm_copilot_discovery.catalog import SchemaCatalog
 
 LIMITS = ParseLimits()
+# Inside the control grant's window (issued 00:00:00Z, expires 00:01:00Z).
+NOW = datetime(2026, 1, 1, 0, 0, 45, tzinfo=timezone.utc)
 RUNTIME = RuntimeIdentity(
     package_version="2.0.0",
     schema_version="2.0.0",
@@ -181,6 +184,8 @@ def test_coherent_partition_decodes_every_record(
     authorization = decode_authorization(
         encode(consumed_authorization()),
         latch_present=True,
+        now=NOW,
+        used_latch_present=False,
         invocation=invocation,
         identity=IDENTITY,
         operation="inventory",
@@ -315,20 +320,33 @@ def test_capability_attestation_bindings_each_refuse_with_a_distinct_reason(
     assert reason in message
 
 
-AUTHORIZATION_CASES: list[tuple[Callable[[Document], None], bool, str, str, str]] = [
-    (unchanged, True, "inventory", OTHER_REFERENCE, "not the referenced grant"),
+AUTHORIZATION_CASES: list[
+    tuple[Callable[[Document], None], bool, bool, str, str, str]
+] = [
+    (unchanged, True, False, "inventory", OTHER_REFERENCE, "not the referenced grant"),
     (
         top(state="issued", consumed_at=None),
         True,
+        False,
         "inventory",
         OPAQUE_REFERENCE,
         "not been consumed",
     ),
-    (unchanged, False, "inventory", OPAQUE_REFERENCE, "not been consumed"),
-    (unchanged, True, "read-source", OPAQUE_REFERENCE, "another operation"),
+    (unchanged, False, False, "inventory", OPAQUE_REFERENCE, "not been consumed"),
+    (
+        top(expires_at="2026-01-01T00:00:45Z"),
+        True,
+        False,
+        "inventory",
+        OPAQUE_REFERENCE,
+        "expired before dispatch",
+    ),
+    (unchanged, True, True, "inventory", OPAQUE_REFERENCE, "already dispatched"),
+    (unchanged, True, False, "read-source", OPAQUE_REFERENCE, "another operation"),
     (
         top(invocation_ref="invocation-beta0"),
         True,
+        False,
         "inventory",
         OPAQUE_REFERENCE,
         "another invocation",
@@ -336,6 +354,7 @@ AUTHORIZATION_CASES: list[tuple[Callable[[Document], None], bool, str, str, str]
     (
         nested("identity", agent_id="agent-beta"),
         True,
+        False,
         "inventory",
         OPAQUE_REFERENCE,
         "another native identity",
@@ -343,6 +362,7 @@ AUTHORIZATION_CASES: list[tuple[Callable[[Document], None], bool, str, str, str]
     (
         top(start_attestation_ref=OTHER_START),
         True,
+        False,
         "inventory",
         OPAQUE_REFERENCE,
         "differs from the invocation",
@@ -350,16 +370,19 @@ AUTHORIZATION_CASES: list[tuple[Callable[[Document], None], bool, str, str, str]
 ]
 
 
-@pytest.mark.parametrize("mutate,latch,operation,reference,reason", AUTHORIZATION_CASES)
+@pytest.mark.parametrize(
+    "mutate,latch,used,operation,reference,reason", AUTHORIZATION_CASES
+)
 def test_authorization_bindings_each_refuse_with_a_distinct_reason(
     initialization_catalog: SchemaCatalog,
     mutate: Callable[[Document], None],
     latch: bool,
+    used: bool,
     operation: str,
     reference: str,
     reason: str,
 ) -> None:
-    """Only a consumed, latched grant for this request and identity is admitted."""
+    """Only a consumed, latched, unexpired and undispatched grant is admitted."""
     invocation = invocation_document(initialization_catalog)
     document = consumed_authorization()
     mutate(document)
@@ -368,6 +391,8 @@ def test_authorization_bindings_each_refuse_with_a_distinct_reason(
         lambda: decode_authorization(
             encode(document),
             latch_present=latch,
+            now=NOW,
+            used_latch_present=used,
             invocation=invocation,
             identity=IDENTITY,
             operation=operation,

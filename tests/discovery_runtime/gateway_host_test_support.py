@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -12,6 +13,7 @@ from drm_copilot_discovery.agent_output import required_output_digest
 from drm_copilot_discovery.configuration import DEFAULT_PROFILE
 from drm_copilot_discovery.gateway_host import (
     CONSUMED_LATCH_SUFFIX,
+    USED_LATCH_SUFFIX,
     HostPrincipal,
     HostServiceIO,
     invocation_directory,
@@ -43,6 +45,8 @@ if TYPE_CHECKING:
 
 HOST, SESSION, AGENT = "codex", "session-alpha", "agent-alpha"
 ROLE, INVOCATION = "legacy-parity-analyst", "invocation-alpha"
+# Inside the control grant's window (issued 00:00:00Z, expires 00:01:00Z).
+NOW = datetime(2026, 1, 1, 0, 0, 45, tzinfo=timezone.utc)
 READ_REFERENCE = "protected-read-000000000002"
 FINALIZE_REFERENCE = "protected-final-00000000003"
 CONTRACTS = "docs/migration/discovery/feature-contracts"
@@ -87,6 +91,13 @@ class MemoryHostStore:
     def exists(self, path: str) -> bool:
         """Return whether path is stored."""
         return path in self.files
+
+    def create_exclusive(self, path: str) -> None:
+        """Store the latch at path once; record the write; refuse a second create."""
+        if path in self.files:
+            raise FileExistsError(path)
+        self.files[path] = "{}\n"
+        self.writes.append(path)
 
 
 @dataclass
@@ -151,6 +162,10 @@ class HostCase:
         if latch:
             self.store.files[path + CONSUMED_LATCH_SUFFIX] = "{}\n"
         return document
+
+    def used_latch(self, reference: str) -> str:
+        """Return the path of the runtime's exclusive `.used` latch for reference."""
+        return f"{self.directory}/authorizations/{reference}.json{USED_LATCH_SUFFIX}"
 
 
 def no_repository(root: str, repository_id: str | None) -> None:
@@ -283,6 +298,7 @@ def host_case(
                 host=HOST, session_id=SESSION, agent_id=AGENT, role=ROLE
             ),
             store=store,
+            clock=lambda: NOW,
             runtime_identity=service.runtime_identity,
         ),
         directory=invocation_directory(location, SESSION, INVOCATION),
