@@ -248,6 +248,10 @@ carries exactly these five elements.
    The token `Parallel mode: true` must appear exactly: it is the marker F7's Layer 1 barrier hook
    matches on. The clause `PR base branch MUST be main` is the child's explicit base-branch
    instruction, recorded as prompt text rather than left to a base-branch ancestry heuristic.
+   The prompt also instructs the child to record top-level `parallel_mode: true` and
+   `parallel_slug: <slug>` in its first per-feature checkpoint write (issue #997). Both keys are
+   unvalidated; the merge gate's green-CI branch declines a checkpoint that carries either, so a
+   parallel child cannot merge its own pull request through that branch.
 2. The item's active feature folder path, written literally as `docs/features/active/<basename>`.
    The child needs it for its own operation, and F7's Layer 1 hook resolves the target item by
    scanning the prompt for exactly that path shape, so the path is emitted as a bare path token.
@@ -363,9 +367,11 @@ delegations, not to fork-routed skill invocations.
 ## Per-Item Merge to Main (Merge-on-Green)
 
 The parent — `parallel-orchestrator` — performs each item's merge to `main`. The child contract is
-unchanged: `.claude/skills/orchestrate/SKILL.md` is **not modified by this feature**. There is no
-`parallel_mode` clause in its step 9, no `parallel_merge` object in the child checkpoint, and no
-additional condition on the child's PR Creation Gate.
+unchanged: `.claude/skills/orchestrate/SKILL.md` is **not modified by this feature**.
+Issue #997 amends `.claude/skills/orchestrate/SKILL.md` for standalone runs only: a standalone run with a green S9 gate merges its own pull request, and a parallel child never merges its own pull request.
+Its step 9 mentions `parallel_mode` only to exclude a parallel child from that standalone merge.
+There is no `parallel_merge` object in the child checkpoint and no parallel-specific condition on
+the child's PR Creation Gate.
 
 Issue #744 later amended two parts of that child contract for CI-dependent acceptance criteria,
 whose verification requires the result of CI on the item's pull-request head: PR Creation Gate
@@ -421,20 +427,32 @@ Procedure, per item:
 `gh pr merge` spelling except a pure `--disable-auto`, and every `gh api` merge or enqueue
 mutation; issue #952) unless a checkpoint satisfies
 one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate has
-four allow conditions
+five allow conditions
 which it evaluates in this order: a per-feature checkpoint with `epic_mode == true` and
 `step9_status == "passed"`; an epic checkpoint whose `epic_merge_pr.ci_gate.conclusion` is
-`success` with a matching `pr_number`; the parallel condition described next; and a standalone
-merge authorization record, described after it. The parallel condition authorizes a per-item merge
+`success` with a matching `pr_number`; the parallel condition described next; the green-CI
+standalone condition (issue #997), evaluated after the parallel condition and before the
+authorization record; and a standalone merge authorization record, described after it. The parallel condition authorizes a per-item merge
 when the parallel-orchestrator checkpoint has `route_id == "parallel"`, the target item's
 `merge_status == "ci_green"`, and, when a PR number is named, it matches the item's `pr_number`.
 Step 3 above is therefore permitted for a legitimate parallel merge; a missing, unreadable, or
 invalid parallel checkpoint, a target item whose `merge_status` is not `ci_green`, or a PR number
 that matches no item still fails closed with `EPIC_MERGE_GATE_BLOCKED`.
 
-The standalone condition (issue #670) is the only route for merging a pull request that is not a
-parallel item, such as a standalone fix that unblocks the run. It is evaluated last and never
-overrides the other three. Writer procedure for the coordinating session:
+The green-CI condition (issue #997) lets a standalone run merge its own pull request after S9
+step 7 of `.claude/skills/orchestrate/SKILL.md`: the command names the PR number, no epic or
+parallel checkpoint records that number or the item worktree, the per-feature checkpoint carries
+no `parallel_mode` or `parallel_slug` marker and records `step9_status == "passed"`,
+`ci_gate.conclusion == "success"`, and a matching `pr_gate.pr_number`, and the live PR head
+equals `ci_gate.head_sha` (and `--match-head-commit`, when passed). Its parallel exclusion is
+best-effort: the `Parallel mode: true` marker is in the delegation prompt, not in a Bash payload,
+so a parallel child whose PR number and worktree are not yet recorded by this checkpoint, and
+which omits the `parallel_mode` key, is not excluded by the hook. A parallel child still never
+merges its own pull request; that rule is enforced by the kickoff contract above.
+
+The standalone authorization condition (issue #670) is the route for merging a pull request that
+is not a parallel item and has no green S9 gate, such as a standalone fix that unblocks the run.
+It is evaluated last and never overrides the other four. Writer procedure for the coordinating session:
 
 1. Write the record into a top-level `standalone_merge_authorizations` array in the
    parallel-orchestrator checkpoint (`artifacts/orchestration/parallel-orchestrator-state.json`);

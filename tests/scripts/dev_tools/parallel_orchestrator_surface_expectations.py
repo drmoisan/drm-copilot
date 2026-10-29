@@ -234,6 +234,7 @@ MERGE_ON_GREEN_FRAGMENTS: tuple[str, ...] = (
     "merge_status: ci_green",
     "Execute `gh pr merge --merge <PR>`",
     "`.claude/skills/orchestrate/SKILL.md` is **not modified by this feature**",
+    "Issue #997 amends `.claude/skills/orchestrate/SKILL.md` for standalone runs only",
 )
 
 MERGE_CONFLICT_FRAGMENTS: tuple[str, ...] = (

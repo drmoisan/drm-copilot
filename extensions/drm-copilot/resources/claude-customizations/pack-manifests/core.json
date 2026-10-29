@@ -35,6 +35,7 @@
     ".claude/hooks/enforce-epic-merge-gate-authorization.ps1",
     ".claude/hooks/enforce-epic-merge-gate-resolution.ps1",
     ".claude/hooks/enforce-epic-merge-gate-command.ps1",
+    ".claude/hooks/enforce-epic-merge-gate-green-ci.ps1",
     ".claude/hooks/enforce-epic-wave-barrier.ps1",
     ".claude/hooks/enforce-epic-worktree-removal-gate.ps1",
     ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
