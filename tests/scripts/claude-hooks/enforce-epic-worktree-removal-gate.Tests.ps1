@@ -26,6 +26,9 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
         . $script:UnderTest
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        # No main checkout root is modelled, so no row reads the real repository (issue #995).
+        Mock Get-WorktreeRunMainCheckoutRoot { $null }
+        Mock Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution { $null }
         Mock Resolve-EpicWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }

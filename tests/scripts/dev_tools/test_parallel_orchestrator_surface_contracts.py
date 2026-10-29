@@ -83,17 +83,27 @@ def test_agent_frontmatter_declares_parallel_orchestrator_identity() -> None:
     ), f"agent skills list must contain parallel-orchestrate, found {skills}"
 
 
-def test_agent_tools_allowlist_excludes_pr_author_channel() -> None:
-    """Require the agent to declare no ``Agent(pr-author)`` delegation channel."""
+def test_agent_tools_allowlist_grants_only_the_records_pr_author_channel() -> None:
+    """Require the only ``pr-author`` grant to be the Run Closing records channel.
+
+    The agent delegates the run's records pull request to ``Agent(pr-author)``
+    in its Run Closing step (issue #995), while each item's pull request is
+    still authored inside that item's own child run. Exactly one tools entry
+    may therefore name ``pr-author``, and it must be ``Agent(pr-author)``.
+    """
 
     # Arrange / Act
     frontmatter = parse_frontmatter(read_repo_text(AGENT_RELATIVE))
     tools = string_sequence(frontmatter.get("tools"))
 
+    # Collect every tools entry naming pr-author, so a second or broader grant
+    # is reported alongside the expected one.
+    pr_author_entries = [entry for entry in tools if "pr-author" in entry]
+
     # Assert
-    assert not [
-        entry for entry in tools if "pr-author" in entry
-    ], f"agent tools allowlist must not grant a pr-author channel: {tools}"
+    assert pr_author_entries == [
+        "Agent(pr-author)"
+    ], f"agent tools allowlist must grant exactly Agent(pr-author): {tools}"
 
 
 def test_agent_subagent_stop_hook_targets_parallel_checkpoint() -> None:

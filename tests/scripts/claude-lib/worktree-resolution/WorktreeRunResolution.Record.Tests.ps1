@@ -29,6 +29,7 @@ BeforeAll {
     Import-Module (Join-Path $script:LibRoot 'WorktreeItemResolution.psm1')
     Import-Module (Join-Path $script:LibRoot 'WorktreeResolution.psm1')
     Import-Module (Join-Path $script:LibRoot 'WorktreeTargetResolution.psm1')
+    Import-Module (Join-Path $script:LibRoot 'WorktreeRunRecordPath.psm1')
 
     $script:NoTargetCode = Get-WorktreeResolutionNoTargetReasonCode
     $script:AmbiguityCode = Get-WorktreeResolutionAmbiguityReasonCode
@@ -51,6 +52,8 @@ BeforeAll {
             if ($textMap.ContainsKey($Path)) { return $textMap[$Path] }
             return $null
         }.GetNewClosure()
+        # No main checkout root is modelled, so no row reads the real repository (issue #995).
+        Mock -CommandName Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution -MockWith { $null }
     }
 
     # Place operands by prefix: a path under a listed root ascends to that root.
@@ -86,7 +89,7 @@ BeforeAll {
     function Get-DisallowedCommandName {
         $own = @($script:ModuleAst.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) |
                 ForEach-Object { $_.Name })
-        $siblings = foreach ($name in @('WorktreeResolution', 'WorktreeTargetResolution', 'WorktreeItemResolution')) {
+        $siblings = foreach ($name in @('WorktreeResolution', 'WorktreeTargetResolution', 'WorktreeItemResolution', 'WorktreeRunRecordPath')) {
             (Get-Module -Name $name | Select-Object -First 1).ExportedFunctions.Keys
         }
         $builtins = @('Set-StrictMode', 'Import-Module', 'Join-Path', 'Test-Path', 'ConvertFrom-Json', 'Where-Object', 'Export-ModuleMember')

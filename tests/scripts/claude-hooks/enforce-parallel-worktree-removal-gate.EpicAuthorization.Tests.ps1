@@ -33,6 +33,9 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1 epic authorization' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        # No main checkout root is modelled, so no row reads the real repository (issue #995).
+        Mock Get-WorktreeRunMainCheckoutRoot { $null }
+        Mock Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution { $null }
         Mock Resolve-ParallelWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 

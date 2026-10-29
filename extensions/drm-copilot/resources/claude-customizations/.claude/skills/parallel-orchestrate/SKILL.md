@@ -531,8 +531,9 @@ against the observed radius, and requeue of the later-started item to F8.
 ## Worktree Cleanup
 
 After an item reaches `merge_status: merged` and that state is durably confirmed by
-`gh pr view --json state,mergedAt,headRefOid`, the parent — running from the main repository
-checkout, never from inside a child worktree — issues `git worktree remove <worktree_path>`. On
+`gh pr view --json state,mergedAt,headRefOid`, the parent removes the item's worktree through
+substep 1 of `### Run Closing` below, which takes the absolute path from
+`git worktree list --porcelain` rather than from the relative `items[].worktree_path`. On
 success it records `merge_status: worktree_removed` and `worktree_removed_at`, then regenerates
 `docs/features/parallel/<slug>/parallel-status.md`.
 
@@ -550,7 +551,55 @@ non-authorizing `merge_status` still denies on both branches. The coordination m
 `PreToolUse` denials are conjunctive: a new allow-hook alone could not have overridden the epic
 gate's independent deny, which is why the epic gate itself had to gain the parallel branch.
 The parallel-orchestrator-surface feature (F7) shipped no hook file and made no
-`.claude/settings.json` change of its own.
+`.claude/settings.json` change of its own. Both gates compare a recorded `worktree_path` to the
+removal target through `Test-WorktreeRunRecordedPathMatchesTarget`, so a relative record is joined
+to the main checkout root and to the root that holds the checkpoint (issue #995).
+
+### Run Closing
+
+Run Closing runs once per run, after every non-withdrawn item has `merge_status` of `merged` or
+`worktree_removed` and before completion is reported (issue #995). It re-derives state from
+`git worktree list --porcelain`, `git`, and `gh` rather than from the checkpoint, so it is safe to
+repeat: a substep whose outcome already holds is skipped. The five substeps run in order.
+
+1. **Item worktrees.** For each item whose `merge_status` is `merged`, take the absolute worktree
+   path from `git worktree list --porcelain`, never from the relative `items[].worktree_path`. When
+   that registration is locked, run `git worktree unlock <path>` only when the lock reason names
+   the item's own agent; leave any other lock in place. Run `git worktree remove <path>` with no
+   force flag. On success, set `merge_status: worktree_removed` and `worktree_removed_at`. On
+   refusal, leave `merge_status: merged`, append a `completed_steps` entry naming the path and the
+   refusal reason as a deferral, and continue with the next item.
+2. **Final status.** Regenerate `docs/features/parallel/<slug>/parallel-status.md` so it shows the
+   closing state.
+3. **Run documents.** Stage the run folder and the promoted lifecycle files created for this run by
+   literal path only, in commands of the form
+   `git add -- docs/features/parallel/<slug>/parallel-status.md docs/features/potential/promoted/<promoted-file>.md`
+   and
+   `git commit -m "docs(parallel): close run <slug>" -- docs/features/parallel/<slug>/parallel-status.md docs/features/potential/promoted/<promoted-file>.md`,
+   in which every pathspec begins with `docs/features/` or `artifacts/orchestration/`. Never use
+   `git add -A` or `git add .`, and never stage a `docs/features/active/<item>/` folder: each item
+   folder lands through that item's own pull request. Before pushing, require that
+   `git diff --name-only origin/main...HEAD` lists only `docs/` paths; when it lists any other
+   path, stop and report without forcing, rebasing, or splitting the branch. The coordinator holds
+   no `artifacts/orchestration/orchestrator-state.json`, so the existing documentation-only
+   exemptions apply to these commands. Push the branch, delegate the pull request to
+   `Agent(pr-author)` with a `branch:` label in place of an issue number, merge it with
+   `gh pr merge <PR> --merge` naming the pull request number, and confirm the merge with the step 3
+   procedure of `## Per-Item Merge to Main (Merge-on-Green)`.
+4. **Scratch worktrees.** After the merge of the run-document pull request is confirmed, run the
+   `cleanup-merged-worktrees` report with
+   `bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`. Run the same script
+   with `--apply` only when every row the report marks delete-eligible is a worktree this run
+   created: an item worktree, or a planner scratch worktree named in the run's manifest, kickoff,
+   or checkpoint. Otherwise apply nothing and report each remaining scratch worktree as a deferral,
+   because apply mode is repository-wide and can classify a concurrent session's clean,
+   zero-commit worktree as merged. Add no hook allow for scratch worktrees.
+5. **Report.** Report every deferral. The named deferral cases are LV1, an item worktree whose
+   removal was refused after unlock because the item's harness process still holds it; LV2, a
+   run-document pull request still open because the merge queue has not merged it or `origin/main`
+   was absent when the merge gate evaluated it; and LV3, a run-document pull request that needs
+   manual authoring because the `Agent(pr-author)` delegation without an issue number failed its
+   model-routing receipt check. Each scratch worktree left in place is also a deferral.
 
 ## Documentation Maintenance Boundaries
 
@@ -660,6 +709,8 @@ hold:
    source files by that item's own run, per the `acceptance-criteria-tracking` skill.
    A CI-dependent criterion is checked off and pushed by that item's own run before its DONE, so
    the head the parent merges already contains the check-off; the parent never commits it.
+5. `### Run Closing` (under `## Worktree Cleanup`) has run, and its run-document pull request is
+   merged or reported as a deferral.
 
 In `open` mode there is no automatic completion. The run is a standing queue and terminates only via
 `/parallel-close`, which is owned by F6 and is neither specified nor shipped by this feature. Do not
@@ -667,7 +718,8 @@ synthesize a completion condition for an `open`-mode run.
 
 No completion condition involves a run-level pull request. There is no final integration pull
 request on this surface, so completion keys on the per-item terminal states above and on nothing
-else.
+else. The Run Closing run-document pull request is a bookkeeping pull request that lands the run's
+generated documents; it is not a run-level integration pull request and merges no item work.
 
 ## Mutation Protocol (F6)
 

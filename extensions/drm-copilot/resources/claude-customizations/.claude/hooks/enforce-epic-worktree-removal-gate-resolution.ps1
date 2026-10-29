@@ -21,6 +21,9 @@
       for the removal target, and Get-EpicWorktreeGateDenyDiagnostics, which builds the
       diagnostics clause of the final deny from two read results without reading any
       file (issue #851).
+    - The import guard for WorktreeRunRecordPath.psm1 and Get-EpicWorktreeGateBaseRoot,
+      which pairs the main checkout root with a read's own root so a relative recorded
+      worktree_path is compared through the shared matcher (issue #995).
 
 .NOTES
     PowerShell 7+. Depends on Get-EpicWorktreeGateBlockDecision,
@@ -29,6 +32,8 @@
     extensions/drm-copilot/resources/claude-customizations/.
 #>
 
+# Shared recorded-path matcher and main-checkout-root seam (issue #995).
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
 function Get-EpicWorktreeGateCheckpointContent {
@@ -127,18 +132,48 @@ function Read-EpicWorktreeGateRunCheckpoint {
     }
 }
 
+function Get-EpicWorktreeGateBaseRoot {
+    <#
+    .SYNOPSIS
+        Return the base roots a relative recorded worktree_path is joined to (issue #995).
+    .DESCRIPTION
+        Pure. The main checkout root and the root that holds the checkpoint a read
+        resolved, with blank entries dropped.
+    .PARAMETER MainRoot
+        The main checkout root, or $null when none was derived.
+    .PARAMETER Read
+        A Read-EpicWorktreeGateRunCheckpoint result, or $null.
+    .OUTPUTS
+        System.String[]
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]], [object[]])]
+    param(
+        [AllowNull()][AllowEmptyString()][string] $MainRoot,
+        [AllowNull()] $Read
+    )
+
+    $readRoot = $null
+    if ($null -ne $Read -and $null -ne $Read.Target -and @($Read.Target.PSObject.Properties.Name) -contains 'WorktreeRoot') {
+        $readRoot = [string] $Read.Target.WorktreeRoot
+    }
+    return , [string[]] @(@($MainRoot, $readRoot) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+}
+
 function Find-EpicWorktreeGateParallelItemRecord {
     <#
     .SYNOPSIS
         Locate the parallel items[] record whose worktree_path matches the target path.
     .DESCRIPTION
-        Pure. Normalizes both paths exactly as Test-ParallelCheckpointAllowsWorktreeRemoval
-        does (backslash to slash, trailing slash trimmed, PowerShell -eq) and returns the
-        first matching entry (issue #851).
+        Pure. Compares through Test-WorktreeRunRecordedPathMatchesTarget, exactly as
+        Test-ParallelCheckpointAllowsWorktreeRemoval does, and returns the first matching
+        entry (issues #851, #995).
     .PARAMETER Checkpoint
         Parsed parallel-orchestrator checkpoint, or $null when absent/unreadable.
     .PARAMETER WorktreePath
         The removal target the command names.
+    .PARAMETER BaseRoot
+        Optional. The roots a relative recorded worktree_path is joined to.
     .OUTPUTS
         System.Object or $null
     #>
@@ -148,7 +183,9 @@ function Find-EpicWorktreeGateParallelItemRecord {
         $Checkpoint,
 
         [AllowNull()]
-        [string] $WorktreePath
+        [string] $WorktreePath,
+
+        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @()
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -159,7 +196,7 @@ function Find-EpicWorktreeGateParallelItemRecord {
         return $null
     }
 
-    $normalizedTarget = ($WorktreePath -replace '\\', '/').TrimEnd('/')
+    # Scan the items for the first record the shared matcher accepts for the target.
     foreach ($item in @($Checkpoint.items)) {
         if ($null -eq $item) {
             continue
@@ -168,8 +205,7 @@ function Find-EpicWorktreeGateParallelItemRecord {
         if ($itemProps -notcontains 'worktree_path') {
             continue
         }
-        $normalizedItemPath = (([string]$item.worktree_path) -replace '\\', '/').TrimEnd('/')
-        if ($normalizedItemPath -eq $normalizedTarget) {
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
             return $item
         }
     }
@@ -191,6 +227,9 @@ function Get-EpicWorktreeGateDenyDiagnostics {
         The parallel read result (Target, Checkpoint, Path).
     .PARAMETER WorktreePath
         The removal target the command names.
+    .PARAMETER MainRoot
+        Optional. The main checkout root the gate derived; with each read's own root it
+        forms the base roots a relative recorded worktree_path is joined to (issue #995).
     .OUTPUTS
         System.String
     #>
@@ -200,7 +239,8 @@ function Get-EpicWorktreeGateDenyDiagnostics {
     param(
         [Parameter(Mandatory)] $EpicRead,
         [Parameter(Mandatory)] $ParallelRead,
-        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath,
+        [AllowNull()][AllowEmptyString()][string] $MainRoot
     )
 
     $parts = foreach ($kind in @('epic', 'parallel')) {
@@ -213,11 +253,12 @@ function Get-EpicWorktreeGateDenyDiagnostics {
             $recordText = 'checkpoint absent or unparseable'
         }
         else {
+            $baseRoot = Get-EpicWorktreeGateBaseRoot -MainRoot $MainRoot -Read $read
             $record = if ($kind -eq 'epic') {
-                Find-EpicWorktreeFeatureRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath
+                Find-EpicWorktreeFeatureRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath -BaseRoot $baseRoot
             }
             else {
-                Find-EpicWorktreeGateParallelItemRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath
+                Find-EpicWorktreeGateParallelItemRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath -BaseRoot $baseRoot
             }
             $arrayName = if ($kind -eq 'epic') { 'features' } else { 'items' }
             $recordText = if ($null -eq $record) {

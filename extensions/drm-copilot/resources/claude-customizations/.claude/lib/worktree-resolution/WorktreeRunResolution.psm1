@@ -31,6 +31,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'WorktreeResolution.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'WorktreeTargetResolution.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'WorktreeItemResolution.psm1') -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'WorktreeRunRecordPath.psm1') -ErrorAction Stop
 
 # The run checkpoint locations relative to a worktree root.
 $script:EpicCheckpointRelativePath = 'artifacts/orchestration/epic-orchestrator-state.json'
@@ -339,24 +340,6 @@ function Resolve-WorktreeParallelTarget {
     return (Resolve-WorktreeRunMatch -Matched $matched.ToArray() -SessionRoot $SessionRoot -Description ("parallel_slug '{0}'" -f $ParallelSlug))
 }
 
-# Private: compare two worktree paths, insensitive to separator style and trailing
-# slashes, and case-insensitive for drive-letter and UNC (//) paths.
-function Test-WorktreeRunPathEqual {
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param(
-        [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $Left,
-        [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $Right
-    )
-
-    if ([string]::IsNullOrWhiteSpace($Left) -or [string]::IsNullOrWhiteSpace($Right)) { return $false }
-    $a = ($Left.Trim() -replace '\\', '/').TrimEnd('/')
-    $b = ($Right.Trim() -replace '\\', '/').TrimEnd('/')
-    $isCaseInsensitivePath = ($a -match '^([A-Za-z]:|//)') -or ($b -match '^([A-Za-z]:|//)')
-    $comparison = if ($isCaseInsensitivePath) { [System.StringComparison]::OrdinalIgnoreCase } else { [System.StringComparison]::Ordinal }
-    return [string]::Equals($a, $b, $comparison)
-}
-
 # Private: compare two pull request numbers as integers.
 function Test-WorktreeRunPrNumberEqual {
     [CmdletBinding()]
@@ -373,6 +356,8 @@ function Test-WorktreeRunPrNumberEqual {
 }
 
 # Private: whether a parsed run checkpoint records a pull request number or worktree path.
+# A worktree_path record is compared through the shared matcher, so a relative record is
+# joined to each BaseRoot (issue #995); with no BaseRoot a relative record matches nothing.
 function Test-WorktreeRunCheckpointRecord {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -380,7 +365,8 @@ function Test-WorktreeRunCheckpointRecord {
         [Parameter(Mandatory = $true)] [pscustomobject] $Checkpoint,
         [Parameter(Mandatory = $true)] [ValidateSet('epic', 'parallel')] [string] $Kind,
         [Parameter(Mandatory = $true)] [ValidateSet('pr_number', 'worktree_path')] [string] $RecordField,
-        [Parameter(Mandatory = $true)] [string] $Value
+        [Parameter(Mandatory = $true)] [string] $Value,
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $BaseRoot = @()
     )
 
     $values = [System.Collections.Generic.List[object]]::new()
@@ -397,7 +383,7 @@ function Test-WorktreeRunCheckpointRecord {
         if ($RecordField -eq 'pr_number') {
             if (Test-WorktreeRunPrNumberEqual -Recorded $recorded -Expected ([long] $Value)) { return $true }
         }
-        elseif (Test-WorktreeRunPathEqual -Left ([string] $recorded) -Right $Value) { return $true }
+        elseif (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string] $recorded) -TargetPath $Value -BaseRoot $BaseRoot) { return $true }
     }
     return $false
 }
@@ -438,11 +424,15 @@ function Resolve-WorktreeRunTargetByRecord {
                 'the command names no usable {0}, so the {1} run it belongs to cannot be identified' -f $RecordField, $Kind))
     }
     $needle = $Value.Trim()
+    # A relative worktree_path record is joined to the main checkout root and to the root
+    # holding the checkpoint (issue #995); the main root is derived once, and only for paths.
+    $mainRoot = if ($RecordField -eq 'worktree_path') { Get-WorktreeRunMainCheckoutRoot -SessionRoot $SessionRoot } else { $null }
     $matched = [System.Collections.Generic.List[string]]::new()
     foreach ($root in (Get-WorktreeRunLiveRoot -SessionRoot $SessionRoot)) {
         $checkpoint = Get-WorktreeRunCheckpoint -Kind $Kind -WorktreeRoot $root
         if ($null -eq $checkpoint) { continue }
-        if (Test-WorktreeRunCheckpointRecord -Checkpoint $checkpoint -Kind $Kind -RecordField $RecordField -Value $needle) { $matched.Add($root) }
+        $baseRoot = [string[]] @(@($mainRoot, $root) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+        if (Test-WorktreeRunCheckpointRecord -Checkpoint $checkpoint -Kind $Kind -RecordField $RecordField -Value $needle -BaseRoot $baseRoot) { $matched.Add($root) }
     }
     return (Resolve-WorktreeRunMatch -Matched $matched.ToArray() -SessionRoot $SessionRoot -Description $description)
 }

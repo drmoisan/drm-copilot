@@ -30,6 +30,7 @@ BeforeAll {
         '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
+        '.claude/lib/worktree-resolution/WorktreeRunRecordPath.psm1'
         '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'
     )
 }
@@ -41,6 +42,7 @@ Describe 'WorktreeResolution core.json manifest membership' {
         '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
+        '.claude/lib/worktree-resolution/WorktreeRunRecordPath.psm1'
         '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'
     ) {
         # Arrange: the manifest paths array.
@@ -56,6 +58,7 @@ Describe 'WorktreeResolution core.json manifest membership' {
         '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
+        '.claude/lib/worktree-resolution/WorktreeRunRecordPath.psm1'
         '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'
     ) {
         # Arrange / Act: count exact string-equality survivors.
@@ -87,6 +90,7 @@ Describe 'WorktreeResolution bundle mirror byte identity' {
         '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
         '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
+        '.claude/lib/worktree-resolution/WorktreeRunRecordPath.psm1'
         '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'
     ) {
         # Arrange: the repo-side file and its bundle counterpart.

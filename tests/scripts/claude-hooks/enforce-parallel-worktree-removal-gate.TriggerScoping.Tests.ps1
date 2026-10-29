@@ -36,6 +36,9 @@ Describe 'enforce-parallel-worktree-removal-gate trigger scoping (issue #545)' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        # No main checkout root is modelled, so no row reads the real repository (issue #995).
+        Mock Get-WorktreeRunMainCheckoutRoot { $null }
+        Mock Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution { $null }
 
         function ConvertTo-CommandEnvelope {
             <#

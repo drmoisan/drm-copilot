@@ -148,5 +148,29 @@ Describe 'CleanupWorktreeManifest' {
             # exists to close.
             $isCovered | Should -BeTrue
         }
+
+        It 'reports coverage for a relative checkpoint record joined to a base root (issue #995)' {
+            # Arrange: a parallel checkpoint recording the target relative to the main
+            # checkout, as an isolated item worktree is recorded.
+            $checkpoint = '{"items":[{"worktree_path":".claude/worktrees/agent-0f1c2d","merge_status":"pr_open"}]}' | ConvertFrom-Json
+
+            # Act: supply the main checkout root as a base root.
+            $isCovered = Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath 'C:/repos/main/.claude/worktrees/agent-0f1c2d' -BaseRoot @('C:/repos/main')
+
+            # Assert: the relative record covers the absolute target, so the manifest
+            # branch cannot authorize a removal the checkpoint protects.
+            $isCovered | Should -BeTrue
+        }
+
+        It 'does not report coverage for an unsafe .. relative checkpoint record (issue #995)' {
+            # Arrange: a relative record that would climb out of the base root.
+            $checkpoint = '{"items":[{"worktree_path":"..","merge_status":"pr_open"}]}' | ConvertFrom-Json
+
+            # Act: the target is the parent of the base root, the path the record names.
+            $isCovered = Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath 'C:/repos' -BaseRoot @('C:/repos/main')
+
+            # Assert: an unsafe relative record matches nothing.
+            $isCovered | Should -BeFalse
+        }
     }
 }
