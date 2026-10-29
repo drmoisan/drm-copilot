@@ -200,7 +200,7 @@ Toolchain and CI:
 - [x] AC-28: The PowerShell toolchain loop (format, lint, architecture-boundary tests, unit tests, contract checks) passes in a single pass, with pass and fail counts taken from `artifacts/pester/pester-junit.xml` and not from the PoshQC MCP result. Evidence is stored under `<FEATURE>/evidence/`.
 - [x] AC-29: Line coverage is at least 85 percent for the new sibling and for the edited gate, read per file from `artifacts/pester/powershell-coverage.xml`.
 - [x] AC-30: Seeded shuffled Pester runs show no order dependence, and no new test creates temporary files or starts `gh`.
-- [ ] AC-31 (pending-CI): CI on the PR head is green, including the Linux hook-suite job over `tests/scripts/claude-hooks` and the Python documentation and push-down contract jobs, with `ci_gate.head_sha` equal to the final PR head. Owner: this item's own orchestrator run at S9, after `ci_gate.conclusion` is `success` and before DONE.
+- [x] AC-31 (CI verified on PR #1000: every check passed on head b62e25b8cc2f2dab888c84b7de1ac081274ac4e6): CI on the PR head is green, including the Linux hook-suite job over `tests/scripts/claude-hooks` and the Python documentation and push-down contract jobs, with `ci_gate.head_sha` equal to the final PR head. Owner: this item's own orchestrator run at S9, after `ci_gate.conclusion` is `success` and before DONE.
 - [ ] AC-32 (pending live verification, deferred): After merge, a non-isolated run from the merged tree shows a standalone orchestration merging its own green PR and a parallel child not doing so. This item is not an acceptance fact before merge and is recorded as a deferred verification, not claimed as passed.
 
 ## Risks & Mitigations
