@@ -193,7 +193,7 @@ The file-scoped assertions that pass today under a stricter bound remain valid. 
 - [x] AC4: A PreToolUse hook denies a Write or Edit that leaves a covered file above 800 lines, with a message naming the tiers and the split requirement; baselined files may shrink or stay equal.
 - [x] AC5: Every existing test, hook, validator, and document that hard-codes the 500-line limit is updated or confirmed unaffected.
 - [x] AC6: The baseline list is generated deterministically from the repository at the merge base and is reviewable.
-- [ ] AC7: All mirrors and bundle copies pass the contract tests, and the seven-stage toolchain passes.
+- [x] AC7: All mirrors and bundle copies pass the contract tests, and the seven-stage toolchain passes.
 
 ## Definition of Done
 
