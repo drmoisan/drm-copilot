@@ -1,0 +1,17 @@
+# Preflight Fixes
+
+Timestamp: 2026-10-28T12-39
+Plan: docs/features/active/2026-10-28-tiered-file-size-policy-500-700-800-990/plan.2026-10-28T07-57.md
+
+These fixes change task text only. No task was added, removed, or reordered.
+
+1. [P1-T3] | validator-blind defect (a check that reads tracked files only, applied to files the plan creates) | `scripts/dev_tools/check_quality_tiers.py` discovers projects from `git ls-files -z`. An untracked `.claude/lib/file-size-policy/` folder therefore produces QT007 for the new `quality-tiers.yml` entry. The acceptance now requires the new files to be staged before the check runs and names QT007 next to QT008. The asserted outcome (exit 0) is unchanged.
+2. [P7-T7] | same class as fix 1 | The tier-check acceptance now requires every file the plan creates to be staged before the check runs. The asserted outcome is unchanged.
+3. [P2-T2] | incomplete changed-behavior test dispositions | Added the derived suites that read the Claude registration, each with disposition "unchanged" and the reason: `tests/scripts/claude-hooks/PreToolUsePayload.Contract.Tests.ps1`, `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1`, and `tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py`. The file set and assertions are unchanged.
+4. [P3-T3] | incomplete changed-behavior test dispositions | Added the derived suites that read the Codex registration and manifest, each with disposition "unchanged" and the reason: `tests/scripts/dev_tools/test_codex_core_manifest_closure.py`, `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, and `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1`. The file set and assertions are unchanged.
+5. [P5-T5] | ambiguous reference | The acceptance named "the four suites" without listing them. It now lists the four suites that carry the unchanged assertions. The task body is unchanged.
+6. [P6-T4] | policy-file path not named explicitly | "each twin under `extensions/drm-copilot/resources/`" was replaced with the four explicit twin paths. The policy-file twins are marked as covered by the user approval.
+7. [P6-T10] | assertion literal that cannot fail for one row | A case-sensitive search for `Under 500` does not match the `Cohesive and under 500 lines` row, so that row could remain unchanged and the check would still pass. The search is now case-insensitive for `under 500`. What is asserted (zero remaining 500-line rows in both template copies) is unchanged.
+8. [P6-T12] | validator-blind defect (`git grep` on files the plan creates) and an incomplete class list | Changed to `git grep --untracked` so that files the plan creates are searched. Added the class "tiered-policy text written by this plan that names 500 as the guidance tier". The final condition is now "no hit classed as a single-limit (500-line cap) policy statement". Without the new class, the rewritten tier text from [P6-T1] through [P6-T8] would itself contain the token `500 lines` and could not satisfy the original wording. The intent of AC5 is unchanged.
+9. [P7-T4] | coverage list omits a contingent file | Added any sibling module and Codex mirror created under the [P1-T2] split contingency to the per-file coverage list.
+10. `## Size Justification` | factual correction | The text said the plan "exceeds the 400-line guideline". The plan is under 400 lines and exceeds only the 40-task guideline. The sentence now says so.

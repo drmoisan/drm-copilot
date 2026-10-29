@@ -29,7 +29,7 @@ Run the toolchain in order: format → analyze → test. Restart from step 1 if 
 - Avoid `Invoke-Expression`, plaintext secrets, and hard-coded credentials/paths.
 - Use `Write-Error`/`throw` for failures; avoid silent catch-alls.
 - Use approved verbs and descriptive nouns for function names (PSScriptAnalyzer enforces this).
-- Keep scripts cohesive and under 500 lines.
+- Keep scripts cohesive and within the tiered file-size policy in `.agents/skills/general-code-change/SKILL.md` (`## File Size Limit`).
 
 ## Change Budget
 

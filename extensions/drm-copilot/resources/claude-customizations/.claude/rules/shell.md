@@ -89,7 +89,7 @@ single pass. Do not substitute the VS Code task wrappers for the native command 
 - Use shfmt default formatting (tab indentation, as in `scripts/bash/coverage_lib.sh`).
 - Quote all expansions; resolve tools with `command -v` (honoring the `SHELL_QC_<TOOL>_BIN`
   override seam).
-- No production, test, or reusable shell file may exceed 500 lines.
+- Production, test, and reusable shell files follow the tiered file-size policy in `.claude/rules/general-code-change.md` (`## File Size Limit`).
 - Tests live in `tests/shell/*.bats` and mirror `scripts/bash/`. Tests must not create
   temporary files; use checked-in fixtures under `tests/fixtures/` and checked-in stub
   binaries under `tests/fixtures/shell_qc/stub-bin/` wired through the `SHELL_QC_<TOOL>_BIN`

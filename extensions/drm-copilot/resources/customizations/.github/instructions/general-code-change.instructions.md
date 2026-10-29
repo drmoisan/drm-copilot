@@ -143,8 +143,11 @@ Rules for functions:
 
    - A module/file should have a clear purpose (e.g. “QIF parsing,” “Lexile model,” “corpus download”).
    - Avoid dumping unrelated classes/functions into the same file.
-   - Do not exceed 500 lines for any one file.
-   - This 500-line limit applies to production code, test code, and reusable scripts.
+   - File size follows a tiered policy that applies to production code, test code, and reusable scripts:
+     - **500 lines (guidance):** look for logical ways to divide the file into multiple files, provided the parts can be separated logically. No gate fails at this tier.
+     - **700 lines (advisory):** look for a split more aggressively. Reviewers and `feature-review` report a non-blocking Warning for a file at or above 700 lines. No gate fails at this tier.
+     - **Above 800 lines (hard block):** a split is enforced regardless of logical separability. A file of 801 lines or more is blocked by the repository CI check and by the PreToolUse hook; a file of exactly 800 lines passes. Legacy files already above 800 lines are recorded in `config/file-size-baseline.json` and may shrink (with the entry tightened) or stay the same size, but may not grow.
+     - Lines are logical lines: the content split on line terminators, where a trailing terminator does not add a line.
    - Exceptions: temporary throwaway scripts created and deleted during an agent session; raw text fixtures used for language-processing test data; Markdown documentation files.
 
 2. Public vs internal

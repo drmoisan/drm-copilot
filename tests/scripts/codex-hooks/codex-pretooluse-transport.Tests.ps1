@@ -10,13 +10,14 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
         . (Join-Path $script:HookRoot 'enforce-orchestration-preimplementation-gate.ps1')
         Mock Get-EpicScopeCheckpointText { $null }
 
-        # The eight handlers registered under the ^(apply_patch|Edit|Write)$ matcher.
+        # The nine handlers registered under the ^(apply_patch|Edit|Write)$ matcher.
         $script:GroupHookNames = @(
             'check-python-test-purity.ps1',
             'enforce-python-batch-budget.ps1',
             'check-powershell-test-purity.ps1',
             'enforce-powershell-batch-budget.ps1',
             'enforce-evidence-locations.ps1',
+            'enforce-file-size-limit.ps1',
             'enforce-orchestration-preimplementation-gate.ps1',
             'enforce-checkpoint-monotonic.ps1',
             'enforce-completion-consistency.ps1'
@@ -258,7 +259,7 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
         @{ Label = 'a missing tool_input'; Payload = '{"session_id":"s","hook_event_name":"PreToolUse","tool_name":"Edit"}' }
         @{ Label = 'a null tool_input'; Payload = '{"session_id":"s","hook_event_name":"PreToolUse","tool_name":"Edit","tool_input":null}' }
     ) {
-        # Scoped to the eight group handlers only. The seven non-implicated
+        # Scoped to the nine group handlers only. The seven non-implicated
         # handlers allow this input today and must not be behaviourally changed.
         foreach ($name in $script:GroupHookNames) {
             $result = Invoke-CodexHookProcess -HookName $name -PayloadRaw $Payload

@@ -54,7 +54,7 @@ If the marker is missing or malformed, fail closed to `full-feature`.
 Stop implementation and return to the user when:
 
 - the scope estimate or an in-flight batch would exceed the 3-production-file cap in direct mode,
-- a file is near or would exceed the 500-line limit,
+- a file is above or would exceed the 800-line hard limit of the tiered file-size policy (split it before proceeding; at 500 lines look for a logical split, and at 700 lines split more aggressively),
 - any QA gate delta is non-zero after self-correction,
 - the toolchain cannot be executed in the current environment (mark the change **unverified**),
 - orchestrator handoff mode is requested but the required context package is incomplete,

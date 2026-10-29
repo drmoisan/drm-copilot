@@ -571,8 +571,8 @@ and is prohibited by this skill, which is the term the residual rests on.
 - `.claude/skills/pr-context-artifacts/SKILL.md` — how the PR-context bundle is collected
   and the base-branch resolution rules.
 - `.claude/rules/shell.md` — the bash toolchain (shfmt/shellcheck/bats/kcov), the
-  500-line cap, the no-temp-files test policy, and the `CLEANUP_WT_GIT_BIN` seam
-  convention.
+  reference to the tiered file-size policy, the no-temp-files test policy, and the
+  `CLEANUP_WT_GIT_BIN` seam convention.
 - `.claude/skills/feature-promotion-lifecycle/SKILL.md` — the potential-entry-to-issue
   promotion path used by the Dirty Worktree Triage Procedure's step 9 for `PRESERVE`
   findings that describe unresolved product scope.
