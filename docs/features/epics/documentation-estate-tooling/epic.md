@@ -33,12 +33,12 @@ features:
   - issue_num: 1023
     feature_folder: 2026-10-30-docs-coverage-ledger-and-receipt-1023
     depends_on: [1020]
-  - issue_num: 900006
-    feature_folder: docs-reference-generator
+  - issue_num: 1024
+    feature_folder: 2026-10-30-docs-reference-generator-1024
     depends_on: [1020, 1021]
   - issue_num: 900007
     feature_folder: docs-mcp-tools
-    depends_on: [1021, 1022, 1023, 900006]
+    depends_on: [1021, 1022, 1023, 1024]
   - issue_num: 900008
     feature_folder: docs-enforcement-and-ci
     depends_on: [1021, 1023]
@@ -97,7 +97,7 @@ Consequences applied in this document:
   `packages/docs-page-check` as `drm_copilot_docs_check`, `dev.docs.*` Poetry console commands, a
   Python wheel build script) and the interim TypeScript runtime design (`extensions/drm-copilot/src/docs/`
   and a `drm-copilot-docs` npm bin), which ran pushed-down logic in TypeScript.
-- Children 1020, 1021, 1022, 1023 and 900006 were prepared, or were being prepared, against a
+- Children 1020, 1021, 1022, 1023 and 1024 were prepared, or were being prepared, against a
   withdrawn design. Each is re-prepared with one planner revision against this document.
 - Every child plan carries an artifact classification table: each new or edited file, its class
   (`pushed-down helper/lib`, `hook`, `skill`, `agent`, `MCP tool`, `extension command`,
@@ -176,7 +176,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 | 1 | 1022 | docs-surface-analyzers-python-config | C4 | PowerShell lexical analyzers for Python CLI, HTTP route, public API, configuration and architecture surfaces; `inventory` subcommand. |
 | 1 | 900004 | docs-surface-analyzers-typescript-dotnet | C4 | PowerShell lexical analyzers for TypeScript CLI/route/export and .NET route/config/public-type surfaces; extension-manifest import. |
 | 1 | 1023 | docs-coverage-ledger-and-receipt | C4 | PowerShell coverage ledger, parity matrix, evidence pins and staleness, `docs-complete` receipt. |
-| 2 | 900006 | docs-reference-generator | C3 | PowerShell deterministic reference-page renderer with marker-delimited generated blocks. |
+| 2 | 1024 | docs-reference-generator | C3 | PowerShell deterministic reference-page renderer with marker-delimited generated blocks. |
 | 3 | 900007 | docs-mcp-tools | C3 | TypeScript MCP tool wrappers over `Invoke-DocsCommand.ps1`. |
 | 2 | 900008 | docs-enforcement-and-ci | C3 | Consumer workflow template, surface-delta helper, opt-in integration-PR gate hook, feature-review check. |
 | 4 | 900009 | docs-authoring-workflow | C4 | Four documentation roles, eight skills, page templates, mirrored to all surfaces. |
@@ -210,7 +210,7 @@ None of the following has been approved by the owner. Each is a provisional defa
   under `extensions/drm-copilot/test/`.
 - Subcommands and owners: `init`, `validate-profile` (1020); `check` (1021); `inventory` (1022;
   900004 adds analyzers only); `coverage`, `update-ledger`, `validate` (1023);
-  `generate-reference` (900006); `surface-delta` (900008). Each owner adds its own command module
+  `generate-reference` (1024); `surface-delta` (900008). Each owner adds its own command module
   and one dispatch-table row.
 - Exit codes for every subcommand: 0 success, 1 findings or validation failure, 2 usage or input
   error, 3 internal or I/O error; `-Json` switch emits the envelope defined below.
@@ -281,6 +281,22 @@ None of the following has been approved by the owner. Each is a provisional defa
   own line, so later children append without changing an existing line. Contract tests that
   enumerate registered analyzers or subcommands assert membership, not set equality.
 
+### Generator decisions from the first preparation of 1024 (language-independent)
+
+- Fixed family pages: `cli-reference.md`, `http-reference.md`, `config-reference.md`,
+  `api-reference.md`; `architecture-component` elements are not rendered and are reported as a
+  count. No index page is generated; the consumer links generated pages from an entry page.
+- Output directory: the single profile Diataxis directory entry with mode `reference`, or an
+  explicit output-directory argument. Dry run is the default; a write switch performs writes.
+- Path matching for profile `path_or_glob` entries: exact, or prefix plus `/`, or case-sensitive
+  glob; first match wins. 1023 uses the same rule.
+- Each generated-block marker is a standalone line with blank lines inside and outside the block.
+- Identifier patterns: profile audience identifiers and the page-metadata `audience` pattern must
+  agree. 1020 and 1021 adopt one pattern, `^[a-z0-9][a-z0-9-]*$`, for audience identifiers in both
+  schemas (the first preparation left them inconsistent).
+- The first preparation halted at preflight on missing property tests for six pure functions; the
+  re-preparation plan includes a property test per pure function from the start.
+
 ### Reuse
 
 - Language-neutral data: `schemas/discovery/v2/common.schema.json`,
@@ -298,7 +314,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 ### Cross-feature conflict surface
 
 Children create disjoint new modules. Shared, append-only edit points:
-`.claude/lib/docs/Invoke-DocsCommand.ps1` dispatch table (1020, 1021, 1022, 1023, 900006,
+`.claude/lib/docs/Invoke-DocsCommand.ps1` dispatch table (1020, 1021, 1022, 1023, 1024,
 900008), `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (1022, 900004), any push-down manifest or
 parity list that enumerates mirrored files (every child that adds a module), and
 `quality-tiers.yml` if applicable. Append-only conflicts are resolved inside the child's
@@ -437,7 +453,7 @@ Acceptance criteria:
   only mutating subcommand.
 - Pester line coverage >= 85%.
 
-### 900006 - docs-reference-generator (wave 2, C3)
+### 1024 - docs-reference-generator (wave 2, C3)
 
 Band rationale: deterministic rendering with a merge invariant (prose preservation).
 
@@ -559,7 +575,7 @@ Acceptance criteria:
 - 1021 depends on 1020 because its `check` subcommand registers in 1020's entry script and its
   schema references 1020's `common` definitions (an edge added with the language directive; under
   the withdrawn Python design 1021 was an independent package in wave 0).
-- 900006 depends on 1021 because generated pages must satisfy the page-metadata schema and checker.
+- 1024 depends on 1021 because generated pages must satisfy the page-metadata schema and checker.
 - 900007 waits for the subcommands it wraps; 900004 is excluded because it adds analyzers behind
   the existing `inventory` subcommand.
 - 900008 depends on the checker and the receipt only.
@@ -572,7 +588,7 @@ Computed with `scripts/dev_tools/epic_wave_computation.py`:
 
 - Wave 0: 1020
 - Wave 1: 1021, 1022, 900004, 1023
-- Wave 2: 900006, 900008
+- Wave 2: 1024, 900008
 - Wave 3: 900007
 - Wave 4: 900009
 - Wave 5: 900010
