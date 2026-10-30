@@ -18,10 +18,10 @@ intent:
     - No production file exceeds 800 lines.
     - Line coverage >= 85% and branch coverage >= 75% (where measured) for changed code.
 features:
-  - issue_num: null
+  - issue_num: 1025
     feature_folder: harness-survey-gold-standard-contracts-parity-matrix
     depends_on: []
-  - issue_num: 1016
+  - issue_num: null
     feature_folder: move-development-docs-to-dev-root-and-reserve-docs-for-production
     depends_on: []
   - issue_num: null
@@ -36,7 +36,7 @@ features:
   - issue_num: null
     feature_folder: retire-github-skills-and-thin-copilot-layer
     depends_on: [push-down-consolidation-and-ecosystem-packs, hook-parity-across-claude-codex-copilot]
-  - issue_num: null
+  - issue_num: 1016
     feature_folder: dev-docs-root-migration-and-feature-folder-rename
     depends_on: [move-development-docs-to-dev-root-and-reserve-docs-for-production, retire-github-skills-and-thin-copilot-layer]
 ---
@@ -47,8 +47,9 @@ Epic issue: #1018.
 
 > **Manifest status.** Planning in progress. `issue_num: null` entries are placeholders and
 > `feature_folder` values are short-name hints; both are back-filled from each prepared child's
-> promotion receipt and active folder at fan-in. Child 2 adopts the existing issue #1016 and is
-> not promoted again.
+> promotion receipt and active folder at fan-in. Child 7 adopts the existing issue #1016 and is
+> not promoted again (owner decision E1, 2026-10-30). Child 1 is keyed to its promoted issue
+> #1025.
 
 ## Goal
 
@@ -63,24 +64,25 @@ and are not re-opened here.
 
 | Child | Feature (hint) | Issue | Wave | Band |
 | --- | --- | --- | --- | --- |
-| 1 Survey, gold-standard contracts, parity matrix, Copilot and Codex experiments | harness-survey-gold-standard-contracts-parity-matrix | new | 0 | C4 |
-| 2 #1016 Phase 1: resolver, configured root, folder-name parser, folder creation by issue number | move-development-docs-to-dev-root-and-reserve-docs-for-production | #1016 | 0 | C3 |
+| 1 Survey, gold-standard contracts, parity matrix, Copilot and Codex experiments | harness-survey-gold-standard-contracts-parity-matrix | #1025 | 0 | C4 |
+| 2 #1016 Phase 1: resolver, configured root, folder-name parser, folder creation by issue number | move-development-docs-to-dev-root-and-reserve-docs-for-production | new child issue referencing #1016 | 0 | C3 |
 | 3 Generators and shared-source pipeline (skills, rules, MCP, agents; all with --check) | shared-source-generators-skills-rules-mcp-agents | new | 1 | C3 |
 | 4 Push-down consolidation and per-ecosystem pack selection | push-down-consolidation-and-ecosystem-packs | new | 2 | C3 |
 | 5 Hook parity | hook-parity-across-claude-codex-copilot | new | 2 | C3 |
 | 6 Retirements and the thin Copilot layer | retire-github-skills-and-thin-copilot-layer | new | 3 | C3 |
-| 7 #1016 Phases 2 and 3: migration command, move to .dev, feature-folder rename, default flip | dev-docs-root-migration-and-feature-folder-rename | new | 4 | C3 |
+| 7 #1016 Phases 2 and 3: migration command, move to .dev, feature-folder rename, default flip | dev-docs-root-migration-and-feature-folder-rename | #1016 (adopted) | 4 | C3 |
 
 Waves are 0-indexed (longest-path layering).
 
 ### Issue keying for #1016
 
 The manifest is keyed by `issue_num`, and the planning and execution validators require each
-`issue_num` to be unique. Child 2 adopts #1016 (Phase 1, which also carries the full #1016 spec
-including decisions D-1 to D-22). Child 7 (Phases 2 and 3) receives its own child issue that
-references #1016 and cites child 2's spec; #1016 is not promoted a second time. Merges into the
-integration branch do not auto-close issues, so #1016 stays open until the integration pull
-request reaches `main`.
+`issue_num` to be unique. Owner decision E1 (2026-10-30): child 7 (Phases 2 and 3: migration
+command, `.dev` move, feature-folder rename, default flip) adopts #1016, so #1016 closes only when
+the move completes. Child 2 (Phase 1) receives a new child issue that references #1016; child 2's
+issue, spec, checkpoint and pull request carry no `Closes`/`Fixes`/`Resolves` line for #1016.
+#1016 is not promoted a second time. Child 2 carries the full #1016 design (D-1 to D-22) in its
+spec with Phases 2 and 3 marked as delivered by child 7; child 7's spec cites it.
 
 ## Scope
 
@@ -168,7 +170,13 @@ reference resolves.
   command, settled as an MCP tool with a thin `npx` entry, and any MCP wrapper over a generator),
   the wrapper is TypeScript. Every child plan records the classification of each planned
   artifact, and any case that cannot follow the rule is raised as an owner question rather than
-  decided by the child.
+  decided by the child. Owner exception (E2): a language-native analyzer is allowed when it
+  analyzes that same language and ships only with that language's pack; PowerShell remains the
+  baseline.
+- **Planning ahead of child 1 (owner decision E3).** Children 3 to 6 are planned before child 1's
+  contracts, dispositions and approvals exist. Each cites child 1's spec for the contract format
+  and parity-matrix schema, and carries a Phase 0 gate that re-checks child 1's outputs at
+  execution time; one plan revision is accepted when the survey invalidates a plan.
 - `AGENTS.md` is the instruction source; `CLAUDE.md` is `@AGENTS.md` plus Claude-only text;
   `.github/copilot-instructions.md` holds Copilot-only text.
 - `.agents/skills` is the source for shared skills; tool-only skills stay in their native folder.
