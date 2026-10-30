@@ -292,7 +292,11 @@ Example invocations:
 ### Registry entries
 
 Appended at the end of `ANALYZER_REGISTRY` in `analyzer_contract.py`, in identifier order, each as
-its own Black-formatted multi-line block; no existing line of the file is edited:
+its own Black-formatted multi-line block. At most one existing line of the file changes: when the
+tuple is the one-line empty assignment ending in `= ()` (as #1020 delivers it), that line becomes
+the opening `= (` line, the entries follow, and the closing `)` stands on its own line; when the
+tuple is already multi-line (for example because sibling 900004 appended first), no existing line
+changes:
 
 ```python
     AnalyzerRegistration(
@@ -350,7 +354,10 @@ All diagnostics use the #1020 docs `diagnostic` shape; codes use the discovery `
 
 - **D1 Analyzer identifiers and registry shape.** Identifiers `python-cli`, `python-http`,
   `python-public-api`, `config-files`, `python-architecture`. Each is appended to
-  `ANALYZER_REGISTRY` as its own Black-formatted entry at the end of the tuple. `attribute` names a
+  `ANALYZER_REGISTRY` as its own Black-formatted entry at the end of the tuple. The append changes
+  at most one existing line: the one-line empty assignment ending in `= ()` becomes the opening
+  `= (` line with the closing `)` on its own line, and an already multi-line tuple has no existing
+  line changed. `attribute` names a
   module-level analyzer instance (for example `PYTHON_CLI_ANALYZER = PythonCliAnalyzer()`).
 - **D2 Console-script ownership.** `[project.scripts]` and `[tool.poetry.scripts]` (and
   `[project.gui-scripts]` under the same rule) are owned by `python-cli` and yield `cli-command`
@@ -390,10 +397,15 @@ All diagnostics use the #1020 docs `diagnostic` shape; codes use the discovery `
   `profile_sha256` computation in `## Data & State`; conversion of each
   `SurfaceSelection.exclusions` entry to a discovery `JsonObject` with `path_or_glob` and `rationale`
   in `cli_inventory.py`, whatever type #1020 delivers; and the instance meaning of `attribute`
-  (D1). The only edits to #1020 files are the appended `ANALYZER_REGISTRY` entries and the appended
+  (D1). The only edits to #1020 files are the appended `ANALYZER_REGISTRY` entries (with the single
+  permitted change of the one-line empty assignment described in D1), the appended
   `dev.docs.inventory` script line in root `pyproject.toml` (plus the script line in
-  `packages/docs-runtime/pyproject.toml`). Anything else that would require editing a #1020 file is
-  out of scope and is a dependency on #1020 as delivered.
+  `packages/docs-runtime/pyproject.toml`), and one test-expectation update: when
+  `tests/docs_runtime/test_docs_package_contract.py::test_root_pyproject_registers_docs_console_scripts`
+  or `::test_package_pyproject_matches_runtime_contract` compares the console-script table (or its
+  `dev.docs.*` subset) by equality, the expected set gains exactly the `dev.docs.inventory` entry,
+  because this feature appends that script, and nothing else in the test changes. Anything else that
+  would require editing a #1020 file is out of scope and is a dependency on #1020 as delivered.
 - **D11 Typer default command naming.** The function name with underscores converted to hyphens,
   unless an explicit name is given. Fixtures cover both explicit and default names.
 
@@ -489,7 +501,7 @@ All diagnostics use the #1020 docs `diagnostic` shape; codes use the discovery `
 - [ ] The built fixture snapshot validates against `surface-inventory-snapshot.schema.json` through #1020 `validate_artifact` with no finding, and each `inputs[].sha256` equals `hashlib.sha256` of the corresponding in-bound fixture bytes with `size` equal to its length.
 - [ ] `dev.docs.inventory` exits 0 for a fixture with no blocking diagnostic, 1 when a blocking diagnostic is present or the profile is invalid, 2 for invocation errors, and 3 for runtime failures, each asserted in-process with injected `InventoryPorts`, `io.StringIO` streams and a fixed clock.
 - [ ] `dev.docs.inventory --analyzer <id>` restricts the snapshot to the named analyzers; an unregistered id exits 2 with a message naming it; an id whose analyzer produces none of the profile's selected element kinds exits 2 with a message naming the id; `--revision` rejects a value that is not a full object id with exit 2.
-- [ ] The five registrations are appended at the end of `ANALYZER_REGISTRY` as Black-formatted blocks with no existing line of `analyzer_contract.py` changed; `validate_registry(ANALYZER_REGISTRY)` returns no finding; `load_analyzer` with the real `importlib.import_module` returns, for each entry, a module-level instance whose `identifier` and `element_kinds` equal the registration.
+- [ ] The five registrations are appended at the end of `ANALYZER_REGISTRY` as Black-formatted blocks with at most one existing line of `analyzer_contract.py` changed (the one-line empty assignment ending in `= ()` becomes the opening `= (` line with the closing `)` on its own line; zero existing lines change when the tuple is already multi-line); `validate_registry(ANALYZER_REGISTRY)` returns no finding; `load_analyzer` with the real `importlib.import_module` returns, for each entry, a module-level instance whose `identifier` and `element_kinds` equal the registration.
 - [ ] The root `pyproject.toml` gains exactly one appended line `"dev.docs.inventory" = "drm_copilot_docs.cli_inventory:main_inventory"` after the #1020 `dev.docs.*` entries, with no other line of that file changed.
 - [ ] No file under `packages/discovery-runtime/` or `schemas/discovery/` is changed, verified by an empty `git diff` against the integration branch base for those paths.
 - [ ] Analyzer modules call none of `exec`, `eval`, `__import__` or `importlib.import_module`, and fixtures that import FastAPI and Flask are analyzed successfully although neither package is installed.
