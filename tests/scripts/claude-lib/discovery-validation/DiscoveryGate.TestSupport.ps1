@@ -29,6 +29,13 @@ $script:GateLocatorSha256 = '5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe0
 $script:GateNow = [datetime]::new(2026, 10, 22, 12, 0, 0, [System.DateTimeKind]::Utc)
 $script:GateNonce = '0123456789abcdef0123'
 $script:GateHostEnvironment = @{ Platform = 'windows'; UserHome = 'C:/Users/Example'; LocalAppData = 'C:/Users/Example/AppData/Local'; XdgStateHome = $null }
+# A suite that runs a probe against the real repository root needs a host environment of the running
+# platform, because the authority policy validates that root's shape against the declared platform.
+$script:GateRunningHostEnvironment = $(if ($IsWindows) { $script:GateHostEnvironment } elseif ($IsMacOS) {
+        @{ Platform = 'macos'; UserHome = '/Users/example'; LocalAppData = $null; XdgStateHome = $null }
+    } else {
+        @{ Platform = 'linux'; UserHome = '/home/example'; LocalAppData = $null; XdgStateHome = '/home/example/.local/state' }
+    })
 $script:GateLocation = Resolve-DiscoveryAuthorityLocation -WorkspaceRoot $script:GateWorkspaceRoot -Platform 'windows' -UserHome 'C:/Users/Example' -LocalAppData 'C:/Users/Example/AppData/Local'
 $script:GateInvocationDirectory = Get-DiscoveryInvocationDirectory -Location $script:GateLocation -SessionId 'session-alpha' -InvocationId 'invocation-alpha'
 

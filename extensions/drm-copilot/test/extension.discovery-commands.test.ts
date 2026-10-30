@@ -26,6 +26,7 @@ import {
   createTerminalMock,
   resetExtensionHarnessState,
   setExecutablePresence,
+  setWorkspaceFolders,
   showInputBoxMock,
   showQuickPickMock,
 } from "./extension-test-harness";
@@ -33,6 +34,9 @@ import type { MockChildProcess } from "./runtime-test-helpers";
 import { buildServiceResult } from "./discovery-test-helpers";
 
 const WORKSPACE_ROOT = "C:/workspace";
+/** A workspace root that is absolute under the platform the suite runs on. */
+const HOST_WORKSPACE_ROOT =
+  process.platform === "win32" ? WORKSPACE_ROOT : "/workspace";
 const GATEWAY_ARGV_PREFIX = ["-I", "-m", "drm_copilot_discovery.gateway"];
 const COMMANDS = [
   "validateDiscoveryArtifacts",
@@ -291,9 +295,12 @@ describe("discovery VS Code commands", () => {
   });
 
   it("runDiscoveryDoctor runs the diagnostic without prompts on both paths", async () => {
+    // Doctor resolves the protected authority location against the real host
+    // platform, so the workspace root must be absolute on the running OS.
+    setWorkspaceFolders([{ uri: { fsPath: HOST_WORKSPACE_ROOT } }]);
     await handlerFor("runDiscoveryDoctor")({});
     await handlerFor("runDiscoveryDoctor")();
-    expectGatewayInvocation();
+    expectGatewayInvocation(HOST_WORKSPACE_ROOT);
     expect(stdinRequest(0)).toMatchObject({
       operation: "doctor",
       mode: "structural",

@@ -123,7 +123,8 @@ Describe 'Claude Code discovery adapter entry points' {
         }
 
         It 'defaults the workspace root to the repository that hosts the probe' {
-            $gateHostEnvironment = $script:GateHostEnvironment
+            # The default root is the real checkout, so the host environment must model the running platform.
+            $gateHostEnvironment = $script:GateRunningHostEnvironment
             $probeStore = Get-GateStore
             Mock Get-DiscoveryTrustedHostEnvironment { $gateHostEnvironment }.GetNewClosure()
             Mock Get-DiscoveryDefaultStore { $probeStore }.GetNewClosure()

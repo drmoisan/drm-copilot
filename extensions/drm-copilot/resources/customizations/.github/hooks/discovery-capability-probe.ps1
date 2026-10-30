@@ -49,7 +49,8 @@ function Get-DiscoveryProbeRuntime {
         }
         return $runtime
     }
-    $configuration = Join-Path $WorkspaceRoot '.github/hooks/discovery.json'
+    # The workspace root is a host-modelled path string; Join-Path would require its drive to exist locally.
+    $configuration = "$($WorkspaceRoot.TrimEnd('/', '\'))/.github/hooks/discovery.json"
     $digest = $(if (Test-Path -LiteralPath $configuration -PathType Leaf) { Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes($configuration)) } else { '0' * 64 })
     return [ordered]@{ build_sha256 = $digest; package_version = '2.0.0'; policy_sha256 = $digest; policy_version = 2; schema_version = '2.0.0' }
 }

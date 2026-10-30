@@ -51,8 +51,10 @@ Describe 'Codex enforce-discovery-artifact-gate.ps1' {
     }
 
     It 'resolves the helper modules from the published location first and the repository second' {
-        $published = Get-DiscoveryHelperModulePath -ModuleName 'DiscoveryAuthority.psm1' -ScriptRoot 'C:/dest/.codex/hooks'
-        ($published -replace '\\', '/') | Should -Be 'C:/dest/.codex/hooks/../lib/discovery-validation/DiscoveryAuthority.psm1'
+        # Join-Path needs the root's drive to exist, so the fake destination is rooted for the running platform.
+        $destRoot = $(if ($IsWindows) { 'C:/dest/.codex/hooks' } else { '/dest/.codex/hooks' })
+        $published = Get-DiscoveryHelperModulePath -ModuleName 'DiscoveryAuthority.psm1' -ScriptRoot $destRoot
+        ($published -replace '\\', '/') | Should -Be "$destRoot/../lib/discovery-validation/DiscoveryAuthority.psm1"
         $selfHosted = Get-DiscoveryHelperModulePath -ModuleName 'DiscoveryAuthority.psm1'
         ($selfHosted -replace '\\', '/') | Should -BeLike '*.claude/lib/discovery-validation/DiscoveryAuthority.psm1'
         Test-Path -LiteralPath $selfHosted | Should -BeTrue

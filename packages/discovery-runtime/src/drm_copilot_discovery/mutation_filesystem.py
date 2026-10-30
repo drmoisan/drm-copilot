@@ -10,6 +10,7 @@ No lock is stolen automatically after a crash; root recovery must inspect it.
 from __future__ import annotations
 
 import ctypes
+import importlib
 import os
 import stat
 from contextlib import ExitStack, contextmanager
@@ -66,6 +67,35 @@ class _WindowsCall(Protocol):
         ...
 
 
+class _WindowsKernel(Protocol):
+    """Type the kernel32 library object as only the two calls this module uses."""
+
+    CreateFileW: _WindowsCall
+    CloseHandle: _WindowsCall
+
+
+def _windows_member(module: str, name: str) -> object:
+    """Resolve a Windows-only native member when it is called, not when it is typed.
+
+    ``ctypes.WinDLL`` and ``msvcrt`` exist only on Windows, so a static reference
+    is unknown to type analysis for any other platform. Resolving them by name
+    keeps the module type-exact on every analysed platform while preserving the
+    call-time lookup that the injected-kernel unit tests rely on.
+
+    Args:
+        module: Importable module name that owns the member (for example ctypes).
+        name: Attribute name of the member inside that module.
+
+    Returns:
+        The resolved member as an opaque object for the caller to cast narrowly.
+
+    Raises:
+        ImportError: The module is absent on the current platform.
+        AttributeError: The module does not define the member on this platform.
+    """
+    return getattr(importlib.import_module(module), name)
+
+
 def _ordinary(info: os.stat_result, *, directory: bool) -> None:
     """Reject links, reparse points and nonordinary entries before any byte access."""
     expected = stat.S_ISDIR if directory else stat.S_ISREG
@@ -79,8 +109,11 @@ def pin_windows_path(
 ) -> Generator[os.stat_result, None, None]:
     """Deny delete sharing so Windows cannot rename/replace an opened ancestor."""
     _ordinary(os.lstat(path), directory=directory)
-    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
-    opening = cast("_WindowsCall", kernel.CreateFileW)
+    load_library = cast(
+        "Callable[..., _WindowsKernel]", _windows_member("ctypes", "WinDLL")
+    )
+    kernel = load_library("kernel32", use_last_error=True)
+    opening = kernel.CreateFileW
     opening.argtypes = [
         ctypes.c_wchar_p,
         ctypes.c_uint32,
@@ -91,18 +124,20 @@ def pin_windows_path(
         ctypes.c_void_p,
     ]
     opening.restype = ctypes.c_void_p
-    closing = cast("_WindowsCall", kernel.CloseHandle)
+    closing = kernel.CloseHandle
     closing.argtypes, closing.restype = [ctypes.c_void_p], ctypes.c_int
     # Read/list access participates in sharing checks; attribute access alone does not.
     # OPEN_REPARSE_POINT plus no FILE_SHARE_DELETE protects the checked name.
     handle = opening(str(path), 0x81, 3, None, 3, 0x02200000, None)
     if handle is None or handle == ctypes.c_void_p(-1).value:
         raise OSError("Cannot pin Windows mutation path")
-    import msvcrt
+    open_osfhandle = cast(
+        "Callable[[int, int], int]", _windows_member("msvcrt", "open_osfhandle")
+    )
 
     # Transfer ownership to a descriptor so fstat uses the exact retained handle.
     try:
-        descriptor = msvcrt.open_osfhandle(handle, os.O_RDONLY)
+        descriptor = open_osfhandle(handle, os.O_RDONLY)
     except OSError:
         closing(handle)
         raise

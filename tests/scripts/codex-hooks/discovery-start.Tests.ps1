@@ -59,7 +59,9 @@ Describe 'Codex discovery start attestation' {
     }
 
     It 'resolves the shared modules from the published location first and the repository second' {
-        ((Get-CodexDiscoveryStartModulePath -ModuleName 'DiscoveryStart.psm1' -ScriptRoot 'C:/dest/.codex/hooks') -replace '\\', '/') | Should -Be 'C:/dest/.codex/hooks/../lib/discovery-validation/DiscoveryStart.psm1'
+        # Join-Path needs the root's drive to exist, so the fake destination is rooted for the running platform.
+        $destRoot = $(if ($IsWindows) { 'C:/dest/.codex/hooks' } else { '/dest/.codex/hooks' })
+        ((Get-CodexDiscoveryStartModulePath -ModuleName 'DiscoveryStart.psm1' -ScriptRoot $destRoot) -replace '\\', '/') | Should -Be "$destRoot/../lib/discovery-validation/DiscoveryStart.psm1"
         Test-Path -LiteralPath (Get-CodexDiscoveryStartModulePath -ModuleName 'DiscoveryStart.psm1') | Should -BeTrue
     }
 

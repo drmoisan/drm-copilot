@@ -48,7 +48,9 @@ Describe 'Codex validate-discovery-agent-output.ps1' {
     }
 
     It 'resolves the helper modules from the published location first and the repository second' {
-        ((Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryStop.psm1' -ScriptRoot 'C:/dest/.codex/hooks') -replace '\\', '/') | Should -Be 'C:/dest/.codex/hooks/../lib/discovery-validation/DiscoveryStop.psm1'
+        # Join-Path needs the root's drive to exist, so the fake destination is rooted for the running platform.
+        $destRoot = $(if ($IsWindows) { 'C:/dest/.codex/hooks' } else { '/dest/.codex/hooks' })
+        ((Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryStop.psm1' -ScriptRoot $destRoot) -replace '\\', '/') | Should -Be "$destRoot/../lib/discovery-validation/DiscoveryStop.psm1"
         Test-Path -LiteralPath (Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryStop.psm1') | Should -BeTrue
     }
 
