@@ -940,7 +940,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
 
 ### Phase 16 — Remediation cycle 1: final verification, reconciliation and handoff
 
-- [ ] [P16-T1] Run the Python formatting, lint, type and full coverage loop on the remediated tree (FEATURE/evidence/qa-gates/).
+- [x] [P16-T1] Run the Python formatting, lint, type and full coverage loop on the remediated tree (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P14-T6 with the artifact names p16-python-{format,lint,types,tests}.<timestamp>.md, SCRATCH/issue-980-p16-coverage.json and SCRATCH/issue-980-p16-junit.xml; copy the JSON report to FEATURE/evidence/qa-gates/p16-python-coverage.<timestamp>.json.
   - Tests and proof: As P14-T6; the tests record carries the pytest summary line, the wall-clock seconds and the JSON totals.
   - Acceptance: One clean pass; repository line coverage at least 85% and branch coverage at least 75%; the threshold gate exits 0; the retained JSON report exists.
