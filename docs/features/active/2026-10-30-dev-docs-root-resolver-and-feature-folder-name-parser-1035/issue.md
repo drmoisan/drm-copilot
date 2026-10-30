@@ -1,13 +1,16 @@
-# move-development-docs-to-dev-root-and-reserve-docs-for-production (Issue #1016)
+# dev-docs-root-resolver-and-feature-folder-name-parser (Issue #1035)
 
 - Date captured: 2026-10-30
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/move-development-docs-to-dev-root-and-reserve-docs-for-production/ (Issue #1016)
+- Status: Promoted -> docs/features/active/2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035/ (Issue #1035)
 
-- Issue: #1016
-- Issue URL: https://github.com/drmoisan/drm-copilot/issues/1016
+- Issue: #1035
+- Issue URL: https://github.com/drmoisan/drm-copilot/issues/1035
+- Parent issue: #1016 (referenced, not closed by this issue; no Closes, Fixes or Resolves line for #1016)
 - Last Updated: 2026-10-30
 - Work Mode: full-feature
+
+> Re-keyed 2026-10-30 under owner decision E1 on epic #1018: this folder was prepared under #1016 and moved from `2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016`. Issue #1016 is adopted by epic child 7 (Phases 2 and 3). The body below is the #1016 record, kept as the design source for Phase 1; the promoted record for #1035 is `docs/features/potential/promoted/2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser.md`.
 
 ## Problem / Why
 

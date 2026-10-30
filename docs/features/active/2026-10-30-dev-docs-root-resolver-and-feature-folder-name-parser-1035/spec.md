@@ -1,13 +1,13 @@
-# 2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production — Spec
+# 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser — Spec
 
-- **Issue:** #1016
+- **Issue:** #1035 (Phase 1 of #1016; references #1016 and does not close it — no Closes, Fixes or Resolves line for #1016)
 - **Parent (optional):** epic #1018 (`docs/features/epics/shared-agent-harness-layer/epic.md`), child 2
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-30
 - **Status:** Ready for planning
 - **Version:** 1.0
 - **Work Mode:** full-feature (acceptance criteria in this file and in `user-story.md`)
-- **Branch:** `feature/dev-docs-root-resolver-phase1-1016`
+- **Branch:** `feature/dev-docs-root-resolver-phase1-1035`
 - **Research:** `research/research.2026-10-30T21-15.md` (inventory and proposed contracts)
 - **Settled decisions:** `docs/features/potential/promoted/2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production.md` (D-1 to D-22). This spec does not re-open any decision.
 
@@ -17,13 +17,13 @@
 
 Goal of issue #1016: separate development documentation from production documentation. Development records move to a new top-level `.dev/` root, and `docs/` is reserved for production documentation. The lifecycle semantics (potential, active, completed, archive) do not change.
 
-This spec records the full #1016 design (target layout, three phases, D-1 to D-22). Issue #1016 is child 2 of epic #1018 and delivers **Phase 1 only**. Phases 2 and 3 are delivered by epic child 7 under its own child issue, which references #1016 and cites this spec. The acceptance criteria in this spec cover Phase 1 only.
+This spec records the full #1016 design (target layout, three phases, D-1 to D-22). Child 2 of epic #1018 is tracked by issue #1035 and delivers **Phase 1 only**. Phases 2 and 3 are delivered by epic child 7, which adopts #1016 (owner decision E1), so #1016 closes only when the move to `.dev` completes; child 7 cites this spec. The acceptance criteria in this spec cover Phase 1 only.
 
 ## Scope Boundary
 
 | Item | Phase | Delivered by | In scope for this child |
 | --- | --- | --- | --- |
-| `development_docs_root` key, default `docs/features`, behavior identical | 1 | child 2 (#1016) | Yes |
+| `development_docs_root` key, default `docs/features`, behavior identical | 1 | child 2 (#1035) | Yes |
 | Resolvers in Python, PowerShell and TypeScript; area map; writer/matcher split; `.dev` fallback logic | 1 | child 2 | Yes |
 | Routing every production consumer through the resolver | 1 | child 2 | Yes |
 | CI docs-only scope for `.dev/` (D-12); JSON governance glob (D-14); dot-folder handling (D-13) | 1 | child 2 | Yes |

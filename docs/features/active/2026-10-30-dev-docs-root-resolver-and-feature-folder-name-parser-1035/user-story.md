@@ -1,6 +1,6 @@
 # `2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production` — User Story
 
-- Issue: #1016 (epic #1018, child 2: Phase 1 only)
+- Issue: #1035 (epic #1018, child 2: Phase 1 of #1016 only; references #1016 and does not close it)
 - Owner: drmoisan
 - Status: Ready for planning
 - Last Updated: 2026-10-30

@@ -1,13 +1,13 @@
-# 2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production - Plan
+# 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser - Plan
 
-- **Issue:** #1016 (epic #1018, child 2: Phase 1 only)
+- **Issue:** #1035 (epic #1018, child 2: Phase 1 of #1016 only; references #1016 and does not close it — no Closes, Fixes or Resolves line for #1016 in any commit or pull request)
 - **Parent (optional):** epic #1018 (`docs/features/epics/shared-agent-harness-layer/epic.md`)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-30T17-11
 - **Status:** Ready for preflight (revision 1 after preflight round 1)
 - **Version:** 1.1
 - **Work Mode:** full-feature (acceptance criteria from `spec.md` and `user-story.md`)
-- **Branch:** `feature/dev-docs-root-resolver-phase1-1016`
+- **Branch:** `feature/dev-docs-root-resolver-phase1-1035`
 
 ## Required References
 
@@ -17,8 +17,8 @@
 
 ## Execution Preamble
 
-- `<FEATURE>` is `docs/features/active/2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016`. Evidence goes to `<FEATURE>/evidence/<kind>/<name>.<timestamp>.md` with the write-time UTC stamp.
-- SCRATCH resolves to `<session scratchpad>/issue-1016/`; scratch file names start with `issue-1016-`. Evidence records the token `SCRATCH`, never a host path.
+- `<FEATURE>` is `docs/features/active/2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035`. Evidence goes to `<FEATURE>/evidence/<kind>/<name>.<timestamp>.md` with the write-time UTC stamp.
+- SCRATCH resolves to `<session scratchpad>/issue-1035/`; scratch file names start with `issue-1035-`. Evidence records the token `SCRATCH`, never a host path.
 - Route: this child exceeds the per-session cap in every language (about 40 PowerShell, 28 Python and 25 TypeScript production files, plus bundle mirrors that also count). Execution uses the `large` route described in `## Batch Budget` of the `execution-environment` skill; the item worktree checkpoint selects it before Phase 1.
 - Scope diffs anchor on the merge base of `origin/main` and `HEAD`.
 - Invariant for every consumer task: with the default root `docs/features`, every user-facing message, error string, written path and exit status is byte-identical to today. Matchers accept the union of both known roots regardless of the configured value; writers use the resolved root through the area map.
@@ -78,7 +78,7 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
   - Acceptance: `<FEATURE>/evidence/baseline/file-size.<timestamp>.md` lists each file with its count and tier, and the three divergent regions named in D-P3 (or records any further region, which P6-T11 then also unifies).
 - [ ] [P0-T5] Capture the Python static baseline: Black in check mode, Ruff, Pyright over `scripts/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/baseline/python-static.<timestamp>.md` with one Command/EXIT_CODE/Output Summary block per tool (finding counts).
-- [ ] [P0-T6] Capture the Python test baseline with coverage for every module in `## Coverage Targets`, using dotted `--cov=` arguments (for example `--cov=scripts.dev_tools.json_config`), `--cov-branch`, `--cov-report=term-missing` and `--cov-report=json:SCRATCH/issue-1016-baseline-coverage.json`.
+- [ ] [P0-T6] Capture the Python test baseline with coverage for every module in `## Coverage Targets`, using dotted `--cov=` arguments (for example `--cov=scripts.dev_tools.json_config`), `--cov-branch`, `--cov-report=term-missing` and `--cov-report=json:SCRATCH/issue-1035-baseline-coverage.json`.
   - Acceptance: `<FEATURE>/evidence/baseline/python-tests.<timestamp>.md` records pass/fail counts and numeric line and branch percentages per module, branch figures read from the JSON report.
 - [ ] [P0-T7] Capture the TypeScript static baseline in `extensions/drm-copilot/`: Prettier check mode, `npm run lint`, `npm run typecheck`.
   - Acceptance: `<FEATURE>/evidence/baseline/typescript-static.<timestamp>.md` with one block per tool.
@@ -247,7 +247,7 @@ Every hook that imports the module uses the guarded import pattern; Codex hooks 
   - Acceptance: `--check` exits 0 reporting no drift; `test_codex_agent_wrapper_contracts.py`, `test_codex_handoff_contract_parity.py` and `test_push_down_codex_and_agents_resource_contracts.py` pass.
 - [ ] [P7-T5] Add `extensions/drm-copilot/test/lib/development-docs/write-scopes.contract.test.ts` implementing the three directions of `spec.md` `### Checker test (three directions)`; reverse coverage maps variant files (`-c1` to `-c4`, `-c3-elevated`) to their base agent; reads use forward-slash repository-relative paths.
   - Acceptance: suite passes, and fails when one `.dev` literal is removed locally (observation recorded in the P10-T6 artifact).
-- [ ] [P7-T6] Re-baseline the `.claude/agents/epic-orchestrator.md` digest in `PINNED_FROZEN_SURFACE_HASHES` (`tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`) with a dated `RE-BASELINED by issue #1016` comment stating that only the `tools:` list gained `.dev` literals.
+- [ ] [P7-T6] Re-baseline the `.claude/agents/epic-orchestrator.md` digest in `PINNED_FROZEN_SURFACE_HASHES` (`tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`) with a dated `RE-BASELINED by issue #1035` comment stating that only the `tools:` list gained `.dev` literals.
   - Acceptance: `test_parallel_orchestrator_surface_contracts.py` and `test_parallel_planner_surface_contracts.py` pass.
 
 ### Phase 8 — CI Docs-Only Scope and Brief
@@ -277,7 +277,7 @@ Every hook that imports the module uses the guarded import pattern; Codex hooks 
   - Acceptance: `<FEATURE>/evidence/other/scope-boundary.<timestamp>.md` all PASS.
 - [ ] [P10-T3] Run Black in check mode, Ruff and Pyright; on any failure or fix, restart the loop from formatting.
   - Acceptance: `<FEATURE>/evidence/qa-gates/python-static.<timestamp>.md` records exit 0 for each and Black's unchanged-files summary.
-- [ ] [P10-T4] Run the full Pytest suite, then the coverage run of P0-T6 against `## Coverage Targets` with `--cov-report=json:SCRATCH/issue-1016-final-coverage.json`.
+- [ ] [P10-T4] Run the full Pytest suite, then the coverage run of P0-T6 against `## Coverage Targets` with `--cov-report=json:SCRATCH/issue-1035-final-coverage.json`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/python-tests.<timestamp>.md` records zero failures and per-module line and branch percentages.
 - [ ] [P10-T5] Run Prettier in check mode, `npm run lint` and `npm run typecheck` in `extensions/drm-copilot/`; restart on any failure or fix.
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-static.<timestamp>.md` with exit 0 for each.
