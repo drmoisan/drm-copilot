@@ -1086,7 +1086,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: The complete extension population with every per-file threshold, including ET/discovery-sentinel.contract.test.ts; the type check covers the test tree.
   - Acceptance: The install exits 0 and leaves `git status --porcelain` empty; one clean cycle; the two retained reports exist and the tests record cites them; every per-file threshold is met without blanket mocks.
 
-- [ ] [P18-T3] Run the PowerShell format, analyzer and single-process coverage gates (FEATURE/evidence/qa-gates/).
+- [x] [P18-T3] Run the PowerShell format, analyzer and single-process coverage gates (FEATURE/evidence/qa-gates/).
   - Files and behavior: Format and analyze as P16-T3 with p18-powershell-{format,analyze,tests}.<timestamp>.md; the fresh single-process run over tests/scripts writes artifacts/pester/powershell-coverage.xml and artifacts/pester/pester-junit.xml, which are copied to FEATURE/evidence/qa-gates/p18-powershell-coverage.<timestamp>.xml and p18-powershell-junit.<timestamp>.xml; the shard matrix is not re-run in this cycle.
   - Tests and proof: Analyzer findings from a direct run with the repository settings file; counts from the JUnit copy, which include LPTEST/DiscoverySentinelConsumption.Contract.Tests.ps1; coverage from the XML copy.
   - Acceptance: No failure, line coverage at least 85% read from the evidence copy, and the canonical artifacts/pester/powershell-coverage.xml total equals the evidence copy's total.
