@@ -3,7 +3,7 @@
     Epic-scope legs, checkpoint read seams, and target resolution of the preimplementation gate.
 
 .DESCRIPTION
-    Dot-sourced by enforce-orchestration-preimplementation-gate.ps1. Holds four groups of
+    Dot-sourced by enforce-orchestration-preimplementation-gate.ps1. Holds five groups of
     functions:
 
     - The import guards for the worktree-resolution modules (issue #690). A failed import
@@ -15,13 +15,20 @@
       read binds to the calling process's directory. Get-CheckpointContent and
       Get-OrchestrationModeDenyReason were relocated here from the gate file by issue #690
       to keep the gate inside the 500-line cap.
+    - The target-resolution building blocks of issue #1010: the worktree-list wrapper
+      Get-OrchestrationGateWorktreeList (the only listing seam), the recording invoker
+      Invoke-OrchestrationGateWorktreeList, which records a failed or empty listing in
+      $script:OrchestrationGateWorktreeListFailed, and the command-operand parser
+      Get-OrchestrationGateCommandOperandPath for git add and git commit.
     - The target resolution of issue #690. Resolve-OrchestrationGateTarget selects the
       worktree whose checkpoint governs the call from portable identity only: the
       integration_branch: value for an epic delegation, the parallel_slug: value for a
-      parallel delegation, the file_path or git -C operand for the path and command legs,
-      and the canonical issue-number line and branch: label for a single-feature
-      delegation. Read-OrchestrationGateCheckpoint reads the checkpoint beneath the
-      resolved root, or returns the deny for an unresolved target.
+      parallel delegation, and the canonical issue-number line and branch: label for a
+      single-feature delegation. The path and command legs resolve through
+      Resolve-HookTargetWorktree (issue #1010) from the file_path or from every git add
+      and git commit selector and absolute operand. Read-OrchestrationGateCheckpoint reads
+      the checkpoint beneath the resolved root, or returns the deny for an unresolved
+      target.
     - The epic-scope decision for the command and path legs (issue #663). A staging
       command or a Write/Edit call is epic scope when the effective worktree's HEAD equals
       the integration branch of the epic checkpoint that Resolve-EpicScopeCheckpoint
@@ -30,21 +37,24 @@
 
 .NOTES
     PowerShell 7+. Depends on functions the gate defines or dot-sources before any call:
-    Split-OrchestrationCommandLine and ConvertTo-OrchestrationCommandToken (helpers file),
     Get-OrchestrationDelegationCheckpointPath (modes file), the gate's allow and block
-    decision constructors, and, through the targets file this file dot-sources (issue #738),
-    Read-CommandLineSegment, Get-CommandLineGlobalOption, and Get-CommandLineInvocation
-    (loaded by the gate's dot-source of hook-command-invocation.ps1). Imports
-    WorktreeItemResolution.psm1 and WorktreeRunResolution.psm1 before
-    EpicScopeResolution.psm1, so the nested import inside EpicScopeResolution reuses the
-    same module instance. Mirrored byte-identically under
+    decision constructors, and Read-CommandLineSegment, Get-CommandLineGlobalOption, and
+    Get-CommandLineInvocation (loaded by the gate's dot-source of
+    hook-command-invocation.ps1), which the targets file this file dot-sources (issue #738)
+    and Get-OrchestrationGateCommandOperandPath call. Imports
+    WorktreeResolution.psm1 (the reason-code accessors), then WorktreeItemResolution.psm1
+    and WorktreeRunResolution.psm1 before EpicScopeResolution.psm1, so the nested import
+    inside EpicScopeResolution reuses the same module instance, and HookTargetWorktree.psm1
+    (Resolve-HookTargetWorktree, issue #1009) last. Mirrored byte-identically under
     extensions/drm-copilot/resources/claude-customizations/.
 #>
 
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeReadiness.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/HookTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookTargetWorktree.psm1' -ErrorRecord $_ }
 # Per-segment target resolution for the epic-scope decision (issue #738).
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 
@@ -102,15 +112,98 @@ function Get-OrchestrationModeDenyReason {
         'require that checkpoint to satisfy every readiness predicate before implementation begins.')
 }
 
+function Get-OrchestrationGateWorktreeList {
+    <#
+    .SYNOPSIS
+        Returns the porcelain worktree listing for the session root (issue #1010 seam).
+    .DESCRIPTION
+        Runs the listing exactly as the default WorktreeListInvoker of
+        Resolve-HookTargetWorktree does and returns an empty string on a non-zero exit. It
+        is the only test seam for the listing.
+    .OUTPUTS
+        System.String
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][string] $SessionRoot)
+
+    $porcelain = & git -C $SessionRoot worktree list --porcelain 2>$null
+    if ($LASTEXITCODE -ne 0) { return '' }
+    return ($porcelain -join "`n")
+}
+
+function Invoke-OrchestrationGateWorktreeList {
+    <#
+    .SYNOPSIS
+        Recording WorktreeListInvoker: returns the listing and records a listing failure.
+    .DESCRIPTION
+        Sets $script:OrchestrationGateWorktreeListFailed when the wrapper throws (and then
+        rethrows) or when its text holds no worktree entry, so the gate denies instead of
+        accepting the resolver's session-root fallback (issue #1010, spec E1).
+    .OUTPUTS
+        System.String
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][string] $SessionRoot)
+
+    try {
+        $text = [string](Get-OrchestrationGateWorktreeList -SessionRoot $SessionRoot)
+    } catch {
+        $script:OrchestrationGateWorktreeListFailed = $true
+        throw
+    }
+    if (@(ConvertFrom-HookTargetWorktreePorcelain -Text $text).Count -eq 0) {
+        $script:OrchestrationGateWorktreeListFailed = $true
+    }
+    return $text
+}
+
+function Get-OrchestrationGateCommandOperandPath {
+    <#
+    .SYNOPSIS
+        Returns the worktree-selecting paths of every git add and git commit invocation.
+    .DESCRIPTION
+        Scans every Structural match of git add and git commit (every command segment and
+        wrapper payload). Each -C value in any git global-option position and each absolute
+        operand is returned, distinct and in first-seen order. Relative operands, a -C on a
+        git segment invoking neither add nor commit, and Indeterminate matches are ignored.
+    .PARAMETER Command
+        The full command line.
+    .OUTPUTS
+        System.String[]
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Command)
+
+    $paths = [System.Collections.Generic.List[string]]::new()
+    foreach ($subcommand in @('add', 'commit')) {
+        foreach ($match in @(Get-CommandLineInvocation -CommandText $Command -CommandWord 'git' -SubcommandPath @($subcommand))) {
+            if ($match.Status -ne 'Structural') { continue }
+            $candidates = @(@($match.GlobalOptions) | Where-Object { $_.Name -ceq '-C' -and $_.Value } | ForEach-Object { [string]$_.Value })
+            $candidates += @(@($match.Operands) | Where-Object { $_ -match '^([A-Za-z]:[\\/]|/)' })
+            foreach ($candidate in $candidates) {
+                if ($paths -notcontains $candidate) { $paths.Add($candidate) }
+            }
+        }
+    }
+    return [string[]]$paths.ToArray()
+}
+
 function Resolve-OrchestrationGateTarget {
     <#
     .SYNOPSIS
         Resolves the worktree whose checkpoint governs a gated call (issue #690 seam).
     .DESCRIPTION
         An epic delegation is keyed on integration_branch: (with epic_feature_folder: as a
-        cross-check), a parallel delegation on parallel_slug:, a path leg on its file_path
-        operand, a command leg on its git -C selector (none means the session root), and a
-        single-feature delegation on its canonical issue-number line and branch: label.
+        cross-check), a parallel delegation on parallel_slug:, and a single-feature
+        delegation on its canonical issue-number line and branch: label. The path and
+        command legs use Resolve-HookTargetWorktree (issue #1010): a path leg passes its
+        file_path, a command leg the Get-OrchestrationGateCommandOperandPath result, and the
+        recording invoker supplies the worktree listing. A failed or empty listing denies as
+        not derivable instead of falling back to the session root; an ambiguous result
+        denies as ambiguous; a null root denies as not derivable.
     .OUTPUTS
         System.Management.Automation.PSCustomObject (the worktree-resolution target result).
     #>
@@ -131,13 +224,29 @@ function Resolve-OrchestrationGateTarget {
         }
         return Resolve-WorktreeParallelTarget -ParallelSlug $signal.ParallelSlug -SessionRoot $sessionRoot
     }
-    if ($FilePath) {
-        return Resolve-WorktreeOperandTarget -Path $FilePath -SessionRoot $sessionRoot
+    if (-not $FilePath -and -not $Command) {
+        return Resolve-WorktreeItemTarget -Text $Prompt -SessionRoot $sessionRoot
     }
-    if ($Command) {
-        return Resolve-WorktreeOperandTarget -Path (Get-OrchestrationEpicScopeSelector -Command $Command) -SessionRoot $sessionRoot
+    $script:OrchestrationGateWorktreeListFailed = $false
+    $invoker = { param($SessionRoot) Invoke-OrchestrationGateWorktreeList -SessionRoot $SessionRoot }
+    $resolved = if ($FilePath) {
+        Resolve-HookTargetWorktree -SessionRoot $sessionRoot -FilePath @($FilePath) -WorktreeListInvoker $invoker
+    } else {
+        Resolve-HookTargetWorktree -SessionRoot $sessionRoot -CommandOperandPath @(Get-OrchestrationGateCommandOperandPath -Command $Command) -WorktreeListInvoker $invoker
     }
-    return Resolve-WorktreeItemTarget -Text $Prompt -SessionRoot $sessionRoot
+    $detail = "resolver source $($resolved.Source): $($resolved.Detail)"
+    if ($script:OrchestrationGateWorktreeListFailed) {
+        return [pscustomobject]@{ Status = 'NoTarget'; WorktreeRoot = $null; ReasonCode = (Get-WorktreeResolutionNoTargetReasonCode); Detail = "the worktree listing failed or named no worktree; $detail" }
+    }
+    if ($resolved.Ambiguous) {
+        return [pscustomobject]@{ Status = 'Ambiguous'; WorktreeRoot = $null; ReasonCode = (Get-WorktreeResolutionAmbiguityReasonCode); Detail = $detail }
+    }
+    if ([string]::IsNullOrEmpty([string]$resolved.WorktreeRoot)) {
+        return [pscustomobject]@{ Status = 'NoTarget'; WorktreeRoot = $null; ReasonCode = (Get-WorktreeResolutionNoTargetReasonCode); Detail = $detail }
+    }
+    $isSession = [string]::Equals([string]$resolved.WorktreeRoot, (ConvertTo-HookTargetWorktreeNormalizedPath -Path $sessionRoot), [System.StringComparison]::OrdinalIgnoreCase)
+    $status = if ($isSession) { 'SessionRoot' } else { 'OtherWorktree' }
+    return [pscustomobject]@{ Status = $status; WorktreeRoot = [string]$resolved.WorktreeRoot; ReasonCode = $null; Detail = $detail }
 }
 
 function Read-OrchestrationGateCheckpoint {
@@ -185,34 +294,6 @@ function Read-OrchestrationGateCheckpoint {
         Path       = $path
         DenyReason = $null
     }
-}
-
-function Get-OrchestrationEpicScopeSelector {
-    <#
-    .SYNOPSIS
-        Returns the value of a leading `git -C <value>` selector, or $null.
-    .DESCRIPTION
-        Pure. Reads only the first segment of the command line, split and tokenized with
-        the helpers-file parser so quoting is handled exactly as the staging exemption
-        handles it. An unbalanced command line has no decidable selector and returns $null.
-    .PARAMETER Command
-        The full command line.
-    .OUTPUTS
-        System.String
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([Parameter(Mandatory)][AllowEmptyString()][string] $Command)
-
-    $split = Split-OrchestrationCommandLine -CommandText $Command
-    if (-not $split.Balanced -or @($split.Segments).Count -eq 0) {
-        return $null
-    }
-    $token = @(ConvertTo-OrchestrationCommandToken -Segment ([string]@($split.Segments)[0]).Trim())
-    if ($token.Count -ge 3 -and $token[0] -ceq 'git' -and $token[1] -ceq '-C' -and $token[2]) {
-        return $token[2]
-    }
-    return $null
 }
 
 function Get-OrchestrationEpicScopeDecision {
