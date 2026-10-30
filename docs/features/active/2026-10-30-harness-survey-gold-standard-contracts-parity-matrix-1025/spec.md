@@ -85,7 +85,7 @@ These contracts are consumed by children 3 to 6. Changing any of them after this
 | `disposition` | enum | yes | `shared`, `native`, `generated`, `dropped` (see `### Disposition Semantics`) |
 | `reason` | string | when `disposition` is `dropped` | `minLength: 1`; optional for other dispositions |
 | `target_paths` | array of string | when `disposition` is `shared` or `generated` | `minItems: 1`, `uniqueItems: true`, each item a repository-relative POSIX path; must be absent when `disposition` is `dropped` |
-| `generated_from` | string | when `disposition` is `generated` | repository-relative POSIX path of the single source |
+| `generated_from` | string | when `disposition` is `generated` | repository-relative POSIX path of the single source, or, while that single source does not yet exist, the placeholder `pending-source:<kind>` (pattern `^pending-source:[a-z-]+$`), which children 3 to 6 replace with the path when they create the source; the placeholder is permitted only when `decision_status` is `provisional` |
 | `generator` | string | no | generator identifier; filled by child 3 |
 | `parity_group` | string | yes | `minLength: 1`; logical function key shared by equivalent features across ecosystems, of the form `<kind-family>:<function>` (for example `skill:orchestrate`, `hook:validate-bash`, `mcp:drm-copilot`) |
 | `consumers` | array of enum | yes | items from `claude-code`, `codex`, `copilot-vscode`, `copilot-cli`, `copilot-cloud`; `uniqueItems: true`; may be empty. Lists the tools that load the feature with default settings. Values that depend on a pending experiment are set provisionally and the entry's `decision_status` is `provisional`. |
@@ -100,6 +100,7 @@ Conditional rules, expressed in the schema with `if`/`then` under `allOf`:
 - `disposition` in (`shared`, `generated`) requires `target_paths` with at least one item.
 - `disposition == "generated"` requires `generated_from`.
 - `decision_status == "provisional"` requires `decision_ref`.
+- `generated_from` beginning with `pending-source:` requires `decision_status == "provisional"`.
 
 ### Disposition Semantics
 
@@ -380,12 +381,12 @@ Runbook requirements: each runbook carries the five sections required by `.claud
 
 ## Owner Stop
 
-Execution stops exactly once for owner input.
+Execution stops exactly once for owner input. The stop is owned by the orchestrator and sits between two executor plans: plan A (`plan.2026-10-30T17-06.md`) carries the work that may proceed before the stop and completes with every task checked; plan B (`owner-decision-plan.md`) carries the work that follows the stop and is delegated only after the resume condition holds. No executor run halts mid-plan for owner input, and no executor writes the orchestrator checkpoint.
 
-- Recorded in `artifacts/orchestration/orchestrator-state.json` with `blocked_reason: "human_decision_required"` and one `human_interaction.requirements[]` entry per pending item: `response: "halt"` for the approval artifact (bulk approval, disputed cases and owner questions), and `response: "exception"` with `runbook_path` for each of the E1, E2, E3, E4 and E6 runbooks, per `.claude/rules/orchestrator-state.md` and `.claude/skills/human-exception-runbook/SKILL.md`.
-- Resume condition: `Approval-Status` is `approved` or `approved-with-overrides`, every disputed case has an `Owner-Decision`, and every runbook has a recorded result or an owner statement in `## Owner Overrides` that it is deferred. Deferred runbooks leave the dependent matrix entries `provisional` with `decision_ref` pointing to the runbook.
+- Recorded by the orchestrator after plan A completes, in `artifacts/orchestration/orchestrator-state.json` with `blocked_reason: "human_decision_required"` and one `human_interaction.requirements[]` entry per pending item: `response: "halt"` for the approval artifact (bulk approval, disputed cases and owner questions), and `response: "exception"` with `runbook_path` for each of the E1, E2, E3, E4 and E6 runbooks, per `.claude/rules/orchestrator-state.md` and `.claude/skills/human-exception-runbook/SKILL.md`.
+- Resume condition, checked by the orchestrator before it delegates plan B: `Approval-Status` is `approved` or `approved-with-overrides`, every disputed case has an `Owner-Decision`, and every runbook has a recorded result or an owner statement in `## Owner Overrides` that it is deferred. Deferred runbooks leave the dependent matrix entries `provisional` with `decision_ref` pointing to the runbook. A feature or skill name inventoried after plan A (found when the branch is re-synchronized with `origin/main`) is a re-planning stop, not part of plan B.
 
-May proceed before the stop:
+May proceed before the stop (plan A):
 
 - Phase 0 gate; identity pass and identity evidence; survey index and all batch records; classification; the approval artifact in `pending` state.
 - E5 result; runbooks E1 to E4 and E6.
@@ -394,7 +395,7 @@ May proceed before the stop:
 - Contracts and bundle copies for the names present in both `.claude/skills` and `.agents/skills` (default disposition `shared`).
 - Full toolchain loop and coverage evidence on the pre-stop state.
 
-Follows the stop:
+Follows the stop (plan B):
 
 - Apply owner overrides and disputed-case decisions to the survey records and the matrix.
 - Write contracts and bundle copies for any single-ecosystem skill the owner approves as `shared`; remove the contract and bundle copy for any skill the owner moves off `shared`; revise contracts affected by overrides.
