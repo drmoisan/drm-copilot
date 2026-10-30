@@ -43,6 +43,7 @@ docs/
 - Add `.dev/**/*.json` to the governed globs in `json-config.ts` (and its Python source) so governance is not dropped.
 - Give every Node-glob and ripgrep consumer explicit dot-folder handling, with a test that finds a file under `.dev`. Python and PowerShell include dot folders by default.
 - Change every agent and hook write scope from `docs/**` and `docs/features/**` to the `.dev` root, generated or checked as a literal because permission rules cannot read config, with a test that each agent's scope covers the root.
+- Add the feature-folder name parser (the old date-first format and the new `<NNNN>-<feature>` format both accepted) and make the folder-creation tool name new folders from the issue number (D-18 to D-22).
 - Update the mirrored and bundled copies, pack manifests and Codex counterparts.
 
 **Phase 2: migration command (TypeScript, no Python).**
@@ -53,6 +54,7 @@ docs/
 **Phase 3: move this repo and flip the default.**
 
 - Run the migration on this repo as one mechanical commit, flip `development_docs_root` to `.dev`, and update the tests and prose.
+- Rename the existing feature folders in `active`, `completed` and `archive` to the new format in the same move, reporting non-matching folders and issue-number collisions and stopping for an owner decision on each.
 - Historical JSON fixtures that record past runs stay frozen with their `docs/features` paths and are read through the fallback.
 
 ## Acceptance Criteria (early draft)
@@ -103,6 +105,11 @@ Confirmed by the owner on 2026-10-30:
 - **D-15** The 245 historical fixtures stay frozen and read through the fallback.
 - **D-16** Agent and hook write scopes use a generated or checked literal, with a coverage test.
 - **D-17** The migration command is an MCP tool in `@danmoisan/drm-copilot-mcp` with a thin `npx` entry point.
+- **D-18** Feature folders are named `<4-digit zero-padded issue number>-<feature>` (four digits, because issue numbers already exceed 999).
+- **D-19** Parsers treat `^\d{4}-\d{2}-\d{2}-` as the old date-first format and any other name starting with 4 digits and a dash as the new format.
+- **D-20** The 339 existing folders are renamed in the same mass move as the `.dev` migration; parsers accept both formats until then.
+- **D-21** The migration reports the 36 non-matching folders and the issue numbers with several folders, and stops for an owner decision on each; folders with no recoverable number keep their names.
+- **D-22** Only feature folders in `active`, `completed` and `archive` change; potential records, epics, parallel runs and research keep their names.
 
 ## Test Conditions to Consider
 
