@@ -1,0 +1,202 @@
+---
+epic: shared-agent-harness-layer
+integration_branch: epic/shared-agent-harness-layer-integration
+created_at: 2026-10-30T20:30
+intent:
+  epic_type: enabler
+  business_outcome_hypothesis: With default settings, Claude Code, Codex and GitHub Copilot each load every skill and instruction in this repository and in destination repositories exactly once, each shared skill meets one tool-neutral gold standard, and no native capability is lost.
+  leading_indicators:
+    - The parity matrix assigns a disposition to every native feature of every ecosystem, and its completeness test passes.
+    - Every shared skill has a references/standard.md contract and each ecosystem's expression is checked against it.
+    - Each generator reports no drift in --check mode on the integration branch.
+    - A destination that selects one ecosystem pack receives no files for the other ecosystems.
+  nfrs:
+    - Enforcement hooks do not invoke Python.
+    - New scripts, tools, generators, checkers and CLI entry points are TypeScript or PowerShell; existing Python may be reused or called.
+    - Mirrors are generated, not symlinked.
+    - Migration of a destination is non-destructive, reports a dry run first, and never overwrites a destination's own edits.
+    - No production file exceeds 800 lines.
+    - Line coverage >= 85% and branch coverage >= 75% (where measured) for changed code.
+features:
+  - issue_num: null
+    feature_folder: harness-survey-gold-standard-contracts-parity-matrix
+    depends_on: []
+  - issue_num: 1016
+    feature_folder: move-development-docs-to-dev-root-and-reserve-docs-for-production
+    depends_on: []
+  - issue_num: null
+    feature_folder: shared-source-generators-skills-rules-mcp-agents
+    depends_on: [harness-survey-gold-standard-contracts-parity-matrix, move-development-docs-to-dev-root-and-reserve-docs-for-production]
+  - issue_num: null
+    feature_folder: push-down-consolidation-and-ecosystem-packs
+    depends_on: [shared-source-generators-skills-rules-mcp-agents]
+  - issue_num: null
+    feature_folder: hook-parity-across-claude-codex-copilot
+    depends_on: [shared-source-generators-skills-rules-mcp-agents]
+  - issue_num: null
+    feature_folder: retire-github-skills-and-thin-copilot-layer
+    depends_on: [push-down-consolidation-and-ecosystem-packs, hook-parity-across-claude-codex-copilot]
+  - issue_num: null
+    feature_folder: dev-docs-root-migration-and-feature-folder-rename
+    depends_on: [move-development-docs-to-dev-root-and-reserve-docs-for-production, retire-github-skills-and-thin-copilot-layer]
+---
+
+# Epic: Shared Agent-Harness Layer Across Claude Code, Codex and GitHub Copilot
+
+Epic issue: #1018.
+
+> **Manifest status.** Planning in progress. `issue_num: null` entries are placeholders and
+> `feature_folder` values are short-name hints; both are back-filled from each prepared child's
+> promotion receipt and active folder at fan-in. Child 2 adopts the existing issue #1016 and is
+> not promoted again.
+
+## Goal
+
+Migrate the three agent ecosystems in this repository to the common cross-tool conventions so
+that each tool loads every skill and instruction exactly once with default settings, without
+losing the power of any native harness, and with each ecosystem expressing each shared skill at
+the same gold standard. The confirmed design, facts, acceptance criteria and risks are recorded in
+`docs/features/potential/promoted/2026-10-30-shared-agent-harness-layer-across-claude-codex-copilot.md`
+and are not re-opened here.
+
+## Children
+
+| Child | Feature (hint) | Issue | Wave | Band |
+| --- | --- | --- | --- | --- |
+| 1 Survey, gold-standard contracts, parity matrix, Copilot and Codex experiments | harness-survey-gold-standard-contracts-parity-matrix | new | 0 | C4 |
+| 2 #1016 Phase 1: resolver, configured root, folder-name parser, folder creation by issue number | move-development-docs-to-dev-root-and-reserve-docs-for-production | #1016 | 0 | C3 |
+| 3 Generators and shared-source pipeline (skills, rules, MCP, agents; all with --check) | shared-source-generators-skills-rules-mcp-agents | new | 1 | C3 |
+| 4 Push-down consolidation and per-ecosystem pack selection | push-down-consolidation-and-ecosystem-packs | new | 2 | C3 |
+| 5 Hook parity | hook-parity-across-claude-codex-copilot | new | 2 | C3 |
+| 6 Retirements and the thin Copilot layer | retire-github-skills-and-thin-copilot-layer | new | 3 | C3 |
+| 7 #1016 Phases 2 and 3: migration command, move to .dev, feature-folder rename, default flip | dev-docs-root-migration-and-feature-folder-rename | new | 4 | C3 |
+
+Waves are 0-indexed (longest-path layering).
+
+### Issue keying for #1016
+
+The manifest is keyed by `issue_num`, and the planning and execution validators require each
+`issue_num` to be unique. Child 2 adopts #1016 (Phase 1, which also carries the full #1016 spec
+including decisions D-1 to D-22). Child 7 (Phases 2 and 3) receives its own child issue that
+references #1016 and cites child 2's spec; #1016 is not promoted a second time. Merges into the
+integration branch do not auto-close issues, so #1016 stays open until the integration pull
+request reaches `main`.
+
+## Scope
+
+- **Child 1.** Content-level survey of the 90 skill names (the heading comparison overstates
+  differences), a tool-neutral gold-standard contract per shared skill
+  (`.agents/skills/<name>/references/standard.md`: objective, observable behaviors, acceptance
+  checks), classification of every difference as positive, negative, neutral or mechanism-only
+  with bulk owner approval and escalation of disputed cases, the parity matrix with a disposition
+  (shared, native, generated, dropped with a written reason) for every native feature of every
+  ecosystem plus the completeness test, and the unverified-behavior experiments (Copilot duplicate
+  listing, Codex tolerance of Claude-only frontmatter, Copilot CLI and cloud agent reading
+  `.claude/agents`, workspace-scope Copilot settings, Claude hooks/subagent/permissions details).
+  Experiments that need VS Code or Codex are delivered as owner-run runbooks with recorded results.
+  Child 1 owns the location and schema of the parity matrix and the contract format; later
+  children consume them.
+- **Child 2 (#1016 Phase 1).** The `development_docs_root` key (default `docs/features`, behavior
+  unchanged), a resolver in Python, PowerShell and TypeScript, the `.dev` fallback, the CI
+  docs-only scope, JSON governance globs, dot-folder handling for Node-glob and ripgrep consumers,
+  checked write-scope literals, the feature-folder name parser accepting both formats (D-18 to
+  D-22), the folder-creation tool naming new folders `<NNNN>-<feature>`, and the mirrored, bundled
+  and Codex counterparts.
+- **Child 3.** Generators with `--check` for the shared skill mirror (`.agents/skills` to
+  `.claude/skills`), path-scoped rules (one source to `.claude/rules` `paths:` and
+  `.github/instructions` `applyTo`), MCP servers (one list to `.mcp.json` and the `[mcp_servers]`
+  table of `.codex/config.toml`), and agents (one logical definition to `.claude/agents/*.md` and
+  `.codex/agents/*.toml`); `AGENTS.md` as the instruction source with `CLAUDE.md` importing it.
+- **Child 4.** The three push-downs become one pipeline with the existing MCP tools kept as thin
+  wrappers; per-ecosystem pack selection with the shared layer always installed; dry-run report
+  first; no overwrite of a destination's own edits, detected against the last pushed-down manifest.
+- **Child 5.** Hook parity of function per the parity matrix; Codex gains a hook only where its
+  system can express the behavior; no Python in enforcement hooks.
+- **Child 6.** Retire `.github/skills` after porting or finding stale its three unique sections
+  (`feature-promotion-lifecycle`, `feature-review-workflow`); retire `.github/agents` or reduce it
+  to a generated file per child 1's verification result; the thin Copilot layer (prompts,
+  handoffs, hooks native in `.github`); Copilot collision controls in `.vscode/settings.json` if
+  workspace scope works, otherwise documented.
+- **Child 7 (#1016 Phases 2 and 3).** The TypeScript migration command (MCP tool in
+  `@danmoisan/drm-copilot-mcp` with a thin `npx` entry point, no Python, idempotent), the move of
+  this repository to `.dev`, the rename of existing feature folders to `<NNNN>-<feature>` with the
+  owner-decision stop for non-matching folders and issue-number collisions, and the default flip.
+
+## Non-Goals
+
+- Re-opening any confirmed design decision in the epic record or in #1016 (D-1 to D-22).
+- Symlinked mirrors (Windows symlinks are unreliable).
+- Python in enforcement hooks or in the migration command.
+- Any change to the lifecycle semantics of potential, active, completed and archive.
+- Renaming potential records, epics, parallel runs or research folders.
+- Edits to files or branches of the in-flight parallel run `bugs-1001-1002-1003-1006`.
+
+## Dependency Rationale
+
+Edges are drawn only where a child consumes a contract or edits a file that an upstream child
+creates or changes.
+
+- **Child 3 depends on child 1 and child 2.** The generators emit the dispositions and contract
+  layout child 1 defines (which surfaces are shared, generated or native), and the agent generator
+  emits write scopes that child 2 converts to checked literals for the configured root (D-16).
+- **Child 4 depends on child 3.** The consolidated push-down installs the generated shared layer
+  and the per-ecosystem outputs that child 3 produces; pack manifests list generated files.
+- **Child 5 depends on child 3.** Hook registrations live in agent frontmatter and in
+  `.codex/config.toml`, both of which child 3's generators own after it merges.
+- **Child 6 depends on child 4 and child 5.** Retiring `.github/skills` and `.github/agents`
+  changes pack contents (child 4), and the thin Copilot layer keeps the Copilot hooks whose
+  dispositions child 5 settles.
+- **Child 7 depends on child 2 and child 6.** The migration consumes child 2's resolver, parser
+  and configured key, and the owner requires it to run last because the mass move rewrites paths
+  that every other child edits; child 6 is the last of those children, so the edge orders child 7
+  after all of them transitively.
+
+Wave computation (longest-path layering, 0-indexed): wave 0 = {child 1, child 2}; wave 1 =
+{child 3}; wave 2 = {child 4, child 5}; wave 3 = {child 6}; wave 4 = {child 7}. No cycles; every
+reference resolves.
+
+## Shared Design
+
+- **Language (owner directive, 2026-10-30).** Avoid Python scripts. Existing Python in the repo
+  is tolerated and may be reused, extended in place or called (for example the existing Codex
+  agent-variant generator and the Python ports of the push-down), but new scripts, tools,
+  generators, checkers and CLI entry points are written in TypeScript or PowerShell, to avoid
+  adding environmental dependencies for destination repos. This applies to the skill, rule, MCP
+  and agent generators with `--check` modes, the push-down consolidation, the parity-matrix tests,
+  the hook work and the survey tooling. Enforcement hooks do not use Python. Each child plan
+  records its language choice with cost and risk; a child that cannot reasonably avoid new Python
+  records an owner question with the reason and the TypeScript or PowerShell alternative instead
+  of deciding.
+- `AGENTS.md` is the instruction source; `CLAUDE.md` is `@AGENTS.md` plus Claude-only text;
+  `.github/copilot-instructions.md` holds Copilot-only text.
+- `.agents/skills` is the source for shared skills; tool-only skills stay in their native folder.
+- Every generator has a `--check` mode that reports drift and fails CI on drift.
+- The parity matrix is machine-readable and owned by child 1; a test fails when a native feature
+  has no disposition.
+- `development_docs_root` is the one configured key for the development-docs root; no consumer
+  hard-codes `docs/features` after child 2.
+- Feature-folder names: `^\d{4}-\d{2}-\d{2}-` is the old date-first format; any other name starting
+  with four digits and a dash is the new format; both are accepted until child 7 migrates.
+
+## Execution Preconditions
+
+- Execution starts only after the parallel run `bugs-1001-1002-1003-1006` has merged to `main`.
+  That run changes hooks, skills, the execution-environment brief, the policy-audit templates and
+  the bundled extension mirrors. Every child plan names the exact files it edits and carries a
+  Phase 0 gate that re-checks those files against current `origin/main` at execution time and
+  stops for re-planning when a named file, symbol or heading has moved.
+- Before each wave the epic orchestrator syncs `origin/main` into the integration branch per the
+  epic-orchestrate skill.
+
+## Complexity Assessment
+
+- Child 1: research-heavy, novel, with owner-run experiments and bulk approvals; band C4 by
+  judgment.
+- Child 2: cross_module_contract_change (one key read by every consumer in three runtimes); C3.
+- Child 3: cross_module_contract_change (new generated surfaces consumed by every ecosystem); C3.
+- Child 4: cross_module_contract_change (push-down MCP tool contract and pack manifests); C3.
+- Child 5: cross_module_contract_change (hook behavior across two ecosystems); C3.
+- Child 6: cross_module_contract_change (retires two Copilot surfaces and changes pack contents);
+  C3.
+- Child 7: cross_module_contract_change plus a repository-wide mechanical move with an owner stop;
+  C3.
