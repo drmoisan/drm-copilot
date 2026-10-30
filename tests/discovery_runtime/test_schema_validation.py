@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import sys
@@ -383,10 +384,13 @@ def test_repeated_validations_through_one_catalog_are_independent() -> None:
 
     The result of each validation equals the result for the same text through a
     fresh catalog, and the registry resolves unchanged schema contents afterwards.
-    No object identity is asserted, so the test holds whether or not the catalog
-    shares one registry across validations.
+    `before` is a deep copy of the resolved contents taken ahead of the
+    validations, so the final comparison against the live lookup can fail if a
+    validation mutates the shared schema; the catalog must also hand out one
+    registry object across the three validations.
     """
     catalog = load_catalog()
+    registry = catalog.registry()
     invalid = control_fixture("activation")
     del invalid["enabled"]
     texts = (
@@ -394,7 +398,7 @@ def test_repeated_validations_through_one_catalog_are_independent() -> None:
         json.dumps(control_fixture("activation")),
         json.dumps(invalid),
     )
-    before = catalog.registry().resolver().lookup(V2_URN + "activation").contents
+    before = copy.deepcopy(registry.resolver().lookup(V2_URN + "activation").contents)
 
     # Validate the invalid, valid, invalid sequence through the same catalog.
     shared = [
@@ -418,4 +422,5 @@ def test_repeated_validations_through_one_catalog_are_independent() -> None:
     assert shared == fresh
     assert shared[0] == shared[2] and not shared[0].ok
     assert shared[1].ok
+    assert catalog.registry() is registry
     assert after == before
