@@ -975,7 +975,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: The record, and for each driven host the observation documents it cites.
   - Acceptance: No row claims an observation it does not cite; every row names its source; the VS Code legacy Local harness row reads `unsupported`; the record carries `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`.
 
-- [ ] [P16-T8] Run the repository and publication contracts under the tiered file-size policy (FEATURE/evidence/qa-gates/).
+- [x] [P16-T8] Run the repository and publication contracts under the tiered file-size policy (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P14-T13 with p16-repository-contracts.<timestamp>.md and p16-file-size.<timestamp>.md, plus the evidence-location validator (`poetry run python scripts/dev_tools/validate_evidence_locations.py --root .`).
   - Tests and proof: Generator check, mirror and pack contracts, packaging closure, documentation contracts, tier classification, source-neutrality scan, test-I/O scan, FileSizePolicy.RepoGate.Tests.ps1 from the P16-T3 JUnit copy, the logical-line count of every branch-changed production, test and script file, and the evidence-location validator.
   - Acceptance: Zero drift and zero unsupported references; the file-size gate passes with no file above 800 logical lines and no baselined file grown; every file at or above 700 is listed as an advisory Warning (expected: none) and extensions/drm-copilot/jest.config.cjs is recorded below 700; the six brief copies are byte-identical; no forbidden test I/O; the evidence-location validator exits 0.
