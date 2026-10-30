@@ -43,15 +43,23 @@ that grant by binding before it runs the Python gateway with `--principal host` 
 agent's `--author-id`, `--session-id`, `--host-name` and `--agent-role`. The host
 composition verifies every protected record, replays the pinned baseline and admits the
 request; `finalize_discovery_agent` runs the `finalize-agent` route, and the gateway client
-mints the `agent-output` `validation-receipt` that the stop hook accepts. Observed on Claude
-Code, Codex and the Copilot Local harness against the shipped digests above
-(`evidence/qa-gates/discovery-native-capabilities.2026-10-28T15-06.md`): prepare, attested
-start, agent-scoped `read_discovery_source`, granted `create_discovery_artifact`, finalize
-`pass` with `output_valid` true, the stop allowed with that receipt, the stop blocked after
-an input edit, a replayed controlled call denied `AUTHORIZATION_CONSUMED`, `finalize-agent`
-as `local-user` refused `SERVICE_AUTHORITY` (exit 3) and an unattributed host principal
-refused at exit 2. `docs/engineering/legacy-discovery-and-parity/enforcement.md`
-(`## Host-principal path`) describes the route, the records and every refusal class.
+mints the `agent-output` `validation-receipt` that the stop hook accepts. The P12-T12 runs
+recorded in `evidence/qa-gates/discovery-native-capabilities.2026-10-28T15-06.md` were
+harness-simulated host events: the hooks were driven as real processes from `SCRATCH`
+launchers that exported the identity under the retired `DRM_DISCOVERY_*` contract, so they
+prove the installed packages and the receipt chain against the shipped digests above
+(prepare, attested start, agent-scoped `read_discovery_source`, granted
+`create_discovery_artifact`, finalize `pass` with `output_valid` true, the stop allowed with
+that receipt, the stop blocked after an input edit, a replayed controlled call denied
+`AUTHORIZATION_CONSUMED`, `finalize-agent` as `local-user` refused `SERVICE_AUTHORITY`
+(exit 3) and an unattributed host principal refused at exit 2), but they are not
+observations of a real Claude Code, Codex or Copilot host payload. Remediation cycle 1 moved
+identity to the host hook payload only (`docs/engineering/legacy-discovery-and-parity/enforcement.md`,
+`## Identity source`); the per-host observation record of that design is the P16-T7 table
+(`evidence/qa-gates/discovery-host-observations.*.md`, lexicographically greatest), and only
+a row that cites an observation document claims a host observation.
+`docs/engineering/legacy-discovery-and-parity/enforcement.md` (`## Host-principal path`)
+describes the route, the records and every refusal class.
 
 What remains for the consumers is the work itself, not a framework gap: step 6 and step 7
 below can be run through discovery agents or through the console path (`validate-all`,

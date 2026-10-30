@@ -2,8 +2,8 @@
 
 - Issue: #980
 - Owner: drmoisan
-- Status: Implemented on `feature/legacy-discovery-and-parity-980`; executor reconciliation complete with one escalated installed-host blocker (see `completion-report.md`); independent review and exact-head CI pending
-- Last Updated: 2026-10-26T02-54
+- Status: Remediation cycle 1 in progress on `feature/legacy-discovery-and-parity-980`: identity now comes from the host hook payload only, unbound controlled calls fail closed and the capability probe derives support from recorded host observations (Phases 15 and 16); Phase 16 final verification, AC reconciliation, independent review and exact-head CI pending (see `completion-report.md`)
+- Last Updated: 2026-10-30T00-30
 
 ## Story Statement
 

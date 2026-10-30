@@ -88,12 +88,17 @@ processes, never against the checkout. The sequence, with its pinning suites:
    `-I -m venv` interpreter and the npm tarball into an issue-scoped prefix, and push the
    host layouts from the installed resources. Record the three digests and the installed
    runtime identity (`dev.discovery.doctor`).
-2. Probe each host (`discovery-capability-probe.ps1`) against the installed identity; a
-   wheel rebuild changes the identity, so re-probe after every rebuild.
-3. Per host, in sequence: `prepare_discovery_agent` once (five protected files), the start
-   hook under the root environment, `read_discovery_source` and `create_discovery_artifact`
+2. Probe each host (`discovery-capability-probe.ps1`) against the installed identity after
+   a `discovery-capability-sentinel` run in the session under test, because the probe derives
+   its status from the observations that run leaves (see `enforcement.md`, `## Capability
+   probe`); a wheel rebuild changes the identity, so re-probe after every rebuild. Identity
+   is never exported to the hooks: a launcher that sets identity variables proves nothing
+   about the host, and such a run is recorded as harness-simulated, not as a host observation.
+3. Per host, in sequence: `prepare_discovery_agent` once (five protected files, admitted by
+   the root grant the gate wrote for the call), the start hook with the host's own payload,
+   `read_discovery_source` and `create_discovery_artifact` with the `invocation_ref`
    through the tool gate and the MCP server, `finalize_discovery_agent` (receipt `pass`,
-   `output_valid` true), the stop hook under the root environment (allowed), one input edit
+   `output_valid` true), the stop hook with the host's own payload (allowed), one input edit
    and the stop again (blocked with the stale-inputs reason), a replayed controlled call
    (`AUTHORIZATION_CONSUMED`), the gateway as `local-user` for `finalize-agent`
    (`SERVICE_AUTHORITY`, exit 3) and as `host` without session identity (exit 2). Revert

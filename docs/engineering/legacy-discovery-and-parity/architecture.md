@@ -163,13 +163,19 @@ The gateway module composes one of two port sets from its fixed options. `--prin
 local-user` (optionally `--author-id`) composes `installed_local_io`, which refuses every
 host marker: an invocation or authorization reference, `agent-output` mode or
 `finalize-agent` is `SERVICE_AUTHORITY` at exit 3. `--principal host` with `--author-id`
-(the agent id), `--session-id`, `--host-name` and `--agent-role` composes the host port set,
-which reads the protected partition the native hooks and the gateway client wrote, verifies
+(the agent id), `--session-id`, `--host-name` and `--agent-role` composes the host port set.
+The gateway client supplies those four values from the protected records it consumed, never
+from its own process: the MCP provider carries no identity of its own, a controlled call
+with an `invocation_ref` takes its identity from the `started` invocation that the
+consumed `tool-authorization` binds, and a root call takes host, session and parent from the
+consumed `root-grant` the native gate wrote for it. The host port set
+reads the protected partition the native hooks and the gateway client wrote, verifies
 the invocation, start attestation, capability attestation, authorization and the protected
 baseline record (`baseline-result.json`, the verbatim `prepare-agent` result the root pinned),
 reconstructs that baseline from the current capture and returns a `host` authority bound to
-the invocation with grants derived from the consumed authorization. The host port set never
-writes to the store and never returns a `local-user` authority. Receipts are minted only by
+the invocation with grants derived from the consumed authorization. The host port set writes
+nothing to the store except the authorization's `.used` dispatch latch and never returns a
+`local-user` authority. Receipts are minted only by
 the gateway client after the engine's `finalize-agent` result is verified; the engine itself
 mints nothing. [`enforcement.md`](enforcement.md) (`## Host-principal path`) lists each
 step and its refusal classes.
