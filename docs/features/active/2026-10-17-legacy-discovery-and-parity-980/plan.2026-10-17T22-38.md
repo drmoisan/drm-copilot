@@ -950,7 +950,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Complete coverage-enabled populations with every per-file threshold including those of P15-T20; type checks, architecture checks and both builds; figures from the run output.
   - Acceptance: One clean cycle; the four retained reports exist and the tests records cite them; every per-file threshold is met without blanket mocks.
 
-- [ ] [P16-T3] Run the PowerShell gates and regenerate the canonical coverage file from the full run (FEATURE/evidence/qa-gates/).
+- [x] [P16-T3] Run the PowerShell gates and regenerate the canonical coverage file from the full run (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P14-T8 with p16-powershell-{format,analyze,tests,single-process,shards}.<timestamp>.md; the fresh single-process run over tests/scripts writes artifacts/pester/powershell-coverage.xml and artifacts/pester/pester-junit.xml, which are copied to FEATURE/evidence/qa-gates/p16-powershell-coverage.<timestamp>.xml and p16-powershell-junit.<timestamp>.xml; every later consumer reads the evidence copies.
   - Tests and proof: Analyzer findings from a direct run with the repository settings file; counts from the JUnit copy; coverage from the XML copy; shard completeness; the Linux hook-suite shape over CPTEST and XPTEST.
   - Acceptance: No failure, no missing shard, line coverage at least 85% read from the evidence copy, and the canonical artifacts/pester/powershell-coverage.xml total equals the evidence copy's total.
