@@ -1,0 +1,100 @@
+{
+  "schema_version": "2.0.0",
+  "description": "Sentinel consumption contract shared by the PowerShell gate and probe, the TypeScript sentinel consumer and the Python schema check. The envelopes are Claude PreToolUse payloads of the discovery-capability-sentinel agent; the records are what ConvertTo-DiscoveryHostObservationRecord builds from them (state issued); the latch is the exact text consumeSentinelGrant writes beside the tool record at consumer_now. Replayed by tests/discovery_runtime/test_sentinel_consumption_fixture.py, extensions/drm-copilot/test/discovery-sentinel.contract.test.ts and tests/scripts/claude-lib/discovery-validation/DiscoverySentinelConsumption.Contract.Tests.ps1.",
+  "workspace": {
+    "workspace_root": "C:/Users/Example/Repos/Workspace",
+    "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+    "profile_path": "docs/migration/discovery/domain-profile.yaml",
+    "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+  },
+  "host": "claude-code",
+  "session_id": "session-alpha",
+  "handler_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "nonce": "0123456789abcdef0123",
+  "gate_now": "2026-10-22T11:59:00Z",
+  "ttl_seconds": 300,
+  "consumer_now": "2026-10-22T12:00:00Z",
+  "envelopes": {
+    "tool": {
+      "session_id": "session-alpha",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__drm-copilot__discovery_capability_sentinel",
+      "tool_input": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace"
+      },
+      "cwd": "C:/Users/Example/Repos/Workspace",
+      "tool_use_id": "toolu-sentinel-tool-0001",
+      "agent_id": "agent-sentinel",
+      "agent_type": "discovery-capability-sentinel"
+    },
+    "shell": {
+      "session_id": "session-alpha",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "Bash",
+      "tool_input": {
+        "command": "drm-copilot discovery capability probe sentinel-alpha: this command must be denied by the native hook and never executed"
+      },
+      "cwd": "C:/Users/Example/Repos/Workspace",
+      "tool_use_id": "toolu-sentinel-shell-0001",
+      "agent_id": "agent-sentinel",
+      "agent_type": "discovery-capability-sentinel"
+    }
+  },
+  "records": {
+    "tool": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:host-observation",
+      "schema_version": "2.0.0",
+      "artifact_kind": "host-observation",
+      "id": "observation-9d1e601211b5b2e4eebc",
+      "observation_ref": "observation-9d1e601211b5b2e4eebc",
+      "host": "claude-code",
+      "session_id": "session-alpha",
+      "agent_id": "agent-sentinel",
+      "agent_type": "discovery-capability-sentinel",
+      "parent_agent_id": "root",
+      "tool_name": "mcp__drm-copilot__discovery_capability_sentinel",
+      "tool_use_id_present": true,
+      "decision": "allow",
+      "code": "SENTINEL",
+      "handler_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "observed_at": "2026-10-22T11:59:00Z",
+      "tool": "discovery_capability_sentinel",
+      "input_sha256": "f669b6d054acde041e542a10eccffd69c53c02a9a7bb7a1ccad2bbc679e03493",
+      "expires_at": "2026-10-22T12:04:00Z",
+      "state": "issued"
+    },
+    "shell": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:host-observation",
+      "schema_version": "2.0.0",
+      "artifact_kind": "host-observation",
+      "id": "observation-096157b85914eda38ead",
+      "observation_ref": "observation-096157b85914eda38ead",
+      "host": "claude-code",
+      "session_id": "session-alpha",
+      "agent_id": "agent-sentinel",
+      "agent_type": "discovery-capability-sentinel",
+      "parent_agent_id": "root",
+      "tool_name": "Bash",
+      "tool_use_id_present": true,
+      "decision": "deny",
+      "code": "SHELL",
+      "handler_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "observed_at": "2026-10-22T11:59:00Z"
+    }
+  },
+  "relative_paths": {
+    "tool": "sessions/99b1d23983d285eb64aa2e321f429dd6678a40ec15149dc258098ed6a5bd536d/observations/observation-9d1e601211b5b2e4eebc.json",
+    "shell": "sessions/99b1d23983d285eb64aa2e321f429dd6678a40ec15149dc258098ed6a5bd536d/observations/observation-096157b85914eda38ead.json"
+  },
+  "input_sha256": "f669b6d054acde041e542a10eccffd69c53c02a9a7bb7a1ccad2bbc679e03493",
+  "latch": {
+    "relative_path": "sessions/99b1d23983d285eb64aa2e321f429dd6678a40ec15149dc258098ed6a5bd536d/observations/observation-9d1e601211b5b2e4eebc.json.consumed",
+    "text": "{\"consumed_at\":\"2026-10-22T12:00:00.000Z\",\"observation_ref\":\"observation-9d1e601211b5b2e4eebc\"}\n"
+  },
+  "sentinel_result": {
+    "observed": true,
+    "observationRef": "observation-9d1e601211b5b2e4eebc",
+    "agentIdPresent": true,
+    "agentType": "discovery-capability-sentinel"
+  }
+}
