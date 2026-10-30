@@ -4,8 +4,8 @@
 - **Parent (optional):** epic #1018 (`docs/features/epics/shared-agent-harness-layer/epic.md`)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-30T17-11
-- **Status:** Ready for preflight
-- **Version:** 1.0
+- **Status:** Ready for preflight (revision 1 after preflight round 1)
+- **Version:** 1.1
 - **Work Mode:** full-feature (acceptance criteria from `spec.md` and `user-story.md`)
 - **Branch:** `feature/dev-docs-root-resolver-phase1-1016`
 
@@ -22,19 +22,22 @@
 - Route: this child exceeds the per-session cap in every language (about 40 PowerShell, 28 Python and 25 TypeScript production files, plus bundle mirrors that also count). Execution uses the `large` route described in `## Batch Budget` of the `execution-environment` skill; the item worktree checkpoint selects it before Phase 1.
 - Scope diffs anchor on the merge base of `origin/main` and `HEAD`.
 - Invariant for every consumer task: with the default root `docs/features`, every user-facing message, error string, written path and exit status is byte-identical to today. Matchers accept the union of both known roots regardless of the configured value; writers use the resolved root through the area map.
+- Command text: `.claude/hooks/enforce-promotion-mcp-only.ps1` denies any Bash command text that contains the promotion-script file name of P6-T11 (`PROMOTION_MCP_ONLY_BLOCKED`), including read-only commands. P0-T4 and P6-T11 inspect and compare the two copies with Read and Grep, or through a launcher script under `SCRATCH` whose command text names only the launcher; Pester runs of its suites use the branch-current `Invoke-PoshQCTest` route of the brief.
 - Override recorded: `spec.md` names `evidence/coverage/` for coverage evidence. EVIDENCE_LOCATION_OVERRIDE_REJECTED: `<FEATURE>/evidence/coverage/` replaced with `<FEATURE>/evidence/qa-gates/`.
 
 ## Recorded Decisions (planner interpretations)
 
 - D-P1. Python resolver and parser are added in place to `scripts/dev_tools/json_config.py` (delegation settles OQ-2). No new Python file under `scripts/`, no `pyproject.toml` entry.
 - D-P2. `validate-required-artifact-output.ps1` `ConvertTo-ArtifactSpec` splits on `|` with `-split '\|', 3`, so the contracted pattern `^(?:docs/features|\.dev)/active/.+/spec\.md$` would be cut at its alternation. The parser changes to: token before the first `|`, description after the last `|`, pattern between (P6-T10). Existing three-part specs parse identically.
-- D-P3. `scripts/dev-tools/new-potential-entry.ps1` and `extensions/drm-copilot/resources/templates/new-potential-entry.ps1` already differ in text today. The spec's "equal text" criterion is implemented as: identical `param` block and identical root-dependent path lines in both copies, asserted by a Pester test (P6-T11). Unifying the remaining divergence is out of scope and is reported to the orchestrator.
+- D-P3 (supersedes the round-1 "param block only" reading). `scripts/dev-tools/new-potential-entry.ps1` and `extensions/drm-copilot/resources/templates/new-potential-entry.ps1` differ today in three regions: `Get-AuthorName` (only the `scripts/dev-tools` copy has the `-GetCommand` git-availability guard), the `$workspace` assignment (the `scripts/dev-tools` copy uses two parents of `$PSScriptRoot`, the bundled copy uses `(Get-Location).Path`), and trailing blank lines. Spec S-14 is not amended: P6-T11 makes the copies byte-identical. Unified content: `Get-AuthorName` keeps the guarded form; `$workspace` is two parents of `$PSScriptRoot` when the script directory's leaf is `dev-tools` and its parent's leaf is `scripts`, and `(Get-Location).Path` otherwise, so each copy resolves the workspace exactly as it does today; one trailing newline.
 - D-P4. `RepoAutomationService.newPotentialEntry` appends `-DevelopmentDocsRoot <root>` only when the resolved root differs from the default, so `repo-automation-dispatch.test.ts` (exact argv) stays unchanged; a new test proves `.dev` is passed when configured and present.
-- D-P5. The TypeScript resolver accepts a structural reader type (`exists`, `isDirectory`, `readTextFile`) that `FileSystem` satisfies, so seams such as `FolderFileSystem` adapt without a `vscode` or real-disk dependency.
+- D-P5. The TypeScript resolver accepts a structural reader type (`exists`, `isDirectory`, `readTextFile`) that `FileSystem` satisfies, so seams such as `FolderFileSystem` adapt without a `vscode` or real-disk dependency. Probe order: `exists` on the routing file first (false gives R-1 without a read), then `readTextFile`; `isDirectory` only when the value is `.dev`. Existing suites whose `FileSystem` fakes throw `not used` from `exists` or `isDirectory` and whose unit under test now resolves the root (the `InMemoryFileSystem` fakes in `test/lib/new-potential-bug-entry.test.ts` and `test/lib/new-potential-bug-entry-service-call.test.ts`, and the fake in `test/lib/validate/evidence-locations.test.ts` when the P4-T4 hint resolves through that seam) have that fake method answer from the fake's own file map; their case assertions are unchanged.
 - D-P6. The potential-to-issue status line uses `formatFeatureFolderName(issue, stripDateFirstPrefix(potential stem))`; when the formatter rejects the stem (N-5), it falls back to today's sanitized `featurePath` token under the resolved active area, so promotion never fails on the status line.
 - D-P7. `.claude/lib/development-docs` is a new `.claude/lib/<name>` project, so `quality-tiers.yml` gains a T3 entry (rule R4 of `scripts/dev_tools/quality_tiers_contract.py`).
 - D-P8. `.codex/hooks/hook-docs-only-diff.ps1` is the Codex twin of the Claude hook and receives the same `.dev/` change.
 - D-P9. Existing date-first and issue-less folders keep their names; issue-less creation keeps today's slug (OQ-4).
+- D-P10. `PotentialFileSystem` (`promotion-filesystem.ts`) has no directory probe. `promotePotential` resolves the root through a local adapter over its injected `fs` seam (`exists` serves both the existence and the directory probe, `readText` reads the routing file under `workspacePath`); `promotion-filesystem.ts` is unchanged.
+- D-P11. The shared corpus fixture `valid-large-waives-feature-folder-dev-root.json` is added only after all three feature-folder-record validators accept `.dev` (P6-T13), because the three parity suites run every file in `tests/fixtures/orchestrator_state_issue_adoption/`. Until then each runtime proves `.dev` acceptance with an in-memory case.
 
 ## Conflict Re-Check Inventory
 
@@ -67,11 +70,12 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
 - [ ] [P0-T1] Confirm the parallel run `bugs-1001-1002-1003-1006` has merged: fetch `origin`; for each of issues #1001, #1002, #1003 and #1006 record the merged pull request (number and merge commit from `gh`) and that the merge commit is an ancestor of `origin/main`; record that every such merge commit is also an ancestor of `HEAD`.
   - Acceptance: `<FEATURE>/evidence/baseline/merge-gate.<timestamp>.md` (Timestamp, Command, EXIT_CODE, Output Summary) lists four merged items. If any item is unmerged, record `STOP: PARALLEL_RUN_NOT_MERGED`; if merged but not in `HEAD`, record `STOP: BRANCH_SYNC_REQUIRED` for the orchestrator. Either STOP ends execution before P0-T2.
 - [ ] [P0-T2] Re-check every row of `## Conflict Re-Check Inventory` at the merge base of `origin/main` and `HEAD`: file present at that ref and each anchor found in it by a fixed-string search at that ref.
-  - Acceptance: `<FEATURE>/evidence/baseline/conflict-recheck.<timestamp>.md` holds one PASS/MOVED row per file and anchor. Any MOVED row records the old and new location and `STOP: REPLAN_REQUIRED`; no file is edited after a STOP.
+  - Then re-run the production-consumer inventory search at the same merge base (the roots and patterns of P10-T1). Each file with a hit must be named in research `## 2. Inventory of production consumers`, named in a task of this plan, or covered by a P10-T1 Stay row.
+  - Acceptance: `<FEATURE>/evidence/baseline/conflict-recheck.<timestamp>.md` holds one PASS/MOVED row per file and anchor, and one row per consumer file with hits (NAMED or NEW). Any MOVED row records the old and new location, and any NEW row records the file and pattern; either records `STOP: REPLAN_REQUIRED`, and no file is edited after a STOP.
 - [ ] [P0-T3] Read the policy files in the order of `## Required References`.
   - Acceptance: `<FEATURE>/evidence/baseline/phase0-instructions-read.<timestamp>.md` carries `Timestamp:`, `Policy Order:` and the list of files read.
-- [ ] [P0-T4] Record physical line counts (method from `execution-environment` `## Preflight Defect Classes the Validator Cannot See`) for every existing production file this plan edits that is at or above 500 lines, and record whether the two `new-potential-entry.ps1` copies differ.
-  - Acceptance: `<FEATURE>/evidence/baseline/file-size.<timestamp>.md` lists each file with its count and tier, and the copy-divergence fact (D-P3).
+- [ ] [P0-T4] Record physical line counts (method from `execution-environment` `## Preflight Defect Classes the Validator Cannot See`) for every existing production file this plan edits that is at or above 500 lines, and record the regions in which the two `new-potential-entry.ps1` copies differ, compared with Read and Grep (command-text restriction in `## Execution Preamble`).
+  - Acceptance: `<FEATURE>/evidence/baseline/file-size.<timestamp>.md` lists each file with its count and tier, and the three divergent regions named in D-P3 (or records any further region, which P6-T11 then also unifies).
 - [ ] [P0-T5] Capture the Python static baseline: Black in check mode, Ruff, Pyright over `scripts/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/baseline/python-static.<timestamp>.md` with one Command/EXIT_CODE/Output Summary block per tool (finding counts).
 - [ ] [P0-T6] Capture the Python test baseline with coverage for every module in `## Coverage Targets`, using dotted `--cov=` arguments (for example `--cov=scripts.dev_tools.json_config`), `--cov-branch`, `--cov-report=term-missing` and `--cov-report=json:SCRATCH/issue-1016-baseline-coverage.json`.
@@ -79,9 +83,9 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
 - [ ] [P0-T7] Capture the TypeScript static baseline in `extensions/drm-copilot/`: Prettier check mode, `npm run lint`, `npm run typecheck`.
   - Acceptance: `<FEATURE>/evidence/baseline/typescript-static.<timestamp>.md` with one block per tool.
 - [ ] [P0-T8] Capture the Jest coverage baseline (`npm run test:coverage` in `extensions/drm-copilot/`).
-  - Acceptance: `<FEATURE>/evidence/baseline/typescript-tests.<timestamp>.md` records suite and test counts and per-file line and branch percentages for every TypeScript file in `## Coverage Targets`.
-- [ ] [P0-T9] Capture the PowerShell static baseline: PoshQC format check and a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`.
-  - Acceptance: `<FEATURE>/evidence/baseline/powershell-static.<timestamp>.md` records the analyzer finding count by severity.
+  - Acceptance: `<FEATURE>/evidence/baseline/typescript-tests.<timestamp>.md` records suite and test counts and per-file line and branch percentages for every TypeScript file in `## Coverage Targets`, read from `extensions/drm-copilot/coverage/lcov.info` (the `test:coverage` script prints only `text-summary` totals).
+- [ ] [P0-T9] Capture the PowerShell static baseline: PoshQC format check and a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`. `Invoke-PoshQCFormat` has no check mode, so the format check runs the branch-current `Invoke-PoshQCFormat` with a no-op `-WriteFile` script block (no file is rewritten) and reads its logged lines.
+  - Acceptance: `<FEATURE>/evidence/baseline/powershell-static.<timestamp>.md` records the count of `Formatted:` lines from the format check and the analyzer finding count by severity.
 - [ ] [P0-T10] Capture the Pester baseline through branch-current `Invoke-PoshQCTest` (route per the brief).
   - Acceptance: `<FEATURE>/evidence/baseline/powershell-tests.<timestamp>.md` records pass/fail counts from `artifacts/pester/pester-junit.xml` and per-file line coverage from `artifacts/pester/powershell-coverage.xml` for every PowerShell file in `## Coverage Targets`.
 
@@ -98,7 +102,7 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
   - Acceptance: suite passes; threshold met.
 - [ ] [P1-T4] Add `extensions/drm-copilot/test/lib/development-docs/no-vscode-import.test.ts`, which reads each `.ts` file under `src/lib/development-docs/` through a repository-relative forward-slash path and fails on any `vscode` import or require.
   - Acceptance: test passes and fails when a `vscode` import is added locally (observation recorded in the P10-T6 artifact).
-- [ ] [P1-T5] Extend `scripts/dev_tools/json_config.py` in place with `DEVELOPMENT_DOCS_ROOT_KEY`, `DEFAULT_DEVELOPMENT_DOCS_ROOT`, `KNOWN_DEVELOPMENT_DOCS_ROOTS`, `resolve_development_docs_root`, `development_docs_path`, `known_root_prefixes` per `spec.md` `### Python`, with injected `read_text` and `is_dir`; widen the module docstring to repository layout configuration.
+- [ ] [P1-T5] Extend `scripts/dev_tools/json_config.py` in place with `DEVELOPMENT_DOCS_ROOT_KEY`, `DEFAULT_DEVELOPMENT_DOCS_ROOT`, `KNOWN_DEVELOPMENT_DOCS_ROOTS`, `resolve_development_docs_root`, `development_docs_path`, `known_root_prefixes` per `spec.md` `### Python`, with injected `read_text` and `is_dir`; add a module docstring that describes the module as repository layout configuration (the module has no docstring today).
   - Tests: new `tests/scripts/dev_tools/test_json_config_development_docs.py` (injected readers only): R-1 to R-8, area map under both roots, unknown area error, prefixes. `tests/scripts/dev_tools/test_json_config.py` unchanged.
   - Acceptance: both modules pass.
 - [ ] [P1-T6] Add `FeatureFolderName`, `parse_feature_folder_name`, `format_feature_folder_name`, `strip_date_first_prefix` to `scripts/dev_tools/json_config.py` with the same rules as P1-T3, holding its own copy of the `NAME_PATTERN` expression so `json_config` keeps importing nothing from `scripts.dev_tools`.
@@ -134,8 +138,8 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
 - [ ] [P3-T3] In `scripts/dev_tools/new_active_feature_folder_io.py` (`build_folder_slug`, `find_potential_file`) and `new_active_feature_folder_flow.py`, apply the P3-T1 routing and naming; argparse help keeps today's text under the default root.
   - Tests updated: `test_new_active_feature_folder.py` (`test_build_folder_slug_uses_potential_and_issue_number`, the `2025-12-23-json-quality-63` and `bug-case-77` expectations), `test_new_active_feature_folder_part2.py` (`refactor-test-88`, `auto-test-42`), `test_new_active_feature_folder_part4.py` (`2026-02-22-testing-missing-mock-injections-42`); parts 3 and 5 unchanged. New cases mirror P3-T1.
   - Acceptance: all five modules pass.
-- [ ] [P3-T4] In `extensions/drm-copilot/src/lib/potential-to-issue/content.ts` `updateMetadataLines` and `promotion.ts`, build the status line per D-P6 under the resolved active area and the promoted directory through `developmentDocsPath(root, "potential/promoted")`.
-  - Tests updated: `test/lib/potential-to-issue/content.test.ts` and `promotion.test.ts` status-line expectations (`Feature_Title` cases) move to the D-P6 form under `docs/features/active/`; a new case asserts `Promoted -> docs/features/active/1016-foo/`.
+- [ ] [P3-T4] In `extensions/drm-copilot/src/lib/potential-to-issue/content.ts` `updateMetadataLines` and `promotion.ts`, build the status line per D-P6 under the resolved active area and the promoted directory through `developmentDocsPath(root, "potential/promoted")`, resolving the root per D-P10.
+  - Tests updated: `test/lib/potential-to-issue/content.test.ts` and `promotion.test.ts` status-line expectations (`Feature_Title` cases) move to the D-P6 form under `docs/features/active/`; a new case asserts `Promoted -> docs/features/active/1016-foo/`. New `promotion.test.ts` cases with the in-memory routing file set to `.dev`: `.dev` present gives `destination` under `<workspace>/.dev/potential/promoted/` and a status line `Promoted -> .dev/active/1016-foo/`; `.dev` absent gives `destination` under `<workspace>/docs/features/potential/promoted/` and `Promoted -> docs/features/active/1016-foo/`.
   - Acceptance: suites pass, including `promotion.matrix.test.ts` and `promotion.move-verification.test.ts` unchanged.
 - [ ] [P3-T5] Apply P3-T4 in `scripts/dev_tools/potential_to_issue_content.py` and `potential_to_issue.py`.
   - Tests updated: `test_potential_to_issue_content.py`, `test_potential_to_issue.py` status-line expectations; new `1016-foo` case.
@@ -150,20 +154,20 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
 ### Phase 4 — TypeScript Consumers
 
 - [ ] [P4-T1] Replace `ACTIVE_FEATURE_DOCS_DIRECTORY` and `POTENTIAL_DOCS_DIRECTORY` in `src/extension-command-helpers.ts` with resolver calls, and route the potential and template joins in `src/lib/new-potential-bug-entry.ts`.
-  - Tests: `test/extension-command-helpers.test.ts`, `test/lib/new-potential-bug-entry*.test.ts` unchanged; new `.dev` write case in `new-potential-bug-entry.test.ts`.
+  - Tests: `test/extension-command-helpers.test.ts`, `test/lib/new-potential-bug-entry*.test.ts` existing cases unchanged (the `InMemoryFileSystem` fakes in `new-potential-bug-entry.test.ts` and `new-potential-bug-entry-service-call.test.ts` gain map-backed `exists` and `isDirectory` per D-P5); two new `createBugEntry` cases in `new-potential-bug-entry.test.ts` with the in-memory routing file set to `.dev`: `.dev` present writes under `<workspace>/.dev/potential/`; `.dev` absent writes under `<workspace>/docs/features/potential/`.
   - Acceptance: suites pass.
 - [ ] [P4-T2] Make `RepoAutomationService.newPotentialEntry` in `src/repo-automation-service.ts` resolve the root through its injected `fileSystem` and pass `-DevelopmentDocsRoot` per D-P4.
-  - Tests: `test/repo-automation-dispatch.test.ts` unchanged (default argv); new `test/repo-automation-service.new-potential-entry-root.test.ts` asserts `.dev` is passed when configured and present.
-  - Acceptance: both pass.
+  - Tests: `test/repo-automation-dispatch.test.ts`, `test/extension.workflow-commands.test.ts` (`newPotentialEntry passes the bundled script path and short-name args`) and `test/extension.integration.test.ts` (`newPotentialEntry succeeds in a workspace without docs/features/templates using bundled templates`) unchanged (default argv per D-P4); new `test/repo-automation-service.new-potential-entry-root.test.ts` asserts `.dev` is passed when configured and present.
+  - Acceptance: the three existing suites and the new suite pass.
 - [ ] [P4-T3] Route `src/lib/pr-context/feature-docs.ts`, `render-feature-excerpts.ts`, `verification-evidence.ts` (writers through resolver), `summary-helpers.ts` `isScopingDoc` (union) and `collector-core.ts` docs bucket (add `.dev/`).
   - Tests: existing pr-context suites unchanged; new `.dev` cases in `collector-core.test.ts` and `verification-evidence.test.ts`.
   - Acceptance: pr-context suites pass.
 - [ ] [P4-T4] Route `src/lib/validate/epic-orchestrator-state-resolution.ts`, `parallel-orchestrator-state-cohort-barrier.ts`, `epic-planner-readiness-integrity.ts`, `epic-kickoff-artifact.ts` and `parallel-kickoff-artifact.ts` (`MANIFEST_RE`), `orchestrator-state-issue-adoption.ts` (`POTENTIAL_RECORD_PREFIX`) to the union, and `evidence-locations.ts` hint through the resolver.
   - Tests: existing validate suites unchanged; new `test/lib/validate/development-docs-matchers.test.ts` holds one `.dev` acceptance case per routed file.
   - Acceptance: validate suites pass.
-- [ ] [P4-T5] Make `src/lib/validate/orchestrator-state-feature-folder-record.ts` accept `docs/features/active/<folder>` and `.dev/active/<folder>`; add shared fixture `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-feature-folder-dev-root.json`.
-  - Tests: `test/lib/validate/orchestrator-state-issue-adoption-feature-folder.test.ts` gains the fixture case; existing fixtures unchanged.
-  - Acceptance: suite passes.
+- [ ] [P4-T5] Make `FEATURE_FOLDER_PATH_PATTERN` in `src/lib/validate/orchestrator-state-feature-folder-record.ts` accept `docs/features/active/<folder>` and `.dev/active/<folder>`; `ERROR_FEATURE_FOLDER_PATH_FORMAT` text unchanged. No corpus fixture is added here (D-P11).
+  - Tests: `test/lib/validate/orchestrator-state-issue-adoption-feature-folder.test.ts` existing cases unchanged; new in-memory case: a record and checkpoint `feature-folder` of `.dev/active/2026-09-29-sample-feature-509` yield no error. Parity suites `orchestrator-state-issue-adoption-parity.test.ts`, `test_orchestrator_state_issue_adoption_parity.py` and `OrchestratorStateIssueAdoption.Parity.Tests.ps1` unchanged: the corpus is unchanged at this task and no existing fixture uses a `.dev` path.
+  - Acceptance: the feature-folder suite and the TypeScript parity suite pass.
 - [ ] [P4-T6] Add `.dev/**/*.json` to `GOVERNED_GLOBS` in `src/lib/json-config.ts`; in `src/lib/file-system.ts` export `compileGlob` and add the named constant `GLOB_MATCHES_DOT_ENTRIES` with a comment stating dot entries match.
   - Tests: `test/lib/file-system.test.ts` asserts `compileGlob` matches `.dev/active/x/spec.md` for `**` and `**/*.md`; `.dev` discovery cases in `json-config.test.ts` (`iterGovernedFiles`), `validate/json-validator.test.ts`, `validate/evidence-locations.test.ts`, `pr-context/verification-evidence.test.ts`, `pr-context/feature-docs.test.ts` (feature-docs-parsers glob), and `push-down/claude-blast-radius-derive.test.ts` asserting `isExcludedDirectoryName(".dev")` is `true`.
   - Acceptance: suites pass with in-memory fakes only.
@@ -179,9 +183,9 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
 - [ ] [P5-T3] Route `epic_planner_readiness.py`, `epic_kickoff_contract.py` and `parallel_kickoff_contract.py` (`MANIFEST_RE`), `_orchestrator_state_issue_adoption.py` (`POTENTIAL_RECORD_PREFIX`), `_epic_orchestrator_state_resolution.py`, `_parallel_orchestrator_state_cohort_barrier.py` to the union and `validate_evidence_locations.py` hint through the resolver.
   - Tests: existing suites unchanged; new `tests/scripts/dev_tools/test_development_docs_matchers.py` holds one `.dev` case per routed file.
   - Acceptance: affected modules pass; TypeScript parity suites for the same validators pass.
-- [ ] [P5-T4] Make `_orchestrator_state_feature_folder_record.py` accept both roots.
-  - Tests: `test_orchestrator_state_issue_adoption_feature_folder.py` consumes the P4-T5 fixture.
-  - Acceptance: module passes.
+- [ ] [P5-T4] Make `FEATURE_FOLDER_PATH_PATTERN` in `scripts/dev_tools/_orchestrator_state_feature_folder_record.py` accept both roots; `ERROR_FEATURE_FOLDER_PATH_FORMAT` text unchanged.
+  - Tests: `test_orchestrator_state_issue_adoption_feature_folder.py` existing cases unchanged (including `test_require_complete_text_accepts_adopted_feature_folder`, which reads `valid-large-waives-feature-folder-with-record.json`); new in-memory case mirroring P4-T5. `test_orchestrator_state_issue_adoption_parity.py` unchanged: the corpus is unchanged until P6-T13 (D-P11).
+  - Acceptance: the feature-folder module and the Python parity module pass.
 - [ ] [P5-T5] Add `.dev/**/*.json` to `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py`.
   - Tests: `test_json_config.py` gains `test_iter_governed_files_finds_dev_json` using `mem_fs_path` and a membership assertion; existing tests unchanged.
   - Acceptance: module passes.
@@ -191,14 +195,14 @@ Files and anchors this plan edits that appear in research section 9. P0-T2 check
 Every hook that imports the module uses the guarded import pattern; Codex hooks import `.codex/lib/development-docs/` first and `.claude/lib/development-docs/` second (pattern in `.codex/hooks/enforce-discovery-planning-gate.ps1`).
 
 - [ ] [P6-T1] Route `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` (`$script:FeatureFolderPattern`), `EpicScopeReadiness.psm1` (`$script:EpicManifestPattern`), `.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1` (`$script:LifecyclePrefixes`) and `OrchestratorStateIssueAdoption.psm1` (`$script:POTENTIAL_RECORD_PREFIX`) to the union.
-  - Tests: existing suites unchanged; one `.dev` case each in their existing test files.
+  - Tests: existing suites unchanged; one `.dev` case each in their existing test files. `OrchestratorStateIssueAdoption.Parity.Tests.ps1` unchanged and passing (corpus unchanged until P6-T13).
   - Acceptance: suites pass.
 - [ ] [P6-T2] Route `OrchestratorStateFeatureFolderRecord.psm1` (`$script:FEATURE_FOLDER_PATH_PATTERN`) to the union; `$script:ERROR_PATH_FORMAT` text unchanged.
-  - Tests: `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateFeatureFolderRecord.Tests.ps1` and `OrchestratorStateIssueAdoption.Tests.ps1` consume the P4-T5 fixture.
-  - Acceptance: suites pass.
+  - Tests: `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateFeatureFolderRecord.Tests.ps1` existing cases unchanged; new in-memory case in `Describe 'feature_folder_record rule 11a'` mirroring P4-T5. `OrchestratorStateIssueAdoption.Tests.ps1` (reads no corpus file) and `OrchestratorStateIssueAdoption.Parity.Tests.ps1` unchanged (corpus unchanged until P6-T13).
+  - Acceptance: the three suites pass.
 - [ ] [P6-T3] Route `Test-FeatureDocumentationOrEvidencePath` and `Test-OrchestrationReady` in `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` and its Codex twin, the exempt prefix list in both `enforce-orchestration-preimplementation-gate-helpers.ps1`, the epic regex in both `-modes.ps1`, and `$script:EpicScopeManifestPattern` in `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1` to the union.
-  - Tests: existing gate suites unchanged; new `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.DevRoot.Tests.ps1` and `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-dev-root.Tests.ps1` assert `.dev/active/` and `.dev/epics/` paths are recognized alongside `docs/features` forms; the helpers `Parity` suites pass.
-  - Acceptance: suites pass.
+  - Tests: existing gate suites unchanged; new `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.DevRoot.Tests.ps1` and `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-dev-root.Tests.ps1` assert `.dev/active/` and `.dev/epics/` paths are recognized alongside `docs/features` forms; the helpers `Parity` suite (`enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1`, which hash-compares the two helpers with their bundle copies) passes after P6-T12.
+  - Acceptance: suites pass; the helpers `Parity` suite passes after P6-T12.
 - [ ] [P6-T4] Route `Test-IsUnderResearchRoot` and the Pre-Mortem applicability test in `.claude/hooks/validate-task-researcher-output.ps1` to both roots and both research roots; messages unchanged.
   - Tests: new cases in `validate-task-researcher-output.Tests.ps1` for `.dev/active/x/research/` and `.dev/research/`.
   - Acceptance: the three task-researcher suites pass.
@@ -219,11 +223,15 @@ Every hook that imports the module uses the guarded import pattern; Codex hooks 
 - [ ] [P6-T10] Change `ConvertTo-ArtifactSpec` in `.claude/hooks/validate-required-artifact-output.ps1` per D-P2.
   - Tests: `validate-required-artifact-output.Tests.ps1` and `.Reentry.Tests.ps1` existing cases unchanged; new case parses the contracted `spec-path` spec and matches `.dev/active/x/spec.md`.
   - Acceptance: suites pass.
-- [ ] [P6-T11] Add `-DevelopmentDocsRoot` (`ValidateSet` of the two roots, default `docs/features`) to both `new-potential-entry.ps1` copies, deriving potential, template and backlog paths from it; add the same parameter to `scripts/dev-tools/link-feature-docs.ps1` for its generated links.
-  - Tests: `tests/scripts/dev-tools/new-potential-entry.Tests.ps1` param-block regex still matches; new cases for `.dev` and for identical `param` block and root-dependent lines in both copies (D-P3); `link-feature-docs.Tests.ps1` gains a `.dev` case.
-  - Acceptance: suites pass.
+- [ ] [P6-T11] Make `scripts/dev-tools/new-potential-entry.ps1` and `extensions/drm-copilot/resources/templates/new-potential-entry.ps1` byte-identical with the unified content of D-P3, plus `-DevelopmentDocsRoot` (`ValidateSet` of the two roots, default `docs/features`) from which the potential target, workspace template and backlog paths derive; add the same parameter to `scripts/dev-tools/link-feature-docs.ps1` for its generated links. Inspect and compare the copies per the command-text restriction in `## Execution Preamble`.
+  - Existing tests and callers, with disposition: in `tests/scripts/dev-tools/new-potential-entry.Tests.ps1`, the `Test-ValidShortName`, `Get-AuthorName` (including `falls back to USERNAME environment variable when git is unavailable`, which needs the guarded form), `Convert-TemplateContent` and `Invoke-VSCodeOpen` Describe blocks, and `contains all expected function definitions`, `validates parameter declaration`, `contains the parent-directory guard block before copying the template in both production scripts` and `uses reuse-window CLI invocation without Start-Process inside Invoke-VSCodeOpen in both production scripts` are unchanged (the unified text keeps every asserted function, parameter and block). `new-potential-entry.TemplateRoot.Tests.ps1` (`uses the supplied template root when the bundled potential template exists`, `falls back to the workspace template when the supplied template root lacks the potential template`) is unchanged: the `scripts/dev-tools` copy still resolves the workspace two parents above `$PSScriptRoot`. `.vscode/tasks.json` (`Dev: 1 New Potential Entry`, no new argument) and `RepoAutomationService.newPotentialEntry` with `repo-automation-dispatch.test.ts`, `extension.workflow-commands.test.ts` and `extension.integration.test.ts` are unchanged (argv per D-P4; the bundled copy still uses the current location). The promotion hook suites (`enforce-promotion-mcp-only.Tests.ps1`, `enforce-promotion-mcp-only.TriggerScoping.Tests.ps1`, `hook-command-parser.AcceptanceCases.Tests.ps1`, the two Codex suites) and the push-down rewrite tests assert only the file name and are unchanged.
+  - New tests: `tests/scripts/dev-tools/new-potential-entry.CopyParity.Tests.ps1` asserts equal SHA-256 hashes of the two copies; `new-potential-entry.TemplateRoot.Tests.ps1` gains a `.dev` case (`-DevelopmentDocsRoot .dev` targets `.dev/potential/`) and a bundled-copy case asserting the target under a mocked `Get-Location`; `link-feature-docs.Tests.ps1` gains a `.dev` case.
+  - Acceptance: the four suites pass; the two copies hash equal.
 - [ ] [P6-T12] Mirror every `.claude/` and `.codex/` file edited in Phase 6 to its bundle copy under `extensions/drm-copilot/resources/claude-customizations/` or `resources/codex-and-agents-customizations/`.
   - Acceptance: `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_pack_manifest_dependency_closure.py`, `hook-dependency-guard-completeness.Tests.ps1` and `enforcement-hooks-no-python-invocation.Tests.ps1` pass.
+- [ ] [P6-T13] Add the shared corpus fixture `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-feature-folder-dev-root.json` (keys `name`, `notes`, `checkpoint`, `expected_errors`; `name` equals the file stem; modeled on `valid-large-waives-feature-folder-with-record.json` with the checkpoint `feature-folder` and the record `path` both `.dev/active/2026-09-29-sample-feature-509`; `expected_errors` empty). This runs after P4-T5, P5-T4 and P6-T2, so all three validators accept `.dev` (D-P11).
+  - Tests, with disposition: the three parity suites `extensions/drm-copilot/test/lib/validate/orchestrator-state-issue-adoption-parity.test.ts`, `tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py` and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Parity.Tests.ps1` are unchanged in source and each discovers the new file (one file more than before this task, above the `MINIMUM_CORPUS_COUNT` of 48; the on-disk count check still holds) and asserts no routing error for it.
+  - Acceptance: the three parity suites pass.
 
 ### Phase 7 — Write-Scope Literal Contract (D-16)
 
@@ -264,7 +272,7 @@ Every hook that imports the module uses the guarded import pattern; Codex hooks 
 ### Phase 10 — Final QA, Evidence and Self-Review
 
 - [ ] [P10-T1] Run the residual search over `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`, `extensions/drm-copilot/src` for `docs/features`, `docs[\\/]+features`, the Python split form `"docs" / "features"` and the TypeScript split form `"docs", "features"`, and the part-index forms `parts[1] === "features"` and `parts[1] == "features"`.
-  - Acceptance: `<FEATURE>/evidence/other/residual-search.<timestamp>.md` records commands, output and an allowlist of Stay rows (resolver constants, prose, help citations, `build_discovery_runtime.py` `RESOURCE_ROOTS`); every hit is on the allowlist.
+  - Acceptance: `<FEATURE>/evidence/other/residual-search.<timestamp>.md` records commands, output and an allowlist of Stay rows (resolver constants, prose, help citations, `build_discovery_runtime.py` `RESOURCE_ROOTS`, and the tracked coverage annotation file `scripts/dev_tools/pr_context/render.py,cover`, which is not a production source file); every hit is on the allowlist.
 - [ ] [P10-T2] Verify the scope boundary: no `.dev/` path exists (`git status --porcelain` and a tree listing), `development_docs_root` is `docs/features` in all three copies, no folder under `docs/features/` is renamed (a name-status diff with rename detection, anchored on the merge base, shows no rename row), no migration command or new `pyproject.toml` entry exists.
   - Acceptance: `<FEATURE>/evidence/other/scope-boundary.<timestamp>.md` all PASS.
 - [ ] [P10-T3] Run Black in check mode, Ruff and Pyright; on any failure or fix, restart the loop from formatting.
@@ -274,9 +282,9 @@ Every hook that imports the module uses the guarded import pattern; Codex hooks 
 - [ ] [P10-T5] Run Prettier in check mode, `npm run lint` and `npm run typecheck` in `extensions/drm-copilot/`; restart on any failure or fix.
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-static.<timestamp>.md` with exit 0 for each.
 - [ ] [P10-T6] Run `npm run test:coverage` in `extensions/drm-copilot/`; record the P1-T4 and P7-T5 negative observations.
-  - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-tests.<timestamp>.md` records zero failures, every `coverageThreshold` met, and line and branch percentages for each file in `## Coverage Targets`.
-- [ ] [P10-T7] Run the PoshQC format check and the direct analyzer run of P0-T9; restart on any finding.
-  - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records zero Error and Warning findings.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-tests.<timestamp>.md` records zero failures, every `coverageThreshold` met, and line and branch percentages for each file in `## Coverage Targets`, read from `extensions/drm-copilot/coverage/lcov.info`.
+- [ ] [P10-T7] Run the PoshQC format check (no-op `-WriteFile` form of P0-T9) and the direct analyzer run of P0-T9; restart on any finding.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records no `Formatted:` line (every file logs `Already formatted:`) and zero Error and Warning findings.
 - [ ] [P10-T8] Run Pester over `tests/scripts` through branch-current `Invoke-PoshQCTest` with coverage.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-tests.<timestamp>.md` records zero failures from the JUnit file and line coverage of `DevelopmentDocsRoot.psm1` at or above 85% and of each changed PowerShell file from the coverage XML.
 - [ ] [P10-T9] Run every contract test in `## Contract Tests That Pin Mirrored Files` of the brief, plus `test_orchestration_routing_config_parity.py`, `test_push_down_codex_and_agents_virtual_paths.py`, `test_quality_tiers_contract_classification.py`, `ClaudeLibModuleConvention.Tests.ps1`, `enforcement-hooks-no-python-invocation.Tests.ps1`, and the Codex generator `--check`.
@@ -310,7 +318,7 @@ Every hook that imports the module uses the guarded import pattern; Codex hooks 
 
 - Review checklists: a reviewer finds a consumer still hard-coding `docs/features` or a changed message; P10-T1 residual search with a recorded allowlist, the byte-identical-message invariant, and P10-T13 self-review over all three templates.
 - Coverage: new TypeScript files lack thresholds or Python figures come from a path-form `--cov`; P1-T2, P1-T3, P7-T1 add per-file `coverageThreshold` entries, Python uses dotted `--cov` with `--cov-branch` and JSON branch figures, Pester line coverage is read from `artifacts/pester/powershell-coverage.xml`, and P10-T11 compares against Phase 0.
-- Mirror parity: module copies (P2-T1), pack manifests (P2-T3), Codex publication (P2-T4), hook bundle copies (P6-T12, P9-T2), agent and settings copies (P7-T2, P7-T3), generator run and `--check` (P7-T4), hash re-baseline (P7-T6), and the execution-environment brief update in all six byte-identical copies (P8-T2), which this plan requires because it changes the docs-only allowlist fact the brief states.
+- Mirror parity: the two `new-potential-entry.ps1` copies made byte-identical with a hash test (P6-T11), module copies (P2-T1), pack manifests (P2-T3), Codex publication (P2-T4), hook bundle copies (P6-T12, P9-T2), agent and settings copies (P7-T2, P7-T3), generator run and `--check` (P7-T4), hash re-baseline (P7-T6), and the execution-environment brief update in all six byte-identical copies (P8-T2), which this plan requires because it changes the docs-only allowlist fact the brief states.
 - File size: P0-T4 records files at or above 500 lines before editing; new logic lives in the new modules; P10-T12 confirms no file above 800.
 - Test isolation: resolvers take injected readers in all runtimes and no test reads the real routing file or probes for `.dev`; P10-T10 runs a seeded shuffled Jest run, a reversed-order run of the changed Python test modules, and a three-seed shuffled Pester file-order run, each seed recorded.
 - CI-only behavior: the checker and `.dev` fixtures use forward-slash relative paths and no drive letters; no test diffs against `origin/main`; Linux hook suites use `Join-Path` and exact case; the allowlist file change triggers a full CI run.
@@ -330,9 +338,9 @@ Spec criteria are numbered in document order (S-1 to S-42); user-story criteria 
 | S-9 full suites, limited expectation changes | P3-T1 to P3-T5, P10-T4, P10-T6, P10-T8 |
 | S-10 residual search | P10-T1 |
 | S-11 `.dev` writes in folder creation, bug entry, promotion | P3-T1, P3-T4, P4-T1 |
-| S-12 feature-folder record matchers | P4-T5, P5-T4, P6-T2 |
+| S-12 feature-folder record matchers | P4-T5, P5-T4, P6-T2, P6-T13 |
 | S-13 gate and researcher matchers | P6-T3, P6-T4 |
-| S-14 `new-potential-entry.ps1` | P6-T11, P4-T2 |
+| S-14 `new-potential-entry.ps1` (byte-identical copies, D-P3) | P6-T11, P4-T2 |
 | S-15 fail-closed hook | P6-T8 |
 | S-16, S-17 CI docs-only config and suites | P8-T1 |
 | S-18 `hook-docs-only-diff.ps1` | P6-T9 |
@@ -352,10 +360,10 @@ Spec criteria are numbered in document order (S-1 to S-42); user-story criteria 
 
 ## Size Justification
 
-This child is one cross-runtime contract change: one configured key read by about 93 production consumers in three runtimes, plus mirrors, a write-scope contract and CI scope. The owner decided the child is not split. Each task covers one consumer group with its tests so that each binary outcome stays checkable, which requires 76 canonical tasks (above the guideline of 40) in about 360 lines. Files produced by the Codex generator run count as one task (P7-T4).
+This child is one cross-runtime contract change: one configured key read by about 93 production consumers in three runtimes, plus mirrors, a write-scope contract and CI scope. The owner decided the child is not split. Each task covers one consumer group with its tests so that each binary outcome stays checkable, which requires 77 canonical tasks (above the guideline of 40) in about 370 lines (within the 400-line guideline). Files produced by the Codex generator run count as one task (P7-T4).
 
 ## Open Questions / Notes
 
 - OQ-1, OQ-3, OQ-4 and OQ-5 from `spec.md` are applied as recorded there; package version bumps are not part of this child.
-- D-P3 departs from the literal "equal text" wording of one spec criterion; the orchestrator confirms the interpretation or files the unification separately.
+- D-P3 now follows the literal "equal text" wording of S-14 (orchestrator decision after preflight round 1); the unified `$workspace` rule keeps each copy's current resolution.
 - `.dev/backlog.md` becomes docs-only under the spec's `.dev/` include, while `docs/features/backlog.md` is not docs-only today; recorded for the owner, not changed.
