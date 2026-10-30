@@ -27,6 +27,7 @@ Related: #1006 covers shared-surface demotion, generic worksheet-name contracts,
 4. **Benefit currency.** Benefit stays as band durations (a cohort-step estimate).
 5. **Issue combination.** At planning time the planner combines a pair on its own, with no operator approval:
    - Candidates are pairs whose reasons are hard `contract_dependency` or `same_file`.
+   - Contract-only pairs qualify. Cost currently comes only from path overlap, so a pair that shares only a contract would score 0 and never combine. Add a `conflict_tolerance.weights.contract` weight (integer of at least 1, validated like the other weights) and sum it once per shared contract identifier into the pair's cost. At `tolerance_percent` 0 the output stays identical to strict scheduling.
    - A pair combines when its cost is at least the shorter item's benefit times `conflict_tolerance.combination_threshold_percent` (default 400, a destination can change it).
    - The combined item is one item with one branch and one PR that closes both issues. Both issues stay separate on GitHub, with no umbrella issue.
    - The combined item gets a fresh complexity assessment from its merged scope.

@@ -6,7 +6,7 @@
 
 - Issue: #1013
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/1013
-- Last Updated: 2026-10-30
+- Last Updated: 2026-10-30 (body mirrored from evidence/issue-updates/issue-1013.2026-10-30T16-21.md)
 - Work Mode: full-feature
 
 ## Problem / Why
@@ -29,6 +29,7 @@ Related: #1006 covers shared-surface demotion, generic worksheet-name contracts,
 4. **Benefit currency.** Benefit stays as band durations (a cohort-step estimate).
 5. **Issue combination.** At planning time the planner combines a pair on its own, with no operator approval:
    - Candidates are pairs whose reasons are hard `contract_dependency` or `same_file`.
+   - Contract-only pairs qualify (owner decision 2026-10-30). Cost previously came only from path overlap, so a pair that shares only a contract scored 0 and never combined. A new `conflict_tolerance.weights.contract` weight (an integer of at least 1, validated exactly like `same_file`, `possible_overlap`, `append_only`, and `module`, with fail-fast errors naming the key and booleans rejected) is summed once per shared contract identifier into the pair's cost. Python, PowerShell, the TypeScript push-down and overlay surfaces, and both truth tables stay in parity. `contract_dependency` remains a hard edge class; the weight affects cost, combination eligibility, and the aggregate cap, not the hard-edge rule. At `tolerance_percent` 0 the edge set stays identical to strict scheduling.
    - A pair combines when its cost is at least the shorter item's benefit times `conflict_tolerance.combination_threshold_percent` (default 400, a destination can change it).
    - The combined item is one item with one branch and one PR that closes both issues. Both issues stay separate on GitHub, with no umbrella issue.
    - The combined item gets a fresh complexity assessment from its merged scope.
@@ -48,6 +49,7 @@ Related: #1006 covers shared-surface demotion, generic worksheet-name contracts,
 - [ ] `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other keys, and equal across Python, PowerShell, and TypeScript where ported.
 - [ ] The plan report lists each combination and its estimated savings.
 - [ ] Mirrored and bundled copies, pack manifest, and contract tests pass.
+- [ ] A pair that shares only a contract has a nonzero cost from `conflict_tolerance.weights.contract` (an integer of at least 1, validated like the other weights, summed once per shared contract identifier) and can qualify for combination; `contract_dependency` remains a hard edge class, and at `tolerance_percent` 0 the edge set equals strict scheduling.
 
 ## Constraints & Risks
 
@@ -56,6 +58,7 @@ Related: #1006 covers shared-surface demotion, generic worksheet-name contracts,
 - Combining changes issue boundaries and closing references. A combined PR is larger to review and merges or fails as a unit.
 - Cost remains a heuristic. Telemetry measures it and does not tune it.
 - Hard `contract_dependency` still serializes unless the pair combines.
+- The `contract` weight name is required in `conflict_tolerance.weights`, so every config and fixture that carries `weights` must carry it.
 - Enforcement hooks do not invoke Python.
 
 ## Test Conditions to Consider
