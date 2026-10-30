@@ -1076,12 +1076,12 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
 
 ### Phase 18 — Remediation cycle 2: lean verification, AC-64 reconciliation and handoff
 
-- [ ] [P18-T1] Run the Python formatting, lint, type and coverage gates on the cycle-2 tree (FEATURE/evidence/qa-gates/).
+- [x] [P18-T1] Run the Python formatting, lint, type and coverage gates on the cycle-2 tree (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P16-T1 with the artifact names p18-python-{format,lint,types,tests}.<timestamp>.md, SCRATCH/issue-980-p18-coverage.json and SCRATCH/issue-980-p18-junit.xml; copy the JSON report to FEATURE/evidence/qa-gates/p18-python-coverage.<timestamp>.json.
   - Tests and proof: As P16-T1; the population includes PT/test_sentinel_consumption_fixture.py; the tests record carries the pytest summary line and the JSON totals.
   - Acceptance: One clean pass; repository line coverage at least 85% and branch coverage at least 75%; the threshold gate exits 0; the retained JSON report exists.
 
-- [ ] [P18-T2] Run the extension TypeScript gates after a clean root dependency install and retain the coverage report (FEATURE/evidence/qa-gates/).
+- [x] [P18-T2] Run the extension TypeScript gates after a clean root dependency install and retain the coverage report (FEATURE/evidence/qa-gates/).
   - Files and behavior: Run `npm ci` at the repository root first, because the rebase changed the root package manifest and lockfile, and record it as p18-typescript-root-install.<timestamp>.md; then run the extension format check, lint, type check and coverage-enabled test population in extensions/drm-copilot as P16-T2 did for that package, with p18-typescript-extension-{format,lint,types,tests}.<timestamp>.md and the retained p18-typescript-extension-lcov.<timestamp>.info and p18-typescript-extension-coverage-summary.<timestamp>.json; the root package is not in the fix's scope and is not re-run here.
   - Tests and proof: The complete extension population with every per-file threshold, including ET/discovery-sentinel.contract.test.ts; the type check covers the test tree.
   - Acceptance: The install exits 0 and leaves `git status --porcelain` empty; one clean cycle; the two retained reports exist and the tests record cites them; every per-file threshold is met without blanket mocks.
