@@ -960,7 +960,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Per file: baseline (or `new`), final and delta for lines and, for Python and TypeScript, branches; new files at least 90% lines; every file at least 85% lines and 75% branches; no regression on changed lines; the ten P15-T20 files and every Phase 15 module listed by name.
   - Acceptance: Every listed file has numeric measurements meeting the floors; a missing measurement fails the gate; no exclusion and no threshold change.
 
-- [ ] [P16-T5] Run the isolation checks on the remediated tree (FEATURE/evidence/regression-testing/).
+- [x] [P16-T5] Run the isolation checks on the remediated tree (FEATURE/evidence/regression-testing/).
   - Files and behavior: Write FEATURE/evidence/regression-testing/p16-isolation.<timestamp>.md and one record per run.
   - Tests and proof: A seeded shuffled Jest run in extensions/drm-copilot and at the root with the seeds recorded; a reversed-order single-process Pytest run of every Python test module Phase 15 added or changed, with PT/test_catalog.py placed after another catalog-building module so the cache is populated before `test_missing_required_dependency_fails_without_reduced_validation` runs; a seeded shuffled file-order run of every Pester suite Phase 15 added or changed with at least three seeds, each seed and file order recorded; the fresh single-process Pester run is the P16-T3 run.
   - Acceptance: Every order passes; an order dependence is fixed on both sides, the affected loop among P16-T1 through P16-T3 is repeated and every seed is re-run.
