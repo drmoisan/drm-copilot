@@ -33,7 +33,7 @@ payload-identity design is P16-T7 (`evidence/qa-gates/discovery-host-observation
 earlier `evidence/qa-gates/discovery-native-capabilities.*.md` records (P11-T7, P12-T12) were
 harness-simulated runs against previous builds, as `## Installed-host agent path` states.
 
-## Installed-host agent path (proven in P12-T12; closes the P11-T7 blocker)
+## Installed-host agent path (implemented in Phase 12, requalified in remediation cycle 1)
 
 The installed runtime now carries both principals. The root prepares a specialist through
 `prepare_discovery_agent`: the Python `prepare-agent` route pins the pre-invocation baseline
@@ -69,13 +69,23 @@ reports, `snapshot-export`, `snapshot-import`), and each attempt needs its own p
 invocation (one prepared invocation admits one start; a second prepare for the same
 specialist in one session makes the start ambiguous and is denied).
 
-## Delivery status (executor handoff, P14-T16)
+## Delivery status (executor handoff, P16-T11)
 
-Every plan task is checked with canonical proof (`evidence/qa-gates/p14-handoff-validation.*.md`,
-lexicographically greatest). The final gates ran on the corrected tree, rebased onto main, in
-Phase 14; `completion-report.md` lists them. Not yet done, and not claimed: the independent
-feature review (AC-64 "Feature review reports no blocking defects.", the seeded condition for
-the final full feature review, deliverable D20) and exact-head CI on the pull request the
+Every plan task is checked with canonical proof (`evidence/qa-gates/p16-handoff-validation.*.md`,
+lexicographically greatest): all 156 tasks of Phases 0 to 16, including the 34 tasks of
+remediation cycle 1. The final gates ran on the remediated tree in Phase 16:
+`evidence/qa-gates/p16-python-*.2026-10-30T00-42.md`, `p16-typescript-*.2026-10-30T01-40.md`,
+`p16-powershell-*.2026-10-30T01-29.md`, `p16-coverage-comparison.2026-10-30T01-41.md`,
+`evidence/regression-testing/p16-isolation.2026-10-30T01-45.md`,
+`discovery-installed-runtime.2026-10-30T01-47.md`, `discovery-host-observations.2026-10-30T01-47.md`,
+`p16-repository-contracts.2026-10-30T01-55.md`, `acceptance-criteria-status.2026-10-30T01-58.md`
+and `self-review.2026-10-30T02-04.md` (0 FAIL rows); `completion-report.md` lists them. The
+review findings of 2026-10-29T13-16 (R1 to R4, the Major and every Minor) are closed by the
+tasks named in `acceptance-criteria-status.2026-10-30T01-58.md`. Not yet done, and not claimed:
+the independent re-review of remediation cycle 1 (AC-64 "Feature review reports no blocking
+defects.", the seeded condition for the final full feature review, deliverable D20), a live
+per-host observation (orchestrator-driven, instructions in
+`discovery-host-observations.2026-10-30T01-47.md`) and exact-head CI on the pull request the
 orchestrator opens. No open blocker remains from the executor's side.
 
 ## Publication prerequisites
@@ -104,7 +114,7 @@ done by the framework.
    client selects the workspace `.venv` interpreter before `py` or `python`, which is the
    interpreter setting; there is no separate configuration key. Run
    `python -I -m drm_copilot_discovery.cli doctor --workspace-root <repo>`.
-2. **Host package.** Install the tested extension (1.1.22) or configure the standalone
+2. **Host package.** Install the tested extension (1.1.23) or configure the standalone
    server (`npx @danmoisan/drm-copilot-mcp`) in the agent client. A customization push alone
    installs no Python.
 3. **Push down the native customizations** with the installed MCP tools, one call per host

@@ -990,7 +990,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: A FAIL row is fixed, the affected loop among P16-T1 through P16-T3 and every later dependent Phase 16 task are repeated, and the self-review is rewritten before this task completes.
   - Acceptance: Zero FAIL rows and no unverified blocking row; every review finding row cites existing evidence.
 
-- [ ] [P16-T11] Return the refreshed executor handoff (FEATURE/handoff.md).
+- [x] [P16-T11] Return the refreshed executor handoff (FEATURE/handoff.md).
   - Files and behavior: Finalize this plan's task state, FEATURE/completion-report.md and FEATURE/handoff.md; write FEATURE/evidence/qa-gates/p16-handoff-validation.<timestamp>.md; validate the plan with `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md` and validate the orchestrator checkpoint.
   - Tests and proof: Each checked task names existing canonical proof; the remaining review- and CI-dependent items are listed for the orchestrator continuation below.
   - Acceptance: The handoff is internally consistent, names no open blocker, cites Phase 16 evidence for every final gate, and claims no completion for the independent re-review or exact-head CI.
