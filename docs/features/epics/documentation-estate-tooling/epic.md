@@ -39,15 +39,15 @@ features:
   - issue_num: 900007
     feature_folder: docs-mcp-tools
     depends_on: [1021, 1022, 1023, 1024]
-  - issue_num: 900008
-    feature_folder: docs-enforcement-and-ci
+  - issue_num: 1034
+    feature_folder: 2026-10-30-docs-enforcement-and-ci-1034
     depends_on: [1021, 1023]
   - issue_num: 900009
     feature_folder: docs-authoring-workflow
     depends_on: [900007]
   - issue_num: 900010
     feature_folder: documentation-estate-template-and-onboarding
-    depends_on: [900008, 900009]
+    depends_on: [1034, 900009]
   - issue_num: 900011
     feature_folder: docs-surface-analyzer-python-native
     depends_on: [1022]
@@ -230,7 +230,7 @@ provisional defaults.
 | 1 | 1023 | docs-coverage-ledger-and-receipt | C4 | PowerShell coverage ledger, parity matrix, evidence pins and staleness, `docs-complete` receipt. |
 | 2 | 1024 | docs-reference-generator | C3 | PowerShell deterministic reference-page renderer with marker-delimited generated blocks. |
 | 3 | 900007 | docs-mcp-tools | C3 | TypeScript MCP tool wrappers over `Invoke-DocsCommand.ps1`. |
-| 2 | 900008 | docs-enforcement-and-ci | C3 | Consumer workflow template, surface-delta helper, opt-in integration-PR gate hook, feature-review check. |
+| 2 | 1034 | docs-enforcement-and-ci | C3 | Consumer workflow template, surface-delta helper, opt-in integration-PR gate hook, feature-review check. |
 | 4 | 900009 | docs-authoring-workflow | C4 | Four documentation roles, eight skills, page templates, mirrored to all surfaces. |
 | 5 | 900010 | documentation-estate-template-and-onboarding | C3 | `documentation-estate` epic template, onboarding docs, end-to-end Pester fixture test. |
 | 2 | 900011 | docs-surface-analyzer-python-native | C3 | Python-native (`ast`) analyzer for Python surfaces, shipped in the python pack, with scanner fallback (D3). |
@@ -264,7 +264,7 @@ provisional defaults.
   under `extensions/drm-copilot/test/`.
 - Subcommands and owners: `init`, `validate-profile` (1020); `check` (1021); `inventory` (1022;
   900004 adds analyzers only); `coverage`, `update-ledger`, `validate` (1023);
-  `generate-reference` (1024); `surface-delta` (900008). Each owner adds its own command module
+  `generate-reference` (1024); `surface-delta` (1034). Each owner adds its own command module
   and one dispatch-table row.
 - Exit codes for every subcommand: 0 success, 1 findings or validation failure, 2 usage or input
   error, 3 internal or I/O error; `-Json` switch emits the envelope defined below.
@@ -290,9 +290,9 @@ provisional defaults.
   are unchanged. Evidence pins are stored as one collection document.
 - The neutrality test configures consumer identifiers only as SHA-256 digests, never as text.
 - `extensions/drm-copilot/resources/templates/` is not a push-down root. Consumer configuration
-  and the 900008 workflow template are delivered either through a tree a push-down command copies
+  and the 1034 workflow template are delivered either through a tree a push-down command copies
   or by `Invoke-DocsCommand.ps1 init` writing them; 1020's re-preparation decides which, and
-  1021/900008 follow it.
+  1021/1034 follow it.
 - Execution should run in the item worktree, not an isolated executor worktree, because the batch
   budget otherwise denies the fourth production file.
 - `quality-tiers.yml` exists at the repository root; new code areas are classified there if its
@@ -320,9 +320,9 @@ provisional defaults.
   `Get-DocsSchemaStructuralFinding`; schema constraints that must name a failing field stay within
   its keyword subset.
 - The consumer profile is JSON at `docs/documentation-estate/docs-profile.json`; YAML is rejected.
-- Consumer configuration and the 900008 workflow template are written by
+- Consumer configuration and the 1034 workflow template are written by
   `Invoke-DocsCommand.ps1 -Command init` from templates under `.claude/lib/docs/templates/`; 1021
-  and 900008 each add one template row.
+  and 1034 each add one template row.
 - Every new `.claude/lib/docs/` file is listed in the Claude `pack-manifests/core.json` and
   mirrored byte-identically. `.claude/lib/docs` is T3 in `quality-tiers.yml`.
 - Execution runs in the item worktree under an exempt-route checkpoint (batch budget).
@@ -339,7 +339,7 @@ provisional defaults.
   subcommand that changes the ledger, matrix or pins.
 - The receipt is always returned in `result`; persisting it needs an explicit write-receipt switch
   through the mutation boundary. The receipt identifier is derived from its content excluding the
-  issue time. 900007's `validate_docs_artifacts` does not persist receipts; 900008 reads a
+  issue time. 900007's `validate_docs_artifacts` does not persist receipts; 1034 reads a
   persisted receipt.
 - Pin states: `current`, `digest-changed`, `element-missing`; a page is stale when any pin is not
   current. Digests are compared as opaque values.
@@ -398,7 +398,7 @@ provisional defaults.
 
 Children create disjoint new modules. Shared, append-only edit points:
 `.claude/lib/docs/Invoke-DocsCommand.ps1` dispatch table (1020, 1021, 1022, 1023, 1024,
-900008), `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (1022, 900004), any push-down manifest or
+1034), `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (1022, 900004), any push-down manifest or
 parity list that enumerates mirrored files (every child that adds a module), and
 `quality-tiers.yml` if applicable. Append-only conflicts are resolved inside the child's
 remediation loop.
@@ -578,7 +578,7 @@ Acceptance criteria:
   reachable from a skill through `Invoke-DocsCommand.ps1`.
 - Jest line coverage >= 85% and branch coverage >= 75% on the new modules.
 
-### 900008 - docs-enforcement-and-ci (wave 2, C3)
+### 1034 - docs-enforcement-and-ci (wave 2, C3)
 
 Band rationale: gate behavior across CI template, hook and review agent; alters an existing
 review contract.
@@ -698,7 +698,7 @@ Acceptance criteria:
 - 1024 depends on 1021 because generated pages must satisfy the page-metadata schema and checker.
 - 900007 waits for the subcommands it wraps; 900004 is excluded because it adds analyzers behind
   the existing `inventory` subcommand.
-- 900008 depends on the checker and the receipt only.
+- 1034 depends on the checker and the receipt only.
 - 900009 depends on the MCP tools its roles are restricted to.
 - 900010 composes everything and depends on the authoring workflow and enforcement.
 - 900011 depends on 1022 (analyzer identifiers, element kinds, fixtures and the fallback target)
@@ -711,7 +711,7 @@ Computed with `scripts/dev_tools/epic_wave_computation.py`:
 
 - Wave 0: 1020
 - Wave 1: 1021, 1022, 900004, 1023
-- Wave 2: 1024, 900008, 900011
+- Wave 2: 1024, 1034, 900011
 - Wave 3: 900007
 - Wave 4: 900009
 - Wave 5: 900010
