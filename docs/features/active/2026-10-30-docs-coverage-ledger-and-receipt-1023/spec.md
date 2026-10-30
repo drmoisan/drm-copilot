@@ -1,13 +1,17 @@
 # docs-coverage-ledger-and-receipt — Spec
 
 - **Issue:** #1023
-- **Parent (optional):** #1019 (epic documentation-estate-tooling, child 900005, wave 1, band C4)
-- **Depends on:** #1020 (docs-profile-and-artifact-schemas; planned, not executed)
+- **Parent (optional):** #1019 (epic documentation-estate-tooling, wave 1, band C4)
+- **Depends on:** #1020 (docs-profile-and-artifact-schemas, including its D3/D5 amendment; planned, not executed)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-30
 - **Status:** Draft
-- **Version:** 0.2
-- **Research:** `docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023/research/2026-10-30T20-59-docs-coverage-ledger-and-receipt-research.md`
+- **Version:** 0.3 (PowerShell design; new planning cycle under owner decision D1)
+- **Research (design source):** `docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023/research/2026-10-30T22-40-docs-coverage-ledger-and-receipt-powershell-addendum.md`
+- **1020 amendment cited:** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T22-35-docs-profile-amendment-d3-d5-addendum-research.md` (on branch `feature/docs-profile-and-artifact-schemas-1020`)
+- **Superseded:** version 0.2 (withdrawn Python design under `packages/docs-runtime`). The earlier
+  research `research/2026-10-30T20-59-docs-coverage-ledger-and-receipt-research.md` is kept
+  unmodified; its language-independent semantics are carried forward below.
 
 ## Overview
 
@@ -18,575 +22,626 @@ files while only 4 of 79 documentation pages were edited, and the gap was measur
 
 This feature is the correspondence core of the documentation-estate epic: the coverage ledger, the
 parity matrix, evidence pins with staleness detection, and the `docs-complete` validation receipt.
-Two later features depend on its command contracts: 900007 wraps the three commands in MCP tools,
-and 900008 consumes the persisted receipt in a CI workflow and an opt-in hook. The command
-contracts, the receipt contents and the write boundary below are therefore normative for those
-features.
+It is implemented as PowerShell modules under `.claude/lib/docs/` behind the 1020 entry script
+`Invoke-DocsCommand.ps1`, under the epic language rule (pushed-down libs are PowerShell or bash).
+Later features depend on its contracts: 900007 wraps the three subcommands in MCP tools, #1034
+(docs-enforcement-and-ci) consumes the persisted receipt in a workflow and an opt-in hook, and the
+scanner analyzers #1022 and #1033 emit the precision-limit diagnostics this feature records. Those
+contracts are stated in `## Contracts Later Children Must Honor` and are normative.
 
-The naming contract in the epic `## Shared Design` section and the schemas, models and CLI planned
-by #1020 are consumed as written. This specification cites #1020 contracts by file and symbol and
-does not re-specify or re-create them.
+1020 contracts are consumed as written in the 1020 `spec.md` (`## Decisions Later Children Must
+Honor`, module and schema sections) as amended for D3 and D5. This specification cites them by
+module and function and does not re-specify them.
 
 ## Behavior
 
-Add to `packages/docs-runtime/src/drm_copilot_docs/`:
+- `coverage` (read-only): reports totals, undocumented elements, deferred entries, scanner
+  precision limits, stale pages and per-dimension parity scores.
+- `update-ledger` (the only mutating subcommand): one operation per call over the ledger, the parity
+  matrix and the evidence pin collection; dry run by default; `-Write` commits through the single
+  write boundary.
+- `validate`: modes `profile`, `ledger`, `matrix` and `docs-complete`, each including the checks of
+  the modes before it; a required revision; the receipt is always returned in `result` and is
+  persisted only with `-WriteReceipt`, which is permitted only with `-Mode docs-complete`.
 
-- Ledger models and rules (`ledger_models.py`, `ledger_rules.py`): completeness, disposition
-  companions, duplicates, orphans, kind agreement and snapshot reference checks over a
-  `docs-coverage-ledger` document.
-- The parity matrix (`parity_models.py`, `parity_rules.py`, `parity_scoring.py`): row binding,
-  evidence references, `exists` and `owner_assigned` consistency, and integer per-dimension
-  scoring.
-- Evidence pins and staleness (`evidence_pins.py`, `staleness.py`): pin creation from a current
-  snapshot element, pin self-consistency, and digest-based staleness per pin and per page.
-- The receipt (`receipt.py`) and validation (`validation.py`) with modes `profile`, `ledger`,
-  `matrix` and `docs-complete`.
-- A single write boundary (`mutation.py`) modelled on discovery `mutation_io`.
-- A coverage report (`coverage_report.py`).
-- Two file-list refinements accepted from research: `snapshot_view.py` (builds `SurfaceElement`
-  values from a validated `surface-inventory-snapshot` document; #1020 plans no snapshot reader)
-  and `cli_support.py` (shared ports, argument helpers, output envelope and exit-code constants).
-- Three console commands: `dev.docs.coverage` (`cli_coverage.py`), `dev.docs.update-ledger`
-  (`cli_ledger.py`) and `dev.docs.validate` (`cli_validate.py`).
-
-Ledger dispositions are `documented` (requires at least one page binding), `excluded` (requires a
-rationale) and `deferred` (requires an owner and a target). Parity dimensions are `exists`,
-`accurate`, `example_present`, `owner_assigned` and `diataxis_mode`.
-
-Pure cores take in-memory inputs (raw bytes keyed by POSIX relative path, parsed `JsonObject`
-values and #1020 dataclasses). I/O stays in the thin CLI modules and in the local adapter inside
-`mutation.py`. `drm_copilot_discovery` is used as a library: only its generic primitives are
-imported (`findings.Finding`, `FindingCollector`, `ordered_findings`, `finding_key`,
-`validate_finding_path`; `models.canonical_json`, `JsonObject`, `JsonValue`, `ParsedDocument`;
-`parsing.parse_document`; `analyzer.findings.row`, `stable_id`; `revision_rules.is_full_revision`).
-Discovery rule modules (`revision_rules.validate_revisions`, `evidence_rules`, `coverage_rules`,
-`parity_rules`, `mutation_io`) are imitated, not imported, because they are typed on discovery
-snapshots. No discovery file is edited and discovery behavior does not change.
+Ledger dispositions are `documented` (at least one page binding), `excluded` (rationale) and
+`deferred` (owner and target). Parity dimensions are `exists`, `accurate`, `example_present`,
+`owner_assigned` and `diataxis_mode`. Pin states are `current`, `digest-changed` and
+`element-missing`; a page is stale when any of its pins is not `current`. Each ledger entry records
+`analysis_method` (`native` or `scanner`). A scanner precision limit (a construct the PowerShell
+text scanner reports as a diagnostic instead of an element) is recorded as a `deferred` ledger entry
+with an owner and a target (owner decision D3).
 
 ## Inputs / Outputs
 
-- Inputs:
-  - The docs profile (default `docs/documentation-estate/docs-profile.json`, the #1020 default),
-    loaded with `drm_copilot_docs.profile.parse_profile`. JSON, or YAML when the extension is
-    `.yaml` or `.yml`, as #1020 specifies.
-  - The artifacts named by the profile `artifact_paths` (`profile_models.ArtifactPaths`):
-    `inventory_snapshot`, `coverage_ledger`, `parity_matrix`, `evidence_pins`,
-    `validation_receipt`. Artifacts other than the profile are parsed as JSON through
-    `drm_copilot_discovery.parsing.parse_document`.
-  - The page-path set: every file below each `documentation_roots[*].path` of the profile, as
-    sorted POSIX relative paths.
-  - `completion_gates.docs_complete` (`profile_models.DocsCompleteGate`) and `page_owners`
-    (`profile_models.PageOwner`).
-  - CLI arguments listed in `## API / CLI Surface`. No environment variable is read.
+- Inputs (all through the 1020 command context; no environment variable is read):
+  - The docs profile (`-Profile`, default `Get-DocsDefaultProfilePath`,
+    `docs/documentation-estate/docs-profile.json`), loaded with `ConvertFrom-DocsProfileText`.
+    JSON only.
+  - The artifacts named by `artifact_paths`: `inventory_snapshot`, `coverage_ledger`,
+    `parity_matrix`, `evidence_pins`, `validation_receipt`; parsed with `ConvertFrom-DocsJsonText`
+    and validated with `Test-DocsArtifactText` over the composed schema set
+    (`Read-DocsSchemaSet`, `Get-DocsComposedSchemaSet`).
+  - The page-path set: the ordinal-sorted union of `Context.ListFile` over each
+    `documentation_roots[].path`.
+  - `completion_gates.docs_complete.{allow_deferred, max_stale_pages, required_parity_dimensions}`
+    and `page_owners[{path_or_glob, owner}]`.
+  - The clock: `Context.UtcNow` (must have `Kind` `Utc`).
 - Outputs:
-  - Standard output: one result per invocation, in text (default) or JSON (`--format json`).
-  - Standard error: one fixed diagnostic line on a non-zero exit; nothing on exit 0.
-  - Files, written only through `mutation.py`: the ledger, matrix and pin collection
-    (`dev.docs.update-ledger --write`) and the receipt (`dev.docs.validate --write-receipt`).
-    Written bytes are `canonical_json` of the document (sorted keys, compact, LF).
-- Config keys and defaults: all repository specificity is profile data. No new profile field is
-  introduced.
-- Versioning: the artifact shapes are the #1020 schemas at `urn:drm-copilot:docs:1.0.0:<name>`.
-  The CLI output envelope is a Python-level contract asserted by tests (no schema; see open
-  question Q4). With the T2 classification, a breaking change to the envelope, an exit code or a
-  receipt field requires an epic-level update.
+  - Standard output: with `-Json`, one envelope; otherwise `ConvertTo-DocsReportText` lines.
+  - Standard error: one fixed line on exit 3 only (1020 entry boundary).
+  - Files, written only through `Invoke-DocsArtifactWrite` in `DocsLedgerMutation.psm1`: the
+    ledger, matrix and pin collection (`update-ledger -Write`) and the receipt
+    (`validate -Mode docs-complete -WriteReceipt`). Written text is
+    `ConvertTo-DocsJsonText -Value <document> -Indented`; digests and identifiers use
+    `ConvertTo-DocsCanonicalJson`.
+- Versioning: artifact shapes are the 1020 schemas at `urn:drm-copilot:docs:1.0.0:<name>` as
+  amended (ledger `$defs/entry` and snapshot `$defs/element` carry required `analysis_method`;
+  `source_sha256` is the declaration-lines digest). The `-Json` envelope validates against
+  `schemas/docs/v1/docs-command-envelope.schema.json`. No schema file is created or edited by 1023.
 
 ## API / CLI Surface
 
-### Shared CLI conventions (`cli_support.py`)
+### Module conventions
 
-- Console-script wrappers `main_coverage`, `main_update_ledger`, `main_validate` take no
-  arguments, return `int`, and delegate to `run_coverage_cli`, `run_ledger_cli`,
-  `run_validate_cli`, each with signature
-  `(argv: Sequence[str], *, ports: DocsCliPorts, stdout: TextIO, stderr: TextIO) -> int`.
-- `DocsCliPorts` (frozen, `kw_only`): `read_bytes: Callable[[str], bytes]` (raises
-  `FileNotFoundError` for an absent path), `list_pages: Callable[[Sequence[str]], tuple[str, ...]]`
-  (documentation roots to existing relative page paths, sorted), `store: ArtifactStore`
-  (`mutation.py`), `clock: Callable[[], datetime]` (timezone-aware UTC). If the merged #1020
-  `cli.py` port type already provides a reader, `DocsCliPorts` reuses it rather than defining a
-  parallel reader. The installed-ports factory in `cli_support.py` is the only place that
-  constructs `mutation.LocalArtifactStore`.
-- Parsing uses `argparse` (as #1020 `cli.py` does). `SystemExit` raised by parsing is caught and
-  never escapes. A top-level `except Exception` (`# noqa: BLE001`) writes a fixed stderr line and
-  returns 3.
-- Common options on all three commands:
+Inherited from 1020 `### Module conventions`: advanced functions with `[CmdletBinding()]`; the help
+token `imports its siblings with -ErrorAction Stop`; `Set-StrictMode -Version Latest` followed by
+`$ErrorActionPreference = 'Stop'`; only literal `Join-Path -Path $PSScriptRoot -ChildPath
+'<literal>'` sibling imports. Pure functions take strings and hashtables and touch no filesystem,
+clock, process, environment or module-scope mutable state. File and clock access happens only
+through the 1020 command context, whose only write function is `Write-DocsFileText` (exposed as
+`Context.WriteText`). Command modules never print and never call `exit`. Additional 1023 rules:
 
-| Option | Required | Values | Default |
-|---|---|---|---|
-| `--profile <path>` | optional | POSIX relative path (checked with `validate_finding_path`) | `docs/documentation-estate/docs-profile.json` |
-| `--format <format>` | optional | `text`, `json` | `text` |
-| `-h`, `--help` | optional | flag | absent |
+- Context members are passed to `[scriptblock]`-typed parameters and invoked as `& $WriteText`,
+  never as `& $Context.<Member>` (the existing
+  `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` reports a member
+  expression in command position as dynamic invocation).
+- Pure functions whose verb is state-changing (`New-`) carry the
+  `PSUseShouldProcessForStateChangingFunctions` suppression with the justification
+  "Pure in-memory factory that changes no system state." (precedent `New-EpicScopeResult`);
+  transformations use `Merge-`, `Get-`, `Measure-`, `Test-` or `ConvertTo-`.
+- Identifier and path comparisons are ordinal and case-sensitive (`-ceq`, `-cne`,
+  `[StringComparison]::Ordinal`); every sort uses `[System.StringComparer]::Ordinal`.
+- Scores use integer arithmetic only.
 
-- `--help` prints the `argparse` help text to stdout, reads no input, and exits 0.
+### Modules (`.claude/lib/docs/`)
 
-### Exit codes (all three commands)
+| Module | Exported functions (pure unless marked) | Imports (1020 unless named) |
+|---|---|---|
+| `DocsLedger.psm1` | `ConvertTo-DocsSnapshotView`, `Test-DocsPrecisionLimitDiagnostic`, `Get-DocsPrecisionLimitElementId`, `New-DocsLedgerEntry`, `New-DocsPrecisionLimitEntry`, `New-DocsLedgerDocument`, `Get-DocsLedgerEntryCompanionFinding`, `Get-DocsLedgerFinding`, `Merge-DocsLedgerEntry`, `Get-DocsLedgerWithoutEntry`, `Merge-DocsLedgerSnapshotRef` | `DocsJson`, `DocsFinding`, `DocsSurface` |
+| `DocsParity.psm1` | `Get-DocsParityDimension`, `Test-DocsPathOrGlobMatch`, `Get-DocsPageOwner`, `New-DocsParityRow`, `New-DocsParityMatrixDocument`, `Get-DocsMatrixFinding`, `Merge-DocsParityDimension`, `Get-DocsMatrixWithoutBinding`, `Merge-DocsMatrixPinRemoval`, `Merge-DocsMatrixRef`, `Get-DocsScoreBasisPoint`, `Measure-DocsParityScore` | `DocsJson`, `DocsFinding`, `DocsSurface` |
+| `DocsEvidencePins.psm1` | `Get-DocsPinId`, `New-DocsEvidencePin`, `New-DocsPinCollectionDocument`, `Get-DocsPinFinding`, `Merge-DocsEvidencePin`, `Get-DocsPinSetWithoutPin` | `DocsJson`, `DocsFinding`, `DocsSurface` |
+| `DocsStaleness.psm1` | `Get-DocsPinStatus`, `Get-DocsStalePage`, `Get-DocsStalenessFinding` | `DocsFinding`, 1023 `DocsEvidencePins` |
+| `DocsReceipt.psm1` | `ConvertTo-DocsTimestampText`, `Get-DocsWriterVersion`, `Get-DocsArtifactPin`, `Get-DocsReceiptId`, `Measure-DocsReceiptCount`, `New-DocsValidationReceipt`, `Get-DocsReceiptGateDecision` (pure apart from the built-in `Test-Json`) | `DocsJson`, `DocsFinding`, `DocsSchema`, `DocsSurface` |
+| `DocsValidation.psm1` | `Get-DocsValidationMode`, `Get-DocsValidationInputKind`, `Get-DocsCompletionGateFinding`, `Invoke-DocsValidation` (pure apart from `Test-Json`) | `DocsJson`, `DocsFinding`, `DocsSchema`, `DocsProfile`, 1023 `DocsLedger`, `DocsParity`, `DocsEvidencePins`, `DocsStaleness`, `DocsReceipt` |
+| `DocsLedgerMutation.psm1` | `Get-DocsArtifactWritePlan`; `Invoke-DocsArtifactWrite` (not pure: I/O only through its `-ReadBytes`, `-TestFile` and `-WriteText` scriptblock parameters) | `DocsJson`, `DocsFinding`, `DocsSurface` |
+| `DocsLedgerCommands.psm1` | `Invoke-DocsCoverageCommand`, `Invoke-DocsUpdateLedgerCommand`, `Invoke-DocsValidateCommand` (I/O through the context); `Read-DocsLedgerInputSet` (I/O through scriptblock parameters); `Test-DocsUpdateLedgerArgument`, `Test-DocsValidateArgument`, `Get-DocsCoverageReport`, `ConvertTo-DocsCoverageReportLine` (pure) | every 1023 module above, `DocsProfile`, `DocsSchema`, `DocsFinding`, `DocsJson` |
 
-| Code | Meaning |
+No import cycle: `DocsLedgerCommands.psm1` is the only importer of `DocsLedgerMutation.psm1`, which
+imports no 1023 module. Pre-approved splits at the 500-line guidance: `DocsLedgerRules.psm1` (rules
+from `DocsLedger.psm1`) and `DocsCoverageReport.psm1` (coverage report from
+`DocsLedgerCommands.psm1`), each with its own suite, bundle copy and `core.json` line.
+
+Consumed 1020 functions: `ConvertFrom-DocsJsonText`, `ConvertTo-DocsJsonText`,
+`ConvertTo-DocsCanonicalJson`, `Get-DocsSha256Hex`, `Get-DocsBytesSha256Hex`, `New-DocsFinding`,
+`Get-DocsChildPointer`, `Get-DocsOrderedFinding`, `Test-DocsFindingHasError`,
+`New-DocsCommandResult`, `Read-DocsSchemaSet`, `Get-DocsComposedSchemaSet`, `Test-DocsArtifactText`
+(artifact kinds plus `docs-command-envelope`), `Get-DocsElementKind`, `Get-DocsAnalysisMethod`,
+`Test-DocsRelativePath`, `Test-DocsFullRevision`, `Get-DocsStableId`, `Get-DocsElementId`,
+`Test-DocsElementId`, `ConvertFrom-DocsSurfaceElement`, `Get-DocsDefaultProfilePath`,
+`ConvertFrom-DocsProfileText`. Consumed 1020 finding codes: `DOCS_JSON_INVALID`,
+`DOCS_JSON_DUPLICATE_KEY`, `DOCS_JSON_TOO_DEEP`, the `DOCS_SCHEMA_*` codes of the structural walk
+and `DOCS_SCHEMA_INVALID`, `DOCS_PROFILE_*`, `DOCS_ELEMENT_ID_MISMATCH` (surfaced as
+`DOCS_SNAPSHOT_ELEMENT_INVALID`), `DOCS_CLI_ARGUMENTS`, `DOCS_CLI_RUNTIME`, `FINDINGS_LIMIT`.
+
+### Function contracts (summary)
+
+- `ConvertTo-DocsSnapshotView -Snapshot <IDictionary> -SnapshotSha256 <string> [-ArtifactPath]`
+  returns `@{ Repository; Revision; Sha256; Element; PrecisionLimit; Findings }`: `Element` maps
+  `element_id` to each element rebuilt with `ConvertFrom-DocsSurfaceElement` (a rebuild failure is
+  `DOCS_SNAPSHOT_ELEMENT_INVALID` at `/elements/<n>`); `PrecisionLimit` maps the precision-limit
+  element id (below) to `@{ DiagnosticId; AnalyzerId; Code; Path; ElementKind; ElementId }`.
+- `New-DocsLedgerEntry` copies `element_id`, `kind` and `analysis_method` from the current element;
+  page bindings are sorted by `page_path` then `anchor` (null first).
+- `Get-DocsLedgerFinding` implements the ledger rules in `### Finding codes`;
+  `Get-DocsLedgerEntryCompanionFinding` implements the 1020 disposition companion table.
+- `Merge-DocsLedgerEntry` replaces or inserts by `element_id` and returns a new ledger with entries
+  sorted by `element_id`; inputs are never mutated (same for every `Merge-` and `Get-...Without...`
+  function).
+- `Test-DocsPathOrGlobMatch -Path -PathOrGlob` implements the epic rule (1024 decision): a value `E`
+  covers `P` when `P` equals `E`, when `P` starts with `E` + `/`, or when `P` matches `E` as a
+  case-sensitive glob (`*` any run including `/`, `?` one character, `[...]` a class, `[!...]` a
+  negated class, no escape character), translated to an anchored .NET regular expression without
+  `IgnoreCase` (PowerShell `-like` and `[WildcardPattern]` are not used). `Get-DocsPageOwner
+  -PagePath -PageOwner` evaluates `page_owners` in array order; the first match gives the owner.
+- `Get-DocsPinId -ElementId -PagePath -Symbol` is `Get-DocsStableId -Prefix 'pin' -Value
+  [ordered]@{ element_id; page_path; symbol }`. `New-DocsEvidencePin` copies `source_sha256` from
+  the element as an opaque value.
+- `Get-DocsPinStatus -Pin -Element` returns `element-missing` when no current element has the pin's
+  `element_id`, `digest-changed` when the digests differ (ordinal), otherwise `current`. A revision
+  difference never changes the status.
+- `Get-DocsStalePage` returns one record per page with at least one non-current pin,
+  `{page_path, pins: [{pin_id, element_id, status}]}`, sorted by `page_path` then `pin_id`.
+- `ConvertTo-DocsTimestampText -UtcNow <DateTime>` formats `yyyy-MM-dd'T'HH:mm:ss'Z'` with the
+  invariant culture and throws when `Kind` is not `Utc` (exit 3, `DOCS_CLI_RUNTIME`).
+- `Get-DocsScoreBasisPoint -Pass -Fail -NotAssessed` returns
+  `floor(10000 * pass / (pass + fail + not_assessed))`, or `$null` when that denominator is 0.
+- `Get-DocsArtifactWritePlan -Document <object[]>`: each input `@{ Path; ArtifactKind; ArtifactId;
+  Text; BeforeSha256 }`; returns plans sorted by `Path` (ordinal) with `Sha256` of the UTF-8 text
+  bytes and status `planned`, or `skipped` when `Sha256` equals `BeforeSha256`.
+- `Invoke-DocsArtifactWrite -Plan -ReadBytes -TestFile -WriteText [-DryRun]`: with `-DryRun` it
+  calls no scriptblock. Otherwise, in ascending path order and skipping `skipped` plans: when
+  `BeforeSha256` is null, `& $TestFile` must return false, then `& $WriteText <path> <text>
+  'create'` (status `created`); otherwise `& $ReadBytes` and `Get-DocsBytesSha256Hex` must equal
+  `BeforeSha256`, then `& $WriteText <path> <text> 'overwrite'` (status `updated`). A mismatch, or a
+  file present when absence was expected, is status `conflict` and stops the sequence; earlier
+  writes are not rolled back. Returns `@{ Write; Failed; WrittenPath }`.
+
+### Command contract (all three subcommands)
+
+| Exit | Meaning |
 |---|---|
-| `0` | Success or help. `dev.docs.validate`: receipt `validation_result` is `pass`. `dev.docs.update-ledger`: the operation introduced no `error` finding and, with `--write`, every planned write committed. `dev.docs.coverage`: the report was built. |
-| `1` | Findings. `dev.docs.validate`: at least one `error` finding (receipt `validation_result` is `fail`), or the profile does not load. `dev.docs.update-ledger`: the operation would introduce an `error` finding; nothing is written. `dev.docs.coverage`: an input is missing or fails schema or snapshot-element validation, so no report can be built. |
-| `2` | Usage or input error: unknown option, missing option value, missing required option, value outside an enumeration, an option not permitted for the selected operation, `--profile` or `--page` not a POSIX relative path, `--element` outside the `element-id` grammar, `--actor-id` outside the discovery `identifier` grammar, `--revision` failing `is_full_revision`, a repeated `--page` value. No input file is read. |
-| `3` | Internal or I/O error: unreadable profile, a read failure other than an absent artifact, unavailable schema resources, a mutation commit failure (digest precondition conflict or write error), a non-UTC or naive clock value, a built receipt that fails its own schema (defect guard), or any unexpected exception. |
+| 0 | Success or `-Help`; no `error` finding in `findings`. `validate`: receipt `validation_result` `pass`. `update-ledger`: the operation introduces no new `error` finding and, with `-Write`, every planned write committed. `coverage`: report built. |
+| 1 | Findings. `validate`: at least one `error` finding (receipt `fail`), or the profile does not load (`result` null). `update-ledger`: the operation would introduce a new `error` finding, or names a target that does not exist (`DOCS_UPDATE_TARGET_INVALID`); nothing is written. `coverage`: snapshot absent (`DOCS_INPUT_UNREADABLE`) or an input fails parse, schema or element rebuild; `result` null. |
+| 2 | Usage or input error before any read: exactly one `DOCS_CLI_ARGUMENTS` finding; `result` null. |
+| 3 | Internal or I/O error: exactly one `DOCS_CLI_RUNTIME` finding; `result` null; one stderr line. Covers a read failure other than absence, uncomposable schemas, a non-UTC clock, the receipt defect guard, and a commit `conflict` or write failure (the message names the failing path and its status; `related_paths` holds that path and every path already written). |
 
-### Output envelope (`--format json`)
+- `-Json`: one canonical JSON envelope `{command, exit_code, findings, ok, result}`; `command` is the
+  subcommand name (`coverage`, `update-ledger`, `validate`); `ok` is true exactly when `exit_code`
+  is 0; `findings` in `Get-DocsOrderedFinding` order. Identical inputs, arguments and clock produce
+  identical bytes. Every envelope validates through
+  `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'` against
+  `schemas/docs/v1/docs-command-envelope.schema.json`.
+- Without `-Json`: `ConvertTo-DocsReportText` (finding lines, command lines, summary line
+  `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`).
+- Exit codes and the receipt `validation_result` are computed from the unbounded finding set,
+  before `Get-DocsOrderedFinding` applies its bound (risk R2, owner question OQ-3).
+- Value grammars are checked by `Test-DocsUpdateLedgerArgument` and `Test-DocsValidateArgument`
+  before any read: relative paths (`Test-DocsRelativePath`), `-Element` (`Test-DocsElementId`),
+  `-Revision` (`Test-DocsFullRevision`), `-ActorId` and `-Owner` (docs `identifier`), `-Limit`
+  (docs `identifier` with the prefix `diagnostic-`), `-Page` as `<relative path>[#<anchor>]`, and
+  the enumerations listed below. A violation returns exit 2 through `New-DocsCommandResult`.
 
-Standard output receives exactly one document, `canonical_json` of:
+### `coverage` (read-only)
 
-```json
-{"command": "<dev.docs.coverage|dev.docs.update-ledger|dev.docs.validate>", "ok": true, "exit_code": 0, "findings": [], "result": {}}
-```
+Options: `-Profile`. Reads the profile, snapshot, ledger, matrix, pin collection and page-path set;
+an absent ledger, matrix or pin collection is treated as empty. Never passes `WriteText` anywhere.
+On exit 0, `findings` is empty; rule violations are reported by `validate`. `result`:
 
-- `command`: the console command name.
-- `ok`: `true` exactly when `exit_code` is 0.
-- `exit_code`: the process exit code (0, 1, 2 or 3).
-- `findings`: `Finding.to_dict()` values with keys `code`, `severity` (`error`, `warning`,
-  `info`), `artifact_path` (relative path or `null`), `pointer` (RFC 6901), `related_ids`,
-  `related_paths`, `message`, `next_action`. Ordered by `drm_copilot_discovery.findings.finding_key`,
-  deduplicated, and bounded through `FindingCollector` (default limit 100, with the discovery
-  `FINDINGS_LIMIT` marker when truncated). Counts in `result` are computed independently of the
-  bound.
-- `result`: the command-specific object below, or `null` on exit 2, on exit 3, on
-  `dev.docs.coverage` exit 1, and on `dev.docs.validate` exit 1 when the profile does not load.
-- On exit 2, `findings` holds exactly one `DOCS_CLI_ARGUMENTS` finding. On exit 3, `findings`
-  holds exactly one finding: `DOCS_MUTATION_FAILED` for a commit failure (the conflicting path and
-  any paths already written in `related_paths`), otherwise `DOCS_CLI_RUNTIME`.
-- Determinism: with identical inputs, arguments and clock value, the stdout bytes are identical
-  across runs.
+- `totals`: the receipt `counts` object plus `by_analysis_method` `{native, scanner}` over ledger
+  entries matching current elements;
+- `undocumented`: `[{element_id, kind, declaration, path}]` sorted by `element_id`;
+- `deferred`: `[{element_id, owner, target}]` for element entries, sorted by `element_id`;
+- `precision_limits`: `[{element_id, diagnostic_id, analyzer_id, code, path, owner, target,
+  recorded}]` sorted by `element_id`; `recorded` is false (and `owner`, `target` null) when no
+  ledger entry exists;
+- `stale_pages`: `[{page_path, pins: [{pin_id, element_id, status}]}]`;
+- `parity`: per dimension `{pass, fail, not_assessed, not_applicable, score_basis_points}`.
 
-### Text format (`--format text`, default)
-
-- One line per finding, in envelope order:
-  `<severity> <code> <artifact_path><pointer>: <message>` (`<artifact_path>` is omitted when
-  `null`).
-- Command-specific result lines (below), then one summary line:
-  `<command>: exit=<exit_code> errors=<n> warnings=<n> infos=<n>`.
-
-### `dev.docs.coverage` (`cli_coverage.py`, read-only)
-
-Arguments: the common options only.
-
-- Reads the profile, `inventory_snapshot`, `coverage_ledger`, `parity_matrix`, `evidence_pins`
-  and the page-path set. An absent ledger, matrix or pin collection is treated as an empty
-  document (every element undocumented). An absent snapshot yields `DOCS_INPUT_UNREADABLE` and
-  exit 1.
-- Builds `coverage_report.build_coverage_report(...)`. Semantic rule violations are not reported
-  by this command; they are reported by `dev.docs.validate`. On exit 0, `findings` is empty.
-- Never calls the `ArtifactStore`.
-- `result`:
-  - `totals`: the receipt `counts` object (see `### Receipt`).
-  - `undocumented`: `[{element_id, kind, declaration, path}]` for elements without a ledger
-    entry, sorted by `element_id`.
-  - `deferred`: `[{element_id, owner, target}]`, sorted by `element_id`.
-  - `stale_pages`: `[{page_path, pins: [{pin_id, element_id, status}]}]`, sorted by `page_path`
-    then `pin_id`; `status` is `digest-changed` or `element-missing`.
-  - `parity`: one key per parity dimension, each
-    `{pass, fail, not_assessed, not_applicable, score_basis_points}`; integer counts;
-    `score_basis_points` is `floor(10000 * pass / (pass + fail + not_assessed))`, or `null` when
-    that denominator is 0. No floating-point value appears.
-- Text result lines (`coverage_report.render_coverage_text`): a totals block, then
-  `undocumented <element_id> <kind> <declaration>`, `deferred <element_id> <owner> <target>`,
-  `stale <page_path> <pin_id> <status>` and `parity <dimension> <pass>/<fail>/<not_assessed>/<not_applicable> <score>`
-  lines, each group in the order of the JSON arrays.
-
-### `dev.docs.update-ledger` (`cli_ledger.py`, the only mutating ledger command)
-
-| Option | Required | Values | Default |
-|---|---|---|---|
-| `--operation` | required | `set-disposition`, `remove-entry`, `pin`, `unpin`, `set-dimension`, `sync-refs` | none |
-| `--element` | per operation | `element-id` | none |
-| `--disposition` | per operation | `documented`, `excluded`, `deferred` | none |
-| `--page` | per operation; repeatable only for `set-disposition` | `<relative path>[#<anchor>]` | none |
-| `--rationale` | optional where permitted | text | `null` |
-| `--owner` | optional where permitted | identifier | `null` |
-| `--target` | optional where permitted | text | `null` |
-| `--dimension` | per operation | parity dimension | none |
-| `--state` | per operation | `pass`, `fail`, `not-assessed`, `not-applicable` | none |
-| `--claim` | optional where permitted | text | `null` |
-| `--actor-kind` | required | `human`, `agent`, `tool` | none |
-| `--actor-id` | required | identifier | none |
-| `--write` | optional | flag | absent (dry run) |
-| `--profile`, `--format` | optional | as above | as above |
-
-Per-operation argument rules. Any option outside the operation's required and optional sets is a
-usage error (exit 2).
+### `update-ledger` (the only mutating subcommand)
 
 | Operation | Required | Optional | Documents it may change |
 |---|---|---|---|
-| `set-disposition` | `--element`, `--disposition` | `--page` (repeatable), `--rationale`, `--owner`, `--target` | ledger; matrix rows and pins for a removed binding |
-| `remove-entry` | `--element` | none | ledger; matrix rows and pins for that element |
-| `pin` | `--element`, `--page` (one, no anchor) | `--claim` | pin collection |
-| `unpin` | `--element`, `--page` (one, no anchor) | none | pin collection; matrix `evidence_pin_ids` |
-| `set-dimension` | `--element`, `--page` (one, no anchor), `--dimension`, `--state` | `--rationale` | matrix |
-| `sync-refs` | none | none | ledger `snapshot_ref`; matrix `snapshot_ref` and `ledger_ref` |
+| `set-disposition` | `-Element` xor `-Limit`; `-Disposition` | `-Page` (multi), `-Rationale`, `-Owner`, `-Target` | ledger; matrix rows and pins of a dropped binding |
+| `remove-entry` | `-Element` xor `-Limit` | none | ledger; the element's matrix rows and pins |
+| `pin` | `-Element`, one `-Page` without anchor | `-Claim` | pin collection |
+| `unpin` | `-Element`, one `-Page` without anchor | none | pin collection; matrix `evidence_pin_ids` |
+| `set-dimension` | `-Element`, one `-Page` without anchor, `-Dimension`, `-State` | `-Rationale` | matrix |
+| `sync-refs` | none | none | ledger `snapshot_ref` and element-entry `analysis_method`; matrix `snapshot_ref` and `ledger_ref` |
 
-Operation semantics:
+- Every operation requires `-Operation`, `-ActorKind` (`human`, `agent`, `tool`) and `-ActorId`.
+  Enumerations: `-Disposition` (`documented`, `excluded`, `deferred`), `-Dimension` (the five parity
+  dimensions), `-State` (`pass`, `fail`, `not-assessed`, `not-applicable`).
+- Exit 2: an option outside the operation's sets, `-Element` with `-Limit`, `-Limit` with a
+  `-Disposition` other than `deferred`, or a repeated `-Page` value.
+- Dry run is the default and calls no write scriptblock; `-Write` commits through
+  `Invoke-DocsArtifactWrite`. `result` is `{dry_run, preexisting_errors, writes: [{path,
+  artifact_kind, artifact_id, sha256, status}]}` sorted by `path`; `status` is one of `planned`,
+  `created`, `updated`, `skipped`, `conflict`; `preexisting_errors` counts `error` findings present
+  before the operation.
+- Newly-introduced rule: each changed document is validated with `Test-DocsArtifactText` and the
+  1023 rules; the operation fails (exit 1, nothing written) when the resulting `error` findings
+  contain a finding absent before the operation, compared on every field except `pointer`. On exit 1
+  `findings` holds those new errors. Pre-existing errors do not block an operation and are not
+  emitted in `findings` (they are reported by `validate`), so an exit-0 envelope carries only
+  `warning` and `info` findings introduced by the operation.
+- Semantics: `set-disposition` replaces the whole entry (kind and `analysis_method` from the current
+  element) and removes matrix rows and pins for a dropped binding; `remove-entry` removes the entry
+  and the element's rows and pins; `pin` re-pins the same element and page under the same `pin_id`
+  (revision from the snapshot, possibly null; `pinned_at` from the clock); `unpin` removes the pin
+  and its id from every `evidence_pin_ids`; `set-dimension` creates the row when absent (other
+  dimensions `not-assessed`) and derives that dimension's `evidence_pin_ids` from the existing pins
+  for the element and page; `sync-refs` sets `snapshot_ref` to the snapshot bytes digest, refreshes
+  each element entry's `analysis_method` from the current element, and sets the matrix `ledger_ref`
+  to the digest of the ledger text as it will be written. A created document carries the 1020
+  artifact header with `id` = `Get-DocsStableId -Prefix <artifact_kind> -Value @{ repository = <profile
+  repository id> }`; an existing document keeps its `id`.
+- Precision-limit operations: `set-disposition -Limit <diagnostic id> -Disposition deferred -Owner
+  -Target [-Rationale]` writes the entry built by `New-DocsPrecisionLimitEntry` for a precision-limit
+  diagnostic present in the current snapshot; `remove-entry -Limit <diagnostic id>` removes the entry
+  whose marker names that diagnostic. Either target absent is `DOCS_UPDATE_TARGET_INVALID` (exit 1).
+  `pin`, `unpin` and `set-dimension` naming a precision-limit element id are
+  `DOCS_UPDATE_TARGET_INVALID`.
 
-- `set-disposition` replaces the whole entry for the element: `kind` from the current snapshot
-  element, `disposition`, `page_bindings` from `--page` (anchor `null` when absent; sorted by
-  `page_path` then `anchor`), `rationale`, `owner`, `target`, and `updated_by`
-  `{kind: --actor-kind, id: --actor-id}`. Missing companions are not usage errors; they become
-  ledger findings (`DOCS_LEDGER_BINDING_REQUIRED`, `DOCS_LEDGER_RATIONALE_REQUIRED`,
-  `DOCS_LEDGER_OWNER_REQUIRED`, `DOCS_LEDGER_TARGET_REQUIRED`) and exit 1. When the new entry drops
-  a page binding, matrix rows and pins for that element and page are removed in the same write
-  set. An element absent from the snapshot yields `DOCS_LEDGER_ORPHAN_ENTRY` and exit 1.
-- `remove-entry` removes the entry and the element's matrix rows and pins.
-- `pin` builds a pin with `evidence_pins.pin_from_element` from the current snapshot element:
-  `element_id`, `element_kind`, `symbol` (declaration), `source_path`, `source_sha256`, `revision`
-  (snapshot revision, possibly `null`), `claim`, `pinned_at` (clock), `pinned_by` (actor). `pin_id`
-  is `stable_id("pin", row(element_id=..., page_path=..., symbol=...))`, so re-pinning the same
-  element and page replaces the existing pin.
-- `unpin` removes the pin for the element and page and removes its id from every matrix
-  `evidence_pin_ids`.
-- `set-dimension` creates the row for the element and page when absent (other dimensions
-  `not-assessed`, `rationale` `null`, `evidence_pin_ids` empty) and sets the named dimension's
-  `state` and `rationale`; that dimension's `evidence_pin_ids` becomes the sorted ids of pins for
-  the element and page.
-- `sync-refs` sets the ledger and matrix `snapshot_ref` to the current snapshot bytes digest and
-  the matrix `ledger_ref` to the digest of the ledger bytes as they will be written.
-- `remove-entry`, `pin`, `unpin` or `set-dimension` naming an entry, binding, pin or element that
-  does not exist yields `DOCS_UPDATE_TARGET_INVALID` and exit 1.
-- A document created by the command (absent before) carries the #1020 artifact header with `id`
-  `stable_id(<artifact_kind>, row(repository=<profile repository id>))`; an existing document keeps
-  its `id`. Ledger entries are sorted by `element_id`, matrix rows by `element_id` then
-  `page_path`, pins by `pin_id`.
-- Validation before planning: each changed document is validated against its schema
-  (`schema_validation.validate_artifact`) and its rules (`ledger_rules`, `parity_rules`,
-  `evidence_pins.validate_pins`). The operation fails (exit 1, nothing planned or written) when the
-  resulting `error` findings contain a finding absent before the operation; findings are compared
-  on every field except `pointer`. Pre-existing errors, such as missing dispositions for other
-  elements, do not block an operation.
-- Without `--write`, the command plans the writes, makes no `ArtifactStore` write call, and reports
-  each changed document as `planned` and each unchanged one as `skipped`. With `--write`, writes
-  are committed through `mutation.commit_artifact_writes` in ascending path order, stopping at the
-  first failure; earlier writes are not rolled back and are listed in the failure finding.
-- `result`: `{"dry_run": bool, "writes": [{"path", "artifact_kind", "artifact_id", "sha256", "status"}]}`,
-  sorted by `path`; `status` is one of `planned`, `created`, `updated`, `skipped`, `conflict`
-  (the discovery `MutationArtifact` vocabulary).
-- Text result lines: `<status> <artifact_kind> <path> <sha256>` per write.
+### `validate`
 
-### `dev.docs.validate` (`cli_validate.py`)
+- Options: `-Mode` (required: `profile`, `ledger`, `matrix`, `docs-complete`), `-Revision`
+  (required in every mode), `-WriteReceipt` (switch; any mode other than `docs-complete` with
+  `-WriteReceipt` is exit 2), `-Profile`.
 
-| Option | Required | Values | Default |
-|---|---|---|---|
-| `--mode` | required | `profile`, `ledger`, `matrix`, `docs-complete` | none |
-| `--revision` | required | full revision (40 or 64 lowercase hex; `is_full_revision`) | none |
-| `--write-receipt` | optional | flag | absent |
-| `--profile`, `--format` | optional | as above | as above |
-
-- Loads the inputs the mode needs (table in `### Validation modes`) and calls
-  `validation.validate(inputs, *, mode, revision, issued_at, resources=None)`. An absent artifact
-  is omitted from the inputs and reported by the core as `DOCS_INPUT_UNREADABLE`.
-- `result`: the receipt document, emitted on `pass` (exit 0) and on `fail` (exit 1). When the
-  profile does not load, no receipt can be built (the repository identifier is unknown): exit 1,
-  `result` `null`, findings from `parse_profile`.
-- Without `--write-receipt`, the command makes no `ArtifactStore` call in any mode.
-- With `--write-receipt`, after a receipt is built (pass or fail), the receipt is written to
-  `artifact_paths.validation_receipt` through `mutation.commit_artifact_writes`: exclusive create
-  when absent, digest-checked replace when present. The command plans only the
-  `docs-validation-receipt` artifact kind. A commit failure exits 3.
-- Text result lines: `receipt <id> <mode> <validation_result> <revision>`.
-
-### Downstream constraints (binding on 900007 and 900008)
-
-- 900007 `validate_docs_artifacts` invokes `dev.docs.validate --format json` and must not pass
-  `--write-receipt`, so `update_docs_ledger` (mapped onto `dev.docs.update-ledger`) remains the
-  only mutating MCP tool. 900007 `run_docs_coverage` invokes `dev.docs.coverage --format json`.
-- 900008's CI workflow and opt-in hook are the consumers of a persisted receipt: the workflow runs
-  `dev.docs.validate --mode docs-complete --revision <head> --write-receipt`, and the hook reads
-  the file at `artifact_paths.validation_receipt` and allows the gated merge only when `mode` is
-  `docs-complete`, `validation_result` is `pass` and `revision` equals the head revision.
-
-### Validation modes (`validation.py`)
-
-`validate(inputs: ValidationInputs, *, mode: ValidationMode, revision: str, issued_at: datetime,
-resources: Mapping[str, bytes] | None = None) -> ValidationOutcome`; `ValidationInputs` holds raw
-bytes per artifact path plus the page-path set; `ValidationOutcome` holds `receipt: JsonObject`,
-`findings: tuple[Finding, ...]`, `ok: bool`. The function is pure when `resources` is supplied.
-Each mode includes the checks of the modes before it.
-
-| Mode | Inputs read | Checks |
+| Mode | Inputs | Checks (cumulative) |
 |---|---|---|
-| `profile` | profile | `profile.parse_profile` findings. |
-| `ledger` | profile, snapshot, ledger | schema validation of snapshot and ledger; `snapshot_view` element rebuild; `ledger_rules`; `DOCS_REVISION_MISMATCH`. |
-| `matrix` | profile, snapshot, ledger, matrix, pin collection, page-path set | schema validation of matrix and pins; `parity_rules`; pin consistency; staleness as `warning`. |
-| `docs-complete` | same as `matrix` | gate evaluation from `completion_gates.docs_complete`; staleness severity per `max_stale_pages`; `DOCS_PAGE_MISSING`; `DOCS_SNAPSHOT_UNPINNED`. |
+| `profile` | profile | `ConvertFrom-DocsProfileText` findings |
+| `ledger` | plus snapshot, ledger | schema validation; snapshot view; ledger rules including precision-limit rules; `DOCS_REVISION_MISMATCH` |
+| `matrix` | plus matrix, pin collection, page-path set | schema validation; matrix rules; pin consistency; `DOCS_PAGE_STALE` as `warning` |
+| `docs-complete` | as `matrix` | gate from `completion_gates.docs_complete`: `DOCS_SNAPSHOT_UNPINNED`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_PAGE_MISSING`, `DOCS_PAGE_STALE` severity per `max_stale_pages` |
 
-### Finding codes
+- `result` is the receipt on exit 0 and on exit 1 with a loaded profile; otherwise null.
+- `DOCS_REVISION_MISMATCH`: the snapshot revision is non-null and differs from `-Revision`.
+  `DOCS_SNAPSHOT_UNPINNED`: in `docs-complete`, the snapshot revision is null; validation fails
+  closed (D5).
+- Persistence: without `-WriteReceipt`, no write scriptblock is passed in any mode. With
+  `-Mode docs-complete -WriteReceipt`, the receipt (pass or fail) is written to
+  `artifact_paths.validation_receipt` through `Invoke-DocsArtifactWrite` (create when absent,
+  digest-checked overwrite when present); only that artifact kind is planned.
 
-| Code | Severity | Raised by | Condition |
-|---|---|---|---|
-| `SCHEMA_INVALID` | error | `schema_validation.validate_artifact` (#1020) | schema violation |
-| `DOCS_INPUT_UNREADABLE` | error | `validation`, `cli_coverage` | an artifact the mode needs is absent |
-| `DOCS_SNAPSHOT_ELEMENT_INVALID` | error | `snapshot_view` | `SurfaceElement` construction fails (identifier mismatch, parent rule, line range) |
-| `DOCS_LEDGER_MISSING_DISPOSITION` | error | `ledger_rules` | an inventoried element has no entry; message names kind, declaration and element id; `related_ids` holds the element id, `related_paths` its path |
-| `DOCS_LEDGER_DUPLICATE_ENTRY` | error | `ledger_rules` | two entries for one element id |
-| `DOCS_LEDGER_ORPHAN_ENTRY` | error | `ledger_rules` | an entry names an element absent from the snapshot |
-| `DOCS_LEDGER_KIND_MISMATCH` | error | `ledger_rules` | entry `kind` differs from the element kind |
-| `DOCS_LEDGER_BINDING_REQUIRED` | error | `ledger_rules` | `documented` with no page binding |
-| `DOCS_LEDGER_RATIONALE_REQUIRED` | error | `ledger_rules` | `excluded` without rationale text |
-| `DOCS_LEDGER_OWNER_REQUIRED` | error | `ledger_rules` | `deferred` without owner |
-| `DOCS_LEDGER_TARGET_REQUIRED` | error | `ledger_rules` | `deferred` without target |
-| `DOCS_LEDGER_SNAPSHOT_REF` | warning | `ledger_rules` | `snapshot_ref.sha256` differs from the current snapshot bytes digest |
-| `DOCS_MATRIX_LEDGER_REF` | warning | `parity_rules` | `ledger_ref.sha256` differs from the current ledger bytes digest |
-| `DOCS_MATRIX_UNBOUND_ROW` | error | `parity_rules` | a row whose element is not `documented` with a binding to `page_path` |
-| `DOCS_MATRIX_ROW_MISSING` | error | `parity_rules` | a documented binding has no row |
-| `DOCS_MATRIX_DUPLICATE_ROW` | error | `parity_rules` | two rows for one element and page |
-| `DOCS_MATRIX_PIN_UNKNOWN` | error | `parity_rules` | `evidence_pin_ids` names an absent pin or a pin for another element or page |
-| `DOCS_MATRIX_ACCURACY_UNPINNED` | error | `parity_rules` | `accurate` is `pass` with no evidence pin |
-| `DOCS_MATRIX_EXISTS_INCONSISTENT` | error | `parity_rules` | `exists` is `pass` but the page path is not in the page-path set |
-| `DOCS_MATRIX_OWNER_INCONSISTENT` | error | `parity_rules` | `owner_assigned` is `pass` but no `page_owners` entry matches (`fnmatch.fnmatchcase`) |
-| `DOCS_PIN_INCONSISTENT` | error | `evidence_pins` | pin identity fields do not reproduce `element_id`, or `pin_id` differs from its derivation |
-| `DOCS_PAGE_STALE` | warning in `matrix`; in `docs-complete` error when the stale-page count exceeds `max_stale_pages`, otherwise warning | `staleness` | one finding per stale page; message names the page path and, per non-current pin, the element declaration, element id and status; `related_paths` holds the page path, `related_ids` the element and pin ids |
-| `DOCS_PAGE_MISSING` | error | `validation` (`docs-complete`) | a bound page path is not in the page-path set |
-| `DOCS_DEFERRED_NOT_ALLOWED` | error | `validation` (`docs-complete`) | a `deferred` entry while `allow_deferred` is false |
-| `DOCS_PARITY_REQUIRED_DIMENSION` | error | `validation` (`docs-complete`) | a required dimension is `fail` or `not-assessed` for a documented binding (`pass` and `not-applicable` satisfy it) |
-| `DOCS_REVISION_MISMATCH` | error | `validation` | snapshot `revision` is non-null and differs from `--revision` |
-| `DOCS_SNAPSHOT_UNPINNED` | error | `validation` (`docs-complete`) | snapshot `revision` is `null` (assumption A-1) |
-| `DOCS_UPDATE_TARGET_INVALID` | error | `cli_ledger` | the operation names an entry, binding, pin or element that does not exist |
-| `DOCS_CLI_ARGUMENTS` | error | `cli_support` | usage or input error (exit 2) |
-| `DOCS_CLI_RUNTIME` | error | `cli_support` | internal or I/O error (exit 3) |
-| `DOCS_MUTATION_FAILED` | error | `cli_support` | a commit failure (exit 3) |
-
-### Staleness (`evidence_pins.py`, `staleness.py`)
-
-- `staleness.assess_pin(pin, *, elements)` compares one pin with the current snapshot elements
-  indexed by `element_id` and returns exactly one status:
-  - `element-missing`: no current element has the pin's `element_id` (a rename, move or
-    declaration change lands here, because the identifier derives from kind, path and
-    declaration).
-  - `digest-changed`: the element exists and `pin.source_sha256 != element.source_sha256`.
-  - `current`: the element exists and the digests are equal.
-- A page is stale exactly when at least one pin with that `page_path` is not `current`.
-  `stale_pages` returns one record per stale page, sorted by `page_path`.
-- Staleness is digest-based only. A revision difference between a pin and the snapshot never marks
-  a page stale; no remote freshness is inferred (imitating discovery `revision_rules`).
-- The digest is compared for equality only and is treated as opaque, so the behavior does not
-  depend on how 900003 and 900004 define element `source_sha256` (open question Q1).
-- A `current` pin proves only that the pinned declaration digest is unchanged; prose accuracy is
-  the matrix `accurate` dimension, judged by the reviewer role (epic non-goal).
-
-### Receipt (`receipt.py`)
-
-The receipt is a `docs-validation-receipt` document as planned by #1020. Every field:
+### Receipt (`docs-validation-receipt`)
 
 | Field | Value |
 |---|---|
-| `$schema` | `schema_validation.docs_schema_id("docs-validation-receipt")` |
-| `schema_version` | `"1.0.0"` |
-| `artifact_kind` | `"docs-validation-receipt"` |
-| `id` | `receipt_identifier(...)` = `stable_id("docs-validation-receipt", row(mode=..., repository=..., revision=..., inputs=..., validation_result=...))`; `issued_at`, `counts`, `findings` and `writer` are excluded, so the identity is independent of the issue time |
-| `extensions` | the empty value permitted by discovery `common` `extensions` |
-| `mode` | the `--mode` value |
-| `repository` | the profile `repository.id` |
-| `revision` | the validated `--revision` value (the pinned revision; never `null`) |
-| `inputs` | one `artifact-pin` (`artifact_kind`, `path`, `sha256`) per artifact read, `sha256` from `ParsedDocument.source_sha256` of the raw bytes; sorted by `artifact_kind` then `path`; an absent artifact is not pinned |
-| `counts.elements_total` | number of snapshot elements (0 in `profile` mode) |
-| `counts.undocumented` | number of snapshot elements without a ledger entry (0 in `profile` mode) |
-| `counts.stale_pages` | number of stale pages (0 in `profile` and `ledger` modes) |
-| `counts.by_disposition` | entries matching current elements, keyed by exactly the three dispositions |
-| `counts.by_kind` | snapshot elements keyed by exactly the six element kinds |
-| `validation_result` | `fail` when any `error` finding exists (evaluated before the findings bound), otherwise `pass` |
-| `findings` | `Finding.to_dict()` values, deduplicated, ordered by `finding_key`, bounded as in the envelope |
-| `issued_at` | the injected clock value, UTC `date-time` |
-| `writer` | `{tool: "drm-copilot-docs", version: drm_copilot_docs.__version__}` |
+| header | `$schema` and `artifact_kind` per 1020; `schema_version` `1.0.0`; `extensions` empty object |
+| `id` | `Get-DocsReceiptId`: `Get-DocsStableId -Prefix 'docs-validation-receipt' -Value [ordered]@{ inputs; mode; repository; revision; validation_result }`; `issued_at`, `counts`, `findings` and `writer` are excluded, so the identifier does not depend on the issue time |
+| `mode`, `repository`, `revision` | the `-Mode` value, profile `repository.id`, the `-Revision` value (never null) |
+| `inputs` | one `artifact-pin` per artifact read (`sha256` = `Get-DocsBytesSha256Hex` of the raw bytes), sorted by `artifact_kind` then `path`; an absent artifact is not pinned |
+| `counts` | `elements_total`, `undocumented`, `stale_pages`; `by_disposition` over entries matching current elements (precision-limit entries excluded, OQ-5); `by_kind` over snapshot elements; zeros where the mode reads no such input |
+| `validation_result` | `fail` when the unbounded finding set has an `error` finding, otherwise `pass` |
+| `findings` | the ordered finding set (bound per OQ-3) |
+| `issued_at` | `ConvertTo-DocsTimestampText` of `Context.UtcNow` |
+| `writer` | `{tool: "drm-copilot-docs", version: Get-DocsWriterVersion}` (`1.0.0`) |
 
-Every built receipt is validated with
-`validate_artifact(..., artifact_kind="docs-validation-receipt")` before it is returned; a failure
-is a defect guard (exit 3). The receipt is always printed in `result`; it is persisted only with
-`--write-receipt`, through `mutation.py`.
+Every built receipt is validated with `Test-DocsArtifactText -ArtifactKind
+'docs-validation-receipt'`; a failure is a defect guard (exit 3, `DOCS_CLI_RUNTIME`).
 
-### Write boundary (`mutation.py`)
+`Get-DocsReceiptGateDecision -ReceiptText <string> -HeadRevision <string> -ComposedSchemaSet
+<IDictionary>` returns `@{ Allow; Reason; ReceiptId }` with reasons in fixed precedence:
+`receipt-invalid` (parse or schema finding), `mode-not-docs-complete`, `result-fail`,
+`revision-mismatch` (ordinal comparison), else `Allow` true with `Reason` `pass`. An absent receipt
+file is the caller's `receipt-missing`.
 
-- `ArtifactStore` (`typing.Protocol`): `read(path) -> bytes | None`,
-  `create_exclusive(path, data) -> None`, `replace_if_digest(path, data, *, expected_sha256) -> None`.
-- `PlannedArtifactWrite`, `ArtifactWriteResult`, `MutationOutcome`;
-  `plan_artifact_writes(...)` (pure) and
-  `commit_artifact_writes(plans, *, store: ArtifactStore, dry_run: bool = True) -> MutationOutcome`.
-- A new file is created exclusively; an existing file is replaced only when its current digest
-  equals the digest read at planning time, otherwise the status is `conflict` and the command
-  exits 3 with `DOCS_MUTATION_FAILED`.
-- `LocalArtifactStore`: `os.open` with `O_CREAT | O_EXCL` for create; a staged sibling file plus
-  `os.replace` after a digest re-check for replace; paths must pass `validate_finding_path` and
-  are resolved against the current working directory.
-- `mutation.py` is the only module of this feature containing a filesystem write primitive.
-  `commit_artifact_writes` is referenced only from `cli_ledger.py` and `cli_validate.py`.
-  `ledger_to_json`, `matrix_to_json` and `pins_to_json` are referenced, outside their defining
-  modules and their tests, only from `cli_ledger.py` (and `coverage_report.py` is read-only).
+### Scanner precision limits (D3)
+
+A precision-limit diagnostic is a snapshot `diagnostics[]` item that satisfies all of:
+
+1. its `extensions` contains the key `docs.precision-limit` whose value is an object with
+   `element_kind` set to one of the element kinds;
+2. its `path` is a non-null relative path;
+3. its `analyzer_id` names a snapshot `analyzers[]` item whose `analysis_method` is `scanner`.
+
+A diagnostic with the key but failing rule 1 (value), 2 or 3 yields `DOCS_SNAPSHOT_LIMIT_INVALID`
+(error, `ledger` mode and above). Diagnostics without the key are not read by 1023.
+
+Precision-limit element id (`Get-DocsPrecisionLimitElementId`): `Get-DocsElementId -Kind
+<element_kind> -Path <diagnostic path> -Declaration <diagnostic id>`, that is `<kind>-<sha256>` over
+canonical `{declaration, kind, path}` with the diagnostic identity as the declaration. The id
+satisfies the `element-id` grammar. Because the diagnostic `id` is `Get-DocsStableId -Prefix
+'diagnostic' -Value @{ analyzer; code; path }` (1020 `New-DocsDiagnostic`), one entry covers every
+construct with that analyzer and code in that file. A precision-limit element id equal to a
+snapshot element id is `DOCS_SNAPSHOT_LIMIT_INVALID`.
+
+The ledger entry (`New-DocsPrecisionLimitEntry`) uses the existing closed `$defs/entry` shape:
+`element_id` (the precision-limit element id), `kind` (`element_kind`), `analysis_method`
+`scanner`, `disposition` `deferred`, `page_bindings` empty, `rationale` (text or null), `owner` and
+`target` (required by the 1020 companion rules), `updated_by`, and `extensions` holding
+`docs.precision-limit` = `{analyzer_id, code, diagnostic_id}`. The `extensions` definition copied
+into docs common from `schemas/discovery/v2/common.schema.json` admits this marker: the key matches
+`^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$` and the value is a `json-value` object. Its `description`
+annotation ("never merged into core IDs, claims, gates, references or dimensions") is the subject of
+owner question OQ-2.
+
+`docs-complete` treats precision-limit entries exactly as deferred entries:
+`completion_gates.docs_complete.allow_deferred` true passes them and lists them in `coverage`;
+false yields one `DOCS_DEFERRED_NOT_ALLOWED` per entry (risk R6).
+
+### Finding codes
+
+| Code | Severity | Owner function | Condition |
+|---|---|---|---|
+| 1020 `DOCS_JSON_*`, `DOCS_SCHEMA_*`, `DOCS_PROFILE_*` | error | 1020 | Parse, schema and profile findings |
+| `DOCS_INPUT_UNREADABLE` | error | `Invoke-DocsValidation`, `Invoke-DocsCoverageCommand` | An artifact the mode needs is absent |
+| `DOCS_SNAPSHOT_ELEMENT_INVALID` | error | `ConvertTo-DocsSnapshotView` | Element rebuild fails |
+| `DOCS_SNAPSHOT_LIMIT_INVALID` | error | `ConvertTo-DocsSnapshotView` | Malformed precision-limit marker, null path, non-scanner analyzer, or id collision |
+| `DOCS_LEDGER_MISSING_DISPOSITION` | error | `Get-DocsLedgerFinding` | Element without entry; message names kind, declaration and element id; `related_ids` the element id, `related_paths` its path |
+| `DOCS_LEDGER_DUPLICATE_ENTRY`, `DOCS_LEDGER_ORPHAN_ENTRY`, `DOCS_LEDGER_KIND_MISMATCH` | error | `Get-DocsLedgerFinding` | Two entries for one id; entry for an id that is neither a current element nor a current precision limit and carries no marker; entry `kind` differs |
+| `DOCS_LEDGER_BINDING_REQUIRED`, `DOCS_LEDGER_RATIONALE_REQUIRED`, `DOCS_LEDGER_OWNER_REQUIRED`, `DOCS_LEDGER_TARGET_REQUIRED` | error | `Get-DocsLedgerEntryCompanionFinding` | Companion rules |
+| `DOCS_LEDGER_SNAPSHOT_REF` | warning | `Get-DocsLedgerFinding` | `snapshot_ref.sha256` differs from the snapshot bytes digest |
+| `DOCS_LEDGER_ANALYSIS_METHOD_CHANGED` | warning | `Get-DocsLedgerFinding` | Element entry `analysis_method` differs from the current element (not a coverage or staleness event) |
+| `DOCS_LEDGER_LIMIT_UNRECORDED` | error | `Get-DocsLedgerFinding` | Precision-limit diagnostic without an entry; message names analyzer, code, path, diagnostic id and element id |
+| `DOCS_LEDGER_LIMIT_MISMATCH` | error | `Get-DocsLedgerFinding` | Entry for a precision-limit id that is not `deferred`, not `scanner`, lacks the marker, or whose marker differs from the diagnostic |
+| `DOCS_LEDGER_LIMIT_RESOLVED` | warning | `Get-DocsLedgerFinding` | Entry with a marker whose diagnostic is absent from the snapshot |
+| `DOCS_MATRIX_LEDGER_REF` | warning | `Get-DocsMatrixFinding` | `ledger_ref.sha256` differs |
+| `DOCS_MATRIX_UNBOUND_ROW`, `DOCS_MATRIX_ROW_MISSING`, `DOCS_MATRIX_DUPLICATE_ROW`, `DOCS_MATRIX_PIN_UNKNOWN`, `DOCS_MATRIX_ACCURACY_UNPINNED`, `DOCS_MATRIX_EXISTS_INCONSISTENT`, `DOCS_MATRIX_OWNER_INCONSISTENT` | error | `Get-DocsMatrixFinding` | Row not bound by a documented entry; documented binding without row; duplicate row; unknown or foreign pin id; `accurate` `pass` without pin; `exists` `pass` for a page outside the page-path set; `owner_assigned` `pass` with no `Get-DocsPageOwner` match |
+| `DOCS_PIN_INCONSISTENT` | error | `Get-DocsPinFinding` | Pin identity fields do not reproduce `element_id`, `pin_id` differs from `Get-DocsPinId`, or duplicate `pin_id` |
+| `DOCS_PAGE_STALE` | warning in `matrix`; in `docs-complete` error when stale pages exceed `max_stale_pages`, otherwise warning | `Get-DocsStalenessFinding` | One per stale page; message names the page path and, per non-current pin, the declaration, element id and status |
+| `DOCS_PAGE_MISSING`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_SNAPSHOT_UNPINNED` | error | `Get-DocsCompletionGateFinding` | Bound page outside the page-path set; deferred entry with `allow_deferred` false; required dimension `fail` or `not-assessed`; null snapshot revision |
+| `DOCS_REVISION_MISMATCH` | error | `Invoke-DocsValidation` | Non-null snapshot revision differs from `-Revision` |
+| `DOCS_UPDATE_TARGET_INVALID` | error | `Invoke-DocsUpdateLedgerCommand` | Named entry, binding, pin, element or precision limit absent |
+| `DOCS_CLI_ARGUMENTS` | error (exit 2) | 1020 parser, `Test-DocsUpdateLedgerArgument`, `Test-DocsValidateArgument` | Usage error |
+| `DOCS_CLI_RUNTIME` | error (exit 3) | 1020 entry boundary, `DocsLedgerCommands.psm1` | Internal or I/O error, including commit conflict and the receipt defect guard |
+
+### Dispatch rows (`Invoke-DocsCommand.ps1`)
+
+Inserted directly under the existing anchor `# --- 1023: coverage, update-ledger, validate ---` in
+the 1020 row form; no other line of the entry script changes, and the bundle copy receives the same
+edit:
+
+```powershell
+    # --- 1023: coverage, update-ledger, validate ---
+    [pscustomobject]@{ Name = 'coverage'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsCoverageCommand'; Option = @{ Profile = 'value' } }
+    [pscustomobject]@{ Name = 'update-ledger'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsUpdateLedgerCommand'; Option = @{ Profile = 'value'; Operation = 'value'; Element = 'value'; Limit = 'value'; Disposition = 'value'; Page = 'multi'; Rationale = 'value'; Owner = 'value'; Target = 'value'; Dimension = 'value'; State = 'value'; Claim = 'value'; ActorKind = 'value'; ActorId = 'value'; Write = 'switch' } }
+    [pscustomobject]@{ Name = 'validate'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsValidateCommand'; Option = @{ Profile = 'value'; Mode = 'value'; Revision = 'value'; WriteReceipt = 'switch' } }
+```
+
+Each row passes `Test-DocsCommandTable`. The literal join lets the existing dependency-closure test
+see `DocsLedgerCommands.psm1`.
 
 ## Data & State
 
-- Data transformations and invariants:
-  - Ledger completeness is exact-once accounting: each snapshot element has exactly one entry.
-  - Element identity is `surface_models.element_identifier` (#1020); a pin is self-consistent
-    when `element_identifier(kind=element_kind, path=source_path, declaration=symbol)` equals its
-    `element_id`.
-  - All ordering is deterministic: entries and elements by `element_id`, rows by `element_id`
-    then `page_path`, pins by `pin_id`, findings by `finding_key`, receipt inputs by
-    `artifact_kind` then `path`.
-  - Serialization of every written artifact and of the JSON envelope is `canonical_json`.
-  - Framework code contains no consumer identifier; repository specificity is profile data.
+- Ledger completeness is exact-once accounting over snapshot elements and precision-limit
+  diagnostics: each has exactly one entry.
+- Element identity is `Get-DocsElementId`; a pin is self-consistent when
+  `Get-DocsElementId -Kind element_kind -Path source_path -Declaration symbol` equals its
+  `element_id`. `analysis_method` does not participate in any identifier.
+- Ordering is deterministic and ordinal: entries and elements by `element_id`, rows by `element_id`
+  then `page_path`, pins by `pin_id`, findings by `Get-DocsOrderedFinding`, receipt inputs by
+  `artifact_kind` then `path`, plans by `path`.
+- Staleness is digest-based only (opaque comparison of `source_sha256`); a `current` pin proves only
+  that the pinned declaration lines are unchanged. Prose accuracy is the `accurate` dimension.
 - Persistence: ledger, matrix and pin collection at their `artifact_paths`, written only by
-  `dev.docs.update-ledger --write`; receipt at `artifact_paths.validation_receipt`, written only by
-  `dev.docs.validate --write-receipt`. Both go through `mutation.py`.
-- Caching: none beyond the #1020 schema registry cache.
-- Migration or backfill: none. Absent ledger, matrix or pin documents are created on first write.
+  `update-ledger -Write`; receipt at `artifact_paths.validation_receipt`, written only by
+  `validate -Mode docs-complete -WriteReceipt`; both through `Invoke-DocsArtifactWrite`.
+- No module-scope cache; schemas are read and composed once per invocation. No migration; absent
+  documents are created on first write. Framework code contains no consumer identifier.
 
-## Assumptions and Open Questions
+## Contracts Later Children Must Honor
 
-- **A-1 (assumption pending owner confirmation).** `docs-complete` fails closed when the snapshot
-  `revision` is `null` (working-copy snapshot), with `DOCS_SNAPSHOT_UNPINNED`, so a receipt never
-  claims a revision its snapshot did not capture. The rule is isolated to `validation.py`.
-- **A-2 (assumption).** Persisting the receipt requires `--write-receipt`; 900007 does not pass
-  it. Flagged for epic confirmation by research.
-- **Q1 (epic-level open question).** Meaning of snapshot element `source_sha256`: whole-file
-  digest or declaration digest. Research recommends the SHA-256 of the declaration's source span
-  (the bytes of the `line_range` lines) when `line_range` is not `null`, otherwise the file digest.
-  900003 and 900004 populate the field. 900005 compares whatever digest the snapshot records, so
-  its code is independent of the choice; only fixture meaning and documentation change. A
-  whole-file digest would mark every pinned page for a file stale on any edit to that file.
-- **Q2.** The receipt cannot bind page bytes: `artifact-pin.artifact_kind` admits only the six docs
-  artifact kinds. Page existence is checked (`DOCS_PAGE_MISSING`); page content is not pinned.
-  Report-only gap unless the epic requires page binding.
-- **Q3.** After #1020 merges: the exact name of its CLI port type, and whether
-  `test_root_pyproject_registers_docs_console_scripts` and
-  `test_package_pyproject_matches_runtime_contract` assert presence or exact sets. The plan's
-  first phase records both.
-- **Q4.** Whether a `docs-command-result` schema for the envelope is wanted; it would be a
-  #1020-family change. Currently a Python-level contract.
-- **Decisions made in this specification (beyond research), for review:** matrix rows and pins for
-  a dropped binding are removed by `set-disposition` and `remove-entry`; `set-dimension` derives
-  `evidence_pin_ids` from existing pins; a newly created artifact's `id` is
-  `stable_id(<artifact_kind>, row(repository=...))`; `dev.docs.coverage` treats an absent ledger,
-  matrix or pin collection as empty; the page-path set is every file below the documentation
-  roots; an update fails only on a newly introduced `error` finding.
+### 900007 (docs-mcp-tools; TypeScript wrappers)
 
-## Constraints & Risks
+- Invocation: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command <name> -Json
+  <options>` with the workspace root as working directory; the wrapper parses the envelope and
+  returns `exit_code`, `findings` and `result` unchanged; no logic beyond argument mapping.
+- `run_docs_coverage` maps to `-Command coverage -Json [-Profile <p>]`; read-only.
+- `update_docs_ledger` maps to `-Command update-ledger -Json -Operation <op> -ActorKind <k>
+  -ActorId <id> [-Element <id> | -Limit <diagnostic id>] [-Disposition <d>] [-Page <p> ...]
+  [-Rationale <t>] [-Owner <id>] [-Target <t>] [-Dimension <d>] [-State <s>] [-Claim <t>]
+  [-Write]`; the only mutating tool.
+- `validate_docs_artifacts` maps to `-Command validate -Json -Mode <m> -Revision <rev>
+  [-Profile <p>]` and never passes `-WriteReceipt`, so it is read-only in every mode.
+- Pre-process input validation mirrors the grammars and enumerations of `### Command contract`,
+  `### update-ledger` and `### validate`. Jest tests may validate captured envelopes against
+  `schemas/docs/v1/docs-command-envelope.schema.json`.
 
-- Dependency: execution happens after #1020 merges into
-  `epic/documentation-estate-tooling-integration`. #1020 symbols, schema fields and test names may
-  change during its execution; the plan's first phase re-reads the merged `surface_models.py`,
-  `profile_models.py`, `profile.py`, `schema_validation.py`, `cli.py`, the docs schemas and
-  `tests/docs_runtime/test_docs_package_contract.py`, and records any renamed symbol before code is
-  written. A changed schema field is an epic-level change, not a local divergence.
-- Reliance on provisional assumption A5 (package `packages/docs-runtime`, import
-  `drm_copilot_docs`) and A6 (MCP tools in 900007 only). If A5 changes, every module path here
-  changes.
-- Append-only conflicts in `[tool.poetry.scripts]` of the root and package `pyproject.toml` with
-  900002, 900003, 900006 and 900008; resolved in the later child's remediation loop.
-- Domain-neutral code: no consumer identifier in source; the #1020 neutrality test scans the new
-  modules automatically.
-- Tests create no temporary files. `LocalArtifactStore` is tested by monkeypatching `os.open`,
-  `os.write`, `os.fsync`, `os.close`, `os.replace` and `os.unlink`, as
-  `tests/discovery_runtime/test_mutation_filesystem.py` does.
-- Finding volume: `FindingCollector` truncates at 100 findings; receipt counts stay exact.
-- Batch budget: more than three non-test production Python files are created, so execution runs on
-  the large route in the item worktree that holds the orchestration checkpoint.
-- File size: `validation.py`, `parity_rules.py` and `cli_ledger.py` are the largest candidates;
-  growth goes into a new module with its own test file before 500 lines.
+### #1034 (docs-enforcement-and-ci; workflow and opt-in hook)
+
+- Workflow command: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command validate
+  -Mode docs-complete -Revision <revision> -WriteReceipt -Json`; exit 0 means `pass`, exit 1 means
+  `fail` (the receipt is still persisted when the profile loads).
+- Receipt path: the profile (default `docs/documentation-estate/docs-profile.json`, read through
+  `ConvertFrom-DocsProfileText`) field `artifact_paths.validation_receipt`.
+- Decision: the hook imports `DocsReceipt.psm1` and `DocsSchema.psm1` with literal joins, composes
+  the schema set, and calls `Get-DocsReceiptGateDecision -ReceiptText -HeadRevision
+  -ComposedSchemaSet`. It allows only when `Allow` is true. Fields read: `artifact_kind`, `mode`,
+  `validation_result`, `revision`, `id`.
+- Revision pin: `revision` compared ordinally with the revision the hook supplies; which revision
+  that is for a receipt committed to the branch is owner question OQ-4.
+- Deny reasons (deny text names one): `receipt-missing` (file absent; decided by the hook),
+  `receipt-invalid`, `mode-not-docs-complete`, `result-fail`, `revision-mismatch`.
+
+### #1022 and #1033 (PowerShell scanners) for precision-limit diagnostics
+
+For each construct the scanner cannot classify within its precision limit, the scanner emits a
+docs `diagnostic` (1020 `New-DocsDiagnostic`) with:
+
+- `analyzer_id` equal to its registered identifier, whose snapshot `analyzers[]` item carries
+  `analysis_method: scanner`;
+- `path` the relative path of the input file (never null);
+- `code` a stable code per construct class (the scanner's choice);
+- `extensions` containing `"docs.precision-limit": {"element_kind": "<element kind>"}`, where the
+  kind is the element kind the scanner would have emitted had it classified the construct.
+
+Diagnostics for other conditions (oversize or undecodable input, environment files) do not carry
+the key. #1031 (Python-native analyzer) emits elements, not precision-limit diagnostics; when it
+classifies a construct, the corresponding entry is reported as `DOCS_LEDGER_LIMIT_RESOLVED`.
+
+### #1024 (docs-reference-generator)
+
+Path matching for `path_or_glob` uses `Test-DocsPathOrGlobMatch` and `Get-DocsPageOwner` from
+`DocsParity.psm1` unless OQ-1 moves them into 1020.
+
+## Artifact Classification
+
+Rules: R1 = epic language rule clause (1) (pushed-down skills, helpers, hooks and libs are PowerShell
+or bash); D = epic `### Artifact classes for this epic` (schema/config/data, test and documentation
+rows). "Avoid new Python" applies to every row. B =
+`extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`.
+
+| File | Change | Class | Language | Permitting rule |
+|---|---|---|---|---|
+| `.claude/lib/docs/DocsLedger.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsParity.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsEvidencePins.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsStaleness.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsReceipt.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsValidation.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsLedgerMutation.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsLedgerCommands.psm1` | create | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/Invoke-DocsCommand.ps1` | edit (three rows under the 1023 anchor) | pushed-down helper/lib (entry) | PowerShell | R1 |
+| B`DocsLedger.psm1`, B`DocsParity.psm1`, B`DocsEvidencePins.psm1`, B`DocsStaleness.psm1`, B`DocsReceipt.psm1`, B`DocsValidation.psm1`, B`DocsLedgerMutation.psm1`, B`DocsLedgerCommands.psm1` | create (byte-identical) | pushed-down helper/lib (mirror) | PowerShell | R1 |
+| B`Invoke-DocsCommand.ps1` | edit (same three rows) | pushed-down helper/lib (mirror) | PowerShell | R1 |
+| `.claude/lib/docs/DocsLedgerRules.psm1`, `.claude/lib/docs/DocsCoverageReport.psm1` and their B copies | create only if the pre-approved split is used | pushed-down helper/lib | PowerShell | R1 |
+| `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` | edit (one `paths` line per new `.claude/lib/docs/` file) | schema/config/data | JSON | D |
+| `tests/scripts/claude-lib/docs/DocsLedger.Tests.ps1`, `DocsParity.Tests.ps1`, `DocsEvidencePins.Tests.ps1`, `DocsStaleness.Tests.ps1`, `DocsReceipt.Tests.ps1`, `DocsValidation.Tests.ps1`, `DocsLedgerMutation.Tests.ps1`, `DocsLedgerCommands.Tests.ps1`, `DocsWriteBoundary.Tests.ps1`, `DocsCompleteIntegration.Tests.ps1`, property suites, `DocsLedger.TestSupport.psm1` | create | test | PowerShell (Pester) | D |
+| `docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023/**` | create / edit | documentation | Markdown | D |
+
+No hook, skill, agent, MCP tool, extension command, schema, Python or TypeScript file is created or
+edited by 1023, and `quality-tiers.yml` is not edited (1020 classifies `.claude/lib/docs` as T3).
+Every artifact follows the language rule; no language owner question arises.
+
+## Owner Questions
+
+None is decided beyond its provisional default.
+
+1. **OQ-1 - Ownership of path matching.** `Test-DocsPathOrGlobMatch` and `Get-DocsPageOwner`
+   implement the epic rule shared by 1023 and 1024. Provisional default: 1023 owns them in
+   `DocsParity.psm1`, and 1024 imports `DocsParity.psm1` (a 1024-on-1023 dependency within the
+   existing wave order). Alternative: move both into a 1020 module (a further 1020 amendment) so that
+   1024 does not import a 1023 module.
+2. **OQ-2 - Precision-limit marker in `extensions`.** The docs common `extensions` definition admits
+   the `docs.precision-limit` key structurally, but its `description` annotation states that
+   namespaced data is never merged into core identifiers or gates. This design derives the
+   precision-limit element id from the marker's `element_kind` and uses the marker to identify
+   diagnostics for the completeness rule. Provisional default: proceed (the annotation is not a
+   validation keyword, and the 1020 amendment states no further schema change is needed for D3).
+   Alternative: a 1020 amendment adds core diagnostic fields (for example `element_kind` and a
+   precision-limit flag).
+3. **OQ-3 - `FINDINGS_LIMIT` severity (1020 contract).** 1020 `Get-DocsOrderedFinding` appends a
+   `FINDINGS_LIMIT` finding with severity `error` when more than 100 findings exist. A passing
+   validation with more than 100 warnings (for example many `DOCS_PAGE_STALE` warnings under
+   `max_stale_pages`) would then place an `error` finding into a `pass` receipt and an exit-0
+   envelope, both of which the 1020 schemas reject. 1023 handling: exit code and
+   `validation_result` are computed from the unbounded set. Provisional default: 1020 gives
+   `FINDINGS_LIMIT` the highest severity among the dropped findings; until then, 1023 calls
+   `Get-DocsOrderedFinding -Limit` with the finding count for the receipt `findings` (no truncation;
+   the receipt schema sets no `maxItems`), and the exit-0 envelope case remains a known defect.
+4. **OQ-4 - Committed receipt versus head revision (#1034 contract).** A receipt committed to the
+   branch changes the head revision it pins, so a hook comparing `revision` with the head after the
+   receipt commit always denies. Options: (a) the workflow publishes the receipt as a CI artifact and
+   does not commit it; (b) the hook supplies the parent revision when the head commit changes only
+   the receipt path; (c) `revision` names the last revision whose surface the receipt covers, and the
+   hook accepts descendants that change no source root. 1023 is neutral: `Get-DocsReceiptGateDecision`
+   compares with whatever `-HeadRevision` the caller supplies. Provisional default: (a).
+5. **OQ-5 - Receipt counts for precision limits.** Provisional default: receipt `counts` are
+   unchanged and exclude precision-limit entries; `by_analysis_method` and precision-limit totals
+   appear only in the `coverage` result. Alternative: a 1020 receipt-schema amendment adds them.
+
+## Risks
+
+- R1 - 1020 dependency: 1023 relies on the amended 1020 contracts (`analysis_method`, the
+  declaration-lines `source_sha256`, the envelope schema and `Test-DocsArtifactText -ArtifactKind
+  'docs-command-envelope'`). Execution starts only after 1020 (with its amendment) merges into
+  `epic/documentation-estate-tooling-integration`; the plan's first phase re-reads the merged
+  modules and schemas and records any renamed symbol before code is written.
+- R2 - Finding truncation (OQ-3): with the current 1020 bound, an exit-0 result with more than 100
+  non-error findings produces an envelope the schema rejects.
+- R3 - Check-then-write window: between the digest re-check and `WriteText 'overwrite'` another
+  writer can change the file, and whether `Write-DocsFileText` mode `create` fails on an existing
+  file is not yet verified. Accepted for a local single-writer command; 1023 checks `TestFile` before
+  `create`.
+- R4 - Culture and case defaults: PowerShell comparison and sort defaults are case-insensitive;
+  property tests use mixed-case inputs to detect a non-ordinal comparison.
+- R5 - Committed receipt and head revision (OQ-4).
+- R6 - Deferred gate for precision limits: precision-limit entries follow
+  `allow_deferred`. A repository whose scanners report precision limits passes `docs-complete` only
+  with `allow_deferred` true, until a native analyzer (#1031 for Python; C# and TypeScript native
+  analyzers are later, optional children) classifies those constructs. This is a documented
+  consequence of D3, not an open question.
+- R7 - Scanner adoption: if #1022 or #1033 omit the `docs.precision-limit` key, unclassified
+  constructs are invisible to the ledger and `docs-complete` can pass without recording them. The
+  marker is a binding contract on both scanners (see `## Contracts Later Children Must Honor`).
+- R8 - CI-only behavior: `Test-Json` evaluation of the composed schemas depends on the
+  `windows-latest` runner's PowerShell; tests assert codes, pointers and booleans, never message
+  text.
+- R9 - File size: `DocsLedgerCommands.psm1`, `DocsValidation.psm1` and `DocsLedger.psm1` are the
+  largest candidates; the pre-approved splits apply at the 500-line guidance.
+- R10 - Batch budget: the production files and bundle copies exceed the direct-mode cap; execution
+  runs in the item worktree under a non-terminal exempt-route checkpoint, never in an isolated
+  executor worktree.
 
 ## Non-Functional Requirements
 
-- Domain-neutral code; no consumer identifier appears in source, schemas, tests or fixtures.
-- Pure cores take in-memory inputs; only `mutation.py` (adapter) and the CLI modules perform I/O.
-- Tests create no temporary files and do not depend on installed resources (schema `resources`
-  are passed explicitly from the canonical schema bytes).
-- Property tests use deterministic `itertools` enumerations; `hypothesis` and `random` are not
-  used.
-- Line coverage >= 85% and branch coverage >= 75% for every new module.
-- File size: guidance at 500 lines, advisory at 700, hard block above 800.
-- The discovery runtime is used as a library without behavior change.
-- No new dependency; `poetry.lock` is unchanged.
+- PowerShell 7 built-ins only (epic A8); no new module dependency; `ConvertFrom-Json` is not used
+  for artifacts.
+- Domain-neutral code; no consumer identifier in source, tests or fixtures.
+- Tests create no temporary files and use no API forbidden by
+  `.claude/hooks/check-powershell-test-purity.ps1`; every suite uses in-memory contexts and removes
+  every `Docs*` module in `AfterAll`.
+- One property test per pure function, generated with a seeded `[System.Random]` (fixed seed list,
+  seed included in every `-Because` message) or exhaustive enumeration; no new module.
+- Pester line coverage >= 85% for each new production file; Pester measures no branch coverage, so
+  no branch gate applies; no production file is excluded from coverage.
+- File size: guidance 500 lines, advisory 700, hard block above 800.
 
 ## Implementation Strategy
 
-- Implementation scope: create under `packages/docs-runtime/src/drm_copilot_docs/`:
-
-| Module | Public symbols | Pure |
-|---|---|---|
-| `snapshot_view.py` | `SnapshotView` (`repository`, `revision`, `elements` by id, `sha256`), `snapshot_view(value, *, artifact_path, source_sha256)` | yes |
-| `ledger_models.py` | `PageBinding`, `Actor`, `ArtifactPinRef`, `LedgerEntry`, `CoverageLedger`, `ledger_from_json`, `ledger_to_json` | yes |
-| `ledger_rules.py` | `validate_ledger(value, *, snapshot, artifact_path)`, `apply_disposition(...)`, `remove_entry(...)` | yes |
-| `parity_models.py` | `PARITY_DIMENSIONS`, `DimensionResult`, `ParityRow`, `ParityMatrix`, `matrix_from_json`, `matrix_to_json` | yes |
-| `parity_rules.py` | `validate_matrix(value, *, ledger, pins, snapshot, page_paths, page_owners, artifact_path)`, `set_dimension(...)` | yes |
-| `parity_scoring.py` | `DimensionScore`, `score_matrix(matrix)` | yes |
-| `evidence_pins.py` | `EvidencePin`, `PinCollection`, `pin_identifier`, `pin_from_element`, `pins_from_json`, `pins_to_json`, `validate_pins(...)` | yes |
-| `staleness.py` | `PinStatus`, `PinAssessment`, `StalePage`, `assess_pin`, `stale_pages` | yes |
-| `receipt.py` | `receipt_identifier`, `receipt_counts`, `build_receipt` | yes |
-| `validation.py` | `ValidationMode`, `ValidationInputs`, `ValidationOutcome`, `validate` | yes with `resources` |
-| `coverage_report.py` | `build_coverage_report`, `render_coverage_text` | yes |
-| `mutation.py` | `ArtifactStore`, `PlannedArtifactWrite`, `ArtifactWriteResult`, `MutationOutcome`, `plan_artifact_writes`, `commit_artifact_writes`, `LocalArtifactStore` | core yes; adapter I/O |
-| `cli_support.py` | `DocsCliPorts`, envelope emission, input loading, argument helpers, exit-code constants | I/O through ports |
-| `cli_coverage.py`, `cli_ledger.py`, `cli_validate.py` | `main_coverage`, `run_coverage_cli`; `main_update_ledger`, `run_ledger_cli`; `main_validate`, `run_validate_cli` | I/O through ports |
-
-- Edit (append only): root `pyproject.toml` `[tool.poetry.scripts]` after the #1020 docs entries,
-  and the same entries in `packages/docs-runtime/pyproject.toml` (which #1020 plans to declare its
-  own scripts):
-  `"dev.docs.coverage" = "drm_copilot_docs.cli_coverage:main_coverage"`,
-  `"dev.docs.update-ledger" = "drm_copilot_docs.cli_ledger:main_update_ledger"`,
-  `"dev.docs.validate" = "drm_copilot_docs.cli_validate:main_validate"`. No edit to
-  `[tool.coverage.run]`, `[tool.pyright]`, `quality-tiers.yml`, `poetry.lock`, any schema, any
-  #1020 module, or any discovery file.
-- Tests under `tests/docs_runtime/` (a package per #1020): `test_snapshot_view.py`,
-  `test_ledger_models.py`, `test_ledger_rules.py`, `test_docs_parity_models.py`,
-  `test_docs_parity_rules.py`, `test_parity_scoring.py`, `test_evidence_pins.py`,
-  `test_staleness.py`, `test_receipt.py`, `test_validation.py`, `test_mutation.py`,
-  `test_docs_coverage_report.py`, `test_cli_support.py`, `test_cli_coverage.py`,
-  `test_cli_ledger.py`, `test_cli_validate.py`, `test_ledger_properties.py`,
-  `test_write_boundary.py`, `test_docs_complete_integration.py`. The `docs_` prefix is applied to
-  the three basenames that already exist in `tests/discovery_runtime/` (`test_parity_models.py`,
-  `test_parity_rules.py`, `test_coverage_report.py`).
-- CLI tests use `io.StringIO` streams, a dictionary-backed `read_bytes`, a fixed `list_pages`, a
-  recording in-memory `ArtifactStore` and a fixed clock.
-- Dependency changes: none. Standard library (`hashlib`, `os`, `fnmatch`, `argparse`, `datetime`,
-  `itertools`) plus `drm_copilot_discovery` and `drm_copilot_docs`.
-- Logging and telemetry: none added; CLI diagnostics go to stderr.
-- Rollout: additive; consumers opt in by installing the docs wheel. New modules ship in the wheel
-  through the existing `packages = [{ include = "drm_copilot_docs", from = "src" }]` entry.
+- Create the eight modules listed in `### Modules`, their byte-identical bundle copies, and the
+  `core.json` lines; insert the three dispatch rows in the entry script and its bundle copy.
+- Tests under `tests/scripts/claude-lib/docs/` (layout mirrors `tests/scripts/claude-lib/mermaid/`):
+  one suite per module, `DocsWriteBoundary.Tests.ps1`, `DocsCompleteIntegration.Tests.ps1`, the
+  property suites, and `DocsLedger.TestSupport.psm1` (in-memory context with a path-to-bytes
+  hashtable, recording `WriteText`, `ReadBytes`, `TestFile`, `ListFile`, and a fixed `UtcNow` of
+  `Kind` `Utc`). Schemas come from the committed runtime copies through `Read-DocsSchemaSet`.
+- Pester suites with coverage run on `windows-latest` in the `poshqc / PowerShell QC shard 1`,
+  `shard 2` and `shard 3` jobs, aggregated by the required check `poshqc / PowerShell QC`; format
+  and PSScriptAnalyzer run in `poshqc / PowerShell QC static`. The existing Python push-down contract
+  tests (`tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`,
+  `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`) run in
+  `quality-checks7 / Code Quality & Tests`; they are called, not edited.
+- Evidence under `docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023/evidence/<kind>/`
+  (coverage figures under `evidence/qa-gates/`, isolation runs under `evidence/regression-testing/`).
+- No change to `config/poshqc-coverage.json`, `config/poshqc-scan.json`, `quality-tiers.yml`, any
+  schema, any 1020 module other than the three dispatch rows, or any discovery file.
 
 ## Acceptance Criteria
 
-- [ ] A ledger missing a disposition for any inventoried element fails validation with a `DOCS_LEDGER_MISSING_DISPOSITION` error whose message names the element's kind, declaration and element id; an `excluded` entry without rationale fails with `DOCS_LEDGER_RATIONALE_REQUIRED`, and a `deferred` entry without owner or without target fails with `DOCS_LEDGER_OWNER_REQUIRED` or `DOCS_LEDGER_TARGET_REQUIRED`.
-- [ ] A pin whose recorded `source_sha256` differs from the current snapshot element's `source_sha256` has status `digest-changed` and marks its bound page stale; a pin whose element is absent from the snapshot has status `element-missing` and marks its page stale; a pin with an equal digest has status `current`, and a revision difference alone does not mark a page stale.
-- [ ] A property test over every combination of {element present, element absent} and {digest equal, digest different} yields exactly the statuses `current`, `digest-changed` and `element-missing`, and a page is reported stale exactly when at least one of its pins is not `current`.
-- [ ] `dev.docs.validate --mode docs-complete` emits a receipt with `validation_result` `pass` and exits 0 on a complete fixture; on an in-memory fixture with one undocumented element and one stale page it exits non-zero, emits a `fail` receipt, and its output names both the undocumented element (declaration and element id) and the stale page path (`tests/docs_runtime/test_docs_complete_integration.py`).
-- [ ] After the integration fixture's missing ledger entry is added and its stale pin is re-pinned, `dev.docs.validate --mode docs-complete` exits 0 with a `pass` receipt.
-- [ ] Every receipt emitted by `dev.docs.validate` in each of the modes `profile`, `ledger`, `matrix` and `docs-complete`, on pass and on fail, validates against the #1020 `docs-validation-receipt` schema, and its `revision` equals the `--revision` argument.
-- [ ] The receipt `id` equals `stable_id("docs-validation-receipt", row(mode=..., repository=..., revision=..., inputs=..., validation_result=...))`, and a property test shows it is unchanged when only `issued_at` differs and changes when any of those five members differs.
-- [ ] The receipt `inputs` contain one `artifact-pin` per artifact read, with `sha256` equal to the SHA-256 of that artifact's raw bytes, sorted by `artifact_kind` then `path`.
-- [ ] `dev.docs.validate --mode docs-complete` with a snapshot whose `revision` is `null` exits 1 and reports `DOCS_SNAPSHOT_UNPINNED`; with a non-null snapshot revision that differs from `--revision` it reports `DOCS_REVISION_MISMATCH`.
-- [ ] In `docs-complete` mode, a `deferred` entry with `allow_deferred` false yields `DOCS_DEFERRED_NOT_ALLOWED`; a required parity dimension in state `fail` or `not-assessed` yields `DOCS_PARITY_REQUIRED_DIMENSION`; a bound page absent from the page-path set yields `DOCS_PAGE_MISSING`; and `DOCS_PAGE_STALE` is an `error` when the stale-page count exceeds `max_stale_pages` and a `warning` otherwise.
-- [ ] Ledger and matrix writes happen only through `mutation.py`; `dev.docs.update-ledger` is the only CLI that mutates the ledger, matrix or pin collection. `tests/docs_runtime/test_write_boundary.py` proves it by an AST scan of every module under `packages/docs-runtime/src/drm_copilot_docs/` (filesystem write primitives appear only in modules on an explicit allowlist with one reason per entry, of which this feature contributes only `mutation.py`; `commit_artifact_writes` is referenced only from `cli_ledger.py` and `cli_validate.py`; `ledger_to_json`, `matrix_to_json` and `pins_to_json` are not referenced from `cli_validate.py` or `cli_coverage.py`), and a positive control in which the scan helper reports a write call in an in-memory source string.
-- [ ] With a recording in-memory `ArtifactStore`, `dev.docs.coverage` makes zero store calls, `dev.docs.validate` without `--write-receipt` makes zero store calls in every mode, `dev.docs.validate --write-receipt` plans only the `docs-validation-receipt` artifact kind at `artifact_paths.validation_receipt`, and `dev.docs.update-ledger` without `--write` makes zero store write calls and reports each changed document with status `planned`.
-- [ ] `dev.docs.update-ledger --write` creates an absent document exclusively and replaces an existing document only when its digest equals the digest read at planning time; a digest mismatch exits 3 with `DOCS_MUTATION_FAILED` and status `conflict`.
-- [ ] `dev.docs.update-ledger` exits 1 and makes no store write call when the operation would introduce an `error` finding not present before it (for example `set-disposition --disposition excluded` without `--rationale`), and succeeds when pre-existing errors for other elements are present.
-- [ ] Each of the operations `set-disposition`, `remove-entry`, `pin`, `unpin`, `set-dimension` and `sync-refs` produces the documented change in a CLI test, and an option outside the operation's permitted set exits 2.
-- [ ] For each of `dev.docs.coverage`, `dev.docs.update-ledger` and `dev.docs.validate`, CLI tests assert exit 0 on success, exit 1 on findings, exit 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` `null` on an unknown option, a missing required option and an invalid value (including an invalid `--revision`, `--element` or relative path), and exit 3 with exactly one `DOCS_CLI_RUNTIME` or `DOCS_MUTATION_FAILED` finding on an injected read or write failure; `--help` exits 0 without reading input, and no `SystemExit` escapes.
-- [ ] With `--format json`, each command writes exactly one `canonical_json` document to stdout whose keys are exactly `command`, `ok`, `exit_code`, `findings` and `result`, with `ok` true exactly when `exit_code` is 0, findings carrying exactly the `Finding.to_dict` keys ordered by `finding_key`, and byte-identical output across two runs with the same inputs and clock.
-- [ ] With `--format text`, each command prints one `<severity> <code> <artifact_path><pointer>: <message>` line per finding and ends with the summary line `<command>: exit=<exit_code> errors=<n> warnings=<n> infos=<n>`.
-- [ ] `dev.docs.coverage --format json` returns `result` with `totals`, `undocumented`, `deferred`, `stale_pages` and `parity`, where each parity dimension's counts sum to the matrix row count and `score_basis_points` is an integer or `null` (property test over enumerated state assignments).
-- [ ] Order-invariance property tests (`itertools.permutations`) show that permuting ledger entries, matrix rows and pins yields byte-identical `canonical_json` output and identical findings, and a ledger-completeness property test over every subset of a fixed snapshot (`itertools.combinations`) shows the missing-disposition findings name exactly the complement.
-- [ ] A disposition-companion property test (`itertools.product` over the three dispositions and the presence of bindings, rationale, owner and target) shows the finding set equals the companion table.
-- [ ] The root `pyproject.toml` and `packages/docs-runtime/pyproject.toml` `[tool.poetry.scripts]` each contain the three entries `"dev.docs.coverage" = "drm_copilot_docs.cli_coverage:main_coverage"`, `"dev.docs.update-ledger" = "drm_copilot_docs.cli_ledger:main_update_ledger"` and `"dev.docs.validate" = "drm_copilot_docs.cli_validate:main_validate"`; the #1020 contract tests in `tests/docs_runtime/test_docs_package_contract.py` pass; `poetry check --lock` exits 0 and `poetry.lock` is unchanged.
-- [ ] The #1020 neutrality test `tests/docs_runtime/test_neutrality.py` passes with the new modules in its scan scope.
-- [ ] No test module added by this feature imports `tempfile`, `hypothesis` or `random`, or requests the `tmp_path` or `tmp_path_factory` fixtures.
-- [ ] Discovery runtime and #1020 files are unchanged: `git diff --name-only` between the merge base with the integration branch and the feature head returns no path under `packages/discovery-runtime/`, `schemas/discovery/` or `schemas/docs/`, and none of the #1020 modules `surface_models.py`, `profile_models.py`, `profile.py`, `schema_validation.py`, `resources.py`, `analyzer_contract.py` or `cli.py`.
-- [ ] Line coverage >= 85% and branch coverage >= 75% for every new module, measured with `--cov=drm_copilot_docs --cov-branch` and read per file from the JSON report.
-- [ ] No production or test file created by this feature exceeds 800 lines, and the file-size repository gate passes.
+Unless stated otherwise, each Pester criterion is verified by the named suite under
+`tests/scripts/claude-lib/docs/`, run with coverage on `windows-latest` in `poshqc / PowerShell QC`
+(shards aggregated by that required check).
+
+- [ ] A ledger missing a disposition for any inventoried element yields `DOCS_LEDGER_MISSING_DISPOSITION` (error) whose message names the element's kind, declaration and element id; an `excluded` entry without rationale yields `DOCS_LEDGER_RATIONALE_REQUIRED`; a `deferred` entry without owner or without target yields `DOCS_LEDGER_OWNER_REQUIRED` or `DOCS_LEDGER_TARGET_REQUIRED` (`DocsLedger.Tests.ps1`).
+- [ ] `Get-DocsLedgerFinding` reports `DOCS_LEDGER_DUPLICATE_ENTRY`, `DOCS_LEDGER_ORPHAN_ENTRY`, `DOCS_LEDGER_KIND_MISMATCH` and `DOCS_LEDGER_SNAPSHOT_REF` for fixtures exhibiting each condition, and `DOCS_LEDGER_ANALYSIS_METHOD_CHANGED` (warning) when an element entry's `analysis_method` differs from the current element (`DocsLedger.Tests.ps1`).
+- [ ] Every ledger entry written by `update-ledger` carries `analysis_method` copied from the current snapshot element (`native` or `scanner`), and `sync-refs` refreshes it after the element's method changes (`DocsLedgerCommands.Tests.ps1`).
+- [ ] For a snapshot containing a precision-limit diagnostic (marker `docs.precision-limit` with `element_kind`, non-null `path`, scanner analyzer), `validate -Mode ledger` reports `DOCS_LEDGER_LIMIT_UNRECORDED` naming the analyzer, code, path, diagnostic id and element id; after `update-ledger -Operation set-disposition -Limit <diagnostic id> -Disposition deferred -Owner <id> -Target <text> -Write`, the ledger holds one `deferred` entry with `analysis_method` `scanner`, `element_id` equal to `Get-DocsElementId -Kind <element_kind> -Path <path> -Declaration <diagnostic id>`, and `extensions` `docs.precision-limit` holding `analyzer_id`, `code` and `diagnostic_id`, and the finding is gone (`DocsLedger.Tests.ps1`, `DocsLedgerCommands.Tests.ps1`).
+- [ ] `DOCS_SNAPSHOT_LIMIT_INVALID` is reported for a marker whose `element_kind` is not an element kind, a marked diagnostic with null `path`, a marked diagnostic from a `native` analyzer, and a precision-limit element id equal to a snapshot element id; `DOCS_LEDGER_LIMIT_MISMATCH` is reported for a precision-limit entry that is not `deferred` or whose marker differs; `DOCS_LEDGER_LIMIT_RESOLVED` (warning) is reported for a marked entry whose diagnostic is absent (`DocsLedger.Tests.ps1`).
+- [ ] In `docs-complete`, a precision-limit entry passes when `allow_deferred` is true and yields `DOCS_DEFERRED_NOT_ALLOWED` when it is false, exactly as an element `deferred` entry does (`DocsValidation.Tests.ps1`).
+- [ ] `Get-DocsPinStatus` returns `digest-changed` when the pin's `source_sha256` differs from the current element's, `element-missing` when no current element has the pin's `element_id`, and `current` when the digests are equal; a revision difference alone never changes the status, and a page is stale exactly when at least one of its pins is not `current` (`DocsStaleness.Tests.ps1`).
+- [ ] `validate -Mode docs-complete` exits 0 with a `pass` receipt on a complete in-memory fixture; on an in-memory fixture with one undocumented element and one stale page it exits 1, returns a `fail` receipt, and its findings name the undocumented element (declaration and element id) and the stale page path; after the missing entry is added and the stale pin re-pinned through `update-ledger`, it exits 0 with a `pass` receipt (`DocsCompleteIntegration.Tests.ps1`).
+- [ ] Every receipt returned by `validate` in each of the modes `profile`, `ledger`, `matrix` and `docs-complete`, on pass and on fail, produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-validation-receipt'`, and its `revision` equals the `-Revision` argument (`DocsValidation.Tests.ps1`).
+- [ ] The receipt `id` equals `Get-DocsStableId -Prefix 'docs-validation-receipt'` over `inputs`, `mode`, `repository`, `revision` and `validation_result`; a property test shows it is unchanged when only `issued_at`, `counts` or `findings` differ and changes when any of those five members differs (`DocsReceipt.Tests.ps1`).
+- [ ] The receipt `inputs` hold one `artifact-pin` per artifact read, with `sha256` equal to `Get-DocsBytesSha256Hex` of the raw bytes, sorted by `artifact_kind` then `path`, and no pin for an absent artifact (`DocsReceipt.Tests.ps1`).
+- [ ] `validate -Mode docs-complete` with a snapshot whose `revision` is null exits 1 with `DOCS_SNAPSHOT_UNPINNED`; with a non-null snapshot revision different from `-Revision` it reports `DOCS_REVISION_MISMATCH` (`DocsValidation.Tests.ps1`).
+- [ ] In `docs-complete`, a required parity dimension in state `fail` or `not-assessed` yields `DOCS_PARITY_REQUIRED_DIMENSION`, a bound page outside the page-path set yields `DOCS_PAGE_MISSING`, and `DOCS_PAGE_STALE` is `error` when the stale-page count exceeds `max_stale_pages` and `warning` otherwise; in `matrix` mode `DOCS_PAGE_STALE` is always `warning` (`DocsValidation.Tests.ps1`).
+- [ ] `Get-DocsMatrixFinding` reports each of `DOCS_MATRIX_UNBOUND_ROW`, `DOCS_MATRIX_ROW_MISSING`, `DOCS_MATRIX_DUPLICATE_ROW`, `DOCS_MATRIX_PIN_UNKNOWN`, `DOCS_MATRIX_ACCURACY_UNPINNED`, `DOCS_MATRIX_EXISTS_INCONSISTENT`, `DOCS_MATRIX_OWNER_INCONSISTENT` and `DOCS_MATRIX_LEDGER_REF` for a fixture exhibiting its condition, and `Get-DocsPinFinding` reports `DOCS_PIN_INCONSISTENT` for a tampered pin identity, a wrong `pin_id` and a duplicate `pin_id` (`DocsParity.Tests.ps1`, `DocsEvidencePins.Tests.ps1`).
+- [ ] `Test-DocsPathOrGlobMatch` agrees with an enumerated table covering exact match, prefix plus `/`, `*` across `/`, `?`, `[...]`, `[!...]` and case difference (no match), and `Get-DocsPageOwner` returns the first matching `page_owners` entry and is unchanged when non-matching entries are appended (`DocsParity.Tests.ps1`).
+- [ ] `Measure-DocsParityScore` returns per dimension integer counts that sum to the row count and `score_basis_points` equal to `floor(10000 * pass / (pass + fail + not_assessed))` or null when that denominator is 0 (`DocsParity.Tests.ps1`).
+- [ ] Each `update-ledger` operation `set-disposition`, `remove-entry`, `pin`, `unpin`, `set-dimension` and `sync-refs` produces its documented change on an in-memory fixture; `set-disposition` that drops a binding removes that element-page's matrix rows and pins; re-pinning the same element and page keeps one pin with the same `pin_id`; an option outside the operation's permitted set, `-Element` with `-Limit`, and `-Limit` with a disposition other than `deferred` each exit 2 (`DocsLedgerCommands.Tests.ps1`).
+- [ ] `update-ledger` exits 1, returns the new `error` findings, and makes no `WriteText` call when the operation would introduce an `error` finding absent before it (for example `set-disposition -Disposition excluded` without `-Rationale`); it exits 0 when only pre-existing errors for other elements exist, and its exit-0 envelope carries no `error` finding (`DocsLedgerCommands.Tests.ps1`).
+- [ ] `update-ledger` without `-Write` makes no `WriteText` call and `Invoke-DocsArtifactWrite -DryRun` invokes none of its scriptblock parameters, and the subcommand reports each changed document as `planned` and each unchanged one as `skipped`; with `-Write` it creates an absent document only after `TestFile` returns false and overwrites an existing document only when its digest equals the digest read at load time; a digest mismatch exits 3 with one `DOCS_CLI_RUNTIME` finding naming the conflicting path, with already-written paths in `related_paths` (`DocsLedgerMutation.Tests.ps1`, `DocsLedgerCommands.Tests.ps1`).
+- [ ] With a recording in-memory context, `coverage` makes zero `WriteText` calls, `validate` without `-WriteReceipt` makes zero `WriteText` calls in every mode, `validate -Mode docs-complete -WriteReceipt` writes only the `docs-validation-receipt` document at `artifact_paths.validation_receipt` on both pass and fail, and `-WriteReceipt` with any other mode exits 2 (`DocsLedgerCommands.Tests.ps1`).
+- [ ] `DocsWriteBoundary.Tests.ps1` parses every `.ps1` and `.psm1` under `.claude/lib/docs/` with the PowerShell parser and asserts: no filesystem write primitive (`Set-Content`, `Add-Content`, `Out-File`, `New-Item`, `Copy-Item`, `Move-Item`, `Remove-Item`, `Tee-Object`, `Export-Csv`, `Export-Clixml`, member calls on `System.IO.File`, `System.IO.FileStream`, `System.IO.StreamWriter`, file redirection) except `Write-DocsFileText` in `Invoke-DocsCommand.ps1` (allowlist reason "init create-only and explicit overwrite"); a scriptblock named `WriteText` is invoked only inside `Invoke-DocsArtifactWrite`; among 1023 modules only `DocsLedgerCommands.psm1` accesses the member `WriteText`; `Invoke-DocsArtifactWrite` is referenced only from `DocsLedgerCommands.psm1`; and a positive control reports a write call in an in-memory source string.
+- [ ] For each of `coverage`, `update-ledger` and `validate`, tests assert exit 0 on success, exit 1 on findings, exit 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` null for an unknown option, a missing required option and an invalid value (including an invalid `-Revision`, `-Element`, `-Limit` and relative path) before any context read, and exit 3 with exactly one `DOCS_CLI_RUNTIME` finding and `result` null for an injected read failure, an injected write failure and a non-UTC clock (`DocsLedgerCommands.Tests.ps1`).
+- [ ] Every `-Json` envelope captured by the 1023 suites produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'`, has `command` equal to the subcommand name and `ok` true exactly when `exit_code` is 0, and two runs with identical inputs, arguments and clock produce byte-identical stdout (`DocsLedgerCommands.Tests.ps1`).
+- [ ] Without `-Json`, each subcommand prints one `<severity> <code> <artifact_path><pointer>: <message>` line per finding and ends with `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>` (`DocsLedgerCommands.Tests.ps1`).
+- [ ] `coverage -Json` returns `result` with `totals` (including `by_analysis_method`), `undocumented`, `deferred`, `precision_limits` (with `recorded` false for an unrecorded limit), `stale_pages` and `parity`, and with no ledger, matrix or pin collection present it lists every inventoried element as undocumented and exits 0 (`DocsLedgerCommands.Tests.ps1`).
+- [ ] `Get-DocsReceiptGateDecision` returns `receipt-invalid` for unparsable or schema-invalid text, `mode-not-docs-complete`, `result-fail`, `revision-mismatch` (including a revision differing only in letter case), and `Allow` true with `pass` for a passing docs-complete receipt pinned to the supplied revision, in that precedence (`DocsReceipt.Tests.ps1`).
+- [ ] `Get-DocsCommandTable` (dot-sourced from `Invoke-DocsCommand.ps1`) contains rows named `coverage`, `update-ledger` and `validate` whose `Module` resolves to `DocsLedgerCommands.psm1` and whose `Function` values are `Invoke-DocsCoverageCommand`, `Invoke-DocsUpdateLedgerCommand` and `Invoke-DocsValidateCommand`; `Test-DocsCommandTable` returns no finding (`DocsLedgerCommands.Tests.ps1`).
+- [ ] Every pure function exported by the eight 1023 modules has at least one property test using a seeded `[System.Random]` (seed in each `-Because` message) or exhaustive enumeration, including: order invariance of ledger, matrix and pin findings and serialized output under input permutation; ledger completeness over every subset of a fixed snapshot (missing-disposition findings name exactly the complement, `DOCS_LEDGER_LIMIT_UNRECORDED` names exactly the unrecorded limits); the disposition-companion table over all disposition and field-presence combinations; and `Get-DocsArtifactWritePlan` ordering and `skipped` status; the plan's traceability maps each pure function to its property test.
+- [ ] Each new file under `.claude/lib/docs/` has a byte-identical copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/` and one `paths` line in `pack-manifests/core.json`, the bundle `Invoke-DocsCommand.ps1` carries the same three rows, and `Docs.Manifest.Tests.ps1` (1020), `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py` pass (`poshqc / PowerShell QC` and `quality-checks7 / Code Quality & Tests`).
+- [ ] Each new module passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` (no `& $Context.<Member>` call) and PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` with zero findings (`poshqc / PowerShell QC` and `poshqc / PowerShell QC static`).
+- [ ] No 1023 test file uses a token forbidden by `.claude/hooks/check-powershell-test-purity.ps1` (including `New-TemporaryFile`, `GetTempFileName`, `GetTempPath`, `$env:TEMP`, `$env:TMP`, `Start-Process`, `Start-Sleep`); every suite removes the `Docs*` modules in `AfterAll`; three seeded shuffled file-order runs of the docs suites and one fresh single-process run over `tests/scripts` pass, recorded under `evidence/regression-testing/`.
+- [ ] Pester line coverage is >= 85% for each new production file, read per file from the Pester coverage report of `poshqc / PowerShell QC` (`windows-latest`), with no production file excluded from measurement; figures recorded under `evidence/qa-gates/`.
+- [ ] No production or test file created or edited by this feature exceeds 800 lines, and the repository file-size gate passes.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit, property and integration)
-- [ ] Edge cases and error handling covered by tests (empty file, invalid JSON, duplicate keys, absent artifact, tampered element id, duplicate entry, orphan entry, kind mismatch, duplicate row, unknown pin, naive clock, digest conflict)
-- [ ] At least one property test per pure function in the new modules (T2 obligation)
-- [ ] Docs updated (`packages/docs-runtime/README.md`: the three commands, exit codes and receipt persistence)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → architecture → test → contract → integration) in a single clean pass
+- [ ] Acceptance criteria documented and mapped to tests
+- [ ] Behavior matches acceptance criteria on `windows-latest` in `poshqc / PowerShell QC`
+- [ ] Tests added (unit, property and integration Pester suites)
+- [ ] Edge cases and error handling covered (empty file, invalid JSON, duplicate keys, absent artifact, tampered element id, duplicate entry, orphan entry, kind mismatch, duplicate row, unknown pin, non-UTC clock, digest conflict, malformed precision-limit marker)
+- [ ] One property test per pure function
+- [ ] Toolchain pass completed (format, lint, type check not applicable to PowerShell, architecture, test, contract, integration) in a single clean pass
 - [ ] Evidence written under `docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023/evidence/<kind>/`
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage areas: ledger rules, parity rules and scoring, pins and staleness, receipt, validation modes, mutation boundary
+- [ ] Unit coverage areas: ledger rules (including precision limits), parity rules and scoring, pins and staleness, receipt and gate decision, validation modes, write boundary
 - [ ] Integration scenarios: docs-complete validation over an in-memory fixture with one undocumented element and one stale page
-- [ ] CLI/API examples: `dev.docs.coverage`, `dev.docs.update-ledger`, `dev.docs.validate --mode docs-complete`
+- [ ] CLI examples: `Invoke-DocsCommand.ps1 -Command coverage`, `-Command update-ledger`, `-Command validate -Mode docs-complete`
