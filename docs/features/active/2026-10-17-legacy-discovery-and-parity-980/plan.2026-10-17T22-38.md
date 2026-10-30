@@ -1106,7 +1106,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: The status artifact lists every criterion with its cited evidence; no criterion is checked from executor prose alone.
   - Acceptance: AC-64 is unchecked and its row cites the cycle-2 evidence and the deferral record; the five re-cited criteria each cite Phase 18 evidence or are unchecked; the deliverable set is unchanged.
 
-- [ ] [P18-T7] Rewrite the complete checklist self-review on the cycle-2 tree (FEATURE/evidence/qa-gates/).
+- [x] [P18-T7] Rewrite the complete checklist self-review on the cycle-2 tree (FEATURE/evidence/qa-gates/).
   - Files and behavior: Walk docs/features/templates/policy_audit/{policy-audit.yyyy-MM-ddTHH-mm,code-review.yyyy-MM-ddTHH-mm,feature-audit.yyyy-MM-ddTHH-mm}.md against the branch diff from the merge base of origin/main and HEAD; write FEATURE/evidence/qa-gates/self-review.<timestamp>.md with one PASS, FAIL or justified N/A row per checklist item, one row for R5 naming its closing tasks and evidence, one row each for the root-grant Minor and the shell-observation Nit recording the deferral to #1007 and #1008 by user decision, one row for the enforcement.md sentence, and the retained cycle-1 rows. The sweep also covers this plan's Phase 17 and 18 text and the 2026-10-30T10-19 review set for wording that violates the rule it enforces.
   - Tests and proof: A FAIL row is fixed, the affected gate among P18-T1 through P18-T3 and every later dependent Phase 18 task are repeated, and the self-review is rewritten before this task completes.
   - Acceptance: Zero FAIL rows and no unverified blocking row; every finding row cites existing evidence or the deferral record.
