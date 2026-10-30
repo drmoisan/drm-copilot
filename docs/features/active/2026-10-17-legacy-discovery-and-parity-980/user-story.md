@@ -2,8 +2,8 @@
 
 - Issue: #980
 - Owner: drmoisan
-- Status: Remediation cycle 1 in progress on `feature/legacy-discovery-and-parity-980`: identity now comes from the host hook payload only, unbound controlled calls fail closed and the capability probe derives support from recorded host observations (Phases 15 and 16); Phase 16 final verification, AC reconciliation, independent review and exact-head CI pending (see `completion-report.md`)
-- Last Updated: 2026-10-30T00-30
+- Status: Remediation cycle 1 implemented and verified on `feature/legacy-discovery-and-parity-980`: identity comes from the host hook payload only, unbound controlled calls fail closed and the capability probe derives support from recorded host observations (Phases 15 and 16); 65 of 66 criteria checked after the P16-T9 re-reconciliation; independent re-review (AC-64) and exact-head CI pending (see `completion-report.md`)
+- Last Updated: 2026-10-30T01-58
 
 ## Story Statement
 
