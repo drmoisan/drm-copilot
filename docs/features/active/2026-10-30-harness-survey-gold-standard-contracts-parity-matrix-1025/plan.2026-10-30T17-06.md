@@ -183,7 +183,7 @@ Modules follow `.claude/rules/powershell.md`: `[CmdletBinding()]`, comment-based
 
 ### Phase 5 — Matrix Bootstrap
 
-- [ ] [P5-T1] Write `SCRATCH/issue-1025-matrix-bootstrap.ps1` and run it: it imports the three modules, calls `Get-HarnessInventory` and `New-HarnessParityMatrixSkeleton`, applies `## Matrix Bootstrap Rules` row by row (first match wins) plus the `consumers` rule, and writes `config/harness-parity-matrix.json` (`$schema` and `schema_version` `1.0.0`; UTF-8 without BOM, LF, two-space indent; `features` sorted by `id`). The script exits 1 if an entry matches no row.
+- [ ] [P5-T1] Write `SCRATCH/issue-1025-matrix-bootstrap.ps1` and run it: it imports the three modules, calls `Get-HarnessInventory` and `New-HarnessParityMatrixSkeleton`, applies `## Matrix Bootstrap Rules` row by row (first match wins) plus the `consumers` rule, and writes `config/harness-parity-matrix.json` (`$schema` set to the spec const `https://drm-copilot.dev/schemas/harness-parity-matrix/1.0.0/schema.json`, `schema_version` `1.0.0`; UTF-8 without BOM, LF, two-space indent; `features` sorted by `id`). The script exits 1 if an entry matches no row.
   - Acceptance: `<FEATURE>/evidence/other/matrix-bootstrap.<timestamp>.md` has the four command-step fields, `EXIT_CODE: 0`, the entry count per `kind`, the count per `disposition`, the count of `pending-source:` entries, and `Unmatched: 0`.
 - [ ] [P5-T2] Run `Get-HarnessParityMatrixViolation` on `config/harness-parity-matrix.json` against the live inventory from a scratch script.
   - Acceptance: `<FEATURE>/evidence/other/matrix-violations-pre-contract.<timestamp>.md` records `Violations: 0`, `Approved: 0`, and a count of `codex:skill` entries with disposition `shared` equal to the number of `<FEATURE>/survey/skill-survey.md` rows with `Claude` and `Codex` both `yes`.
@@ -232,7 +232,7 @@ Each contract task writes `.agents/skills/<name>/references/standard.md` for eve
 ### Phase 9 — Final QA Loop, Stop Readiness and Self-Review
 
 - [ ] [P9-T1] Run PowerShell formatting over `scripts/harness` and `tests/scripts/harness`.
-  - Acceptance: `<FEATURE>/evidence/qa-gates/final-format.<timestamp>.md` has the four command-step fields and every file prints `Already formatted:` with none printing `Formatted:`; a rewrite restarts the loop at this task.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-format.<timestamp>.md` has the four command-step fields and every file prints `Already formatted:` with none printing `Formatted:`, each file recorded by its repository-relative path (the formatter prints absolute paths, which evidence never records); a rewrite restarts the loop at this task.
 - [ ] [P9-T2] Run PSSA with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `scripts/harness` and `tests/scripts/harness`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/final-pssa.<timestamp>.md` records 0 findings; any finding is fixed and the loop restarts at P9-T1.
 - [ ] [P9-T3] Run the four harness suites branch-current with coverage.
@@ -306,6 +306,8 @@ Resume conditions the orchestrator checks before delegating plan B (all must hol
 | US-AC-CP Copilot entries approved or provisional with issue-keyed `decision_ref` (user-story) | — | B P1-T3, B P1-T6 |
 
 Plan-A-only rows (checked off at P9-T11): SPEC-AC-01, 02, 03, 07, 11, 13, 14, 17, 18, 19, 20 and US-AC-PG. Every other row is checked off by plan B, except SPEC-AC-15, which the orchestrator checks off at S9.
+
+User-story criteria not listed in the table restate spec rows and are checked off by plan B P2-T7: survey index (SPEC-AC-02), difference classification (SPEC-AC-05), owner decision (SPEC-AC-06), `dropped` reason and `decision_ref` (SPEC-AC-08, SPEC-AC-11), E5 and runbooks (SPEC-AC-19, SPEC-AC-20), runbook results (SPEC-AC-21), owner stop (SPEC-AC-22), no new Python, file size and excluded paths (SPEC-AC-23 to SPEC-AC-25), matrix and schema paths (SPEC-AC-07), entry fields (SPEC-AC-08), contracts (SPEC-AC-09, SPEC-AC-13), bundle copies (SPEC-AC-10), survey record shape (SPEC-AC-04) and coverage (SPEC-AC-16). The criterion beginning `The completeness gate fails on` (SPEC-AC-11, SPEC-AC-12, SPEC-AC-15) is CI-dependent and is checked off by the orchestrator at S9.
 
 ## Citations Re-Checked at Phase 0
 
