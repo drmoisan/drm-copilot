@@ -338,6 +338,20 @@ provisional defaults.
   mirrored byte-identically. `.claude/lib/docs` is T3 in `quality-tiers.yml`.
 - Execution runs in the item worktree under an exempt-route checkpoint (batch budget).
 
+### Generator contracts from the PowerShell preparation of 1024 (binding)
+
+- `generate-reference [-Profile] [-Snapshot] [-OutputDirectory] [-Write] [-Json]`; dry run is the
+  default and performs no write. Exit 1 means error findings and nothing written; exit 3 covers a
+  write conflict or failure. `result` is `{mode, pages, summary, unrendered}`. Output is
+  byte-identical regardless of the clock.
+- Anchor labels in 1020's dispatch table still carry placeholder numbers (for example
+  `900006: generate-reference`); children locate their anchor by subcommand token. Owner question
+  Q15: where the shared `path_or_glob` matcher lives (provisional default: a 1020 amendment, with a
+  1024-local fallback).
+- Two independent 1024 preparations cleared preflight during a relaunch. The pushed set
+  (`285786ec4`) is kept; the duplicate set remains unpushed on the relaunch worktree branch and was
+  not deleted.
+
 ### Native-analyzer contracts from the preparation of 1031 (binding)
 
 - The Python helper emits raw facts only (kind, path, declaration, line span); PowerShell computes
