@@ -20,8 +20,8 @@ features:
   - issue_num: 1020
     feature_folder: 2026-10-30-docs-profile-and-artifact-schemas-1020
     depends_on: []
-  - issue_num: 900002
-    feature_folder: docs-page-quality-checker
+  - issue_num: 1021
+    feature_folder: 2026-10-30-docs-page-quality-checker-1021
     depends_on: []
   - issue_num: 900003
     feature_folder: docs-surface-analyzers-python-config
@@ -34,13 +34,13 @@ features:
     depends_on: [1020]
   - issue_num: 900006
     feature_folder: docs-reference-generator
-    depends_on: [1020, 900002]
+    depends_on: [1020, 1021]
   - issue_num: 900007
     feature_folder: docs-mcp-tools
-    depends_on: [900002, 900003, 900005, 900006]
+    depends_on: [1021, 900003, 900005, 900006]
   - issue_num: 900008
     feature_folder: docs-enforcement-and-ci
-    depends_on: [900002, 900005]
+    depends_on: [1021, 900005]
   - issue_num: 900009
     feature_folder: docs-authoring-workflow
     depends_on: [900007]
@@ -84,7 +84,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 - **A2 - Docs-site build.** A docs-site build (MkDocs or similar) is out of scope.
 - **A3 - Issue #5 `markdown-toolchain`.** This epic stays separate from issue #5. It would reuse an
   existing Markdown QC configuration; none exists on `main` at planning time (no `.pymarkdown*`,
-  `.vale.ini` or `styles/` at the repository root), so 900002 ships a base PyMarkdown configuration
+  `.vale.ini` or `styles/` at the repository root), so 1021 ships a base PyMarkdown configuration
   and a base Vale style that issue #5 may adopt.
 - **A4 - Integration branch.** `epic/documentation-estate-tooling-integration` starts from
   `origin/main`, which contains the merged discovery runtime (#980, PR #1014).
@@ -103,7 +103,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 | Wave | issue_num | Feature | Band | Purpose |
 |---|---|---|---|---|
 | 0 | 1020 | docs-profile-and-artifact-schemas | C3 | Docs profile, versioned schemas, surface element model, analyzer contract, `drm_copilot_docs` package skeleton. |
-| 0 | 900002 | docs-page-quality-checker | C3 | Consumer-installable page checker (front matter, links/anchors, Diataxis mode, orphans) with base PyMarkdown and Vale configuration. |
+| 0 | 1021 | docs-page-quality-checker | C3 | Consumer-installable page checker (front matter, links/anchors, Diataxis mode, orphans) with base PyMarkdown and Vale configuration. |
 | 1 | 900003 | docs-surface-analyzers-python-config | C4 | Python CLI, HTTP route, public API, configuration and architecture analyzers; `dev.docs.inventory`. |
 | 1 | 900004 | docs-surface-analyzers-typescript-dotnet | C4 | TypeScript CLI/route/export and .NET route/config/public-type analyzers; extension-manifest import. |
 | 1 | 900005 | docs-coverage-ledger-and-receipt | C4 | Coverage ledger, parity matrix, evidence pins and staleness, `docs-complete` receipt. |
@@ -133,7 +133,7 @@ None of the following has been approved by the owner. Each is a provisional defa
   (`drm_copilot_docs_check`).
 - Schemas: `schemas/docs/v1/<name>.schema.json`; examples: `examples/docs/v1/`.
 - Console commands (one module per command family, so children edit disjoint modules):
-  `dev.docs.init`, `dev.docs.validate-profile` (1020); `dev.docs.check` (900002);
+  `dev.docs.init`, `dev.docs.validate-profile` (1020); `dev.docs.check` (1021);
   `dev.docs.inventory` (900003, 900004 adds analyzers only); `dev.docs.coverage`,
   `dev.docs.update-ledger`, `dev.docs.validate` (900005); `dev.docs.generate-reference` (900006);
   `dev.docs.surface-delta` (900008).
@@ -156,7 +156,7 @@ None of the following has been approved by the owner. Each is a provisional defa
   `urn:drm-copilot:docs:1.0.0:common`), holds shared definitions; the six artifact schema names
   are unchanged. Evidence pins are stored as one collection document.
 - Diataxis mode values are exactly `tutorial`, `how-to`, `reference`, `explanation` (shared by
-  1020 and 900002).
+  1020 and 1021).
 - Schema tests live under `tests/schemas/docs/`.
 - `quality-tiers.yml` exists at the repository root; each new package is classified there
   (`packages/docs-runtime` is T2), which also updates the tier classification test.
@@ -166,6 +166,19 @@ None of the following has been approved by the owner. Each is a provisional defa
   under the package's `_resources` and writes a wheel; consumers install the discovery and docs
   wheels. This resolves the installation risk below for `drm_copilot_docs`.
 - The neutrality test configures consumer identifiers only as SHA-256 digests, never as text.
+
+### Decisions recorded during preparation of 1021 (binding on later children)
+
+- `packages/docs-page-check` is T2 in `quality-tiers.yml` (same append-only edit point as 1020).
+- `extensions/drm-copilot/resources/templates/` is not a push-down root: files placed there ship in
+  the extension bundle, but no command copies them into a consumer repository. 1021 documents
+  manual adoption of the base PyMarkdown and Vale configuration. Automated delivery of consumer
+  templates (including the 900008 workflow template) is unresolved; 900008 research must choose a
+  delivery path that a push-down command actually copies.
+- Property tests use the repository's seeded `Draw` generator pattern (no `hypothesis`).
+- Prepared plans take scope diffs against the merge base with `origin/main`; execution should run
+  in the item worktree, not an isolated executor worktree, because the batch budget otherwise
+  denies the fourth production Python file.
 
 ### Reuse of the merged discovery runtime
 
@@ -184,10 +197,10 @@ confirms the exact symbols it consumes.
 ### Cross-feature conflict surface
 
 Children edit disjoint new modules. The shared files that more than one child edits, all
-append-only: root `pyproject.toml` `[tool.poetry.scripts]` and path dependencies (1020, 900002,
-900003, 900005, 900006, 900008), `poetry.lock` (1020, 900002),
+append-only: root `pyproject.toml` `[tool.poetry.scripts]` and path dependencies (1020, 1021,
+900003, 900005, 900006, 900008), `poetry.lock` (1020, 1021),
 `packages/docs-runtime/src/drm_copilot_docs/analyzer_contract.py` registry table (900003, 900004),
-`quality-tiers.yml` and its tier classification test (1020, 900002).
+`quality-tiers.yml` and its tier classification test (1020, 1021).
 Append-only conflicts are resolved inside the child's remediation loop.
 
 ## Child Feature Specifications
@@ -237,7 +250,7 @@ Acceptance criteria:
   `packages/docs-runtime/src/` or `schemas/docs/`.
 - Line coverage >= 85% and branch coverage >= 75% for `drm_copilot_docs`.
 
-### 900002 - docs-page-quality-checker (wave 0, C3)
+### 1021 - docs-page-quality-checker (wave 0, C3)
 
 Band rationale: a port of a proven design into a new package with rule logic and configuration
 artifacts; bounded but crosses package, schema and push-down boundaries.
@@ -439,7 +452,7 @@ Files (edit): `config/orchestration-routing.json` (role routing entries), `.clau
 
 Acceptance criteria:
 - Each role's tool list excludes Write and Edit on ledger and matrix paths; a test asserts it.
-- Every skill references only MCP tools and commands defined in 900002-900007.
+- Every skill references only MCP tools and commands defined in 1021-900007.
 - Mirror and push-down parity tests pass for all new agents and skills.
 - The SubagentStop check blocks a role output that lacks its required result fields.
 
@@ -468,8 +481,8 @@ Acceptance criteria:
 
 - Contracts first: 1020 fixes the schemas, element model and analyzer protocol so the four
   wave-1 features build in parallel against stable contracts.
-- 900002 is independent (separate package) and runs in wave 0.
-- 900006 depends on 900002 because generated pages must satisfy the page-metadata schema and
+- 1021 is independent (separate package) and runs in wave 0.
+- 900006 depends on 1021 because generated pages must satisfy the page-metadata schema and
   checker.
 - 900007 waits for the CLIs it wraps; 900004 is excluded from its dependencies because 900004 adds
   analyzers behind the existing `dev.docs.inventory` command.
@@ -481,7 +494,7 @@ Acceptance criteria:
 
 ## Planned Waves
 
-- Wave 0: 1020, 900002
+- Wave 0: 1020, 1021
 - Wave 1: 900003, 900004, 900005, 900006
 - Wave 2: 900007, 900008
 - Wave 3: 900009
