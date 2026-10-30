@@ -129,7 +129,7 @@ These pass every validator rule and are found only by reading the plan against t
 - A unit test runs in milliseconds. A full suite above about 15 minutes, or a single unit test above about 10 seconds, indicates repeated work in the code under test or its fixtures, not missing parallelism.
 - Diagnose before proposing sharding or parallel workers. First aggregate per-test and per-module time from the JUnit report that the full run already writes (`--junitxml`); a small fraction of tests usually holds most of the time. Then run the slowest test under a profiler (`python -m cProfile -o <file> -m pytest <node id>`) and read the profile with `pstats`.
 - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
-- Share an expensive immutable fixture second, and give each test its own copy, so test independence is unchanged.
+- Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
 - Parallel shards reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
 - A candidate fix can be measured before the tree is edited by loading a pytest plugin module from `SCRATCH` with `-p <module>` and `PYTHONPATH`.
 
