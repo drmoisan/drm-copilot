@@ -12,7 +12,7 @@ intent:
     - A destination that selects one ecosystem pack receives no files for the other ecosystems.
   nfrs:
     - Enforcement hooks do not invoke Python.
-    - New scripts, tools, generators, checkers and CLI entry points are TypeScript or PowerShell; existing Python may be reused or called.
+    - No new Python. Code pushed down to destination repos (skills, skill helpers, hooks, libs) is PowerShell or bash; TypeScript is only for MCP tools and extension commands.
     - Mirrors are generated, not symlinked.
     - Migration of a destination is non-destructive, reports a dry run first, and never overwrites a destination's own edits.
     - No production file exceeds 800 lines.
@@ -157,16 +157,18 @@ reference resolves.
 
 ## Shared Design
 
-- **Language (owner directive, 2026-10-30).** Avoid Python scripts. Existing Python in the repo
-  is tolerated and may be reused, extended in place or called (for example the existing Codex
-  agent-variant generator and the Python ports of the push-down), but new scripts, tools,
-  generators, checkers and CLI entry points are written in TypeScript or PowerShell, to avoid
-  adding environmental dependencies for destination repos. This applies to the skill, rule, MCP
-  and agent generators with `--check` modes, the push-down consolidation, the parity-matrix tests,
-  the hook work and the survey tooling. Enforcement hooks do not use Python. Each child plan
-  records its language choice with cost and risk; a child that cannot reasonably avoid new Python
-  records an owner question with the reason and the TypeScript or PowerShell alternative instead
-  of deciding.
+- **Language (owner directive, refined 2026-10-30; replaces the earlier wording).** Avoid new
+  Python; existing Python is tolerated (reuse, call or extend in place only). The language depends
+  on where the new code runs: (1) anything pushed down to destination repos, meaning skills, skill
+  helpers, hooks and libs, is PowerShell or bash, never TypeScript and never Python; (2)
+  TypeScript is only for MCP commands (tools in the MCP server package) and extension commands.
+  The skill, rule, MCP-config and agent generators, their `--check` modes, the parity-matrix
+  checks and the survey tooling are each classified: if a skill or hook invokes it, it is
+  PowerShell or bash; if it is an MCP tool or extension command (for example the #1016 migration
+  command, settled as an MCP tool with a thin `npx` entry, and any MCP wrapper over a generator),
+  the wrapper is TypeScript. Every child plan records the classification of each planned
+  artifact, and any case that cannot follow the rule is raised as an owner question rather than
+  decided by the child.
 - `AGENTS.md` is the instruction source; `CLAUDE.md` is `@AGENTS.md` plus Claude-only text;
   `.github/copilot-instructions.md` holds Copilot-only text.
 - `.agents/skills` is the source for shared skills; tool-only skills stay in their native folder.
