@@ -3,9 +3,10 @@
 - **Issue:** #1020
 - **Parent (optional):** #1019 (epic documentation-estate-tooling, child 1020, wave 0, band C3)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T22-15
+- **Last Updated:** 2026-10-30T22-50
 - **Status:** Draft
-- **Version:** 0.3 (re-preparation for the refined implementation-language rule)
+- **Version:** 0.4 (requirements amendment for owner decisions D3 and D5; new planning cycle under D1)
+- **Research (amendment design source):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T22-35-docs-profile-amendment-d3-d5-addendum-research.md`
 - **Research (primary design source):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T21-45-docs-profile-powershell-design-addendum-research.md`
 - **Research (language-independent sections only):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T20-30-docs-profile-and-artifact-schemas-research.md`
 
@@ -19,6 +20,29 @@ edits). That design is withdrawn by the epic `## Owner Directive: Implementation
 front-matter fields) is kept and revised where the addendum research or the orchestrator probe
 changes it. Where `issue.md` still describes the Python design, this file is authoritative.
 
+Version 0.4 amends version 0.3 for the owner decisions of 2026-10-30 recorded in the epic
+`## Owner Decisions (2026-10-30, received through the coordinator)` and `### Amendment of 1020
+required by D3 and D5`. Under D1 this amendment is a new planning cycle for 1020. The amendment
+design source is the 2026-10-30T22-35 addendum research. Changes:
+
+- D3: an `analysis_method` field (`native` or `scanner`) on snapshot elements, snapshot
+  `analyzers[]` items and coverage-ledger entries, carried by `DocsSurface.psm1` and by registry
+  rows keyed on (`Id`, `AnalysisMethod`). It is not part of the element identifier.
+- D5: `source_sha256` is the declaration-lines digest (`#### Declaration-lines digest`), not a
+  whole-file digest; `line_range` is required for every kind except `architecture-component`.
+- D5: the `-Json` envelope gets its own schema, `schemas/docs/v1/docs-command-envelope.schema.json`,
+  with a runtime copy, a bundle copy, a `core.json` line and an example. The earlier statement that
+  the envelope has no schema file is withdrawn.
+- D3: the analyzer registry carries a 900011 anchor. Stale placeholder numbers are corrected from
+  git history as confirmed by the orchestrator: 900002 is 1021, 900003 is 1022, 900005 is 1023 and
+  900006 is 1024. The numbers 900004, 900007, 900008, 900009, 900010 and 900011 used in this file
+  remain epic placeholders.
+- Epic 1024 generator decision: audience identifiers use one shared docs common pattern
+  (`audience-id`), referenced by the profile schema and by the 1021 page-metadata schema.
+
+Everything not named above is unchanged from version 0.3. Open points from the addendum are OQ-6
+to OQ-9 under `## Owner Questions`.
+
 ## Overview
 
 The documentation-estate-tooling epic (#1019) needs a stable set of contracts before its analyzer,
@@ -31,8 +55,8 @@ configuration in a docs profile.
 
 This feature delivers those contracts as PowerShell modules under `.claude/lib/docs/`, which the
 existing Claude push-down delivers to destination repositories, plus versioned JSON schemas and
-examples. Features 1021, 900003, 900004, 1023, 900006 and 900008 consume the modules directly;
-900007 consumes them through `Invoke-DocsCommand.ps1`. The contracts below are normative: a
+examples. Features 1021, 1022, 900004, 900011, 1023, 1024 and 900008 consume the modules
+directly; 900007 consumes them through `Invoke-DocsCommand.ps1`. The contracts below are normative: a
 downstream feature that needs a different shape changes this specification through an epic-level
 update rather than diverging locally.
 
@@ -56,15 +80,18 @@ provide:
   JSON pointers.
 - The surface element model: kinds `cli-command`, `cli-option`, `http-route`, `config-key`,
   `public-symbol`, `architecture-component`, with deterministic identifiers derived from kind,
-  path and declaration.
-- The analyzer contract and an owner-anchored analyzer registry, empty in this feature, that 900003
-  and 900004 extend.
+  path and declaration; the analysis methods `native` and `scanner`; and the declaration-lines
+  digest that each element records as `source_sha256`.
+- The analyzer contract and an owner-anchored analyzer registry, empty in this feature, keyed on
+  (`Id`, `AnalysisMethod`), that 1022, 900004 and 900011 extend.
 - Profile parsing, schema and semantic validation, and a starter profile.
 - The entry script `Invoke-DocsCommand.ps1 -Command <subcommand> [arguments]` with an
   owner-anchored dispatch table and the subcommands `init` and `validate-profile`.
-- Six artifact schemas plus one definitions-only `common.schema.json` under `schemas/docs/v1/`,
-  one example per artifact schema under `examples/docs/v1/`, and a byte-identical runtime copy of
-  the schemas under `.claude/lib/docs/schemas/v1/` (owner question OQ-1).
+- Six artifact schemas, one definitions-only `common.schema.json` and one non-artifact
+  `docs-command-envelope.schema.json` (the `-Json` envelope, D5) under `schemas/docs/v1/`; one
+  example per artifact schema and one envelope example under `examples/docs/v1/`; and a
+  byte-identical runtime copy of every schema under `.claude/lib/docs/schemas/v1/` (owner question
+  OQ-1).
 - Push-down registration: every file under `.claude/lib/docs/` listed in the Claude core pack
   manifest and mirrored byte-identically to
   `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`.
@@ -176,7 +203,8 @@ import is closed under core.
 
 - `Get-DocsSchemaName` (pure) returns the schema names in fixed order: `common`, `docs-profile`,
   `surface-inventory-snapshot`, `docs-coverage-ledger`, `docs-parity-matrix`, `docs-evidence-pin`,
-  `docs-validation-receipt`, followed by the anchor comment `# --- 1021: page-metadata ---`.
+  `docs-validation-receipt`, `docs-command-envelope`, followed by the anchor comment
+  `# --- 1021: page-metadata ---`.
 - `Get-DocsSchemaPath` returns an ordered map of name to path, built from one literal join per
   file, for example `Join-Path -Path $PSScriptRoot -ChildPath 'schemas/v1/docs-profile.schema.json'`.
 - `Read-DocsSchemaSet [-SchemaPath <IDictionary>] [-ReadText <scriptblock>]` is the module's only
@@ -188,7 +216,8 @@ import is closed under core.
   returned alongside and make the set unusable (exit 3 at the command boundary).
 - `Test-DocsArtifactText -ArtifactKind <string> -JsonText <string> -ComposedSchemaSet <IDictionary>
   [-ArtifactPath <string>]` (pure apart from the built-in `Test-Json`) returns ordered findings per
-  `### Artifact validation`.
+  `### Artifact validation`. The parameter name stays `ArtifactKind`; it also accepts the one
+  non-artifact kind `docs-command-envelope`, which validates a `-Json` envelope.
 - `Get-DocsSchemaStructuralFinding -Schema <IDictionary> -Instance <object> -RootSchema
   <IDictionary> [-Pointer <string> = ''] [-ArtifactPath <string>]` (pure) is the structural walk
   per `### Structural walk`.
@@ -206,6 +235,13 @@ default; inline `#/$defs/...` refs work, including `$defs` keys containing `.` s
 `common.kind`; two calls with the same `$id` and different schema content do not collide.
 Composition therefore relies only on inline refs, needs no `-FetchExternalReference` and no global
 schema registry, and keeps one copy of the shared vocabulary.
+
+Owner decision D5 asks for `Test-Json` cross-file `$ref` to be tested first, with self-contained
+schemas as the fallback. The probe above is that test; cross-file refs fail by default, so the
+fallback applies. The fallback is the in-memory composed schema: each schema file keeps its docs
+common URN refs, and `Join-DocsSchemaText` produces a self-contained schema in memory before
+`Test-Json` runs. No schema file carries a physically inlined copy of a docs common definition.
+Owner acceptance of this form is OQ-6.
 
 `Join-DocsSchemaText`:
 
@@ -282,6 +318,10 @@ this subset or accepts a `DOCS_SCHEMA_INVALID` finding for them.
 ### `DocsSurface.psm1` (pure)
 
 - `Get-DocsElementKind` returns the element kinds in contract order; `Test-DocsElementKind -Kind`.
+- `Get-DocsAnalysisMethod` returns the analysis methods in contract order: `native`, `scanner`.
+- `ConvertTo-DocsDeclarationText -Text <string> [-LineRange <int[]>]` and
+  `Get-DocsDeclarationSha256 -Text <string> [-LineRange <int[]>]` per
+  `#### Declaration-lines digest`.
 - `Test-DocsRelativePath -Path` (POSIX relative path grammar, equal to docs common
   `relative-path`); `Test-DocsFullRevision -Revision` (40 or 64 lowercase hex).
 - `Get-DocsStableId -Prefix <string> -Value <object>` returns `<prefix>-` plus the lowercase hex
@@ -290,12 +330,19 @@ this subset or accepts a `DOCS_SCHEMA_INVALID` finding for them.
 - `Get-DocsElementId -Kind <string> -Path <string> -Declaration <string>` per
   `### Element identifiers`.
 - `Test-DocsElementId -ElementId <string>` (docs common `element-id` pattern).
-- `New-DocsSurfaceElement -Kind -Path -Declaration -Name -AnalyzerId -SourceSha256 [-ParentId]
-  [-LineRange <int[]>] [-Property <IDictionary>] [-Extension <IDictionary>]` returns an ordered
-  hashtable in the snapshot `element` shape with a computed `element_id`; `cli-option` requires a
-  parent identifier beginning `cli-command-`; `LineRange` requires `1 <= start <= end`.
-- `ConvertFrom-DocsSurfaceElement -Record <IDictionary>` re-verifies `element_id` and throws
-  `DOCS_ELEMENT_ID_MISMATCH` for a record whose identifier differs from the recomputed one.
+- `New-DocsSurfaceElement -Kind -Path -Declaration -Name -AnalyzerId -AnalysisMethod -SourceText
+  [-ParentId] [-LineRange <int[]>] [-Property <IDictionary>] [-Extension <IDictionary>]` returns an
+  ordered hashtable in the snapshot `element` shape with a computed `element_id` and a computed
+  `source_sha256` (`Get-DocsDeclarationSha256 -Text $SourceText -LineRange $LineRange`).
+  `-AnalysisMethod` is mandatory and must be a value of `Get-DocsAnalysisMethod`; `-SourceText` is
+  the strict-UTF-8 text of the captured input for `Path`. `-LineRange` is mandatory for every kind
+  except `architecture-component`, and requires `1 <= start <= end <= <line count>`. A caller
+  cannot supply a digest. `cli-option` requires a parent identifier beginning `cli-command-`.
+  An invalid argument throws `DOCS_IDENTITY_INPUT_INVALID` naming the argument, or
+  `DOCS_DIGEST_RANGE_INVALID` for a range outside the text.
+- `ConvertFrom-DocsSurfaceElement -Record <IDictionary>` requires `analysis_method` in the record,
+  re-verifies `element_id` and throws `DOCS_ELEMENT_ID_MISMATCH` for a record whose identifier
+  differs from the recomputed one.
 - `New-DocsDiagnostic -Code -Path -Message -AnalyzerId [-Blocking <bool> = $true]` returns the docs
   `diagnostic` shape with `id` equal to `Get-DocsStableId -Prefix 'diagnostic' -Value
   @{ analyzer; code; path }`, severity `error` when blocking, otherwise `warning`.
@@ -313,7 +360,10 @@ this subset or accepts a `DOCS_SCHEMA_INVALID` finding for them.
   (checked with a throwing `UTF8Encoding`). No Unicode normalization is applied.
 - Because the hashed value is canonical JSON of three named members, concatenation ambiguities (for
   example path `a/b` with declaration `c` versus path `a` with declaration `b/c`) cannot collide.
-- Declaration conventions per kind (binding on 900003 and 900004):
+- `analysis_method`, `source_sha256`, `line_range`, `name` and `properties` do not participate in
+  the identifier. A native and a scanner analysis of the same declaration therefore produce the
+  same `element_id`, and ledger entries and evidence pins stay valid when the method changes.
+- Declaration conventions per kind (binding on 1022, 900004 and 900011):
 
 | Kind | Declaration | Example |
 |---|---|---|
@@ -324,26 +374,81 @@ this subset or accepts a `DOCS_SCHEMA_INVALID` finding for them.
 | `public-symbol` | qualified name | `example_pkg.module.function` |
 | `architecture-component` | package or module path | `example_pkg.analyzers` |
 
+#### Declaration-lines digest (D5)
+
+An element digest covers the declaration's source lines, not the whole file. The field names stay
+`source_sha256` and `line_range` (`{start, end}`).
+
+`ConvertTo-DocsDeclarationText -Text <string> [-LineRange <int[]>]` (pure) returns the canonical
+declaration text:
+
+1. Remove one leading U+FEFF if present.
+2. Replace every CRLF with LF, then every remaining CR with LF.
+3. If the text ends with LF, remove exactly one trailing LF. Split on LF into lines numbered from 1.
+   The empty text has zero lines.
+4. With `-LineRange @(start, end)`: require `1 <= start <= end <= <line count>`, otherwise throw
+   `DOCS_DIGEST_RANGE_INVALID` naming the range. Select lines `start` through `end` inclusive.
+   Without `-LineRange` (permitted only for `architecture-component`): select every line.
+5. Return the selected lines, each followed by exactly one LF. No trimming, no tab or whitespace
+   change and no Unicode normalization is applied. Zero selected lines give the empty string.
+
+`Get-DocsDeclarationSha256 -Text <string> [-LineRange <int[]>]` (pure) returns
+`Get-DocsSha256Hex -Text (ConvertTo-DocsDeclarationText -Text $Text -LineRange $LineRange)`: the
+lowercase hex SHA-256 of the UTF-8 bytes, without BOM, of the canonical declaration text. The input
+is the strict-UTF-8 `text` of `New-DocsCapturedInput`, so no unpaired surrogate reaches the
+encoder.
+
+Properties:
+
+- Line numbers and the range are not hashed. Inserting or deleting lines above a declaration shifts
+  its `line_range` and leaves `source_sha256` unchanged.
+- CRLF and LF forms of the same file, a file with and without a final newline, and a file with and
+  without a BOM produce the same digest.
+- An edit to any line outside the range leaves the digest unchanged; an edit to any line inside the
+  range changes it.
+- Architecture-component exception: an `architecture-component` element (a package or module path)
+  may have `line_range` `null`; its digest then covers every line of the normalized file, because
+  the module is its own declaration. This is the only case in which the digest equals a whole-file
+  digest. Owner acceptance is OQ-7.
+- A native analyzer (900011) reproduces the digest from its own line numbers with the same five
+  steps; `Invoke-DocsAnalyzer` recomputes it, so byte agreement between the scanner and a native
+  analyzer is a checked property.
+- Golden vector D1: source text `a = 1<CR><LF>def handler():<CR><LF>    return 1<CR><LF>b = 2` (no
+  final newline), range `@(2, 3)`, canonical text `def handler():<LF>    return 1<LF>`; the hex
+  digest is recorded once from an independent hash of the canonical text, with evidence under
+  `<FEATURE>/evidence/other/`.
+
 ### `DocsAnalyzerRegistry.psm1`
 
 - `Get-DocsAnalyzerRegistration` (pure) returns the committed registration rows.
 - `Test-DocsAnalyzerRegistration -Registration <object[]>` (pure) returns findings
-  (`DOCS_ANALYZER_REGISTRATION_INVALID` with a pointer to the row and field): duplicate `Id`, `Id`
-  outside the identifier grammar, empty `ElementKinds` or a kind outside `Get-DocsElementKind`,
-  `Module` not resolving inside `.claude/lib/docs/` or without a `DocsAnalyzer*.psm1` leaf,
-  `Function` not matching `^Invoke-DocsAnalyzer[A-Za-z]+$`, blank `Version`.
+  (`DOCS_ANALYZER_REGISTRATION_INVALID` with a pointer to the row and field): duplicate
+  (`Id`, `AnalysisMethod`) pair, `Id` outside the identifier grammar, `AnalysisMethod` outside
+  `Get-DocsAnalysisMethod`, a `native` row whose `Id` has no `scanner` row (the scanner baseline is
+  always available, D3), empty `ElementKinds` or a kind outside `Get-DocsElementKind`, `Module` not
+  resolving inside `.claude/lib/docs/` or without a `DocsAnalyzer*.psm1` leaf, `Function` not
+  matching `^Invoke-DocsAnalyzer[A-Za-z]+$`, blank `Version`. Uniqueness is on (`Id`,
+  `AnalysisMethod`), not on `Id` alone, so a native analyzer registers under the same identifier as
+  its scanner.
 - `Select-DocsAnalyzerRegistration -Registration <object[]> -ElementKind <string[]> [-AnalyzerId
-  <string[]>]` (pure) validates the whole request before any import, reports each unknown identifier
-  as `DOCS_ANALYZER_UNKNOWN`, and returns rows sorted by `Id` (invariant under input order).
+  <string[]>] [-NativeAvailable <string[]>]` (pure) validates the whole request before any import,
+  reports each unknown identifier as `DOCS_ANALYZER_UNKNOWN`, and returns one row per selected `Id`,
+  sorted by `Id` (invariant under input order): the `native` row when the `Id` is in
+  `-NativeAvailable` and a `native` row exists, otherwise the `scanner` row. Detection of a language
+  pack and interpreter is not part of this function; it belongs to the native analyzer's adapter
+  (900011). This selection rule is provisional (OQ-9).
 - `New-DocsCapturedInput -Path <string> -Bytes <byte[]> [-MaxBytes <int>]` (pure) returns
   `@{ path; sha256; size; text; diagnostic }`; strict UTF-8 decoding; an oversize or undecodable
   input carries a diagnostic and `text` `$null`.
 - `Invoke-DocsAnalyzer -Registration <object> -CapturedInput <object[]> -Selection <object>
   [-ImportModule <scriptblock>]` imports the module through the seam (default `Import-Module -Name
   <path> -Force -ErrorAction Stop`), calls the analyzer function, validates the output (kinds within
-  the registration, `analyzer_id` equal to `Id`, recomputed element identifiers) and returns
-  `@{ Elements; Diagnostics }` sorted by identifier.
-- Analyzer function contract (900003, 900004): `Invoke-DocsAnalyzer<Name> -CapturedInput
+  the registration, `analyzer_id` equal to `Id`, `analysis_method` equal to the row's
+  `AnalysisMethod`, recomputed element identifiers, and `source_sha256` equal to
+  `Get-DocsDeclarationSha256` over the captured input text of the element's `path` and its
+  `line_range`) and returns `@{ Elements; Diagnostics }` sorted by identifier. Output that fails
+  any check is rejected with a finding.
+- Analyzer function contract (1022, 900004, 900011): `Invoke-DocsAnalyzer<Name> -CapturedInput
   <object[]> -Selection <object>` returns `@{ Elements = @(...); Diagnostics = @(...) }`; pure,
   deterministic, no I/O, inputs not mutated; an unclassifiable or oversize input yields a diagnostic
   rather than a partial result.
@@ -351,15 +456,19 @@ this subset or accepts a `DOCS_SCHEMA_INVALID` finding for them.
 
 ```powershell
 $script:DocsAnalyzerRow = @(
-    # --- 900003: Python and configuration analyzers ---
+    # --- 1022: Python and configuration analyzers ---
     # --- 900004: TypeScript and .NET analyzers ---
+    # --- 900011: Python-native analyzers ---
 )
 ```
 
-  Row form: `[pscustomobject]@{ Id = '<identifier>'; Version = '1.0.0'; ElementKinds = @('<kind>');
-  Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzer<Name>.psm1'); Function =
-  'Invoke-DocsAnalyzer<Name>' }`, one row per line. Profiles select analyzer identifiers only; no
-  profile names a module.
+  Row form: `[pscustomobject]@{ Id = '<identifier>'; Version = '1.0.0'; AnalysisMethod =
+  '<scanner|native>'; ElementKinds = @('<kind>'); Module = (Join-Path -Path $PSScriptRoot
+  -ChildPath 'DocsAnalyzer<Name>.psm1'); Function = 'Invoke-DocsAnalyzer<Name>' }`, one row per
+  line. Profiles select analyzer identifiers only; no profile names a module or a method.
+  Anchor format is `# --- <issue number>: <scope> ---`; 900011 is appended last so no existing
+  anchor line moves. A child whose placeholder number changes on promotion edits only its own anchor
+  comment, in the same change that inserts its rows.
 
 ### `DocsProfile.psm1`
 
@@ -452,12 +561,17 @@ $script:DocsCommandRow = @(
     [pscustomobject]@{ Name = 'init'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileCommands.psm1'); Function = 'Invoke-DocsInitCommand'; Option = @{ RepositoryId = 'value'; Profile = 'value'; Write = 'switch'; Force = 'switch' } }
     [pscustomobject]@{ Name = 'validate-profile'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileCommands.psm1'); Function = 'Invoke-DocsValidateProfileCommand'; Option = @{ Profile = 'value' } }
     # --- 1021: check ---
-    # --- 900003: inventory ---
+    # --- 1022: inventory ---
     # --- 1023: coverage, update-ledger, validate ---
-    # --- 900006: generate-reference ---
+    # --- 1024: generate-reference ---
     # --- 900008: surface-delta ---
 )
 ```
+
+- Anchor numbers are the promoted issue numbers (1021, 1022, 1023, 1024) where promoted, and the
+  epic placeholder (900008) otherwise. 900011 adds no subcommand (`inventory` belongs to 1022), so
+  the dispatch table has no 900011 anchor. A child whose placeholder number changes on promotion
+  edits only its own anchor comment, in the same change that inserts its rows.
 
 - `Option` maps a PascalCase option name to `value`, `multi` (repeatable) or `switch`. The names
   `Command`, `Json`, `Help` and `RepositoryRoot` are reserved.
@@ -477,13 +591,18 @@ $script:DocsCommandRow = @(
 | 3 | Internal, environment or I/O error: PowerShell below 7.4 (`DOCS_RUNTIME_UNSUPPORTED`), a read failure other than absence, unreadable or uncomposable runtime schemas, or any unexpected exception caught at the entry boundary (`DOCS_CLI_RUNTIME`). `findings` holds exactly one finding; `result` is `null`; one fixed line is also written to stderr |
 
 - `-Json`: stdout receives exactly one document, the canonical JSON (sorted keys, compact, trailing
-  LF) of `{command, exit_code, findings, ok, result}`, where `command` is the subcommand name (for
-  example `validate-profile`), `ok` is `true` exactly when `exit_code` is 0, and `findings` is in
-  `Get-DocsOrderedFinding` order. Identical inputs, arguments and clock value produce identical
-  bytes. The envelope has no schema file; Pester and 900007 Jest tests pin it.
+  LF) of `{command, exit_code, findings, ok, result}`, where `command` is the `-Command` value when
+  it names a row of the dispatch table (for example `validate-profile`) and `null` otherwise
+  (missing or unknown command, exit 2), `ok` is `true` exactly when `exit_code` is 0, and
+  `findings` is in `Get-DocsOrderedFinding` order with its default limit. Identical inputs,
+  arguments and clock value produce identical bytes.
+- Envelope schema (D5): `schemas/docs/v1/docs-command-envelope.schema.json` pins the envelope (see
+  `### Envelope schema: docs-command-envelope`). Every `-Json` output of every subcommand validates
+  against it through `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'` and `Test-Json`.
 - Without `-Json`: `ConvertTo-DocsReportText` output on stdout.
-- `-Help`: usage text listing the table rows; reads no input; exit 0. A missing `-Command` without
-  `-Help` exits 2.
+- `-Help`: usage text listing the table rows; reads no input; exit 0. With `-Json`, `-Help` writes
+  an envelope with `exit_code` 0, no findings and `result` `{"usage": [<line>, ...]}`. A missing
+  `-Command` without `-Help` exits 2.
 
 ### Schema identity and reference conventions
 
@@ -494,6 +613,9 @@ $script:DocsCommandRow = @(
   `schema_version` (const `"1.0.0"`), `artifact_kind` (const equal to `<name>`), `id`
   (`urn:drm-copilot:docs:1.0.0:common#/$defs/identifier`), `extensions`
   (`urn:drm-copilot:docs:1.0.0:common#/$defs/extensions`).
+- Exception: `docs-command-envelope` is not an artifact. Its key set is fixed to `command`,
+  `exit_code`, `findings`, `ok` and `result`, so it carries no artifact header, and it is not a
+  value of `docs-artifact-kind` (an envelope is never pinned).
 - Shared references use the absolute docs common URN plus a JSON pointer, for example
   `{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"}`; schema-local references use
   `#/$defs/<name>`. No docs schema references `schemas/discovery/v2/`, which is not pushed down.
@@ -521,6 +643,9 @@ Docs-specific definitions:
 | Definition | Shape |
 |---|---|
 | `element-kind` | `enum: ["cli-command", "cli-option", "http-route", "config-key", "public-symbol", "architecture-component"]` |
+| `analysis-method` | `enum: ["native", "scanner"]` (D3) |
+| `audience-id` | string, pattern `^[a-z0-9][a-z0-9-]*$(?![\s\S])` |
+| `audience-ids` | array, `uniqueItems`, items `audience-id` |
 | `element-id` | string, pattern `^(?:cli-command\|cli-option\|http-route\|config-key\|public-symbol\|architecture-component)-[0-9a-f]{64}$` (also satisfies `identifier`) |
 | `element-ids` | array, `uniqueItems`, items `element-id` |
 | `disposition` | `enum: ["documented", "excluded", "deferred"]` |
@@ -536,8 +661,18 @@ Docs-specific definitions:
 | `finding` | closed object: `code` (pattern `^[A-Z][A-Z0-9_]*$`), `severity` (`enum: ["error", "warning", "info"]`), `artifact_path` (relative-path or `null`), `pointer` (RFC 6901 pointer pattern), `related_ids` (identifiers), `related_paths` (paths), `message` (text), `next_action` (text). Key set equals the output of `New-DocsFinding`. |
 | `diagnostic` | closed object: `id` (identifier), `code`, `severity` (`enum: ["information", "warning", "error"]`), `path` (relative-path or `null`), `message` (text), `analyzer_id` (identifier), `blocking` (boolean), `extensions`. |
 
-The `diataxis-mode` values are shared with 1021 (`page-metadata.schema.json`) and 900006
+The `diataxis-mode` values are shared with 1021 (`page-metadata.schema.json`) and 1024
 (`diataxis_mode: reference`).
+
+`audience-id` implements the epic pattern `^[a-z0-9][a-z0-9-]*$` (epic `### Generator decisions
+from the first preparation of 1024`) as the one shared definition for audience identifiers. The
+`(?![\s\S])` suffix follows the convention of the copied discovery patterns: `Test-Json` uses .NET
+regular expressions, in which `$` also matches before a final newline, so without the suffix a
+value such as `"readers\n"` would pass. For every string that contains no newline, the stored
+pattern accepts exactly the strings the epic pattern accepts. `audience-id` is distinct from
+`identifier`: `docs.v2` passes only `identifier`, and `2nd-line` passes only `audience-id`. An
+invalid audience identifier fails a `pattern`, which is outside the structural walk subset, so it
+yields `DOCS_SCHEMA_INVALID` rather than a field-named finding.
 
 ### Artifact schema: `docs-profile`
 
@@ -545,18 +680,20 @@ The `diataxis-mode` values are shared with 1021 (`page-metadata.schema.json`) an
 |---|---|
 | header | as above |
 | `repository` | closed object `{id: identifier}` |
-| `audiences` | array `minItems 1`, `uniqueItems`, items closed `{id: identifier, description: text}` |
-| `documentation_roots` | array `minItems 1`, items closed `{id: identifier, path: relative-path, audience_ids: identifiers}` |
+| `audiences` | array `minItems 1`, `uniqueItems`, items closed `{id: audience-id, description: text}` |
+| `documentation_roots` | array `minItems 1`, items closed `{id: identifier, path: relative-path, audience_ids: audience-ids}` |
 | `surface_selection` | closed object: `element_kinds` (array `minItems 1`, `uniqueItems`, items `element-kind`), `source_roots` (paths, `minItems 1`), `exclusions` (exclusions), `analyzers` (identifiers; optional; absent means every registered analyzer whose kinds intersect `element_kinds`) |
 | `page_owners` | array of closed `{path_or_glob: path-or-glob, owner: identifier}` |
 | `diataxis_policy` | closed object: `modes` (array `minItems 1`, `uniqueItems`, items `diataxis-mode`), `required_front_matter` (array `uniqueItems`, items `front-matter-field`), `directory_modes` (array of closed `{path_or_glob: path-or-glob, mode: diataxis-mode}`) |
 | `completion_gates` | closed object: `docs_complete` (closed `{required_dispositions_complete: const true, allow_deferred: boolean, max_stale_pages: integer minimum 0, required_parity_dimensions: array uniqueItems of parity-dimension}`), `integration_pr_gate` (closed `{enabled: boolean}`) |
 | `artifact_paths` | closed object: `inventory_snapshot`, `coverage_ledger`, `parity_matrix`, `evidence_pins`, `validation_receipt`, each relative-path |
 
-Semantic checks after schema validation are listed under `Test-DocsProfileSemantic`. Consumers:
-900003 reads `surface_selection` and `artifact_paths.inventory_snapshot`; 1023 reads
+Semantic checks after schema validation are listed under `Test-DocsProfileSemantic`, which is
+unchanged by the audience-id amendment. `New-DocsStarterProfile` and the example profile use
+audience identifiers that match `audience-id` (for example `maintainers`). Consumers: 1022 reads
+`surface_selection` and `artifact_paths.inventory_snapshot`; 1023 reads
 `completion_gates.docs_complete`, `page_owners`, `documentation_roots` and the other
-`artifact_paths`; 900006 reads `diataxis_policy` and `page_owners`; 900008 reads
+`artifact_paths`; 1024 reads `diataxis_policy` and `page_owners`; 900008 reads
 `completion_gates.integration_pr_gate.enabled`.
 
 ### Artifact schema: `surface-inventory-snapshot`
@@ -567,7 +704,7 @@ Semantic checks after schema validation are listed under `Test-DocsProfileSemant
 | `repository` | identifier |
 | `revision` | revision or `null` (working copy) |
 | `profile_sha256` | sha256 of the canonical profile bytes |
-| `analyzers` | array `uniqueItems` of closed `{id: identifier, version: text}` |
+| `analyzers` | array `uniqueItems` of closed `{id: identifier, version: text, analysis_method: analysis-method}`, all required; uniqueness of `analyzers[].id` within one snapshot is a semantic rule owned by 1022, because `uniqueItems` compares whole objects |
 | `inputs` | array `uniqueItems` of closed `{path: relative-path, sha256: sha256, size: integer minimum 0}` |
 | `elements` | array `uniqueItems` of `#/$defs/element` |
 | `diagnostics` | array of docs `diagnostic` |
@@ -575,11 +712,20 @@ Semantic checks after schema validation are listed under `Test-DocsProfileSemant
 
 `$defs/element` (closed): `element_id` (element-id), `kind` (element-kind), `path`
 (relative-path), `declaration` (text), `name` (text), `parent_id` (element-id or `null`),
-`analyzer_id` (identifier), `source_sha256` (sha256), `line_range` (closed
+`analyzer_id` (identifier), `analysis_method` (analysis-method; required, not nullable),
+`source_sha256` (sha256; schema `description` "SHA-256 of the declaration lines selected by
+line_range (normalized per spec), not of the whole file"), `line_range` (closed
 `{start: integer minimum 1, end: integer minimum 1}` or `null`), `properties` (array of closed
 `{name: identifier, value: string | number | boolean | null}`; keys and shapes only, never
-configuration values), `extensions`. Conditional rule: `kind: cli-option` requires `parent_id`
-matching `^cli-command-`; every other kind allows `null` or any element-id.
+configuration values), `extensions`. Conditional rules: `kind: cli-option` requires `parent_id`
+matching `^cli-command-`; every other kind allows `null` or any element-id. `if` `kind` is one of
+the five kinds other than `architecture-component`, `then` `properties.line_range` has
+`type: "object"`, so a `null` range on, for example, a `cli-command` yields
+`DOCS_SCHEMA_TYPE_MISMATCH` at `/elements/<n>/line_range`. `start <= end` is not expressible in
+JSON Schema and is enforced by `New-DocsSurfaceElement` and `ConvertTo-DocsDeclarationText`.
+
+The snapshot example exercises both methods: some elements carry `analysis_method: "native"` and
+others `"scanner"`, and `analyzers[]` lists one entry per method with neutral identifiers.
 
 ### Artifact schema: `docs-coverage-ledger`
 
@@ -590,9 +736,14 @@ matching `^cli-command-`; every other kind allows `null` or any element-id.
 | `snapshot_ref` | `artifact-pin` with `artifact_kind` const `surface-inventory-snapshot` |
 | `entries` | array `uniqueItems` of `#/$defs/entry` |
 
-`$defs/entry` (closed): `element_id` (element-id), `kind` (element-kind), `disposition`
-(`disposition`), `page_bindings` (array of `page-binding`), `rationale` (text or `null`), `owner`
-(identifier or `null`), `target` (text or `null`), `updated_by` (`actor`), `extensions`.
+`$defs/entry` (closed): `element_id` (element-id), `kind` (element-kind), `analysis_method`
+(analysis-method; required, not nullable), `disposition` (`disposition`), `page_bindings` (array of
+`page-binding`), `rationale` (text or `null`), `owner` (identifier or `null`), `target` (text or
+`null`), `updated_by` (`actor`), `extensions`. `analysis_method` records the method of the snapshot
+element at the last ledger synchronization; 1023 keeps it current. The ledger example copies the
+method of each entry's element. The scanner precision limit (D3) is recorded by 1023 as a
+`deferred` entry with an owner and a target, which the companion rules below already require; no
+further schema change is needed for it.
 
 Disposition companion rules (`allOf` of `if`/`then` keyed on `disposition`, within the structural
 walk subset so each violation names its field):
@@ -635,8 +786,9 @@ One document per repository holds every pin, sorted by `pin_id`.
 
 `$defs/pin` (closed): `pin_id` (identifier), `element_id` (element-id), `element_kind`
 (element-kind), `page_path` (relative-path), `symbol` (text; the pinned declaration),
-`source_path` (relative-path), `source_sha256` (sha256; 1023 compares it as an opaque value with the
-current snapshot element), `revision` (revision or `null`), `claim` (text or `null`), `pinned_at`
+`source_path` (relative-path), `source_sha256` (sha256; the declaration-lines digest copied from
+the snapshot element; 1023 compares it as an opaque value with the current snapshot element),
+`revision` (revision or `null`), `claim` (text or `null`), `pinned_at`
 (timestamp), `pinned_by` (`actor`).
 
 ### Artifact schema: `docs-validation-receipt`
@@ -665,11 +817,62 @@ Rejection coverage: each artifact schema carries an element-kind or disposition 
 means the artifact schemas `docs-profile`, `surface-inventory-snapshot`, `docs-coverage-ledger`,
 `docs-parity-matrix`, `docs-evidence-pin` and `docs-validation-receipt`; the definitions-only
 `common` schema has no root object and no example and is verified through the artifact schemas
-that reference it.
+that reference it. The non-artifact `docs-command-envelope` schema is not one of the artifact
+schemas; it has its own example and its own acceptance criterion.
+
+### Envelope schema: `docs-command-envelope`
+
+`schemas/docs/v1/docs-command-envelope.schema.json` (D5):
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:docs-command-envelope",
+  "title": "Invoke-DocsCommand.ps1 -Json output envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command", "exit_code", "findings", "ok", "result"],
+  "properties": {
+    "command": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$(?![\\s\\S])"},
+    "exit_code": {"type": "integer", "enum": [0, 1, 2, 3]},
+    "findings": {"type": "array", "maxItems": 101, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/finding"}},
+    "ok": {"type": "boolean"},
+    "result": {}
+  },
+  "allOf": [
+    {"if": {"properties": {"exit_code": {"const": 0}}},
+     "then": {"properties": {"ok": {"const": true}, "findings": {"items": {"properties": {"severity": {"enum": ["warning", "info"]}}}}}},
+     "else": {"properties": {"ok": {"const": false}}}},
+    {"if": {"properties": {"exit_code": {"const": 1}}},
+     "then": {"properties": {"findings": {"minItems": 1}}}},
+    {"if": {"properties": {"exit_code": {"enum": [2, 3]}}},
+     "then": {"properties": {"findings": {"minItems": 1, "maxItems": 1}, "result": {"type": "null"}}}}
+  ]
+}
+```
+
+- `result` is open (`{}`): each subcommand owns its result shape, so later children do not edit
+  this file. The exit 2 and exit 3 rows force `null`.
+- Every constraint except `pattern` is inside the structural walk subset, so an envelope violation
+  names its field. `maxItems: 101` is the `Get-DocsOrderedFinding` default limit of 100 plus the
+  one `FINDINGS_LIMIT` finding; every command uses the default limit.
+- The file keeps the docs common URN ref and is composed in memory by `Get-DocsComposedSchemaSet`
+  like every other docs schema (`#### Schema composition`). It has a byte-identical runtime copy
+  under `.claude/lib/docs/schemas/v1/`, a byte-identical bundle copy, and one `core.json` `paths`
+  line `".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json"`.
+- Example: `examples/docs/v1/docs-command-envelope.example.json`, a `validate-profile` exit 1
+  envelope with one `DOCS_PROFILE_AUDIENCE_UNKNOWN` finding and `result`
+  `{"profile_path": ..., "repository_id": ...}`.
 
 ## Data & State
 
-- Element identity is a pure function of kind, path and declaration.
+- Element identity is a pure function of kind, path and declaration; the analysis method does not
+  affect it.
+- `source_sha256` is a pure function of the captured input text and `line_range`
+  (`Get-DocsDeclarationSha256`).
+- The analysis method is recorded per snapshot element, per snapshot `analyzers[]` item and per
+  ledger entry; diagnostics carry no method field, and a diagnostic's method is derived through its
+  `analyzer_id` (OQ-8).
 - All ordering is deterministic: findings by `Get-DocsOrderedFinding`, elements by `element_id`,
   pins by `pin_id`, analyzer rows by `Id`, schema names in fixed order.
 - Framework code, schemas and examples contain no consumer-specific names; all repository
@@ -695,13 +898,21 @@ that reference it.
   `ConvertTo-Json` are not used for artifacts; no new module dependency.
 - CI-only behavior: the `windows-latest` runner's PowerShell version and bundled JsonSchema.Net
   determine `Test-Json` behavior; a local 7.6.9 run does not prove it. Tests assert codes, pointers
-  and field-name containment only, and the runtime fails closed below 7.4.
+  and field-name containment only, and the runtime fails closed below 7.4. The envelope schema
+  relies on `if`/`then`/`else` with `const` and `enum`, the empty schema `{}` and a `type` array
+  with `pattern`, and `audience-id` relies on the `(?![\s\S])` suffix; these are confirmed only by
+  the CI result.
+- Digest tests use in-memory strings with explicit CR characters, so the repository
+  `.gitattributes` line-ending rule cannot affect them.
 - Batch budget: sixteen production PowerShell files (eight plus eight bundle copies) exceed the
   direct-mode cap, so execution runs on the large route in the item worktree that holds the
   orchestration checkpoint, never in an isolated executor worktree.
 - File size: `Invoke-DocsCommand.ps1`, `DocsSchema.psm1` and `DocsProfile.psm1` are the largest
   candidates; a file reaching the 500-line guidance is split into a new `Docs<Area>.psm1` with its
-  own Pester suite, push-down copy and core entry.
+  own Pester suite, push-down copy and core entry. `DocsSurface.psm1` and
+  `DocsAnalyzerRegistry.psm1` grow with this amendment; if `DocsSurface.psm1` approaches 500 lines,
+  the digest functions move to `DocsDeclarationDigest.psm1` with the same obligations and a
+  classification row.
 - Test isolation: dot-sourcing the entry script imports `Docs*` and `DiscoveryEncoding` modules into
   the session; every suite removes them in `AfterAll`.
 - Shared append-only edit points: `Invoke-DocsCommand.ps1` dispatch table, `DocsAnalyzerRegistry.psm1`,
@@ -714,8 +925,9 @@ that reference it.
 ## Implementation Strategy
 
 - Create the eight production files under `.claude/lib/docs/` listed in `### Module conventions`.
-- Create `schemas/docs/v1/common.schema.json` and the six artifact schemas, and
-  `examples/docs/v1/<name>.example.json` for each artifact schema.
+- Create `schemas/docs/v1/common.schema.json`, the six artifact schemas and
+  `schemas/docs/v1/docs-command-envelope.schema.json`, and `examples/docs/v1/<name>.example.json`
+  for each artifact schema and for the envelope.
 - Create the runtime copies `.claude/lib/docs/schemas/v1/*.schema.json`.
 - Create byte-identical bundle copies of every file under `.claude/lib/docs/` at
   `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`.
@@ -742,7 +954,8 @@ that reference it.
   and `examples/docs/`, read once into memory.
 - Golden identity vectors: for each chosen `(kind, path, declaration)` the test asserts the exact
   canonical string and the hex digest recorded once from an independent hash of that string
-  (evidence under `<FEATURE>/evidence/`).
+  (evidence under `<FEATURE>/evidence/`). The declaration-lines digest golden vector D1 is recorded
+  the same way, in the same evidence file.
 - Dependency changes: none.
 - Logging: none added; exit-3 diagnostics go to stderr.
 - Rollout: additive; destination repositories receive the lib through the existing Claude
@@ -766,9 +979,13 @@ Python" applies to every row.
 | `.claude/lib/docs/DocsProfileCommands.psm1` | pushed-down helper/lib | PowerShell | R1 |
 | `.claude/lib/docs/Invoke-DocsCommand.ps1` | pushed-down helper/lib (entry) | PowerShell | R1 |
 | `.claude/lib/docs/schemas/v1/*.schema.json` (runtime copies of `schemas/docs/v1/`) | schema/config/data (pushed down) | JSON | D; location is OQ-1 |
+| `.claude/lib/docs/schemas/v1/docs-command-envelope.schema.json` (runtime copy, D5) | schema/config/data (pushed down) | JSON | D; location is OQ-1 |
 | `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/**` (bundle copies of every file above) | pushed-down helper/lib and data (mirror) | PowerShell, JSON | R1, D |
+| `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/schemas/v1/docs-command-envelope.schema.json` (bundle copy, D5) | schema/config/data (mirror) | JSON | D |
 | `schemas/docs/v1/common.schema.json` and the artifact schemas | schema/config/data | JSON | D |
+| `schemas/docs/v1/docs-command-envelope.schema.json` (canonical, non-artifact, D5) | schema/config/data | JSON | D |
 | `examples/docs/v1/<name>.example.json` (one per artifact schema) | schema/config/data | JSON | D |
+| `examples/docs/v1/docs-command-envelope.example.json` (D5) | schema/config/data | JSON | D |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit) | schema/config/data | JSON | D |
 | `quality-tiers.yml` (edit) | schema/config/data | YAML | D |
 | `tests/scripts/claude-lib/docs/*.Tests.ps1`, `Docs.TestSupport.psm1`, `fixtures/*.psm1` | test | PowerShell (Pester) | D |
@@ -776,16 +993,40 @@ Python" applies to every row.
 
 No MCP tool, extension command, hook, skill, agent, Python file or TypeScript file is created or
 edited. Every artifact follows the language rule; OQ-1 and OQ-2 concern location and reachability,
-not language.
+not language. The D3 language exception (a language-native analyzer pushed down only with its
+language's pack) applies to 900011, not to 1020: 1020 creates no Python file. If the conditional
+split of `## Constraints & Risks` creates `.claude/lib/docs/DocsDeclarationDigest.psm1`, it is a
+pushed-down helper/lib in PowerShell under R1, with a bundle copy and a `core.json` line.
 
 ## Decisions Later Children Must Honor
 
 - Register a subcommand by inserting rows directly under the child's own anchor in
-  `Invoke-DocsCommand.ps1` (1021, 900003, 1023, 900006, 900008); never edit another anchor or row.
+  `Invoke-DocsCommand.ps1` (1021, 1022, 1023, 1024, 900008); never edit another anchor or row.
   Command modules are `Docs<Area>Commands.psm1` or the epic-named module and follow the command
-  function contract.
-- Analyzer rows go under the child's anchor in `DocsAnalyzerRegistry.psm1` (900003, 900004);
+  function contract. 900011 has no dispatch anchor.
+- Analyzer rows go under the child's anchor in `DocsAnalyzerRegistry.psm1`, whose anchors are, in
+  order, `# --- 1022: Python and configuration analyzers ---`,
+  `# --- 900004: TypeScript and .NET analyzers ---` and `# --- 900011: Python-native analyzers ---`;
   analyzers follow the `Invoke-DocsAnalyzer<Name> -CapturedInput -Selection` contract and are pure.
+  A child whose placeholder number changes on promotion edits only its own anchor comment, in the
+  same change that inserts its rows.
+- Registry keying (D3): every row carries `AnalysisMethod` (`scanner` or `native`); uniqueness is
+  on (`Id`, `AnalysisMethod`); a `native` row requires a `scanner` row with the same `Id`. 1022 and
+  900004 register `scanner` rows; 900011 registers `native` rows under the same identifiers as the
+  1022 Python analyzers. Selection takes the `native` row only for identifiers passed in
+  `-NativeAvailable`; detection of the pack and interpreter belongs to the 900011 adapter (OQ-9).
+- `analysis_method` (D3): every element an analyzer returns carries `analysis_method` equal to its
+  registry row's `AnalysisMethod` (1022 and 900004: `scanner`; 900011: `native`); every snapshot
+  `analyzers[]` item carries it; every ledger entry carries the method of its snapshot element and
+  1023 keeps it current. It is not part of the element identifier and is not added to diagnostics.
+  The scanner precision limit is recorded by 1023 as a `deferred` ledger entry with an owner and a
+  target.
+- Declaration-lines digest (D5): `source_sha256` is `Get-DocsDeclarationSha256` over the captured
+  input text and `line_range`, built only through `New-DocsSurfaceElement -SourceText`; `line_range`
+  is required for every kind except `architecture-component`; `Invoke-DocsAnalyzer` rejects any
+  element whose digest differs from the recomputed one. A native analyzer (900011) reproduces the
+  five normalization steps of `#### Declaration-lines digest` byte for byte. Evidence pins copy the
+  element digest, and 1023 compares digests as opaque values.
 - Use only literal `Join-Path -Path $PSScriptRoot -ChildPath '<literal>'` for sibling modules and
   data; list every new `.claude/lib/docs/` file (PowerShell and data) in Claude `core.json`, mirror
   it byte-identically, and keep `Docs.Manifest.Tests.ps1` green.
@@ -794,12 +1035,23 @@ not language.
   under the 1021 anchor; shared definitions are referenced through
   `urn:drm-copilot:docs:1.0.0:common#/$defs/<name>`; no ref to discovery schemas; timestamps use a
   `pattern`, never `format` alone.
+- Audience identifiers (coordination with 1021): 1021 `page-metadata.schema.json` `audience` is
+  `minItems 1` with items `urn:drm-copilot:docs:1.0.0:common#/$defs/audience-id` (or `audience-ids`
+  plus `minItems 1`); it does not restate the pattern. The docs profile uses `audience-id` for
+  `audiences[].id` and `audience-ids` for `documentation_roots[].audience_ids`, so profile audience
+  identifiers and page-metadata `audience` values follow one pattern.
 - Validate artifacts with `Test-DocsArtifactText`; never rely on `Test-Json` message text to name a
   field. Constraints whose failures must name a field stay within the structural walk subset.
 - Parse JSON with `ConvertFrom-DocsJsonText`; never `ConvertFrom-Json` for artifacts.
 - Build findings with `New-DocsFinding` and results with `New-DocsCommandResult`; exit codes 0/1/2/3
   and the `-Json` envelope apply to every subcommand; never print output or call `exit` inside a
   command module.
+- Envelope schema (D5): every subcommand's `-Json` output validates against
+  `schemas/docs/v1/docs-command-envelope.schema.json`; each child adds a Pester case that validates
+  its subcommands' `-Json` output through `Test-DocsArtifactText -ArtifactKind
+  'docs-command-envelope'`. `result` is owned by each subcommand and is not constrained by the
+  envelope schema; children do not edit the envelope schema. Commands use the default finding
+  limit.
 - No filesystem, clock or process access outside the command context; tests use in-memory contexts
   and create no temporary files.
 - Consumer configuration and workflow templates ship as data under `.claude/lib/docs/templates/` and
@@ -807,8 +1059,9 @@ not language.
   900008); no push-down root is added and no file goes under
   `extensions/drm-copilot/resources/templates/`.
 - Element identifiers come from `Get-DocsElementId`; records are rebuilt with
-  `ConvertFrom-DocsSurfaceElement`; pin and receipt identifiers use `Get-DocsStableId`; digests use
-  `Get-DocsBytesSha256Hex` and are compared as opaque values (1023).
+  `ConvertFrom-DocsSurfaceElement`; pin and receipt identifiers use `Get-DocsStableId`; element
+  digests use `Get-DocsDeclarationSha256`, other file digests use `Get-DocsBytesSha256Hex`, and all
+  digests are compared as opaque values (1023).
 - Profile access goes through `ConvertFrom-DocsProfileText`; the keys 1023 relies on are
   `artifact_paths.{inventory_snapshot, coverage_ledger, parity_matrix, evidence_pins,
   validation_receipt}`, `completion_gates.docs_complete.{allow_deferred, max_stale_pages,
@@ -816,7 +1069,8 @@ not language.
 - 1023's single-write-boundary test allowlists `Write-DocsFileText` in `Invoke-DocsCommand.ps1` with
   the reason "init create-only and explicit overwrite"; 1023 adds its own boundary module.
 - 900007 invokes `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command <name>
-  -Json ...` with the workspace root as working directory and parses the envelope; it adds no logic.
+  -Json ...` with the workspace root as working directory and parses the envelope, whose shape is
+  fixed by `docs-command-envelope.schema.json`; it adds no logic.
 - 900009 skills call `Invoke-DocsCommand.ps1` or the MCP tools; Codex reachability follows OQ-2.
 - 900010 states PowerShell 7.4 as the destination prerequisite (OQ-3).
 
@@ -846,19 +1100,41 @@ criteria through a specification revision.
    through `init` means a pushed-down helper writes into a destination's `.github/workflows/` and
    repository-root dotfiles. Provisional default: allowed only with `-Write`, create-only unless
    `-Force`, dry run by default, every planned path listed before any write.
+6. **OQ-6 - D5 self-contained fallback form.** D5 names self-contained schemas as the fallback when
+   cross-file `$ref` fails, which the probe confirmed. Options: (a) each schema file keeps the docs
+   common URN ref and `Join-DocsSchemaText` composes a self-contained schema in memory before
+   `Test-Json`; (b) each file physically inlines the shared definitions it uses (a second copy per
+   file, each needing a parity test). Provisional default: (a).
+7. **OQ-7 - Architecture-component digest exception.** An `architecture-component` element may have
+   `line_range` `null`, and its digest then covers every line of the normalized file. This is the
+   only case where the digest equals a whole-file digest. Provisional default: allow the exception.
+8. **OQ-8 - Granularity of the recorded method.** D3 says the ledger records the analysis method
+   "per finding". Provisional default: the method is recorded per ledger entry, per snapshot element
+   and per snapshot `analyzers[]` item, matching the epic D3 text "per element"; the docs common
+   `diagnostic` gains no method field, and a diagnostic's method is derived through its
+   `analyzer_id`.
+9. **OQ-9 - Registry key and native selection rule.** Provisional default: rows are unique on
+   (`Id`, `AnalysisMethod`); a `native` row requires a `scanner` row with the same `Id`; selection
+   returns the `native` row only for identifiers in `-NativeAvailable`, otherwise the `scanner` row.
+   1022 and 900011 confirm or revise this rule in their own preparation through an epic-level
+   update.
 
-No owner question was added beyond OQ-1 to OQ-5.
+OQ-1 to OQ-5 come from the re-preparation; OQ-6 to OQ-9 come from the D3 and D5 amendment research
+and are not decided beyond their provisional defaults.
 
 ## Numeric Derivation Reference
 
-The acceptance criteria name the artifact schemas by name and assert no count. Counts used in the
-narrative are supported by complete `## Numeric Derivation Evidence` records: the artifact schema
-family in the earlier research and the production PowerShell file family (eight files) in the
-addendum research.
+The acceptance criteria name the artifact schemas, anchors and test cases by name and assert no
+count. Counts used in the narrative are supported by complete `## Numeric Derivation Evidence`
+records: the artifact schema family in the earlier research, the production PowerShell file family
+(eight files) in the PowerShell design addendum research, and, in the D3 and D5 amendment
+research, the docs schema file family after the amendment (eight files, including `common` and
+`docs-command-envelope`) and the `.claude/lib/docs/` file family after the amendment (sixteen files:
+eight PowerShell files and eight runtime schema copies).
 
 ## Acceptance Criteria
 
-- [ ] Every example under `examples/docs/v1/` validates against its artifact schema: `Test-Json` returns `True` and `Test-DocsArtifactText` returns no finding for each example (`tests/scripts/claude-lib/docs/DocsSchemaContract.Tests.ps1`).
+- [ ] Every example under `examples/docs/v1/` validates against its schema, including the `docs-command-envelope` example against the envelope schema: `Test-Json` returns `True` and `Test-DocsArtifactText` returns no finding for each example (`tests/scripts/claude-lib/docs/DocsSchemaContract.Tests.ps1`).
 - [ ] For each artifact schema (`docs-profile`, `surface-inventory-snapshot`, `docs-coverage-ledger`, `docs-parity-matrix`, `docs-evidence-pin`, `docs-validation-receipt`), an in-memory copy of its example with one required field deleted, and a copy with an unknown element kind or disposition, each make `Test-Json` return `False` and make `Test-DocsArtifactText` return an `error` finding (`DOCS_SCHEMA_REQUIRED_MISSING`, `DOCS_SCHEMA_VALUE_NOT_ALLOWED` or `DOCS_SCHEMA_PROPERTY_UNKNOWN`) whose pointer locates the mutated field (`DocsSchemaContract.Tests.ps1`).
 - [ ] `Invoke-DocsCommand.ps1 -Command validate-profile -Profile examples/docs/v1/docs-profile.example.json` exits 0 with no `error` finding (`tests/scripts/claude-lib/docs/Invoke-DocsCommand.Tests.ps1` and `DocsProfileCommands.Tests.ps1`).
 - [ ] `-Command validate-profile` exits 1 for an invalid profile, and the finding names the failing field: a profile without `audiences` yields `DOCS_SCHEMA_REQUIRED_MISSING` at `/audiences` with a message containing `audiences`; a missing required field inside a nested `$ref` target yields a finding whose pointer and message name that field; an unknown element kind yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/surface_selection/element_kinds/<n>`; the field naming comes from `Get-DocsSchemaStructuralFinding`, not from `Test-Json` message text (`DocsProfileCommands.Tests.ps1`, `DocsSchema.Tests.ps1`).
@@ -874,9 +1150,9 @@ addendum research.
 - [ ] `Join-DocsSchemaText` rewrites docs common URN refs and refs inside copied definitions to `#/$defs/common.<name>`, leaves local refs unchanged, removes the root `$id`, returns `DOCS_SCHEMA_COMPOSITION_CONFLICT` for a target `$defs` key beginning `common.`, and returns `DOCS_SCHEMA_REF_UNRESOLVED` for an unknown common name and for a foreign URN, file or URI ref without retrieving it (`tests/scripts/claude-lib/docs/DocsSchema.Tests.ps1`).
 - [ ] `Test-DocsArtifactText` returns exactly one `DOCS_SCHEMA_INVALID` finding with pointer `''` when `Test-Json` returns `False` with no ErrorRecord and the structural walk finds nothing, and returns the walk findings when the walk reports an error (`DocsSchema.Tests.ps1`, using a schema constraint outside the walk subset and a stubbed `Test-Json` result where needed).
 - [ ] Exit codes follow 0/1/2/3 for every 1020 subcommand: 0 for success and `-Help`; 1 for `error` findings; 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` `null` for a missing `-Command`, an unknown command, an unknown option, a missing value, a repeated non-`multi` option and a non-relative path; 3 with exactly one finding (`DOCS_RUNTIME_UNSUPPORTED` through the `-PowerShellVersion` seam set below 7.4, or `DOCS_CLI_RUNTIME` for an injected exception) and one stderr line (`Invoke-DocsCommand.Tests.ps1`).
-- [ ] With `-Json`, stdout is exactly one canonical JSON document whose keys are `command`, `exit_code`, `findings`, `ok` and `result`, `command` is the subcommand name, `ok` is `true` exactly when `exit_code` is 0, and two runs with identical inputs, arguments and clock produce identical bytes; without `-Json`, the last line is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>` (`Invoke-DocsCommand.Tests.ps1`, `DocsFinding.Tests.ps1`).
-- [ ] `Test-DocsCommandTable` returns no finding for the committed dispatch table; the table contains the `init` and `validate-profile` rows under the `# --- 1020: init, validate-profile ---` anchor followed by the anchors for 1021, 900003, 1023, 900006 and 900008 in that order; and `Test-DocsCommandTable` rejects a duplicate name, a reserved option name and a function outside `^Invoke-Docs[A-Za-z]+Command$` (`Invoke-DocsCommand.Tests.ps1`).
-- [ ] The committed analyzer registry has no rows and carries the 900003 and 900004 anchors; `Test-DocsAnalyzerRegistration` returns no finding for it and returns `DOCS_ANALYZER_REGISTRATION_INVALID` for a duplicate `Id` and for a `Module` outside `.claude/lib/docs/`; `Select-DocsAnalyzerRegistration` reports `DOCS_ANALYZER_UNKNOWN` without invoking the `-ImportModule` seam; `Invoke-DocsAnalyzer` rejects fixture output whose kind is outside the registration (`tests/scripts/claude-lib/docs/DocsAnalyzerRegistry.Tests.ps1`).
+- [ ] With `-Json`, stdout is exactly one canonical JSON document whose keys are `command`, `exit_code`, `findings`, `ok` and `result`, `command` is the subcommand name when `-Command` names a dispatch-table row and `null` for a missing or unknown command, `ok` is `true` exactly when `exit_code` is 0, and two runs with identical inputs, arguments and clock produce identical bytes; without `-Json`, the last line is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>` (`Invoke-DocsCommand.Tests.ps1`, `DocsFinding.Tests.ps1`).
+- [ ] `Test-DocsCommandTable` returns no finding for the committed dispatch table; the table contains the `init` and `validate-profile` rows under the `# --- 1020: init, validate-profile ---` anchor followed by the anchors for 1021, 1022, 1023, 1024 and 900008 in that order, with no anchor numbered 900003 or 900006; and `Test-DocsCommandTable` rejects a duplicate name, a reserved option name and a function outside `^Invoke-Docs[A-Za-z]+Command$` (`Invoke-DocsCommand.Tests.ps1`).
+- [ ] The committed analyzer registry has no rows and carries the anchors `# --- 1022: Python and configuration analyzers ---`, `# --- 900004: TypeScript and .NET analyzers ---` and `# --- 900011: Python-native analyzers ---` in that order, with no anchor numbered 900003; `Test-DocsAnalyzerRegistration` returns no finding for it and returns `DOCS_ANALYZER_REGISTRATION_INVALID` for a duplicate (`Id`, `AnalysisMethod`) pair and for a `Module` outside `.claude/lib/docs/`; `Select-DocsAnalyzerRegistration` reports `DOCS_ANALYZER_UNKNOWN` without invoking the `-ImportModule` seam; `Invoke-DocsAnalyzer` rejects fixture output whose kind is outside the registration (`tests/scripts/claude-lib/docs/DocsAnalyzerRegistry.Tests.ps1`).
 - [ ] Every new file under `.claude/lib/docs/` passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, and no production file under `.claude/lib/docs/` exceeds 500 logical lines.
 - [ ] `quality-tiers.yml` contains an entry with `path: ".claude/lib/docs"` and `tier: T3`; `python -m scripts.dev_tools.check_quality_tiers` exits 0 and `test_committed_quality_tiers_yml_matches_live_tree` and `test_committed_quality_tiers_yml_assigns_spec_tiers` pass unmodified.
 - [ ] No Python or TypeScript file is added or modified: `git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`; and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
@@ -884,12 +1160,16 @@ addendum research.
 - [ ] No test creates a temporary file: no file under `tests/scripts/claude-lib/docs/` contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and every command test uses an in-memory command context.
 - [ ] Pester line coverage is at least 85% for each production file under `.claude/lib/docs/`, read from the PoshQC coverage report produced by `Invoke-PoshQCTest`, with no production file excluded from measurement (no branch-coverage gate applies to Pester); the figures are recorded under `<FEATURE>/evidence/coverage/`.
 - [ ] (CI-dependent) The required check `poshqc / PowerShell QC` on `windows-latest` and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
+- [ ] Analysis method (D3): docs common defines `analysis-method` as `enum: ["native", "scanner"]`; the snapshot `$defs/element`, the snapshot `analyzers[]` items and the ledger `$defs/entry` each require a non-null `analysis_method`, and for each of them an in-memory copy of the example with `analysis_method` deleted yields `DOCS_SCHEMA_REQUIRED_MISSING` and a copy with an unknown value yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED`, each with a pointer that locates the field (`DocsSchemaContract.Tests.ps1`); `New-DocsSurfaceElement` rejects an `-AnalysisMethod` outside `Get-DocsAnalysisMethod` with `DOCS_IDENTITY_INPUT_INVALID`, and two elements that differ only in `AnalysisMethod` have equal `element_id` and are both accepted by `ConvertFrom-DocsSurfaceElement` (`DocsSurface.Tests.ps1`); `Test-DocsAnalyzerRegistration` returns `DOCS_ANALYZER_REGISTRATION_INVALID` for an `AnalysisMethod` outside `Get-DocsAnalysisMethod` and for a `native` row without a `scanner` row of the same `Id`, and accepts a `scanner` row and a `native` row that share an `Id`; `Select-DocsAnalyzerRegistration` returns the `native` row for an `Id` in `-NativeAvailable` and the `scanner` row otherwise; `Invoke-DocsAnalyzer` rejects fixture output whose `analysis_method` differs from the row's `AnalysisMethod` (`DocsAnalyzerRegistry.Tests.ps1`).
+- [ ] Declaration-lines digest (D5): a Pester test proves locality of `Get-DocsDeclarationSha256` for a six-line in-memory text and range `@(3, 4)`: changing line 1, changing line 6, inserting two lines above with the range shifted to `@(5, 6)`, converting line endings to CRLF, removing the final newline and adding a BOM each leave the digest unchanged, while changing one character in line 3, changing one character in line 4, and extending the range to `@(3, 5)` each change it; a seeded `[System.Random]` property test (seed printed on failure) shows that a mutation of a line outside the range never changes the digest and appending a character to a line inside the range always changes it; ranges `@(0, 1)`, `@(3, 2)` and an `end` beyond the line count throw `DOCS_DIGEST_RANGE_INVALID`; an `architecture-component` without a range digests every normalized line; golden vector D1 matches its recorded canonical text and hex digest (`DocsSurface.Tests.ps1`); a `null` `line_range` on a `cli-command` element yields `DOCS_SCHEMA_TYPE_MISMATCH` at `/elements/<n>/line_range` (`DocsSchemaContract.Tests.ps1`); and `Invoke-DocsAnalyzer` rejects fixture output whose `source_sha256` differs from the digest recomputed from the captured input and `line_range` (`DocsAnalyzerRegistry.Tests.ps1`).
+- [ ] Envelope schema (D5): `schemas/docs/v1/docs-command-envelope.schema.json` exists with `$id` `urn:drm-copilot:docs:1.0.0:docs-command-envelope`, its runtime copy under `.claude/lib/docs/schemas/v1/` and its bundle copy are byte-identical to it, and `core.json` lists `.claude/lib/docs/schemas/v1/docs-command-envelope.schema.json`; a Pester test validates the `Invoke-DocsCommand.ps1 -Json` output of each planned `-Json` scenario (exit 0 `validate-profile`, exit 1 invalid profile, each exit 2 case, each exit 3 case, and `-Help -Json`) against the envelope schema, asserting that `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'` returns no finding and that `Test-Json` with the composed envelope schema returns `True`, with `Test-Json` not mocked in that suite (`Invoke-DocsCommand.Tests.ps1`); and in-memory mutations of the envelope example are rejected: `ok` true with `exit_code` 1 yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/ok`, an extra key yields `DOCS_SCHEMA_PROPERTY_UNKNOWN`, `exit_code` 2 with two findings yields `DOCS_SCHEMA_ITEM_COUNT` at `/findings`, `exit_code` 0 with an `error` finding yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/findings/0/severity`, and a missing `result` yields `DOCS_SCHEMA_REQUIRED_MISSING` at `/result` (`DocsSchemaContract.Tests.ps1`).
+- [ ] Audience identifiers: docs common defines `audience-id` with pattern `^[a-z0-9][a-z0-9-]*$(?![\s\S])` and `audience-ids`, and the profile schema references them for `audiences[].id` and `documentation_roots[].audience_ids` (`DocsSchemaContract.Tests.ps1`); profiles with audience identifiers `Readers`, `docs.v2`, `a_b`, `-x` and `readers` followed by a newline are each rejected by `ConvertFrom-DocsProfileText` (`Ok` false, at least one `error` finding), and profiles with `2nd-line` and `maintainers` are accepted (`DocsProfile.Tests.ps1`).
 
 ## Definition of Done
 
 - [ ] Acceptance criteria documented and mapped to Pester suites or commands
 - [ ] Behavior matches acceptance criteria on PowerShell 7.4 or later and on the CI `windows-latest` runner
-- [ ] Edge cases covered by tests: empty file, invalid JSON, duplicate keys, excess depth, unknown analyzer identifier, duplicate audience identifiers, unknown audience reference, directory mode outside the policy, existing init target
+- [ ] Edge cases covered by tests: empty file, invalid JSON, duplicate keys, excess depth, unknown analyzer identifier, duplicate audience identifiers, unknown audience reference, directory mode outside the policy, existing init target, digest range outside the text, empty source text, `architecture-component` without a range, `native` registry row without a `scanner` row, analyzer output with a mismatched method or digest
 - [ ] Docs suites pass in three seeded shuffled file-order runs in one process (each seed and order recorded) and in a fresh single-process run over `tests/scripts`, with evidence under `<FEATURE>/evidence/regression-testing/`
 - [ ] Toolchain pass completed (format, lint with PSScriptAnalyzer, architecture and contract tests, Pester) in a single clean pass
 - [ ] Forbidden-token scan with bracket-class patterns over every changed file reports no match
@@ -897,6 +1177,6 @@ addendum research.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage areas: JSON parsing, findings and envelope, schema composition and structural walk, profile loading and validation, surface identities, analyzer registry, entry script.
+- [ ] Unit coverage areas: JSON parsing, findings and envelope, schema composition and structural walk, profile loading and validation, surface identities, declaration-lines digest, analyzer registry, entry script.
 - [ ] Integration scenarios: every example validates against its composed schema; runtime schema copies and bundle copies match their sources.
 - [ ] CLI examples: `Invoke-DocsCommand.ps1 -Command init`, `Invoke-DocsCommand.ps1 -Command validate-profile`.
