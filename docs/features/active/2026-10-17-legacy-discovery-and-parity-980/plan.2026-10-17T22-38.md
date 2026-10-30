@@ -1091,12 +1091,12 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Analyzer findings from a direct run with the repository settings file; counts from the JUnit copy, which include LPTEST/DiscoverySentinelConsumption.Contract.Tests.ps1; coverage from the XML copy.
   - Acceptance: No failure, line coverage at least 85% read from the evidence copy, and the canonical artifacts/pester/powershell-coverage.xml total equals the evidence copy's total.
 
-- [ ] [P18-T4] Verify coverage for the changed production file of the cycle and the repository totals (FEATURE/evidence/qa-gates/).
+- [x] [P18-T4] Verify coverage for the changed production file of the cycle and the repository totals (FEATURE/evidence/qa-gates/).
   - Files and behavior: Write FEATURE/evidence/qa-gates/p18-coverage-comparison.<timestamp>.md from the P18-T1 JSON, the P18-T2 summary and the P18-T3 XML: per-file baseline (the lexicographically greatest FEATURE/evidence/qa-gates/p16-coverage-comparison.*.md), final and delta for CL/DiscoveryCapability.psm1 with its changed lines fully covered, confirmation through `git diff --name-only --diff-filter=AM` from the merge base of origin/main and HEAD to HEAD that no other production file changed since that baseline, and the Python, extension TypeScript and PowerShell totals beside the P17-T1 baseline figures, with `git status --porcelain` recorded empty beside them.
   - Tests and proof: The module at least 85% lines with no regression on changed lines; no total below its P17-T1 baseline by more than the lines the cycle changed; no exclusion and no threshold change.
   - Acceptance: Every listed value is numeric and meets its floor; a missing measurement fails the gate.
 
-- [ ] [P18-T5] Verify mirror parity, publication contracts, file size and evidence locations on the final tree (FEATURE/evidence/qa-gates/).
+- [x] [P18-T5] Verify mirror parity, publication contracts, file size and evidence locations on the final tree (FEATURE/evidence/qa-gates/).
   - Files and behavior: Write FEATURE/evidence/qa-gates/p18-mirror-and-publication-contracts.<timestamp>.md, p18-file-size.<timestamp>.md and p18-evidence-locations.<timestamp>.md.
   - Tests and proof: The byte comparison of CL/DiscoveryCapability.psm1 against each mirror; the generator check; the push-down resource, pack-manifest and dependency-closure contracts and DTTEST/test_discovery_publication_contracts.py; the logical-line count of every Phase 17 production, test and script file; `poetry run python scripts/dev_tools/validate_evidence_locations.py --root .`.
   - Acceptance: Zero differences and zero drift; every named suite passes; every Phase 17 file is at or below 500 logical lines; the evidence-location validator exits 0.
