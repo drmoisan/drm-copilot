@@ -11,7 +11,7 @@ Every implementation task of the plan is accepted with canonical evidence. Phase
 
 ## Acceptance criteria
 
-Source files: `spec.md` and `user-story.md` (`## Acceptance Criteria`, 66 criteria each, identical text). Per-criterion mapping: `evidence/qa-gates/acceptance-criteria-status.2026-10-26T02-57.md` for the full table, `evidence/qa-gates/acceptance-criteria-status.2026-10-29T12-51.md` for the Phase 14 changes, and `evidence/qa-gates/acceptance-criteria-status.2026-10-30T01-58.md` for the remediation-cycle re-evaluation of AC-07, AC-60, AC-65 and AC-66 (each re-proven from Phase 15 or 16 evidence), the Phase 16 quality citations and the closing task of every review finding. Counts: 65 checked and 1 unchecked in each file.
+Source files: `spec.md` and `user-story.md` (`## Acceptance Criteria`, 66 criteria each, identical text). Per-criterion mapping: `evidence/qa-gates/acceptance-criteria-status.2026-10-26T02-57.md` for the full table, `evidence/qa-gates/acceptance-criteria-status.2026-10-29T12-51.md` for the Phase 14 changes, `evidence/qa-gates/acceptance-criteria-status.2026-10-30T01-58.md` for the cycle-1 re-evaluation of AC-07, AC-60, AC-65 and AC-66 (each re-proven from Phase 15 or 16 evidence), and `evidence/qa-gates/acceptance-criteria-status.2026-10-30T12-46.md` for the cycle-2 re-citation of AC-59, AC-60, AC-61, AC-63 and AC-66 from Phase 18 evidence, the AC-64 row with the R5 closing evidence and the deferral record, and the closing task of every 2026-10-30T10-19 finding. Counts: 65 checked and 1 unchecked in each file.
 
 | Unchecked criterion | Reason |
 | --- | --- |
@@ -41,6 +41,10 @@ The two blockers the first self-review escalated (`evidence/qa-gates/self-review
 ## Review findings of 2026-10-29T13-16 and their closure
 
 R1 (TypeScript coverage artifact absent): P15-T20, P16-T2, P16-T4. R2 (evidence-location validator): P15-T2, P16-T8. R3 (probe attests from its own synthetic environment): P15-T10, P15-T11, P16-T7. R4 (no production supplier of the trusted identity; user decision: the host hook payload): P15-T3 to P15-T9, P15-T12 to P15-T16, P15-T23. The Major (Python re-admits a consumed grant): P15-T16. The Minors: P15-T19 (deep-copied `before`), P15-T16 (identity-refusal finding per row), P16-T3 (full-run coverage file), P15-T17 (read-target re-check), P15-T23 and P16-T9 (status lines), P15-T21 (brief wording). The user-directed catalog cache: P15-T18. The per-finding evidence is tabulated in `evidence/qa-gates/acceptance-criteria-status.2026-10-30T01-58.md`.
+
+## Review findings of 2026-10-30T10-19 and their closure
+
+R5 (Blocker, sentinel consumption contract): P17-T2 (shared fixture with Python and TypeScript replays), P17-T3 (fail-before contract run), P17-T4 (probe reads the `.consumed` latch; test pair built from the gate), P17-T5 (cross-runtime smoke over one real filesystem store), P17-T6 (mirrors). The Minor (root-grant strict decode and no pruning) and the Nit (`SHELL` observation matched by `agent_id` only): deferred to #1007 and #1008 by user decision (`evidence/other/p17-deferred-findings.2026-10-30T12-13.md`). The `## Capability probe` sentence: P17-T7. The per-finding evidence is tabulated in `evidence/qa-gates/acceptance-criteria-status.2026-10-30T12-46.md`.
 
 ## Review, CI and orchestration
 
