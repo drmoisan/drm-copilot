@@ -46,16 +46,17 @@ Goal: migrate to the common cross-tool conventions so that each tool loads every
 - **Gold standard.** Each shared skill has a tool-neutral contract (objective, observable behaviors, acceptance checks). Differences between ecosystems are judged against the skill's objective: positive, negative, neutral or mechanism-only. Positives are ported in any direction. The owner approves in bulk and only disputed cases are escalated. Mechanism may differ per tool; the gold standard does not.
 - **Retirements.** `.github/skills` retires once its three unique sections (in `feature-promotion-lifecycle` and `feature-review-workflow`) are ported or found stale. It is a strict subset of the other two folders.
 - **Delivery.** Destinations choose packs per ecosystem and the shared layer is always installed. The three push-downs become one pipeline with the existing MCP tools kept as thin wrappers. Migration is non-destructive: a dry-run report first, and a destination's own edits are never overwritten (detected against the last pushed-down manifest).
+- **Feature folder naming (added 2026-10-30).** Feature folders in `active`, `completed` and `archive` change from `yyyy-MM-dd-<feature>-<issue>` to `<4-digit zero-padded issue number>-<feature>` (for example `0997-...` and `1018-...`; four digits because issue numbers already exceed 999). Parsers treat `^\d{4}-\d{2}-\d{2}-` as the old date-first format and any other name starting with 4 digits and a dash as the new format, and accept both until the migration. The tool that creates feature folders names new folders from the issue number. Potential records, epics, parallel runs and research keep their current names. The 339 existing folders are renamed with `git mv` in the same mass move as the `.dev` migration. The migration reports the 36 folders that do not match the old pattern and the issue numbers that have several folders (for example #543 with three) and stops for an owner decision on each; folders with no recoverable issue number keep their names.
 
 ## Decomposition (draft; `/epic-plan` finalizes)
 
 1. Survey, gold-standard contracts and parity matrix, plus the Copilot and Codex experiments. First, and gates the restructuring.
-2. Issue #1016 Phase 1: the resolver and configured development-docs root, behavior unchanged. May run alongside child 1.
+2. Issue #1016 Phase 1: the resolver and configured development-docs root, behavior unchanged, plus the feature-folder name parser (both formats accepted) and the folder-creation tool that names new folders `<NNNN>-<feature>`. May run alongside child 1.
 3. Generators and the shared-source pipeline: skill mirror, rules, MCP and agent generators, all with `--check`.
 4. Push-down consolidation and per-ecosystem pack selection.
 5. Hook parity.
 6. Retirements and the thin Copilot layer.
-7. Issue #1016 Phases 2 and 3: migration command, the move to `.dev`, and the default flip. Last, after the other work has merged.
+7. Issue #1016 Phases 2 and 3: migration command, the move to `.dev`, the rename of existing feature folders to `<NNNN>-<feature>`, and the default flip. Last, after the other work has merged.
 
 Sequencing: starts after the current nine-item parallel run (`bugs-1001-1002-1003-1006`) merges. This epic takes priority over #1016 as a standalone feature, and #1016 becomes children 2 and 7.
 
@@ -70,6 +71,7 @@ Sequencing: starts after the current nine-item parallel run (`bugs-1001-1002-100
 - [ ] A destination chooses packs per ecosystem; an unused ecosystem installs no files.
 - [ ] The migration to the new layout is non-destructive, reports a dry run first, and never overwrites a destination's own edits.
 - [ ] No native capability of any ecosystem is dropped without a written reason approved by the owner.
+- [ ] New feature folders are named `<4-digit issue number>-<feature>`; parsers accept the old and new formats until the migration; the migration reports non-matching folders and issue-number collisions and stops for an owner decision on each.
 - [ ] Enforcement hooks do not invoke Python.
 
 ## Constraints & Risks
@@ -79,6 +81,7 @@ Sequencing: starts after the current nine-item parallel run (`bugs-1001-1002-100
 - The skill heading comparison overstates real differences (the same topic under different headings). The survey needs a content read.
 - Windows symlinks are unreliable, so mirrors are generated, not linked.
 - Touches the same hooks, skills and push-down code as the in-flight parallel run, so the epic starts after that run merges.
+- Folder renames touch every consumer that parses the date-first format (31 files in hooks, libs, scripts and the extension source, plus tests) and the 339 existing folders; 36 do not match the old pattern and 3 issue numbers have several folders.
 - Several Copilot features are Preview or experimental (hooks, nested `AGENTS.md`, workspace-root `.mcp.json`).
 
 ## Test Conditions to Consider
