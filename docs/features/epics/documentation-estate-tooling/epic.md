@@ -14,7 +14,7 @@ intent:
     - No consumer identifier appears in framework source.
   nfrs:
     - Framework code is domain-neutral; all repository specificity is runtime configuration in the docs profile.
-    - Pushed-down skills, skill helpers, hooks and libs are PowerShell (or bash); TypeScript is used only for MCP tools; the epic adds no new Python.
+    - Pushed-down skills, skill helpers, hooks and libs are PowerShell (or bash); TypeScript is used only for MCP tools; the only new Python is the owner-approved Python-native analyzer shipped in the python pack (D3).
     - Analyzers are read-only, lexical, bounded and deterministic; no analyzer executes, compiles or installs consumer code.
     - Line coverage >= 85% on new PowerShell (Pester; no branch gate) and line >= 85% / branch >= 75% on new TypeScript; files stay within the 500/700/800 line tiers.
 features:
@@ -48,6 +48,9 @@ features:
   - issue_num: 900010
     feature_folder: documentation-estate-template-and-onboarding
     depends_on: [900008, 900009]
+  - issue_num: 900011
+    feature_folder: docs-surface-analyzer-python-native
+    depends_on: [1022]
 ---
 
 # documentation-estate-tooling - Epic
@@ -115,9 +118,44 @@ Consequences applied in this document:
 | Schema, example, configuration | JSON/YAML/INI data | `schemas/docs/v1/`, `examples/docs/v1/`, consumer configuration templates |
 | Test | Pester for PowerShell, Jest for TypeScript | `tests/scripts/claude-lib/docs/`, `tests/scripts/claude-hooks/`, `extensions/drm-copilot/test/` |
 
-## Assumptions Pending Owner Confirmation
+## Owner Decisions (2026-10-30, received through the coordinator)
 
-None of the following has been approved by the owner. Each is a provisional default.
+- **Assumptions A1-A8: confirmed as written below.**
+- **D1 - Planning cycles.** The PowerShell rewrite counts as a new planning cycle for every
+  superseded child (1021, 1022, 1023, 1024): each gets a fresh allowance of one planner revision
+  and the single-pass preflight. 1024's new plan must address its halted preflight (a property test
+  for each pure function).
+- **D3 - Language-native analyzer exception.** A language-native analyzer is allowed when it
+  analyzes that same language and is pushed down only with that language's pack. The PowerShell
+  text scanner remains the always-available baseline and keeps its documented precision limit,
+  recorded as `deferred` with an owner in the coverage ledger. The Python-native analyzer (Python
+  `ast`, written in Python, listed in the python pack manifest, tested under the Python gates) is
+  in the first release as new child 900011, depending on 1022. C# and TypeScript native analyzers
+  are later, optional children; 900004 stays the baseline TypeScript/.NET scanner. The inventory
+  snapshot and the ledger record the analysis method (`native` or `scanner`) per element.
+- **D4 - Linting.** Optional by default: configuration data only; no required Node or Python
+  linter (settles Q3).
+- **D5 - Contracts.** `docs-complete` fails closed when the snapshot has no revision (settles Q5).
+  An element digest covers the declaration's source lines, not the whole file. The JSON output
+  envelope gets its own schema. `Test-Json` cross-file `$ref` is tested first, with self-contained
+  schemas as the fallback (1020 tested it; it fails by default, so the fallback is in effect).
+- Q6-Q10 (raised by 1020) were not addressed by these decisions; their provisional defaults stand.
+- The language rule is otherwise unchanged.
+
+### Amendment of 1020 required by D3 and D5
+
+1020 was cleared before these decisions. Its schemas and contracts gain: an `analysis_method`
+field (`native` | `scanner`) on inventory elements and ledger entries; the declaration-lines
+digest rule; `schemas/docs/v1/docs-command-envelope.schema.json` for the `-Json` envelope; and a
+900011 anchor in `DocsAnalyzerRegistry.psm1`. 1020 is re-planned once for this requirements change
+(a new cycle under D1).
+
+Consequences for other children: 1022 and 900004 record `analysis_method: scanner` and the
+declaration-lines digest; 1023 records `analysis_method` per ledger entry and supports the
+scanner precision limit as a `deferred` entry with an owner; every subcommand's `-Json` output
+validates against the envelope schema.
+
+## Assumptions (confirmed by the owner 2026-10-30)
 
 - **A1 - Analyzer scope.** Python/configuration analyzers (1022) and TypeScript/.NET analyzers
   (900004) are both in the epic as separate features, both implemented as PowerShell lexical
@@ -150,6 +188,10 @@ None of the following has been approved by the owner. Each is a provisional defa
   work without a new module (for example a YAML parser) records an owner question instead.
 
 ## Owner Questions Raised by the Refined Directive
+
+Status: Q1 resolved by test (fallback in effect); Q3 settled by D4; Q5 settled by D5; Q2 settled by
+D3 (scanner baseline plus language-native analyzers per pack); Q4 and Q6-Q10 stand on their
+provisional defaults.
 
 - **Q1 - JSON Schema validation in PowerShell.** `Test-Json -Schema` in PowerShell 7 may not
   resolve cross-file `$ref` into `schemas/discovery/v2/common.schema.json`. Provisional default:
@@ -191,6 +233,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 | 2 | 900008 | docs-enforcement-and-ci | C3 | Consumer workflow template, surface-delta helper, opt-in integration-PR gate hook, feature-review check. |
 | 4 | 900009 | docs-authoring-workflow | C4 | Four documentation roles, eight skills, page templates, mirrored to all surfaces. |
 | 5 | 900010 | documentation-estate-template-and-onboarding | C3 | `documentation-estate` epic template, onboarding docs, end-to-end Pester fixture test. |
+| 2 | 900011 | docs-surface-analyzer-python-native | C3 | Python-native (`ast`) analyzer for Python surfaces, shipped in the python pack, with scanner fallback (D3). |
 
 ## Non-Goals
 
@@ -202,7 +245,8 @@ None of the following has been approved by the owner. Each is a provisional defa
 - A docs-site build (A2).
 - Markdown QC adoption for this repository's own documentation (issue #5, A3).
 - Changes to the Python discovery runtime. A defect found there is filed separately.
-- New Python code of any kind, and TypeScript outside MCP tools and extension commands. Existing
+- New Python code other than the D3 Python-native analyzer (900011), and TypeScript outside MCP
+  tools and extension commands. C# and TypeScript native analyzers (later, optional children). Existing
   repository Python tooling (for example the mirror generators `scripts/dev_tools/agentic_sync.py`
   and `scripts/dev_tools/generate_codex_agent_variants.py`, or the plan validator) may still be
   called.
@@ -607,6 +651,43 @@ Acceptance criteria:
 - The onboarding guide documents every subcommand and MCP tool with an example and states the
   destination-repository prerequisite (PowerShell 7).
 
+### 900011 - docs-surface-analyzer-python-native (wave 2, C3)
+
+Band rationale: a bounded Python `ast` analyzer behind an existing contract; the precision and
+classification rules come from 1022, and the new work is the cross-language handoff (PowerShell
+inventory to a pack-shipped Python helper) and pack packaging. Owner-approved exception D3.
+
+Scope split with 1022 (planner decision): 1022 is the PowerShell text scanner for Python and
+configuration surfaces and is always available. 900011 adds a native analyzer for the Python
+surfaces only (`python-cli`, `python-http`, `python-public-api`, `python-architecture`); the
+`config-files` analyzer stays scanner-only. When the python pack is installed and a Python
+interpreter is available, `inventory` runs the native analyzer for those four identifiers and
+records `analysis_method: native`; otherwise it falls back to the scanner and records
+`analysis_method: scanner`. The native analyzer emits the same element kinds, identifiers and
+declaration-lines digests as the scanner, so ledger pins stay valid when the method changes.
+
+Files (create):
+- Python helper (written in Python, using only the standard library `ast`) under the docs lib in
+  the location the python pack ships (research confirms the pack layout); it reads in-memory
+  sources passed as JSON on standard input and writes elements as JSON on standard output.
+- PowerShell adapter `.claude/lib/docs/DocsAnalyzerPythonNative.psm1` that detects the pack and
+  interpreter, invokes the helper, validates its output and falls back to the scanner.
+- Python tests under the repository's Python test tree and Pester tests for the adapter.
+
+Files (edit): `extensions/drm-copilot/resources/claude-customizations/pack-manifests/python.json`
+(and the Codex pack manifest if the python pack carries libs there), `DocsAnalyzerRegistry.psm1`
+(append under the 900011 anchor), `pack-manifests/core.json` for the PowerShell adapter.
+
+Acceptance criteria:
+- For the 1022 Python fixture, the native analyzer emits the same element identifiers as the
+  scanner for every construct both classify, and additionally classifies the constructs the
+  scanner reports as diagnostics.
+- Without the python pack or without an interpreter, `inventory` succeeds with the scanner and
+  records `analysis_method: scanner`; no error is raised.
+- The helper never imports or executes analyzed code (`ast.parse` only).
+- The Python helper is listed only in the python pack manifest; the core pack contains no Python.
+- Python line coverage >= 85% and branch coverage >= 75%; Pester line coverage >= 85%.
+
 ## Decomposition Rationale
 
 - Contracts first: 1020 fixes the schemas, element model, analyzer registry and entry script so
@@ -620,6 +701,9 @@ Acceptance criteria:
 - 900008 depends on the checker and the receipt only.
 - 900009 depends on the MCP tools its roles are restricted to.
 - 900010 composes everything and depends on the authoring workflow and enforcement.
+- 900011 depends on 1022 (analyzer identifiers, element kinds, fixtures and the fallback target)
+  and transitively on 1020; it lands in wave 2, the earliest wave its dependencies allow. No
+  feature depends on 900011, because the scanner keeps every downstream feature working without it.
 
 ## Planned Waves
 
@@ -627,7 +711,7 @@ Computed with `scripts/dev_tools/epic_wave_computation.py`:
 
 - Wave 0: 1020
 - Wave 1: 1021, 1022, 900004, 1023
-- Wave 2: 1024, 900008
+- Wave 2: 1024, 900008, 900011
 - Wave 3: 900007
 - Wave 4: 900009
 - Wave 5: 900010
