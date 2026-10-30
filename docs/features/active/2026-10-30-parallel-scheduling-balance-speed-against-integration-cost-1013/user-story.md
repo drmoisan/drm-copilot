@@ -70,7 +70,7 @@ As a parallel-run operator, I want each item's total tolerated integration cost 
 Acceptance Criteria:
 
 - [ ] US-01 An item whose tolerated overlaps exceed its aggregate cap has its cheapest-to-serialize pair converted to an edge, deterministically, in both Python and PowerShell (spec AC-02, AC-03).
-- [ ] US-02 At `tolerance_percent` 0 the edge set equals strict scheduling, and the existing strict-identity pins pass unchanged (spec AC-04).
+- [ ] US-02 At `tolerance_percent` 0 the edge set equals strict scheduling, and the existing strict-identity pins pass with test bodies unchanged (spec AC-04).
 - [ ] US-03 The set-level scheduling properties are pinned and the rule text narrows the monotonicity statement to the pairwise decision (spec AC-05).
 
 ### Story 2 — Planning-time issue combination (parallel-run operator)
