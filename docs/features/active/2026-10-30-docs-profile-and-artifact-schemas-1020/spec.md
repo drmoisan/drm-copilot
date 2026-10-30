@@ -1,124 +1,527 @@
 # docs-profile-and-artifact-schemas — Spec
 
 - **Issue:** #1020
-- **Parent (optional):** #1019 (epic documentation-estate-tooling, child 900001, wave 0, band C3)
+- **Parent (optional):** #1019 (epic documentation-estate-tooling, child 1020, wave 0, band C3)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T20-45
+- **Last Updated:** 2026-10-30T22-15
 - **Status:** Draft
-- **Version:** 0.2
-- **Research:** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T20-30-docs-profile-and-artifact-schemas-research.md`
+- **Version:** 0.3 (re-preparation for the refined implementation-language rule)
+- **Research (primary design source):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T21-45-docs-profile-powershell-design-addendum-research.md`
+- **Research (language-independent sections only):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T20-30-docs-profile-and-artifact-schemas-research.md`
+
+## Revision Note
+
+Version 0.2 of this specification described a Python package (`packages/docs-runtime`,
+`drm_copilot_docs`, `dev.docs.*` Poetry scripts, Python tests, `pyproject.toml` and `poetry.lock`
+edits). That design is withdrawn by the epic `## Owner Directive: Implementation Language
+(2026-10-30, refined)`. This version specifies the PowerShell design. Language-independent content
+(schema field shapes, docs common `$defs`, element model, dispositions, parity dimensions,
+front-matter fields) is kept and revised where the addendum research or the orchestrator probe
+changes it. Where `issue.md` still describes the Python design, this file is authoritative.
 
 ## Overview
 
 The documentation-estate-tooling epic (#1019) needs a stable set of contracts before its analyzer,
-ledger, generator, MCP and enforcement features can be built in parallel. No documentation profile,
-documentation artifact schema, surface element model or analyzer protocol exists in the repository
-today. Without them, every downstream feature would invent its own shapes, and the coverage ledger,
-parity matrix and `docs-complete` receipt could not be validated consistently. Framework code must also
-stay domain-neutral: all repository specificity must be runtime configuration in a docs profile.
+page-check, ledger, generator, MCP and enforcement features can be built in parallel. No
+documentation profile, documentation artifact schema, surface element model or analyzer contract
+exists in the repository today. Without them, every downstream feature would invent its own shapes,
+and the coverage ledger, parity matrix and `docs-complete` receipt could not be validated
+consistently. Framework code must also stay domain-neutral: all repository specificity is runtime
+configuration in a docs profile.
 
-This feature delivers those contracts. Features 900003, 900004, 900005 and 900006 consume them
-directly, and 900007 and 900008 consume them through the commands those features add. The
-contracts below are therefore normative: a downstream feature that needs a different shape must
-change this specification through an epic-level update rather than diverge locally.
+This feature delivers those contracts as PowerShell modules under `.claude/lib/docs/`, which the
+existing Claude push-down delivers to destination repositories, plus versioned JSON schemas and
+examples. Features 1021, 900003, 900004, 1023, 900006 and 900008 consume the modules directly;
+900007 consumes them through `Invoke-DocsCommand.ps1`. The contracts below are normative: a
+downstream feature that needs a different shape changes this specification through an epic-level
+update rather than diverging locally.
 
-The naming contract in the epic `## Shared Design` section is fixed and is restated, not changed,
-here.
+The epic `### Naming contract (fixed for all children)` is restated, not changed, here.
 
 ## Behavior
 
-Create the `packages/docs-runtime` package (distribution `drm-copilot-docs`, import name
-`drm_copilot_docs`, version `1.0.0`). It depends on the merged discovery runtime
-(`packages/discovery-runtime`, `drm_copilot_discovery`) as a library. No discovery file is edited
-and discovery behavior does not change. The package provides:
+Create eight production PowerShell files under `.claude/lib/docs/` (see `## Numeric Derivation
+Reference`): the six files named by the epic (`DocsProfile.psm1`, `DocsSchema.psm1`,
+`DocsSurface.psm1`, `DocsAnalyzerRegistry.psm1`, `DocsProfileCommands.psm1`,
+`Invoke-DocsCommand.ps1`) and two refinement modules (`DocsJson.psm1`, `DocsFinding.psm1`). They
+provide:
 
-- Profile dataclasses (audiences, documentation roots, surface selection, page owners, Diataxis
-  policy, completion gates, artifact paths) and a loader that validates a docs profile against the
-  `docs-profile` schema and a set of semantic checks.
-- Docs v1 schema loading through an offline registry that resolves references into discovery v2
-  `common`.
+- JSON reading through `System.Text.Json` into ordinal hashtables with duplicate-key detection, and
+  deterministic serialization, canonical JSON and SHA-256 helpers that delegate to the existing
+  `.claude/lib/discovery-validation/DiscoveryEncoding.psm1`.
+- A finding model, deterministic finding order, command results, the `-Json` envelope and the text
+  report.
+- Schema loading, in-memory schema composition (epic Q1), artifact validation through `Test-Json`
+  as the schema gate, and a PowerShell structural walk that produces field-naming findings with
+  JSON pointers.
 - The surface element model: kinds `cli-command`, `cli-option`, `http-route`, `config-key`,
   `public-symbol`, `architecture-component`, with deterministic identifiers derived from kind,
-  path and declaration through `drm_copilot_discovery.analyzer.findings.stable_id`.
-- The `SurfaceAnalyzer` protocol and an append-only registry table (`ANALYZER_REGISTRY`) in
-  `analyzer_contract.py`, empty in this feature, that 900003 and 900004 extend.
-- One CLI module (`cli.py`) providing `dev.docs.init` (emit a starter profile) and
-  `dev.docs.validate-profile`.
-- Six artifact schemas under `schemas/docs/v1/`: `docs-profile`, `surface-inventory-snapshot`,
-  `docs-coverage-ledger`, `docs-parity-matrix`, `docs-evidence-pin`, `docs-validation-receipt`,
-  with one example per artifact schema under `examples/docs/v1/<name>.example.json`.
-- One definitions-only schema `schemas/docs/v1/common.schema.json` (`$id`
-  `urn:drm-copilot:docs:1.0.0:common`) holding the docs shared vocabulary. It is not an artifact
-  kind, carries no artifact header, and has no example. This is a file-list refinement permitted by
-  the epic; it does not change the naming contract.
-- Ledger dispositions `documented`, `excluded`, `deferred`; parity dimensions `exists`, `accurate`,
-  `example_present`, `owner_assigned`, `diataxis_mode`; page front-matter fields `owner`,
-  `last_reviewed`, `audience`, `diataxis_mode`, `surface_refs`.
-- Distribution following the discovery runtime mechanism: a docs-owned builder stages hash-verified
-  copies of the docs schemas inside the package and builds a wheel that a consumer repository
-  installs alongside the discovery wheel.
+  path and declaration.
+- The analyzer contract and an owner-anchored analyzer registry, empty in this feature, that 900003
+  and 900004 extend.
+- Profile parsing, schema and semantic validation, and a starter profile.
+- The entry script `Invoke-DocsCommand.ps1 -Command <subcommand> [arguments]` with an
+  owner-anchored dispatch table and the subcommands `init` and `validate-profile`.
+- Six artifact schemas plus one definitions-only `common.schema.json` under `schemas/docs/v1/`,
+  one example per artifact schema under `examples/docs/v1/`, and a byte-identical runtime copy of
+  the schemas under `.claude/lib/docs/schemas/v1/` (owner question OQ-1).
+- Push-down registration: every file under `.claude/lib/docs/` listed in the Claude core pack
+  manifest and mirrored byte-identically to
+  `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`.
+- `quality-tiers.yml` registration of `.claude/lib/docs` (owner question OQ-4).
+
+No Python or TypeScript file is created or edited. No discovery runtime file, discovery schema or
+`.claude/lib/discovery-validation/` file is edited. The Codex customization tree is not changed
+(owner question OQ-2).
 
 ## Inputs / Outputs
 
 - Inputs:
-  - A docs profile file (JSON; YAML accepted when the extension is `.yaml` or `.yml`). Default
-    path for `dev.docs.validate-profile`: `docs/documentation-estate/docs-profile.json`.
-  - CLI flags listed in `## API / CLI Surface`.
-  - Installed resources: the staged docs schemas inside `drm_copilot_docs/_resources/` and the
-    discovery `schemas/discovery/v2/common.schema.json` read through
-    `drm_copilot_discovery.resources.read_resource` (hash-verified).
-  - No environment variables are read.
+  - A docs profile file, JSON only. Default path `docs/documentation-estate/docs-profile.json`
+    (`Get-DocsDefaultProfilePath`); `-Profile <relative path>` overrides it. YAML is not accepted:
+    PowerShell 7 has no built-in YAML parser and epic assumption A8 forbids a new third-party
+    module.
+  - Arguments to `Invoke-DocsCommand.ps1` (see `### Entry script`).
+  - Runtime schemas read from `.claude/lib/docs/schemas/v1/`, located with literal
+    `Join-Path -Path $PSScriptRoot -ChildPath '<literal>'` joins. The same code path runs in this
+    repository and in a destination repository.
+  - No environment variable is read. The repository root is `-RepositoryRoot` when given, otherwise
+    the current location; it is never derived from `$PSScriptRoot`.
 - Outputs:
-  - `dev.docs.init`: the starter profile as canonical JSON on stdout, or written to `--output`.
-  - `dev.docs.validate-profile`: findings in text (default) or JSON on stdout; diagnostics for
-    invocation and runtime failures on stderr.
-  - Build output: `dist/docs/drm_copilot_docs-1.0.0-py3-none-any.whl` (untracked).
-- Config keys and defaults: all repository specificity is profile data. Starter defaults are
-  listed under `dev.docs.init`.
-- Versioning and backward compatibility:
+  - `init`: the starter profile and the planned writes in `result`; with `-Write`, the profile file
+    and any template-table files (none in 1020).
+  - `validate-profile`: findings and a result in text (default) or the `-Json` envelope on stdout;
+    on exit 3, one fixed line on stderr.
+- Versioning and compatibility:
   - Schema family version `1.0.0`; every artifact carries `schema_version` const `"1.0.0"`.
-  - With the T2 classification, a breaking change to any schema or to the public symbols in
-    `## Data & State` requires a major version bump (`urn:drm-copilot:docs:2.0.0:*`,
-    `schemas/docs/v2/`).
-  - The docs package declares `drm-copilot-discovery = ">=2.0.0,<3.0.0"`.
+  - A breaking change to any schema or to an exported function contract in this specification
+    requires a new family (`urn:drm-copilot:docs:2.0.0:*`, `schemas/docs/v2/`) and an epic-level
+    update.
+- Runtime prerequisite: PowerShell 7.4 or later (owner question OQ-3). Below 7.4 every subcommand
+  exits 3 with `DOCS_RUNTIME_UNSUPPORTED`.
 
 ## API / CLI Surface
+
+### Module conventions (all files under `.claude/lib/docs/`)
+
+- Conventions pinned by `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`: the help
+  block contains the sentence token `imports its siblings with -ErrorAction Stop`;
+  `Set-StrictMode -Version Latest` is followed immediately by `$ErrorActionPreference = 'Stop'`;
+  every column-0 `Import-Module` carries `-ErrorAction Stop`.
+- Every `$PSScriptRoot` use is the literal form `Join-Path -Path $PSScriptRoot -ChildPath
+  '<literal>'`, so the existing recognized-form and dependency-closure tests
+  (`tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`) see every sibling
+  module, command module, schema and template target.
+- Every function is an advanced function with `[CmdletBinding()]`; parameter names are PascalCase.
+- "Pure" means no filesystem, clock, process, environment or module-scope mutable state. Pure
+  functions take in-memory strings and hashtables. No module keeps a schema or composition cache.
+- Command modules never write output and never call `exit`; only `Invoke-DocsCommand.ps1` does.
+
+Import graph (literal joins):
+
+| File | Role | Imports |
+|---|---|---|
+| `DocsJson.psm1` | Parsing, deterministic serialization, canonical JSON, SHA-256 | `../discovery-validation/DiscoveryEncoding.psm1` |
+| `DocsFinding.psm1` | Finding model, ordering, bound, command result, envelope, text report | `DocsJson.psm1` |
+| `DocsSchema.psm1` | Schema table, schema reading, composition, artifact validation, structural walk, version floor | `DocsJson.psm1`, `DocsFinding.psm1` |
+| `DocsSurface.psm1` | Element kinds, path and revision grammar, stable and element identifiers, element and diagnostic records | `DocsJson.psm1`, `DocsFinding.psm1` |
+| `DocsAnalyzerRegistry.psm1` | Analyzer contract, registration table, selection, captured inputs, invocation | `DocsSurface.psm1`, `DocsFinding.psm1` |
+| `DocsProfile.psm1` | Profile parse, schema and semantic validation, starter profile | `DocsJson.psm1`, `DocsSchema.psm1`, `DocsFinding.psm1`, `DocsAnalyzerRegistry.psm1` |
+| `DocsProfileCommands.psm1` | `init` and `validate-profile` command functions, init template table | `DocsProfile.psm1`, `DocsSchema.psm1`, `DocsFinding.psm1`, `DocsJson.psm1` |
+| `Invoke-DocsCommand.ps1` | Entry: parameters, dispatch table, argument parsing, real command context, output, exit | `DocsFinding.psm1`, `DocsJson.psm1`; command modules imported only when their row is selected |
+
+`DiscoveryEncoding.psm1` is already listed in the Claude core pack manifest, so the cross-area
+import is closed under core.
+
+### `DocsJson.psm1` (pure)
+
+- `ConvertFrom-DocsJsonText -Text <string> [-ArtifactPath <string>] [-MaxDepth <int> = 64]` returns
+  `@{ Value; Findings }`. Objects become hashtables with the ordinal comparer, integers `Int64`,
+  other numbers `Double`, strings unchanged (no DateTime coercion). Findings: `DOCS_JSON_INVALID`
+  (malformed text, including an empty file), `DOCS_JSON_DUPLICATE_KEY` (at the repeated member's
+  pointer), `DOCS_JSON_TOO_DEEP`. `ConvertFrom-Json` is never used for artifacts.
+- `ConvertTo-DocsJsonText -Value <object> [-Indented]` returns text with ordinal key order at every
+  depth, relaxed escaping, LF line endings and one trailing LF. Used for files a person reads.
+- `ConvertTo-DocsCanonicalJson -Value <object>` delegates to `ConvertTo-DiscoveryCanonicalJson`
+  (compact, sorted keys, trailing LF).
+- `Get-DocsSha256Hex -Text <string>` and `Get-DocsBytesSha256Hex -Bytes <byte[]>` delegate to
+  `Get-DiscoverySha256Hex` and `Get-DiscoveryBytesSha256Hex`; output is lowercase hex.
+
+### `DocsFinding.psm1` (pure)
+
+- `New-DocsFinding -Code <string> -Severity <error|warning|info> -Message <string> -NextAction
+  <string> [-ArtifactPath <string>] [-Pointer <string> = ''] [-RelatedId <string[]>] [-RelatedPath
+  <string[]>]` returns an ordered hashtable with exactly the eight keys of the docs common
+  `finding` definition. It enforces the code grammar `^[A-Z][A-Z0-9_]*$`, the RFC 6901 pointer
+  grammar, the identifier grammar for related identifiers and the relative-path grammar for paths,
+  and sorts and de-duplicates both related lists. An invalid argument throws.
+- `Get-DocsChildPointer -Pointer <string> -Part <object>` escapes `~` and `/` per RFC 6901.
+- `Get-DocsOrderedFinding -Finding <object[]> [-Limit <int> = 100]` returns findings sorted by
+  artifact path (null as empty), pointer, code, related identifiers, related paths, severity,
+  message, next action (ordinal comparison), de-duplicated, bounded at `Limit`, with one
+  `FINDINGS_LIMIT` error finding appended when truncated.
+- `Test-DocsFindingHasError -Finding <object[]>` returns `$true` when any finding has severity
+  `error`.
+- `New-DocsCommandResult -Command <string> -ExitCode <0|1|2|3> -Finding <object[]> [-Result
+  <object>] [-Line <string[]>]` returns a `[pscustomobject]` with `Command`, `ExitCode`, `Findings`
+  (ordered through `Get-DocsOrderedFinding`), `Result` and `Line`.
+- `ConvertTo-DocsEnvelopeText -CommandResult <object>` returns the canonical JSON of the envelope
+  (see `### Exit codes and the -Json envelope`).
+- `ConvertTo-DocsReportText -CommandResult <object>` returns one line per finding
+  (`<severity> <code> <artifact_path><pointer>: <message>`, path omitted when null), then the
+  command-specific lines, then the summary line
+  `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`.
+
+### `DocsSchema.psm1`
+
+- `Get-DocsSchemaName` (pure) returns the schema names in fixed order: `common`, `docs-profile`,
+  `surface-inventory-snapshot`, `docs-coverage-ledger`, `docs-parity-matrix`, `docs-evidence-pin`,
+  `docs-validation-receipt`, followed by the anchor comment `# --- 1021: page-metadata ---`.
+- `Get-DocsSchemaPath` returns an ordered map of name to path, built from one literal join per
+  file, for example `Join-Path -Path $PSScriptRoot -ChildPath 'schemas/v1/docs-profile.schema.json'`.
+- `Read-DocsSchemaSet [-SchemaPath <IDictionary>] [-ReadText <scriptblock>]` is the module's only
+  read and returns an ordered map of name to text.
+- `Join-DocsSchemaText -SchemaText <string> -CommonSchemaText <string>` (pure) returns
+  `@{ Text; Value; Findings }` per `### Schema composition`.
+- `Get-DocsComposedSchemaSet -SchemaSet <IDictionary>` (pure) composes every artifact schema once per
+  call and returns an ordered map of artifact kind to `@{ Text; Value }`; composition findings are
+  returned alongside and make the set unusable (exit 3 at the command boundary).
+- `Test-DocsArtifactText -ArtifactKind <string> -JsonText <string> -ComposedSchemaSet <IDictionary>
+  [-ArtifactPath <string>]` (pure apart from the built-in `Test-Json`) returns ordered findings per
+  `### Artifact validation`.
+- `Get-DocsSchemaStructuralFinding -Schema <IDictionary> -Instance <object> -RootSchema
+  <IDictionary> [-Pointer <string> = ''] [-ArtifactPath <string>]` (pure) is the structural walk
+  per `### Structural walk`.
+- `ConvertFrom-DocsSchemaErrorRecord -ErrorRecord <ErrorRecord> [-ArtifactPath <string>]` (pure)
+  maps one `Test-Json` ErrorRecord to a `DOCS_SCHEMA_INVALID` finding whose pointer is the final
+  ` at '<pointer>'` of the message when present, otherwise empty.
+- `Get-DocsRuntimeVersionError [-PowerShellVersion <version> = $PSVersionTable.PSVersion]` (pure)
+  returns the fail-closed message below 7.4, otherwise `$null` (precedent
+  `Get-DiscoveryRuntimeVersionError` in `.claude/lib/discovery-validation/DiscoveryValidation.psm1`).
+
+#### Schema composition (epic Q1 resolution)
+
+Orchestrator probe (PowerShell 7.6.9, 2026-10-30): `Test-Json` rejects a cross-file `$ref` by
+default; inline `#/$defs/...` refs work, including `$defs` keys containing `.` such as
+`common.kind`; two calls with the same `$id` and different schema content do not collide.
+Composition therefore relies only on inline refs, needs no `-FetchExternalReference` and no global
+schema registry, and keeps one copy of the shared vocabulary.
+
+`Join-DocsSchemaText`:
+
+1. Parse both texts with `ConvertFrom-DocsJsonText`.
+2. Copy every docs common `$defs/<name>` into the target `$defs` as `common.<name>`. A target that
+   already defines a `$defs` key beginning with `common.` yields `DOCS_SCHEMA_COMPOSITION_CONFLICT`.
+3. Rewrite every string-valued `$ref` keyword:
+   - `urn:drm-copilot:docs:1.0.0:common#/$defs/<name>` becomes `#/$defs/common.<name>`; a `<name>`
+     absent from docs common yields `DOCS_SCHEMA_REF_UNRESOLVED`;
+   - inside the copied definitions, `#/$defs/<name>` becomes `#/$defs/common.<name>`;
+   - a target-local ref beginning with `#` is unchanged;
+   - any other ref (another URN, a file name, any URI scheme) yields `DOCS_SCHEMA_REF_UNRESOLVED`
+     and is never fetched.
+   Only keys named `$ref` whose value is a string are rewritten; a `properties` member named
+   `$schema` or `$ref` maps to an object and is not a keyword.
+4. Remove the root `$id` from the composed schema; keep the root `$schema` for dialect selection.
+   The probe shows no collision would occur; removal keeps the composed text free of any document
+   identity and costs nothing.
+5. Serialize with `ConvertTo-DocsJsonText`.
+
+#### Artifact validation
+
+Orchestrator probe (PowerShell 7.6.9, 2026-10-30): a failure inside a `$ref` target makes
+`Test-Json` return `False` with zero ErrorRecords, and when several failures exist only one
+ErrorRecord is written. Because composition places almost every field behind an inline `$ref`,
+`Test-Json` messages cannot be relied on to name the failing field. Field naming therefore comes
+from the PowerShell structural walk; `Test-Json` is the schema gate.
+
+`Test-DocsArtifactText`:
+
+1. Parse the instance with `ConvertFrom-DocsJsonText`. Any parse finding is returned and
+   validation stops.
+2. Run `Test-Json -Json <original text after BOM removal> -Schema <composed text> -ErrorAction
+   SilentlyContinue -ErrorVariable <var>`.
+3. Run `Get-DocsSchemaStructuralFinding` over the parsed instance with the composed schema value.
+4. Result:
+   - `Test-Json` `True` and no walk finding: no findings (valid).
+   - Any walk finding: the walk findings are returned and `Test-Json` ErrorRecords are discarded.
+     This includes the case where `Test-Json` returned `True` (fail closed; a test pins that the
+     committed examples never reach this case).
+   - `Test-Json` `False` and no walk finding: one `DOCS_SCHEMA_INVALID` finding per ErrorRecord
+     through `ConvertFrom-DocsSchemaErrorRecord`, or, when there is no ErrorRecord, exactly one
+     `DOCS_SCHEMA_INVALID` finding with pointer `''` and a message naming the artifact kind.
+   - An unknown `ArtifactKind` throws `DOCS_SCHEMA_UNKNOWN_KIND`.
+
+Tests assert finding codes, pointers and that messages contain the field name. They do not assert
+JsonSchema.Net wording, which varies by PowerShell release.
+
+#### Structural walk
+
+`Get-DocsSchemaStructuralFinding` evaluates this keyword subset over the composed schema and returns
+`error` findings, each with the instance pointer and a message that names the field (the last
+pointer segment, or the property name for a missing or unknown property):
+
+| Keyword | Behavior | Finding code |
+|---|---|---|
+| `$ref` (local `#/$defs/...` only) | Resolve in `RootSchema` and continue; expansion depth bounded at 64 | `DOCS_SCHEMA_TOO_DEEP` on overflow |
+| `type` (string or array of names) | Compare with the JSON type of the value (`integer` accepts `Int64`) | `DOCS_SCHEMA_TYPE_MISMATCH` |
+| `required` | Each absent name yields one finding at `<pointer>/<name>` | `DOCS_SCHEMA_REQUIRED_MISSING` |
+| `properties` | Walk each present member with its subschema | — |
+| `additionalProperties: false` | Each member not in `properties` yields one finding at its pointer | `DOCS_SCHEMA_PROPERTY_UNKNOWN` |
+| `enum`, `const` | Value not allowed; message names the field and the allowed values | `DOCS_SCHEMA_VALUE_NOT_ALLOWED` |
+| `items` | Walk each element at `<pointer>/<index>` | — |
+| `minItems`, `maxItems` | Array length outside the bound | `DOCS_SCHEMA_ITEM_COUNT` |
+| `allOf` | Walk every member at the same location | — |
+| `if` / `then` / `else` | `if` holds when the walk of `if` yields no finding; then walk `then`, else walk `else` | — |
+| `anyOf` | Holds when the walk of any branch yields no finding; otherwise one finding at the location | `DOCS_SCHEMA_NO_BRANCH_MATCH` |
+
+Every other keyword (for example `pattern`, `uniqueItems`, `minimum`, `format`) is ignored by the
+walk and enforced only by `Test-Json`. The walk is pure, has no cache and never mutates its inputs.
+A later child that adds a schema whose failures must name a field keeps those constraints within
+this subset or accepts a `DOCS_SCHEMA_INVALID` finding for them.
+
+### `DocsSurface.psm1` (pure)
+
+- `Get-DocsElementKind` returns the element kinds in contract order; `Test-DocsElementKind -Kind`.
+- `Test-DocsRelativePath -Path` (POSIX relative path grammar, equal to docs common
+  `relative-path`); `Test-DocsFullRevision -Revision` (40 or 64 lowercase hex).
+- `Get-DocsStableId -Prefix <string> -Value <object>` returns `<prefix>-` plus the lowercase hex
+  SHA-256 of `ConvertTo-DocsCanonicalJson -Value`. An `AUTHORIZATION_INPUT_INVALID: ...` error from
+  `DiscoveryEncoding.psm1` is rethrown as `DOCS_IDENTITY_INPUT_INVALID: ...`.
+- `Get-DocsElementId -Kind <string> -Path <string> -Declaration <string>` per
+  `### Element identifiers`.
+- `Test-DocsElementId -ElementId <string>` (docs common `element-id` pattern).
+- `New-DocsSurfaceElement -Kind -Path -Declaration -Name -AnalyzerId -SourceSha256 [-ParentId]
+  [-LineRange <int[]>] [-Property <IDictionary>] [-Extension <IDictionary>]` returns an ordered
+  hashtable in the snapshot `element` shape with a computed `element_id`; `cli-option` requires a
+  parent identifier beginning `cli-command-`; `LineRange` requires `1 <= start <= end`.
+- `ConvertFrom-DocsSurfaceElement -Record <IDictionary>` re-verifies `element_id` and throws
+  `DOCS_ELEMENT_ID_MISMATCH` for a record whose identifier differs from the recomputed one.
+- `New-DocsDiagnostic -Code -Path -Message -AnalyzerId [-Blocking <bool> = $true]` returns the docs
+  `diagnostic` shape with `id` equal to `Get-DocsStableId -Prefix 'diagnostic' -Value
+  @{ analyzer; code; path }`, severity `error` when blocking, otherwise `warning`.
+
+#### Element identifiers
+
+- Rule: `element_id = <kind> + "-" + lowercase hex SHA-256 of the UTF-8 bytes of
+  canonical_json({"declaration": D, "kind": K, "path": P}) + "\n"`, computed as
+  `Get-DocsStableId -Prefix $Kind -Value ([ordered]@{ kind = $Kind; path = $Path; declaration =
+  $Declaration })`. This mirrors the discovery runtime's findings identity; `DiscoveryEncoding.psm1`
+  documents byte agreement with that runtime.
+- Input validation before hashing (throws `DOCS_IDENTITY_INPUT_INVALID` naming the argument): `Kind`
+  is one of the element kinds; `Path` passes `Test-DocsRelativePath`; `Declaration` is non-blank,
+  has no leading or trailing whitespace, no C0 control characters and no unpaired UTF-16 surrogate
+  (checked with a throwing `UTF8Encoding`). No Unicode normalization is applied.
+- Because the hashed value is canonical JSON of three named members, concatenation ambiguities (for
+  example path `a/b` with declaration `c` versus path `a` with declaration `b/c`) cannot collide.
+- Declaration conventions per kind (binding on 900003 and 900004):
+
+| Kind | Declaration | Example |
+|---|---|---|
+| `cli-command` | full command path | `tool docs inventory` |
+| `cli-option` | command path, one space, long option | `tool docs inventory --analyzer` |
+| `http-route` | upper-case method, one space, route template | `GET /items/{id}` |
+| `config-key` | dotted key path | `tool.settings.timeout` |
+| `public-symbol` | qualified name | `example_pkg.module.function` |
+| `architecture-component` | package or module path | `example_pkg.analyzers` |
+
+### `DocsAnalyzerRegistry.psm1`
+
+- `Get-DocsAnalyzerRegistration` (pure) returns the committed registration rows.
+- `Test-DocsAnalyzerRegistration -Registration <object[]>` (pure) returns findings
+  (`DOCS_ANALYZER_REGISTRATION_INVALID` with a pointer to the row and field): duplicate `Id`, `Id`
+  outside the identifier grammar, empty `ElementKinds` or a kind outside `Get-DocsElementKind`,
+  `Module` not resolving inside `.claude/lib/docs/` or without a `DocsAnalyzer*.psm1` leaf,
+  `Function` not matching `^Invoke-DocsAnalyzer[A-Za-z]+$`, blank `Version`.
+- `Select-DocsAnalyzerRegistration -Registration <object[]> -ElementKind <string[]> [-AnalyzerId
+  <string[]>]` (pure) validates the whole request before any import, reports each unknown identifier
+  as `DOCS_ANALYZER_UNKNOWN`, and returns rows sorted by `Id` (invariant under input order).
+- `New-DocsCapturedInput -Path <string> -Bytes <byte[]> [-MaxBytes <int>]` (pure) returns
+  `@{ path; sha256; size; text; diagnostic }`; strict UTF-8 decoding; an oversize or undecodable
+  input carries a diagnostic and `text` `$null`.
+- `Invoke-DocsAnalyzer -Registration <object> -CapturedInput <object[]> -Selection <object>
+  [-ImportModule <scriptblock>]` imports the module through the seam (default `Import-Module -Name
+  <path> -Force -ErrorAction Stop`), calls the analyzer function, validates the output (kinds within
+  the registration, `analyzer_id` equal to `Id`, recomputed element identifiers) and returns
+  `@{ Elements; Diagnostics }` sorted by identifier.
+- Analyzer function contract (900003, 900004): `Invoke-DocsAnalyzer<Name> -CapturedInput
+  <object[]> -Selection <object>` returns `@{ Elements = @(...); Diagnostics = @(...) }`; pure,
+  deterministic, no I/O, inputs not mutated; an unclassifiable or oversize input yields a diagnostic
+  rather than a partial result.
+- Registry form (owner-anchored slots; 1020 commits no rows):
+
+```powershell
+$script:DocsAnalyzerRow = @(
+    # --- 900003: Python and configuration analyzers ---
+    # --- 900004: TypeScript and .NET analyzers ---
+)
+```
+
+  Row form: `[pscustomobject]@{ Id = '<identifier>'; Version = '1.0.0'; ElementKinds = @('<kind>');
+  Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzer<Name>.psm1'); Function =
+  'Invoke-DocsAnalyzer<Name>' }`, one row per line. Profiles select analyzer identifiers only; no
+  profile names a module.
+
+### `DocsProfile.psm1`
+
+- `Get-DocsDefaultProfilePath` returns `docs/documentation-estate/docs-profile.json`.
+- `ConvertFrom-DocsProfileText -Text <string> -ArtifactPath <string> -ComposedSchemaSet
+  <IDictionary> [-AnalyzerId <string[]>]` (pure) returns `@{ Profile; Findings; Ok }`: parse, then
+  `Test-DocsArtifactText -ArtifactKind 'docs-profile'`, then semantic checks. `Profile` is the
+  parsed ordinal hashtable with snake_case keys, `$null` when parse or schema validation fails.
+  `Ok` is `$true` when no `error` finding exists. `AnalyzerId` defaults to the identifiers of
+  `Get-DocsAnalyzerRegistration`.
+- `Test-DocsProfileSemantic -Profile <IDictionary> -AnalyzerId <string[]>` (pure) returns `error`
+  findings with a pointer to the offending field: `DOCS_PROFILE_AUDIENCE_DUPLICATE`,
+  `DOCS_PROFILE_ROOT_DUPLICATE`, `DOCS_PROFILE_AUDIENCE_UNKNOWN`
+  (`/documentation_roots/<n>/audience_ids/<m>`), `DOCS_PROFILE_MODE_NOT_IN_POLICY`
+  (`/diataxis_policy/directory_modes/<n>/mode`), `DOCS_ANALYZER_UNKNOWN`
+  (`/surface_selection/analyzers/<n>`).
+- `New-DocsStarterProfile [-RepositoryId <string> = 'repository']` (pure) returns a profile that
+  passes `ConvertFrom-DocsProfileText` with the committed (empty) registry; it omits
+  `surface_selection.analyzers` and sets `completion_gates.integration_pr_gate.enabled` to `false`.
+
+### `DocsProfileCommands.psm1`
+
+- `Invoke-DocsInitCommand -Argument <IDictionary> -Context <object>`; options `RepositoryId`
+  (value), `Profile` (value), `Write` (switch), `Force` (switch).
+- `Invoke-DocsValidateProfileCommand -Argument <IDictionary> -Context <object>`; option `Profile`
+  (value).
+- `Get-DocsInitTemplate` (pure) returns the init template table: rows
+  `[pscustomobject]@{ Source = (Join-Path -Path $PSScriptRoot -ChildPath 'templates/<file>');
+  Destination = '<destination-relative path>' }` under the anchors
+  `# --- 1021: page-check configuration ---` and `# --- 900008: docs workflow ---`. 1020 commits the
+  mechanism and both anchors with no rows; the profile itself is generated by
+  `New-DocsStarterProfile`, not copied.
+
+`init` behavior (consumer configuration delivery decision):
+
+- Without `-Write`: performs only destination existence checks, writes nothing, and returns exit 0
+  with `result` `{profile, planned_writes: [{path, action}]}`, where `action` is `create`,
+  `overwrite` (destination exists and `-Force` given) or `exists` (destination exists, no `-Force`).
+- With `-Write`: every destination is checked first. If any exists and `-Force` is absent, the
+  command exits 1 with one `DOCS_INIT_TARGET_EXISTS` finding per existing path and writes nothing.
+  Otherwise it writes each file through `Context.WriteText` (`create`, or `overwrite` under
+  `-Force`) and exits 0.
+- `-RepositoryId` outside the identifier grammar or a non-relative `-Profile` is a usage error
+  (exit 2).
+- The starter profile is self-validated before it is returned; a self-validation failure is a
+  defect guard that exits 3 with `DOCS_CLI_RUNTIME`.
+
+`validate-profile` behavior:
+
+- Reads the profile through `Context.ReadText`. An absent profile exits 1 with
+  `DOCS_PROFILE_MISSING` (pointer `''`, artifact path the profile path).
+- Exit 0 when `ConvertFrom-DocsProfileText` returns no `error` finding; exit 1 otherwise. Each
+  finding names its JSON pointer and the failing field. Examples: a profile without `audiences`
+  yields `DOCS_SCHEMA_REQUIRED_MISSING` at `/audiences`; an unknown element kind yields
+  `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/surface_selection/element_kinds/<n>`; a duplicate key yields
+  `DOCS_JSON_DUPLICATE_KEY`.
+- `result` is `{profile_path, repository_id}` on exit 0 or 1 with a parsed profile, otherwise
+  `null`.
+
+### Entry script (`Invoke-DocsCommand.ps1`)
+
+- Parameters: `-Command <string>`, `-Json` (switch), `-Help` (switch), `-RepositoryRoot <string>`,
+  and `[Parameter(ValueFromRemainingArguments = $true)] [string[]] $CommandArgument`, with
+  `[CmdletBinding(PositionalBinding = $false)]`. No parameter is Mandatory, so a missing `-Command`
+  exits 2 instead of prompting. Orchestrator probe: arguments after `-Command` reach the
+  `ValueFromRemainingArguments` parameter identically under `&` and `pwsh -File`.
+- Functions: `Get-DocsCommandTable`, `Test-DocsCommandTable` (pure), `ConvertFrom-DocsCommandArgument
+  -CommandArgument <string[]> -OptionSpec <IDictionary>` (pure), `New-DocsCommandContext
+  -RepositoryRoot <string>`, `Write-DocsFileText` (the only filesystem write primitive), and
+  `Invoke-DocsCommandCli -Command -Json -Help -RepositoryRoot -CommandArgument [-Context]` returning
+  `@{ ExitCode; Stdout; Stderr }`.
+- Guard: the top-level body runs only when `$MyInvocation.InvocationName -ne '.'`, so Pester
+  dot-sources the script to load its functions without running it; the body writes `Stdout` and
+  `Stderr` and calls `exit $outcome.ExitCode`.
+- Command context (`[pscustomobject]`, built for real only by `New-DocsCommandContext`):
+  `RepositoryRoot`; `ReadText` (`param($RelativePath)`, throws an item-not-found error for an absent
+  file, strips a leading BOM); `ReadBytes`; `TestFile`; `ListFile` (`param($RelativeRoot)`, sorted
+  relative POSIX paths); `WriteText` (`param($RelativePath, $Text, $Mode)`, `Mode` `create` or
+  `overwrite`, UTF-8 without BOM, LF); `UtcNow`. Relative paths are checked with
+  `Test-DocsRelativePath` before any context call.
+
+#### Dispatch table
+
+`Get-DocsCommandTable` returns rows from literal source lines, one row per line, with one anchor
+comment per owner:
+
+```powershell
+$script:DocsCommandRow = @(
+    # --- 1020: init, validate-profile ---
+    [pscustomobject]@{ Name = 'init'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileCommands.psm1'); Function = 'Invoke-DocsInitCommand'; Option = @{ RepositoryId = 'value'; Profile = 'value'; Write = 'switch'; Force = 'switch' } }
+    [pscustomobject]@{ Name = 'validate-profile'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileCommands.psm1'); Function = 'Invoke-DocsValidateProfileCommand'; Option = @{ Profile = 'value' } }
+    # --- 1021: check ---
+    # --- 900003: inventory ---
+    # --- 1023: coverage, update-ledger, validate ---
+    # --- 900006: generate-reference ---
+    # --- 900008: surface-delta ---
+)
+```
+
+- `Option` maps a PascalCase option name to `value`, `multi` (repeatable) or `switch`. The names
+  `Command`, `Json`, `Help` and `RepositoryRoot` are reserved.
+- `Test-DocsCommandTable` returns findings for a duplicate `Name`, a reserved option name, an option
+  kind outside `value`/`multi`/`switch`, and a `Function` outside `^Invoke-Docs[A-Za-z]+Command$`.
+- Command function contract: `Invoke-Docs<Area>Command -Argument <IDictionary> -Context <object>`
+  returns the object from `New-DocsCommandResult`. Usage errors are detected by
+  `ConvertFrom-DocsCommandArgument` before the command function runs.
+
+#### Exit codes and the `-Json` envelope
+
+| Code | Meaning in every subcommand |
+|---|---|
+| 0 | Success or `-Help`; no `error` finding |
+| 1 | Findings: at least one `error` finding, or a command-specific failure condition (for example `DOCS_PROFILE_MISSING`, `DOCS_INIT_TARGET_EXISTS`) |
+| 2 | Usage or input error detected before any read: missing or unknown `-Command`, unknown option, missing value, repeated non-`multi` option, value outside the option grammar, non-relative path. `findings` holds exactly one `DOCS_CLI_ARGUMENTS`; `result` is `null` |
+| 3 | Internal, environment or I/O error: PowerShell below 7.4 (`DOCS_RUNTIME_UNSUPPORTED`), a read failure other than absence, unreadable or uncomposable runtime schemas, or any unexpected exception caught at the entry boundary (`DOCS_CLI_RUNTIME`). `findings` holds exactly one finding; `result` is `null`; one fixed line is also written to stderr |
+
+- `-Json`: stdout receives exactly one document, the canonical JSON (sorted keys, compact, trailing
+  LF) of `{command, exit_code, findings, ok, result}`, where `command` is the subcommand name (for
+  example `validate-profile`), `ok` is `true` exactly when `exit_code` is 0, and `findings` is in
+  `Get-DocsOrderedFinding` order. Identical inputs, arguments and clock value produce identical
+  bytes. The envelope has no schema file; Pester and 900007 Jest tests pin it.
+- Without `-Json`: `ConvertTo-DocsReportText` output on stdout.
+- `-Help`: usage text listing the table rows; reads no input; exit 0. A missing `-Command` without
+  `-Help` exits 2.
 
 ### Schema identity and reference conventions
 
 - `$schema`: `https://json-schema.org/draft/2020-12/schema` in every docs schema.
 - `$id`: `urn:drm-copilot:docs:1.0.0:<name>`, where `<name>` is the file stem without
-  `.schema.json` (for example `urn:drm-copilot:docs:1.0.0:docs-profile`).
-- Artifact header, required in each of the six artifact schemas: `$schema` (const equal to the
-  schema `$id`), `schema_version` (const `"1.0.0"`), `artifact_kind` (const equal to `<name>`),
-  `id` (`urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier`), `extensions`
-  (`urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions`).
-- Cross-family references use the absolute discovery URN plus a JSON pointer, for example
-  `{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"}`.
-- Docs-internal shared references use the absolute docs URN, for example
-  `{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"}`. Schema-local references
-  use `#/$defs/<name>`.
-- `$defs` names are kebab-case; property names are snake_case.
+  `.schema.json`.
+- Artifact header, required in each artifact schema: `$schema` (const equal to the schema `$id`),
+  `schema_version` (const `"1.0.0"`), `artifact_kind` (const equal to `<name>`), `id`
+  (`urn:drm-copilot:docs:1.0.0:common#/$defs/identifier`), `extensions`
+  (`urn:drm-copilot:docs:1.0.0:common#/$defs/extensions`).
+- Shared references use the absolute docs common URN plus a JSON pointer, for example
+  `{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"}`; schema-local references use
+  `#/$defs/<name>`. No docs schema references `schemas/discovery/v2/`, which is not pushed down.
+- `$defs` names are kebab-case; property names are snake_case; no nested `$id`.
 - Every object is closed (`additionalProperties: false`) and lists every property in `required`
-  unless this specification marks it optional. Inapplicable companion fields are `null`, not
-  absent.
-- Formats: only `date-time` (and `uri` if required), because
-  `drm_copilot_discovery.schema_validation.discovery_format_checker` registers only those. A
-  calendar date uses the pattern `^[0-9]{4}-[0-9]{2}-[0-9]{2}$`; calendar validity is checked in
-  Python.
-- No nested `$id`. No reference outside the docs v1 set plus discovery v2 `common`. No remote
-  retrieval: the registry `retrieve` callable raises `referencing.exceptions.NoSuchResource`.
-
-In the tables below, "text", "identifier", "identifiers", "relative-path", "paths",
-"path-or-glob", "exclusions", "revision", "sha256", "timestamp", "extensions" and
-"validation-outcome" mean the definitions of those names in discovery v2 `common`.
+  unless this specification marks it optional. Inapplicable companion fields are `null`, not absent.
+- Formats: the orchestrator probe shows `format: date-time` is an annotation only under
+  `Test-Json`. Every timestamp constraint is therefore a regex `pattern`. Docs common `timestamp`
+  keeps `format: date-time` as an annotation and adds the pattern
+  `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,9})?Z$`. A calendar date
+  uses the pattern `^[0-9]{4}-[0-9]{2}-[0-9]{2}$`; calendar validity is not a schema rule and is
+  checked in PowerShell by the feature that consumes the field (1021 for `last_reviewed`).
 
 ### Docs `common` `$defs` (`urn:drm-copilot:docs:1.0.0:common`)
+
+Copied from discovery v2 common (pinned by a parity test, compared as canonical JSON): `text`,
+`identifier`, `identifiers`, `relative-path`, `paths`, `path-or-glob`, `exclusions`, `revision`,
+`sha256`, `timestamp`, `extensions`, `validation-outcome`, and any definition those reference
+transitively. `timestamp` is the only deliberate divergence (the added pattern above) and is
+excluded from the parity comparison by name. In the tables below these names mean the docs common
+copies.
+
+Docs-specific definitions:
 
 | Definition | Shape |
 |---|---|
 | `element-kind` | `enum: ["cli-command", "cli-option", "http-route", "config-key", "public-symbol", "architecture-component"]` |
-| `element-id` | string, pattern `^(?:cli-command\|cli-option\|http-route\|config-key\|public-symbol\|architecture-component)-[0-9a-f]{64}$` (also satisfies discovery `identifier`) |
+| `element-id` | string, pattern `^(?:cli-command\|cli-option\|http-route\|config-key\|public-symbol\|architecture-component)-[0-9a-f]{64}$` (also satisfies `identifier`) |
 | `element-ids` | array, `uniqueItems`, items `element-id` |
 | `disposition` | `enum: ["documented", "excluded", "deferred"]` |
 | `parity-dimension` | `enum: ["exists", "accurate", "example_present", "owner_assigned", "diataxis_mode"]` |
@@ -130,13 +533,13 @@ In the tables below, "text", "identifier", "identifiers", "relative-path", "path
 | `artifact-pin` | closed object: `artifact_kind` (`docs-artifact-kind`), `path` (relative-path), `sha256` (sha256) |
 | `page-binding` | closed object: `page_path` (relative-path), `anchor` (text or `null`) |
 | `actor` | closed object: `kind` (`enum: ["human", "agent", "tool"]`), `id` (identifier) |
-| `finding` | closed object: `code` (pattern `^[A-Z][A-Z0-9_]*$`), `severity` (`enum: ["error", "warning", "info"]`), `artifact_path` (relative-path or `null`), `pointer` (RFC 6901 pointer, same pattern as discovery `service-result`), `related_ids` (identifiers), `related_paths` (paths), `message` (text), `next_action` (text). Key set equals `drm_copilot_discovery.findings.Finding.to_dict`. |
-| `diagnostic` | closed object: `id` (identifier), `code`, `severity` (`enum: ["information", "warning", "error"]`), `path` (relative-path or `null`), `message` (text), `analyzer_id` (identifier), `blocking` (boolean), `extensions`. Same shape as discovery `inventory-snapshot#/$defs/diagnostic`. |
+| `finding` | closed object: `code` (pattern `^[A-Z][A-Z0-9_]*$`), `severity` (`enum: ["error", "warning", "info"]`), `artifact_path` (relative-path or `null`), `pointer` (RFC 6901 pointer pattern), `related_ids` (identifiers), `related_paths` (paths), `message` (text), `next_action` (text). Key set equals the output of `New-DocsFinding`. |
+| `diagnostic` | closed object: `id` (identifier), `code`, `severity` (`enum: ["information", "warning", "error"]`), `path` (relative-path or `null`), `message` (text), `analyzer_id` (identifier), `blocking` (boolean), `extensions`. |
 
-The `diataxis-mode` values are shared with 900002 (`page-metadata.schema.json`) and 900006
-(`diataxis_mode: reference`); 900002 must use the same values.
+The `diataxis-mode` values are shared with 1021 (`page-metadata.schema.json`) and 900006
+(`diataxis_mode: reference`).
 
-### Artifact schema: `docs-profile` (`docs-profile.schema.json`)
+### Artifact schema: `docs-profile`
 
 | Field | Shape |
 |---|---|
@@ -150,13 +553,9 @@ The `diataxis-mode` values are shared with 900002 (`page-metadata.schema.json`) 
 | `completion_gates` | closed object: `docs_complete` (closed `{required_dispositions_complete: const true, allow_deferred: boolean, max_stale_pages: integer minimum 0, required_parity_dimensions: array uniqueItems of parity-dimension}`), `integration_pr_gate` (closed `{enabled: boolean}`) |
 | `artifact_paths` | closed object: `inventory_snapshot`, `coverage_ledger`, `parity_matrix`, `evidence_pins`, `validation_receipt`, each relative-path |
 
-Semantic checks applied after schema validation (each an `error` finding with a pointer to the
-offending field): audience identifiers unique; documentation root identifiers unique; every
-`documentation_roots[*].audience_ids` member names a declared audience; every
-`diataxis_policy.directory_modes[*].mode` is a member of `diataxis_policy.modes`; every
-`surface_selection.analyzers` member is a registered analyzer identifier (error pointer
-`/surface_selection/analyzers/<n>`). Consumers: 900003 reads `surface_selection` and
-`artifact_paths.inventory_snapshot`; 900005 reads `completion_gates.docs_complete` and the other
+Semantic checks after schema validation are listed under `Test-DocsProfileSemantic`. Consumers:
+900003 reads `surface_selection` and `artifact_paths.inventory_snapshot`; 1023 reads
+`completion_gates.docs_complete`, `page_owners`, `documentation_roots` and the other
 `artifact_paths`; 900006 reads `diataxis_policy` and `page_owners`; 900008 reads
 `completion_gates.integration_pr_gate.enabled`.
 
@@ -192,10 +591,11 @@ matching `^cli-command-`; every other kind allows `null` or any element-id.
 | `entries` | array `uniqueItems` of `#/$defs/entry` |
 
 `$defs/entry` (closed): `element_id` (element-id), `kind` (element-kind), `disposition`
-(docs `disposition`), `page_bindings` (array of `page-binding`), `rationale` (text or `null`),
-`owner` (identifier or `null`), `target` (text or `null`), `updated_by` (`actor`), `extensions`.
+(`disposition`), `page_bindings` (array of `page-binding`), `rationale` (text or `null`), `owner`
+(identifier or `null`), `target` (text or `null`), `updated_by` (`actor`), `extensions`.
 
-Disposition companion rules (`allOf` of `if`/`then` keyed on `disposition`):
+Disposition companion rules (`allOf` of `if`/`then` keyed on `disposition`, within the structural
+walk subset so each violation names its field):
 
 | Disposition | `page_bindings` | `rationale` | `owner` | `target` |
 |---|---|---|---|---|
@@ -203,7 +603,7 @@ Disposition companion rules (`allOf` of `if`/`then` keyed on `disposition`):
 | `excluded` | `maxItems 0` | text | `null` | `null` |
 | `deferred` | `maxItems 0` | text or `null` | identifier | text |
 
-Completeness (every inventoried element has an entry) is a semantic rule owned by 900005, not a
+Completeness (every inventoried element has an entry) is a semantic rule owned by 1023, not a
 schema rule.
 
 ### Artifact schema: `docs-parity-matrix`
@@ -217,12 +617,11 @@ schema rule.
 | `rows` | array `uniqueItems` of `#/$defs/row` |
 
 `$defs/row` (closed): `element_id` (element-id), `kind` (element-kind), `page_path`
-(relative-path), `dimensions` (closed object whose required keys are exactly `exists`,
-`accurate`, `example_present`, `owner_assigned`, `diataxis_mode`, each a
-`#/$defs/dimension-result`), `extensions`. `$defs/dimension-result` (closed): `state`
-(parity-state), `rationale` (text or `null`), `evidence_pin_ids` (identifiers); `fail` and
-`not-applicable` require `rationale` text. An unknown dimension is rejected by
-`additionalProperties: false`.
+(relative-path), `dimensions` (closed object whose required keys are exactly `exists`, `accurate`,
+`example_present`, `owner_assigned`, `diataxis_mode`, each a `#/$defs/dimension-result`),
+`extensions`. `$defs/dimension-result` (closed): `state` (parity-state), `rationale` (text or
+`null`), `evidence_pin_ids` (identifiers); `fail` and `not-applicable` require `rationale` text.
+An unknown dimension is rejected by `additionalProperties: false`.
 
 ### Artifact schema: `docs-evidence-pin` (collection form)
 
@@ -236,9 +635,9 @@ One document per repository holds every pin, sorted by `pin_id`.
 
 `$defs/pin` (closed): `pin_id` (identifier), `element_id` (element-id), `element_kind`
 (element-kind), `page_path` (relative-path), `symbol` (text; the pinned declaration),
-`source_path` (relative-path), `source_sha256` (sha256; 900005 compares it with the current
-snapshot element to mark the bound page stale), `revision` (revision or `null`), `claim` (text or
-`null`), `pinned_at` (timestamp), `pinned_by` (`actor`).
+`source_path` (relative-path), `source_sha256` (sha256; 1023 compares it as an opaque value with the
+current snapshot element), `revision` (revision or `null`), `claim` (text or `null`), `pinned_at`
+(timestamp), `pinned_by` (`actor`).
 
 ### Artifact schema: `docs-validation-receipt`
 
@@ -249,322 +648,255 @@ snapshot element to mark the bound page stale), `revision` (revision or `null`),
 | `repository` | identifier |
 | `revision` | revision (non-null; 900008 matches it against the head revision) |
 | `inputs` | array `uniqueItems` of `artifact-pin` |
-| `counts` | closed object: `elements_total`, `undocumented`, `stale_pages` (integers minimum 0), `by_disposition` (closed object whose required keys are exactly the three dispositions, integer values minimum 0), `by_kind` (closed object whose required keys are exactly the six element kinds, integer values minimum 0) |
+| `counts` | closed object: `elements_total`, `undocumented`, `stale_pages` (integers minimum 0), `by_disposition` (closed object whose required keys are exactly the dispositions, integer values minimum 0), `by_kind` (closed object whose required keys are exactly the element kinds, integer values minimum 0) |
 | `validation_result` | validation-outcome |
 | `findings` | array `uniqueItems` of docs `finding` |
 | `issued_at` | timestamp |
 | `writer` | closed `{tool: const "drm-copilot-docs", version: text}` |
 
 Result binding copied from discovery `validation-receipt`: `pass` forbids any finding with
-severity `error`; `fail` requires at least one. An unknown disposition or kind is rejected
-through the closed `by_disposition` and `by_kind` objects.
+severity `error`; `fail` requires at least one. An unknown disposition or kind is rejected through
+the closed `by_disposition` and `by_kind` objects.
 
 Rejection coverage: each artifact schema carries an element-kind or disposition field (profile
 `surface_selection.element_kinds`, snapshot `elements[].kind`, ledger `entries[].kind` and
 `entries[].disposition`, matrix `rows[].kind`, pin `pins[].element_kind`, receipt
-`counts.by_kind` and `counts.by_disposition`). In acceptance criterion 1, "each schema" means the
-six artifact schemas; the definitions-only `common` schema has no root object and no example and
-is verified through the artifact schemas that reference it.
-
-### Element identifier function and declaration conventions (`surface_models.py`)
-
-- `ElementKind = Literal["cli-command", "cli-option", "http-route", "config-key",
-  "public-symbol", "architecture-component"]`; `ELEMENT_KINDS: tuple[ElementKind, ...]` in that
-  order.
-- `element_identifier(*, kind: ElementKind, path: str, declaration: str) -> str` returns
-  `stable_id(kind, row(kind=kind, path=path, declaration=declaration))` using
-  `drm_copilot_discovery.analyzer.findings`. The result is `<kind>-<64 lowercase hex>` and
-  matches `element-id`.
-- Input validation (`ValueError` naming the argument): `kind` in `ELEMENT_KINDS`; `path` passes
-  `drm_copilot_discovery.findings.validate_finding_path` (POSIX relative path grammar); `declaration`
-  non-blank, no leading or trailing whitespace, no control characters. No Unicode normalization
-  is applied, so identity is byte-exact.
-- Because the hashed value is canonical JSON of three named members, concatenation ambiguities
-  (for example path `a/b` with declaration `c` versus path `a` with declaration `b/c`) cannot
-  collide.
-- Declaration conventions per kind (binding on 900003 and 900004):
-
-| Kind | Declaration | Example |
-|---|---|---|
-| `cli-command` | full command path | `dev.docs.inventory` |
-| `cli-option` | command path, one space, long option | `dev.docs.inventory --analyzer` |
-| `http-route` | upper-case method, one space, route template | `GET /items/{id}` |
-| `config-key` | dotted key path | `tool.poetry.scripts` |
-| `public-symbol` | qualified name | `drm_copilot_docs.profile.parse_profile` |
-| `architecture-component` | package or module path | `drm_copilot_docs.analyzers` |
-
-### `SurfaceElement` and related models (`surface_models.py`)
-
-- `SurfaceElement` (frozen dataclass, `kw_only`): `element_id: str`, `kind: ElementKind`,
-  `path: str`, `declaration: str`, `name: str`, `parent_id: str | None`, `analyzer_id: str`,
-  `source_sha256: str`, `line_range: tuple[int, int] | None`, `properties: JsonObject`.
-  `__post_init__` recomputes `element_identifier(kind=..., path=..., declaration=...)` and raises
-  `ValueError` when `element_id` differs; it also enforces the `cli-option` parent rule and
-  `1 <= start <= end` for `line_range`.
-- `SurfaceDiagnostic` (frozen, `kw_only`) mirroring the docs `diagnostic` shape; its `id` is
-  derived with `stable_id("diagnostic", ...)` as in
-  `drm_copilot_discovery.analyzer.findings.diagnostic`.
-- `element_to_json(element: SurfaceElement) -> JsonObject` and
-  `diagnostic_to_json(diagnostic: SurfaceDiagnostic) -> JsonObject` project to the snapshot
-  `element` and docs `diagnostic` shapes.
-
-### Analyzer contract (`analyzer_contract.py`)
-
-- `SurfaceAnalyzer` (`typing.Protocol`):
-  - `identifier: str` (read-only property),
-  - `element_kinds: tuple[ElementKind, ...]` (read-only property),
-  - `analyze(self, inputs: Mapping[str, bytes], *, selection: SurfaceSelection) -> SurfaceAnalysis`.
-  - Contract: pure and deterministic; no I/O; inputs are not mutated; inputs are captured bytes
-    keyed by POSIX relative path; an input above the size bound yields a diagnostic rather than a
-    partial result.
-- `SurfaceAnalysis` (frozen): `elements: tuple[SurfaceElement, ...]` sorted by `element_id`;
-  `diagnostics: tuple[SurfaceDiagnostic, ...]` sorted by `id`.
-- `AnalyzerRegistration` (frozen, `kw_only`): `identifier: str` (discovery `identifier`
-  grammar), `element_kinds: tuple[ElementKind, ...]` (non-empty, members of `ELEMENT_KINDS`),
-  `module: str` (must start with `drm_copilot_docs.analyzers.`), `attribute: str`.
-- `ANALYZER_REGISTRY: tuple[AnalyzerRegistration, ...] = ()`. A source comment states that 900003
-  and 900004 append one entry per line at the end of the tuple and that order in source is not
-  significant. Profiles select identifiers only; no profile can name a module.
-- Helper functions:
-  - `validate_registry(registry: Sequence[AnalyzerRegistration]) -> tuple[Finding, ...]`:
-    error findings for a duplicate identifier, an identifier outside the grammar, empty or
-    unknown kinds, and a module outside the `drm_copilot_docs.analyzers.` prefix. The committed
-    `ANALYZER_REGISTRY` returns no findings.
-  - `registered_identifiers(registry) -> tuple[str, ...]`: sorted identifiers.
-  - `select_registrations(registry, *, kinds: Sequence[ElementKind], analyzer_ids:
-    Sequence[str] | None) -> tuple[AnalyzerRegistration, ...]`: validates the full request
-    before any import; `ValueError` naming the first unknown identifier or invalid registry;
-    output sorted by identifier and invariant under input permutation.
-  - `load_analyzer(registration, *, import_module=importlib.import_module) -> SurfaceAnalyzer`:
-    refuses a module outside the prefix before calling `import_module`; checks that the loaded
-    object's `identifier` and `element_kinds` equal the registration.
-
-### Profile models and `profile.py` API
-
-- `profile_models.py` frozen `kw_only` dataclasses: `DocsProfile`, `Audience`,
-  `DocumentationRoot`, `SurfaceSelection`, `PageOwner`, `DiataxisPolicy`, `DirectoryMode`,
-  `DocsCompleteGate`, `IntegrationPrGate`, `CompletionGates`, `ArtifactPaths`. Field names equal
-  the schema property names; sequences are tuples; `SurfaceSelection.analyzers` is
-  `tuple[str, ...] | None`.
-- `profile.py`:
-  - `parse_profile(content: bytes, *, format: Literal["json", "yaml"], artifact_path: str,
-    registry: Sequence[AnalyzerRegistration] | None = None) -> ProfileLoadResult`. Parses through
-    `drm_copilot_discovery.parsing.parse_document` (bounded, duplicate keys rejected), validates
-    against `docs-profile`, applies the semantic checks against `registry` (default
-    `ANALYZER_REGISTRY`), and builds the dataclasses only when no `error` finding exists.
-  - `ProfileLoadResult` (frozen): `profile: DocsProfile | None`, `findings: tuple[Finding, ...]`
-    ordered through `FindingCollector`, `ok: bool` (true when no `error` finding).
-  - `starter_profile(*, repository_id: str) -> JsonObject`: a profile that passes schema and
-    semantic validation with the empty registry (it omits `surface_selection.analyzers`).
-  - `render_profile_json(value: JsonValue) -> str`: canonical JSON (sorted keys, LF).
-
-### Schema validation and resources API
-
-- `schema_validation.py`: `DOCS_SCHEMA_NAMES` (the six artifact names plus `common`);
-  `docs_schema_id(name: str) -> str`; `build_registry(resources: Mapping[str, bytes]) ->
-  referencing.Registry` (pure, offline, `check_schema` on each schema, eager `$ref` resolution,
-  cached by content); `validate_artifact(value: JsonValue, *, artifact_kind: str, artifact_path:
-  str, resources: Mapping[str, bytes] | None = None) -> tuple[Finding, ...]` using
-  `Draft202012Validator(..., format_checker=discovery_format_checker())`, finding code
-  `SCHEMA_INVALID`, pointers from `error.absolute_path`. When `resources` is `None`, the installed
-  docs schemas and the installed discovery `common` are read.
-- `resources.py`: `RESOURCE_DIRECTORY = "_resources"`, `MANIFEST_FILENAME = "manifest.json"`,
-  `ResourceError`, `read_resource(path: str, *, read_bytes=...) -> bytes`. The manifest lists
-  sorted `{path, sha256, size}` entries and `runtime_version` equal to
-  `drm_copilot_docs.__version__`; a read verifies size and SHA-256 before returning bytes.
-
-### CLI
-
-Console scripts (root and package `pyproject.toml`):
-`"dev.docs.init" = "drm_copilot_docs.cli:main_init"`,
-`"dev.docs.validate-profile" = "drm_copilot_docs.cli:main_validate_profile"`. Each wrapper is a
-zero-argument function returning `int` that delegates to
-`run_cli(command, argv, *, ports, stdout, stderr) -> int` with injectable read and write ports.
-Argument parsing uses `argparse`; `SystemExit` from parsing is caught and never escapes.
-
-`dev.docs.init [--repository-id <identifier>] [--output <relative path>] [--force]`:
-
-- Without `--output`, prints the starter profile to stdout and writes no file.
-- `--output` writes through one exclusive-create port and refuses an existing file unless
-  `--force` is given.
-- `--repository-id` sets `repository.id`; the default is the neutral identifier
-  `example-repository`.
-
-`dev.docs.validate-profile [--profile <path>] [--format text|json]`:
-
-- Default `--profile`: `docs/documentation-estate/docs-profile.json`.
-- Each finding prints its JSON pointer, field name and message. A missing required field reports
-  the parent pointer and the message `'<field>' is a required property`; a semantic finding points
-  at the offending field.
-
-Exit codes (both commands):
-
-| Code | Meaning |
-|---|---|
-| `0` | Success or help. For `validate-profile`, no `error` finding. |
-| `1` | Validation failure: `validate-profile` found at least one `error` finding; `init` rendered a starter that failed self-validation (defect guard). |
-| `2` | Invocation error: unknown flag, missing flag value, `--repository-id` outside the identifier grammar, `--output` or `--profile` not a POSIX relative path. |
-| `3` | Runtime or output failure: unreadable profile, unavailable or hash-mismatched schema resource, `--output` target exists without `--force`, write failure. A top-level handler writes a fixed stderr line and returns `3`. |
-
-Example invocations:
-
-- `poetry run dev.docs.init` prints a starter profile and exits `0`.
-- `poetry run dev.docs.validate-profile --profile examples/docs/v1/docs-profile.example.json`
-  exits `0`.
-- Validating a profile without `audiences` exits `1` and prints the root pointer (the empty
-  RFC 6901 pointer) with the message `'audiences' is a required property`.
+`counts.by_kind` and `counts.by_disposition`). In the acceptance criteria, "each artifact schema"
+means the artifact schemas `docs-profile`, `surface-inventory-snapshot`, `docs-coverage-ledger`,
+`docs-parity-matrix`, `docs-evidence-pin` and `docs-validation-receipt`; the definitions-only
+`common` schema has no root object and no example and is verified through the artifact schemas
+that reference it.
 
 ## Data & State
 
-- Data transformations and invariants:
-  - Element identity is a pure function of kind, path and declaration.
-  - Profiles, snapshots, ledgers, matrices, pins and receipts are validated against closed
-    schemas; all ordering is deterministic (findings by `finding_key`, elements by `element_id`,
-    pins by `pin_id`).
-  - Framework code and schemas contain no consumer-specific names; all repository specificity is
-    profile data.
-- Caching: the schema registry is built once per process and cached keyed by resource content
-  (immutable), so tests with different in-memory resources do not share state.
-- Persistence: this feature writes only the optional `--output` starter profile. Ledger and matrix
-  writes belong to 900005.
-- Distribution state:
-  - `packages/docs-runtime/resource-manifest.json`: allowlist of `schemas/docs/v1/*.schema.json`
-    files to stage. Staging enumerates only allowlisted files and does not reject other files in
-    `schemas/docs/v1/` (900002 adds `page-metadata.schema.json` for its own package).
-  - `packages/docs-runtime/src/drm_copilot_docs/_resources/schemas/docs/v1/` and
-    `_resources/manifest.json`: staged copies plus a sorted SHA-256 manifest.
-  - No `_build_manifest.json` is created; it exists for discovery gateway trust and this feature has
-    no gateway.
+- Element identity is a pure function of kind, path and declaration.
+- All ordering is deterministic: findings by `Get-DocsOrderedFinding`, elements by `element_id`,
+  pins by `pin_id`, analyzer rows by `Id`, schema names in fixed order.
+- Framework code, schemas and examples contain no consumer-specific names; all repository
+  specificity is profile data.
+- No module-scope cache: schemas are read and composed once per command invocation.
+- Persistence: `init -Write` writes the profile (and, after 1021 and 900008, their template rows)
+  through `Write-DocsFileText`, the only filesystem write in 1020. Ledger, matrix, pin and receipt
+  writes belong to 1023.
+- Runtime schema copy: `.claude/lib/docs/schemas/v1/` holds byte-identical copies of every file in
+  `schemas/docs/v1/` (canonical location, naming contract). The bundle copy holds byte-identical
+  copies of every file under `.claude/lib/docs/`.
 - Migration or backfill: none.
 
 ## Constraints & Risks
 
-- The naming contract in the epic manifest `## Shared Design` section is fixed; this feature may not
-  change it.
-- Downstream features consume these schemas and contracts, so they must be stated precisely.
-- Reliance on assumption A5 (provisional, not approved by the owner): package placement in
-  `packages/docs-runtime`, import name `drm_copilot_docs`, discovery reused as a library. If A5 is
-  rejected, the package path, import name, distribution name, root registration, tier entry and
-  every downstream module path in this specification change. A6 (no MCP work here) is also relied
-  on. A1-A4 do not affect this feature.
-- Consumer installation follows the discovery runtime mechanism: a docs-owned builder
-  `scripts/dev_tools/build_docs_runtime.py` (`--check`, `--stage-only`, default builds
-  `dist/docs/drm_copilot_docs-1.0.0-py3-none-any.whl` with `pip wheel --no-index --no-deps
-  --no-build-isolation`), staged `_resources` copies with a SHA-256 manifest, and
-  `drm_copilot_docs/resources.py`. A consumer runs `python -I -m pip install` with the discovery
-  wheel and the docs wheel, both built from this repository. The builder reuses
-  `scripts.dev_tools.build_discovery_runtime.verify_schema_closure` and
-  `drm_copilot_discovery.resources.validate_resource_path` unchanged.
-- Discovery runtime files and behavior are unchanged: no file under `packages/discovery-runtime/`
-  or `schemas/discovery/`, and neither `scripts/dev_tools/build_discovery_runtime.py` nor
-  `scripts/dev_tools/discovery_build_identity.py`, is edited.
-- No test creates temporary files; pure cores take in-memory mappings and I/O stays in thin CLI modules.
-- Shared append-only files (`pyproject.toml`, `poetry.lock`) are also edited by sibling features.
-- `quality-tiers.yml` and `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py`
-  are also edited by 900002 (which adds `packages/docs-page-check`). These files are not listed in the
-  epic conflict surface. The conflict is append-only and is resolved in the later child's
-  remediation loop.
-- `analyzer_contract.py` is appended to by 900003 and 900004; the one-entry-per-line form keeps those
-  conflicts to adjacent lines.
-- Poetry resolution (unverified): whether Poetry resolves the docs package's range dependency on
-  `drm-copilot-discovery` alongside the root directory dependency without a lock conflict has not
-  been verified. Fallback: regenerate `poetry.lock` in the item worktree; `poetry check --lock`
-  must pass and `git diff --exit-code poetry.lock` must be clean after `poetry install`.
-- Freshness of staged copies: CI does not run any runtime builder. Stale copies are caught by the
-  byte-equality test and by the builder `--check` mode.
-- Batch budget: the feature creates more than three non-test Python production files, so execution
-  must run on the large route in the item worktree that holds the orchestration checkpoint.
-- Test collection: pytest runs in prepend import mode. `tests/docs_runtime/__init__.py` is required,
-  and the resource and schema-validation tests carry a `docs_` prefix to avoid basename collisions
-  with `tests/discovery_runtime/` and 900002 tests.
-- The epic file list names `tests/schemas/docs_schemas/`; this feature uses `tests/schemas/docs/`,
-  mirroring `schemas/docs/` as `tests/schemas/discovery/` mirrors `schemas/discovery/`. This is a
-  file-list refinement, not a naming-contract change.
-- Neutrality: the configured consumer identifiers are stored only as lowercase hex SHA-256 digests
-  of lowercase word tokens, never as plaintext.
+- The epic naming contract is fixed; this feature may not change it. The runtime schema copy is an
+  addition, not a relocation (OQ-1).
+- Language rule (epic `## Owner Directive: Implementation Language (2026-10-30, refined)`): every
+  artifact is PowerShell, JSON, YAML or Markdown; no Python or TypeScript is created or edited. Any
+  artifact that cannot follow the rule is an owner question, not a decision. No such artifact was
+  found (see `## Artifact Classification`).
+- PowerShell 7 built-ins only (epic A8): `Test-Json` and `System.Text.Json`; `ConvertFrom-Json` and
+  `ConvertTo-Json` are not used for artifacts; no new module dependency.
+- CI-only behavior: the `windows-latest` runner's PowerShell version and bundled JsonSchema.Net
+  determine `Test-Json` behavior; a local 7.6.9 run does not prove it. Tests assert codes, pointers
+  and field-name containment only, and the runtime fails closed below 7.4.
+- Batch budget: sixteen production PowerShell files (eight plus eight bundle copies) exceed the
+  direct-mode cap, so execution runs on the large route in the item worktree that holds the
+  orchestration checkpoint, never in an isolated executor worktree.
+- File size: `Invoke-DocsCommand.ps1`, `DocsSchema.psm1` and `DocsProfile.psm1` are the largest
+  candidates; a file reaching the 500-line guidance is split into a new `Docs<Area>.psm1` with its
+  own Pester suite, push-down copy and core entry.
+- Test isolation: dot-sourcing the entry script imports `Docs*` and `DiscoveryEncoding` modules into
+  the session; every suite removes them in `AfterAll`.
+- Shared append-only edit points: `Invoke-DocsCommand.ps1` dispatch table, `DocsAnalyzerRegistry.psm1`,
+  `DocsSchema.psm1` schema table, `DocsProfileCommands.psm1` template table, Claude `core.json`, and
+  `quality-tiers.yml`. Owner anchors keep insertion points apart; remaining conflicts are resolved
+  in the later child's remediation loop.
+- Neutrality: consumer identifiers are configured only as lowercase hex SHA-256 digests, never as
+  text.
 
 ## Implementation Strategy
 
-- Implementation scope:
-  - Create `packages/docs-runtime/pyproject.toml` (backend `poetry.core.masonry.api`, requires
-    `poetry-core>=1.9.0`; name `drm-copilot-docs`; version `1.0.0`;
-    `packages = [{ include = "drm_copilot_docs", from = "src" }]`; `include` for `py.typed`; the
-    two console scripts; dependencies `python = ">=3.10,<4.0"`,
-    `drm-copilot-discovery = ">=2.0.0,<3.0.0"`, `jsonschema = "^4.25.1"`,
-    `referencing = ">=0.37,<0.38"`, `PyYAML = ">=6.0"`), `README.md`, `resource-manifest.json`.
-  - Create `packages/docs-runtime/src/drm_copilot_docs/`: `__init__.py` (`__version__ = "1.0.0"`),
-    `py.typed`, `profile_models.py`, `profile.py`, `schema_validation.py`, `resources.py`,
-    `surface_models.py`, `analyzer_contract.py`, `cli.py`, and the staged `_resources/` tree.
-  - Create `scripts/dev_tools/build_docs_runtime.py`.
-  - Create `schemas/docs/v1/common.schema.json` and the six artifact schemas, and six examples
-    `examples/docs/v1/<name>.example.json`.
-  - Edit root `pyproject.toml` (append only): `[tool.poetry.dependencies]`
-    `drm-copilot-docs = { path = "packages/docs-runtime", develop = true }`; the two
-    `[tool.poetry.scripts]` entries; `"packages/docs-runtime/src"` in `[tool.coverage.run] source`
-    and in `[tool.pyright] include`.
-  - Regenerate `poetry.lock`.
-  - Edit `quality-tiers.yml`: classify `packages/docs-runtime` as `T2`. Update
-    `test_committed_quality_tiers_yml_assigns_spec_tiers` so the expected elevated list contains
-    `packages/discovery-runtime` and `packages/docs-runtime`.
-- Tests:
-  - `tests/docs_runtime/__init__.py`, `test_profile.py`, `test_profile_properties.py`,
-    `test_surface_models.py`, `test_analyzer_contract.py`, `test_cli.py`, `test_neutrality.py`,
-    `test_docs_schema_validation.py`, `test_docs_resources.py`, `test_docs_package_contract.py`.
-  - `tests/schemas/docs/test_docs_schemas_v1.py`: `check_schema`, `$id`, closed roots, every
-    example validates, and per artifact schema one in-memory mutation deleting a required field and
-    one setting an unknown element kind or disposition, each producing errors; offline closure
-    through `verify_schema_closure` with discovery `common` included.
-  - `tests/scripts/dev_tools/test_build_docs_runtime.py` with an in-memory filesystem.
-  - Property tests use exhaustive `itertools.product` and `itertools.permutations` enumerations
-    (identifier determinism and injectivity across all element kinds, paths with separators and
-    non-ASCII characters, and boundary concatenations; starter validity over repository
-    identifiers; render round trip and key-order invariance; registry selection order
-    invariance).
-  - Neutrality test (`tests/docs_runtime/test_neutrality.py`): a module-level tuple of configured
-    digests
-    `bbddb9f7a8340215503f6089cb5364689432a9cfb261cd7683c4fe2f20760f6b` and
-    `59f0db478528b4c446cfaf3d5b8a358dc500a6d97b29a215ee8c216a2f7174e2`; a pure helper tokenizes text
-    (lowercase, split on non-alphanumeric characters), hashes each token with SHA-256 and reports
-    matches; a parametrized read-only scan covers every file under `packages/docs-runtime/src/` and
-    `schemas/docs/`; a positive control injects a synthetic token into an in-memory mapping, adds its
-    digest to the configured set for that call, and asserts detection.
-  - CLI tests pass `io.StringIO` streams and in-memory ports and assert exit codes `0`, `1`, `2`, `3`.
-- Dependency changes: none new. `hypothesis` is not approved and is not added. The docs package
-  declares only dependencies already in the root environment plus the local discovery package.
-- Logging and telemetry: none added; CLI diagnostics go to stderr.
-- Rollout: additive. No feature flag. Consumers opt in by installing the docs wheel.
+- Create the eight production files under `.claude/lib/docs/` listed in `### Module conventions`.
+- Create `schemas/docs/v1/common.schema.json` and the six artifact schemas, and
+  `examples/docs/v1/<name>.example.json` for each artifact schema.
+- Create the runtime copies `.claude/lib/docs/schemas/v1/*.schema.json`.
+- Create byte-identical bundle copies of every file under `.claude/lib/docs/` at
+  `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`.
+- Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (`paths`):
+  append every file under `.claude/lib/docs/`, PowerShell and data.
+- Edit `quality-tiers.yml`: add `path: ".claude/lib/docs"`, `tier: T3` (OQ-4), with a rationale
+  stating that it is a runtime library shipped in the `.claude` bundle. No change to
+  `config/poshqc-coverage.json` (already lists `.claude/lib`) or `config/poshqc-scan.json`.
+- Tests (Pester, `tests/scripts/claude-lib/docs/`): `DocsJson.Tests.ps1`, `DocsFinding.Tests.ps1`,
+  `DocsSchema.Tests.ps1`, `DocsSchemaContract.Tests.ps1`, `DocsSurface.Tests.ps1`,
+  `DocsAnalyzerRegistry.Tests.ps1`, `DocsProfile.Tests.ps1`, `DocsProfileCommands.Tests.ps1`,
+  `Invoke-DocsCommand.Tests.ps1`, `Docs.Manifest.Tests.ps1`, `DocsNeutrality.Tests.ps1`, one
+  `Docs.TestSupport.psm1` (in-memory command context and schema-set builders), and a committed
+  fixture analyzer module under `tests/scripts/claude-lib/docs/fixtures/` loaded through the
+  `-ImportModule` seam.
+- Neutrality test: `$script:ConsumerIdentifierSha256` holds lowercase hex SHA-256 digests of the
+  lowercase identifier forms to ban, supplied by the orchestrator or owner. The first preparation
+  recorded `bbddb9f7a8340215503f6089cb5364689432a9cfb261cd7683c4fe2f20760f6b` and
+  `59f0db478528b4c446cfaf3d5b8a358dc500a6d97b29a215ee8c216a2f7174e2`; the executor confirms each
+  value by an independent route before use. The pure helper `Find-DocsIdentifierDigest -FileText
+  <IDictionary> -Digest <string[]>` lowercases text, enumerates maximal `[a-z0-9]+` runs and maximal
+  `[a-z0-9]+(?:[-_.][a-z0-9]+)+` compounds, hashes each candidate with `Get-DocsSha256Hex`, and
+  returns `(path, digest)` pairs. Scan scope: every file under `.claude/lib/docs/`, `schemas/docs/`
+  and `examples/docs/`, read once into memory.
+- Golden identity vectors: for each chosen `(kind, path, declaration)` the test asserts the exact
+  canonical string and the hex digest recorded once from an independent hash of that string
+  (evidence under `<FEATURE>/evidence/`).
+- Dependency changes: none.
+- Logging: none added; exit-3 diagnostics go to stderr.
+- Rollout: additive; destination repositories receive the lib through the existing Claude
+  push-down and opt in by running `init`.
+
+## Artifact Classification
+
+Rule references: R1 = language rule clause (1) (pushed-down skills, helpers, hooks and libs are
+PowerShell or bash); R2 = clause (2) (TypeScript only for MCP and extension commands; none here);
+D = epic `### Artifact classes for this epic` (schema, configuration, data and test rows). "Avoid new
+Python" applies to every row.
+
+| File (create unless noted) | Class | Language | Permitting rule |
+|---|---|---|---|
+| `.claude/lib/docs/DocsJson.psm1` | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsFinding.psm1` | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsSchema.psm1` | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsSurface.psm1` | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsAnalyzerRegistry.psm1` | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsProfile.psm1` | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsProfileCommands.psm1` | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/Invoke-DocsCommand.ps1` | pushed-down helper/lib (entry) | PowerShell | R1 |
+| `.claude/lib/docs/schemas/v1/*.schema.json` (runtime copies of `schemas/docs/v1/`) | schema/config/data (pushed down) | JSON | D; location is OQ-1 |
+| `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/**` (bundle copies of every file above) | pushed-down helper/lib and data (mirror) | PowerShell, JSON | R1, D |
+| `schemas/docs/v1/common.schema.json` and the artifact schemas | schema/config/data | JSON | D |
+| `examples/docs/v1/<name>.example.json` (one per artifact schema) | schema/config/data | JSON | D |
+| `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit) | schema/config/data | JSON | D |
+| `quality-tiers.yml` (edit) | schema/config/data | YAML | D |
+| `tests/scripts/claude-lib/docs/*.Tests.ps1`, `Docs.TestSupport.psm1`, `fixtures/*.psm1` | test | PowerShell (Pester) | D |
+| `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/**` (spec, user story, plan, evidence) | documentation | Markdown | D |
+
+No MCP tool, extension command, hook, skill, agent, Python file or TypeScript file is created or
+edited. Every artifact follows the language rule; OQ-1 and OQ-2 concern location and reachability,
+not language.
+
+## Decisions Later Children Must Honor
+
+- Register a subcommand by inserting rows directly under the child's own anchor in
+  `Invoke-DocsCommand.ps1` (1021, 900003, 1023, 900006, 900008); never edit another anchor or row.
+  Command modules are `Docs<Area>Commands.psm1` or the epic-named module and follow the command
+  function contract.
+- Analyzer rows go under the child's anchor in `DocsAnalyzerRegistry.psm1` (900003, 900004);
+  analyzers follow the `Invoke-DocsAnalyzer<Name> -CapturedInput -Selection` contract and are pure.
+- Use only literal `Join-Path -Path $PSScriptRoot -ChildPath '<literal>'` for sibling modules and
+  data; list every new `.claude/lib/docs/` file (PowerShell and data) in Claude `core.json`, mirror
+  it byte-identically, and keep `Docs.Manifest.Tests.ps1` green.
+- New schemas (1021 `page-metadata.schema.json`) go to `schemas/docs/v1/` and the runtime copy under
+  `.claude/lib/docs/schemas/v1/`, with a `Get-DocsSchemaPath` row and a `Get-DocsSchemaName` entry
+  under the 1021 anchor; shared definitions are referenced through
+  `urn:drm-copilot:docs:1.0.0:common#/$defs/<name>`; no ref to discovery schemas; timestamps use a
+  `pattern`, never `format` alone.
+- Validate artifacts with `Test-DocsArtifactText`; never rely on `Test-Json` message text to name a
+  field. Constraints whose failures must name a field stay within the structural walk subset.
+- Parse JSON with `ConvertFrom-DocsJsonText`; never `ConvertFrom-Json` for artifacts.
+- Build findings with `New-DocsFinding` and results with `New-DocsCommandResult`; exit codes 0/1/2/3
+  and the `-Json` envelope apply to every subcommand; never print output or call `exit` inside a
+  command module.
+- No filesystem, clock or process access outside the command context; tests use in-memory contexts
+  and create no temporary files.
+- Consumer configuration and workflow templates ship as data under `.claude/lib/docs/templates/` and
+  are delivered by `init` through one `Get-DocsInitTemplate` row under the child's anchor (1021,
+  900008); no push-down root is added and no file goes under
+  `extensions/drm-copilot/resources/templates/`.
+- Element identifiers come from `Get-DocsElementId`; records are rebuilt with
+  `ConvertFrom-DocsSurfaceElement`; pin and receipt identifiers use `Get-DocsStableId`; digests use
+  `Get-DocsBytesSha256Hex` and are compared as opaque values (1023).
+- Profile access goes through `ConvertFrom-DocsProfileText`; the keys 1023 relies on are
+  `artifact_paths.{inventory_snapshot, coverage_ledger, parity_matrix, evidence_pins,
+  validation_receipt}`, `completion_gates.docs_complete.{allow_deferred, max_stale_pages,
+  required_parity_dimensions}`, `page_owners[{path_or_glob, owner}]` and `documentation_roots`.
+- 1023's single-write-boundary test allowlists `Write-DocsFileText` in `Invoke-DocsCommand.ps1` with
+  the reason "init create-only and explicit overwrite"; 1023 adds its own boundary module.
+- 900007 invokes `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command <name>
+  -Json ...` with the workspace root as working directory and parses the envelope; it adds no logic.
+- 900009 skills call `Invoke-DocsCommand.ps1` or the MCP tools; Codex reachability follows OQ-2.
+- 900010 states PowerShell 7.4 as the destination prerequisite (OQ-3).
+
+## Owner Questions
+
+None of these is decided beyond its provisional default. Owner answers may change the affected
+criteria through a specification revision.
+
+1. **OQ-1 - Runtime schema location.** The naming contract fixes `schemas/docs/v1/`, which no
+   push-down root publishes. Options: (a) keep canonical `schemas/docs/v1/` and ship a
+   byte-identical runtime copy under `.claude/lib/docs/schemas/v1/` pinned by a Pester test;
+   (b) make `.claude/lib/docs/schemas/v1/` the only canonical location (naming-contract change);
+   (c) add `schemas` as a push-down root (TypeScript plus in-place edits of existing Python twins).
+   Provisional default: (a).
+2. **OQ-2 - Codex and `.agents` reachability.** The docs lib is published only in the Claude bundle.
+   Codex skills mirrored by 900009 would need either the Claude push-down in the destination or a
+   `.codex/lib/docs/` virtual directory (new `VIRTUAL_RESOURCE_DIRECTORIES` entry in TypeScript, the
+   in-place edit of the existing Python twin, and Codex skill text naming `.codex/lib/docs/`).
+   Provisional default: Claude bundle only in 1020; 900009 decides after the owner answers.
+3. **OQ-3 - Destination PowerShell floor.** The epic states "PowerShell 7 only"; `Test-Json` Draft
+   2020-12 support needs 7.4. Provisional default: require 7.4 and fail closed with
+   `DOCS_RUNTIME_UNSUPPORTED` (exit 3) below it.
+4. **OQ-4 - Tier of `.claude/lib/docs`.** T3 matches every existing `.claude/lib/*` entry; T2 would
+   reflect the contract role but adds property-test density and mutation-trend obligations and
+   requires changing `test_committed_quality_tiers_yml_assigns_spec_tiers`. Provisional default: T3.
+5. **OQ-5 - `init -Write` scope.** Delivering the 900008 workflow and 1021 linter configuration
+   through `init` means a pushed-down helper writes into a destination's `.github/workflows/` and
+   repository-root dotfiles. Provisional default: allowed only with `-Write`, create-only unless
+   `-Force`, dry run by default, every planned path listed before any write.
+
+No owner question was added beyond OQ-1 to OQ-5.
+
+## Numeric Derivation Reference
+
+The acceptance criteria name the artifact schemas by name and assert no count. Counts used in the
+narrative are supported by complete `## Numeric Derivation Evidence` records: the artifact schema
+family in the earlier research and the production PowerShell file family (eight files) in the
+addendum research.
 
 ## Acceptance Criteria
 
-- [ ] Every example under `examples/docs/v1/` validates against its schema; each schema rejects a missing required field and an unknown disposition or element kind.
-- [ ] `dev.docs.validate-profile` exits 0 for the example profile and non-zero with a message naming the failing field for an invalid profile; `dev.docs.init` emits a starter profile that validates.
-- [ ] Element identifiers are deterministic (property test: same kind, path and declaration yield the same identifier; distinct inputs yield distinct identifiers).
-- [ ] A neutrality test fails when a configured consumer identifier appears under `packages/docs-runtime/src/` or `schemas/docs/`.
-- [ ] Line coverage >= 85% and branch coverage >= 75% for `drm_copilot_docs`.
-- [ ] For every schema file listed in `packages/docs-runtime/resource-manifest.json`, `drm_copilot_docs.resources.read_resource` returns bytes equal to the canonical file under `schemas/docs/v1/`, and `_resources/manifest.json` records that file's SHA-256 and size; a test in `tests/docs_runtime/test_docs_package_contract.py` asserts both.
-- [ ] `scripts.dev_tools.build_docs_runtime.main(["--check"], ...)` returns 0 when every staged copy and the staged manifest match the canonical bytes, returns non-zero and names the drifted path on stderr when a staged copy is missing or differs, and writes no file in either case (in-memory filesystem test); `poetry run python -m scripts.dev_tools.build_docs_runtime --check` exits 0 on the feature branch.
-- [ ] The root `pyproject.toml` contains `drm-copilot-docs = { path = "packages/docs-runtime", develop = true }` under `[tool.poetry.dependencies]`, the script entries `dev.docs.init = drm_copilot_docs.cli:main_init` and `dev.docs.validate-profile = drm_copilot_docs.cli:main_validate_profile` under `[tool.poetry.scripts]`, and `packages/docs-runtime/src` in both `[tool.coverage.run] source` and `[tool.pyright] include`; a test in `tests/docs_runtime/test_docs_package_contract.py` asserts each entry.
-- [ ] `poetry check --lock` exits 0 with the committed `poetry.lock`, and `git diff --exit-code poetry.lock` reports no change after `poetry install`.
-- [ ] `quality-tiers.yml` classifies `packages/docs-runtime` as `T2`; `python -m scripts.dev_tools.check_quality_tiers` exits 0 and the updated `test_committed_quality_tiers_yml_assigns_spec_tiers` passes.
-- [ ] Discovery runtime files are unchanged: `git diff --name-only` between the merge base with `main` and the feature head returns no path under `packages/discovery-runtime/` or `schemas/discovery/` and neither `scripts/dev_tools/build_discovery_runtime.py` nor `scripts/dev_tools/discovery_build_identity.py`.
-- [ ] `analyzer_contract.validate_registry` returns an `error` finding for a registry containing two registrations with the same identifier and for a registration whose `module` does not start with `drm_copilot_docs.analyzers.`; `load_analyzer` refuses such a registration without calling the injected `import_module`; the committed `ANALYZER_REGISTRY` yields no findings.
+- [ ] Every example under `examples/docs/v1/` validates against its artifact schema: `Test-Json` returns `True` and `Test-DocsArtifactText` returns no finding for each example (`tests/scripts/claude-lib/docs/DocsSchemaContract.Tests.ps1`).
+- [ ] For each artifact schema (`docs-profile`, `surface-inventory-snapshot`, `docs-coverage-ledger`, `docs-parity-matrix`, `docs-evidence-pin`, `docs-validation-receipt`), an in-memory copy of its example with one required field deleted, and a copy with an unknown element kind or disposition, each make `Test-Json` return `False` and make `Test-DocsArtifactText` return an `error` finding (`DOCS_SCHEMA_REQUIRED_MISSING`, `DOCS_SCHEMA_VALUE_NOT_ALLOWED` or `DOCS_SCHEMA_PROPERTY_UNKNOWN`) whose pointer locates the mutated field (`DocsSchemaContract.Tests.ps1`).
+- [ ] `Invoke-DocsCommand.ps1 -Command validate-profile -Profile examples/docs/v1/docs-profile.example.json` exits 0 with no `error` finding (`tests/scripts/claude-lib/docs/Invoke-DocsCommand.Tests.ps1` and `DocsProfileCommands.Tests.ps1`).
+- [ ] `-Command validate-profile` exits 1 for an invalid profile, and the finding names the failing field: a profile without `audiences` yields `DOCS_SCHEMA_REQUIRED_MISSING` at `/audiences` with a message containing `audiences`; a missing required field inside a nested `$ref` target yields a finding whose pointer and message name that field; an unknown element kind yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/surface_selection/element_kinds/<n>`; the field naming comes from `Get-DocsSchemaStructuralFinding`, not from `Test-Json` message text (`DocsProfileCommands.Tests.ps1`, `DocsSchema.Tests.ps1`).
+- [ ] `-Command validate-profile` exits 1 with `DOCS_JSON_DUPLICATE_KEY` for a profile containing a repeated member, with `DOCS_PROFILE_AUDIENCE_UNKNOWN` for an undeclared audience reference, and with `DOCS_PROFILE_MISSING` for an absent profile (`DocsProfile.Tests.ps1`, `DocsProfileCommands.Tests.ps1`).
+- [ ] `-Command init` without `-Write` exits 0, writes nothing, and returns a starter profile that `ConvertFrom-DocsProfileText` accepts with no finding for several repository identifiers; with `-Write` it creates the profile; with `-Write` and an existing target it exits 1 with `DOCS_INIT_TARGET_EXISTS` and writes nothing; with `-Write -Force` it overwrites (`DocsProfileCommands.Tests.ps1`, using an in-memory context).
+- [ ] Element identifiers are deterministic over a seeded set of inputs: for a seeded `[System.Random]` input set (seed printed on failure) the same kind, path and declaration yield the same identifier, enumerated boundary cases yield distinct identifiers, each golden vector matches its recorded canonical string and hex digest, and an unpaired surrogate or a non-relative path is rejected with `DOCS_IDENTITY_INPUT_INVALID` (`tests/scripts/claude-lib/docs/DocsSurface.Tests.ps1`).
+- [ ] `ConvertFrom-DocsSurfaceElement` throws `DOCS_ELEMENT_ID_MISMATCH` for a record whose `element_id` was altered, and `New-DocsSurfaceElement` rejects a `cli-option` without a `cli-command-` parent (`DocsSurface.Tests.ps1`).
+- [ ] `tests/scripts/claude-lib/docs/DocsNeutrality.Tests.ps1` holds consumer identifiers only as lowercase hex SHA-256 digests (no identifier text), finds no configured digest in any file under `.claude/lib/docs/`, `schemas/docs/` or `examples/docs/`, detects a synthetic identifier injected into an in-memory file map (positive control), and asserts the digest list is non-empty with every entry matching `^[0-9a-f]{64}$`.
+- [ ] `tests/scripts/claude-lib/docs/Docs.Manifest.Tests.ps1` passes: every file under `.claude/lib/docs/` (PowerShell and data, recursively) is listed exactly once in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and is SHA-256 identical to its copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`.
+- [ ] The existing push-down contract tests `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py` (including `test_every_psscriptroot_occurrence_is_recognized`) pass on the feature branch without modification.
+- [ ] The file set under `.claude/lib/docs/schemas/v1/` equals the file set under `schemas/docs/v1/` and each runtime copy is byte-identical to its canonical file (`DocsSchemaContract.Tests.ps1`).
+- [ ] Each docs common definition copied from discovery v2 common equals the discovery definition as canonical JSON, except `timestamp`, which carries the timestamp `pattern`; no docs schema contains a `$ref` to a discovery URN or to a file (`DocsSchemaContract.Tests.ps1`).
+- [ ] `Join-DocsSchemaText` rewrites docs common URN refs and refs inside copied definitions to `#/$defs/common.<name>`, leaves local refs unchanged, removes the root `$id`, returns `DOCS_SCHEMA_COMPOSITION_CONFLICT` for a target `$defs` key beginning `common.`, and returns `DOCS_SCHEMA_REF_UNRESOLVED` for an unknown common name and for a foreign URN, file or URI ref without retrieving it (`tests/scripts/claude-lib/docs/DocsSchema.Tests.ps1`).
+- [ ] `Test-DocsArtifactText` returns exactly one `DOCS_SCHEMA_INVALID` finding with pointer `''` when `Test-Json` returns `False` with no ErrorRecord and the structural walk finds nothing, and returns the walk findings when the walk reports an error (`DocsSchema.Tests.ps1`, using a schema constraint outside the walk subset and a stubbed `Test-Json` result where needed).
+- [ ] Exit codes follow 0/1/2/3 for every 1020 subcommand: 0 for success and `-Help`; 1 for `error` findings; 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` `null` for a missing `-Command`, an unknown command, an unknown option, a missing value, a repeated non-`multi` option and a non-relative path; 3 with exactly one finding (`DOCS_RUNTIME_UNSUPPORTED` through the `-PowerShellVersion` seam set below 7.4, or `DOCS_CLI_RUNTIME` for an injected exception) and one stderr line (`Invoke-DocsCommand.Tests.ps1`).
+- [ ] With `-Json`, stdout is exactly one canonical JSON document whose keys are `command`, `exit_code`, `findings`, `ok` and `result`, `command` is the subcommand name, `ok` is `true` exactly when `exit_code` is 0, and two runs with identical inputs, arguments and clock produce identical bytes; without `-Json`, the last line is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>` (`Invoke-DocsCommand.Tests.ps1`, `DocsFinding.Tests.ps1`).
+- [ ] `Test-DocsCommandTable` returns no finding for the committed dispatch table; the table contains the `init` and `validate-profile` rows under the `# --- 1020: init, validate-profile ---` anchor followed by the anchors for 1021, 900003, 1023, 900006 and 900008 in that order; and `Test-DocsCommandTable` rejects a duplicate name, a reserved option name and a function outside `^Invoke-Docs[A-Za-z]+Command$` (`Invoke-DocsCommand.Tests.ps1`).
+- [ ] The committed analyzer registry has no rows and carries the 900003 and 900004 anchors; `Test-DocsAnalyzerRegistration` returns no finding for it and returns `DOCS_ANALYZER_REGISTRATION_INVALID` for a duplicate `Id` and for a `Module` outside `.claude/lib/docs/`; `Select-DocsAnalyzerRegistration` reports `DOCS_ANALYZER_UNKNOWN` without invoking the `-ImportModule` seam; `Invoke-DocsAnalyzer` rejects fixture output whose kind is outside the registration (`tests/scripts/claude-lib/docs/DocsAnalyzerRegistry.Tests.ps1`).
+- [ ] Every new file under `.claude/lib/docs/` passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, and no production file under `.claude/lib/docs/` exceeds 500 logical lines.
+- [ ] `quality-tiers.yml` contains an entry with `path: ".claude/lib/docs"` and `tier: T3`; `python -m scripts.dev_tools.check_quality_tiers` exits 0 and `test_committed_quality_tiers_yml_matches_live_tree` and `test_committed_quality_tiers_yml_assigns_spec_tiers` pass unmodified.
+- [ ] No Python or TypeScript file is added or modified: `git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`; and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
+- [ ] No discovery file changes: `git diff --name-only <merge-base>..HEAD` lists no path under `packages/discovery-runtime/`, `schemas/discovery/` or `.claude/lib/discovery-validation/`.
+- [ ] No test creates a temporary file: no file under `tests/scripts/claude-lib/docs/` contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and every command test uses an in-memory command context.
+- [ ] Pester line coverage is at least 85% for each production file under `.claude/lib/docs/`, read from the PoshQC coverage report produced by `Invoke-PoshQCTest`, with no production file excluded from measurement (no branch-coverage gate applies to Pester); the figures are recorded under `<FEATURE>/evidence/coverage/`.
+- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` on `windows-latest` and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests (empty file, invalid JSON, duplicate keys, YAML profile, unknown analyzer identifier, duplicate audience identifiers, unknown audience reference, directory mode outside the policy)
-- [ ] Line coverage >= 85% and branch coverage >= 75% for `drm_copilot_docs`, measured with `--cov=drm_copilot_docs --cov-branch` and read from the JSON report
-- [ ] Line coverage >= 85% and branch coverage >= 75% for `scripts.dev_tools.build_docs_runtime`, measured with `--cov=scripts.dev_tools.build_docs_runtime --cov-branch` and read from the JSON report
-- [ ] At least one property test per pure function in `drm_copilot_docs` (T2 obligation)
-- [ ] No production source file exceeds 500 lines
-- [ ] Docs updated (`packages/docs-runtime/README.md`: staged resources, builder commands, wheel install line)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → architecture → test → contract → integration) in a single clean pass
+- [ ] Acceptance criteria documented and mapped to Pester suites or commands
+- [ ] Behavior matches acceptance criteria on PowerShell 7.4 or later and on the CI `windows-latest` runner
+- [ ] Edge cases covered by tests: empty file, invalid JSON, duplicate keys, excess depth, unknown analyzer identifier, duplicate audience identifiers, unknown audience reference, directory mode outside the policy, existing init target
+- [ ] Docs suites pass in three seeded shuffled file-order runs in one process (each seed and order recorded) and in a fresh single-process run over `tests/scripts`, with evidence under `<FEATURE>/evidence/regression-testing/`
+- [ ] Toolchain pass completed (format, lint with PSScriptAnalyzer, architecture and contract tests, Pester) in a single clean pass
+- [ ] Forbidden-token scan with bracket-class patterns over every changed file reports no match
 - [ ] Evidence written under `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/evidence/<kind>/`
 
 ## Seeded Test Conditions (from potential)
-- [ ] Unit coverage areas: profile loading and validation, surface identities, analyzer registry, CLI.
-- [ ] Integration scenarios: example artifacts validate against each schema; schema references resolve into discovery v2.
-- [ ] CLI/API examples: `dev.docs.init`, `dev.docs.validate-profile`.
+
+- [ ] Unit coverage areas: JSON parsing, findings and envelope, schema composition and structural walk, profile loading and validation, surface identities, analyzer registry, entry script.
+- [ ] Integration scenarios: every example validates against its composed schema; runtime schema copies and bundle copies match their sources.
+- [ ] CLI examples: `Invoke-DocsCommand.ps1 -Command init`, `Invoke-DocsCommand.ps1 -Command validate-profile`.

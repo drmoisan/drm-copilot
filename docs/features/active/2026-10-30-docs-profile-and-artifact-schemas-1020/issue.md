@@ -21,6 +21,10 @@ stay domain-neutral: all repository specificity must be runtime configuration in
 
 ## Proposed Behavior
 
+> Note (2026-10-30): the Python package design described in this section is withdrawn under the
+> epic's refined implementation-language rule. `spec.md` in this folder (PowerShell design under
+> `.claude/lib/docs/`) is authoritative.
+
 Create the `packages/docs-runtime` package (import name `drm_copilot_docs`), depending on the merged
 discovery runtime (`packages/discovery-runtime`, `drm_copilot_discovery`) as a library without changing
 its behavior. The package provides:
