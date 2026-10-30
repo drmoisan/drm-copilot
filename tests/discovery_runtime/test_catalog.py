@@ -289,27 +289,31 @@ def test_extension_cannot_change_dialect_identity_or_escape_its_document(
         load_catalog(extensions=(_extension(schema),))
 
 
-def _count_registry_builds(monkeypatch: MonkeyPatch) -> list[int]:
-    """Wrap the module registry builder with a delegating call counter.
+def _count_registry_builds(
+    monkeypatch: MonkeyPatch, name: str = "_registry"
+) -> list[int]:
+    """Wrap a module registry function with a delegating call counter.
 
     Args:
-        monkeypatch (MonkeyPatch): restores the real builder after the test.
+        monkeypatch (MonkeyPatch): restores the real function after the test.
+        name (str): `_registry` (every registry request) or `_build_registry`
+            (only the builds the content-keyed cache did not satisfy).
 
     Returns:
-        list[int]: a one-element counter incremented on every registry build.
+        list[int]: a one-element counter incremented on every call.
     """
-    original = cast("_RegistryBuilder", vars(catalog_module)["_registry"])
+    original = cast("_RegistryBuilder", vars(catalog_module)[name])
     calls = [0]
 
     def counting(
         documents: tuple[tuple[str, JsonObject], ...],
         extensions: tuple[ExtensionSchema, ...],
     ) -> Registry[Schema]:
-        """Count one build and delegate to the real builder unchanged."""
+        """Count one call and delegate to the real function unchanged."""
         calls[0] += 1
         return original(documents, extensions)
 
-    monkeypatch.setattr("drm_copilot_discovery.catalog._registry", counting)
+    monkeypatch.setattr(f"drm_copilot_discovery.catalog.{name}", counting)
     return calls
 
 
@@ -326,18 +330,32 @@ def test_registry_is_built_once_per_catalog(monkeypatch: MonkeyPatch) -> None:
     assert all(registry is registries[0] for registry in registries)
 
 
-def test_distinct_catalogs_do_not_share_a_registry(monkeypatch: MonkeyPatch) -> None:
-    """Each catalog value, including a replaced copy, owns its own built registry."""
+def test_identical_content_shares_one_registry_and_different_content_does_not(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Catalogs built from identical bytes share one verified registry; others do not.
+
+    The content-keyed cache is emptied first so the count starts at zero, and only
+    `_build_registry` is counted: a cache hit is a `_registry` call without a build.
+    """
+    monkeypatch.setattr(catalog_module, "_REGISTRY_CACHE", {})
+    builds = _count_registry_builds(monkeypatch, "_build_registry")
+
     first = load_catalog()
     second = load_catalog()
-    calls = _count_registry_builds(monkeypatch)
-
     copied = replace(first, documents=first.documents)
-    builds_for_copy = calls[0]
+    extension = _extension({"type": "string"})
+    extended = load_catalog(extensions=(extension,))
 
-    assert first.registry() is not second.registry()
-    assert builds_for_copy == 1
-    assert copied.registry() is not first.registry()
+    # Two loads of the installed bytes and a replaced copy are one build.
+    assert first.registry() is second.registry()
+    assert copied.registry() is first.registry()
+    assert builds[0] == 2
+    # A catalog pinning an extension is other content and never shares the registry.
+    assert extended.registry() is not first.registry()
+    extended_again = load_catalog(extensions=(extension,))
+    assert extended_again.registry() is extended.registry()
+    assert builds[0] == 2
 
 
 def test_extension_registry_is_scoped_to_its_catalog() -> None:

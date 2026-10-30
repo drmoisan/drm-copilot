@@ -7,12 +7,18 @@ filesystem paths; extension bytes are supplied through the caller's read boundar
 from __future__ import annotations
 
 import hashlib
+import importlib
 import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, cast
 
 from drm_copilot_discovery.findings import validate_finding_path
-from drm_copilot_discovery.models import JsonObject, JsonValue, to_plain_value
+from drm_copilot_discovery.models import (
+    JsonObject,
+    JsonValue,
+    canonical_json,
+    to_plain_value,
+)
 from drm_copilot_discovery.parsing import parse_document
 from drm_copilot_discovery.resources import (
     ResourceError,
@@ -27,6 +33,8 @@ if TYPE_CHECKING:
     from referencing.jsonschema import Schema
 
 DIALECT = "https://json-schema.org/draft/2020-12/schema"
+# Libraries the registry builder imports; checked before every registry access.
+SCHEMA_LIBRARIES = ("jsonschema", "referencing")
 V2_URN = "urn:drm-copilot:discovery:2.0.0:"
 V1_KINDS = (
     "coverage-ledger",
@@ -190,21 +198,87 @@ def _deny_retrieval(uri: str) -> Resource[Schema]:
     raise NoSuchResource(ref=uri)
 
 
+def _require_schema_libraries() -> None:
+    """Import the validator libraries or raise CatalogError; return None.
+
+    This check is the only place the optional libraries are required, and every
+    registry access runs it first, so a missing library is reported before any
+    cached registry could stand in for full validation.
+    """
+    # Import each library the builder depends on by name so the failure names it.
+    for module_name in SCHEMA_LIBRARIES:
+        try:
+            importlib.import_module(module_name)
+        except ImportError as error:
+            raise CatalogError(
+                f"Required schema dependency unavailable: {error}"
+            ) from error
+
+
+# Verified registries keyed by the content they were built from. Entries are
+# immutable (referencing.Registry is frozen and every operation returns a new
+# value) and the key covers every schema byte and pinned extension, so a catalog
+# built from different bytes never observes another catalog's registry. No
+# eviction: the size is bounded by the distinct schema sets one process builds.
+_REGISTRY_CACHE: dict[str, Registry[Schema]] = {}
+
+
+def _registry_key(
+    documents: tuple[tuple[str, JsonObject], ...],
+    extensions: tuple[ExtensionSchema, ...],
+) -> str:
+    """Return the SHA-256 of the canonical bytes of every schema and pinned extension.
+
+    documents are the identifier and document pairs the registry is built from;
+    extensions are the pinned extension values whose namespace, identifier and
+    content digest also shape the build. Equal bytes give equal keys.
+    """
+    # Reduce each extension to the three fields that fix its registry resource;
+    # the document pairs are canonicalized as they are.
+    pinned = tuple(
+        (item.namespace, item.identifier, item.sha256) for item in extensions
+    )
+    payload = (documents, pinned)
+    return hashlib.sha256(canonical_json(cast("JsonValue", payload))).hexdigest()
+
+
 def _registry(
     documents: tuple[tuple[str, JsonObject], ...],
     extensions: tuple[ExtensionSchema, ...],
 ) -> Registry[Schema]:
-    """Build the full validator registry or fail explicitly on a missing library."""
-    try:
-        from jsonschema import Draft202012Validator
-        from jsonschema.exceptions import SchemaError
-        from referencing import Registry, Resource
-        from referencing.exceptions import Unresolvable
-        from referencing.jsonschema import DRAFT202012, Schema
-    except ImportError as error:
-        raise CatalogError(
-            f"Required schema dependency unavailable: {error}"
-        ) from error
+    """Return the verified registry for documents and extensions, building it once.
+
+    The library check runs first so a missing dependency fails even when the
+    registry for these bytes is already cached. Then the cached registry for the
+    content key is returned, or the registry is built, verified, stored and
+    returned. Raises CatalogError for a missing library or an invalid schema set.
+    """
+    _require_schema_libraries()
+    key = _registry_key(documents, extensions)
+    registry = _REGISTRY_CACHE.get(key)
+    # Build and verify only on a cache miss; a hit is already fully verified.
+    if registry is None:
+        registry = _build_registry(documents, extensions)
+        _REGISTRY_CACHE[key] = registry
+    return registry
+
+
+def _build_registry(
+    documents: tuple[tuple[str, JsonObject], ...],
+    extensions: tuple[ExtensionSchema, ...],
+) -> Registry[Schema]:
+    """Build and fully verify the validator registry for documents and extensions.
+
+    Every schema is checked against its metaschema and every static and dynamic
+    reference is resolved eagerly before the registry is returned; a failure
+    raises CatalogError. Called by _registry once per distinct content key.
+    """
+    from jsonschema import Draft202012Validator
+    from jsonschema.exceptions import SchemaError
+    from referencing import Registry, Resource
+    from referencing.exceptions import Unresolvable
+    from referencing.jsonschema import DRAFT202012, Schema
+
     resources: list[tuple[str, Resource[Schema]]] = []
     # Validate every document before registering any schema for instance evaluation.
     for identifier, document in documents:
@@ -265,9 +339,11 @@ class SchemaCatalog:
     """Hold the complete immutable schema set; expose fresh validator inputs.
 
     Prefer load_catalog to bind installed hashes before construction. The catalog
-    verifies identities, metaschemas and complete local reference closure once at
-    construction; validators are created per call over the shared registry. No
-    network or writes are performed.
+    verifies identities at construction and obtains its registry through the
+    module's content-keyed cache: the metaschema and complete local reference
+    closure checks run once per distinct schema set in a process, and catalogs
+    built from identical bytes share that one verified, immutable registry.
+    Validators are created per call over it. No network or writes are performed.
     """
 
     documents: tuple[tuple[str, JsonObject], ...]
@@ -300,7 +376,7 @@ class SchemaCatalog:
         if len(set(namespaces)) != len(namespaces):
             raise CatalogError("Extension schema namespaces must be unique")
         # Validate closure eagerly, including references in currently unused branches,
-        # and keep the verified registry so later validations do not rebuild it.
+        # through the content-keyed cache, and keep the verified registry.
         object.__setattr__(
             self,
             "_shared_registry",
@@ -353,15 +429,17 @@ class SchemaCatalog:
         return tuple(documents)
 
     def registry(self) -> Registry[Schema]:
-        """Return the shared offline registry built and verified once at construction.
+        """Return the shared offline registry obtained and verified at construction.
 
         Sharing is safe because referencing.Registry is immutable: lookups and
         resource additions return new registries or resolvers and never change
-        this one. No build, I/O or verification is performed by this call.
+        this one. The library check runs first so a missing dependency is
+        reported here as well; no build, I/O or verification follows.
 
         Returns:
             Registry[Schema]: the catalog's verified registry, identical per call.
         """
+        _require_schema_libraries()
         return self._shared_registry
 
 
