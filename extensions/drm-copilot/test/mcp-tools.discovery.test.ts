@@ -304,3 +304,60 @@ describe("discovery dispatch failure and validation mapping", () => {
     expect(result.summary).toMatch(/AUTHORIZATION_OPERATION_UNKNOWN/);
   });
 });
+
+describe("discovery_capability_sentinel dispatch", () => {
+  let service: jest.Mocked<RepoAutomationService>;
+
+  beforeEach(() => {
+    service = createMockService();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("hands the raw tool input to the sentinel seam and surfaces its observation", async () => {
+    const sentinel = jest
+      .fn<NonNullable<RepoAutomationService["discoveryCapabilitySentinel"]>>()
+      .mockResolvedValue({
+        ...successResult("discovery_capability_sentinel"),
+        sentinel: {
+          observed: true,
+          observation_ref: "obs-0123456789abcdef0123",
+          agent_id_present: true,
+          agent_type: "discovery-capability-sentinel",
+        },
+      });
+    service.discoveryCapabilitySentinel = sentinel;
+
+    const result = await dispatchRepoAutomationTool(
+      "discovery_capability_sentinel",
+      { workspace_root: WORKSPACE_ROOT },
+      service,
+    );
+
+    // The sentinel is neither authorized nor root-granted; the observation is its evidence.
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
+    expect(sentinel).toHaveBeenCalledWith({
+      workspaceRoot: WORKSPACE_ROOT,
+      toolInputs: { workspace_root: WORKSPACE_ROOT },
+    });
+    expect(result).toMatchObject({
+      ok: true,
+      tool: "discovery_capability_sentinel",
+      sentinel: { observed: true, agent_type: "discovery-capability-sentinel" },
+    });
+  });
+
+  it("fails closed when the service has no sentinel seam", async () => {
+    const result = await dispatchRepoAutomationTool(
+      "discovery_capability_sentinel",
+      { workspace_root: WORKSPACE_ROOT },
+      service,
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.tool).toBe("discovery_capability_sentinel");
+    expect(result.summary).toMatch(/DISCOVERY_SENTINEL_UNAVAILABLE/);
+  });
+});
