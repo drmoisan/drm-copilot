@@ -1039,7 +1039,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
 
 ### Phase 17 — Remediation cycle 2: sentinel consumption contract
 
-- [ ] [P17-T1] Record the cycle-2 remediation baseline and the consumption decision (FEATURE/evidence/remediation-baseline/).
+- [x] [P17-T1] Record the cycle-2 remediation baseline and the consumption decision (FEATURE/evidence/remediation-baseline/).
   - Files and behavior: Re-read the policy files in the `policy-compliance-order` sequence, the three review artifacts and the remediation inputs of 2026-10-30T10-19; write FEATURE/evidence/remediation-baseline/phase17-instructions-read.<timestamp>.md listing the files read, the policy order, the three findings with their dispositions (R5 closed in this cycle; the Minor and the Nit deferred to follow-up issues by user decision) and the canonical consumption representation of the cycle-2 revision; record the head state (`git status --porcelain` empty, the branch name `feature/legacy-discovery-and-parity-980`, and the merge base of origin/main and HEAD as the scope anchor); record the gate figures the review verified (Python 96.69% lines and 93.59% branches, extension TypeScript 97.04% lines and 93.64% branches, root TypeScript 98.20% lines and 93.37% branches, PowerShell 93.34% lines) as the cycle-2 baseline with their source artifacts.
   - Tests and proof: None run; this task writes evidence only.
   - Acceptance: The artifact has `Timestamp:`, `Command:`, `EXIT_CODE: 0` and `Output Summary:`; it lists every file read, every finding with its disposition and the decision; no implementation has preceded it.
