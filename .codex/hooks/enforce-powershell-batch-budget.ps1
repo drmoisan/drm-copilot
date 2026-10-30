@@ -8,14 +8,26 @@
     operation. When the target file is a PowerShell source file (.ps1, .psm1, .psd1),
     it decides whether the change may proceed in direct mode.
 
-    Direct mode counts distinct production PowerShell paths per Codex session. The
-    running set is persisted under .codex/state/powershell-batch-budget.<session_id>.json,
-    and repeated edits to the same file are counted once. The 4th distinct production
-    path is denied with a POWERSHELL_LARGE_PATH_REQUIRED reason that instructs the
-    caller to route the change through .codex/prompts/orchestrate-work.md.
+    Direct mode counts distinct production PowerShell paths per Codex session and per
+    resolved target worktree, and repeated edits to the same file are counted once. The
+    4th distinct production path in one worktree is denied with a
+    POWERSHELL_LARGE_PATH_REQUIRED reason that instructs the caller to route the change
+    through .codex/prompts/orchestrate-work.md.
 
-    The orchestrated large path is detected from
-    <root>/artifacts/orchestration/orchestrator-state.json. The selected route is the
+    Each evaluated path is placed with Resolve-HookTargetWorktree from the dot-sourced
+    hook-target-worktree.ps1. An absolute path resolves to its nearest enclosing
+    registered git worktree; a relative path, a path inside no registered worktree, and
+    an ambiguous result use the session root. The route is read from
+    artifacts/orchestration/orchestrator-state.json in the resolved target worktree.
+    The running set is kept under the session root, in
+    .codex/state/powershell-batch-budget.<session_id>.json when the resolved target worktree
+    is the session root and in .codex/state/powershell-batch-budget.<session_id>.<worktree key>.json
+    otherwise; no state is written under another worktree. A path under the root-level
+    artifacts/ directory of the resolved target worktree is never counted and writes no
+    state. No containment filter applies: a path outside every registered worktree is
+    counted against the session root, as before.
+
+    The selected route is the
     route_id value when that key is present, otherwise the path_selected value, and it
     is usable only as a non-blank string. When the selected route is large,
     remediation, or preparation and the checkpoint is not terminal (next_step is not
@@ -36,9 +48,12 @@
     hookSpecificOutput.permissionDecision = 'deny' and exits 0. Files already counted
     are always allowed through.
 
-    Known limitation: a stale non-terminal large-path checkpoint left at the root
-    exempts a later direct-mode session at that root. Orchestrator checkpoint hygiene
-    (issue #673) moves foreign checkpoints aside before a new run.
+    Known limitations: an 8.3 short-name path, or a path reached through a junction,
+    that differs textually from the long path git reports matches no registered
+    worktree and falls back to the session root. A stale non-terminal large-path
+    checkpoint in a worktree exempts a later direct-mode session editing that worktree;
+    orchestrator checkpoint hygiene (issue #673) moves foreign checkpoints aside before
+    a new run.
 
 .NOTES
     Compatible with PowerShell 7+.
@@ -50,6 +65,9 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 # Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
 try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
+
+# Shared target-worktree resolver; the Codex twin of HookTargetWorktree.psm1.
+try { . (Join-Path $PSScriptRoot 'hook-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'hook-target-worktree.ps1' -ErrorRecord $_ }
 
 # Shared route helpers; this file is byte-identical to the Claude runtime copy.
 $script:PowerShellBatchBudgetRouteImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { $script:PowerShellBatchBudgetRouteImportFailure = 'enforce-batch-budget-route.ps1' }
@@ -194,7 +212,8 @@ function Invoke-PowerShellBatchBudgetHook {
         [scriptblock] $WriteState = {
             param([string] $Path, [System.Collections.IDictionary] $State)
             $State | ConvertTo-Json -Depth 5 | Set-Content -Path $Path -Encoding UTF8
-        }
+        },
+        [scriptblock] $WorktreeListInvoker
     )
 
     if (-not $ToolInputRaw) {
@@ -218,12 +237,31 @@ function Invoke-PowerShellBatchBudgetHook {
     }
     if ($script:PowerShellBatchBudgetRouteImportFailure) { return Get-PowerShellBatchBudgetBlockDecision -Reason "POWERSHELL_LARGE_PATH_REQUIRED: the route helper '$($script:PowerShellBatchBudgetRouteImportFailure)' failed to load, so the batch budget for '$normalized' cannot be evaluated; the gate fails closed." }
 
+    # The path is evaluated against the registered worktree that holds it; the session root
+    # is the fallback for a relative path, a path in no registered worktree, and an ambiguous result.
+    $resolverArguments = @{ SessionRoot = $Root; FilePath = @($filePath) }
+    if ($PSBoundParameters.ContainsKey('WorktreeListInvoker')) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $resolution = Resolve-HookTargetWorktree @resolverArguments
+    $targetRoot = $Root
+    $isSessionRoot = $true
+    if (-not $resolution.Ambiguous -and $null -ne $resolution.WorktreeRoot -and -not [string]::Equals($resolution.WorktreeRoot, (ConvertTo-HookTargetWorktreeNormalizedPath -Path $Root), [System.StringComparison]::OrdinalIgnoreCase)) {
+        $targetRoot = $resolution.WorktreeRoot
+        $isSessionRoot = $false
+    }
+
+    # The root-level artifacts/ directory is gitignored scratch, never a production file.
+    $relativePath = if ($normalized -match '^(/|[A-Za-z]:/)') { Get-HookTargetWorktreeRelativePath -Path $normalized -WorktreeRoot $targetRoot } else { $normalized }
+    if ($null -ne $relativePath -and $relativePath.StartsWith('artifacts/', [System.StringComparison]::OrdinalIgnoreCase)) {
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    }
+
     $stateDir = Join-Path -Path $Root -ChildPath '.codex/state'
-    $stateFile = Join-Path -Path $stateDir -ChildPath ("powershell-batch-budget.$SessionId.json")
+    $stateLeaf = if ($isSessionRoot) { "powershell-batch-budget.$SessionId.json" } else { "powershell-batch-budget.$SessionId.$(Get-HookTargetWorktreeKey -WorktreeRoot $targetRoot).json" }
+    $stateFile = Join-Path -Path $stateDir -ChildPath $stateLeaf
 
     # The checkpoint is read before any state operation, so the large path neither
     # creates the state directory nor reads or writes the state file.
-    $checkpointPath = Join-Path -Path $Root -ChildPath 'artifacts/orchestration/orchestrator-state.json'
+    $checkpointPath = Join-Path -Path $targetRoot -ChildPath 'artifacts/orchestration/orchestrator-state.json'
     $checkpointText = ''
     try {
         $checkpointText = [string](& $ReadCheckpoint $checkpointPath)
@@ -279,7 +317,8 @@ function Invoke-PowerShellBatchBudgetCodexEntryPoint {
     .PARAMETER PayloadRaw
         Raw PreToolUse payload text.
     .PARAMETER RepositoryRoot
-        Root used to locate the Codex state directory and the orchestrator checkpoint.
+        Session root: it locates the Codex state directory and is the fallback root. The
+        orchestrator checkpoint comes from the resolved target worktree of each path.
     .PARAMETER HookSeams
         Optional seam overrides splatted into Invoke-PowerShellBatchBudgetHook.
     #>
