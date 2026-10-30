@@ -7,14 +7,28 @@
     operation. When the target file is a Python file (.py), it decides whether the
     change may proceed in direct mode.
 
-    Direct mode counts distinct production Python paths per Claude Code session. The
-    running set is persisted under .claude/state/python-batch-budget.<session_id>.json,
-    and repeated edits to the same file are counted once. The 4th distinct production
-    path is denied with a PYTHON_LARGE_PATH_REQUIRED reason that instructs the caller
-    to route the change through /orchestrate.
+    Direct mode counts distinct production Python paths per Claude Code session and per
+    resolved target worktree, and repeated edits to the same file are counted once. The
+    4th distinct production path in one worktree is denied with a
+    PYTHON_LARGE_PATH_REQUIRED reason that instructs the caller to route the change
+    through /orchestrate.
 
-    The orchestrated large path is detected from
-    <root>/artifacts/orchestration/orchestrator-state.json. The selected route is the
+    The edited file is placed with Resolve-HookTargetWorktree from
+    .claude/lib/worktree-resolution/HookTargetWorktree.psm1. An absolute path resolves to
+    its nearest enclosing registered git worktree; a relative path, a path inside no
+    registered worktree, and an ambiguous result use the session root (the checkout that
+    holds this hook). The route is read from
+    artifacts/orchestration/orchestrator-state.json in the resolved target worktree.
+    The running set is kept under the session root, in
+    .claude/state/python-batch-budget.<session_id>.json when the resolved target worktree
+    is the session root and in
+    .claude/state/python-batch-budget.<session_id>.<worktree key>.json otherwise, where
+    the key comes from Get-HookTargetWorktreeKey; no state is written under another
+    worktree. A path under the root-level artifacts/ directory of the resolved target worktree
+    is gitignored scratch: it is allowed, consumes no slot, and writes no state. A
+    nested directory named artifacts elsewhere in the tree still counts.
+
+    The selected route is the
     route_id value when that key is present, otherwise the path_selected value, and it
     is usable only as a non-blank string. When the selected route is large,
     remediation, or preparation and the checkpoint is not terminal (next_step is not
@@ -38,9 +52,9 @@
     is composed into a file name, so a hostile id cannot escape the state
     directory. Resolving the id never creates the state directory.
 
-    Candidate paths are contained to the resolved root. A candidate that resolves
-    outside it is discarded: the decision is 'allow', no slot is consumed, and no
-    state is written. Persisted entries that fail the same containment test are
+    Candidate paths are contained to the resolved target worktree root. A candidate
+    that resolves outside it is discarded: the decision is 'allow', no slot is consumed,
+    and no state is written. Persisted entries that fail the same containment test are
     dropped when state is rehydrated, so a state file carried between worktrees
     cannot spend this worktree's budget.
 
@@ -48,9 +62,12 @@
     hookSpecificOutput.permissionDecision = 'deny' and exits 0. Files already counted
     are always allowed through.
 
-    Known limitation: a stale non-terminal large-path checkpoint left at the root
-    exempts a later direct-mode session at that root. Orchestrator checkpoint hygiene
-    (issue #673) moves foreign checkpoints aside before a new run.
+    Known limitations: an 8.3 short-name path, or a path reached through a junction,
+    that differs textually from the long path git reports matches no registered
+    worktree and falls back to the session root. A stale non-terminal large-path
+    checkpoint in a worktree exempts a later direct-mode session editing that worktree;
+    orchestrator checkpoint hygiene (issue #673) moves foreign checkpoints aside before
+    a new run.
 
 .NOTES
     Compatible with PowerShell 7+.
@@ -61,6 +78,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/HookTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookTargetWorktree.psm1' -ErrorRecord $_ }
 $script:PythonBatchBudgetRouteImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { $script:PythonBatchBudgetRouteImportFailure = 'enforce-batch-budget-route.ps1' }
 
 function Test-PythonBatchBudgetPathInRoot {
@@ -354,7 +372,8 @@ function Invoke-PythonBatchBudgetHook {
         [scriptblock] $WriteState = {
             param([string] $Path, [System.Collections.IDictionary] $State)
             $State | ConvertTo-Json -Depth 5 | Set-Content -Path $Path -Encoding UTF8
-        }
+        },
+        [scriptblock] $WorktreeListInvoker
     )
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
@@ -376,6 +395,25 @@ function Invoke-PythonBatchBudgetHook {
     }
     if ($script:PythonBatchBudgetRouteImportFailure) { return Get-PythonBatchBudgetBlockDecision -Reason "PYTHON_LARGE_PATH_REQUIRED: the route helper '$($script:PythonBatchBudgetRouteImportFailure)' failed to load, so the batch budget for '$normalized' cannot be evaluated; the gate fails closed." }
 
+    # The file is evaluated against the registered worktree that holds it. The session root
+    # stays the fallback for a relative path, a path in no registered worktree, and an
+    # ambiguous result, which keeps today's checkpoint, containment, and state-file name.
+    $resolverArguments = @{ SessionRoot = $Root; FilePath = @($filePath) }
+    if ($PSBoundParameters.ContainsKey('WorktreeListInvoker')) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $resolution = Resolve-HookTargetWorktree @resolverArguments
+    $targetRoot = $Root
+    $isSessionRoot = $true
+    if (-not $resolution.Ambiguous -and $null -ne $resolution.WorktreeRoot -and -not [string]::Equals($resolution.WorktreeRoot, (ConvertTo-HookTargetWorktreeNormalizedPath -Path $Root), [System.StringComparison]::OrdinalIgnoreCase)) {
+        $targetRoot = $resolution.WorktreeRoot
+        $isSessionRoot = $false
+    }
+
+    # The root-level artifacts/ directory is gitignored scratch, never a production file.
+    $relativePath = if ($normalized -match '^(/|[A-Za-z]:/)') { Get-HookTargetWorktreeRelativePath -Path $normalized -WorktreeRoot $targetRoot } else { $normalized }
+    if ($null -ne $relativePath -and $relativePath.StartsWith('artifacts/', [System.StringComparison]::OrdinalIgnoreCase)) {
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    }
+
     $stateDir = Join-Path -Path $Root -ChildPath '.claude/state'
 
     # Resolved before the directory is ensured, because reading the session-id
@@ -386,11 +424,12 @@ function Invoke-PythonBatchBudgetHook {
         -SessionIdFilePath (Join-Path -Path $stateDir -ChildPath 'current-session-id') `
         -ReadSessionIdFile $ReadSessionIdFile
 
-    $stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$resolvedSessionId.json")
+    $stateLeaf = if ($isSessionRoot) { "python-batch-budget.$resolvedSessionId.json" } else { "python-batch-budget.$resolvedSessionId.$(Get-HookTargetWorktreeKey -WorktreeRoot $targetRoot).json" }
+    $stateFile = Join-Path -Path $stateDir -ChildPath $stateLeaf
 
     # The checkpoint is read before any state operation, so the large path neither
     # creates the state directory nor reads or writes the state file.
-    $checkpointPath = Join-Path -Path $Root -ChildPath 'artifacts/orchestration/orchestrator-state.json'
+    $checkpointPath = Join-Path -Path $targetRoot -ChildPath 'artifacts/orchestration/orchestrator-state.json'
     $checkpointText = ''
     try {
         $checkpointText = [string](& $ReadCheckpoint $checkpointPath)
@@ -402,7 +441,7 @@ function Invoke-PythonBatchBudgetHook {
     $isLargePath = Test-BatchBudgetLargePathRoute -CheckpointText $checkpointText
     $observedRoute = Get-BatchBudgetSelectedRoute -CheckpointText $checkpointText
     if ($isLargePath) {
-        return Invoke-PythonBatchBudgetDecision -FilePath $filePath -State (Get-PythonBatchBudgetState -ProdCap $ProdCap) -StateFile $stateFile -Root $Root -LargePathRoute
+        return Invoke-PythonBatchBudgetDecision -FilePath $filePath -State (Get-PythonBatchBudgetState -ProdCap $ProdCap) -StateFile $stateFile -Root $targetRoot -LargePathRoute
     }
 
     if (-not (& $TestPathExists $stateDir)) {
@@ -414,13 +453,13 @@ function Invoke-PythonBatchBudgetHook {
     if (& $TestPathExists $stateFile) {
         try {
             $loaded = & $ReadState $stateFile | ConvertFrom-Json -ErrorAction Stop
-            $state = ConvertTo-PythonBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -Root $Root
+            $state = ConvertTo-PythonBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -Root $targetRoot
         } catch {
             Write-Verbose "Ignoring unreadable Python batch-budget state file '$stateFile': $($_.Exception.Message)"
         }
     }
 
-    $decision = Invoke-PythonBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile -Root $Root -ObservedRoute $observedRoute
+    $decision = Invoke-PythonBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile -Root $targetRoot -ObservedRoute $observedRoute
     if ($decision.shouldWriteState) {
         try {
             & $WriteState $stateFile $decision.state

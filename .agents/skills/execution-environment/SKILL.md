@@ -36,17 +36,20 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 
 ## Batch Budget
 
-- In direct mode the batch-budget hooks allow at most three distinct production files per kind in one session: the fourth distinct non-test PowerShell file is denied with `POWERSHELL_LARGE_PATH_REQUIRED` and the fourth distinct non-test Python file with `PYTHON_LARGE_PATH_REQUIRED` (`.claude/hooks/enforce-powershell-batch-budget.ps1` and `.claude/hooks/enforce-python-batch-budget.ps1`; Codex copies under `.codex/hooks/`). Test files never count.
-- Exemption: the cap does not apply when `artifacts/orchestration/orchestrator-state.json` in the worktree that holds the hook script selects the `large`, `remediation`, or `preparation` route and is not terminal (`Test-BatchBudgetLargePathRoute` in `.claude/hooks/enforce-batch-budget-route.ps1`). An isolated subagent worktree has no checkpoint, because `artifacts/` is gitignored, so direct mode applies there.
+- In direct mode the batch-budget hooks allow at most three distinct production files per kind in one session and one resolved worktree: the fourth distinct non-test PowerShell file is denied with `POWERSHELL_LARGE_PATH_REQUIRED` and the fourth distinct non-test Python file with `PYTHON_LARGE_PATH_REQUIRED` (`.claude/hooks/enforce-powershell-batch-budget.ps1` and `.claude/hooks/enforce-python-batch-budget.ps1`; Codex copies under `.codex/hooks/`). Test files never count.
+- Exemption: the cap does not apply when `artifacts/orchestration/orchestrator-state.json` in the worktree containing the edited file selects the `large`, `remediation`, or `preparation` route and is not terminal (`Test-BatchBudgetLargePathRoute` in `.claude/hooks/enforce-batch-budget-route.ps1`). That worktree is resolved by `Resolve-HookTargetWorktree` in `.claude/lib/worktree-resolution/HookTargetWorktree.psm1` (Codex twin `.codex/hooks/hook-target-worktree.ps1`): an absolute path resolves to its nearest enclosing registered git worktree, and a relative path, a path in no registered worktree, or an ambiguous result uses the session root. An isolated subagent worktree has no checkpoint, because `artifacts/` is gitignored, so direct mode applies there.
 - Bundle mirror copies under `extensions/drm-copilot/resources/` are production files and count against the cap.
-- A scratch `.ps1` file counts when it resolves inside the worktree root. Files under `SCRATCH`, which is outside the worktree root, are discarded without consuming a slot.
+- A scratch `.ps1` file counts when it resolves inside the worktree root and outside that root's `artifacts/` directory. Files under `SCRATCH`, which is outside the worktree root, are discarded without consuming a slot.
+- Paths under the root-level `artifacts/` directory of the resolved worktree never count: they are allowed without consuming a slot and write no state. A nested directory named `artifacts` elsewhere in the tree still counts.
+- Claude edits to a sibling registered worktree count against that worktree's own budget, because containment uses the resolved root; a path outside every registered worktree keeps the session root and is discarded by containment. Codex has no containment filter, so a Codex edit outside every registered worktree counts against the session root.
 - Only `Write` and `Edit` calls are seen (the hook matcher is `Write|Edit`). Files written by Bash, by a copy script, or by a generator are not seen.
-- Budget state is kept per session under `.claude/state/`; there is no automatic reset.
+- Budget state is kept per session and per resolved worktree root under the session root's `.claude/state/` (Codex `.codex/state/`): the session root keeps `<kind>-batch-budget.<session id>.json`, and another worktree uses `<kind>-batch-budget.<session id>.<worktree key>.json` with the key from `Get-HookTargetWorktreeKey`. No state is written into another worktree, and there is no automatic reset.
 
 ## Hook Execution Context
 
 - Hooks for an isolated subagent run inside the subagent's worktree with that worktree's hook scripts, which are `main`'s copies. A hook change on a branch is not exercised by isolated subagents until it merges.
 - Hook behavior on a branch is therefore proven by Pester suites, not by a live subagent run. A live check of a branch hook needs a non-isolated delegation from the item worktree.
+- The batch-budget hooks evaluate the checkpoint of the target worktree that `Resolve-HookTargetWorktree` resolves for the edited file, so an edit made from a coordinating session into an item worktree is evaluated against the item worktree's checkpoint. The other gates that read `artifacts/orchestration/orchestrator-state.json` are unchanged and still use the root that holds the hook script until #1010 (preimplementation gate) and #1011 (PR authoring gate) adopt the resolver.
 - Enforcement hooks do not invoke Python; bash is preferred and PowerShell is acceptable (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`).
 
 ## MCP Surfaces Run the Installed Extension
@@ -101,7 +104,7 @@ These pass every validator rule and are found only by reading the plan against t
 - A checkbox diff-pair assertion against a file the plan adds, and a CRLF fixture under the `eol=lf` attribute rule.
 - A new TypeScript production file without its own `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs`, whose threshold map has per-file entries only and no `global` key.
 - A per-file coverage floor asserted for code that the tests replace with blanket mocks.
-- Batch-budget exhaustion across a session, and an acceptance condition that depends on a branch hook being exercised by an isolated subagent.
+- Batch-budget exhaustion within one worktree over a session, and an acceptance condition that depends on a branch hook being exercised by an isolated subagent.
 - `origin/main` advancing during planning: scope diffs anchor on the merge base of `origin/main` and `HEAD`, never on `origin/main` itself.
 - `Measure-Object -Line` counts non-empty lines only; physical line counts use `wc -l` or `@(Get-Content -LiteralPath <path>).Count`.
 - A coverage argument written as a filesystem path measures nothing; the dotted module form is required, and branch figures come from the JSON report, not the combined terminal column.
