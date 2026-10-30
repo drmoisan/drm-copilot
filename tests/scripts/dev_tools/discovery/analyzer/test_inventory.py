@@ -169,11 +169,11 @@ def test_filter_paths_preserves_input_order() -> None:
 @pytest.mark.parametrize(
     ("relative_path", "expected"),
     [
-        pytest.param("app.solution", UnitType.SOLUTION, id="solution-marker"),
-        pytest.param("lib.project", UnitType.PROJECT, id="project-marker"),
+        pytest.param("app.sln", UnitType.SOLUTION, id="solution-marker"),
+        pytest.param("lib.csproj", UnitType.PROJECT, id="project-marker"),
         pytest.param("src/main.txt", UnitType.FILE, id="plain-file"),
         pytest.param("nested/dir/notes.md", UnitType.FILE, id="non-matching"),
-        pytest.param("sub/core.solution", UnitType.SOLUTION, id="solution-in-subdir"),
+        pytest.param("sub/core.sln", UnitType.SOLUTION, id="solution-in-subdir"),
     ],
 )
 def test_classify_unit_uses_default_markers(
@@ -194,16 +194,16 @@ def test_classify_unit_honors_custom_marker_table() -> None:
 
     # Act / Assert
     assert classify_unit("thing.pkg", custom) is UnitType.PROJECT
-    assert classify_unit("app.solution", custom) is UnitType.FILE
+    assert classify_unit("app.sln", custom) is UnitType.FILE
 
 
 def test_classify_paths_tags_every_unit() -> None:
     """classify_paths returns one classified unit per input path, in order."""
     # Act
-    units = classify_paths(("a.solution", "b.txt"), DEFAULT_MARKERS)
+    units = classify_paths(("a.sln", "b.txt"), DEFAULT_MARKERS)
 
     # Assert
-    assert tuple(u.relative_path for u in units) == ("a.solution", "b.txt")
+    assert tuple(u.relative_path for u in units) == ("a.sln", "b.txt")
     assert units[0].unit_type is UnitType.SOLUTION
     assert units[1].unit_type is UnitType.FILE
 
@@ -211,16 +211,16 @@ def test_classify_paths_tags_every_unit() -> None:
 def test_classify_stage_filters_then_tags(mem_fs_path: Path) -> None:
     """The classify stage applies include/exclude before tagging."""
     # Arrange
-    _write(mem_fs_path, "a.solution")
+    _write(mem_fs_path, "a.sln")
     _write(mem_fs_path, "b.txt")
     _write(mem_fs_path, "skip/c.txt")
     _write(mem_fs_path, "d.log")
     analyzer = InventoryAnalyzer(fs=RealAnalyzerFileSystem())
-    ctx = _context(mem_fs_path, include=("*.solution", "*.txt"), exclude=("skip/*",))
+    ctx = _context(mem_fs_path, include=("*.sln", "*.txt"), exclude=("skip/*",))
 
     # Act
     classified = analyzer.classify(analyzer.parse(ctx))
 
     # Assert
     tags = {u.relative_path: u.unit_type for u in classified.units}
-    assert tags == {"a.solution": UnitType.SOLUTION, "b.txt": UnitType.FILE}
+    assert tags == {"a.sln": UnitType.SOLUTION, "b.txt": UnitType.FILE}

@@ -1,0 +1,197 @@
+"""Reconcile completed P4-T9 receipts and preserve raw proof without rerunning tests."""
+import ast
+import base64
+import datetime
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+ordered_path = Path(sys.argv[1])
+ordered = json.loads(ordered_path.read_bytes())
+candidate_path = Path(ordered['candidate_manifest'])
+candidate = json.loads(candidate_path.read_bytes())
+
+
+def sha(raw):
+    """Return a whole-stream SHA-256 binding."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    """Bind an existing repository-relative evidence path."""
+    path = Path(path)
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+def write(path, value):
+    """Create readable LF JSON without changing previous evidence."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+
+
+assert sha(candidate_path.read_bytes()) == ordered['candidate_sha256']
+assert [(item['stage'], item['label']) for item in ordered['receipts']] == [
+    (1, 'format'), (2, 'lint'), (3, 'types'), (4, 'architecture'),
+    (5, 'tests-registry-reverse'), (5, 'tests-shared-reverse'), (5, 'tests-core-reverse'), (6, 'contracts'), (7, 'native')]
+assert len(ordered['test_nodes']) == len(set(ordered['test_nodes'])) == 354
+assert len(ordered['contract_nodes']) == len(set(ordered['contract_nodes'])) == 177
+assert not ordered['native_pending']
+bindings = {item['path']: sha(Path(item['path']).read_bytes()) for item in candidate['bindings']}
+assert bindings == {item['path']: item['sha256'] for item in candidate['bindings']}
+binding_sha = sha(json.dumps(bindings, sort_keys=True, separators=(',', ':')).encode())
+assert binding_sha == ordered['binding_sha256']
+receipts, previous_finished = [], None
+for item in ordered['receipts']:
+    path = Path(item['path'])
+    assert sha(path.read_bytes()) == item['sha256']
+    receipt = json.loads(path.read_bytes())
+    assert receipt['exit_code'] == 0 and receipt['binding_before_sha256'] == receipt['binding_after_sha256'] == binding_sha
+    if previous_finished:
+        assert previous_finished <= receipt['started_at']
+    previous_finished = receipt['finished_at']
+    receipts.append({**item, 'seconds': receipt['seconds'], 'started_at': receipt['started_at'], 'finished_at': receipt['finished_at'], 'markdown': ref(path.with_suffix('.md'))})
+native_path = Path(ordered['native_path'])
+native = json.loads(native_path.read_bytes())
+assert native['passed'] == len(native['checks']) == 20
+assert native['source_and_git_tree_before'] == native['source_and_git_tree_after']
+baseline_path = Path(candidate['baseline']['path'])
+assert sha(baseline_path.read_bytes()) == candidate['baseline']['sha256']
+baseline = json.loads(baseline_path.read_bytes())
+old_coverage = {item['path']: item for item in baseline['coverage_baselines']}
+module_coverage, ranges, changed = {}, [], []
+coverage_refs = []
+for batch in ordered['coverage_batches']:
+    path = Path(batch['coverage_path'])
+    assert sha(path.read_bytes()) == batch['coverage_sha256']
+    coverage = json.loads(path.read_bytes())
+    raw = scratch / batch['raw_coverage']['path'].removeprefix('SCRATCH/')
+    assert sha(raw.read_bytes()) == batch['raw_coverage']['sha256']
+    assert set(batch['test_nodes']) == set(candidate['prior_node_order'][batch['batch']])
+    coverage_refs.append({'batch': batch['batch'], **ref(path), 'totals': coverage['totals'],
+                          'raw_coverage': batch['raw_coverage'], 'case_count': len(batch['test_nodes'])})
+    for relative, data in coverage['files'].items():
+        assert relative not in module_coverage
+        summary = data['summary']
+        assert summary['percent_statements_covered'] >= 90 and summary['percent_branches_covered'] >= 75
+        module_coverage[relative] = summary
+        prior = old_coverage.get(relative)
+        if prior:
+            for key in ('percent_statements_covered', 'percent_branches_covered'):
+                assert summary[key] >= prior['summary'][key]
+        tree = ast.parse(Path(relative).read_bytes())
+
+        def collect(nodes, prefix=''):
+            """Bind real class/callable ranges to the raw coverage families."""
+            for node in nodes:
+                if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                    family = 'classes' if isinstance(node, ast.ClassDef) else 'functions'
+                    name = prefix + node.name
+                    measured = data[family][name]['summary']
+                    assert not measured['num_statements'] or measured['percent_statements_covered'] >= 90
+                    ranges.append({'path': relative, 'name': name, 'kind': type(node).__name__,
+                        'start': node.lineno, 'end': node.end_lineno, 'summary': measured,
+                        'missing_lines': data[family][name]['missing_lines'], 'floor_exemption': None})
+                    collect(node.body, name + '.')
+
+        collect(tree.body)
+        # Working-tree comparison includes the authorized uncommitted comment movement.
+        diff = subprocess.run(['git', 'diff', '--no-ext-diff', '--unified=0', candidate['accepted_baseline'], '--', relative], capture_output=True, check=True).stdout.decode()
+        selected = set()
+        for first, count in re.findall(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@', diff, flags=re.M):
+            selected.update(range(int(first), int(first) + (int(count) if count else 1)))
+        executable = set(data['executed_lines']) | set(data['missing_lines'])
+        missing = sorted(selected & set(data['missing_lines']))
+        assert not missing
+        changed.append({'path': relative, 'changed_executable_lines': sorted(selected & executable), 'missing_changed_lines': missing})
+assert len(module_coverage) == 6
+files = []
+head = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode().strip()
+for entry in candidate['files']:
+    path = entry['path']
+    raw = Path(path).read_bytes()
+    index = subprocess.run(['git', 'show', ':' + path], capture_output=True, check=True).stdout
+    committed = subprocess.run(['git', 'show', 'HEAD:' + path], capture_output=True, check=True).stdout
+    normalized = raw.replace(b'\r\n', b'\n')
+    relation = 'identical' if raw == index else 'CRLF-to-LF-only normalization'
+    if normalized != index:
+        assert path.endswith('/analyzer/emitter.py')
+        assert ast.dump(ast.parse(raw), include_attributes=False) == ast.dump(ast.parse(index), include_attributes=False)
+        relation = 'Authorized comment-only working delta; exact AST matches index, with CRLF/LF normalization qualified separately.'
+    if index != committed:
+        assert path.endswith('/analyzer/emitter.py')
+        assert ast.dump(ast.parse(index), include_attributes=False) == ast.dump(ast.parse(committed), include_attributes=False)
+    attributes = subprocess.run(['git', 'check-attr', 'text', 'eol', '--', path], capture_output=True, check=True).stdout.decode().strip()
+    working_blob = subprocess.run(['git', 'hash-object', '--no-filters', '--stdin'], input=raw, capture_output=True, check=True).stdout.decode().strip()
+    filtered_blob = subprocess.run(['git', 'hash-object', '--path=' + path, '--stdin'], input=raw, capture_output=True, check=True).stdout.decode().strip()
+    files.append({'path': path, 'sha256': sha(raw), 'physical_lines': len(raw.splitlines()), 'working_blob': working_blob,
+                  'filtered_blob': filtered_blob, 'index_sha256': sha(index), 'commit_sha256': sha(committed),
+                  'commit': head, 'git_attributes': attributes, 'relation': relation,
+                  'index_commit_relation': 'identical' if index == committed else 'Authorized comment-only AST-equivalent staged delta.'})
+# Retain exact original streams, including the first stopped pass, in reconstructable form.
+raw_entries = []
+for path in sorted(qa.glob('p4t9-final-*.json')):
+    record = json.loads(path.read_bytes())
+    if 'raw_stdout' not in record or 'raw_stderr' not in record:
+        continue
+    for label in ('raw_stdout', 'raw_stderr'):
+        item = record[label]
+        raw = (scratch / item['path'].removeprefix('SCRATCH/')).read_bytes()
+        assert sha(raw) == item['sha256']
+        encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode()
+        assert gzip.decompress(base64.b64decode(encoded)) == raw
+        raw_entries.append({'receipt': path.as_posix(), 'stream': label, 'original_sha256': sha(raw),
+                            'original_bytes': len(raw), 'encoding': 'gzip+base64', 'payload': encoded})
+for item in [batch['raw_coverage'] for batch in ordered['coverage_batches']] + [ordered['raw_native']]:
+    raw = (scratch / item['path'].removeprefix('SCRATCH/')).read_bytes()
+    assert sha(raw) == item['sha256']
+    encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode()
+    assert gzip.decompress(base64.b64decode(encoded)) == raw
+    raw_entries.append({'source': item['path'], 'original_sha256': sha(raw), 'original_bytes': len(raw), 'encoding': 'gzip+base64', 'payload': encoded})
+archive = qa / ('p4t9-final-original-streams.' + stamp + '.json')
+write(archive, {'task': 'P4-T9', 'decode_verified': True, 'entries': raw_entries,
+    'qualification': 'Exact original stdout/stderr/coverage/native streams are losslessly recoverable. Readable views sanitize workspace/scratch paths, JSON coverage keys normalize separators, and rendered Markdown trims trailing whitespace only.'})
+range_path = qa / ('p4t9-final-coverage-ranges.' + stamp + '.json')
+write(range_path, {'task': 'P4-T9', 'module_summaries': module_coverage, 'unit_ranges': ranges,
+    'coverage_batches': coverage_refs, 'changed_line_measurement': changed, 'baseline': candidate['baseline'],
+    'qualification': 'All actual current classes/callables are measured. No current floor exemption is applied; accepted documentation-only and comment-only AST qualifications remain in the referenced reviews.'})
+copy = qa / ('p4t9-final-handoff-harness.' + stamp + '.txt')
+assert not copy.exists()
+copy.write_bytes(Path(__file__).read_bytes())
+limitations = [
+    'Extension inputs are inert local data under the configured inventory root; arbitrary plugin/module/shell execution is unsupported.',
+    'Source claims cover selected production/test/exact entrypoint bytes. Documentation remains in input digest/accounting but cannot be an extension source claim under the current loader contract.',
+    'ValidatedExtension is descriptive only. merge_extension_inventory reconstructs from raw snapshot bytes; caller-created carriers confer no authority.',
+    'Generic emitter row-text handling remains its prior contract; extension merge adds full prospective serialized-byte/row/node/work reservations before aggregation.',
+    'The existing inventory publication planner intentionally reconstructs built-ins only. A future importing CLI needs its own guarded reconstructed merge planner before plan_mutation/commit_mutation.',
+    'Windows Python/Git composition only. No installed coding-agent host, non-Windows execution, runtime behavior, discovery completion or parity approval claim.',
+    'Feature-wide repository coverage and remaining implementation/host gates are still outstanding; this handoff claims only the complete six-module P4-T9 scope.']
+handoff = qa / ('p4t9-final-handoff.' + stamp + '.json')
+value = {'task': 'P4-T9', 'timestamp': stamp, 'state': 'EXECUTOR_ACCEPTANCE_PENDING', 'candidate_commit': head,
+    'candidate': ref(candidate_path), 'ordered_stages': ref(ordered_path), 'ordered_receipts': receipts,
+    'source_files': files, 'binding_count': len(bindings), 'binding_sha256': binding_sha,
+    'baseline': candidate['baseline'], 'subset_manifests': candidate['subset_manifests'], 'reviews': candidate['review_references'],
+    'preserved_predecessors': candidate['retained_predecessor_count'], 'coverage_ranges': ref(range_path),
+    'raw_originals': ref(archive), 'handoff_harness': ref(copy), 'native_result': ref(native_path),
+    'test_cases': {**candidate['expected_test_counts'], 'total': 354, 'contracts': 177, 'native_assertions': 20},
+    'native_timing': {'whole_composition_seconds': native['elapsed_seconds'], 'individual_operation_seconds': native['operation_seconds']},
+    'deltas': {'new_lint_findings': 0, 'new_type_diagnostics': 0, 'new_test_failures': 0, 'missing_changed_lines': 0},
+    'public_interfaces': ['Analyzer = InventoryAdapter; builtin_analyzer_identities() and select_analyzers(profile)',
+        'extension_input_projection(capture), extension_input_digest(capture), extension_manifest_digest(document)',
+        'inventory_result(..., extension_adapters=None) preserves built-in-only behavior',
+        'validate_extension_results(snapshot, *, manifest_paths=None)',
+        'merge_extension_inventory(snapshot, *, timestamp, author_or_agent, manifest_paths=None)'],
+    'phase_4_handoff': 'Fixed registry dispatch covers 12 built-in identities with explicit optional consent. Core accounting, classifications, evidence pins and unassigned ledger proposals remain intact. Later services should use these public APIs and keep validation/merge separate from mutation authorization.',
+    'limitations': limitations, 'publication': 'not-attempted', 'task_acceptance': 'parent/executor-owned'}
+write(handoff, value)
+table = '\n'.join(f'| {Path(path).name} | {item["covered_lines"]}/{item["num_statements"]} | {item["covered_branches"]}/{item["num_branches"]} |' for path, item in module_coverage.items())
+handoff.with_suffix('.md').write_text(f'# P4-T9 final handoff\n\nTimestamp: {stamp}\nCommand: `.venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-handoff.py <ordered-stages>`\nEXIT_CODE: 0\nOutput Summary: Seven ordered stages passed; independent acceptance remains pending.\n\nScoped Black/Ruff, whole-repository Pyright, structural/isolation checks, 354 unique cases in three isolated reversed-module batches, 177 affected contracts and 20 Windows/Git assertions passed. All 142 bound streams and 93 retained predecessors are unchanged. The earlier one-comment failure and its AST-equivalent repair remain preserved.\n\n| Module | Statements | Branches |\n|---|---:|---:|\n{table}\n\nFixed dispatch exposes 12 built-in identities. Local extension transport is validated and merged from exact captured raw bytes with original provenance and confidence. The prepared native composition used actual capture/loading and pinned Git reads; it made no publication attempt. Later CLI importing needs a guarded reconstructed merge planner. Documentation is accounted but remains unsupported as an extension source claim. Exact unit ranges, changed-line measurements, node orders, raw streams, timings and working/index/commit qualifications are in the paired JSON.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'handoff': ref(handoff), 'coverage_ranges': len(ranges), 'modules': len(module_coverage),
+                  'statements': sum(item['covered_lines'] for item in module_coverage.values()),
+                  'branches': sum(item['covered_branches'] for item in module_coverage.values()), 'raw_streams': len(raw_entries)}), flush=True)

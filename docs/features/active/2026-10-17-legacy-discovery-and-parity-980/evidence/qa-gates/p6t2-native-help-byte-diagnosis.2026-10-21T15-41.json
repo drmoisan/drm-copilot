@@ -1,0 +1,116 @@
+{
+  "Timestamp": "2026-10-21T15-41",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "Command": "Read exact frozen archive members and help/spec contract; byte comparison only",
+  "EXIT_CODE": 0,
+  "Output Summary": "Alias/help wording and options match; exactly two CR bytes before LF cause the frozen assertion mismatch. No console replay or normalization applied.",
+  "status": "TRANSPORT_LINE_ENDING_ONLY_MISMATCH_INDEPENDENT_CLASSIFICATION_PENDING",
+  "native_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+    "sha256": "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108"
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+    "sha256": "34900a9a4dcd074497a38770bfa57ee550c229b4a05afb56bb8e0234464617bc"
+  },
+  "stdout_member": "SCRATCH\\issue-980-p6t2-native-cli-20261021T153823\\alias-help.stdout.bin",
+  "stderr_member": "SCRATCH\\issue-980-p6t2-native-cli-20261021T153823\\alias-help.stderr.bin",
+  "harness_member": "SCRATCH\\issue-980-p6t2-console-native-once.py",
+  "harness_sha256": "462f33a658b29e9ed962ad95c9052246efb135472e33c61031ad2b21ec8fbac9",
+  "expected": {
+    "bytes": 144,
+    "sha256": "8660f5e11ac1adbcde20b5d057e9e4d1af1896b21030b74b4349e7a8885a969c",
+    "python_bytes_repr": "b'Usage: dev.discovery.validate [options]\\nOptions: --help -h --workspace-root --profile --repository-id --mode --format --output-prefix --dry-run\\n'",
+    "hex": "55736167653a206465762e646973636f766572792e76616c6964617465205b6f7074696f6e735d0a4f7074696f6e733a202d2d68656c70202d68202d2d776f726b73706163652d726f6f74202d2d70726f66696c65202d2d7265706f7369746f72792d6964202d2d6d6f6465202d2d666f726d6174202d2d6f75747075742d707265666978202d2d6472792d72756e0a"
+  },
+  "actual": {
+    "bytes": 146,
+    "sha256": "a6663a788df52baca6c17b152431bec480939a7053e65aaa9cb1909439bcab2a",
+    "python_bytes_repr": "b'Usage: dev.discovery.validate [options]\\r\\nOptions: --help -h --workspace-root --profile --repository-id --mode --format --output-prefix --dry-run\\r\\n'",
+    "hex": "55736167653a206465762e646973636f766572792e76616c6964617465205b6f7074696f6e735d0d0a4f7074696f6e733a202d2d68656c70202d68202d2d776f726b73706163652d726f6f74202d2d70726f66696c65202d2d7265706f7369746f72792d6964202d2d6d6f6465202d2d666f726d6174202d2d6f75747075742d707265666978202d2d6472792d72756e0d0a",
+    "carriage_return_offsets": [
+      39,
+      144
+    ],
+    "line_feed_offsets": [
+      40,
+      145
+    ]
+  },
+  "comparison": {
+    "wording_alias_option_order_identical": true,
+    "difference": "Only CR inserted immediately before each of the two LF bytes",
+    "expected_lf_count": 2,
+    "actual_crlf_count": 2,
+    "actual_lone_cr_count": 0,
+    "normalization_used_to_accept": false
+  },
+  "original_verdict_preserved": "STOPPED_FIRST_FAILURE at alias-help fixed LF usage text; exit0 and installed origins/unchanged fixture/package proof remain retained.",
+  "contracts": [
+    {
+      "reference": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-cli-preparation-delta.2026-10-20T15-11.md",
+        "sha256": "52fa180d56688577e3ac0f4acfbe7b811375c69f4487e0c1b5a9e744cf18a923"
+      },
+      "location": "Shared argument, request and result behavior, help bullet",
+      "text": "Help exits 0 with fixed usage and no service/provider calls.",
+      "scope": "No explicit help transport-byte newline requirement."
+    },
+    {
+      "reference": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+        "sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f"
+      },
+      "location": "API / CLI Surface, lines298-308; analyzer section line567",
+      "scope": "API describes typed JSON result and malformed stdout handling; line567 LF UTF-8 requirement is stated in the analyzer findings/output paragraph. No help-specific raw newline requirement identified in these clauses."
+    },
+    {
+      "location": "cli_arguments.py::_help",
+      "scope": "Builds fixed two-line logical string with LF delimiters; CliHelp validates text size/UTF-8 encodability, not stream newline behavior."
+    },
+    {
+      "location": "cli.py::run_cli help branch, _write and _main",
+      "scope": "Writes parsed help text to the supplied TextIO; actual console _main supplies sys.stdout unchanged. Observer did not reconfigure or replace streams."
+    },
+    {
+      "location": "cli.py::_emit",
+      "scope": "LF JSON docstring is for typed results, not the help branch. The three remaining console boundaries have not run; no conclusion about their bytes is claimed."
+    },
+    {
+      "reference": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-installed-cli-preparation.2026-10-21T15-08.json",
+        "sha256": "55c70ec7b4f9cb5b6a2e4bf3cc33de3880c90e7e7ed70b27aa646a004915e683"
+      },
+      "location": "invocations[0], alias-help",
+      "scope": "Native preparation explicitly expected LF help bytes; this stricter assertion remains the preserved failing authority until coordinator resolves classification."
+    }
+  ],
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa"
+    }
+  ],
+  "actual_console_calls": 1,
+  "remaining_calls": 3,
+  "new_native_calls": 0,
+  "requested_decision": "Independent confirmation of whether help-only platform line endings warrant an explicit verification qualification. No assertion/source change or remaining invocation is authorized by this diagnostic.",
+  "no_changes": [
+    "source",
+    "test",
+    "package",
+    "fixture",
+    "original harness",
+    "original expected bytes",
+    "original actual bytes"
+  ]
+}

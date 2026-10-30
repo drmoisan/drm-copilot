@@ -11,7 +11,7 @@ Usage:
 Flow:
     The classifier inspects the normalized relative path, applies the ecosystem
     routing rules, and emits a ``MappingRecord`` with ``target_path`` still
-    unresolved.
+    unresolved. The Claude path lives in ``classifier_claude``.
 
 Invariants / Constraints:
     Classification is deterministic and path-driven. Unsupported surfaces are
@@ -27,6 +27,10 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.codex_native_converter.classifier_claude import (
+    classify_claude,
+    read_optional_text,
+)
 from scripts.dev_tools.codex_native_converter.models import (
     ConversionClass,
     MappingRecord,
@@ -38,11 +42,14 @@ from scripts.dev_tools.codex_native_converter.models import (
     TargetRole,
 )
 
+# Published GitHub hook handlers and their registration documents are the
+# approved `.github/hooks` native surfaces; documentation and templates are not.
+_GITHUB_HOOK_SCRIPT_SUFFIXES: tuple[str, ...] = (".ps1", ".py")
+
 if TYPE_CHECKING:
     from pathlib import Path
 
 _REPO_WIDE_APPLY_TO_PATTERN = re.compile(r"(?m)^applyTo:\s*([\"'])?\*\*(?:\1)?\s*$")
-_REPO_WIDE_PATHS_PATTERN = re.compile(r"(?m)^paths:\s*\n\s*-\s*([\"'])?\*\*(?:\1)?\s*$")
 _PROMPT_WORKFLOW_HEADING_PATTERN = re.compile(
     r"(workflow|steps|task execution|required orchestration behavior|"
     r"completion criteria|output format|what to investigate|section rules|"
@@ -55,35 +62,6 @@ _PROMPT_ENFORCEMENT_PATTERN = re.compile(
     re.IGNORECASE,
 )
 _NUMBERED_STEP_PATTERN = re.compile(r"(?m)^\d+[.)]\s+")
-
-
-def _read_optional_text(source_root: Path, source_path: Path) -> str:
-    """Read source text when note generation requires content inspection.
-
-    Purpose:
-        Inspect agent manifests for mixed-concern markers such as handoffs
-        without making text parsing a hard requirement for every file.
-
-    Args:
-        source_root (Path): Absolute or relative source root.
-        source_path (Path): Source-root-relative path to inspect.
-
-    Returns:
-        str: File contents decoded as UTF-8 when possible; otherwise an empty
-        string.
-
-    Raises:
-        None.
-
-    Side Effects:
-        Reads a source file from disk.
-    """
-
-    absolute_path = (source_root.resolve() / source_path).resolve()
-    try:
-        return absolute_path.read_text(encoding="utf-8")
-    except OSError:
-        return ""
 
 
 def _has_repo_wide_apply_to(source_root: Path, source_path: Path) -> bool:
@@ -107,34 +85,69 @@ def _has_repo_wide_apply_to(source_root: Path, source_path: Path) -> bool:
         Reads one source file from disk.
     """
 
-    source_text = _read_optional_text(source_root, source_path)
+    source_text = read_optional_text(source_root, source_path)
     return bool(_REPO_WIDE_APPLY_TO_PATTERN.search(source_text))
 
 
-def _has_repo_wide_paths_yaml(source_root: Path, source_path: Path) -> bool:
-    """Determine whether one rule file declares repo-wide YAML `paths` scope.
+def _classify_github_hook(path_text: str) -> MappingRecord:
+    """Classify one published `.github/hooks` resource.
 
     Purpose:
-        Identify Claude rule files whose declared scope is every path in the
-        repository so they can merge into standing guidance instead of a skill.
+        Route GitHub hook handlers to native Codex hooks and hook registration
+        documents to the decomposed native config surface, while keeping hook
+        documentation and templates explicitly unsupported and optional.
 
     Args:
-        source_root (Path): Absolute or relative source root.
-        source_path (Path): Source-root-relative path to inspect.
+        path_text (str): POSIX source-root-relative hook resource path.
 
     Returns:
-        bool: True when the rule declares a YAML list-form `paths:` block whose
-        only entry is `**`.
+        MappingRecord: The classification result with unresolved target path.
 
     Raises:
         None.
 
     Side Effects:
-        Reads one source file from disk.
+        None.
     """
 
-    source_text = _read_optional_text(source_root, source_path)
-    return bool(_REPO_WIDE_PATHS_PATTERN.search(source_text))
+    # Decision order: a handler script is a direct hook; a JSON registration
+    # decomposes into native config; anything else (README, templates) is an
+    # instruction-only resource and never becomes a native control.
+    if path_text.endswith(_GITHUB_HOOK_SCRIPT_SUFFIXES):
+        return MappingRecord(
+            source_path=path_text,
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            source_kind=SourceKind.HOOK_DEFINITION,
+            conversion_class=ConversionClass.DIRECT,
+            target_role=TargetRole.HOOK,
+            target_path=None,
+        )
+    if path_text.endswith(".json"):
+        return MappingRecord(
+            source_path=path_text,
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            source_kind=SourceKind.PERMISSIONS_OR_SETTINGS,
+            conversion_class=ConversionClass.DECOMPOSED,
+            target_role=TargetRole.MCP_CONFIG,
+            target_path=None,
+            notes=(
+                "GitHub hook registration requires decomposition into native "
+                "Codex config, hooks, and approval surfaces.",
+            ),
+        )
+    return MappingRecord(
+        source_path=path_text,
+        source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+        source_kind=SourceKind.UNKNOWN,
+        conversion_class=ConversionClass.UNSUPPORTED,
+        target_role=TargetRole.UNSUPPORTED,
+        target_path=None,
+        notes=(
+            "Hook documentation and template resources have no native runtime "
+            "surface in v1.",
+        ),
+        is_required=False,
+    )
 
 
 def _classify_github_copilot(source_root: Path, source_path: Path) -> MappingRecord:
@@ -222,7 +235,7 @@ def _classify_github_copilot(source_root: Path, source_path: Path) -> MappingRec
         )
 
     if path_text.startswith(".github/agents/") and path_text.endswith(".agent.md"):
-        source_text = _read_optional_text(source_root, source_path)
+        source_text = read_optional_text(source_root, source_path)
         if "handoff" in source_text.lower() or "handoffs:" in source_text.lower():
             notes.append(
                 "Agent manifest contains handoff semantics that require "
@@ -237,6 +250,9 @@ def _classify_github_copilot(source_root: Path, source_path: Path) -> MappingRec
             target_path=None,
             notes=tuple(notes),
         )
+
+    if path_text.startswith(".github/hooks/"):
+        return _classify_github_hook(path_text)
 
     if path_text.startswith(".github/prompts/") and path_text.endswith(".md"):
         return MappingRecord(
@@ -261,128 +277,6 @@ def _classify_github_copilot(source_root: Path, source_path: Path) -> MappingRec
         target_role=TargetRole.UNSUPPORTED,
         target_path=None,
         notes=("No supported GitHub Copilot v1 mapping rule matched this artifact.",),
-    )
-
-
-def _classify_claude(source_root: Path, source_path: Path) -> MappingRecord:
-    """Classify one Claude source artifact.
-
-    Purpose:
-        Apply deterministic Claude classification rules for v1 mapping.
-
-    Args:
-        source_root (Path): Source root that bounds the artifact.
-        source_path (Path): Source-root-relative artifact path.
-
-    Returns:
-        MappingRecord: The classification result with unresolved target path.
-
-    Raises:
-        None.
-
-    Side Effects:
-        May read agent manifests to add review notes for mixed-concern content.
-    """
-
-    path_text = source_path.as_posix()
-    notes: list[str] = []
-
-    if path_text == "CLAUDE.md":
-        return MappingRecord(
-            source_path=path_text,
-            source_ecosystem=SourceEcosystem.CLAUDE,
-            source_kind=SourceKind.STANDING_INSTRUCTION,
-            conversion_class=ConversionClass.DIRECT,
-            target_role=TargetRole.STANDING_GUIDANCE,
-            target_path=None,
-        )
-
-    if "/SKILL.md" in path_text and path_text.startswith(".claude/skills/"):
-        return MappingRecord(
-            source_path=path_text,
-            source_ecosystem=SourceEcosystem.CLAUDE,
-            source_kind=SourceKind.REUSABLE_SKILL,
-            conversion_class=ConversionClass.DIRECT,
-            target_role=TargetRole.SHARED_SKILL,
-            target_path=None,
-        )
-
-    if path_text.startswith(".claude/agents/") and path_text.endswith(".md"):
-        source_text = _read_optional_text(source_root, source_path)
-        if "handoff" in source_text.lower() or "agent:" in source_text.lower():
-            notes.append(
-                "Claude agent manifest may encode orchestration or handoff "
-                "semantics that require validation before apply mode."
-            )
-        return MappingRecord(
-            source_path=path_text,
-            source_ecosystem=SourceEcosystem.CLAUDE,
-            source_kind=SourceKind.AGENT_MANIFEST,
-            conversion_class=ConversionClass.DECOMPOSED,
-            target_role=TargetRole.SUBAGENT,
-            target_path=None,
-            notes=tuple(notes),
-        )
-
-    if path_text.startswith(".claude/hooks/"):
-        return MappingRecord(
-            source_path=path_text,
-            source_ecosystem=SourceEcosystem.CLAUDE,
-            source_kind=SourceKind.HOOK_DEFINITION,
-            conversion_class=ConversionClass.DIRECT,
-            target_role=TargetRole.HOOK,
-            target_path=None,
-        )
-
-    if path_text == ".claude/settings.json":
-        return MappingRecord(
-            source_path=path_text,
-            source_ecosystem=SourceEcosystem.CLAUDE,
-            source_kind=SourceKind.PERMISSIONS_OR_SETTINGS,
-            conversion_class=ConversionClass.DECOMPOSED,
-            target_role=TargetRole.MCP_CONFIG,
-            target_path=None,
-            notes=(
-                "Claude settings require decomposition across native Codex "
-                "config, hooks, and approval surfaces.",
-            ),
-        )
-
-    if path_text.startswith(".claude/rules/") and path_text.endswith(".md"):
-        if _has_repo_wide_paths_yaml(source_root, source_path):
-            return MappingRecord(
-                source_path=path_text,
-                source_ecosystem=SourceEcosystem.CLAUDE,
-                source_kind=SourceKind.PATH_SCOPED_INSTRUCTION,
-                conversion_class=ConversionClass.DECOMPOSED,
-                target_role=TargetRole.STANDING_GUIDANCE,
-                target_path=None,
-                notes=(
-                    "Repo-wide Claude rule applies to all files and merges into "
-                    "standing guidance.",
-                ),
-            )
-        return MappingRecord(
-            source_path=path_text,
-            source_ecosystem=SourceEcosystem.CLAUDE,
-            source_kind=SourceKind.PATH_SCOPED_INSTRUCTION,
-            conversion_class=ConversionClass.DECOMPOSED,
-            target_role=TargetRole.SHARED_SKILL,
-            target_path=None,
-            notes=(
-                "Path-scoped Claude rule requires decomposition into shared "
-                "skills or standing guidance.",
-            ),
-        )
-
-    return MappingRecord(
-        source_path=path_text,
-        source_ecosystem=SourceEcosystem.CLAUDE,
-        source_kind=SourceKind.UNKNOWN,
-        conversion_class=ConversionClass.UNSUPPORTED,
-        target_role=TargetRole.UNSUPPORTED,
-        target_path=None,
-        notes=("No supported Claude v1 mapping rule matched this artifact.",),
     )
 
 
@@ -416,7 +310,7 @@ def classify_source_artifact(
 
     if source_ecosystem is SourceEcosystem.GITHUB_COPILOT:
         return _classify_github_copilot(source_root, source_path)
-    return _classify_claude(source_root, source_path)
+    return classify_claude(source_root, source_path)
 
 
 def classify_prompt_sections(

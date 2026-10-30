@@ -1,0 +1,132 @@
+{
+  "candidate_freeze": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json",
+  "candidate_freeze_sha256": "8259456707ebccae5a88a2d3863644a0d8974d7c149760f9773e3247658aae48",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T06:02:55.728726+00:00",
+  "harness_sha256": "e343c5e74a0434191ee0dcc3b000418962e09ea2ca2d01a33050c8e4d2948149",
+  "probes": [
+    {
+      "children": 64,
+      "configured_max_bytes": 8192,
+      "configured_max_keys": 65,
+      "input_bytes": 2684,
+      "input_sha256": "8e0979016562d34a2205af32683cb7b92c6777c00426b7fd0d57cdb36d33cb1b",
+      "outcome": "returned",
+      "probe": "json-expanded-path-budget",
+      "returned_keys": 65,
+      "total_pointer_utf8_bytes": 133559
+    },
+    {
+      "children": 128,
+      "configured_max_bytes": 8192,
+      "configured_max_keys": 129,
+      "input_bytes": 3352,
+      "input_sha256": "d27f949ee8ffa992db996d8bf0136d74a211f4e0432a1754066ebf82630bc16c",
+      "outcome": "returned",
+      "probe": "json-expanded-path-budget",
+      "returned_keys": 129,
+      "total_pointer_utf8_bytes": 265107
+    },
+    {
+      "children": 256,
+      "configured_max_bytes": 8192,
+      "configured_max_keys": 257,
+      "input_bytes": 4760,
+      "input_sha256": "37dc20ba8f4260e658cba41d7b56ce4ee5de7de3e1e4e6f25a963f757470cab7",
+      "outcome": "returned",
+      "probe": "json-expanded-path-budget",
+      "returned_keys": 257,
+      "total_pointer_utf8_bytes": 528275
+    },
+    {
+      "code": "configuration-ini-invalid",
+      "exception_cause_absent": true,
+      "exception_context_absent": true,
+      "input_sha256": "3a17db5e6f864c5ffc1acd7e9e3a1d62c7dc2faeb8f15302b609d18fde8f9d03",
+      "probe": "ini-delimiter-free-line",
+      "seconds": 0.00499010001658462,
+      "source_redacted": true,
+      "spaces": 1024
+    },
+    {
+      "code": "configuration-ini-invalid",
+      "exception_cause_absent": true,
+      "exception_context_absent": true,
+      "input_sha256": "e2a263dedb3592aa025a4f9f30fd79922c0a357c825b23fde7dde477f503e667",
+      "probe": "ini-delimiter-free-line",
+      "seconds": 0.01947139998083003,
+      "source_redacted": true,
+      "spaces": 2048
+    },
+    {
+      "code": "configuration-ini-invalid",
+      "exception_cause_absent": true,
+      "exception_context_absent": true,
+      "input_sha256": "688fdf493e7ba290f51e963976178e20df7be755ea63f294a9750e3ec1c8ffcb",
+      "probe": "ini-delimiter-free-line",
+      "seconds": 0.07802990000345744,
+      "source_redacted": true,
+      "spaces": 4096
+    },
+    {
+      "input_sha256": "603f2e5a7f920e556083b4516dda4488958f8e70ae1942ca79dbd7083a4a0457",
+      "probe": "ini-unicode-value-separator",
+      "records": [
+        {
+          "conditional": false,
+          "kind": "ini-section",
+          "line": 1,
+          "name": "S",
+          "origin_pointer": null,
+          "pointer": "/section_declarations/0"
+        },
+        {
+          "conditional": false,
+          "kind": "ini-key",
+          "line": 2,
+          "name": "K",
+          "origin_pointer": null,
+          "pointer": "/sections/S/K"
+        },
+        {
+          "conditional": false,
+          "kind": "ini-key",
+          "line": 3,
+          "name": "End",
+          "origin_pointer": null,
+          "pointer": "/sections/S/End"
+        }
+      ],
+      "source_redacted": true
+    },
+    {
+      "code": "configuration-limit",
+      "context_absent": true,
+      "input_sha256": "f35d06032780cc530c5ff07f4ef03591cb5fe7503b623e10bdaeedf50bf35250",
+      "probe": "ini-physical-line-limit"
+    }
+  ],
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "started_at": "2026-10-19T06:02:55.622230+00:00",
+  "suite_replayed": false,
+  "task": "P4-T4"
+}

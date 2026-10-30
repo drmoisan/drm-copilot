@@ -1,0 +1,195 @@
+"""Bind only the completed PC1 documentation delta and its repeated scoped proof."""
+import ast
+import base64
+import hashlib
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+F = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+E = F / "evidence/regression-testing"
+S = Path(__file__).parent
+original_path = E / "p5t2-outcomes-freeze.2026-10-20T06-25.json"
+original = json.loads(original_path.read_text(encoding="utf-8"))
+raw_original = json.loads(
+    Path(original["raw_archive"]["path"]).read_text(encoding="utf-8")
+)
+owned = original["owned_paths"]
+changed = [owned[2], owned[3]]
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def archive(raw):
+    return {"sha256": sha(raw), "base64": base64.b64encode(raw).decode("ascii")}
+
+
+def write(path, value):
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8", newline="\n",
+    )
+
+
+def normalized_ast(raw):
+    tree = ast.parse(raw)
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.body
+            and isinstance(node.body[0], ast.Expr)
+            and isinstance(node.body[0].value, ast.Constant)
+            and isinstance(node.body[0].value.value, str)
+        ):
+            node.body = node.body[1:]
+    return ast.dump(tree, include_attributes=False).encode("utf-8")
+
+
+bindings = {}
+for path in owned:
+    current = Path(path).read_bytes()
+    before = base64.b64decode(raw_original["sources"][path]["base64"])
+    assert normalized_ast(current) == normalized_ast(before)
+    assert len(current.splitlines()) <= 500
+    if path not in changed:
+        assert current == before
+    bindings[path] = {
+        "original_sha256": sha(before), "working_sha256": sha(current),
+        "physical_lines": len(current.splitlines()),
+        "executable_ast_sha256": sha(normalized_ast(current)),
+        "executable_ast_equal": True, "documentation_only": path in changed,
+        "working_git_blob": subprocess.check_output(
+            ["git", "hash-object", "--no-filters", path]
+        ).decode().strip(),
+    }
+
+stages = []
+for stage in ("format", "lint", "types", "tests"):
+    path = sorted(E.glob(f"p5t2-outcomes-pc1-{stage}.*.json"))[-1]
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    assert receipt["exit_code"] == 0
+    for source in owned:
+        assert receipt["source_before"][source] == bindings[source]["working_sha256"]
+        assert receipt["source_after"][source] == bindings[source]["working_sha256"]
+    stages.append({**reference(path), "duration_seconds": receipt["duration_seconds"]})
+
+tests = json.loads(Path(stages[-1]["path"]).read_text(encoding="utf-8"))
+stdout = base64.b64decode(tests["stdout"]["base64"]).decode("utf-8")
+nodes = [
+    line.split(" PASSED ", 1)[0]
+    for line in stdout.splitlines()
+    if line.startswith("tests/") and " PASSED " in line
+]
+assert nodes == original["collected_node_order"]
+assert "91 passed in 11.94s" in stdout
+
+coverage_raw = (S / "outcomes-pc1-coverage.json").read_bytes()
+coverage = json.loads(coverage_raw)
+coverage["files"] = {
+    path.replace("\\", "/"): data for path, data in coverage["files"].items()
+}
+old_coverage = json.loads(Path(original["coverage"]["path"]).read_text(encoding="utf-8"))
+units = []
+for path, data in coverage["files"].items():
+    prior = old_coverage["files"][path]
+    for key in ("covered_lines", "num_statements", "missing_lines", "num_branches", "covered_branches", "missing_branches"):
+        assert data["summary"][key] == prior["summary"][key]
+    for node in ast.walk(ast.parse(Path(path).read_bytes())):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        measured = {
+            "path": path, "name": node.name, "kind": type(node).__name__,
+            "start": node.lineno, "end": node.end_lineno,
+            "executed_lines": [line for line in data["executed_lines"] if node.lineno <= line <= node.end_lineno],
+            "missing_lines": [line for line in data["missing_lines"] if node.lineno <= line <= node.end_lineno],
+            "executed_branches": [edge for edge in data["executed_branches"] if node.lineno <= edge[0] <= node.end_lineno],
+            "missing_branches": [edge for edge in data["missing_branches"] if node.lineno <= edge[0] <= node.end_lineno],
+        }
+        old_unit = next(
+            item for item in original["unit_ranges"]
+            if item["path"] == path and item["name"] == node.name and item["kind"] == type(node).__name__
+        )
+        for field in ("executed_lines", "missing_lines", "executed_branches", "missing_branches"):
+            assert len(measured[field]) == len(old_unit[field])
+        measured["same_executable_counts_as_original"] = True
+        units.append(measured)
+
+now = datetime.now(timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+prefix = E / f"p5t2-outcomes-pc1-freeze.{stamp}"
+archive_path = E / f"p5t2-outcomes-pc1-raw-archive.{stamp}.json"
+coverage_path = E / f"p5t2-outcomes-pc1-coverage.{stamp}.json"
+harness_path = E / f"p5t2-outcomes-pc1-freeze-harness.{stamp}.txt"
+write(archive_path, {
+    "changed_sources": {path: archive(Path(path).read_bytes()) for path in changed},
+    "coverage_json": archive(coverage_raw),
+    "coverage_database": archive((S / "outcomes-pc1-tests.coverage").read_bytes()),
+    "precheck_script": archive((S / "check_pc1.py").read_bytes()),
+    "precheck_launcher_qualification": (
+        "An initial inline PowerShell/Python quoting attempt failed before evaluation "
+        "with SyntaxError: unterminated string literal (detected at line1). "
+        "The retained standalone check_pc1.py then verified executable identity. "
+        "No source, test or behavioral result changed because of that launcher error."
+    ),
+})
+write(coverage_path, coverage)
+harness_path.write_bytes(Path(__file__).read_bytes())
+review_path = F / "evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27.json"
+payload = {
+    "task": "P5-T2", "status": "OUTCOME_PC1_REPAIRED_FROZEN_PENDING_CONFIRMATION",
+    "timestamp_utc": now.isoformat(), "original_freeze": reference(original_path),
+    "review": reference(review_path), "owned_bindings": bindings,
+    "ordered_receipts": stages, "test_count": 91, "test_duration_seconds": 11.94,
+    "executed_nodes": nodes, "test_population_and_order_unchanged": True,
+    "coverage": reference(coverage_path), "raw_archive": reference(archive_path),
+    "harness": reference(harness_path), "unit_ranges": units,
+    "borrowed_report_models": {
+        "before_sha256": tests["source_before"]["packages/discovery-runtime/src/drm_copilot_discovery/report_models.py"],
+        "after_sha256": tests["source_after"]["packages/discovery-runtime/src/drm_copilot_discovery/report_models.py"],
+        "qualification": "Only accepted budget/error symbols are consumed; the original freeze contains committed dependency closure.",
+    },
+    "limits": [
+        "Only named PC1 documentation contracts changed; no assertion, parametrization, executable or carrier-field change.",
+        "All earlier baseline, failure, relocation and uncovered-guard qualifications remain authoritative by reference.",
+        "Graph projection, integration, final task gates and acceptance remain pending.",
+    ],
+}
+assert payload["borrowed_report_models"]["before_sha256"] == payload["borrowed_report_models"]["after_sha256"]
+write(Path(str(prefix) + ".json"), payload)
+Path(str(prefix) + ".md").write_text(
+    f"# P5-T2 outcome PC1 repair\n\nTimestamp: {stamp}\n\n"
+    "Command: poetry run python SCRATCH/freeze_outcomes_pc1.py\n\nEXIT_CODE: 0\n\n"
+    "Output Summary: The same 91 cases passed in 11.94 seconds after clean Black, "
+    "Ruff and scoped Pyright. All 26 measured ranges retain their exact prior "
+    "statement and branch counts.\n\n"
+    "Only the listed approval and test contracts changed. Docstring-stripped "
+    "AST identity proves unchanged executable statements, assertions and "
+    "parametrization. The JSON receipt references the immutable original freeze "
+    "and review instead of duplicating predecessor evidence. Exact new raw "
+    "coverage, verbose executed node order and corrected sources are archived. "
+    "Independent confirmation and full task acceptance remain pending.\n",
+    encoding="utf-8", newline="\n",
+)
+stage_path = E / f"p5t2-outcomes-pc1-stage-paths.{stamp}.json"
+old_stage = json.loads(
+    (E / "p5t2-outcomes-stage-paths.2026-10-20T06-25.json").read_text(encoding="utf-8")
+)
+paths = set(old_stage["paths"]) | {path.as_posix() for path in E.glob("p5t2-outcomes-pc1*")}
+paths.add(stage_path.as_posix())
+write(stage_path, {
+    "task": "P5-T2", "freeze": reference(Path(str(prefix) + ".json")),
+    "paths": sorted(paths),
+    "qualification": "Parent adds independent confirmation; no sibling producer or validator file is included.",
+})
+print(json.dumps({
+    "freeze": reference(Path(str(prefix) + ".json")),
+    "stage_paths": reference(stage_path), "test_count": 91,
+    "ranges": len(units), "owned_bindings": bindings,
+}))

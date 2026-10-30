@@ -1,0 +1,76 @@
+"""Capture bounded owner gates with raw stream bytes and portable readable receipts."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+feature = root / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+label = sys.argv[1]
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+kind = "baseline" if label == "baseline" else "regression-testing"
+base = feature / "evidence" / kind
+runtime = "packages/discovery-runtime/src/drm_copilot_discovery/"
+old = "scripts/dev_tools/discovery/completion_report.py"
+old_tests = ["tests/scripts/dev_tools/discovery/test_completion_report.py",
+             "tests/scripts/dev_tools/discovery/test_io.py"]
+if label == "baseline":
+    production, tests = [old], old_tests
+    modules = ["scripts.dev_tools.discovery.completion_report"]
+elif label.startswith("rendering"):
+    production = [runtime + "report_models.py", runtime + "report_rendering.py"]
+    tests = ["tests/discovery_runtime/test_report_rendering.py",
+             "tests/discovery_runtime/test_report_models.py",
+             "tests/scripts/dev_tools/discovery/test_rendering.py"]
+    modules = ["drm_copilot_discovery.report_models", "drm_copilot_discovery.report_rendering"]
+else:
+    production, tests = [old], old_tests
+    modules = ["scripts.dev_tools.discovery.completion_report"]
+paths = production + tests
+before = {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in paths if (root / p).exists()}
+coverage = base / f"p5t3-{label}-coverage.{stamp}.json"
+env = dict(os.environ, COVERAGE_FILE=str(scratch / f"issue-980-p5t3-{label}-{stamp}.coverage"),
+           PYTHONPATH=str(root) + os.pathsep + str(root / "packages/discovery-runtime/src"),
+           PYTHONDONTWRITEBYTECODE="1")
+commands = [
+    ("format", [sys.executable, "-m", "black", "--check", *paths]),
+    ("lint", [sys.executable, "-m", "ruff", "check", *paths]),
+    ("types", [sys.executable, "-m", "pyright", *paths]),
+    ("tests", [sys.executable, "-m", "pytest", "-o", "addopts=", "-p", "no:cacheprovider",
+               *tests, *["--cov=" + m for m in modules], "--cov-branch",
+               "--cov-report=term-missing", "--cov-report=json:" + str(coverage)]),
+]
+results = []
+for stage, command in commands:
+    clock = time.monotonic()
+    output = subprocess.run(command, cwd=root, env=env, capture_output=True, timeout=300)
+    raw = {}
+    for name, data in (("stdout", output.stdout), ("stderr", output.stderr)):
+        target = scratch / f"issue-980-p5t3-{label}-{stage}-{stamp}.{name}.bin"
+        target.write_bytes(data)
+        view = data.decode("utf-8", errors="strict").replace(str(root), "WORKSPACE").replace(str(scratch), "SCRATCH")
+        raw[name] = {"path": "SCRATCH/" + target.name, "sha256": hashlib.sha256(data).hexdigest(),
+                     "readable": view}
+    result = {"stage": stage, "command": [v.replace(str(root), "WORKSPACE").replace(str(scratch), "SCRATCH") for v in command],
+              "exit_code": output.returncode, "seconds": time.monotonic() - clock, "streams": raw}
+    results.append(result)
+    print(json.dumps({"label": label, "stage": stage, "exit_code": output.returncode,
+                      "seconds": result["seconds"]}), flush=True)
+    if output.returncode:
+        print(raw["stdout"]["readable"] + raw["stderr"]["readable"], flush=True)
+        break
+after = {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in before}
+receipt = {"Timestamp": stamp, "label": label, "scope": paths, "before": before, "after": after,
+           "results": results, "coverage": coverage.relative_to(root).as_posix() if coverage.exists() else None,
+           "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+           "raw_policy": "Exact binary streams in SCRATCH; JSON readable strings replace only workspace/scratch absolute paths; CR/LF preserved as escapes.",
+           "status": "focused-pass-not-task-acceptance" if len(results) == 4 and all(r["exit_code"] == 0 for r in results) else "failed"}
+path = base / f"p5t3-{label}-gates.{stamp}.json"
+path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+print(json.dumps({"receipt": path.relative_to(root).as_posix(), "status": receipt["status"]}), flush=True)
+sys.exit(results[-1]["exit_code"])

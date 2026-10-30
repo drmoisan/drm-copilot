@@ -1,0 +1,19 @@
+{
+  "task": "P6-T1",
+  "timestamp_utc": "2026-10-20T15:21:32.704785+00:00",
+  "path": "tests/discovery_runtime/test_service_result_limits.py",
+  "exists": false,
+  "approval": "Parent approved exact result-limit test split.",
+  "trigger": "326-line existing tests plus required counted controls exceed 500 lines.",
+  "scope": "New SR1/SR2/SC1 counted enum/manifest/resource controls only; originals retained.",
+  "references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+      "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.json",
+      "sha256": "e17cb15a5550b54975c7986de62ef68c676459d403869a51af3e011a0053c30d"
+    }
+  ]
+}

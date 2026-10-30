@@ -1,0 +1,38 @@
+[
+  {
+    "name": "python310_tomllib_absence",
+    "Timestamp": "2026-10-20T15-05",
+    "Command": "poetry run python -B -c import sys; sys.dont_write_bytecode=True; sys.path.insert(0,\"packages/discovery-runtime/src\"); sys.modules[\"tomllib\"]=None; import scripts.dev_tools.discovery_build_identity",
+    "EXIT_CODE": 1,
+    "ExpectedExitCode": 1,
+    "Output Summary": "Traceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n    import sys; sys.dont_write_bytecode=True; sys.path.insert(0,\"packages/discovery-runtime/src\"); sys.modules[\"tomllib\"]=None; import scripts.dev_tools.discovery_build_identity\r\n                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"WORKSPACE\\scripts\\dev_tools\\discovery_build_identity.py\", line 11, in <module>\r\n    import tomllib\r\nModuleNotFoundError: import of tomllib halted; None in sys.modules\r\n",
+    "scope": "Bounded simulated API and in-memory boundary probes; actual Python 3.13.12, not an older-interpreter execution"
+  },
+  {
+    "name": "python311_path_api",
+    "Timestamp": "2026-10-20T15-05",
+    "Command": "poetry run python -B -c import sys; sys.dont_write_bytecode=True; sys.path.insert(0,\"packages/discovery-runtime/src\"); from scripts.dev_tools.discovery_build_identity import list_build_source_files; LegacyPath=type(\"LegacyPath\",(),{\"__truediv__\":lambda self,part:self,\"is_symlink\":lambda self:False}); list_build_source_files(LegacyPath())",
+    "EXIT_CODE": 1,
+    "ExpectedExitCode": 1,
+    "Output Summary": "Traceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n    import sys; sys.dont_write_bytecode=True; sys.path.insert(0,\"packages/discovery-runtime/src\"); from scripts.dev_tools.discovery_build_identity import list_build_source_files; LegacyPath=type(\"LegacyPath\",(),{\"__truediv__\":lambda self,part:self,\"is_symlink\":lambda self:False}); list_build_source_files(LegacyPath())\r\n                                                                                                                                                                                                                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\r\n  File \"WORKSPACE\\scripts\\dev_tools\\discovery_build_identity.py\", line 48, in list_build_source_files\r\n    if root.is_symlink() or root.is_junction():\r\n                            ^^^^^^^^^^^^^^^^\r\nAttributeError: 'LegacyPath' object has no attribute 'is_junction'\r\n",
+    "scope": "Bounded simulated API and in-memory boundary probes; actual Python 3.13.12, not an older-interpreter execution"
+  },
+  {
+    "name": "legacy_junction_detection",
+    "Timestamp": "2026-10-20T15-05",
+    "Command": "poetry run python -B -c import sys; sys.dont_write_bytecode=True; sys.path.insert(0,\"packages/discovery-runtime/src\"); from pathlib import Path; from types import SimpleNamespace; from drm_copilot_discovery import build_identity as b; Path.is_symlink=lambda self:False; Path.is_junction=lambda self:True; b.sys=SimpleNamespace(version_info=(3,11)); print(\"simulated_python=3.11 junction=True linked=\"+str(b._linked(Path(\"memory\"))))",
+    "EXIT_CODE": 0,
+    "ExpectedExitCode": 0,
+    "Output Summary": "simulated_python=3.11 junction=True linked=False\r\n",
+    "scope": "Bounded simulated API and in-memory boundary probes; actual Python 3.13.12, not an older-interpreter execution"
+  },
+  {
+    "name": "prospective_directory_allocation",
+    "Timestamp": "2026-10-20T15-05",
+    "Command": "poetry run python -B -c import sys; sys.dont_write_bytecode=True; sys.path.insert(0,\"packages/discovery-runtime/src\"); import os,pytest; from pathlib import Path; from types import SimpleNamespace; from contextlib import nullcontext; from drm_copilot_discovery import build_identity as b; from drm_copilot_discovery.models import ParseLimits; seen=[]; os.scandir=lambda path:nullcontext((seen.append(i) or SimpleNamespace(path=\"memory/entry\"+str(i)+\".py\") for i in range(4))); Path.is_symlink=lambda self:False; Path.is_junction=lambda self:False; Path.is_dir=lambda self:False; Path.is_file=lambda self:True; b.files=lambda anchor:Path(\"memory\"); error=pytest.raises(ValueError,b.PackageBuildStore().paths,limits=ParseLimits(artifact_records=1)); print(\"artifact_records_limit=1 enumerated_before_rejection=\"+str(len(seen))+\" error=\"+str(error.value))",
+    "EXIT_CODE": 0,
+    "ExpectedExitCode": 0,
+    "Output Summary": "artifact_records_limit=1 enumerated_before_rejection=4 error=Package enumeration exceeds limits\r\n",
+    "scope": "Bounded simulated API and in-memory boundary probes; actual Python 3.13.12, not an older-interpreter execution"
+  }
+]

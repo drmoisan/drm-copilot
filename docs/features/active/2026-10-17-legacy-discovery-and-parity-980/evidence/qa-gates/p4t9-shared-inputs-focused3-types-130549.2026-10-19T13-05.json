@@ -1,0 +1,51 @@
+{
+  "batch": "focused3",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py tests/discovery_runtime/test_extension_inputs.py tests/discovery_runtime/test_extension_input_limits.py tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+  "dependencies_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "dependencies_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "exit_code": 1,
+  "finished_at": "2026-10-19T13:05:49.494176+00:00",
+  "harness": {
+    "path": "SCRATCH/issue-980-shared-inputs-focused.py",
+    "sha256": "244b9a2728fd848f053ccb8a3b827a6163a2c09df28190c36dc5adde5b455b7f"
+  },
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t9-shared-inputs-focused3-types-130549.2026-10-19T13-05.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t9-shared-inputs-focused3-types-130549.2026-10-19T13-05.stdout.txt",
+      "sha256": "670cf62e2e9e517c0a83370dae0a4f743be0cddde9a79013e0427e074d06be4e"
+    }
+  },
+  "seconds": 1.058319,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "f97d0d5978829ed253a5904a820b14c421bcb2070b660f1658b2bb22f9ca2ddd",
+    "tests/discovery_runtime/test_extension_input_limits.py": "9c2f54351c5e6b56a7b892eb022fd77289e6b0db62170f0664a71095add6fd31",
+    "tests/discovery_runtime/test_extension_inputs.py": "db4c827845711c73c0142f2359e4da324d356c342637fdd7286d8820c83f0c21"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "f97d0d5978829ed253a5904a820b14c421bcb2070b660f1658b2bb22f9ca2ddd",
+    "tests/discovery_runtime/test_extension_input_limits.py": "9c2f54351c5e6b56a7b892eb022fd77289e6b0db62170f0664a71095add6fd31",
+    "tests/discovery_runtime/test_extension_inputs.py": "db4c827845711c73c0142f2359e4da324d356c342637fdd7286d8820c83f0c21"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T13:05:48.435857+00:00",
+  "stderr": "",
+  "stdout": "WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\emitter.py\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\emitter.py:138:16 - error: Unnecessary isinstance call; \"str\" is always an instance of \"str\" (reportUnnecessaryIsInstance)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\emitter.py:146:16 - error: Unnecessary isinstance call; \"JsonObject\" is always an instance of \"JsonObject\" (reportUnnecessaryIsInstance)\nWORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\extension_inputs.py\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\extension_inputs.py:298:16 - error: Unnecessary isinstance call; \"RepositoryFile\" is always an instance of \"RepositoryFile\" (reportUnnecessaryIsInstance)\nWORKSPACE\\tests\\discovery_runtime\\test_extension_inputs.py\n  WORKSPACE\\tests\\discovery_runtime\\test_extension_inputs.py:167:5 - error: Type of \"analyzers\" is partially unknown\n  \u00a0\u00a0Type of \"analyzers\" is \"dict[str, list[str] | dict[Unknown, Unknown]]\" (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\test_extension_inputs.py:173:56 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"analyzers\" in function \"capture_case\"\n  \u00a0\u00a0Argument type is \"dict[str, list[str] | dict[Unknown, Unknown]]\" (reportUnknownArgumentType)\n  WORKSPACE\\tests\\discovery_runtime\\test_extension_inputs.py:179:54 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"analyzers\" in function \"capture_case\"\n  \u00a0\u00a0Argument type is \"dict[str, list[str] | dict[Unknown, Unknown]]\" (reportUnknownArgumentType)\n6 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T13-05"
+}

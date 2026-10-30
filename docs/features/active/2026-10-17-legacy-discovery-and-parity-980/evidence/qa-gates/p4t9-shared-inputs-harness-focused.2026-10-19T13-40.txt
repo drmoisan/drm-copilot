@@ -1,0 +1,81 @@
+"""Retain isolated shared-contract gates and exact source/dependency bindings."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+evidence = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence'
+production = ['packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py', 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py']
+test_paths = ['tests/discovery_runtime/test_extension_inputs.py', 'tests/discovery_runtime/test_extension_input_limits.py', 'tests/discovery_runtime/analyzer/test_emitter_extensions.py']
+callers = ['tests/discovery_runtime/analyzer/test_pipeline.py', 'tests/scripts/dev_tools/discovery/analyzer/test_emitter.py']
+paths = production + test_paths
+shared = ['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py']
+batch = sys.argv[1]
+apply_format = '--apply-format' in sys.argv
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def hashes(selected):
+    return {path: sha((root / path).read_bytes()) for path in selected}
+
+def portable(value):
+    for path, label in ((root, 'WORKSPACE'), (scratch, 'SCRATCH')):
+        value = re.sub(re.escape(str(path)), label, value, flags=re.IGNORECASE)
+        value = re.sub(re.escape(path.as_posix()), label, value, flags=re.IGNORECASE)
+    return value
+
+initial = hashes(paths)
+dependencies = hashes(shared + callers)
+receipts = []
+
+def run(stage, args):
+    before = hashes(paths)
+    assert hashes(shared + callers) == dependencies
+    started = datetime.datetime.now(datetime.timezone.utc)
+    environment = dict(os.environ, PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1', COVERAGE_FILE=str(scratch / (batch + '.coverage')))
+    result = subprocess.run([sys.executable, '-m', *args], capture_output=True, env=environment)
+    finish = datetime.datetime.now(datetime.timezone.utc)
+    stamp = finish.strftime('%Y-%m-%dT%H-%M')
+    stem = 'p4t9-shared-inputs-' + batch + '-' + stage + '-' + finish.strftime('%H%M%S') + '.' + stamp
+    raw = {}
+    for label, data in (('stdout', result.stdout), ('stderr', result.stderr)):
+        target = scratch / (stem + '.' + label + '.txt')
+        target.write_bytes(data)
+        raw[label] = {'path': 'SCRATCH/' + target.name, 'sha256': sha(data)}
+    record = {'task': 'P4-T9', 'batch': batch, 'stage': stage, 'timestamp': stamp, 'started_at': started.isoformat(), 'finished_at': finish.isoformat(), 'seconds': (finish-started).total_seconds(), 'command': portable('poetry run python -m ' + subprocess.list2cmdline(args)), 'exit_code': result.returncode, 'source_before': before, 'source_after': hashes(paths), 'dependencies_before': dependencies, 'dependencies_after': hashes(shared + callers), 'raw': raw, 'stdout': portable(result.stdout.decode('utf-8', errors='replace')), 'stderr': portable(result.stderr.decode('utf-8', errors='replace')), 'harness': {'path': 'SCRATCH/' + Path(__file__).name, 'sha256': sha(Path(__file__).read_bytes())}}
+    if stage.startswith('tests'):
+        record['test_node_order'] = re.findall(r'^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)', record['stdout'], flags=re.MULTILINE)
+    record['phase'] = 'tests' if stage.startswith('tests') else stage
+    kind = 'regression-testing' if stage.startswith('tests') else 'qa-gates'
+    target = evidence / kind / (stem + '.json')
+    target.write_text(json.dumps(record, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+    markdown = f'# P4-T9 Shared Inputs {batch} {stage}\n\nTimestamp: {stamp}\nCommand: `{record["command"]}`\nEXIT_CODE: {result.returncode}\nOutput Summary: Isolated development gate; exact input and raw-output bindings are in the paired JSON.\n\n```text\n{record["stdout"]}{record["stderr"]}\n```\n'
+    target.with_suffix('.md').write_text('\n'.join(line.rstrip() for line in markdown.splitlines())+'\n', encoding='utf-8', newline='\n')
+    receipts.append({'path': target.relative_to(root).as_posix(), 'sha256': sha(target.read_bytes())})
+    print(json.dumps({'stage': stage, 'exit_code': result.returncode, 'seconds': record['seconds'], 'receipt': target.relative_to(root).as_posix()}), flush=True)
+    if result.returncode or record['source_after'] != before or record['dependencies_after'] != dependencies:
+        print((record['stdout'] + record['stderr']).encode('ascii', errors='backslashreplace').decode('ascii'))
+        raise SystemExit(result.returncode or 1)
+
+run('format', ['black', *([] if apply_format else ['--check']), *paths])
+run('lint', ['ruff', 'check', *paths])
+run('types', ['pyright', *paths])
+run('tests-fixture-precheck', ['pytest', '-v', '-o', 'addopts=', 'tests/discovery_runtime/test_extension_input_limits.py::test_projected_mappings_reserve_records_before_row_construction'])
+coverage = scratch / ('p4t9-shared-inputs-' + batch + '-coverage.raw.json')
+run('tests', ['pytest', '-v', '-o', 'addopts=', *test_paths, *callers, '--cov=drm_copilot_discovery.extension_inputs', '--cov=drm_copilot_discovery.analyzer.emitter', '--cov-branch', '--cov-report=term-missing', '--cov-report=json:' + str(coverage)])
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+data = json.loads(coverage.read_bytes())
+data['files'] = {portable(key).replace('\\', '/'): value for key, value in data['files'].items()}
+target = evidence / 'regression-testing' / ('p4t9-shared-inputs-' + batch + '-coverage.' + stamp + '.json')
+target.write_text(json.dumps(data, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+record = {'task': 'P4-T9', 'batch': batch, 'timestamp': stamp, 'initial_sources': initial, 'sources': hashes(paths), 'dependencies': dependencies, 'receipts': receipts, 'coverage': {'path': target.relative_to(root).as_posix(), 'sha256': sha(target.read_bytes()), 'raw_path': 'SCRATCH/' + coverage.name, 'raw_sha256': sha(coverage.read_bytes())}}
+binding = evidence / 'qa-gates' / ('p4t9-shared-inputs-' + batch + '-binding.' + stamp + '.json')
+binding.write_text(json.dumps(record, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+print(json.dumps({'binding': binding.relative_to(root).as_posix(), 'coverage': data['totals']}), flush=True)

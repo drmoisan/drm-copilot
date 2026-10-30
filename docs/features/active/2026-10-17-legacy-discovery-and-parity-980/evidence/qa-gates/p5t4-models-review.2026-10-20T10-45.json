@@ -1,0 +1,228 @@
+{
+  "Timestamp": "2026-10-20T10-45",
+  "Command": "Bounded independent source, UTF-8 archive, receipt, AST range and Git-binding reconciliation; no behavioral execution",
+  "EXIT_CODE": 0,
+  "status": "READY_FOR_CHECKED_MODEL_SUBSET_COMMIT",
+  "task": "P5-T4",
+  "task_acceptance": false,
+  "authority": {
+    "delegation_id": "rendering_review_p5t4_models_20261020",
+    "phase": "S5_P5T4_models_review",
+    "agent_id": "01a1587f-5823-7210-9d39-169420f2da62",
+    "agent_type": "atomic-executor-c3-elevated",
+    "model": "gpt-6-astra",
+    "effort": "high",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true,
+    "qualification": "Existing native SubagentStart attestation independently reread; current persisted route verified for this resumed bounded review."
+  },
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+    "tests/discovery_runtime/test_acceptance_properties.py"
+  ],
+  "findings": [],
+  "source_review": {
+    "identity": "Eight explicit canonical members, immutable exact types, strict identifier spelling, full SHA-256 scenario ID; pins and mutable content excluded.",
+    "carriers": "Bounded immutable documents with separate repository ownership; detached serialization; model consistency alone establishes no semantic acceptance.",
+    "tags": "Exact spelling preserved; sorted unique tags; offline only for actual offline mode; mobile only for explicit boolean applicability supplied by generation.",
+    "aggregate": "Tuple/population caps precede traversal. Aggregate bytes, nodes, records and work are reserved before retained keys/content, hashing, sorting and findings retention. No partial successful result on exhaustion.",
+    "collisions": "Equal identity with differing content/owner and equal output ID for unequal keys fail; exact duplicates deduplicate deterministically.",
+    "ready": "Exact unique candidate subset with ready document state; blocking findings prohibit ready output. Final public-rule membership remains generator responsibility.",
+    "policy": "Production 418 lines; test 475 lines. Intent documentation covers all new callables. Tests use immutable in-memory fixtures and deterministic monkeypatches; no external I/O, temporary files, timing assertions, new dependencies or suppressions."
+  },
+  "proof": {
+    "ordered_receipts": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-format.2026-10-20T10-36.json",
+        "started": "2026-10-20T10:36:33.784730+00:00",
+        "finished": "2026-10-20T10:36:35.544971+00:00",
+        "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py tests/discovery_runtime/test_acceptance_properties.py",
+        "sha256": "e27fa50a54f0e12335c69e7ac29ce17a4e3f26c827bc92e2782f6c88cea34c7d"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-lint.2026-10-20T10-36.json",
+        "started": "2026-10-20T10:36:35.548785+00:00",
+        "finished": "2026-10-20T10:36:36.795041+00:00",
+        "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py tests/discovery_runtime/test_acceptance_properties.py",
+        "sha256": "84b04921a5b04d77c980adda9cafc59667fee5758aabc29d79c2cb1ccfa192ff"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-types.2026-10-20T10-36.json",
+        "started": "2026-10-20T10:36:36.800654+00:00",
+        "finished": "2026-10-20T10:36:38.926419+00:00",
+        "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py tests/discovery_runtime/test_acceptance_properties.py",
+        "sha256": "c635a7aef216a8ebead2a1a38c0bedcff7827fbb4e317c0b6a4cfc60a6a0ecf9"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-tests.2026-10-20T10-36.json",
+        "started": "2026-10-20T10:36:38.931994+00:00",
+        "finished": "2026-10-20T10:36:41.160047+00:00",
+        "command": "poetry run python SCRATCH\\tests.py",
+        "sha256": "b1628621295a97de5b2f47f2846c31e28f161502d53040931f14884809e4ef48"
+      }
+    ],
+    "passed": 70,
+    "failed": 0,
+    "module_statements": "180/180",
+    "module_branch_arcs": "82/82",
+    "qualified_functions": [
+      {
+        "name": "_identifier",
+        "start": 28,
+        "end": 49,
+        "statements": 14,
+        "branches": 12,
+        "coverage_percent": 100
+      },
+      {
+        "name": "AcceptanceIdentity.__post_init__",
+        "start": 81,
+        "end": 87,
+        "statements": 1,
+        "branches": 0,
+        "coverage_percent": 100
+      },
+      {
+        "name": "AcceptanceIdentity.key",
+        "start": 89,
+        "end": 140,
+        "statements": 21,
+        "branches": 20,
+        "coverage_percent": 100
+      },
+      {
+        "name": "AcceptanceIdentity.scenario_id",
+        "start": 142,
+        "end": 148,
+        "statements": 1,
+        "branches": 0,
+        "coverage_percent": 100
+      },
+      {
+        "name": "acceptance_tags",
+        "start": 151,
+        "end": 200,
+        "statements": 27,
+        "branches": 14,
+        "coverage_percent": 100
+      },
+      {
+        "name": "AcceptanceSpecification.__post_init__",
+        "start": 224,
+        "end": 261,
+        "statements": 18,
+        "branches": 12,
+        "coverage_percent": 100
+      },
+      {
+        "name": "AcceptanceSpecification.to_dict",
+        "start": 263,
+        "end": 270,
+        "statements": 2,
+        "branches": 0,
+        "coverage_percent": 100
+      },
+      {
+        "name": "AcceptanceSpecification.to_json",
+        "start": 272,
+        "end": 279,
+        "statements": 2,
+        "branches": 0,
+        "coverage_percent": 100
+      },
+      {
+        "name": "_finding_fields",
+        "start": 282,
+        "end": 297,
+        "statements": 1,
+        "branches": 0,
+        "coverage_percent": 100
+      },
+      {
+        "name": "_encoded",
+        "start": 300,
+        "end": 309,
+        "statements": 4,
+        "branches": 0,
+        "coverage_percent": 100
+      },
+      {
+        "name": "AcceptanceGeneration.__post_init__",
+        "start": 333,
+        "end": 418,
+        "statements": 47,
+        "branches": 24,
+        "coverage_percent": 100
+      }
+    ],
+    "ast_ranges_verified": 14,
+    "range_qualification": "The 14 AST ranges include three classes and 11 executable callables. Named coverage.py function summaries exclude declaration statements counted by module/range metrics. End lines come from exact source AST, not an absent coverage.py end_line.",
+    "baseline": "Model and property test absent at accepted predecessor 25a66a8cf74842d8e2f99989f6a6b4efb075e58f; no changed predecessor lines or lost changed coverage.",
+    "archive_entries_verified": 7,
+    "raw_readable_streams_verified": 24,
+    "reports_verified": 210,
+    "normalization": "Exact base64 raw bytes and SHA-256 verified; readable streams match only observed WORKSPACE/SCRATCH alias replacement. Raw coverage and nodes payloads equal lossless archive.",
+    "retained_fixture_failure": "69 passed, one fixture failure retained. Explicit UTF-8 comparison confirms one construction-only replacement invoking AcceptanceGeneration directly before findings deduplication. Production unchanged.",
+    "fixture_diff": "--- \n+++ \n@@ -454,7 +454,12 @@\n         code=\"REVIEW\", message=\"Review.\", next_action=\"Inspect.\", severity=\"warning\"\n     )\n     with pytest.raises(ReportLimitError):\n-        generation(findings=(warning, warning), limits=ParseLimits(findings=1))\n+        AcceptanceGeneration(\n+            specifications=(),\n+            ready=(),\n+            findings=(warning, warning),\n+            limits=ParseLimits(findings=1),\n+        )\n \n \n def test_hash_collision_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:\n",
+    "reader_diagnostic": "First diff used platform-default decoding and displayed mojibake; explicit UTF-8 retry verifies exactly one fixture-construction hunk. Source bytes and archive hashes were unchanged.",
+    "behavioral_replays": 0
+  },
+  "dependency_closure": {
+    "accepted_predecessor": "25a66a8cf74842d8e2f99989f6a6b4efb075e58f",
+    "modules": {
+      "acceptance_models": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+        "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a"
+      },
+      "repository_reader": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+        "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd"
+      },
+      "path_models": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+        "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab"
+      },
+      "findings": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+        "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+      },
+      "report_models": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+      },
+      "report_rendering": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2"
+      },
+      "models": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+        "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+      },
+      "rendering": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+        "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08"
+      },
+      "parsing": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+        "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b"
+      }
+    },
+    "committed_dependencies_match": true,
+    "generation_or_context_dependency": false,
+    "specification_inverse_matches_predecessor": true
+  },
+  "staging_contract": {
+    "owner_manifest": "evidence/regression-testing/p5t4-models-staging.2026-10-20T10-38.json",
+    "owner_manifest_sha256": "5e0612662c9446bfad51964d37468ed060a8ba1ac9f23fc6c244c59ab831ee00",
+    "union_receipt": "p5t4-models-review.staging.2026-10-20T10-45.json",
+    "prerequisites": "Includes exact baseline/contract/spec clarification and preparation receipts; P5-T5 preparation included only because frozen baseline references it.",
+    "exclusions": "Unfinished acceptance_generation/context, generation tests and evidence; checkpoint, plan, task/AC checkoffs and unrelated workspace changes."
+  },
+  "effects": {
+    "source_test_spec_plan_checkpoint_git_mutation": false,
+    "tests_executed": false,
+    "evidence_only": true
+  }
+}

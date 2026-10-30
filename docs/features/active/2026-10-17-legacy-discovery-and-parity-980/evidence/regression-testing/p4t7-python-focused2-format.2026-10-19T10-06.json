@@ -1,0 +1,45 @@
+{
+  "stage": "format",
+  "label": "p4t7-python-focused2-format",
+  "started": "2026-10-19T10:06:51.164449+00:00",
+  "finished": "2026-10-19T10:06:52.645640+00:00",
+  "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py tests/discovery_runtime/analyzer/test_dependency_python.py",
+  "exit_code": 0,
+  "duration_seconds": 1.481,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "689fa1aa6545c404d689b390325ba3221610f801bdd856eb970ff22acaaa96b2",
+      "physical_lines": 263
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "9eaf028cca40d194fc521488b465a3170bf5704c15ab61733e6711c29496dfa1",
+      "physical_lines": 283
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "689fa1aa6545c404d689b390325ba3221610f801bdd856eb970ff22acaaa96b2",
+      "physical_lines": 263
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "9eaf028cca40d194fc521488b465a3170bf5704c15ab61733e6711c29496dfa1",
+      "physical_lines": 283
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused2-format-100652.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused2-format-100652.stderr.bin",
+      "raw_sha256": "42952929f98ff284b84ffc33f5fca4e517620f9b2ceb3fca1375e504affa8195",
+      "raw_bytes": 58,
+      "presentation": "All done! \u2728 \ud83c\udf70 \u2728\r\n2 files would be left unchanged.\r\n"
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 Python parser only"
+}

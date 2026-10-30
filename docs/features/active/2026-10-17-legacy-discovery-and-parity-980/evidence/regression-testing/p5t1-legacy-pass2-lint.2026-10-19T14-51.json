@@ -1,0 +1,117 @@
+{
+  "stage": "lint",
+  "label": "p5t1-legacy-pass2-lint",
+  "started": "2026-10-19T14:51:48.024508+00:00",
+  "finished": "2026-10-19T14:51:49.178426+00:00",
+  "command": "poetry run ruff check scripts/dev_tools/discovery/coverage_report.py tests/scripts/dev_tools/discovery/test_coverage_report.py tests/scripts/dev_tools/discovery/test_rendering.py",
+  "exit_code": 1,
+  "duration_seconds": 1.154,
+  "source_before": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "5027c2059d6c0ca5939bd3957b741ff9f61abd7797941a2a7b1bfdcc478a4cbc",
+      "physical_lines": 123
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "bbf3cfe7f4ee63c472b5c9de1a13fbc869f10d149e1f04d9834097ffe9729413",
+      "physical_lines": 394
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ee14298ea7c4631a3ac7d91b4bf04899ac7b24917ea51d74c5297ff76ee4c823",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "5027c2059d6c0ca5939bd3957b741ff9f61abd7797941a2a7b1bfdcc478a4cbc",
+      "physical_lines": 123
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "bbf3cfe7f4ee63c472b5c9de1a13fbc869f10d149e1f04d9834097ffe9729413",
+      "physical_lines": 394
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ee14298ea7c4631a3ac7d91b4bf04899ac7b24917ea51d74c5297ff76ee4c823",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass2-lint-145149.stdout.bin",
+      "raw_sha256": "3f72c591c93f9c0e89f8f70bbf646530c621085899a6117dfe475256e25aade3",
+      "raw_bytes": 1761,
+      "presentation": "I001 [*] Import block is un-sorted or un-formatted\n  --> scripts\\dev_tools\\discovery\\coverage_report.py:8:1\n   |\n 6 |   \"\"\"\n 7 |\n 8 | / from __future__ import annotations\n 9 | |\n10 | | import argparse\n11 | | import sys\n12 | | from pathlib import Path\n13 | | from typing import TYPE_CHECKING\n14 | |\n15 | | from drm_copilot_discovery.report_models import (\n16 | |     build_coverage_rows as build_coverage_rows,\n17 | |     parse_coverage_ledger as parse_coverage_ledger,\n18 | |     render_coverage_report as render_coverage_report,\n19 | | )\n20 | |\n21 | | from scripts.dev_tools.discovery.io import (\n22 | |     ArtifactValidationError,\n23 | |     ArtifactValidator,\n24 | |     read_artifact_text,\n25 | |     validate_or_raise,\n26 | |     write_report,\n27 | | )\n   | |_^\n28 |\n29 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nE501 Line too long (89 > 88)\n   --> tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:261:89\n    |\n259 |     helper: str, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]\n260 | ) -> None:\n261 |     \"\"\"For helper (str), catch ValueError without exposing its source-bearing message.\"\"\"\n    |                                                                                         ^\n262 |     writes: list[str] = []\n    |\n\nE501 Line too long (90 > 88)\n  --> tests\\scripts\\dev_tools\\discovery\\test_rendering.py:92:89\n   |\n91 | def test_coverage_adapter_retains_pretty_json_escaping_and_single_lf() -> None:\n92 |     \"\"\"Retain deterministic legacy bytes for Unicode/newlines without external effects.\"\"\"\n   |                                                                                         ^^\n93 |     rows: list[dict[str, object]] = [\n94 |         {\n   |\n\nFound 3 errors.\n[*] 1 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass2-lint-145149.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "P5-T1 legacy coverage adapter subset"
+}

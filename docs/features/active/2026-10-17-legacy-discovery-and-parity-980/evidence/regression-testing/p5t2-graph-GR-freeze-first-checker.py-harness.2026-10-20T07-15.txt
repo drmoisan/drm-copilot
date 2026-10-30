@@ -1,0 +1,234 @@
+"""Bind the repaired candidate and new proof without replaying accepted suites."""
+from __future__ import annotations
+
+import ast
+import base64
+import difflib
+import gzip
+import hashlib
+import json
+import re
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+OUT = FEATURE / "evidence/regression-testing"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+PRE_PATH = OUT / "p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json"
+PRE = json.loads(PRE_PATH.read_text())
+RECEIPT = OUT / "p5t2-graph-GR-repair7-tests.2026-10-20T07-07.json"
+PROOF = json.loads(RECEIPT.read_text())
+SOURCES = [row["path"] for row in PRE["sources_and_tests"][:3]]
+TESTS = [row["path"] for row in PRE["sources_and_tests"][3:]] + [
+    "tests/discovery_runtime/test_parity_axes.py"]
+
+
+def sha(raw: bytes) -> str:
+    """Return an exact byte identity without interpreting content."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def ref(path: Path) -> dict[str, object]:
+    """Bind an existing workspace artifact using a relative location."""
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(),
+            "sha256": sha(raw), "bytes": len(raw)}
+
+
+def save(name: str, value: object) -> Path:
+    """Write a new LF-only canonical JSON artifact at the current write minute."""
+    path = OUT / f"{name}.{STAMP}.json"
+    path.write_bytes((json.dumps(value, indent=2, sort_keys=True) + "\n").encode())
+    return path
+
+
+def definitions(tree: ast.AST, prefix: str = "") -> dict[str, ast.AST]:
+    """Index qualified definitions for raw-range coverage and exact comparisons."""
+    result: dict[str, ast.AST] = {}
+    for node in ast.iter_child_nodes(tree):
+        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            name = prefix + node.name
+            result[name] = node
+            result.update(definitions(node, name + "."))
+    return result
+
+
+assert PROOF["clean"] and PROOF["before"] == PROOF["after"]
+for path, expected in PROOF["after"].items():
+    assert sha((ROOT / path).read_bytes()) == expected, path
+nodes = re.findall(r"(?m)^(tests/.+?) PASSED(?:\s|$)", PROOF["stdout"])
+assert len(nodes) == len(set(nodes)) == 58
+assert set(PRE["executed_nodes"]) <= set(nodes)
+current_coverage = SCRATCH / "p5t2-graph-GR-repair7-coverage.json"
+coverage = json.loads(current_coverage.read_text())
+coverage_path = OUT / f"p5t2-graph-GR-coverage.{STAMP}.json"
+coverage_path.write_bytes(current_coverage.read_bytes())
+
+# Reuse the immutable pre-repair source archive to prove the exact authorized delta.
+old_archive = json.loads((ROOT / PRE["raw_archive"]["path"]).read_text())
+old_sources = {}
+for path in SOURCES + TESTS[:-1]:
+    member = old_archive["members"][path]
+    raw = gzip.decompress(base64.b64decode(member["data"]))
+    assert sha(raw) == member["sha256"]
+    old_sources[path] = raw.decode()
+for path in SOURCES:
+    before = definitions(ast.parse(old_sources[path]))
+    after = definitions(ast.parse((ROOT / path).read_text()))
+    for name, old in before.items():
+        if path.endswith("/parity_metrics.py") and name in {
+                "ParityProjection", "ParityProjection.axes"}:
+            continue
+        assert ast.dump(old) == ast.dump(after[name]), (path, name)
+assertions_retained = {}
+for path in TESTS[:-1]:
+    old = ast.parse(old_sources[path])
+    new = ast.parse((ROOT / path).read_text())
+    old_asserts = [ast.dump(node) for node in ast.walk(old)
+                   if isinstance(node, ast.Assert)]
+    new_asserts = [ast.dump(node) for node in ast.walk(new)
+                   if isinstance(node, ast.Assert)]
+    assert old_asserts == new_asserts, path
+    assertions_retained[path] = len(old_asserts)
+old_helper = definitions(ast.parse(old_sources[TESTS[0]]))["_assessed_projection"]
+new_helper = definitions(ast.parse((ROOT / TESTS[0]).read_text()))["assessed_projection"]
+old_helper.name = new_helper.name
+assert ast.dump(old_helper) == ast.dump(new_helper)
+
+# Current execution and retained unchanged-body proof remain separately inspectable.
+qualified = {}
+retained = {item["source"]: item for item in PRE["retained_unchanged_body_proof"]}
+for path in SOURCES:
+    raw = next(value for name, value in coverage["files"].items()
+               if name.replace("\\", "/") == path)
+    executed, missing = set(raw["executed_lines"]), set(raw["missing_lines"])
+    retained_lines = set()
+    if path in retained:
+        assert sha((ROOT / path).read_bytes()) == next(
+            row["sha256"] for row in PRE["sources_and_tests"] if row["path"] == path)
+        for item in retained[path]["exact_ast_unchanged"]:
+            retained_lines.update(item["mapped_covered_lines"])
+    measured = executed | missing
+    supported = executed | retained_lines
+    ranges = []
+    for name, node in definitions(ast.parse((ROOT / path).read_text())).items():
+        statements = {line for line in measured
+                      if node.lineno <= line <= node.end_lineno}
+        absent = statements - supported
+        percentage = 100.0 if not statements else 100 * (1 - len(absent) / len(statements))
+        assert percentage >= 90, (path, name, percentage, sorted(absent))
+        ranges.append({"name": name, "start": node.lineno, "end": node.end_lineno,
+                       "statements": len(statements), "current_covered": len(statements & executed),
+                       "retained_additional": sorted(statements & (retained_lines - executed)),
+                       "qualified_line_percentage": percentage, "unsupported_lines": sorted(absent)})
+    try:
+        base_text = subprocess.check_output(
+            ["git", "show", f"2b069afb0d88ae1a3c17ef10f7a52c3936800462:{path}"],
+            cwd=ROOT, stderr=subprocess.DEVNULL).decode()
+    except subprocess.CalledProcessError:
+        base_text = ""
+    current_lines = (ROOT / path).read_text().splitlines()
+    unchanged = set()
+    for block in difflib.SequenceMatcher(
+            a=base_text.splitlines(), b=current_lines, autojunk=False).get_matching_blocks():
+        unchanged.update(range(block.b + 1, block.b + block.size + 1))
+    changed = measured - unchanged
+    assert changed <= executed, (path, sorted(changed - executed))
+    qualified[path] = {"raw_summary": raw["summary"], "ranges": ranges,
+                       "changed_executable_lines": sorted(changed),
+                       "changed_lines_currently_covered": True,
+                       "retained_proof": "See pre-repair freeze exact-AST body mappings",
+                       "unsupported_module_lines": sorted(measured - supported)}
+    assert not qualified[path]["unsupported_module_lines"], path
+
+bindings = []
+for path in SOURCES + TESTS:
+    raw = (ROOT / path).read_bytes()
+    lines = raw.decode().splitlines()
+    assert len(lines) <= 500, path
+    for node in ast.walk(ast.parse(raw)):
+        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            assert ast.get_docstring(node), (path, node.lineno)
+        if isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+            assert lines[node.lineno - 2].lstrip().startswith("#"), (path, node.lineno)
+    bindings.append({**ref(ROOT / path), "physical_lines": len(lines),
+                     "lf_sha256": sha(raw.replace(b"\r\n", b"\n"))})
+
+# Archive only new repair streams; the old 201-stream archive is referenced intact.
+archive = {}
+new_inputs = [*sorted(SCRATCH.glob("p5t2-graph-GR*")),
+              *sorted(OUT.glob("p5t2-graph-GR-repair*.json")),
+              *sorted(OUT.glob("p5t2-graph-GR-repair*.md")),
+              *(ROOT / path for path in SOURCES + TESTS)]
+for path in new_inputs:
+    if not path.is_file():
+        continue
+    raw = path.read_bytes()
+    encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode()
+    assert gzip.decompress(base64.b64decode(encoded)) == raw
+    name = "SCRATCH/" + path.name if path.parent == SCRATCH else path.relative_to(ROOT).as_posix()
+    archive[name] = {"sha256": sha(raw), "bytes": len(raw), "data": encoded}
+archive_path = save("p5t2-graph-GR-raw-archive", {
+    "encoding": "base64(gzip(bytes;mtime=0))", "members": archive,
+    "historical_archive": PRE["raw_archive"]})
+harnesses = []
+for path in sorted(SCRATCH.glob("p5t2-graph-GR*")):
+    if path.is_file() and (path.suffix == ".py" or path.name.endswith(".py.txt")):
+        raw = path.read_bytes()
+        view = OUT / f"{path.stem}-harness.{STAMP}.txt"
+        normalized = "\n".join(line.rstrip() for line in raw.decode().splitlines()).rstrip() + "\n"
+        view.write_bytes(normalized.encode())
+        harnesses.append({**ref(view), "original": "SCRATCH/" + path.name,
+                          "original_sha256": sha(raw),
+                          "identical_to_executed_bytes": view.read_bytes() == raw})
+
+native_path = FEATURE / "evidence/qa-gates/p5t2-native-preparation.2026-10-20T06-22.json"
+native = json.loads(native_path.read_text())
+expected = native["expected_metrics_pending_producer_freeze"]
+assert len(expected) == 16
+native_confirmation = {
+    "preparation": ref(native_path), "expected_metrics": expected,
+    "status": "ALL_16_UNCHANGED_BY_SOURCE_AND_FIXTURE_REVIEW",
+    "basis": "One required source, one browser obligation, missing row, undeclared optional axes.",
+    "qualification": "Read-only contract confirmation only; no native execution or fixture mutation.",
+}
+stages = [ref(path) for path in sorted(OUT.glob("p5t2-graph-GR-repair7-*.json"))]
+freeze = save("p5t2-graph-GR-freeze", {
+    "task": "P5-T2", "status": "FOCUSED_PASS_AWAITING_BOUNDED_CONFIRMATION",
+    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "sources_and_tests": bindings, "source_delta": "ParityProjection.axes only; public test-helper rename",
+    "stage_receipts": stages, "case_count": 58, "executed_nodes": nodes,
+    "narrow_precheck_cases": 3, "original_36_preserved": True,
+    "assertion_counts_preserved": assertions_retained,
+    "borrowed": {path: value for path, value in PROOF["after"].items() if path not in SOURCES + TESTS},
+    "raw_coverage": ref(coverage_path), "per_unit_coverage": qualified,
+    "pre_repair_freeze": ref(PRE_PATH), "new_raw_archive": ref(archive_path),
+    "harnesses": harnesses, "native_pointer_confirmation": native_confirmation,
+    "review_closure_claim": "GR1/GR2 focused behavior passes; independent confirmation and full task gates pending.",
+})
+historical_closure = json.loads((OUT / "p5t2-graph-pre-repair-staging.2026-10-20T06-56.json").read_text())
+new_paths = sorted({row["path"] for row in bindings} | {
+    path.relative_to(ROOT).as_posix() for path in OUT.glob("p5t2-graph-GR*")} | {
+    path.relative_to(ROOT).as_posix()
+    for path in (FEATURE / "evidence/baseline").glob("p5t2-graph-axis-split*")})
+closure_path = OUT / f"p5t2-graph-GR-staging.{STAMP}.json"
+closure = save("p5t2-graph-GR-staging", {
+    "freeze": ref(freeze), "new_stage_paths": new_paths,
+    "stage_paths": sorted(set(historical_closure["stage_paths"] + new_paths +
+                             [closure_path.relative_to(ROOT).as_posix()])),
+})
+for path in [freeze, closure, coverage_path, archive_path]:
+    raw = path.read_bytes()
+    assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n")
+for row in stages:
+    for suffix in (".json", ".md"):
+        path = (ROOT / row["path"]).with_suffix(suffix)
+        raw = path.read_bytes()
+        assert b"\r" not in raw and not raw.endswith(b"\n\n")
+        assert all(line == line.rstrip() for line in raw.decode().splitlines())
+print(json.dumps({"freeze": ref(freeze), "staging": ref(closure),
+                  "ranges": sum(len(value["ranges"]) for value in qualified.values()),
+                  "cases": len(nodes), "archive_members": len(archive)}))

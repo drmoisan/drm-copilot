@@ -1,0 +1,30 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:19:39.188859+00:00",
+  "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+  "source_hash_initial": "69f2b59123d7651fc3d3634a67786488b22f4f78b9c0a65f4683870f78e4f831",
+  "source_hash": "69f2b59123d7651fc3d3634a67786488b22f4f78b9c0a65f4683870f78e4f831",
+  "source_stable": true,
+  "passed": 0,
+  "total": 3,
+  "results": [
+    {
+      "name": "Owned partial stage is removed on failure",
+      "passed": false,
+      "exception": "AttributeError",
+      "message": "'FakeDirectory' object has no attribute 'identity'"
+    },
+    {
+      "name": "Opened parent identity must match recorded stamp",
+      "passed": false,
+      "exception": "AttributeError",
+      "message": "'FakeDirectory' object has no attribute 'identity'"
+    },
+    {
+      "name": "Configured larger original is not rejected by a fixed default limit",
+      "passed": false,
+      "exception": "AttributeError",
+      "message": "'FakeDirectory' object has no attribute 'identity'"
+    }
+  ]
+}

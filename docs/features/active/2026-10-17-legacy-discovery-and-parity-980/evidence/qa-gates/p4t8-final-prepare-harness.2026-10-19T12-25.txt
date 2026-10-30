@@ -1,0 +1,99 @@
+"""Bind two immutable subsets and unexecuted combined gate harnesses."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+scratch = Path(__file__).parent
+evidence = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence')
+regression, qa = evidence / 'regression-testing', evidence / 'qa-gates'
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+def save(path, value):
+    assert not path.exists(), path
+    path.write_bytes((json.dumps(value, indent=2) + '\n').encode())
+
+optional_path = regression / 'p4t8-optional-freeze.2026-10-19T11-52.json'
+compatibility_path = regression / 'p4t8-compatibility-freeze.2026-10-19T11-54.json'
+assert sha(optional_path.read_bytes()) == 'bc5e0282808ff51b21ca2973ec78d908be376a450ee157341344754500090ad1'
+assert sha(compatibility_path.read_bytes()) == '1af156a5062951f276ae2de4dc2177fec5febbb6699978f204aef323ba9cc06d'
+optional, compatibility = json.loads(optional_path.read_bytes()), json.loads(compatibility_path.read_bytes())
+files = [{'path': item['path'], 'sha256': item['sha256']} for item in optional['source_files'] + compatibility['source_bindings']]
+assert len(files) == len({item['path'] for item in files}) == 16
+assert all(sha(Path(item['path']).read_bytes()) == item['sha256'] for item in files)
+fixtures = optional['fixtures']
+assert all(sha(Path(item['path']).read_bytes()) == item['sha256'] for item in fixtures)
+prior_nodes = {'optional': optional['test_nodes_in_execution_order'], 'compatibility': compatibility['test_node_order']}
+counts = {'optional': 100, 'compatibility': 166}
+assert all(len(nodes) == len(set(nodes)) == counts[key] for key, nodes in prior_nodes.items())
+forward = {key: list(dict.fromkeys(node.split('::', 1)[0] for node in nodes)) for key, nodes in prior_nodes.items()}
+production = {key: [item['path'] for item in values if not item['path'].startswith('tests/')]
+              for key, values in (('optional', optional['source_files']), ('compatibility', compatibility['source_bindings']))}
+baseline_path = evidence / 'baseline/p4t8-shared-baseline.2026-10-19T11-23.json'
+baseline = json.loads(baseline_path.read_bytes())
+preserved = {item['path']: item for item in baseline['existing_files'] if item['path'] not in {value['path'] for value in files}}
+for key, field in (('baseline', 'preserved_files'), ('handoff', 'source_files')):
+    binding = baseline['preserved_predecessors'][key]
+    path = Path(binding['path'])
+    assert sha(path.read_bytes()) == binding['sha256']
+    for item in json.loads(path.read_bytes())[field]:
+        if item['path'] not in {value['path'] for value in files}:
+            preserved[item['path']] = item
+preserved = [{'path': name, 'sha256': value['sha256']} for name, value in sorted(preserved.items())]
+assert all(sha(Path(item['path']).read_bytes()) == item['sha256'] for item in preserved)
+head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+candidate = {'task': 'P4-T8', 'preparation_only': True, 'execution_released': False, 'coordinator_release_receipt': None,
+    'head_at_preparation': head, 'accepted_baseline': baseline['head'], 'baseline': ref(baseline_path),
+    'files': files, 'fixtures': fixtures, 'preserved_files': preserved,
+    'subset_manifests': [ref(optional_path), ref(compatibility_path)], 'review': None, 'confirmation': None,
+    'expected_test_counts': counts, 'forward_test_module_order': forward, 'prior_node_order': prior_nodes,
+    'production_paths': production, 'coverage_targets': {'optional': ['drm_copilot_discovery.analyzer.optional'],
+        'compatibility': ['drm_copilot_discovery.analyzer.registry', 'scripts.dev_tools.discovery.analyzer.stack_cli',
+                          'scripts.dev_tools.discovery.analyzer.vsto_office', 'scripts.dev_tools.discovery.analyzer.vsto_patterns']},
+    'release_requirements': ['All source/test/fixture streams remain identical', 'Consolidated review and any bounded repair confirmation are bound',
+        'Coordinator explicitly releases execution with current routing receipt']}
+candidate_path = scratch / 'issue-980-p4t8-final-candidate.preparation.json'
+save(candidate_path, candidate)
+harnesses, native_checks = [], []
+for name in ('gates', 'architecture', 'native'):
+    path = scratch / ('issue-980-p4t8-final-' + name + '.py')
+    raw = path.read_bytes()
+    tree = ast.parse(raw)
+    assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n')
+    assert len(raw.splitlines()) <= 500 and not re.search(rb'(?<![A-Za-z])[A-Za-z]:[\\/]', raw)
+    harnesses.append({'path': 'SCRATCH/' + path.name, 'sha256': sha(raw), 'lines': len(raw.splitlines()), 'syntax_parse': 'passed', 'executed': False})
+    if name == 'native':
+        native_checks = [node.args[0].value for node in ast.walk(tree) if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == 'check' and isinstance(node.args[0], ast.Constant)]
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+record = {'task': 'P4-T8', 'timestamp': stamp, 'state': 'PREPARED_NOT_EXECUTED', 'source_head': head,
+    'command': 'poetry run python SCRATCH/issue-980-p4t8-final-prepare.py', 'exit_code': 0,
+    'prepared_harnesses': harnesses, 'preparation_harness': {'path': 'SCRATCH/' + Path(__file__).name, 'sha256': sha(Path(__file__).read_bytes())},
+    'adaptation_harness': {'path': 'SCRATCH/issue-980-p4t8-final-adapt.py', 'sha256': sha((scratch / 'issue-980-p4t8-final-adapt.py').read_bytes())},
+    'candidate_manifest': {'path': 'SCRATCH/' + candidate_path.name, 'sha256': sha(candidate_path.read_bytes())},
+    'source_files': files, 'fixtures': fixtures, 'preserved_stream_count': len(preserved), 'subset_manifests': candidate['subset_manifests'],
+    'shared_baseline': ref(baseline_path), 'retained_runner_preparation': ref(qa / 'p4t7-final-preparation.2026-10-19T11-00.json'),
+    'retained_publication_proof': ref(qa / 'p4t1-final-native-result.2026-10-19T02-54.json'),
+    'stages': ['Scoped Black on 16 files', 'Scoped Ruff on the same files', 'Whole-repository Pyright',
+        'Architecture, size, docstrings/loops, optional purity, lazy import ownership and memory-only test isolation',
+        'Two isolated reverse-module-order batches: optional100 and compatibility166; eight modules and every measured class/callable',
+        'Actual inventory-schema, quality-tier/classification, package metadata/tooling and frozen template-neutrality contracts',
+        'Native Windows/Git captured-byte optional registry composition and explicit refusal boundaries'],
+    'forward_test_module_order': forward, 'expected_test_counts': counts, 'native_assertions': native_checks,
+    'native_fixtures': ['Four selected files: CSharp with CRLF, valid 2006 Ribbon, valid 2009 Ribbon as UTF16, and COM project declarations',
+        'Accepted configured example profile narrowed to legacy-source with no links/clients/extensions; exact captured Git revision',
+        'The original two-root XML remains unchanged and is used only for an expected malformed-input refusal'],
+    'output_contract': 'Bind source/tests/fixtures and untouched predecessors before/after stages, exact nodes and order, raw coverage/streams, durations and executed LF harness bytes. No final execution by this preparation.',
+    'pending': candidate['release_requirements'], 'gate_execution': False, 'source_test_mutation': False, 'git_mutation': False,
+    'limits': 'Read-only native Windows Python/Git composition. No installed Office runtime, callback execution, host automation, non-Windows result or publication attempt. Registry selection grants no mutation authority.'}
+path = qa / ('p4t8-final-preparation.' + stamp + '.json')
+save(path, record)
+path.with_suffix('.md').write_bytes((f'# P4-T8 final gate preparation\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: PREPARED_NOT_EXECUTED; three LF-only scratch harnesses parse and bind 16 source/test files plus two fixtures.\n\n'
+    f'The existing ordered runner is adapted to two fixed batches: 100 optional and 166 compatibility cases. Scoped format/lint precede whole-repository Pyright, bounded structural/purity/isolation checks, reverse module order in separate processes, applicable contracts and {len(native_checks)} native Windows/Git assertions. All eight production modules remain measured, including the initializer with no executable statements.\n\n'
+    'Native preparation composes actual captured source bytes, immutable Git pins and supported optional registry dispatch. It tests lazy disabled/mixed-selection imports, legacy CLI refusal, XML/CSharp confidence separation, unresolved callbacks, redacted values, false embedding, historical IDs, missing pins, exhaustion, direct consent revalidation, malformed retained XML, schema-valid deterministic inventory and unchanged source/artifact/Git state. Publication is unattempted; earlier guarded publication proof remains a reference only.\n\n'
+    'Source/test and focused evidence stay frozen. Consolidated review, any required confirmation and explicit coordinator release are required before execution. Prepared fixture assumptions were checked against the accepted profile/capture APIs and actual fixture callback counts without running the harnesses.\n').encode())
+print(json.dumps({'preparation': ref(path), 'candidate': record['candidate_manifest'], 'code_files': len(files), 'cases': sum(counts.values()), 'native_checks': len(native_checks), 'harnesses': harnesses}, indent=2))

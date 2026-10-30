@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-10-19T02-10",
+  "normalization_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-evidence-normalization.2026-10-19T02-09.json",
+  "normalization_manifest_sha256": "1fb8f3931a800bf801b83f1625c19a0ed75acf72b255bd23dacec12f85bffd5e",
+  "original_preservation_hashes_verified": true,
+  "raw_json_unchanged": true,
+  "source_test_hashes_unchanged": true,
+  "loader_sqlite_files_remaining_in_canonical_evidence": 0,
+  "markdown_timestamp_and_rendering_checks": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-baseline.2026-10-19T01-53.md",
+      "sha256": "b1eeb12b10c104cde3a0faa6c8ba5d464e83806298e7b40e8508d84c377d305d",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-pyright.2026-10-19T01-59.md",
+      "sha256": "c9120a4953d0a39f1ec8c8e8b671dd2f219831dd91d9bc6c857316d8943b4b1b",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-ruff.2026-10-19T01-59.md",
+      "sha256": "d73a1ffbaa942aade0209f71936cf23c6593f6add6be676b3dbeb6f7d80eaef1",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-candidate.2026-10-19T01-58.md",
+      "sha256": "d29507c36ece2ede9853ade848468ba4b3aeae8613df219d2953b48ebdc3ffcf",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-diffs.2026-10-19T02-02.md",
+      "sha256": "a524e0441cf5869cd44238b3a50037ab018bfb962994eea58f3318349ae8a783",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-evidence-normalization.2026-10-19T02-09.md",
+      "sha256": "af725bc0e410c0af29b4fa8d1a1799b1a082da574b60836e42b683a5f915a1c7",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-black.2026-10-19T02-02.md",
+      "sha256": "c89e88699be2e9fa5c668dcc6a427e19feb1ba448ea29bc095f333afc98f4c60",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-handoff.2026-10-19T02-05.md",
+      "sha256": "7402299011e26adf47d5383806f085ef3c86f40758e497d8833f9b741b0dd823",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pyright.2026-10-19T02-02.md",
+      "sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pytest-reversed.2026-10-19T02-05.md",
+      "sha256": "8cd8f67735b8d0bef692c9fbb1f34e732d8241e4ba66583033104d608cd34ba6",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-ruff.2026-10-19T02-02.md",
+      "sha256": "b7d8edfcb44b65e8868aef829f0e94856b9bce80a1a5fc089cff47ce31a6f1ad",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-loader-rejected-baseline-command.2026-10-19T01-59.md",
+      "sha256": "a85c1ae34bdcba2fa28ce3284c15749e615a7f216230bf4a00c271cde7351994",
+      "minute_filename": true,
+      "minute_header": true,
+      "no_machine_path": true,
+      "no_command_placeholder": true
+    }
+  ],
+  "scope": "Only p4t1-loader-owned evidence; no test rerun or source/test changes"
+}

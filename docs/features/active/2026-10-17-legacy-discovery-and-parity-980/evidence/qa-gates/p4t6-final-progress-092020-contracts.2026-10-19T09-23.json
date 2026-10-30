@@ -1,0 +1,63 @@
+{
+  "candidate_manifest": "SCRATCH/issue-980-p4t6-final-candidate.released.2026-10-19T09-20.json",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-format-092021.2026-10-19T09-20.json",
+      "sha256": "9ac5efa45bc1abb237db19ee972c0fd04cdbfd8880e22df0f5919b33afa3eb53",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-lint-092021.2026-10-19T09-20.json",
+      "sha256": "29fac241d5ef27e97c741f88f7f5703f7a7ee6cd6af02704421b2f92f591d044",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-types-092033.2026-10-19T09-20.json",
+      "sha256": "4cade3ebfc01c04e10186a87a1c0a7f49262de17591ea4ce2e1ab7a6095d888b",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-architecture-092033.2026-10-19T09-20.json",
+      "sha256": "6ac4ff9f7c8acf8ce13254e73076efe6b19f9df68e577939c94e60f4a9f0366c",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-ui-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-tests-ui-reverse-092116.2026-10-19T09-21.json",
+      "sha256": "0fc14966cd7e37f8df3b335d4e743180999e90c81b7535a1039765bc4b463741",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-references-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-tests-references-reverse-092331.2026-10-19T09-23.json",
+      "sha256": "6027f0ad419d8e131809685b8614fbb64643f3d72ce0bf5a38169af857176aae",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-contracts-092332.2026-10-19T09-23.json",
+      "sha256": "75a3af80f397a7b577656d1c48f03d6cd25d338f40a2b51910dc66fef2d69372",
+      "stage": 6
+    }
+  ],
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090"
+  }
+}

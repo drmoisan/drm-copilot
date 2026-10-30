@@ -1,0 +1,99 @@
+{
+  "issue": 980,
+  "task": "P6-T3",
+  "timestamp": "2026-10-21T16:49:58.636520+00:00",
+  "route": "build_identity_p6t3_validator_review_20261021T164700",
+  "status": "REPAIR_REQUIRED",
+  "task_acceptance": false,
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-freeze.2026-10-21T16-46.json",
+    "sha256": "2716dc2cf0e431a69c45279b09bf3b8415558723585c8ff3485efcecd328da09"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-staging.2026-10-21T16-46.json",
+    "sha256": "cd5ea94b7857e8830881b85f590b616dacc122044f6ac1833a414660c3149c85"
+  },
+  "scope": [
+    {
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py",
+      "sha256": "5f1211cd606da0cafe4f54bebf96f2cc6dfcc565d5c4e59a7dedbf1e57cd9f2c"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "sha256": "0e8a16f4e26e8c053e5eb763631100b05548ec1bafd995ff66986e7a2a228578"
+    }
+  ],
+  "findings": [
+    {
+      "id": "VAL-R1",
+      "severity": "P2",
+      "status": "BLOCKING_REPAIR_REQUIRED",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py",
+      "lines": [
+        75,
+        79,
+        82
+      ],
+      "title": "Reuse the validated sequence bound when capturing compatibility arguments",
+      "description": "The helper accepts collections.abc.Sequence, validates len(active)-start and reserves count work, then calls len(active) again to select the iteration range. A valid custom Sequence can return different lengths. Additional empty exact-str tokens consume byte capacity but no per-token work and are appended without a second record-count check. Both validator and shared report routing consume this helper.",
+      "finite_source_trace": {
+        "kind": "Source-derived exact control trace; no behavioral execution claimed",
+        "input": "Sequence[str] whose first __len__ returns 1, second returns 100001, and __getitem__ returns the empty exact str for each requested index",
+        "default_artifact_records": 100000,
+        "count_validated": 1,
+        "count_work_reserved": 4,
+        "loop_iterations": 100001,
+        "empty_token_text_work": 0,
+        "empty_token_encoded_charge_each": 2,
+        "total_empty_token_encoded_charge": 200002,
+        "default_document_bytes": 16777216,
+        "result": "The helper can return 100001 tokens despite the 100000-token count limit. Work/count prepaid for one token does not cover the actual capture.",
+        "scope": "Bounded 100001-element mathematical trace; no hostile filesystem, process, network or production invocation."
+      },
+      "repair_direction": "Capture end = len(active) once, derive count = end - start, and iterate range(start, end) only after validating/reserving that count. Preserve exact-string checks, text reservations and rejection behavior.",
+      "required_regression": "Small memory-only changing-length Sequence: make a second length observation grow beyond a tiny limit or raise, verify only the validated first bound is used and no extra indexes are accessed. Retain count and text-before-traversal controls."
+    }
+  ],
+  "open_probes": [],
+  "other_source_confirmation": [
+    "Explicit selected-kind compatibility invokes only that validator after selection; all/unknown routes do not probe artifact types or read input.",
+    "Canonical routes and eight wrappers forward fixed installed suffixes and preserve exit codes; compatibility validators do not authorize installed v2 operations.",
+    "Report route selection uses bounded exact tokens and rejects mixed option families; report implementations remain outside this review.",
+    "Pure validator modules remain byte-identical. Intent documentation and retained legacy error/read behavior otherwise match the scoped contract."
+  ],
+  "retained_proof": {
+    "ordered_stages": [
+      "164332-format-check",
+      "164337-lint",
+      "164341-types",
+      "164354-tests"
+    ],
+    "all_exit_codes": 0,
+    "chronological_order_verified": true,
+    "passed_nodes": 38,
+    "node_sequence_matches_raw_stdout": true,
+    "test_elapsed_seconds": 7.066744,
+    "tested_current_dependency_count": 27,
+    "before_after_current_identical": true,
+    "owner_staging_bindings_verified": 33,
+    "module_statements": [
+      102,
+      102
+    ],
+    "module_branches": [
+      32,
+      32
+    ],
+    "named_body_ranges": 14,
+    "named_body_coverage_percent": 100,
+    "raw_coverage_digest_verified": true,
+    "source_test_raw_archives_verified": true,
+    "coverage_limitation": "All observed lines/arcs pass, but current 38 cases do not test changing sequence length between the two observations. Coverage does not discharge VAL-R1."
+  },
+  "qualifications": [
+    "No broad probe, suite, production import, source/test/Git/staging/checkpoint mutation or report review occurred.",
+    "One read-only metadata check initially used nodes instead of passed_nodes; corrected to the existing key with no artifact/source modification.",
+    "Runtime cli.py c7273db5 remains the independently reviewed prerequisite; final isolation/composition remains pending.",
+    "Preservation union is exact evidence/WIP only, not authorization to label this source slice checked or ready."
+  ]
+}

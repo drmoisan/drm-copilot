@@ -196,6 +196,30 @@
       {
         "command": "drmCopilotExtension.runDiscoveryReport",
         "title": "drm-copilot: Run Discovery Report"
+      },
+      {
+        "command": "drmCopilotExtension.runDiscoveryDoctor",
+        "title": "drm-copilot: Run Discovery Doctor"
+      },
+      {
+        "command": "drmCopilotExtension.configureDiscoveryWorkspace",
+        "title": "drm-copilot: Configure Discovery Workspace"
+      },
+      {
+        "command": "drmCopilotExtension.transferDiscoverySnapshot",
+        "title": "drm-copilot: Transfer Discovery Snapshot"
+      },
+      {
+        "command": "drmCopilotExtension.migrateDiscoveryArtifacts",
+        "title": "drm-copilot: Migrate Discovery Artifacts"
+      },
+      {
+        "command": "drmCopilotExtension.createDiscoveryArtifact",
+        "title": "drm-copilot: Create Discovery Artifact"
+      },
+      {
+        "command": "drmCopilotExtension.linkDiscoveryEvidence",
+        "title": "drm-copilot: Link Discovery Evidence"
       }
     ]
   },

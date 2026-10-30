@@ -1,0 +1,97 @@
+{
+  "Timestamp": "2026-10-20T09:09:25.502689+00:00",
+  "Command": "python SCRATCH/issue-980-p5t3-producer-source-review.py",
+  "EXIT_CODE": 0,
+  "status": "SOURCE_REVIEW_CLEAR_PLANNING_COMPOSITION_PENDING",
+  "task": "P5-T3",
+  "route": "atomic_execution_p5t3_producer_review_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_routing_launch_provenance_verified": true,
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.json",
+    "sha256": "48b9fd0a719512655a3f9a8973896d1faa6cd61379f1fc4dc92f8020eeb87508"
+  },
+  "scope": [
+    {
+      "bytes": 11322,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+      "physical_lines": 261,
+      "sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69"
+    },
+    {
+      "bytes": 15649,
+      "path": "tests/discovery_runtime/test_completion_report.py",
+      "physical_lines": 389,
+      "sha256": "0403687ca7be3c7606ca734d0c28e80b05646da067b6d5e90b2c5309cc1df962"
+    },
+    {
+      "bytes": 15345,
+      "path": "tests/discovery_runtime/test_completion_planning.py",
+      "physical_lines": 360,
+      "sha256": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214"
+    }
+  ],
+  "interface_contract": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-interface-contract.2026-10-20T08-23.json",
+    "sha256": "71fb7f502f0b99a98f75f4f3e44d4a7a93bcdb840ffc4806d99282aeda288c61"
+  },
+  "source_conclusions": [
+    "Closed root-mode validation precedes preflight; malformed-input availability remains independent of semantic success and planning prerequisite.",
+    "The pure summary preserves every supplied diagnostic index and severity count, marks FINDINGS_LIMIT incomplete, and groups exact next_action text without trimming or case folding.",
+    "Input cardinality, action text, retained rows/indices and sorting work are reserved before their corresponding retained output or bounded collection operations; failure returns no partial summary.",
+    "The builder lazily delegates one mode/kind/identifier to public report_projection and detaches the bounded report. It does not independently evaluate another rule family.",
+    "Planning requires exactly two WriteGrant values matching completion-report kind, caller ID and configured deterministic JSON/Markdown paths before generation. It derives CAS hashes only from captured files and both streams from the same report.",
+    "Existing plan_mutation owns path authorization, prospective graph/identity validation and later commit_mutation authority. The producer performs no I/O, accepts no caller-rendered bytes and mints no grants.",
+    "Legacy helpers reuse accepted bounded v1 adapters and explicitly label compatibility counts without a readiness claim; versioned render envelopes are rejected.",
+    "All three reviewed files are at most 500 lines, have typed intent contracts, and the tests use memory fixtures without filesystem/process/network work."
+  ],
+  "reused_pure_proof": {
+    "receipt": {
+      "bytes": 9585,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+      "sha256": "235e7b873529c5ea0e7cb211ac6dc129077e10b881759ac99131388e131a6719"
+    },
+    "archive": {
+      "bytes": 46825,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-archive.2026-10-20T09-01.json",
+      "sha256": "40be07f7d204d6c2ca99410deecf4c3d1d887d523e52294dd1d35150fb42b8a0"
+    },
+    "decoded_entries": 28,
+    "test_count": 35,
+    "pytest_seconds": 27.58,
+    "captured_seconds": 29.391055,
+    "raw_coverage": {
+      "covered_branches": 18,
+      "covered_lines": 72,
+      "excluded_lines": 4,
+      "missing_branches": 6,
+      "missing_lines": 23,
+      "num_branches": 24,
+      "num_partial_branches": 0,
+      "num_statements": 95,
+      "percent_branches_covered": 75.0,
+      "percent_branches_covered_display": "75",
+      "percent_covered": 75.63025210084034,
+      "percent_covered_display": "76",
+      "percent_statements_covered": 75.78947368421052,
+      "percent_statements_covered_display": "76"
+    },
+    "test_documentation_only_AST_identity": true,
+    "qualification": "This is partial producer proof: 72/95 statements and 18/24 branches, not full-module acceptance. Raw output and coverage identities remain unmodified."
+  },
+  "findings": [],
+  "open_behavioral_probes": [],
+  "additional_behavior_run": false,
+  "pending": [
+    "Nineteen declared planning cases are not a collected or passed result in this receipt.",
+    "Semantic completion dispatch and trusted-warning integration belong to the disjoint assessment owner.",
+    "Full producer/caller coverage, paired-view real composition, final gates and task acceptance await those frozen dependencies and results."
+  ],
+  "checked_WIP_readiness": false,
+  "task_acceptance": false,
+  "plan_AC_edits": false,
+  "payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-payload.2026-10-20T09-09.json",
+    "sha256": "3d3abb24f580c54b764dd0471fa98b11c2c5cea791fd0191fee948acc903cb75"
+  }
+}

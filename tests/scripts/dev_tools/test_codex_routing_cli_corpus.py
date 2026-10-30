@@ -114,10 +114,68 @@ def test_deployment_corpus_matches_python_cli(record: CorpusRecord) -> None:
     _assert_record(resolve_codex_deployment.main, record)
 
 
+DISCOVERY_SKILL_IDS: tuple[str, ...] = (
+    "inventory-legacy-system",
+    "extract-feature-contract",
+    "characterize-runtime-behavior",
+    "reconcile-parity-matrix",
+    "review-discovery-coverage",
+    "adjudicate-unspecified-behavior",
+    "generate-acceptance-scenarios",
+    "initialize-discovery-workspace",
+    "validate-discovery-artifacts",
+)
+DISCOVERY_ROLES: tuple[str, ...] = (
+    "legacy-parity-analyst",
+    "runtime-characterization-analyst",
+    "requirements-reconciler",
+    "migration-coverage-reviewer",
+)
+# Issue #980 adds 29 topology and 24 deployment rows to the original 23.
+DISCOVERY_TOPOLOGY_IDS: frozenset[str] = frozenset(
+    {
+        *(f"topo-discovery-{skill_id}" for skill_id in DISCOVERY_SKILL_IDS),
+        "topo-discovery-epic_preparation_child",
+        "topo-discovery-epic_execution_child",
+        "topo-explicit-ordinary-small",
+        "topo-explicit-ordinary-root",
+        "topo-ordinary-zero-count",
+        "topo-discovery-missing-skill",
+        "topo-discovery-unknown-skill",
+        "topo-discovery-alias-skill",
+        "topo-discovery-empty-skill",
+        "topo-discovery-whitespace-skill",
+        "topo-discovery-production-positive",
+        "topo-discovery-production-negative",
+        "topo-discovery-test-count",
+        "topo-discovery-language",
+        "topo-discovery-cross-cutting",
+        "topo-discovery-root-override",
+        "topo-discovery-epic-root-refused",
+        "topo-ordinary-skill-default",
+        "topo-ordinary-skill-explicit",
+        "topo-invalid-invocation-kind",
+    }
+)
+DISCOVERY_DEPLOYMENT_IDS: frozenset[str] = frozenset(
+    {
+        *(
+            f"dep-discovery-{role}-{band}"
+            for role in DISCOVERY_ROLES
+            for band in ("c1", "c2", "c3", "c4", "epic-c3")
+        ),
+        "dep-discovery-c3-c4-ceiling",
+        "dep-discovery-c3-epic-c4-ceiling",
+        "dep-discovery-ceiling-below-band",
+        "dep-discovery-profile-is-not-logical-role",
+    }
+)
+
+
 def test_corpus_covers_required_cases() -> None:
-    """The corpus holds the 23 required case ids and the named inputs (AC-4.8)."""
+    """The corpus holds the 23 original and 53 discovery case ids (AC-4.8, #980)."""
     # Arrange
-    expected_ids = {
+    original_ids = {
         "topo-standalone-small",
         "topo-powershell-budget-exceeded",
         "topo-epic-preparation-child",
@@ -142,6 +200,7 @@ def test_corpus_covers_required_cases() -> None:
         "dep-ceiling-below-band",
         "dep-unsupported-agent",
     }
+    expected_ids = original_ids | DISCOVERY_TOPOLOGY_IDS | DISCOVERY_DEPLOYMENT_IDS
     records = [*TOPOLOGY_RECORDS, *DEPLOYMENT_RECORDS]
 
     # Act
@@ -149,7 +208,29 @@ def test_corpus_covers_required_cases() -> None:
     tokens = [token for record in records for token in record["argv"]]
 
     # Assert
-    assert len(actual_ids) == 23
+    assert len(original_ids) == 23
+    assert len(actual_ids) == 76
+    assert len(TOPOLOGY_RECORDS) == 43
+    assert len(DEPLOYMENT_RECORDS) == 33
     assert set(actual_ids) == expected_ids
     assert any(any(ord(char) > 127 for char in token) for token in tokens)
     assert "commit-steward" in tokens
+
+
+def test_original_corpus_rows_precede_discovery_rows() -> None:
+    """The 23 original rows keep their positions ahead of the added rows (#980)."""
+    # Arrange / Act
+    topology_prefix = [record["id"] for record in TOPOLOGY_RECORDS[:14]]
+    deployment_prefix = [record["id"] for record in DEPLOYMENT_RECORDS[:9]]
+
+    # Assert
+    assert not any(record_id in DISCOVERY_TOPOLOGY_IDS for record_id in topology_prefix)
+    assert not any(
+        record_id in DISCOVERY_DEPLOYMENT_IDS for record_id in deployment_prefix
+    )
+    assert all(
+        record["id"] in DISCOVERY_TOPOLOGY_IDS for record in TOPOLOGY_RECORDS[14:]
+    )
+    assert all(
+        record["id"] in DISCOVERY_DEPLOYMENT_IDS for record in DEPLOYMENT_RECORDS[9:]
+    )

@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.dev_tools.discovery.analyzer.emitter import serialize_record
 from scripts.dev_tools.discovery.analyzer.inventory import InventoryAnalyzer
 from scripts.dev_tools.discovery.analyzer.models import AnalyzerContext
 from scripts.dev_tools.discovery.analyzer.pipeline import (
@@ -30,10 +31,10 @@ def _build_tree(source_root: Path) -> None:
     """Populate an in-memory consumer source tree."""
     source_root.mkdir(parents=True, exist_ok=True)
     (source_root / "a.txt").write_text("alpha", encoding="utf-8")
-    (source_root / "app.solution").write_text("sln", encoding="utf-8")
+    (source_root / "app.sln").write_text("sln", encoding="utf-8")
     sub = source_root / "sub"
     sub.mkdir(parents=True, exist_ok=True)
-    (sub / "b.project").write_text("proj", encoding="utf-8")
+    (sub / "b.csproj").write_text("proj", encoding="utf-8")
 
 
 def _context(source_root: Path, out_root: Path) -> AnalyzerContext:
@@ -62,15 +63,11 @@ def test_end_to_end_emits_one_instance_per_unit(mem_fs_path: Path) -> None:
 
     # Assert
     assert len(result.records) == 3
-    assert len(result.written_paths) == 3
-    kinds = {
-        json.loads(p.read_text(encoding="utf-8"))["kind"] for p in result.written_paths
-    }
+    assert result.written_paths == ()
+    assert not ctx.artifact_root.exists()
+    kinds = {record.kind for record in result.records}
     assert kinds == {"file"}
-    unit_types = {
-        json.loads(p.read_text(encoding="utf-8"))["metadata"]["unit_type"]
-        for p in result.written_paths
-    }
+    unit_types = {dict(record.metadata)["unit_type"] for record in result.records}
     assert unit_types == {"file", "solution", "project"}
 
 
@@ -85,14 +82,22 @@ def test_end_to_end_is_byte_identical_on_rerun(mem_fs_path: Path) -> None:
 
     # Act
     first = run_analyzer(analyzer, ctx, fs)
-    first_content = {p.name: p.read_text(encoding="utf-8") for p in first.written_paths}
+    first_content = {
+        record.id: serialize_record(
+            record, ctx.artifact_root / f"{record.id}.json", ctx.schema_path
+        )
+        for record in first.records
+    }
     second = run_analyzer(analyzer, ctx, fs)
     second_content = {
-        p.name: p.read_text(encoding="utf-8") for p in second.written_paths
+        record.id: serialize_record(
+            record, ctx.artifact_root / f"{record.id}.json", ctx.schema_path
+        )
+        for record in second.records
     }
 
     # Assert
-    assert first_content == second_content
+    assert first_content and first_content == second_content
 
 
 @pytest.mark.skipif(
@@ -114,6 +119,11 @@ def test_end_to_end_instances_validate_against_schema(mem_fs_path: Path) -> None
     result = run_analyzer(analyzer, ctx, fs)
 
     # Assert
-    for path in result.written_paths:
-        document = json.loads(path.read_text(encoding="utf-8"))
+    assert len(result.records) == 3 and not result.written_paths
+    for record in result.records:
+        document = json.loads(
+            serialize_record(
+                record, ctx.artifact_root / f"{record.id}.json", ctx.schema_path
+            )
+        )
         jsonschema.validate(instance=document, schema=schema)

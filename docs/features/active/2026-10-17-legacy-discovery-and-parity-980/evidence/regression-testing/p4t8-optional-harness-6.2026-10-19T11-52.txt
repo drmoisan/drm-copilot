@@ -1,0 +1,48 @@
+"""Capture one scoped optional stage with exact raw streams and immutable inputs."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+repo,scratch=Path.cwd(),Path(__file__).parent
+evidence=repo/'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing'
+label,stage,*args=sys.argv[1:]
+owned=['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/'+name+'.py' for name in ('__init__','vsto_office','vsto_patterns','vsto_syntax')]+['tests/discovery_runtime/analyzer/'+name+'.py' for name in ('test_optional_adapter','test_optional_limits')]
+borrowed=['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/'+name+'.py' for name in ('source_text','csharp_tokens','csharp_declarations','com_interop','com_syntax','xml_input','findings','models','emitter')]
+def binding(names):
+    return {p:{'sha256':hashlib.sha256(Path(p).read_bytes()).hexdigest(),'lines':len(Path(p).read_bytes().splitlines())} for p in names}
+def sanitize(text):
+    for path,replacement in ((scratch,'SCRATCH'),(repo,'.')):
+        for spelling in (str(path),path.as_posix()):
+            text=re.sub(re.escape(spelling),lambda m:replacement,text,flags=re.I)
+    return text
+before,prior=binding(owned),binding(borrowed)
+if stage=='black': command=[sys.executable,'-m','black',*args,*owned]
+elif stage=='ruff': command=[sys.executable,'-m','ruff','check',*args,*owned]
+elif stage=='pyright': command=[sys.executable,'-m','pyright',*owned]
+elif stage=='pytest':
+    command=[sys.executable,'-m','pytest','-o','addopts=',*owned[-2:],'-v','--tb=short','--cov=drm_copilot_discovery.analyzer.optional','--cov-branch','--cov-report=term-missing','--cov-report=json:'+str(scratch/('issue-980-'+label+'-coverage.json'))]
+else: raise ValueError(stage)
+started=datetime.datetime.now(datetime.timezone.utc); timer=time.monotonic()
+env=dict(os.environ,PYTHONIOENCODING='utf-8',COVERAGE_FILE=str(scratch/('issue-980-'+label+'.coverage')))
+result=subprocess.run(command,cwd=repo,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+finished=datetime.datetime.now(datetime.timezone.utc); duration=round(time.monotonic()-timer,3)
+stamp=finished.strftime('%Y-%m-%dT%H-%M');streams={}
+for channel,raw in (('stdout',result.stdout),('stderr',result.stderr)):
+    saved=scratch/f'issue-980-{label}-{stage}-{finished.strftime("%H%M%S")}.{channel}.bin';saved.write_bytes(raw)
+    streams[channel]={'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'scratch_identifier':'SCRATCH/'+saved.name,'presentation':sanitize(raw.decode('utf-8',errors='replace'))}
+record={'command':sanitize(subprocess.list2cmdline(command)),'started':started.isoformat(),'finished':finished.isoformat(),'exit_code':result.returncode,'duration_seconds':duration,'stage':stage,'source_before':before,'source_after':binding(owned),'borrowed_before':prior,'borrowed_after':binding(borrowed),'streams':streams,'accepted_baseline':'e5223d18ca0cfb92653efa75b56e6c5ec079b817'}
+record['changed']=record['source_before']!=record['source_after']
+prefix=evidence/f'{label}-{stage}.{stamp}'; out=Path(str(prefix)+'.json');assert not out.exists()
+out.write_bytes((json.dumps(record,indent=2)+'\n').encode())
+output=streams['stdout']['presentation']+streams['stderr']['presentation']
+view='\n'.join(line.rstrip() for line in output.splitlines()).rstrip()
+Path(str(prefix)+'.md').write_bytes((f'# {label} {stage}\n\nTimestamp: {started.strftime("%Y-%m-%dT%H-%M")}\nCommand: {record["command"]}\nEXIT_CODE: {result.returncode}\nOutput Summary: scoped {stage}, {duration} seconds; source changed={record["changed"]}. Separate exact raw streams qualify sanitized presentation.\n\n```text\n{view}\n```\n').encode())
+sys.stdout.reconfigure(encoding='utf-8')
+print(output);print(out.relative_to(repo).as_posix());print('CHANGED',record['changed'])
+assert record['borrowed_before']==record['borrowed_after']
+sys.exit(result.returncode)

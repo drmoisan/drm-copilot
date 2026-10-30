@@ -1,0 +1,440 @@
+{
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json",
+    "sha256": "4db1465e45dc14de9ae028e1f0ab04eed05f165f31f796fa73a19729af357e2a"
+  },
+  "binding_count": 142,
+  "binding_sha256": "3610dc89f5153197b091eae34ea728192e70573aac42662129744ffa8d7f12a9",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-restart-preparation.2026-10-19T14-10.json",
+    "sha256": "4c6165f0efa7b952b074ef3c0c1a4af2cbdc7b7315bc7de0d151c4d16f9dd945"
+  },
+  "candidate_commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-coverage-ranges.2026-10-19T14-20.json",
+    "sha256": "44acc3952082dfcf00cf35e2557f6f3e1f9eb1066eeea27af245968e0c04f64d"
+  },
+  "deltas": {
+    "missing_changed_lines": 0,
+    "new_lint_findings": 0,
+    "new_test_failures": 0,
+    "new_type_diagnostics": 0
+  },
+  "handoff_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-handoff-harness.2026-10-19T14-20.txt",
+    "sha256": "f24f438b607200faa96785396b810a73927ef76aa3fe484b4683c9b072c36d55"
+  },
+  "limitations": [
+    "Extension inputs are inert local data under the configured inventory root; arbitrary plugin/module/shell execution is unsupported.",
+    "Source claims cover selected production/test/exact entrypoint bytes. Documentation remains in input digest/accounting but cannot be an extension source claim under the current loader contract.",
+    "ValidatedExtension is descriptive only. merge_extension_inventory reconstructs from raw snapshot bytes; caller-created carriers confer no authority.",
+    "Generic emitter row-text handling remains its prior contract; extension merge adds full prospective serialized-byte/row/node/work reservations before aggregation.",
+    "The existing inventory publication planner intentionally reconstructs built-ins only. A future importing CLI needs its own guarded reconstructed merge planner before plan_mutation/commit_mutation.",
+    "Windows Python/Git composition only. No installed coding-agent host, non-Windows execution, runtime behavior, discovery completion or parity approval claim.",
+    "Feature-wide repository coverage and remaining implementation/host gates are still outstanding; this handoff claims only the complete six-module P4-T9 scope."
+  ],
+  "native_result": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-result.2026-10-19T14-20.json",
+    "sha256": "ed4a1c541daa3f5aa965db17052c1e3bbf159982ea0976205aa52e9bab5879c1"
+  },
+  "native_timing": {
+    "individual_operation_seconds": {
+      "actual_capture_loading_and_pin": 2.3441192000173032,
+      "merge_extension_inventory": 1.4516319000103977,
+      "repeated_merge_extension_inventory": 1.4553557999897748,
+      "validate_extension_results": 0.7280747999902815
+    },
+    "whole_composition_seconds": 12.152538299997104
+  },
+  "ordered_receipts": [
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:10:37.944446+00:00",
+      "label": "format",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-141037.2026-10-19T14-10.md",
+        "sha256": "e4758513b17d2d5118e87961fef9ea117da2fd2aa35d887ba19f3090cc994ad7"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-141037.2026-10-19T14-10.json",
+      "seconds": 0.582145,
+      "sha256": "589385ab3ba82ac823e31694b600d8afb6b371624056b97155f93390f3799835",
+      "stage": 1,
+      "started_at": "2026-10-19T14:10:37.362301+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:10:38.073790+00:00",
+      "label": "lint",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-141038.2026-10-19T14-10.md",
+        "sha256": "b80739d92e92aa6bf1a1dd5df738e6b76bb196d4303e262f707ce07f14958aa2"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-141038.2026-10-19T14-10.json",
+      "seconds": 0.108734,
+      "sha256": "b52817c0d8d448cfc2fda1e983903f43bd79915096e8728cf0dfe5b45d43c066",
+      "stage": 2,
+      "started_at": "2026-10-19T14:10:37.965056+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:10:50.385473+00:00",
+      "label": "types",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-types-141050.2026-10-19T14-10.md",
+        "sha256": "4e1f300e388f65d0220945d46d8605aaceb5e5496c58b9cc3acaefc71380d795"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-types-141050.2026-10-19T14-10.json",
+      "seconds": 12.292212,
+      "sha256": "5aab41744c45d0dc355511ce3275758242636cef3a98d369726286b728b051ed",
+      "stage": 3,
+      "started_at": "2026-10-19T14:10:38.093261+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:10:50.553559+00:00",
+      "label": "architecture",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-141050.2026-10-19T14-10.md",
+        "sha256": "a7ed403515606773efd9c281cfcafc2347f95a68f8dc76f4dfbb4a8ab1821bfd"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-141050.2026-10-19T14-10.json",
+      "seconds": 0.135749,
+      "sha256": "bfb285d1333fe8b05e3ed30fb1d62a2a59f5422793b8d27b7d485d7cafe9121c",
+      "stage": 4,
+      "started_at": "2026-10-19T14:10:50.417810+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:11:25.309290+00:00",
+      "label": "tests-registry-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-registry-reverse-141125.2026-10-19T14-11.md",
+        "sha256": "bc80c9f8d4e08c4912c46fde1d3b6835487ddc51970bf8f7013360a103e1b5fa"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-registry-reverse-141125.2026-10-19T14-11.json",
+      "seconds": 34.723609,
+      "sha256": "86da19b964180c6708754e345dd85c16019b3540e3834a1384a8bec12a026dcf",
+      "stage": 5,
+      "started_at": "2026-10-19T14:10:50.585681+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:17:07.013363+00:00",
+      "label": "tests-shared-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-shared-reverse-141707.2026-10-19T14-17.md",
+        "sha256": "5de1d3e1a8dd073fec850191ed05fa6610943506376cf12a2842b919e9057bf5"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-shared-reverse-141707.2026-10-19T14-17.json",
+      "seconds": 341.583652,
+      "sha256": "47debaa6e2e302d18c3f038e569adcb965e387987d8f8430e85b1ec80f0112e9",
+      "stage": 5,
+      "started_at": "2026-10-19T14:11:25.429711+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:19:20.971529+00:00",
+      "label": "tests-core-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-core-reverse-141920.2026-10-19T14-19.md",
+        "sha256": "7b5c20a24475a5176b2c39d08fc3b4926aa31df27bd4853de258ba050804fc08"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-core-reverse-141920.2026-10-19T14-19.json",
+      "seconds": 133.839333,
+      "sha256": "2e42df2e4c0af203b9c9ed63542efe70fe4d629db92b597d55db1761a0574c2f",
+      "stage": 5,
+      "started_at": "2026-10-19T14:17:07.132196+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:19:22.846540+00:00",
+      "label": "contracts",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-contracts-141922.2026-10-19T14-19.md",
+        "sha256": "998282829b4a48db2ddcb3e82ec889153b1eed8bf10c835065c7564b72467923"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-contracts-141922.2026-10-19T14-19.json",
+      "seconds": 1.750288,
+      "sha256": "21311fbc7c597234189b1a470662756abf62fd79351a6040b521ab2241216485",
+      "stage": 6,
+      "started_at": "2026-10-19T14:19:21.096252+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T14:20:06.649333+00:00",
+      "label": "native",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-142006.2026-10-19T14-20.md",
+        "sha256": "1ffef10118d8bd805fcef87565dd62bab7d05decccece744e397c0ca207cb79c"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-142006.2026-10-19T14-20.json",
+      "seconds": 12.373327,
+      "sha256": "19f26a9490833fe529ba7141b501d733a1e04a5ca4dae00b97b11fe63c541b19",
+      "stage": 7,
+      "started_at": "2026-10-19T14:19:54.276006+00:00"
+    }
+  ],
+  "ordered_stages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-ordered-stages.2026-10-19T14-20.json",
+    "sha256": "725bf0acf730e2ad702df743fb6680ae6fc07e67a7309ecdc684ff56f80cd990"
+  },
+  "phase_4_handoff": "Fixed registry dispatch covers 12 built-in identities with explicit optional consent. Core accounting, classifications, evidence pins and unassigned ledger proposals remain intact. Later services should use these public APIs and keep validation/merge separate from mutation authorization.",
+  "preserved_predecessors": 93,
+  "public_interfaces": [
+    "Analyzer = InventoryAdapter; builtin_analyzer_identities() and select_analyzers(profile)",
+    "extension_input_projection(capture), extension_input_digest(capture), extension_manifest_digest(document)",
+    "inventory_result(..., extension_adapters=None) preserves built-in-only behavior",
+    "validate_extension_results(snapshot, *, manifest_paths=None)",
+    "merge_extension_inventory(snapshot, *, timestamp, author_or_agent, manifest_paths=None)"
+  ],
+  "publication": "not-attempted",
+  "raw_originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-original-streams.2026-10-19T14-20.json",
+    "sha256": "84e6a29697317e450186b440d42842d76dc5bc8ef1899034aafd743b5fc484c1"
+  },
+  "reviews": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review.2026-10-19T13-08.json",
+      "sha256": "6844dd6514fc230ec6e7f5ad43a7a4912726aef5fa86bfd0436372ef21187f30"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+      "sha256": "cf6834b4361d243f28255374ed9151a2cd8e0916403b4b9b75149bc13cf05bc5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-repair-confirmation.2026-10-19T13-43.json",
+      "sha256": "7f78ece97ca748ec551cfda24e6099a090fc20a87a45879f956f04fd5c3d89cb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-repair-confirmation.2026-10-19T13-52.json",
+      "sha256": "dba30c862c35f1a6f7780c49f65ffe76ceab1873ca511cb7ff29f5faf6027d19"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-static-comment-repair.2026-10-19T14-09.json",
+      "sha256": "8bec364c4ba9c34afe1e764285dda04ba6f05e85113dc2a027213fbe0bef5da8"
+    }
+  ],
+  "source_files": [
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a",
+      "filtered_blob": "936fa3106428fd0d733a11b4908a03de9feecc3c",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "physical_lines": 9,
+      "relation": "identical",
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a",
+      "working_blob": "936fa3106428fd0d733a11b4908a03de9feecc3c"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "filtered_blob": "a4df6556a54878467473b0cec700db5bab3be212",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "physical_lines": 319,
+      "relation": "Authorized comment-only working delta; exact AST matches index, with CRLF/LF normalization qualified separately.",
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786",
+      "working_blob": "a4df6556a54878467473b0cec700db5bab3be212"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "filtered_blob": "a89ea802f7900ce7daa779e275634af879b42553",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "physical_lines": 164,
+      "relation": "identical",
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "working_blob": "a89ea802f7900ce7daa779e275634af879b42553"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "filtered_blob": "e80eb8b83492d9926bb314ac5f0763d10b311d5f",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+      "physical_lines": 442,
+      "relation": "identical",
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "working_blob": "e80eb8b83492d9926bb314ac5f0763d10b311d5f"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+      "filtered_blob": "feb1a6bf946821fac6a395a2c8d67891a418719d",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/extension_results.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+      "physical_lines": 328,
+      "relation": "identical",
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+      "working_blob": "feb1a6bf946821fac6a395a2c8d67891a418719d"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c",
+      "filtered_blob": "ce7a5851f6d8ec321ac14b98dfe5b9869292ba85",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+      "physical_lines": 459,
+      "relation": "identical",
+      "sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c",
+      "working_blob": "ce7a5851f6d8ec321ac14b98dfe5b9869292ba85"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca",
+      "filtered_blob": "076c3458a2decf4f5d894dc638b16f835ec229ad",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_emitter_extensions.py: text: auto\ntests/discovery_runtime/analyzer/test_emitter_extensions.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca",
+      "path": "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+      "physical_lines": 447,
+      "relation": "identical",
+      "sha256": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca",
+      "working_blob": "076c3458a2decf4f5d894dc638b16f835ec229ad"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "filtered_blob": "3b784fe98d2a920f49578b512d9a3dfbc76a9c06",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_registry.py: text: auto\ntests/discovery_runtime/analyzer/test_registry.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "physical_lines": 304,
+      "relation": "identical",
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "working_blob": "3b784fe98d2a920f49578b512d9a3dfbc76a9c06"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7",
+      "filtered_blob": "007da257a47fad62c42adc3f712bfa06ef15ecc7",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_registry_dispatch.py: text: auto\ntests/discovery_runtime/analyzer/test_registry_dispatch.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7",
+      "path": "tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+      "physical_lines": 405,
+      "relation": "identical",
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7",
+      "working_blob": "007da257a47fad62c42adc3f712bfa06ef15ecc7"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033",
+      "filtered_blob": "98344d81bdade075697436e48320ae9ffca80025",
+      "git_attributes": "tests/discovery_runtime/test_extension_input_limits.py: text: auto\ntests/discovery_runtime/test_extension_input_limits.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033",
+      "path": "tests/discovery_runtime/test_extension_input_limits.py",
+      "physical_lines": 324,
+      "relation": "identical",
+      "sha256": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033",
+      "working_blob": "98344d81bdade075697436e48320ae9ffca80025"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf",
+      "filtered_blob": "afb928c56a22d72b0844a85516a92419b6c48eaf",
+      "git_attributes": "tests/discovery_runtime/test_extension_inputs.py: text: auto\ntests/discovery_runtime/test_extension_inputs.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf",
+      "path": "tests/discovery_runtime/test_extension_inputs.py",
+      "physical_lines": 400,
+      "relation": "identical",
+      "sha256": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf",
+      "working_blob": "afb928c56a22d72b0844a85516a92419b6c48eaf"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857",
+      "filtered_blob": "da47fe51113b2595486c4ea7a32d395983eefb65",
+      "git_attributes": "tests/discovery_runtime/test_extension_inventory_merge.py: text: auto\ntests/discovery_runtime/test_extension_inventory_merge.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857",
+      "path": "tests/discovery_runtime/test_extension_inventory_merge.py",
+      "physical_lines": 457,
+      "relation": "identical",
+      "sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857",
+      "working_blob": "da47fe51113b2595486c4ea7a32d395983eefb65"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "filtered_blob": "1edd42cd9ff3b9a2b36ffae90a4308bbdf690a45",
+      "git_attributes": "tests/discovery_runtime/test_extension_results.py: text: auto\ntests/discovery_runtime/test_extension_results.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "path": "tests/discovery_runtime/test_extension_results.py",
+      "physical_lines": 429,
+      "relation": "identical",
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "working_blob": "1edd42cd9ff3b9a2b36ffae90a4308bbdf690a45"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "filtered_blob": "494e7bbaf19ba1cc3b8f4694da7bbe94135fc659",
+      "git_attributes": "tests/discovery_runtime/test_extension_validation_limits.py: text: auto\ntests/discovery_runtime/test_extension_validation_limits.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "path": "tests/discovery_runtime/test_extension_validation_limits.py",
+      "physical_lines": 314,
+      "relation": "identical",
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "working_blob": "494e7bbaf19ba1cc3b8f4694da7bbe94135fc659"
+    },
+    {
+      "commit": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+      "commit_sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "filtered_blob": "9048ae9b5f782ebb9341df2967c440d746b0892a",
+      "git_attributes": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py: eol: lf",
+      "index_commit_relation": "identical",
+      "index_sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "physical_lines": 233,
+      "relation": "identical",
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "working_blob": "9048ae9b5f782ebb9341df2967c440d746b0892a"
+    }
+  ],
+  "state": "EXECUTOR_ACCEPTANCE_PENDING",
+  "subset_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-registry-freeze.2026-10-19T13-00.json",
+      "sha256": "32f5966bdba3d0c5819fb029eaa3c41d3c9550f902d1fc3d4b5f2ab1cc19afbf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-freeze.2026-10-19T13-40.json",
+      "sha256": "f0fb0b997ccc8ea45540bd30a09e87d4b905a69b50ecde6ec28236299a79db76"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-core-freeze.2026-10-19T13-45.json",
+      "sha256": "5c39693cb1f753fbe36b3c7dd427b78497f5f6fac5119b991dab2c3ec04b7a5b"
+    }
+  ],
+  "task": "P4-T9",
+  "task_acceptance": "parent/executor-owned",
+  "test_cases": {
+    "contracts": 177,
+    "core": 144,
+    "native_assertions": 20,
+    "registry": 77,
+    "shared": 133,
+    "total": 354
+  },
+  "timestamp": "2026-10-19T14-20"
+}

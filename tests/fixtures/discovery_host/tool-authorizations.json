@@ -1,0 +1,793 @@
+{
+  "schema_version": "2.0.0",
+  "description": "Native tool/input digest vectors and one-use authorization records. Digests are sha256(canonical_json({inputs, operation, tool})) from the Python runtime; records are schema-checked at generation. Replayed by tests/discovery_runtime/test_tool_authorization_fixture.py and extensions/drm-copilot/test/discovery-authorization.test.ts.",
+  "tool_operations": {
+    "read_discovery_source": [
+      "read-source"
+    ],
+    "run_discovery_repo_inventory": [
+      "inventory"
+    ],
+    "run_discovery_dotnet_analyzer": [
+      "inventory"
+    ],
+    "run_discovery_vsto_analyzer": [
+      "inventory"
+    ],
+    "create_discovery_artifact": [
+      "new-contract",
+      "new-scenario"
+    ],
+    "update_discovery_artifact": [
+      "update-artifact"
+    ],
+    "link_discovery_evidence": [
+      "link-evidence"
+    ],
+    "run_discovery_scenario_generation": [
+      "generate-acceptance"
+    ],
+    "run_discovery_report": [
+      "coverage-report",
+      "parity-report",
+      "completion-report"
+    ],
+    "validate_discovery_artifacts": [
+      "profile",
+      "validate-profile",
+      "validate-feature-contract",
+      "validate-coverage-ledger",
+      "validate-runtime-scenario",
+      "validate-parity-matrix",
+      "validate-unspecified-behavior",
+      "validate-product-decision",
+      "validate-evidence-reference",
+      "validate-decisions",
+      "validate-all"
+    ],
+    "finalize_discovery_agent": [
+      "finalize-agent"
+    ],
+    "discovery_capability_sentinel": [
+      "sentinel"
+    ]
+  },
+  "controlled_operations": [
+    "profile",
+    "inventory",
+    "new-contract",
+    "new-scenario",
+    "update-artifact",
+    "link-evidence",
+    "validate-profile",
+    "validate-feature-contract",
+    "validate-coverage-ledger",
+    "validate-runtime-scenario",
+    "validate-parity-matrix",
+    "validate-unspecified-behavior",
+    "validate-product-decision",
+    "validate-evidence-reference",
+    "validate-decisions",
+    "validate-all",
+    "coverage-report",
+    "parity-report",
+    "completion-report",
+    "generate-acceptance",
+    "read-source",
+    "finalize-agent",
+    "sentinel"
+  ],
+  "root_only_operations": [
+    "init",
+    "configure",
+    "snapshot-export",
+    "snapshot-import",
+    "import-inventory",
+    "migrate",
+    "doctor",
+    "prepare-agent"
+  ],
+  "identity": {
+    "host": "claude-code",
+    "session_id": "session-alpha",
+    "agent_id": "agent-alpha",
+    "role": "legacy-parity-analyst",
+    "invocation_id": "invocation-alpha"
+  },
+  "workspace": {
+    "workspace_root": "C:/Users/Example/Repos/Workspace",
+    "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+    "profile_path": "docs/migration/discovery/domain-profile.yaml",
+    "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+  },
+  "digest_vectors": [
+    {
+      "name": "inventory-sorted",
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "inputs": {
+        "analyzer_ids": [
+          "repository"
+        ],
+        "repository_id": "legacy-crm",
+        "draft": false
+      },
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c"
+    },
+    {
+      "name": "inventory-unsorted-keys",
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "inputs": {
+        "repository_id": "legacy-crm",
+        "draft": false,
+        "analyzer_ids": [
+          "repository"
+        ]
+      },
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c"
+    },
+    {
+      "name": "inventory-reordered-list",
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "inputs": {
+        "analyzer_ids": [
+          "dotnet",
+          "repository"
+        ],
+        "repository_id": "legacy-crm",
+        "draft": false
+      },
+      "input_sha256": "deca3d01a3e5a94328bb3d9927d6f91ccd8fbb3b3e3f01f8c71908ed28317116"
+    },
+    {
+      "name": "read-source-unicode",
+      "tool": "read_discovery_source",
+      "operation": "read-source",
+      "inputs": {
+        "paths": [
+          "src/équipe/Ünïcode.cs",
+          "docs/plan.md"
+        ],
+        "line_start": 1,
+        "line_end": 40
+      },
+      "input_sha256": "b6fab12c27a3ad08381c608d283c86d014fde8b74c3d4da0f14daea3d3391d5d"
+    },
+    {
+      "name": "read-source-empty",
+      "tool": "read_discovery_source",
+      "operation": "read-source",
+      "inputs": {},
+      "input_sha256": "f4d8287d574c1ed163e8474b0b49a37fb85e51e636c733e15bf74ed51c5b8a84"
+    },
+    {
+      "name": "new-contract-nested",
+      "tool": "create_discovery_artifact",
+      "operation": "new-contract",
+      "inputs": {
+        "feature_id": "orders.export",
+        "name": "Order export",
+        "tags": [
+          "billing",
+          "export"
+        ],
+        "draft": true,
+        "notes": null
+      },
+      "input_sha256": "1c4282427af746eb15faf9e1d34ff69ae48bb5b6ebcdea35eb9d63dd4e79325f"
+    },
+    {
+      "name": "report-escapes",
+      "tool": "run_discovery_report",
+      "operation": "parity-report",
+      "inputs": {
+        "title": "line\nbreak \"quoted\" \\ back\tslash \u0001"
+      },
+      "input_sha256": "7a4156bacae8e8a9c54cad5d9ff5027654ceb4c9c69bcab18e6910f0b1549221"
+    },
+    {
+      "name": "finalize",
+      "tool": "finalize_discovery_agent",
+      "operation": "finalize-agent",
+      "inputs": {
+        "outputs": [
+          "docs/migration/discovery/features/orders.export.yaml"
+        ]
+      },
+      "input_sha256": "9924625dadfa2d1648cef6babc4ea24a8557c26372cc57f9595552f36a372ebf"
+    }
+  ],
+  "records": {
+    "issued": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "consumed": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-beta",
+      "authorization_ref": "authz-beta-00000000000000002",
+      "request_id": "request-beta",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "consumed",
+      "consumed_at": "2026-10-22T12:01:00Z",
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "revoked": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-gamma",
+      "authorization_ref": "authz-gamma-0000000000000003",
+      "request_id": "request-gamma",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "revoked",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "expired": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-delta",
+      "authorization_ref": "authz-delta-0000000000000004",
+      "request_id": "request-delta",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T11:00:00Z",
+      "expires_at": "2026-10-22T11:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "root-identity-forgery": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-epsilon",
+      "authorization_ref": "authz-epsilon-000000000000005",
+      "request_id": "request-epsilon",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "requirements-reconciler",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    }
+  },
+  "invalid_records": {
+    "extra-key": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      },
+      "destination": "C:/anywhere"
+    },
+    "missing-writer": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null
+    },
+    "unknown-state": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "granted",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "consumed-without-stamp": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "consumed",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "issued-with-stamp": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": "2026-10-22T12:01:00Z",
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "uppercase-digest": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78F78320C46CF2952BCBCEF7F2E73286DFA59AB16C44FA51B3A6210B2D56375C",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "root-operation": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "configure",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "unknown-tool": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_shell",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "native-root-role": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "native-root",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "short-reference": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "short",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "native-pretooluse",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    },
+    "writer-not-native": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+      "schema_version": "2.0.0",
+      "artifact_kind": "tool-authorization",
+      "id": "authz-alpha",
+      "authorization_ref": "authz-alpha-0000000000000001",
+      "request_id": "request-alpha",
+      "workspace": {
+        "workspace_root": "C:/Users/Example/Repos/Workspace",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653"
+      },
+      "identity": {
+        "host": "claude-code",
+        "session_id": "session-alpha",
+        "agent_id": "agent-alpha",
+        "role": "legacy-parity-analyst",
+        "invocation_id": "invocation-alpha"
+      },
+      "tool": "run_discovery_repo_inventory",
+      "operation": "inventory",
+      "input_sha256": "78f78320c46cf2952bcbcef7f2e73286dfa59ab16c44fa51b3a6210b2d56375c",
+      "invocation_ref": "invocation-alpha-000000000001",
+      "start_attestation_ref": "attestation-alpha-00000000001",
+      "capability_ref": "capability-alpha-000000000001",
+      "issued_at": "2026-10-22T12:00:00Z",
+      "expires_at": "2026-10-22T12:05:00Z",
+      "state": "issued",
+      "consumed_at": null,
+      "writer": {
+        "kind": "analyst",
+        "host": "claude-code",
+        "event_id": "event-alpha",
+        "handler_sha256": "3128389bb1c21bafeaa7b6e627026558f2845a3817f88436925b1ed9f845973e"
+      }
+    }
+  }
+}

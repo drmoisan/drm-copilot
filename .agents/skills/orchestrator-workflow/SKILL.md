@@ -277,6 +277,14 @@ If an exact signal or required path field is missing, set the relevant step to `
    delegation.
 9. Use Sol/High for standalone ceiling-C3 work. Use Astra/High for C3 epic children or C3 work in
    an orchestration whose monotonic ceiling is C4. Do not infer this overlay from file count.
+10. In a workspace with an active discovery activation, the native planning gate
+    (`enforce-discovery-planning-gate.ps1`) admits an `atomic-planner` delegation only when
+    the session holds a current `planning`-mode validation receipt that satisfies the
+    profile's `completion_gates.planning_prerequisite`. A `DISCOVERY_PLANNING_GATE_BLOCKED:`
+    denial means the discovery criteria are not current: run `validate-all --mode planning`
+    through the installed gateway and re-delegate; never bypass the gate. Discovery criteria
+    gate planning; they never substitute for the plan's own tests (see
+    `docs/engineering/legacy-discovery-and-parity/enforcement.md`).
 
 ## Small Path
 

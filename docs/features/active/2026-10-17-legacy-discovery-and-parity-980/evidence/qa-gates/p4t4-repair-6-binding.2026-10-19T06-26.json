@@ -1,0 +1,39 @@
+{
+  "batch": "repair-6",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-6-coverage.2026-10-19T06-26.json",
+    "raw_path": "SCRATCH/p4t4-repair-6-coverage.raw.json",
+    "raw_sha256": "559285d9fd8a99bfd35dffb4bf15d090e38d4a8da3b0cbc0cade74f5b81f7dfb",
+    "sha256": "40558fe0f58e9964cf68f37dce6bf506675a4ab1e99908a795b92f27cb34ad99"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-6-format-062601.2026-10-19T06-26.json",
+      "sha256": "9d69cd0aea95c0a7d2a0c95afd52a230c0d532b52ba775278d2809b5598389b2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-6-lint-062602.2026-10-19T06-26.json",
+      "sha256": "b0cd1ef0de36372a351fc3bb94b9b82a0684b3936908af11cba7a184348e9e2f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-6-types-062602.2026-10-19T06-26.json",
+      "sha256": "2709092867a9c64b4e484b123555352c271cbca9bfe0f147e445a38fbbfed282"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-6-tests-062656.2026-10-19T06-26.json",
+      "sha256": "54c21271fcb16920bd1dacfb51fd50a7550dba95860313d80564b3e5c9dc0296"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "aeb4b0c3d2d33023554b9806a4579ac827fbdb910c2a567dc2174781395b581d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "a5e4bd8200de5f779cc3491aa62f799455cffd8aff877e364108e2bdbf6d5f1f",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-26"
+}

@@ -1,0 +1,354 @@
+{
+  "Timestamp": "2026-10-20T15-35",
+  "Command": "Bounded SR1/SR2/ST1/SC1 repair confirmation; retained ordered proof and finite closure reconciliation",
+  "EXIT_CODE": 0,
+  "status": "READY_FOR_CHECKED_COMMIT",
+  "task": "P6-T1",
+  "task_acceptance": false,
+  "authority": {
+    "delegation_id": "rendering_review_p6t1_shared_confirmation_20261020",
+    "phase": "S5_P6T1_shared_repair_confirmation",
+    "agent_type": "atomic-executor-c3-elevated",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_authority_sha256": "f4016ebdabcd36d1e5aac5c6dde6e1ebdb558bec770792f5c188710d8c621bf5",
+    "qualification": "Persisted resumed route and existing native launch attestation verified before evidence write; routing, launch authority and provenance valid."
+  },
+  "original_review": {
+    "path": "evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.json",
+    "sha256": "e17cb15a5550b54975c7986de62ef68c676459d403869a51af3e011a0053c30d"
+  },
+  "resolved": [
+    {
+      "id": "SR1",
+      "result": "Exact str guards precede enum equality at the four recorded constructors. Nullable result context is preserved; malformed request-error context becomes None. Retained probe has zero equality callbacks at all six fields, and new controls cover non-string objects and str subclasses."
+    },
+    {
+      "id": "SR2",
+      "result": "Manifest text, both role pins, missing paths and captured-content hashing are prepaid; one cumulative work budget covers result fields, summary, finding/artifact rows and subsequent projection. Final exact byte/node measurement has a separate budget but does not reset work. Existing InputManifest.to_dict and digest algorithms remain unchanged. Retained rejected-work probes call no projection/hash; the positive small-manifest test preserves exact digest, missing paths and both roles."
+    },
+    {
+      "id": "ST1",
+      "result": "Only the two approval evidence fixtures change from strings to structured artifact_kind/id references. All nine original assertions and original test identities remain."
+    },
+    {
+      "id": "SC1",
+      "result": "All six identified named bodies now have 100% statements and branches. All 30 recorded nonmodule function bodies meet the unchanged >=90% statement floor. Raw coverage and declaration exclusions are preserved."
+    }
+  ],
+  "findings": [],
+  "source": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "lines": 440,
+      "changed_named_bodies": [
+        "ServiceRuntimeError",
+        "ServiceRuntimeError.__init__",
+        "ServiceRequestError",
+        "ServiceRequestError.__init__",
+        "DiscoveryResult",
+        "DiscoveryResult.__post_init__",
+        "ServiceAuthority",
+        "ServiceAuthority.__post_init__"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "lines": 415,
+      "changed_named_bodies": [
+        "_manifest",
+        "result_document"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "lines": 279,
+      "changed_named_bodies": []
+    }
+  ],
+  "signature_preservation": true,
+  "freeze": {
+    "path": "evidence/regression-testing/p6t1-shared-freeze.2026-10-20T15-34.json",
+    "sha256": "fa15d9c6baa761682075afa49181bf54684ba489a5ce2e24599489f0fb1a2536"
+  },
+  "owner_staging": {
+    "path": "evidence/regression-testing/p6t1-shared-staging.2026-10-20T15-34.json",
+    "sha256": "60110d6bed1fdc0cb280fd89ab6029394d510692318e87aada7354d43c7eb2db"
+  },
+  "reconciliation": {
+    "ordered_stages": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-black.2026-10-20T15-24.json",
+        "sha256": "08f8906a7dbf7cfc5b591ab2c42e459e7339c0d981104ac76291adb331236a32",
+        "stage": "black",
+        "start": "2026-10-20T15:24:46.024186+00:00",
+        "elapsed_seconds": 2.010964
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-coverage.2026-10-20T15-27.json",
+        "sha256": "1f145261ea3e72042dfe27ff407b14aedd65bb898172c404c01edf88f94f3194",
+        "stage": "coverage",
+        "start": "2026-10-20T15:27:08.089583+00:00",
+        "elapsed_seconds": 1.611003
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-precheck.2026-10-20T15-24.json",
+        "sha256": "b4999734b2613a3a1aa95045fe685cf923cb729dd38a0d37a8ba3b16ffb3432a",
+        "stage": "precheck",
+        "start": "2026-10-20T15:24:53.564527+00:00",
+        "elapsed_seconds": 5.017324
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-pyright.2026-10-20T15-24.json",
+        "sha256": "87471cb9e564e2d10236a9fa162cb9b5c438f1d4487069f0e9d5ace75d42b60b",
+        "stage": "pyright",
+        "start": "2026-10-20T15:24:49.507047+00:00",
+        "elapsed_seconds": 2.42219
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-reprobe.2026-10-20T15-24.json",
+        "sha256": "c30ca07461eeca0c1af633e559829bc74c6f2fad57a5f05365d472217d353bd0",
+        "stage": "reprobe",
+        "start": "2026-10-20T15:24:51.938233+00:00",
+        "elapsed_seconds": 1.611063
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-ruff.2026-10-20T15-24.json",
+        "sha256": "3c30c94e44262f3ba3bf0984cd3c63956f15c99a3d702bfd489f29939c59d1c8",
+        "stage": "ruff",
+        "start": "2026-10-20T15:24:48.046580+00:00",
+        "elapsed_seconds": 1.446269
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-tests.2026-10-20T15-27.json",
+        "sha256": "a4ec4337c3a8d47668d13be5c64a9bff8912fad33034fa72952c6a08778d4b96",
+        "stage": "tests",
+        "start": "2026-10-20T15:24:58.597048+00:00",
+        "elapsed_seconds": 129.475245
+      }
+    ],
+    "passing_nodes": 145,
+    "original_nodes_retained": 116,
+    "passing_prechecks": 23,
+    "raw_readable_streams": 14,
+    "archived_stage_payloads": 28,
+    "freeze_archive_members": 18,
+    "freeze_archive_sha256": "30a865bf03a46727281c04a2a452be6a804dcd5423473d9a3a0f4960e410d755",
+    "coverage_raw_sha256": "d4ab68d9e49c8750851a89491d342549977540f1ad5cc774fb52f7a2dda84e75",
+    "raw_coverage_final_newline": false,
+    "coverage": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+        "summary": {
+          "covered_lines": 132,
+          "num_statements": 132,
+          "percent_covered": 100,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 19,
+          "percent_statements_covered": 100,
+          "percent_statements_covered_display": "100",
+          "num_branches": 26,
+          "num_partial_branches": 0,
+          "covered_branches": 26,
+          "missing_branches": 0,
+          "percent_branches_covered": 100,
+          "percent_branches_covered_display": "100"
+        },
+        "named_bodies": 16
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+        "summary": {
+          "covered_lines": 71,
+          "num_statements": 74,
+          "percent_covered": 95.45454545454545,
+          "percent_covered_display": "95",
+          "missing_lines": 3,
+          "excluded_lines": 2,
+          "percent_statements_covered": 95.94594594594595,
+          "percent_statements_covered_display": "96",
+          "num_branches": 58,
+          "num_partial_branches": 3,
+          "covered_branches": 55,
+          "missing_branches": 3,
+          "percent_branches_covered": 94.82758620689656,
+          "percent_branches_covered_display": "95"
+        },
+        "named_bodies": 2
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+        "summary": {
+          "covered_lines": 154,
+          "num_statements": 154,
+          "percent_covered": 100,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 3,
+          "percent_statements_covered": 100,
+          "percent_statements_covered_display": "100",
+          "num_branches": 56,
+          "num_partial_branches": 0,
+          "covered_branches": 56,
+          "missing_branches": 0,
+          "percent_branches_covered": 100,
+          "percent_branches_covered_display": "100"
+        },
+        "named_bodies": 12
+      }
+    ],
+    "sc1_ranges": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+        "name": "DiscoveryResult.__post_init__",
+        "start": 238,
+        "end": 271,
+        "covered_statements": 8,
+        "total_statements": 8,
+        "covered_branches": 6,
+        "total_branches": 6
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+        "name": "validate_service_result",
+        "start": 430,
+        "end": 440,
+        "covered_statements": 3,
+        "total_statements": 3,
+        "covered_branches": 2,
+        "total_branches": 2
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+        "name": "normalize_findings",
+        "start": 123,
+        "end": 146,
+        "covered_statements": 15,
+        "total_statements": 15,
+        "covered_branches": 8,
+        "total_branches": 8
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+        "name": "check_request",
+        "start": 205,
+        "end": 228,
+        "covered_statements": 5,
+        "total_statements": 5,
+        "covered_branches": 2,
+        "total_branches": 2
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+        "name": "_manifest",
+        "start": 264,
+        "end": 294,
+        "covered_statements": 18,
+        "total_statements": 18,
+        "covered_branches": 8,
+        "total_branches": 8
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+        "name": "checked_result_document",
+        "start": 395,
+        "end": 415,
+        "covered_statements": 6,
+        "total_statements": 6,
+        "covered_branches": 2,
+        "total_branches": 2
+      }
+    ],
+    "source_before_after_current_identical": true,
+    "qualification": "Archived UTF-8 runner normalization, WORKSPACE/SCRATCH aliases, CR/LF and terminal whitespace conventions reconcile to readable streams. Raw coverage/database/source/harness bytes remain exact, including raw coverage's missing final LF. Historical failed candidate and original probes retained; no behavioral replay."
+  },
+  "dependencies": {
+    "current_head": "44cb1199efeb40d735c007c45098f41d6720204b",
+    "task_source_baseline": "2c69b559bbd5dfe1f97c23947bd5d25d607e0303",
+    "nonowned_committed_bindings": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+        "working_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+        "expected_git_blob": "2093aa96e1b81e582d293ef58ef794a65939440b"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+        "working_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+        "expected_git_blob": "de5dfad1cd931ef1bf4139e989d24ed09cb383b1"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+        "working_sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+        "expected_git_blob": "7f095e147f9e2dd2260217baae4b5614b20324af"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+        "working_sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+        "expected_git_blob": "aff2bf88f5aff90ab6afbfa89f8559ffe8d11409"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "working_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+        "expected_git_blob": "908612c6aad30ea9e4b5cb8800d2eb33b0930a3f"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+        "working_sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+        "expected_git_blob": "03fe3327734efd5126140fd207c7df9a33f1a57a"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+        "working_sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+        "expected_git_blob": "1f916e605db08561b861c3af9f7bde59a81fe8db"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+        "working_sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+        "expected_git_blob": "478b20959275de55e1dab0e21a2fd0f9a98491c3"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+        "working_sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+        "expected_git_blob": "7fc2805aa8184c038f24e74544a6b0640e466ab3"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+        "working_sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+        "expected_git_blob": "262707e26d2837517e1f345bcce3244b40a810e3"
+      },
+      {
+        "path": "schemas/discovery/v2/service-request.schema.json",
+        "working_sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+        "expected_git_blob": "ae9d64f0f23908eb6e15d26ac54e6038554b8ffa"
+      },
+      {
+        "path": "tests/schemas/discovery/v2_control_test_support.py",
+        "working_sha256": "5075c10ea9fe0021ff94671a4f5abffb2cc242f20f3681a41a25dd4419569500",
+        "expected_git_blob": "1ac45982a381b563523d45f95f9ee46b93cceee5"
+      },
+      {
+        "path": "tests/schemas/discovery/v2_schema_test_support.py",
+        "working_sha256": "531fd20dec0d27347595e88b4cbf1f10a7413df588976cd9918b8f11fbaa1f48",
+        "expected_git_blob": "03e199552187819a4c7b6f645918008ef7114259"
+      },
+      {
+        "path": "tests/discovery_runtime/test_snapshot_io.py",
+        "working_sha256": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+        "expected_git_blob": "ca01e77ec40d46ce4ab69eef4efa01836690ba86"
+      }
+    ],
+    "owned_source_schema_test_count": 10,
+    "qualification": "Analyzer-only accepted HEAD advance is preserved. All 14 directly bound non-owned dependencies match committed Git under permitted line normalization. Canonical/generated result schema and resource manifest belong to this shared union. Build identity may be combined only through its separate reviewed union; selector/core/gateway remain outside this confirmation."
+  },
+  "effects": {
+    "source_test_schema_edits": false,
+    "git_checkpoint_plan_ac_edits": false,
+    "delegation": false,
+    "behavioral_execution": false,
+    "whole_task_acceptance": false
+  },
+  "next": "Coordinator may stage this exact self-bound shared union, independently or with the separately confirmed build union. P6-T1 final composed acceptance remains pending. Current phase P6; upcoming P6-T1, P6-T2, P6-T3, P7-T1, P7-T2."
+}

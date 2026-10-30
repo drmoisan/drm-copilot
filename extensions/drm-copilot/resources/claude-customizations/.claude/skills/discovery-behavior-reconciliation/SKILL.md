@@ -1,65 +1,46 @@
 ---
 name: discovery-behavior-reconciliation
-description: 'Capture unspecified or contradictory behavior and reconcile it into product decisions in the discovery workflow. Use when recording unspecified-behavior findings from the parity matrix and reconciling them into product-decision records via the reconciler role. Sixth stage, after parity and before the validation gate.'
+description: 'Dispatch unresolved behavior to canonical proposal and root-approval handling. Use when invoking the existing behavior-reconciliation alias.'
 ---
 
-# Discovery Behavior Reconciliation
-
-Runs the reconciliation stage of the discovery and parity-definition workflow.
-It captures behavior that is unspecified or contradictory across the legacy
-source, the runtime observations, and the parity matrix, then reconciles each
-finding into a product decision. All domain specificity is read from the domain
-profile at runtime.
+# Discovery Behavior Reconciliation Alias
 
 ## When to Use This Skill
 
-- The parity matrix has flagged gaps or contradictions that need a documented
-  resolution.
-- You need product-decision records before the final validation gate.
+Use this compatibility name only to dispatch to its canonical workflow.
 
-## Prerequisites
+## Inputs
 
-- `discovery-parity-matrix` has completed.
-- The domain profile is loaded and valid.
+| Input | Required contract |
+| --- | --- |
+| inputs | Required inputs of the linked canonical workflow, forwarded unchanged. |
 
-## Workflow
+Forward all other supplied canonical inputs to the selected target. These
+alias selectors are not service-request fields. A fixed mapping requires no
+additional selector; it does not add fields to `prepare-agent`.
 
-1. **Capture unspecified behavior.** Record each unspecified or contradictory
-   behavior as a record conforming to the schema
-   `schemas/discovery/v1/unspecified-behavior-record.schema.json`, citing the
-   parity-matrix entry and evidence that surfaced it.
+## Dispatch
 
-2. **Reconcile into product decisions.** For each captured record, produce a
-   product-decision record conforming to the schema
-   `schemas/discovery/v1/product-decision-record.schema.json`, stating the
-   decision and its rationale.
+| Selector | Canonical skill |
+| --- | --- |
+| fixed | adjudicate-unspecified-behavior |
 
-3. **Route reconciliation.** Hand the records to the reconciler role for the
-   reconciliation decision (see `## Worker Routing`).
+Dispatch directly to `adjudicate-unspecified-behavior`. The target separates specialist proposals from authorized root approval; this alias does not approve decisions.
 
-## Worker Routing
+This alias has no independent output or write authority. Do not duplicate
+business validation, call tools independently, create a receipt, change a model
+or auto-launch a role. Use only the linked canonical workflow's lifecycle and
+exact grants; no alias chain or filesystem fallback is permitted.
 
-- Worker: `requirements-reconciler`
+## Stop and result
 
-The reconciler role decides how each unspecified or contradictory behavior is
-resolved and records the outcome as a product decision.
+Return the selected canonical workflow's explicit result and references without
+changing failed, blocked, pending or incremental outcomes into completion.
+An unknown selector fails with no fallback. Missing configuration or native
+capability is handled by the canonical workflow, including initialization's
+explicit root bootstrap exception. The alias cannot bypass prepare/finalize or
+native start/stop requirements.
 
-## Validation
+## References
 
-- Validate unspecified-behavior records with
-  `dev.discovery.validate-unspecified-behavior`.
-- Validate product-decision records with
-  `dev.discovery.validate-product-decision`.
-- An empty error list is a pass. On any error, follow the direction in
-  `discovery-validate-artifacts`.
-
-## Referenced Skills
-
-- `discovery-workflow` — stage order and the canonical Referenced Contracts
-  registry.
-- `discovery-validate-artifacts` — pass/fail semantics and error routing.
-
-## Notes
-
-- Product-decision records complete the artifact set consumed by the final
-  validation gate in `discovery-validate-artifacts`.
+- [adjudicate-unspecified-behavior](../adjudicate-unspecified-behavior/SKILL.md)

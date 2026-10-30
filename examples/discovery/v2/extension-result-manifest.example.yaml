@@ -1,0 +1,25 @@
+$schema: urn:drm-copilot:discovery:2.0.0:extension-result-manifest
+schema_version: 2.0.0
+artifact_kind: extension-result-manifest
+id: adapter-export-alpha
+adapter: {id: synthetic.adapter, version: 1.0.0}
+repository:
+  id: synthetic-source
+  revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+input_manifest_sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+source_inputs:
+  - path: src/Processor.cs
+    sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    size: 64
+result_files:
+  - artifact_kind: inventory-snapshot
+    id: inventory-alpha
+    schema_version: 2.0.0
+    path: inventory/inventory-alpha.json
+    sha256: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+    size: 256
+manifest_sha256: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+generated_at: "2026-01-01T00:00:00Z"
+generated_by: {kind: tool, id: synthetic.adapter}
+diagnostics: []
+extensions: {}

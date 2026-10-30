@@ -1,0 +1,161 @@
+{
+  "issue": 980,
+  "task": "P6-T1",
+  "recorded_utc": "2026-10-21T08:31:29+00:00",
+  "status": "CHANGES_REQUIRED",
+  "route": "atomic_execution_p6t1_capture_candidate_20261021T081900",
+  "head": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+  "scope": "One frozen three-production/two-owned-test candidate; the sixth binding is an unchanged direct-regression dependency. Boundary checkpoint remains accepted and outside this review.",
+  "bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01",
+      "bytes": 15075,
+      "physical_lines": 354
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "sha256": "ffb07582f5aa78c99d16f6ddfc4e815702e520d49ccc415d3bb011d8dbdbaf28",
+      "bytes": 13127,
+      "physical_lines": 287
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "ef8b270058a8357ad4da3f703cfbbd5b3b7d14c198fdbd860b5b95b23037efb8",
+      "bytes": 22184,
+      "physical_lines": 500
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "9d1beb4dcaee6fb5b4fcdcc422a9d5776dfa768206c0305fb8894fcc2dcba22f",
+      "bytes": 19576,
+      "physical_lines": 497
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_migration.py",
+      "sha256": "1e11c2d4a2142ba7f1a13411b82ad8a5583c0811f09baa3ab4e29b9a0d8ede13",
+      "bytes": 17631,
+      "physical_lines": 409
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4",
+      "bytes": 19193,
+      "physical_lines": 484
+    }
+  ],
+  "references": {
+    "frozen_statics": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-081715-types.2026-10-21T08-17.json",
+      "sha256": "fe0ca32ae2f948aff43c05359240fc938064d72db6629fddac75c642cd955d74"
+    },
+    "precheck": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-081749-precheck.2026-10-21T08-22.json",
+      "sha256": "ee8daca94fda2a97c23401957267d23df5837f7b0866bdd00f62350c6c23fbe1"
+    },
+    "precheck_raw": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-081749-precheck-raw.2026-10-21T08-22.json",
+      "sha256": "3ec99d142d2e2e76a76ac4cbd5d2bcd96abb2a1a1cb0930d7e0546ade042f268"
+    },
+    "capture_supplement": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-capture-supplement.2026-10-21T07-55.json",
+      "sha256": "df19757a72db2a607cbac1a1a69368ca6fe90b83d442558a36005845ba993fde"
+    },
+    "projection_prerequisite": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-migration-projection-prerequisite.2026-10-21T08-07.json",
+      "sha256": "5f410e9bd88a2f56530f28a684abca6aca6080975e37b1d20e8cd7389143e012"
+    }
+  },
+  "result": {
+    "statics": "Owner's ordered Black/Ruff/scoped Pyright passed on the frozen candidate.",
+    "precheck": {
+      "passed": 12,
+      "failed": 1,
+      "total": 13,
+      "harness_seconds": 282.386613,
+      "exit_code": 1,
+      "all_before_after_bindings_equal": true
+    },
+    "failed_node": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_retains_exact_files_and_trusted_ports",
+    "corrected_progress_qualification": "Earlier progress messages counted completed nodes as passes. The immutable completed receipt is authoritative: 12 passed and one failed; body-mismatch and evidence-link controls passed.",
+    "full_29": "Held; no complete 29-case or final integration result is claimed.",
+    "additional_reviewer_execution": "No behavioral probe, test suite, factory, native operation or package execution. Source-order evidence is sufficient for the reservation finding. Original source and raw diagnostic bytes were not changed."
+  },
+  "findings": [
+    {
+      "id": "MC2-R1",
+      "classification": "Production resource-reservation contract defect",
+      "location": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:317-340 (project_snapshot)",
+      "observed": "The projected/original indexes are built, then line 333 retains each selected original with files.setdefault. Only afterward do lines 334-340 reject the merged file count and aggregate raw bytes. Thus an over-capacity supplemental merge is performed before its count/byte refusal.",
+      "impact_and_limits": "The final manifest is not returned after rejection, and no write is demonstrated. Existing work reservation precedes index construction; this finding does not claim an unbounded loader or a missing work prepayment for the initial combined iteration. It concerns the explicitly required prospective merged-capacity check.",
+      "required": "Compute and enforce the exact prospective merged count and raw-byte total before supplemental retention/encoding. Charge existing overlap once and preserve loader classification when identical. Keep immutable-original rejection, bounded work accounting, empty-marker return, strict loader/path policy and post-write hash equality unchanged.",
+      "verification": "Add four direct project_snapshot controls: count exactly sufficient, count one short, raw bytes exactly sufficient, raw bytes one short. Use deterministic observation to prove short cases refuse before supplemental retention/encoding. Binder-only exhaustion controls do not establish this projection property."
+    },
+    {
+      "id": "MT1",
+      "classification": "Test fixture comparison operand defect",
+      "location": "tests/discovery_runtime/test_service_migration.py:260-262",
+      "observed": "The empty-marker projection is compared to base.proposal_base.snapshot.manifest, an unrecomputed plan snapshot. The fixture reconstructs plan.directories and files but omits the pre-existing application directory created by service_plan. The unchanged loader therefore adds application to missing_paths.",
+      "actual_missing_paths": [
+        "application",
+        "config/discovery.json",
+        "proposals",
+        "verification"
+      ],
+      "unrecomputed_missing_paths": [
+        "config/discovery.json",
+        "proposals",
+        "verification"
+      ],
+      "required": "Compare the empty-marker result with project_snapshot(base.proposal_base, ()).manifest under the same fixture. Keep the assertion of unchanged default operation, marker retention, category, exact bytes and unmarked exclusion. Do not weaken the loader or suppress missing paths."
+    },
+    {
+      "id": "MC2-C1",
+      "classification": "Measured critical-path and new-body verification gap",
+      "location": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py:131-170 (_Supplement.capture)",
+      "measurement": "Owner's retained 13-control diagnostic reports 19/23 body statements, missing 141, 145, 160 and 165; module 112/120 statements and 35/44 branches. These are preliminary counts, not a completed 29-case coverage gate.",
+      "policy": "AGENTS.md General Unit Test Policy: any new module, class or method targets at least 90% coverage; critical behavior must be tested. Use the established declaration-exclusive BODY reader without augmenting raw counters.",
+      "required_controls": [
+        "Set profile.limits.source_files to exactly the existing captured-file count and select an already captured profile path. Require successful coalescing with unchanged count, category and bytes (line 141).",
+        "Use that same exact source_files ceiling plus one new selected legacy file. Require ReportLimitError with zero reader calls (line 145); do not substitute artifact_records and fail at an unrelated work ceiling.",
+        "Set document_bytes to exactly the aggregate existing immutable bytes, then select one new file. Require remaining-read refusal before reader use (line 160).",
+        "Select an already captured profile path whose physical memory bytes changed to a different same-length value. Require the exact captured-byte conflict with no successful capture or write (line 165)."
+      ]
+    }
+  ],
+  "finite_repair_scope": {
+    "production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py::project_snapshot"
+    ],
+    "tests": "Correct MT1 and add exactly the four capture plus four projection controls. The proposed cohesive test_migration_capture.py split moves the existing 11 capture nodes and sole helper, preserving old-to-new identity mapping; the nine schema controls remain in test_service_migration.py. Preserve assertions outside MT1 and the authorized additions.",
+    "population": "Expected focused 37 and final 326 after the eight additions; bind actual collection identities before claiming those totals. Preserve the three approved direct test_mutation_plan selectors and the real guarded migration-write control.",
+    "size": "Current physical lines: service_bootstrap 354, migration_capture 287, mutation_plan 500, publication test 497, migration test 409. Keep every resulting production/test file at most 500; no additional production file or unrelated refactor is required by this finding."
+  },
+  "closed_review": {
+    "compatible_contract": "Public keyword-default-empty marker, trusted per-operation I/O clone, selected original bytes/ordinary observations, both recaptures, exact registered v1 schema identity and pinned evidence revision are consistent with the approved finite contract, subject to MC2-R1 and completed proof.",
+    "unchanged_boundaries": "No init_io/profile-field/PathPolicy/mutation_io changes, no broader roots or grants, no arbitrary unmarked retention. The public marker is not independent authority.",
+    "default": "Source lines 303-304 return the same accepted loader result for the empty marker. MT1 is a fixture operand error, not demonstrated default-loader regression.",
+    "publication": "The existing real migration-write test invokes the actual guarded writer, directly exercising its unchanged projected-versus-recaptured hash postcondition; no extra publication-control node is required by this review.",
+    "intent_type_size": "No additional concrete intent-comment, type, size or API-compatibility finding in the frozen changed scope. Clean static proof does not substitute for remaining behavior and BODY gates.",
+    "prior_review_qualification": "The earlier exact-file-as-documentation-root source-clear claim remains withdrawn by MC1. The current clone/marker correction is independently assessed here; historical failed candidates and all-planned boundary expectation remain preserved, not rewritten.",
+    "open_investigations": []
+  },
+  "completion_implications": {
+    "required": "After the finite repair, one clean ordered static/precheck/focused sequence, current BODY/changed-line and prior-covered-point proof, then the actual complete reversed affected final population and four contracts. No acceptance/checkoff now.",
+    "package": "Runtime source changes require regenerated package identity, build/check/install and a fresh installed identity binding. The earlier package/native records remain historical.",
+    "native": "Reuse unaffected native operations only with exact unchanged implementation/dependency bindings and explicit empty-marker default-path qualification. Retained native evidence does not prove new supplemental migration behavior. This finite review requires the actual guarded in-memory migration write and fresh package identity, not a default replay of the entire accepted native chain.",
+    "counts": {
+      "completed_plan_tasks": 46,
+      "total_plan_tasks": 84,
+      "completed_source_acs": 23,
+      "total_source_acs": 66
+    },
+    "next_five": [
+      "P6-T1",
+      "P6-T2",
+      "P6-T3",
+      "P7-T1",
+      "P7-T2"
+    ]
+  }
+}

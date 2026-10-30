@@ -1,0 +1,106 @@
+{
+  "written_at_utc": "2026-10-18T15:19:31.056795+00:00",
+  "task": "P3-T3 prerequisite only",
+  "head": "e0f5b74fd0217ea266db2675ec0ec919f73084db",
+  "acceptance_baseline": "639c37269ed12b0bd4b5d74d66723e2f5ce4dedd",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "sha256": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+      "bytes": 18537
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_filesystem.py",
+      "sha256": "582a880ea65afadaa103c147da82b4bc0e6ab9f2f79d44e71152583b31ce9e29",
+      "bytes": 19516
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass1-integration.2026-10-18T15-07.md",
+      "sha256": "844681fd458f17dba90aa35f2caeebe1f6d6703449134040188cabbd04dac462",
+      "bytes": 4018
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-windows-activation.2026-10-18T15-07.json",
+      "sha256": "eb7b40756cdb46632c98d337ae163b1d08df7594a300ee3b0ed6f7b1baf72ac3",
+      "bytes": 1813
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-native-activation-diagnosis.2026-10-18T15-07.md",
+      "sha256": "1fb02f734bb8809cd2cc960e5009ef67c11b27b36219b9b94363f0ed7691c990",
+      "bytes": 4637
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-windows-activation-diagnostic.2026-10-18T15-07.json",
+      "sha256": "46c31bcbe40c89464223817b5341266e8bc51bc7bde26404040780cf599e7060",
+      "bytes": 1814
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-native-byte-diagnosis.2026-10-18T15-08.json",
+      "sha256": "f6ed8827467e6ff90c5b01ccb4892294583e7cffeb8562fb56aced34a9afa173",
+      "bytes": 758
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-native-byte-diagnosis.2026-10-18T15-08.md",
+      "sha256": "db889f862bce68549399418543d60607ba33f7a09f881282040487e2eda0b338",
+      "bytes": 1337
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-binary-native-diagnostic.2026-10-18T15-14.md",
+      "sha256": "0841a30dfa784adbb9bd3a2e37a6e9a1e0d7cf1c15cd2acb6eb974070f3c4d5e",
+      "bytes": 8427
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-windows-binary-prerequisite.2026-10-18T15-14.json",
+      "sha256": "539eadb859ae0c1c83ce30161661b6f329a100be31e734e5fc7c99b3bfb555db",
+      "bytes": 4476
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t3-binary-fix-unit-extract.2026-10-18T15-19.json",
+      "sha256": "d751d3d486fff25ca7673cd286741c006769385551075b004c9c4036900b2a84",
+      "bytes": 57664
+    }
+  ],
+  "prior_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "db2aca8bf68f64333b509ca12cbe8445d1a0dadc0532064d93581acb1afb422c",
+    "tests/discovery_runtime/test_mutation_filesystem.py": "5f57206cb69c35e39cff7a0c5f4b57f71b200c1a66ed678df4a3a69dad12f5ba"
+  },
+  "changed_task_paths_to_leave_unstaged": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "tests/discovery_runtime/test_activation_filesystem.py": "3d1ade9a26bba3755b7399922937c8ec7f35c06b46e033be1636fe2379f7a134",
+    "tests/discovery_runtime/test_activation_store.py": "8cc5f600177fa2ae5d3e51c3250e265780d41074bd521b9250f7f9a698ab58cd",
+    "tests/discovery_runtime/test_configuration.py": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425"
+  },
+  "tests": {
+    "full_forward": 134,
+    "full_reverse": 134,
+    "provider_cases": 42,
+    "new_binary_cases": 8,
+    "contract_cases": 385,
+    "windows_binary_checks": 17,
+    "windows_activation_checks": 12
+  },
+  "provider_coverage": {
+    "covered_lines": 207,
+    "lines": 209,
+    "covered_arcs": 51,
+    "arcs": 54,
+    "delta_from_accepted_baseline": 0
+  },
+  "full_run_receipts_to_leave_unstaged": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-architecture.2026-10-18T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-contracts.2026-10-18T15-18.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-coverage-check.2026-10-18T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-format.2026-10-18T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-integration-activation.2026-10-18T15-18.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-lint.2026-10-18T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-reverse.2026-10-18T15-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-tests.2026-10-18T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-pass2-types.2026-10-18T15-15.md"
+  ],
+  "pending": [
+    "One combined native initialization projected-output/physical-byte reproof",
+    "Final task source/index/prior audit and independent acceptance",
+    "P3-T3 accepted-task commit before P3-T4 release"
+  ],
+  "qualification": "Earlier Windows mutation and initialization exact-byte claims are historical. The corrected provider now has independent raw-byte proof; initialization composition is still pending. No P3-T3 completion is claimed. No process remains active."
+}

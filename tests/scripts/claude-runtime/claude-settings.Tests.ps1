@@ -102,6 +102,32 @@ Describe "claude-settings" {
         $content | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 
+    It "registers the native discovery start, tool, stop and planning handlers for the four discovery agents (issue #980)" {
+        $settingsPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json'
+        $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
+        $roles = @('legacy-parity-analyst', 'runtime-characterization-analyst', 'requirements-reconciler', 'migration-coverage-reviewer')
+
+        $start = @($settings.hooks.SubagentStart | Where-Object { ($_.hooks | ForEach-Object { $_.command }) -match 'record-discovery-agent-start\.ps1' })
+        $start.Count | Should -Be 1
+        foreach ($role in $roles) { $role | Should -Match $start[0].matcher }
+
+        $tool = @($settings.hooks.PreToolUse | Where-Object { ($_.hooks | ForEach-Object { $_.command }) -match 'enforce-discovery-artifact-gate\.ps1' })
+        $tool.Count | Should -Be 1
+        foreach ($name in @('Bash', 'Write', 'Edit', 'Agent', 'mcp__drm-copilot__run_discovery_repo_inventory', 'mcp__drm-copilot__discovery_capability_sentinel')) { $name | Should -Match $tool[0].matcher }
+        # The sentinel agent is not a discovery role: no SubagentStart or SubagentStop matcher names it.
+        foreach ($entry in @($settings.hooks.SubagentStart) + @($settings.hooks.SubagentStop)) { 'discovery-capability-sentinel' | Should -Not -Match "^($($entry.matcher))$" }
+
+        $planning = @($settings.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Agent' })
+        @($planning[0].hooks.command) | Should -Contain 'pwsh -NoProfile -File .claude/hooks/enforce-discovery-planning-gate.ps1'
+
+        $broadStop = @($settings.hooks.SubagentStop | Where-Object { $_.matcher -like 'atomic-planner|atomic-executor|*' })
+        $broadStop.Count | Should -Be 1
+        @($broadStop[0].matcher -split '\|').Count | Should -Be 15
+        $dedicatedStop = @($settings.hooks.SubagentStop | Where-Object { $_.matcher -ceq ($roles -join '|') })
+        $dedicatedStop.Count | Should -Be 1
+        @($dedicatedStop[0].hooks.command) | Should -Be @('pwsh -NoProfile -File .claude/hooks/validate-discovery-artifact-gate.ps1')
+    }
+
     It "requires the Bash PreToolUse hook chain to include validate-bash and enforce-promotion-mcp-only" {
         $settingsPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json'
         $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json

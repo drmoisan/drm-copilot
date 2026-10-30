@@ -1,0 +1,42 @@
+{
+  "Timestamp": "2026-10-20T12-41",
+  "task": "P5-T5",
+  "status": "PREPARATION_CLOSURE_CHECK_FAILED",
+  "exit_code": 1,
+  "gate_or_suite_executed": false,
+  "source_or_test_changed": false,
+  "diagnostic": "FileNotFoundError during staging closure: the prior diagnostic serialized two partial snapshot paths as one string.",
+  "qualification": "The 12:39 preparation payload was written before the invocation failed at staging; it is retained as a partial attempt and is superseded by the subsequent complete preparation receipt. Three execution readers are unchanged.",
+  "correction": "Use the exact two original snapshot names independently and preserve all partial-attempt files.",
+  "partial_attempt": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-template.2026-10-20T12-39.json",
+      "sha256": "a7a772c63345dbab89ac47221cf21c21dcc0c901e6e304812dafbbcf72246e0d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_prepare_final.2026-10-20T12-39.txt",
+      "sha256": "b88cef9cd57402a42749f6f62d7397e5ad6831606b165e11d9af0e8b4f8aea2a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_gates.2026-10-20T12-39.txt",
+      "sha256": "dc92ab67e5cdc6abc0f9548fc53f5eaf8660b0a22b9d243a9ca630cfc82ba8f6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_static.2026-10-20T12-39.txt",
+      "sha256": "dd52c76c58063d0caea6e71c42b82c92357ed7784e77f3f5c7d826167638b964"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_coverage.2026-10-20T12-39.txt",
+      "sha256": "a8f163389dfaad6acd39d0cbdce954f07a89fd03f3070f793f81fad2c3e4e477"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation.2026-10-20T12-39.json",
+      "sha256": "7a3a1123357d2da7c7e3834da438c3dec3caf04bc78e0d5811a868972304ddb1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation.2026-10-20T12-39.md",
+      "sha256": "6f517250249e2e825dc94b4b902c148e42ede6bee15fe150d15b9817c5b9b371"
+    }
+  ],
+  "stream_qualification": "Tool-rendered metadata diagnostic, not raw subprocess stream evidence."
+}

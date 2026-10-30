@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:product-decision",
+  "title": "Discovery v2 product decision",
+  "description": "Target policy proposals and authorized dispositions. Structural approval metadata is not an authorization grant; ownership, scope and conflicts require graph/host validation.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "decision_id", "feature_refs", "unspecified_behavior_refs", "decision_key", "scope", "status", "decision", "rationale", "alternatives", "affected_platforms", "required_migration_behavior", "approval", "resulting_acceptance_criteria", "supersedes", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:product-decision"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "product-decision"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "decision_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "feature_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/feature-references"},
+    "unspecified_behavior_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/unresolved-references"},
+    "decision_key": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "scope": {"$ref": "#/$defs/scope"},
+    "status": {"enum": ["proposed", "approved", "rejected", "superseded"]},
+    "decision": {"$ref": "#/$defs/nullable-text"},
+    "rationale": {"$ref": "#/$defs/nullable-text"},
+    "alternatives": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/alternative"}},
+    "affected_platforms": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+    "required_migration_behavior": {"$ref": "#/$defs/nullable-text"},
+    "approval": {"anyOf": [{"$ref": "#/$defs/approval"}, {"type": "null"}]},
+    "resulting_acceptance_criteria": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:feature-contract#/$defs/acceptance-criterion"}},
+    "supersedes": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-references"},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "allOf": [
+    {"anyOf": [{"properties": {"feature_refs": {"minItems": 1}}}, {"properties": {"unspecified_behavior_refs": {"minItems": 1}}}]},
+    {
+      "if": {"properties": {"status": {"const": "approved"}}, "required": ["status"]},
+      "then": {"properties": {
+        "decision": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "required_migration_behavior": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "approval": {"$ref": "#/$defs/approval"},
+        "resulting_acceptance_criteria": {"minItems": 1, "items": {"properties": {"readiness": {"const": "ready"}}}}
+      }}
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["proposed", "rejected"]}}, "required": ["status"]},
+      "then": {"properties": {"resulting_acceptance_criteria": {"items": {"properties": {"readiness": {"const": "pending"}}}}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "proposed"}}, "required": ["status"]},
+      "then": {"properties": {"approval": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "rejected"}}, "required": ["status"]},
+      "then": {"properties": {"rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "superseded"}}, "required": ["status"]},
+      "then": {"properties": {"resulting_acceptance_criteria": {"items": {"properties": {"readiness": {"const": "superseded"}}}}}}
+    }
+  ],
+  "$defs": {
+    "nullable-text": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+    "scope": {
+      "type": "object", "additionalProperties": false, "required": ["feature_ids", "client_ids", "platforms", "modes", "dimensions"],
+      "description": "Explicit selectors; empty client/platform/mode/dimension arrays mean unrestricted within linked features. Graph validation resolves feature and owner scope.",
+      "properties": {
+        "feature_ids": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers", "minItems": 1},
+        "client_ids": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "platforms": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "modes": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "dimensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimensions"}
+      }
+    },
+    "approval": {
+      "type": "object", "additionalProperties": false, "required": ["owner", "timestamp", "evidence_refs"],
+      "properties": {
+        "owner": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "timestamp": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references", "minItems": 1}
+      }
+    },
+    "alternative": {
+      "type": "object", "additionalProperties": false, "required": ["id", "description", "reason_not_selected"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "description": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "reason_not_selected": {"$ref": "#/$defs/nullable-text"}
+      }
+    }
+  }
+}

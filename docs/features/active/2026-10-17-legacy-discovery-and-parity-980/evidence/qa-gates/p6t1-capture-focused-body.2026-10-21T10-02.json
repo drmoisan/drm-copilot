@@ -1,0 +1,2119 @@
+{
+  "Timestamp": "2026-10-21T10:02:52.787639+00:00",
+  "approved_revision_assignment_executed": 302,
+  "changed_body_text_mappings_for_confirmation": [
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "current_sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+      "mapped_previously_executed_branches": [
+        [
+          104,
+          107
+        ],
+        [
+          104,
+          110
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        96,
+        102,
+        104,
+        107,
+        110
+      ],
+      "name": "CapturedWorkspace.__post_init__",
+      "not_freshly_reexecuted_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "qualification": "Exact unchanged text coordinates only; fresh named-BODY floor remains independently enforced. Bounded review must reconcile changed-body segment reuse.",
+      "raw_counters_augmented": false,
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "source_sha256": "0a3b2c3b8f4f504693b934630c9d942e397e9d924a371730b13a8557ac9667ee",
+      "unchanged_text_line_map": {
+        "94": 96,
+        "96": 102,
+        "97": 103,
+        "98": 104,
+        "99": 105,
+        "100": 106,
+        "101": 107,
+        "102": 108,
+        "103": 109,
+        "104": 110
+      },
+      "whole_body_unchanged": false,
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "current_sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        270,
+        279,
+        280
+      ],
+      "name": "project_snapshot",
+      "not_freshly_reexecuted_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "qualification": "Exact unchanged text coordinates only; fresh named-BODY floor remains independently enforced. Bounded review must reconcile changed-body segment reuse.",
+      "raw_counters_augmented": false,
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "source_sha256": "0a3b2c3b8f4f504693b934630c9d942e397e9d924a371730b13a8557ac9667ee",
+      "unchanged_text_line_map": {
+        "238": 270,
+        "239": 271,
+        "240": 272,
+        "241": 273,
+        "242": 274,
+        "245": 278,
+        "246": 279,
+        "247": 280,
+        "248": 281,
+        "249": 282,
+        "251": 284,
+        "252": 285,
+        "253": 286,
+        "254": 287,
+        "255": 288,
+        "256": 289,
+        "257": 290,
+        "258": 291,
+        "259": 292,
+        "260": 293,
+        "261": 294,
+        "262": 295,
+        "263": 296,
+        "264": 297,
+        "265": 298,
+        "266": 299,
+        "267": 300,
+        "268": 301,
+        "269": 302
+      },
+      "whole_body_unchanged": false,
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "current_sha256": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1",
+      "mapped_previously_executed_branches": [
+        [
+          246,
+          247
+        ],
+        [
+          246,
+          253
+        ],
+        [
+          264,
+          265
+        ],
+        [
+          264,
+          275
+        ],
+        [
+          275,
+          276
+        ],
+        [
+          275,
+          279
+        ],
+        [
+          279,
+          280
+        ],
+        [
+          279,
+          281
+        ],
+        [
+          281,
+          282
+        ],
+        [
+          281,
+          289
+        ],
+        [
+          289,
+          290
+        ],
+        [
+          289,
+          294
+        ],
+        [
+          294,
+          295
+        ],
+        [
+          294,
+          298
+        ],
+        [
+          301,
+          304
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        213,
+        237,
+        238,
+        240,
+        246,
+        247,
+        253,
+        254,
+        261,
+        264,
+        265,
+        275,
+        276,
+        279,
+        280,
+        281,
+        282,
+        288,
+        289,
+        290,
+        294,
+        295,
+        298,
+        299,
+        301,
+        304,
+        305,
+        306,
+        307,
+        318,
+        321
+      ],
+      "name": "convert_artifact",
+      "not_freshly_reexecuted_lines": [
+        247,
+        295
+      ],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "qualification": "Exact unchanged text coordinates only; fresh named-BODY floor remains independently enforced. Bounded review must reconcile changed-body segment reuse.",
+      "raw_counters_augmented": false,
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "source_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "unchanged_text_line_map": {
+        "213": 213,
+        "214": 214,
+        "215": 215,
+        "216": 216,
+        "217": 217,
+        "218": 218,
+        "219": 219,
+        "220": 220,
+        "221": 221,
+        "222": 222,
+        "223": 223,
+        "224": 224,
+        "225": 225,
+        "226": 226,
+        "227": 227,
+        "228": 228,
+        "229": 229,
+        "230": 230,
+        "231": 231,
+        "232": 232,
+        "233": 233,
+        "234": 234,
+        "235": 235,
+        "236": 236,
+        "237": 237,
+        "238": 238,
+        "239": 239,
+        "240": 240,
+        "241": 241,
+        "242": 242,
+        "243": 243,
+        "244": 244,
+        "245": 245,
+        "246": 246,
+        "247": 247,
+        "248": 248,
+        "249": 249,
+        "250": 250,
+        "251": 251,
+        "252": 252,
+        "253": 253,
+        "254": 254,
+        "255": 255,
+        "256": 256,
+        "257": 257,
+        "258": 258,
+        "259": 259,
+        "260": 260,
+        "261": 261,
+        "262": 262,
+        "263": 263,
+        "264": 264,
+        "265": 265,
+        "266": 266,
+        "267": 267,
+        "268": 268,
+        "269": 269,
+        "270": 270,
+        "271": 271,
+        "272": 272,
+        "273": 273,
+        "274": 274,
+        "275": 275,
+        "276": 276,
+        "277": 277,
+        "278": 278,
+        "279": 279,
+        "280": 280,
+        "281": 281,
+        "282": 282,
+        "283": 283,
+        "284": 284,
+        "285": 285,
+        "286": 286,
+        "287": 287,
+        "288": 288,
+        "289": 289,
+        "290": 290,
+        "291": 291,
+        "292": 292,
+        "293": 293,
+        "294": 294,
+        "295": 295,
+        "296": 296,
+        "297": 297,
+        "298": 298,
+        "299": 299,
+        "300": 300,
+        "301": 301,
+        "303": 303,
+        "304": 304,
+        "305": 305,
+        "306": 306,
+        "307": 307,
+        "308": 308,
+        "309": 309,
+        "310": 310,
+        "311": 311,
+        "312": 312,
+        "313": 313,
+        "314": 314,
+        "315": 315,
+        "316": 316,
+        "317": 317,
+        "318": 318,
+        "319": 319,
+        "320": 320,
+        "321": 321,
+        "322": 322,
+        "323": 323,
+        "324": 324,
+        "325": 325,
+        "326": 326
+      },
+      "whole_body_unchanged": false,
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    }
+  ],
+  "convention": "Current coverage.py qualified-name BODY denominators exclude declarations; raw AST ranges and retained prior qualifications remain separate.",
+  "modules": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py": {
+      "covered_branches": 40,
+      "covered_lines": 116,
+      "excluded_lines": 4,
+      "missing_branches": 4,
+      "missing_lines": 4,
+      "num_branches": 44,
+      "num_partial_branches": 4,
+      "num_statements": 120,
+      "percent_branches_covered": 90.9090909090909,
+      "percent_branches_covered_display": "91",
+      "percent_covered": 95.1219512195122,
+      "percent_covered_display": "95",
+      "percent_statements_covered": 96.66666666666667,
+      "percent_statements_covered_display": "97"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "covered_branches": 20,
+      "covered_lines": 70,
+      "excluded_lines": 4,
+      "missing_branches": 6,
+      "missing_lines": 6,
+      "num_branches": 26,
+      "num_partial_branches": 6,
+      "num_statements": 76,
+      "percent_branches_covered": 76.92307692307692,
+      "percent_branches_covered_display": "77",
+      "percent_covered": 88.23529411764706,
+      "percent_covered_display": "88",
+      "percent_statements_covered": 92.10526315789474,
+      "percent_statements_covered_display": "92"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "covered_branches": 75,
+      "covered_lines": 193,
+      "excluded_lines": 8,
+      "missing_branches": 21,
+      "missing_lines": 21,
+      "num_branches": 96,
+      "num_partial_branches": 15,
+      "num_statements": 214,
+      "percent_branches_covered": 78.125,
+      "percent_branches_covered_display": "78",
+      "percent_covered": 86.45161290322581,
+      "percent_covered_display": "86",
+      "percent_statements_covered": 90.18691588785046,
+      "percent_statements_covered_display": "90"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": {
+      "covered_branches": 16,
+      "covered_lines": 70,
+      "excluded_lines": 3,
+      "missing_branches": 12,
+      "missing_lines": 41,
+      "num_branches": 28,
+      "num_partial_branches": 6,
+      "num_statements": 111,
+      "percent_branches_covered": 57.142857142857146,
+      "percent_branches_covered_display": "57",
+      "percent_covered": 61.8705035971223,
+      "percent_covered_display": "62",
+      "percent_statements_covered": 63.06306306306306,
+      "percent_statements_covered_display": "63"
+    }
+  },
+  "ranges": [
+    {
+      "body_missing_branches": [
+        [
+          44,
+          45
+        ]
+      ],
+      "body_missing_lines": [
+        45
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 7,
+        "covered_lines": 11,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 8,
+        "num_partial_branches": 1,
+        "num_statements": 12,
+        "percent_branches_covered": 87.5,
+        "percent_branches_covered_display": "88",
+        "percent_covered": 90.0,
+        "percent_covered_display": "90",
+        "percent_statements_covered": 91.66666666666667,
+        "percent_statements_covered_display": "92"
+      },
+      "end": 46,
+      "kind": "functions",
+      "name": "_selection",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 8,
+      "raw_ast_range_statements": 13,
+      "start": 26
+    },
+    {
+      "body_missing_branches": [
+        [
+          75,
+          76
+        ],
+        [
+          82,
+          83
+        ],
+        [
+          118,
+          119
+        ]
+      ],
+      "body_missing_lines": [
+        76,
+        83,
+        119
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 21,
+        "covered_lines": 54,
+        "excluded_lines": 0,
+        "missing_branches": 3,
+        "missing_lines": 3,
+        "num_branches": 24,
+        "num_partial_branches": 3,
+        "num_statements": 57,
+        "percent_branches_covered": 87.5,
+        "percent_branches_covered_display": "88",
+        "percent_covered": 92.5925925925926,
+        "percent_covered_display": "93",
+        "percent_statements_covered": 94.73684210526316,
+        "percent_statements_covered_display": "95"
+      },
+      "end": 178,
+      "kind": "classes",
+      "name": "_Supplement",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 24,
+      "raw_ast_range_statements": 63,
+      "start": 49
+    },
+    {
+      "body_missing_branches": [
+        [
+          75,
+          76
+        ],
+        [
+          82,
+          83
+        ]
+      ],
+      "body_missing_lines": [
+        76,
+        83
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 6,
+        "covered_lines": 18,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 2,
+        "num_branches": 8,
+        "num_partial_branches": 2,
+        "num_statements": 20,
+        "percent_branches_covered": 75.0,
+        "percent_branches_covered_display": "75",
+        "percent_covered": 85.71428571428571,
+        "percent_covered_display": "86",
+        "percent_statements_covered": 90.0,
+        "percent_statements_covered_display": "90"
+      },
+      "end": 91,
+      "kind": "functions",
+      "name": "_Supplement.__init__",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 8,
+      "raw_ast_range_statements": 21,
+      "start": 57
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 101,
+      "kind": "functions",
+      "name": "_Supplement.path_work",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 0,
+      "raw_ast_range_statements": 2,
+      "start": 93
+    },
+    {
+      "body_missing_branches": [
+        [
+          118,
+          119
+        ]
+      ],
+      "body_missing_lines": [
+        119
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 3,
+        "covered_lines": 10,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 4,
+        "num_partial_branches": 1,
+        "num_statements": 11,
+        "percent_branches_covered": 75.0,
+        "percent_branches_covered_display": "75",
+        "percent_covered": 86.66666666666667,
+        "percent_covered_display": "87",
+        "percent_statements_covered": 90.9090909090909,
+        "percent_statements_covered_display": "91"
+      },
+      "end": 120,
+      "kind": "functions",
+      "name": "_Supplement.inspect",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 4,
+      "raw_ast_range_statements": 12,
+      "start": 103
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 129,
+      "kind": "functions",
+      "name": "_Supplement.read",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 0,
+      "raw_ast_range_statements": 3,
+      "start": 122
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 12,
+        "covered_lines": 23,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "num_statements": 23,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 178,
+      "kind": "functions",
+      "name": "_Supplement.capture",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 12,
+      "raw_ast_range_statements": 24,
+      "start": 131
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 10,
+        "covered_lines": 26,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 10,
+        "num_partial_branches": 0,
+        "num_statements": 26,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 271,
+      "kind": "classes",
+      "name": "_MigrationIO",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 10,
+      "raw_ast_range_statements": 30,
+      "start": 181
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 208,
+      "kind": "functions",
+      "name": "_MigrationIO.__init__",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 0,
+      "raw_ast_range_statements": 4,
+      "start": 189
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 6,
+        "covered_lines": 14,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "num_statements": 14,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 251,
+      "kind": "functions",
+      "name": "_MigrationIO.capture",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 6,
+      "raw_ast_range_statements": 15,
+      "start": 210
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 4,
+        "covered_lines": 9,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 9,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 271,
+      "kind": "functions",
+      "name": "_MigrationIO.physical_capture",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 4,
+      "raw_ast_range_statements": 10,
+      "start": 253
+    },
+    {
+      "body_missing_branches": [],
+      "body_missing_lines": [],
+      "coverage_named_summary": {
+        "covered_branches": 2,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 287,
+      "kind": "functions",
+      "name": "bind_migration_inputs",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "raw_ast_range_branches": 2,
+      "raw_ast_range_statements": 5,
+      "start": 274
+    },
+    {
+      "body_missing_branches": [
+        [
+          246,
+          247
+        ],
+        [
+          294,
+          295
+        ]
+      ],
+      "body_missing_lines": [
+        247,
+        295
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 14,
+        "covered_lines": 29,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 2,
+        "num_branches": 16,
+        "num_partial_branches": 2,
+        "num_statements": 31,
+        "percent_branches_covered": 87.5,
+        "percent_branches_covered_display": "88",
+        "percent_covered": 91.48936170212765,
+        "percent_covered_display": "91",
+        "percent_statements_covered": 93.54838709677419,
+        "percent_statements_covered_display": "94"
+      },
+      "end": 326,
+      "kind": "functions",
+      "name": "convert_artifact",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_ast_range_branches": 16,
+      "raw_ast_range_statements": 32,
+      "start": 213
+    },
+    {
+      "body_missing_branches": [
+        [
+          117,
+          118
+        ],
+        [
+          148,
+          158
+        ]
+      ],
+      "body_missing_lines": [
+        118,
+        158
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 28,
+        "covered_lines": 40,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 2,
+        "num_branches": 30,
+        "num_partial_branches": 2,
+        "num_statements": 42,
+        "percent_branches_covered": 93.33333333333333,
+        "percent_branches_covered_display": "93",
+        "percent_covered": 94.44444444444444,
+        "percent_covered_display": "94",
+        "percent_statements_covered": 95.23809523809524,
+        "percent_statements_covered_display": "95"
+      },
+      "end": 158,
+      "kind": "classes",
+      "name": "CapturedWorkspace",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_ast_range_branches": 30,
+      "raw_ast_range_statements": 49,
+      "start": 84
+    },
+    {
+      "body_missing_branches": [
+        [
+          117,
+          118
+        ]
+      ],
+      "body_missing_lines": [
+        118
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 17,
+        "covered_lines": 26,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 18,
+        "num_partial_branches": 1,
+        "num_statements": 27,
+        "percent_branches_covered": 94.44444444444444,
+        "percent_branches_covered_display": "94",
+        "percent_covered": 95.55555555555556,
+        "percent_covered_display": "96",
+        "percent_statements_covered": 96.29629629629629,
+        "percent_statements_covered_display": "96"
+      },
+      "end": 136,
+      "kind": "functions",
+      "name": "CapturedWorkspace.__post_init__",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_ast_range_branches": 18,
+      "raw_ast_range_statements": 28,
+      "start": 96
+    },
+    {
+      "body_missing_branches": [
+        [
+          324,
+          330
+        ]
+      ],
+      "body_missing_lines": [
+        330
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 13,
+        "covered_lines": 28,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 14,
+        "num_partial_branches": 1,
+        "num_statements": 29,
+        "percent_branches_covered": 92.85714285714286,
+        "percent_branches_covered_display": "93",
+        "percent_covered": 95.34883720930233,
+        "percent_covered_display": "95",
+        "percent_statements_covered": 96.55172413793103,
+        "percent_statements_covered_display": "97"
+      },
+      "end": 343,
+      "kind": "functions",
+      "name": "project_snapshot",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_ast_range_branches": 14,
+      "raw_ast_range_statements": 30,
+      "start": 270
+    },
+    {
+      "body_missing_branches": [
+        [
+          264,
+          265
+        ],
+        [
+          325,
+          326
+        ]
+      ],
+      "body_missing_lines": [
+        265,
+        326
+      ],
+      "coverage_named_summary": {
+        "covered_branches": 10,
+        "covered_lines": 35,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 2,
+        "num_branches": 12,
+        "num_partial_branches": 2,
+        "num_statements": 37,
+        "percent_branches_covered": 83.33333333333333,
+        "percent_branches_covered_display": "83",
+        "percent_covered": 91.83673469387755,
+        "percent_covered_display": "92",
+        "percent_statements_covered": 94.5945945945946,
+        "percent_statements_covered_display": "95"
+      },
+      "end": 338,
+      "kind": "functions",
+      "name": "_migrate",
+      "named_body_statement_floor_pass": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "raw_ast_range_branches": 12,
+      "raw_ast_range_statements": 38,
+      "start": 244
+    }
+  ],
+  "raw_counters_augmented": false,
+  "raw_coverage": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests-raw.2026-10-21T09-57.json",
+      "sha256": "3aaeebf019491dfd7ad87966ab9c819cfc9f7b50a6fb204fcc49c21d70542480"
+    },
+    "bytes": 48010,
+    "member": "coverage_json",
+    "qualification": "Unmodified tool-output bytes; terminal LF is not imposed on the raw stream.",
+    "sha256": "a23abc3e30c444bb1cdab777dd71dd5ffc471d8cf4f9eff2083a29fa0329870a",
+    "terminal_lf": false
+  },
+  "receipt": {
+    "bytes": 88881,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests.2026-10-21T09-57.json",
+    "sha256": "bad7595d9b9dd7e58dcead976553d30d551ae8e69ebc003bd3609d241006f602"
+  },
+  "required_body_floor_findings": [],
+  "retained_unchanged_units": [
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        42,
+        45,
+        49,
+        50
+      ],
+      "name": "MutationError",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "MutationError",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        45,
+        49,
+        50
+      ],
+      "name": "MutationError.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "MutationError.__init__",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          74,
+          75
+        ],
+        [
+          74,
+          76
+        ],
+        [
+          76,
+          -67
+        ],
+        [
+          76,
+          80
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        54,
+        61,
+        62,
+        63,
+        64,
+        65,
+        67,
+        69,
+        74,
+        75,
+        76,
+        80
+      ],
+      "name": "MutationChange",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "MutationChange",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          74,
+          75
+        ],
+        [
+          74,
+          76
+        ],
+        [
+          76,
+          -67
+        ],
+        [
+          76,
+          80
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        67,
+        69,
+        74,
+        75,
+        76,
+        80
+      ],
+      "name": "MutationChange.__post_init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "MutationChange.__post_init__",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          144,
+          145
+        ],
+        [
+          144,
+          146
+        ],
+        [
+          148,
+          149
+        ],
+        [
+          150,
+          151
+        ],
+        [
+          150,
+          152
+        ],
+        [
+          152,
+          153
+        ],
+        [
+          152,
+          154
+        ],
+        [
+          154,
+          155
+        ],
+        [
+          154,
+          156
+        ],
+        [
+          156,
+          148
+        ],
+        [
+          156,
+          157
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        138,
+        143,
+        144,
+        145,
+        146,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157
+      ],
+      "name": "CapturedWorkspace.inspect",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "CapturedWorkspace.inspect",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        162,
+        165,
+        166,
+        167,
+        168
+      ],
+      "name": "PlannedWrite",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "PlannedWrite",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        172,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185
+      ],
+      "name": "MutationPlan",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "MutationPlan",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          205,
+          206
+        ],
+        [
+          205,
+          210
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          207,
+          208
+        ],
+        [
+          207,
+          209
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        188,
+        191,
+        195,
+        196,
+        198,
+        200,
+        202,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210
+      ],
+      "name": "_PinnedReader",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_PinnedReader",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        191,
+        195,
+        196
+      ],
+      "name": "_PinnedReader.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_PinnedReader.__init__",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        198,
+        200
+      ],
+      "name": "_PinnedReader.identity",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_PinnedReader.identity",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          205,
+          206
+        ],
+        [
+          205,
+          210
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          207,
+          208
+        ],
+        [
+          207,
+          209
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        202,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210
+      ],
+      "name": "_PinnedReader.read_file",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_PinnedReader.read_file",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          238,
+          -220
+        ],
+        [
+          238,
+          239
+        ],
+        [
+          241,
+          242
+        ],
+        [
+          241,
+          257
+        ],
+        [
+          251,
+          241
+        ],
+        [
+          251,
+          252
+        ],
+        [
+          265,
+          266
+        ],
+        [
+          265,
+          267
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        213,
+        220,
+        224,
+        225,
+        227,
+        231,
+        238,
+        239,
+        241,
+        242,
+        243,
+        244,
+        245,
+        248,
+        251,
+        252,
+        257,
+        259,
+        261,
+        263,
+        265,
+        266,
+        267
+      ],
+      "name": "_Overlay",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_Overlay",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          238,
+          -220
+        ],
+        [
+          238,
+          239
+        ],
+        [
+          241,
+          242
+        ],
+        [
+          241,
+          257
+        ],
+        [
+          251,
+          241
+        ],
+        [
+          251,
+          252
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        220,
+        224,
+        225,
+        227,
+        231,
+        238,
+        239,
+        241,
+        242,
+        243,
+        244,
+        245,
+        248,
+        251,
+        252,
+        257
+      ],
+      "name": "_Overlay.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_Overlay.__init__",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        259,
+        261
+      ],
+      "name": "_Overlay.inspect",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_Overlay.inspect",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          265,
+          266
+        ],
+        [
+          265,
+          267
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        263,
+        265,
+        266,
+        267
+      ],
+      "name": "_Overlay.read",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_Overlay.read",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 87689,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          361,
+          362
+        ],
+        [
+          361,
+          363
+        ],
+        [
+          364,
+          365
+        ],
+        [
+          364,
+          391
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          365,
+          369
+        ],
+        [
+          374,
+          379
+        ],
+        [
+          374,
+          384
+        ],
+        [
+          406,
+          410
+        ],
+        [
+          406,
+          411
+        ],
+        [
+          413,
+          414
+        ],
+        [
+          413,
+          455
+        ],
+        [
+          415,
+          420
+        ],
+        [
+          415,
+          421
+        ],
+        [
+          422,
+          423
+        ],
+        [
+          422,
+          428
+        ],
+        [
+          424,
+          425
+        ],
+        [
+          424,
+          428
+        ],
+        [
+          428,
+          429
+        ],
+        [
+          428,
+          432
+        ],
+        [
+          433,
+          440
+        ],
+        [
+          433,
+          443
+        ],
+        [
+          443,
+          444
+        ],
+        [
+          443,
+          447
+        ],
+        [
+          459,
+          460
+        ],
+        [
+          459,
+          481
+        ],
+        [
+          468,
+          469
+        ],
+        [
+          468,
+          470
+        ],
+        [
+          470,
+          472
+        ],
+        [
+          472,
+          459
+        ],
+        [
+          472,
+          478
+        ],
+        [
+          486,
+          487
+        ],
+        [
+          486,
+          492
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        346,
+        361,
+        362,
+        363,
+        364,
+        365,
+        366,
+        369,
+        373,
+        374,
+        379,
+        384,
+        391,
+        393,
+        395,
+        397,
+        399,
+        400,
+        406,
+        410,
+        411,
+        413,
+        414,
+        415,
+        420,
+        421,
+        422,
+        423,
+        424,
+        425,
+        428,
+        429,
+        432,
+        433,
+        440,
+        443,
+        444,
+        447,
+        455,
+        457,
+        459,
+        460,
+        461,
+        468,
+        469,
+        470,
+        472,
+        478,
+        481,
+        486,
+        487,
+        492
+      ],
+      "name": "plan_mutation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "plan_mutation",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "source_ref": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "working_preimage_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          40,
+          41
+        ],
+        [
+          40,
+          42
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        34,
+        40,
+        41,
+        42
+      ],
+      "name": "migrated_id",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "migrated_id",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          51,
+          52
+        ],
+        [
+          51,
+          54
+        ],
+        [
+          54,
+          57
+        ],
+        [
+          54,
+          58
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        45,
+        50,
+        51,
+        52,
+        54,
+        57,
+        58
+      ],
+      "name": "legacy_features",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "legacy_features",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          67,
+          68
+        ],
+        [
+          67,
+          69
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        61,
+        66,
+        67,
+        68,
+        69
+      ],
+      "name": "_parsed",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_parsed",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        72,
+        80,
+        81
+      ],
+      "name": "_draft_changes",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_draft_changes",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          103,
+          104
+        ],
+        [
+          103,
+          107
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        84,
+        103,
+        104,
+        107,
+        108,
+        109,
+        136
+      ],
+      "name": "_scenario",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_scenario",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        144,
+        156,
+        157,
+        180
+      ],
+      "name": "_decision",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_decision",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    },
+    {
+      "coverage": {
+        "bytes": 27302,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+        "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        183,
+        192,
+        193,
+        210
+      ],
+      "name": "_evidence",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "raw_counters_augmented": false,
+      "source_archive": null,
+      "source_name": "_evidence",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "source_ref": "3ba2063649ae7112db056ef04255232ffbb47a17",
+      "working_preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+    }
+  ],
+  "same_source_focused_no_loss": [
+    {
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "prior_raw": {
+        "archive": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck-raw.2026-10-21T08-47.json",
+          "sha256": "fafd55b58d1f8039e342e7fb48c965e0f45202287459b3f96a9b84ad081564f1"
+        },
+        "bytes": 31544,
+        "member": "coverage_json",
+        "qualification": "Unmodified tool-output bytes; terminal LF is not imposed on the raw stream.",
+        "sha256": "4df4a46a36d43a5e1292209f878bf28743d09c6330e70a1f1cc89dbed419a85e",
+        "terminal_lf": false
+      },
+      "prior_receipt": {
+        "bytes": 76645,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck.2026-10-21T08-47.json",
+        "sha256": "f15d9ad127806d39dc061ba218c4af45a100b2adefde3e45f60c3e9993706ded"
+      }
+    },
+    {
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "prior_raw": {
+        "archive": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck-raw.2026-10-21T08-47.json",
+          "sha256": "fafd55b58d1f8039e342e7fb48c965e0f45202287459b3f96a9b84ad081564f1"
+        },
+        "bytes": 31544,
+        "member": "coverage_json",
+        "qualification": "Unmodified tool-output bytes; terminal LF is not imposed on the raw stream.",
+        "sha256": "4df4a46a36d43a5e1292209f878bf28743d09c6330e70a1f1cc89dbed419a85e",
+        "terminal_lf": false
+      },
+      "prior_receipt": {
+        "bytes": 76645,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck.2026-10-21T08-47.json",
+        "sha256": "f15d9ad127806d39dc061ba218c4af45a100b2adefde3e45f60c3e9993706ded"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "prior_receipt": {
+        "bytes": 76645,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck.2026-10-21T08-47.json",
+        "sha256": "f15d9ad127806d39dc061ba218c4af45a100b2adefde3e45f60c3e9993706ded"
+      },
+      "qualification": "Module absent from this prior scoped raw measurement; no zero-coverage baseline or no-loss comparison is inferred."
+    },
+    {
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "prior_raw": {
+        "archive": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck-raw.2026-10-21T09-33.json",
+          "sha256": "80342f17ed9fc1aa9d154b70ba202aac3bccd228d5eeccd849e2168d9d906b27"
+        },
+        "bytes": 48103,
+        "member": "coverage_json",
+        "qualification": "Unmodified tool-output bytes; terminal LF is not imposed on the raw stream.",
+        "sha256": "aebbf982bb10544404101f189486bb1e8645d2fb7edf87649b1a4e67f88e1562",
+        "terminal_lf": false
+      },
+      "prior_receipt": {
+        "bytes": 75764,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck.2026-10-21T09-33.json",
+        "sha256": "6bd62cee09b51f6bdb5ec2aa66fa72ba35f898f5dbd33e864a9983753fd881b0"
+      }
+    },
+    {
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "prior_raw": {
+        "archive": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck-raw.2026-10-21T09-33.json",
+          "sha256": "80342f17ed9fc1aa9d154b70ba202aac3bccd228d5eeccd849e2168d9d906b27"
+        },
+        "bytes": 48103,
+        "member": "coverage_json",
+        "qualification": "Unmodified tool-output bytes; terminal LF is not imposed on the raw stream.",
+        "sha256": "aebbf982bb10544404101f189486bb1e8645d2fb7edf87649b1a4e67f88e1562",
+        "terminal_lf": false
+      },
+      "prior_receipt": {
+        "bytes": 75764,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck.2026-10-21T09-33.json",
+        "sha256": "6bd62cee09b51f6bdb5ec2aa66fa72ba35f898f5dbd33e864a9983753fd881b0"
+      }
+    },
+    {
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "prior_raw": {
+        "archive": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck-raw.2026-10-21T09-33.json",
+          "sha256": "80342f17ed9fc1aa9d154b70ba202aac3bccd228d5eeccd849e2168d9d906b27"
+        },
+        "bytes": 48103,
+        "member": "coverage_json",
+        "qualification": "Unmodified tool-output bytes; terminal LF is not imposed on the raw stream.",
+        "sha256": "aebbf982bb10544404101f189486bb1e8645d2fb7edf87649b1a4e67f88e1562",
+        "terminal_lf": false
+      },
+      "prior_receipt": {
+        "bytes": 75764,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck.2026-10-21T09-33.json",
+        "sha256": "6bd62cee09b51f6bdb5ec2aa66fa72ba35f898f5dbd33e864a9983753fd881b0"
+      }
+    },
+    {
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "prior_raw": {
+        "archive": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck-raw.2026-10-21T09-33.json",
+          "sha256": "80342f17ed9fc1aa9d154b70ba202aac3bccd228d5eeccd849e2168d9d906b27"
+        },
+        "bytes": 48103,
+        "member": "coverage_json",
+        "qualification": "Unmodified tool-output bytes; terminal LF is not imposed on the raw stream.",
+        "sha256": "aebbf982bb10544404101f189486bb1e8645d2fb7edf87649b1a4e67f88e1562",
+        "terminal_lf": false
+      },
+      "prior_receipt": {
+        "bytes": 75764,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck.2026-10-21T09-33.json",
+        "sha256": "6bd62cee09b51f6bdb5ec2aa66fa72ba35f898f5dbd33e864a9983753fd881b0"
+      }
+    }
+  ]
+}

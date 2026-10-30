@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t2-final-candidate.2026-10-20T08-03.json",
+  "candidate_sha256": "53643d5bab35298e155d99d8986538f0aa5da1893b033e753022869050d6c073",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m black --check packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py packages/discovery-runtime/src/drm_copilot_discovery/report_models.py packages/discovery-runtime/src/drm_copilot_discovery/validation.py scripts/dev_tools/discovery/parity_report.py tests/discovery_runtime/test_parity_axes.py tests/discovery_runtime/test_parity_metrics.py tests/discovery_runtime/test_parity_models.py tests/discovery_runtime/test_parity_report.py tests/discovery_runtime/test_parity_report_projection.py tests/discovery_runtime/test_report_models.py tests/discovery_runtime/test_validation_modes.py tests/scripts/dev_tools/discovery/test_parity_report.py",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T08:03:32.031560+00:00",
+  "label": "format",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-format-080331-raw.2026-10-20T08-03.json",
+    "sha256": "049593b6aa018279e5bc77f562b8b4c47006802c5d0f2706c640cd5acdcb60b0"
+  },
+  "seconds": 1.011,
+  "stage": 1,
+  "started_at": "2026-10-20T08:03:31.020201+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\n16 files would be left unchanged.\n",
+  "stdout": "",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T08-03"
+}

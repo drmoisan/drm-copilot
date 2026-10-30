@@ -1,0 +1,76 @@
+"""Prepare final receipt reconciliation from the retained accepted mechanics."""
+import ast
+from pathlib import Path
+
+scratch = Path(__file__).parent
+text = (scratch / 'issue-980-p4t7-final-handoff.py').read_text('utf-8').replace('P4-T7', 'P4-T8').replace('p4t7', 'p4t8')
+text = text.replace('import hashlib\n', 'import hashlib\nimport gzip\n')
+text = text.replace("(5, 'tests-shared-reverse'), (5, 'tests-node-reverse'), (5, 'tests-python-reverse'), (5, 'tests-dotnet-reverse'), (5, 'tests-integration-reverse')",
+                    "(5, 'tests-optional-reverse'), (5, 'tests-compatibility-reverse')")
+text = text.replace("len(native['checks']) == 16", "len(native['checks']) == 22")
+text = text.replace("native['publication'] == 'refused-unregistered-adapter'", "native['publication'] == 'not-attempted'")
+text = text.replace('assert len(module_coverage) == 6', 'assert len(module_coverage) == 8')
+text = text.replace("preserved = json.loads(baseline.read_bytes())['preserved_files']", "preserved = candidate['preserved_files']")
+start = text.index("for name in ('issue-980-p4t8-final-adapt.py'")
+end = text.index("    snapshot_inputs", start)
+text = text[:start] + "for name in ('issue-980-p4t8-final-adapt.py', 'issue-980-p4t8-final-prepare.py', 'issue-980-p4t8-final-handoff-prepare.py'):\n" + text[end:]
+text = text.replace("'All six modules are new at the accepted P4-T6 baseline. Each module has 100% measured statements/branches and every class/callable meets its required floor. Original shared repair and format-parser proofs remain immutable; all predecessor streams are unchanged.'",
+    "'Four optional modules are new; four existing registry/compatibility modules retain their scoped behavior mapping and measured baselines. Actual current changed-line coverage and all class/callable ranges are reported separately. All out-of-scope predecessors remain unchanged.'")
+text = text.replace("'native_assertions': 16", "'native_assertions': 22")
+start = text.index("    'limitations': [")
+end = text.index("    'overall_repository_coverage'", start)
+text = text[:start] + """    'limitations': ['Finite explicitly consented optional CSharp/COM/MSBuild/Ribbon syntax only.',
+        'CSharp relevance and callback targets remain inferred; static declarations never prove binding, condition activation or runtime execution.',
+        'Safe assembly names remain declared data; argument values, GUID/ProgID literals, target paths and raw conditions are omitted.',
+        'Legacy v1 parse/classify/map/emit and CLI execution fail closed with actionable v2 migration guidance.',
+        'Native Windows Python/Git only; no installed Office, callback execution, host automation, coding-agent host or non-Windows proof.',
+        'Registry dispatch grants no mutation authority; native publication was not attempted.',
+        'Independent task/AC acceptance remains executor-owned.'],
+    'changed_line_coverage': 'Actual diff-to-accepted-baseline changed executable lines are measured below; retained legacy intent is traced in the frozen compatibility behavior mapping.',
+""" + text[end:]
+text = text.replace('complete six-module task population only.', 'complete eight-module task population only.')
+point = text.index('\nwrite(handoff, document)')
+extra = '''
+changed = []
+for relative in module_coverage:
+    diff = subprocess.run(['git', 'diff', '--no-ext-diff', '--unified=0', candidate['accepted_baseline'], 'HEAD', '--', relative], capture_output=True, check=True).stdout.decode()
+    line_numbers = set()
+    for start, count in re.findall(r'^@@ -\\d+(?:,\\d+)? \\+(\\d+)(?:,(\\d+))? @@', diff, flags=re.M):
+        line_numbers.update(range(int(start), int(start) + (int(count) if count else 1)))
+    measured = next(json.loads((root / batch['coverage_path']).read_bytes())['files'][relative] for batch in ordered['coverage_batches'] if relative in json.loads((root / batch['coverage_path']).read_bytes())['files'])
+    executable = set(measured['executed_lines']) | set(measured['missing_lines'])
+    selected = sorted(executable & line_numbers)
+    missing = sorted(set(measured['missing_lines']) & line_numbers)
+    assert not missing, (relative, missing)
+    changed.append({'path': relative, 'changed_executable_lines': selected, 'missing_changed_lines': missing,
+                    'changed_statement_count': len(selected), 'coverage_percent': 100 if selected else None})
+document['changed_line_measurement'] = changed
+document['fixture_bindings'] = candidate['fixtures']
+document['native_timing'] = {'whole_composition_seconds': native['whole_composition_seconds'], 'individual_operation_seconds': native['operation_seconds']}
+raw_entries = []
+for entry in ordered['receipts']:
+    record = json.loads((root / entry['path']).read_bytes())
+    for channel in ('raw_stdout', 'raw_stderr'):
+        source = record[channel]
+        raw = (scratch / source['path'].removeprefix('SCRATCH/')).read_bytes()
+        assert sha(raw) == source['sha256']
+        encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode('ascii')
+        assert gzip.decompress(base64.b64decode(encoded)) == raw
+        raw_entries.append({'receipt': entry['path'], 'stream': channel, 'original_sha256': sha(raw),
+                            'original_bytes': len(raw), 'encoding': 'gzip+base64', 'payload': encoded})
+raw_path = qa / ('p4t8-final-raw-streams.' + stamp + '.json')
+write(raw_path, {'entries': raw_entries, 'decode_verified': True, 'qualification': 'Exact raw process streams are losslessly retained; stage JSON/Markdown remains the path-sanitized readable view.'})
+document['canonical_raw_streams'] = ref(raw_path)
+'''
+text = text[:point] + '\n' + extra + text[point:]
+text = text.replace('Seven ordered stages passed on 14 bound source/test files.', 'Seven ordered stages passed on 16 bound source/test files and two fixtures.')
+text = text.replace('five isolated reversed module-order processes', 'two isolated reversed module-order processes').replace('16 native Windows/Git assertions', '22 native Windows/Git assertions')
+text = text.replace('Direct adapter composition is schema-valid; the current registry refuses publication as required until P4-T9. No installation, restore, dependency execution, evaluated graph, behavioral coverage, installed-host or non-Windows claim is made.',
+    'Explicit optional registry dispatch produces schema-valid immutable inventory; the native composition makes no publication attempt. CSharp relevance and callback binding remain inferred/unresolved. No installed Office, callback execution, host automation, behavioral coverage, installed-host or non-Windows claim is made.')
+path = scratch / 'issue-980-p4t8-final-handoff.py'
+assert not path.exists()
+raw = (text.rstrip() + '\n').encode()
+assert b'\r' not in raw
+ast.parse(raw)
+path.write_bytes(raw)
+print(path.name)

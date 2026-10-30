@@ -1,0 +1,25 @@
+{
+  "Timestamp": "2026-10-20T15-58",
+  "Command": "Read-only approved repair route, native profile and test-split absence verification",
+  "EXIT_CODE": 0,
+  "baseline": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+  "review": "evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.json",
+  "review_sha256": "8b091fecd4f8fd0f2a832705577f3310671d4a26f6664cf18378b191143c9d5c",
+  "route": "gateway_doctor_p6t1_repair_20261020",
+  "phase": "S5_P6T1_gateway_repair",
+  "native_agent_id": "01a159bb-4e7a-73e3-b403-8036e893f954",
+  "native_attestation_key": "734c7ba8b652c4e4e1050cdd5b45467fe238e48ecc4d49b799ae439274aeb10f",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "authority_result": "Persisted repair route matches native python-typed-engineer-c4 / gpt-6-astra / max attestation and current profile hash; routing/provenance/launch flags true",
+  "paths": [
+    {
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "exists": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "exists": false
+    }
+  ],
+  "qualification": "Append-only absence declaration for approved test-only split; original shared baseline and both 86-case proofs remain unchanged"
+}

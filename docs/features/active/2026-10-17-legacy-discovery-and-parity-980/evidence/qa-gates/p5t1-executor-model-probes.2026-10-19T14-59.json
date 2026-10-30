@@ -1,0 +1,207 @@
+{
+  "Timestamp": "2026-10-19T14-59",
+  "Command": ".venv/Scripts/python.exe SCRATCH/issue-980-p5t1-model-probes.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Quadratic immutable-member traversal reproduced with deterministic comparison counts; encoding and Markdown controls passed.",
+  "task": "P5-T1",
+  "scope": "Frozen report_models only; retained JsonObject method observed without changing it",
+  "candidate": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c"
+  },
+  "traversal": [
+    {
+      "operation": "ReportBudget.check",
+      "members": 16,
+      "key_lookups": 16,
+      "key_comparisons": 136,
+      "derived_work_capacity": 256,
+      "work_remaining": 256,
+      "nodes_charged": 33
+    },
+    {
+      "operation": "bounded_object",
+      "members": 16,
+      "key_lookups": 32,
+      "key_comparisons": 272,
+      "derived_work_capacity": 256,
+      "work_remaining": 256,
+      "nodes_charged": null
+    },
+    {
+      "operation": "ReportBudget.check",
+      "members": 32,
+      "key_lookups": 32,
+      "key_comparisons": 528,
+      "derived_work_capacity": 256,
+      "work_remaining": 256,
+      "nodes_charged": 65
+    },
+    {
+      "operation": "bounded_object",
+      "members": 32,
+      "key_lookups": 64,
+      "key_comparisons": 1056,
+      "derived_work_capacity": 256,
+      "work_remaining": 256,
+      "nodes_charged": null
+    },
+    {
+      "operation": "ReportBudget.check",
+      "members": 64,
+      "key_lookups": 64,
+      "key_comparisons": 2080,
+      "derived_work_capacity": 256,
+      "work_remaining": 256,
+      "nodes_charged": 129
+    },
+    {
+      "operation": "bounded_object",
+      "members": 64,
+      "key_lookups": 128,
+      "key_comparisons": 4160,
+      "derived_work_capacity": 256,
+      "work_remaining": 256,
+      "nodes_charged": null
+    }
+  ],
+  "encoding_controls": [
+    {
+      "pretty": false,
+      "type": "NoneType",
+      "encoded_bytes": 5,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "bool",
+      "encoded_bytes": 5,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "bool",
+      "encoded_bytes": 6,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "int",
+      "encoded_bytes": 2,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "int",
+      "encoded_bytes": 3,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "int",
+      "encoded_bytes": 20,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "float",
+      "encoded_bytes": 4,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "float",
+      "encoded_bytes": 5,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "str",
+      "encoded_bytes": 21,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "list",
+      "encoded_bytes": 14,
+      "exact": true
+    },
+    {
+      "pretty": false,
+      "type": "dict",
+      "encoded_bytes": 23,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "NoneType",
+      "encoded_bytes": 5,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "bool",
+      "encoded_bytes": 5,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "bool",
+      "encoded_bytes": 6,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "int",
+      "encoded_bytes": 2,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "int",
+      "encoded_bytes": 3,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "int",
+      "encoded_bytes": 20,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "float",
+      "encoded_bytes": 4,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "float",
+      "encoded_bytes": 5,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "str",
+      "encoded_bytes": 33,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "list",
+      "encoded_bytes": 30,
+      "exact": true
+    },
+    {
+      "pretty": true,
+      "type": "dict",
+      "encoded_bytes": 41,
+      "exact": true
+    }
+  ],
+  "markdown_fence_control": "PASS",
+  "zero_denominator_control": "PASS",
+  "fresh_projection_control": "PASS",
+  "probes_open": [],
+  "timing_thresholds": false
+}

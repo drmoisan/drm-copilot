@@ -1,0 +1,2287 @@
+{
+  "task": "P4-T1",
+  "timestamp": "2026-10-19T02:49:07.971925+00:00",
+  "accepted_baseline": "a94c44fa31e66d830d01203ee9cc068fce2deef1",
+  "scope": "Source-bound analyzer line/branch/class/callable and relocation comparison; final ordered loop still pending native-fixture correction.",
+  "retained_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-tests-reverse-run-024404.2026-10-19T02-44.json",
+    "sha256": "148769a914255a7e9c2ae1b8cddc31616665b36d3cf10f22db262ebb703254f5",
+    "exit_code": 0
+  },
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-coverage.2026-10-19T02-39.json",
+    "sha256": "791b465efd84fe5eea8e6d963cb7f9a939fc6197b0337e552c99cc57b8833ff9"
+  },
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+    "scripts/dev_tools/discovery/analyzer/emitter.py": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+    "scripts/dev_tools/discovery/analyzer/inventory.py": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+    "scripts/dev_tools/discovery/analyzer/models.py": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+    "scripts/dev_tools/discovery/analyzer/pipeline.py": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+    "tests/discovery_runtime/analyzer/test_input_capture.py": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/discovery_runtime/analyzer/test_registry.py": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+    "tests/discovery_runtime/analyzer/test_repository.py": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+    "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+    "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+    "tests/scripts/dev_tools/discovery/analyzer/test_models.py": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+    "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+  },
+  "baseline": {
+    "covered_lines": 180,
+    "num_statements": 180,
+    "covered_branches": 30,
+    "num_branches": 30,
+    "proof": {
+      "manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-analyzer-prior-manifest.2026-10-19T01-42.json",
+      "sha256": "6c8b85a37e9fe665d718f9a6232d0cf6a82daf1f5fa8919a48e916dc023afcf2",
+      "coverage_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-analyzer-coverage.2026-10-19T01-42.json",
+      "coverage_sha256": "71fc8b1a54e6483f05b3e7f5cdf23ac2c73bd4ab84784e333bcfe116d29579b5",
+      "bindings": [
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/__init__.py",
+          "working_sha256": "bda306382c2a7335f09f6e62add357089cdbe7acb0c0c52851cf738f4eae7c09",
+          "canonical_sha256": "bda306382c2a7335f09f6e62add357089cdbe7acb0c0c52851cf738f4eae7c09",
+          "git_blob": "fc9c4bb1b329ffdf331f307ca4832df178080bba",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/__init__.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/__init__.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/__main__.py",
+          "working_sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7",
+          "canonical_sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7",
+          "git_blob": "0caabad412e4e140863a73d3693fafb9def93127",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/__main__.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/__main__.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/cli.py",
+          "working_sha256": "f775c05019116140cd28d0a2f353e7cd2ea26133eed587f5873546b42380b89a",
+          "canonical_sha256": "f775c05019116140cd28d0a2f353e7cd2ea26133eed587f5873546b42380b89a",
+          "git_blob": "05b8efcf7efd19cf490cc2391e82cab3de2d5d5a",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/cli.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/cli.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+          "working_sha256": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+          "canonical_sha256": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+          "git_blob": "764c8aceab3139e51539985f3cc6e5fba3048d30",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+          "working_sha256": "7014add372728ab44f31c1f9d5e9b079db7c1876cebabe5ba49dc2a8d89a05e6",
+          "canonical_sha256": "7014add372728ab44f31c1f9d5e9b079db7c1876cebabe5ba49dc2a8d89a05e6",
+          "git_blob": "38679e3d3f85ef2a9e00db4ed6983d52fc926995",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/emitter.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/emitter.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "working_sha256": "655d49e2bfcbb608cdda3f8b1db420f12a34bf8f37940bb2d4ecb3bdac34d385",
+          "canonical_sha256": "655d49e2bfcbb608cdda3f8b1db420f12a34bf8f37940bb2d4ecb3bdac34d385",
+          "git_blob": "6b7f454f36ba0da1a3c2157d50691ef538030176",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/inventory.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/inventory.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "working_sha256": "987c1e1568c523742794ba1197792961a4718b248843b7233ebfd019647b85f6",
+          "canonical_sha256": "987c1e1568c523742794ba1197792961a4718b248843b7233ebfd019647b85f6",
+          "git_blob": "1f74a9a9dcd585d2ac8b8a8d498fbf047ed79b55",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/models.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/models.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "working_sha256": "5870b66ea1a3c0fb935c9f528c1595fa5f2744b93a2818802f9815b1737639d3",
+          "canonical_sha256": "5870b66ea1a3c0fb935c9f528c1595fa5f2744b93a2818802f9815b1737639d3",
+          "git_blob": "e7af3b914dd37c6e305f2b4133fef535eb3f502d",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/pipeline.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/pipeline.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+          "working_sha256": "5fb87349ca8c817d6939319db0c606e20c9d1399e34f40311744c5838e769319",
+          "canonical_sha256": "5fb87349ca8c817d6939319db0c606e20c9d1399e34f40311744c5838e769319",
+          "git_blob": "f56e42541445f16c5666e84c651b1bfec08732ca",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/source_text.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/source_text.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+          "working_sha256": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd",
+          "canonical_sha256": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd",
+          "git_blob": "1b2a98c81066da84b3c29c1943f39161fd3b50c9",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/stack_cli.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/stack_cli.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+          "working_sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+          "canonical_sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+          "git_blob": "3a1354f5ee6f4853fdfe7e28bd8582a46203f057",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/vsto_office.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/vsto_office.py: eol: lf"
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+          "working_sha256": "fce4a759b05315c92ecf28287ab128d437fc5b93661df2043e94b7e2596d4c4c",
+          "canonical_sha256": "fce4a759b05315c92ecf28287ab128d437fc5b93661df2043e94b7e2596d4c4c",
+          "git_blob": "2876de753c070266e9f4d0fbcf0251fca03e8886",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "scripts/dev_tools/discovery/analyzer/vsto_patterns.py: text: auto",
+            "scripts/dev_tools/discovery/analyzer/vsto_patterns.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/__init__.py",
+          "working_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "canonical_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/__init__.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/__init__.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+          "working_sha256": "a9874d052e56dadb892b2eb79be4ffffd974c41a7036af6d7271b41d6df2b735",
+          "canonical_sha256": "a9874d052e56dadb892b2eb79be4ffffd974c41a7036af6d7271b41d6df2b735",
+          "git_blob": "644819f8b8d12bc9e14b82a9a9b4333d61247a08",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_cli.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_cli.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+          "working_sha256": "dc2693cc6427e8cb74aa0d1b6cadea85599bbe3eb6ac29596d62cd630e75783e",
+          "canonical_sha256": "dc2693cc6427e8cb74aa0d1b6cadea85599bbe3eb6ac29596d62cd630e75783e",
+          "git_blob": "5de87cfb4ac4593a47f67bf53940915bce8959ac",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+          "working_sha256": "401d0583377a4b28e5a9abbc2ee63f160d4efc31370f128b4ac9104f25fb7e97",
+          "canonical_sha256": "401d0583377a4b28e5a9abbc2ee63f160d4efc31370f128b4ac9104f25fb7e97",
+          "git_blob": "122a547ae53924985611c5014e822e9e9afc1fe3",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+          "working_sha256": "707025c9a5b2ef80077a90428e42b25620c9ddf8445b30ab873589723152c55e",
+          "canonical_sha256": "707025c9a5b2ef80077a90428e42b25620c9ddf8445b30ab873589723152c55e",
+          "git_blob": "c496a239afa3dcb34af66392e2c7a1249ce7f205",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+          "working_sha256": "aaa245064b25e882a934274fbb60122933f8648060ed4a14a1b48efa39ed8b78",
+          "canonical_sha256": "aaa245064b25e882a934274fbb60122933f8648060ed4a14a1b48efa39ed8b78",
+          "git_blob": "693c584910425e2d2da836731750b76aa59ecf8c",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+          "working_sha256": "03c5b0f87c6ef6a98f42d51887105afa47a35da412ee7451bf94326c7a48a92f",
+          "canonical_sha256": "03c5b0f87c6ef6a98f42d51887105afa47a35da412ee7451bf94326c7a48a92f",
+          "git_blob": "ec6d978ac9e9dac965e071842c6d7562e633bb82",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+          "working_sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+          "canonical_sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+          "git_blob": "ac193b73194d7a8dd7dec6b1d7177c00013e0b55",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_models.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_models.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+          "working_sha256": "29e460a2b090291d9ce1955bf9538efbe26214ba54b52e39dc09bf809ca9790e",
+          "canonical_sha256": "29e460a2b090291d9ce1955bf9538efbe26214ba54b52e39dc09bf809ca9790e",
+          "git_blob": "0505961047bbebf72fc0d70ea4940b3d8e01455f",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+          "working_sha256": "2109820f4584f96cab5d022bffdc38f1fe6ebe7338a8e5c27407a296978e1add",
+          "canonical_sha256": "2109820f4584f96cab5d022bffdc38f1fe6ebe7338a8e5c27407a296978e1add",
+          "git_blob": "aa0137cc1163f4122fef9f78ad45375213117565",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+          "working_sha256": "bca794b2ec833cc7cef7460ea2d377f7a34a07696555cbc2bf1e2eaf77958985",
+          "canonical_sha256": "bca794b2ec833cc7cef7460ea2d377f7a34a07696555cbc2bf1e2eaf77958985",
+          "git_blob": "3710d1abaf567cdab0a3501805a34f6ff880dcd2",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+          "working_sha256": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+          "canonical_sha256": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+          "git_blob": "aaf40db04182800902a9c096e690905e96d66aa5",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: eol: lf"
+          ]
+        },
+        {
+          "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+          "working_sha256": "c12c4d74e7a95b64e7323266a695a2a7b98f806b45f27a2088b49f979b55a8c7",
+          "canonical_sha256": "c12c4d74e7a95b64e7323266a695a2a7b98f806b45f27a2088b49f979b55a8c7",
+          "git_blob": "6866eb7abcbd1657e181cc462cc52a0788f45599",
+          "relationship": "exact-canonical",
+          "attributes": [
+            "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py: text: auto",
+            "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py: eol: lf"
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+          "covered_lines": 18,
+          "total_lines": 18,
+          "covered_branches": 2,
+          "total_branches": 2,
+          "units": [
+            {
+              "name": "compute_schema_ref",
+              "first": 34,
+              "last": 62,
+              "covered": 9,
+              "total": 9
+            },
+            {
+              "name": "serialize_record",
+              "first": 65,
+              "last": 80,
+              "covered": 4,
+              "total": 4
+            }
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "covered_lines": 68,
+          "total_lines": 68,
+          "covered_branches": 16,
+          "total_branches": 16,
+          "units": [
+            {
+              "name": "AnalyzerError",
+              "first": 64,
+              "last": 69,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "filter_paths",
+              "first": 72,
+              "last": 97,
+              "covered": 8,
+              "total": 8
+            },
+            {
+              "name": "classify_unit",
+              "first": 100,
+              "last": 119,
+              "covered": 6,
+              "total": 6
+            },
+            {
+              "name": "classify_paths",
+              "first": 122,
+              "last": 129,
+              "covered": 2,
+              "total": 2
+            },
+            {
+              "name": "_slug",
+              "first": 132,
+              "last": 135,
+              "covered": 3,
+              "total": 3
+            },
+            {
+              "name": "InventoryAnalyzer",
+              "first": 138,
+              "last": 231,
+              "covered": 38,
+              "total": 38
+            },
+            {
+              "name": "__init__",
+              "first": 150,
+              "last": 159,
+              "covered": 4,
+              "total": 4
+            },
+            {
+              "name": "_require_ctx",
+              "first": 161,
+              "last": 165,
+              "covered": 4,
+              "total": 4
+            },
+            {
+              "name": "parse",
+              "first": 167,
+              "last": 188,
+              "covered": 7,
+              "total": 7
+            },
+            {
+              "name": "classify",
+              "first": 190,
+              "last": 194,
+              "covered": 4,
+              "total": 4
+            },
+            {
+              "name": "map",
+              "first": 196,
+              "last": 218,
+              "covered": 8,
+              "total": 8
+            },
+            {
+              "name": "emit",
+              "first": 220,
+              "last": 231,
+              "covered": 9,
+              "total": 9
+            }
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "covered_lines": 52,
+          "total_lines": 52,
+          "covered_branches": 6,
+          "total_branches": 6,
+          "units": [
+            {
+              "name": "UnitType",
+              "first": 34,
+              "last": 44,
+              "covered": 4,
+              "total": 4
+            },
+            {
+              "name": "AnalyzerContext",
+              "first": 47,
+              "last": 66,
+              "covered": 8,
+              "total": 8
+            },
+            {
+              "name": "ParseResult",
+              "first": 69,
+              "last": 77,
+              "covered": 3,
+              "total": 3
+            },
+            {
+              "name": "ClassifiedUnit",
+              "first": 80,
+              "last": 90,
+              "covered": 4,
+              "total": 4
+            },
+            {
+              "name": "ClassifyResult",
+              "first": 93,
+              "last": 101,
+              "covered": 3,
+              "total": 3
+            },
+            {
+              "name": "EvidenceRecord",
+              "first": 104,
+              "last": 161,
+              "covered": 21,
+              "total": 21
+            },
+            {
+              "name": "AnalyzerRunResult",
+              "first": 164,
+              "last": 174,
+              "covered": 4,
+              "total": 4
+            },
+            {
+              "name": "to_json_dict",
+              "first": 133,
+              "last": 161,
+              "covered": 10,
+              "total": 10
+            }
+          ]
+        },
+        {
+          "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "covered_lines": 42,
+          "total_lines": 42,
+          "covered_branches": 6,
+          "total_branches": 6,
+          "units": [
+            {
+              "name": "AnalyzerFileSystem",
+              "first": 40,
+              "last": 68,
+              "covered": 7,
+              "total": 7
+            },
+            {
+              "name": "Analyzer",
+              "first": 71,
+              "last": 96,
+              "covered": 6,
+              "total": 6
+            },
+            {
+              "name": "RealAnalyzerFileSystem",
+              "first": 99,
+              "last": 130,
+              "covered": 20,
+              "total": 20
+            },
+            {
+              "name": "run_analyzer",
+              "first": 133,
+              "last": 150,
+              "covered": 6,
+              "total": 6
+            },
+            {
+              "name": "exists",
+              "first": 50,
+              "last": 52,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "is_dir",
+              "first": 54,
+              "last": 56,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "walk_files",
+              "first": 58,
+              "last": 60,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "read_bytes",
+              "first": 62,
+              "last": 64,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "write_text",
+              "first": 66,
+              "last": 68,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "parse",
+              "first": 80,
+              "last": 82,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "classify",
+              "first": 84,
+              "last": 86,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "map",
+              "first": 88,
+              "last": 90,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "emit",
+              "first": 92,
+              "last": 96,
+              "covered": 1,
+              "total": 1
+            },
+            {
+              "name": "exists",
+              "first": 102,
+              "last": 104,
+              "covered": 2,
+              "total": 2
+            },
+            {
+              "name": "is_dir",
+              "first": 106,
+              "last": 108,
+              "covered": 2,
+              "total": 2
+            },
+            {
+              "name": "walk_files",
+              "first": 110,
+              "last": 121,
+              "covered": 10,
+              "total": 10
+            },
+            {
+              "name": "read_bytes",
+              "first": 123,
+              "last": 125,
+              "covered": 2,
+              "total": 2
+            },
+            {
+              "name": "write_text",
+              "first": 127,
+              "last": 130,
+              "covered": 3,
+              "total": 3
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-analyzer-format.2026-10-19T01-42.md",
+          "sha256": "042f8889bc0d36594e0db9c1f67061bd24d5a643f2a818185c19a413e4cfba2d",
+          "label": "format"
+        },
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-analyzer-lint.2026-10-19T01-42.md",
+          "sha256": "febe83d1e0dc951286e7395fef4289f0771028ea63b11fd15e79d2c1a0748a1e",
+          "label": "lint"
+        },
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-analyzer-types.2026-10-19T01-42.md",
+          "sha256": "25fad67118e858b1d943cba0c553e2f0f4438fa7cdba52c4f98eca1663f0cac7",
+          "label": "types"
+        },
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-analyzer-tests.2026-10-19T01-42.md",
+          "sha256": "16fe9575d4ebb1ae7b2a8abff367cc8cf4f6295d597b8559165261889a6dcf8d",
+          "label": "tests"
+        }
+      ]
+    }
+  },
+  "canonical_totals": {
+    "covered_lines": 447,
+    "num_statements": 447,
+    "covered_branches": 120,
+    "num_branches": 120
+  },
+  "adapter_lines": {
+    "covered": 20,
+    "total": 20
+  },
+  "combined_totals": {
+    "covered_lines": 467,
+    "num_statements": 467,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 58,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 120,
+    "num_partial_branches": 0,
+    "covered_branches": 120,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "modules": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [],
+      "changed_executable_coverage_percent": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "legacy_path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "summary": {
+        "covered_lines": 50,
+        "num_statements": 50,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 14,
+        "num_partial_branches": 0,
+        "covered_branches": 14,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        23,
+        27,
+        29,
+        30,
+        31,
+        32,
+        33,
+        95,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        111,
+        134,
+        139,
+        143,
+        148,
+        151,
+        155,
+        157,
+        159,
+        160,
+        165,
+        168,
+        170,
+        185,
+        202,
+        210,
+        218,
+        219,
+        224
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 22,
+        "num_statements": 22,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 2,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "covered_branches": 2,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        7,
+        9,
+        10,
+        12,
+        18,
+        25,
+        28,
+        35,
+        38,
+        44,
+        47,
+        58,
+        59,
+        60,
+        68,
+        76,
+        85,
+        99,
+        100,
+        112,
+        122,
+        123
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 112,
+        "num_statements": 112,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 7,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 46,
+        "num_partial_branches": 0,
+        "covered_branches": 46,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        7,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        18,
+        28,
+        31,
+        41,
+        42,
+        44,
+        45,
+        47,
+        48,
+        56,
+        59,
+        70,
+        71,
+        72,
+        73,
+        81,
+        82,
+        85,
+        93,
+        97,
+        98,
+        101,
+        111,
+        112,
+        114,
+        115,
+        116,
+        117,
+        118,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        137,
+        160,
+        162,
+        169,
+        170,
+        171,
+        172,
+        175,
+        178,
+        179,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        195,
+        200,
+        201,
+        202,
+        204,
+        205,
+        208,
+        209,
+        210,
+        212,
+        213,
+        215,
+        216,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        229,
+        230,
+        237,
+        238,
+        239,
+        240,
+        241,
+        250,
+        251,
+        259,
+        275,
+        276,
+        277,
+        278,
+        282,
+        285,
+        287,
+        289,
+        290,
+        291,
+        292,
+        297,
+        302,
+        305,
+        307,
+        308,
+        309
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "summary": {
+        "covered_lines": 80,
+        "num_statements": 80,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 5,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 22,
+        "num_partial_branches": 0,
+        "covered_branches": 22,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        37,
+        45,
+        53,
+        258,
+        263,
+        270,
+        272,
+        280,
+        281,
+        283,
+        285,
+        286,
+        293,
+        294,
+        295,
+        296,
+        297,
+        298,
+        299,
+        307,
+        308,
+        313,
+        328
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "summary": {
+        "covered_lines": 109,
+        "num_statements": 109,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 24,
+        "num_partial_branches": 0,
+        "covered_branches": 24,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        12,
+        14,
+        15,
+        16,
+        171,
+        172,
+        180,
+        181,
+        182,
+        183,
+        184,
+        186,
+        194,
+        195,
+        196,
+        198,
+        199,
+        204,
+        205,
+        206,
+        211,
+        214,
+        215,
+        224,
+        225,
+        226,
+        227,
+        229,
+        237,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        251,
+        252,
+        255,
+        256,
+        263,
+        264,
+        265,
+        266,
+        268,
+        276,
+        277,
+        278,
+        279,
+        280,
+        283,
+        284,
+        291,
+        292,
+        293
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "summary": {
+        "covered_lines": 60,
+        "num_statements": 60,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 28,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 10,
+        "num_partial_branches": 0,
+        "covered_branches": 10,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        25,
+        27,
+        142,
+        173,
+        176,
+        195,
+        196,
+        198,
+        200,
+        210,
+        230,
+        231,
+        232,
+        238,
+        240,
+        246,
+        247,
+        250,
+        254,
+        257,
+        258,
+        260,
+        263,
+        270
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 14,
+        "num_statements": 14,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 8,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "covered_branches": 2,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        7,
+        9,
+        11,
+        18,
+        21,
+        22,
+        29,
+        39,
+        49,
+        50,
+        51,
+        52,
+        53,
+        57
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        3,
+        6
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 8,
+        "num_statements": 8,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21,
+        24
+      ],
+      "changed_executable_coverage_percent": 100.0
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "legacy_path": null,
+      "summary": {
+        "covered_lines": 4,
+        "num_statements": 4,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "changed_executable_lines": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "changed_executable_coverage_percent": 100.0
+    }
+  ],
+  "units": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "name": "compute_schema_ref",
+      "kind": "FunctionDef",
+      "first": 46,
+      "last": 74,
+      "disposition": "relocated",
+      "covered_lines": 9,
+      "statement_count": 9,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "name": "serialize_record",
+      "kind": "FunctionDef",
+      "first": 77,
+      "last": 92,
+      "disposition": "relocated",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "name": "_ordered",
+      "kind": "FunctionDef",
+      "first": 95,
+      "last": 108,
+      "disposition": "new",
+      "covered_lines": 7,
+      "statement_count": 7,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "name": "inventory_result",
+      "kind": "FunctionDef",
+      "first": 111,
+      "last": 228,
+      "disposition": "new",
+      "covered_lines": 19,
+      "statement_count": 19,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "name": "row",
+      "kind": "FunctionDef",
+      "first": 18,
+      "last": 25,
+      "disposition": "new",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "name": "stable_id",
+      "kind": "FunctionDef",
+      "first": 28,
+      "last": 35,
+      "disposition": "new",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "name": "tool",
+      "kind": "FunctionDef",
+      "first": 38,
+      "last": 44,
+      "disposition": "new",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "name": "source_reference",
+      "kind": "FunctionDef",
+      "first": 47,
+      "last": 65,
+      "disposition": "new",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "name": "pinned_matches",
+      "kind": "FunctionDef",
+      "first": 68,
+      "last": 82,
+      "disposition": "new",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "name": "diagnostic",
+      "kind": "FunctionDef",
+      "first": 85,
+      "last": 109,
+      "disposition": "new",
+      "covered_lines": 3,
+      "statement_count": 3,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "name": "seed_component",
+      "kind": "FunctionDef",
+      "first": 112,
+      "last": 142,
+      "disposition": "new",
+      "covered_lines": 3,
+      "statement_count": 3,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "name": "exclusion_rules",
+      "kind": "FunctionDef",
+      "first": 31,
+      "last": 56,
+      "disposition": "new",
+      "covered_lines": 8,
+      "statement_count": 8,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "name": "exclusion_reason",
+      "kind": "FunctionDef",
+      "first": 59,
+      "last": 82,
+      "disposition": "new",
+      "covered_lines": 7,
+      "statement_count": 7,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "name": "_category",
+      "kind": "FunctionDef",
+      "first": 85,
+      "last": 98,
+      "disposition": "new",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "name": "capture_snapshot",
+      "kind": "FunctionDef",
+      "first": 101,
+      "last": 134,
+      "disposition": "new",
+      "covered_lines": 14,
+      "statement_count": 14,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "name": "capture_inputs",
+      "kind": "FunctionDef",
+      "first": 137,
+      "last": 256,
+      "disposition": "new",
+      "covered_lines": 50,
+      "statement_count": 50,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "name": "capture_inputs.bounded_read",
+      "kind": "FunctionDef",
+      "first": 162,
+      "last": 172,
+      "disposition": "new",
+      "covered_lines": 5,
+      "statement_count": 5,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "name": "pin_inventory_sources",
+      "kind": "FunctionDef",
+      "first": 259,
+      "last": 311,
+      "disposition": "new",
+      "covered_lines": 18,
+      "statement_count": 18,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "AnalyzerError",
+      "kind": "ClassDef",
+      "first": 82,
+      "last": 87,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "filter_paths",
+      "kind": "FunctionDef",
+      "first": 90,
+      "last": 116,
+      "disposition": "relocated",
+      "covered_lines": 8,
+      "statement_count": 8,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "classify_unit",
+      "kind": "FunctionDef",
+      "first": 119,
+      "last": 139,
+      "disposition": "relocated",
+      "covered_lines": 6,
+      "statement_count": 6,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "classify_paths",
+      "kind": "FunctionDef",
+      "first": 142,
+      "last": 150,
+      "disposition": "relocated",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "_slug",
+      "kind": "FunctionDef",
+      "first": 153,
+      "last": 156,
+      "disposition": "relocated",
+      "covered_lines": 3,
+      "statement_count": 3,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "InventoryAnalyzer",
+      "kind": "ClassDef",
+      "first": 159,
+      "last": 260,
+      "disposition": "changed-existing",
+      "covered_lines": 31,
+      "statement_count": 31,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "InventoryAnalyzer.__init__",
+      "kind": "FunctionDef",
+      "first": 171,
+      "last": 186,
+      "disposition": "relocated",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "InventoryAnalyzer._require_ctx",
+      "kind": "FunctionDef",
+      "first": 188,
+      "last": 192,
+      "disposition": "relocated",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "InventoryAnalyzer.parse",
+      "kind": "FunctionDef",
+      "first": 194,
+      "last": 216,
+      "disposition": "relocated",
+      "covered_lines": 7,
+      "statement_count": 7,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "InventoryAnalyzer.classify",
+      "kind": "FunctionDef",
+      "first": 218,
+      "last": 222,
+      "disposition": "relocated",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "InventoryAnalyzer.map",
+      "kind": "FunctionDef",
+      "first": 224,
+      "last": 247,
+      "disposition": "relocated",
+      "covered_lines": 8,
+      "statement_count": 8,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "InventoryAnalyzer.emit",
+      "kind": "FunctionDef",
+      "first": 249,
+      "last": 260,
+      "disposition": "changed-existing",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "RepositoryAnalyzer",
+      "kind": "ClassDef",
+      "first": 263,
+      "last": 328,
+      "disposition": "new",
+      "covered_lines": 19,
+      "statement_count": 19,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "name": "RepositoryAnalyzer.analyze",
+      "kind": "FunctionDef",
+      "first": 272,
+      "last": 328,
+      "disposition": "new",
+      "covered_lines": 17,
+      "statement_count": 17,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "UnitType",
+      "kind": "ClassDef",
+      "first": 28,
+      "last": 38,
+      "disposition": "relocated",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "AnalyzerContext",
+      "kind": "ClassDef",
+      "first": 42,
+      "last": 60,
+      "disposition": "relocated",
+      "covered_lines": 7,
+      "statement_count": 7,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "ParseResult",
+      "kind": "ClassDef",
+      "first": 64,
+      "last": 71,
+      "disposition": "relocated",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "ClassifiedUnit",
+      "kind": "ClassDef",
+      "first": 75,
+      "last": 84,
+      "disposition": "relocated",
+      "covered_lines": 3,
+      "statement_count": 3,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "ClassifyResult",
+      "kind": "ClassDef",
+      "first": 88,
+      "last": 95,
+      "disposition": "relocated",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "EvidenceRecord",
+      "kind": "ClassDef",
+      "first": 99,
+      "last": 155,
+      "disposition": "relocated",
+      "covered_lines": 20,
+      "statement_count": 20,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "EvidenceRecord.to_json_dict",
+      "kind": "FunctionDef",
+      "first": 127,
+      "last": 155,
+      "disposition": "relocated",
+      "covered_lines": 10,
+      "statement_count": 10,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "AnalyzerRunResult",
+      "kind": "ClassDef",
+      "first": 159,
+      "last": 168,
+      "disposition": "relocated",
+      "covered_lines": 3,
+      "statement_count": 3,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "InventoryInput",
+      "kind": "ClassDef",
+      "first": 172,
+      "last": 211,
+      "disposition": "new",
+      "covered_lines": 16,
+      "statement_count": 16,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "InventoryInput.__post_init__",
+      "kind": "FunctionDef",
+      "first": 186,
+      "last": 211,
+      "disposition": "new",
+      "covered_lines": 10,
+      "statement_count": 10,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "InventoryCapture",
+      "kind": "ClassDef",
+      "first": 215,
+      "last": 252,
+      "disposition": "new",
+      "covered_lines": 19,
+      "statement_count": 19,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "InventoryCapture.__post_init__",
+      "kind": "FunctionDef",
+      "first": 229,
+      "last": 252,
+      "disposition": "new",
+      "covered_lines": 14,
+      "statement_count": 14,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "Analysis",
+      "kind": "ClassDef",
+      "first": 256,
+      "last": 280,
+      "disposition": "new",
+      "covered_lines": 11,
+      "statement_count": 11,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "Analysis.__post_init__",
+      "kind": "FunctionDef",
+      "first": 268,
+      "last": 280,
+      "disposition": "new",
+      "covered_lines": 6,
+      "statement_count": 6,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "name": "InventoryResult",
+      "kind": "ClassDef",
+      "first": 284,
+      "last": 293,
+      "disposition": "new",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "AnalyzerFileSystem",
+      "kind": "ClassDef",
+      "first": 48,
+      "last": 74,
+      "disposition": "relocated",
+      "covered_lines": 6,
+      "statement_count": 6,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "AnalyzerFileSystem.exists",
+      "kind": "FunctionDef",
+      "first": 56,
+      "last": 58,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "AnalyzerFileSystem.is_dir",
+      "kind": "FunctionDef",
+      "first": 60,
+      "last": 62,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "AnalyzerFileSystem.walk_files",
+      "kind": "FunctionDef",
+      "first": 64,
+      "last": 66,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "AnalyzerFileSystem.read_bytes",
+      "kind": "FunctionDef",
+      "first": 68,
+      "last": 70,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "AnalyzerFileSystem.write_text",
+      "kind": "FunctionDef",
+      "first": 72,
+      "last": 74,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "Analyzer",
+      "kind": "ClassDef",
+      "first": 77,
+      "last": 103,
+      "disposition": "relocated",
+      "covered_lines": 6,
+      "statement_count": 6,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "Analyzer.parse",
+      "kind": "FunctionDef",
+      "first": 87,
+      "last": 89,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "Analyzer.classify",
+      "kind": "FunctionDef",
+      "first": 91,
+      "last": 93,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "Analyzer.map",
+      "kind": "FunctionDef",
+      "first": 95,
+      "last": 97,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "Analyzer.emit",
+      "kind": "FunctionDef",
+      "first": 99,
+      "last": 103,
+      "disposition": "relocated",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "RealAnalyzerFileSystem",
+      "kind": "ClassDef",
+      "first": 106,
+      "last": 144,
+      "disposition": "changed-existing",
+      "covered_lines": 19,
+      "statement_count": 19,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "RealAnalyzerFileSystem.exists",
+      "kind": "FunctionDef",
+      "first": 109,
+      "last": 111,
+      "disposition": "relocated",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "RealAnalyzerFileSystem.is_dir",
+      "kind": "FunctionDef",
+      "first": 113,
+      "last": 115,
+      "disposition": "relocated",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "RealAnalyzerFileSystem.walk_files",
+      "kind": "FunctionDef",
+      "first": 117,
+      "last": 130,
+      "disposition": "relocated",
+      "covered_lines": 10,
+      "statement_count": 10,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "RealAnalyzerFileSystem.read_bytes",
+      "kind": "FunctionDef",
+      "first": 132,
+      "last": 134,
+      "disposition": "relocated",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "RealAnalyzerFileSystem.write_text",
+      "kind": "FunctionDef",
+      "first": 136,
+      "last": 144,
+      "disposition": "changed-existing",
+      "covered_lines": 2,
+      "statement_count": 2,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "run_analyzer",
+      "kind": "FunctionDef",
+      "first": 147,
+      "last": 173,
+      "disposition": "changed-existing",
+      "covered_lines": 5,
+      "statement_count": 5,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "run_inventory",
+      "kind": "FunctionDef",
+      "first": 176,
+      "last": 207,
+      "disposition": "new",
+      "covered_lines": 5,
+      "statement_count": 5,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "name": "plan_inventory",
+      "kind": "FunctionDef",
+      "first": 210,
+      "last": 270,
+      "disposition": "new",
+      "covered_lines": 15,
+      "statement_count": 15,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "name": "InventoryAdapter",
+      "kind": "ClassDef",
+      "first": 18,
+      "last": 36,
+      "disposition": "new",
+      "covered_lines": 4,
+      "statement_count": 4,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "name": "InventoryAdapter.identifier",
+      "kind": "FunctionDef",
+      "first": 22,
+      "last": 27,
+      "disposition": "new",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "name": "InventoryAdapter.analyze",
+      "kind": "FunctionDef",
+      "first": 29,
+      "last": 36,
+      "disposition": "new",
+      "covered_lines": 1,
+      "statement_count": 1,
+      "line_coverage_percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "name": "select_analyzers",
+      "kind": "FunctionDef",
+      "first": 39,
+      "last": 57,
+      "disposition": "new",
+      "covered_lines": 7,
+      "statement_count": 7,
+      "line_coverage_percent": 100.0
+    }
+  ],
+  "preserved_legacy_units": [
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "unit": "compute_schema_ref"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "unit": "serialize_record"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "AnalyzerError"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "filter_paths"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "classify_unit"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "classify_paths"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "_slug"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "InventoryAnalyzer"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "InventoryAnalyzer.__init__"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "InventoryAnalyzer._require_ctx"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "InventoryAnalyzer.parse"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "InventoryAnalyzer.classify"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "InventoryAnalyzer.map"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "unit": "InventoryAnalyzer.emit"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "UnitType"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "AnalyzerContext"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "ParseResult"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "ClassifiedUnit"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "ClassifyResult"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "EvidenceRecord"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "EvidenceRecord.to_json_dict"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "unit": "AnalyzerRunResult"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "AnalyzerFileSystem"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "AnalyzerFileSystem.exists"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "AnalyzerFileSystem.is_dir"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "AnalyzerFileSystem.walk_files"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "AnalyzerFileSystem.read_bytes"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "AnalyzerFileSystem.write_text"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "Analyzer"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "Analyzer.parse"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "Analyzer.classify"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "Analyzer.map"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "Analyzer.emit"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "RealAnalyzerFileSystem"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "RealAnalyzerFileSystem.exists"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "RealAnalyzerFileSystem.is_dir"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "RealAnalyzerFileSystem.walk_files"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "RealAnalyzerFileSystem.read_bytes"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "RealAnalyzerFileSystem.write_text"
+    },
+    {
+      "old_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "new_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "unit": "run_analyzer"
+    }
+  ],
+  "unit_counts": {
+    "new": 31,
+    "relocated": 35,
+    "changed-existing": 5
+  },
+  "measured_unit_count": 71,
+  "minimum_measured_unit_percent": 100.0,
+  "findings": [],
+  "task_checked_off": false
+}

@@ -1,0 +1,105 @@
+{
+  "actual_ordered_stages": [
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-black.2026-10-21T12-13.json",
+        "sha256": "beac5096b6b4bd914dd88cc3502dd986d8b0c725b567dfffb61e41472c99894b"
+      },
+      "stage": "black"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-ruff.2026-10-21T12-13.json",
+        "sha256": "91511ccce2ccb4572dce60ee5687280d265b8cd0409a4e2d2c7b5500b531c951"
+      },
+      "stage": "ruff"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-pyright.2026-10-21T12-13.json",
+        "sha256": "c5a91dbd86b441192664f3c7c67db6b87255dea596c2b22aca29c026a0f255a2"
+      },
+      "stage": "pyright"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-tests.2026-10-21T12-14.json",
+        "sha256": "71ee055af55c41f5d8971b4dac2248fd3f1de6833352450e0aff15931362ffea"
+      },
+      "stage": "tests"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-coverage.2026-10-21T12-14.json",
+        "sha256": "54b3819f11fe1ba1e6ec8ca892e16bc6eb083a2a881b50220290504998771e20"
+      },
+      "stage": "coverage"
+    }
+  ],
+  "changed_bindings_since_prior_focused_proof": [
+    "tests/discovery_runtime/test_service_context_guards.py"
+  ],
+  "counts": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 7
+  },
+  "doc_qualification": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-context-guards-doc-qualification.2026-10-21T12-13.json",
+    "sha256": "8938794d5e696543d093d3e87a0bb4e6c28ae9d9af18be72383c9ce07c9b99a1"
+  },
+  "executed_nodes": [
+    "tests/discovery_runtime/test_service_context_guards.py::test_configured_uncaptured_read_refuses_before_physical_io",
+    "tests/discovery_runtime/test_service_context_guards.py::test_required_read_none_contract_violation_refuses_fabricated_bytes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_naive_trusted_clock_refuses_before_capture_or_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_missing_activation_profile_refuses_without_graph_authority",
+    "tests/discovery_runtime/test_service_context_guards.py::test_profile_change_between_selection_and_capture_refuses_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_changed_reauthorization_actor_refuses_dispatch_and_writes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_bootstrap_rejects_wrong_operation_family_without_effects"
+  ],
+  "final_acceptance": false,
+  "lines": 316,
+  "old_test_bytes_preserved": true,
+  "original_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-freeze.2026-10-21T12-07.json",
+    "sha256": "80b69e65e8e9c8f7aa8eb9a0539e9f280e1dc023a23a177e370a9d20d4b04506"
+  },
+  "owned_file": {
+    "path": "tests/discovery_runtime/test_service_context_guards.py",
+    "sha256": "1782569926171ae2f2aee129b171477c1eb5f9d8ecf147009e87d5dd0ffcab12"
+  },
+  "raw_counters_augmented": false,
+  "raw_coverage": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-coverage-raw.2026-10-21T12-14.json",
+      "sha256": "5e3cc2a08b23b1afdb78f7f800376e6c615f4d4f6c3188ecef35cd3b0b02c995"
+    },
+    "encoding": "gzip-base64",
+    "member": "coverage_json",
+    "raw_sha256": "d8af887a5d816a5d146a2e542606807d78d9a5b883a6f231734beb4c8d47c08d"
+  },
+  "retained_diagnostic_body_union": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-context-guards-body-preflight.2026-10-21T12-07.json",
+    "sha256": "51f3a0e82f75e3a02f0fe8d04d4edd13a0a3411d596915561d2a8b4369aec4d6"
+  },
+  "same_source_named_body_measurements": [
+    {
+      "name": "OperationContext.read",
+      "named_body_measurement_exactly_equal_to_original_focused7": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py"
+    },
+    {
+      "name": "_context",
+      "named_body_measurement_exactly_equal_to_original_focused7": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py"
+    },
+    {
+      "name": "bootstrap",
+      "named_body_measurement_exactly_equal_to_original_focused7": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py"
+    }
+  ],
+  "status": "CG_DOC1_REPAIRED_SEVEN_PASSED_CONFIRMATION_PENDING",
+  "task": "P6-T1",
+  "test_elapsed_seconds": 51.706182
+}

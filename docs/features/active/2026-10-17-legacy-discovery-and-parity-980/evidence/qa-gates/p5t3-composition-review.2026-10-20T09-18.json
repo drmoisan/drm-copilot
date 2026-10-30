@@ -1,0 +1,244 @@
+{
+  "Timestamp": "2026-10-20T09-18",
+  "Command": "Bounded retained producer planning receipt/archive/coverage reconciliation; no behavioral replay",
+  "EXIT_CODE": 0,
+  "status": "PRODUCER_PLANNING_PROOF_CLEAR_SEMANTIC_REVIEW_PENDING",
+  "findings": [],
+  "task": "P5-T3",
+  "task_accepted": false,
+  "whole_candidate_commit_ready": false,
+  "route": "rendering_review_p5t3_composition_20261020",
+  "phase": "S5_P5T3_producer_composition_reconciliation",
+  "authority": {
+    "profile": "atomic-executor-c3-elevated",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_attestation_key": "17a9c35c5720e245acb9e7e26ea514e403ed5aae4ba44629f4ea7a2e7c577065",
+    "qualification": "Resumed native worker with fresh matching persisted composition route; existing launch attestation retained."
+  },
+  "extends": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.json",
+      "sha256": "3187ca526a066823017a1ad3018404efeb94b2c459b3e8d89e3d3b88b0ccc7b3",
+      "conclusion": "Clear independent source review reused without repetition; previously pending19-case planning proof now reconciled."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-legacy-review.2026-10-20T09-08.json",
+      "conclusion": "Clear legacy adapter source/proof review retained; producer dependency source and planning proof now clear, but semantic dependency review remains pending."
+    }
+  ],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.json",
+    "sha256": "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-staging.2026-10-20T09-15.json",
+    "sha256": "d8c7aee353aec650d7e473bb1b2cb1db414f30bca0fefb8fdbccf7d3f7a161f4"
+  },
+  "reconciliation": {
+    "archive_entries": [
+      22,
+      28
+    ],
+    "ordered_gates": [
+      {
+        "stage": "black",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-black.2026-10-20T09-13.json",
+        "sha256": "2b7998259e45c25ee488b3bdeaf25ae481a2e1e6b829873069b8a69aacedea56",
+        "exit_code": 0,
+        "started_utc": "2026-10-20T09:13:00.917429+00:00",
+        "elapsed_seconds": 1.902774
+      },
+      {
+        "stage": "ruff",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-ruff.2026-10-20T09-13.json",
+        "sha256": "613bf695b8e9f58e109f83cfe377ae521d35f1bde4302ea7d41b0ee295dfdc45",
+        "exit_code": 0,
+        "started_utc": "2026-10-20T09:13:02.824860+00:00",
+        "elapsed_seconds": 1.594187
+      },
+      {
+        "stage": "pyright",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-pyright.2026-10-20T09-13.json",
+        "sha256": "29337c2a74b71cb07628eec7964591d41a15620dae32e41a3643a03af311fb9e",
+        "exit_code": 0,
+        "started_utc": "2026-10-20T09:13:04.424433+00:00",
+        "elapsed_seconds": 2.315732
+      },
+      {
+        "stage": "tests",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-tests.2026-10-20T09-15.json",
+        "sha256": "8dd9b0360a75f9619772fea127c7be5317c8ba50a0da50dd44b63df50a16c9a4",
+        "exit_code": 0,
+        "started_utc": "2026-10-20T09:13:06.745095+00:00",
+        "elapsed_seconds": 132.547579
+      },
+      {
+        "stage": "coverage",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-coverage.2026-10-20T09-15.json",
+        "sha256": "177c849b157d7b0e728ab1e5485a25915c931f355135541a0ff566d0cb7b65be",
+        "exit_code": 0,
+        "started_utc": "2026-10-20T09:15:19.298438+00:00",
+        "elapsed_seconds": 1.392432
+      }
+    ],
+    "dependencies": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+        "recorded_sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+        "current_sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+        "recorded_sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+        "current_sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+        "recorded_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+        "current_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+        "recorded_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+        "current_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+        "recorded_sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+        "current_sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+        "recorded_sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+        "current_sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "recorded_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+        "current_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "recorded_sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+        "current_sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+        "recorded_sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+        "current_sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+        "recorded_sha256": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+        "current_sha256": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+        "matches": true
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+        "recorded_sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+        "current_sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+        "matches": true
+      },
+      {
+        "path": "tests/discovery_runtime/test_completion_planning.py",
+        "recorded_sha256": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214",
+        "current_sha256": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214",
+        "matches": true
+      }
+    ],
+    "disjoint_cases": [
+      35,
+      19
+    ],
+    "coverage": {
+      "statements": 95,
+      "covered_statements": 95,
+      "branches": 24,
+      "covered_branches": 24,
+      "qualified_callable_ranges": [
+        {
+          "qualified_name": "_mode_label",
+          "covered_statements": 3,
+          "statements": 3,
+          "percentage": 100
+        },
+        {
+          "qualified_name": "completion_preflight",
+          "covered_statements": 1,
+          "statements": 1,
+          "percentage": 100
+        },
+        {
+          "qualified_name": "completion_summary",
+          "covered_statements": 41,
+          "statements": 41,
+          "percentage": 100
+        },
+        {
+          "qualified_name": "build_completion_report",
+          "covered_statements": 6,
+          "statements": 6,
+          "percentage": 100
+        },
+        {
+          "qualified_name": "plan_completion_report",
+          "covered_statements": 19,
+          "statements": 19,
+          "percentage": 100
+        },
+        {
+          "qualified_name": "build_completion_summary",
+          "covered_statements": 3,
+          "statements": 3,
+          "percentage": 100
+        },
+        {
+          "qualified_name": "render_completion_report",
+          "covered_statements": 5,
+          "statements": 5,
+          "percentage": 100
+        }
+      ],
+      "excluded_lines": [
+        20,
+        21,
+        22,
+        23
+      ]
+    },
+    "frozen_source_unchanged": true
+  },
+  "qualifications": [
+    "Nineteen planning cases are verified collected/passed nodes, including paired-view dry-run/replacement/unchanged-skip and malformed prospective rejection. Prior35 pure cases retained with unchanged producer bytes and previously reviewed executable test AST.",
+    "Raw final22 and prior28 archive entries decode losslessly and match bytes/SHA256. Planning stage streams match raw bindings; readable stdout/stderr use existing path/newline presentation. Raw CRLF and missing terminal LF remain in archives.",
+    "Seven qualified coverage.py callable-body populations are used, rather than declaration-inclusive AST interval counts. TYPE_CHECKING declaration lines20-23 are inherited exclusions; no callable or production module is excluded.",
+    "All12 current planning source/test/dependency hashes match before/after receipts. Original pure proof retains its historical dependency snapshot and is not relabeled as a current semantic integration pass.",
+    "Semantic validation is separately owned. Coordinator reports a separate public validation-report malformed-input dispatch regression and withdrawal of the unreachable-branch qualification after the20-case batch. Semantic repair/rebinding and the final composed gate remain pending. This receipt does not accept or diagnose that defect.",
+    "Do not commit this conditional union as a complete candidate until semantic source/test/proof acceptance and the dependency-complete combined union are checked. If dependency bytes change, reassess affected proof applicability without invalidating unchanged pure evidence.",
+    "No new source review, behavioral sweep, source/test/plan/checkpoint/Git/staging changes or checkoffs."
+  ],
+  "checklist": {
+    "phase": 5,
+    "accepted_tasks": "43/84",
+    "accepted_AC": "17/66",
+    "current": "P5-T3 unchecked",
+    "next": [
+      "P5-T3",
+      "P5-T4",
+      "P5-T5",
+      "P6-T1",
+      "P6-T2"
+    ]
+  }
+}

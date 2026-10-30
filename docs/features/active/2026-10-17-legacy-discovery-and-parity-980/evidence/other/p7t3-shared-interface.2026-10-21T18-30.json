@@ -1,0 +1,399 @@
+{
+  "Timestamp": "2026-10-21T18-30",
+  "Command": "python SCRATCH/issue-980-p7t3-shared-author.py",
+  "EXIT_CODE": 0,
+  "task": "P7-T3",
+  "status": "SHARED_CONTRACT_FROZEN_IMPLEMENTATION_PENDING",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p7t3-shared-baseline.2026-10-21T18-27.json",
+    "sha256": "63006d76671db526c0306ad980257fdd15e1fad9ab0b14267baf7d2d6211980a"
+  },
+  "bindings": {
+    "config/orchestration-routing.json": {
+      "sha256": "b98b9e9a37024ce82d1a462e35ce81b038d5453ebb33a05d3962cc579a1d93f7",
+      "bytes": 14457,
+      "physical_lines": 416
+    },
+    "tests/fixtures/codex_routing/topology.json": {
+      "sha256": "e6c16aa00ef071a7801aaaabef4b2a283a12477b890e82af58738917209c5cce",
+      "bytes": 26279,
+      "physical_lines": 400
+    },
+    "tests/fixtures/codex_routing/deployment.json": {
+      "sha256": "abd22c96636ff9d805f7413cc2ef48e107e836c8901b582bb2061b35694e26e6",
+      "bytes": 21468,
+      "physical_lines": 308
+    }
+  },
+  "discovery_operations": {
+    "inventory-legacy-system": {
+      "logical_agent": "legacy-parity-analyst",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "coverage-ledger",
+        "evidence-reference",
+        "inventory-snapshot",
+        "required-output-manifest",
+        "unspecified-behavior",
+        "unspecified-behavior-collection"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "extract-feature-contract": {
+      "logical_agent": "legacy-parity-analyst",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "coverage-ledger",
+        "evidence-reference",
+        "feature-contract",
+        "required-output-manifest",
+        "unspecified-behavior",
+        "unspecified-behavior-collection"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "characterize-runtime-behavior": {
+      "logical_agent": "runtime-characterization-analyst",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "evidence-payload",
+        "evidence-reference",
+        "required-output-manifest",
+        "runtime-characterization-scenario",
+        "unspecified-behavior",
+        "unspecified-behavior-collection"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "reconcile-parity-matrix": {
+      "logical_agent": "requirements-reconciler",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "parity-matrix",
+        "required-output-manifest",
+        "unspecified-behavior",
+        "unspecified-behavior-collection"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "review-discovery-coverage": {
+      "logical_agent": "migration-coverage-reviewer",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "completion-report",
+        "coverage-report",
+        "parity-report",
+        "required-output-manifest",
+        "validation-report"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "adjudicate-unspecified-behavior": {
+      "logical_agent": "requirements-reconciler",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "acceptance-specification",
+        "acceptance-view",
+        "product-decision",
+        "product-decision-collection",
+        "required-output-manifest",
+        "unspecified-behavior",
+        "unspecified-behavior-collection"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "generate-acceptance-scenarios": {
+      "logical_agent": "requirements-reconciler",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "acceptance-specification",
+        "acceptance-view",
+        "required-output-manifest"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "initialize-discovery-workspace": {
+      "logical_agent": "migration-coverage-reviewer",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "coverage-report",
+        "required-output-manifest",
+        "validation-report"
+      ],
+      "gate_mode": "agent-output"
+    },
+    "validate-discovery-artifacts": {
+      "logical_agent": "migration-coverage-reviewer",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "coverage-report",
+        "required-output-manifest",
+        "validation-report"
+      ],
+      "gate_mode": "agent-output"
+    }
+  },
+  "added_generated_families": [
+    "legacy-parity-analyst",
+    "runtime-characterization-analyst",
+    "requirements-reconciler",
+    "migration-coverage-reviewer"
+  ],
+  "request": {
+    "python": {
+      "invocation_kind": "keyword default 'ordinary'; explicit None/non-string/unknown/case variant rejected",
+      "skill_id": "keyword default None; None is absence; ordinary accepts only absence; discovery requires an exact canonical nonempty string without trimming or alias resolution"
+    },
+    "powershell": "InvocationKind and SkillId use AllowNull object boundaries; validate types explicitly, do not coerce through string parameter binding.",
+    "typescript": "invocationKind defaults only when omitted/undefined; explicit null is invalid. skillId omitted/undefined/null means absence. Distinct receipt type/overloads preserve ordinary checkpoint consumer types.",
+    "cli": [
+      "--invocation-kind ordinary|discovery (default ordinary)",
+      "--skill-id <exact canonical id> (default absent)"
+    ],
+    "gate_and_review_mode": "gate_mode is always agent-output. No user gate, role, kinds, output-version or assessment-mode override is accepted by topology; review assessment mode stays in the service request."
+  },
+  "validation_order": [
+    "Keep existing execution-context validation",
+    "Keep existing language normalization/element validation",
+    "Keep existing integer production/test count validation",
+    "Keep existing boolean cross-cutting validation",
+    "Validate invocation_kind exactly",
+    "For ordinary, reject non-absent skill_id, then run the complete unchanged ordinary root/epic/zero-count/budget path",
+    "For discovery, reject root_persona other than None/null",
+    "Reject production_file_count other than zero",
+    "Reject test_file_count other than zero",
+    "Reject nonempty normalized languages",
+    "Reject cross_cutting true",
+    "Require exact canonical skill_id and construct a fresh discovery receipt before ordinary dispatch"
+  ],
+  "rejection_messages": {
+    "invocation_kind": "invocation_kind must be ordinary or discovery.",
+    "ordinary_skill": "skill_id is only valid for discovery invocations.",
+    "root_persona": "Discovery invocations do not accept root_persona.",
+    "production_file_count": "Discovery invocations require production_file_count=0.",
+    "test_file_count": "Discovery invocations require test_file_count=0.",
+    "languages": "Discovery invocations do not accept languages.",
+    "cross_cutting": "Discovery invocations do not accept cross_cutting.",
+    "skill_id": "Discovery invocations require a supported skill_id."
+  },
+  "receipt": {
+    "ordinary": "Exactly the existing 12 fields; no invocation_kind or skill_id keys, including explicit ordinary requests.",
+    "discovery_example": {
+      "cross_cutting": false,
+      "execution_context": "standalone",
+      "gate_mode": "agent-output",
+      "invocation_kind": "discovery",
+      "languages": [],
+      "logical_agent": "legacy-parity-analyst",
+      "max_production_files": 0,
+      "max_test_files": 0,
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": [
+        "coverage-ledger",
+        "evidence-reference",
+        "inventory-snapshot",
+        "required-output-manifest",
+        "unspecified-behavior",
+        "unspecified-behavior-collection"
+      ],
+      "production_file_count": 0,
+      "root_persona": null,
+      "route": "discovery",
+      "routing_reason": "fixed_discovery_operation",
+      "skill_id": "inventory-legacy-system",
+      "test_file_count": 0,
+      "topology": "discovery_specialist"
+    },
+    "mutable_members": "Every receipt owns fresh languages/permissible_artifact_kinds arrays. Caller mutation cannot change later decisions or the canonical map.",
+    "authority": "Topology/model receipts select a role/profile only. They grant no filesystem/configuration/approval/write authority and do not replace ordinary orchestration checkpoints. Protected native discovery-invocation receipts remain P8/P9.",
+    "bootstrap": "initialize-discovery-workspace selects the reviewer only after root bootstrap; it does not authorize the specialist to initialize/configure."
+  },
+  "model_contract": {
+    "deployment_api": "Unchanged; extend only the recognized generated families.",
+    "profiles": {
+      "C1": [
+        "c1",
+        "gpt-6-luna",
+        "low"
+      ],
+      "C2": [
+        "c2",
+        "gpt-6.1-sol",
+        "medium"
+      ],
+      "C3": [
+        "c3",
+        "gpt-6.1-sol",
+        "high"
+      ],
+      "C4": [
+        "c4",
+        "gpt-6-astra",
+        "max"
+      ]
+    },
+    "c3_overlay": "Existing epic_context, c4_orchestration_ceiling and epic_context_and_c4_ceiling rules remain exact.",
+    "availability": "Existing native/API availability refusal remains mandatory, without fallback; CLI corpus has no availability option. Cover unavailable exact models in direct language tests.",
+    "complexity": "C1-C4/context/monotonic ceiling remain independent from zero production-file count."
+  },
+  "corpus": {
+    "schema": "Existing five-field CLI case schema unchanged. expected_stdout is independent contract-authored sorted/indented JSON with no terminal newline; no resolver output was copied.",
+    "original_count": 23,
+    "original_rows_unchanged": true,
+    "original_row_prefix_bytes_unchanged": true,
+    "topology": {
+      "count": 43,
+      "original_ids": [
+        "topo-standalone-small",
+        "topo-powershell-budget-exceeded",
+        "topo-epic-preparation-child",
+        "topo-epic-execution-child",
+        "topo-cross-cutting",
+        "topo-root-persona-epic-planner",
+        "topo-root-persona-epic-orchestrator",
+        "topo-repeated-language",
+        "topo-non-ascii-language",
+        "topo-missing-required",
+        "topo-invalid-choice",
+        "topo-non-integer-count",
+        "topo-empty-language",
+        "topo-root-persona-non-standalone"
+      ],
+      "added_ids": [
+        "topo-discovery-inventory-legacy-system",
+        "topo-discovery-extract-feature-contract",
+        "topo-discovery-characterize-runtime-behavior",
+        "topo-discovery-reconcile-parity-matrix",
+        "topo-discovery-review-discovery-coverage",
+        "topo-discovery-adjudicate-unspecified-behavior",
+        "topo-discovery-generate-acceptance-scenarios",
+        "topo-discovery-initialize-discovery-workspace",
+        "topo-discovery-validate-discovery-artifacts",
+        "topo-discovery-epic_preparation_child",
+        "topo-discovery-epic_execution_child",
+        "topo-explicit-ordinary-small",
+        "topo-explicit-ordinary-root",
+        "topo-ordinary-zero-count",
+        "topo-discovery-missing-skill",
+        "topo-discovery-unknown-skill",
+        "topo-discovery-alias-skill",
+        "topo-discovery-empty-skill",
+        "topo-discovery-whitespace-skill",
+        "topo-discovery-production-positive",
+        "topo-discovery-production-negative",
+        "topo-discovery-test-count",
+        "topo-discovery-language",
+        "topo-discovery-cross-cutting",
+        "topo-discovery-root-override",
+        "topo-discovery-epic-root-refused",
+        "topo-ordinary-skill-default",
+        "topo-ordinary-skill-explicit",
+        "topo-invalid-invocation-kind"
+      ]
+    },
+    "deployment": {
+      "count": 33,
+      "original_ids": [
+        "dep-c1-standalone",
+        "dep-commit-steward",
+        "dep-feature-review-alias-epic-preparation",
+        "dep-c3-epic-execution-c4-ceiling",
+        "dep-forced-epic-planner",
+        "dep-missing-required",
+        "dep-invalid-choice",
+        "dep-ceiling-below-band",
+        "dep-unsupported-agent"
+      ],
+      "added_ids": [
+        "dep-discovery-legacy-parity-analyst-c1",
+        "dep-discovery-legacy-parity-analyst-c2",
+        "dep-discovery-legacy-parity-analyst-c3",
+        "dep-discovery-legacy-parity-analyst-c4",
+        "dep-discovery-runtime-characterization-analyst-c1",
+        "dep-discovery-runtime-characterization-analyst-c2",
+        "dep-discovery-runtime-characterization-analyst-c3",
+        "dep-discovery-runtime-characterization-analyst-c4",
+        "dep-discovery-requirements-reconciler-c1",
+        "dep-discovery-requirements-reconciler-c2",
+        "dep-discovery-requirements-reconciler-c3",
+        "dep-discovery-requirements-reconciler-c4",
+        "dep-discovery-migration-coverage-reviewer-c1",
+        "dep-discovery-migration-coverage-reviewer-c2",
+        "dep-discovery-migration-coverage-reviewer-c3",
+        "dep-discovery-migration-coverage-reviewer-c4",
+        "dep-discovery-legacy-parity-analyst-epic-c3",
+        "dep-discovery-runtime-characterization-analyst-epic-c3",
+        "dep-discovery-requirements-reconciler-epic-c3",
+        "dep-discovery-migration-coverage-reviewer-epic-c3",
+        "dep-discovery-c3-c4-ceiling",
+        "dep-discovery-c3-epic-c4-ceiling",
+        "dep-discovery-ceiling-below-band",
+        "dep-discovery-profile-is-not-logical-role"
+      ]
+    },
+    "total_count": 76,
+    "consumer_prerequisite": "Update only the existing fixed 23-case membership assertion in test_codex_routing_cli_corpus.py to the exact 76 IDs; PS existing generic corpus shape remains valid. TS should bind expected rows to this same corpus, retaining inline controls."
+  },
+  "ownership": {
+    "shared_current": [
+      "config/orchestration-routing.json",
+      "tests/fixtures/codex_routing/topology.json",
+      "tests/fixtures/codex_routing/deployment.json"
+    ],
+    "python_proposed": [
+      "scripts/dev_tools/resolve_codex_topology.py",
+      "scripts/dev_tools/_codex_discovery_routing.py",
+      "scripts/dev_tools/resolve_codex_deployment.py",
+      "scripts/dev_tools/generate_codex_agent_variants.py",
+      "tests/scripts/dev_tools/test_resolve_codex_topology.py",
+      "tests/scripts/dev_tools/test_resolve_codex_deployment.py",
+      "tests/scripts/dev_tools/test_generate_codex_agent_variants.py",
+      "tests/scripts/dev_tools/test_codex_routing_cli_corpus.py",
+      "tests/scripts/dev_tools/test_codex_topology_policy_config_parity.py",
+      "tests/scripts/dev_tools/test_codex_model_policy_config_parity.py"
+    ],
+    "powershell_proposed": [
+      ".claude/lib/codex-routing/CodexTopology.psm1",
+      ".claude/lib/codex-routing/CodexDiscoveryRouting.psm1",
+      ".claude/lib/codex-routing/CodexDeployment.psm1",
+      ".codex/scripts/Resolve-CodexTopology.ps1",
+      "tests/scripts/claude-lib/codex-routing/CodexTopology.Parity.Tests.ps1",
+      "tests/scripts/claude-lib/codex-routing/CodexDeployment.Parity.Tests.ps1",
+      "tests/scripts/claude-lib/codex-routing/CodexDeployment.GeneratedFamilies.Parity.Tests.ps1",
+      "tests/scripts/claude-lib/codex-routing/CodexRouting.Manifest.Tests.ps1",
+      "tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1"
+    ],
+    "typescript_proposed": [
+      "extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts",
+      "extensions/drm-copilot/src/lib/validate/codex-discovery-routing.ts",
+      "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts",
+      "extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts",
+      "extensions/drm-copilot/test/lib/validate/codex-discovery-routing.test.ts",
+      "extensions/drm-copilot/test/lib/validate/codex-deployment.test.ts"
+    ],
+    "serialized_later": "Converter/native bases, four new variant families, explicit PS helper virtual-resource pairs, bundled resources/core manifests, and exact active-profile comparison remain coordinator-serialized. No independent language writer edits the shared data or generated copies."
+  },
+  "concrete_prerequisites": [
+    "Separate discovery receipt type/overloads keep ordinary checkpoint consumers unchanged.",
+    "PowerShell topology is 394 lines and gets the cohesive CodexDiscoveryRouting.psm1 helper.",
+    "TypeScript model routing is 487 lines; keep only minimal family import/spread there and use the proposed helper.",
+    "New TS helper requires its own existing per-file coverage-threshold entry.",
+    "New PS helper requires explicit publication resource pairs/core membership; this is part of first generation, while P10 destination merge stays deferred."
+  ],
+  "p10_deferred": "Append absent discovery_operations; retain an equal map; refuse conflicting fixed rows without writing destination policy. In compatible codex_model_policy append only four missing families, preserving customizations; incompatible model/context/ceiling policy blocks delivery rather than replacing the whole block.",
+  "profile_hash_rule": "All present native/bundled Codex profiles are conservatively bound. Identical bytes permit authority reuse; changed active profiles require a fresh verified native launch, with orchestrator transitions coordinated by root.",
+  "data_checks": [
+    "JSON parse and exact declared config delta",
+    "Original 23 rows and prefix bytes retained",
+    "76 distinct exact IDs and existing case schema",
+    "All three shared files at or below 500 physical lines",
+    "All recorded non-owned predecessor/profile hashes and absences unchanged"
+  ],
+  "execution": {
+    "resolvers_run": false,
+    "tests_run": false,
+    "generators_run": false,
+    "native_launch_run": false,
+    "qa_status": "Pending language implementation and ordered gates; this is a shared-data/interface freeze, not task acceptance."
+  }
+}

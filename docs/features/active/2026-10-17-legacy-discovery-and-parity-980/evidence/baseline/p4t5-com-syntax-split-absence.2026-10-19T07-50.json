@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-10-19T07-50",
+  "absent_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+  "routing_receipt": "workspace_operations_p4t5_com_syntax_split",
+  "scope": "Pure C# COM candidates; explicit re-export preserves the existing public API.",
+  "baseline": "evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json",
+  "baseline_sha256": "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7",
+  "frozen_pre_repair_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-wip-freeze.2026-10-19T07-27.json",
+  "frozen_pre_repair_sha256": "7cb5dc86803a76495cec0e9501a9b5553e992c99a1bf71bbb1ce9422c805d2b7",
+  "original_streams": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "sha256": "4ddaeea981fd1442761276eb5a97fe1e0445dc7b3381fe7e83e1db9cc003977e",
+      "physical_lines": 496,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "4ddaeea981fd1442761276eb5a97fe1e0445dc7b3381fe7e83e1db9cc003977e",
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: eol: lf"
+      ],
+      "index_binding": "Not staged by this worker; normalized digest is a projection only."
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "sha256": "9ee41392d4b043e3e35f392387f87ee87a0f8b48067fc0b9e9fac0a4f1186e70",
+      "physical_lines": 341,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "9ee41392d4b043e3e35f392387f87ee87a0f8b48067fc0b9e9fac0a4f1186e70",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_interop.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_interop.py: eol: lf"
+      ],
+      "index_binding": "Not staged by this worker; normalized digest is a projection only."
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "sha256": "92b74102568f7aca3ef2f2d0d46531bffa0ca03f28d155045ffb8be7b3cfb20c",
+      "physical_lines": 348,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "92b74102568f7aca3ef2f2d0d46531bffa0ca03f28d155045ffb8be7b3cfb20c",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: eol: lf"
+      ],
+      "index_binding": "Not staged by this worker; normalized digest is a projection only."
+    }
+  ],
+  "preserved_directory": "SCRATCH/issue-980-p4t5-com-reviewed-2026-10-19T07-50",
+  "source_changes_before_absence_check": false,
+  "plan_ac_checkpoint_git_mutations": false
+}

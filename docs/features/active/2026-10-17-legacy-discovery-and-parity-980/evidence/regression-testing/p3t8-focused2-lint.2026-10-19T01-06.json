@@ -1,0 +1,46 @@
+{
+  "stage": 2,
+  "label": "p3t8-focused2-lint",
+  "started": "2026-10-19T01:06:13.774923+00:00",
+  "finished": "2026-10-19T01:06:14.938462+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py tests/discovery_runtime/test_source_reads.py tests/discovery_runtime/test_source_read_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 1.164,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "55bc6c09f21aff17dba7072987202f69ef73d8948dfdfc8d7a03d52640b4f2c1",
+      "physical_lines": 350
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "22df663b170ba6fe3a30798719a68056770ee7a0c19cef8ed8e82e4a50af68c3",
+      "physical_lines": 464
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "afcc321c099836d7d82a841bff8876cbe38eed8eb643c1649372390b34ff54be",
+      "physical_lines": 444
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "bc15010b263be0f995511597710406dbe6a9d232f55a4d312ea72dae1f2d646c",
+      "physical_lines": 452
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "55bc6c09f21aff17dba7072987202f69ef73d8948dfdfc8d7a03d52640b4f2c1",
+      "physical_lines": 350
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "22df663b170ba6fe3a30798719a68056770ee7a0c19cef8ed8e82e4a50af68c3",
+      "physical_lines": 464
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "afcc321c099836d7d82a841bff8876cbe38eed8eb643c1649372390b34ff54be",
+      "physical_lines": 444
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "bc15010b263be0f995511597710406dbe6a9d232f55a4d312ea72dae1f2d646c",
+      "physical_lines": 452
+    }
+  },
+  "output": "All checks passed!\n"
+}

@@ -1,0 +1,427 @@
+{
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-review-repair-coverage.2026-10-19T07-53.json",
+    "raw_path": "SCRATCH/p4t5-access-review-repair-coverage.raw.json",
+    "raw_sha256": "eff10702c3bc1f462b51029872fb9dce97440ebe1d321363e34f5a5340e25dfa",
+    "sha256": "1ddaefa66885c61714a0b8ad5790625decd03f9feb3860cde5a5bbc0a6ef0b0d"
+  },
+  "module_summaries": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": {
+      "covered_branches": 30,
+      "covered_lines": 91,
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 30,
+      "num_partial_branches": 0,
+      "num_statements": 91,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": {
+      "covered_branches": 64,
+      "covered_lines": 115,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 64,
+      "num_partial_branches": 0,
+      "num_statements": 115,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": {
+      "covered_branches": 0,
+      "covered_lines": 11,
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 11,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": {
+      "covered_branches": 0,
+      "covered_lines": 9,
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "num_statements": 9,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  },
+  "retained_test_definitions": [
+    {
+      "name": "serialized",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_fixed_filesystem_forms_are_inferred_without_arguments",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_non_access_and_masked_syntax_never_becomes_evidence",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_repeated_multiline_sites_keep_exact_physical_offsets",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_custom_types_aliases_and_preprocessing_never_resolve_bindings",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_exact_captured_bytes_back_offsets_checksums_and_composed_inventory",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_arguments_do_not_define_ids_and_unchanged_pin_is_not_reused",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_malformed_input_discards_its_candidates_and_redacts_errors",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_unavailable_excluded_and_unrelated_files_preserve_selection",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_invalid_candidate_bounds_fail_explicitly",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "CountedPin",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_whole_capture_provenance_matching_visits_each_pin_once",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_provenance_index_preserves_any_exact_matching_identity",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_provenance_count_is_bounded_before_any_pin_inspection",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_aggregate_byte_work_is_bounded_separately_from_output",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_known_registry_syntax_keeps_platform_and_key_unresolved",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_non_registry_receivers_and_declarations_are_not_candidates",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_registry_roots_keep_repeated_offsets_and_no_argument_anchor",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_invalid_fixed_definitions_fail_before_scanning",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_record_overflow_discards_the_whole_aggregate",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_zero_candidate_budget_permits_absence_but_never_allocates_a_site",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_text_reservations_precede_projection_and_discard_partial_claims",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_unicode_provenance_serializes_within_documented_byte_reservations",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_missing_pin_and_byte_limit_are_explicit_fixed_failures",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "CountedTokens",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_aggregate_token_work_is_linear_for_long_and_repeated_chains",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    },
+    {
+      "name": "test_token_limit_never_emits_partial_candidates",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "proof": "Exact original AST; the work-test matrix retains its four original entries and adds three."
+    }
+  ],
+  "source_files": [
+    {
+      "filtered_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 284,
+      "original_sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "working_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc"
+    },
+    {
+      "filtered_git_blob": "0e13a47629abc928cc6d689a513ef6d5769eff02",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 267,
+      "original_sha256": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "sha256": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+      "working_git_blob": "0e13a47629abc928cc6d689a513ef6d5769eff02"
+    },
+    {
+      "filtered_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 134,
+      "original_sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "working_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7"
+    },
+    {
+      "filtered_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 56,
+      "original_sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "working_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff"
+    },
+    {
+      "filtered_git_blob": "57c6dcd2a01fce7a015f4f031bd0984b4128bad3",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_filesystem_access.py: text: auto\ntests/discovery_runtime/analyzer/test_filesystem_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 471,
+      "original_sha256": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "sha256": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+      "working_git_blob": "57c6dcd2a01fce7a015f4f031bd0984b4128bad3"
+    },
+    {
+      "filtered_git_blob": "01407354b51ed1d1445dbdea9c8a364dd810225b",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_registry_access.py: text: auto\ntests/discovery_runtime/analyzer/test_registry_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 470,
+      "original_sha256": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "sha256": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35",
+      "working_git_blob": "01407354b51ed1d1445dbdea9c8a364dd810225b"
+    }
+  ],
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-56",
+  "units": [
+    {
+      "covered_branches": 0,
+      "covered_statements": 2,
+      "end": 48,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "_failure",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "start": 36
+    },
+    {
+      "covered_branches": 0,
+      "covered_statements": 3,
+      "end": 71,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "_row_cost",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "start": 51
+    },
+    {
+      "covered_branches": 10,
+      "covered_statements": 16,
+      "end": 107,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "_verified_paths",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "start": 74
+    },
+    {
+      "covered_branches": 4,
+      "covered_statements": 12,
+      "end": 206,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "_project",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "start": 110
+    },
+    {
+      "covered_branches": 16,
+      "covered_statements": 51,
+      "end": 284,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "analyze_access",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "start": 209
+    },
+    {
+      "covered_branches": 10,
+      "covered_statements": 18,
+      "end": 63,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "ApiSurface",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "start": 17
+    },
+    {
+      "covered_branches": 10,
+      "covered_statements": 12,
+      "end": 63,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "ApiSurface.__post_init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "start": 31
+    },
+    {
+      "covered_branches": 0,
+      "covered_statements": 7,
+      "end": 80,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "AccessSite",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "start": 67
+    },
+    {
+      "covered_branches": 12,
+      "covered_statements": 16,
+      "end": 106,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "_balanced",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "start": 83
+    },
+    {
+      "covered_branches": 14,
+      "covered_statements": 20,
+      "end": 162,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "_recognize",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "start": 109
+    },
+    {
+      "covered_branches": 28,
+      "covered_statements": 47,
+      "end": 267,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "access_sites",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "start": 165
+    },
+    {
+      "covered_branches": 0,
+      "covered_statements": 4,
+      "end": 134,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "FilesystemAccessAnalyzer",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "start": 123
+    },
+    {
+      "covered_branches": 0,
+      "covered_statements": 2,
+      "end": 134,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "FilesystemAccessAnalyzer.analyze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "start": 128
+    },
+    {
+      "covered_branches": 0,
+      "covered_statements": 4,
+      "end": 56,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "RegistryAccessAnalyzer",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "start": 45
+    },
+    {
+      "covered_branches": 0,
+      "covered_statements": 2,
+      "end": 56,
+      "missing_branches": 0,
+      "missing_statements": 0,
+      "name": "RegistryAccessAnalyzer.analyze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "start": 50
+    }
+  ]
+}

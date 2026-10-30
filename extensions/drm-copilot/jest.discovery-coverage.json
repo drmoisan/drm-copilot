@@ -1,0 +1,52 @@
+{
+  "./src/discovery-result.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-runtime.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-authority.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-authority-record.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-authorization.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-authorization-record.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-authorization-binding.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-root-grant.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-sentinel.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-invocation.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-invocation-record.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-routing.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-input-manifest.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-finalization.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-authority-provider.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-capabilities.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-capability-record.ts": { "lines": 90, "branches": 75 },
+  "./src/repo-automation-service-discovery.ts": { "lines": 90, "branches": 75 },
+  "./src/repo-automation-service-discovery-agent.ts": {
+    "lines": 90,
+    "branches": 75
+  },
+  "./src/repo-automation-service-discovery-identity.ts": {
+    "lines": 90,
+    "branches": 75
+  },
+  "./src/mcp-discovery-authorization-gate.ts": { "lines": 90, "branches": 75 },
+  "./src/mcp-discovery-authority-tool-definitions.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/mcp-tool-inputs-discovery-authority.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/mcp-tool-inputs-discovery-shared.ts": { "lines": 85, "branches": 75 },
+  "./src/discovery-authority-paths.ts": { "lines": 90, "branches": 75 },
+  "./src/repo-automation-execute-discovery.ts": { "lines": 90, "branches": 75 },
+  "./src/mcp-tool-inputs-discovery.ts": { "lines": 85, "branches": 75 },
+  "./src/mcp-handlers/discovery-handlers.ts": { "lines": 85, "branches": 75 },
+  "./src/mcp-discovery-tool-definitions.ts": { "lines": 85, "branches": 75 },
+  "./src/discovery-command-registration.ts": { "lines": 85, "branches": 75 },
+  "./src/discovery-workspace-command-registration.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/discovery-artifact-command-registration.ts": {
+    "lines": 85,
+    "branches": 75
+  }
+}

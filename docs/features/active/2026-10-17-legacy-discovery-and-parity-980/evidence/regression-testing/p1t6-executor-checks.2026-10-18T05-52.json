@@ -1,0 +1,424 @@
+{
+  "task": "P1-T6",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 33,
+  "schemas": [
+    "parity-matrix",
+    "implementation-record",
+    "unspecified-behavior",
+    "product-decision",
+    "unspecified-behavior-collection",
+    "product-decision-collection",
+    "acceptance-specification"
+  ],
+  "fixtures": [
+    {
+      "kind": "parity-matrix",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "entries",
+            0,
+            "source_contract_ref",
+            "revision"
+          ],
+          "message": "'main' does not match '^(?:[0-9a-f]{40}|[0-9a-f]{64})$(?![\\\\s\\\\S])'"
+        }
+      ]
+    },
+    {
+      "kind": "implementation-record",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "test_references"
+          ],
+          "message": "[] does not contain items matching the given schema"
+        },
+        {
+          "path": [
+            "verification_evidence_refs"
+          ],
+          "message": "[] should be non-empty"
+        },
+        {
+          "path": [
+            "test_references"
+          ],
+          "message": "[] should be non-empty"
+        }
+      ]
+    },
+    {
+      "kind": "unspecified-behavior",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "approved_target_behavior"
+          ],
+          "message": "'An unapproved expectation.' is not of type 'null'"
+        }
+      ]
+    },
+    {
+      "kind": "product-decision",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "approval"
+          ],
+          "message": "None is not of type 'object'"
+        }
+      ]
+    },
+    {
+      "kind": "unspecified-behavior-collection",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "records"
+          ],
+          "message": "'not-a-list' is not of type 'array'"
+        }
+      ]
+    },
+    {
+      "kind": "product-decision-collection",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "records"
+          ],
+          "message": "'not-a-list' is not of type 'array'"
+        }
+      ]
+    },
+    {
+      "kind": "acceptance-specification",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "then"
+          ],
+          "message": "['An expectation that has not been established.'] is not of type 'null'"
+        }
+      ]
+    }
+  ],
+  "independent_boundary_cases": [
+    {
+      "name": "empty unpinned parity initialization",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "populated parity requires immutable pins",
+      "valid": false,
+      "finding_count": 2
+    },
+    {
+      "name": "unconfigured optional platform fields omitted",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "source contract reference rejects mutable branch",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "unspecified applicability cannot claim pass",
+      "valid": false,
+      "finding_count": 3
+    },
+    {
+      "name": "retirement requires decision link",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "target verification requires evidence",
+      "valid": false,
+      "finding_count": 2
+    },
+    {
+      "name": "approved decision requires approval metadata",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "proposed decision cannot supply ready criterion",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "proposed decision with pending criterion",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unresolved behavior cannot claim approved target",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "observation resolution needs evidence",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "empty initialized unspecified-behavior-collection",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "strict inner kind unspecified-behavior-collection",
+      "valid": false,
+      "finding_count": 18
+    },
+    {
+      "name": "empty initialized product-decision-collection",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "strict inner kind product-decision-collection",
+      "valid": false,
+      "finding_count": 17
+    },
+    {
+      "name": "pending acceptance without Then",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "pending acceptance rejects invented Then",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "target approval cannot define legacy expectation",
+      "valid": false,
+      "finding_count": 2
+    },
+    {
+      "name": "acceptance readiness is not test execution",
+      "valid": false,
+      "finding_count": 1
+    }
+  ],
+  "packaged_resources": 24,
+  "unchanged_prior_paths": 84,
+  "coverage_lines": "312/312",
+  "coverage_branch_arcs": "132/132",
+  "new_or_changed_production_executable_lines": 0,
+  "line_counts": {
+    "examples/discovery/v2/acceptance-specification.example.yaml": 36,
+    "examples/discovery/v2/implementation-record.example.yaml": 37,
+    "examples/discovery/v2/parity-matrix.example.yaml": 46,
+    "examples/discovery/v2/product-decision-collection.example.yaml": 6,
+    "examples/discovery/v2/product-decision.example.yaml": 45,
+    "examples/discovery/v2/unspecified-behavior-collection.example.yaml": 6,
+    "examples/discovery/v2/unspecified-behavior.example.yaml": 31,
+    "packages/discovery-runtime/resource-manifest.json": 33,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": 126,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json": 64,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json": 55,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json": 133,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json": 14,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json": 88,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json": 14,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json": 71,
+    "schemas/discovery/v2/acceptance-specification.schema.json": 64,
+    "schemas/discovery/v2/implementation-record.schema.json": 55,
+    "schemas/discovery/v2/parity-matrix.schema.json": 133,
+    "schemas/discovery/v2/product-decision-collection.schema.json": 14,
+    "schemas/discovery/v2/product-decision.schema.json": 88,
+    "schemas/discovery/v2/unspecified-behavior-collection.schema.json": 14,
+    "schemas/discovery/v2/unspecified-behavior.schema.json": 71,
+    "tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml": 30,
+    "tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml": 21,
+    "tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml": 34,
+    "tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml": 6,
+    "tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml": 37,
+    "tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml": 6,
+    "tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml": 22,
+    "tests/schemas/discovery/test_v2_acceptance_schemas.py": 207,
+    "tests/schemas/discovery/test_v2_decision_schemas.py": 342,
+    "tests/schemas/discovery/test_v2_target_schemas.py": 394
+  },
+  "paths": [
+    {
+      "path": "examples/discovery/v2/acceptance-specification.example.yaml",
+      "git_blob": "348ff16e9f70c8af13bd90cd09150c0d1438bdaa",
+      "sha256": "19669dbbceaf429a9c76525201a3d46d6ffdba1a8239f020429fb7c4a678fced"
+    },
+    {
+      "path": "examples/discovery/v2/implementation-record.example.yaml",
+      "git_blob": "32eaee6bba898420de7b5b5f9589a76eb554361f",
+      "sha256": "faa5bb6777cfe5907cb588c9a762f78141360da728bdbb65e41cacfb8a1da37f"
+    },
+    {
+      "path": "examples/discovery/v2/parity-matrix.example.yaml",
+      "git_blob": "5fe31c4e991aa5eda1687124d512495532568331",
+      "sha256": "68ba6c2c375cea85111e9bad31be4c2d211c8faa5f86e3fcaf7f0f78e3d7e559"
+    },
+    {
+      "path": "examples/discovery/v2/product-decision-collection.example.yaml",
+      "git_blob": "7092cb7c3746ed33d89ab3cf364f9ab66b84b33b",
+      "sha256": "87cdcc25f1a53d2b2f8ca19b5d1c295659ff34fbf9fee9aea4de0c92351e5358"
+    },
+    {
+      "path": "examples/discovery/v2/product-decision.example.yaml",
+      "git_blob": "4edf18028f3fb5632d651ce1c7d223229e5ac82a",
+      "sha256": "73a2cdd11adeb70db511ed9f840147c69751ed47c7d5da30f5bbbf8b0caffd55"
+    },
+    {
+      "path": "examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "git_blob": "f7942c8183b7f14edd816d5df4cb9ed2eb368ad1",
+      "sha256": "adfe0c5b98cbbd6ae8c972e681c037323b433ec076dd366a6d35f000f124acc4"
+    },
+    {
+      "path": "examples/discovery/v2/unspecified-behavior.example.yaml",
+      "git_blob": "56fe2bb45b810f6066dacee3d837bbee3595765c",
+      "sha256": "f44693147791220a3dccf76348b768db4f36f7fa648296bd985138bb3a37d629"
+    },
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "git_blob": "f7c02c356e9c5f0d0e4c8c1b28cbf12cfbeaf78b",
+      "sha256": "f8269cb91c47126f30a5e2593c794af0012c672474f5470b98d1447aed310dba"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "git_blob": "c169107f8d72a8ab08e235993883e11fe120339e",
+      "sha256": "7c48bc4b5765ff4fd6b14129b8bfe022e5116eef6b275e53d28162883f355dc5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "git_blob": "faa87f161d4cca70f759d57015d3cd716ca80b5a",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "git_blob": "8dd36ece890889b2a59f5de49855069261f929b0",
+      "sha256": "0e1f156b06ad957c802d0dad5a31a8ae1f327a6ff6f482250fff99c8a4532070"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "git_blob": "c4bbb32afce53df2a502c9897a13bb5542e504d7",
+      "sha256": "fcb7dd0d9e8228c4f2d8fc65c1616e81f09f8ddd670e2e3947ad75889bee4fe5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "git_blob": "2c909e3d058fc0721176fa29f195cb0268d34eed",
+      "sha256": "84aba2147dbdfcba691e044652d3869d49fcae52c2f4aee7efd1efa71ac8bc33"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "git_blob": "56948993a098ccafef4a8ed8a538342acc60be33",
+      "sha256": "05b52b489d7d28505cc547d2063d442b4b0f8331e97a55e33a040c3306551c7c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "git_blob": "618445c67220f306f6531e02b402563f7b11c92e",
+      "sha256": "d34a3b97ea4dee7436740fd82331477c6a552e9345ca3ce3db34132bbef6cca3"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "git_blob": "d386377536356486538abd04600d460103b5c6af",
+      "sha256": "3e0ce21871eb6b5f6e74949e67f6553efcb5f10110c58f69db1eb1dbe6b9888d"
+    },
+    {
+      "path": "schemas/discovery/v2/acceptance-specification.schema.json",
+      "git_blob": "faa87f161d4cca70f759d57015d3cd716ca80b5a",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888"
+    },
+    {
+      "path": "schemas/discovery/v2/implementation-record.schema.json",
+      "git_blob": "8dd36ece890889b2a59f5de49855069261f929b0",
+      "sha256": "0e1f156b06ad957c802d0dad5a31a8ae1f327a6ff6f482250fff99c8a4532070"
+    },
+    {
+      "path": "schemas/discovery/v2/parity-matrix.schema.json",
+      "git_blob": "c4bbb32afce53df2a502c9897a13bb5542e504d7",
+      "sha256": "fcb7dd0d9e8228c4f2d8fc65c1616e81f09f8ddd670e2e3947ad75889bee4fe5"
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision-collection.schema.json",
+      "git_blob": "2c909e3d058fc0721176fa29f195cb0268d34eed",
+      "sha256": "84aba2147dbdfcba691e044652d3869d49fcae52c2f4aee7efd1efa71ac8bc33"
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision.schema.json",
+      "git_blob": "56948993a098ccafef4a8ed8a538342acc60be33",
+      "sha256": "05b52b489d7d28505cc547d2063d442b4b0f8331e97a55e33a040c3306551c7c"
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "git_blob": "618445c67220f306f6531e02b402563f7b11c92e",
+      "sha256": "d34a3b97ea4dee7436740fd82331477c6a552e9345ca3ce3db34132bbef6cca3"
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior.schema.json",
+      "git_blob": "d386377536356486538abd04600d460103b5c6af",
+      "sha256": "3e0ce21871eb6b5f6e74949e67f6553efcb5f10110c58f69db1eb1dbe6b9888d"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "git_blob": "297167e6bee0a2d12061f54a6d26def1363d4ef3",
+      "sha256": "25e675c67ec5684e2e57605fe935d8ceb96c1211ce3fc64685db4b38b1f562c4"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "git_blob": "32c1f9fe97c6243a4447c38d212a7f74d74b9b43",
+      "sha256": "a61b23dfc68a80adac7e390c890df4b65dd2202c9bc5f95eba479db11a50ceab"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "git_blob": "f6fd497917023b39b75ecbc333000ae4891265b3",
+      "sha256": "7ae3350b68b33662c57d0fe4ad77d7bd72a7d67a885636dede78fadb0f06e32b"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "git_blob": "ff30205f8582023a5a7053cd63587524b2055a55",
+      "sha256": "11d0ac14ced26e3e35d4e89eb52f6153f9aceb0af1ead3c2b173dcbb81e52367"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "git_blob": "c8feef89971d0f5bc85c77a0cb25c3bcc0723e8a",
+      "sha256": "8ce469bbe3d8f983ccbd29b6d42adc45ba9acb0de0c05d11af898561dad447f2"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "git_blob": "fda857f36f513840d5835448066a6b2e0a951634",
+      "sha256": "db09d5b212fa7b10fefcdaf2f526413f7f5be0546908a7722a8a1f52b21a7c7c"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "git_blob": "acf8baefca128d9e507f76e1b597975ed4f0fbd3",
+      "sha256": "d0125313774e7cf6d9dc0c45fb7c00522a63c57c5e0298eaf69a9ddde24d3f7a"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "git_blob": "ef25c31dde17e4eb5fcc0157329ba3ac615f7544",
+      "sha256": "d077f3840630143a7c8ae566aecc8a0fed346e434831b152e8bba61a48f7b133"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_decision_schemas.py",
+      "git_blob": "f8752dd2ac3e637eb7b9216ce9eb1188baff8002",
+      "sha256": "c544c37c20c65550888f237b2a5a2e55ff814195b0ddcbced8d1fb33b1931619"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_target_schemas.py",
+      "git_blob": "28e5259e3a670bb94adbef2e86ae1357895eea83",
+      "sha256": "3f9e1ac73efbf141a5e43866f7b48074248b07b9e73d4eee5a05e53f4a38b457"
+    }
+  ]
+}

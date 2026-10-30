@@ -1,0 +1,53 @@
+{
+  "stage": "lint",
+  "label": "p4t7-python-focused7-lint",
+  "started": "2026-10-19T10:11:19.853874+00:00",
+  "finished": "2026-10-19T10:11:21.034007+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py tests/discovery_runtime/analyzer/test_dependency_python.py",
+  "exit_code": 0,
+  "duration_seconds": 1.18,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "dcbf0058a783a54264f7defd8c874cdcb561667c007b4799838d1be014ce875b",
+      "physical_lines": 289
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "97e3b22f403a174efd0abc04807b16a7a458e154432d2a3be36767b070f97f8a",
+      "physical_lines": 309
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+      "physical_lines": 496
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "dcbf0058a783a54264f7defd8c874cdcb561667c007b4799838d1be014ce875b",
+      "physical_lines": 289
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "97e3b22f403a174efd0abc04807b16a7a458e154432d2a3be36767b070f97f8a",
+      "physical_lines": 309
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+      "physical_lines": 496
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused7-lint-101121.stdout.bin",
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_bytes": 19,
+      "presentation": "All checks passed!\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused7-lint-101121.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 Python parser only"
+}

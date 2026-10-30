@@ -1,0 +1,77 @@
+{
+  "stage": "format",
+  "label": "p4t9-registry-import-trap-normalize",
+  "started": "2026-10-19T12:57:18.430912+00:00",
+  "finished": "2026-10-19T12:57:19.963249+00:00",
+  "command": "poetry run black tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+  "exit_code": 0,
+  "duration_seconds": 1.532,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": {
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a",
+      "physical_lines": 9
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "fe2f19b4d58b24f36d73d8b36b378f22bf709a42ced7f07d5a9be3ceea3359ae",
+      "physical_lines": 403
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": {
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a",
+      "physical_lines": 9
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7",
+      "physical_lines": 405
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t9-registry-import-trap-normalize-125719.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t9-registry-import-trap-normalize-125719.stderr.bin",
+      "raw_sha256": "4d87ca364af5127f2a086b0eac13c9dba55991b0463354e27feb864bf612d33a",
+      "raw_bytes": 119,
+      "presentation": "reformatted tests\\discovery_runtime\\analyzer\\test_registry_dispatch.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n1 file reformatted.\r\n"
+    }
+  },
+  "accepted_baseline": "p4t9-shared-baseline.2026-10-19T12-41.json",
+  "scope": "P4-T9 registry subset"
+}

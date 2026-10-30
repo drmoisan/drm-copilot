@@ -1,0 +1,39 @@
+{
+  "batch": "development",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T07:17:31.556029+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t5-access-development-types-071731.2026-10-19T07-17.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t5-access-development-types-071731.2026-10-19T07-17.stdout.txt",
+      "sha256": "eaa157a4aacb7819ca71faf1c6dc55811ce18fa765b4d7403f8308608c1d70a3"
+    }
+  },
+  "seconds": 0.972381,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0df91febc3db341422c7116e475abaa41432aeb7a1798fd2309f805f203c0e2a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "e6c62c1d0d0a6df3e736ed75101e8ddb56d7d086184118c04043cab564dfec5f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "b9eb53a6355930694000e328bde037db5dbd6c5f5e08f96b092f3e3bbdcb49db",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "04be6fefac8852c14296bc0277a92e583f9a6dd458af16bdb94597de78624188"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0df91febc3db341422c7116e475abaa41432aeb7a1798fd2309f805f203c0e2a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "e6c62c1d0d0a6df3e736ed75101e8ddb56d7d086184118c04043cab564dfec5f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "b9eb53a6355930694000e328bde037db5dbd6c5f5e08f96b092f3e3bbdcb49db",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "04be6fefac8852c14296bc0277a92e583f9a6dd458af16bdb94597de78624188"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T07:17:30.583648+00:00",
+  "stderr": "",
+  "stdout": "WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_syntax.py\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_syntax.py:38:16 - error: Unnecessary isinstance call; \"tuple[str, ...]\" is always an instance of \"tuple[Unknown, ...]\" (reportUnnecessaryIsInstance)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_syntax.py:39:17 - error: Unnecessary isinstance call; \"frozenset[tuple[str, str]] | frozenset[str]\" is always an instance of \"frozenset[Unknown]\" (reportUnnecessaryIsInstance)\nWORKSPACE\\tests\\discovery_runtime\\analyzer\\test_registry_access.py\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_registry_access.py:273:5 - error: Type of \"original\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_registry_access.py:274:9 - error: Expected type but received a string literal (reportGeneralTypeIssues)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_registry_access.py:291:16 - error: Return type is unknown (reportUnknownVariableType)\n5 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-17"
+}

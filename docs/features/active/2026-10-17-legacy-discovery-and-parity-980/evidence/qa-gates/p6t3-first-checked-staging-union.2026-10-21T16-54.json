@@ -1,0 +1,692 @@
+{
+  "Timestamp": "2026-10-21T16:55:14.8369196Z",
+  "issue": 980,
+  "task": "P6-T3",
+  "status": "CHECKED_WIP_READY",
+  "current_head": "e926b481d9958b174a4012fb3bb268a390fa8fc2",
+  "task_accepted": false,
+  "scope": "Reviewed public installed entry, packaged identity, analyzer and acceptance adapters; preserve scoped proof and disabled final preparation",
+  "source_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-staging-union.2026-10-21T16-48.json",
+      "sha256": "8d55a1ff13b85f8f3865b5114098a42ec088aada005721d3f6537b9ae7db1f83"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-package-staging-union.2026-10-21T16-53.json",
+      "sha256": "9f28ca64ff2b7fdbd6c55c6eddda4cce34219f4e80b892ef899b0305342cce38"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-analyzers-checked-staging-union.2026-10-21T16-42.json",
+      "sha256": "07680f22b860d65ebd967e0c16a44a5c17417c916a2cdaf387739b5ea83046d5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-checked-staging-union.2026-10-21T16-46.json",
+      "sha256": "bc277b508fc2006d93f97fc56760eb9c7a42153a44c2b58d10e7629061e86874"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-acceptance-retained-baseline.2026-10-21T16-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-entry-preedit.2026-10-21T16-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-integration-final-preparation.2026-10-21T16-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-checked-staging-union.2026-10-21T16-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-format.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-raw-archive.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-lint.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-lint.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-freeze.2026-10-21T16-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-independent-review.2026-10-21T16-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-coverage.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-lint.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-tests.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-types.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-proof-archive.2026-10-21T16-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-analyzers-checked-staging-union.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-analyzers-independent-review.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-body.2026-10-21T16-44.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate-formatted.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate-imports.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate-streams.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate.2026-10-21T16-34.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-freeze.2026-10-21T16-44.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-source-freeze.2026-10-21T16-35.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-staging-union.2026-10-21T16-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-staging.2026-10-21T16-44.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-entry-confirmation.2026-10-21T16-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-entry-confirmation.2026-10-21T16-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-package-confirmation.2026-10-21T16-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-first-checked-staging-union.2026-10-21T16-54.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-package-staging-union.2026-10-21T16-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-build.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-check.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-handoff.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-install.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-pip-support.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure-readable.2026-10-21T16-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-raw-archive.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-staging-qualification.2026-10-21T16-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-venv.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-format.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-lint.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-freeze.2026-10-21T16-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-originals.2026-10-21T16-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-format.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-lint.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-tests.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-types.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-preedit-originals.2026-10-21T16-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-staging.2026-10-21T16-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-import-format.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-format-black-raw.2026-10-21T16-35.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-format-black.2026-10-21T16-35.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-format-black.2026-10-21T16-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-static-black-raw.2026-10-21T16-34.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-static-black.2026-10-21T16-34.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-static-black.2026-10-21T16-34.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-black-raw.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-black.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-black.2026-10-21T16-36.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-ruff-raw.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-ruff.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-ruff.2026-10-21T16-36.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-black-raw.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-black.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-black.2026-10-21T16-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-pyright-raw.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-pyright.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-pyright.2026-10-21T16-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-ruff-raw.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-ruff.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-ruff.2026-10-21T16-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-tests-raw.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-tests.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-tests.2026-10-21T16-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-black-raw.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-black.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-black.2026-10-21T16-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-coverage-raw.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-coverage.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-coverage.2026-10-21T16-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-pyright-raw.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-pyright.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-pyright.2026-10-21T16-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-ruff-raw.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-ruff.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-ruff.2026-10-21T16-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-tests-raw.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-tests.2026-10-21T16-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-tests.2026-10-21T16-38.md",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+    "scripts/dev_tools/discovery/analyzer/__init__.py",
+    "scripts/dev_tools/discovery/analyzer/cli.py",
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+    "scripts/dev_tools/generate_acceptance_scenarios.py",
+    "tests/discovery_runtime/test_legacy_adapters.py",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py"
+  ],
+  "bindings_excluding_self": [
+    {
+      "working_sha256": "e7d74aa99ab9fbf0447587085f83aeff4e9d1de39ac86980cdb8c4dd3c0a47c8",
+      "git_lf_sha256": "e7d74aa99ab9fbf0447587085f83aeff4e9d1de39ac86980cdb8c4dd3c0a47c8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-acceptance-retained-baseline.2026-10-21T16-31.json"
+    },
+    {
+      "working_sha256": "aca64ff8a4c2dc1de97a2c459a4651a6e0f3fdf1e5dd31c461d370aab2f861c4",
+      "git_lf_sha256": "aca64ff8a4c2dc1de97a2c459a4651a6e0f3fdf1e5dd31c461d370aab2f861c4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-entry-preedit.2026-10-21T16-31.json"
+    },
+    {
+      "working_sha256": "860f116f0eb1305b23566aa0ab5bccd5a18ede71cd0f90a2ee516354fc817223",
+      "git_lf_sha256": "860f116f0eb1305b23566aa0ab5bccd5a18ede71cd0f90a2ee516354fc817223",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-integration-final-preparation.2026-10-21T16-50.json"
+    },
+    {
+      "working_sha256": "bc277b508fc2006d93f97fc56760eb9c7a42153a44c2b58d10e7629061e86874",
+      "git_lf_sha256": "41d394459ffff541eabff3efbbd0e2f35cdaf7429c6ca2786adf4ca148862456",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-checked-staging-union.2026-10-21T16-46.json"
+    },
+    {
+      "working_sha256": "2a8d755647b6217625732a935b069e67c1a91f0ad881554844fc03c278b7c4b6",
+      "git_lf_sha256": "2a8d755647b6217625732a935b069e67c1a91f0ad881554844fc03c278b7c4b6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-format.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "5f051aaa88dbb68f18bf8da6cbe8ae5807dd23c9d1c80aff9a98fcd25d405d29",
+      "git_lf_sha256": "5f051aaa88dbb68f18bf8da6cbe8ae5807dd23c9d1c80aff9a98fcd25d405d29",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-raw-archive.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "fbd8fa4b9d9da5a47e5187dc193cb81b4b729f105aef19de1d3f004978acb4e5",
+      "git_lf_sha256": "fbd8fa4b9d9da5a47e5187dc193cb81b4b729f105aef19de1d3f004978acb4e5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-format.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "030f196b19daf253fe210eff8b966f127e4eb43bf643b18c4df538d9adddb0f5",
+      "git_lf_sha256": "030f196b19daf253fe210eff8b966f127e4eb43bf643b18c4df538d9adddb0f5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-lint.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "76ea6d227332c3d14a00d0f10da07879ae36a6ec04bf46c9f0c5c74bbb6cd742",
+      "git_lf_sha256": "76ea6d227332c3d14a00d0f10da07879ae36a6ec04bf46c9f0c5c74bbb6cd742",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-raw-archive.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "7b7543b4bf3ba697b9948da9726bec83bcb3c07feeaa3ed914a60fc00192e0af",
+      "git_lf_sha256": "7b7543b4bf3ba697b9948da9726bec83bcb3c07feeaa3ed914a60fc00192e0af",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-format.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "415db0e489f53876b0fb3f7eed6a4985b72f34c63039baedb5b6f73b0bd37c7e",
+      "git_lf_sha256": "415db0e489f53876b0fb3f7eed6a4985b72f34c63039baedb5b6f73b0bd37c7e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-lint.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "6ea746204d8c338e91a379d443e83720902f9f1cafeefd02e97a76d3d32e7682",
+      "git_lf_sha256": "6ea746204d8c338e91a379d443e83720902f9f1cafeefd02e97a76d3d32e7682",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-raw-archive.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "84c4a317730f5ee6467bef1fdf1ba1d3c5d1eb9f98ccf5342e13f853e445b946",
+      "git_lf_sha256": "84c4a317730f5ee6467bef1fdf1ba1d3c5d1eb9f98ccf5342e13f853e445b946",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-freeze.2026-10-21T16-40.json"
+    },
+    {
+      "working_sha256": "a91a66211fa902771f2fae398a07de40eef33d65c28add7ca4b45e65391eb879",
+      "git_lf_sha256": "0b4d92804dd4bbc131b7c81a6f483deeb3c2152638bb6976b3dc61758fd093b6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-independent-review.2026-10-21T16-46.json"
+    },
+    {
+      "working_sha256": "f9ae807d3f5f9c8657c8eafe0e6961e986c0ead3a890109838ac04200e1c0ee5",
+      "git_lf_sha256": "f9ae807d3f5f9c8657c8eafe0e6961e986c0ead3a890109838ac04200e1c0ee5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-format.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "e805d9464b934baee6f7398a075e7af4b9f1f6e8d5395b65417ea85737d77969",
+      "git_lf_sha256": "e805d9464b934baee6f7398a075e7af4b9f1f6e8d5395b65417ea85737d77969",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-raw-archive.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "974f28b168cc8cdfcf2c00aba4d2eec520784482fbaf7d0831eeae40f74850e3",
+      "git_lf_sha256": "974f28b168cc8cdfcf2c00aba4d2eec520784482fbaf7d0831eeae40f74850e3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-coverage.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "5b3d353dd10de45dfa221b5092d75bc94a1fdd861992d027460b084f0af78b73",
+      "git_lf_sha256": "5b3d353dd10de45dfa221b5092d75bc94a1fdd861992d027460b084f0af78b73",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-format.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "d335391c44bfe1587ed3926ae187e4c16719d1f2bbcb56c41ed2a59e945b712c",
+      "git_lf_sha256": "d335391c44bfe1587ed3926ae187e4c16719d1f2bbcb56c41ed2a59e945b712c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-lint.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "78b4f3d45867ff516d224b07cdcfd700095f8aa4a966746c3c05275cf1ac1414",
+      "git_lf_sha256": "78b4f3d45867ff516d224b07cdcfd700095f8aa4a966746c3c05275cf1ac1414",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-raw-archive.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "ae8ec53e04e3e57529f05721e019f0f48fd40f6bb89e3f4ed5fa7f14d9b1e89c",
+      "git_lf_sha256": "ae8ec53e04e3e57529f05721e019f0f48fd40f6bb89e3f4ed5fa7f14d9b1e89c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-tests.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "01532eb3d1559914fe8197bf808beadb48010d2739e79e450bcef7b546b64bea",
+      "git_lf_sha256": "01532eb3d1559914fe8197bf808beadb48010d2739e79e450bcef7b546b64bea",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-types.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "94ad8a4f420e5e3dc3825d25c3cffa08667ec30b53f58c5f3384988a6ac7867b",
+      "git_lf_sha256": "94ad8a4f420e5e3dc3825d25c3cffa08667ec30b53f58c5f3384988a6ac7867b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-proof-archive.2026-10-21T16-40.json"
+    },
+    {
+      "working_sha256": "07680f22b860d65ebd967e0c16a44a5c17417c916a2cdaf387739b5ea83046d5",
+      "git_lf_sha256": "80954fc0ef1afab89286a934b401cdcd01e1ede271f925327903578189e4487a",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-analyzers-checked-staging-union.2026-10-21T16-42.json"
+    },
+    {
+      "working_sha256": "9c2ec8832dfc21418a2ed50c95434a1723d6387a9af6273434afee2bfc2f75d1",
+      "git_lf_sha256": "352c3b17458de257ff11abd74450dc3a995db073443f4dedf0b6eb5134f8fe69",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-analyzers-independent-review.2026-10-21T16-42.json"
+    },
+    {
+      "working_sha256": "2c57f16369e735a7df83f4d94de85265e035b4a2940ac3d0fbce2e4c64386dd6",
+      "git_lf_sha256": "2c57f16369e735a7df83f4d94de85265e035b4a2940ac3d0fbce2e4c64386dd6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-body.2026-10-21T16-44.json"
+    },
+    {
+      "working_sha256": "5be420c42ad88d648cce52b586eb077b126ad118b0ca1aa5ad0bef9da0a13b44",
+      "git_lf_sha256": "5be420c42ad88d648cce52b586eb077b126ad118b0ca1aa5ad0bef9da0a13b44",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate-formatted.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "a113ffc659c69f1be54dc73756d404b0155669be79844a4347d2b58c7ea61863",
+      "git_lf_sha256": "a113ffc659c69f1be54dc73756d404b0155669be79844a4347d2b58c7ea61863",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate-imports.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "cd7730a3614c33e8f8bb78ead34601069c5c11aa258ff91ab4df21c14a1f0d71",
+      "git_lf_sha256": "cd7730a3614c33e8f8bb78ead34601069c5c11aa258ff91ab4df21c14a1f0d71",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate-streams.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "8aee27ed3eca8b5d5dfaf39df1f84ba2e7654ac2b12d7f6f0c445deeebe31784",
+      "git_lf_sha256": "8aee27ed3eca8b5d5dfaf39df1f84ba2e7654ac2b12d7f6f0c445deeebe31784",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-candidate.2026-10-21T16-34.json"
+    },
+    {
+      "working_sha256": "318ab9cb8002b716b7eabe22d7dc158b2dd85aaedef81a2322b27a99ece8db0e",
+      "git_lf_sha256": "318ab9cb8002b716b7eabe22d7dc158b2dd85aaedef81a2322b27a99ece8db0e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-freeze.2026-10-21T16-44.json"
+    },
+    {
+      "working_sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f",
+      "git_lf_sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json"
+    },
+    {
+      "working_sha256": "a6040de0de31179f687d448402868ca89cb356f94d818ee0ca80c19cb95218b3",
+      "git_lf_sha256": "a6040de0de31179f687d448402868ca89cb356f94d818ee0ca80c19cb95218b3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-source-freeze.2026-10-21T16-35.json"
+    },
+    {
+      "working_sha256": "8d55a1ff13b85f8f3865b5114098a42ec088aada005721d3f6537b9ae7db1f83",
+      "git_lf_sha256": "8d55a1ff13b85f8f3865b5114098a42ec088aada005721d3f6537b9ae7db1f83",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-staging-union.2026-10-21T16-48.json"
+    },
+    {
+      "working_sha256": "f1e31a848fc03b2bbd8e77b9dd6564fa967915b32c1232b5c4befa90e74a223f",
+      "git_lf_sha256": "f1e31a848fc03b2bbd8e77b9dd6564fa967915b32c1232b5c4befa90e74a223f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-staging.2026-10-21T16-44.json"
+    },
+    {
+      "working_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+      "git_lf_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-entry-confirmation.2026-10-21T16-48.json"
+    },
+    {
+      "working_sha256": "d5267b3338d0379be892193923b025adabae6318b1fe89620f78954b9b9acb0a",
+      "git_lf_sha256": "d5267b3338d0379be892193923b025adabae6318b1fe89620f78954b9b9acb0a",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-entry-confirmation.2026-10-21T16-48.md"
+    },
+    {
+      "working_sha256": "15cb990a8412270b37106c68d30b9997930250c9828571444367808e1851f86f",
+      "git_lf_sha256": "15cb990a8412270b37106c68d30b9997930250c9828571444367808e1851f86f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-package-confirmation.2026-10-21T16-53.json"
+    },
+    {
+      "working_sha256": "9f28ca64ff2b7fdbd6c55c6eddda4cce34219f4e80b892ef899b0305342cce38",
+      "git_lf_sha256": "9f28ca64ff2b7fdbd6c55c6eddda4cce34219f4e80b892ef899b0305342cce38",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-package-staging-union.2026-10-21T16-53.json"
+    },
+    {
+      "working_sha256": "d93a8ce20ecfadb5eed010a849826c1753a88d29e97f591133b61415ddd241a3",
+      "git_lf_sha256": "d93a8ce20ecfadb5eed010a849826c1753a88d29e97f591133b61415ddd241a3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-build.2026-10-21T16-45.json"
+    },
+    {
+      "working_sha256": "1b48e3dc3667024c26e481c040d76847a94307a9da48b466ad682dd6d41d8585",
+      "git_lf_sha256": "1b48e3dc3667024c26e481c040d76847a94307a9da48b466ad682dd6d41d8585",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-check.2026-10-21T16-45.json"
+    },
+    {
+      "working_sha256": "b33e7a0d9d4f9050fdcf6f08d5fad4052ba990e7171382cd49c3471b8b954f7f",
+      "git_lf_sha256": "b33e7a0d9d4f9050fdcf6f08d5fad4052ba990e7171382cd49c3471b8b954f7f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-handoff.2026-10-21T16-45.json"
+    },
+    {
+      "working_sha256": "eb546017ab0b8de3e390aee4e8dde9f3f89ff98f0b8421c5faa4fb20ae3ddf59",
+      "git_lf_sha256": "eb546017ab0b8de3e390aee4e8dde9f3f89ff98f0b8421c5faa4fb20ae3ddf59",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-install.2026-10-21T16-45.json"
+    },
+    {
+      "working_sha256": "d17ccb9d533561a078fc4c3631370b6950085b362706bcd0adc7d05a67f69d02",
+      "git_lf_sha256": "d17ccb9d533561a078fc4c3631370b6950085b362706bcd0adc7d05a67f69d02",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-pip-support.2026-10-21T16-45.json"
+    },
+    {
+      "working_sha256": "2784b2d539a760bc9d83f38db83c7006a79361252a127035ece66b89a10ed3a0",
+      "git_lf_sha256": "2784b2d539a760bc9d83f38db83c7006a79361252a127035ece66b89a10ed3a0",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure-readable.2026-10-21T16-47.json"
+    },
+    {
+      "working_sha256": "c79b51f613b05fdee7625274402ff1d43fb53b0f328e410e652593bb782b99a5",
+      "git_lf_sha256": "c79b51f613b05fdee7625274402ff1d43fb53b0f328e410e652593bb782b99a5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-raw-archive.2026-10-21T16-45.json"
+    },
+    {
+      "working_sha256": "da043c09f0a390944de842f57909fbb9834a79dfecd57b158bb2029a27ac5bba",
+      "git_lf_sha256": "da043c09f0a390944de842f57909fbb9834a79dfecd57b158bb2029a27ac5bba",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-staging-qualification.2026-10-21T16-47.json"
+    },
+    {
+      "working_sha256": "d05a140381f7f033bd31024a381197032e1f76e901c81688d9a19b54f1dd01d5",
+      "git_lf_sha256": "d05a140381f7f033bd31024a381197032e1f76e901c81688d9a19b54f1dd01d5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-venv.2026-10-21T16-45.json"
+    },
+    {
+      "working_sha256": "4afed8fc4c80abb5118187f761dc12f1be1ea56f9d0f946e5d01f7d9360ef734",
+      "git_lf_sha256": "4afed8fc4c80abb5118187f761dc12f1be1ea56f9d0f946e5d01f7d9360ef734",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-format.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "24780e91c4ad8567bf9f99a6836af1010150bf8c639af7d0922bd5627b351801",
+      "git_lf_sha256": "24780e91c4ad8567bf9f99a6836af1010150bf8c639af7d0922bd5627b351801",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-lint.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "aaeeb38c5d149057697c32748bf28c7a300782f2152f97dba0d7f3943b0d526d",
+      "git_lf_sha256": "aaeeb38c5d149057697c32748bf28c7a300782f2152f97dba0d7f3943b0d526d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-freeze.2026-10-21T16-39.json"
+    },
+    {
+      "working_sha256": "1a608616f0ad2568362c4974fa0afd90ef7f85b1214ba1055d2ade353f09e1ee",
+      "git_lf_sha256": "1a608616f0ad2568362c4974fa0afd90ef7f85b1214ba1055d2ade353f09e1ee",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-originals.2026-10-21T16-39.json"
+    },
+    {
+      "working_sha256": "ded29927e7e2fe5310efc6ac767e165ae5cf43b2f3f4a0fff52d620f81e58f0d",
+      "git_lf_sha256": "ded29927e7e2fe5310efc6ac767e165ae5cf43b2f3f4a0fff52d620f81e58f0d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-format.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "2694d1b8cd998a527f87ab21f0402669ca641d47501336d3220bf3c730f40d1b",
+      "git_lf_sha256": "2694d1b8cd998a527f87ab21f0402669ca641d47501336d3220bf3c730f40d1b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-lint.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "b007697d88ee9af742f5ba91a09c9d31334dc058dfddaaf09f5601ebb8c63755",
+      "git_lf_sha256": "b007697d88ee9af742f5ba91a09c9d31334dc058dfddaaf09f5601ebb8c63755",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-tests.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "1f672b22d5887e03090ba55856f2c1d5e4f683ef7a4207f6c5396fe646042330",
+      "git_lf_sha256": "1f672b22d5887e03090ba55856f2c1d5e4f683ef7a4207f6c5396fe646042330",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-types.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "2d8470e0b1a9a32ca3e8ead9c64b48f22e018073d4572663bf5089c6f50a2376",
+      "git_lf_sha256": "2d8470e0b1a9a32ca3e8ead9c64b48f22e018073d4572663bf5089c6f50a2376",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-preedit-originals.2026-10-21T16-30.json"
+    },
+    {
+      "working_sha256": "d293b233c01c49a774ec9e3ab3d36703fa74d6d37343c331d02ec4264166cc78",
+      "git_lf_sha256": "d293b233c01c49a774ec9e3ab3d36703fa74d6d37343c331d02ec4264166cc78",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-staging.2026-10-21T16-39.json"
+    },
+    {
+      "working_sha256": "b435f997ac7449563f79d3a7527acbbe52ce717a2a15a16393acf1267b01d4f4",
+      "git_lf_sha256": "b435f997ac7449563f79d3a7527acbbe52ce717a2a15a16393acf1267b01d4f4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-import-format.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "9d54f91792f8c27636f1ca00f390256dba5b4aa7338b2386dd5812b5a82e449a",
+      "git_lf_sha256": "9d54f91792f8c27636f1ca00f390256dba5b4aa7338b2386dd5812b5a82e449a",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-format-black-raw.2026-10-21T16-35.json"
+    },
+    {
+      "working_sha256": "73f05692fb90960bfd539984b38508db7817b72663e1b3020020e979acb7949e",
+      "git_lf_sha256": "73f05692fb90960bfd539984b38508db7817b72663e1b3020020e979acb7949e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-format-black.2026-10-21T16-35.json"
+    },
+    {
+      "working_sha256": "2de327988bc91593c922349ce3762757476fcd004db1e42291645e343a551cd3",
+      "git_lf_sha256": "2de327988bc91593c922349ce3762757476fcd004db1e42291645e343a551cd3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-format-black.2026-10-21T16-35.md"
+    },
+    {
+      "working_sha256": "459388e102c81a6cb280dd897df3cfc1607ead0a066e406152fbd712ac4be76f",
+      "git_lf_sha256": "459388e102c81a6cb280dd897df3cfc1607ead0a066e406152fbd712ac4be76f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-static-black-raw.2026-10-21T16-34.json"
+    },
+    {
+      "working_sha256": "269604c5e097d7ac6c27dabff899e373f6b5b59a17fe7272e800866ab63d3c1d",
+      "git_lf_sha256": "269604c5e097d7ac6c27dabff899e373f6b5b59a17fe7272e800866ab63d3c1d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-static-black.2026-10-21T16-34.json"
+    },
+    {
+      "working_sha256": "5194a79de67e796d29ee4e881940d21ee02cf014da45c1b8c091a6b4af31c811",
+      "git_lf_sha256": "5194a79de67e796d29ee4e881940d21ee02cf014da45c1b8c091a6b4af31c811",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass1-static-black.2026-10-21T16-34.md"
+    },
+    {
+      "working_sha256": "136805d95f7f662853f6bc7e93e76517005faae1cbeed6907cee1df4fd3a95c0",
+      "git_lf_sha256": "136805d95f7f662853f6bc7e93e76517005faae1cbeed6907cee1df4fd3a95c0",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-black-raw.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "f20729f00ba3c76c4fe1939a657b47c5945dbba8a466e4afa016f2bc45b9bfbf",
+      "git_lf_sha256": "f20729f00ba3c76c4fe1939a657b47c5945dbba8a466e4afa016f2bc45b9bfbf",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-black.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "4270cf4d82135d940c036b5623d4fa15d973caa24c8a271b4cb028317fc6175c",
+      "git_lf_sha256": "4270cf4d82135d940c036b5623d4fa15d973caa24c8a271b4cb028317fc6175c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-black.2026-10-21T16-36.md"
+    },
+    {
+      "working_sha256": "22dc9fb3c82ad019be2e2b3b8a575b8ddb986bb3711910ca64d30b7eb25e0ba9",
+      "git_lf_sha256": "22dc9fb3c82ad019be2e2b3b8a575b8ddb986bb3711910ca64d30b7eb25e0ba9",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-ruff-raw.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "1229083d137c78b42daad0e25cf36ed8bfc7c4c98231cec742020d4b64804ae9",
+      "git_lf_sha256": "1229083d137c78b42daad0e25cf36ed8bfc7c4c98231cec742020d4b64804ae9",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-ruff.2026-10-21T16-36.json"
+    },
+    {
+      "working_sha256": "28c83968f8de6b4347b9030a7688eebcd7f08ace847b6054447148a45788f9e2",
+      "git_lf_sha256": "28c83968f8de6b4347b9030a7688eebcd7f08ace847b6054447148a45788f9e2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass2-ruff.2026-10-21T16-36.md"
+    },
+    {
+      "working_sha256": "5fc30476c3f6539f66c3ef35a6cdcf20a267437591aa87d5e549f7014146bb40",
+      "git_lf_sha256": "5fc30476c3f6539f66c3ef35a6cdcf20a267437591aa87d5e549f7014146bb40",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-black-raw.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "0a955235629c039e46b04221909dbd81e063f55dc04887c5d39eb0f3f5993f20",
+      "git_lf_sha256": "0a955235629c039e46b04221909dbd81e063f55dc04887c5d39eb0f3f5993f20",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-black.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "22fc8b464c03f1370605be2223c18f22dbc9bc2260701cf068c7adebdd6947ac",
+      "git_lf_sha256": "22fc8b464c03f1370605be2223c18f22dbc9bc2260701cf068c7adebdd6947ac",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-black.2026-10-21T16-37.md"
+    },
+    {
+      "working_sha256": "9d2cb7ee9575eda54e713045bdaaf3ab193fa0f19844ca783a6c36f6e84af5f8",
+      "git_lf_sha256": "9d2cb7ee9575eda54e713045bdaaf3ab193fa0f19844ca783a6c36f6e84af5f8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-pyright-raw.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "ba2710750c0dca58b34a59fcb8d47ba33a042e0ca8a4f4c8e12c12c56ebdbed6",
+      "git_lf_sha256": "ba2710750c0dca58b34a59fcb8d47ba33a042e0ca8a4f4c8e12c12c56ebdbed6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-pyright.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "cb11420219bb77e7cfb43a1b606e134bc47c0c99870e34b01d4106991d548ed1",
+      "git_lf_sha256": "cb11420219bb77e7cfb43a1b606e134bc47c0c99870e34b01d4106991d548ed1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-pyright.2026-10-21T16-37.md"
+    },
+    {
+      "working_sha256": "1d6ab273035c715feaffcb1cb07323b444800c297e456def36112b3c110cd1b4",
+      "git_lf_sha256": "1d6ab273035c715feaffcb1cb07323b444800c297e456def36112b3c110cd1b4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-ruff-raw.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "354ddc8c041483b0729570c3ee3a567e0091749bca22cd62aa95fa4156adad49",
+      "git_lf_sha256": "354ddc8c041483b0729570c3ee3a567e0091749bca22cd62aa95fa4156adad49",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-ruff.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "8587b8b0c183188e3b6430913ac3dc3494417cb1c153a0501c7c3c5365cb9606",
+      "git_lf_sha256": "8587b8b0c183188e3b6430913ac3dc3494417cb1c153a0501c7c3c5365cb9606",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-ruff.2026-10-21T16-37.md"
+    },
+    {
+      "working_sha256": "5a99af5196273226b8afade39bfb745edf45ff4d2ecc91924741bc019c550469",
+      "git_lf_sha256": "5a99af5196273226b8afade39bfb745edf45ff4d2ecc91924741bc019c550469",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-tests-raw.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "bd807f0e9370645f13a8d927e5d18f99a516b6e5325ab0113770f16ad979484b",
+      "git_lf_sha256": "bd807f0e9370645f13a8d927e5d18f99a516b6e5325ab0113770f16ad979484b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-tests.2026-10-21T16-37.json"
+    },
+    {
+      "working_sha256": "af2f73a34a39220adcb829cfaefd33b56da7e98473a5547df1f9e71941b160de",
+      "git_lf_sha256": "af2f73a34a39220adcb829cfaefd33b56da7e98473a5547df1f9e71941b160de",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass3-tests.2026-10-21T16-37.md"
+    },
+    {
+      "working_sha256": "3e2578cf43875d0d20e6d52752f0e6bd6bb0e4672fef464f49be2dd1c8fc156f",
+      "git_lf_sha256": "3e2578cf43875d0d20e6d52752f0e6bd6bb0e4672fef464f49be2dd1c8fc156f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-black-raw.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "d633d17cf857207ddd106794b9f69590846903ad1d240cd610b8528e34a12af6",
+      "git_lf_sha256": "d633d17cf857207ddd106794b9f69590846903ad1d240cd610b8528e34a12af6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-black.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "9cc0c489b81d55205eef09575ae430e735bdbecebc0a98bb5f042a9f3cd8884a",
+      "git_lf_sha256": "9cc0c489b81d55205eef09575ae430e735bdbecebc0a98bb5f042a9f3cd8884a",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-black.2026-10-21T16-38.md"
+    },
+    {
+      "working_sha256": "21902a0ee2d5fee9a6b371df40dac1bbfd6f51079b553a4922d1473b39b4a3ab",
+      "git_lf_sha256": "21902a0ee2d5fee9a6b371df40dac1bbfd6f51079b553a4922d1473b39b4a3ab",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-coverage-raw.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "4390956a2f967f77636d5329d7f0eaf25f6b853695375f9eec6303464b45a664",
+      "git_lf_sha256": "4390956a2f967f77636d5329d7f0eaf25f6b853695375f9eec6303464b45a664",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-coverage.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "23fe818ec5e5170acb7a636a008b78f3a0a536112e23e2b20886c21cf1d26fc5",
+      "git_lf_sha256": "23fe818ec5e5170acb7a636a008b78f3a0a536112e23e2b20886c21cf1d26fc5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-coverage.2026-10-21T16-38.md"
+    },
+    {
+      "working_sha256": "5f7b69ad635e5fbede4d668ed984f9487c4b1fe8320550261f28fa07ae1e9ff5",
+      "git_lf_sha256": "5f7b69ad635e5fbede4d668ed984f9487c4b1fe8320550261f28fa07ae1e9ff5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-pyright-raw.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "bffb7da292ebd75757415c74215cd8cb2b120f2d2fe9a4dc5ced75fdc4ac78b5",
+      "git_lf_sha256": "bffb7da292ebd75757415c74215cd8cb2b120f2d2fe9a4dc5ced75fdc4ac78b5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-pyright.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "d467665bc29be5afd4bec1d73e6db1f61ee27d6ef62746f41f47b4c122375bdb",
+      "git_lf_sha256": "d467665bc29be5afd4bec1d73e6db1f61ee27d6ef62746f41f47b4c122375bdb",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-pyright.2026-10-21T16-38.md"
+    },
+    {
+      "working_sha256": "70bf463c6583d283393d1c164a4a99db349b0b2efdda18831a3b2f88360bbf90",
+      "git_lf_sha256": "70bf463c6583d283393d1c164a4a99db349b0b2efdda18831a3b2f88360bbf90",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-ruff-raw.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "35091b11f7584d3090647cab32adf53bfdd969187a41982144b5e879d2540f03",
+      "git_lf_sha256": "35091b11f7584d3090647cab32adf53bfdd969187a41982144b5e879d2540f03",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-ruff.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "16f9c2d85d1c5b1ae6f7f6879abb6104e9fbc85c06e472392f1416f5226d4ac3",
+      "git_lf_sha256": "16f9c2d85d1c5b1ae6f7f6879abb6104e9fbc85c06e472392f1416f5226d4ac3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-ruff.2026-10-21T16-38.md"
+    },
+    {
+      "working_sha256": "668fe881c2f9e16479d6df511039e858c26ff1b955e3c33993cbd6aaa1817bad",
+      "git_lf_sha256": "668fe881c2f9e16479d6df511039e858c26ff1b955e3c33993cbd6aaa1817bad",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-tests-raw.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "d8c803de40a7474a00f422a46ce8503a1a84a32d38da1b0d48dbf7bc2cc63105",
+      "git_lf_sha256": "d8c803de40a7474a00f422a46ce8503a1a84a32d38da1b0d48dbf7bc2cc63105",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-tests.2026-10-21T16-38.json"
+    },
+    {
+      "working_sha256": "15a7a225f6cb62e49e519bd59b0d5a5b93d8009a293a8cc239a2a4d8a72e4cb4",
+      "git_lf_sha256": "15a7a225f6cb62e49e519bd59b0d5a5b93d8009a293a8cc239a2a4d8a72e4cb4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-tests.2026-10-21T16-38.md"
+    },
+    {
+      "working_sha256": "8f582785ddc98f897777e3e1dab6251f2457ab674b591f14dc2a9a304afa4386",
+      "git_lf_sha256": "8f582785ddc98f897777e3e1dab6251f2457ab674b591f14dc2a9a304afa4386",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json"
+    },
+    {
+      "working_sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+      "git_lf_sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py"
+    },
+    {
+      "working_sha256": "3905cd4b6c8f7498267d1b1789fdc0802341d56b54ec0b6ebde833ac404b1e45",
+      "git_lf_sha256": "4158fe8e2faebf1463c8194afcee7a4c7c5629220670b0c83225759d44886030",
+      "path": "scripts/dev_tools/discovery/analyzer/__init__.py"
+    },
+    {
+      "working_sha256": "8ef3a6bb2422af14f88c39f16a167bf04393fd5976a822b7e3da0b84b0fb0dee",
+      "git_lf_sha256": "10503014ef0ec81f3b3f2918f6ef20623799680f32a4ffa30f43f1aa4a435bbc",
+      "path": "scripts/dev_tools/discovery/analyzer/cli.py"
+    },
+    {
+      "working_sha256": "835bfb91eb9d04a2a2541a1cb55404608187734f47dcf829b90ae7b2a487ca51",
+      "git_lf_sha256": "835bfb91eb9d04a2a2541a1cb55404608187734f47dcf829b90ae7b2a487ca51",
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py"
+    },
+    {
+      "working_sha256": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+      "git_lf_sha256": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py"
+    },
+    {
+      "working_sha256": "e17f4db20b7b4909cd2d29d429246317c4665de113bd9dd121366df7c7d769db",
+      "git_lf_sha256": "e17f4db20b7b4909cd2d29d429246317c4665de113bd9dd121366df7c7d769db",
+      "path": "tests/discovery_runtime/test_legacy_adapters.py"
+    },
+    {
+      "working_sha256": "120d7696a04d1e0a86b2de74f29f47fa39cab212196d84d7fa9f73582f593cc7",
+      "git_lf_sha256": "120d7696a04d1e0a86b2de74f29f47fa39cab212196d84d7fa9f73582f593cc7",
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py"
+    },
+    {
+      "working_sha256": "00a1ff1417324c0f443be57caa3877c3c82e95040670614b1d3f611fa8b4610c",
+      "git_lf_sha256": "00a1ff1417324c0f443be57caa3877c3c82e95040670614b1d3f611fa8b4610c",
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py"
+    },
+    {
+      "working_sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+      "git_lf_sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py"
+    }
+  ],
+  "already_committed_unchanged": [
+    "scripts/dev_tools/discovery/analyzer/__main__.py"
+  ],
+  "dependency_closure": "Public cli.py c727 and generated build8f582785 are included with all adapter imports; unfinished profile/init and validator/report work excluded",
+  "remaining": "Profile/init review; repaired validator/report review;17 composed legacy calls;final ordered reverse/isolation/contracts and acceptance",
+  "counts": {
+    "total_tasks": 84,
+    "accepted_tasks": 48,
+    "total_criteria": 66,
+    "accepted_criteria": 25
+  },
+  "original_receipts": "All source-manifest raw archives and explicit readable qualifications retained. Host-specific original observer receipt is losslessly archived and not staged separately."
+}

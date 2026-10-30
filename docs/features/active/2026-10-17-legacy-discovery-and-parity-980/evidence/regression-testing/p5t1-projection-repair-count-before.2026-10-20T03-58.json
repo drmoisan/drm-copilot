@@ -1,0 +1,133 @@
+{
+  "stage": "count-probe",
+  "label": "p5t1-projection-repair-count-before",
+  "started": "2026-10-20T03:58:05.881678+00:00",
+  "finished": "2026-10-20T03:58:08.013206+00:00",
+  "command": "poetry run python SCRATCH/count_before.py",
+  "exit_code": 1,
+  "duration_seconds": 2.132,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "fd48c7b881924d6f81edaf20739c627bec3727d067ce06e0da18e4ab9f3727a3",
+      "physical_lines": 449
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "7a57c25da496d0b71f51aeb345518cc19d156a3d78425fbd4f14a619486aa1da",
+      "physical_lines": 446
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "sha256": "83b68a08fd75b923d5be27e1a8c486ec6b91a841b28b6f118be8cb434b1bb397",
+      "physical_lines": 460
+    },
+    "tests/discovery_runtime/test_mutation_plan.py": {
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4",
+      "physical_lines": 484
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "physical_lines": 179
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {
+      "sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+      "physical_lines": 411
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "tests/discovery_runtime/validation_test_support.py": {
+      "sha256": "6f68b99b09df4a48f4a5a5c3d8e644776f14dac414e969921ddba5014aaa17a7",
+      "physical_lines": 324
+    },
+    "tests/discovery_runtime/mutation_test_support.py": {
+      "sha256": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+      "physical_lines": 294
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "fd48c7b881924d6f81edaf20739c627bec3727d067ce06e0da18e4ab9f3727a3",
+      "physical_lines": 449
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "7a57c25da496d0b71f51aeb345518cc19d156a3d78425fbd4f14a619486aa1da",
+      "physical_lines": 446
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "sha256": "83b68a08fd75b923d5be27e1a8c486ec6b91a841b28b6f118be8cb434b1bb397",
+      "physical_lines": 460
+    },
+    "tests/discovery_runtime/test_mutation_plan.py": {
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4",
+      "physical_lines": 484
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "physical_lines": 179
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {
+      "sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+      "physical_lines": 411
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "tests/discovery_runtime/validation_test_support.py": {
+      "sha256": "6f68b99b09df4a48f4a5a5c3d8e644776f14dac414e969921ddba5014aaa17a7",
+      "physical_lines": 324
+    },
+    "tests/discovery_runtime/mutation_test_support.py": {
+      "sha256": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+      "physical_lines": 294
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-projection-repair-count-before-035808.stdout.bin",
+      "raw_sha256": "72461e910588eb28b426c60eca298866fb88bd660ea438c704affb72579f640a",
+      "raw_bytes": 146,
+      "presentation": "{\"complete_calls\": {\"validate_coverage\": 2, \"validate_dimensions\": 2, \"validate_acceptance\": 2}, \"expected_after_repair\": 1, \"before_repair\": 2}\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-projection-repair-count-before-035808.stderr.bin",
+      "raw_sha256": "c2afe4509727cb847bac28389510b3a07a0c8744a8c4a1ac1bcba7385fb60c7c",
+      "raw_bytes": 384,
+      "presentation": "Traceback (most recent call last):\r\n  File \"SCRATCH\\count_before.py\", line 22, in <module>\r\n    assert set(counts.values()) == {1}, 'Existing duplicate complete-source assessments: expected each once.'\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nAssertionError: Existing duplicate complete-source assessments: expected each once.\r\n"
+    }
+  },
+  "accepted_baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "P5-T1 shared report-validator integration subset"
+}

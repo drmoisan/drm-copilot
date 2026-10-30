@@ -1,22 +1,31 @@
-"""Unit tests for the ``dev.discovery.profile`` console entry point.
-
-Covers ``parse_args`` (default path, explicit path, ``--json``) and ``main``
-success and failure paths via ``capsys`` and the in-memory ``mem_fs_path``
-fixture. No temporary files are used.
-"""
+"""Verify installed profile forwarding while preserving pure v1 display contracts."""
 
 from __future__ import annotations
 
 import json
+import runpy
+import sys
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools.discovery.domain_profile import DEFAULT_PROFILE_FILENAME
-from scripts.dev_tools.discovery.profile_cli import main, parse_args
+import pytest
+from drm_copilot_discovery import cli as runtime_cli
+from drm_copilot_discovery.domain_profile import (
+    DEFAULT_PROFILE_FILENAME,
+    DomainProfileError,
+    parse_domain_profile_text,
+)
+
+from scripts.dev_tools.discovery import profile_cli as mod
+from tests.discovery_runtime.gateway_test_support import (
+    installed_schema as installed_schema,
+)
+from tests.discovery_runtime.test_configuration import config_catalog as config_catalog
+from tests.scripts.dev_tools.discovery.test_init_cli import (
+    forbid_effects as forbid_effects,
+)
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
-    import pytest
+    from collections.abc import Sequence
 
 VALID_FULL = (
     "profile_version: 1\n"
@@ -53,128 +62,190 @@ MALFORMED = (
 
 
 def test_parse_args_defaults_to_documented_filename() -> None:
-    """With no arguments, the positional path defaults and ``--json`` is off."""
-    args = parse_args([])
+    """Return None after asserting historical defaults; no file access occurs."""
+    args = mod.parse_args([])
     assert args.profile_path == DEFAULT_PROFILE_FILENAME
     assert args.json is False
 
 
-def test_parse_args_accepts_explicit_path_and_json_flag() -> None:
-    """An explicit path and ``--json`` are captured on the namespace."""
-    args = parse_args(["custom.yaml", "--json"])
+def test_parse_args_accepts_explicit_path_and_json_flag(
+    forbid_effects: list[str],
+) -> None:
+    """Use forbid_effects (list[str]) to prove old parsing is nonauthoritative.
+
+    Return None after namespace/no-call assertions; no profile is read or rendered.
+    """
+    args = mod.parse_args(["custom.yaml", "--json"])
     assert args.profile_path == "custom.yaml"
     assert args.json is True
+    assert forbid_effects == []
 
 
-def test_main_prints_resolved_text_and_exits_zero(
-    mem_fs_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """A valid profile renders aligned text on stdout and exits 0."""
-    # Arrange
-    profile_path = mem_fs_path / DEFAULT_PROFILE_FILENAME
-    profile_path.write_text(VALID_FULL, encoding="utf-8")
-
-    # Act
-    exit_code = main([str(profile_path)])
-
-    # Assert
-    captured = capsys.readouterr()
-    assert exit_code == 0
-    assert "profile_version" in captured.out
-    assert "legacy_source.root" in captured.out
-    assert "../Legacy" in captured.out
-    assert captured.err == ""
+def test_render_text_preserves_resolved_v1_values() -> None:
+    """Return None after full v1 text assertions; parse/render stay memory-only."""
+    profile = parse_domain_profile_text(VALID_FULL)
+    rendered = mod.render_text(profile)
+    assert "profile_version" in rendered and "legacy_source.root" in rendered
+    assert "../Legacy" in rendered and "src/**" in rendered
+    assert "csharp" in rendered and "typescript" in rendered
+    assert "feature-contract=contracts/" in rendered and "my-migration" in rendered
+    assert len(rendered.splitlines()) == 12
 
 
-def test_main_json_output_round_trips_and_exits_zero(
-    mem_fs_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """The ``--json`` output parses back into the resolved profile structure."""
-    # Arrange
-    profile_path = mem_fs_path / DEFAULT_PROFILE_FILENAME
-    profile_path.write_text(VALID_FULL, encoding="utf-8")
-
-    # Act
-    exit_code = main([str(profile_path), "--json"])
-
-    # Assert
-    captured = capsys.readouterr()
-    assert exit_code == 0
-    payload = json.loads(captured.out)
-    assert payload["profile_version"] == 1
-    assert payload["profile_name"] == "my-migration"
+def test_render_json_preserves_resolved_v1_structure() -> None:
+    """Return None after sorted v1 JSON assertions; no parameters or external I/O."""
+    profile = parse_domain_profile_text(VALID_FULL)
+    rendered = mod.render_json(profile)
+    payload = json.loads(rendered)
+    assert payload["profile_version"] == 1 and payload["profile_name"] == "my-migration"
     assert payload["legacy_source"]["root"] == "../Legacy"
     assert payload["technology_stack"]["legacy"] == ["csharp"]
     assert payload["artifacts"]["root"] == "discovery/"
+    assert rendered == json.dumps(payload, sort_keys=True, indent=2)
 
 
-def test_main_minimal_profile_shows_applied_defaults(
-    mem_fs_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """A minimal profile prints resolved defaults explicitly and exits 0."""
-    # Arrange
-    profile_path = mem_fs_path / DEFAULT_PROFILE_FILENAME
-    profile_path.write_text(VALID_MINIMAL, encoding="utf-8")
-
-    # Act
-    exit_code = main([str(profile_path)])
-
-    # Assert
-    captured = capsys.readouterr()
-    assert exit_code == 0
-    assert "profile_name" in captured.out
-    assert "(none)" in captured.out
+def test_render_minimal_profile_preserves_applied_defaults() -> None:
+    """Return None after absent optional values render explicitly; no I/O."""
+    profile = parse_domain_profile_text(VALID_MINIMAL)
+    rendered = mod.render_text(profile)
+    payload = json.loads(mod.render_json(profile))
+    assert "profile_name" in rendered and "(none)" in rendered
+    assert payload["profile_name"] is None
+    assert payload["legacy_source"]["include"] == []
+    assert payload["legacy_source"]["exclude"] == []
+    assert payload["technology_stack"]["target"] == []
 
 
-def test_main_missing_file_exits_one_with_stderr_message(
-    mem_fs_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """A missing profile file exits 1 and names the path on stderr."""
-    # Arrange
-    missing = mem_fs_path / "absent-profile.yaml"
+def test_v1_reader_preserves_invalid_profile_diagnostics() -> None:
+    """Return None after the actual v1 reader raises all expected field errors.
 
-    # Act
-    exit_code = main([str(missing)])
-
-    # Assert
-    captured = capsys.readouterr()
-    assert exit_code == 1
-    assert "absent-profile.yaml" in captured.err
-    assert captured.out == ""
-
-
-def test_main_malformed_profile_reports_all_errors_on_stderr(
-    mem_fs_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """A malformed profile exits 1 with every field error on stderr."""
-    # Arrange
-    profile_path = mem_fs_path / DEFAULT_PROFILE_FILENAME
-    profile_path.write_text(MALFORMED, encoding="utf-8")
-
-    # Act
-    exit_code = main([str(profile_path)])
-
-    # Assert
-    captured = capsys.readouterr()
-    assert exit_code == 1
-    assert "profile_version: unsupported profile_version 2" in captured.err
-    assert "legacy_source.root: expected non-empty string, got int" in captured.err
-    assert "technology_stack.legacy: expected a non-empty list" in captured.err
-
-
-def test_main_default_filename_resolution(
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    """With no path argument, ``main`` resolves the default filename.
-
-    No ``discovery-profile.yaml`` exists in the working directory during the
-    test, so the default-resolved path surfaces on stderr with exit code 1,
-    demonstrating that the default filename was used.
+    No parameters or effects; malformed historical input cannot become v2 proof.
     """
-    # Act
-    exit_code = main([])
+    with pytest.raises(DomainProfileError) as invalid:
+        parse_domain_profile_text(MALFORMED)
+    assert "profile_version: unsupported profile_version 2" in str(invalid.value)
+    assert "legacy_source.root: expected non-empty string, got int" in str(
+        invalid.value
+    )
+    assert "technology_stack.legacy: expected a non-empty list" in str(invalid.value)
 
-    # Assert
+
+@pytest.mark.parametrize("exit_code", [0, 1, 2, 3])
+def test_main_forwards_profile_selection_and_typed_exit(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    exit_code: int,
+) -> None:
+    """Forward explicit selection and exit_code (int) without legacy rendering.
+
+    monkeypatch (pytest.MonkeyPatch) supplies a memory entry; capsys
+    (pytest.CaptureFixture[str]) detects extra output. Return None; no external I/O.
+    """
+    argv = ("--workspace-root", "/consumer", "--profile", "docs/profile.yaml")
+    calls: list[tuple[str, Sequence[str] | None]] = []
+
+    def installed(command: str, arguments: Sequence[str] | None = None) -> int:
+        """Record command/arguments (str/Sequence[str] | None); return int exit.
+
+        Only the call list changes; the supplied vector remains untouched.
+        """
+        calls.append((command, arguments))
+        return exit_code
+
+    monkeypatch.setattr(runtime_cli, "run_installed_cli", installed)
+    assert mod.main(argv) == exit_code
+    assert calls == [("profile", argv)] and calls[0][1] is argv
+    assert capsys.readouterr() == ("", "")
+
+
+@pytest.mark.parametrize("argv", [None, ()], ids=["process", "explicit-empty"])
+def test_main_retains_installed_argument_selection(
+    monkeypatch: pytest.MonkeyPatch, argv: tuple[str, ...] | None
+) -> None:
+    """Forward argv (tuple[str, ...] | None) without default-file or ancestor lookup.
+
+    monkeypatch (pytest.MonkeyPatch) supplies a memory entry. Return None after
+    argument identity/exit assertions; no process arguments or filesystem are read.
+    """
+    calls: list[tuple[str, Sequence[str] | None]] = []
+
+    def installed(command: str, arguments: Sequence[str] | None = None) -> int:
+        """Record command/arguments (str/Sequence[str] | None); return 1, no I/O."""
+        calls.append((command, arguments))
+        return 1
+
+    monkeypatch.setattr(runtime_cli, "run_installed_cli", installed)
+    assert mod.main(argv) == 1
+    assert calls == [("profile", argv)] and calls[0][1] is argv
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ("absent-profile.yaml",),
+        ("malformed-profile.yaml", "--json"),
+        ("--json",),
+        ("--workspace-root", "/consumer", "profile.yaml"),
+        ("--workspace-root", "/consumer", "--template-root", "/arbitrary"),
+        ("--workspace-root", "/consumer", "--force"),
+    ],
+    ids=[
+        "missing-positional",
+        "invalid-positional",
+        "json",
+        "mixed",
+        "template",
+        "force",
+    ],
+)
+def test_legacy_profile_inputs_refuse_before_effects(
+    argv: tuple[str, ...], forbid_effects: list[str], capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Reject ambiguous argv (tuple[str, ...]) through the installed parser.
+
+    forbid_effects (list[str]) blocks ports; capsys (pytest.CaptureFixture[str])
+    captures output. Return None after typed refusal/no-call assertions; no I/O.
+    """
+    assert mod.main(argv) == 2
     captured = capsys.readouterr()
-    assert exit_code == 1
-    assert DEFAULT_PROFILE_FILENAME in captured.err
+    payload = json.loads(captured.out)
+    assert payload["exit_code"] == 2 and payload["operation"] == "profile"
+    assert payload["runtime"] is None and payload["input_manifest"] is None
+    assert payload["artifacts"] == [] and forbid_effects == []
+    assert payload["findings"][0]["code"] == "CLI_ARGUMENTS"
+    assert payload["findings"][1]["code"] == "CLI_REQUEST"
+    assert "--help" in payload["findings"][0]["next_action"]
+    assert "/arbitrary" not in captured.out + captured.err
+
+
+def test_help_uses_installed_profile_options_without_providers(
+    forbid_effects: list[str], capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Use forbid_effects (list[str])/capsys (pytest.CaptureFixture[str]) in memory.
+
+    Return None after fixed help/no-call assertions; only captured output changes.
+    """
+    assert mod.main(("--help",)) == 0
+    captured = capsys.readouterr()
+    assert "--workspace-root" in captured.out and "--profile" in captured.out
+    assert "profile_path" not in captured.out and captured.err == ""
+    assert forbid_effects == []
+
+
+def test_module_entry_returns_installed_exit(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Use monkeypatch (pytest.MonkeyPatch) to prove module SystemExit(1).
+
+    Return None after in-process module execution; only the restored module cache
+    and patched installed entry change, with no provider or external I/O.
+    """
+
+    def installed(command: str, argv: Sequence[str] | None = None) -> int:
+        """Require fixed command (str)/default argv; return 1 without I/O."""
+        assert command == "profile" and argv is None
+        return 1
+
+    monkeypatch.setattr(runtime_cli, "run_installed_cli", installed)
+    monkeypatch.delitem(sys.modules, mod.__name__)
+    with pytest.raises(SystemExit) as stopped:
+        runpy.run_module(mod.__name__, run_name="__main__")
+    assert stopped.value.code == 1

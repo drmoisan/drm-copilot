@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "04e475da4d094aa121bcc94fb7c703390245e182f51bf5967cbfc3f6f17aae66",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m black --check packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py tests/discovery_runtime/test_acceptance_properties.py tests/discovery_runtime/test_acceptance_generation.py tests/discovery_runtime/test_acceptance_decisions.py tests/discovery_runtime/test_acceptance_generation_limits.py",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T11:40:34.695936+00:00",
+  "label": "format",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-format-114033-raw.2026-10-20T11-40.json",
+    "sha256": "51a6ce6da7756476165f65e34575e1375d88f2f5b41d16e2e32f291198346189"
+  },
+  "seconds": 1.011,
+  "stage": 1,
+  "started_at": "2026-10-20T11:40:33.684495+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\n7 files would be left unchanged.\n",
+  "stdout": "",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T11-40"
+}

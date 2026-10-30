@@ -1,0 +1,204 @@
+"""Confirm only P4-T4 R1-R3 and retained proof, without replaying a test suite."""
+from __future__ import annotations
+
+import ast
+import configparser
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+
+from drm_copilot_discovery.analyzer import configuration_input as module
+
+ROOT = Path.cwd()
+WORKER = (Path(tempfile.gettempdir()) / "issue-980-p4t4").resolve()
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+FREEZE = QA / "p4t4-repair-freeze.2026-10-19T06-32.json"
+ORIGINAL = QA / "p4t4-focused-wip-freeze.2026-10-19T05-54.json"
+ORIGINAL_COMMIT = "d6d00ae2a5a612fdfb026bf954f868edf4c5ff9e"
+HEAD = "5329894a0e8485c7837cc67f1700bf3764116fd2"
+started = dt.datetime.now(dt.timezone.utc)
+
+
+def sha(raw: bytes) -> str:
+    """Return SHA-256 without changing immutable bytes."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def portable(value: str) -> str:
+    """Reproduce only the retained worker's explicit host-path normalization."""
+    for path, label in ((ROOT, "WORKSPACE"), (WORKER, "SCRATCH")):
+        value = re.sub(re.escape(str(path)), label, value, flags=re.IGNORECASE)
+        value = re.sub(re.escape(path.as_posix()), label, value, flags=re.IGNORECASE)
+    return value
+
+
+def executable_definition(node: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef) -> str:
+    """Return AST including decorators/assertions and excluding a leading docstring."""
+    if node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+        node.body = node.body[1:]
+    return ast.dump(node, include_attributes=False)
+
+
+freeze = json.loads(FREEZE.read_bytes())
+original = json.loads(ORIGINAL.read_bytes())
+assert sha(FREEZE.read_bytes()) == "59076e69064acac3b90609c73788d952d1774b59e8fb2477e5bb313526da335f"
+assert subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip() == HEAD
+expected = {item["path"]: item["sha256"] for item in freeze["files"]}
+bindings = []
+# Compare all eight released files; only the four explicitly approved Python paths differ.
+for item in freeze["files"]:
+    path = item["path"]
+    raw = Path(path).read_bytes()
+    staged = subprocess.check_output(["git", "show", ":" + path])
+    committed = subprocess.check_output(["git", "show", HEAD + ":" + path])
+    assert sha(raw) == expected[path] and raw == staged == committed
+    assert len(raw.splitlines()) <= 500
+    bindings.append({"path": path, "working_sha256": sha(raw), "index_sha256": sha(staged),
+                     "commit_sha256": sha(committed), "raw_identity": True,
+                     "original_sha256": item["original_sha256"], "disposition": item["disposition"]})
+assert {item["path"] for item in freeze["files"] if item["sha256"] != item["original_sha256"]} == set(freeze["changed_paths"])
+assert all(sha(Path(item["path"]).read_bytes()) == item["sha256"] for item in original["preserved_predecessors"])
+retained_definitions = []
+# Verify unchanged original assertion/parameter ASTs from the committed review candidate.
+for path in (item["path"] for item in freeze["files"] if item["path"].startswith("tests/") and item["path"].endswith(".py")):
+    before = ast.parse(subprocess.check_output(["git", "show", ORIGINAL_COMMIT + ":" + path]).decode())
+    after = ast.parse(Path(path).read_text(encoding="utf-8"))
+    current = {node.name: node for node in after.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))}
+    for node in before.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            assert executable_definition(node) == executable_definition(current[node.name])
+            retained_definitions.append({"path": path, "name": node.name, "executable_ast_and_decorators_preserved": True})
+assert len(retained_definitions) == 16
+stages = []
+# Retain the successful focused loop rather than execute the 91 tests again.
+for reference in freeze["receipts"]:
+    raw_receipt = Path(reference["path"]).read_bytes()
+    assert sha(raw_receipt) == reference["sha256"]
+    receipt = json.loads(raw_receipt)
+    assert receipt["exit_code"] == 0 and receipt["source_before"] == receipt["source_after"] == expected
+    for stream in ("stdout", "stderr"):
+        raw_ref = receipt["raw"][stream]
+        raw = (WORKER / raw_ref["path"].removeprefix("SCRATCH/")).read_bytes()
+        assert sha(raw) == raw_ref["sha256"]
+        assert portable(raw.decode("utf-8", errors="replace")) == receipt[stream]
+    stages.append({"stage": receipt["stage"], "path": reference["path"], "sha256": reference["sha256"],
+                   "started_at": receipt["started_at"], "finished_at": receipt["finished_at"],
+                   "seconds": receipt["seconds"], "exit_code": 0})
+assert [item["stage"] for item in stages] == ["format", "lint", "types", "tests"]
+assert all(stages[i]["finished_at"] <= stages[i + 1]["started_at"] for i in range(3))
+coverage_ref = freeze["coverage"]
+assert sha(Path(coverage_ref["path"]).read_bytes()) == coverage_ref["sha256"]
+assert sha((WORKER / coverage_ref["raw_path"].removeprefix("SCRATCH/")).read_bytes()) == coverage_ref["raw_sha256"]
+coverage = json.loads(Path(coverage_ref["path"]).read_bytes())
+assert coverage["totals"] == freeze["totals"]
+# Confirm the reported new/changed unit ranges against the same bound coverage data.
+for unit in freeze["unit_ranges"]:
+    data = next(value for path, value in coverage["files"].items() if path.replace("\\", "/").endswith(unit["path"]))
+    span = set(range(unit["start"], unit["end"] + 1))
+    executed = len(set(data["executed_lines"]) & span)
+    total = len((set(data["executed_lines"]) | set(data["missing_lines"])) & span)
+    assert executed == unit["covered_statements"] and total == unit["statements"] and executed / total >= .9
+proofs = [freeze[name] for name in ("consolidated_review", "original_candidate", "focused_binding", "structural_checker_correction")]
+# Preserve supplied correction/original proof and exact successful harness snapshots.
+for proof in proofs:
+    assert sha(Path(proof["path"]).read_bytes()) == proof["sha256"]
+for proof in freeze["harness_snapshots"]:
+    raw = Path(proof["path"]).read_bytes()
+    assert sha(raw) == proof["sha256"]
+    assert raw == (WORKER / proof["source"].removeprefix("SCRATCH/")).read_bytes()
+probes = []
+prior = json.loads((QA / "p4t4-executor-candidate-probes.2026-10-19T06-02.json").read_bytes())
+prior_valid = json.loads((QA / "p4t4-executor-ini-work-probe.2026-10-19T06-05.json").read_bytes())
+# Replay only the three original bounded expansion reproducers, unchanged byte-for-byte.
+for count in (64, 128, 256):
+    payload = json.dumps({"p" * 2048: {"key" + str(i): 0 for i in range(count)}}, separators=(",", ":")).encode()
+    original_probe = next(item for item in prior["probes"] if item["probe"] == "json-expanded-path-budget" and item["children"] == count)
+    assert sha(payload) == original_probe["input_sha256"]
+    try:
+        module.parse_configuration(payload, format="json", max_bytes=8192, max_keys=count + 1)
+    except module.ConfigurationInputError as error:
+        assert error.code == "configuration-text-limit" and error.__context__ is None and error.__cause__ is None
+        probes.append({"family": "R1-original-long-prefix", "count": count, "input_sha256": sha(payload), "result": error.code, "partial_result": False})
+    else:
+        raise AssertionError("Original text amplification reproduction still returns")
+parser_type = vars(module)["_IniParser"]
+linear = parser_type.OPTCRE
+inherited = configparser.ConfigParser.OPTCRE
+assert linear.pattern == r"(?P<option>[^=:]*)(?P<vi>[=:])(?P<value>.*)$"
+visits = []
+
+
+class CountedMatcher:
+    """Count complete linear-match input for the two actual INI parsing stages."""
+    def match(self, text: str):
+        """Return the actual regex result after recording str input length locally."""
+        visits.append(len(text))
+        return linear.match(text)
+
+
+class ProhibitedMatcher:
+    """Reject accidental fallback to the original overlapping stdlib expression."""
+    def match(self, text: str):
+        """Raise before using the str input; no source values are exposed."""
+        raise AssertionError("Inherited overlapping option expression invoked")
+
+
+try:
+    parser_type.OPTCRE = CountedMatcher()
+    configparser.ConfigParser.OPTCRE = ProhibitedMatcher()
+    # Reuse six exact input hashes; an explicit text budget isolates R2 from R1.
+    for valid in (False, True):
+        for spaces in (1024, 2048, 4096):
+            key = "K" + " " * spaces + "Suffix"
+            payload = ("[S]\n" + (key + "=VALUE_SENTINEL" if valid else "K" + " " * spaces + "VALUE_SENTINEL")).encode()
+            original_probe = (next(item for item in prior_valid["outcomes"] if item["spaces"] == spaces) if valid else next(item for item in prior["probes"] if item["probe"] == "ini-delimiter-free-line" and item["spaces"] == spaces))
+            assert sha(payload) == original_probe["input_sha256"]
+            visits.clear()
+            try:
+                result = module.parse_configuration(payload, format="ini", max_bytes=8192, max_keys=8, max_text_bytes=262144)
+            except module.ConfigurationInputError as error:
+                assert not valid and error.code == "configuration-ini-invalid" and error.__context__ is None
+                outcome = error.code
+            else:
+                assert valid and len(result) == 2 and result[1].name == key and "VALUE_SENTINEL" not in repr(result)
+                outcome = "valid key retained"
+            assert len(visits) == 2 and sum(visits) <= 2 * len(payload)
+            probes.append({"family": "R2-original-valid" if valid else "R2-original-invalid", "spaces": spaces,
+                           "input_sha256": sha(payload), "result": outcome, "matcher_calls": len(visits),
+                           "matched_characters": sum(visits), "maximum_matched_characters": 2 * len(payload),
+                           "qualification": "max_text_bytes=262144 isolates matcher work from the new independent text limit; no timing assertion"})
+finally:
+    parser_type.OPTCRE = linear
+    configparser.ConfigParser.OPTCRE = inherited
+assert all(sha(Path(path).read_bytes()) == digest for path, digest in expected.items())
+stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+report = {"task": "P4-T4", "status": "PASS", "acceptance_scope": "R1-R3 bounded repair confirmation only",
+          "timestamp": stamp, "started_at": started.isoformat(), "finished_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+          "command": "poetry run python SCRATCH/issue-980-p4t4-repair-confirmation.py", "exit_code": 0,
+          "candidate_commit": HEAD, "original_review_commit": ORIGINAL_COMMIT,
+          "repair_freeze": {"path": FREEZE.as_posix(), "sha256": sha(FREEZE.read_bytes())},
+          "reused_proofs": proofs, "source_bindings": bindings, "unchanged_predecessors": len(original["preserved_predecessors"]),
+          "retained_original_definitions": retained_definitions, "focused_stages": stages,
+          "tests": "91 passed = 61 retained + 30 new; retained successful execution only",
+          "coverage": freeze["totals"], "measured_ranges": len(freeze["unit_ranges"]),
+          "retained_worker_harnesses": freeze["harness_snapshots"], "independent_reproductions": probes,
+          "closed_findings": {
+              "R1": "Prospective RFC6901 addresses and key records reserve finite text before construction; aggregate projection charges complete source/key rows before retaining output. Twelve encoded bytes per Unicode character cover BMP/control/astral escapes under either compact-JSON policy. Retained new tests prove before-helper/before-project rejection, inherited INI expansion, cross-file exhaustion, whole-result failure and both serialization policies.",
+              "R2": "The same fixed disjoint-character option expression is used by locator and ConfigParser. All six original input hashes complete through exactly two linear matches with no inherited matcher; retained 64-line tests cover aggregate linear input work and both delimiters without timing gates.",
+              "R3": "Required intent comments are present at the prior named loop/assertions and repair iteration sites. All 16 original test/helper executable ASTs and parametrization remain unchanged; new code stays within the approved four Python paths and 500-line limit."},
+          "findings": [], "open_probes": [], "behavioral_suite_replayed": False, "predecessor_review_replayed": False,
+          "remaining": "Parent release of scoped final seven-stage sequence; no task/AC checkoff before final acceptance",
+          "known_limits": freeze["limitations"], "plan_counts": "35/84", "ac_counts": "13/66"}
+destination = QA / f"p4t4-executor-repair-confirmation.{stamp}.json"
+destination.write_bytes((json.dumps(report, indent=2, sort_keys=True) + "\n").encode())
+harness = QA / f"p4t4-executor-repair-confirmation-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"status": "PASS", "path": destination.as_posix(), "sha256": sha(destination.read_bytes()),
+                  "harness": harness.as_posix(), "harness_sha256": sha(harness.read_bytes()),
+                  "reproductions": len(probes), "source_bindings": len(bindings), "retained_definitions": len(retained_definitions),
+                  "ranges": len(freeze["unit_ranges"])}))

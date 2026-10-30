@@ -1,0 +1,70 @@
+"""Bind the authorized predecessor deviation without replaying accepted tests."""
+import base64
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+EVIDENCE = FEATURE / "evidence"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+PREFIX = EVIDENCE / "baseline" / f"p5t1-report-boundary-baseline.{STAMP}"
+SOURCE = "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py"
+TEST = "tests/discovery_runtime/test_coverage_report_contract.py"
+METRICS = EVIDENCE / "regression-testing/p2t6-coverage-metrics.2026-10-18T09-31.json"
+COVERAGE = EVIDENCE / "regression-testing/p2t6-coverage.2026-10-18T09-31.json"
+FINDING = EVIDENCE / "qa-gates/p5t1-final-native-finding.2026-10-20T04-44.json"
+
+
+def bind(path):
+    path = Path(path)
+    raw = path.read_bytes()
+    return {
+        "path": path.as_posix(),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "bytes": len(raw),
+    }
+
+
+metrics = json.loads(METRICS.read_text())
+assert bind(SOURCE)["sha256"] == metrics["owned_sha256"][SOURCE]
+assert bind(FINDING)["sha256"] == "e99b51c31f3ab10f6d1ae52daf70cd5065495d13bba2aef977e57a3ebc99ff98"
+sources = {
+    name: {
+        **bind(name),
+        "physical_lines": len(Path(name).read_text().splitlines()),
+        "base64": base64.b64encode(Path(name).read_bytes()).decode(),
+    }
+    for name in (SOURCE, TEST)
+}
+for name in (SOURCE, TEST):
+    (Path(__file__).parent / (Path(name).name + ".before-report-boundary")).write_bytes(
+        Path(name).read_bytes()
+    )
+payload = {
+    "task": "P5-T1",
+    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "accepted_candidate_commit": "f5a37bc6d237668174069d8e7c8a0f057d685bbf",
+    "scope": "Configured report-output boundary in the expected-input predicate and focused in-memory tests only.",
+    "owned": sources,
+    "accepted_metrics": bind(METRICS),
+    "accepted_coverage": bind(COVERAGE),
+    "source_coverage": metrics["coverage"][SOURCE],
+    "finding": bind(FINDING),
+    "baseline_execution": "No tests replayed. Exact accepted source SHA binds the P2-T6 92-case proof and 142/142 statements,78/78 branch destinations.",
+}
+Path(str(PREFIX) + ".json").write_text(
+    json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+)
+Path(str(PREFIX) + ".md").write_text(
+    f"# P5-T1 report-output boundary baseline\n\nTimestamp: {STAMP}\n\n"
+    "Command: Bind exact predecessor source/test bytes and accepted coverage receipts.\n\n"
+    "EXIT_CODE: 0\n\nOutput Summary: Original scope validator matches accepted P2-T6 bytes; "
+    "142/142 statements and 78/78 branch destinations were covered by its retained "
+    "92-case proof. No baseline tests were replayed. Exact source/test originals are "
+    "losslessly archived in the paired JSON before the approved two-file repair.\n",
+    encoding="utf-8",
+    newline="\n",
+)
+Path(str(PREFIX) + ".txt").write_bytes(Path(__file__).read_bytes())
+print(json.dumps(bind(str(PREFIX) + ".json")))

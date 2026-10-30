@@ -1,0 +1,1301 @@
+{
+  "task": "P2-T8",
+  "captured_at": "2026-10-18T10:09:39.969776+00:00",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "085826fbaf6dc7b5c128991b99c56c7980fd3e9f1021687366dbb861b1bdded8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": "12290b6ef29dc7bf2c5633649a293b4f021221e4313feb0a14f3e931e9fd8707"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "085826fbaf6dc7b5c128991b99c56c7980fd3e9f1021687366dbb861b1bdded8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": "12290b6ef29dc7bf2c5633649a293b4f021221e4313feb0a14f3e931e9fd8707"
+  },
+  "passed": 45,
+  "failed": 4,
+  "results": [
+    {
+      "name": "full-combined-repository-structural",
+      "passed": true,
+      "expected_valid": true,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "full-combined-repository-completion",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "optional-offline-and-mobile-omitted",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "honest-missing-structural",
+      "passed": true,
+      "expected_valid": true,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "missing-cannot-complete",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_INCOMPLETE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Required parity remains unassessed, partial, missing or conflicting."
+        }
+      ]
+    },
+    {
+      "name": "honest-partial-structural",
+      "passed": true,
+      "expected_valid": true,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "partial-cannot-complete",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_INCOMPLETE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Required parity remains unassessed, partial, missing or conflicting."
+        }
+      ]
+    },
+    {
+      "name": "honest-conflicting-structural",
+      "passed": true,
+      "expected_valid": true,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "conflicting-cannot-complete",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_INCOMPLETE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Required parity remains unassessed, partial, missing or conflicting."
+        }
+      ]
+    },
+    {
+      "name": "honest-unassessed-structural",
+      "passed": true,
+      "expected_valid": true,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "unassessed-cannot-complete",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_INCOMPLETE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Required parity remains unassessed, partial, missing or conflicting."
+        }
+      ]
+    },
+    {
+      "name": "full-without-target-execution",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        }
+      ]
+    },
+    {
+      "name": "wrong-source-pin",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 2,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_SOURCE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/source_contract_ref",
+          "message": "Parity requires a uniquely resolved source contract at its exact pin/hash."
+        }
+      ]
+    },
+    {
+      "name": "wrong-source-hash",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 1,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_SOURCE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/source_contract_ref",
+          "message": "Parity requires a uniquely resolved source contract at its exact pin/hash."
+        }
+      ]
+    },
+    {
+      "name": "missing-source-contract",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 3,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "message": "Implementation claims require matching target bytes, client and test proof."
+        },
+        {
+          "code": "PARITY_SOURCE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/source_contract_ref",
+          "message": "Parity requires a uniquely resolved source contract at its exact pin/hash."
+        }
+      ]
+    },
+    {
+      "name": "wrong-implementation-hash",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 1,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Parity claims need independently evidenced target implementation."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "message": "Target implementation links must bind this feature/client and exact captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "wrong-implementation-payload-hash",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 1,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "message": "Implementation claims require matching target bytes, client and test proof."
+        },
+        {
+          "code": "PARITY_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Parity claims need independently evidenced target implementation."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "message": "Target implementation links must bind this feature/client and exact captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "source-code-cannot-prove-target-execution",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "message": "Implementation claims require matching target bytes, client and test proof."
+        },
+        {
+          "code": "PARITY_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Parity claims need independently evidenced target implementation."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/failure",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/observable_outputs",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/state_transitions",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/trigger",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "message": "Target implementation links must bind this feature/client and exact captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "source-test-cannot-prove-target-at-same-pin",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "message": "Implementation claims require matching target bytes, client and test proof."
+        },
+        {
+          "code": "PARITY_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Parity claims need independently evidenced target implementation."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/failure",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/observable_outputs",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/state_transitions",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/trigger",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "message": "Target implementation links must bind this feature/client and exact captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "renamed-source-test-payload-cannot-prove-target",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "message": "Implementation claims require matching target bytes, client and test proof."
+        },
+        {
+          "code": "PARITY_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Parity claims need independently evidenced target implementation."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/failure",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/observable_outputs",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/state_transitions",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/trigger",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "message": "Target implementation links must bind this feature/client and exact captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "target-capture-wrong-client",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "message": "Implementation claims require matching target bytes, client and test proof."
+        },
+        {
+          "code": "PARITY_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Parity claims need independently evidenced target implementation."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/failure",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/observable_outputs",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/state_transitions",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/trigger",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "message": "Target implementation links must bind this feature/client and exact captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "target-capture-wrong-mode",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/online",
+          "message": "Dimension results need independent target proof for their context."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Dimension results need independent target proof for their context."
+        }
+      ]
+    },
+    {
+      "name": "target-capture-wrong-platform",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        }
+      ]
+    },
+    {
+      "name": "test-coordinates-wrong-mode",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        }
+      ]
+    },
+    {
+      "name": "test-coordinates-wrong-platform",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        }
+      ]
+    },
+    {
+      "name": "required-client-row-missing",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_MISSING",
+          "path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "",
+          "message": "Required feature lacks parity for client alternate-example."
+        }
+      ]
+    },
+    {
+      "name": "two-clients-with-distinct-proof",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "custom-required-mode-missing-proof",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/batch."
+        }
+      ]
+    },
+    {
+      "name": "custom-required-mode-with-proof",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "configured-offline-missing",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/offline."
+        },
+        {
+          "code": "PARITY_DIMENSION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions",
+          "message": "Required target classifications are absent."
+        }
+      ]
+    },
+    {
+      "name": "missing-required-dimension",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DIMENSION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions",
+          "message": "Required target classifications are absent."
+        }
+      ]
+    },
+    {
+      "name": "required-dimension-unverified",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DIMENSION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/failure",
+          "message": "Required target dimensions must pass or have approved non-applicability."
+        }
+      ]
+    },
+    {
+      "name": "duplicate-online-verification-conflict",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DIMENSION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Required target dimensions must pass or have approved non-applicability."
+        },
+        {
+          "code": "PARITY_MODE_CONFLICT",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Explicit and nested mode classifications disagree."
+        }
+      ]
+    },
+    {
+      "name": "duplicate-online-applicability-conflict",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DIMENSION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Required target dimensions must pass or have approved non-applicability."
+        },
+        {
+          "code": "PARITY_MODE_CONFLICT",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Explicit and nested mode classifications disagree."
+        }
+      ]
+    },
+    {
+      "name": "duplicate-online-second-proof-invalid",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "message": "Dimension results need independent target proof for their context."
+        }
+      ]
+    },
+    {
+      "name": "online-only-in-dimensions",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "online-only-explicit",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "approved-intentional-change",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "proposed-intentional-change",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DECISION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/intentional_deviation_refs",
+          "message": "Changed or retired parity needs current approvals within this feature/client scope."
+        }
+      ]
+    },
+    {
+      "name": "wrong-scope-intentional-change",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DECISION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/intentional_deviation_refs",
+          "message": "Changed or retired parity needs current approvals within this feature/client scope."
+        }
+      ]
+    },
+    {
+      "name": "approved-change-needs-target-verification",
+      "passed": true,
+      "expected_valid": false,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_VERIFICATION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Missing passing target test/capture for browser-example/browser/online."
+        }
+      ]
+    },
+    {
+      "name": "approved-retirement-without-implementation",
+      "passed": true,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "proposed-retirement",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DECISION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/retirement_decision_ref",
+          "message": "Changed or retired parity needs current approvals within this feature/client scope."
+        }
+      ]
+    },
+    {
+      "name": "wrong-scope-retirement",
+      "passed": true,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DECISION",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/retirement_decision_ref",
+          "message": "Changed or retired parity needs current approvals within this feature/client scope."
+        }
+      ]
+    },
+    {
+      "name": "retirement-cannot-mask-unsupported-present-claim",
+      "passed": false,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "retirement-cannot-mask-duplicate-mode-conflict",
+      "passed": false,
+      "expected_valid": false,
+      "complete": false,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": []
+    },
+    {
+      "name": "optional-partial-feature-does-not-block-required-parity",
+      "passed": false,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_INCOMPLETE",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "message": "Required parity remains unassessed, partial, missing or conflicting."
+        }
+      ]
+    },
+    {
+      "name": "configured-mobile-dimension-on-portable-platform",
+      "passed": false,
+      "expected_valid": true,
+      "complete": true,
+      "upstream_findings": {
+        "index": 0,
+        "evidence": 0,
+        "revisions": 0,
+        "decisions": 0,
+        "dimensions": 0,
+        "claims": 0
+      },
+      "snapshot_unchanged": true,
+      "findings": [
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/mobile",
+          "message": "Dimension results need independent target proof for their context."
+        }
+      ]
+    },
+    {
+      "name": "python-310-syntax-for-both-boundaries",
+      "passed": true
+    }
+  ]
+}

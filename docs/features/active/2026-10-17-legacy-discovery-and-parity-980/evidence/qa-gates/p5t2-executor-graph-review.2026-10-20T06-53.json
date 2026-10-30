@@ -1,0 +1,250 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:53:35.619173+00:00",
+  "status": "GRAPH_SOURCE_REVIEW_REQUIRES_SCOPED_REPAIR",
+  "route": "atomic_execution_p5t2_graph_review_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "source_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-graph-source-freeze.2026-10-20T06-41.json",
+    "sha256": "5641b33321e718bad62b41a0baf3fea10e97234a8bee6034c6b06116ef8c3fe9",
+    "bytes": 1455
+  },
+  "reviewed_sources": [
+    {
+      "bytes": 7219,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "physical_lines": 173,
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036"
+    },
+    {
+      "bytes": 17837,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "physical_lines": 399,
+      "sha256": "cd96d559f5562fef7ac6db69af3f1dbe0632e6ad6c3ec0955ce233401a74556d"
+    },
+    {
+      "bytes": 14576,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "physical_lines": 346,
+      "sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903"
+    }
+  ],
+  "findings": [
+    {
+      "id": "GR1",
+      "priority": "required-report-contract",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "lines": [
+        167,
+        264
+      ],
+      "contract": "spec.md:452 and P5-T2 per-client verification counts",
+      "problem": "The per-axis row omits authored passed, failed, blocked and not-run verification counters. Reading the enum only to compute verified/conflicting loses required status information.",
+      "reproduction": "Four otherwise identical online outcomes with verification passed, failed, blocked and not-run all produce the exact same axis row: applicable=1, verified=0, required_pending=1.",
+      "required_change": "Expose per-client online/offline/mobile authored verification-state counts, including passed, failed, blocked and not-run, separately from evidence-backed verified/required_verified. Retain not-applicable applicability and disposition counts. Do not promote authored passed to verified, select one of conflicting representations, or count a feature/client/axis more than once.",
+      "regression": "Assert each required authored state separately, passed-with-invalid-proof remains unverified, consistent duplicate representations count once, conflicts remain explicit, optional undeclared axes remain not-required, and unavailable scope retains null metrics."
+    },
+    {
+      "id": "GR2",
+      "priority": "bounded-work",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "lines": [
+        177,
+        216
+      ],
+      "contract": "Execution environment/resource contract and ParityProjection prospective aggregate work invariant",
+      "problem": "For every axis, name in requirements.modes scans a tuple. The work reservation counts modes and names only once, so custom-mode membership is quadratic without accounting.",
+      "reproduction": [
+        {
+          "custom_modes": 8,
+          "axis_rows": 11,
+          "configured_remaining_work": 24,
+          "charged_work": 19,
+          "actual_string_equality_comparisons": 52,
+          "returned_without_limit_error": true
+        },
+        {
+          "custom_modes": 32,
+          "axis_rows": 35,
+          "configured_remaining_work": 96,
+          "charged_work": 67,
+          "actual_string_equality_comparisons": 592,
+          "returned_without_limit_error": true
+        },
+        {
+          "custom_modes": 64,
+          "axis_rows": 67,
+          "configured_remaining_work": 192,
+          "charged_work": 131,
+          "actual_string_equality_comparisons": 2208,
+          "returned_without_limit_error": true
+        }
+      ],
+      "required_change": "Index required modes once after a prospective reservation and reuse constant-time membership, or reserve the actual aggregate comparisons before any scan. Preserve the independent output budget and fail without a partial result.",
+      "regression": "Use deterministic counted controls for increasing custom-mode populations and a one-unit-short work budget. Do not use elapsed-time thresholds or change accepted predecessor implementations."
+    }
+  ],
+  "open_behavioral_probes": [],
+  "source_review_complete": true,
+  "test_evidence_acceptance": "Pending owner frozen graph test manifest; this source finding set authorizes no implementation mutation.",
+  "probe": {
+    "exit_code": 0,
+    "operational_timeout_seconds": 15,
+    "result": {
+      "timestamp_utc": "2026-10-20T06:51:46.414051+00:00",
+      "frozen_sources": {
+        "parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+        "parity_metrics.py": "cd96d559f5562fef7ac6db69af3f1dbe0632e6ad6c3ec0955ce233401a74556d",
+        "report_models.py": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903"
+      },
+      "authored_verification_loss": [
+        {
+          "authored_verification": "passed",
+          "projected_axis": {
+            "name": "online",
+            "required": 1,
+            "applicable": 1,
+            "not_required": 0,
+            "unspecified": 0,
+            "conflicting": 0,
+            "not_applicable": 0,
+            "disposed": 0,
+            "retired": 0,
+            "verified": 0,
+            "required_verified": 0,
+            "required_pending": 1
+          }
+        },
+        {
+          "authored_verification": "failed",
+          "projected_axis": {
+            "name": "online",
+            "required": 1,
+            "applicable": 1,
+            "not_required": 0,
+            "unspecified": 0,
+            "conflicting": 0,
+            "not_applicable": 0,
+            "disposed": 0,
+            "retired": 0,
+            "verified": 0,
+            "required_verified": 0,
+            "required_pending": 1
+          }
+        },
+        {
+          "authored_verification": "blocked",
+          "projected_axis": {
+            "name": "online",
+            "required": 1,
+            "applicable": 1,
+            "not_required": 0,
+            "unspecified": 0,
+            "conflicting": 0,
+            "not_applicable": 0,
+            "disposed": 0,
+            "retired": 0,
+            "verified": 0,
+            "required_verified": 0,
+            "required_pending": 1
+          }
+        },
+        {
+          "authored_verification": "not-run",
+          "projected_axis": {
+            "name": "online",
+            "required": 1,
+            "applicable": 1,
+            "not_required": 0,
+            "unspecified": 0,
+            "conflicting": 0,
+            "not_applicable": 0,
+            "disposed": 0,
+            "retired": 0,
+            "verified": 0,
+            "required_verified": 0,
+            "required_pending": 1
+          }
+        }
+      ],
+      "custom_mode_work": [
+        {
+          "custom_modes": 8,
+          "axis_rows": 11,
+          "configured_remaining_work": 24,
+          "charged_work": 19,
+          "actual_string_equality_comparisons": 52,
+          "returned_without_limit_error": true
+        },
+        {
+          "custom_modes": 32,
+          "axis_rows": 35,
+          "configured_remaining_work": 96,
+          "charged_work": 67,
+          "actual_string_equality_comparisons": 592,
+          "returned_without_limit_error": true
+        },
+        {
+          "custom_modes": 64,
+          "axis_rows": 67,
+          "configured_remaining_work": 192,
+          "charged_work": 131,
+          "actual_string_equality_comparisons": 2208,
+          "returned_without_limit_error": true
+        }
+      ],
+      "qualification": "Isolated in-memory axes method, not full graph validation. Real immutable carriers and independent local budgets; CountedMode instruments equality and the output seam restores its identical ordinary text before strict budget validation. No elapsed-time correctness assertion, file fixture, network, process-under-test or repository mutation. Initial instrumentation was rejected because the strict output boundary disallows str subclasses; that attempt is preserved separately."
+    },
+    "payload": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-payload.json",
+      "sha256": "087be712f28153008c1828b0da68cbd5ab920646c1a2c8117f19e30844fbebe8",
+      "bytes": 90856
+    }
+  },
+  "cleared_properties": [
+    "Unique selected source identities and distinct feature/client obligations use separate denominators. True empty confirmed scope differs from unavailable/null scope.",
+    "Retained validity/completeness outcomes remain distinct from authored parity states. Duplicate and unresolved rows cannot supply complete proof.",
+    "Matching applicability with contradictory verification remains conflicting. Approved intentional change and retirement retain disposition versus execution distinctions.",
+    "Missing rows remain obligations; undeclared optional axes remain not-required. Blocker/decision references preserve captured physical ownership.",
+    "Output uses prospective per-row budgets and final immutable bounded projection; no I/O, mutation, publication or new authority is introduced.",
+    "Only the closed coverage/parity heading choice changes the accepted Markdown renderer. Legacy helper and accepted outcome behavior are reused.",
+    "Current three source files meet the file-size and intent-documentation requirements. No additional finite policy finding was identified."
+  ],
+  "retained_proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-helper-adapter-review.2026-10-20T06-06.json",
+      "qualification": "Committed helper/adapter source review and 44-case proof reused.",
+      "sha256": "2219f081f9ab374cb39d51ac870b40991e84cfcc85981fbe709880e20a4c40e3",
+      "bytes": 4540
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-PC1-confirmation.2026-10-20T06-40.json",
+      "qualification": "Committed outcome/PC1 proof at 3e5a1ca02104a20e222870b966500b99dfc9958a reused; no re-review.",
+      "sha256": "8bc71ae26f2017f3a92601874afe0d19b922866ab47360b61a60eb45333c58a3",
+      "bytes": 7787
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-original.2026-10-20T06-35.json",
+      "qualification": "Owner's exact original conflict reproduction remains authoritative; not rerun.",
+      "sha256": "2b41d8cf84e0d79f6b2165dfa326cd3ef2464fa99e8049098e7cccce40f62994",
+      "bytes": 2645
+    }
+  ],
+  "qualifications": [
+    "The isolated method probe supplies real immutable carriers and local budgets; it is not full graph validation or evidence of host behavior.",
+    "The first probe attempt reached the strict output guard because equality instrumentation used a str subclass. Its source/stdout/stderr are preserved. The corrected output seam restores identical ordinary text before the unchanged output-budget check.",
+    "The counted probe measures tuple string equality comparisons, not wall-clock performance. At 64 modes it observed 2,208 comparisons against 131 charged work units; no timing assertion is used.",
+    "Source/accepted predecessor suites were not replayed. The owner's 36-case result remains historical source-freeze evidence pending its test manifest, not independently accepted here.",
+    "Integration PC1 review is retained; its owner has separate corrective proof. No new integration, helper or accepted outcome source review was performed."
+  ],
+  "task_accepted": false,
+  "plan_count": "42/84",
+  "source_AC_count": "17/66",
+  "next_five_pending_tasks": [
+    "P5-T2",
+    "P5-T3",
+    "P5-T4",
+    "P5-T5",
+    "P6-T1"
+  ]
+}

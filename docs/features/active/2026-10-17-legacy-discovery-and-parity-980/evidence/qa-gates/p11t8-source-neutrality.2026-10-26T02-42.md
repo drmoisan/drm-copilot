@@ -1,0 +1,8 @@
+# P11-T8 Source neutrality
+
+Timestamp: 2026-10-26T02-42
+Task: [P11-T8] Run complete repository and publication contracts on the final implementation.
+Command: `grep -rniE "taskmaster|\btmw\b" packages/discovery-runtime/src .claude/lib/discovery-validation .claude/hooks .codex/hooks .github/hooks extensions/drm-copilot/src --include=*.py --include=*.ps1 --include=*.psm1 --include=*.psd1 --include=*.ts --include=*.json -l`; the analyzer neutrality suites `tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py` and `test_stack_neutrality.py` and `test_push_down_issue_824_follow_ups.py` inside the `tests/scripts/dev_tools` run recorded in `p11t8-mirror-and-publication-contracts.2026-10-26T02-42.md`
+EXIT_CODE: 1 (grep: no match in any scanned file), 0 (suites)
+Output Summary: No consumer-specific token (`taskmaster`, `tmw`) appears in the discovery runtime package, the native discovery helpers, the Claude, Codex or Copilot hooks, or the extension sources, including the modules this branch's final tasks added (`repository_binding.py`, the attestation writer, the doctor projection and the deployment binding). The analyzer neutrality suites keep the banned core identifiers (`taskmaster`, `tmw`, `outlook`, `vsto`, `email`, `task-management`) outside every analyzer module except the fixed optional-adapter dispatch branch, and the pushed rules and skills name no consuming product. The only remaining occurrences are the isolated optional VSTO adapter under `analyzer/optional/` and the `DOC/examples/taskmaster-tmw.md` case study, which are the plan's declared exceptions.
+Result: PASS

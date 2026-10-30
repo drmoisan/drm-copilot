@@ -1,0 +1,366 @@
+{
+  "timestamp": "2026-10-19T07-58",
+  "command": "poetry run python SCRATCH/issue-980-p4t5-com-repair-freeze.py",
+  "exit_code": 0,
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: eol: lf"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "physical_lines": 229,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "physical_lines": 367,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_interop.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_interop.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+      "physical_lines": 429,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: eol: lf"
+      ]
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair-coverage.2026-10-19T07-58.json",
+    "sha256": "8361548e52da433e5ddea4c0c7a3f8ebec8e12700e080de1e9b27614bdcb5f71"
+  },
+  "summaries": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "module": {
+        "covered_lines": 121,
+        "num_statements": 121,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 3,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 46,
+        "num_partial_branches": 0,
+        "covered_branches": 46,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "_local": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "com_project_candidates": {
+          "covered_lines": 26,
+          "num_statements": 26,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 16,
+          "num_partial_branches": 0,
+          "covered_branches": 16,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_failure": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_project": {
+          "covered_lines": 15,
+          "num_statements": 15,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "ComInteropAnalyzer.analyze": {
+          "covered_lines": 54,
+          "num_statements": 54,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 22,
+          "num_partial_branches": 0,
+          "covered_branches": 22,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      "classes": {
+        "ComInteropAnalyzer": {
+          "covered_lines": 54,
+          "num_statements": 54,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 22,
+          "num_partial_branches": 0,
+          "covered_branches": 22,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "module": {
+        "covered_lines": 85,
+        "num_statements": 85,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 42,
+        "num_partial_branches": 0,
+        "covered_branches": 42,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "_qualified": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_kind": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_delimiter_ends": {
+          "covered_lines": 13,
+          "num_statements": 13,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_attribute_sections": {
+          "covered_lines": 15,
+          "num_statements": 15,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 8,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_method_declaration": {
+          "covered_lines": 2,
+          "num_statements": 2,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "com_source_candidates": {
+          "covered_lines": 31,
+          "num_statements": 31,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 16,
+          "num_partial_branches": 0,
+          "covered_branches": 16,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      "classes": {}
+    }
+  ],
+  "structures": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "definitions_with_docstrings": 6,
+      "loops_with_immediate_intent_comments": 5,
+      "retained_original_test_definitions": [],
+      "physical_lines": 356
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "definitions_with_docstrings": 6,
+      "loops_with_immediate_intent_comments": 5,
+      "retained_original_test_definitions": [],
+      "physical_lines": 229
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "definitions_with_docstrings": 13,
+      "loops_with_immediate_intent_comments": 0,
+      "retained_original_test_definitions": [
+        "serialized",
+        "test_direct_com_selection_is_schema_valid_and_never_claims_execution",
+        "test_original_encoding_and_physical_anchor_are_preserved",
+        "test_missing_pin_read_failures_exclusions_and_unrelated_inputs_are_honest",
+        "test_adapter_sanitizes_encoding_size_and_parser_failures",
+        "test_aggregate_budgets_discard_partial_output",
+        "test_failed_reads_still_consume_the_aggregate_record_budget",
+        "test_retained_pin_budgets_fail_before_projection",
+        "test_indexed_pin_candidates_preserve_exact_identity_and_duplicate_semantics",
+        "test_projection_determinism_redaction_and_no_file_io"
+      ],
+      "physical_lines": 367
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "definitions_with_docstrings": 18,
+      "loops_with_immediate_intent_comments": 1,
+      "retained_original_test_definitions": [
+        "test_known_attribute_candidates_keep_exact_span_without_values",
+        "test_call_families_distinguish_lookup_activation_and_lifetime",
+        "test_non_com_or_masked_lookalikes_do_not_become_candidates",
+        "test_masked_earlier_guid_cannot_replace_the_actual_candidate_anchor",
+        "test_invalid_source_fails_without_partial_candidates",
+        "test_invalid_candidate_capacity_rejected_at_each_public_seam",
+        "test_token_and_candidate_limits_reject_before_partial_output",
+        "test_source_text_limit_rejects_before_masking_allocation",
+        "test_repeated_multiline_calls_keep_independent_exact_spans",
+        "test_project_structural_limits_reject_before_candidate_publication",
+        "test_project_items_keep_declared_boolean_and_condition_presence",
+        "test_project_duplicates_and_unresolved_metadata_remain_separate",
+        "test_comments_assembly_references_and_properties_are_not_com_items",
+        "test_unsafe_or_malformed_project_fails_without_partial_declarations",
+        "test_generated_layouts_preserve_fixed_candidates_without_values"
+      ],
+      "physical_lines": 429
+    }
+  ],
+  "retained_production_definitions": [
+    "_qualified",
+    "_kind",
+    "_local",
+    "com_project_candidates",
+    "_failure",
+    "_project",
+    "ComInteropAnalyzer"
+  ],
+  "retained_original_cases": 111,
+  "added_cases": 26,
+  "executed_cases": 137,
+  "predecessor_streams_preserved": 45,
+  "changed_line_coverage": "100%; all previously covered executable behavior and all newly introduced context checks are measured.",
+  "manual_intent_review": "R3 ordinal/operation/embed_interop_types assertions each have an immediate intent comment. New projection/branch logic was inspected before gates."
+}

@@ -1,0 +1,89 @@
+"""Run released stage 7 after the same candidate passed final stages 1 through 6."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+manifest_path, completed_path = map(Path, sys.argv[1:3])
+assert sys.argv[3] == 'coordinator-released-stage7'
+manifest, completed = [json.loads(path.read_bytes()) for path in (manifest_path, completed_path)]
+assert completed['candidate_sha256'] == hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+assert completed['test_node_count'] == 354 and completed['contract_node_count'] == 177
+assert {item['stage'] for item in completed['receipts']} == {1, 2, 3, 4, 5, 6}
+assert all(item['exit_code'] == 0 for item in completed['receipts'])
+for item in completed['receipts']:
+    assert hashlib.sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256']
+
+
+def binding():
+    """Check all candidate source/test/dependency bytes and exact prepared harnesses."""
+    actual = {item['path']: hashlib.sha256(Path(item['path']).read_bytes()).hexdigest() for item in manifest['bindings']}
+    assert actual == {item['path']: item['sha256'] for item in manifest['bindings']}
+    for name, digest in manifest['harnesses'].items():
+        assert hashlib.sha256((scratch / name).read_bytes()).hexdigest() == digest
+    return hashlib.sha256(json.dumps(actual, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def portable(value):
+    """Sanitize readable paths while preserving exact raw command streams."""
+    for path, label in ((root, 'WORKSPACE'), (scratch, 'SCRATCH')):
+        for spelling in (str(path), path.as_posix()):
+            value = re.sub(re.escape(spelling), lambda match: label, value, flags=re.I)
+    return value
+
+
+def write(path, value):
+    """Create one non-overwriting LF-only artifact."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+
+
+before = binding()
+assert before == completed['binding_sha256']
+started = datetime.datetime.now(datetime.timezone.utc)
+native_raw = scratch / ('issue-980-p4t9-final-native-result-' + started.strftime('%H%M%S') + '.raw.json')
+command = [sys.executable, str(scratch / 'issue-980-p4t9-final-native.py'), str(native_raw)]
+env = dict(os.environ)
+env.update(PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1')
+result = subprocess.run(command, capture_output=True, env=env)
+finished = datetime.datetime.now(datetime.timezone.utc)
+stamp = finished.strftime('%Y-%m-%dT%H-%M')
+stem = 'p4t9-final-native-' + finished.strftime('%H%M%S') + '.' + stamp
+streams = {}
+for label, raw in (('stdout', result.stdout), ('stderr', result.stderr)):
+    path = scratch / ('issue-980-' + stem + '.' + label + '.txt')
+    path.write_bytes(raw)
+    streams[label] = {'path': 'SCRATCH/' + path.name, 'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+after = binding()
+receipt = {'stage': 7, 'label': 'native', 'timestamp': stamp, 'started_at': started.isoformat(),
+    'finished_at': finished.isoformat(), 'seconds': (finished - started).total_seconds(),
+    'command': portable(subprocess.list2cmdline(command)), 'exit_code': result.returncode,
+    'binding_before_sha256': before, 'binding_after_sha256': after,
+    'candidate_manifest': manifest_path.as_posix(), 'candidate_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+    'stdout': portable(result.stdout.decode('utf-8', errors='replace')), 'stderr': portable(result.stderr.decode('utf-8', errors='replace')),
+    'raw_stdout': streams['stdout'], 'raw_stderr': streams['stderr']}
+path = qa / (stem + '.json')
+write(path, receipt)
+markdown = f'# P4-T9 final native composition\n\nTimestamp: {stamp}\nCommand: `{receipt["command"]}`\nEXIT_CODE: {result.returncode}\nOutput Summary: Stage 7; actual Windows/Git capture and read-only merge, with exact bindings and timings in the paired JSON.\n\n```text\n{receipt["stdout"]}{receipt["stderr"]}\n```\n'
+path.with_suffix('.md').write_text('\n'.join(line.rstrip() for line in markdown.splitlines()).rstrip() + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'stage': 7, 'exit_code': result.returncode, 'seconds': receipt['seconds'], 'receipt': path.as_posix()}), flush=True)
+if result.returncode:
+    print(receipt['stdout'][-8000:] + receipt['stderr'][-8000:], flush=True)
+    raise SystemExit(result.returncode)
+native = json.loads(native_raw.read_bytes())
+assert native['passed'] == len(native['checks']) == 20
+native_path = qa / ('p4t9-final-native-result.' + stamp + '.json')
+write(native_path, native)
+completed['receipts'].append({'stage': 7, 'label': 'native', 'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'exit_code': 0})
+completed.update(native_pending=False, finished_at=finished.isoformat(), native_path=native_path.as_posix(),
+    raw_native={'path': 'SCRATCH/' + native_raw.name, 'sha256': hashlib.sha256(native_raw.read_bytes()).hexdigest()},
+    native_gate_harness_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+ordered = qa / ('p4t9-final-ordered-stages.' + stamp + '.json')
+write(ordered, completed)
+print(json.dumps({'ordered_stages': ordered.as_posix(), 'native_passed': 20}), flush=True)

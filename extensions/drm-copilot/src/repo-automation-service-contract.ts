@@ -20,6 +20,26 @@ import type {
   TransitionPreparedOrchestrationRequest,
   TransitionPreparedOrchestrationResult,
 } from "./mcp-repo-automation-tool-definitions-handoff";
+import type { DiscoveryServiceResult } from "./discovery-service-types";
+import type {
+  ConfigureDiscoveryWorkspaceInput,
+  ConsumeDiscoveryRootGrantInput,
+  ConsumeDiscoveryToolAuthorizationInput,
+  DiscoveryCapabilitySentinelInput,
+  CreateDiscoveryArtifactInput,
+  FinalizeDiscoveryAgentInput,
+  FinalizedReceiptSummary,
+  ImportDiscoveryInventoryInput,
+  LinkDiscoveryEvidenceInput,
+  MigrateDiscoveryArtifactsInput,
+  PrepareDiscoveryAgentInput,
+  PreparedInvocationSummary,
+  ReadDiscoverySourceInput,
+  RunDiscoveryDoctorInput,
+  SentinelObservationSummary,
+  TransferDiscoverySnapshotInput,
+  UpdateDiscoveryArtifactInput,
+} from "./repo-automation-service-discovery-types";
 
 /**
  * Service contract declarations for {@link RepoAutomationService}.
@@ -55,6 +75,17 @@ export interface RepoAutomationExecutionResult {
   readonly resolvedHeadRef?: string | null;
   /** The head SHA the collector actually used, or `null` when unresolved. */
   readonly resolvedHeadSha?: string | null;
+  /**
+   * The validated v2 discovery service result. Present only on discovery tool
+   * results; it is the authoritative structured outcome and never a grant.
+   */
+  readonly discovery?: DiscoveryServiceResult;
+  /** Launchable deployment summary; present only on prepare_discovery_agent. */
+  readonly invocation?: PreparedInvocationSummary;
+  /** Protected receipt summary; present only on finalize_discovery_agent. */
+  readonly receipt?: FinalizedReceiptSummary;
+  /** Sentinel tool observation; evidence for the capability probe only. */
+  readonly sentinel?: SentinelObservationSummary;
 }
 
 export interface WorkspaceExecutionInput {
@@ -209,5 +240,59 @@ export interface RepoAutomationService {
   ): Promise<RepoAutomationExecutionResult>;
   runDiscoveryReport(
     input: RunDiscoveryReportInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  configureDiscoveryWorkspace(
+    input: ConfigureDiscoveryWorkspaceInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  createDiscoveryArtifact(
+    input: CreateDiscoveryArtifactInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  updateDiscoveryArtifact(
+    input: UpdateDiscoveryArtifactInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  linkDiscoveryEvidence(
+    input: LinkDiscoveryEvidenceInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  transferDiscoverySnapshot(
+    input: TransferDiscoverySnapshotInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  importDiscoveryInventory(
+    input: ImportDiscoveryInventoryInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  migrateDiscoveryArtifacts(
+    input: MigrateDiscoveryArtifactsInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  runDiscoveryDoctor(
+    input: RunDiscoveryDoctorInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  readDiscoverySource(
+    input: ReadDiscoverySourceInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  prepareDiscoveryAgent(
+    input: PrepareDiscoveryAgentInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  finalizeDiscoveryAgent(
+    input: FinalizeDiscoveryAgentInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  /**
+   * Consume the one-use native authorization bound to the started invocation a
+   * controlled tool call names through `invocation_ref`; returns its reference.
+   * Only the MCP gate calls it, and only for a call carrying `invocation_ref`.
+   */
+  consumeDiscoveryToolAuthorization?(
+    input: ConsumeDiscoveryToolAuthorizationInput,
+  ): string;
+  /**
+   * Consume the one-use root grant the native host gate issued for a root call
+   * (no `invocation_ref`) of a controlled tool; returns its reference. Only the
+   * MCP gate calls it.
+   */
+  consumeDiscoveryRootGrant?(input: ConsumeDiscoveryRootGrantInput): string;
+  /**
+   * Consume the one-use sentinel grant the native host gate recorded for a
+   * capability sentinel call and report what the host observed.
+   */
+  discoveryCapabilitySentinel?(
+    input: DiscoveryCapabilitySentinelInput,
   ): Promise<RepoAutomationExecutionResult>;
 }

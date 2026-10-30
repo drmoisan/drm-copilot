@@ -1,0 +1,158 @@
+{
+  "timestamp_utc": "2026-10-19T04-36",
+  "scope": "P4-T3 masking worker checked WIP only",
+  "artifacts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t3-masking-worker-binding.2026-10-19T04-25.md",
+      "sha256": "78e75e0b9940e5b9d026ddab79835849510fb1b97473daf39f0e7921e386e4d7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-coverage.2026-10-19T04-35.json",
+      "sha256": "ffc9f8e0fac787e074a3389e3644d0224cd56eb56d4c457fa36289199d22e50d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.json",
+      "sha256": "e625a35724b6fc697f3de1caf7e6e5bac109b90a93c86bae1fb96b9514a20acf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.md",
+      "sha256": "5ede920ae1827e73acf4d1a60aa6d2294cef238147f926f7a119a76d6f24d6d2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json",
+      "sha256": "92b7f1253e014c4efffa84b415a8a667bf42e410c2060cdc594ab4405e0647e4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.md",
+      "sha256": "d3192346f70dfc9379e50b6b77df87e4a02557d5050aa209b5737e32caa896a6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.json",
+      "sha256": "4ac7ca9fcc6d8e77f5b1fca7e07b1a64a103aa51c9026fa4bf8510d55ae67067"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.md",
+      "sha256": "9e98cf5d00b922a1ee497de5f2eda11dfa05a66fed788a0271105cd0ac3bcb88"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.json",
+      "sha256": "5677828389a5a1f30389ab27938f2d1f664ba8a8f3a5b343eaf12a4b33b915fb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.md",
+      "sha256": "6ec2fd3cbfff67d2017160875b88409a64b9bf5f300e84f257e6df62c8d76732"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.json",
+      "sha256": "aaf3bae17a87966360f5e461166b182cb10b58c8f7ba5af0b204f73698126592"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.md",
+      "sha256": "e7e0e4b54c97c5bf2a0b36393eaf78cce6766a91153e8273715309965464cc39"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.json",
+      "sha256": "5c8e98eeb5906db10b5195993aaa2dae069ecbe5f8e7663e5c8361184956cc58"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.md",
+      "sha256": "97981697b38ce00a0b0e4e1b67ae50f855639bde11abb4c68c8f44489793dfda"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.json",
+      "sha256": "ceaaa71c6293212d14cff5f40c18270150df7eddd094cdf7530dd02885f839da"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.md",
+      "sha256": "cc62af1115d4aad5b83d3b0bd5fb59335f68b8fa78128a05185a72a831aad6b9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.json",
+      "sha256": "ee93b4142551b120fc280df354412771d56eb54129a66a2199c398233d99d695"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.md",
+      "sha256": "ca3fec3cc73ecbbaf9ccb629dc60136c07252bb2af067e71673ff636fbf1f6df"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.json",
+      "sha256": "3bc5979d19c43fc512a9f7cefa26a59272c0657c07455b915a0df804858c03e5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.md",
+      "sha256": "e3f5e97ef1fc5873facb76b646c2d67620b893542eb29e34a6df93973e2198e5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.json",
+      "sha256": "3c585c773678aac9dcc93355e9e62f489b1794710a7a5ce923ff9c249c595118"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.md",
+      "sha256": "7e626535e7b65d82a0c77faf09fcc3d9e553ae7bb433115c79a3cdf5d25085a0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.json",
+      "sha256": "700f52a5ddc6ea0fc932f99732fbd04eee74c4e2a16d624cc9c84e997962629f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.md",
+      "sha256": "d3f94b8d33aa64a274be716495416f21035490fadbaae7ae9f79149fd27eb373"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.json",
+      "sha256": "fe367fbfb133f2fca830519333209438748ae13d2b9883bb9186be16252f1199"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.md",
+      "sha256": "eba87401f7502e33923220cf2fd711db184938cce12f598214eaab4206b674d5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.json",
+      "sha256": "10412ba62e4c27f5c0304bd1bee9f6f5f637e6c4e7edc63616070f356ff9dc22"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.md",
+      "sha256": "71b14be6560b0deb5fb0a458fefcb137c2f710af38f3405b1b264a866019a201"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.json",
+      "sha256": "8b5ec94a911435083b2b71f08692196fba6556c108a9049aecdb67b43b584189"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.md",
+      "sha256": "7cf15fc2b9c22a5e0ae98d7583b9ed43fa88131ec59078d15c447d62510afce0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.json",
+      "sha256": "f4426e59f3872aa8966f5250dbc94a1e456c7300b379c73b4261eca27a4126f9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.md",
+      "sha256": "4ae40db71805007375ce02b62d3b40e6105724ae499d0aef878cc58c99e371e6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.json",
+      "sha256": "4e2bacc91ab7817092fdf236b62fccc16f9c726493871fe0ee86d2c45658abfd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.md",
+      "sha256": "ab06d31714f7cf45be1958d0f217eec345c1eaee889b8535f9b25a4849359040"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.json",
+      "sha256": "ff684b1ab5f120c84f0c5307c4f9daff0df9a3fcc98462bfff2d367376d6a418"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.md",
+      "sha256": "e3d86b50c49095be3e05cb812acf6f68c12a04b99ae4334c58a318d58793f98a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.json",
+      "sha256": "bc5ba63b45a5bf98b16d2fda77673c1032d7917f0779316df0e02316e93dbb78"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.md",
+      "sha256": "daa5c2e472969459e66e9d77bc17108b9757ca8b9d6f7a82885e790cdf1374b9"
+    }
+  ]
+}

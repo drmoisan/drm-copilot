@@ -1,0 +1,66 @@
+{
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": "acf567175af47e9b85e7866e898e60cbd712931568d73094f4d1e02d40caa642",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "41a6a6ef71367221c2d0240a426eb118d374b439ad0f1576683ea9611593ade6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+    "tests/discovery_runtime/test_parity_metrics.py": "d27523d341a392813d0f6afe65377cdeaf503dda569f8b904fe3fe8b957466f6",
+    "tests/discovery_runtime/test_parity_report.py": "c208e66fbe63e76b4645e638a4ae002766aa3f67d3d8e43e10f12dac2d36b9d4",
+    "tests/discovery_runtime/test_report_models.py": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": "acf567175af47e9b85e7866e898e60cbd712931568d73094f4d1e02d40caa642",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "41a6a6ef71367221c2d0240a426eb118d374b439ad0f1576683ea9611593ade6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+    "tests/discovery_runtime/test_parity_metrics.py": "d27523d341a392813d0f6afe65377cdeaf503dda569f8b904fe3fe8b957466f6",
+    "tests/discovery_runtime/test_parity_report.py": "c208e66fbe63e76b4645e638a4ae002766aa3f67d3d8e43e10f12dac2d36b9d4",
+    "tests/discovery_runtime/test_report_models.py": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2"
+  },
+  "clean": true,
+  "command": [
+    "poetry",
+    "run",
+    "black",
+    "--check",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "tests/discovery_runtime/test_parity_report.py",
+    "tests/discovery_runtime/test_parity_metrics.py",
+    "tests/discovery_runtime/test_report_models.py"
+  ],
+  "elapsed_seconds": 1.764971,
+  "exit_code": 0,
+  "harness_sha256": "0cab2c397ac566b1170a568d9fb752b2ab37c77fa7cfcb44e781a2e2a61fbf85",
+  "population": null,
+  "raw": {
+    "stderr": {
+      "bytes": 70,
+      "scratch_relative": "p5t2-graph-focused4-black.stderr",
+      "sha256": "7f71b86ed914f0506f920b5cce4cb3ac305729e9cd0ab03bcb2cd635e3e61ce4"
+    },
+    "stdout": {
+      "bytes": 0,
+      "scratch_relative": "p5t2-graph-focused4-black.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "stage": "black",
+  "started_utc": "2026-10-20T06:24:07.316692+00:00",
+  "stderr": "All done! \\u2728 \\U0001f370 \\u2728\r\n6 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P5-T2"
+}

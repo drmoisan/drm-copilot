@@ -1,0 +1,26 @@
+{
+  "Timestamp": "2026-10-20T10-17",
+  "Command": "Exact single-boundary replacement from approved preparation delta; verify inverse replacement, saved bytes, AC lines and user-story SHA256",
+  "EXIT_CODE": 0,
+  "status": "NARROW_SPECIFICATION_CLARIFICATION_COMPLETE_NOT_P5_T4_IMPLEMENTATION",
+  "delegation_id": "specification_identity_p5t4_20261020",
+  "phase": "S5_P5T4_spec_clarification",
+  "native_authority_release": "Parent verified routing, launch and provenance; exact profile/model/effort/SHA match for agent01a158cf-c2eb-7711-a8d3-c31223252bc2",
+  "profile_sha256": "21ee1e52aaf343bbf1d2227afbedfeddfb77ac58ad48b9a23cde18a1b73d2985",
+  "preparation_delta_sha256": "c12e4839dad279a2d64c6989962a43a2515f1dfd189b2fe0b17bf0cd8e9c2e52",
+  "spec_before_sha256": "fa81cc5f18d407cdf764700bab3dd4348038abc5d27a98cacd237902a5448bfa",
+  "spec_after_sha256": "9c0eff6ffad0d0711fa0e000f8cbb78e7f4715ac2a8b28440bef0de4b6a78baf",
+  "user_story_sha256": "26b9738375d200453de4ef52c4a2417297ab9ec7381447d32e2d46dc402c8ca3",
+  "replaced_text": "Stable scenario IDs derive from kind, feature ID, criterion ID, client ID, and mode ID using a specified canonical string plus SHA-256 suffix; statement edits update a content digest without inventing a new identity. Sort by those keys.",
+  "replacement_text": "Stable scenario IDs derive from a specified canonical structured key containing the source repository ID, specification kind, feature ID, criterion ID, client ID, applicable platform ID, actual mode coordinates, and any existing linked scenario identity discriminator. Preserve distinct clients on the same platform and distinct platforms for one client. Use that key and a SHA-256 suffix for identity and deterministic ordering; reject remaining identity collisions. Display names, unrelated metadata, statements, evidence content and pinned revisions do not participate in the identity key. Statement or evidence changes update the content digest and traceability as applicable; pinned revisions remain in source provenance and the source content digest.",
+  "verification": {
+    "unique_boundary": true,
+    "inverse_replacement_matches_original": true,
+    "saved_bytes_match_expected": true,
+    "surrounding_content_unchanged": true,
+    "acceptance_lines_unchanged": true,
+    "user_story_unchanged": true,
+    "research_sufficient": true
+  },
+  "scope": "Only spec.md acceptance-generation identity/digest/sorting text and this receipt were written. No code, tests, plan, issue, user-story, policy, Git or checkpoint changes performed."
+}

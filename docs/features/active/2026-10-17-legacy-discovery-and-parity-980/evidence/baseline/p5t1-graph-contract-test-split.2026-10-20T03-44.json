@@ -1,0 +1,11 @@
+{
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-20T03:44:04.819261+00:00",
+  "absent_path": "tests/discovery_runtime/test_coverage_report_contract.py",
+  "source_path": "tests/discovery_runtime/test_coverage_report.py",
+  "source_sha256": "cc47b726a19167e3c830c8a7c17eec1a6a5087b75b209f67b21ae37822797f79",
+  "source_lines": 380,
+  "black_forecast_lines": 543,
+  "baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "Public reporting, rendering, input, digest and resource contracts only."
+}

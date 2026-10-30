@@ -1,0 +1,290 @@
+{
+  "Timestamp": "2026-10-20T09:31:33.658352+00:00",
+  "task": "P5-T3",
+  "status": "READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "route": "atomic_execution_p5t3_repair_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_routing_launch_provenance_verified": true,
+  "command": "python SCRATCH/issue-980-p5t3-semantic-confirmation.py",
+  "review_base_commit": "d8cdc87f8b70ef7311eb907966b13bbdbc48d89d",
+  "semantic_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-freeze.2026-10-20T09-27.json",
+    "sha256": "29f00c84225e64d98a556b51d45615f5d58c004f1d9fe2d76f5688545d95355c"
+  },
+  "owner_stage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-staging.2026-10-20T09-27.json",
+    "sha256": "3b4003b5d3d53930932290b0b26c2c907c9e8972590507f1443b3cb5de7ae979"
+  },
+  "composition_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-composition-review.staging.2026-10-20T09-19.json",
+    "sha256": "ae7d384f9564071856de3b537e7fd1680cac6c52fc19e7b7ff9ea9d3c2b80662"
+  },
+  "original_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-semantic-review.2026-10-20T09-21.json",
+    "sha256": "740bc42eae6453f621205a6be7e26746c506cc578868353fa5dc075cbaa013c5"
+  },
+  "producer_source_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.json",
+    "sha256": "3187ca526a066823017a1ad3018404efeb94b2c459b3e8d89e3d3b88b0ccc7b3"
+  },
+  "payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-semantic-confirmation-payload.2026-10-20T09-31.json",
+    "sha256": "15b485b9bc51eb321327417b4addb8c8b3ae89eefeae25eee73f42158c6e94ab"
+  },
+  "owned_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+    "tests/discovery_runtime/test_completion_projection.py": "3720cc8f5133a35b1170ebf5ef92530fa247172695b1697351064f449315ce6e",
+    "tests/discovery_runtime/test_validation_modes.py": "98d747f7309d2a9240c248c3eaf684572b0899809a41e116ae19475f9490c113"
+  },
+  "repair_confirmation": {
+    "SD1": "Completion preflight and malformed diagnostics are kind-specific. Validation-report retains its plain valid envelope and prior malformed ValueError; both compatibility controls passed.",
+    "ST1": "Added artifact and manifest members are selected by baseline path membership. Every original assertion/decorator is retained, and all three refusal cases now pass.",
+    "coverage_qualification_withdrawn": "Both [243,246] and [296,305] actually executed. validation-report is a supported fourth kind; no unreachable-path claim is retained."
+  },
+  "ordered_proof": [
+    {
+      "label": "format",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-repair1-format.2026-10-20T09-22.json",
+        "sha256": "a31fb218ba795f3d622f4e559c90eea8b792fddbc1a91a7ab88639fa62503a05"
+      },
+      "started": "2026-10-20T09:22:13.160295+00:00",
+      "finished": "2026-10-20T09:22:14.629779+00:00",
+      "exit_code": 0,
+      "nodes": [],
+      "raw_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "lint",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-repair1-lint.2026-10-20T09-22.json",
+        "sha256": "c2969593c36bdfb77849d01f355028c4ad8cc0ace44a3531cc22060c56b201ff"
+      },
+      "started": "2026-10-20T09:22:23.728019+00:00",
+      "finished": "2026-10-20T09:22:24.947240+00:00",
+      "exit_code": 0,
+      "nodes": [],
+      "raw_stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "types",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-repair1-types.2026-10-20T09-22.json",
+        "sha256": "4443d1d2f0d56767744ddd421d84694a3cf04b9f46f3b2388771ca6c9d105813"
+      },
+      "started": "2026-10-20T09:22:32.610756+00:00",
+      "finished": "2026-10-20T09:22:34.798779+00:00",
+      "exit_code": 0,
+      "nodes": [],
+      "raw_stdout_sha256": "3307f698d88973f65006330f0737c9aec078e957a38c212bb8cf681e476f83bd"
+    },
+    {
+      "label": "precheck",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-repair1-precheck.2026-10-20T09-23.json",
+        "sha256": "5bcdc9e12c3a3e32785fa1cb5af07c4e0a58f8e990ea1930b078f6a621743165"
+      },
+      "started": "2026-10-20T09:22:44.500768+00:00",
+      "finished": "2026-10-20T09:23:48.702387+00:00",
+      "exit_code": 0,
+      "nodes": [
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[missing-profile]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[malformed]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[loader]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[True]",
+          "PASSED"
+        ]
+      ],
+      "raw_stdout_sha256": "6192af0aeec88abd6cee2c04f8466f6fc0eee7e7a5ec6cc772b43056401ef9da"
+    },
+    {
+      "label": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-repair1-tests.2026-10-20T09-27.json",
+        "sha256": "0bb953dc383df1188ecb5bd0f98893a1d8810bc362f646b2785475c1caa199ee"
+      },
+      "started": "2026-10-20T09:24:05.989562+00:00",
+      "finished": "2026-10-20T09:27:05.508053+00:00",
+      "exit_code": 0,
+      "nodes": [
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[structural-False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[structural-True]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[discovery-complete-False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[discovery-complete-True]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[parity-complete-False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[parity-complete-True]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[planning-False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[planning-True]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[missing-profile]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[malformed]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[loader]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_recomputation_reuses_assessment_and_rejects_authored_override",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_preserves_bounded_warning_and_truncation_authority[100]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_preserves_bounded_warning_and_truncation_authority[101]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_preflight_precedes_input_validation",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[automatic-False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[automatic-True]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[agent-output-False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[agent-output-True]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[False]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[True]",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly",
+          "PASSED"
+        ],
+        [
+          "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[coverage-report-initialized-root]",
+          "PASSED"
+        ]
+      ],
+      "raw_stdout_sha256": "587fa4535d9e358849b0ef3a748f399c31d400eb304d015360e3e0c548a9bed0"
+    }
+  ],
+  "test_count": 23,
+  "direct_precheck_count": 5,
+  "decoded_archive_entries": 42,
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "raw": {
+        "covered_lines": 74,
+        "num_statements": 89,
+        "percent_covered": 80.45112781954887,
+        "percent_covered_display": "80",
+        "missing_lines": 15,
+        "excluded_lines": 4,
+        "percent_statements_covered": 83.14606741573034,
+        "percent_statements_covered_display": "83",
+        "num_branches": 44,
+        "num_partial_branches": 9,
+        "covered_branches": 33,
+        "missing_branches": 11,
+        "percent_branches_covered": 75.0,
+        "percent_branches_covered_display": "75"
+      },
+      "named_ranges": 4,
+      "unproved_lines": [],
+      "unproved_arcs": [],
+      "raw_counters_augmented": false
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": {
+      "raw": {
+        "covered_lines": 96,
+        "num_statements": 98,
+        "percent_covered": 95.83333333333333,
+        "percent_covered_display": "96",
+        "missing_lines": 2,
+        "excluded_lines": 6,
+        "percent_statements_covered": 97.95918367346938,
+        "percent_statements_covered_display": "98",
+        "num_branches": 22,
+        "num_partial_branches": 3,
+        "covered_branches": 19,
+        "missing_branches": 3,
+        "percent_branches_covered": 86.36363636363636,
+        "percent_branches_covered_display": "86"
+      },
+      "named_ranges": 6,
+      "unproved_lines": [],
+      "unproved_arcs": [],
+      "raw_counters_augmented": false
+    }
+  },
+  "coverage_qualification": "Current raw measurements are separate from exact mapped unchanged statements/arcs retained through the accepted mechanical proof. Ten named class/function ranges reconcile without unproved points; no raw counters are augmented.",
+  "dependency_rebind": {
+    "validation_recorded_by_producer": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+    "validation_repaired": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+    "operation_unchanged": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+    "qualification": "Producer source, legacy source and their completed 54/31 cases are retained without rereview. The 19 planner cases ran against the recorded earlier semantic pair; the prepared final scope repeats them against the repaired committed dependency. No extra pre-final replay was performed."
+  },
+  "preserved": [
+    "Original 17/20 result and raw tracebacks",
+    "Original two-call dispatch reproduction",
+    "Historical static diagnostics",
+    "Exact raw/readable identities and mechanical-body qualifications"
+  ],
+  "findings": [],
+  "open_probes": [],
+  "new_behavioral_runs": 0,
+  "checked_WIP_ready": true,
+  "task_acceptance": false,
+  "plan_AC_edits": false,
+  "pending": "Final native-first ordered composition gates and P5-T3 acceptance remain pending."
+}

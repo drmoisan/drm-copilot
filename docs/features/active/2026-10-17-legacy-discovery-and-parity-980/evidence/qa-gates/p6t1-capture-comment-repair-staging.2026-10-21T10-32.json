@@ -1,0 +1,23 @@
+{
+  "no_git_staging_performed": true,
+  "paths": [
+    {
+      "path": "tests/discovery_runtime/test_migration_capture.py",
+      "sha256": "16d7bf1201b84dd74d84a41205d9c1a274686b013700674ff930e623baefea0e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-comment-repair-originals.2026-10-21T10-32.json",
+      "sha256": "89471783d21f7c15a6a5efb047302cb3531bc97d36ba1f7146e02f105c8b5c54"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-comment-repair.2026-10-21T10-32.json",
+      "sha256": "f9547061610013df1fc29a77cf17c917f75bf38c1f8010bca5d739d8c2461df9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-capture-comment-candidate.2026-10-21T10-32.json",
+      "sha256": "d3383c7dbfd1c854bbf5209ac9c2ad66d8d13ae89938a28ff0cfa1a50b6b587b"
+    }
+  ],
+  "purpose": "Checked comment-only progress preservation; final gates and task acceptance pending.",
+  "task": "P6-T1"
+}

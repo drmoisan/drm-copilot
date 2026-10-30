@@ -1,0 +1,64 @@
+{
+  "task": "P3-T3",
+  "stage": "initial diagnostic",
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": "c8566a4861d06faff33963456653f991afcf9b4150c7139b019d5ed9922e2e8b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "a0e6aaa0c9e9e6f2678d420f597034a106bf8f624482ee5587ba51c8edc0a852",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "c3fe930affb00c8adcf0951d471eed3fa736508affadc738eb61a6c3f11daf07"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": "c8566a4861d06faff33963456653f991afcf9b4150c7139b019d5ed9922e2e8b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "a0e6aaa0c9e9e6f2678d420f597034a106bf8f624482ee5587ba51c8edc0a852",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "c3fe930affb00c8adcf0951d471eed3fa736508affadc738eb61a6c3f11daf07"
+  },
+  "source_stable": true,
+  "passed": 6,
+  "total": 8,
+  "cases": [
+    {
+      "name": "real-memory root activation and deliberate deactivation",
+      "passed": true,
+      "details": {
+        "activations": 4,
+        "invalidations": 2
+      }
+    },
+    {
+      "name": "default profile requires controlled activation",
+      "passed": true,
+      "details": {
+        "effects": 0
+      }
+    },
+    {
+      "name": "active locator deletion remains blocking",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "dry-run cannot assert root authority",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "deactivated fast path detects concurrent reactivation",
+      "passed": false,
+      "error": "AssertionError: returned inactive after protected activation changed; reads=1"
+    },
+    {
+      "name": "known candidate appearing before guarded commit blocks activation",
+      "passed": false,
+      "error": "AssertionError: ConfigurationResult(ok=True, action='activate', changed=('protected-activation', 'config', 'config/discovery.json'), uncertain=(), authority_invalidated=True, error=None)"
+    },
+    {
+      "name": "parent identity changing at registry publication is not recaptured as trusted",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "partial workspace failure retains protected active intent",
+      "passed": true,
+      "details": null
+    }
+  ]
+}

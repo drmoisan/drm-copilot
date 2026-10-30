@@ -1,0 +1,45 @@
+"""Check the frozen task's size, intent documentation, purity and unit isolation."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+manifest = json.loads(Path(sys.argv[1]).read_bytes())
+checked = []
+# Only owned source/tests are policy-scoped; retained callers have separate bindings.
+for entry in manifest['files']:
+    path = Path(entry['path'])
+    raw = path.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == entry['sha256']
+    lines = raw.decode('utf-8').splitlines()
+    assert len(lines) <= 500
+    tree = ast.parse(raw)
+    definitions, loops, imports, calls = [], [], [], []
+    # Inspect actual syntax rather than matching prohibited words in test fixtures.
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            imports.append(node.module)
+        elif isinstance(node, ast.Import):
+            imports.extend(item.name for item in node.names)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            definitions.append(node)
+            assert ast.get_docstring(node), (path, node.name)
+        if isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+            loops.append(node)
+            assert lines[node.lineno - 2].lstrip().startswith('#'), (path, node.lineno)
+        if isinstance(node, ast.Call):
+            calls.append(ast.unparse(node.func))
+    assert not any(item.split('.')[0] in {'subprocess', 'socket', 'requests', 'http', 'urllib', 'tempfile'} for item in imports), path
+    assert not any(item in {'open', 'eval', 'exec', 'compile'} for item in calls), path
+    assert not any(item.endswith(('.write_bytes', '.write_text', '.mkdir', '.unlink')) for item in calls), path
+    if path.as_posix().startswith('packages/'):
+        assert not any(item.startswith('scripts') for item in imports), path
+        assert not any(item.endswith(('.read_bytes', '.read_text', '.glob', '.rglob')) for item in calls), path
+    else:
+        assert not any(isinstance(node, ast.Name) and node.id in {'tmp_path', 'tmpdir'} for node in ast.walk(tree)), path
+    checked.append({'path': path.as_posix(), 'physical_lines': len(lines),
+        'documented_definitions': len(definitions), 'commented_explicit_loops': len(loops),
+        'boundary': 'Pure fixed dispatch/data validation; memory-only cases and immutable checked-in contract reads.'})
+assert len(checked) == 15
+print(json.dumps({'passed': len(checked), 'checks': checked}, indent=2))

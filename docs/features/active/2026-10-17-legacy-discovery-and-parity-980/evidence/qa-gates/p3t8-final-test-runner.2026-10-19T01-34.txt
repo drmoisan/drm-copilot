@@ -1,0 +1,21 @@
+"""Run the exact source inspection case population in one process and bind its order."""
+import hashlib
+import json
+from pathlib import Path
+import sys
+import pytest
+
+scratch = Path(__file__).parent
+mode, *extra = sys.argv[1:]
+paths = ["tests/discovery_runtime/test_source_reads.py", "tests/discovery_runtime/test_source_read_limits.py", "tests/discovery_runtime/test_source_read_snapshot_scope.py"]
+sys.path.insert(0, str(Path.cwd()))
+
+class Order:
+    def pytest_collection_modifyitems(self, items):
+        if mode == "reverse":
+            items.reverse()
+        content = {"mode": mode, "node_ids": [item.nodeid for item in items],
+                   "files": {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in paths}}
+        (scratch / ("issue-980-p3t8-" + mode + "-nodes.json")).write_text(json.dumps(content, indent=2) + "\n", encoding="utf-8")
+
+sys.exit(pytest.main(["-o", "addopts=-ra", *paths, "-q", *extra], plugins=[Order()]))

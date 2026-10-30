@@ -1,0 +1,41 @@
+{
+  "batch": "scanners",
+  "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py --cov=drm_copilot_discovery.analyzer.csharp_declarations --cov=drm_copilot_discovery.analyzer.event_subscriptions --cov=drm_copilot_discovery.analyzer.dotnet_inventory --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t3-scanners-coverage.raw.json",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T04:40:21.303219+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-scanners-tests-044021.2026-10-19T04-40.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-scanners-tests-044021.2026-10-19T04-40.stdout.txt",
+      "sha256": "280c5e9b8c7d71047f10a565f68b96365acdf9f962835a53f11e70f07ed93bc3"
+    }
+  },
+  "seconds": 15.932696,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f507e6d51b48cfe8d8a4c682f6c1fddbad177a4dd1896787d4e57db37c379881",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "fa84b4d4bd80b6f16a235be47f05c457dc95266da1cdf8bfe0f123e4a925ba13",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "c996e08f705d6b1953420935961ed16c24464c038fc5e235682726c0f13109b0",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "14848052203abab264d84b86391c9e0d14e1340e0f39cee1a22a39fd9179df89",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f507e6d51b48cfe8d8a4c682f6c1fddbad177a4dd1896787d4e57db37c379881",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "fa84b4d4bd80b6f16a235be47f05c457dc95266da1cdf8bfe0f123e4a925ba13",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "c996e08f705d6b1953420935961ed16c24464c038fc5e235682726c0f13109b0",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "14848052203abab264d84b86391c9e0d14e1340e0f39cee1a22a39fd9179df89",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "stage": "tests",
+  "started_at": "2026-10-19T04:40:05.370523+00:00",
+  "stderr": "",
+  "stdout": "...................F.................................................... [ 68%]\r\n.................................                                        [100%]\r\n================================== FAILURES ===================================\r\n_____ test_non_declaration_fragments_do_not_invent_names[delegate* ptr;] ______\r\n\r\nsource = 'delegate* ptr;'\r\n\r\n    @pytest.mark.parametrize(\r\n        \"source\",\r\n        [\r\n            \"\",\r\n            \"namespace ;\",\r\n            \"class ;\",\r\n            \"event ;\",\r\n            \"delegate (int a) {};\",\r\n            \"var item = object.class;\",\r\n            \"where T : class\",\r\n            \"record;\",\r\n            \"event Action\",\r\n            \"delegate* ptr;\",\r\n            \"}\",\r\n        ],\r\n    )\r\n    def test_non_declaration_fragments_do_not_invent_names(source: str) -> None:\r\n        \"\"\"Incomplete str source produces no invented declaration; assertions are pure.\"\"\"\r\n>       assert declaration_candidates(\"a.cs\", source) == ()\r\nE       AssertionError: assert (Detection(pa..._line', 1))),) == ()\r\nE         \r\nE         Left contains one more item: Detection(path='a.cs', line=1, detection_kind='delegate', symbol='ptr', symbol_kind='delegate', extra=(('offset', 0), ('end_line', 1)))\r\nE         Use -v to get more diff\r\n\r\ntests\\discovery_runtime\\analyzer\\test_csharp_declarations.py:149: AssertionError\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                   Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\csharp_declarations.py     155      6     90      7    95%   72->76, 215, 221, 223, 228, 264, 266\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_inventory.py        137      1     36      1    99%   182\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\event_subscriptions.py      43      0     26      0   100%\r\n----------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                    335      7    152      8    97%\r\nCoverage JSON written to file SCRATCH\\p4t3-scanners-coverage.raw.json\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/analyzer/test_csharp_declarations.py::test_non_declaration_fragments_do_not_invent_names[delegate* ptr;]\r\n1 failed, 104 passed in 15.35s\r\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-40"
+}

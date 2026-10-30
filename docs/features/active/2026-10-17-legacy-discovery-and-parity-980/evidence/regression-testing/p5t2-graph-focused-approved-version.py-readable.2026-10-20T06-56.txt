@@ -1,0 +1,116 @@
+"""Capture the approved projection subset without replaying predecessor suites."""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+ATTEMPT = sys.argv[1]
+PREFIX = f"p5t2-graph-{ATTEMPT}"
+SOURCES = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/" + name + ".py"
+    for name in ("parity_report", "parity_metrics", "report_models")
+]
+TESTS = [
+    "tests/discovery_runtime/" + name + ".py"
+    for name in ("test_parity_report", "test_parity_metrics", "test_report_models")
+]
+BORROWED = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/" + name + ".py"
+    for name in ("validation", "parity_rules", "parity_entry_rules", "parity_models",
+                 "coverage_population", "coverage_report", "coverage_scope_rules")
+]
+NODES = [
+    TESTS[1],
+    TESTS[0] + "::test_graph_entrypoints_reject_non_snapshot_inputs",
+    TESTS[0] + "::test_graph_preflight_reserves_input_before_projection",
+    TESTS[0] + "::test_public_builder_reuses_complete_projection_with_independent_root_mode",
+    TESTS[2] + "::test_heading_uses_only_closed_artifact_kind",
+    TESTS[0] + "::test_graph_work_rejects_before_retaining_entry_locations",
+    TESTS[0] + "::test_axis_output_budget_rejects_before_processing_remaining_rows",
+]
+env = dict(os.environ)
+env.update(PYTHONDONTWRITEBYTECODE="1", PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
+           COVERAGE_FILE=str(SCRATCH / f"{PREFIX}.coverage"))
+
+
+def safe_text(value: str) -> str:
+    """Render paths case-insensitively while raw bytes remain separately preserved."""
+    for path, marker in ((str(SCRATCH), '<SCRATCH>'), (str(ROOT), '<WORKSPACE>')):
+        value = re.sub(re.escape(path), lambda match: marker, value, flags=re.I)
+    return value.replace('\r\n', '\n').replace('\r', '\n')
+
+
+def hashes(paths: list[str]) -> dict[str, str]:
+    """Bind the exact existing working streams without interpreting their contents."""
+    return {path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest() for path in paths}
+
+
+def run(label: str, args: list[str]) -> bool:
+    """Capture command streams, UTC times, duration and source bindings."""
+    before = hashes(SOURCES + TESTS + BORROWED)
+    started = datetime.now(timezone.utc)
+    start = time.monotonic()
+    result = subprocess.run(args, cwd=ROOT, env=env, capture_output=True, timeout=600)
+    elapsed = time.monotonic() - start
+    output = result.stdout.decode("utf-8", errors="replace")
+    errors = result.stderr.decode("utf-8", errors="replace")
+    for suffix, raw in (("stdout", result.stdout), ("stderr", result.stderr)):
+        (SCRATCH / f"{PREFIX}-{label}.{suffix}").write_bytes(raw)
+    after = hashes(SOURCES + TESTS + BORROWED)
+    clean = result.returncode == 0 and before == after
+    receipt = {
+        "task": "P5-T2", "stage": label, "command": [arg.replace(str(SCRATCH), "<SCRATCH>") for arg in args],
+        "started_utc": started.isoformat(), "elapsed_seconds": round(elapsed, 6),
+        "exit_code": result.returncode, "clean": clean, "before": before, "after": after,
+        "stdout": safe_text(output),
+        "stderr": safe_text(errors),
+        "raw": {name: {"scratch_relative": f"{PREFIX}-{label}.{name}",
+                       "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+                for name, raw in (("stdout", result.stdout), ("stderr", result.stderr))},
+        "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "population": NODES if label == "tests" else None,
+    }
+    base = FEATURE / "evidence/regression-testing" / f"{PREFIX}-{label}.{STAMP}"
+    Path(str(base) + ".json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    rendered = (
+        f"# P5-T2 graph {label}\n\nTimestamp: {started.strftime('%Y-%m-%dT%H-%M')}\n\n"
+        f"Command: `{' '.join(args).replace(str(SCRATCH), '<SCRATCH>')}`\n\n"
+        f"EXIT_CODE: {result.returncode}\n\nOutput Summary: "
+        f"{'PASS' if clean else 'FAIL or changed bytes'}; {elapsed:.3f} seconds.\n\n"
+        f"```text\n{output}{errors}```\n"
+    )
+    rendered = safe_text(rendered)
+    Path(str(base) + ".md").write_text("\n".join(line.rstrip() for line in rendered.splitlines()).rstrip() + "\n", encoding="utf-8", newline="\n")
+    print(json.dumps({"stage": label, "exit_code": result.returncode, "clean": clean,
+                      "elapsed": round(elapsed, 3), "receipt": Path(str(base) + ".json").relative_to(ROOT).as_posix()}), flush=True)
+    if not clean:
+        print(output[-6000:] + errors[-6000:], flush=True)
+    return clean
+
+
+commands = [
+    ("black", ["poetry", "run", "black", *([] if ATTEMPT.endswith("format") else ["--check"]), *SOURCES, *TESTS]),
+    ("ruff", ["poetry", "run", "ruff", "check", *SOURCES, *TESTS]),
+    ("pyright", ["poetry", "run", "pyright", *SOURCES, *TESTS]),
+    ("approval-controls", ["poetry", "run", "pytest", "-v", "--tb=short", "-o", "addopts=", "-p", "no:cacheprovider",
+         TESTS[1] + "::test_authored_states_do_not_imply_approved_completion[intentionally-changed]",
+         TESTS[1] + "::test_authored_states_do_not_imply_approved_completion[retired]"]),
+    ("tests", ["poetry", "run", "coverage", "run", "--branch",
+               "--source=drm_copilot_discovery.parity_report,drm_copilot_discovery.parity_metrics,drm_copilot_discovery.report_models",
+               "-m", "pytest", "-v", "--tb=short", "-o", "addopts=", "-p", "no:cacheprovider", *NODES]),
+    ("coverage", ["poetry", "run", "coverage", "json", "--show-contexts", "-o", str(SCRATCH / f"{PREFIX}-coverage.json")]),
+]
+for label, args in commands:
+    if not run(label, args):
+        raise SystemExit(1)

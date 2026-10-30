@@ -1,0 +1,107 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:38:52.076731+00:00",
+  "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+  "source_hash_initial": "3d4ebf82948d07f6d7404c1b17e6a0caa6c8c0bcce7360b4e46a35486a2ab2ba",
+  "source_hash": "3d4ebf82948d07f6d7404c1b17e6a0caa6c8c0bcce7360b4e46a35486a2ab2ba",
+  "source_stable": true,
+  "passed": 3,
+  "total": 3,
+  "results": [
+    {
+      "name": "Owned partial stage is removed on failure",
+      "passed": true,
+      "details": {
+        "close_calls": 1,
+        "remove_calls": 1,
+        "message": "Injected partial write",
+        "foreign_remove_calls": 0
+      }
+    },
+    {
+      "name": "Opened parent identity must match recorded stamp",
+      "passed": true,
+      "details": {
+        "error": "Opened mutation parent identity changed",
+        "resulting_content": "original",
+        "events": [
+          [
+            "enter",
+            "."
+          ],
+          [
+            "enter",
+            "docs"
+          ],
+          [
+            "enter",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs"
+          ],
+          [
+            "exit",
+            "."
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Configured larger original is not rejected by a fixed default limit",
+      "passed": true,
+      "details": {
+        "error": null,
+        "original_size": 16777217,
+        "profile_schema_maximum": 67108864,
+        "events": [
+          [
+            "enter",
+            "."
+          ],
+          [
+            "enter",
+            "docs"
+          ],
+          [
+            "enter",
+            "docs/observations"
+          ],
+          [
+            "stage",
+            "docs/observations/.drm-mutation-owned-stage"
+          ],
+          [
+            "read-limit",
+            33554432
+          ],
+          [
+            "publish",
+            "docs/observations/value.txt"
+          ],
+          [
+            "remove",
+            "docs/observations/.drm-mutation-owned-stage"
+          ],
+          [
+            "exit",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs"
+          ],
+          [
+            "exit",
+            "."
+          ]
+        ]
+      }
+    }
+  ]
+}

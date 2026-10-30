@@ -1,0 +1,90 @@
+{
+  "Timestamp": "2026-10-20T09-42",
+  "Command": "Read-only git show and exact-path qualified-definition/body AST comparison against accepted predecessor",
+  "EXIT_CODE": 0,
+  "status": "TWO_UNCHANGED_TEST_HELPERS_QUALIFIED",
+  "task": "P5-T3",
+  "task_accepted": false,
+  "route": "rendering_review_p5t3_static_20261020",
+  "phase": "S5_P5T3_static_baseline_qualification",
+  "authority": {
+    "profile": "atomic-executor-c3-elevated",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_attestation_key": "17a9c35c5720e245acb9e7e26ea514e403ed5aae4ba44629f4ea7a2e7c577065",
+    "qualification": "Existing native worker reused under fresh matching persisted static qualification route."
+  },
+  "verification": {
+    "baseline_ref": "cb6fdef6f2ff266d09cc326854b9dbc518bec8c4",
+    "path": "tests/scripts/dev_tools/discovery/test_io.py",
+    "baseline_sha256": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f",
+    "working_sha256": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f",
+    "exact_bytes_identical": true,
+    "qualified_helpers": [
+      {
+        "path": "tests/scripts/dev_tools/discovery/test_io.py",
+        "qualified_name": "test_read_artifact_text_returns_stubbed_text.fake_read_text",
+        "line": 56,
+        "end_line": 59,
+        "definition_ast_sha256": "185ab7e547160db71d4c667c111ee45fe43c54a67fd4ce85b678f1f9ddc06474",
+        "body_ast_sha256": "8289d71c9727da47fce7b0b027566a7bb69d49f8405f2d2b46f9c54050dc0e75",
+        "baseline_identical": true
+      },
+      {
+        "path": "tests/scripts/dev_tools/discovery/test_io.py",
+        "qualified_name": "test_write_report_calls_write_text_with_exact_content.fake_write_text",
+        "line": 75,
+        "end_line": 79,
+        "definition_ast_sha256": "8476811d643554987226b7c2dc2fde777e5a06dbce8231fd61088d308baec24e",
+        "body_ast_sha256": "ae26d87af1dc11b318c4d188638e584c336e1661de5ef47ebe19e750c1d0fd05",
+        "baseline_identical": true
+      }
+    ],
+    "failure": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-static-093927.2026-10-20T09-39.json",
+      "sha256": "7a3a7f9007cfab5efd8b45ee72b726f46ea9142e6595356aed8c4a1999e864db",
+      "exit_code": 1,
+      "completed_nodes": 0,
+      "binding_unchanged": true
+    },
+    "raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-static-093927-raw.2026-10-20T09-39.json",
+      "sha256": "25e8b1fd1f95ebb1116e143b8f5af838b24a67071f035c8e1cee8d4731ce6926"
+    }
+  },
+  "consolidated_diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-static-diagnosis.2026-10-20T09-41.json",
+    "sha256": "68cae889f6f4491fdaf3afa411a4b973c8692224ad3cc872dae7aff500ed90a3",
+    "owner": "inventory_analyzers",
+    "scope": "Retained owner diagnosis scanned all16 exact-manifest files and21 retained bodies; only the two named docstring assertions failed. This reviewer independently confirms only those two identities and does not repeat the candidate review."
+  },
+  "conclusion": "The static checker applied a new/changed-callable docstring assertion to two byte-identical accepted baseline test fakes. This is a task-delta classification false positive, not a claim that either helper has a docstring.",
+  "permitted_correction": {
+    "owner": "inventory_analyzers",
+    "location": "Existing scratch static checker and its exact qualification inputs only",
+    "matching": "Exact repository-relative path plus qualified nested definition name, accepted source ref/file SHA256 and full AST identity. Full definition hashes use ast.dump(node, include_attributes=False). Body hashes use ast.dump(ast.Module(body=node.body,type_ignores=[]), include_attributes=False).",
+    "exception": "Only bypass missing-docstring assertion for the two verified unchanged helpers. Do not exempt whole files, all nested fakes or other static predicates.",
+    "changed_units": "All new or changed callables retain the full intent gate. Any file/qualified-name/AST mismatch invalidates this qualification and fails closed.",
+    "restart": "Preserve original failed receipt/archive and perform the mandatory full ordered restart from formatting after checker repair."
+  },
+  "retained_proof": "Existing legacy review and31-case proof include unchanged four I/O controls; no behavioral replay required for this checker-only correction.",
+  "no_behavioral_execution": true,
+  "no_native_execution": true,
+  "source_test_changes": false,
+  "checkpoint_changes": false,
+  "git_changes": false,
+  "checklist": {
+    "phase": 5,
+    "accepted_tasks": "43/84",
+    "accepted_AC": "17/66",
+    "current": "P5-T3 remains unchecked",
+    "next": [
+      "P5-T3",
+      "P5-T4",
+      "P5-T5",
+      "P6-T1",
+      "P6-T2"
+    ]
+  }
+}

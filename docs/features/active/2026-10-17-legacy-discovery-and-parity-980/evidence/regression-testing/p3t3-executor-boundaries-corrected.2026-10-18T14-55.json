@@ -1,0 +1,67 @@
+{
+  "task": "P3-T3",
+  "stage": "post-WIP correction verification",
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": "0193463923026c5c06d4154b6854a9445682e3a05f372a81f2859b422494d3d2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "d001281488ba92425a38929ce5770fbffd8000acfe34e0dade1e91f2e7fe572c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": "0193463923026c5c06d4154b6854a9445682e3a05f372a81f2859b422494d3d2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "d001281488ba92425a38929ce5770fbffd8000acfe34e0dade1e91f2e7fe572c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746"
+  },
+  "source_stable": true,
+  "passed": 8,
+  "total": 8,
+  "cases": [
+    {
+      "name": "real-memory root activation and deliberate deactivation",
+      "passed": true,
+      "details": {
+        "activations": 4,
+        "invalidations": 2
+      }
+    },
+    {
+      "name": "default profile requires controlled activation",
+      "passed": true,
+      "details": {
+        "effects": 0
+      }
+    },
+    {
+      "name": "active locator deletion remains blocking",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "dry-run cannot assert root authority",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "deactivated fast path detects concurrent reactivation",
+      "passed": true,
+      "details": {
+        "code": "CONFIGURATION_CHANGED",
+        "reads": 2
+      }
+    },
+    {
+      "name": "known candidate appearing before guarded commit blocks activation",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "parent identity changing at registry publication is not recaptured as trusted",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "partial workspace failure retains protected active intent",
+      "passed": true,
+      "details": null
+    }
+  ]
+}

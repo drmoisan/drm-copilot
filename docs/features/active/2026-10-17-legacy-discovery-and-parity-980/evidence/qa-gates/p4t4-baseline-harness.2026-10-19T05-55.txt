@@ -1,0 +1,29 @@
+"""Bind new P4-T4 scope to existing accepted interfaces without predecessor reruns."""
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import subprocess
+
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+now = datetime.now(timezone.utc); stamp = now.strftime('%Y-%m-%dT%H-%M')
+scope = ['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py','tests/discovery_runtime/analyzer/test_configuration.py']
+assert all(not Path(path).exists() for path in scope)
+proofs = [feature/'evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json',feature/'evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json']
+records = {}
+for path in proofs:
+    proof = json.loads(path.read_text())
+    for entry in proof['files']:
+        expected = entry.get('sha256',entry.get('working_sha256'))
+        actual = sha256(Path(entry['path']).read_bytes()).hexdigest()
+        assert actual == expected, entry['path']
+        records[entry['path']] = {'path':entry['path'],'sha256':actual,'retained_proof':path.as_posix()}
+interfaces = ['analyzer/models.py','analyzer/findings.py','analyzer/emitter.py','analyzer/input_capture.py','models.py','parsing.py','findings.py','profile_v2.py']
+for name in interfaces:
+    path = Path('packages/discovery-runtime/src/drm_copilot_discovery')/name
+    records[path.as_posix()] = {'path':path.as_posix(),'sha256':sha256(path.read_bytes()).hexdigest(),'retained_proof':'Accepted predecessor task boundary; no edits or suite rerun.'}
+doc = {'task':'P4-T4','timestamp':now.isoformat(),'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'routing_receipt':'inventory_analyzers_p4t4_execution','new_absent_paths':scope,'fixture_root':'tests/fixtures/discovery_analyzers/configuration','predecessor_files':list(records.values()),'proofs':[{'path':p.as_posix(),'sha256':sha256(p.read_bytes()).hexdigest()} for p in proofs],'baseline':'New configuration module and tests have no predecessor executable coverage. Accepted unchanged P4-T3 full Pyright and scoped format/lint/test proof retained; accepted P4-T2 XML proof retained. No existing suite was rerun.','selected_inputs':{'json':['appsettings.json','appsettings.<nonempty-qualifier>.json','settings.json','config.json'],'xml':['*.config','*.settings','settings.xml','configuration.xml'],'ini':['*.ini'],'unsupported':['*.toml']},'decisions':['JSON requires an object root; arrays are explicit unsupported roots.','INI requires sections, strict duplicates, no interpolation, case-preserved names and exact explicit/default/inherited distinction.','XML configuration, settings and SettingsFile roots have finite declaration allowlists; unknown settings roots fail.','Only identifiers/structural paths/anchors/kinds/unresolved applicability escape parsers; no values, condition expressions, raw parser errors or read-error rationales.','No registry wiring or parser dependency added.']}
+path=feature/'evidence/baseline'/f'p4t4-baseline-binding.{stamp}.json'
+path.write_text(json.dumps(doc,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+path.with_suffix('.md').write_text(f'# P4-T4 new-module baseline\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-baseline.py`\nEXIT_CODE: 0\nOutput Summary: New configuration module/test paths are absent. Exact accepted interface bytes and prior successful proofs are retained in the paired JSON; no predecessor suite was rerun.\n\nScope is the new configuration analyzer, focused tests and synthetic configuration fixtures. Selected JSON/XML/INI filenames and truthful unsupported/root behavior are recorded before implementation. Values and raw parser/read errors are forbidden from analyzer results.\n',encoding='utf-8',newline='\n')
+print(json.dumps({'baseline':path.as_posix(),'sha256':sha256(path.read_bytes()).hexdigest(),'retained_paths':len(records)}))

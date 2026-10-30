@@ -1,0 +1,38 @@
+{
+  "frozen_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+    "sha256": "4a2c3d7ccc0b81be030d6f1611051c2ccc88296e8b838dbe2d7a6a7aa1a44be5"
+  },
+  "ordered_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-ordered-stages.2026-10-19T04-06.json",
+    "sha256": "c734d479907b8e8570707405ff9b5dfe3fb635c33d0b7084324a2796e1eab211"
+  },
+  "reproduction": "Inspect the snapshots directly, or restore their original three .py basenames in a separate scratch directory and use the frozen candidate commit/profile and exact command sequence from the ordered receipts. Native harness creates only an isolated synthetic scratch Git repository.",
+  "scope": "Evidence-only addition. Frozen handoff, source, tests, fixtures, gate outcomes and historical receipts are unchanged. No gates were rerun.",
+  "snapshots": [
+    {
+      "exact_byte_copy": true,
+      "original_reference": "SCRATCH/architecture_gate.py",
+      "raw_sha256": "b933a9831cfa8cdad73d29a0eb4924b65450a440a12aa9d621f9d15c7b71ab6e",
+      "snapshot_format": "UTF-8 Python source stored as inert .txt evidence; no conversion or normalization applied.",
+      "snapshot_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-architecture-gate.2026-10-19T04-10.txt"
+    },
+    {
+      "exact_byte_copy": true,
+      "original_reference": "SCRATCH/final_gates.py",
+      "raw_sha256": "a7fd1de29ec63d272b91992f360f9e16d8caa94d2240eba6c3d9b0d95f4a7c2f",
+      "snapshot_format": "UTF-8 Python source stored as inert .txt evidence; no conversion or normalization applied.",
+      "snapshot_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-final-gates.2026-10-19T04-10.txt"
+    },
+    {
+      "exact_byte_copy": true,
+      "original_reference": "SCRATCH/native_gate.py",
+      "raw_sha256": "13fc23ce16deb7324d6ddb07e5c83576b14f5d9ac16031e52e4b9aaa2c770de2",
+      "snapshot_format": "UTF-8 Python source stored as inert .txt evidence; no conversion or normalization applied.",
+      "snapshot_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-native-gate.2026-10-19T04-10.txt"
+    }
+  ],
+  "status": "EXACT_HARNESS_BYTES_PRESERVED",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T04-10"
+}

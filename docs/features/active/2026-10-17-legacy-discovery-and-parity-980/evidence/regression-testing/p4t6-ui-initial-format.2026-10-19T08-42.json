@@ -1,0 +1,40 @@
+{
+  "stage": "format",
+  "label": "p4t6-ui-initial-format",
+  "started": "2026-10-19T08:42:05.878736+00:00",
+  "finished": "2026-10-19T08:42:07.664013+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 1.785,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "b2cc03dd319cf4b0017c00a7e9014d217a5e554b9e4393df34a41c648b26b225",
+      "physical_lines": 353
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "f585d1fe5582624b754bd60a5dff936086ddc5609882906018eef90775ad3977",
+      "physical_lines": 249
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "fe508de4acf4b737132582d082fa0cfee48882cf2869993dcc0e5580b5a4e24b",
+      "physical_lines": 172
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "aa9d17a4b2e3bec2ada859eaa4bf06cac77dc910a1bc8df9580ad78aae7f494c",
+      "physical_lines": 455
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "a1b7f11a7c0811dbcb8c4c5978f4a1f5d3959ae98d4e8c1504724d957641632e",
+      "physical_lines": 401
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "424275f55c99d94f7329a2ad8a2188b0ec67f3d26ae4df64a732da220bb296fa",
+      "physical_lines": 239
+    }
+  },
+  "output": "reformatted tests\\discovery_runtime\\analyzer\\test_ui_callback_limits.py\nreformatted tests\\discovery_runtime\\analyzer\\test_ui_callbacks.py\nreformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\ui_callbacks.py\n\nAll done! \u2728 \ud83c\udf70 \u2728\n3 files reformatted.\n",
+  "accepted_baseline": "6804041b88ea80e386948a0327dca8f0d7a89471",
+  "scope": "P4-T6 UI subset only"
+}

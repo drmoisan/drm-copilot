@@ -1,0 +1,1507 @@
+[
+  {
+    "package": "./.claude/hooks",
+    "path": "check-powershell-test-purity.ps1",
+    "covered_lines": 57,
+    "total_lines": 61,
+    "line_percent": 93.44262295081967
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "check-python-test-purity.ps1",
+    "covered_lines": 62,
+    "total_lines": 66,
+    "line_percent": 93.93939393939394
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-batch-budget-route.ps1",
+    "covered_lines": 32,
+    "total_lines": 34,
+    "line_percent": 94.11764705882354
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-checkpoint-monotonic.ps1",
+    "covered_lines": 96,
+    "total_lines": 100,
+    "line_percent": 96.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-completion-consistency.ps1",
+    "covered_lines": 139,
+    "total_lines": 149,
+    "line_percent": 93.28859060402685
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-completion-helpers.ps1",
+    "covered_lines": 62,
+    "total_lines": 67,
+    "line_percent": 92.53731343283582
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-discovery-artifact-gate.ps1",
+    "covered_lines": 66,
+    "total_lines": 69,
+    "line_percent": 95.65217391304348
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-invocation-origin.ps1",
+    "covered_lines": 66,
+    "total_lines": 73,
+    "line_percent": 90.41095890410959
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-merge-gate-authorization.ps1",
+    "covered_lines": 100,
+    "total_lines": 100,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-merge-gate-command.ps1",
+    "covered_lines": 54,
+    "total_lines": 54,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-merge-gate-resolution.ps1",
+    "covered_lines": 44,
+    "total_lines": 46,
+    "line_percent": 95.65217391304348
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-merge-gate.ps1",
+    "covered_lines": 129,
+    "total_lines": 129,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-wave-barrier.ps1",
+    "covered_lines": 94,
+    "total_lines": 96,
+    "line_percent": 97.91666666666667
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-worktree-removal-gate-resolution.ps1",
+    "covered_lines": 50,
+    "total_lines": 51,
+    "line_percent": 98.03921568627452
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-epic-worktree-removal-gate.ps1",
+    "covered_lines": 110,
+    "total_lines": 115,
+    "line_percent": 95.65217391304348
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-evidence-locations.ps1",
+    "covered_lines": 41,
+    "total_lines": 46,
+    "line_percent": 89.1304347826087
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-feature-folder-order.ps1",
+    "covered_lines": 61,
+    "total_lines": 66,
+    "line_percent": 92.42424242424242
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-mermaid-validation.ps1",
+    "covered_lines": 80,
+    "total_lines": 85,
+    "line_percent": 94.11764705882354
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-model-routing-receipt.ps1",
+    "covered_lines": 70,
+    "total_lines": 73,
+    "line_percent": 95.89041095890411
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-epic-scope.ps1",
+    "covered_lines": 67,
+    "total_lines": 68,
+    "line_percent": 98.52941176470588
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "covered_lines": 156,
+    "total_lines": 159,
+    "line_percent": 98.11320754716981
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-modes.ps1",
+    "covered_lines": 135,
+    "total_lines": 137,
+    "line_percent": 98.54014598540147
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-targets.ps1",
+    "covered_lines": 165,
+    "total_lines": 166,
+    "line_percent": 99.39759036144578
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-orchestration-preimplementation-gate.ps1",
+    "covered_lines": 153,
+    "total_lines": 159,
+    "line_percent": 96.22641509433963
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-parallel-abandon-gate.ps1",
+    "covered_lines": 79,
+    "total_lines": 84,
+    "line_percent": 94.04761904761905
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-parallel-cohort-barrier-helpers.ps1",
+    "covered_lines": 77,
+    "total_lines": 77,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-parallel-cohort-barrier.ps1",
+    "covered_lines": 80,
+    "total_lines": 82,
+    "line_percent": 97.5609756097561
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-parallel-drift-gate-helpers.ps1",
+    "covered_lines": 66,
+    "total_lines": 66,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-parallel-drift-gate.ps1",
+    "covered_lines": 115,
+    "total_lines": 117,
+    "line_percent": 98.2905982905983
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-parallel-worktree-removal-gate.ps1",
+    "covered_lines": 102,
+    "total_lines": 110,
+    "line_percent": 92.72727272727273
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-powershell-batch-budget.ps1",
+    "covered_lines": 125,
+    "total_lines": 138,
+    "line_percent": 90.57971014492753
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-pr-author-command-allowlist.ps1",
+    "covered_lines": 75,
+    "total_lines": 75,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-pr-author-skill-helpers.ps1",
+    "covered_lines": 111,
+    "total_lines": 114,
+    "line_percent": 97.36842105263158
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-pr-author-skill.artifact-root.ps1",
+    "covered_lines": 64,
+    "total_lines": 66,
+    "line_percent": 96.96969696969697
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-pr-author-skill.docs-only.ps1",
+    "covered_lines": 53,
+    "total_lines": 54,
+    "line_percent": 98.14814814814815
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-pr-author-skill.epic-base-branch.ps1",
+    "covered_lines": 29,
+    "total_lines": 31,
+    "line_percent": 93.54838709677419
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-pr-author-skill.ps1",
+    "covered_lines": 52,
+    "total_lines": 57,
+    "line_percent": 91.2280701754386
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-prd-feature-before-planner-helpers.ps1",
+    "covered_lines": 57,
+    "total_lines": 59,
+    "line_percent": 96.61016949152543
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-prd-feature-before-planner.ps1",
+    "covered_lines": 96,
+    "total_lines": 99,
+    "line_percent": 96.96969696969697
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-promotion-mcp-only.ps1",
+    "covered_lines": 61,
+    "total_lines": 66,
+    "line_percent": 92.42424242424242
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "enforce-python-batch-budget.ps1",
+    "covered_lines": 125,
+    "total_lines": 138,
+    "line_percent": 90.57971014492753
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "feature-folder-resolution.ps1",
+    "covered_lines": 111,
+    "total_lines": 111,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "feature-review-coverage-thresholds.ps1",
+    "covered_lines": 21,
+    "total_lines": 21,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-command-heredoc.ps1",
+    "covered_lines": 42,
+    "total_lines": 42,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-command-invocation-operands.ps1",
+    "covered_lines": 40,
+    "total_lines": 40,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-command-invocation.ps1",
+    "covered_lines": 147,
+    "total_lines": 147,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-command-payload-powershell.ps1",
+    "covered_lines": 71,
+    "total_lines": 71,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-command-payload.ps1",
+    "covered_lines": 186,
+    "total_lines": 186,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-command-scanner.ps1",
+    "covered_lines": 149,
+    "total_lines": 149,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-dependency-guard.ps1",
+    "covered_lines": 19,
+    "total_lines": 19,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "hook-docs-only-diff.ps1",
+    "covered_lines": 124,
+    "total_lines": 127,
+    "line_percent": 97.63779527559055
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "persist-session-id.ps1",
+    "covered_lines": 37,
+    "total_lines": 42,
+    "line_percent": 88.0952380952381
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "premortem-section.ps1",
+    "covered_lines": 45,
+    "total_lines": 45,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "subagentstop-envelope.ps1",
+    "covered_lines": 60,
+    "total_lines": 60,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-bash.ps1",
+    "covered_lines": 94,
+    "total_lines": 99,
+    "line_percent": 94.94949494949495
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-discovery-artifact-gate.ps1",
+    "covered_lines": 64,
+    "total_lines": 64,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-executor-output.ps1",
+    "covered_lines": 168,
+    "total_lines": 168,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-feature-review-coverage-metrics.ps1",
+    "covered_lines": 72,
+    "total_lines": 72,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-feature-review-coverage-rules.ps1",
+    "covered_lines": 88,
+    "total_lines": 89,
+    "line_percent": 98.87640449438203
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-feature-review-coverage.ps1",
+    "covered_lines": 85,
+    "total_lines": 85,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-orchestrator-output-resolution.ps1",
+    "covered_lines": 93,
+    "total_lines": 94,
+    "line_percent": 98.93617021276596
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-orchestrator-output-routing.ps1",
+    "covered_lines": 27,
+    "total_lines": 28,
+    "line_percent": 96.42857142857143
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-orchestrator-output.ps1",
+    "covered_lines": 110,
+    "total_lines": 111,
+    "line_percent": 99.09909909909909
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-planner-output.ps1",
+    "covered_lines": 206,
+    "total_lines": 207,
+    "line_percent": 99.51690821256038
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-pr-author-output.ps1",
+    "covered_lines": 33,
+    "total_lines": 33,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-prd-feature-output.ps1",
+    "covered_lines": 66,
+    "total_lines": 66,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-required-artifact-output.ps1",
+    "covered_lines": 61,
+    "total_lines": 62,
+    "line_percent": 98.38709677419355
+  },
+  {
+    "package": "./.claude/hooks",
+    "path": "validate-task-researcher-output.ps1",
+    "covered_lines": 107,
+    "total_lines": 109,
+    "line_percent": 98.1651376146789
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadius.psm1",
+    "covered_lines": 107,
+    "total_lines": 107,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusConfig.psm1",
+    "covered_lines": 81,
+    "total_lines": 81,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusConflict.psm1",
+    "covered_lines": 95,
+    "total_lines": 97,
+    "line_percent": 97.9381443298969
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusExtraction.psm1",
+    "covered_lines": 80,
+    "total_lines": 80,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusGlob.psm1",
+    "covered_lines": 77,
+    "total_lines": 77,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusNormalization.psm1",
+    "covered_lines": 51,
+    "total_lines": 51,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusScheduling.psm1",
+    "covered_lines": 116,
+    "total_lines": 116,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusTokenShape.psm1",
+    "covered_lines": 33,
+    "total_lines": 33,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusValidation.psm1",
+    "covered_lines": 98,
+    "total_lines": 101,
+    "line_percent": 97.02970297029702
+  },
+  {
+    "package": "./.claude/lib/blast-radius",
+    "path": "BlastRadiusWriteIntent.psm1",
+    "covered_lines": 102,
+    "total_lines": 102,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/ci-gate",
+    "path": "Invoke-CiGateParser.ps1",
+    "covered_lines": 46,
+    "total_lines": 46,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/ci-gate",
+    "path": "Invoke-MergeConfirmationParser.ps1",
+    "covered_lines": 48,
+    "total_lines": 48,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/cleanup-manifest",
+    "path": "CleanupWorktreeManifest.psm1",
+    "covered_lines": 100,
+    "total_lines": 108,
+    "line_percent": 92.5925925925926
+  },
+  {
+    "package": "./.claude/lib/codex-routing",
+    "path": "CodexDeployment.psm1",
+    "covered_lines": 68,
+    "total_lines": 68,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/codex-routing",
+    "path": "CodexTopology.psm1",
+    "covered_lines": 109,
+    "total_lines": 109,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/discovery-validation",
+    "path": "DiscoveryValidation.psm1",
+    "covered_lines": 103,
+    "total_lines": 109,
+    "line_percent": 94.4954128440367
+  },
+  {
+    "package": "./.claude/lib/hook-payload",
+    "path": "HookPayload.psm1",
+    "covered_lines": 102,
+    "total_lines": 104,
+    "line_percent": 98.07692307692308
+  },
+  {
+    "package": "./.claude/lib/mermaid",
+    "path": "MermaidGrammar.psm1",
+    "covered_lines": 142,
+    "total_lines": 143,
+    "line_percent": 99.3006993006993
+  },
+  {
+    "package": "./.claude/lib/mermaid",
+    "path": "MermaidLineScanner.psm1",
+    "covered_lines": 164,
+    "total_lines": 164,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/mermaid",
+    "path": "MermaidMarkdownFences.psm1",
+    "covered_lines": 80,
+    "total_lines": 80,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/mermaid",
+    "path": "MermaidValidation.psm1",
+    "covered_lines": 148,
+    "total_lines": 150,
+    "line_percent": 98.66666666666667
+  },
+  {
+    "package": "./.claude/lib/model-routing",
+    "path": "ModelRouting.psm1",
+    "covered_lines": 47,
+    "total_lines": 47,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorState.psm1",
+    "covered_lines": 109,
+    "total_lines": 110,
+    "line_percent": 99.0909090909091
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateCheckpointValue.psm1",
+    "covered_lines": 66,
+    "total_lines": 66,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateCodexModelReceipts.psm1",
+    "covered_lines": 81,
+    "total_lines": 81,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateCodexTopologyReceipts.psm1",
+    "covered_lines": 81,
+    "total_lines": 81,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateCompletion.psm1",
+    "covered_lines": 97,
+    "total_lines": 97,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateCompletionChecks.psm1",
+    "covered_lines": 99,
+    "total_lines": 100,
+    "line_percent": 99.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateEpicWaveBarrier.psm1",
+    "covered_lines": 108,
+    "total_lines": 108,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateIssueAdoption.psm1",
+    "covered_lines": 116,
+    "total_lines": 116,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateModelReceipts.psm1",
+    "covered_lines": 91,
+    "total_lines": 91,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateReceipts.psm1",
+    "covered_lines": 117,
+    "total_lines": 117,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateRemediationAccounting.psm1",
+    "covered_lines": 100,
+    "total_lines": 100,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateRoutingContract.psm1",
+    "covered_lines": 110,
+    "total_lines": 111,
+    "line_percent": 99.09909909909909
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateRoutingMatrix.psm1",
+    "covered_lines": 74,
+    "total_lines": 74,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/orchestrator-state",
+    "path": "OrchestratorStateUnconditional.psm1",
+    "covered_lines": 29,
+    "total_lines": 29,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/parallel-drift",
+    "path": "Invoke-ParallelDriftDetection.ps1",
+    "covered_lines": 91,
+    "total_lines": 96,
+    "line_percent": 94.79166666666667
+  },
+  {
+    "package": "./.claude/lib/parallel-drift",
+    "path": "ParallelDrift.psm1",
+    "covered_lines": 123,
+    "total_lines": 123,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/parallel-drift",
+    "path": "ParallelDriftHalt.psm1",
+    "covered_lines": 67,
+    "total_lines": 67,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/project-file-merge",
+    "path": "ProjectFileMerge.psm1",
+    "covered_lines": 124,
+    "total_lines": 124,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/project-file-merge",
+    "path": "ProjectFileMergeGrammar.psm1",
+    "covered_lines": 121,
+    "total_lines": 122,
+    "line_percent": 99.18032786885246
+  },
+  {
+    "package": "./.claude/lib/project-file-merge",
+    "path": "Resolve-MergeableConflict.ps1",
+    "covered_lines": 56,
+    "total_lines": 65,
+    "line_percent": 86.15384615384616
+  },
+  {
+    "package": "./.claude/lib/requirements",
+    "path": "GeneratedDocumentCounters.psm1",
+    "covered_lines": 15,
+    "total_lines": 15,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/worktree-resolution",
+    "path": "EpicScopeReadiness.psm1",
+    "covered_lines": 47,
+    "total_lines": 49,
+    "line_percent": 95.91836734693878
+  },
+  {
+    "package": "./.claude/lib/worktree-resolution",
+    "path": "EpicScopeResolution.psm1",
+    "covered_lines": 105,
+    "total_lines": 112,
+    "line_percent": 93.75
+  },
+  {
+    "package": "./.claude/lib/worktree-resolution",
+    "path": "WorktreeItemResolution.psm1",
+    "covered_lines": 134,
+    "total_lines": 136,
+    "line_percent": 98.52941176470588
+  },
+  {
+    "package": "./.claude/lib/worktree-resolution",
+    "path": "WorktreeResolution.psm1",
+    "covered_lines": 142,
+    "total_lines": 144,
+    "line_percent": 98.61111111111111
+  },
+  {
+    "package": "./.claude/lib/worktree-resolution",
+    "path": "WorktreeRunResolution.psm1",
+    "covered_lines": 149,
+    "total_lines": 149,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.claude/lib/worktree-resolution",
+    "path": "WorktreeTargetResolution.psm1",
+    "covered_lines": 104,
+    "total_lines": 104,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "authorize-root-epic-invocation.ps1",
+    "covered_lines": 54,
+    "total_lines": 100,
+    "line_percent": 54.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "check-powershell-test-purity.ps1",
+    "covered_lines": 68,
+    "total_lines": 68,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "check-python-test-purity.ps1",
+    "covered_lines": 73,
+    "total_lines": 73,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "codex-agent-profile-attestation.ps1",
+    "covered_lines": 75,
+    "total_lines": 80,
+    "line_percent": 93.75
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "codex-authority-store.ps1",
+    "covered_lines": 45,
+    "total_lines": 58,
+    "line_percent": 77.58620689655173
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "codex-epic-child-launch-attestation.ps1",
+    "covered_lines": 65,
+    "total_lines": 66,
+    "line_percent": 98.48484848484848
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "codex-pretooluse-file-mapping.ps1",
+    "covered_lines": 101,
+    "total_lines": 101,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-batch-budget-route.ps1",
+    "covered_lines": 32,
+    "total_lines": 34,
+    "line_percent": 94.11764705882354
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-checkpoint-monotonic.ps1",
+    "covered_lines": 109,
+    "total_lines": 110,
+    "line_percent": 99.0909090909091
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-codex-model-routing.ps1",
+    "covered_lines": 78,
+    "total_lines": 78,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-completion-consistency.ps1",
+    "covered_lines": 153,
+    "total_lines": 153,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-completion-helpers.ps1",
+    "covered_lines": 56,
+    "total_lines": 67,
+    "line_percent": 83.58208955223881
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-epic-child-worktree-binding.ps1",
+    "covered_lines": 159,
+    "total_lines": 166,
+    "line_percent": 95.78313253012048
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-epic-merge-gate-command.ps1",
+    "covered_lines": 54,
+    "total_lines": 54,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-epic-merge-gate.ps1",
+    "covered_lines": 152,
+    "total_lines": 153,
+    "line_percent": 99.34640522875817
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-epic-planning-only.ps1",
+    "covered_lines": 162,
+    "total_lines": 169,
+    "line_percent": 95.85798816568047
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-epic-root-invocation.ps1",
+    "covered_lines": 56,
+    "total_lines": 56,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-epic-wave-barrier.ps1",
+    "covered_lines": 133,
+    "total_lines": 139,
+    "line_percent": 95.68345323741008
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-epic-worktree-removal-gate.ps1",
+    "covered_lines": 77,
+    "total_lines": 78,
+    "line_percent": 98.71794871794872
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-evidence-locations.ps1",
+    "covered_lines": 47,
+    "total_lines": 47,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-epic-resolution.ps1",
+    "covered_lines": 140,
+    "total_lines": 147,
+    "line_percent": 95.23809523809524
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-epic-scope.ps1",
+    "covered_lines": 55,
+    "total_lines": 55,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "covered_lines": 156,
+    "total_lines": 159,
+    "line_percent": 98.11320754716981
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-modes.ps1",
+    "covered_lines": 133,
+    "total_lines": 135,
+    "line_percent": 98.51851851851852
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-orchestration-preimplementation-gate-targets.ps1",
+    "covered_lines": 165,
+    "total_lines": 166,
+    "line_percent": 99.39759036144578
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-orchestration-preimplementation-gate.ps1",
+    "covered_lines": 171,
+    "total_lines": 171,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-powershell-batch-budget.ps1",
+    "covered_lines": 100,
+    "total_lines": 105,
+    "line_percent": 95.23809523809524
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-promotion-mcp-only.ps1",
+    "covered_lines": 71,
+    "total_lines": 71,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "enforce-python-batch-budget.ps1",
+    "covered_lines": 100,
+    "total_lines": 105,
+    "line_percent": 95.23809523809524
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "feature-folder-resolution.ps1",
+    "covered_lines": 111,
+    "total_lines": 111,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "feature-review-coverage-thresholds.ps1",
+    "covered_lines": 21,
+    "total_lines": 21,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-command-heredoc.ps1",
+    "covered_lines": 42,
+    "total_lines": 42,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-command-invocation-operands.ps1",
+    "covered_lines": 40,
+    "total_lines": 40,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-command-invocation.ps1",
+    "covered_lines": 147,
+    "total_lines": 147,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-command-payload-powershell.ps1",
+    "covered_lines": 71,
+    "total_lines": 71,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-command-payload.ps1",
+    "covered_lines": 186,
+    "total_lines": 186,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-command-scanner.ps1",
+    "covered_lines": 149,
+    "total_lines": 149,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-dependency-guard.ps1",
+    "covered_lines": 19,
+    "total_lines": 19,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "hook-docs-only-diff.ps1",
+    "covered_lines": 124,
+    "total_lines": 127,
+    "line_percent": 97.63779527559055
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "record-subagent-routing-attestation.ps1",
+    "covered_lines": 189,
+    "total_lines": 204,
+    "line_percent": 92.6470588235294
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "validate-bash.ps1",
+    "covered_lines": 81,
+    "total_lines": 81,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "validate-codex-subagent-routing.ps1",
+    "covered_lines": 68,
+    "total_lines": 68,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/hooks",
+    "path": "validate-feature-review-coverage.ps1",
+    "covered_lines": 146,
+    "total_lines": 146,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "codex-routing-cli-common.ps1",
+    "covered_lines": 113,
+    "total_lines": 113,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "epic-child-launch-contract.ps1",
+    "covered_lines": 190,
+    "total_lines": 229,
+    "line_percent": 82.96943231441048
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "epic-child-launch-runtime.ps1",
+    "covered_lines": 30,
+    "total_lines": 229,
+    "line_percent": 13.100436681222707
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "epic-child-persistence-runtime.ps1",
+    "covered_lines": 29,
+    "total_lines": 51,
+    "line_percent": 56.86274509803921
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "epic-child-sandbox-preflight.ps1",
+    "covered_lines": 26,
+    "total_lines": 34,
+    "line_percent": 76.47058823529412
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "launch-epic-child-wave.ps1",
+    "covered_lines": 97,
+    "total_lines": 291,
+    "line_percent": 33.333333333333336
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "post-codex-worktree-session.ps1",
+    "covered_lines": 0,
+    "total_lines": 85,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "Resolve-CodexDeployment.ps1",
+    "covered_lines": 31,
+    "total_lines": 31,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "Resolve-CodexTopology.ps1",
+    "covered_lines": 39,
+    "total_lines": 39,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./.codex/scripts",
+    "path": "resume-epic-child.ps1",
+    "covered_lines": 38,
+    "total_lines": 181,
+    "line_percent": 20.994475138121548
+  },
+  {
+    "package": "./scripts/ci",
+    "path": "CiChangeScope.psm1",
+    "covered_lines": 131,
+    "total_lines": 140,
+    "line_percent": 93.57142857142857
+  },
+  {
+    "package": "./scripts/ci",
+    "path": "Invoke-CiChangeScope.ps1",
+    "covered_lines": 103,
+    "total_lines": 113,
+    "line_percent": 91.15044247787611
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "activate.ps1",
+    "covered_lines": 52,
+    "total_lines": 53,
+    "line_percent": 98.11320754716981
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "bootstrap-host.ps1",
+    "covered_lines": 7,
+    "total_lines": 7,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "DrmCopilotPromptSupport.ps1",
+    "covered_lines": 28,
+    "total_lines": 38,
+    "line_percent": 73.6842105263158
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Enter-DrmCopilotShell.ps1",
+    "covered_lines": 0,
+    "total_lines": 6,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "format-powershell.ps1",
+    "covered_lines": 0,
+    "total_lines": 5,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "HostBootstrap.psm1",
+    "covered_lines": 155,
+    "total_lines": 155,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "HostBootstrapWorkspace.psm1",
+    "covered_lines": 64,
+    "total_lines": 64,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "HostTooling.psm1",
+    "covered_lines": 40,
+    "total_lines": 42,
+    "line_percent": 95.23809523809524
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "HostVerification.psm1",
+    "covered_lines": 149,
+    "total_lines": 149,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-FullRelease.ps1",
+    "covered_lines": 95,
+    "total_lines": 104,
+    "line_percent": 91.34615384615384
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-FullReleaseFlow.CheckHelpers.ps1",
+    "covered_lines": 30,
+    "total_lines": 30,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-FullReleaseFlow.MergeWait.ps1",
+    "covered_lines": 23,
+    "total_lines": 23,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-FullReleaseFlow.ps1",
+    "covered_lines": 134,
+    "total_lines": 142,
+    "line_percent": 94.36619718309859
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-MarketplacePublish.ps1",
+    "covered_lines": 56,
+    "total_lines": 62,
+    "line_percent": 90.3225806451613
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-ReleaseReconciliation.ps1",
+    "covered_lines": 24,
+    "total_lines": 27,
+    "line_percent": 88.88888888888889
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-ReleaseTagPush.ps1",
+    "covered_lines": 75,
+    "total_lines": 77,
+    "line_percent": 97.40259740259741
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-ReleaseVerification.ps1",
+    "covered_lines": 56,
+    "total_lines": 65,
+    "line_percent": 86.15384615384616
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "Invoke-ReleaseVerificationHelpers.ps1",
+    "covered_lines": 29,
+    "total_lines": 29,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "link-feature-docs.ps1",
+    "covered_lines": 37,
+    "total_lines": 45,
+    "line_percent": 82.22222222222223
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "link-parent-child.ps1",
+    "covered_lines": 93,
+    "total_lines": 100,
+    "line_percent": 93.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "load-openai-key.ps1",
+    "covered_lines": 0,
+    "total_lines": 16,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "new-claude-worktree-session.ps1",
+    "covered_lines": 46,
+    "total_lines": 75,
+    "line_percent": 61.333333333333336
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "new-potential-entry.ps1",
+    "covered_lines": 72,
+    "total_lines": 87,
+    "line_percent": 82.75862068965517
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "publish-sideloaded-extension.ps1",
+    "covered_lines": 30,
+    "total_lines": 32,
+    "line_percent": 93.75
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "run-actionlint.ps1",
+    "covered_lines": 4,
+    "total_lines": 50,
+    "line_percent": 8.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "run-pester.ps1",
+    "covered_lines": 0,
+    "total_lines": 5,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "run-poshqc-suite.ps1",
+    "covered_lines": 0,
+    "total_lines": 5,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "run-psscriptanalyzer.ps1",
+    "covered_lines": 0,
+    "total_lines": 5,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "SideloadedExtensionPublish.psm1",
+    "covered_lines": 136,
+    "total_lines": 139,
+    "line_percent": 97.84172661870504
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "sync-agents-from-instructions.ps1",
+    "covered_lines": 93,
+    "total_lines": 129,
+    "line_percent": 72.09302325581395
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "tree.ps1",
+    "covered_lines": 11,
+    "total_lines": 19,
+    "line_percent": 57.89473684210526
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "verify-host.ps1",
+    "covered_lines": 7,
+    "total_lines": 7,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/dev-tools",
+    "path": "vscode-cli.helpers.ps1",
+    "covered_lines": 10,
+    "total_lines": 27,
+    "line_percent": 37.03703703703704
+  },
+  {
+    "package": "./scripts/powershell",
+    "path": "Publish-DrmCopilotExtension.ps1",
+    "covered_lines": 109,
+    "total_lines": 116,
+    "line_percent": 93.96551724137932
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "convert-poshqc-coverage.ps1",
+    "covered_lines": 0,
+    "total_lines": 16,
+    "line_percent": 0.0
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.Analyzer.psm1",
+    "covered_lines": 74,
+    "total_lines": 88,
+    "line_percent": 84.0909090909091
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.Coverage.psm1",
+    "covered_lines": 103,
+    "total_lines": 109,
+    "line_percent": 94.4954128440367
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.CoverageMerge.psm1",
+    "covered_lines": 72,
+    "total_lines": 72,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.FileDiscovery.psm1",
+    "covered_lines": 40,
+    "total_lines": 49,
+    "line_percent": 81.63265306122449
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.psm1",
+    "covered_lines": 53,
+    "total_lines": 60,
+    "line_percent": 88.33333333333333
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.ScanConfig.psm1",
+    "covered_lines": 42,
+    "total_lines": 46,
+    "line_percent": 91.30434782608695
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.Shard.psm1",
+    "covered_lines": 95,
+    "total_lines": 95,
+    "line_percent": 100.0
+  },
+  {
+    "package": "./scripts/powershell/PoshQC",
+    "path": "PoshQC.Testing.psm1",
+    "covered_lines": 190,
+    "total_lines": 203,
+    "line_percent": 93.5960591133005
+  }
+]

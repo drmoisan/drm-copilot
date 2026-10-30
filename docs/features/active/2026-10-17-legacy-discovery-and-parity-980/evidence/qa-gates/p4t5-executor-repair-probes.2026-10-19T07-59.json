@@ -1,0 +1,194 @@
+{
+  "case_count": 12,
+  "cases": [
+    {
+      "actual_count": 1,
+      "case": "com-attribute-positive",
+      "expectation_met": true,
+      "expected_count": 1,
+      "input_sha256": "6e57b0c02f07987383abbc99ec616dccdfec5721318c6287eb759be9db28d5a4",
+      "observed": [
+        {
+          "detection_kind": "com_attribute",
+          "extra": [
+            [
+              "offset",
+              1
+            ],
+            [
+              "end_offset",
+              10
+            ],
+            [
+              "end_line",
+              1
+            ],
+            [
+              "binding",
+              "unresolved"
+            ]
+          ],
+          "line": 1,
+          "path": "src/probe.cs",
+          "symbol": "ComImport",
+          "symbol_kind": "attribute"
+        }
+      ]
+    },
+    {
+      "actual_count": 1,
+      "case": "com-call-positive",
+      "expectation_met": true,
+      "expected_count": 1,
+      "input_sha256": "f3ba17236560a3fdc113d3e557ae7a5bb997c0e0c1b30ec4e6d3909c249e3aea",
+      "observed": [
+        {
+          "detection_kind": "marshal_call",
+          "extra": [
+            [
+              "offset",
+              0
+            ],
+            [
+              "end_offset",
+              19
+            ],
+            [
+              "end_line",
+              1
+            ],
+            [
+              "binding",
+              "unresolved"
+            ]
+          ],
+          "line": 1,
+          "path": "src/probe.cs",
+          "symbol": "Marshal.IsComObject",
+          "symbol_kind": "call"
+        }
+      ]
+    },
+    {
+      "actual_count": 0,
+      "case": "collection-argument",
+      "expectation_met": true,
+      "expected_count": 0,
+      "input_sha256": "0558606b1e03653c0fe41afddb67c3696a0522dd929856e99e7b26e1c3d8968b",
+      "observed": []
+    },
+    {
+      "actual_count": 0,
+      "case": "second-collection-argument",
+      "expectation_met": true,
+      "expected_count": 0,
+      "input_sha256": "1f748166e471ce8ec1bece3cffdd9b311f1dadfee948a5a3291846e3e854985f",
+      "observed": []
+    },
+    {
+      "actual_count": 0,
+      "case": "explicit-com-member-declaration",
+      "expectation_met": true,
+      "expected_count": 0,
+      "input_sha256": "653cbd5f8aa4fc8ecfdc051dc8779ef48bf48b8a4f7bda4f4cb89750ced368d8",
+      "observed": []
+    },
+    {
+      "actual_count": 0,
+      "case": "explicit-file-member-declaration",
+      "expectation_met": true,
+      "expected_count": 0,
+      "input_sha256": "5fa08adc26689c2516c14c93558f81c2b71d6641b78b91b78d79e62fffc3e42f",
+      "observed": []
+    },
+    {
+      "actual_count": 0,
+      "case": "explicit-registry-member-declaration",
+      "expectation_met": true,
+      "expected_count": 0,
+      "input_sha256": "ffd3461db65b56376fb0791c5b6d166d4cece637e3cfedf75b5fc73ef6024592",
+      "observed": []
+    },
+    {
+      "case": "capacity-type-bool-True",
+      "code": "source-record-limit",
+      "expectation_met": true,
+      "max_sites": true,
+      "rejected": true
+    },
+    {
+      "case": "capacity-type-bool-False",
+      "code": "source-record-limit",
+      "expectation_met": true,
+      "max_sites": false,
+      "rejected": true
+    },
+    {
+      "case": "capacity-type-float-0.5",
+      "code": "source-record-limit",
+      "expectation_met": true,
+      "max_sites": 0.5,
+      "rejected": true
+    },
+    {
+      "allocation_scope": "One 64 MiB-plus-one input string; real masking was replaced by an immediate sentinel, with no timing assertion.",
+      "case": "public-source-limit-precedes-masking",
+      "code": "source-limit",
+      "error_type": "SourceScanError",
+      "expectation_met": true,
+      "input_characters": 67108865,
+      "mask_calls": []
+    },
+    {
+      "case": "approved-com-reexport-public-contract",
+      "expectation_met": true,
+      "same_callable": true,
+      "signature": "(path: 'str', text: 'str', *, max_tokens: 'int' = 100000, max_candidates: 'int' = 100000) -> 'tuple[Detection, ...]'"
+    }
+  ],
+  "command": "poetry run python SCRATCH/issue-980-p4t5-repair-probes.py <access-manifest> <sha256> <com-manifest> <sha256>",
+  "exit_code": 0,
+  "failed_expectations": 0,
+  "finished_at": "2026-10-19T07:59:48.958730+00:00",
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-repair-probe-harness.2026-10-19T07-59.txt",
+    "sha256": "269848a1e66fe82d5e6d066ce706625ba1d2d9a0e90fc6601ea3aa385f61b5cf"
+  },
+  "manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-repair-freeze.2026-10-19T07-56.json",
+      "sha256": "ac19d12cb7096d9c30e86470cff02032a9d1ac87055db3c39292f875bc76b3c4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair-freeze.2026-10-19T07-58.json",
+      "sha256": "d3914889c412fd3c0e81d9aaedb4284328dcda050a47a943b9800f3fa1eebfc4"
+    }
+  ],
+  "original_probes": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-candidate-probes.2026-10-19T07-34.json",
+    "sha256": "6504b78d3b627259799ccefbbbcd798a8f8eae8ce41c1be7ced36289f2a7cb71"
+  },
+  "publication_time_utc": "2026-10-19T07:59:48.959392+00:00",
+  "scope": "Eleven retained memory-only probes plus the approved COM split/re-export contract; no unit suite or predecessor test rerun.",
+  "source_before_and_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+    "tests/discovery_runtime/analyzer/test_com_interop.py": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35"
+  },
+  "started_at": "2026-10-19T07:59:48.942211+00:00",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-59",
+  "timestamp_qualification": {
+    "actual_original_review_publication_utc": "2026-10-19T07:45:10Z",
+    "meaning": "07:42 was binding execution; the original candidate review files were published at 07:45:10 UTC.",
+    "original_review_filename_time": "2026-10-19T07-42",
+    "original_review_files_mutated": false
+  }
+}

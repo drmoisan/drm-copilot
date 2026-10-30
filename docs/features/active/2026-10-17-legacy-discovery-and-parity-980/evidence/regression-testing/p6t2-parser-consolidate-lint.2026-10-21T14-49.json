@@ -1,0 +1,157 @@
+{
+  "Timestamp": "2026-10-21T14-49",
+  "Command": "poetry run ruff check --fix packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py tests/discovery_runtime/test_cli_commands.py tests/discovery_runtime/test_cli_errors.py",
+  "EXIT_CODE": 1,
+  "Output Summary": "lint exit 1",
+  "started": "2026-10-21T14:49:20.018385+00:00",
+  "finished": "2026-10-21T14:49:21.606182+00:00",
+  "duration_seconds": 1.5879417000105605,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "3cfaed91f4c66d010c253609561013d99d19e87c8db2674e280aab99e26ae69e",
+      "physical_lines": 363
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "9b9af55ee4ecfa5280c127e7d4ac46a80eaddeabed99e24b2a5d24906818313e",
+      "physical_lines": 240
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "sha256": "195620bc53413b3481f38c2c53c7f65d252aabf5c0804adb490e4310d407ab2b",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/test_cli_errors.py": {
+      "sha256": "19d74c0329558cc788ab11f2c0feb5e6d8922d41a27ed1fbdd611617ca4774e7",
+      "physical_lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "physical_lines": 212
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "3cfaed91f4c66d010c253609561013d99d19e87c8db2674e280aab99e26ae69e",
+      "physical_lines": 363
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "9b9af55ee4ecfa5280c127e7d4ac46a80eaddeabed99e24b2a5d24906818313e",
+      "physical_lines": 240
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "sha256": "977603ee6bf2e670509ab693c960b3b9e00de28471c5cd6c2f34010c80bfb699",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/test_cli_errors.py": {
+      "sha256": "19d74c0329558cc788ab11f2c0feb5e6d8922d41a27ed1fbdd611617ca4774e7",
+      "physical_lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "physical_lines": 212
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "1306c6d1862b044591caa8065ff82a697dfb2566e68876ada1494d3d89440012",
+      "raw_base64": "RTUwMSBMaW5lIHRvbyBsb25nICg5MSA+IDg4KQogICAtLT4gcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxjbGlfYXJndW1lbnRzLnB5OjE3NTo4OQogICAgfAoxNzMgfCAgICAgZmxhZ3MgPSAiICIuam9pbihvcHRpb24uZmxhZyBmb3Igb3B0aW9uIGluIG9wdGlvbnMpCjE3NCB8ICAgICByZXR1cm4gQ2xpSGVscCgKMTc1IHwgICAgICAgICB0ZXh0PWYiVXNhZ2U6IGRldi5kaXNjb3Zlcnkue2NvbW1hbmQubmFtZX0gW29wdGlvbnNdXG5PcHRpb25zOiAtLWhlbHAgLWgge2ZsYWdzfVxuIgogICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXl5eCjE3NiB8ICAgICApCiAgICB8CgpFNTAxIExpbmUgdG9vIGxvbmcgKDk2ID4gODgpCiAgIC0tPiBwYWNrYWdlc1xkaXNjb3ZlcnktcnVudGltZVxzcmNcZHJtX2NvcGlsb3RfZGlzY292ZXJ5XGNsaV9hcmd1bWVudHMucHk6MzE4Ojg5CiAgICB8CjMxNiB8ICAgICAgICAgICAgICAgICBjb2RlPWNvZGUsCjMxNyB8ICAgICAgICAgICAgICAgICBtZXNzYWdlPSJEaXNjb3ZlcnkgY29tbWFuZCBhcmd1bWVudHMgYXJlIGludmFsaWQgb3IgZXhjZWVkIGxpbWl0cy4iLAozMTggfCAgICAgICAgICAgICAgICAgbmV4dF9hY3Rpb249IlVzZSAtLWhlbHAgZm9yIHRoaXMgY29tbWFuZCBhbmQgcHJvdmlkZSBib3VuZGVkIGV4cGxpY2l0IG9wdGlvbnMuIiwKICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl5eXl5eCjMxOSB8ICAgICAgICAgICAgICksCjMyMCB8ICAgICAgICAgKSwKICAgIHwKClRDMDAxIE1vdmUgYXBwbGljYXRpb24gaW1wb3J0IGBkcm1fY29waWxvdF9kaXNjb3Zlcnkuc2VydmljZV9jb250cmFjdHMuT3BlcmF0aW9uYCBpbnRvIGEgdHlwZS1jaGVja2luZyBibG9jawogLS0+IHBhY2thZ2VzXGRpc2NvdmVyeS1ydW50aW1lXHNyY1xkcm1fY29waWxvdF9kaXNjb3ZlcnlcY2xpX2NvbW1hbmRzLnB5Ojg6NTMKICB8CjYgfCBmcm9tIHR5cGluZyBpbXBvcnQgTGl0ZXJhbAo3IHwKOCB8IGZyb20gZHJtX2NvcGlsb3RfZGlzY292ZXJ5LnNlcnZpY2VfY29udHJhY3RzIGltcG9ydCBPcGVyYXRpb24KICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeXl5eXl5eXl4KICB8CmhlbHA6IE1vdmUgaW50byB0eXBlLWNoZWNraW5nIGJsb2NrCgpUQzAwMiBNb3ZlIHRoaXJkLXBhcnR5IGltcG9ydCBgZHJtX2NvcGlsb3RfZGlzY292ZXJ5LnNlcnZpY2VfY29udHJhY3RzLk1vZGVgIGludG8gYSB0eXBlLWNoZWNraW5nIGJsb2NrCiAgLS0+IHRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3RfY2xpX2Vycm9ycy5weToyMTo1MwogICB8CjE5IHwgZnJvbSBkcm1fY29waWxvdF9kaXNjb3ZlcnkubW9kZWxzIGltcG9ydCBKc29uT2JqZWN0LCBQYXJzZUxpbWl0cwoyMCB8IGZyb20gZHJtX2NvcGlsb3RfZGlzY292ZXJ5LnJlcG9ydF9tb2RlbHMgaW1wb3J0IFJlcG9ydExpbWl0RXJyb3IsIGJvdW5kZWRfb2JqZWN0CjIxIHwgZnJvbSBkcm1fY29waWxvdF9kaXNjb3Zlcnkuc2VydmljZV9jb250cmFjdHMgaW1wb3J0IE1vZGUsIE9wZXJhdGlvbgogICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeXl5eCjIyIHwKMjMgfCBMSU1JVFMgPSBQYXJzZUxpbWl0cygpCiAgIHwKaGVscDogTW92ZSBpbnRvIHR5cGUtY2hlY2tpbmcgYmxvY2sKClRDMDAyIE1vdmUgdGhpcmQtcGFydHkgaW1wb3J0IGBkcm1fY29waWxvdF9kaXNjb3Zlcnkuc2VydmljZV9jb250cmFjdHMuT3BlcmF0aW9uYCBpbnRvIGEgdHlwZS1jaGVja2luZyBibG9jawogIC0tPiB0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVx0ZXN0X2NsaV9lcnJvcnMucHk6MjE6NTkKICAgfAoxOSB8IGZyb20gZHJtX2NvcGlsb3RfZGlzY292ZXJ5Lm1vZGVscyBpbXBvcnQgSnNvbk9iamVjdCwgUGFyc2VMaW1pdHMKMjAgfCBmcm9tIGRybV9jb3BpbG90X2Rpc2NvdmVyeS5yZXBvcnRfbW9kZWxzIGltcG9ydCBSZXBvcnRMaW1pdEVycm9yLCBib3VuZGVkX29iamVjdAoyMSB8IGZyb20gZHJtX2NvcGlsb3RfZGlzY292ZXJ5LnNlcnZpY2VfY29udHJhY3RzIGltcG9ydCBNb2RlLCBPcGVyYXRpb24KICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXl5eXl5eXl5eCjIyIHwKMjMgfCBMSU1JVFMgPSBQYXJzZUxpbWl0cygpCiAgIHwKaGVscDogTW92ZSBpbnRvIHR5cGUtY2hlY2tpbmcgYmxvY2sKCgpGaXhlZCAyIGVycm9yczoKLSB0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVx0ZXN0X2NsaV9jb21tYW5kcy5weToKICAgIDIgw5cgQjAxMCAoc2V0LWF0dHItd2l0aC1jb25zdGFudCkKCkZvdW5kIDcgZXJyb3JzICgyIGZpeGVkLCA1IHJlbWFpbmluZykuCk5vIGZpeGVzIGF2YWlsYWJsZSAoMyBoaWRkZW4gZml4ZXMgY2FuIGJlIGVuYWJsZWQgd2l0aCB0aGUgYC0tdW5zYWZlLWZpeGVzYCBvcHRpb24pLgo=",
+      "presentation": "E501 Line too long (91 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_arguments.py:175:89\n    |\n173 |     flags = \" \".join(option.flag for option in options)\n174 |     return CliHelp(\n175 |         text=f\"Usage: dev.discovery.{command.name} [options]\\nOptions: --help -h {flags}\\n\"\n    |                                                                                         ^^^\n176 |     )\n    |\n\nE501 Line too long (96 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_arguments.py:318:89\n    |\n316 |                 code=code,\n317 |                 message=\"Discovery command arguments are invalid or exceed limits.\",\n318 |                 next_action=\"Use --help for this command and provide bounded explicit options.\",\n    |                                                                                         ^^^^^^^^\n319 |             ),\n320 |         ),\n    |\n\nTC001 Move application import `drm_copilot_discovery.service_contracts.Operation` into a type-checking block\n --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_commands.py:8:53\n  |\n6 | from typing import Literal\n7 |\n8 | from drm_copilot_discovery.service_contracts import Operation\n  |                                                     ^^^^^^^^^\n  |\nhelp: Move into type-checking block\n\nTC002 Move third-party import `drm_copilot_discovery.service_contracts.Mode` into a type-checking block\n  --> tests\\discovery_runtime\\test_cli_errors.py:21:53\n   |\n19 | from drm_copilot_discovery.models import JsonObject, ParseLimits\n20 | from drm_copilot_discovery.report_models import ReportLimitError, bounded_object\n21 | from drm_copilot_discovery.service_contracts import Mode, Operation\n   |                                                     ^^^^\n22 |\n23 | LIMITS = ParseLimits()\n   |\nhelp: Move into type-checking block\n\nTC002 Move third-party import `drm_copilot_discovery.service_contracts.Operation` into a type-checking block\n  --> tests\\discovery_runtime\\test_cli_errors.py:21:59\n   |\n19 | from drm_copilot_discovery.models import JsonObject, ParseLimits\n20 | from drm_copilot_discovery.report_models import ReportLimitError, bounded_object\n21 | from drm_copilot_discovery.service_contracts import Mode, Operation\n   |                                                           ^^^^^^^^^\n22 |\n23 | LIMITS = ParseLimits()\n   |\nhelp: Move into type-checking block\n\n\nFixed 2 errors:\n- tests\\discovery_runtime\\test_cli_commands.py:\n    2 \u00d7 B010 (set-attr-with-constant)\n\nFound 7 errors (2 fixed, 5 remaining).\nNo fixes available (3 hidden fixes can be enabled with the `--unsafe-fixes` option).\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ]
+}

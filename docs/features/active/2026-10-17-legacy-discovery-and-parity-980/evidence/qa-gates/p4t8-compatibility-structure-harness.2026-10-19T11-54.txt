@@ -1,0 +1,65 @@
+"""Inspect exact-scope policy structure and retained executable CLI definitions."""
+import ast
+import copy
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+evidence = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence'
+state = json.loads((root / 'artifacts/orchestration/orchestrator-state.json').read_bytes())
+paths = state['execution_progress']['p4t8_progress']['ownership']['inventory_analyzers']
+issues = []
+structure = []
+for name in paths:
+    content = (root / name).read_bytes()
+    text = content.decode('utf-8')
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    parents = {child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)}
+    definitions = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            doc = ast.get_docstring(node)
+            definitions.append({'name': node.name, 'start': node.lineno, 'end': node.end_lineno, 'has_docstring': bool(doc)})
+            if not doc:
+                issues.append([name, node.lineno, 'missing docstring'])
+        if isinstance(node, (ast.For, ast.While, ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            anchor = node
+            while not isinstance(anchor, ast.stmt) and anchor in parents:
+                anchor = parents[anchor]
+            prior = lines[anchor.lineno-2].lstrip() if anchor.lineno > 1 else ''
+            if not prior.startswith('#'):
+                issues.append([name, node.lineno, 'review iteration intent', prior])
+    if len(lines) > 500:
+        issues.append([name, len(lines), 'file-size-limit'])
+    structure.append({'path': name, 'sha256': hashlib.sha256(content).hexdigest(), 'lines': len(lines), 'definitions': definitions})
+
+def clean(node):
+    result = copy.deepcopy(node)
+    for item in ast.walk(result):
+        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Module)) and item.body and isinstance(item.body[0], ast.Expr) and isinstance(item.body[0].value, ast.Constant) and isinstance(item.body[0].value.value, str):
+            item.body.pop(0)
+    return ast.dump(result, include_attributes=False)
+
+cli = 'scripts/dev_tools/discovery/analyzer/stack_cli.py'
+old = subprocess.run(['git', 'show', 'e5223d18ca0cfb92653efa75b56e6c5ec079b817:' + cli], capture_output=True, check=True).stdout
+old_tree = ast.parse(old)
+new_tree = ast.parse((root / cli).read_bytes())
+preserved = []
+for name in ('_utc_now', '_default_schema_path', '_build_parser', '_run', 'main_dotnet'):
+    before = next(item for item in old_tree.body if isinstance(item, ast.FunctionDef) and item.name == name)
+    after = next(item for item in new_tree.body if isinstance(item, ast.FunctionDef) and item.name == name)
+    equal = clean(before) == clean(after)
+    preserved.append({'definition': name, 'executable_ast_equal': equal})
+    if not equal:
+        issues.append([cli, name, 'unexpected executable change'])
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+document = {'task': 'P4-T8', 'timestamp': stamp, 'command': 'poetry run python SCRATCH/' + Path(__file__).name, 'exit_code': int(bool(issues)), 'scope': structure, 'cli_preservation': preserved, 'issues': issues, 'harness_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), 'qualification': 'Mechanical docstring presence supports, but does not replace, manual typed-contract and intent review.'}
+target = evidence / 'qa-gates' / ('p4t8-compatibility-structure.' + stamp + '.json')
+target.write_text(json.dumps(document, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+print(json.dumps({'receipt': target.relative_to(root).as_posix(), 'issues': issues, 'preserved_cli': preserved}))
+raise SystemExit(bool(issues))

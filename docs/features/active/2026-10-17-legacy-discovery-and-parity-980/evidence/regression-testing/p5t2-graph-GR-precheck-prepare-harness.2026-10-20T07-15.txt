@@ -1,0 +1,16 @@
+"""Retain the first repair runner and add the failed fixture precheck."""
+from pathlib import Path
+
+scratch = Path(__file__).parent
+runner = scratch / "p5t2-graph-GR-focused.py"
+raw = runner.read_bytes()
+(scratch / "p5t2-graph-GR-first-runner.py.txt").write_bytes(raw)
+source = raw.decode()
+needle = '    ("tests", ["poetry", "run", "coverage", "run", "--branch",'
+insert = '''    ("counted-controls", ["poetry", "run", "pytest", "-v", "--tb=short", "-o",
+         "addopts=", "-p", "no:cacheprovider",
+         TESTS[3] + "::test_custom_mode_membership_has_prospective_linear_work"]),
+'''
+assert source.count(needle) == 1
+runner.write_bytes(source.replace(needle, insert + needle).encode())
+print(runner.name)

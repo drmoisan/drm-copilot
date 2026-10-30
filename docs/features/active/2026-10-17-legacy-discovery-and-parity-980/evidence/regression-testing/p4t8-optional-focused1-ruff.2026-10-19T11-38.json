@@ -1,0 +1,152 @@
+{
+  "command": ".\\.venv\\Scripts\\python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py tests/discovery_runtime/analyzer/test_optional_adapter.py tests/discovery_runtime/analyzer/test_optional_limits.py",
+  "started": "2026-10-19T11:38:27.354266+00:00",
+  "finished": "2026-10-19T11:38:27.463194+00:00",
+  "exit_code": 1,
+  "duration_seconds": 0.109,
+  "stage": "ruff",
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py": {
+      "sha256": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570",
+      "lines": 1
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py": {
+      "sha256": "5e4d5d0a68143b9b53c89c8fd8d740e590987e225e46a30bfd87864af1d1ea50",
+      "lines": 458
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py": {
+      "sha256": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd",
+      "lines": 71
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py": {
+      "sha256": "7464f6f62ad1fda40a38a9ff75d241120c4b3396d95fb1ddd2a977178d7968ea",
+      "lines": 442
+    },
+    "tests/discovery_runtime/analyzer/test_optional_adapter.py": {
+      "sha256": "cfb18d99921d5fe0158f630da586ed770a0bc451795acdbe4be0de4be91537d3",
+      "lines": 351
+    },
+    "tests/discovery_runtime/analyzer/test_optional_limits.py": {
+      "sha256": "e8c405aa4ed98d9f45787ea0d028bf74ab4b0b18ac5cbe3a40788812f7bfe6dd",
+      "lines": 204
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py": {
+      "sha256": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570",
+      "lines": 1
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py": {
+      "sha256": "5e4d5d0a68143b9b53c89c8fd8d740e590987e225e46a30bfd87864af1d1ea50",
+      "lines": 458
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py": {
+      "sha256": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd",
+      "lines": 71
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py": {
+      "sha256": "7464f6f62ad1fda40a38a9ff75d241120c4b3396d95fb1ddd2a977178d7968ea",
+      "lines": 442
+    },
+    "tests/discovery_runtime/analyzer/test_optional_adapter.py": {
+      "sha256": "cfb18d99921d5fe0158f630da586ed770a0bc451795acdbe4be0de4be91537d3",
+      "lines": 351
+    },
+    "tests/discovery_runtime/analyzer/test_optional_limits.py": {
+      "sha256": "e8c405aa4ed98d9f45787ea0d028bf74ab4b0b18ac5cbe3a40788812f7bfe6dd",
+      "lines": 204
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "lines": 330
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": {
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "lines": 189
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": {
+      "sha256": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+      "lines": 401
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "lines": 229
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": {
+      "sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+      "lines": 252
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py": {
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "lines": 142
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": {
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "lines": 293
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "lines": 228
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "lines": 330
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": {
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "lines": 189
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": {
+      "sha256": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+      "lines": 401
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "lines": 229
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": {
+      "sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+      "lines": 252
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py": {
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "lines": 142
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": {
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "lines": 293
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "lines": 228
+    }
+  },
+  "streams": {
+    "stdout": {
+      "sha256": "5d6f94a77c2a7b48fda543ac1853f2065cc3eda7512158890a42393245dfb96f",
+      "bytes": 8192,
+      "scratch_identifier": "SCRATCH/issue-980-p4t8-optional-focused1-ruff-113827.stdout.bin",
+      "presentation": "TC001 Move application import `drm_copilot_discovery.profile_v2.ProfileV2` into a type-checking block\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\optional\\vsto_office.py:28:46\n   |\n26 | from drm_copilot_discovery.models import JsonObject\n27 | from drm_copilot_discovery.path_models import relative_path\n28 | from drm_copilot_discovery.profile_v2 import ProfileV2\n   |                                              ^^^^^^^^^\n29 |\n30 | if TYPE_CHECKING:\n   |\nhelp: Move into type-checking block\n\nE501 Line too long (153 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\optional\\vsto_office.py:192:89\n    |\n190 | \u2026\n191 | \u2026\n192 | \u2026figured limits; binding, conditions and execution remain unresolved. Source values are withheld.\",\n    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n193 | \u2026\n194 | \u2026\n    |\n\nE501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\optional\\vsto_office.py:240:89\n    |\n239 |     def reserve(self, count: int, cost: int) -> None:\n240 |         \"\"\"Charge int count/cost before output allocation; return None, private mutation.\n    |                                                                                         ^\n241 |\n242 |         SourceScanError distinguishes exhausted row and conservative encoded-byte\n    |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\optional\\vsto_syntax.py:7:1\n   |\n 5 |   \"\"\"\n 6 |\n 7 | / from __future__ import annotations\n 8 | |\n 9 | | import re\n10 | | from dataclasses import replace\n11 | |\n12 | | from drm_copilot_discovery.analyzer.com_interop import (\n13 | |     com_project_candidates,\n14 | |     com_source_candidates,\n15 | | )\n16 | | from drm_copilot_discovery.analyzer.csharp_declarations import declaration_candidates\n17 | | from drm_copilot_discovery.analyzer.csharp_tokens import (\n18 | |     SourceScanError,\n19 | |     tokenize_csharp,\n20 | | )\n21 | | from drm_copilot_discovery.analyzer.source_text import (\n22 | |     Detection,\n23 | |     strip_comments_and_strings,\n24 | | )\n25 | | from drm_copilot_discovery.analyzer.xml_input import XmlInputError, parse_xml\n26 | | from drm_copilot_discovery.profile_v2 import ProfileV2\n27 | | from drm_copilot_discovery.path_models import relative_path\n28 | | from drm_copilot_discovery.analyzer.optional.vsto_patterns import (\n29 | |     CUSTOMUI_URIS,\n30 | |     DESIGNER_RIBBON_LITERAL,\n31 | | )\n   | |_^\n32 |\n33 |   _IDENTIFIER = re.compile(\n   |\nhelp: Organize imports\n\nE501 Line too long (250 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\optional\\vsto_syntax.py:41:89\n   |\n39 | \u2026\n40 | \u2026\n41 | \u2026ropDown gallery menu splitButton box buttonGroup dialogBoxLauncher separator labelControl contextualTabs tabSet officeMenu qat sharedControls documentControls\".split()\n   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n42 | \u2026\n43 | \u2026\n   |\n\nE501 Line too long (152 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\optional\\vsto_syntax.py:44:89\n   |\n42 | \u2026\n43 | \u2026\n44 | \u2026getPressed getText getContent getItemCount getItemLabel getItemImage getSelectedItemIndex\".split()\n   |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n45 | \u2026\n   |\n\nTC002 Move third-party import `drm_copilot_discovery.profile_v2.ProfileV2` into a type-checking block\n  --> tests\\discovery_runtime\\analyzer\\test_optional_adapter.py:27:46\n   |\n25 | from drm_copilot_discovery.analyzer.xml_input import XmlInputError\n26 | from drm_copilot_discovery.models import JsonObject, canonical_json\n27 | from drm_copilot_discovery.profile_v2 import ProfileV2\n   |                                              ^^^^^^^^^\n28 | from drm_copilot_discovery.repository_reader import RepositoryFile, RepositoryIdentity\n29 | from drm_copilot_discovery.snapshot import SnapshotFile\n   |\nhelp: Move into type-checking block\n\nE501 Line too long (105 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_optional_adapter.py:249:89\n    |\n247 |     \"body\",\n248 |     [\n249 |         '<ProjectExtensions><ItemGroup><COMReference Include=\"SECRET\"/></ItemGroup></ProjectExtensions>',\n    |                                                                                         ^^^^^^^^^^^^^^^^^\n250 |         '<PropertyGroup><ItemGroup><COMReference Include=\"SECRET\"/></ItemGroup></PropertyGroup>',\n251 |         '<ItemGroup><Reference Include=\"C:/SECRET\"/></ItemGroup>',\n    |\n\nE501 Line too long (97 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_optional_adapter.py:250:89\n    |\n248 |     [\n249 |         '<ProjectExtensions><ItemGroup><COMReference Include=\"SECRET\"/></ItemGroup></ProjectExtensions>',\n250 |         '<PropertyGroup><ItemGroup><COMReference Include=\"SECRET\"/></ItemGroup></PropertyGroup>',\n    |                                                                                         ^^^^^^^^^\n251 |         '<ItemGroup><Reference Include=\"C:/SECRET\"/></ItemGroup>',\n252 |     ],\n    |\n\nE501 Line too long (223 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_optional_adapter.py:270:89\n    |\n268 | \u2026\n269 | \u2026\"\"\"\n270 | \u2026EmbedInteropTypes>false</EmbedInteropTypes></COMReference><Reference Include=\"Microsoft.Office.Interop.GenericHost\"/></ItemGroup></Project>'\n    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n271 | \u2026\n272 | \u2026\n    |\n\nE501 Line too long (148 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_optional_adapter.py:287:89\n    |\n285 | \u2026\n286 | \u2026\n287 | \u2026>\\r\\n<customUI xmlns=\"{URI}\" onLoad=\"Start\"><ribbon><button onAction=\"Go\"/></ribbon></customUI>'\n    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n288 | \u2026\n289 | \u2026\n    |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_optional_limits.py:3:1\n   |\n 1 |   \"\"\"Verify optional consent, exact limit types, encoding and aggregate exhaustion.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from typing import TYPE_CHECKING, cast\n 6 | |\n 7 | | import pytest\n 8 | | from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError\n 9 | | from drm_copilot_discovery.analyzer.models import InventoryCapture\n10 | | from drm_copilot_discovery.analyzer.optional import vsto_syntax as patterns\n11 | | from drm_copilot_discovery.analyzer.optional.vsto_office import (\n12 | |     VstoOfficeAnalyzer,\n13 | |     classify_csharp,\n14 | |     classify_project,\n15 | |     classify_xml,\n16 | | )\n17 | | from drm_copilot_discovery.profile_v2 import ProfileError, ProfileV2\n18 | | from tests.discovery_runtime.analyzer.test_optional_adapter import (\n19 | |     captured,\n20 | |     profile as profile,\n21 | |     profile_for,\n22 | |     rendered,\n23 | | )\n24 | | from tests.discovery_runtime.analyzer.test_repository import (\n25 | |     analyzer_catalog as analyzer_catalog,\n26 | | )\n27 | | from tests.discovery_runtime.analyzer.test_repository import inventory_profile\n   | |______________________________________________________________________________^\n28 |\n29 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nTC002 Move third-party import `drm_copilot_discovery.analyzer.models.InventoryCapture` into a type-checking block\n  --> tests\\discovery_runtime\\analyzer\\test_optional_limits.py:9:51\n   |\n 7 | import pytest\n 8 | from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError\n 9 | from drm_copilot_discovery.analyzer.models import InventoryCapture\n   |                                                   ^^^^^^^^^^^^^^^^\n10 | from drm_copilot_discovery.analyzer.optional import vsto_syntax as patterns\n11 | from drm_copilot_discovery.analyzer.optional.vsto_office import (\n   |\nhelp: Move into type-checking block\n\nFound 13 errors.\n[*] 2 fixable with the `--fix` option (3 hidden fixes can be enabled with the `--unsafe-fixes` option).\n"
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "scratch_identifier": "SCRATCH/issue-980-p4t8-optional-focused1-ruff-113827.stderr.bin",
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "e5223d18ca0cfb92653efa75b56e6c5ec079b817",
+  "changed": false
+}

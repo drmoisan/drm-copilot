@@ -1,0 +1,176 @@
+"""Bind the completed parity helper proof without executing production or tests."""
+import ast
+import base64
+import hashlib
+import json
+import re
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+F = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+E = F / "evidence/regression-testing"
+S = Path(__file__).parent
+R = "packages/discovery-runtime/src/drm_copilot_discovery/"
+scope = [
+    R + "parity_report.py",
+    "tests/discovery_runtime/test_parity_report.py",
+    "scripts/dev_tools/discovery/parity_report.py",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py",
+]
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def archive(raw):
+    return {"sha256": sha(raw), "base64": base64.b64encode(raw).decode("ascii")}
+
+
+def write_json(path, value):
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+baseline = F / "evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json"
+adapter_path = E / "p5t2-adapter-freeze.2026-10-20T05-51.json"
+adapter = json.loads(adapter_path.read_text(encoding="utf-8"))
+bindings = {}
+for path in scope:
+    raw = Path(path).read_bytes()
+    tree = ast.parse(raw.decode("utf-8"))
+    assert len(raw.splitlines()) <= 500
+    assert all(
+        ast.get_docstring(node)
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+    )
+    bindings[path] = {"sha256": sha(raw), "physical_lines": len(raw.splitlines())}
+    if path in adapter["bindings"]:
+        assert bindings[path]["sha256"] == adapter["bindings"][path]["sha256"]
+assert bindings[scope[0]]["sha256"] == "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5"
+
+stages = []
+for name in ("format", "lint", "types", "tests"):
+    path = E / f"p5t2-helper-proof3-{name}.2026-10-20T05-57.json"
+    value = json.loads(path.read_text(encoding="utf-8"))
+    assert value["exit_code"] == 0
+    for source in scope:
+        assert value["source_before"][source] == bindings[source]["sha256"]
+        assert value["source_after"][source] == bindings[source]["sha256"]
+    stages.append({**reference(path), "duration_seconds": value["duration_seconds"]})
+
+stdout = (S / "helper-proof3-tests.stdout").read_text(encoding="utf-8")
+nodes = re.findall(r"^(tests/.*?::.*?) PASSED", stdout, re.MULTILINE)
+assert len(nodes) == 44
+coverage_raw = (S / "helper-proof3-coverage.json").read_bytes()
+coverage = json.loads(coverage_raw)
+coverage["files"] = {
+    path.replace("\\", "/"): value for path, value in coverage["files"].items()
+}
+units = []
+for path, data in coverage["files"].items():
+    assert data["summary"]["missing_lines"] == 0
+    assert data["summary"]["missing_branches"] == 0
+    tree = ast.parse(Path(path).read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            executed = [line for line in data["executed_lines"] if node.lineno <= line <= node.end_lineno]
+            missing = [line for line in data["missing_lines"] if node.lineno <= line <= node.end_lineno]
+            branches = [edge for edge in data["executed_branches"] if node.lineno <= edge[0] <= node.end_lineno]
+            absent = [edge for edge in data["missing_branches"] if node.lineno <= edge[0] <= node.end_lineno]
+            units.append({
+                "path": path, "name": node.name, "start": node.lineno,
+                "end": node.end_lineno, "executed_lines": executed,
+                "missing_lines": missing, "executed_branches": branches,
+                "missing_branches": absent,
+                "note": "AST range uses raw executable lines and branch origins; no executable lines means no measurable body.",
+            })
+
+dependency_bindings = {}
+for path in [R + name + ".py" for name in ("models", "parsing", "rendering", "report_models")]:
+    raw = Path(path).read_bytes()
+    committed = subprocess.run(["git", "show", "HEAD:" + path], check=True, capture_output=True).stdout
+    assert raw.replace(b"\r\n", b"\n") == committed.replace(b"\r\n", b"\n")
+    dependency_bindings[path] = {
+        "working_sha256": sha(raw), "head_sha256": sha(committed),
+        "equal_after_crlf_to_lf": True,
+        "qualification": "Accepted direct dependency body is unchanged; no predecessor test replay.",
+    }
+
+now = datetime.now(timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+prefix = E / f"p5t2-helper-freeze.{stamp}"
+raw_path = E / f"p5t2-helper-raw-archive.{stamp}.json"
+coverage_path = E / f"p5t2-helper-coverage.{stamp}.json"
+harness_path = E / f"p5t2-helper-freeze-harness.{stamp}.txt"
+raw_archive = {
+    "coverage_json": archive(coverage_raw),
+    "coverage_database": archive((S / "helper-proof3-tests.coverage").read_bytes()),
+    "frozen_sources": {path: archive(Path(path).read_bytes()) for path in scope},
+    "rejected_initial_launcher": archive((S / "gate.before-argv-fix.py").read_bytes()),
+    "launcher_qualification": "Initial launcher incorrectly removed Poetry-normalized argv; it failed with FileNotFoundError before invoking a tool. The original tool-call diagnostic remains in the session; no raw child stream existed.",
+}
+write_json(raw_path, raw_archive)
+write_json(coverage_path, coverage)
+harness_path.write_bytes(Path(__file__).read_bytes())
+freeze = {
+    "task": "P5-T2", "status": "HELPER_SUBSET_READY_FOR_INDEPENDENT_CONFIRMATION",
+    "timestamp_utc": now.isoformat(), "owned_and_dependency_complete_scope": scope,
+    "bindings": bindings, "baseline": reference(baseline),
+    "retained_adapter_freeze": reference(adapter_path),
+    "accepted_direct_dependencies": dependency_bindings,
+    "ordered_receipts": stages, "test_count": 44, "new_runtime_tests": 20,
+    "retained_adapter_tests": 24, "test_nodes_in_executed_order": nodes,
+    "order": "Legacy adapter module then runtime helper module, reverse of dependency order; one process.",
+    "coverage": reference(coverage_path), "raw_archive": reference(raw_path),
+    "harness": reference(harness_path), "callable_ranges": units,
+    "qualifications": [
+        "Pure helper and wrapper only. No graph/parity completeness, validator integration or full-task acceptance is claimed.",
+        "Coverage tool metadata uses its local timestamp; ordered receipts retain actual UTC start/end times.",
+        "Initial formatting and test-only private-import failure are retained; production helper never changed during this proof.",
+        "Frozen adapter source/tests are unchanged. Parity carriers, graph drafts and sibling validator files are excluded from this checkpoint.",
+        "Raw streams remain byte-exact in receipt base64; readable views use normalized paths and line endings.",
+    ],
+}
+write_json(Path(str(prefix) + ".json"), freeze)
+Path(str(prefix) + ".md").write_text(
+    f"# P5-T2 helper and adapter freeze\n\nTimestamp: {stamp}\n\n"
+    "Command: poetry run python SCRATCH/freeze_helpers.py\n\nEXIT_CODE: 0\n\n"
+    "Output Summary: 44 cases passed after clean formatting, lint and typing. "
+    "Runtime helper: 31/31 statements, 8/8 branches; wrapper: 38/38 statements, 4/4 branches. "
+    "Every measured callable range has zero missing lines or branch destinations.\n\n"
+    "The exact four source/test files remain frozen. The JSON manifest binds the original "
+    "baseline, preserved adapter proof, ordered receipts, raw coverage, executable range "
+    "mapping and accepted direct dependencies. Initial failures remain available. "
+    "Graph projection, outcome carriers, validator integration and task acceptance remain pending.\n",
+    encoding="utf-8", newline="\n",
+)
+evidence = set()
+for directory, patterns in (
+    (E, ("p5t2-helper-*", "p5t2-helpers*")),
+    (F / "evidence/baseline", ("p5t2-shared-baseline*",)),
+    (F / "evidence/other", ("p5t2-interface-contract*",)),
+):
+    for pattern in patterns:
+        evidence.update(directory.glob(pattern))
+stage_path = E / f"p5t2-helper-stage-paths.{stamp}.json"
+stage_files = sorted(set(scope) | {path.as_posix() for path in evidence} | {stage_path.as_posix()})
+write_json(stage_path, {
+    "task": "P5-T2", "freeze": reference(Path(str(prefix) + ".json")),
+    "paths": stage_files,
+    "qualification": "Parent must union the retained adapter evidence and independent review closure. No graph or validator draft is included.",
+})
+print(json.dumps({
+    "freeze": reference(Path(str(prefix) + ".json")),
+    "staging": reference(stage_path), "test_count": len(nodes),
+    "callable_ranges": len(units), "bindings": bindings,
+}))

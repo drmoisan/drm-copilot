@@ -1,0 +1,14 @@
+{
+  "absent": "tests/discovery_runtime/test_report_models.py",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+    "sha256": "db5f95182b86745dbf345e2acab31e038804e7919cb2f115f9cf78bf664b370f"
+  },
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-models-test-split.2026-10-19T14-59.txt",
+    "sha256": "902bf266bf388270c25d650f808a98c7922003dc7e0e81a8c6bf2a44a8cf654e"
+  },
+  "scope": "Direct pure report model tests only",
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-19T14:59:28.302485+00:00"
+}

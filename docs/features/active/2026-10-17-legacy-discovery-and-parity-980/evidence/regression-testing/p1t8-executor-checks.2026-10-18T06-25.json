@@ -1,0 +1,734 @@
+{
+  "task": "P1-T8",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 6,
+  "independent_boundary_cases": [
+    {
+      "name": "empty object json",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "UTF-8 BOM json",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "wrong UTF-8 json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_ENCODING"
+      ]
+    },
+    {
+      "name": "invalid Unicode text json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_ENCODING"
+      ]
+    },
+    {
+      "name": "array root json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_ROOT"
+      ]
+    },
+    {
+      "name": "default depth boundary json",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "default depth exceeded json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_DEPTH"
+      ]
+    },
+    {
+      "name": "record boundary json",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "record exceeded json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_RECORDS"
+      ]
+    },
+    {
+      "name": "UTF-8 byte boundary json",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "UTF-8 byte exceeded json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_BYTES"
+      ]
+    },
+    {
+      "name": "value-node boundary json",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "value-node exceeded json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_NODES"
+      ]
+    },
+    {
+      "name": "empty object yaml",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "UTF-8 BOM yaml",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "wrong UTF-8 yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_ENCODING"
+      ]
+    },
+    {
+      "name": "invalid Unicode text yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_ENCODING"
+      ]
+    },
+    {
+      "name": "array root yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_ROOT"
+      ]
+    },
+    {
+      "name": "default depth boundary yaml",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "default depth exceeded yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_DEPTH"
+      ]
+    },
+    {
+      "name": "record boundary yaml",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "record exceeded yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_RECORDS"
+      ]
+    },
+    {
+      "name": "UTF-8 byte boundary yaml",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "UTF-8 byte exceeded yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_BYTES"
+      ]
+    },
+    {
+      "name": "value-node boundary yaml",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "value-node exceeded yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_NODES"
+      ]
+    },
+    {
+      "name": "nested duplicate",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_DUPLICATE_KEY"
+      ]
+    },
+    {
+      "name": "escaped duplicate",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_DUPLICATE_KEY"
+      ]
+    },
+    {
+      "name": "NaN",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_NONFINITE"
+      ]
+    },
+    {
+      "name": "Infinity",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_NONFINITE"
+      ]
+    },
+    {
+      "name": "overflow float",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_NONFINITE"
+      ]
+    },
+    {
+      "name": "escaped invalid Unicode",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_ENCODING"
+      ]
+    },
+    {
+      "name": "invalid syntax",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_SYNTAX"
+      ]
+    },
+    {
+      "name": "YAML duplicate",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_DUPLICATE_KEY"
+      ]
+    },
+    {
+      "name": "YAML merge",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_MERGE"
+      ]
+    },
+    {
+      "name": "YAML key type",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_KEY_TYPE"
+      ]
+    },
+    {
+      "name": "YAML timestamp",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_VALUE_TYPE"
+      ]
+    },
+    {
+      "name": "YAML binary",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_VALUE_TYPE"
+      ]
+    },
+    {
+      "name": "YAML set",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_VALUE_TYPE"
+      ]
+    },
+    {
+      "name": "YAML custom object",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_VALUE_TYPE"
+      ]
+    },
+    {
+      "name": "YAML invalid scalar",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_VALUE_TYPE"
+      ]
+    },
+    {
+      "name": "YAML nonfinite",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_NONFINITE"
+      ]
+    },
+    {
+      "name": "YAML mapping cycle",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_CYCLE"
+      ]
+    },
+    {
+      "name": "YAML sequence cycle",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_CYCLE"
+      ]
+    },
+    {
+      "name": "YAML multiple documents",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_SYNTAX"
+      ]
+    },
+    {
+      "name": "quoted merge spelling is ordinary JSON key",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "noncyclic alias",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "equivalent JSON aliases",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "name": "scalar-only alias expansion budget",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_NODES"
+      ]
+    },
+    {
+      "name": "supported finding path docs/Feature Contract.yaml",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_SYNTAX"
+      ]
+    },
+    {
+      "name": "supported finding path docs/\u00e9vidence.json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_SYNTAX"
+      ]
+    },
+    {
+      "name": "supported finding path .migration/Record.json",
+      "valid": false,
+      "codes": [
+        "DOCUMENT_SYNTAX"
+      ]
+    },
+    {
+      "name": "unsafe caller path ../escape.json",
+      "valid": false
+    },
+    {
+      "name": "unsafe caller path /absolute.json",
+      "valid": false
+    },
+    {
+      "name": "unsafe caller path C:/absolute.json",
+      "valid": false
+    },
+    {
+      "name": "composed truncation retains unique actionable findings",
+      "valid": true
+    },
+    {
+      "name": "finding truncation permutation invariant",
+      "valid": true
+    },
+    {
+      "name": "immutable detached canonical round trip and key permutations",
+      "valid": true
+    },
+    {
+      "name": "bounded caller limit document_bytes=67108865",
+      "valid": false
+    },
+    {
+      "name": "bounded caller limit nesting_depth=129",
+      "valid": false
+    },
+    {
+      "name": "bounded caller limit artifact_records=1000001",
+      "valid": false
+    },
+    {
+      "name": "bounded caller limit findings=1001",
+      "valid": false
+    },
+    {
+      "name": "bounded caller limit artifact_records=True",
+      "valid": false
+    },
+    {
+      "name": "bounded caller limit document_bytes=0",
+      "valid": false
+    },
+    {
+      "name": "reject nonblocking reserved marker warning",
+      "valid": false
+    },
+    {
+      "name": "reject nonblocking reserved marker info",
+      "valid": false
+    },
+    {
+      "name": "blocking idempotent marker order FINDINGS_LIMIT",
+      "valid": true
+    },
+    {
+      "name": "blocking idempotent marker order REAL_ERROR",
+      "valid": true
+    }
+  ],
+  "unchanged_prior_paths": 138,
+  "coverage_lines": "362/368",
+  "coverage_branch_arcs": "155/158",
+  "new_or_changed_production_executable_lines": 368,
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": 156,
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": 170,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": 418,
+    "tests/discovery_runtime/test_findings.py": 253,
+    "tests/discovery_runtime/test_parsing.py": 234,
+    "tests/discovery_runtime/test_parsing_limits.py": 227
+  },
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": [
+      {
+        "name": "validate_finding_path",
+        "line": 16,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "Finding",
+        "line": 29,
+        "covered": 31,
+        "executable": 31
+      },
+      {
+        "name": "finding_key",
+        "line": 84,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "child_pointer",
+        "line": 98,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "FindingCollector",
+        "line": 103,
+        "covered": 26,
+        "executable": 26
+      },
+      {
+        "name": "ordered_findings",
+        "line": 148,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "__post_init__",
+        "line": 45,
+        "covered": 20,
+        "executable": 20
+      },
+      {
+        "name": "to_dict",
+        "line": 70,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "__init__",
+        "line": 110,
+        "covered": 7,
+        "executable": 7
+      },
+      {
+        "name": "add",
+        "line": 119,
+        "covered": 12,
+        "executable": 12
+      },
+      {
+        "name": "findings",
+        "line": 136,
+        "covered": 5,
+        "executable": 5
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": [
+      {
+        "name": "_validate_value",
+        "line": 21,
+        "covered": 10,
+        "executable": 10
+      },
+      {
+        "name": "JsonObject",
+        "line": 36,
+        "covered": 21,
+        "executable": 21
+      },
+      {
+        "name": "to_plain_value",
+        "line": 76,
+        "covered": 6,
+        "executable": 6
+      },
+      {
+        "name": "canonical_json",
+        "line": 87,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "ParseLimits",
+        "line": 102,
+        "covered": 14,
+        "executable": 14
+      },
+      {
+        "name": "ParsedDocument",
+        "line": 136,
+        "covered": 18,
+        "executable": 18
+      },
+      {
+        "name": "__post_init__",
+        "line": 45,
+        "covered": 10,
+        "executable": 10
+      },
+      {
+        "name": "__getitem__",
+        "line": 59,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "__iter__",
+        "line": 67,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "__len__",
+        "line": 71,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "__post_init__",
+        "line": 115,
+        "covered": 6,
+        "executable": 6
+      },
+      {
+        "name": "expanded_nodes",
+        "line": 130,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "__post_init__",
+        "line": 148,
+        "covered": 10,
+        "executable": 10
+      },
+      {
+        "name": "ok",
+        "line": 168,
+        "covered": 2,
+        "executable": 2
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": [
+      {
+        "name": "_ObjectPairs",
+        "line": 40,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "_DiscoveryLoader",
+        "line": 44,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "_YamlApi",
+        "line": 52,
+        "covered": 3,
+        "executable": 3
+      },
+      {
+        "name": "_ScalarConstructor",
+        "line": 64,
+        "covered": 3,
+        "executable": 3
+      },
+      {
+        "name": "_LimitReached",
+        "line": 79,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "_is_sequence",
+        "line": 83,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "_DocumentReader",
+        "line": 88,
+        "covered": 144,
+        "executable": 148
+      },
+      {
+        "name": "parse_document",
+        "line": 343,
+        "covered": 32,
+        "executable": 34
+      },
+      {
+        "name": "parse",
+        "line": 55,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "compose",
+        "line": 59,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "construct_object",
+        "line": 67,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "dispose",
+        "line": 71,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "__init__",
+        "line": 95,
+        "covered": 10,
+        "executable": 10
+      },
+      {
+        "name": "error",
+        "line": 107,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "stop",
+        "line": 119,
+        "covered": 3,
+        "executable": 3
+      },
+      {
+        "name": "preflight",
+        "line": 124,
+        "covered": 45,
+        "executable": 45
+      },
+      {
+        "name": "check_source_budget",
+        "line": 181,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "scalar",
+        "line": 194,
+        "covered": 22,
+        "executable": 24
+      },
+      {
+        "name": "mapping_items",
+        "line": 233,
+        "covered": 26,
+        "executable": 28
+      },
+      {
+        "name": "visit",
+        "line": 280,
+        "covered": 30,
+        "executable": 30
+      }
+    ]
+  },
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t8-coverage-metrics.2026-10-18T06-24.json",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t8-coverage.2026-10-18T06-24.json",
+  "fixed_findings": [
+    "consumer diagnostic path compatibility and caller path validation",
+    "composed truncation uniqueness and idempotence",
+    "reserved truncation marker cannot downgrade an error"
+  ],
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "git_blob": "de5dfad1cd931ef1bf4139e989d24ed09cb383b1",
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "git_blob": "2093aa96e1b81e582d293ef58ef794a65939440b",
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "git_blob": "8de39ffb5f40f0f8f77e6aebbe8ce69e4d2f1502",
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b"
+    },
+    {
+      "path": "tests/discovery_runtime/test_findings.py",
+      "git_blob": "bbe2deb5c470344a356e7f88ab34a22cce1a61bd",
+      "sha256": "4e76ff0df7b503ea769830fd5e318a213202f86339aef25a337755dda5ecfa57"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parsing.py",
+      "git_blob": "2219ddacdcdcdd793e4464780dcf8c9e39c2aa0f",
+      "sha256": "2bf400da65afa3bdce30036374229baf5bc5cd1c15a0f3f37207b30ffcb6ad2c"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parsing_limits.py",
+      "git_blob": "5dddec5015affc500365e437ee00c37fb989387b",
+      "sha256": "759036ca31e33f18e87ce9b13132a54cd8a01079310a7d2ff03aa080ab58c063"
+    }
+  ]
+}

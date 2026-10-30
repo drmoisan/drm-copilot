@@ -1,0 +1,45 @@
+{
+  "stage": "format",
+  "label": "p4t7-lead-prepare-format",
+  "started": "2026-10-19T09:52:03.476369+00:00",
+  "finished": "2026-10-19T09:52:05.333124+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+  "exit_code": 0,
+  "duration_seconds": 1.857,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "91429a451f6c0606accfd1d454a7fb331bae3952c4b73f19a94997c4c8ee69a3",
+      "physical_lines": 329
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "0247627f3939c3c0e45140e2ceabd8807ff2832681477f6d50c7f644ddc23d8b",
+      "physical_lines": 307
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "7d32c41f57eada48168052c925add04e52dacad914489c2ed0c3a29dad0c5002",
+      "physical_lines": 484
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "95555c954ae1b4ace232b6ca3c6ead38b12a25e7d4c1604b206d2c547aa71ac0",
+      "physical_lines": 454
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-prepare-format-095205.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-prepare-format-095205.stderr.bin",
+      "raw_sha256": "74faf741166474ae4855287f13f77f5ebf12a07ee3040ccc68330bb9c1144fa7",
+      "raw_bytes": 216,
+      "presentation": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_inputs.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_dependency_inputs.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n2 files reformatted.\r\n"
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared dependency contract only"
+}

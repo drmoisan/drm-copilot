@@ -1,228 +1,103 @@
 <#
 .SYNOPSIS
-    Pre-tool-use hook that enforces discovery-artifact completion gates by
-    invoking the discovery validators.
+    Native PreToolUse authorization adapter for Claude Code discovery agents.
 
 .DESCRIPTION
-    Invoked by the Claude Code PreToolUse hook on Write or Edit operations
-    (matcher "Write|Edit"). The hook reads the PreToolUse envelope JSON
-    containing file_path, and either content (Write) or old_string/new_string
-    (Edit).
+    Invoked by the Claude Code PreToolUse hook. The hook reads the PreToolUse
+    envelope, derives the trusted principal from the payload alone (session, the
+    host-assigned agent_id and agent_type, and the literal parent root), and takes
+    its decision from the shared DiscoveryAuthorization module:
 
-    For a Write call whose file_path resolves to a recognized discovery
-    artifact type, and when a required-artifact declaration for that type is
-    present, the hook invokes the discovery validator CLI via
-    Invoke-DiscoveryValidatorExe and maps a non-zero exit code or non-empty
-    error output to a deny decision. Edit calls are allowed unconditionally
-    (Edit supplies only a partial patch, not full file content, so it cannot
-    be reliably validated here; the SubagentStop gate is the authoritative
-    backstop). A file_path that does not resolve to a recognized discovery
-    artifact type, or a required-artifact declaration that is absent, results
-    in an allow decision without invoking the validator (fail-open).
+    - a root call (no agent_id) of prepare_discovery_agent, run_discovery_doctor or
+      a controlled discovery tool is allowed with a one-use root grant the MCP
+      server consumes; every other root call and every call of an agent that is
+      not a discovery specialist is allowed, so ordinary sessions keep the
+      behavior of their other gates;
+    - a sentinel envelope is observed for the capability probe and never granted;
+    - a discovery specialist may use read-only native tools and the controlled
+      discovery MCP tools only; shell, terminal, exec and evaluation tools, generic
+      Write/Edit/apply_patch mutations, nested agents, foreign MCP servers,
+      root-only discovery operations and caller-supplied identity fields are denied
+      before execution;
+    - the specialist's first controlled call binds the single prepared invocation
+      of its session, parent and agent type; every controlled call must name that
+      invocation through invocation_ref and is recorded as one short-lived, one-use
+      tool-authorization in the protected store, which the gateway consumes exactly once.
 
-    This hook never implements or reimplements discovery-validator logic; it
-    only routes to the validator CLI delivered by a separate feature and
-    interprets the CLI's exit code and captured output.
+    Envelope anomalies and dependency failures deny with the
+    DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix. The hook performs no validation of
+    artifact content itself: the installed Python runtime owns artifact semantics
+    and the gateway validates proposed bytes at the service boundary (issue #980).
 
 .NOTES
-    Requires PowerShell 7.4+ (the shared validation module uses
-    `Test-Json -SchemaFile` Draft 2020-12 support). Read-only validation gate that
-    invokes NO external process: validation runs in-process through
-    `.claude/lib/discovery-validation/DiscoveryValidation.psm1` (issue #475).
+    Requires PowerShell 7+. Invokes NO external process and never reads a profile,
+    locator or request field to decide identity or authority.
 #>
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
-$script:DiscoveryValidationImportFailure = $null; try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryValidation.psm1') -Force -Global -ErrorAction Stop } catch { $script:DiscoveryValidationImportFailure = 'DiscoveryValidation.psm1' }
-function Invoke-DiscoveryValidatorExe {
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryToolRouting.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryToolRouting.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryRootGrant.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryRootGrant.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryObservation.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryObservation.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStart.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStart.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
+
+$script:DiscoveryGateReasonPrefix = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+$script:DiscoveryGateHandlerPath = $PSCommandPath
+
+function Get-DiscoveryGateHandlerSha256 {
     <#
     .SYNOPSIS
-        Wrapper around the discovery-artifact validator. Mockable seam.
-    .DESCRIPTION
-        Delegates to the portable PowerShell implementation in
-        `.claude/lib/discovery-validation/DiscoveryValidation.psm1`, keeping this
-        function's name, its `-ValidatorArgs <string[]>` parameter, and its
-        `@{ ExitCode; Output }` return shape unchanged so existing mocks and
-        `Should -Invoke` assertions continue to bind.
-
-        This no longer invokes a Python interpreter (issue #475). The `.claude/**`
-        payload ships to destinations with no guaranteed Python, Poetry, or
-        `scripts/dev_tools`, where the previous `python -m ...` call failed
-        obscurely or blocked every operation.
-
-        Success is SILENT by contract: a passing validation returns `ExitCode = 0`
-        with an EMPTY `Output`. The caller denies on a non-zero exit code OR on
-        non-empty output, so any success chatter here would deny a passing
-        validation (defect D-2).
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]] $ValidatorArgs
-    )
-
-    $modulePath = Join-Path -Path $PSScriptRoot `
-        -ChildPath '../lib/discovery-validation/DiscoveryValidation.psm1'
-    if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
-        return @{ ExitCode = 1; Output = "Discovery-validation module not found: $modulePath" }
-    }
-
-    Import-Module -Name $modulePath -Force -ErrorAction Stop
-    return Invoke-DiscoveryArtifactValidation -ValidatorArgs $ValidatorArgs
-}
-
-function Get-DiscoveryArtifactType {
-    <#
-    .SYNOPSIS
-        Maps a normalized file path to a discovery-artifact-type token.
-    .DESCRIPTION
-        Returns one of the eight validator subcommand tokens (profile,
-        feature-contract, coverage-ledger, runtime-scenario, parity-matrix,
-        unspecified-behavior, product-decision, evidence-reference), or $null
-        when the path does not resolve to a recognized discovery-artifact
-        type.
-
-        # TODO(#9002): this is a narrow, replaceable directory/filename lookup.
-        The schema-versioned directory/filename convention this mapping
-        depends on is owned by #9002 and is not finalized in this branch.
-        Replace this lookup once #9002 ships its versioning convention.
+        Returns the SHA-256 of this handler's own bytes for the authorization writer record.
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $Path
-    )
+    param([Parameter(Mandatory = $false)][AllowNull()][string]$HandlerPath = $script:DiscoveryGateHandlerPath)
 
-    $normalized = $Path -replace '\\', '/'
-
-    $typeMap = [ordered]@{
-        'discovery/profile'              = 'profile'
-        'discovery/feature-contract'     = 'feature-contract'
-        'discovery/coverage-ledger'      = 'coverage-ledger'
-        'discovery/runtime-scenario'     = 'runtime-scenario'
-        'discovery/parity-matrix'        = 'parity-matrix'
-        'discovery/unspecified-behavior' = 'unspecified-behavior'
-        'discovery/product-decision'     = 'product-decision'
-        'discovery/evidence-reference'   = 'evidence-reference'
+    if ([string]::IsNullOrEmpty($HandlerPath) -or -not (Test-Path -LiteralPath $HandlerPath -PathType Leaf)) {
+        return ('0' * 64)
     }
-
-    foreach ($prefix in $typeMap.Keys) {
-        if ($normalized -match "(^|/)$([regex]::Escape($prefix))") {
-            return $typeMap[$prefix]
-        }
-    }
-
-    return $null
-}
-
-function Get-RequiredDiscoveryArtifactDeclaration {
-    <#
-    .SYNOPSIS
-        Reads the domain-profile required-artifact declaration, if present.
-    .DESCRIPTION
-        # TODO(#9001): this is a narrow, injectable RequiredArtifactPathsReader
-        seam. The discovery-workspace root and which of the eight artifact
-        types are "required" for a given gate are domain-profile runtime
-        configuration owned by #9001, which has no shipped parser/schema in
-        this branch.
-
-        Default behavior on absence is documented inline as fail-open (allow):
-        when no domain profile is present, this function returns an object
-        with Present = $false, and callers must treat that as "always allow,
-        never invoke the validator" rather than as an error.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $false)]
-        [scriptblock] $ProfileReader = { $null }
-    )
-
-    $declaration = & $ProfileReader
-    if ($null -eq $declaration) {
-        # Fail open: no domain profile / required-artifact declaration present.
-        return @{ Present = $false }
-    }
-
-    return @{ Present = $true; Declaration = $declaration }
+    return Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes($HandlerPath))
 }
 
 function Invoke-DiscoveryArtifactGateDecision {
     <#
     .SYNOPSIS
-        Parses the PreToolUse envelope and returns an allow-or-deny decision for a
-        discovery-artifact completion gate.
+        Parses the PreToolUse envelope and returns the allow-or-deny decision for a discovery agent.
+    .DESCRIPTION
+        Every seam defaults to the real host (platform state roots, protected
+        store, clock, nonce) and is injectable so tests run over in-memory values.
+        A recorded dependency failure denies before the envelope is read.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
-        [string] $ToolInputRaw,
-
-        [Parameter(Mandatory = $false)]
-        [scriptblock] $RequiredArtifactReader = { Get-RequiredDiscoveryArtifactDeclaration }
+        [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$ToolInputRaw,
+        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][nullable[datetime]]$Now = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Nonce = $null
     )
-    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix $script:DiscoveryGateReasonPrefix
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
-    if (-not $envelope.IsValid) {
-        return [ordered]@{
-            hookSpecificOutput = [ordered]@{
-                hookEventName            = 'PreToolUse'
-                permissionDecision       = 'deny'
-                permissionDecisionReason = 'DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly - ' +
-                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
-                '. The gate fails closed on an envelope it cannot read.'
-            }
-        }
-    }
+    # Seams resolve only after the dependency check so a missing module denies
+    # instead of raising while a default is evaluated.
+    if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
+    if ($null -eq $Store) { $Store = Get-DiscoveryDefaultStore }
+    if ($null -eq $Now) { $Now = [datetime]::UtcNow }
+    if ([string]::IsNullOrEmpty($Nonce)) { $Nonce = Get-DiscoveryAuthorizationNonce }
 
-    $toolInput = $envelope.Value
-    $filePath = Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'file_path'
-    if (-not $filePath) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
-    }
-
-    # Edit calls supply only old_string/new_string (a partial patch), not full
-    # file content. They are allowed unconditionally; the SubagentStop gate is
-    # the authoritative backstop for artifacts touched by Edit.
-    $toolInputProps = @($toolInput.PSObject.Properties.Name)
-    $hasContent = $toolInputProps -contains 'content' -and $null -ne $toolInput.content
-    if (-not $hasContent) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
-    }
-
-    $artifactType = Get-DiscoveryArtifactType -Path $filePath
-    if (-not $artifactType) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
-    }
-    if ($script:DiscoveryValidationImportFailure) { return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = "DISCOVERY_ARTIFACT_GATE_BLOCKED: the validation module '$($script:DiscoveryValidationImportFailure)' failed to load, so the $artifactType artifact cannot be validated; the gate fails closed." } } }
-
-    $requiredDeclaration = & $RequiredArtifactReader
-    if (-not $requiredDeclaration.Present) {
-        # Fail open: no domain profile / required-artifact declaration present.
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
-    }
-
-    $result = Invoke-DiscoveryValidatorExe -ValidatorArgs @($artifactType, $filePath)
-    $hasErrorOutput = -not [string]::IsNullOrWhiteSpace($result.Output)
-    if ($result.ExitCode -ne 0 -or $hasErrorOutput) {
-        $reason = "DISCOVERY_ARTIFACT_GATE_BLOCKED: $($result.Output)"
-        return [ordered]@{
-            hookSpecificOutput = [ordered]@{
-                hookEventName            = 'PreToolUse'
-                permissionDecision       = 'deny'
-                permissionDecisionReason = $reason
-            }
-        }
-    }
-
-    return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName 'claude-code' -Text $ToolInputRaw
+    $outcome = Get-DiscoveryPreToolDecision -Normalized $normalized -HostEnvironment $HostEnvironment `
+        -HandlerSha256 (Get-DiscoveryGateHandlerSha256) -Store $Store -Now $Now -Nonce $Nonce
+    return ConvertTo-DiscoveryPreToolHookOutput -Outcome $outcome -ReasonPrefix $script:DiscoveryGateReasonPrefix
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.

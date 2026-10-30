@@ -1,24 +1,21 @@
 Set-StrictMode -Version Latest
 
-# Structural test for the four legacy-discovery agent personas (#365, epic child #9007).
+# Structural test for the four legacy-discovery agent personas (#365, #980).
 #
-# This test verifies the four domain-neutral persona definitions under `.claude/agents/`
-# against repository conventions and the epic-wide naming-collision and domain-neutrality
-# invariants. Following the `test-name-uniqueness.Tests.ps1` precedent, reusable detection
-# helpers (frontmatter extraction, field presence, banned-substring scan, body-content
-# reference scan, slug-collision check) are defined in `BeforeAll` and exercised with
-# in-memory positive and negative fixtures, so the detection logic is proven independently of
-# the repository files. The same helpers then run over the four real persona files.
+# Issue #980 made `.github/agents/<role>.agent.md` the canonical contract for the four
+# constrained specialist roles. The Claude personas under `.claude/agents/` are generated
+# from those contracts: the body is copied verbatim and each Copilot tool identifier
+# `drmcopilotextension/<operation>` becomes the Claude MCP identifier
+# `mcp__drm-copilot__<operation>`. The personas declare no model, because the existing
+# resolver selects the exact deployment, and no general Write/Edit/Bash grant.
 #
-# The seven assertions mirror the spec's `## Structural Test` section:
-#   1. Existence            4. Model membership       7. AC4 body-content references
-#   2. Frontmatter validity 5. Naming non-collision
-#   3. Name equals slug     6. Banned-substring scan
+# Following the `test-name-uniqueness.Tests.ps1` precedent, reusable detection helpers are
+# defined in `BeforeAll` and exercised against in-memory fixtures before running over the
+# real persona files. No temporary files are created.
 
 BeforeAll {
-    # Resolve the repository root by walking up from this file's own location until a directory
-    # containing a `.claude` folder is found. This keeps resolution CWD-independent so the suite
-    # behaves identically in the terminal and the VS Code Test Explorer.
+    # Walk up from this file to the directory containing `.claude` so resolution is
+    # CWD-independent in the terminal and the VS Code Test Explorer.
     $script:RepoRoot = $PSScriptRoot
     while ($null -ne $script:RepoRoot -and
         -not (Test-Path -Path (Join-Path -Path $script:RepoRoot -ChildPath '.claude') -PathType Container)) {
@@ -28,8 +25,10 @@ BeforeAll {
         throw "Unable to resolve the repository root by walking up from '$PSScriptRoot'."
     }
     $script:AgentsDir = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'agents'
+    $script:CanonicalDir = Join-Path -Path $script:RepoRoot -ChildPath '.github' -AdditionalChildPath 'agents'
+    $script:BundleAgentsDir = Join-Path -Path $script:RepoRoot -ChildPath 'extensions' -AdditionalChildPath `
+        'drm-copilot', 'resources', 'claude-customizations', '.claude', 'agents'
 
-    # The four expected persona slugs.
     $script:ExpectedSlugs = @(
         'legacy-parity-analyst',
         'runtime-characterization-analyst',
@@ -39,42 +38,31 @@ BeforeAll {
 
     # The `code-modernization` plugin agent names; the four slugs must be disjoint from this set.
     $script:PluginAgentNames = @(
-        'legacy-analyst',
-        'business-rules-extractor',
-        'architecture-critic',
-        'scaffolder',
-        'security-auditor',
-        'test-engineer',
-        'version-delta-analyst'
+        'legacy-analyst', 'business-rules-extractor', 'architecture-critic', 'scaffolder',
+        'security-auditor', 'test-engineer', 'version-delta-analyst'
     )
 
     # Banned domain-specific substrings (case-insensitive). Any hit is a Blocking failure.
-    $script:BannedSubstrings = @(
-        'taskmaster',
-        'tmw',
-        'outlook',
-        'vsto',
-        'email',
-        'task-management',
-        'task management'
-    )
+    $script:BannedSubstrings = @('taskmaster', 'tmw', 'outlook', 'vsto', 'email', 'task-management', 'task management')
 
-    # Required body-content references per persona: consumed schema(s), produced schema, and the
-    # literal phrase 'domain profile'. Confirmed against the spec Per-Persona Design section.
+    # Required body references per persona: owned artifact kinds, the validated profile, and
+    # the shared finalize operation. Confirmed against the canonical `.github/agents` contracts.
     $script:RequiredReferences = @{
-        'legacy-parity-analyst'            = @('Feature Contract', 'Parity Matrix', 'Evidence Reference', 'domain profile')
-        'runtime-characterization-analyst' = @('Runtime Characterization Scenario', 'Evidence Reference', 'Feature Contract', 'domain profile')
-        'requirements-reconciler'          = @('Unspecified Behavior Record', 'Product Decision Record', 'Evidence Reference', 'Feature Contract', 'domain profile')
-        'migration-coverage-reviewer'      = @('Coverage Ledger', 'Feature Contract', 'Evidence Reference', 'domain profile')
+        'legacy-parity-analyst'            = @('inventory-snapshot', 'coverage-ledger', 'feature-contract',
+            'evidence-reference', 'required-output-manifest', 'validated profile', 'finalize_discovery_agent')
+        'runtime-characterization-analyst' = @('runtime-characterization-scenario', 'evidence-reference',
+            'evidence-payload', 'required-output-manifest', 'validated profile', 'finalize_discovery_agent')
+        'requirements-reconciler'          = @('parity-matrix', 'product-decision', 'acceptance-specification',
+            'unspecified-behavior', 'required-output-manifest', 'validated profile', 'finalize_discovery_agent')
+        'migration-coverage-reviewer'      = @('coverage-report', 'parity-report', 'completion-report',
+            'validation-report', 'required-output-manifest', 'validated profile', 'finalize_discovery_agent')
     }
 
-    <#
-    .SYNOPSIS
-        Extracts the `---`-delimited YAML frontmatter block from a persona document.
-    .OUTPUTS
-        [string] the frontmatter body, or $null when no delimited block is present.
-    #>
+    # Parity ownership: only the reconciler may list the parity-matrix output row.
+    $script:ParityRowPattern = '(?m)^\| parity-matrix \|'
+
     function Get-FrontmatterBlock {
+        <# Extracts the `---`-delimited YAML frontmatter block, or $null when absent. #>
         param([Parameter(Mandatory = $true)][string]$Content)
 
         if ($Content -match '(?s)\A\s*---\r?\n(.*?)\r?\n---\r?\n') {
@@ -83,13 +71,8 @@ BeforeAll {
         return $null
     }
 
-    <#
-    .SYNOPSIS
-        Returns the document body that follows the frontmatter block.
-    .OUTPUTS
-        [string] the body text, or the whole content when no frontmatter is present.
-    #>
     function Get-BodyText {
+        <# Returns the document body after the frontmatter, or the whole content when absent. #>
         param([Parameter(Mandatory = $true)][string]$Content)
 
         if ($Content -match '(?s)\A\s*---\r?\n.*?\r?\n---\r?\n(.*)\z') {
@@ -98,16 +81,11 @@ BeforeAll {
         return $Content
     }
 
-    <#
-    .SYNOPSIS
-        Returns the list of required frontmatter fields that are absent from a frontmatter block.
-    .OUTPUTS
-        [System.Collections.Generic.List[string]] of missing field names (empty when all present).
-    #>
     function Get-MissingFrontmatterField {
+        <# Returns the required frontmatter fields (name, description, tools, memory) that are absent. #>
         param([Parameter(Mandatory = $true)][AllowEmptyString()][AllowNull()][string]$Frontmatter)
 
-        $required = @('name', 'description', 'model', 'tools', 'memory')
+        $required = @('name', 'description', 'tools', 'memory')
         $missing = [System.Collections.Generic.List[string]]::new()
         if ([string]::IsNullOrWhiteSpace($Frontmatter)) {
             foreach ($field in $required) { $missing.Add($field) }
@@ -121,13 +99,8 @@ BeforeAll {
         return $missing
     }
 
-    <#
-    .SYNOPSIS
-        Extracts a single-line scalar frontmatter field value.
-    .OUTPUTS
-        [string] the trimmed value, or $null when the field is absent or not scalar.
-    #>
     function Get-FrontmatterScalar {
+        <# Extracts a single-line scalar frontmatter value, or $null when absent. #>
         param(
             [Parameter(Mandatory = $true)][string]$Frontmatter,
             [Parameter(Mandatory = $true)][string]$Field
@@ -139,13 +112,25 @@ BeforeAll {
         return $null
     }
 
-    <#
-    .SYNOPSIS
-        Case-insensitive banned-substring scan over arbitrary text.
-    .OUTPUTS
-        [System.Collections.Generic.List[string]] of matched banned substrings (empty when clean).
-    #>
+    function Get-FrontmatterToolList {
+        <# Returns the `tools:` list items of a frontmatter block, quotes stripped. #>
+        param([Parameter(Mandatory = $true)][string]$Frontmatter)
+
+        $tools = [System.Collections.Generic.List[string]]::new()
+        $inTools = $false
+        foreach ($line in $Frontmatter -split "`r?`n") {
+            # The list runs from the `tools:` key to the next top-level key.
+            if ($line -match '^tools\s*:') { $inTools = $true; continue }
+            if ($inTools -and $line -match '^\S') { break }
+            if ($inTools -and $line -match '^\s+-\s*(.+?)\s*$') {
+                $tools.Add($Matches[1].Trim('"', "'"))
+            }
+        }
+        return $tools
+    }
+
     function Find-BannedSubstring {
+        <# Case-insensitive banned-substring scan; returns the matched terms. #>
         param(
             [Parameter(Mandatory = $true)][string]$Text,
             [Parameter(Mandatory = $true)][string[]]$Banned
@@ -154,20 +139,13 @@ BeforeAll {
         $lower = $Text.ToLowerInvariant()
         $hits = [System.Collections.Generic.List[string]]::new()
         foreach ($term in $Banned) {
-            if ($lower.Contains($term.ToLowerInvariant())) {
-                $hits.Add($term)
-            }
+            if ($lower.Contains($term.ToLowerInvariant())) { $hits.Add($term) }
         }
         return $hits
     }
 
-    <#
-    .SYNOPSIS
-        Returns the list of required reference tokens absent from a persona body.
-    .OUTPUTS
-        [System.Collections.Generic.List[string]] of missing tokens (empty when all present).
-    #>
     function Get-MissingReference {
+        <# Returns the required reference tokens absent from a persona body. #>
         param(
             [Parameter(Mandatory = $true)][string]$Body,
             [Parameter(Mandatory = $true)][string[]]$Required
@@ -175,20 +153,13 @@ BeforeAll {
 
         $missing = [System.Collections.Generic.List[string]]::new()
         foreach ($token in $Required) {
-            if ($Body -notmatch [regex]::Escape($token)) {
-                $missing.Add($token)
-            }
+            if ($Body -notmatch [regex]::Escape($token)) { $missing.Add($token) }
         }
         return $missing
     }
 
-    <#
-    .SYNOPSIS
-        Reports whether a slug is present in a candidate name set (collision check).
-    .OUTPUTS
-        [bool] $true when the slug collides with a member of the set.
-    #>
     function Test-SlugCollision {
+        <# Reports whether a slug is present in a candidate name set. #>
         param(
             [Parameter(Mandatory = $true)][string]$Slug,
             [Parameter(Mandatory = $true)][string[]]$NameSet
@@ -197,82 +168,80 @@ BeforeAll {
         return ($NameSet -contains $Slug)
     }
 
+    function Test-ConstrainedToolList {
+        <# True when every tool is a drm-copilot MCP identifier and none is a general grant. #>
+        param([Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]]$Tools)
+
+        if ($Tools.Count -eq 0) { return $false }
+        foreach ($tool in $Tools) {
+            if ($tool -notmatch '^mcp__drm-copilot__[a-z_]+$') { return $false }
+        }
+        return $true
+    }
+
+    function ConvertTo-ExpectedClaudeFrontmatter {
+        <# Applies the generation rewrite to a canonical frontmatter block. #>
+        param([Parameter(Mandatory = $true)][string]$CanonicalFrontmatter)
+
+        return [regex]::Replace(
+            $CanonicalFrontmatter,
+            '(?m)^  - drmcopilotextension/([A-Za-z0-9_]+)$',
+            '  - "mcp__drm-copilot__$1"')
+    }
+
+    function Get-PersonaContent {
+        <# Reads one real persona file as raw text. #>
+        param([Parameter(Mandatory = $true)][string]$Slug)
+
+        return Get-Content -Path (Join-Path -Path $script:AgentsDir -ChildPath "$Slug.md") -Raw
+    }
+
     # ---- In-memory fixtures (no temporary files, per general-unit-test policy) ----
 
-    # Positive fixture: a compliant synthetic persona.
     $script:PositiveFixture = @'
 ---
 name: sample-analyst
 description: Domain-neutral sample persona used only for fixture testing.
-model: sonnet
 tools:
-  - Read
-  - Grep
-  - Glob
-  - "Write(discovery/**)"
+  - "mcp__drm-copilot__read_discovery_source"
+  - "mcp__drm-copilot__finalize_discovery_agent"
 memory: project
 ---
 
 # Sample Analyst
 
-Schemas consumed: Feature Contract, Parity Matrix, Evidence Reference.
-Schema produced: Parity Matrix.
-Reads the domain profile to obtain domain specificity.
+| Artifact kind | Profile key | Selection |
+| --- | --- | --- |
+| coverage-ledger | coverage_ledger | Selected component members |
+| required-output-manifest | reports | Exact invocation manifest |
+
+Derive facts from the validated profile and call `finalize_discovery_agent`.
 '@
 
-    # Negative fixture (a): contains a banned domain-specific substring in the body.
     $script:BannedFixture = @'
 ---
 name: sample-analyst
 description: Synthetic persona used only to exercise the banned-substring scan.
-model: sonnet
 tools:
-  - Read
-  - Grep
-  - Glob
-  - "Write(discovery/**)"
+  - "mcp__drm-copilot__read_discovery_source"
 memory: project
 ---
-
-# Sample Analyst
 
 This body references Outlook behavior, which is a domain-specific leak and must be flagged.
 '@
 
-    # Negative fixture (b): a slug that collides with a plugin agent name.
     $script:CollidingFixtureSlug = 'legacy-analyst'
 
-    # Negative fixture (c): a body missing the required schema and domain-profile references.
-    $script:MissingReferencesFixture = @'
+    $script:BroadGrantFixture = @'
 ---
 name: sample-analyst
-description: Synthetic persona whose body omits the required references.
+description: Synthetic persona that retains a superseded general write grant.
 model: sonnet
 tools:
   - Read
-  - Grep
-  - Glob
   - "Write(discovery/**)"
 memory: project
 ---
-
-# Sample Analyst
-
-This body describes a role in the abstract but names no consumed schema, no produced schema,
-and no profile.
-'@
-
-    # Negative fixture (d): frontmatter missing the required `model` field.
-    $script:MissingFieldFixture = @'
----
-name: sample-analyst
-description: Synthetic persona whose frontmatter omits the model field.
-tools:
-  - Read
-memory: project
----
-
-# Sample Analyst
 
 Body text.
 '@
@@ -281,204 +250,158 @@ Body text.
 Describe "legacy-discovery-agent-roles structural test" {
 
     Context "detection logic (in-memory fixtures)" {
-        It "extracts frontmatter and reports all required fields present in the positive fixture" {
+        It "reports all required fields present and extracts the MCP tool list from the positive fixture" {
             # Arrange / Act
             $frontmatter = Get-FrontmatterBlock -Content $script:PositiveFixture
             $missing = Get-MissingFrontmatterField -Frontmatter $frontmatter
+            $tools = Get-FrontmatterToolList -Frontmatter $frontmatter
 
             # Assert
             $frontmatter | Should -Not -BeNullOrEmpty
             $missing.Count | Should -Be 0
+            $tools.Count | Should -Be 2
+            (Test-ConstrainedToolList -Tools $tools) | Should -BeTrue
+            (Get-FrontmatterScalar -Frontmatter $frontmatter -Field 'model') | Should -BeNullOrEmpty
         }
 
-        It "flags a missing frontmatter field in the negative fixture" {
+        It "rejects a general write grant and a hardcoded model in the broad-grant fixture" {
             # Arrange / Act
-            $frontmatter = Get-FrontmatterBlock -Content $script:MissingFieldFixture
-            $missing = Get-MissingFrontmatterField -Frontmatter $frontmatter
+            $frontmatter = Get-FrontmatterBlock -Content $script:BroadGrantFixture
+            $tools = Get-FrontmatterToolList -Frontmatter $frontmatter
 
             # Assert
-            $missing | Should -Contain 'model'
+            (Test-ConstrainedToolList -Tools $tools) | Should -BeFalse
+            (Get-FrontmatterScalar -Frontmatter $frontmatter -Field 'model') | Should -Be 'sonnet'
         }
 
-        It "detects a banned substring in the banned negative fixture" {
+        It "detects a banned substring in the banned fixture and none in the positive fixture" {
             # Arrange / Act
             $hits = Find-BannedSubstring -Text $script:BannedFixture -Banned $script:BannedSubstrings
+            $clean = Find-BannedSubstring -Text $script:PositiveFixture -Banned $script:BannedSubstrings
 
             # Assert
-            $hits.Count | Should -BeGreaterThan 0
             $hits | Should -Contain 'outlook'
+            $clean.Count | Should -Be 0
         }
 
-        It "reports no banned substring in the positive fixture" {
-            # Arrange / Act
-            $hits = Find-BannedSubstring -Text $script:PositiveFixture -Banned $script:BannedSubstrings
-
-            # Assert
-            $hits.Count | Should -Be 0
+        It "detects a colliding slug and accepts a distinct slug against the plugin name set" {
+            (Test-SlugCollision -Slug $script:CollidingFixtureSlug -NameSet $script:PluginAgentNames) | Should -BeTrue
+            (Test-SlugCollision -Slug 'legacy-parity-analyst' -NameSet $script:PluginAgentNames) | Should -BeFalse
         }
 
-        It "detects a colliding slug against the plugin name set" {
-            # Arrange / Act / Assert
-            (Test-SlugCollision -Slug $script:CollidingFixtureSlug -NameSet $script:PluginAgentNames) |
-                Should -BeTrue
-        }
-
-        It "reports no collision for a distinct slug against the plugin name set" {
-            # Arrange / Act / Assert
-            (Test-SlugCollision -Slug 'legacy-parity-analyst' -NameSet $script:PluginAgentNames) |
-                Should -BeFalse
-        }
-
-        It "flags missing body-content references in the missing-references negative fixture" {
-            # Arrange
-            $body = Get-BodyText -Content $script:MissingReferencesFixture
-            $required = @('Feature Contract', 'Parity Matrix', 'Evidence Reference', 'domain profile')
-
-            # Act
-            $missing = Get-MissingReference -Body $body -Required $required
-
-            # Assert
-            $missing.Count | Should -BeGreaterThan 0
-        }
-
-        It "reports no missing body-content references in the positive fixture" {
+        It "reports missing and present body references against the positive fixture" {
             # Arrange
             $body = Get-BodyText -Content $script:PositiveFixture
-            $required = @('Feature Contract', 'Parity Matrix', 'Evidence Reference', 'domain profile')
 
             # Act
-            $missing = Get-MissingReference -Body $body -Required $required
+            $missing = Get-MissingReference -Body $body -Required @('coverage-ledger', 'parity-matrix')
+            $present = Get-MissingReference -Body $body -Required @('coverage-ledger', 'validated profile')
 
             # Assert
-            $missing.Count | Should -Be 0
+            $missing | Should -Be @('parity-matrix')
+            $present.Count | Should -Be 0
+        }
+
+        It "rewrites a Copilot tool identifier to the Claude MCP identifier" {
+            $canonical = "name: x`ntools:`n  - drmcopilotextension/read_discovery_source`nmemory: project"
+            $expected = "name: x`ntools:`n  - `"mcp__drm-copilot__read_discovery_source`"`nmemory: project"
+
+            (ConvertTo-ExpectedClaudeFrontmatter -CanonicalFrontmatter $canonical) | Should -BeExactly $expected
         }
     }
 
     Context "real persona files" {
-        It "assertion 1 - each of the four persona files exists" {
-            # Arrange
-            $missingFiles = [System.Collections.Generic.List[string]]::new()
-
-            # Act
+        It "assertion 1 - each of the four persona files exists with a canonical source and bundle mirror" {
             foreach ($slug in $script:ExpectedSlugs) {
-                $path = Join-Path -Path $script:AgentsDir -ChildPath "$slug.md"
-                if (-not (Test-Path -Path $path -PathType Leaf)) {
-                    $missingFiles.Add($slug)
-                }
+                (Join-Path -Path $script:AgentsDir -ChildPath "$slug.md") | Should -Exist
+                (Join-Path -Path $script:CanonicalDir -ChildPath "$slug.agent.md") | Should -Exist
+                (Join-Path -Path $script:BundleAgentsDir -ChildPath "$slug.md") | Should -Exist
             }
-
-            # Assert
-            $missingFiles.Count | Should -Be 0 -Because ("missing: " + ($missingFiles -join ', '))
         }
 
-        It "assertion 2 - each persona declares all required frontmatter fields" {
-            # Arrange
+        It "assertion 2 - each persona declares name, description, tools and memory" {
             $failures = [System.Collections.Generic.List[string]]::new()
-
-            # Act
             foreach ($slug in $script:ExpectedSlugs) {
-                $content = Get-Content -Path (Join-Path -Path $script:AgentsDir -ChildPath "$slug.md") -Raw
-                $frontmatter = Get-FrontmatterBlock -Content $content
-                $missing = Get-MissingFrontmatterField -Frontmatter $frontmatter
-                if ($missing.Count -gt 0) {
-                    $failures.Add("$slug missing: $($missing -join ', ')")
-                }
+                $missing = Get-MissingFrontmatterField -Frontmatter (Get-FrontmatterBlock -Content (Get-PersonaContent -Slug $slug))
+                if ($missing.Count -gt 0) { $failures.Add("$slug missing: $($missing -join ', ')") }
             }
-
-            # Assert
             $failures.Count | Should -Be 0 -Because ($failures -join '; ')
         }
 
         It "assertion 3 - each persona name equals its slug and file basename" {
-            # Arrange
             $failures = [System.Collections.Generic.List[string]]::new()
-
-            # Act
             foreach ($slug in $script:ExpectedSlugs) {
-                $content = Get-Content -Path (Join-Path -Path $script:AgentsDir -ChildPath "$slug.md") -Raw
-                $frontmatter = Get-FrontmatterBlock -Content $content
-                $name = Get-FrontmatterScalar -Frontmatter $frontmatter -Field 'name'
-                if ($name -ne $slug) {
-                    $failures.Add("$slug name='$name'")
-                }
+                $name = Get-FrontmatterScalar -Frontmatter (Get-FrontmatterBlock -Content (Get-PersonaContent -Slug $slug)) -Field 'name'
+                if ($name -ne $slug) { $failures.Add("$slug name='$name'") }
             }
-
-            # Assert
             $failures.Count | Should -Be 0 -Because ($failures -join '; ')
         }
 
-        It "assertion 4 - each persona model is one of haiku, sonnet, or opus" {
-            # Arrange
-            $allowed = @('haiku', 'sonnet', 'opus')
+        It "assertion 4 - each persona declares no model override and only drm-copilot MCP tools" {
             $failures = [System.Collections.Generic.List[string]]::new()
-
-            # Act
             foreach ($slug in $script:ExpectedSlugs) {
-                $content = Get-Content -Path (Join-Path -Path $script:AgentsDir -ChildPath "$slug.md") -Raw
-                $frontmatter = Get-FrontmatterBlock -Content $content
-                $model = Get-FrontmatterScalar -Frontmatter $frontmatter -Field 'model'
-                if ($allowed -notcontains $model) {
-                    $failures.Add("$slug model='$model'")
+                $frontmatter = Get-FrontmatterBlock -Content (Get-PersonaContent -Slug $slug)
+                $tools = Get-FrontmatterToolList -Frontmatter $frontmatter
+                if ($null -ne (Get-FrontmatterScalar -Frontmatter $frontmatter -Field 'model')) {
+                    $failures.Add("$slug declares a model override")
+                }
+                if (-not (Test-ConstrainedToolList -Tools $tools)) {
+                    $failures.Add("$slug tools: $($tools -join ', ')")
+                }
+                foreach ($required in @('mcp__drm-copilot__read_discovery_source', 'mcp__drm-copilot__finalize_discovery_agent')) {
+                    if ($tools -notcontains $required) { $failures.Add("$slug lacks $required") }
                 }
             }
-
-            # Assert
             $failures.Count | Should -Be 0 -Because ($failures -join '; ')
         }
 
         It "assertion 5 - the four slugs collide with neither the plugin set nor other agent basenames" {
-            # Arrange: other existing agent basenames, excluding the four expected slugs.
             $allBasenames = @((Get-ChildItem -Path $script:AgentsDir -Filter '*.md' -File).BaseName)
             $otherBasenames = @($allBasenames | Where-Object { $script:ExpectedSlugs -notcontains $_ })
             $failures = [System.Collections.Generic.List[string]]::new()
-
-            # Act
             foreach ($slug in $script:ExpectedSlugs) {
-                if (Test-SlugCollision -Slug $slug -NameSet $script:PluginAgentNames) {
-                    $failures.Add("$slug collides with plugin set")
-                }
-                if (Test-SlugCollision -Slug $slug -NameSet $otherBasenames) {
-                    $failures.Add("$slug collides with an existing agent basename")
-                }
+                if (Test-SlugCollision -Slug $slug -NameSet $script:PluginAgentNames) { $failures.Add("$slug collides with plugin set") }
+                if (Test-SlugCollision -Slug $slug -NameSet $otherBasenames) { $failures.Add("$slug collides with an existing agent basename") }
             }
-
-            # Assert
             $failures.Count | Should -Be 0 -Because ($failures -join '; ')
         }
 
         It "assertion 6 - each persona full text contains no banned domain-specific substring" {
-            # Arrange
             $failures = [System.Collections.Generic.List[string]]::new()
-
-            # Act
             foreach ($slug in $script:ExpectedSlugs) {
-                $content = Get-Content -Path (Join-Path -Path $script:AgentsDir -ChildPath "$slug.md") -Raw
-                $hits = Find-BannedSubstring -Text $content -Banned $script:BannedSubstrings
-                if ($hits.Count -gt 0) {
-                    $failures.Add("$slug hits: $($hits -join ', ')")
-                }
+                $hits = Find-BannedSubstring -Text (Get-PersonaContent -Slug $slug) -Banned $script:BannedSubstrings
+                if ($hits.Count -gt 0) { $failures.Add("$slug hits: $($hits -join ', ')") }
             }
-
-            # Assert
             $failures.Count | Should -Be 0 -Because ($failures -join '; ')
         }
 
-        It "assertion 7 - each persona body names its consumed schemas, produced schema, and the domain profile" {
-            # Arrange
+        It "assertion 7 - each persona body names its owned artifact kinds, the validated profile and finalize" {
             $failures = [System.Collections.Generic.List[string]]::new()
-
-            # Act
             foreach ($slug in $script:ExpectedSlugs) {
-                $content = Get-Content -Path (Join-Path -Path $script:AgentsDir -ChildPath "$slug.md") -Raw
-                $body = Get-BodyText -Content $content
-                $required = $script:RequiredReferences[$slug]
-                $missing = Get-MissingReference -Body $body -Required $required
-                if ($missing.Count -gt 0) {
-                    $failures.Add("$slug missing: $($missing -join ', ')")
-                }
+                $missing = Get-MissingReference -Body (Get-BodyText -Content (Get-PersonaContent -Slug $slug)) -Required $script:RequiredReferences[$slug]
+                if ($missing.Count -gt 0) { $failures.Add("$slug missing: $($missing -join ', ')") }
             }
+            $failures.Count | Should -Be 0 -Because ($failures -join '; ')
+        }
 
-            # Assert
+        It "assertion 8 - parity-matrix output is owned by the reconciler, not the legacy analyst" {
+            (Get-BodyText -Content (Get-PersonaContent -Slug 'requirements-reconciler')) | Should -Match $script:ParityRowPattern
+            (Get-BodyText -Content (Get-PersonaContent -Slug 'legacy-parity-analyst')) | Should -Not -Match $script:ParityRowPattern
+            (Get-BodyText -Content (Get-PersonaContent -Slug 'legacy-parity-analyst')) | Should -Match 'parity reconciliation belongs to the Requirements Reconciler'
+        }
+
+        It "assertion 9 - each persona is the generated rewrite of its canonical contract and is mirrored byte-identically" {
+            $failures = [System.Collections.Generic.List[string]]::new()
+            foreach ($slug in $script:ExpectedSlugs) {
+                $content = Get-PersonaContent -Slug $slug
+                $canonical = Get-Content -Path (Join-Path -Path $script:CanonicalDir -ChildPath "$slug.agent.md") -Raw
+                $expectedFrontmatter = ConvertTo-ExpectedClaudeFrontmatter -CanonicalFrontmatter (Get-FrontmatterBlock -Content $canonical)
+                if ((Get-FrontmatterBlock -Content $content) -cne $expectedFrontmatter) { $failures.Add("$slug frontmatter differs from the canonical rewrite") }
+                if ((Get-BodyText -Content $content) -cne (Get-BodyText -Content $canonical)) { $failures.Add("$slug body differs from the canonical contract") }
+                if ($content -match 'drmcopilotextension' -or $content -match 'Write\(') { $failures.Add("$slug retains an untranslated or broad grant") }
+                $bundled = Get-Content -Path (Join-Path -Path $script:BundleAgentsDir -ChildPath "$slug.md") -Raw
+                if ($bundled -cne $content) { $failures.Add("$slug bundle mirror differs") }
+            }
             $failures.Count | Should -Be 0 -Because ($failures -join '; ')
         }
     }

@@ -1,0 +1,35 @@
+{
+  "batch": "first-behavior",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T08:51:50.192271+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-first-behavior-lint-085150.2026-10-19T08-51.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-first-behavior-lint-085150.2026-10-19T08-51.stdout.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "seconds": 0.105541,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "c06165dd2406dbafac1bc37544075a60a6637689204f879b9cb2001b9ee92a30",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "c06165dd2406dbafac1bc37544075a60a6637689204f879b9cb2001b9ee92a30",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T08:51:50.086730+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-51"
+}

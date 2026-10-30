@@ -1,0 +1,47 @@
+"""Preserve the fresh restart and stage-7 authority without rewriting prior proof."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+state = json.loads(Path('artifacts/orchestration/orchestrator-state.json').read_bytes())
+
+
+def routes(value):
+    """Select the exact persisted delegation receipt without checkpoint mutation."""
+    if isinstance(value, dict):
+        if value.get('delegation_id') == 'workspace_operations_p4t9_final_gates_restart':
+            yield value
+        for item in value.values():
+            yield from routes(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from routes(item)
+
+
+route = next(routes(state))
+profile = Path(route['profile_path'])
+assert hashlib.sha256(profile.read_bytes()).hexdigest() == route['profile_sha256']
+attestation = Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.f50a381e7b3554fe77176b5c0429a53b56579adb36427614259db5bc6770a5d6.json'
+native = json.loads(attestation.read_bytes())
+assert all(native[key] for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+assert native['actual_model'] == route['model'] and native['actual_reasoning_effort'] == route['model_reasoning_effort']
+assert native['profile_sha256'] == route['profile_sha256']
+candidate = qa / 'p4t9-final-restart-preparation.2026-10-19T14-10.json'
+value = {'task': 'P4-T9', 'timestamp': stamp, 'command': '.venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-release.py',
+    'exit_code': 0, 'authority': route, 'native_attestation_sha256': hashlib.sha256(attestation.read_bytes()).hexdigest(),
+    'native_recorded_at': native['recorded_at'], 'native_validations': {key: native[key] for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid')},
+    'candidate': {'path': candidate.as_posix(), 'sha256': hashlib.sha256(candidate.read_bytes()).hexdigest()},
+    'released_stages': [1, 2, 3, 4, 5, 6, 7],
+    'native_authorization': 'Coordinator explicitly authorized the prepared 20-assertion stage after readiness 079084796a7f28fd7f3adc664ef217655f18575647022d1a15affb6d7f24ff4e; execution follows successful stages 1-6.',
+    'qualification': 'The already-running candidate retains its original final-gate route. This supplemental receipt records the fresh same-profile restart and stage-7 release without rewriting historical artifacts.'}
+copy = qa / ('p4t9-final-release-harness.' + stamp + '.txt')
+copy.write_bytes(Path(__file__).read_bytes())
+value['harness'] = {'path': copy.as_posix(), 'sha256': hashlib.sha256(copy.read_bytes()).hexdigest()}
+path = qa / ('p4t9-final-release.' + stamp + '.json')
+assert not path.exists()
+path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+path.with_suffix('.md').write_text(f'# P4-T9 final authority supplement\n\nTimestamp: {stamp}\nCommand: `{value["command"]}`\nEXIT_CODE: 0\nOutput Summary: The persisted exact C4 restart route, unchanged native attestation and current generated profile match. All seven prepared stages are authorized; stage 7 follows the passing first six stages. No source, test or checkpoint changed.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}))

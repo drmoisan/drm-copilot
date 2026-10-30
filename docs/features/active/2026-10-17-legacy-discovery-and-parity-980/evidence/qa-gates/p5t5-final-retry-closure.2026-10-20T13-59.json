@@ -1,0 +1,293 @@
+{
+  "Command": "poetry run python SCRATCH/p5t5_close_retry.py FINAL_HANDOFF",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T13-59",
+  "all_bindings_unchanged": true,
+  "candidate": {
+    "bytes": 37159,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-candidate-released.2026-10-20T13-55.json",
+    "sha256": "1be8286990a30757fc032bbcda1cc1984a237f1eb732eb92ae6acf7bf979b32d"
+  },
+  "checked_commit": "556ccb4bf74a233f7d9dc8214e0cb43d8d83d78e",
+  "closure_harness": {
+    "bytes": 8995,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-closure-harness.2026-10-20T13-59.txt",
+    "sha256": "d206a2360adb22e68aa65053c8bc60c748c77fdd37feff73bca9d4520bfba105"
+  },
+  "command_archives": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-format-135544-raw.2026-10-20T13-55.json",
+      "sha256": "c90cbc8bf7b907d65ae42304f8b96d35a565b0901709f99d8ac1dc27ece9f995"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-lint-135544-raw.2026-10-20T13-55.json",
+      "sha256": "3b8982ec37755e22386d9cf9e891e5a839ae6fa2a6106d3b479dd97a0a50525b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-types-135544-raw.2026-10-20T13-56.json",
+      "sha256": "7e670b92c735d64143b972709b9a31979aeee1cab7b34506d590b7ddf464a05c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-static-135544-raw.2026-10-20T13-56.json",
+      "sha256": "661aa019e653933ee8a8a4231484ae0329c8e5f1c891c12829a6ed74d438d032"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-rendering-135544-raw.2026-10-20T13-57.json",
+      "sha256": "8fd70b02455448c65ffcb5a78b6593c7ba523527fa6c61b10548565edbf51b9d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-combine-135544-raw.2026-10-20T13-57.json",
+      "sha256": "9c9a83eac43fc6a9fd89cdfaa7d5378d209710a9e16eeefa4b582dc43190a53c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-json-135544-raw.2026-10-20T13-57.json",
+      "sha256": "eb5d3bc6e0984fe6c4e8f5a1f3e1da5c2b584f15c099b383f47676c200126a2d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-proof-135544-raw.2026-10-20T13-57.json",
+      "sha256": "8c1a21748943bae8552409b53b3b5f043e14ac76a61d8c4040111b521ea720a2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-contracts-135544-raw.2026-10-20T13-57.json",
+      "sha256": "17d0589363f825f97a4edc81a360772c1336ad27ef3cd897dda8638dfd0e8f35"
+    }
+  ],
+  "composition": {
+    "assertions": [
+      "ready scenarios retain exact trace and steps",
+      "approved target criteria retain original decision and source owner",
+      "unknown expected behavior remains pending Markdown"
+    ],
+    "extra_behavioral_run": false,
+    "kind": "in-memory captured generation to Gherkin/Markdown rendering",
+    "native_execution": false,
+    "nodes": [
+      "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps[False]",
+      "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps[True]",
+      "tests/discovery_runtime/test_acceptance_tags.py::test_approved_target_trace_retains_original_decision_and_owner",
+      "tests/discovery_runtime/test_acceptance_tags.py::test_unknown_expected_behavior_remains_pending_markdown"
+    ],
+    "publication": false,
+    "required_selector_families": [
+      "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps",
+      "tests/discovery_runtime/test_acceptance_tags.py::test_approved_target_trace_retains_original_decision_and_owner",
+      "tests/discovery_runtime/test_acceptance_tags.py::test_unknown_expected_behavior_remains_pending_markdown"
+    ]
+  },
+  "contract_nodes": 4,
+  "coverage": {
+    "coverage_ranges": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-ranges.2026-10-20T13-57.json",
+      "sha256": "c071bef696606c10ca71a2614779b031dcf38c40ffb0a7444809072ff4c1a4fd"
+    },
+    "current_coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-current-coverage.2026-10-20T13-57.json",
+      "sha256": "ede1daae2a2fc956c4d64236dd171a5d9fa789043c17d7a8a4621478118f7e8f"
+    },
+    "current_raw_counters_augmented": false,
+    "module_count": 3,
+    "qualified_prior_proof_count": 0,
+    "range_count": 42
+  },
+  "coverage_attribution": "Final unchanged-reader named-body coverage supersedes the earlier declaration-inclusive range interpretation for _trace. Declaration line 157 does not establish runtime body execution. Original raw statistics, first-run failure and narrow guard proof remain separately retained.",
+  "examples": {
+    "bindings": {
+      "examples/discovery/v2/acceptance/README.md": {
+        "bytes": 838,
+        "lf_sha256": "5d2c4a156cdd82e798ee9404b179a3b8246b69ff87ace139ff7d1d104b3cbf61",
+        "sha256": "5d2c4a156cdd82e798ee9404b179a3b8246b69ff87ace139ff7d1d104b3cbf61"
+      },
+      "examples/discovery/v2/acceptance/approved-target/acceptance.md": {
+        "bytes": 4554,
+        "lf_sha256": "f57426be2d3631d474bce83434f97b9dcb4d8d12c83d5f716a1d8e2491a7d1c7",
+        "sha256": "f57426be2d3631d474bce83434f97b9dcb4d8d12c83d5f716a1d8e2491a7d1c7"
+      },
+      "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature": {
+        "bytes": 2484,
+        "lf_sha256": "36bc16e2604ff3a6a56296503bca627e936ffd5d8f6dd28afd5dca8a07bc983f",
+        "sha256": "36bc16e2604ff3a6a56296503bca627e936ffd5d8f6dd28afd5dca8a07bc983f"
+      },
+      "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-38848f66d18952dfe72d4ee067b5503c0956e62677349253806702d4e11261d2.feature": {
+        "bytes": 2781,
+        "lf_sha256": "3a7fb7a60a8a988d1d46b8b3a5c0daa8cd7173fe727b1d4c041a7b68f25e438b",
+        "sha256": "3a7fb7a60a8a988d1d46b8b3a5c0daa8cd7173fe727b1d4c041a7b68f25e438b"
+      },
+      "examples/discovery/v2/acceptance/observed-source/acceptance.md": {
+        "bytes": 2171,
+        "lf_sha256": "5e00feda4e9b6f9d78c33a6c7c8a4a1937fc7ae79775531ddb9dbfc400c6093a",
+        "sha256": "5e00feda4e9b6f9d78c33a6c7c8a4a1937fc7ae79775531ddb9dbfc400c6093a"
+      },
+      "examples/discovery/v2/acceptance/observed-source/legacy-characterization/scn-1f67726998f52a9c19610fec1527ad56b5272251bcfa11ae78090950c00a368d.feature": {
+        "bytes": 2432,
+        "lf_sha256": "94d1edef4dd3c58683805287be6be6228966cc9531bc87a85e06d9ca88ee9b81",
+        "sha256": "94d1edef4dd3c58683805287be6be6228966cc9531bc87a85e06d9ca88ee9b81"
+      },
+      "examples/discovery/v2/acceptance/pending-target/acceptance.md": {
+        "bytes": 4529,
+        "lf_sha256": "8b6f13b781fa9745873d5b41d6879fc7d9af512437fc20916a65c57956f7b894",
+        "sha256": "8b6f13b781fa9745873d5b41d6879fc7d9af512437fc20916a65c57956f7b894"
+      },
+      "examples/discovery/v2/acceptance/pending-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature": {
+        "bytes": 2484,
+        "lf_sha256": "36bc16e2604ff3a6a56296503bca627e936ffd5d8f6dd28afd5dca8a07bc983f",
+        "sha256": "36bc16e2604ff3a6a56296503bca627e936ffd5d8f6dd28afd5dca8a07bc983f"
+      }
+    },
+    "qualification": "Three generated Markdown outputs retain their exact renderer-produced terminal blank lines. The owner provenance and source-byte bindings are authoritative; examples are not normalized."
+  },
+  "handoff": {
+    "bytes": 31219,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-handoff.2026-10-20T13-57.json",
+    "sha256": "33b0cd256588d68b0c280eb6eb2bc6d7a2b6ca8b3e7e0a8cdd80dacfa15518cf"
+  },
+  "limitations": [
+    "Task verification only; independent acceptance remains pending.",
+    "No publication, CLI migration, step execution, installed-host or feature-completion claim.",
+    "Scoped coverage is not a newly measured repository-wide result.",
+    "Accepted generator/model coverage is retained separately without predecessor replay."
+  ],
+  "remaining_raw_archive": {
+    "bytes": 329427,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-remaining-raw.2026-10-20T13-59.json",
+    "sha256": "162d5edbc8af94892f9b8b8304d3a11340b685c4b5fa8e8df9d5b9990eab3cee"
+  },
+  "retained_proof": {
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+      "sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475"
+    },
+    "baseline_originals": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline-originals.2026-10-20T12-11.json",
+      "sha256": "1588e9bc3b66c73d204a392b37e3ba79bbd4eae3332b1e89b99071289e0818e3"
+    },
+    "closure_diagnostic": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation-closure-diagnostic.2026-10-20T12-41.json",
+      "sha256": "5bbaeb037349c1cf454db5d907e278b7a1da0898604ccd25aa23c07c38e1d558"
+    },
+    "contract": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-contract-delta.2026-10-20T11-11.json",
+      "sha256": "c2030f0a0e27111ced7bd24ce4f46963bceecf516611d4940c92e208218d0aef"
+    },
+    "example_originals": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-renderer-examples-originals.2026-10-20T13-03.json",
+      "sha256": "3421aee8da364eed44fb0de52417abea9115320c6ae68533fe9a968c3394cf54"
+    },
+    "examples": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-renderer-examples.2026-10-20T13-03.json",
+      "sha256": "ff326f25b72302405bc69ae5e78b1152f102a93b0085f9b8308888a476a11e14"
+    },
+    "final_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-rc2-ready.2026-10-20T13-51.json",
+      "sha256": "8eac8d35161b53f246f5d78e1818b9147e6ab88e96b5ac47eccb430a45bef7ca"
+    },
+    "first_final_run": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-first-run-closure.2026-10-20T13-46.json",
+      "sha256": "4853c307b101f85b596585429d24b95646b0f9e230a13ed7f85b2f086d90b743"
+    },
+    "first_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-ready.2026-10-20T13-17.json",
+      "sha256": "e362a02d712308c915e8b8844a207fa3e46ec3b1cbc3bed397102ddc9fe220ac"
+    },
+    "preparation_diagnostic": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation-checker-diagnostic.2026-10-20T12-39.json",
+      "sha256": "0ebaea0e2dc3444c6cbc1e5e021bbd05cf1b909efc590943aaea872fc1c3f1b9"
+    },
+    "prior_final_acceptance": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-final-acceptance.2026-10-20T11-57.json",
+      "sha256": "e454e73f509ca24c0f6e6ebb784be9c9c95166740ce9d6e45d5105c257ce1ad6"
+    },
+    "prior_final_handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-handoff.2026-10-20T11-46.json",
+      "sha256": "3cd8f6080ee99f629d17831d2f2fce41ecb5794153abcdc764573fc2c6ad3bb9"
+    },
+    "rc2": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-freeze.2026-10-20T13-44.json",
+      "sha256": "5d4e2d0667a083ff1f4afa69c92486798a25b34f9997308c774a5daf7b4a79b9"
+    },
+    "renderer": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze.2026-10-20T13-07.json",
+      "sha256": "d6fbe1f305a6f4d46771497147cfc3a3f8630b361f3f653d87068bafdaf3047b"
+    },
+    "renderer_ranges": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-repair-audit.2026-10-20T13-01.json",
+      "sha256": "ebe73fc77b859bf6304bb804407f05f0ee411862aff407eaff2c1afd12d7945f"
+    },
+    "renderer_raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze-originals.2026-10-20T13-07.json",
+      "sha256": "0504bd8ab5f9d641b0f97db29fe0b60fc9372955b16a52089486f4cf7c2cd29e"
+    },
+    "renderer_staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-staging.2026-10-20T13-07.json",
+      "sha256": "ae8f17ea0152622a260740d52f53dd555da3df024dd327a876088eec8cbcdab9"
+    },
+    "set_e": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-freeze.2026-10-20T12-26.json",
+      "sha256": "14859545b59822b63c51717c65d0db755c9abf704d234827228cbc8ac4cceff4"
+    },
+    "set_e_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-set-e-review.2026-10-20T12-29.json",
+      "sha256": "2b0b489a9806b6c1d6d2124b5e31a9d424a35d5b8fc84c9425d4f693bc42b547"
+    }
+  },
+  "run_id": "135544",
+  "source_test_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": "4dabe498a2cc48a1d96d5839b2247be8734c5b35e9d933fd41855976d08cc6a6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+    "tests/discovery_runtime/test_acceptance_render_limits.py": "4e596b4a9a1d5f5a050d5ab4f22653d2479318b49fef1fda7d8948e990d38125",
+    "tests/discovery_runtime/test_acceptance_tags.py": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+    "tests/discovery_runtime/test_gherkin.py": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "001e8869e6657fc4405b22c01a9026de3a990afffbfd4560a718aecf33f2ebfe"
+  },
+  "stage_seconds": {
+    "contracts": 1.017,
+    "coverage-combine": 1.015,
+    "coverage-json": 1.016,
+    "coverage-proof": 1.017,
+    "format": 1.044,
+    "lint": 1.015,
+    "rendering": 78.183,
+    "static": 1.016,
+    "types": 14.044
+  },
+  "state": "FROZEN_FINAL_VERIFICATION_ACCEPTANCE_PENDING",
+  "task": "P5-T5",
+  "task_nodes": 119,
+  "unproved_branches": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": [
+      [
+        106,
+        107
+      ],
+      [
+        134,
+        135
+      ],
+      [
+        138,
+        139
+      ],
+      [
+        141,
+        144
+      ]
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": [
+      [
+        256,
+        257
+      ]
+    ]
+  },
+  "unproved_lines": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": [
+      107,
+      135,
+      139,
+      144
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": [
+      257
+    ]
+  }
+}

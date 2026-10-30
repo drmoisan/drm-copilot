@@ -1,0 +1,35 @@
+{
+  "batch": "consolidated-check",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T08:51:40.793094+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-consolidated-check-lint-085140.2026-10-19T08-51.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-consolidated-check-lint-085140.2026-10-19T08-51.stdout.txt",
+      "sha256": "7625aa77ac657b7f87882da225372859ff72d30f84f5e119b0b1958f136d619f"
+    }
+  },
+  "seconds": 0.115372,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "f04e79d16571b54edb244e482001724f303507cc0e3d791982c9617b05ed7fe0",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "f04e79d16571b54edb244e482001724f303507cc0e3d791982c9617b05ed7fe0",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T08:51:40.677722+00:00",
+  "stderr": "",
+  "stdout": "I001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_test_reference_syntax.py:3:1\n   |\n 1 |   \"\"\"Verify finite reference grammars, public capacities and bounded lexical work.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from typing import TYPE_CHECKING, cast\n 6 | |\n 7 | | import pytest\n 8 | | from drm_copilot_discovery.analyzer import test_reference_syntax\n 9 | | from drm_copilot_discovery.analyzer.csharp_tokens import (\n10 | |     SourceScanError,\n11 | |     Token,\n12 | |     tokenize_csharp,\n13 | | )\n14 | | from drm_copilot_discovery.analyzer.source_text import strip_comments_and_strings\n15 | | from drm_copilot_discovery.analyzer.test_reference_syntax import (\n16 | |     project_reference_sites,\n17 | |     type_mentions,\n18 | | )\n19 | | from drm_copilot_discovery.analyzer.test_references import (\n20 | |     TestReferenceAnalyzer as ReferenceAnalyzer,\n21 | | )\n22 | | from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog\n23 | | from tests.discovery_runtime.analyzer.test_test_references import inputs, serialized\n   | |____________________________________________________________________________________^\n24 |\n25 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nFound 1 error.\n[*] 1 fixable with the `--fix` option.\n",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-51"
+}

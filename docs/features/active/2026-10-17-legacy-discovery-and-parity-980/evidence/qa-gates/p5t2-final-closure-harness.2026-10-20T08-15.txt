@@ -1,0 +1,142 @@
+"""Archive the completed P5-T2 run without changing any tested source or receipt."""
+
+import base64
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+NATIVE = SCRATCH.parent / "codex-legacy-discovery" / "issue-980"
+QA = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+HANDOFF = QA / "p5t2-final-handoff.2026-10-20T08-12.json"
+CANDIDATE = QA / "p5t2-final-candidate.2026-10-20T08-03.json"
+STAGED = set()
+
+
+def sha(data):
+    """Return the digest of exact bytes, without newline conversion."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def ref(path):
+    """Bind one existing repository artifact by its portable path and raw bytes."""
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(data), "bytes": len(data)}
+
+
+def save(path, value):
+    """Create one new authored LF UTF-8 JSON artifact and retain its staging path."""
+    if path.exists():
+        raise ValueError("Refusing to replace an existing evidence artifact")
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    STAGED.add(path)
+    return ref(path)
+
+
+handoff = json.loads(HANDOFF.read_bytes())
+candidate = json.loads(CANDIDATE.read_bytes())
+assert sha(HANDOFF.read_bytes()) == "742d008a70bea7c3d59717f8d76a58615b6dded453187f664b9c2e5ea3841347"
+assert handoff["status"] == "FINAL_GATES_PASSED_ACCEPTANCE_PENDING"
+assert handoff["bindings"]["changed"] == []
+assert all(sha((ROOT / path).read_bytes()) == expected for path, expected in candidate["bindings"].items())
+STAGED.update((HANDOFF, CANDIDATE, QA / "p5t2-final-release-binding-harness.2026-10-20T08-03.txt"))
+STAGED.add(ROOT / candidate["native"]["release"]["path"])
+stage_archives = []
+# Existing command receipts already contain exact raw stdout/stderr/progress archives.
+for record in handoff["receipts"]:
+    receipt = ROOT / record["path"]
+    assert sha(receipt.read_bytes()) == record["sha256"]
+    payload = json.loads(receipt.read_bytes())
+    archive = ROOT / payload["raw_archive"]["path"]
+    assert sha(archive.read_bytes()) == payload["raw_archive"]["sha256"]
+    STAGED.update((receipt, receipt.with_suffix(".md"), archive))
+    stage_archives.append(payload["raw_archive"])
+for key in ("coverage_ranges", "current_coverage"):
+    record = handoff["coverage"][key]
+    path = ROOT / record["path"]
+    assert sha(path.read_bytes()) == record["sha256"]
+    STAGED.add(path)
+
+raw_paths = [(SCRATCH / f"p5t2-final-080331-{label}{suffix}", "SCRATCH")
+             for label in ("outcomes", "graph", "integration", "combined")
+             for suffix in (".coverage", "-coverage.json")]
+raw_paths.append((SCRATCH / "p5t2-final-080331-coverage-result.json", "SCRATCH"))
+raw_paths.extend((NATIVE / candidate["native"][key].removeprefix("NATIVE_SCRATCH/"), "NATIVE_SCRATCH")
+                 for key in ("fixture_receipt", "release_path", "result_path"))
+fixture = NATIVE / "issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83"
+raw_paths.extend((fixture / f"docs/migration/discovery/reports/parity-report.{suffix}", "FIXTURE_REPORT")
+                 for suffix in ("json", "md"))
+raw_entries = []
+# Binary coverage databases and tool-produced JSON are preserved exactly, including absent final newlines.
+for path, label in raw_paths:
+    data = path.read_bytes()
+    raw_entries.append({"path": label + "/" + path.name, "bytes": len(data), "sha256": sha(data),
+                        "crlf_count": data.count(b"\r\n"), "terminal_lf": data.endswith(b"\n"),
+                        "base64": base64.b64encode(data).decode("ascii")})
+archive_ref = save(QA / f"p5t2-final-remaining-raw.{STAMP}.json", {
+    "task": "P5-T2", "timestamp": STAMP,
+    "qualification": "Exact raw bytes encoded as base64. Binary databases and raw JSON need no final newline; readable receipts are separate LF UTF-8 views.",
+    "entries": raw_entries})
+script = Path(__file__)
+snapshot = QA / f"p5t2-final-closure-harness.{STAMP}.txt"
+if snapshot.exists():
+    raise ValueError("Closure harness snapshot already exists")
+snapshot.write_bytes(script.read_bytes())
+STAGED.add(snapshot)
+ranges = json.loads((ROOT / handoff["coverage"]["coverage_ranges"]["path"]).read_bytes())
+checks = handoff["native"]["checks"]
+summary = {
+    "task": "P5-T2", "timestamp": STAMP, "state": "FROZEN_FINAL_VERIFICATION_ACCEPTANCE_PENDING",
+    "candidate": ref(CANDIDATE), "handoff": ref(HANDOFF), "checked_commit": candidate["head"],
+    "checked_tree": candidate["checked_tree"], "checked_review": candidate["review"],
+    "final_source_bindings_reference": ref(CANDIDATE), "current_binding_changes": [],
+    "batch_nodes": {batch["label"]: len(batch["nodes"]) for batch in handoff["batches"]},
+    "task_nodes": handoff["node_count"], "contract_nodes": len(handoff["contracts"]),
+    "native_checks": {"total": len(checks), "candidate_identity": sum(x["label"].startswith("candidate:") for x in checks),
+                      "expected_metrics": sum(x["label"].startswith("metric:") for x in checks)},
+    "stage_seconds": {record["label"]: record["seconds"] for record in handoff["receipts"]},
+    "coverage": handoff["coverage"], "coverage_deltas": "All eight module comparisons retain every previously executed line and branch.",
+    "unproved_lines": {record["path"]: record["remaining_unproved_lines"] for record in ranges["modules"]
+                       if record["remaining_unproved_lines"]},
+    "raw_command_archives": stage_archives, "remaining_raw_archive": archive_ref,
+    "closure_harness": ref(snapshot), "limitations": handoff["limitations"],
+    "qualification": "The 27 exact-AST prior-proof mappings remain separate from current raw counters. No behavioral rerun, source edit, Git mutation or acceptance checkoff occurred during closure.",
+}
+closure = QA / f"p5t2-final-closure.{STAMP}.json"
+save(closure, summary)
+markdown = QA / f"p5t2-final-closure.{STAMP}.md"
+markdown.write_text(
+    f"# P5-T2 final verification\n\nTimestamp: {STAMP}\n\n"
+    "All seven ordered stages passed on the committed candidate. The three isolated reverse-order batches passed 91, 58 and 26 cases; four repository contracts passed. "
+    f"The native Windows/Git fixture passed {len(checks)} checks, including 24 candidate identities and 16 expected metrics.\n\n"
+    "Coverage reconciliation passed for eight modules and 70 class/function ranges. The 27 unchanged-body qualifications remain separate from fresh raw coverage. "
+    "Two defensive parity-entry statements remain uncovered, as explicitly recorded in the retained review and coverage disposition.\n\n"
+    f"Final handoff: `{HANDOFF.name}`; SHA-256 `{sha(HANDOFF.read_bytes())}`.\n\n"
+    f"Exact remaining raw archive: `{Path(archive_ref['path']).name}`; SHA-256 `{archive_ref['sha256']}`.\n\n"
+    "Raw databases, coverage JSON, native release/result and published report bytes are preserved without newline conversion. "
+    "All stdout/stderr/progress archives remain bound by the original command receipts. Source/test bindings are unchanged.\n\n"
+    "This verifies P5-T2 only. Independent acceptance remains pending. Native callback instrumentation does not prove installed coding-agent host hooks or non-Windows execution.\n",
+    encoding="utf-8", newline="\n")
+STAGED.add(markdown)
+# Validate only newly authored readable streams; raw bytes inside archives remain deliberately untouched.
+for path in STAGED:
+    data = path.read_bytes()
+    text = data.decode("utf-8")
+    assert b"\r" not in data and data.endswith(b"\n") and not data.endswith(b"\n\n"), path.name
+    assert all(line == line.rstrip() for line in text.splitlines()), path.name
+    assert str(ROOT) not in text and ROOT.as_posix() not in text, path.name
+    assert str(SCRATCH) not in text and SCRATCH.as_posix() not in text, path.name
+staging = QA / f"p5t2-final-staging.{STAMP}.json"
+staging_value = {
+    "task": "P5-T2", "timestamp": STAMP, "closure": ref(closure),
+    "stage_paths": sorted(path.relative_to(ROOT).as_posix() for path in STAGED | {staging}),
+    "bindings": [ref(path) for path in sorted(STAGED)],
+    "self_qualification": "This staging manifest is listed in stage_paths; its own SHA-256 is supplied externally to avoid a self-referential digest.",
+}
+save(staging, staging_value)
+print(json.dumps({"closure": ref(closure), "staging": ref(staging), "stage_path_count": len(staging_value["stage_paths"]),
+                  "raw_entries": len(raw_entries), "native_checks": summary["native_checks"]}, indent=2))

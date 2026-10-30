@@ -1,0 +1,136 @@
+"""Bind the checked pure subset and pending planner without behavioral replay."""
+from __future__ import annotations
+
+import ast
+import base64
+import gzip
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+OUT = ROOT / FEATURE / "evidence/qa-gates"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+SCOPE = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+    "tests/discovery_runtime/test_completion_report.py",
+    "tests/discovery_runtime/test_completion_planning.py",
+]
+
+
+def digest(raw: bytes) -> str:
+    """Return exact byte identity."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+class Executable(ast.NodeTransformer):
+    """Remove only docstrings from an already parsed test module."""
+
+    def generic_visit(self, node: ast.AST) -> ast.AST:
+        """Retain all executable statements, arguments, decorators and assertions."""
+        super().generic_visit(node)
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+                node.body.pop(0)
+        return node
+
+
+def executable(raw: bytes) -> str:
+    """Return a normalized AST without source-location or documentation fields."""
+    return ast.dump(Executable().visit(ast.parse(raw.decode("utf-8"))), include_attributes=False)
+
+
+def record(path: Path) -> dict[str, object]:
+    """Describe one exact source or evidence stream."""
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest(raw), "bytes": len(raw)}
+
+
+files = []
+for path in SCOPE:
+    value = record(ROOT / path)
+    value["physical_lines"] = len((ROOT / path).read_bytes().splitlines())
+    assert value["physical_lines"] <= 500
+    files.append(value)
+
+qualifications = []
+for current, original in (
+    (SCOPE[1], "p5t3-producer-pure2-original-test.py"),
+    (SCOPE[2], "p5t3-producer-planning2-original-test.py"),
+):
+    old, new = (SCRATCH / original).read_bytes(), (ROOT / current).read_bytes()
+    identical = executable(old) == executable(new)
+    assert identical
+    qualifications.append({
+        "path": current, "old_sha256": digest(old), "current_sha256": digest(new),
+        "qualification": "Test docstrings/comments only; executable AST, decorators, parametrizations and assertions identical.",
+        "executable_ast_identical": identical,
+    })
+
+raw_paths = [
+    SCRATCH / "p5t3-producer-focused.py",
+    SCRATCH / "p5t3-producer-planning-focused.py",
+    SCRATCH / "p5t3-producer-pure2-original-test.py",
+    SCRATCH / "p5t3-producer-planning2-original-test.py",
+    SCRATCH / "p5t3-producer-pure2-coverage.json",
+]
+raw_paths.extend(sorted(SCRATCH.glob("p5t3-producer-pure*.stdout")))
+raw_paths.extend(sorted(SCRATCH.glob("p5t3-producer-pure*.stderr")))
+raw_paths.extend(sorted(SCRATCH.glob("p5t3-producer-planning*.stdout")))
+raw_paths.extend(sorted(SCRATCH.glob("p5t3-producer-planning*.stderr")))
+entries = []
+for path in raw_paths:
+    raw = path.read_bytes()
+    encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode("ascii")
+    assert gzip.decompress(base64.b64decode(encoded)) == raw
+    entries.append({
+        "identifier": "SCRATCH/" + path.name, "sha256": digest(raw), "bytes": len(raw),
+        "encoding": "gzip+base64", "data": encoded, "roundtrip_verified": True,
+    })
+for path in SCOPE:
+    raw = (ROOT / path).read_bytes()
+    encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode("ascii")
+    assert gzip.decompress(base64.b64decode(encoded)) == raw
+    entries.append({
+        "identifier": path, "sha256": digest(raw), "bytes": len(raw),
+        "encoding": "gzip+base64", "data": encoded, "roundtrip_verified": True,
+    })
+archive_path = OUT / f"p5t3-producer-source-archive.{STAMP}.json"
+archive_path.write_bytes((json.dumps({"Timestamp": STAMP, "entries": entries}, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+pure_receipt = ROOT / FEATURE / "evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json"
+pure_coverage = json.loads((SCRATCH / "p5t3-producer-pure2-coverage.json").read_text(encoding="utf-8"))
+summary = {
+    "Timestamp": STAMP, "task": "P5-T3", "state": "SOURCE_READY_PARTIAL_FOCUSED_PROOF",
+    "scope": files, "borrowed_before_after": record(pure_receipt),
+    "pure_cases_passed": 35, "pure_current_coverage": pure_coverage["totals"],
+    "test_documentation_qualification": qualifications, "lossless_archive": record(archive_path),
+    "baseline": {
+        "path": (FEATURE / "evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json").as_posix(),
+        "sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d",
+    },
+    "limits": [
+        "Builder/planner successful composition not yet executed; planning-only population is 19 declared cases, not a collected/result claim.",
+        "Pending semantic completion dispatch is owned separately. The full producer module is not accepted at partial 72/95 statement and 18/24 branch coverage.",
+        "Source/tests contain no runtime filesystem, subprocess, network or native-grant creation; in-memory mutation proof remains pending.",
+        "Working bytes archived exactly; Git index normalization must be separately bound by the coordinator.",
+    ],
+}
+manifest_path = OUT / f"p5t3-producer-source-freeze.{STAMP}.json"
+manifest_path.write_bytes((json.dumps(summary, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+md_path = manifest_path.with_suffix(".md")
+md_path.write_bytes((
+    f"# P5-T3 producer source snapshot\n\nTimestamp: {STAMP}\n\n"
+    "Command: `poetry run python SCRATCH/p5t3-producer-source-freeze.py`\n\n"
+    "EXIT_CODE: 0\n\nOutput Summary: Exact three-file snapshot; 35 pure cases passed. "
+    "Successful builder/planner composition and full module acceptance remain pending.\n\n"
+    "The paired JSON binds source/test hashes, prior ordered receipts, unchanged executable "
+    "test bodies and a lossless archive of exact raw streams, sources and executed harnesses.\n"
+).encode("utf-8"))
+harness_path = OUT / f"p5t3-producer-source-freeze-harness.{STAMP}.txt"
+harness_path.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"manifest": record(manifest_path), "archive": record(archive_path),
+                  "markdown": record(md_path), "harness": record(harness_path),
+                  "source": files[0]}, indent=2))

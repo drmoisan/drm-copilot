@@ -1,0 +1,125 @@
+/**
+ * Supply the protected-store adapters, clock and nonce the discovery agent
+ * lifecycle operations (prepare, finalize, doctor, controlled calls) consume.
+ *
+ * The provider is the only place production wiring reads the platform, the
+ * state-directory environment and the clock for discovery authority. It
+ * exposes no identity: host, session, parent and agent values come only from
+ * the one-use records the native hooks wrote (root grants, tool authorizations
+ * and host observations), which the service consumes through this provider's
+ * store seam. Everything here is injectable so the service can be tested with
+ * in-memory stores and fixed clocks; nothing in a request can substitute for
+ * these values.
+ */
+
+import { randomBytes } from "node:crypto";
+import * as os from "node:os";
+
+import { ActivationStore, type ProtectedEnvelope } from "./discovery-authority";
+import {
+  type AuthorizationStoreIO,
+  createNodeAuthorizationStoreIO,
+} from "./discovery-authorization";
+import {
+  type AuthorityLocation,
+  type AuthorityPlatform,
+  resolveAuthorityLocation,
+  type TrustedHostEnvironment,
+} from "./discovery-authority-paths";
+import type { CapabilityPins } from "./discovery-capabilities";
+import type { ReceiptWriter } from "./discovery-finalization";
+import {
+  createNodeInputReader,
+  type InputBytesReader,
+} from "./discovery-input-manifest";
+
+export interface DiscoveryAuthorityProvider {
+  /** Protected store seam with directory listing for one-use records. */
+  readonly io: AuthorizationStoreIO;
+  readonly reader: InputBytesReader;
+  readonly writer: Omit<ReceiptWriter, "kind" | "host">;
+  /** Host-pinned configuration and hook hashes an attestation must reproduce. */
+  readonly capabilityPins?: CapabilityPins;
+  location(workspaceRoot: string): AuthorityLocation;
+  activation(location: AuthorityLocation): { envelope(): ProtectedEnvelope };
+  now(): Date;
+  nonce(): string;
+}
+
+/** Environment keys the provider reads; both locate the user state directory. */
+export const DISCOVERY_ENVIRONMENT_KEYS = {
+  localAppData: "LOCALAPPDATA",
+  xdgStateHome: "XDG_STATE_HOME",
+} as const;
+
+export interface NodeAuthorityProviderOptions {
+  readonly env?: Readonly<Record<string, string | undefined>>;
+  readonly platform?: NodeJS.Platform;
+  readonly homedir?: string;
+  readonly io?: AuthorizationStoreIO;
+  readonly reader?: InputBytesReader;
+  readonly now?: () => Date;
+  readonly nonce?: () => string;
+  readonly writer?: Omit<ReceiptWriter, "kind" | "host">;
+  readonly component?: "extension" | "standalone-mcp";
+  readonly buildSha256?: string;
+}
+
+/** Map the Node platform onto the authority platform policy. */
+export function authorityPlatform(
+  platform: NodeJS.Platform,
+): AuthorityPlatform {
+  // Windows and macOS have fixed state roots; every other POSIX host uses XDG.
+  if (platform === "win32") {
+    return "windows";
+  }
+  if (platform === "darwin") {
+    return "macos";
+  }
+  return "linux";
+}
+
+/** Build the trusted host environment from process values. */
+export function trustedHostEnvironment(
+  platform: NodeJS.Platform,
+  homedir: string,
+  env: Readonly<Record<string, string | undefined>>,
+): TrustedHostEnvironment {
+  return {
+    platform: authorityPlatform(platform),
+    userHome: homedir,
+    localAppData: env[DISCOVERY_ENVIRONMENT_KEYS.localAppData] ?? null,
+    xdgStateHome: env[DISCOVERY_ENVIRONMENT_KEYS.xdgStateHome] ?? null,
+  };
+}
+
+/** Build the production provider; every seam is overridable for tests. */
+export function createNodeDiscoveryAuthorityProvider(
+  options: NodeAuthorityProviderOptions = {},
+): DiscoveryAuthorityProvider {
+  const env = options.env ?? process.env;
+  const platform = options.platform ?? process.platform;
+  const homedir = options.homedir ?? os.homedir();
+  const io = options.io ?? createNodeAuthorizationStoreIO();
+  const nonce = options.nonce ?? (() => randomBytes(16).toString("hex"));
+  return {
+    io,
+    reader: options.reader ?? createNodeInputReader(),
+    writer: options.writer ?? {
+      component: options.component ?? "extension",
+      id: `gateway-${nonce()}`,
+      build_sha256: options.buildSha256 ?? "0".repeat(64),
+    },
+    location(workspaceRoot) {
+      return resolveAuthorityLocation(
+        workspaceRoot,
+        trustedHostEnvironment(platform, homedir, env),
+      );
+    },
+    activation(location) {
+      return new ActivationStore({ location, io, nonce });
+    },
+    now: options.now ?? (() => new Date()),
+    nonce,
+  };
+}

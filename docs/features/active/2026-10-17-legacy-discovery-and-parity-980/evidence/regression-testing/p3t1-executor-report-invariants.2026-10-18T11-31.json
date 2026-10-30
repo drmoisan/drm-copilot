@@ -1,0 +1,48 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:31:13.553506+00:00",
+  "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+  "source_hash_initial": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+  "source_hash": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+  "source_stable": true,
+  "passed": 9,
+  "total": 9,
+  "results": [
+    {
+      "name": "Actual reports directory creation preserves semantic report digest",
+      "passed": true
+    },
+    {
+      "name": "Actual reports directory creation remains bound by complete snapshot digest",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for docs/migration/discovery/reports",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for docs/migration/discovery/reports/later.json",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for docs/migration/discovery/reports-neighbor",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for src/unreadable.cs",
+      "passed": true
+    },
+    {
+      "name": "Captured bytes exclusion is exact for docs/migration/discovery/reports/coverage-report.md",
+      "passed": true
+    },
+    {
+      "name": "Captured bytes exclusion is exact for docs/migration/discovery/reports-neighbor/view.md",
+      "passed": true
+    },
+    {
+      "name": "Captured bytes exclusion is exact for src/current.cs",
+      "passed": true
+    }
+  ]
+}

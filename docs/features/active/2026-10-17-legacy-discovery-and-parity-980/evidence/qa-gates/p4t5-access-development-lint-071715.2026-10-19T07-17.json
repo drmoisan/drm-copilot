@@ -1,0 +1,39 @@
+{
+  "batch": "development",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T07:17:15.728425+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t5-access-development-lint-071715.2026-10-19T07-17.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t5-access-development-lint-071715.2026-10-19T07-17.stdout.txt",
+      "sha256": "a94cbf570c3b367ca95f1284d482a63207510a933c8d00f7e4fe0bfea413e714"
+    }
+  },
+  "seconds": 0.104034,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "ddd7bf9853b9be825b51a181fca903157c3c2469f213ebabc28f019705b436f1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "09257ec9dad03fd2805a5c41037c9e0377c5ee85a325c4a88792f9da04353e5d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "b9eb53a6355930694000e328bde037db5dbd6c5f5e08f96b092f3e3bbdcb49db",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "d80e5c4594671108ed52c665411ae05ece71414915a5195ed2231dda7dd5b7c1"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "ddd7bf9853b9be825b51a181fca903157c3c2469f213ebabc28f019705b436f1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "09257ec9dad03fd2805a5c41037c9e0377c5ee85a325c4a88792f9da04353e5d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "b9eb53a6355930694000e328bde037db5dbd6c5f5e08f96b092f3e3bbdcb49db",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "d80e5c4594671108ed52c665411ae05ece71414915a5195ed2231dda7dd5b7c1"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T07:17:15.624391+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_access.py:158:89\n    |\n156 |             item.path,\n157 |             \"API spellings are candidates only; custom types, aliases, conditional \"\n158 |             \"compilation, runtime targets and platform applicability remain unresolved.\",\n    |                                                                                         ^\n159 |             analyzer=surface.identifier,\n160 |             blocking=False,\n    |\n\nFound 1 error.\n",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-17"
+}

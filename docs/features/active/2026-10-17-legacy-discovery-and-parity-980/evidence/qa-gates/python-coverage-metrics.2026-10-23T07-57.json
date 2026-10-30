@@ -1,0 +1,1587 @@
+{
+  "timestamp": "2026-10-23T07-57",
+  "command": "poetry run pytest --cov --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p11t2-coverage.json --junitxml=SCRATCH/issue-980-p11t2-junit.xml -p no:cacheprovider",
+  "tests": {
+    "tests": 15485,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "passed": 15479
+  },
+  "repository": {
+    "covered_lines": 31426,
+    "num_statements": 32507,
+    "covered_branches": 11480,
+    "num_branches": 12264,
+    "line_percent": 96.6745624019442,
+    "branch_percent": 93.60730593607306
+  },
+  "changed_production_files": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py": {
+      "status": "A",
+      "covered_lines": 4,
+      "num_statements": 4,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": {
+      "status": "A",
+      "covered_lines": 141,
+      "num_statements": 144,
+      "covered_branches": 44,
+      "num_branches": 46,
+      "line_percent": 97.91666666666667,
+      "branch_percent": 95.65217391304348
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": {
+      "status": "A",
+      "covered_lines": 184,
+      "num_statements": 187,
+      "covered_branches": 59,
+      "num_branches": 62,
+      "line_percent": 98.39572192513369,
+      "branch_percent": 95.16129032258064
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "status": "A",
+      "covered_lines": 180,
+      "num_statements": 180,
+      "covered_branches": 82,
+      "num_branches": 82,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": {
+      "status": "A",
+      "covered_lines": 90,
+      "num_statements": 94,
+      "covered_branches": 46,
+      "num_branches": 50,
+      "line_percent": 95.74468085106383,
+      "branch_percent": 92.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": {
+      "status": "A",
+      "covered_lines": 149,
+      "num_statements": 151,
+      "covered_branches": 73,
+      "num_branches": 76,
+      "line_percent": 98.67549668874172,
+      "branch_percent": 96.05263157894737
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": {
+      "status": "A",
+      "covered_lines": 102,
+      "num_statements": 102,
+      "covered_branches": 30,
+      "num_branches": 30,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py": {
+      "status": "A",
+      "covered_lines": 28,
+      "num_statements": 28,
+      "covered_branches": 4,
+      "num_branches": 4,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": {
+      "status": "A",
+      "covered_lines": 162,
+      "num_statements": 162,
+      "covered_branches": 58,
+      "num_branches": 58,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {
+      "status": "A",
+      "covered_lines": 139,
+      "num_statements": 140,
+      "covered_branches": 67,
+      "num_branches": 68,
+      "line_percent": 99.28571428571429,
+      "branch_percent": 98.52941176470588
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": {
+      "status": "A",
+      "covered_lines": 3,
+      "num_statements": 3,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": {
+      "status": "A",
+      "covered_lines": 91,
+      "num_statements": 91,
+      "covered_branches": 30,
+      "num_branches": 30,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": {
+      "status": "A",
+      "covered_lines": 115,
+      "num_statements": 115,
+      "covered_branches": 64,
+      "num_branches": 64,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "status": "A",
+      "covered_lines": 121,
+      "num_statements": 121,
+      "covered_branches": 46,
+      "num_branches": 46,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "status": "A",
+      "covered_lines": 85,
+      "num_statements": 85,
+      "covered_branches": 42,
+      "num_branches": 42,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": {
+      "status": "A",
+      "covered_lines": 89,
+      "num_statements": 89,
+      "covered_branches": 32,
+      "num_branches": 32,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": {
+      "status": "A",
+      "covered_lines": 201,
+      "num_statements": 204,
+      "covered_branches": 84,
+      "num_branches": 90,
+      "line_percent": 98.52941176470588,
+      "branch_percent": 93.33333333333333
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": {
+      "status": "A",
+      "covered_lines": 174,
+      "num_statements": 174,
+      "covered_branches": 98,
+      "num_branches": 98,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": {
+      "status": "A",
+      "covered_lines": 97,
+      "num_statements": 98,
+      "covered_branches": 47,
+      "num_branches": 48,
+      "line_percent": 98.9795918367347,
+      "branch_percent": 97.91666666666667
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": {
+      "status": "A",
+      "covered_lines": 149,
+      "num_statements": 149,
+      "covered_branches": 62,
+      "num_branches": 62,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "status": "A",
+      "covered_lines": 141,
+      "num_statements": 141,
+      "covered_branches": 72,
+      "num_branches": 72,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "status": "A",
+      "covered_lines": 174,
+      "num_statements": 174,
+      "covered_branches": 74,
+      "num_branches": 74,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "status": "A",
+      "covered_lines": 103,
+      "num_statements": 103,
+      "covered_branches": 52,
+      "num_branches": 52,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "status": "A",
+      "covered_lines": 156,
+      "num_statements": 156,
+      "covered_branches": 86,
+      "num_branches": 86,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "status": "A",
+      "covered_lines": 101,
+      "num_statements": 101,
+      "covered_branches": 68,
+      "num_branches": 68,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": {
+      "status": "A",
+      "covered_lines": 137,
+      "num_statements": 137,
+      "covered_branches": 36,
+      "num_branches": 36,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": {
+      "status": "A",
+      "covered_lines": 126,
+      "num_statements": 126,
+      "covered_branches": 50,
+      "num_branches": 50,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "status": "A",
+      "covered_lines": 100,
+      "num_statements": 100,
+      "covered_branches": 48,
+      "num_branches": 48,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": {
+      "status": "A",
+      "covered_lines": 47,
+      "num_statements": 47,
+      "covered_branches": 28,
+      "num_branches": 28,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": {
+      "status": "A",
+      "covered_lines": 11,
+      "num_statements": 11,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py": {
+      "status": "A",
+      "covered_lines": 22,
+      "num_statements": 22,
+      "covered_branches": 2,
+      "num_branches": 2,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": {
+      "status": "A",
+      "covered_lines": 112,
+      "num_statements": 112,
+      "covered_branches": 46,
+      "num_branches": 46,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py": {
+      "status": "A",
+      "covered_lines": 80,
+      "num_statements": 80,
+      "covered_branches": 22,
+      "num_branches": 22,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": {
+      "status": "A",
+      "covered_lines": 109,
+      "num_statements": 109,
+      "covered_branches": 24,
+      "num_branches": 24,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py": {
+      "status": "A",
+      "covered_lines": 0,
+      "num_statements": 0,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py": {
+      "status": "A",
+      "covered_lines": 127,
+      "num_statements": 127,
+      "covered_branches": 34,
+      "num_branches": 34,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py": {
+      "status": "A",
+      "covered_lines": 16,
+      "num_statements": 16,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py": {
+      "status": "A",
+      "covered_lines": 162,
+      "num_statements": 162,
+      "covered_branches": 92,
+      "num_branches": 92,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "status": "A",
+      "covered_lines": 70,
+      "num_statements": 70,
+      "covered_branches": 18,
+      "num_branches": 18,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "status": "A",
+      "covered_lines": 80,
+      "num_statements": 80,
+      "covered_branches": 38,
+      "num_branches": 38,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": {
+      "status": "A",
+      "covered_lines": 9,
+      "num_statements": 9,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": {
+      "status": "A",
+      "covered_lines": 63,
+      "num_statements": 63,
+      "covered_branches": 34,
+      "num_branches": 34,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "status": "A",
+      "covered_lines": 145,
+      "num_statements": 145,
+      "covered_branches": 50,
+      "num_branches": 50,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": {
+      "status": "A",
+      "covered_lines": 61,
+      "num_statements": 62,
+      "covered_branches": 37,
+      "num_branches": 38,
+      "line_percent": 98.38709677419355,
+      "branch_percent": 97.36842105263158
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": {
+      "status": "A",
+      "covered_lines": 157,
+      "num_statements": 160,
+      "covered_branches": 55,
+      "num_branches": 58,
+      "line_percent": 98.125,
+      "branch_percent": 94.82758620689656
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "status": "A",
+      "covered_lines": 164,
+      "num_statements": 164,
+      "covered_branches": 58,
+      "num_branches": 58,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": {
+      "status": "A",
+      "covered_lines": 101,
+      "num_statements": 101,
+      "covered_branches": 32,
+      "num_branches": 32,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": {
+      "status": "A",
+      "covered_lines": 225,
+      "num_statements": 225,
+      "covered_branches": 96,
+      "num_branches": 96,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "status": "A",
+      "covered_lines": 167,
+      "num_statements": 167,
+      "covered_branches": 82,
+      "num_branches": 82,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py": {
+      "status": "A",
+      "covered_lines": 127,
+      "num_statements": 128,
+      "covered_branches": 70,
+      "num_branches": 72,
+      "line_percent": 99.21875,
+      "branch_percent": 97.22222222222223
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": {
+      "status": "A",
+      "covered_lines": 147,
+      "num_statements": 147,
+      "covered_branches": 12,
+      "num_branches": 12,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "status": "A",
+      "covered_lines": 182,
+      "num_statements": 182,
+      "covered_branches": 70,
+      "num_branches": 70,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "status": "A",
+      "covered_lines": 41,
+      "num_statements": 41,
+      "covered_branches": 10,
+      "num_branches": 10,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": {
+      "status": "A",
+      "covered_lines": 95,
+      "num_statements": 95,
+      "covered_branches": 24,
+      "num_branches": 24,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": {
+      "status": "A",
+      "covered_lines": 72,
+      "num_statements": 72,
+      "covered_branches": 46,
+      "num_branches": 46,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": {
+      "status": "A",
+      "covered_lines": 123,
+      "num_statements": 123,
+      "covered_branches": 48,
+      "num_branches": 48,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "status": "A",
+      "covered_lines": 113,
+      "num_statements": 115,
+      "covered_branches": 46,
+      "num_branches": 50,
+      "line_percent": 98.26086956521739,
+      "branch_percent": 92.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "status": "A",
+      "covered_lines": 111,
+      "num_statements": 111,
+      "covered_branches": 26,
+      "num_branches": 26,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py": {
+      "status": "A",
+      "covered_lines": 106,
+      "num_statements": 106,
+      "covered_branches": 62,
+      "num_branches": 62,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": {
+      "status": "A",
+      "covered_lines": 142,
+      "num_statements": 142,
+      "covered_branches": 78,
+      "num_branches": 78,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py": {
+      "status": "A",
+      "covered_lines": 183,
+      "num_statements": 183,
+      "covered_branches": 76,
+      "num_branches": 76,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py": {
+      "status": "A",
+      "covered_lines": 98,
+      "num_statements": 98,
+      "covered_branches": 32,
+      "num_branches": 32,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": {
+      "status": "A",
+      "covered_lines": 142,
+      "num_statements": 142,
+      "covered_branches": 42,
+      "num_branches": 42,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": {
+      "status": "A",
+      "covered_lines": 202,
+      "num_statements": 203,
+      "covered_branches": 81,
+      "num_branches": 82,
+      "line_percent": 99.50738916256158,
+      "branch_percent": 98.78048780487805
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py": {
+      "status": "A",
+      "covered_lines": 55,
+      "num_statements": 55,
+      "covered_branches": 14,
+      "num_branches": 14,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": {
+      "status": "A",
+      "covered_lines": 119,
+      "num_statements": 120,
+      "covered_branches": 37,
+      "num_branches": 38,
+      "line_percent": 99.16666666666667,
+      "branch_percent": 97.36842105263158
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": {
+      "status": "A",
+      "covered_lines": 50,
+      "num_statements": 50,
+      "covered_branches": 14,
+      "num_branches": 14,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": {
+      "status": "A",
+      "covered_lines": 108,
+      "num_statements": 108,
+      "covered_branches": 38,
+      "num_branches": 38,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": {
+      "status": "A",
+      "covered_lines": 110,
+      "num_statements": 110,
+      "covered_branches": 42,
+      "num_branches": 42,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "status": "A",
+      "covered_lines": 187,
+      "num_statements": 187,
+      "covered_branches": 76,
+      "num_branches": 76,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "status": "A",
+      "covered_lines": 122,
+      "num_statements": 122,
+      "covered_branches": 46,
+      "num_branches": 46,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "status": "A",
+      "covered_lines": 214,
+      "num_statements": 214,
+      "covered_branches": 102,
+      "num_branches": 102,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "status": "A",
+      "covered_lines": 78,
+      "num_statements": 78,
+      "covered_branches": 35,
+      "num_branches": 36,
+      "line_percent": 100.0,
+      "branch_percent": 97.22222222222223
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": {
+      "status": "A",
+      "covered_lines": 117,
+      "num_statements": 117,
+      "covered_branches": 28,
+      "num_branches": 28,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "status": "A",
+      "covered_lines": 141,
+      "num_statements": 142,
+      "covered_branches": 39,
+      "num_branches": 40,
+      "line_percent": 99.29577464788733,
+      "branch_percent": 97.5
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "status": "A",
+      "covered_lines": 147,
+      "num_statements": 148,
+      "covered_branches": 57,
+      "num_branches": 58,
+      "line_percent": 99.32432432432432,
+      "branch_percent": 98.27586206896552
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": {
+      "status": "A",
+      "covered_lines": 134,
+      "num_statements": 136,
+      "covered_branches": 34,
+      "num_branches": 36,
+      "line_percent": 98.52941176470588,
+      "branch_percent": 94.44444444444444
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": {
+      "status": "A",
+      "covered_lines": 137,
+      "num_statements": 140,
+      "covered_branches": 47,
+      "num_branches": 50,
+      "line_percent": 97.85714285714286,
+      "branch_percent": 94.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_models.py": {
+      "status": "A",
+      "covered_lines": 30,
+      "num_statements": 30,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": {
+      "status": "A",
+      "covered_lines": 178,
+      "num_statements": 178,
+      "covered_branches": 60,
+      "num_branches": 60,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "status": "A",
+      "covered_lines": 16,
+      "num_statements": 16,
+      "covered_branches": 2,
+      "num_branches": 2,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py": {
+      "status": "A",
+      "covered_lines": 116,
+      "num_statements": 120,
+      "covered_branches": 40,
+      "num_branches": 44,
+      "line_percent": 96.66666666666667,
+      "branch_percent": 90.9090909090909
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "status": "A",
+      "covered_lines": 76,
+      "num_statements": 76,
+      "covered_branches": 26,
+      "num_branches": 26,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "status": "A",
+      "covered_lines": 96,
+      "num_statements": 96,
+      "covered_branches": 22,
+      "num_branches": 22,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "status": "A",
+      "covered_lines": 131,
+      "num_statements": 131,
+      "covered_branches": 46,
+      "num_branches": 46,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "status": "A",
+      "covered_lines": 84,
+      "num_statements": 84,
+      "covered_branches": 36,
+      "num_branches": 36,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": {
+      "status": "A",
+      "covered_lines": 207,
+      "num_statements": 209,
+      "covered_branches": 51,
+      "num_branches": 54,
+      "line_percent": 99.04306220095694,
+      "branch_percent": 94.44444444444444
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "status": "A",
+      "covered_lines": 135,
+      "num_statements": 136,
+      "covered_branches": 35,
+      "num_branches": 36,
+      "line_percent": 99.26470588235294,
+      "branch_percent": 97.22222222222223
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "status": "A",
+      "covered_lines": 211,
+      "num_statements": 214,
+      "covered_branches": 93,
+      "num_branches": 96,
+      "line_percent": 98.59813084112149,
+      "branch_percent": 96.875
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": {
+      "status": "A",
+      "covered_lines": 158,
+      "num_statements": 158,
+      "covered_branches": 42,
+      "num_branches": 42,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": {
+      "status": "A",
+      "covered_lines": 137,
+      "num_statements": 139,
+      "covered_branches": 53,
+      "num_branches": 56,
+      "line_percent": 98.56115107913669,
+      "branch_percent": 94.64285714285714
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": {
+      "status": "A",
+      "covered_lines": 151,
+      "num_statements": 151,
+      "covered_branches": 51,
+      "num_branches": 56,
+      "line_percent": 100.0,
+      "branch_percent": 91.07142857142857
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "status": "A",
+      "covered_lines": 35,
+      "num_statements": 35,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "status": "A",
+      "covered_lines": 45,
+      "num_statements": 45,
+      "covered_branches": 8,
+      "num_branches": 8,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "status": "A",
+      "covered_lines": 104,
+      "num_statements": 104,
+      "covered_branches": 38,
+      "num_branches": 38,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": {
+      "status": "A",
+      "covered_lines": 99,
+      "num_statements": 99,
+      "covered_branches": 49,
+      "num_branches": 50,
+      "line_percent": 100.0,
+      "branch_percent": 98.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "status": "A",
+      "covered_lines": 200,
+      "num_statements": 206,
+      "covered_branches": 84,
+      "num_branches": 86,
+      "line_percent": 97.0873786407767,
+      "branch_percent": 97.67441860465117
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": {
+      "status": "A",
+      "covered_lines": 98,
+      "num_statements": 98,
+      "covered_branches": 34,
+      "num_branches": 34,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "status": "A",
+      "covered_lines": 161,
+      "num_statements": 161,
+      "covered_branches": 86,
+      "num_branches": 86,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": {
+      "status": "A",
+      "covered_lines": 173,
+      "num_statements": 173,
+      "covered_branches": 20,
+      "num_branches": 20,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "status": "A",
+      "covered_lines": 150,
+      "num_statements": 150,
+      "covered_branches": 32,
+      "num_branches": 32,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py": {
+      "status": "A",
+      "covered_lines": 93,
+      "num_statements": 93,
+      "covered_branches": 66,
+      "num_branches": 68,
+      "line_percent": 100.0,
+      "branch_percent": 97.05882352941177
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "status": "A",
+      "covered_lines": 169,
+      "num_statements": 171,
+      "covered_branches": 82,
+      "num_branches": 84,
+      "line_percent": 98.83040935672514,
+      "branch_percent": 97.61904761904762
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "status": "A",
+      "covered_lines": 15,
+      "num_statements": 15,
+      "covered_branches": 2,
+      "num_branches": 2,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "status": "A",
+      "covered_lines": 138,
+      "num_statements": 138,
+      "covered_branches": 64,
+      "num_branches": 64,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": {
+      "status": "A",
+      "covered_lines": 17,
+      "num_statements": 17,
+      "covered_branches": 4,
+      "num_branches": 4,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "status": "A",
+      "covered_lines": 83,
+      "num_statements": 83,
+      "covered_branches": 24,
+      "num_branches": 24,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": {
+      "status": "A",
+      "covered_lines": 103,
+      "num_statements": 103,
+      "covered_branches": 34,
+      "num_branches": 34,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": {
+      "status": "A",
+      "covered_lines": 186,
+      "num_statements": 187,
+      "covered_branches": 106,
+      "num_branches": 108,
+      "line_percent": 99.46524064171123,
+      "branch_percent": 98.14814814814815
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py": {
+      "status": "A",
+      "covered_lines": 90,
+      "num_statements": 92,
+      "covered_branches": 55,
+      "num_branches": 60,
+      "line_percent": 97.82608695652173,
+      "branch_percent": 91.66666666666667
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "status": "A",
+      "covered_lines": 146,
+      "num_statements": 146,
+      "covered_branches": 60,
+      "num_branches": 60,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py": {
+      "status": "A",
+      "covered_lines": 108,
+      "num_statements": 109,
+      "covered_branches": 25,
+      "num_branches": 26,
+      "line_percent": 99.08256880733946,
+      "branch_percent": 96.15384615384616
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": {
+      "status": "A",
+      "covered_lines": 106,
+      "num_statements": 111,
+      "covered_branches": 23,
+      "num_branches": 28,
+      "line_percent": 95.49549549549549,
+      "branch_percent": 82.14285714285714
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "status": "A",
+      "covered_lines": 132,
+      "num_statements": 132,
+      "covered_branches": 26,
+      "num_branches": 26,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py": {
+      "status": "A",
+      "covered_lines": 114,
+      "num_statements": 115,
+      "covered_branches": 29,
+      "num_branches": 30,
+      "line_percent": 99.1304347826087,
+      "branch_percent": 96.66666666666667
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py": {
+      "status": "A",
+      "covered_lines": 96,
+      "num_statements": 96,
+      "covered_branches": 40,
+      "num_branches": 40,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": {
+      "status": "A",
+      "covered_lines": 84,
+      "num_statements": 84,
+      "covered_branches": 28,
+      "num_branches": 28,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "status": "A",
+      "covered_lines": 72,
+      "num_statements": 74,
+      "covered_branches": 56,
+      "num_branches": 58,
+      "line_percent": 97.29729729729729,
+      "branch_percent": 96.55172413793103
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py": {
+      "status": "A",
+      "covered_lines": 115,
+      "num_statements": 116,
+      "covered_branches": 49,
+      "num_branches": 50,
+      "line_percent": 99.13793103448276,
+      "branch_percent": 98.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "status": "A",
+      "covered_lines": 154,
+      "num_statements": 154,
+      "covered_branches": 56,
+      "num_branches": 56,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": {
+      "status": "A",
+      "covered_lines": 116,
+      "num_statements": 116,
+      "covered_branches": 28,
+      "num_branches": 28,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py": {
+      "status": "A",
+      "covered_lines": 22,
+      "num_statements": 22,
+      "covered_branches": 14,
+      "num_branches": 14,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": {
+      "status": "A",
+      "covered_lines": 186,
+      "num_statements": 186,
+      "covered_branches": 88,
+      "num_branches": 88,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": {
+      "status": "A",
+      "covered_lines": 204,
+      "num_statements": 204,
+      "covered_branches": 116,
+      "num_branches": 118,
+      "line_percent": 100.0,
+      "branch_percent": 98.30508474576271
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "status": "A",
+      "covered_lines": 200,
+      "num_statements": 200,
+      "covered_branches": 72,
+      "num_branches": 72,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "status": "A",
+      "covered_lines": 209,
+      "num_statements": 209,
+      "covered_branches": 104,
+      "num_branches": 104,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": {
+      "status": "A",
+      "covered_lines": 150,
+      "num_statements": 152,
+      "covered_branches": 50,
+      "num_branches": 52,
+      "line_percent": 98.6842105263158,
+      "branch_percent": 96.15384615384616
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": {
+      "status": "A",
+      "covered_lines": 112,
+      "num_statements": 115,
+      "covered_branches": 45,
+      "num_branches": 48,
+      "line_percent": 97.3913043478261,
+      "branch_percent": 93.75
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "status": "A",
+      "covered_lines": 89,
+      "num_statements": 89,
+      "covered_branches": 44,
+      "num_branches": 44,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "status": "A",
+      "covered_lines": 51,
+      "num_statements": 51,
+      "covered_branches": 22,
+      "num_branches": 22,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": {
+      "status": "A",
+      "covered_lines": 98,
+      "num_statements": 98,
+      "covered_branches": 22,
+      "num_branches": 22,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/_codex_discovery_routing.py": {
+      "status": "A",
+      "covered_lines": 70,
+      "num_statements": 70,
+      "covered_branches": 20,
+      "num_branches": 20,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/agentic_sync.py": {
+      "status": "M",
+      "covered_lines": 174,
+      "num_statements": 180,
+      "covered_branches": 38,
+      "num_branches": 40,
+      "line_percent": 96.66666666666667,
+      "branch_percent": 95.0
+    },
+    "scripts/dev_tools/build_discovery_runtime.py": {
+      "status": "A",
+      "covered_lines": 225,
+      "num_statements": 225,
+      "covered_branches": 102,
+      "num_branches": 102,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/codex_native_converter/classifier.py": {
+      "status": "M",
+      "covered_lines": 62,
+      "num_statements": 64,
+      "covered_branches": 32,
+      "num_branches": 34,
+      "line_percent": 96.875,
+      "branch_percent": 94.11764705882354
+    },
+    "scripts/dev_tools/codex_native_converter/classifier_claude.py": {
+      "status": "A",
+      "covered_lines": 40,
+      "num_statements": 43,
+      "covered_branches": 18,
+      "num_branches": 20,
+      "line_percent": 93.02325581395348,
+      "branch_percent": 90.0
+    },
+    "scripts/dev_tools/codex_native_converter/inventory.py": {
+      "status": "M",
+      "covered_lines": 44,
+      "num_statements": 45,
+      "covered_branches": 19,
+      "num_branches": 20,
+      "line_percent": 97.77777777777777,
+      "branch_percent": 95.0
+    },
+    "scripts/dev_tools/codex_native_converter/mapping.py": {
+      "status": "M",
+      "covered_lines": 53,
+      "num_statements": 55,
+      "covered_branches": 24,
+      "num_branches": 26,
+      "line_percent": 96.36363636363636,
+      "branch_percent": 92.3076923076923
+    },
+    "scripts/dev_tools/codex_native_converter/pipeline.py": {
+      "status": "M",
+      "covered_lines": 90,
+      "num_statements": 94,
+      "covered_branches": 39,
+      "num_branches": 44,
+      "line_percent": 95.74468085106383,
+      "branch_percent": 88.63636363636364
+    },
+    "scripts/dev_tools/codex_native_converter/rewrites.py": {
+      "status": "M",
+      "covered_lines": 37,
+      "num_statements": 41,
+      "covered_branches": 8,
+      "num_branches": 10,
+      "line_percent": 90.2439024390244,
+      "branch_percent": 80.0
+    },
+    "scripts/dev_tools/codex_native_converter/rewrites_detection.py": {
+      "status": "A",
+      "covered_lines": 9,
+      "num_statements": 9,
+      "covered_branches": 4,
+      "num_branches": 4,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/__init__.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/__init__.py": {
+      "status": "M",
+      "covered_lines": 11,
+      "num_statements": 11,
+      "covered_branches": 4,
+      "num_branches": 4,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/analyzer/cli.py": {
+      "status": "M",
+      "covered_lines": 19,
+      "num_statements": 19,
+      "covered_branches": 4,
+      "num_branches": 4,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/emitter.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/inventory.py": {
+      "status": "M",
+      "covered_lines": 6,
+      "num_statements": 6,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/models.py": {
+      "status": "M",
+      "covered_lines": 8,
+      "num_statements": 8,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/pipeline.py": {
+      "status": "M",
+      "covered_lines": 4,
+      "num_statements": 4,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "status": "M",
+      "covered_lines": 8,
+      "num_statements": 8,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": {
+      "status": "M",
+      "covered_lines": 7,
+      "num_statements": 7,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/analyzer/vsto_office.py": {
+      "status": "M",
+      "covered_lines": 52,
+      "num_statements": 52,
+      "covered_branches": 8,
+      "num_branches": 8,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/analyzer/vsto_patterns.py": {
+      "status": "M",
+      "covered_lines": 8,
+      "num_statements": 8,
+      "covered_branches": 2,
+      "num_branches": 2,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/completion_report.py": {
+      "status": "M",
+      "covered_lines": 65,
+      "num_statements": 65,
+      "covered_branches": 10,
+      "num_branches": 10,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "status": "M",
+      "covered_lines": 50,
+      "num_statements": 50,
+      "covered_branches": 8,
+      "num_branches": 8,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/domain_profile.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/domain_profile_models.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/init_cli.py": {
+      "status": "M",
+      "covered_lines": 13,
+      "num_statements": 13,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/init_flow.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/init_models.py": {
+      "status": "M",
+      "covered_lines": 5,
+      "num_statements": 5,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "status": "M",
+      "covered_lines": 50,
+      "num_statements": 50,
+      "covered_branches": 8,
+      "num_branches": 8,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/profile_cli.py": {
+      "status": "M",
+      "covered_lines": 36,
+      "num_statements": 36,
+      "covered_branches": 6,
+      "num_branches": 6,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/discovery/rendering.py": {
+      "status": "M",
+      "covered_lines": 2,
+      "num_statements": 2,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/discovery_build_identity.py": {
+      "status": "A",
+      "covered_lines": 101,
+      "num_statements": 101,
+      "covered_branches": 36,
+      "num_branches": 36,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/generate_acceptance_scenarios.py": {
+      "status": "M",
+      "covered_lines": 75,
+      "num_statements": 75,
+      "covered_branches": 0,
+      "num_branches": 0,
+      "line_percent": 100.0,
+      "branch_percent": null
+    },
+    "scripts/dev_tools/generate_codex_agent_variants.py": {
+      "status": "M",
+      "covered_lines": 122,
+      "num_statements": 129,
+      "covered_branches": 41,
+      "num_branches": 46,
+      "line_percent": 94.57364341085271,
+      "branch_percent": 89.1304347826087
+    },
+    "scripts/dev_tools/push_down_codex_and_agents_customizations.py": {
+      "status": "M",
+      "covered_lines": 107,
+      "num_statements": 109,
+      "covered_branches": 16,
+      "num_branches": 18,
+      "line_percent": 98.1651376146789,
+      "branch_percent": 88.88888888888889
+    },
+    "scripts/dev_tools/quality_tiers_contract.py": {
+      "status": "M",
+      "covered_lines": 191,
+      "num_statements": 191,
+      "covered_branches": 78,
+      "num_branches": 78,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/resolve_codex_deployment.py": {
+      "status": "M",
+      "covered_lines": 83,
+      "num_statements": 83,
+      "covered_branches": 18,
+      "num_branches": 18,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/resolve_codex_topology.py": {
+      "status": "M",
+      "covered_lines": 105,
+      "num_statements": 105,
+      "covered_branches": 36,
+      "num_branches": 36,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/validate_discovery_artifacts.py": {
+      "status": "M",
+      "covered_lines": 103,
+      "num_statements": 103,
+      "covered_branches": 32,
+      "num_branches": 32,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/validate_discovery_profile.py": {
+      "status": "M",
+      "covered_lines": 18,
+      "num_statements": 18,
+      "covered_branches": 6,
+      "num_branches": 6,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "status": "M",
+      "covered_lines": 33,
+      "num_statements": 33,
+      "covered_branches": 2,
+      "num_branches": 2,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    }
+  }
+}

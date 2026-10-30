@@ -1,0 +1,168 @@
+"""Bind the bounded P4-T5 repair confirmation without replaying any unit suite."""
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import subprocess
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+E = FEATURE / "evidence"
+Q = E / "qa-gates"
+START = datetime.now(timezone.utc)
+
+
+def digest(data):
+    return sha256(data).hexdigest()
+
+
+def ref(path):
+    return {"path": Path(path).as_posix(), "sha256": digest(Path(path).read_bytes())}
+
+
+def load(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def verify_refs(value):
+    if isinstance(value, dict):
+        if "path" in value and "sha256" in value and value["path"].startswith("docs/"):
+            assert ref(value["path"])["sha256"] == value["sha256"], value["path"]
+        for item in value.values():
+            verify_refs(item)
+    elif isinstance(value, list):
+        for item in value:
+            verify_refs(item)
+
+
+def source_map(value):
+    return {p: r["sha256"] if isinstance(r, dict) else r for p, r in value.items()}
+
+
+paths = [
+    Q / "p4t5-access-repair-freeze.2026-10-19T07-56.json",
+    E / "regression-testing/p4t5-com-repair-freeze.2026-10-19T07-58.json",
+    Q / "p4t5-executor-repair-probes.2026-10-19T07-59.json",
+    Q / "p4t5-executor-candidate-review.2026-10-19T07-42.json",
+]
+expected = ["ac19d12cb7096d9c30e86470cff02032a9d1ac87055db3c39292f875bc76b3c4",
+            "d3914889c412fd3c0e81d9aaedb4284328dcda050a47a943b9800f3fa1eebfc4",
+            "cc6986519a4eb11a7350967379f2a72e90a06c6ee77ddd77efc4a02cf7d111a5",
+            "95773ccf65e1e9f7891338871b4699e13ac51515979bc57943389d4e3fd71726"]
+for path, expected_hash in zip(paths, expected, strict=True):
+    assert ref(path)["sha256"] == expected_hash
+access, com, probes, review = [load(path) for path in paths]
+for document in (access, com, probes):
+    verify_refs(document)
+assert probes["failed_expectations"] == 0 and probes["case_count"] == 12
+assert ref(Q / "p4t5-executor-candidate-review.2026-10-19T07-42.md")["sha256"] == "364c0ab5d53e2f70ef4ccebe53b5fa207cd0c13bf0f8ee75bf2a11a50a61e881"
+
+source_rows = []
+for row in access["files"] + com["source_files"]:
+    path = row["path"]
+    data = Path(path).read_bytes()
+    assert digest(data) == row["sha256"] and b"\r" not in data
+    assert len(data.splitlines()) <= 500
+    index = subprocess.run(["git", "show", ":" + path], capture_output=True, check=False)
+    source_rows.append({"path": path, "working_sha256": digest(data), "lines": len(data.splitlines()),
+                        "index_sha256": digest(index.stdout) if index.returncode == 0 else None,
+                        "working_equals_index": index.returncode == 0 and index.stdout == data,
+                        "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit."})
+assert len(source_rows) == 10
+gate_rows = []
+for label, items, files, count in (("access", access["ordered_receipts"], access["files"], 180),
+                                  ("COM", com["ordered_focused_gates"], com["source_files"], 137)):
+    expected_sources = {row["path"]: row["sha256"] for row in files}
+    last = None
+    for item in items:
+        gate = load(item["path"])
+        assert gate["exit_code"] == 0
+        assert source_map(gate["source_before"]) == expected_sources == source_map(gate["source_after"])
+        start = datetime.fromisoformat(gate.get("started_at", gate.get("started")))
+        finish = datetime.fromisoformat(gate.get("finished_at", gate.get("finished")))
+        assert start <= finish and (last is None or last <= start)
+        last = finish
+        if item["stage"] in {"unit", "tests"}:
+            assert str(count) + " passed" in gate.get("stdout", gate.get("output", ""))
+        gate_rows.append({"subset": label, "stage": item["stage"], "exit_code": 0, "receipt": ref(item["path"])})
+
+ranges = load(access["coverage_ranges"]["path"])
+verify_refs(ranges)
+coverage_access = load(ranges["coverage"]["path"])
+coverage_com = load(com["coverage"]["path"])
+assert coverage_access["totals"]["covered_lines"] == coverage_access["totals"]["num_statements"] == 226
+assert coverage_access["totals"]["covered_branches"] == coverage_access["totals"]["num_branches"] == 94
+assert coverage_com["totals"]["covered_lines"] == coverage_com["totals"]["num_statements"] == 206
+assert coverage_com["totals"]["covered_branches"] == coverage_com["totals"]["num_branches"] == 88
+for unit in ranges["units"]:
+    assert unit["covered_statements"] == unit["statements"] and unit["covered_branches"] == unit["branches"]
+com_structure = load(com["coverage_structure"]["path"])
+com_units = 0
+for module in com_structure["summaries"]:
+    for group in (module["functions"], module["classes"]):
+        for summary in group.values():
+            assert summary["covered_lines"] == summary["num_statements"]
+            assert summary["covered_branches"] == summary["num_branches"]
+            com_units += 1
+assert len(ranges["units"]) == 15 and com_units == 12
+
+checks = [
+    {"id": "R1", "status": "PASS", "proof": "All five retained syntax-negative probes and both positive controls pass. Single-pass delimiter indexes and right-to-left attribute propagation avoid repeated suffix scans; exact declaration/body tests and counted access traversal are retained in owner proof."},
+    {"id": "R2", "status": "PASS", "proof": "Retained True/False/fractional capacities fail with source-record-limit. The real 64 MiB-plus-one probe returns source-limit before masking; no mask call or timing threshold. Exact token/candidate type/range checks precede allocation."},
+    {"id": "R3", "status": "PASS", "proof": "The three metadata assertions now have immediate intent comments; all original assertions and cases are retained."},
+    {"id": "approved-COM-split", "status": "PASS", "proof": "com_syntax.py contains pure lexical work; com_interop explicitly re-exports the identical callable with unchanged keyword defaults. XML, provenance and projection definitions remain in com_interop and preserve their ASTs in owner evidence."},
+]
+harness_time = datetime.now(timezone.utc)
+harness = Q / ("p4t5-executor-repair-confirmation-harness." + harness_time.strftime("%Y-%m-%dT%H-%M") + ".txt")
+assert not harness.exists()
+harness.write_bytes(Path(__file__).read_bytes())
+written = datetime.now(timezone.utc)
+stamp = written.strftime("%Y-%m-%dT%H-%M")
+target = Q / ("p4t5-executor-repair-confirmation." + stamp + ".json")
+assert not target.exists()
+document = {
+    "task": "P4-T5", "timestamp": stamp, "publication_time_utc": written.isoformat(),
+    "started_at": START.isoformat(), "finished_at": written.isoformat(),
+    "command": "poetry run python SCRATCH/issue-980-p4t5-confirm-repair.py", "exit_code": 0,
+    "status": "READY_FOR_CHECKED_WIP_AND_FINAL_GATES", "findings": [], "confirmed_checks": checks,
+    "routing_receipt": "atomic_execution_p4t5_repair_confirmation",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_authority": "Actual gpt-6-astra/max; routing_valid, launch_authority_valid and provenance_valid all true, verified at confirmation entry.",
+    "references": [ref(path) for path in paths], "harness": ref(harness),
+    "working_and_index_bindings": source_rows, "focused_receipts_reused": gate_rows,
+    "coverage": {"access": {"cases": 180, "retained": 156, "added": 24, "lines": [226, 226], "branches": [94, 94], "ranges": 15},
+                 "COM": {"cases": 137, "retained": 111, "added": 26, "lines": [206, 206], "branches": [88, 88], "ranges": 12}},
+    "reuse": "The complete original candidate review remains authoritative outside R1-R3 and the approved split. All 267 original cases remain, plus 50 focused additions. No suite, final gate or predecessor review was repeated.",
+    "timestamp_qualification": probes["timestamp_qualification"],
+    "limitations": ["Lexical candidates remain inferred; aliases, receiver binding, runtime paths and actual platform execution remain unresolved.",
+                    "COM receipt output is path-sanitized combined text, not separate unsanitized stdout/stderr.",
+                    "Final ordered gates and final task acceptance are still pending; no P4-T5 or AC checkoff occurred."],
+    "plan_status": {"completed": 36, "total": 84, "ac_completed": 13, "ac_total": 66},
+    "mutations": "Only executor evidence and inert harness snapshots. No production/test, plan/AC, checkpoint or Git writes.",
+}
+target.write_bytes((json.dumps(document, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+markdown_time = datetime.now(timezone.utc)
+md_stamp = markdown_time.strftime("%Y-%m-%dT%H-%M")
+markdown = Q / ("p4t5-executor-repair-confirmation." + md_stamp + ".md")
+assert not markdown.exists()
+text = f"""# P4-T5 bounded repair confirmation
+
+Timestamp: {md_stamp}
+Publication time (UTC): {markdown_time.isoformat()}
+Command: `poetry run python SCRATCH/issue-980-p4t5-confirm-repair.py`
+EXIT_CODE: 0
+Output Summary: **READY_FOR_CHECKED_WIP_AND_FINAL_GATES**. R1-R3 and the approved COM split pass bounded confirmation; no remaining finding or open probe.
+
+All eleven original probes pass, plus the explicit COM callable re-export/signature check: **12/12**. The genuine over-limit input is rejected before masking, with no timing assertion. Bounded delimiter maps reject the retained collection/declaration false positives and preserve genuine calls and attributes. The three required intent comments are present with assertions retained. XML, provenance and projection remain in the original COM adapter; the new pure syntax helper preserves the public callable.
+
+The two immutable repair manifests bind ten working source/test streams. Their separate focused loops pass: access **180 cases**, **226/226 statements**, **94/94 branches**, **15 ranges**; COM **137 cases**, **206/206 statements**, **88/88 branches**, **12 ranges**. All measured ranges are fully covered. All **267 original cases** remain, with **50 additions**. No suite or predecessor review was repeated. Working/index qualifications are recorded separately; staging belongs to the coordinator.
+
+Timestamp qualification: the immutable candidate-review filenames marked **07:42** refer to the binding execution. Those review files were actually published at **2026-10-19 07:45:10 UTC**. Their original bytes are unchanged. This receipt and its harness use the host clock immediately before publication.
+
+The original complete review is reused outside this bounded correction. Lexical binding/runtime limitations and the COM combined-output qualification remain explicit. Final ordered gates and task acceptance are pending. Plan **36/84**, source ACs **13/66**; no checkoff or production/test/checkpoint/Git mutation.
+
+- [Exact confirmation and manifest bindings]({target.name}), SHA-256 `{ref(target)['sha256']}`.
+- [Original-probe closure](p4t5-executor-repair-probes.2026-10-19T07-59.json), SHA-256 `cc6986519a4eb11a7350967379f2a72e90a06c6ee77ddd77efc4a02cf7d111a5`.
+- [Exact confirmation harness]({harness.name}), SHA-256 `{ref(harness)['sha256']}`.
+"""
+markdown.write_bytes(text.encode("utf-8"))
+print(json.dumps({"status": document["status"], "json": ref(target), "markdown": ref(markdown), "harness": ref(harness)}))

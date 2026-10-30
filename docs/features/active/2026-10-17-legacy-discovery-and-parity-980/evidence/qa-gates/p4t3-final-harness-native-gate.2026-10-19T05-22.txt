@@ -1,0 +1,92 @@
+"""Exercise real Windows byte/Git capture with pure C# adapters in scratch only."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+from uuid import uuid4
+from dataclasses import replace
+
+import yaml
+from drm_copilot_discovery.analyzer.dotnet_inventory import CSharpDeclarationAnalyzer,EventSubscriptionAnalyzer
+from drm_copilot_discovery.analyzer.emitter import inventory_result
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.input_capture import capture_inputs
+from drm_copilot_discovery.analyzer.inventory import RepositoryAnalyzer
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+
+scratch=Path(__file__).resolve().parent
+root=scratch/('native-csharp-'+uuid4().hex)
+root.mkdir()
+assert root.resolve().parent==scratch
+checks=[]
+def check(name,value):
+    if not value: raise AssertionError(name)
+    checks.append(name)
+    print('PASS '+name,flush=True)
+def put(path,content):
+    destination=root/path
+    assert root in destination.resolve().parents
+    destination.parent.mkdir(parents=True,exist_ok=True)
+    destination.write_bytes(content)
+def tree():
+    return {path.relative_to(root).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(root.rglob('*')) if path.is_file() and '.git' not in path.relative_to(root).parts}
+def git(*arguments):
+    return subprocess.run(['git','-C',str(root),*arguments],capture_output=True,check=True).stdout
+def run_git(argv,*,output_limit):
+    process=subprocess.Popen(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    try:
+        content=process.stdout.read(output_limit+1)
+        if len(content)>output_limit:
+            process.kill()
+            raise OSError('Native Git output exceeded its bounded read')
+        if process.wait()!=0: raise OSError('Native Git read failed')
+        return content
+    finally:
+        if process.poll() is None: process.kill()
+        process.wait(); process.stdout.close()
+
+fixtures=Path('tests/fixtures/discovery_dotnet_vsto')
+for name in ('csharp_declarations.cs.txt','csharp_events.cs.txt'):
+    put('src/'+name.removesuffix('.txt'),(fixtures/name).read_bytes())
+put('src/Unicode.CS',('namespace Δ;\r\nclass Ω { public int Count; void Wire() { value += other.Count; } }').encode('utf-16'))
+put('src/Conditional.cs',b'#if FIRST\rclass First {}\r#else\rclass Second {}\r#endif\rclass Literal { string text = """class Hidden {}"""; }')
+git('init','--quiet'); git('config','core.autocrlf','false'); git('add','src')
+git('-c','user.name=Discovery fixture','-c','user.email=discovery@example.invalid','-c','commit.gpgsign=false','commit','--quiet','-m','Synthetic lexical C# inventory')
+revision=git('rev-parse','HEAD').decode('ascii').strip()
+catalog=load_catalog()
+value=yaml.safe_load(Path('examples/discovery/v2/domain-profile.example.yaml').read_text(encoding='utf-8'))
+value.pop('extension_schemas'); value['system']['role']='legacy-source'
+value['repository']['revision']=revision; value['repositories']=[]; value['clients']=[]
+value['production_roots']=['src']; value['test_roots']=[]; value['documentation_roots']=[]
+value['project_entry_points']=[]; value['excluded_paths']=[]
+identifiers=('repository','csharp-symbols','event-subscriptions')
+value['analyzers']={'enabled':list(identifiers),'options':{'max_file_bytes':16384},'ignored_paths':[],'extension_result_manifests':[]}
+profile=ProfileV2(json.dumps(value),format='json',catalog=catalog)
+reader=LocalGitReader(workspace_root=str(root),repository_id=profile.repository.id,run=run_git)
+primitives=LocalMutationPrimitives(workspace_root=str(root),lock_path=str(scratch/('native-csharp-'+uuid4().hex+'.lock')))
+before=tree(); status=git('status','--porcelain=v1','-z')
+inputs=capture_inputs(profile,workspace_root=str(root),metadata=primitives.metadata,read_bytes=primitives.read_bytes)
+check('native capture retains all four selected C# byte inputs',len(inputs.inputs)==4 and all(item.file is not None for item in inputs.inputs))
+pins=tuple(reader.read_file(revision=revision,path=item.path,limit=16384) for item in inputs.inputs)
+inputs=replace(inputs,repository_files=pins)
+check('real Git identity and captured source bytes agree',reader.identity().revision==revision and all(pin.content==item.file.content for pin,item in zip(pins,inputs.inputs)))
+declarations=CSharpDeclarationAnalyzer().analyze(inputs); events=EventSubscriptionAnalyzer().analyze(inputs)
+check('native lexical adapters retain physical declarations without blockers',len(declarations.components)==4 and len(events.components)==4 and not any(item['blocking'] for item in declarations.diagnostics+events.diagnostics))
+symbols={prop['value'] for finding in declarations.findings for prop in finding['properties'] if prop['name']=='symbol'}
+check('wide encoding and inactive branches retain names while raw string traps stay absent',{'Ω','First','Second','Literal'}<=symbols and 'Hidden' not in symbols)
+structural=RepositoryAnalyzer().analyze(inputs)
+result=inventory_result(inputs,(structural,declarations,events),analyzer_ids=identifiers,timestamp='2026-10-19T00:00:00Z',author_or_agent=row(kind='tool',id='native-proof'),catalog=catalog)
+repeated=inventory_result(inputs,(events,declarations,structural),analyzer_ids=tuple(reversed(identifiers)),timestamp='2026-10-20T00:00:00Z',author_or_agent=row(kind='human',id='second-observer'),catalog=catalog)
+check('composed inventory identity is independent of analyzer order and capture clock',result.semantic_sha256==repeated.semantic_sha256 and result.document['id']==repeated.document['id'])
+check('ambiguous handler relationships remain inferred with unresolved targets',events.relationships and all(item['to_component_id'] is None and item['classification']=='inferred' for item in events.relationships))
+check('ledger proposals remain uninspected and unassigned',all(item['inspection_status']=='uninspected' and item['disposition']=='unassigned' for item in result.ledger_components))
+check('analysis preserves the native source tree and Git status',before==tree() and status==git('status','--porcelain=v1','-z'))
+output=Path(sys.argv[1])
+record={'task':'P4-T3','timestamp':datetime.datetime.now(datetime.timezone.utc).isoformat(),'platform':sys.platform,'checks':checks,'scratch_repository':'SCRATCH/'+root.name,'revision':revision,'profile':value,'inputs':before,'inventory_id':result.document['id'],'semantic_sha256':result.semantic_sha256,'component_count':len(result.document['components']),'finding_count':len(result.document['findings']),'relationship_count':len(result.document['relationships']),'source_tree_unchanged':before==tree(),'git_status_unchanged':status==git('status','--porcelain=v1','-z')}
+output.write_text(json.dumps(record,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+print(output.as_posix(),flush=True)

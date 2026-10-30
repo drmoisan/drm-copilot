@@ -1,0 +1,638 @@
+[
+  {
+    "stage": 1,
+    "label": "p3t7-pass1-format",
+    "started": "2026-10-19T00:06:53.957402+00:00",
+    "finished": "2026-10-19T00:06:55.400015+00:00",
+    "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py tests/discovery_runtime/test_migration_v1.py tests/discovery_runtime/test_migration_unknowns.py",
+    "exit_code": 0,
+    "duration_seconds": 1.443,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 2,
+    "label": "p3t7-pass1-lint",
+    "started": "2026-10-19T00:06:58.029561+00:00",
+    "finished": "2026-10-19T00:06:59.189501+00:00",
+    "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py tests/discovery_runtime/test_migration_v1.py tests/discovery_runtime/test_migration_unknowns.py",
+    "exit_code": 0,
+    "duration_seconds": 1.16,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 3,
+    "label": "p3t7-pass1-types",
+    "started": "2026-10-19T00:07:01.797373+00:00",
+    "finished": "2026-10-19T00:07:13.553777+00:00",
+    "command": "poetry run pyright",
+    "exit_code": 0,
+    "duration_seconds": 11.756,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 1,
+    "label": "p3t7-pass2-format",
+    "started": "2026-10-19T00:07:32.845213+00:00",
+    "finished": "2026-10-19T00:07:34.305504+00:00",
+    "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py tests/discovery_runtime/test_migration_v1.py tests/discovery_runtime/test_migration_unknowns.py",
+    "exit_code": 0,
+    "duration_seconds": 1.46,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 2,
+    "label": "p3t7-pass2-lint",
+    "started": "2026-10-19T00:07:37.035089+00:00",
+    "finished": "2026-10-19T00:07:38.225841+00:00",
+    "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py tests/discovery_runtime/test_migration_v1.py tests/discovery_runtime/test_migration_unknowns.py",
+    "exit_code": 0,
+    "duration_seconds": 1.191,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 3,
+    "label": "p3t7-pass2-types",
+    "started": "2026-10-19T00:07:40.849897+00:00",
+    "finished": "2026-10-19T00:07:52.484516+00:00",
+    "command": "poetry run pyright",
+    "exit_code": 0,
+    "duration_seconds": 11.635,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 4,
+    "label": "p3t7-pass2-architecture",
+    "started": "2026-10-19T00:08:25.154336+00:00",
+    "finished": "2026-10-19T00:08:26.823983+00:00",
+    "command": "poetry run python SCRATCH/issue-980-p3t7-architecture.py",
+    "exit_code": 0,
+    "duration_seconds": 1.67,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 5,
+    "label": "p3t7-pass2-unit",
+    "started": "2026-10-19T00:08:29.413106+00:00",
+    "finished": "2026-10-19T00:10:25.482200+00:00",
+    "command": "poetry run python SCRATCH/issue-980-p3t7-tests.py forward --cov=drm_copilot_discovery.migration_models --cov=drm_copilot_discovery.migration_conversion --cov=drm_copilot_discovery.migration_v1 --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p3t7-final-coverage.json",
+    "exit_code": 0,
+    "duration_seconds": 116.069,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 5,
+    "label": "p3t7-pass2-coverage-audit",
+    "started": "2026-10-19T00:10:32.372277+00:00",
+    "finished": "2026-10-19T00:10:33.610570+00:00",
+    "command": "poetry run python SCRATCH/issue-980-p3t7-coverage-audit.py",
+    "exit_code": 0,
+    "duration_seconds": 1.238,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 5,
+    "label": "p3t7-pass2-reverse",
+    "started": "2026-10-19T00:10:36.200114+00:00",
+    "finished": "2026-10-19T00:11:23.761820+00:00",
+    "command": "poetry run python SCRATCH/issue-980-p3t7-tests.py reverse --no-cov",
+    "exit_code": 0,
+    "duration_seconds": 47.562,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 6,
+    "label": "p3t7-pass2-contracts",
+    "started": "2026-10-19T00:11:35.293247+00:00",
+    "finished": "2026-10-19T00:11:43.072141+00:00",
+    "command": "poetry run pytest -o addopts=-ra tests/schemas/discovery/test_v1_schema_documents.py tests/schemas/discovery/test_v1_fixtures.py tests/schemas/discovery/test_v2_common_schemas.py tests/schemas/discovery/test_v2_control_schemas.py tests/discovery_runtime/test_resources.py -q --no-cov",
+    "exit_code": 0,
+    "duration_seconds": 7.779,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  },
+  {
+    "stage": 7,
+    "label": "p3t7-pass2-native",
+    "started": "2026-10-19T00:11:50.423679+00:00",
+    "finished": "2026-10-19T00:21:55.212083+00:00",
+    "command": "poetry run python SCRATCH/issue-980-p3t7-native.py . SCRATCH SCRATCH/issue-980-p3t7-final-native.json",
+    "exit_code": 0,
+    "duration_seconds": 604.788,
+    "source_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    },
+    "source_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+        "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+        "physical_lines": 300
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+        "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+        "physical_lines": 273
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+        "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+        "physical_lines": 356
+      },
+      "tests/discovery_runtime/test_migration_v1.py": {
+        "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+        "physical_lines": 489
+      },
+      "tests/discovery_runtime/test_migration_unknowns.py": {
+        "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+        "physical_lines": 440
+      }
+    }
+  }
+]

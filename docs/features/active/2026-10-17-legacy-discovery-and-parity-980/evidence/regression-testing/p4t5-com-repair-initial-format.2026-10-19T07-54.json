@@ -1,0 +1,48 @@
+{
+  "stage": "0",
+  "label": "p4t5-com-repair-initial-format",
+  "started": "2026-10-19T07:54:52.389997+00:00",
+  "finished": "2026-10-19T07:54:54.210255+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+  "exit_code": 0,
+  "duration_seconds": 1.82,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "090ab06c27dd4cf28dd5cc5acda1cbc30a750d45a018a723e0959c4aeb4aecef",
+      "physical_lines": 228
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "15187a37e17ac9ef617cb9b650881dce416cd3d9516478d547779b9d264b104f",
+      "physical_lines": 364
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "b470e2528f8f0ba0a59112e208de4f33ce919f3fd8142be3188999b4697d4d4a",
+      "physical_lines": 428
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "physical_lines": 229
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "physical_lines": 367
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "63f3619499363757d0dcbccd4a697fecc4a7cad47ea446b0206efc7303dc6e39",
+      "physical_lines": 429
+    }
+  },
+  "output": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\com_syntax.py\nreformatted tests\\discovery_runtime\\analyzer\\test_com_candidates.py\nreformatted tests\\discovery_runtime\\analyzer\\test_com_interop.py\n\nAll done! \u2728 \ud83c\udf70 \u2728\n3 files reformatted, 1 file left unchanged.\n",
+  "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "scope": "P4-T5 COM subset only"
+}

@@ -1,0 +1,23 @@
+{
+  "Command": "Metadata-only native correction binding assembly through Python stdin",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T09-46",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-candidate-native-repair.2026-10-20T09-46.json",
+    "sha256": "1a0da6fa3b283be26954f6c755db3056a1aacb869074bd2e05e51070cb5e0ef2"
+  },
+  "delta": "Only the absence assertion uses path membership in the actual public snapshot.manifest.files tuple. All five required-existing-path lookups and all fixed expectations remain unchanged.",
+  "failure_preservation": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-native-failure-preservation.2026-10-20T09-46.json",
+  "new_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-native-corrected-harness.2026-10-20T09-46.txt",
+    "sha256": "0997873d2633af4bfc819adafe7422ecb7141a19254f66fcbe121fed6e91a6d3"
+  },
+  "old_harness_sha256": "b3d6e78f5f7af0c9d10cb9f6f6f91c16f0fbc754e44e3a0c41abcda65206c1f3",
+  "prior_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-candidate-qualified.2026-10-20T09-44.json",
+    "sha256": "2857c6f423799d2741c7855500b921c7d7f2c5a10fa6df745bd6db10c11174ef"
+  },
+  "source_test_mutation": false,
+  "static_binding_command_qualification": "The 09:44 static-repair-binding Command names its intended checker target. Its EXIT_CODE=0 refers only to metadata assembly, not a checker run; execution_started=false is authoritative. Actual static PASS is recorded separately at 09:44.",
+  "unchanged_nodes": 108
+}

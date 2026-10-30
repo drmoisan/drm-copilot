@@ -15,8 +15,7 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 import pytest
-
-from scripts.dev_tools.discovery.io import (
+from drm_copilot_discovery.io import (
     ArtifactValidationError,
     read_artifact_text,
     validate_or_raise,

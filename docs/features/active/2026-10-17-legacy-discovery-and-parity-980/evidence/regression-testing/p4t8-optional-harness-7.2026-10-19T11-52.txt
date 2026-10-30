@@ -1,0 +1,10 @@
+import json
+from pathlib import Path
+r=Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-optional-focused4-pytest.2026-10-19T11-40.json')
+d=json.loads(r.read_bytes())
+lines=d['streams']['stdout']['presentation'].splitlines()
+start=next((i for i,x in enumerate(lines) if ' ERRORS ' in x),len(lines))
+for line in lines[start:]:
+    if line.strip(): print(line[:600])
+c=json.loads(Path('C:/Users/DanMoisan/AppData/Local/Temp/codex-legacy-discovery/issue-980/issue-980-p4t8-optional-focused4-coverage.json').read_bytes())
+for p,v in c['files'].items(): print(p,v['summary'],v['missing_lines'])

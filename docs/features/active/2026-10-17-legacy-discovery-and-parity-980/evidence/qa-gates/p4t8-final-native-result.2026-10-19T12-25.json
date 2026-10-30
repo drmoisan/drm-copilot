@@ -1,0 +1,154 @@
+{
+  "checks": [
+    "ordinary registry and legacy compatibility imports load no optional package",
+    "configured repository-only selection stays free of optional imports",
+    "complete mixed selection fails before importing its valid optional member",
+    "legacy optional CLI refuses before loading profile or optional implementation",
+    "native capture retains all four configured source XML and project inputs",
+    "real Git provenance preserves CRLF and original UTF16 XML bytes",
+    "explicit optional selection enables sorted fixed registry dispatch",
+    "optional source components retain detected exact-pin provenance",
+    "CSharp relevance remains inferred while XML declarations are detected",
+    "declared callbacks retain inferred unresolved nullable targets",
+    "argument targets and condition values never enter inventory rows",
+    "false embedding and condition presence stay explicit declaration metadata",
+    "source anchors retain original hashes pinned revisions and historical IDs",
+    "valid optional syntax has no blocking diagnostics",
+    "legacy analyze shim forwards only the same consented immutable capture",
+    "missing pins retain low confidence and explicit provenance blockers",
+    "aggregate exhaustion discards partial rows and retains one fixed blocker",
+    "direct adapter rechecks explicit consent after it has already been imported",
+    "retained original two-root Ribbon fixture remains a malformed negative",
+    "registered schema-valid inventory identity ignores adapter order and clock",
+    "coverage proposals remain uninspected and unassigned",
+    "analysis and CLI refusal preserve all source artifact and Git state"
+  ],
+  "component_count": 8,
+  "finding_count": 16,
+  "git_status_unchanged": true,
+  "inputs": {
+    ".gitattributes": "c4aec070ffe08cb285ccd6d83c1d522c2d782ead14ac1b1f6d17c1740db423cd",
+    "docs/migration/discovery/domain-profile.yaml": "18ba757ce930222eb3c4c1ea828e68ac0da8a533cdfebd5a772b6426f26cc6b0",
+    "src/addin.cs": "4f07d1dbaf42168554f161bf83a99c7b44ba87dd7057b7e0a802f7b48311a017",
+    "src/app.csproj": "30a7374a8295ee9ba397b91b7fa83e50fe821268b0007d53c548fbbe970b0777",
+    "src/ribbon2006.xml": "43b8d8fa0caf93e6725f747b54be09f346de052255962b4cbcf2fc3bdd00a97f",
+    "src/ribbon2009.xml": "080cb98afef0a874cd84a50f7ef504145f8acec14b7c190c6f1afe8dd358c333"
+  },
+  "inventory_id": "inventory-5077f6ae9fdd1912403b7372b1984f9c386a48477fe0da046b4c84d5944b33dc",
+  "limitations": "Windows Python/Git operational composition only. No installed Office, callback execution, host automation, coding-agent host, non-Windows run or publication attempt. Registry dispatch never grants mutation authority.",
+  "operation_seconds": {
+    "capture_inputs": 0.04457710002316162,
+    "complete_capture_and_git_precapture": 1.3256413000053726,
+    "optional_analyze": 0.01095490000443533,
+    "two_inventory_projections": 0.7646195999986958,
+    "unpinned_analysis": 0.0022063999786041677
+  },
+  "platform": "win32",
+  "profile": {
+    "$schema": "urn:drm-copilot:discovery:2.0.0:domain-profile",
+    "analyzers": {
+      "enabled": [
+        "repository",
+        "office-vsto"
+      ],
+      "extension_result_manifests": [],
+      "ignored_paths": [],
+      "options": {
+        "max_file_bytes": 16384
+      }
+    },
+    "artifact_kind": "domain-profile",
+    "artifacts": {
+      "acceptance": "docs/migration/discovery/acceptance",
+      "characterization": "docs/migration/discovery/characterization",
+      "coverage_ledger": "docs/migration/discovery/coverage-ledger.json",
+      "evidence": "docs/migration/discovery/evidence",
+      "feature_contracts": "docs/migration/discovery/feature-contracts",
+      "implementation_records": "docs/migration/discovery/implementation-records",
+      "inventory": "docs/migration/discovery/inventory",
+      "parity_matrix": "docs/migration/discovery/parity-matrix.json",
+      "product_decisions": "docs/migration/discovery/product-decisions.yaml",
+      "profile": "docs/migration/discovery/domain-profile.yaml",
+      "reports": "docs/migration/discovery/reports",
+      "root": "docs/migration/discovery",
+      "scope": "docs/migration/discovery/scope.yaml",
+      "source_snapshots": "docs/migration/discovery/source-snapshots",
+      "unspecified_behaviors": "docs/migration/discovery/unspecified-behaviors.yaml"
+    },
+    "clients": [],
+    "completion_gates": {
+      "block_on_unresolved_required_behavior": true,
+      "planning_prerequisite": "discovery-complete",
+      "require_acceptance_scenarios": true,
+      "require_all_dispositions": true,
+      "require_approved_deviations": true,
+      "require_confirmed_scope": true,
+      "require_current_inventory": true,
+      "require_feature_evidence": true,
+      "require_runtime_for_declared_features": true
+    },
+    "decision_owners": [
+      {
+        "id": "owner-example",
+        "required_evidence_types": [
+          "decision"
+        ]
+      }
+    ],
+    "documentation_roots": [],
+    "evidence_roots": [
+      "docs/migration/discovery/evidence"
+    ],
+    "excluded_paths": [],
+    "extensions": {
+      "example.discovery": {
+        "catalog_label": "Synthetic fixture",
+        "revision_notes": []
+      }
+    },
+    "id": "profile-example",
+    "production_roots": [
+      "src"
+    ],
+    "profile_state": "configured",
+    "profile_version": 2,
+    "project_entry_points": [],
+    "repositories": [],
+    "repository": {
+      "id": "workspace-example",
+      "revision": "87b454e870874bcb1b810406dff226f5716899a6",
+      "revision_policy": "working-tree-at-pin",
+      "vcs": "git"
+    },
+    "required_feature_dimensions": [
+      "trigger",
+      "observable_outputs"
+    ],
+    "required_modes": [
+      "online"
+    ],
+    "required_platforms": [
+      "browser"
+    ],
+    "runtime": {
+      "capability": "manual",
+      "required_feature_ids": []
+    },
+    "schema_version": "2.0.0",
+    "system": {
+      "id": "processing-example",
+      "name": "Example processing system",
+      "role": "legacy-source"
+    },
+    "test_roots": []
+  },
+  "publication": "not-attempted",
+  "relationship_count": 3,
+  "revision": "87b454e870874bcb1b810406dff226f5716899a6",
+  "scratch_repository": "SCRATCH/issue-980-p4t8-native-1e08f4d073af4affa80a19aa19d4902d",
+  "semantic_sha256": "5077f6ae9fdd1912403b7372b1984f9c386a48477fe0da046b4c84d5944b33dc",
+  "source_tree_unchanged": true,
+  "task": "P4-T8",
+  "timestamp": "2026-10-19T12:25:05.463310+00:00",
+  "whole_composition_seconds": 4.165836600004695
+}

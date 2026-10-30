@@ -1,0 +1,17 @@
+# p2t9-pass7-final-audit
+
+Timestamp: 2026-10-18T10-57
+Command: poetry run python SCRATCH/issue-980-p2t9-task-audit.py 7
+EXIT_CODE: 0
+Output Summary: {"metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-coverage-metrics.2026-10-18T10-57.json", "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-coverage.2026-10-18T10-57.json", "owned": 8, "prior": 203, "frozen": 24, "focused": 107, "reversed": 107, "coverage": {"packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {"covered_lines": 139, "statements": 140, "covered_branches": 67, "branches": 68, "line_percent": 99.28571428571429, "branch_percent": 98.52941176470588, "baseline_statements": 0, "classification": "new production module"}, "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": {"covered_lines": 72, "statements": 72, "covered_branches": 46, "branches": 46, "line_percent": 100.0, "branch_percent": 100.0, "baseline_statements": 0, "classification": "new production module"}, "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {"covered_lines": 133, "statements": 133, "covered_branches": 42, "branches": 42, "line_percent": 100.0, "branch_percent": 100.0, "baseline_statements": 0, "classification": "new production module"}, "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {"covered_lines": 51, "statements": 51, "covered_branches": 22, "branches": 22, "line_percent": 100.0, "branch_percent": 100.0, "baseline_statements": 0, "classification": "new production module"}}, "minimum_unit_percent": 96.7741935483871, "findings": []}
+
+Working directory: .
+Started: 2026-10-18T10:57:31.771416+00:00
+Duration seconds: 1.088
+Phase: P2-T9 validation composition and role outputs; focused task verification.
+
+## Captured output
+
+```text
+{"metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-coverage-metrics.2026-10-18T10-57.json", "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-coverage.2026-10-18T10-57.json", "owned": 8, "prior": 203, "frozen": 24, "focused": 107, "reversed": 107, "coverage": {"packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {"covered_lines": 139, "statements": 140, "covered_branches": 67, "branches": 68, "line_percent": 99.28571428571429, "branch_percent": 98.52941176470588, "baseline_statements": 0, "classification": "new production module"}, "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": {"covered_lines": 72, "statements": 72, "covered_branches": 46, "branches": 46, "line_percent": 100.0, "branch_percent": 100.0, "baseline_statements": 0, "classification": "new production module"}, "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {"covered_lines": 133, "statements": 133, "covered_branches": 42, "branches": 42, "line_percent": 100.0, "branch_percent": 100.0, "baseline_statements": 0, "classification": "new production module"}, "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {"covered_lines": 51, "statements": 51, "covered_branches": 22, "branches": 22, "line_percent": 100.0, "branch_percent": 100.0, "baseline_statements": 0, "classification": "new production module"}}, "minimum_unit_percent": 96.7741935483871, "findings": []}
+```

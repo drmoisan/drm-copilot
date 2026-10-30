@@ -1,0 +1,37 @@
+{
+  "Timestamp": "2026-10-20T10-58",
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-final_gates.2026-10-20T10-58.txt",
+      "sha256": "49b82d61d9ca580163da854164d9e10c456998e6a7334157eaa15b0aef85577e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-final_static.2026-10-20T10-58.txt",
+      "sha256": "1d1fef1e8f4877d8effde016c06bb92ce16a96cfbc10c6c14bbc3041c6d357e0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-final_coverage.2026-10-20T10-58.txt",
+      "sha256": "0d9e869bf7450535a39d46aa8f218e3c7f5cde0a2dbd1896923bd2efd01db071"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-prepare_final.2026-10-20T10-58.txt",
+      "sha256": "f9aa6d8ac8982da1f283a3e4b249775db7968defc81e2a1d9941d2069d5e30e9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-template.2026-10-20T10-58.json",
+      "sha256": "3428ae22a0ed799733cc6f214f75e71b4365e1df64289b90173945c8564190e3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-preparation.2026-10-20T10-58.json",
+      "sha256": "21e92b7943bb92af15193cdd745456ffe5ae85f581335dcac14454310563d796"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-preparation.2026-10-20T10-58.md",
+      "sha256": "997ce97fd8ba2b740809a4da6b7c2f1048420a701d9090a477da9a50db157196"
+    }
+  ],
+  "preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-preparation.2026-10-20T10-58.json",
+    "sha256": "21e92b7943bb92af15193cdd745456ffe5ae85f581335dcac14454310563d796"
+  }
+}

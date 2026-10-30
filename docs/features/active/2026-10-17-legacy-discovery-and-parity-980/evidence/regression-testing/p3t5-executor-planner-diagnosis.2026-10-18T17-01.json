@@ -1,0 +1,29 @@
+{
+  "source_before": "553b8afe4a86c6b5b1f23003b5fb421683abace78cdbbad0e5dbead371cbd6a5",
+  "ok": false,
+  "error": "MUTATION_INVALID: Prospective graph is invalid",
+  "findings": [
+    {
+      "code": "SCHEMA_INVALID",
+      "path": "docs/migration/discovery/feature-contracts/feature.json",
+      "pointer": "/runtime_evidence_refs/0",
+      "message": "'repository' is a dependency of 'path'"
+    },
+    {
+      "code": "SCHEMA_INVALID",
+      "path": "docs/migration/discovery/feature-contracts/feature.json",
+      "pointer": "/runtime_evidence_refs/0",
+      "message": "'revision' is a dependency of 'path'"
+    },
+    {
+      "code": "SCHEMA_INVALID",
+      "path": "docs/migration/discovery/feature-contracts/feature.json",
+      "pointer": "/runtime_evidence_refs/0",
+      "message": "'sha256' is a dependency of 'path'"
+    }
+  ],
+  "source_after": "553b8afe4a86c6b5b1f23003b5fb421683abace78cdbbad0e5dbead371cbd6a5",
+  "timestamp": "2026-10-18T17:01:07Z",
+  "task": "P3-T5",
+  "disposition": "Confirmed R1: common artifact-reference requires all repository/revision/path/sha256 fields when any are present; local registration emitted only path. Retain the local kind/ID form without weakening the schema."
+}

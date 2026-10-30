@@ -1,0 +1,81 @@
+{
+  "timestamp_utc": "2026-10-20T14:25:18.505291+00:00",
+  "status": "PUBLIC_DECLARATIONS_FROZEN_IMPLEMENTATION_AND_QA_PENDING",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+    "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+  },
+  "approved_release": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-release-preparation.2026-10-20T13-26.json",
+    "sha256": "9b3fdf7cbdabed00de84c1ebe61c81814ad9e17b9475fc4e9a7e75b150dbe19d"
+  },
+  "public_module": "drm_copilot_discovery.service_contracts",
+  "declarations": {
+    "owner_file": "R/service_contracts.py",
+    "state": "Proposed implementation signatures and data shapes frozen by this preparation for coordinator release; not implemented.",
+    "principles": "Frozen keyword-only carriers; immutable JsonObject/tuple fields; exact versioned schema remains wire authority. No duplicate graph/status calculation. Constructor/type checks do not establish authority. Keep canonical schema headers as serializer constants, not caller-overridable fields.",
+    "types": {
+      "Operation": "Literal of the exact 30 service-request operation values; no aliases or arbitrary strings.",
+      "Mode": "Literal['structural','agent-output','discovery-complete','parity-complete','planning'].",
+      "OutputFormat": "Literal['json','markdown','both']. Acceptance output_format remains the existing operation input, not a new envelope field.",
+      "ServiceRequest": "Frozen fields: id:str, request_id:str, operation:Operation, mode:Mode, workspace_root:str, profile_path:str|None, dry_run:bool, write:bool, format:OutputFormat, inputs:JsonObject, invocation_ref:str|None, authorization_ref:str|None. Retain exact immutable operation inputs; fixed operation validation rejects inapplicable combinations.",
+      "RuntimeIdentity": "Frozen fields: package_version:str, schema_version:str, build_sha256:str, policy_version:int, policy_sha256:str. Exact versions/digests originate from approved installed identity verification, not caller JSON.",
+      "ServiceArtifact": "Frozen fields: path:str, kind:str (validated output-kind), status:Literal['planned','created','updated','skipped','conflict'], sha256:str, content:str|None=None. Serialize absent content by omission, never wire null.",
+      "DiscoveryResult": "Frozen fields: operation:Operation|None, mode:Mode|None, ok:bool, exit_code:Literal[0,1,2,3], findings:tuple[Finding,...], artifacts:tuple[ServiceArtifact,...], summary:JsonObject, input_manifest:InputManifest|None, runtime:RuntimeIdentity|None. summary retains the existing closed schema shape, including optional deployment/source_reads. Conditional nulls follow the approved 12:25 failure branch exactly.",
+      "ServiceAuthority": "Frozen trusted fields: principal:Literal['local-user','host'], author_or_agent:str, invocation:InvocationContext|None, grants:tuple[WriteGrant,...], read_selection:ReadSelection|None. Never deserialize this carrier from request fields. Missing host authority cannot construct a local-user fallback.",
+      "ServiceRequestError": "Typed invocation error retaining ordered findings and only recognized operation/mode (otherwise None). It is not used to classify arbitrary downstream ValueError as user error.",
+      "Clock": "Callable[[], datetime]; require timezone-aware values and normalize to UTC RFC3339 at attribution/capture boundaries. Clock does not affect deterministic report/acceptance identity."
+    },
+    "functions": [
+      "parse_service_request(value: JsonValue, *, catalog: SchemaCatalog, limits: ParseLimits) -> ServiceRequest",
+      "DiscoveryResult.to_dict() -> dict[str, object]",
+      "DiscoveryResult.to_json() -> str",
+      "validate_service_result(result: DiscoveryResult, *, catalog: SchemaCatalog, limits: ParseLimits) -> None",
+      "service.execute(request: JsonValue, *, io: ServiceIO, repository_reader: RepositoryReader | None, clock: Clock, analyzer_registry: InventoryRegistry) -> DiscoveryResult"
+    ],
+    "ports": {
+      "ServiceIO.initialization": "Read-only property -> InitializationIO. Reuse its bound workspace_root/catalog/metadata/read_bytes/primitives/open_directory; no parallel filesystem abstraction. The explicit repository_reader argument is the execution selection; reject an incompatible independently bound reader rather than silently switching.",
+      "ServiceIO.activation": "Read-only property -> ActivationStore; preserve its existing configuration and protected registry operations.",
+      "ServiceIO.runtime_identity": "() -> RuntimeIdentity; verified installed identity or typed unavailable/corrupt failure. A resource hash is not a fallback.",
+      "ServiceIO.authorize": "(request: ServiceRequest, *, baseline: CapturedWorkspace | None) -> ServiceAuthority. Trusted provider verifies explicit principal and opaque references; capture unavailable/bootstrap uses None honestly. Provider must not authorize source reads or writes solely from request assertions. Native host implementation remains unavailable until P8.",
+      "ServiceIO.writer": "(baseline: CapturedWorkspace, *, authority: ServiceAuthority) -> MutationWriter. Writer captures the same bounded/pinned inputs and preserves guard/freshness/CAS/invalidation. Publication still requires existing plan_mutation/commit_mutation checks.",
+      "InventoryRegistry": "Owned by analyzer/registry.py, not redefined in shared contracts. select(profile: ProfileV2, *, analyzer_ids: tuple[str,...] | None = None) -> tuple[InventoryAdapter,...]. The installed implementation is fixed and consent-aware."
+    },
+    "dependencies": "service_contracts imports accepted models, findings, snapshots and boundary types; it must not import service/operations/gateway/doctor, build_identity implementation or renderer. build_identity returns shared RuntimeIdentity; service composes that provider. InventoryRegistry belongs to its analyzer owner and is consumed by service, avoiding duplicate Protocols.",
+    "error_rules": "Gateway bounded decoding handles malformed JSON; service handles schema-invalid JsonValue. Both use the approved honest result shape with recognized enum values only. Result serialization validates against the core service-result schema. Partial writes preserve concrete artifacts and cannot use the empty pre-execution branch."
+  },
+  "runtime_failure": {
+    "name": "ServiceRuntimeError",
+    "signature": "ServiceRuntimeError(*, code: Literal['RUNTIME_UNAVAILABLE','RUNTIME_CORRUPT'])",
+    "fields": [
+      "code",
+      "findings: tuple[Finding, ...]"
+    ],
+    "behavior": "One fixed actionable error finding with pointer /runtime; no raw exception text, fallback identity, request or installed-runtime authority."
+  },
+  "author_mapping": "ServiceAuthority.author_or_agent remains a trusted ID str. Local-user maps to {'kind':'human','id':author_or_agent}; host maps to {'kind':'agent','id':author_or_agent}. The request never supplies this authority.",
+  "directory_results": "Only real digest-bearing file outputs become ServiceArtifact rows. Directory/uncertain effects use fixed counters and path-specific findings; no fabricated SHA.",
+  "serializer": "DiscoveryResult.to_json uses the existing trusted installed core catalog reader. validate_service_result(result, catalog=..., limits=...) is pure with an injected catalog. Constructor consistency is not execution or publication authority.",
+  "imports": {
+    "SchemaCatalog": "catalog",
+    "JsonObject, JsonValue, ParseLimits": "models",
+    "Finding": "findings",
+    "InputManifest": "snapshot",
+    "InitializationIO": "init_io",
+    "ActivationStore": "activation_store",
+    "CapturedWorkspace": "mutation_plan",
+    "MutationWriter": "mutation_io",
+    "InvocationContext": "agent_output",
+    "WriteGrant": "path_models",
+    "ReadSelection": "source_read_models"
+  },
+  "split": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+    "absent_before_creation": true,
+    "ownership": "workspace_operations exclusive",
+    "responsibility": "Bounded wire projection, schema enforcement and prospective manifest serialization cost; no dispatch/handler/authority implementation.",
+    "dependency": "service_contracts uses service_serialization. The helper uses TYPE_CHECKING shared types only, with no runtime reverse import.",
+    "size": "Each production module remains at most 500 physical lines."
+  },
+  "qualification": "This artifact freezes names and import compatibility only. No source, schema, test, package manifest, Git, checkpoint or acceptance mutation; no suite replay."
+}

@@ -1,0 +1,47 @@
+{
+  "stage": "lint",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:04:55.401615+00:00",
+  "finished": "2026-10-19T10:04:57.125686+00:00",
+  "duration_seconds": 1.725,
+  "exit_code": 1,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "50a52f85cae3c0de47f32ffe42f54207049a4cbebe7b8652718df6028181b68c",
+      "physical_lines": 330
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "455b261f6cd36a5f41ee86712bc924990c6533b607d7ed8f512996e138d605d7",
+      "physical_lines": 365
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "50a52f85cae3c0de47f32ffe42f54207049a4cbebe7b8652718df6028181b68c",
+      "physical_lines": 330
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "455b261f6cd36a5f41ee86712bc924990c6533b607d7ed8f512996e138d605d7",
+      "physical_lines": 365
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused2-lint.100457125686.stdout.bin",
+      "raw_sha256": "edd073ea56fc34d5575aad60f4ffcac3fd332b4c898ca82bace41c5b76476d87",
+      "raw_bytes": 6411,
+      "presentation": "E501 Line too long (91 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_dotnet.py:116:89\n    |\n114 |         )\n115 |         versions = int(version is not None)\n116 |         # Overrides and child versions remain separate syntax rather than effective values.\n    |                                                                                         ^^^\n117 |         override = node.attribute(\"VersionOverride\")\n118 |         if override is not None:\n    |\n\nE501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_dotnet.py:237:89\n    |\n235 |             _charge(child, budget)\n236 |     elif isinstance(value, tuple):\n237 |         # Array contents remain bounded even when the selected lock grammar ignores them.\n    |                                                                                         ^\n238 |         for child in value:\n239 |             _charge(child, budget)\n    |\n\nE501 Line too long (91 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_dotnet.py:262:89\n    |\n260 |     )\n261 |     if parsed.value is None:\n262 |         # Translate only fixed categories, never messages, pointers or source-derived text.\n    |                                                                                         ^^^\n263 |         codes = {finding.code for finding in parsed.findings}\n264 |         code = (\n    |\n\nE501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_dotnet.py:277:89\n    |\n275 |     frameworks = _object(root.get(\"dependencies\"))\n276 |     occurrence = 0\n277 |     # JsonObject order is canonical member order, never a claimed physical JSON location.\n    |                                                                                         ^\n278 |     for packages in frameworks.values():\n279 |         for name, value in _object(packages).items():\n    |\n\nE501 Line too long (92 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_dotnet.py:294:89\n    |\n292 |                 anchor=DependencyAnchor(\"json\", \"/dependencies\", occurrence),\n293 |             )\n294 |             # Edges retain the declared owner spelling, without inventing record resolution.\n    |                                                                                         ^^^^\n295 |             for target, version in _object(\n296 |                 record.get(\"dependencies\", JsonObject(()))\n    |\n\nE501 Line too long (91 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_dotnet.py:325:89\n    |\n323 |     budget = DependencyBudget(limits)\n324 |     budget.decode(content)\n325 |     # Explicit selection determines the grammar; content never chooses executable behavior.\n    |                                                                                         ^^^\n326 |     if format == \"packages-lock\":\n327 |         _lock(content, budget)\n    |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:3:1\n   |\n 1 |   \"\"\"Verify pure .NET dependency declarations, redaction and bounded failure contracts.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | import json\n 6 | | from dataclasses import replace\n 7 | | from typing import cast\n 8 | |\n 9 | | import pytest\n10 | |\n11 | | from drm_copilot_discovery.analyzer.dependency_dotnet import (\n12 | |     DotnetDependencyFormat,\n13 | |     parse_dotnet_dependencies,\n14 | | )\n15 | | from drm_copilot_discovery.analyzer.dependency_inputs import (\n16 | |     DependencyInputError,\n17 | |     DependencyLimits,\n18 | | )\n   | |_^\n   |\nhelp: Organize imports\n\nE501 Line too long (143 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:113:89\n    |\n111 | \u2026l effects.\n112 | \u2026\n113 | \u2026rsion=\"1.2.3\" targetFramework=\"SECRET\"/>\\n<package id=\"Beta\" Condition=\"SECRET\"/></packages>'\n    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n114 | \u2026\n115 | \u2026DependencyLimits()\n    |\n\nE501 Line too long (123 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:164:89\n    |\n162 |     Returns None; assertions propagate; no external effects.\n163 |     \"\"\"\n164 |     first = b'{\"version\":1,\"dependencies\":{\"net8\":{\"B\":{\"type\":\"Project\"},\"A\":{\"type\":\"Direct\"}}},\"ignored\":[null,[true]]}'\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n165 |     second = b'{\"ignored\":[null,[true]],\"dependencies\":{\"net8\":{\"A\":{\"type\":\"Direct\"},\"B\":{\"type\":\"Project\"}}},\"version\":1}'\n166 |     result = parse_dotnet_dependencies(\n    |\n\nE501 Line too long (124 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:165:89\n    |\n163 |     \"\"\"\n164 |     first = b'{\"version\":1,\"dependencies\":{\"net8\":{\"B\":{\"type\":\"Project\"},\"A\":{\"type\":\"Direct\"}}},\"ignored\":[null,[true]]}'\n165 |     second = b'{\"ignored\":[null,[true]],\"dependencies\":{\"net8\":{\"A\":{\"type\":\"Direct\"},\"B\":{\"type\":\"Project\"}}},\"version\":1}'\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n166 |     result = parse_dotnet_dependencies(\n167 |         first, format=\"packages-lock\", limits=DependencyLimits()\n    |\n\nE501 Line too long (98 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:220:89\n    |\n218 |         project('<PackageReference Include=\"A\" Update=\"B\"/>'),\n219 |         project(\n220 |             '<PackageReference Include=\"A\"><Version><Value>1</Value></Version></PackageReference>'\n    |                                                                                         ^^^^^^^^^^\n221 |         ),\n222 |         b'<!DOCTYPE Project [<!ENTITY x \"SECRET\">]><Project/>',\n    |\n\nE501 Line too long (99 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:223:89\n    |\n221 |         ),\n222 |         b'<!DOCTYPE Project [<!ENTITY x \"SECRET\">]><Project/>',\n223 |         b'<Project xmlns:x=\"http://www.w3.org/2001/XInclude\"><x:include href=\"SECRET\"/></Project>',\n    |                                                                                         ^^^^^^^^^^^\n224 |     ],\n225 | )\n    |\n\nFound 12 errors.\n[*] 1 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused2-lint.100457125686.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "ec2493f4c370bd463a0b269b8a6bed0b47aea99b1a5bd846135f940dcf29ea76"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}

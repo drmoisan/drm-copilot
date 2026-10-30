@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-19T10-36",
+  "published_utc": "2026-10-19T10:36:55.222935+00:00",
+  "streams": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.json",
+      "sha256": "3b83dee865b21e85e5a76cd81f2de56e72ee650613f3c504fec7298f85f4e415",
+      "bytes": 11510
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.md",
+      "sha256": "d864523ef9f1f830a8103c67cfabbde9a3cf58c9ba5af3fdca87af6d269c51a0",
+      "bytes": 1964
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review-harness.2026-10-19T10-23.txt",
+      "sha256": "746fa46b2d8982e2f4ad9a1b7cf131be43e58421cb3175a088c792ed2ce466ea",
+      "bytes": 12614
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe.2026-10-19T10-18.json",
+      "sha256": "8b01c5aac30cf80b9dff0602bbd30d921fbdc181dba03002002a2c511f14ed52",
+      "bytes": 4018
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe-harness.2026-10-19T10-18.txt",
+      "sha256": "d03a2314d7b3fba6bac99f07bd8602d184bcc15b701e293a6d8557e7cdbc18c5",
+      "bytes": 7089
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation.2026-10-19T10-36.json",
+      "sha256": "226d6b3885d34e6bfe53dcda7f98c3f48318704a3dbfb6230d7257f4027b7208",
+      "bytes": 11456
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation.2026-10-19T10-36.md",
+      "sha256": "c8cdb260df97f48daa27b32db16fcb46149a6f547ad1711ccfd37ae69620b344",
+      "bytes": 1416
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation-harness.2026-10-19T10-36.txt",
+      "sha256": "e3424fe9d7afce134ec7e1b0f2a8d90ea48b1a50cc41f737c1e87318425c650c",
+      "bytes": 12983
+    }
+  ],
+  "staging_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review-harness.2026-10-19T10-23.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe.2026-10-19T10-18.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe-harness.2026-10-19T10-18.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation.2026-10-19T10-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation.2026-10-19T10-36.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation-harness.2026-10-19T10-36.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-staging.2026-10-19T10-36.json"
+  ],
+  "scope": "Original five format finding/probe/harness artifacts plus bounded confirmation and this staging index only."
+}

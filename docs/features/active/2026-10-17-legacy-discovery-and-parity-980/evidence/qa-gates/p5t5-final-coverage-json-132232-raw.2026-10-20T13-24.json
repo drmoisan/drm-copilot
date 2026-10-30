@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "base64": "V3JvdGUgSlNPTiByZXBvcnQgdG8gQzpcVXNlcnNcRGFuTW9pc2FuXEFwcERhdGFcTG9jYWxcVGVtcFxpc3N1ZS05ODAtcDV0NS1naGVya2luXHA1dDUtZmluYWwtMTMyMjMyLWNvbWJpbmVkLWNvdmVyYWdlLmpzb24NCg==",
+      "bytes": 124,
+      "path": "SCRATCH/p5t5-final-coverage-json-132232.stdout",
+      "sha256": "28a4b2fc10d29dfde4c0cdbece56d607a5fabca16a90df48f2ae366c134e3b97"
+    },
+    {
+      "base64": "",
+      "bytes": 0,
+      "path": "SCRATCH/p5t5-final-coverage-json-132232.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDYsICJsYWJlbCI6ICJjb3ZlcmFnZS1qc29uIiwgInN0YXR1cyI6ICJmaW5pc2hlZCIsICJjb21wbGV0ZWQiOiAwLCAibGFzdF9ub2RlIjogbnVsbCwgInN0YXJ0ZWRfYXQiOiAiMjAyNi0xMC0yMFQxMzoyNDoxMi43Nzg4OTcrMDA6MDAiLCAidGltZW91dF9zZWNvbmRzIjogMzAwLCAicGlkIjogNzAzMDgsICJlbGFwc2VkX3NlY29uZHMiOiAxLjAxNCwgImV4aXRfY29kZSI6IDB9Cg==",
+      "bytes": 226,
+      "path": "SCRATCH/p5t5-final-coverage-json-132232.progress.json",
+      "sha256": "ae3e77f34d37ac4139c9529b669772f7c8b834ddeaf2ef7b6e0f09856688bc1e"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}

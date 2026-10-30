@@ -1,0 +1,87 @@
+{
+  "task": "P5-T4",
+  "timestamp": "2026-10-20T11-08",
+  "route": "workspace_operations_p5t4_repair_20261020",
+  "authority": "C4 profile hash matches; native routing/launch/provenance true",
+  "scope": "GR1/GT1/GT2/PC1 and approved test-only split",
+  "absent": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+  "baseline_reference": "evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+  "review_reference": "evidence/qa-gates/p5t4-executor-generation-review.2026-10-20T11-06.json",
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "b0ffeacb101d240d9c6585f3ae9b4d973ebf75030f0d09a998ed14b6a63287af",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "0edcab9fd33f17f85127d86aab89ea60868a1cb23d49eee7647418414e1562d0",
+    "tests/discovery_runtime/test_acceptance_generation.py": "85c334d7e66841b1b45f73bc57af517f3b7d8c67187412a572f490b6bee2043f",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "bc7dfa0ff12f5cc68355f35dc60ef575b1d806d7345dc7249aa8b803a99be308"
+  },
+  "original_tests": {
+    "tests/discovery_runtime/test_acceptance_generation.py": {
+      "test_generation_retains_exact_identity_refs_and_rule_authority": {
+        "ast_sha256": "49b2686420444780e668f27adc6266fe53f6aecd40eb464d09b969b6d02a77f3",
+        "assertions": 11
+      },
+      "test_identity_survives_source_changes_while_provenance_changes": {
+        "ast_sha256": "c553ed7a3ddcef7812fac5949b2159d407018f2250e3b50b158c00fbbd3c4a83",
+        "assertions": 4
+      },
+      "test_pending_criteria_preserve_questions_and_never_invent_then": {
+        "ast_sha256": "3bc3e5b388f612c783a1804e222ff889358eff4dcee7cfb46f8af8b80610d574",
+        "assertions": 4
+      },
+      "test_unknown_filters_fail_explicitly_without_default_selection": {
+        "ast_sha256": "ab61ee1f3c91b68bd7eaf4bcd7ebfe4e4b7203b70822ffea8873d81bdb865173",
+        "assertions": 1
+      },
+      "test_integrity_failures_remain_blocking_before_generation_authority": {
+        "ast_sha256": "67cb63675ef602487bc5ab7ce7a4b21df7b2a38bacfe267bd3203855252d0c01",
+        "assertions": 2
+      },
+      "test_empty_actual_population_does_not_create_fallback_scenarios": {
+        "ast_sha256": "fb51f29b55c24d51e7e3357496953c407bb380b5dc16e7e58773862e306ad62c",
+        "assertions": 2
+      }
+    },
+    "tests/discovery_runtime/test_acceptance_decisions.py": {
+      "test_only_current_approved_scoped_policy_can_supply_target_expectations": {
+        "ast_sha256": "4a9e20a6565bb6d2373826c0cc3dad8dd1b8e078aa4643dd5dc9a5908fdc0e91",
+        "assertions": 7
+      },
+      "test_scope_conflicts_and_broken_links_never_create_ready_target_claims": {
+        "ast_sha256": "a3a5cbe4658b860ddec61320aa8d4a9933777144341ea087ac311f4eabb41d4d",
+        "assertions": 4
+      },
+      "test_linked_scenarios_discriminate_ids_without_replacing_criterion_expectations": {
+        "ast_sha256": "efdd69a3e03dc477a68c24d39304b5d51be53bea430f0c45581dfa8c92eaed9a",
+        "assertions": 5
+      },
+      "test_mobile_and_custom_modes_follow_actual_configuration": {
+        "ast_sha256": "e673bbd6f2208ddce960aebab2171201a9a10f6ae8a5d57802f63463db8d6ca7",
+        "assertions": 5
+      },
+      "test_two_complete_rule_passes_are_independent_of_candidate_count": {
+        "ast_sha256": "fdd2fe39b46061c2c0a67faa448d64c3afa1e77b63f54935b94d812f04c291b4",
+        "assertions": 1
+      },
+      "test_invalid_selectors_fail_without_coercion": {
+        "ast_sha256": "8ceab29373459fd7ad5924b61b22181a26b083c097e785efa7d2ff2494796440",
+        "assertions": 0
+      },
+      "test_capacity_exhaustion_precedes_public_assessment": {
+        "ast_sha256": "e46cc0ef3f7c41d91fa636bad56b923f01912ad07b0e6eeb525390702fc462c4",
+        "assertions": 1
+      },
+      "test_batch_pass_limit_and_output_capacity_fail_without_partial_result": {
+        "ast_sha256": "7377f4f608d56709b2a88d90b262e3cd9947b00ecc911d440b50fe6c71231cac",
+        "assertions": 0
+      },
+      "test_unsupported_kinds_cannot_select_an_implicit_generation_mode": {
+        "ast_sha256": "273d756ebbbece8a4d522e485398956a43ad2ef0ef3ea88e5e29c7320cc59cde",
+        "assertions": 0
+      },
+      "test_legacy_client_selector_is_an_explicit_failure": {
+        "ast_sha256": "9ac9f7d40ffefec2f6b1a136536029647d6e2f65ac115f1b230eb9f952850657",
+        "assertions": 2
+      }
+    }
+  },
+  "preservation": "Original exact streams and failed proof remain in immutable review/run archives."
+}

@@ -1,0 +1,30 @@
+"""Preserve the preparation-only URL false positive and create its corrected driver."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+scratch = Path(__file__).parent
+original = scratch / 'issue-980-p4t7-final-prepare.py'
+raw = original.read_bytes()
+text = raw.decode().replace("rb'[A-Za-z]:[\\\\/]'", "rb'(?<![A-Za-z])[A-Za-z]:[\\\\/]'")
+assert text != raw.decode()
+text = text.replace('issue-980-p4t7-final-candidate.preparation.json', 'issue-980-p4t7-final-candidate.preparation2.json')
+text = text.replace('SCRATCH/issue-980-p4t7-final-prepare.py', 'SCRATCH/issue-980-p4t7-final-prepare2.py')
+fixed = scratch / 'issue-980-p4t7-final-prepare2.py'
+assert not fixed.exists()
+fixed.write_bytes((text.rstrip() + '\n').encode())
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+record = {'timestamp': stamp, 'task': 'P4-T7', 'state': 'PREPARATION_DRIVER_CORRECTION',
+    'command': 'poetry run python SCRATCH/issue-980-p4t7-final-preparation-correction.py', 'exit_code': 0,
+    'observed_failed_command': 'poetry run python SCRATCH/issue-980-p4t7-final-prepare.py',
+    'observed_failure': 'AssertionError at line82: the absolute-host-path detector incorrectly matched the s:/ suffix of a synthetic https:// fixture URL.',
+    'original_driver': {'path': 'SCRATCH/' + original.name, 'sha256': hashlib.sha256(raw).hexdigest()},
+    'preserved_partial_manifest': {'path': 'SCRATCH/issue-980-p4t7-final-candidate.preparation.json', 'sha256': hashlib.sha256((scratch / 'issue-980-p4t7-final-candidate.preparation.json').read_bytes()).hexdigest()},
+    'corrected_driver': {'path': 'SCRATCH/' + fixed.name, 'sha256': hashlib.sha256(fixed.read_bytes()).hexdigest()},
+    'correction': 'Use the retained prior harness detector with a nonalphabetic left boundary. Preserve the original executed script and partial manifest; a new driver and manifest are used.',
+    'gate_execution': False, 'source_test_mutation': False, 'behavioral_rerun': False}
+prefix = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates') / ('p4t7-final-preparation-correction.' + stamp)
+Path(str(prefix) + '.json').write_bytes((json.dumps(record, indent=2) + '\n').encode())
+Path(str(prefix) + '.md').write_bytes((f'# Preparation driver correction\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: corrected one preparation-only path detector after a synthetic HTTPS fixture triggered its unbounded drive-letter pattern. The original driver and partial manifest remain unchanged.\n\nNo gate, native composition or behavioral test ran. No source/test or frozen evidence changed. A separately named driver uses the prior detector boundary and a new preparation manifest.\n').encode())
+print(str(prefix) + '.json')

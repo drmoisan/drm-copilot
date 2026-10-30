@@ -1,0 +1,54 @@
+{
+  "stage": 1,
+  "label": "p3t8-review-repair-format",
+  "started": "2026-10-19T01:25:07.332019+00:00",
+  "finished": "2026-10-19T01:25:09.214451+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py tests/discovery_runtime/test_source_reads.py tests/discovery_runtime/test_source_read_limits.py tests/discovery_runtime/test_source_read_snapshot_scope.py",
+  "exit_code": 0,
+  "duration_seconds": 1.882,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "b02021b1c761614095d3bc3684915cfc4e5baf889a4b68ed1219fbb5969523c8",
+      "physical_lines": 374
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "ff2cc7dcce700ee7b8c673f8431c501b758043ccea5ec0864c5578c36ff90f97",
+      "physical_lines": 419
+    },
+    "tests/discovery_runtime/test_source_read_snapshot_scope.py": {
+      "sha256": "53138465640fe7e7291a447c6e9a6f47c1c617345ddd4675084abc6c6419a05a",
+      "physical_lines": 282
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "4a7eaf7a5a6b560a1d95e9cedd6d1456518f775f3121e0b624e4f129b0ef3955",
+      "physical_lines": 364
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "e94654999a4191a66a731aa9cb879877a5533b7d4db200a611ffa19082067cf8",
+      "physical_lines": 415
+    },
+    "tests/discovery_runtime/test_source_read_snapshot_scope.py": {
+      "sha256": "53138465640fe7e7291a447c6e9a6f47c1c617345ddd4675084abc6c6419a05a",
+      "physical_lines": 282
+    }
+  },
+  "output": "reformatted tests\\discovery_runtime\\test_source_reads.py\nreformatted tests\\discovery_runtime\\test_source_read_limits.py\n\nAll done! \u2728 \ud83c\udf70 \u2728\n2 files reformatted, 3 files left unchanged.\n"
+}

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<testsuites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="junit_schema_4.xsd" name="Pester" tests="57" errors="0" failures="0" disabled="0" time="0.994">
+  <testsuite name=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Manifest.Tests.ps1" tests="4" errors="0" failures="0" id="0" skipped="0" disabled="0" package=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Manifest.Tests.ps1" time="0.467">
+    <properties>
+      <property name="platform" value="Windows" />
+      <property name="clr-version" value="10.0.13" />
+      <property name="framework-version" value="5.9.0" />
+      <property name="os-version" value="10.0.26300" />
+      <property name="junit-version" value="4" />
+      <property name="cwd" value="." />
+    </properties>
+    <testcase name="DiscoveryValidation core.json manifest membership.lists the DiscoveryValidation module path in core.json paths" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Manifest.Tests.ps1" assertions="0" time="0.051" />
+    <testcase name="DiscoveryValidation core.json manifest membership.lists the DiscoveryValidation module path exactly once" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Manifest.Tests.ps1" assertions="0" time="0.016" />
+    <testcase name="DiscoveryValidation core.json manifest membership.registers every on-disk discovery-validation module so none is unregistered" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Manifest.Tests.ps1" assertions="0" time="0.007" />
+    <testcase name="DiscoveryValidation bundle mirror byte identity.mirrors the DiscoveryValidation module byte-identically into the bundle" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Manifest.Tests.ps1" assertions="0" time="0.028" />
+  </testsuite>
+  <testsuite name=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" tests="40" errors="0" failures="0" id="1" skipped="0" disabled="0" package=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" time="0.418">
+    <properties>
+      <property name="platform" value="Windows" />
+      <property name="clr-version" value="10.0.13" />
+      <property name="framework-version" value="5.9.0" />
+      <property name="os-version" value="10.0.26300" />
+      <property name="junit-version" value="4" />
+      <property name="cwd" value="." />
+    </properties>
+    <testcase name="DiscoveryValidation.artifact-type table.exposes exactly the seven schema-governed types" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="DiscoveryValidation.artifact-type table.maps the three tokens whose schema filename differs from the token stem" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.016" />
+    <testcase name="DiscoveryValidation.artifact-type table.returns null for a token that is not schema-governed" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="DiscoveryValidation.artifact-type table.names a real committed schema file for every schema-governed type" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.007" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.reports an empty document" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.007" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.reports a whitespace-only document as empty" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.reports a sequence root as a non-mapping root" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.007" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.reports a bare scalar root as a non-mapping root" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.reports a malformed document as a non-mapping root rather than accepting it" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.reports the placeholder required field when it is absent" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.009" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.accepts a document carrying the placeholder required field" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.ignores comments and document markers when collecting top-level keys" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.profile placeholder contract.does not treat an indented key as a top-level key" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.schema resolution.reports a missing schema property" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="DiscoveryValidation.schema resolution.reports a non-string schema property" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.schema resolution.reports an empty schema property" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation.schema resolution.reports a scheme-less schema reference" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="DiscoveryValidation.schema resolution.reports an https schema reference without fetching it" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.schema resolution.reports a file reference that does not exist" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="DiscoveryValidation.schema resolution.resolves a committed file schema reference" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.reports invalid JSON" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.029" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.reports a JSON array root as a non-object root" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.030" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.reports a JSON scalar root as a non-object root" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.018" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.reports a document with no schema property" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.reports a document whose schema property is empty" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.reports a document whose schema property is not a string" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.reports schema violations for a document that fails its schema" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.038" />
+    <testcase name="DiscoveryValidation.schema-governed artifact validation.returns no error for a document that satisfies its schema" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.017" />
+    <testcase name="DiscoveryValidation.dispatch by artifact type.routes the profile token to the placeholder contract" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.009" />
+    <testcase name="DiscoveryValidation.dispatch by artifact type.routes a schema-governed token to the schema check" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation.dispatch by artifact type.returns a flat array of strings, never an array nested in an array" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.012" />
+    <testcase name="DiscoveryValidation.dispatch by artifact type.reports an unrecognized artifact type rather than accepting it" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.dispatch by artifact type.returns no error for a conforming schema-governed document" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation.seam result contract (defect D-2 avoidance).returns exit code 0 and EMPTY output for a passing validation" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="DiscoveryValidation.seam result contract (defect D-2 avoidance).returns exit code 1 and the joined errors for a failing validation" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation.seam result contract (defect D-2 avoidance).always returns exactly the ExitCode and Output keys the seam contract names" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="DiscoveryValidation.seam result contract (defect D-2 avoidance).produces an empty-output success result for a conforming artifact end to end" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="DiscoveryValidation.seam result contract (defect D-2 avoidance).reports a missing artifact path rather than throwing" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.009" />
+    <testcase name="DiscoveryValidation.seam result contract (defect D-2 avoidance).reports insufficient validator arguments rather than throwing" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation.seam result contract (defect D-2 avoidance).joins multiple errors one per line" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.Tests.ps1" assertions="0" time="0.003" />
+  </testsuite>
+  <testsuite name=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" tests="13" errors="0" failures="0" id="2" skipped="0" disabled="0" package=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" time="0.109">
+    <properties>
+      <property name="platform" value="Windows" />
+      <property name="clr-version" value="10.0.13" />
+      <property name="framework-version" value="5.9.0" />
+      <property name="os-version" value="10.0.26300" />
+      <property name="junit-version" value="4" />
+      <property name="cwd" value="." />
+    </properties>
+    <testcase name="DiscoveryValidation destination version floor.floor boundary.returns no error at the 7.4.0 floor" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation destination version floor.floor boundary.returns no error above the floor" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="DiscoveryValidation destination version floor.floor boundary.returns an error below the floor" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation destination version floor.message content (all three required elements).names the required version" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.008" />
+    <testcase name="DiscoveryValidation destination version floor.message content (all three required elements).names the Test-Json SchemaFile Draft 2020-12 reason" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation destination version floor.message content (all three required elements).identifies issue 475" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation destination version floor.message content (all three required elements).reports the actual host version so the message is actionable" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="DiscoveryValidation destination version floor.fail-closed at every entry point.fails closed from the profile entry point on an unsupported host" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation destination version floor.fail-closed at every entry point.fails closed from the schema entry point on an unsupported host" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation destination version floor.fail-closed at every entry point.fails closed from the dispatch entry point on an unsupported host" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation destination version floor.fail-closed at every entry point.reports the floor before reporting a document defect" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="DiscoveryValidation destination version floor.no silent degradation.never returns a passing result on an unsupported host" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="DiscoveryValidation destination version floor.no silent degradation.does not mutate the host version table" status="Passed" classname=".\tests\scripts\claude-lib\discovery-validation\DiscoveryValidation.VersionFloor.Tests.ps1" assertions="0" time="0.003" />
+  </testsuite>
+</testsuites>

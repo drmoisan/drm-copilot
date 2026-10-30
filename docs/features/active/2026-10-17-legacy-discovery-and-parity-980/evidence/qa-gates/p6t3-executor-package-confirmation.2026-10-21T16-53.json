@@ -1,0 +1,135 @@
+{
+  "Timestamp": "2026-10-21T16:53:49.082683+00:00",
+  "issue_number": 980,
+  "task": "P6-T3",
+  "status": "READY_FOR_CHECKED_PACKAGE_PRESERVATION",
+  "current_head": "e926b481d9958b174a4012fb3bb268a390fa8fc2",
+  "route": "atomic_execution_p6t3_review_20261021T163700",
+  "owner_qualification": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-staging-qualification.2026-10-21T16-47.json",
+    "working_sha256": "da043c09f0a390944de842f57909fbb9834a79dfecd57b158bb2029a27ac5bba",
+    "git_lf_sha256": "da043c09f0a390944de842f57909fbb9834a79dfecd57b158bb2029a27ac5bba",
+    "expected_git_blob": "74fc60a305c730ee9f71b10258c97e44b8ef2563",
+    "bytes": 42359,
+    "git_lf_bytes": 42359
+  },
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-handoff.2026-10-21T16-45.json",
+    "working_sha256": "b33e7a0d9d4f9050fdcf6f08d5fad4052ba990e7171382cd49c3471b8b954f7f",
+    "git_lf_sha256": "b33e7a0d9d4f9050fdcf6f08d5fad4052ba990e7171382cd49c3471b8b954f7f",
+    "expected_git_blob": "e1bd692dfee5b6a7b7c2ff9edb17cb6a86a2c36e",
+    "bytes": 63082,
+    "git_lf_bytes": 63082
+  },
+  "entry_confirmation_dependency": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-entry-confirmation.2026-10-21T16-48.json",
+    "working_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+    "git_lf_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+    "expected_git_blob": "c04283d99ddc5fe54900b8f7ce384df52875f2f5",
+    "bytes": 19465,
+    "git_lf_bytes": 19465
+  },
+  "build_manifest": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+    "working_sha256": "8f582785ddc98f897777e3e1dab6251f2457ab674b591f14dc2a9a304afa4386",
+    "git_lf_sha256": "8f582785ddc98f897777e3e1dab6251f2457ab674b591f14dc2a9a304afa4386",
+    "expected_git_blob": "f0cbd0a5ae5610b7560525f321506a1b0a80c25d",
+    "bytes": 22677,
+    "git_lf_bytes": 22677
+  },
+  "build_sha256": "8f582785ddc98f897777e3e1dab6251f2457ab674b591f14dc2a9a304afa4386",
+  "policy_sha256": "680f4d6de6f7fe03492a129cee74f846227a50f927e607b81c04abf33f49c7c3",
+  "wheel_sha256": "f3ae03f1319b491f481e28d86d2d7ff31f99fd76d347bbb5389ce8ad2857a5ed",
+  "verification": {
+    "unchanged_source_inputs_and_each_before_after_map": 216,
+    "installed_payload_byte_matches_excluding_manifest": 172,
+    "installed_manifest_byte_match": true,
+    "launcher_hash_matches": 31,
+    "wheel_hash_match": true,
+    "ordered_gates": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-pip-support.2026-10-21T16-45.json",
+        "sha256": "d17ccb9d533561a078fc4c3631370b6950085b362706bcd0adc7d05a67f69d02",
+        "stage": "pip-support",
+        "exit_code": 0,
+        "seconds": 0.5493835000088438
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-build.2026-10-21T16-45.json",
+        "sha256": "d93a8ce20ecfadb5eed010a849826c1753a88d29e97f591133b61415ddd241a3",
+        "stage": "build",
+        "exit_code": 0,
+        "seconds": 2.9790723999612965
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-check.2026-10-21T16-45.json",
+        "sha256": "1b48e3dc3667024c26e481c040d76847a94307a9da48b466ad682dd6d41d8585",
+        "stage": "check",
+        "exit_code": 0,
+        "seconds": 1.192830200016033
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-venv.2026-10-21T16-45.json",
+        "sha256": "d05a140381f7f033bd31024a381197032e1f76e901c81688d9a19b54f1dd01d5",
+        "stage": "venv",
+        "exit_code": 0,
+        "seconds": 0.17956890002824366
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-install.2026-10-21T16-45.json",
+        "sha256": "eb546017ab0b8de3e390aee4e8dde9f3f89ff98f0b8421c5faa4fb20ae3ddf59",
+        "stage": "install",
+        "exit_code": 0,
+        "seconds": 3.381834500003606
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure.2026-10-21T16-45.json",
+        "sha256": "585ac8128e263107bdaa81413b791a4cc902a46ad7f41d334d9a8f1863f41781",
+        "stage": "public-exposure",
+        "exit_code": 0,
+        "seconds": 0.2679560999968089
+      }
+    ],
+    "lossless_raw_archive_members": 14,
+    "public_exposure": {
+      "origin": "SCRATCH\\issue-980-p6t3-package-20261021T164548-7b9577af\\cli-env\\Lib\\site-packages\\drm_copilot_discovery\\cli.py",
+      "signature": "(command: 'str', argv: 'Sequence[str] | None' = None) -> 'int'",
+      "public_callable": true,
+      "invoked": false
+    },
+    "raw_readable": "The unchanged normalizer extracted from the archived executed package script reproduces all six original stdout/stderr views with the recorded SCRATCH and WORKSPACE aliases. The published observer view differs only by decoded origin substitution and its explicit qualification; original CRLF and raw hashes are preserved."
+  },
+  "presentation_qualification": {
+    "excluded_original": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure.2026-10-21T16-45.json",
+      "sha256": "585ac8128e263107bdaa81413b791a4cc902a46ad7f41d334d9a8f1863f41781",
+      "bytes": 67466
+    },
+    "included_readable": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure-readable.2026-10-21T16-47.json",
+      "sha256": "2784b2d539a760bc9d83f38db83c7006a79361252a127035ece66b89a10ed3a0",
+      "bytes": 67560
+    },
+    "recovery": "Exact original receipt bytes round-trip through original_to_published_mapping in the included qualification and still match the untouched original file.",
+    "diagnostic": "Initial rg used a Windows wildcard as a literal path and returned os error123. Initial serialized-text locator scan falsely matched generic pip URI syntax and also exposed one real nested-JSON origin locator. Exact paths and decoded-field normalization resolved the evidence issue; original receipt and initial checker are preserved. No package step failed or was repeated."
+  },
+  "limitations": [
+    "The isolated installed import/signature/origin observer did not invoke run_installed_cli or a service operation.",
+    "Existing package payload and launcher verification is reused; no build, install, test, native operation, or source review was repeated.",
+    "This is a completed package/public-entry preservation boundary, not P6-T3 task acceptance or a coding-agent-host capability claim.",
+    "Other legacy adapter subsets and task integration/final proof remain independently pending."
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-package-staging-union.2026-10-21T16-53.json",
+  "task_acceptance": false,
+  "counts_unchanged": {
+    "tasks": "48/84",
+    "acceptance_criteria": "25/66"
+  },
+  "next_five": [
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3",
+    "P8-T1"
+  ]
+}

@@ -1,0 +1,106 @@
+"""Execute one reviewed P4-T5 ordered gate loop with immutable candidate bindings."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root=Path.cwd()
+scratch=Path(__file__).resolve().parent
+qa=Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+manifest_path=Path(sys.argv[1])
+manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+expected={entry['path']:entry['sha256'] for entry in manifest['files']}
+code=[path for path in expected if path.endswith('.py')]
+receipts=[]
+harnesses=[Path(__file__).resolve(),scratch/'issue-980-architecture.py',scratch/'issue-980-native.py']
+harness_hashes={'SCRATCH/'+path.name:hashlib.sha256(path.read_bytes()).hexdigest() for path in harnesses}
+start=datetime.datetime.now(datetime.timezone.utc)
+def hashes():
+    return {path:hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in expected}
+def portable(text):
+    for path,label in ((root,'WORKSPACE'),(scratch,'SCRATCH')):
+        text=re.sub(re.escape(str(path)),label,text,flags=re.IGNORECASE)
+        text=re.sub(re.escape(path.as_posix()),label,text,flags=re.IGNORECASE)
+    return text
+def run(number,label,arguments,*,module=True):
+    before=hashes()
+    assert before==expected,('candidate changed before',label)
+    started=datetime.datetime.now(datetime.timezone.utc)
+    env=dict(os.environ)
+    env.update(PYTHONIOENCODING='utf-8',PYTHONDONTWRITEBYTECODE='1',COVERAGE_FILE=str(scratch/('p4t5-final-'+label+'.coverage')))
+    command=[sys.executable,*(['-m'] if module else []),*map(str,arguments)]
+    result=subprocess.run(command,capture_output=True,env=env)
+    finished=datetime.datetime.now(datetime.timezone.utc)
+    stamp=finished.strftime('%Y-%m-%dT%H-%M')
+    stem='p4t5-final-'+label+'-'+finished.strftime('%H%M%S')+'.'+stamp
+    stdout=scratch/(stem+'.stdout.txt')
+    stderr=scratch/(stem+'.stderr.txt')
+    stdout.write_bytes(result.stdout)
+    stderr.write_bytes(result.stderr)
+    after=hashes()
+    document={'stage':number,'label':label,'timestamp':stamp,'started_at':started.isoformat(),'finished_at':finished.isoformat(),'seconds':(finished-started).total_seconds(),'command':portable('poetry run python '+('-m ' if module else '')+subprocess.list2cmdline(list(map(str,arguments)))),'exit_code':result.returncode,'source_before':before,'source_after':after,'stdout':portable(result.stdout.decode('utf-8',errors='replace')),'stderr':portable(result.stderr.decode('utf-8',errors='replace')),'raw_stdout':{'path':'SCRATCH/'+stdout.name,'sha256':hashlib.sha256(result.stdout).hexdigest()},'raw_stderr':{'path':'SCRATCH/'+stderr.name,'sha256':hashlib.sha256(result.stderr).hexdigest()},'harness_hashes':harness_hashes}
+    path=qa/(stem+'.json')
+    path.write_text(json.dumps(document,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+    markdown=f'# P4-T5 final {label}\n\nTimestamp: {stamp}\nCommand: `{document["command"]}`\nEXIT_CODE: {result.returncode}\nOutput Summary: Stage {number} of 7; exact source bindings, timestamps and raw output hashes are in the adjacent JSON.\n\n```text\n{document["stdout"]}{document["stderr"]}\n```\n'
+    path.with_suffix('.md').write_text('\n'.join(line.rstrip() for line in markdown.splitlines())+'\n',encoding='utf-8',newline='\n')
+    receipts.append({'stage':number,'label':label,'path':path.as_posix(),'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'exit_code':result.returncode})
+    progress=qa/('p4t5-final-progress-'+start.strftime('%H%M%S')+'.'+stamp+'.json')
+    progress.write_text(json.dumps({'candidate_manifest':portable(manifest_path.as_posix()),'receipts':receipts,'source_hashes':after},indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+    print(json.dumps({'stage':number,'label':label,'exit_code':result.returncode,'seconds':document['seconds'],'receipt':path.as_posix()}),flush=True)
+    if result.returncode or before!=after:
+        print((document['stdout'][-8000:]+document['stderr'][-8000:]).encode('ascii',errors='backslashreplace').decode('ascii'),flush=True)
+        raise SystemExit(result.returncode or 1)
+
+assert hashes()==expected
+for path in expected:
+    subprocess.run(['git','ls-files','--error-unmatch','--',path],capture_output=True,check=True)
+run(1,'format',['black','--check',*code])
+run(2,'lint',['ruff','check',*code])
+run(3,'types',['pyright'])
+run(4,'architecture',[scratch/'issue-980-architecture.py',manifest_path],module=False)
+runtime_tests='tests/discovery_runtime/analyzer/'
+test_nodes=[]
+tests=[]
+coverage_batches=[]
+batches=(
+    ('access',('registry_access','filesystem_access'),('api_access','api_syntax','filesystem_access','registry_access')),
+    ('com',('com_candidates','com_interop'),('com_interop','com_syntax')),
+)
+for batch,module_names,production_names in batches:
+    batch_tests=[runtime_tests+'test_'+name+'.py' for name in module_names]
+    measured=['drm_copilot_discovery.analyzer.'+name for name in production_names]
+    coverage_raw=scratch/('p4t5-final-'+batch+'-coverage.raw.json')
+    run(5,'tests-'+batch+'-reverse',['pytest','-v','-o','addopts=',*batch_tests,*['--cov='+name for name in measured],'--cov-branch','--cov-report=term-missing','--cov-report=json:'+coverage_raw.as_posix()])
+    test_receipt=json.loads(Path(receipts[-1]['path']).read_text(encoding='utf-8'))
+    batch_nodes=[line.split(' PASSED')[0] for line in test_receipt['stdout'].splitlines() if line.startswith('tests/') and ' PASSED' in line]
+    assert len(batch_nodes)==manifest['expected_test_counts'][batch] and len(batch_nodes)==len(set(batch_nodes)),(batch,len(batch_nodes))
+    tests.extend(batch_tests)
+    test_nodes.extend(batch_nodes)
+    stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    coverage_path=qa/f'p4t5-final-{batch}-coverage.{stamp}.json'
+    coverage=json.loads(coverage_raw.read_bytes())
+    coverage['files']={portable(path).replace('\\','/'):value for path,value in coverage['files'].items()}
+    coverage_path.write_text(json.dumps(coverage,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+    for filename,data in coverage['files'].items():
+        assert data['summary']['percent_statements_covered']>=90,filename
+        assert data['summary']['percent_branches_covered']>=90,filename
+        for family in ('functions','classes'):
+            for name,unit in data.get(family,{}).items():
+                summary=unit['summary']
+                if summary['num_statements']:
+                    assert summary['percent_statements_covered']>=90,(filename,name,summary)
+    coverage_batches.append({'batch':batch,'coverage_path':coverage_path.as_posix(),'coverage_sha256':hashlib.sha256(coverage_path.read_bytes()).hexdigest(),'raw_coverage':{'path':'SCRATCH/'+coverage_raw.name,'sha256':hashlib.sha256(coverage_raw.read_bytes()).hexdigest()},'test_module_order':batch_tests,'test_nodes':batch_nodes})
+assert len(test_nodes)==len(set(test_nodes))
+run(6,'contracts',['pytest','-q','-o','addopts=','--no-cov','tests/schemas/discovery/test_v2_inventory_schemas.py','tests/scripts/dev_tools/test_quality_tiers_contract.py','tests/scripts/dev_tools/test_quality_tiers_contract_classification.py','tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python','tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage','tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py'])
+native_raw=scratch/'p4t5-final-native-result.raw.json'
+run(7,'native',[scratch/'issue-980-native.py',native_raw],module=False)
+native_path=qa/('p4t5-final-native-result.'+datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')+'.json')
+native_path.write_text(json.dumps(json.loads(native_raw.read_bytes()),indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+finished=datetime.datetime.now(datetime.timezone.utc)
+path=qa/('p4t5-final-ordered-stages.'+finished.strftime('%Y-%m-%dT%H-%M')+'.json')
+path.write_text(json.dumps({'task':'P4-T5','candidate_manifest':portable(manifest_path.as_posix()),'candidate_manifest_sha256':hashlib.sha256(manifest_path.read_bytes()).hexdigest(),'started_at':start.isoformat(),'finished_at':finished.isoformat(),'receipts':receipts,'source_hashes':hashes(),'harness_hashes':harness_hashes,'test_module_order':tests,'test_nodes':test_nodes,'test_node_count':len(test_nodes),'coverage_batches':coverage_batches,'native_path':native_path.as_posix(),'raw_native':{'path':'SCRATCH/'+native_raw.name,'sha256':hashlib.sha256(native_raw.read_bytes()).hexdigest()},'host_proof_limitations':'Native Windows Python/Git only; coding-agent host execution and non-Windows CI are not exercised by this task.'},indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+print(path.as_posix(),flush=True)

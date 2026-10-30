@@ -1,0 +1,412 @@
+{
+  "coverage": {
+    "bytes": 45349,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph-coverage.2026-10-20T04-07.json",
+    "sha256": "50baa9942f8b03dfc397558369bd128f59e31bed48aa6b292a05f7978cfa8d86"
+  },
+  "coverage_ranges": {
+    "bytes": 36611,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph-coverage-ranges.2026-10-20T04-07.json",
+    "sha256": "611fc20bc8023a99fde533df2562b9b5a6a9739b8db9f0b07fba1b422c1c4509"
+  },
+  "coverage_totals": {
+    "covered_branches": 72,
+    "covered_lines": 224,
+    "excluded_lines": 16,
+    "missing_branches": 4,
+    "missing_lines": 2,
+    "num_branches": 76,
+    "num_partial_branches": 4,
+    "num_statements": 226,
+    "percent_branches_covered": 94.73684210526316,
+    "percent_branches_covered_display": "95",
+    "percent_covered": 98.01324503311258,
+    "percent_covered_display": "98",
+    "percent_statements_covered": 99.11504424778761,
+    "percent_statements_covered_display": "99"
+  },
+  "harness": {
+    "bytes": 14217,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph-freeze-harness.2026-10-20T04-07.txt",
+    "sha256": "70918ffd573da7cc808cd53005df9641dcf4c16442c2dd1aed773bbefded8b6f"
+  },
+  "historical_receipts": [
+    {
+      "bytes": 3373,
+      "duration_seconds": 1.913,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph1-black.2026-10-20T03-35.json",
+      "sha256": "3b35da138a0b06053d500266665e8397e7029b75c287c6ecb4b2198f765ce4dd"
+    },
+    {
+      "bytes": 3833,
+      "duration_seconds": 1.738,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph10-black.2026-10-20T03-57.json",
+      "sha256": "f787bd1f40f29d1d55aa1fe12a137c6289486be6415216aaf0cdfd202ecee9da"
+    },
+    {
+      "bytes": 3971,
+      "duration_seconds": 2.308,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph10-pyright.2026-10-20T03-58.json",
+      "sha256": "e5368cfdc3a9cf410718034033b6552803e9c4cfbd32416f023ac1c642d50589"
+    },
+    {
+      "bytes": 24617,
+      "duration_seconds": 36.992,
+      "exit_code": 1,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph10-pytest.2026-10-20T03-59.json",
+      "sha256": "a72ebf0825caed06bfaca8cb7f739530a097310f07d259795aedd4784e75555c"
+    },
+    {
+      "bytes": 3746,
+      "duration_seconds": 1.185,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph10-ruff.2026-10-20T03-58.json",
+      "sha256": "5ec8f63a35d82adb01893e1654d9ff680727b58a5af04056250c844f45ce716b"
+    },
+    {
+      "bytes": 3895,
+      "duration_seconds": 1.85,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph11-format.2026-10-20T04-04.json",
+      "sha256": "9a0ed780b0ac0959d8f82e71c78b0be03707b207a3a85c8d44f60092b2d4e30c"
+    },
+    {
+      "bytes": 3802,
+      "duration_seconds": 1.48,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-format.2026-10-20T04-04.json",
+      "sha256": "df0fd1d44acd8ab20e440eac42365b6d66adfbc22a21d6947c5ac15a59f976a2"
+    },
+    {
+      "bytes": 3746,
+      "duration_seconds": 1.197,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-lint.2026-10-20T04-04.json",
+      "sha256": "f65ca4c27d79a75dc235a9a225b6afdc03ae3c528d381e06613a3ef5354f8c14"
+    },
+    {
+      "bytes": 15048,
+      "duration_seconds": 36.832,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-tests.2026-10-20T04-05.json",
+      "sha256": "4d6c92c9f33854ca60dc1bb6ffd57b8876b9bc8c9ffd0a9da62f7195207f0279"
+    },
+    {
+      "bytes": 3969,
+      "duration_seconds": 2.206,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-types.2026-10-20T04-04.json",
+      "sha256": "c2207428f8764dd43835a9e6576ed85e4c51dd5602edf6f21b812a79539d3f91"
+    },
+    {
+      "bytes": 3172,
+      "duration_seconds": 1.482,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph2-black.2026-10-20T03-36.json",
+      "sha256": "dd084e78ccbdcd8a651dfb0dd0ec29e1484aaba1690b74e2727cafe871372354"
+    },
+    {
+      "bytes": 7336,
+      "duration_seconds": 1.592,
+      "exit_code": 1,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph2-ruff.2026-10-20T03-36.json",
+      "sha256": "f0b23d16501ca96588447bba2c733610b00f4c5f237d921711863a033522a4a6"
+    },
+    {
+      "bytes": 3172,
+      "duration_seconds": 1.765,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph3-black.2026-10-20T03-36.json",
+      "sha256": "0858d7b5f09a0c82f30d5e09145acfaf7b688cc2ccec5dda1a90fb37273d066c"
+    },
+    {
+      "bytes": 5713,
+      "duration_seconds": 2.106,
+      "exit_code": 1,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph3-pyright.2026-10-20T03-36.json",
+      "sha256": "4bf64d7d09e9fa8d0d2f3e350bedda270ac0ab761250e6b1ad4aa05f8b45a33e"
+    },
+    {
+      "bytes": 3116,
+      "duration_seconds": 1.197,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph3-ruff.2026-10-20T03-36.json",
+      "sha256": "ca9967dbbf1ed1d7edfce389c727c72babe246dd1df9aa226b70594b62b951bd"
+    },
+    {
+      "bytes": 3172,
+      "duration_seconds": 1.774,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph4-black.2026-10-20T03-36.json",
+      "sha256": "d157168cd00d6737c9ea643b3db54e84869f311e52b6b05eea7f8d138d6c5289"
+    },
+    {
+      "bytes": 3340,
+      "duration_seconds": 2.51,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph4-pyright.2026-10-20T03-37.json",
+      "sha256": "10fe1972669063c0dfc246353262f63d7c313d5c3fee295d5bd6221909ac60bf"
+    },
+    {
+      "bytes": 3116,
+      "duration_seconds": 1.205,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph4-ruff.2026-10-20T03-37.json",
+      "sha256": "d22ec04e3ecb4a2787e37e95fc6149b0761654a3e73d2df8866d1d3855e22516"
+    },
+    {
+      "bytes": 3814,
+      "duration_seconds": 1.81,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph5-black.2026-10-20T03-44.json",
+      "sha256": "c168845366ca780fc0ffa873b6d54727cb310fdc6b84f79a3f58bfd40e9d187b"
+    },
+    {
+      "bytes": 3832,
+      "duration_seconds": 1.484,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph6-black.2026-10-20T03-45.json",
+      "sha256": "06961df23fc04b61e24fb77c31e6fa2bef07006036fe7ca770dd5180870d97ed"
+    },
+    {
+      "bytes": 6721,
+      "duration_seconds": 1.139,
+      "exit_code": 1,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph6-ruff.2026-10-20T03-45.json",
+      "sha256": "3bbc707b148064cf9b18d4c236230220759fd7c4f3712546332c2150f73ca647"
+    },
+    {
+      "bytes": 3831,
+      "duration_seconds": 1.73,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph7-black.2026-10-20T03-45.json",
+      "sha256": "f0575401e8889ec9bd91c960e1a10b4f51a46c7586448fd43412fa9e77677446"
+    },
+    {
+      "bytes": 6057,
+      "duration_seconds": 2.46,
+      "exit_code": 1,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph7-pyright.2026-10-20T03-45.json",
+      "sha256": "e5beff8120067bc374500a20303d00977291b0b13400f58b9be88c12a5321dea"
+    },
+    {
+      "bytes": 3745,
+      "duration_seconds": 1.144,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph7-ruff.2026-10-20T03-45.json",
+      "sha256": "17fd1b9cb58d991a467949a6fc4c37231d729a8edd3e9272a629b31f35ea1c94"
+    },
+    {
+      "bytes": 4209,
+      "duration_seconds": 1.884,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph8-black.2026-10-20T03-57.json",
+      "sha256": "f38803a918ad4078db5624e5edeb6013796caf94307804a021d8f7445fe806c1"
+    },
+    {
+      "bytes": 3832,
+      "duration_seconds": 1.448,
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph9-black.2026-10-20T03-57.json",
+      "sha256": "9d93a835b37b157f34db7880943abce8df25781b16078114efdd93c264dc2e4a"
+    },
+    {
+      "bytes": 6569,
+      "duration_seconds": 1.183,
+      "exit_code": 1,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph9-ruff.2026-10-20T03-57.json",
+      "sha256": "06ac041a5489a995d99dea2d962a9d49afdb5a8b11d3af56e411007add6c1736"
+    }
+  ],
+  "lossless_archive": {
+    "bytes": 172518,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph-lossless-archive.2026-10-20T04-07.json",
+    "sha256": "4b68be88a691d0614e4353d6e246123ef1d2d36086fabb68be97f9e28133086f"
+  },
+  "nodes": [
+    "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[inspected-supporting-0-1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[inspected-unassigned-0-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[blocked-blocked-1-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[blocked-supporting-1-1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[uninspected-unassigned-0-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_missing_and_duplicate_ledger_rows_remain_in_selected_denominator[rows0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_missing_and_duplicate_ledger_rows_remain_in_selected_denominator[rows1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_only_valid_exclusions_leave_the_eligible_denominator[True]",
+    "tests/discovery_runtime/test_coverage_report.py::test_only_valid_exclusions_leave_the_eligible_denominator[False]",
+    "tests/discovery_runtime/test_coverage_report.py::test_unselected_inventory_and_multiple_feature_links_have_named_units",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[observed-1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[passed-1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[failed-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[not-run-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[blocked-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[absent-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[missing]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[checksum]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[stale]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[uri-only]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[environment]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[claim]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[truncation]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[passed-without-proof]",
+    "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[target-owned]",
+    "tests/discovery_runtime/test_coverage_report.py::test_required_feature_count_is_distinct_from_client_obligations",
+    "tests/discovery_runtime/test_coverage_report.py::test_confidence_never_substitutes_for_verified_claim_or_evidence[inferred-high-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_confidence_never_substitutes_for_verified_claim_or_evidence[verified-low-1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_confidence_never_substitutes_for_verified_claim_or_evidence[unknown-high-0]",
+    "tests/discovery_runtime/test_coverage_report.py::test_unresolved_questions_are_counted_independently[open-1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_unresolved_questions_are_counted_independently[under-review-1]",
+    "tests/discovery_runtime/test_coverage_report.py::test_unresolved_questions_are_counted_independently[resolved-0]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_renders_exact_fields_and_null_empty_percentages",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_never_promotes_missing_or_invalid_graphs[draft]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_never_promotes_missing_or_invalid_graphs[uninventoried]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_never_promotes_missing_or_invalid_graphs[invalid]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_outputs_do_not_change_input_digest_or_semantic_counts",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_arbitrary_objects_cannot_supply_graph_authority[None]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_arbitrary_objects_cannot_supply_graph_authority[value1]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_arbitrary_objects_cannot_supply_graph_authority[value2]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_aggregate_preflight_limits_nonascii_input_before_validation",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_preflight_excludes_large_report_output_but_not_authored_artifacts",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[empty-ledger]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[absent]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[missing-scope]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[ambiguous]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_selector_work_is_reserved_before_the_accepted_scope_query[16-False]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_selector_work_is_reserved_before_the_accepted_scope_query[128-False]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_selector_work_is_reserved_before_the_accepted_scope_query[1024-True]"
+  ],
+  "owned_source_test_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "bytes": 15007,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "physical_lines": 337,
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "bytes": 18385,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "physical_lines": 430,
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10"
+    },
+    "tests/discovery_runtime/test_coverage_report.py": {
+      "bytes": 17386,
+      "path": "tests/discovery_runtime/test_coverage_report.py",
+      "physical_lines": 477,
+      "sha256": "b71488600269b2f84820abbee1481b8ee27702592f36161eb6ecb1249f6d4b72"
+    },
+    "tests/discovery_runtime/test_coverage_report_contract.py": {
+      "bytes": 10977,
+      "path": "tests/discovery_runtime/test_coverage_report_contract.py",
+      "physical_lines": 285,
+      "sha256": "7540488f38aa576f47f02dad42e8ca389c8c37f6086b8616937c7068c575ee2b"
+    }
+  },
+  "qualifications": [
+    "The initial graph10 batch had 47 passes and two captured-byte fixture failures. Its validator dependency changed, so public composition proof is provisional. Its exact raw streams, source bindings and coverage remain retained.",
+    "Graph12 repeats the same 49 node identities after fixture-only corrections and holds both producers plus repaired validator unchanged across all four ordered stages.",
+    "Missing or ambiguous real ledger/scope selection returns null selection-dependent populations. Captured known_inventory_refs remain references only and do not establish validated selection. A real empty ledger retains selected inventory gaps.",
+    "Runtime required/observed/verified/missing use selected nonexcluded runtime-required component identities; source scenarios/features/runs remain distinct. Passed text without accepted source proof cannot create verified coverage.",
+    "Raw coverage and source bytes are losslessly archived. Portable coverage changes only filename separators; historical evidence is not rewritten.",
+    "Two population statements and four branch destinations remain uncovered and are explicitly listed. Every measured class/callable has at least 90 percent statement coverage; no cases were added solely for 100 percent.",
+    "The committed 114-case helper/legacy proof is reused unchanged. Whole-task final ordered/reversed checks and native composition remain pending."
+  ],
+  "references": {
+    "baseline": {
+      "bytes": 18320,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+      "sha256": "db5f95182b86745dbf345e2acab31e038804e7919cb2f115f9cf78bf664b370f"
+    },
+    "committed_helper_proof": {
+      "bytes": 31688,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-freeze.2026-10-20T03-23.json",
+      "sha256": "533d40493b030131e607b6dcbdd6b1b9b3d3f75bfe7a3c614dce64da29ffbfdf"
+    },
+    "original_probe_archive": {
+      "bytes": 56262,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-probes-payload.2026-10-20T03-47.json",
+      "sha256": "f2b0f0dba4fec41f83981fc19cfbd3d0e474a073b7cdfe8293d2794013d1a192"
+    },
+    "original_review": {
+      "bytes": 8891,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.json",
+      "sha256": "9edec6099eb52d7099db75e466bb9cc25e60f21ff0416920ea74266928967dd3"
+    },
+    "validator_repair_freeze": {
+      "bytes": 41813,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair-freeze.2026-10-20T04-03.json",
+      "sha256": "9ab59c5939f4b8fb1f157cfd467bbcb1d01cbd68f017de4ee92d001769fd1841"
+    }
+  },
+  "stable_dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "bytes": 14345,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "bytes": 19112,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6"
+    }
+  },
+  "stages": [
+    {
+      "bytes": 3802,
+      "duration_seconds": 1.48,
+      "executed_harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-format-harness.2026-10-20T04-04.txt",
+        "sha256": "0e72ae2b20d59bf4e34ec1b0716112a09eddd5726ac644516dca4260394b13d4"
+      },
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-format.2026-10-20T04-04.json",
+      "sha256": "df0fd1d44acd8ab20e440eac42365b6d66adfbc22a21d6947c5ac15a59f976a2",
+      "stage": "format",
+      "started_at": "2026-10-20T04:04:13.806758+00:00"
+    },
+    {
+      "bytes": 3746,
+      "duration_seconds": 1.197,
+      "executed_harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-lint-harness.2026-10-20T04-04.txt",
+        "sha256": "0e72ae2b20d59bf4e34ec1b0716112a09eddd5726ac644516dca4260394b13d4"
+      },
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-lint.2026-10-20T04-04.json",
+      "sha256": "f65ca4c27d79a75dc235a9a225b6afdc03ae3c528d381e06613a3ef5354f8c14",
+      "stage": "lint",
+      "started_at": "2026-10-20T04:04:22.427215+00:00"
+    },
+    {
+      "bytes": 3969,
+      "duration_seconds": 2.206,
+      "executed_harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-types-harness.2026-10-20T04-04.txt",
+        "sha256": "0e72ae2b20d59bf4e34ec1b0716112a09eddd5726ac644516dca4260394b13d4"
+      },
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-types.2026-10-20T04-04.json",
+      "sha256": "c2207428f8764dd43835a9e6576ed85e4c51dd5602edf6f21b812a79539d3f91",
+      "stage": "types",
+      "started_at": "2026-10-20T04:04:30.550939+00:00"
+    },
+    {
+      "bytes": 15048,
+      "duration_seconds": 36.832,
+      "executed_harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-tests-harness.2026-10-20T04-05.txt",
+        "sha256": "0e72ae2b20d59bf4e34ec1b0716112a09eddd5726ac644516dca4260394b13d4"
+      },
+      "exit_code": 0,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-tests.2026-10-20T04-05.json",
+      "sha256": "4d6c92c9f33854ca60dc1bb6ffd57b8876b9bc8c9ffd0a9da62f7195207f0279",
+      "stage": "tests",
+      "started_at": "2026-10-20T04:04:39.809602+00:00"
+    }
+  ],
+  "status": "FROZEN_GRAPH_CANDIDATE_FOR_INDEPENDENT_REVIEW_NOT_TASK_ACCEPTANCE",
+  "task": "P5-T1",
+  "test_count": 49,
+  "timestamp_utc": "2026-10-20T04:07:43.848737+00:00"
+}

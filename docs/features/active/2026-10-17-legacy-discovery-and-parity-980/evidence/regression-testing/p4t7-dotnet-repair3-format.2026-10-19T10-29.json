@@ -1,0 +1,68 @@
+{
+  "stage": "format",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:29:43.779535+00:00",
+  "finished": "2026-10-19T10:29:45.246073+00:00",
+  "duration_seconds": 1.467,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "physical_lines": 465
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "physical_lines": 465
+    }
+  },
+  "shared_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    }
+  },
+  "shared_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    }
+  },
+  "streams": {
+    "stdout": {
+      "path": "SCRATCH/p4t7-dotnet-repair3-format.102945246073.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "path": "SCRATCH/p4t7-dotnet-repair3-format.102945246073.stderr.bin",
+      "raw_sha256": "4874b2c3a7b699f761bfd72d5f281823ce8b127797f57e4c84ea180debe5de49",
+      "bytes": 61,
+      "presentation": "All done! \\u2728 \\U0001f370 \\u2728\r\n2 files left unchanged.\r\n"
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-repair-gates.py",
+    "sha256": "bfe522f495eef5b0e53bd5d147c5e6b35edc3d039ebc900bfe5d04b0d08ea277"
+  },
+  "review": "p4t7-executor-format-review.2026-10-19T10-23.json FR2",
+  "scope": "Only .NET parser/test repair; predecessor proof reused"
+}

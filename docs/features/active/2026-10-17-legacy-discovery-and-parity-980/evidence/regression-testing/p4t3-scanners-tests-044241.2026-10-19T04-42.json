@@ -1,0 +1,41 @@
+{
+  "batch": "scanners",
+  "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py --cov=drm_copilot_discovery.analyzer.csharp_declarations --cov=drm_copilot_discovery.analyzer.event_subscriptions --cov=drm_copilot_discovery.analyzer.dotnet_inventory --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t3-scanners-coverage.raw.json",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T04:42:41.051318+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-scanners-tests-044241.2026-10-19T04-42.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-scanners-tests-044241.2026-10-19T04-42.stdout.txt",
+      "sha256": "09e45c8dd613e7e863ee7e48db60e6d9a3b0a04f28619fc5245e4bf251f48495"
+    }
+  },
+  "seconds": 15.667239,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f9385043cf75790d2fc64215d7e398204689061d368b2311a96837718d2c95e9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "6a36b65aaafb94f97f25f5f766acbda3db167e28695250503617f2ff3063c62d",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "ac6a6d638de7283f47f9614abc5db9a43b42ce5adff8d731fc681581d892599e",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "d687be93bf79b53ebe95d36e20ad4ead6421f632f61e5e47df4708ed029c2217",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f9385043cf75790d2fc64215d7e398204689061d368b2311a96837718d2c95e9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "6a36b65aaafb94f97f25f5f766acbda3db167e28695250503617f2ff3063c62d",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "ac6a6d638de7283f47f9614abc5db9a43b42ce5adff8d731fc681581d892599e",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "d687be93bf79b53ebe95d36e20ad4ead6421f632f61e5e47df4708ed029c2217",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "stage": "tests",
+  "started_at": "2026-10-19T04:42:25.384079+00:00",
+  "stderr": "",
+  "stdout": "........................................................................ [ 64%]\r\n.......................................                                  [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                   Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\csharp_declarations.py     161      0     94      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_inventory.py        137      0     36      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\event_subscriptions.py      47      0     28      0   100%\r\n----------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                    345      0    158      0   100%\r\nCoverage JSON written to file SCRATCH\\p4t3-scanners-coverage.raw.json\r\n111 passed in 15.03s\r\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-42"
+}

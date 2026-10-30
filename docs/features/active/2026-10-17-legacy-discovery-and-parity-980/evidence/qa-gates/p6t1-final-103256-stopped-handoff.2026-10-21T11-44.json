@@ -1,0 +1,167 @@
+{
+  "Timestamp": "2026-10-21T11:44:51.082246+00:00",
+  "bound_input_check": {
+    "before_equals_after_each_completed_stage": true,
+    "count": 241,
+    "coverage_and_test_stage_unchanged": true,
+    "final_gate_acceptance": false
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-capture-comment-candidate.2026-10-21T10-32.json",
+    "sha256": "d3383c7dbfd1c854bbf5209ac9c2ad66d8d13ae89938a28ff0cfa1a50b6b587b"
+  },
+  "contracts": {
+    "executed": 0,
+    "expected": 4,
+    "status": "UNEXECUTED_AFTER_COVERAGE_GATE_FAILURE"
+  },
+  "coverage_failure_exact": "Traceback (most recent call last):\n  File \"SCRATCH\\p6t1_final_nio1_coverage.py\", line 234, in <module>\n    main()\n    ~~~~^^\n  File \"SCRATCH\\p6t1_final_nio1_coverage.py\", line 197, in main\n    assert not unit_lines or len(effective) / len(unit_lines) >= .9, (path, name, \"raw AST line floor\")\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ('packages/discovery-runtime/src/drm_copilot_discovery/operations.py', 'OperationContext.read', 'raw AST line floor')",
+  "coverage_json_raw": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-proof-raw.2026-10-21T11-43.json",
+      "sha256": "79e2916f486035174fe46459bb4175e8efca20ebc9ec99b460bef0f0c702290e"
+    },
+    "bytes": 602272,
+    "encoding": "gzip-base64",
+    "member": "coverage_json",
+    "sha256": "2aba1fdd995dfdd75a2ab4280f62b5aae645de099aa977ac8459f0d2d6878103"
+  },
+  "exact_single_process_reversed_population_passed": true,
+  "expected_nodes": 329,
+  "failed_tests": 0,
+  "liveness_observation": {
+    "after": {
+      "observed_utc": "2026-10-21T11:27:42.8408860Z",
+      "processes": [
+        {
+          "kernel_100ns": "156250",
+          "parent_id": 73660,
+          "process_id": 48068,
+          "role": "existing_runner",
+          "user_100ns": "0"
+        },
+        {
+          "kernel_100ns": "5000000",
+          "parent_id": 48068,
+          "process_id": 73324,
+          "role": "existing_runner",
+          "user_100ns": "6718750"
+        },
+        {
+          "kernel_100ns": "468750",
+          "parent_id": 73324,
+          "process_id": 87340,
+          "role": "existing_descendant",
+          "user_100ns": "0"
+        },
+        {
+          "kernel_100ns": "213750000",
+          "parent_id": 87340,
+          "process_id": 17348,
+          "role": "existing_descendant",
+          "user_100ns": "32209062500"
+        }
+      ]
+    },
+    "before": {
+      "observed_utc": "2026-10-21T11:27:20.4527444Z",
+      "processes": [
+        {
+          "kernel_100ns": "156250",
+          "parent_id": 73660,
+          "process_id": 48068,
+          "role": "existing_runner",
+          "user_100ns": "0"
+        },
+        {
+          "kernel_100ns": "5000000",
+          "parent_id": 48068,
+          "process_id": 73324,
+          "role": "existing_runner",
+          "user_100ns": "6718750"
+        },
+        {
+          "kernel_100ns": "468750",
+          "parent_id": 73324,
+          "process_id": 87340,
+          "role": "existing_descendant",
+          "user_100ns": "0"
+        },
+        {
+          "kernel_100ns": "213281250",
+          "parent_id": 87340,
+          "process_id": 17348,
+          "role": "existing_descendant",
+          "user_100ns": "31988125000"
+        }
+      ]
+    }
+  },
+  "liveness_qualification": "Read-only counters from the same active descendant, sampled once on coordinator request. Migration real-write subsequently passed in the authoritative 329-node result; CPU activity alone was not treated as behavioral proof.",
+  "new_completed_stages": [
+    {
+      "clean": true,
+      "elapsed_seconds": 4193.486938,
+      "exit_code": 0,
+      "passed_nodes": 329,
+      "population_matches": true,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-tests-raw.2026-10-21T11-43.json",
+        "sha256": "1867c800df66e01b637a61b15dc640e3c9a6834d11d0aeb568cce43710f797fa"
+      },
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-tests.2026-10-21T11-43.json",
+        "sha256": "1903c76500b8cd738707bf8a007b89ff97082ca9634fee7ffd7ad03ffeca0884"
+      },
+      "stage": "tests"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 0.609749,
+      "exit_code": 0,
+      "passed_nodes": 0,
+      "population_matches": true,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json-raw.2026-10-21T11-43.json",
+        "sha256": "c3aa5a742c864eb1b7702ac499d4c82d5c04a77f01cc3845b295951ee0d7b020"
+      },
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json.2026-10-21T11-43.json",
+        "sha256": "05a3b3b8fcdbfe351f9d2833ffe0dd64b68c78378e5cbc732f364f3fbd4f42f0"
+      },
+      "stage": "coverage-json"
+    },
+    {
+      "clean": false,
+      "elapsed_seconds": 1.411042,
+      "exit_code": 1,
+      "passed_nodes": 0,
+      "population_matches": true,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-proof-raw.2026-10-21T11-43.json",
+        "sha256": "79e2916f486035174fe46459bb4175e8efca20ebc9ec99b460bef0f0c702290e"
+      },
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-proof.2026-10-21T11-43.json",
+        "sha256": "7420094ca714edebf9cf3e3de449cf05867bf43bd1ccef0c762d86dc3ea38b46"
+      },
+      "stage": "coverage-proof"
+    }
+  ],
+  "passed": 329,
+  "pending": [
+    "bounded coverage diagnosis",
+    "coverage gate resolution",
+    "four package contracts",
+    "independent task acceptance"
+  ],
+  "raw_readable_qualification": "Each raw archive retains exact stdout/stderr/progress/coverage/candidate/harness bytes and hashes, including CRLF or no terminal newline. Authored readable receipts are LF-terminated UTF-8. No source/test/package/reader edits, retry or native replay occurred.",
+  "run": "p6t1-final-103256",
+  "static_proof_already_preserved": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-wip-staging.2026-10-21T11-12.json",
+    "sha256": "ed04041516296666af8f0a181b73ed6ee8f47db0fad283abc94d34d5ca3111e3"
+  },
+  "status": "TESTS_PASSED_COVERAGE_GATE_FAILED_ACCEPTANCE_PENDING",
+  "task": "P6-T1",
+  "test_errors": 0
+}

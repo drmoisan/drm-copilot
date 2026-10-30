@@ -1,0 +1,46 @@
+{
+  "checkoff": "P4-T7 only; 39/84 tasks and unchanged 13/66 AC",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-reconciliation.2026-10-19T11-14.json",
+      "sha256": "36ee0af9301195e720eedd0d96569ccf3fe8569ccae300899077649dbe283285"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-reconciliation.2026-10-19T11-14.md",
+      "sha256": "ba6371edee48dff1a72a780db825bf1820dcfe8248aa3d2ef311168a01e9e5be"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-reconciliation-harness.2026-10-19T11-14.txt",
+      "sha256": "d9e8bdfe7976b89c0ff32af391d3f4cc1ad89edbad3643c44bf04df022733024"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-acceptance.2026-10-19T11-14.json",
+      "sha256": "4b70896c9536df3bd02372ab3c38f39979eff6e2c39c46fcc5c23026f315a125"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-acceptance.2026-10-19T11-14.md",
+      "sha256": "586dfd1a138dece9ad046b6f1bdd1179cc61c7a9dea53115ec093ee7ba6cde5c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "ba2110c12a1146251bcc5a0820523ae6bcb4d8e3c61def86dcf4b56857fdd3f0"
+    }
+  ],
+  "source_test_checkpoint_git_mutations": false,
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-reconciliation.2026-10-19T11-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-reconciliation.2026-10-19T11-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-reconciliation-harness.2026-10-19T11-14.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-acceptance.2026-10-19T11-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-acceptance.2026-10-19T11-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-staging.2026-10-19T11-14.json"
+  ],
+  "status": "ACCEPTED",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T11-14",
+  "worker_evidence_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-staging.2026-10-19T11-10.json",
+    "sha256": "de47bfecbb0826d2976f51ee080e247b6ae208bde2998d2e7670fcc4aae9dbcf"
+  }
+}

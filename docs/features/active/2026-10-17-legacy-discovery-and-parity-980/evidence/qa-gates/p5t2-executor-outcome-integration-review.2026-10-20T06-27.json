@@ -1,0 +1,223 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:27:08.800629+00:00",
+  "status": "FROZEN_OUTCOME_INTEGRATION_SOURCE_REVIEW_POLICY_REPAIR_REQUIRED",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "bytes": 3503,
+      "physical_lines": 86
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+      "bytes": 14686,
+      "physical_lines": 345
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "sha256": "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9",
+      "bytes": 19702,
+      "physical_lines": 471
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_models.py",
+      "sha256": "20c411fb2ae13b85546ec432f4bb6f38f8deba2a280c211aad8a0f1f50ca6e42",
+      "bytes": 12050,
+      "physical_lines": 292
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+      "bytes": 20616,
+      "physical_lines": 494
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_report_projection.py",
+      "sha256": "a6d3a178bc9a20af966f0fb4b03d7a7e8f951dac35020215ca077c5238e2b1fb",
+      "bytes": 9995,
+      "physical_lines": 266
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "bytes": 17875,
+      "physical_lines": 476
+    }
+  ],
+  "integration_source_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-source-freeze.2026-10-20T06-20.json",
+    "sha256": "149f5e543a465298fb201c1fb03a77a15297bdc1061702ebf0df554527451bd3",
+    "bytes": 69009
+  },
+  "original_outcome_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-freeze.2026-10-20T06-25.json",
+    "sha256": "5bf765cd3e16f77beb9e86ad58555b5e50c045d43c00e8ea36de5f922c45f0a0",
+    "bytes": 54377
+  },
+  "outcome_passing_ordered_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-format.2026-10-20T06-18.json",
+      "sha256": "b90ed32c4aa8ec98c71bfe33f4f256729cea5747353764f597d7c1f43b051481",
+      "bytes": 4984
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-lint.2026-10-20T06-18.json",
+      "sha256": "adf940cfe54435d42543635bdac6739279920d4e9f7d3047154a12f594a669a1",
+      "bytes": 4927
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-types.2026-10-20T06-19.json",
+      "sha256": "21a7e896a73c182508375d121ae7c0cefe686e83f75fe69f94ee252b934105ca",
+      "bytes": 5150
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-tests.2026-10-20T06-19.json",
+      "sha256": "d1777367938f6dc6602cd2b280f748e2ab4ec0338017368a64402033357ad141",
+      "bytes": 6923
+    }
+  ],
+  "prior_helper_adapter": {
+    "commit": "2b069afb0d88ae1a3c17ef10f7a52c3936800462",
+    "review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-helper-adapter-review.2026-10-20T06-06.json",
+      "sha256": "2219f081f9ab374cb39d51ac870b40991e84cfcc85981fbe709880e20a4c40e3",
+      "bytes": 4540
+    }
+  },
+  "payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27-payload.json",
+    "sha256": "1df182023109ed4f44c2e1b5759df651f1907f533ae5b8649ef0d7bfcf6c9861",
+    "bytes": 149353
+  },
+  "behavioral_findings": [],
+  "open_behavioral_probes": [],
+  "findings": [
+    {
+      "id": "PC1",
+      "kind": "mandatory intent/documentation contract",
+      "policy": {
+        "path": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
+        "sha256": "791e8bf84834adbec7e66241474c44d51a58eea31cd9a2cd6e136699ee8a5a71",
+        "bytes": 4791
+      },
+      "rule_lines": [
+        28,
+        36,
+        38,
+        47,
+        55
+      ],
+      "impact": "Current new/changed contracts omit required parameter/result/effect details, and two new branching blocks lack decision-intent comments.",
+      "locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+          "line": 172,
+          "symbol": "ParityEntryRules.approval",
+          "required": "Name matrix (ArtifactRecord), row (JsonObject), pointer (str), and obligation (FeatureObligation) with their purpose; keep the existing bool/effect contract."
+        },
+        {
+          "path": "tests/discovery_runtime/test_parity_models.py",
+          "lines": [
+            52,
+            80,
+            106,
+            132,
+            152,
+            175,
+            192,
+            236,
+            262
+          ],
+          "required": "Include explicit ProfileV2/SchemaCatalog fixture types and pytest.MonkeyPatch where present. Retain existing purpose/None/isolation wording."
+        },
+        {
+          "path": "tests/discovery_runtime/test_parity_models.py",
+          "line": 218,
+          "symbol": "limited_context",
+          "required": "Specify ReferenceIndex, EvidenceValidation and int parameters and returned ClaimContext; make the fresh bounded-context behavior explicit."
+        },
+        {
+          "path": "tests/discovery_runtime/test_parity_models.py",
+          "line": 275,
+          "symbol": "bounded_work",
+          "required": "Identify the fresh ReportBudget result and its local work-counter initialization; retain ParseLimits input meaning."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+          "line": 203,
+          "symbol": "_Validation.complete",
+          "required": "Document parity (bool), tuple[Finding, ...] return, and the new per-operation complete_dimensions/complete_parity state retained for report composition; no external effects."
+        },
+        {
+          "path": "tests/discovery_runtime/test_parity_report_projection.py",
+          "lines": [
+            47,
+            74,
+            138,
+            161,
+            224,
+            255
+          ],
+          "required": "Include SchemaCatalog and other actual parameter types, explicit None return and memory-only/local-patch effects; retain each scenario's purpose."
+        },
+        {
+          "path": "tests/discovery_runtime/test_parity_report_projection.py",
+          "line": 241,
+          "symbol": "unexpected",
+          "required": "State that the DiscoverySnapshot observer appends its digest to the local call list and returns an empty tuple[Finding, ...]."
+        },
+        {
+          "path": "tests/discovery_runtime/test_parity_report_projection.py",
+          "lines": [
+            79,
+            202
+          ],
+          "required": "Add immediate intent comments distinguishing the three captured-input fault branches and separating summary-carrier observation from complete-validator counts."
+        }
+      ],
+      "repair_scope": "Documentation/comments only in the enumerated existing files. Preserve executable AST, assertions, parametrization and existing passing proof; no semantic expansion."
+    }
+  ],
+  "cleared_source_properties": [
+    "Outcomes retain actual branch/evidence decisions independently from authored states and bounded diagnostics.",
+    "Unknown source/target/client/obligation ownership remains invalid with required=None; duplicates invalidate every competing resolved row.",
+    "Present-claim validity and completed proof are distinct; approved retirement is explicit; absent optional classifications are not-required.",
+    "Prospective retained-input, entry-work, pointer-text and coordinate reservations precede the corresponding added work; no concrete uncovered behavioral risk remains.",
+    "The integration retains requested root results alongside independent parity-complete results; per-operation caches reuse the same complete carriers.",
+    "Derived reports are excluded from graph indexing and must match exact recomputation; invalid-core parity is fail/unavailable and cannot authorize output.",
+    "Existing findings-first ParityValidation construction and explicit re-export identity remain compatible."
+  ],
+  "final_integration_population": {
+    "total": 25,
+    "prepared_parity_and_public_guard_cases": {
+      "count": 17,
+      "source": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-source-freeze.2026-10-20T06-20.json",
+        "sha256": "149f5e543a465298fb201c1fb03a77a15297bdc1061702ebf0df554527451bd3",
+        "bytes": 69009
+      }
+    },
+    "additional_existing_controls": [
+      {
+        "selector": "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results",
+        "count": 6,
+        "reason": "The coverage/parity shared report branch changed; preserve existing root-mode versus independent discovery-result semantics."
+      },
+      {
+        "selector": "tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts",
+        "count": 2,
+        "reason": "The modified structural-invalid return now chooses coverage/parity field names and unavailable summaries through shared ternaries."
+      }
+    ],
+    "reuse": "Other immutable P5-T1 caller proof is retained; no 138-caller replay proposed. Native parity composition precedes long final tests."
+  },
+  "qualifications": [
+    "This is the complete finite finding set for the seven frozen files only. The graph projection is not frozen and is excluded.",
+    "Outcome source is bound to the clean 91-case loop and original 06:25 freeze; full per-range/closure reconciliation is deferred to corrected-byte confirmation. No outcome suite replay occurred.",
+    "The integration freeze is source-only; its 17 cases have not yet been represented as passing proof.",
+    "No production/test/checkpoint/Git/checkoff changes were made; repair authorization belongs to the coordinator.",
+    "Source semantic review is closed for unchanged bytes. Later confirmation is limited to PC1 and final frozen proof."
+  ]
+}

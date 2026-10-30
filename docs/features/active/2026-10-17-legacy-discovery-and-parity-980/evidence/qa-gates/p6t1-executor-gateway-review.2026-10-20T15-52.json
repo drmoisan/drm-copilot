@@ -1,0 +1,1684 @@
+{
+  "task": "P6-T1",
+  "timestamp": "2026-10-20T15-52",
+  "status": "SCOPED_FINDINGS_COMPLETE",
+  "routing": "atomic_execution_p6t1_gateway_review_20261020 / S5_P6T1_gateway_review",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-handoff.2026-10-20T15-39.json",
+    "sha256": "2b4131888a8e9e580b3cdf58d63e5f7d6180016487f63d592728b22ba02b592b",
+    "bytes": 10875
+  },
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-freeze.2026-10-20T15-35.json",
+    "sha256": "939ef244f98bbd91ad6f9cfb4e679c2c08784a7e25ca90cb726d4ff21ff22184",
+    "bytes": 10571
+  },
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "41ff97e3d4ff0469f14d6077862d57a6aa57fee01d214efa0b2e196ba775015e",
+      "physical_lines": 301,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "f9c4fe395d8c22cd8dd0540c8d218a9f2a940607c20c881923f290f7217888f1",
+      "physical_lines": 319,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "sha256": "310a9171c942802530ae3f7d224826b897e95a599367f48b17ed1e01748f22e2",
+      "physical_lines": 213,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "sha256": "c2300b8288df099381ced7f9921ee59300c311e7aec019c3c0a183204314b5c2",
+      "physical_lines": 496,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "49114bf39862874dd1557ff5dcf4e35fa462c519b5ba2b3b3712b6202aefbb7c",
+      "physical_lines": 483,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "tests/discovery_runtime/test_doctor.py",
+      "sha256": "56af82ec9550549a5f3d424138016deb1772743a19c7f35f31eca903a2ca8846",
+      "physical_lines": 343,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    }
+  ],
+  "probe_and_original_sources": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-probe.2026-10-20T15-52.json",
+    "sha256": "6dd9f01571209147eda24121bf55c7160ce4cf26bf35b16edd70919a2883f199",
+    "bytes": 40134
+  },
+  "retained_proofs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.raw.json",
+      "sha256": "1a6baa81d2c60cb72b5ce2e60a9f90db21a51b8e0e2491acc9afb0ca8f41ee62",
+      "bytes": 5664
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-ruff.2026-10-20T15-29.raw.json",
+      "sha256": "624885d3f96676caa28a66f02adfd55373116e6145b8613bf69ed97f8df4e2ba",
+      "bytes": 5609
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.raw.json",
+      "sha256": "0d982d315105e48015f75009ea536595104dd2981acdbec93b50b91e96a675ff",
+      "bytes": 5839
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.raw.json",
+      "sha256": "b5e5b49de0ad387f15d6fecb878bdb3825e72a768bd490109f33832f780945d4",
+      "bytes": 8128
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.raw.json",
+      "sha256": "510b6a8e983ddd09044e24ca7b39c2c06e1d8f3cf63b03a4b4b12c785d06a99d",
+      "bytes": 6437
+    }
+  ],
+  "verification": {
+    "ordered_static_gates": "Black/Ruff/scoped Pyright passed on the held six-file candidate.",
+    "focused_tests_passed": 86,
+    "reverse_tests_passed": 86,
+    "behavior_replayed_by_reviewer": false,
+    "bounded_probe_exit": 0,
+    "coverage": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": {
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "minimum_named_body_line_percent": 100.0,
+        "named_bodies_with_statements": 7,
+        "predecessor": "Absent; no prior executable lines",
+        "changed_line_loss": "Not applicable for new files; complete final file measured"
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": {
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "minimum_named_body_line_percent": 100.0,
+        "named_bodies_with_statements": 6,
+        "predecessor": "Absent; no prior executable lines",
+        "changed_line_loss": "Not applicable for new files; complete final file measured"
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+        "line_percent": 99.07407407407408,
+        "branch_percent": 96.875,
+        "minimum_named_body_line_percent": 92.85714285714286,
+        "named_bodies_with_statements": 11,
+        "predecessor": "Absent; no prior executable lines",
+        "changed_line_loss": "Not applicable for new files; complete final file measured"
+      }
+    },
+    "qualification": "Existing named-body proof is retained, not re-executed. It does not cover the newly demonstrated boundaries or establish task acceptance."
+  },
+  "dependencies_observed": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+  },
+  "cleared_scope_conclusions": [
+    "Request JSON uses the accepted finite parser; short pipe reads continue through EOF/sentinel. Fixed installed dispatch does not select imports from request data.",
+    "The explicit outer workspace/repository reader is retained by initialization, execution and writer recapture. Local authority does not accept host markers, agent-output invocation, prepare/finalize or a substituted root.",
+    "Guarded publication and path/link checks are reused. The P6 empty-authority callback claims no native revocation or host capability; P8 replacement remains mandatory before host enablement.",
+    "Typed emergency result handling remains restricted to unavailable pre-execution context; arbitrary invalid/evaluated results do not receive a replacement empty-effects envelope. GW1 addresses unexpected exceptions escaping that refusal.",
+    "Doctor retains actual captured bytes/absence, no artifacts or receipt, and reports native enforcement unavailable. GW3 addresses its unreserved path work.",
+    "All six held files are at most 500 physical lines. Unit tests use memory doubles; no test suite or native process was rerun."
+  ],
+  "findings": [
+    {
+      "id": "GW1",
+      "classification": "source",
+      "severity": "blocking",
+      "title": "Unexpected result serialization failure escapes the post-execution refusal boundary",
+      "locations": [
+        "gateway.py:_emit",
+        "gateway.py:run_gateway final _emit call"
+      ],
+      "observed": {
+        "calls": [
+          "executor_returned",
+          "serialization"
+        ],
+        "outcome": {
+          "returned": false,
+          "error_type": "RuntimeError",
+          "error": "synthetic-private-serialization-marker"
+        },
+        "stdout": "",
+        "stderr": ""
+      },
+      "impact": "The executor returns a real DiscoveryResult, then its serializer raises RuntimeError. run_gateway propagates that exception with no fixed stderr or exit code. A normal module invocation can therefore print the unredacted traceback. No replacement JSON or fabricated effects were observed.",
+      "repair": "Keep the fixed emergency envelope restricted to the existing typed pre-execution catalog/provider case. Catch unexpected post-executor serialization/emission failures at the top-level boundary, emit only a fixed diagnostic and return 3 without a second JSON attempt or exception text. Preserve the no-partial-output replacement rule.",
+      "minimum_controls": "Unexpected serializer failure after executor return, alongside existing invalid-result, evaluated-catalog failure and partial-output controls. Assert fixed stderr, exit 3, no marker disclosure and no fabricated empty-effect result."
+    },
+    {
+      "id": "GW2",
+      "classification": "source",
+      "severity": "blocking",
+      "title": "The Git deadline is applied only after a potentially blocking stdout read",
+      "locations": [
+        "gateway_local.py:run_local_git stdout.read(output_limit + 1) followed by wait(timeout=30)"
+      ],
+      "observed": {
+        "events": [
+          {
+            "event": "stdout.read",
+            "size": 5,
+            "prior_wait_timeouts": []
+          },
+          {
+            "event": "poll"
+          },
+          {
+            "event": "kill"
+          },
+          {
+            "event": "wait",
+            "timeout": null
+          },
+          {
+            "event": "context_exit"
+          }
+        ],
+        "qualification": "The sentinel stops at read entry. This demonstrates deadline ordering only; no hung child or elapsed-time result is claimed."
+      },
+      "impact": "A child that neither closes stdout nor supplies the requested bytes can hold the read indefinitely, so the later timed wait does not enforce a command deadline. Output byte capacity alone does not bound this blocking operation.",
+      "repair": "Apply a finite deadline across pipe consumption and process completion, retain the output_limit+1 ceiling before retention, and terminate/reap the child on timeout or overflow. Preserve the exact Git executable selection, shell=False, discarded stderr and stripped Git environment overrides. Do not use unbounded communicate/capture as a replacement.",
+      "minimum_controls": "A deterministic process/pipe double whose read remains pending until deadline cancellation, plus current success, overflow, nonzero and cleanup controls. Assert cancellation/reaping and no unbounded buffer; no flaky wall-clock threshold.",
+      "qualification": "The probe stops at read entry using a sentinel and records timeout/cleanup call order. No actual hung process, elapsed deadline or timing measurement is claimed."
+    },
+    {
+      "id": "GW3",
+      "classification": "source",
+      "severity": "blocking",
+      "title": "Doctor path traversal is not charged before candidate text measurement",
+      "locations": [
+        "doctor.py:inspect_doctor candidate budget.check/set/sort",
+        "doctor.py:_DoctorCapture path and work accounting"
+      ],
+      "observed": {
+        "candidate_characters": 4095,
+        "configured_work": 2048,
+        "text_measurements": [
+          {
+            "characters": 4095,
+            "work_left_before_text": 2048
+          }
+        ],
+        "work_remaining": [
+          2046
+        ],
+        "outcome": {
+          "returned": true,
+          "exit_code": 0,
+          "missing_paths": 2
+        },
+        "workspace_byte_reads": 0,
+        "registry_write_observed": false,
+        "revocations": 0
+      },
+      "impact": "One valid 32-component candidate path contains 4,095 characters. Under the existing trusted ParseLimits seam (8,192 bytes, 32 records, 2,048 work units), actual ReportBudget.text scans that value with all 2,048 units remaining; the operation returns exit 0 with 2,046 units remaining. The minimum demonstrated text traversal alone exceeds total configured work. No workspace byte read, write or revocation occurred.",
+      "repair": "Prospectively reserve actual candidate/selected-path text, set/sort and repeated comparison work in the same doctor operation budget before measurement, allocation or observation. Preserve exact capture/absence and existing selector/path safety semantics. Reuse accepted selection and snapshot implementations without modifying their behavior.",
+      "minimum_controls": "The same counted long-path/tight-work seam must reject before the text/path observation; a sufficient-capacity control must retain exact missing/captured inputs and truthful state. Keep aggregate byte-read and protected-locator controls unchanged.",
+      "qualification": "The finite policy is injected at the same doctor ParseLimits seam used by existing resource tests. This is a direct doctor composition finding, not a defect claim about ReportBudget's documented caller-owned work reservation."
+    },
+    {
+      "id": "GP1",
+      "classification": "policy",
+      "severity": "required",
+      "title": "Complete changed-scope typed docstring contracts and immediate intent comments",
+      "rule": ".agents/skills/self-explanatory-code-commenting/SKILL.md: Mandatory Function and Method Docstrings; Mandatory Class Docstrings; Loops and Comprehensions",
+      "function_contracts": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "line": 41,
+          "qualified_name": "ServiceExecutor.__call__",
+          "parameters_to_document": [
+            {
+              "name": "request",
+              "type": "JsonValue"
+            },
+            {
+              "name": "io",
+              "type": "ServiceIO"
+            },
+            {
+              "name": "repository_reader",
+              "type": "RepositoryReader | None"
+            },
+            {
+              "name": "clock",
+              "type": "Clock"
+            },
+            {
+              "name": "analyzer_registry",
+              "type": "InventoryRegistry"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "line": 54,
+          "qualified_name": "_execute",
+          "parameters_to_document": [
+            {
+              "name": "request",
+              "type": "JsonValue"
+            },
+            {
+              "name": "io",
+              "type": "ServiceIO"
+            },
+            {
+              "name": "repository_reader",
+              "type": "RepositoryReader | None"
+            },
+            {
+              "name": "clock",
+              "type": "Clock"
+            },
+            {
+              "name": "analyzer_registry",
+              "type": "InventoryRegistry"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "line": 74,
+          "qualified_name": "_failure",
+          "parameters_to_document": [
+            {
+              "name": "code",
+              "type": "str"
+            },
+            {
+              "name": "exit_code",
+              "type": "Literal[2, 3]"
+            },
+            {
+              "name": "value",
+              "type": "JsonObject | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "line": 117,
+          "qualified_name": "_emit",
+          "parameters_to_document": [
+            {
+              "name": "result",
+              "type": "DiscoveryResult"
+            },
+            {
+              "name": "stdout",
+              "type": "TextIO"
+            },
+            {
+              "name": "stderr",
+              "type": "TextIO"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "line": 158,
+          "qualified_name": "_read_request",
+          "parameters_to_document": [
+            {
+              "name": "stdin",
+              "type": "BinaryIO"
+            },
+            {
+              "name": "limits",
+              "type": "ParseLimits"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "line": 177,
+          "qualified_name": "run_gateway",
+          "parameters_to_document": [
+            {
+              "name": "stdin",
+              "type": "BinaryIO"
+            },
+            {
+              "name": "stdout",
+              "type": "TextIO"
+            },
+            {
+              "name": "stderr",
+              "type": "TextIO"
+            },
+            {
+              "name": "create_io",
+              "type": "Callable[[], ServiceIO]"
+            },
+            {
+              "name": "repository_reader",
+              "type": "RepositoryReader | None"
+            },
+            {
+              "name": "clock",
+              "type": "Clock"
+            },
+            {
+              "name": "analyzer_registry",
+              "type": "InventoryRegistry"
+            },
+            {
+              "name": "limits",
+              "type": "ParseLimits | None"
+            },
+            {
+              "name": "execute_request",
+              "type": "ServiceExecutor"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "line": 231,
+          "qualified_name": "main",
+          "parameters_to_document": [
+            {
+              "name": "argv",
+              "type": "Sequence[str] | None"
+            },
+            {
+              "name": "stdin",
+              "type": "BinaryIO | None"
+            },
+            {
+              "name": "stdout",
+              "type": "TextIO | None"
+            },
+            {
+              "name": "stderr",
+              "type": "TextIO | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "line": 44,
+          "qualified_name": "LocalServiceIO.__init__",
+          "parameters_to_document": [
+            {
+              "name": "activation",
+              "type": "ActivationStore"
+            },
+            {
+              "name": "repository",
+              "type": "RepositoryReader | None"
+            },
+            {
+              "name": "principal",
+              "type": "Literal['local-user', 'host']"
+            },
+            {
+              "name": "author_id",
+              "type": "str"
+            },
+            {
+              "name": "identity",
+              "type": "Callable[[], RuntimeIdentity]"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "line": 89,
+          "qualified_name": "LocalServiceIO.authorize",
+          "parameters_to_document": [
+            {
+              "name": "request",
+              "type": "ServiceRequest"
+            },
+            {
+              "name": "baseline",
+              "type": "CapturedWorkspace | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "line": 134,
+          "qualified_name": "LocalServiceIO.writer",
+          "parameters_to_document": [
+            {
+              "name": "baseline",
+              "type": "CapturedWorkspace"
+            },
+            {
+              "name": "authority",
+              "type": "ServiceAuthority"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "line": 156,
+          "qualified_name": "LocalServiceIO._recapture",
+          "parameters_to_document": [
+            {
+              "name": "baseline",
+              "type": "CapturedWorkspace"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "line": 185,
+          "qualified_name": "_repository_selection",
+          "parameters_to_document": [
+            {
+              "name": "capture",
+              "type": "CapturedWorkspace"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "line": 212,
+          "qualified_name": "run_local_git",
+          "parameters_to_document": [
+            {
+              "name": "argv",
+              "type": "tuple[str, ...]"
+            },
+            {
+              "name": "output_limit",
+              "type": "int"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "line": 282,
+          "qualified_name": "installed_local_io",
+          "parameters_to_document": [
+            {
+              "name": "root",
+              "type": "str"
+            },
+            {
+              "name": "repository",
+              "type": "RepositoryReader | None"
+            },
+            {
+              "name": "principal",
+              "type": "str"
+            },
+            {
+              "name": "author_id",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+          "line": 36,
+          "qualified_name": "_DoctorCapture.__init__",
+          "parameters_to_document": [
+            {
+              "name": "io",
+              "type": "InitializationIO"
+            },
+            {
+              "name": "limits",
+              "type": "ParseLimits"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+          "line": 49,
+          "qualified_name": "_DoctorCapture._bounded_read",
+          "parameters_to_document": [
+            {
+              "name": "path",
+              "type": "str"
+            },
+            {
+              "name": "limit",
+              "type": "int"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+          "line": 56,
+          "qualified_name": "_DoctorCapture.read",
+          "parameters_to_document": [
+            {
+              "name": "path",
+              "type": "str"
+            },
+            {
+              "name": "limit",
+              "type": "int"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+          "line": 78,
+          "qualified_name": "_DoctorCapture.observe",
+          "parameters_to_document": [
+            {
+              "name": "path",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 46,
+          "qualified_name": "installed_schema",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 59,
+          "qualified_name": "MemoryExecutor.__init__",
+          "parameters_to_document": [
+            {
+              "name": "result",
+              "type": "DiscoveryResult"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 64,
+          "qualified_name": "MemoryExecutor.__call__",
+          "parameters_to_document": [
+            {
+              "name": "request",
+              "type": "JsonValue"
+            },
+            {
+              "name": "io",
+              "type": "ServiceIO"
+            },
+            {
+              "name": "repository_reader",
+              "type": "RepositoryReader | None"
+            },
+            {
+              "name": "clock",
+              "type": "Clock"
+            },
+            {
+              "name": "analyzer_registry",
+              "type": "InventoryRegistry"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 81,
+          "qualified_name": "result_for",
+          "parameters_to_document": [
+            {
+              "name": "exit_code",
+              "type": "int"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 115,
+          "qualified_name": "invoke",
+          "parameters_to_document": [
+            {
+              "name": "catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "content",
+              "type": "bytes"
+            },
+            {
+              "name": "result",
+              "type": "DiscoveryResult | None"
+            },
+            {
+              "name": "limits",
+              "type": "ParseLimits | None"
+            },
+            {
+              "name": "source",
+              "type": "BinaryIO | None"
+            },
+            {
+              "name": "output",
+              "type": "io.StringIO | None"
+            },
+            {
+              "name": "validate_wire",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 160,
+          "qualified_name": "test_exact_result_and_exit_are_forwarded_once",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "exit_code",
+              "type": "int"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 191,
+          "qualified_name": "test_malformed_json_is_rejected_before_any_service_call",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "content",
+              "type": "bytes"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 205,
+          "qualified_name": "test_actual_bytes_limit_precedes_parse_and_dispatch",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 228,
+          "qualified_name": "test_provider_failure_is_redacted_with_recognized_context",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "error",
+              "type": "Exception"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 260,
+          "qualified_name": "test_short_stream_reads_are_not_treated_as_end_of_input",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 268,
+          "qualified_name": "test_short_stream_reads_are_not_treated_as_end_of_input.ShortStream.read",
+          "parameters_to_document": [
+            {
+              "name": "size",
+              "type": "int | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 279,
+          "qualified_name": "test_nonconforming_stream_cannot_exceed_reserved_capacity",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 287,
+          "qualified_name": "test_nonconforming_stream_cannot_exceed_reserved_capacity.Oversized.read",
+          "parameters_to_document": [
+            {
+              "name": "size",
+              "type": "int | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 299,
+          "qualified_name": "test_catalog_unavailable_uses_only_fixed_preexecution_shape",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "known",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 335,
+          "qualified_name": "test_no_emergency_fallback_for_evaluated_or_invalid_results",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "failure",
+              "type": "Exception"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 354,
+          "qualified_name": "test_output_failure_never_appends_a_second_document",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "behavior",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 362,
+          "qualified_name": "test_output_failure_never_appends_a_second_document.FailedOutput.write",
+          "parameters_to_document": [
+            {
+              "name": "text",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 400,
+          "qualified_name": "test_fixed_outer_options_reject_arbitrary_dispatch",
+          "parameters_to_document": [
+            {
+              "name": "arguments",
+              "type": "list[str]"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 412,
+          "qualified_name": "test_main_binds_one_outer_reader_to_the_fixed_service",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "with_repository",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 425,
+          "qualified_name": "test_main_binds_one_outer_reader_to_the_fixed_service.create",
+          "parameters_to_document": [
+            {
+              "name": "root",
+              "type": "str"
+            },
+            {
+              "name": "repository",
+              "type": "RepositoryReader | None"
+            },
+            {
+              "name": "principal",
+              "type": "str"
+            },
+            {
+              "name": "author",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 444,
+          "qualified_name": "test_main_binds_one_outer_reader_to_the_fixed_service.FixedDatetime.now",
+          "parameters_to_document": [
+            {
+              "name": "zone",
+              "type": "object"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 475,
+          "qualified_name": "test_unexpected_executor_failure_cannot_claim_empty_effects",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "line": 482,
+          "qualified_name": "test_unexpected_executor_failure_cannot_claim_empty_effects.refuse",
+          "parameters_to_document": [
+            {
+              "name": "args",
+              "type": "object"
+            },
+            {
+              "name": "ports",
+              "type": "object"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 39,
+          "qualified_name": "memory_io",
+          "parameters_to_document": [
+            {
+              "name": "catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "repository",
+              "type": "RepositoryReader | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 61,
+          "qualified_name": "test_local_ports_share_exact_readers_and_guard",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 77,
+          "qualified_name": "test_missing_identity_never_fabricates_runtime",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 99,
+          "qualified_name": "test_host_principal_is_never_converted_to_local_user",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 119,
+          "qualified_name": "test_request_markers_cannot_expand_local_authority",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "marker",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 181,
+          "qualified_name": "test_cross_workspace_baseline_and_writer_are_rejected",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 210,
+          "qualified_name": "test_writer_recaptures_real_memory_state_and_invalidates",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 226,
+          "qualified_name": "test_read_selection_is_exact_and_profile_scoped",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 247,
+          "qualified_name": "test_inventory_writer_preserves_exact_pinned_selection",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "mismatch",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 265,
+          "qualified_name": "test_inventory_writer_preserves_exact_pinned_selection.recapture",
+          "parameters_to_document": [
+            {
+              "name": "values",
+              "type": "object"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 270,
+          "qualified_name": "test_inventory_writer_preserves_exact_pinned_selection.augment",
+          "parameters_to_document": [
+            {
+              "name": "current",
+              "type": "CapturedWorkspace"
+            },
+            {
+              "name": "reader",
+              "type": "RepositoryReader"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 294,
+          "qualified_name": "test_extra_pins_require_the_bound_repository_reader",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 318,
+          "qualified_name": "MemoryProcess.__init__",
+          "parameters_to_document": [
+            {
+              "name": "content",
+              "type": "bytes"
+            },
+            {
+              "name": "code",
+              "type": "int"
+            },
+            {
+              "name": "pipe",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 327,
+          "qualified_name": "MemoryProcess.__exit__",
+          "parameters_to_document": [
+            {
+              "name": "kind",
+              "type": "type[BaseException] | None"
+            },
+            {
+              "name": "value",
+              "type": "BaseException | None"
+            },
+            {
+              "name": "traceback",
+              "type": "TracebackType | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 335,
+          "qualified_name": "MemoryProcess.wait",
+          "parameters_to_document": [
+            {
+              "name": "timeout",
+              "type": "float | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 361,
+          "qualified_name": "test_fixed_git_runner_bounds_output_and_cleans_process",
+          "parameters_to_document": [
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "content",
+              "type": "bytes"
+            },
+            {
+              "name": "code",
+              "type": "int"
+            },
+            {
+              "name": "pipe",
+              "type": "bool"
+            },
+            {
+              "name": "valid",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 376,
+          "qualified_name": "test_fixed_git_runner_bounds_output_and_cleans_process.which",
+          "parameters_to_document": [
+            {
+              "name": "name",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 383,
+          "qualified_name": "test_fixed_git_runner_bounds_output_and_cleans_process.start",
+          "parameters_to_document": [
+            {
+              "name": "argv",
+              "type": "tuple[str, ...]"
+            },
+            {
+              "name": "options",
+              "type": "object"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 417,
+          "qualified_name": "test_git_runner_rejects_unavailable_or_unbounded_selection",
+          "parameters_to_document": [
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "argv",
+              "type": "tuple[str, ...]"
+            },
+            {
+              "name": "limit",
+              "type": "int"
+            },
+            {
+              "name": "executable",
+              "type": "str | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 425,
+          "qualified_name": "test_git_runner_rejects_unavailable_or_unbounded_selection.which",
+          "parameters_to_document": [
+            {
+              "name": "name",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 436,
+          "qualified_name": "test_installed_factory_wires_only_trusted_outer_host_values",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 443,
+          "qualified_name": "test_installed_factory_wires_only_trusted_outer_host_values.resolve",
+          "parameters_to_document": [
+            {
+              "name": "strict",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "line": 456,
+          "qualified_name": "test_installed_factory_wires_only_trusted_outer_host_values.activate",
+          "parameters_to_document": [
+            {
+              "name": "location",
+              "type": "RegistryLocation"
+            },
+            {
+              "name": "catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "authorize_root",
+              "type": "Callable[[], None]"
+            },
+            {
+              "name": "invalidate_authority",
+              "type": "Callable[[], None]"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 42,
+          "qualified_name": "doctor_request",
+          "parameters_to_document": [
+            {
+              "name": "case",
+              "type": "ConfigurationCase"
+            },
+            {
+              "name": "path",
+              "type": "str | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 60,
+          "qualified_name": "diagnose",
+          "parameters_to_document": [
+            {
+              "name": "case",
+              "type": "ConfigurationCase"
+            },
+            {
+              "name": "path",
+              "type": "str | None"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 75,
+          "qualified_name": "test_doctor_reports_configuration_without_native_attestation",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "state",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 107,
+          "qualified_name": "test_doctor_follows_protected_custom_locator_and_captures_exact_bytes",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 129,
+          "qualified_name": "test_doctor_explicit_profile_retains_real_bytes",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 146,
+          "qualified_name": "test_invalid_configuration_returns_fixed_failure_and_observed_bytes",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "path",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 163,
+          "qualified_name": "test_ambiguous_profiles_remain_blocking",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 179,
+          "qualified_name": "test_read_failure_is_safe_and_has_no_side_effect",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "oversized",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 188,
+          "qualified_name": "test_read_failure_is_safe_and_has_no_side_effect.fail",
+          "parameters_to_document": [
+            {
+              "name": "path",
+              "type": "str"
+            },
+            {
+              "name": "limit",
+              "type": "int"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 208,
+          "qualified_name": "test_changed_selection_cannot_report_healthy_configuration",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            },
+            {
+              "name": "changed",
+              "type": "str"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 221,
+          "qualified_name": "test_changed_selection_cannot_report_healthy_configuration.selected",
+          "parameters_to_document": [
+            {
+              "name": "profile_path",
+              "type": "str | None"
+            },
+            {
+              "name": "controlled",
+              "type": "bool"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 249,
+          "qualified_name": "test_candidate_capacity_is_checked_before_observation",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 265,
+          "qualified_name": "test_aggregate_capacity_rejects_next_file_before_reading",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 288,
+          "qualified_name": "test_protected_profile_selection_shares_remaining_byte_capacity",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 304,
+          "qualified_name": "test_protected_profile_selection_shares_remaining_byte_capacity.bounded",
+          "parameters_to_document": [
+            {
+              "name": "path",
+              "type": "str"
+            },
+            {
+              "name": "limit",
+              "type": "int"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 325,
+          "qualified_name": "test_cached_selection_respects_a_stricter_reader_limit",
+          "parameters_to_document": [
+            {
+              "name": "config_catalog",
+              "type": "SchemaCatalog"
+            },
+            {
+              "name": "monkeypatch",
+              "type": "pytest.MonkeyPatch"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 333,
+          "qualified_name": "test_cached_selection_respects_a_stricter_reader_limit.select",
+          "parameters_to_document": [
+            {
+              "name": "options",
+              "type": "object"
+            }
+          ],
+          "repair": "Complete the missing explicit parameter types, meanings and constraints; preserve existing purpose, and state the actual return/None, contract-relevant exceptions and effects. Type hints alone do not meet the docstring rule."
+        }
+      ],
+      "procedure_contracts": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "qualified_name": "_authorize_local_root",
+          "repair": "State None return and preserve the already-authenticated local-only/no-I/O scope."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+          "qualified_name": "_invalidate_empty_authority",
+          "repair": "State None return; preserve the explicit empty P6 authority set and mandatory P8 replacement limitation."
+        }
+      ],
+      "class_contracts": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+          "qualified_name": "ServiceExecutor",
+          "repair": "State the once-per-parsed-request call lifecycle, typed result, possible execution effects and unknown-effect failure boundary."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway.py",
+          "qualified_name": "MemoryExecutor",
+          "repair": "State result/calls state, construction then invocation lifecycle, recorded collaboration and memory-only effects."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gateway_local.py",
+          "qualified_name": "MemoryProcess",
+          "repair": "State stdout/code/finished/killed invariants, context/read/wait/cleanup lifecycle and lack of native process effects."
+        }
+      ],
+      "intent_comments": [
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 95,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 104,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 123,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 156,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 159,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 283,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 285,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        },
+        {
+          "path": "tests/discovery_runtime/test_doctor.py",
+          "line": 322,
+          "repair": "Add the missing immediate intent comment for this assertion projection/comparison; preserve assertions and test behavior."
+        }
+      ],
+      "qualification": "This is the finite list within the six new owned files. Concise inline contract wording is sufficient; no prescribed docstring style or redundant restatement is required. Preserve all 86 existing node identities/assertions and the 500-line limit; any necessary test-only split requires the coordinator's approved ownership."
+    }
+  ],
+  "open_probes": [],
+  "limits": [
+    "Source changes are required before checked gateway readiness.",
+    "Core and shared repairs, real integrated service execution, installed-package/native proof and final task acceptance remain separate.",
+    "No source/test/schema/Git/checkpoint/plan/AC edit or staging action occurred."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "2.0.0",
+  "description": "The controlled operation set: the sorted union of TOOL_OPERATIONS in extensions/drm-copilot/src/discovery-authorization-record.ts. The TypeScript gate and the Python host gateway each assert equality with this list; a host-principal request outside it (other than finalize-agent, which is itself a member) is refused.",
+  "controlled_operations": [
+    "completion-report",
+    "coverage-report",
+    "finalize-agent",
+    "generate-acceptance",
+    "inventory",
+    "link-evidence",
+    "new-contract",
+    "new-scenario",
+    "parity-report",
+    "profile",
+    "read-source",
+    "sentinel",
+    "update-artifact",
+    "validate-all",
+    "validate-coverage-ledger",
+    "validate-decisions",
+    "validate-evidence-reference",
+    "validate-feature-contract",
+    "validate-parity-matrix",
+    "validate-product-decision",
+    "validate-profile",
+    "validate-runtime-scenario",
+    "validate-unspecified-behavior"
+  ]
+}

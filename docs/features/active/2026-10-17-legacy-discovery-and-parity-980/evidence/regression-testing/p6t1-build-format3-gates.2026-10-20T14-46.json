@@ -1,0 +1,82 @@
+{
+  "Timestamp": "2026-10-20T14-46",
+  "label": "format3",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "344335cace828a54cd05e58383790a424d75f6cbb95562b94f337a41da5dc0de",
+    "scripts/dev_tools/discovery_build_identity.py": "11191e74b9daf63156df01ab32b04064418e0f28a8a770a1f355695a0a27815e",
+    "scripts/dev_tools/build_discovery_runtime.py": "5ce1c5b91a10f8c4fcf1477aba1c86cba09acc705bede1f782ac8d67d515be3a",
+    "tests/discovery_runtime/test_build_identity.py": "734111f19db773217c9215bfc2841ecd3384ae661fd9544fdf01aa3ee46bfeac",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "767dad5276b424f09e410ab5558d1cad67e8431557d1d9690a1e170b1df69e88",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "317c78616bd01f6bb5db652c545e998515501ad91ffd5872f1cb74906e590552",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "fab038609cb3fdf1683ae0c04ad5c187c1922eeca019b97d8f2ec7f2098658b1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "73eeedeedcab0b6d58627376b083cee789c911ffa0189511cdecb6c92d9e50cf",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "99cdf3b03a492a1106feafc0008e164344bec31212ae0d79ffaeac34813d35e7",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "344335cace828a54cd05e58383790a424d75f6cbb95562b94f337a41da5dc0de",
+    "scripts/dev_tools/discovery_build_identity.py": "11191e74b9daf63156df01ab32b04064418e0f28a8a770a1f355695a0a27815e",
+    "scripts/dev_tools/build_discovery_runtime.py": "5ce1c5b91a10f8c4fcf1477aba1c86cba09acc705bede1f782ac8d67d515be3a",
+    "tests/discovery_runtime/test_build_identity.py": "734111f19db773217c9215bfc2841ecd3384ae661fd9544fdf01aa3ee46bfeac",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "767dad5276b424f09e410ab5558d1cad67e8431557d1d9690a1e170b1df69e88",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "317c78616bd01f6bb5db652c545e998515501ad91ffd5872f1cb74906e590552",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "fab038609cb3fdf1683ae0c04ad5c187c1922eeca019b97d8f2ec7f2098658b1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "73eeedeedcab0b6d58627376b083cee789c911ffa0189511cdecb6c92d9e50cf",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "99cdf3b03a492a1106feafc0008e164344bec31212ae0d79ffaeac34813d35e7",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "format-write",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7225014000141528,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-format3-20261020T144618-format-write.stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-format3-20261020T144618-format-write.stderr.bin",
+          "sha256": "f41837bb776a932ae315a38d4d7c5f68a43908d7671ff1aa48850a50473a5dbe",
+          "readable": "All done! \u2728 \ud83c\udf70 \u2728\r\n7 files left unchanged.\r\n"
+        }
+      }
+    }
+  ],
+  "coverage": null,
+  "harness_sha256": "9b0aeaf994b97cd2ec6c7735f74541dcbf9838eb862e0244c2c036fa29e3ddac",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "focused-pass-not-acceptance"
+}

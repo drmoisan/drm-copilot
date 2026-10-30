@@ -1,0 +1,62 @@
+{
+  "Timestamp": "2026-10-20T16-19",
+  "Command": ".venv/Scripts/python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py tests/discovery_runtime/gateway_test_support.py tests/discovery_runtime/test_gateway_boundaries.py",
+  "EXIT_CODE": 0,
+  "input_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "70317b21203fb11dd640fa2036b8b13521516f8ce8c8f7412b4d177e2b9207db",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "15d1ffba846eb418b8046cad1d2455c725167da2985f4c7e80f6fb44185564e1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+    "tests/discovery_runtime/test_gateway.py": "7cb784279aac1e0d0aa6f7b6f38e7a0e50df1a3eb010e064851fe5ea361135fd",
+    "tests/discovery_runtime/test_gateway_local.py": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+    "tests/discovery_runtime/test_doctor.py": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+    "tests/discovery_runtime/gateway_test_support.py": "54399f29e71f00b20fac8b9c4036126c91bced0c12e8c1239dac5792fa72e6b7",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "5912b128cd25dda37c09d5c24c636d685f2dff94f71b8f52cec6e002f8e39bde"
+  },
+  "input_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "70317b21203fb11dd640fa2036b8b13521516f8ce8c8f7412b4d177e2b9207db",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "15d1ffba846eb418b8046cad1d2455c725167da2985f4c7e80f6fb44185564e1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+    "tests/discovery_runtime/test_gateway.py": "7cb784279aac1e0d0aa6f7b6f38e7a0e50df1a3eb010e064851fe5ea361135fd",
+    "tests/discovery_runtime/test_gateway_local.py": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+    "tests/discovery_runtime/test_doctor.py": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+    "tests/discovery_runtime/gateway_test_support.py": "54399f29e71f00b20fac8b9c4036126c91bced0c12e8c1239dac5792fa72e6b7",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "5912b128cd25dda37c09d5c24c636d685f2dff94f71b8f52cec6e002f8e39bde"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact raw UTF-8 streams; base64 retains original path and newline bytes.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "streams": {
+    "stdout": {
+      "base64": "QWxsIGNoZWNrcyBwYXNzZWQhCg==",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "stage": 1,
+  "label": "p4t3-masking-pass2-format",
+  "started": "2026-10-19T04:30:31.101110+00:00",
+  "finished": "2026-10-19T04:30:32.920502+00:00",
+  "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py",
+  "exit_code": 0,
+  "duration_seconds": 1.819,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "bbbe4fc7b08bfde95508817893ead60307cac95c96b9b3cfb71dd436f1033ea7",
+      "physical_lines": 204
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "bbbe4fc7b08bfde95508817893ead60307cac95c96b9b3cfb71dd436f1033ea7",
+      "physical_lines": 204
+    }
+  },
+  "output": "All done! \u2728 \ud83c\udf70 \u2728\n4 files would be left unchanged.\n"
+}

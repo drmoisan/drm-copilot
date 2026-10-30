@@ -1,0 +1,66 @@
+{
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": "9e412a71f0b9a8dcd020c0aff44482cd82bb9fd68669f6107a3ddf339a528aaf",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "c54b2b29ebf0023790f29d15be950e8f073ae4ce60b8da22dc9e1fd124dd19ce",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "a4d5051f29999b77ca2c931b317d00846dec2b7103094ac086f45f19eeeb5aca",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+    "tests/discovery_runtime/test_parity_metrics.py": "4ea7f0f7ecc63b3bfb8b313f19a97edddf96fb228977012fdc470587e3854d40",
+    "tests/discovery_runtime/test_parity_report.py": "59f2390a653207192ae5dd33202c23c5bc2d514b49fc77f20bae68a9c09cbcef",
+    "tests/discovery_runtime/test_report_models.py": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": "9e412a71f0b9a8dcd020c0aff44482cd82bb9fd68669f6107a3ddf339a528aaf",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "c54b2b29ebf0023790f29d15be950e8f073ae4ce60b8da22dc9e1fd124dd19ce",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "a4d5051f29999b77ca2c931b317d00846dec2b7103094ac086f45f19eeeb5aca",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+    "tests/discovery_runtime/test_parity_metrics.py": "4ea7f0f7ecc63b3bfb8b313f19a97edddf96fb228977012fdc470587e3854d40",
+    "tests/discovery_runtime/test_parity_report.py": "59f2390a653207192ae5dd33202c23c5bc2d514b49fc77f20bae68a9c09cbcef",
+    "tests/discovery_runtime/test_report_models.py": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2"
+  },
+  "clean": false,
+  "command": [
+    "poetry",
+    "run",
+    "ruff",
+    "check",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "tests/discovery_runtime/test_parity_report.py",
+    "tests/discovery_runtime/test_parity_metrics.py",
+    "tests/discovery_runtime/test_report_models.py"
+  ],
+  "elapsed_seconds": 1.199367,
+  "exit_code": 1,
+  "harness_sha256": "0cab2c397ac566b1170a568d9fb752b2ab37c77fa7cfcb44e781a2e2a61fbf85",
+  "population": null,
+  "raw": {
+    "stderr": {
+      "bytes": 0,
+      "scratch_relative": "p5t2-graph-focused2-ruff.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "bytes": 6198,
+      "scratch_relative": "p5t2-graph-focused2-ruff.stdout",
+      "sha256": "2a6d4b0e2919cdc0e7d804226446d7a7075b555f59a19ef3f4162386cf16fada"
+    }
+  },
+  "stage": "ruff",
+  "started_utc": "2026-10-20T06:23:00.505940+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (95 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\parity_metrics.py:146:89\n    |\n144 |             if isinstance(authored, tuple):\n145 |                 budget.work(len(authored))\n146 |                 # Preserve each authored blocker and exact row rather than deduplicating prose.\n    |                                                                                         ^^^^^^^\n147 |                 for text in authored:\n148 |                     value = {**location, \"blocker\": text}\n    |\n\nE501 Line too long (93 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\parity_metrics.py:187:89\n    |\n185 |             required.add(\"mobile\")\n186 |         values: dict[str, list[ParityDimensionOutcome]] = {}\n187 |         # Multiple direct/nested representations remain a single axis with combined validity.\n    |                                                                                         ^^^^^\n188 |         for dimension in entry.dimensions if entry else ():\n189 |             values.setdefault(dimension.name, []).append(dimension)\n    |\n\nE501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\parity_metrics.py:253:89\n    |\n252 |     def project(self, unavailable: JsonObject) -> JsonObject:\n253 |         \"\"\"Return a bounded summary, using unavailable (JsonObject) when scope is absent.\n    |                                                                                         ^\n254 |\n255 |         Unavailable source scope produces null metrics, not inferred completion.\n    |\n\nE501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\parity_metrics.py:277:89\n    |\n275 |         totals = Counter[str]()\n276 |         self.population.budget.work(len(obligations))\n277 |         # Missing rows remain obligations; duplicate rows never select a preferred proof.\n    |                                                                                         ^\n278 |         for (identity, client), obligation in obligations.items():\n279 |             matches = self.by_obligation.get((identity, client), [])\n    |\n\nE501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\parity_metrics.py:331:89\n    |\n329 |             len(self.decisions.approved) + len(self.population.index.records)\n330 |         )\n331 |         # Physical approval identity prevents same-ID records from borrowing eligibility.\n    |                                                                                         ^\n332 |         for item in self.decisions.approved:\n333 |             approved.add((item.record.artifact.path, item.record.pointer))\n    |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\parity_report.py:3:1\n   |\n 1 |   \"\"\"Project parity from captured assessments while retaining bounded v1 helpers.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | import re\n 6 | | from typing import TYPE_CHECKING, cast\n 7 | |\n 8 | | from drm_copilot_discovery.parity_metrics import ParityProjection\n 9 | | from drm_copilot_discovery.coverage_report import coverage_preflight\n10 | | from drm_copilot_discovery.models import JsonObject, ParseLimits, to_plain_value\n11 | | from drm_copilot_discovery.parsing import parse_document\n12 | | from drm_copilot_discovery.rendering import render_pretty_json, sort_rows\n13 | | from drm_copilot_discovery.report_models import (\n14 | |     DiscoveryReport,\n15 | |     ReportBudget,\n16 | |     bounded_object,\n17 | | )\n   | |_^\n18 |\n19 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nE501 Line too long (90 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\report_models.py:274:89\n    |\n272 |         whitespace or ASCII escaping would exceed the independent output budget.\n273 |         \"\"\"\n274 |         # Only the closed artifact kind selects a heading; authored text cannot inject it.\n    |                                                                                         ^^\n275 |         heading = (\n276 |             \"parity\"\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_parity_metrics.py:137:89\n    |\n135 |         dimensions=dimensions,\n136 |     )\n137 |     # Preserve all actual family diagnostics when authoritative source scope is selected.\n    |                                                                                         ^\n138 |     findings = tuple(\n139 |         item\n    |\n\nE501 Line too long (91 > 88)\n   --> tests\\discovery_runtime\\test_parity_metrics.py:255:89\n    |\n253 |     value: str,\n254 | ) -> None:\n255 |     \"\"\"Reject altered field/value (str) without hiding authored full state; return None.\"\"\"\n    |                                                                                         ^^^\n256 |     snapshot = report_graph(report_profile, snapshot_catalog)\n257 |     matrix = next(\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_parity_metrics.py:381:89\n    |\n379 |     \"\"\"Remove authority kind (str); return None without promoting an empty graph.\"\"\"\n380 |     snapshot = report_graph(report_profile, snapshot_catalog)\n381 |     # Removing a record tests absence without changing independent retained source bytes.\n    |                                                                                         ^\n382 |     snapshot = replace(\n383 |         snapshot,\n    |\n\nTC002 Move third-party import `drm_copilot_discovery.snapshot.DiscoverySnapshot` into a type-checking block\n   --> tests\\discovery_runtime\\test_parity_report.py:168:48\n    |\n166 | def test_graph_entrypoints_reject_non_snapshot_inputs(value: object) -> None:\n167 |     \"\"\"Reject value (object) before any graph work; return None without I/O.\"\"\"\n168 |     from drm_copilot_discovery.snapshot import DiscoverySnapshot\n    |                                                ^^^^^^^^^^^^^^^^^\n169 |\n170 |     with pytest.raises(ValueError, match=\"captured v2 DiscoverySnapshot\"):\n    |\nhelp: Move into type-checking block\n\nFound 11 errors.\n[*] 1 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n",
+  "task": "P5-T2"
+}

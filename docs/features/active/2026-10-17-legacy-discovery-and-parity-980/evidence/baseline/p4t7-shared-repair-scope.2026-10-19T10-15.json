@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-10-19T10-15",
+  "captured_utc": "2026-10-19T10:15:14.858429+00:00",
+  "task": "P4-T7",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-shared-repair-baseline.py",
+  "exit_code": 0,
+  "new_paths_absent_before_creation": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py"
+  ],
+  "paused_integration": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "073f4d390cb41aaf2b55c2451bdbceab706d5353137df1e735d90502a83c7115",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/dependencies.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "fef3fbfb7d32a25f6b7067cc4802574ce85f87b30244f5613e83059eb9ed6123",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/test_dependencies.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "3e9486a2f0ab8857ec5ebcc7593359af20d95ac89727f94363048f848268bb9d",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/test_dependency_projection_limits.py"
+    }
+  ],
+  "shared_baseline": {
+    "path": "evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "review_sha256": "0bd89530074639e96b6c31027546c6124f0c1ebd6b4278bb85c9d2b8b1b396a8",
+  "routing_receipt": "workspace_operations_p4t7_shared_repair",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "native_authority": "routing_valid, launch_authority_valid and provenance_valid reread true before edits",
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "checked_shared_wip": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+  "original_152_case_evidence": "Preserved unchanged; no baseline replay."
+}

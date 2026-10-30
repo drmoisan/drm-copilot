@@ -1,0 +1,643 @@
+{
+  "written_at_utc": "2026-10-18T15:16:53.706918+00:00",
+  "label": "pass2",
+  "diagnostic_only": false,
+  "historical_union": null,
+  "metrics": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": {
+      "covered_lines": 102,
+      "lines": 102,
+      "line_percent": 100.0,
+      "covered_branches": 30,
+      "branches": 30,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": {
+      "covered_lines": 162,
+      "lines": 162,
+      "line_percent": 100.0,
+      "covered_branches": 58,
+      "branches": 58,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": {
+      "covered_lines": 123,
+      "lines": 123,
+      "line_percent": 100.0,
+      "covered_branches": 48,
+      "branches": 48,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": {
+      "covered_lines": 207,
+      "lines": 209,
+      "line_percent": 99.04306220095694,
+      "covered_branches": 51,
+      "branches": 54,
+      "branch_percent": 94.44444444444444
+    }
+  },
+  "callable_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": [
+      {
+        "name": "RegistryLocation",
+        "start": 24,
+        "end": 76,
+        "covered": 25,
+        "statements": 25,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "NativeRegistry",
+        "start": 79,
+        "end": 179,
+        "covered": 67,
+        "statements": 67,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "for_host",
+        "start": 37,
+        "end": 76,
+        "covered": 20,
+        "statements": 20,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 87,
+        "end": 99,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_directory",
+        "start": 102,
+        "end": 123,
+        "covered": 17,
+        "statements": 17,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_identity",
+        "start": 125,
+        "end": 134,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read",
+        "start": 136,
+        "end": 147,
+        "covered": 11,
+        "statements": 11,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "guard",
+        "start": 150,
+        "end": 164,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "write",
+        "start": 166,
+        "end": 179,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": [
+      {
+        "name": "RegistryIO",
+        "start": 49,
+        "end": 60,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ActivationStore",
+        "start": 63,
+        "end": 453,
+        "covered": 146,
+        "statements": 146,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read",
+        "start": 53,
+        "end": 56,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "write",
+        "start": 58,
+        "end": 60,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 72,
+        "end": 96,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "local",
+        "start": 99,
+        "end": 135,
+        "covered": 10,
+        "statements": 10,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_optional",
+        "start": 137,
+        "end": 142,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_record",
+        "start": 144,
+        "end": 153,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "select",
+        "start": 155,
+        "end": 209,
+        "covered": 21,
+        "statements": 21,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_policy",
+        "start": 211,
+        "end": 216,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_parents",
+        "start": 218,
+        "end": 247,
+        "covered": 17,
+        "statements": 17,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_require_inputs",
+        "start": 249,
+        "end": 272,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "configure",
+        "start": 274,
+        "end": 453,
+        "covered": 74,
+        "statements": 74,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": [
+      {
+        "name": "ConfigurationError",
+        "start": 32,
+        "end": 48,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "locator_bytes",
+        "start": 51,
+        "end": 65,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ActivationRecord",
+        "start": 69,
+        "end": 166,
+        "covered": 41,
+        "statements": 41,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ConfigurationSelection",
+        "start": 170,
+        "end": 177,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "select_configuration",
+        "start": 180,
+        "end": 273,
+        "covered": 32,
+        "statements": 32,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ConfigurationRequest",
+        "start": 277,
+        "end": 298,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ConfigurationResult",
+        "start": 302,
+        "end": 310,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 35,
+        "end": 48,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 86,
+        "end": 114,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "active",
+        "start": 117,
+        "end": 119,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "encode",
+        "start": 121,
+        "end": 123,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "decode",
+        "start": 126,
+        "end": 166,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 285,
+        "end": 298,
+        "covered": 8,
+        "statements": 8,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": [
+      {
+        "name": "Directory",
+        "start": 30,
+        "end": 55,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_WindowsCall",
+        "start": 58,
+        "end": 66,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_ordinary",
+        "start": 69,
+        "end": 73,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "pin_windows_path",
+        "start": 77,
+        "end": 115,
+        "covered": 23,
+        "statements": 23,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "NativeDirectory",
+        "start": 118,
+        "end": 226,
+        "covered": 56,
+        "statements": 56,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "open_local_directory",
+        "start": 230,
+        "end": 256,
+        "covered": 16,
+        "statements": 17,
+        "percent": 94.11764705882354,
+        "missing": [
+          243
+        ]
+      },
+      {
+        "name": "exclusive_workspace_lock",
+        "start": 260,
+        "end": 267,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "LocalMutationPrimitives",
+        "start": 270,
+        "end": 436,
+        "covered": 78,
+        "statements": 79,
+        "percent": 98.73417721518987,
+        "missing": [
+          409
+        ]
+      },
+      {
+        "name": "identity",
+        "start": 33,
+        "end": 35,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "child",
+        "start": 37,
+        "end": 39,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read",
+        "start": 41,
+        "end": 43,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "stage",
+        "start": 45,
+        "end": 47,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "publish",
+        "start": 49,
+        "end": 51,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "remove",
+        "start": 53,
+        "end": 55,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__call__",
+        "start": 64,
+        "end": 66,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 121,
+        "end": 124,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "identity",
+        "start": 126,
+        "end": 128,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_name",
+        "start": 130,
+        "end": 137,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "child",
+        "start": 140,
+        "end": 147,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read",
+        "start": 149,
+        "end": 175,
+        "covered": 19,
+        "statements": 19,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "stage",
+        "start": 177,
+        "end": 200,
+        "covered": 15,
+        "statements": 15,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "publish",
+        "start": 202,
+        "end": 222,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "remove",
+        "start": 224,
+        "end": 226,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 279,
+        "end": 309,
+        "covered": 15,
+        "statements": 15,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "metadata",
+        "start": 311,
+        "end": 339,
+        "covered": 9,
+        "statements": 9,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read_bytes",
+        "start": 341,
+        "end": 351,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "guard",
+        "start": 354,
+        "end": 368,
+        "covered": 10,
+        "statements": 10,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "create_exclusive",
+        "start": 370,
+        "end": 372,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "replace_if_digest",
+        "start": 374,
+        "end": 380,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_publish",
+        "start": 382,
+        "end": 436,
+        "covered": 31,
+        "statements": 32,
+        "percent": 96.875,
+        "missing": [
+          409
+        ]
+      }
+    ]
+  },
+  "minimum_callable": 94.11764705882354,
+  "findings": []
+}

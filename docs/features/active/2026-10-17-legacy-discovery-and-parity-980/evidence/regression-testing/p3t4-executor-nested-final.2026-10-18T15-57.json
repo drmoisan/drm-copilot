@@ -1,0 +1,99 @@
+{
+  "task": "P3-T4",
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1"
+  },
+  "source_stable": true,
+  "checks": [
+    {
+      "name": "inferred-positive",
+      "passed": true,
+      "expected_valid": true,
+      "actual_valid": true,
+      "findings": [],
+      "question_dimensions": [
+        "alternate_clients",
+        "cancellation",
+        "environment_constraints",
+        "failure",
+        "inputs",
+        "mobile",
+        "observable_outputs",
+        "offline",
+        "online",
+        "ordering",
+        "preconditions",
+        "security_permissions",
+        "side_effects",
+        "timing",
+        "trigger"
+      ]
+    },
+    {
+      "name": "verified-nested-rejected",
+      "passed": true,
+      "expected_valid": false,
+      "actual_valid": false,
+      "findings": [],
+      "question_dimensions": null
+    },
+    {
+      "name": "unknown-nested-linked",
+      "passed": true,
+      "expected_valid": true,
+      "actual_valid": true,
+      "findings": [],
+      "question_dimensions": [
+        "alternate_clients",
+        "cancellation",
+        "environment_constraints",
+        "failure",
+        "inputs",
+        "mobile",
+        "observable_outputs",
+        "offline",
+        "online",
+        "ordering",
+        "preconditions",
+        "security_permissions",
+        "side_effects",
+        "state_transitions",
+        "timing",
+        "trigger"
+      ]
+    },
+    {
+      "name": "unknown-nested-empty-links-generated",
+      "passed": true,
+      "expected_valid": true,
+      "actual_valid": true,
+      "findings": [],
+      "question_dimensions": [
+        "alternate_clients",
+        "cancellation",
+        "environment_constraints",
+        "failure",
+        "inputs",
+        "mobile",
+        "observable_outputs",
+        "offline",
+        "online",
+        "ordering",
+        "preconditions",
+        "security_permissions",
+        "side_effects",
+        "state_transitions",
+        "timing",
+        "trigger"
+      ]
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "Timestamp": "2026-10-18T15-57"
+}

@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t2-final-candidate.2026-10-20T08-03.json",
+  "candidate_sha256": "53643d5bab35298e155d99d8986538f0aa5da1893b033e753022869050d6c073",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u NATIVE_SCRATCH\\issue-980-p5t2-native-composition.py NATIVE_SCRATCH\\issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83.json NATIVE_SCRATCH\\issue-980-p5t2-native-result.2026-10-20T08-03.json --release NATIVE_SCRATCH\\issue-980-p5t2-native-release.2026-10-20T08-03.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T08:06:20.508094+00:00",
+  "label": "native",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-native-080331-raw.2026-10-20T08-06.json",
+    "sha256": "c9e91af16c44391fa0daf989c7045d141fbba7ac5ba6e54cf8b6325456a5fecc"
+  },
+  "seconds": 151.326,
+  "stage": 5,
+  "started_at": "2026-10-20T08:03:49.181934+00:00",
+  "stderr": "",
+  "stdout": "PASS fixture-byte-identity-before\nPASS checkout-identity\nPASS actual-loaded-membership\nPASS known-captured-bytes\nPASS source-and-target-role-pins\nPASS client-scope\nPASS structural-contract\nPASS qualification-read-only\nPASS harness-release-hash\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/report_models.py\nPASS candidate:packages/discovery-runtime/src/drm_copilot_discovery/validation.py\nPASS candidate:pyproject.toml\nPASS candidate:scripts/dev_tools/discovery/io.py\nPASS candidate:scripts/dev_tools/discovery/parity_report.py\nPASS candidate:tests/discovery_runtime/parity_test_support.py\nPASS candidate:tests/discovery_runtime/test_parity_axes.py\nPASS candidate:tests/discovery_runtime/test_parity_clients.py\nPASS candidate:tests/discovery_runtime/test_parity_metrics.py\nPASS candidate:tests/discovery_runtime/test_parity_models.py\nPASS candidate:tests/discovery_runtime/test_parity_report.py\nPASS candidate:tests/discovery_runtime/test_parity_report_projection.py\nPASS candidate:tests/discovery_runtime/test_parity_rules.py\nPASS candidate:tests/discovery_runtime/test_report_models.py\nPASS candidate:tests/discovery_runtime/test_validation_modes.py\nPASS candidate:tests/scripts/dev_tools/discovery/test_parity_report.py\nPASS metric-projection-identity\nPASS explicit-failure-result\nPASS explicit-failure-findings\nPASS nonempty-population-available\nPASS metric:/parity/clients/0/dimensions/mobile/not_required\nPASS metric:/parity/clients/0/dimensions/mobile/required\nPASS metric:/parity/clients/0/dimensions/mobile/verification/percentage\nPASS metric:/parity/clients/0/dimensions/mobile/verified\nPASS metric:/parity/clients/0/dimensions/offline/not_required\nPASS metric:/parity/clients/0/dimensions/offline/required\nPASS metric:/parity/clients/0/dimensions/offline/verification/percentage\nPASS metric:/parity/clients/0/dimensions/offline/verified\nPASS metric:/parity/entries/complete\nPASS metric:/parity/entries/state_counts/missing\nPASS metric:/parity/entries/total\nPASS metric:/parity/feature_client_obligations/completed_required\nPASS metric:/parity/feature_client_obligations/required\nPASS metric:/parity/source_features/completed_required\nPASS metric:/parity/source_features/required\nPASS metric:/parity/source_features/total\nPASS json-view-identity\nPASS markdown-view-identity\nPASS captured-input-immutability\nPASS dry-run-dispositions\nPASS dry-run-no-write\nPASS publication-result\nPASS publication-output-membership\nPASS publication-invalidation-seam\nPASS generated-json-membership\nPASS generated-markdown-membership\nPASS semantic-digest-stability\nPASS full-snapshot-changed\nPASS pinned-input-identity-stability\nPASS authored-file-identity-stability\nPASS recomputed-report-identity\nPASS published-structural-validation\nPASS failure-semantics-preserved\nPASS idempotent-dispositions\nPASS idempotent-no-invalidation\nPASS missing-grant-rejected\nPASS stale-original-rejected\nPASS only-granted-report-bytes-changed\n",
+  "timed_out": false,
+  "timeout_seconds": 600,
+  "timestamp": "2026-10-20T08-06"
+}

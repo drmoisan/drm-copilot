@@ -1,0 +1,45 @@
+"""Bind approved absent helper/test paths before their first creation."""
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path.cwd()
+feature = root / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+    "tests/discovery_runtime/test_acceptance_render_limits.py",
+]
+assert all(not (root / path).exists() for path in paths)
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+receipt = {
+    "task": "P5-T5",
+    "recorded_utc": datetime.now(timezone.utc).isoformat(),
+    "approval": "workspace_operations_p5t5_repair_20261020",
+    "absent_paths": paths,
+    "baseline": "evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+    "baseline_sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475",
+    "review": "evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.json",
+    "review_sha256": "21701357b3dbc458b29f395246ca49cc025422835d39e3afd3ee6215ab3b9477",
+    "moves": {
+        "gherkin._Output": "acceptance_render_text.AcceptanceTextOutput",
+        "gherkin._plain": "acceptance_render_text._plain",
+    },
+    "test_scope": "All original 62 nodes stay in their original modules; new RR1/RR2/RC1 controls only in the approved limits module.",
+    "unused_path": "tests/discovery_runtime/test_gherkin_limits.py remains unauthorized and absent.",
+}
+output = feature / "evidence/baseline" / f"p5t5-renderer-split.{stamp}.json"
+output.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+output.with_suffix(".md").write_text(
+    "# P5-T5 approved renderer split\n\n"
+    "Both new paths were absent before creation. The immutable shared baseline and "
+    "complete review remain authoritative. The existing output encoder and JSON "
+    "detachment move together; public renderer APIs remain unchanged. All original "
+    "62 test identities remain in place.\n\n"
+    f"Exact binding: `{output.name}`.\n",
+    encoding="utf-8", newline="\n",
+)
+snapshot = output.with_name(f"p5t5-renderer-split-harness.{stamp}.txt")
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"path": output.relative_to(root).as_posix(),
+                  "sha256": hashlib.sha256(output.read_bytes()).hexdigest()}))

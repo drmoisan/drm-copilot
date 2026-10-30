@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "7f98e8a0b6e26474397ca4d80466ad26b8d840a4d24c34432e83fec015925afd"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "7f98e8a0b6e26474397ca4d80466ad26b8d840a4d24c34432e83fec015925afd"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t3-final-candidate-native-repair.2026-10-20T09-46.json",
+  "candidate_sha256": "1a0da6fa3b283be26954f6c755db3056a1aacb869074bd2e05e51070cb5e0ef2",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u NATIVE_SCRATCH\\issue-980-p5t3-native-composition.py NATIVE_SCRATCH\\issue-980-p5t3-native-fixture.2026-10-20T08-50.json NATIVE_SCRATCH\\issue-980-p5t3-native-result-restart.json --release NATIVE_SCRATCH\\issue-980-p5t3-native-release-restart.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T09:51:31.325481+00:00",
+  "label": "native",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-native-094649-raw.2026-10-20T09-51.json",
+    "sha256": "7204887928190748a45817f9f86a3ea4cfa9958471c0b0075088b23415a80fda"
+  },
+  "seconds": 264.573,
+  "stage": 5,
+  "started_at": "2026-10-20T09:47:06.752477+00:00",
+  "stderr": "",
+  "stdout": "PASS accepted-fixture-byte-identity\nPASS checkout-identity\nPASS captured-byte-identity\nPASS semantic-input-identity\nPASS actual-core-structural-pass\nPASS completion-output-absence\nPASS missing-grants-refused\nPASS wrong-kind-refused\nPASS authored-contract-grant-refused\nPASS malformed-identity\nPASS malformed-json\nPASS malformed-heading\nPASS malformed-markdown\nPASS malformed-no-authority\nPASS malformed-known-error\nPASS malformed-unavailable\nPASS malformed-input-findings-retained\nPASS malformed-structural-refused\nPASS malformed-publication-plan-refused\nPASS malformed-plan-keeps-findings\nPASS negative-controls-no-write\nPASS structural-identity\nPASS structural-json\nPASS structural-heading\nPASS structural-markdown\nPASS structural-no-authority\nPASS structural-explicit-mode\nPASS structural-current-input-digest\nPASS structural-independent-expectations\nPASS planned-immutable-pair\nPASS new-output-preconditions\nPASS dry-run-planned\nPASS dry-run-no-write\nPASS structural-publication\nPASS structural-pair-on-disk\nPASS structural-invalidation-seam\nPASS parity-complete-identity\nPASS parity-complete-json\nPASS parity-complete-heading\nPASS parity-complete-markdown\nPASS parity-complete-no-authority\nPASS selected-failure-explicit\nPASS independent-error-population\nPASS failure-actions-and-indices\nPASS replacement-immutable-pair\nPASS replacement-cas-preconditions\nPASS truthful-failure-published\nPASS replacement-pair-on-disk\nPASS semantic-digest-stable\nPASS full-snapshot-changed\nPASS source-pins-unchanged\nPASS authored-identities-unchanged\nPASS authoritative-recomputation\nPASS published-structural-pass\nPASS replacement-invalidation-seam\nPASS idempotent-no-write\nPASS stale-original-rejected\nPASS only-completion-output-bytes-changed\nPASS source-bindings-stable\n",
+  "timed_out": false,
+  "timeout_seconds": 660,
+  "timestamp": "2026-10-20T09-51"
+}

@@ -48,6 +48,21 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     runDiscoveryVstoAnalyzer: jest.fn(),
     runDiscoveryScenarioGeneration: jest.fn(),
     runDiscoveryReport: jest.fn(),
+    configureDiscoveryWorkspace: jest.fn(),
+    createDiscoveryArtifact: jest.fn(),
+    updateDiscoveryArtifact: jest.fn(),
+    linkDiscoveryEvidence: jest.fn(),
+    transferDiscoverySnapshot: jest.fn(),
+    importDiscoveryInventory: jest.fn(),
+    migrateDiscoveryArtifacts: jest.fn(),
+    runDiscoveryDoctor: jest.fn(),
+    readDiscoverySource: jest.fn(),
+    prepareDiscoveryAgent: jest.fn(),
+    finalizeDiscoveryAgent: jest.fn(),
+    // A controlled root call consumes a root grant; the mock issues one.
+    consumeDiscoveryRootGrant: jest
+      .fn<NonNullable<RepoAutomationService["consumeDiscoveryRootGrant"]>>()
+      .mockReturnValue("grant-0123456789abcdef0123"),
   };
 }
 
@@ -274,15 +289,75 @@ describe("discovery dispatch failure and validation mapping", () => {
     expect(result.summary).toMatch(/artifact_path/);
   });
 
-  it("rejects an out-of-enum report_type before touching the service", async () => {
+  it("rejects an out-of-enum report_type before touching the service or any record", async () => {
     const result = await dispatchRepoAutomationTool(
       "run_discovery_report",
       { workspace_root: WORKSPACE_ROOT, report_type: "bogus", input_path: "m" },
       service,
     );
 
+    // The gate derives the controlled operation before the resolver runs, so an
+    // unknown report type is refused as an underivable operation.
     expect(service.runDiscoveryReport).not.toHaveBeenCalled();
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
     expect(result.ok).toBe(false);
-    expect(result.summary).toMatch(/report type/);
+    expect(result.summary).toMatch(/AUTHORIZATION_OPERATION_UNKNOWN/);
+  });
+});
+
+describe("discovery_capability_sentinel dispatch", () => {
+  let service: jest.Mocked<RepoAutomationService>;
+
+  beforeEach(() => {
+    service = createMockService();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("hands the raw tool input to the sentinel seam and surfaces its observation", async () => {
+    const sentinel = jest
+      .fn<NonNullable<RepoAutomationService["discoveryCapabilitySentinel"]>>()
+      .mockResolvedValue({
+        ...successResult("discovery_capability_sentinel"),
+        sentinel: {
+          observed: true,
+          observation_ref: "obs-0123456789abcdef0123",
+          agent_id_present: true,
+          agent_type: "discovery-capability-sentinel",
+        },
+      });
+    service.discoveryCapabilitySentinel = sentinel;
+
+    const result = await dispatchRepoAutomationTool(
+      "discovery_capability_sentinel",
+      { workspace_root: WORKSPACE_ROOT },
+      service,
+    );
+
+    // The sentinel is neither authorized nor root-granted; the observation is its evidence.
+    expect(service.consumeDiscoveryRootGrant).not.toHaveBeenCalled();
+    expect(sentinel).toHaveBeenCalledWith({
+      workspaceRoot: WORKSPACE_ROOT,
+      toolInputs: { workspace_root: WORKSPACE_ROOT },
+    });
+    expect(result).toMatchObject({
+      ok: true,
+      tool: "discovery_capability_sentinel",
+      sentinel: { observed: true, agent_type: "discovery-capability-sentinel" },
+    });
+  });
+
+  it("fails closed when the service has no sentinel seam", async () => {
+    const result = await dispatchRepoAutomationTool(
+      "discovery_capability_sentinel",
+      { workspace_root: WORKSPACE_ROOT },
+      service,
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.tool).toBe("discovery_capability_sentinel");
+    expect(result.summary).toMatch(/DISCOVERY_SENTINEL_UNAVAILABLE/);
   });
 });

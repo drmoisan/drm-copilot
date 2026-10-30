@@ -1,0 +1,54 @@
+{
+  "stage": 4,
+  "label": "p3t7-pass2-architecture",
+  "started": "2026-10-19T00:08:25.154336+00:00",
+  "finished": "2026-10-19T00:08:26.823983+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p3t7-architecture.py",
+  "exit_code": 0,
+  "duration_seconds": 1.67,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "physical_lines": 300
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "physical_lines": 273
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "physical_lines": 356
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+      "physical_lines": 489
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+      "physical_lines": 440
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "physical_lines": 300
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "physical_lines": 273
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "physical_lines": 356
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+      "physical_lines": 489
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+      "physical_lines": 440
+    }
+  },
+  "output": "......                                                                   [100%]\n6 passed, 143 deselected in 0.05s\nPASS migration package/pure boundary: migration_models\nPASS migration package/pure boundary: migration_conversion\nPASS migration package/pure boundary: migration_v1\nPASS in-memory test boundary: test_migration_v1\nPASS in-memory test boundary: test_migration_unknowns\n"
+}

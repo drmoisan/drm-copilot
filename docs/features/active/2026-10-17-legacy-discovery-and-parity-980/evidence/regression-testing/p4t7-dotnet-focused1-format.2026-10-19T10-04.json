@@ -1,0 +1,47 @@
+{
+  "stage": "format",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:04:41.573913+00:00",
+  "finished": "2026-10-19T10:04:43.363145+00:00",
+  "duration_seconds": 1.79,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "2dd4678d3d3a00bc1fdf96d093086e37312c7447f6d775e22975be21fd7f8883",
+      "physical_lines": 291
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "4810352cbde2c827e5c1da0616594aa641b296f69afabedd073f5f321785f593",
+      "physical_lines": 233
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "50a52f85cae3c0de47f32ffe42f54207049a4cbebe7b8652718df6028181b68c",
+      "physical_lines": 330
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "455b261f6cd36a5f41ee86712bc924990c6533b607d7ed8f512996e138d605d7",
+      "physical_lines": 365
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused1-format.100443363145.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused1-format.100443363145.stderr.bin",
+      "raw_sha256": "b203c0ca306fa3ad28f41c9d104d7d2301f1335a95567826beedad5baa2ac58b",
+      "raw_bytes": 228,
+      "presentation": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_dotnet.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py\r\n\r\nAll done! \\u2728 \\U0001f370 \\u2728\r\n2 files reformatted.\r\n"
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "ec2493f4c370bd463a0b269b8a6bed0b47aea99b1a5bd846135f940dcf29ea76"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}

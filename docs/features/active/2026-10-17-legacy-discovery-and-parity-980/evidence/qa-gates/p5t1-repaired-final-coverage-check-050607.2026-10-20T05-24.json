@@ -1,0 +1,38 @@
+{
+  "binding_after": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "binding_before": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\issue-980-p5t1-repaired-coverage.py docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t1-repaired-final-candidate.2026-10-20T05-06.json SCRATCH\\issue-980-p5t1-repaired-final-050607-combined-coverage.raw.json SCRATCH\\issue-980-p5t1-repaired-final-050607-coverage-check.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T05:24:17.538663+00:00",
+  "label": "coverage-check",
+  "last_node": null,
+  "pid": 85712,
+  "raw": [
+    {
+      "bytes": 80,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-check.stdout",
+      "sha256": "37bd3060ce217538db6bf42b8d4a7dc2142b9eff31cbb1cadf74488558468f89"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 227,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-check.progress.json",
+      "sha256": "22caa98f5eb2eb705a627c469779bc31dcc0374c9e4b79d369233cbf48957b68"
+    }
+  ],
+  "seconds": 1.011,
+  "stage": 6,
+  "started_at": "2026-10-20T05:24:16.527813+00:00",
+  "stderr": "",
+  "stdout": "{\"range_count\": 37, \"regressions\": 4, \"current_raw_counters_unmodified\": true}\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T05-24"
+}

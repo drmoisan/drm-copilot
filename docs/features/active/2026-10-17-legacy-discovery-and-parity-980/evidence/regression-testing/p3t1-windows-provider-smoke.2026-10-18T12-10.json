@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-10-18T12:10:56.968576+00:00",
+  "platform": "nt",
+  "provider_sha256": "db2aca8bf68f64333b509ca12cbe8445d1a0dadc0532064d93581acb1afb422c",
+  "source": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+  "scratch_name": "issue-980-p3t1-windows-smoke-a3716f130fc3410d967b1702d11e278f",
+  "checks": [
+    {
+      "name": "exclusive-create-and-retained-parent",
+      "passed": true
+    },
+    {
+      "name": "digest-checked-replacement",
+      "passed": true
+    },
+    {
+      "name": "stale-digest-rejection",
+      "passed": true
+    },
+    {
+      "name": "exclusive-collision-rejection",
+      "passed": true
+    },
+    {
+      "name": "authorized-concurrent-exclusion",
+      "passed": true
+    },
+    {
+      "name": "retained-handle-and-stage-cleanup",
+      "passed": true
+    }
+  ],
+  "failure": null,
+  "passed": true,
+  "guarantee": "Cooperating authorized writers; individual atomic publication, not a multi-file transaction or kernel digest CAS."
+}

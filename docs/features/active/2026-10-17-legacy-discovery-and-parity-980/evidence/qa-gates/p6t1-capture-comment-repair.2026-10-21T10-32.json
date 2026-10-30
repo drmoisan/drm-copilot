@@ -1,0 +1,28 @@
+{
+  "after_sha256": "16d7bf1201b84dd74d84a41205d9c1a274686b013700674ff930e623baefea0e",
+  "before_sha256": "4cb44991947a5fc4083a7aabedcfc19778d51eb88878d52d481bc7008e302b4f",
+  "change": "One immediately preceding intent comment at migration_capture_case captured-file loop; no other source change.",
+  "complete_finding_set": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-static-diagnosis.2026-10-21T10-30.json",
+    "sha256": "e2bff89e27240f4024a4c97c25e8b84efa4e71d1e981fe8f3254c3462173804f"
+  },
+  "exact_reversed_node_sha256_unchanged": "5afa272290c9bc63b21e7ca17ed83741aa399bed4495c1d0287108c5d168ed48",
+  "full_executable_assertion_decorator_ast_identical": true,
+  "module_ast_sha256_after": "8fc00c6bb3913e3810dcb1661a82b8cd2f1ded02ba9d24d65f2d4da843e9a2e9",
+  "module_ast_sha256_before": "8fc00c6bb3913e3810dcb1661a82b8cd2f1ded02ba9d24d65f2d4da843e9a2e9",
+  "node_count": 329,
+  "originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-comment-repair-originals.2026-10-21T10-32.json",
+    "sha256": "89471783d21f7c15a6a5efb047302cb3531bc97d36ba1f7146e02f105c8b5c54"
+  },
+  "physical_lines": 481,
+  "prior_stopped_static": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-102811-static.2026-10-21T10-28.json",
+    "sha256": "f3c132cdf3204f8b9e1f3e064d8698cea621fee34d7cef4975f851c43ae002bc"
+  },
+  "production_package_readers_changed": false,
+  "route": "inventory_analyzers_p6t1_capture_final_retry_20261021T103200",
+  "separate_behavioral_execution": false,
+  "source_path": "tests/discovery_runtime/test_migration_capture.py",
+  "task": "P6-T1"
+}

@@ -1,0 +1,61 @@
+"""Bind the single comment repair and prepared native stage without replaying tests."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+scratch = Path(__file__).resolve().parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+original = qa / 'p4t9-final-preparation.2026-10-19T14-04.json'
+manifest = json.loads(original.read_bytes())
+repair = qa / 'p4t9-static-comment-repair.2026-10-19T14-09.json'
+assert hashlib.sha256(repair.read_bytes()).hexdigest() == '8bec364c4ba9c34afe1e764285dda04ba6f05e85113dc2a027213fbe0bef5da8'
+emitter = 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py'
+digest = '470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786'
+for family in ('files', 'bindings'):
+    for item in manifest[family]:
+        if item['path'] == emitter:
+            item['sha256'] = digest
+        assert hashlib.sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256']
+readiness_path = qa / 'p4t9-final-native-readiness.2026-10-19T14-09.json'
+assert hashlib.sha256(readiness_path.read_bytes()).hexdigest() == '079084796a7f28fd7f3adc664ef217655f18575647022d1a15affb6d7f24ff4e'
+readiness = json.loads(readiness_path.read_bytes())
+for item in readiness['harnesses']:
+    manifest['harnesses'][item['scratch_name']] = item['sha256']
+    manifest['harness_snapshots'].append({'path': item['path'], 'sha256': item['sha256']})
+raw = Path(__file__).read_bytes()
+assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n')
+copy = qa / ('p4t9-final-restart-prepare-harness.' + stamp + '.txt')
+assert not copy.exists()
+copy.write_bytes(raw)
+manifest['harnesses'][Path(__file__).name] = hashlib.sha256(raw).hexdigest()
+manifest['harness_snapshots'].append({'path': copy.as_posix(), 'sha256': hashlib.sha256(raw).hexdigest()})
+manifest['review_references'].append({'path': repair.as_posix(), 'sha256': hashlib.sha256(repair.read_bytes()).hexdigest()})
+manifest.update(timestamp=stamp, restart_of={'path': original.as_posix(), 'sha256': hashlib.sha256(original.read_bytes()).hexdigest()},
+    native_readiness={'path': readiness_path.as_posix(), 'sha256': hashlib.sha256(readiness_path.read_bytes()).hexdigest()},
+    head_at_preparation=subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode().strip())
+manifest['qualifications'].append('Exactly one comment moved in emitter.py; the approved repair proves AST equality and preservation of the other 14 candidate streams. Earlier review/behavioral proof remains retained; the full final sequence restarts from formatting.')
+manifest['qualifications'].append('This candidate binds current working bytes independently of the earlier committed emitter. Git index/commit normalization will be recorded separately at final handoff.')
+code = [item['path'] for item in manifest['files']]
+commands = [
+    ['.venv/Scripts/python.exe', '-m', 'black', '--check', *code],
+    ['.venv/Scripts/python.exe', '-m', 'ruff', 'check', *code],
+    ['.venv/Scripts/python.exe', '-m', 'pyright'],
+    ['.venv/Scripts/python.exe', 'SCRATCH/issue-980-p4t9-final-architecture.py', '<this candidate>'],
+]
+for batch in ('registry', 'shared', 'core'):
+    commands.append(['.venv/Scripts/python.exe', '-m', 'pytest', '-v', '-o', 'addopts=',
+        *list(reversed(manifest['forward_test_module_order'][batch])),
+        *['--cov=' + value for value in manifest['coverage_targets'][batch]],
+        *(['--cov-config=SCRATCH/issue-980-p4t9-final-registry-coverage.ini'] if batch == 'registry' else []),
+        '--cov-branch', '--cov-report=term-missing', '--cov-report=json:SCRATCH/issue-980-p4t9-final-' + batch + '-coverage.raw.json'])
+commands.append(['.venv/Scripts/python.exe', '-m', 'pytest', '-v', '-o', 'addopts=', '--no-cov', *manifest['contract_selection']])
+commands.append(['.venv/Scripts/python.exe', 'SCRATCH/issue-980-p4t9-final-native-gate.py', '<this candidate>', '<passed stages1-6>', 'coordinator-released-stage7'])
+manifest['exact_stage_commands'] = commands
+path = qa / ('p4t9-final-restart-preparation.' + stamp + '.json')
+assert not path.exists()
+path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+path.with_suffix('.md').write_text(f'# P4-T9 final restart preparation\n\nTimestamp: {stamp}\nCommand: `.venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-restart-prepare.py`\nEXIT_CODE: 0\nOutput Summary: Bound the approved comment-only repair, unchanged 354-case/177-contract population and the prepared 20-assertion native stage. No source/test or behavioral mutation occurred in this preparation. The full final sequence restarts from formatting; stage 7 requires coordinator release.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'emitter_sha256': digest}))

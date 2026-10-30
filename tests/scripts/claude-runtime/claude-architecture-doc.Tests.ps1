@@ -58,6 +58,21 @@ Describe "claude-architecture-doc" {
         $docContent | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 
+    It "requires the architecture document to describe the discovery controls and the planning prerequisite linkage (issue #980)" {
+        $docPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
+        $content = Get-Content -Path $docPath -Raw
+
+        # The four native discovery hooks are an enforcement boundary and a repository-enforceable control.
+        foreach ($hook in @('record-discovery-agent-start.ps1', 'enforce-discovery-artifact-gate.ps1', 'enforce-discovery-planning-gate.ps1', 'validate-discovery-artifact-gate.ps1')) {
+            $content | Should -Match ([regex]::Escape($hook))
+        }
+        $content | Should -Match 'completion_gates\.planning_prerequisite'
+        $content | Should -Match 'DISCOVERY_\*_BLOCKED:'
+        $content | Should -Match 'docs/engineering/legacy-discovery-and-parity/enforcement\.md'
+        # Criteria gate planning; the document must not claim the gate asserts an implementation pass.
+        $content | Should -Match 'without asserting any implementation passes'
+    }
+
     It "requires .claude/agents/feature-review.md to support writing review artifacts into a selected version folder" {
         $featureReviewPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'agents', 'feature-review.md'
         $content = Get-Content -Path $featureReviewPath -Raw

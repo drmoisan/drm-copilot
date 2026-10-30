@@ -1,0 +1,144 @@
+{
+  "Timestamp": "2026-10-20T15-16",
+  "label": "staticrepair1",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "98ae00f74282ef3946110554f5c37b23062b140ebb1fb55f1dc718cda135d8f0",
+    "scripts/dev_tools/discovery_build_identity.py": "2d0e4ed84b78aeadfd549cd45182aece15e454490a7175ff3548b22db60bf78e",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "c118bb4df1a83c791155ec90865736fc197387d55584125a6d92f29e9b088e94",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "313e734a5f002670b2b5f174f40d1462b9ae86404dd873459200c5d9ecba73e9",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "14c1b8b738bbd08da4f0ff504412d11036bbed768c3d0d0e2087452c12b03d79",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "98ae00f74282ef3946110554f5c37b23062b140ebb1fb55f1dc718cda135d8f0",
+    "scripts/dev_tools/discovery_build_identity.py": "2d0e4ed84b78aeadfd549cd45182aece15e454490a7175ff3548b22db60bf78e",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "c118bb4df1a83c791155ec90865736fc197387d55584125a6d92f29e9b088e94",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "313e734a5f002670b2b5f174f40d1462b9ae86404dd873459200c5d9ecba73e9",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "14c1b8b738bbd08da4f0ff504412d11036bbed768c3d0d0e2087452c12b03d79",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "format",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4331108999904245,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-staticrepair1-20261020T151556-format.stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-staticrepair1-20261020T151556-format.stderr.bin",
+          "sha256": "84b9efe87539186dc93860b3f3a897d1a12d9d88af87ec1dd653ef7f7d1eab58",
+          "readable": "All done! \u2728 \ud83c\udf70 \u2728\r\n7 files would be left unchanged.\r\n"
+        }
+      }
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3328713999944739,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-staticrepair1-20261020T151556-lint.stdout.bin",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+          "readable": "All checks passed!\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-staticrepair1-20261020T151556-lint.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "types",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 1,
+      "seconds": 2.2635202999808826,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-staticrepair1-20261020T151556-types.stdout.bin",
+          "sha256": "de593e188f8ee2dcc70161048a26ee7296980a1117b50d6df52a1b8764cb0a0c",
+          "readable": "WORKSPACE\\scripts\\dev_tools\\discovery_build_identity.py\n  WORKSPACE\\scripts\\dev_tools\\discovery_build_identity.py:72:16 - error: Import \"tomli\" could not be resolved (reportMissingImports)\n  WORKSPACE\\scripts\\dev_tools\\discovery_build_identity.py:74:9 - error: Type of \"decoded\" is partially unknown\n  \u00a0\u00a0Type of \"decoded\" is \"dict[str, Any] | Unknown\" (reportUnknownVariableType)\n  WORKSPACE\\scripts\\dev_tools\\discovery_build_identity.py:74:27 - error: Type of \"loads\" is partially unknown\n  \u00a0\u00a0Type of \"loads\" is \"((s: str, /, *, parse_float: ((str) -> Any) = ...) -> dict[str, Any]) | Unknown\" (reportUnknownMemberType)\n  WORKSPACE\\scripts\\dev_tools\\discovery_build_identity.py:75:36 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"check\"\n  \u00a0\u00a0Argument type is \"dict[str, Any] | Unknown\" (reportUnknownArgumentType)\nWORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:48:6 - error: The function \"contextmanager\" is deprecated\n  \u00a0\u00a0Annotating the return type as `-> Iterator[Foo]` with `@contextmanager` is deprecated. Use `-> Generator[Foo]` instead. (reportDeprecated)\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:79:6 - error: The function \"contextmanager\" is deprecated\n  \u00a0\u00a0Annotating the return type as `-> Iterator[Foo]` with `@contextmanager` is deprecated. Use `-> Generator[Foo]` instead. (reportDeprecated)\n6 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-staticrepair1-20261020T151556-types.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    }
+  ],
+  "coverage": null,
+  "harness_sha256": "143a7a124671f9b3c69f2840d432f3f5171758c80ccf1b12ea1f64d7a3307cac",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "failed-retained"
+}

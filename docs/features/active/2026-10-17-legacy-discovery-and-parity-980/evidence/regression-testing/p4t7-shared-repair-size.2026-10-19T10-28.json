@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-10-19T10-28",
+  "recorded_utc": "2026-10-19T10:28:03.186328+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-shared-repair-size.py",
+  "exit_code": 0,
+  "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+  "before_sha256": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+  "after_sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+  "before_lines": 501,
+  "after_lines": 500,
+  "preserved_original": "SCRATCH/issue-980-p4t7-shared-repair3-inputs-original.bin",
+  "change": "Removed exactly one blank line inside DependencyBudget class docstring; all doc text and executable syntax unchanged.",
+  "failed_audit": {
+    "command": "poetry run python SCRATCH/issue-980-p4t7-shared-repair-freeze.py",
+    "exit_code": 1,
+    "observed_diagnostic": "AssertionError at line73: len(lines) <= 500 and docstring presence predicate; actual input module was501 lines.",
+    "qualification": "Diagnostic transcribed from tool output; not represented as an independently captured raw stream. No canonical freeze file was written before this check failed."
+  },
+  "prior_passing_behavior": "191 tests/275 statements/142 branches retained; corrected bytes receive a new ordered focused loop.",
+  "normalized_ast_equal": true,
+  "integration_mutations": false
+}

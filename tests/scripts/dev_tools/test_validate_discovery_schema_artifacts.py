@@ -1,142 +1,138 @@
-"""Unit tests for `validate_discovery_schema_artifacts`.
-
-Purpose:
-    Cover `_extract_schema_uri`, `_validate_against_schema`, and the
-    `validate_feature_contract_text` / `validate_coverage_ledger_text` /
-    `validate_runtime_scenario_text` / `validate_parity_matrix_text` wrappers
-    using inline literal schemas and artifacts, per the plan's fixture note
-    (#9002 fixtures not yet wired in).
-"""
+"""Verify stable text wrappers against real expected schemas without remote mocks."""
 
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
 import pytest
+from drm_copilot_discovery.catalog import CatalogError, schema_path
 
 import scripts.dev_tools.validate_discovery_schema_artifacts as discovery_schema
+from tests.schemas.discovery.v2_schema_test_support import load_fixture
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-    from pathlib import Path
+    from collections.abc import Callable, Mapping
 
-    from _pytest.monkeypatch import MonkeyPatch
+ROOT = Path(__file__).resolve().parents[3]
+
+
+def fixture_text(kind: str) -> str:
+    """Read committed legacy examples without creating filesystem fixtures."""
+    filename = Path(schema_path(kind, "1.0.0")).name.replace(
+        ".schema.json", ".example.json"
+    )
+    return (ROOT / "examples/discovery/v1" / filename).read_text("utf-8")
 
 
 def test_extract_schema_uri_raises_for_missing_schema_field() -> None:
-    """A document without `$schema` should raise ValueError."""
-    with pytest.raises(ValueError, match="missing \\$schema"):
-        discovery_schema._extract_schema_uri({})  # type: ignore[reportPrivateUsage]
-
-
-def test_extract_schema_uri_returns_declared_uri() -> None:
-    """A document with a `$schema` string should return that string."""
-    uri = discovery_schema._extract_schema_uri(  # type: ignore[reportPrivateUsage]
-        {"$schema": "https://x/y.json"}
+    """Metadata inspection still reports absent schema text explicitly."""
+    extract = cast(
+        "Callable[[Mapping[str, object]], str]",
+        vars(discovery_schema)["_extract_schema_uri"],
     )
+    with pytest.raises(ValueError, match=r"missing \$schema"):
+        extract({})
 
-    assert uri == "https://x/y.json"
 
-
-def test_validate_against_schema_rejects_malformed_json() -> None:
-    """Malformed JSON should be reported as an error string, not raised."""
-    errors = discovery_schema._validate_against_schema(  # type: ignore[reportPrivateUsage]
-        "{not json", "feature-contract"
+def test_extract_schema_uri_returns_declared_uri_without_loading_it() -> None:
+    """Inspection is separate from authority to resolve an unregistered URI."""
+    extract = cast(
+        "Callable[[Mapping[str, object]], str]",
+        vars(discovery_schema)["_extract_schema_uri"],
     )
-
-    assert len(errors) == 1
-    assert "invalid JSON" in errors[0]
-
-
-def test_validate_against_schema_rejects_non_dict_root() -> None:
-    """A JSON array at the document root should be rejected explicitly."""
-    errors = discovery_schema._validate_against_schema(  # type: ignore[reportPrivateUsage]
-        "[]", "feature-contract"
-    )
-
-    assert errors == ["JSON root must be an object for validation"]
-
-
-def test_validate_against_schema_reports_missing_schema_field_as_error_string() -> None:
-    """A document with no `$schema` field should report resolution failure."""
-    errors = discovery_schema._validate_against_schema(  # type: ignore[reportPrivateUsage]
-        json.dumps({"acceptance_criteria": []}), "feature-contract"
-    )
-
-    assert len(errors) == 1
-    assert "schema resolution failed" in errors[0]
-
-
-def _permissive_object_schema(_uri: str, _cache_dir: Path) -> dict[str, object]:
-    """Stand in for `load_schema` requiring `acceptance_criteria`."""
-    return {
-        "type": "object",
-        "required": ["acceptance_criteria"],
-        "properties": {"acceptance_criteria": {"type": "array"}},
-    }
-
-
-def test_validate_feature_contract_text_accepts_conforming_fixture(
-    monkeypatch: MonkeyPatch,
-) -> None:
-    """A conforming feature-contract fixture should validate with no errors."""
-    monkeypatch.setattr(discovery_schema, "load_schema", _permissive_object_schema)
-
-    errors = discovery_schema.validate_feature_contract_text(
-        json.dumps(
-            {
-                "$schema": "https://example.test/feature-contract.schema.json",
-                "acceptance_criteria": [],
-            }
-        )
-    )
-
-    assert errors == []
-
-
-def test_validate_feature_contract_text_rejects_non_conforming_fixture(
-    monkeypatch: MonkeyPatch,
-) -> None:
-    """A fixture missing `acceptance_criteria` should be rejected with detail.
-
-    Note: `jsonschema`'s `Draft202012Validator` reports a missing top-level
-    required property with an empty `error.path` (the path to the instance
-    that failed, not the missing key), so the formatted message is
-    `"[]: 'acceptance_criteria' is a required property"` rather than a
-    `['acceptance_criteria']`-prefixed message. This assertion checks the
-    verified real output rather than the bracket-wrapped form.
-    """
-    monkeypatch.setattr(discovery_schema, "load_schema", _permissive_object_schema)
-
-    errors = discovery_schema.validate_feature_contract_text(
-        json.dumps({"$schema": "https://example.test/feature-contract.schema.json"})
-    )
-
-    assert len(errors) == 1
-    assert "acceptance_criteria" in errors[0]
-    assert "required property" in errors[0]
-
-
-def _permissive_type_object_schema(_uri: str, _cache_dir: Path) -> dict[str, object]:
-    """Stand in for `load_schema` returning a minimal permissive schema."""
-    return {"type": "object"}
+    assert extract({"$schema": "https://x/y.json"}) == "https://x/y.json"
+    with pytest.raises(CatalogError, match="Unregistered"):
+        discovery_schema.load_schema("https://x/y.json")
 
 
 @pytest.mark.parametrize(
-    "validator",
+    ("text", "code"),
     [
-        discovery_schema.validate_coverage_ledger_text,
-        discovery_schema.validate_runtime_scenario_text,
-        discovery_schema.validate_parity_matrix_text,
+        ("{not json", "DOCUMENT_SYNTAX"),
+        ("[]", "DOCUMENT_ROOT"),
+        ('{"id":1,"id":2}', "DOCUMENT_DUPLICATE_KEY"),
     ],
 )
-def test_first_three_remaining_schema_validators_accept_conforming_fixtures(
-    validator: Callable[[str], list[str]], monkeypatch: MonkeyPatch
+def test_validate_against_schema_rejects_malformed_json(text: str, code: str) -> None:
+    """Strict parsing errors remain actionable list results rather than exceptions."""
+    errors = discovery_schema.validate_feature_contract_text(text)
+
+    assert len(errors) == 1
+    assert code in errors[0]
+
+
+def test_missing_schema_field_reports_identity_failure() -> None:
+    """Missing identity cannot select an inferred or weaker schema."""
+    errors = discovery_schema.validate_feature_contract_text(
+        '{"schema_version":"1.0.0"}'
+    )
+
+    assert len(errors) == 1
+    assert "SCHEMA_IDENTITY /$schema" in errors[0]
+
+
+def test_validate_feature_contract_text_accepts_real_frozen_v1_fixture() -> None:
+    """Default wrapper calls preserve the documented compatibility reader."""
+    assert (
+        discovery_schema.validate_feature_contract_text(
+            fixture_text("feature-contract")
+        )
+        == []
+    )
+
+
+def test_validate_feature_contract_text_rejects_missing_acceptance_criteria() -> None:
+    """The real v1 schema retains its required acceptance-criteria assertion."""
+    document = cast("dict[str, object]", json.loads(fixture_text("feature-contract")))
+    del document["acceptance_criteria"]
+
+    errors = discovery_schema.validate_feature_contract_text(json.dumps(document))
+
+    assert len(errors) == 1
+    assert "acceptance_criteria" in errors[0] and "required property" in errors[0]
+
+
+@pytest.mark.parametrize(
+    ("validator", "kind"),
+    [
+        (discovery_schema.validate_coverage_ledger_text, "coverage-ledger"),
+        (
+            discovery_schema.validate_runtime_scenario_text,
+            "runtime-characterization-scenario",
+        ),
+        (discovery_schema.validate_parity_matrix_text, "parity-matrix"),
+    ],
+)
+def test_remaining_wrappers_preserve_expected_kind_validation(
+    validator: Callable[[str], list[str]],
+    kind: str,
 ) -> None:
-    """Each of these three validators should accept a conforming fixture."""
-    monkeypatch.setattr(discovery_schema, "load_schema", _permissive_type_object_schema)
+    """Actual legacy artifacts pass only the corresponding wrapper."""
+    assert validator(fixture_text(kind)) == []
+    assert validator(fixture_text("feature-contract"))
 
-    errors = validator(json.dumps({"$schema": "https://example.test/schema.json"}))
 
-    assert errors == []
+def test_trusted_version_keyword_enables_v2_without_artifact_selected_dispatch() -> (
+    None
+):
+    """Existing calls stay v1 while an explicit caller version selects exact v2."""
+    text = json.dumps(load_fixture("feature-contract"))
+
+    assert discovery_schema.validate_feature_contract_text(text)
+    assert (
+        discovery_schema.validate_feature_contract_text(text, schema_version="2.0.0")
+        == []
+    )
+    assert discovery_schema.validate_feature_contract_text(text, schema_version="2.0.1")
+
+
+def test_registered_schema_lookup_retains_unused_cache_argument() -> None:
+    """The old load_schema export performs no cache writes or external retrieval."""
+    schema = discovery_schema.load_schema(
+        "../../../schemas/discovery/v1/feature-contract.schema.json",
+        Path("unused-cache"),
+    )
+
+    assert schema["$id"] == "schemas/discovery/v1/feature-contract.schema.json"

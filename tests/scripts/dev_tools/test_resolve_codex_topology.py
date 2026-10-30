@@ -195,6 +195,36 @@ def test_root_persona_rejects_epic_child_context() -> None:
         )
 
 
+def test_discovery_invocation_selects_fixed_specialist() -> None:
+    """A discovery invocation with an exact skill selects its fixed role (#980)."""
+
+    receipt = resolve_codex_topology(
+        [],
+        0,
+        0,
+        "standalone",
+        invocation_kind="discovery",
+        skill_id="reconcile-parity-matrix",
+    )
+
+    assert receipt["route"] == "discovery"
+    assert receipt["logical_agent"] == "requirements-reconciler"
+    assert receipt["max_production_files"] == 0
+
+
+def test_ordinary_default_rejects_skill_and_keeps_zero_count_escalation() -> None:
+    """Without a discovery selector a skill is rejected and zero counts escalate."""
+
+    with pytest.raises(ValueError, match="only valid for discovery"):
+        resolve_codex_topology(
+            [], 0, 0, "standalone", skill_id="inventory-legacy-system"
+        )
+
+    receipt = resolve_codex_topology([], 0, 0, "standalone")
+
+    assert receipt["routing_reason"] == "invalid_estimate"
+
+
 def test_cli_emits_stable_receipt(capsys: pytest.CaptureFixture[str]) -> None:
     """Expose the pure resolver through a machine-readable CLI."""
 

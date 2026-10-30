@@ -1,0 +1,273 @@
+{
+  "timestamp": "2026-10-19T08-52",
+  "command": "poetry run python SCRATCH/issue-980-p4t6-ui-freeze.py",
+  "exit_code": 0,
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "physical_lines": 458,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "physical_lines": 417,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_ui_callbacks.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_ui_callbacks.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "physical_lines": 241,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_ui_callback_limits.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_ui_callback_limits.py: eol: lf"
+      ]
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-ui-coverage.2026-10-19T08-52.json",
+    "sha256": "d495a62b9582b58a31fb4cccc8e9953dfc5fb2e8a19ff693ea7687df95db5acc"
+  },
+  "summaries": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+      "module": {
+        "covered_lines": 164,
+        "num_statements": 164,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 3,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 58,
+        "num_partial_branches": 0,
+        "covered_branches": 58,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "callback_candidates": {
+          "covered_lines": 27,
+          "num_statements": 27,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 18,
+          "num_partial_branches": 0,
+          "covered_branches": 18,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_failure": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.__init__": {
+          "covered_lines": 19,
+          "num_statements": 19,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.reserve": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.local": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.payload": {
+          "covered_lines": 9,
+          "num_statements": 9,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.code": {
+          "covered_lines": 25,
+          "num_statements": 25,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 12,
+          "num_partial_branches": 0,
+          "covered_branches": 12,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.inspect": {
+          "covered_lines": 36,
+          "num_statements": 36,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 8,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "UiCallbackAnalyzer.analyze": {
+          "covered_lines": 10,
+          "num_statements": 10,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      "classes": {
+        "_Run": {
+          "covered_lines": 96,
+          "num_statements": 96,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 34,
+          "num_partial_branches": 0,
+          "covered_branches": 34,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "UiCallbackAnalyzer": {
+          "covered_lines": 10,
+          "num_statements": 10,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    }
+  ],
+  "structures": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+      "definitions_with_docstrings": 11,
+      "loops_with_immediate_intent_comments": 6,
+      "physical_lines": 458,
+      "no_unit_temp_files": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+      "definitions_with_docstrings": 19,
+      "loops_with_immediate_intent_comments": 0,
+      "physical_lines": 417,
+      "no_unit_temp_files": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+      "definitions_with_docstrings": 14,
+      "loops_with_immediate_intent_comments": 0,
+      "physical_lines": 241,
+      "no_unit_temp_files": true
+    }
+  ],
+  "executed_cases": 107,
+  "predecessor_streams_preserved": 55,
+  "changed_line_coverage": "100%; this is a new module, with every executable line and branch measured.",
+  "manual_intent_review": "Pure candidate and adapter transforms, all explicit loops, metadata comprehensions, branch routing and nested helpers were inspected before the clean focused sequence.",
+  "scope": "Focused UI subset proof only; repository-wide and combined P4-T6 final gates remain with the coordinator."
+}

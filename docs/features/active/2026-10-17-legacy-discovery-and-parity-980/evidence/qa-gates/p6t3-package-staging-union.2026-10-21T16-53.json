@@ -1,0 +1,133 @@
+{
+  "Timestamp": "2026-10-21T16:53:49.082683+00:00",
+  "issue_number": 980,
+  "task": "P6-T3",
+  "status": "READY_FOR_CHECKED_PACKAGE_PRESERVATION",
+  "current_head": "e926b481d9958b174a4012fb3bb268a390fa8fc2",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-package-confirmation.2026-10-21T16-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-package-staging-union.2026-10-21T16-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-build.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-check.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-handoff.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-install.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-pip-support.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure-readable.2026-10-21T16-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-raw-archive.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-staging-qualification.2026-10-21T16-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-venv.2026-10-21T16-45.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json"
+  ],
+  "path_count_including_self": 12,
+  "bindings_excluding_self": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "working_sha256": "8f582785ddc98f897777e3e1dab6251f2457ab674b591f14dc2a9a304afa4386",
+      "git_lf_sha256": "8f582785ddc98f897777e3e1dab6251f2457ab674b591f14dc2a9a304afa4386",
+      "expected_git_blob": "f0cbd0a5ae5610b7560525f321506a1b0a80c25d",
+      "bytes": 22677,
+      "git_lf_bytes": 22677
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-pip-support.2026-10-21T16-45.json",
+      "working_sha256": "d17ccb9d533561a078fc4c3631370b6950085b362706bcd0adc7d05a67f69d02",
+      "git_lf_sha256": "d17ccb9d533561a078fc4c3631370b6950085b362706bcd0adc7d05a67f69d02",
+      "expected_git_blob": "18fc9b5704d9e9d86e3777cc099ab9638c8bff4a",
+      "bytes": 71361,
+      "git_lf_bytes": 71361
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-build.2026-10-21T16-45.json",
+      "working_sha256": "d93a8ce20ecfadb5eed010a849826c1753a88d29e97f591133b61415ddd241a3",
+      "git_lf_sha256": "d93a8ce20ecfadb5eed010a849826c1753a88d29e97f591133b61415ddd241a3",
+      "expected_git_blob": "8fd5822e3ec788a332960097b33e0f6fb21fbf72",
+      "bytes": 76688,
+      "git_lf_bytes": 76688
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-check.2026-10-21T16-45.json",
+      "working_sha256": "1b48e3dc3667024c26e481c040d76847a94307a9da48b466ad682dd6d41d8585",
+      "git_lf_sha256": "1b48e3dc3667024c26e481c040d76847a94307a9da48b466ad682dd6d41d8585",
+      "expected_git_blob": "94b7d933a0fe0c34bf9f04c0a692aecd692c91a8",
+      "bytes": 76458,
+      "git_lf_bytes": 76458
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-venv.2026-10-21T16-45.json",
+      "working_sha256": "d05a140381f7f033bd31024a381197032e1f76e901c81688d9a19b54f1dd01d5",
+      "git_lf_sha256": "d05a140381f7f033bd31024a381197032e1f76e901c81688d9a19b54f1dd01d5",
+      "expected_git_blob": "5eed4fafce8425ca938acdb74b39cf06ffab7cfc",
+      "bytes": 66494,
+      "git_lf_bytes": 66494
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-install.2026-10-21T16-45.json",
+      "working_sha256": "eb546017ab0b8de3e390aee4e8dde9f3f89ff98f0b8421c5faa4fb20ae3ddf59",
+      "git_lf_sha256": "eb546017ab0b8de3e390aee4e8dde9f3f89ff98f0b8421c5faa4fb20ae3ddf59",
+      "expected_git_blob": "c20e7cf7a6a8796b9766f152ef8821f0985dc786",
+      "bytes": 66917,
+      "git_lf_bytes": 66917
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure-readable.2026-10-21T16-47.json",
+      "working_sha256": "2784b2d539a760bc9d83f38db83c7006a79361252a127035ece66b89a10ed3a0",
+      "git_lf_sha256": "2784b2d539a760bc9d83f38db83c7006a79361252a127035ece66b89a10ed3a0",
+      "expected_git_blob": "e55eea795a5a21d606bdf1263f8c55984d39070b",
+      "bytes": 67560,
+      "git_lf_bytes": 67560
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-handoff.2026-10-21T16-45.json",
+      "working_sha256": "b33e7a0d9d4f9050fdcf6f08d5fad4052ba990e7171382cd49c3471b8b954f7f",
+      "git_lf_sha256": "b33e7a0d9d4f9050fdcf6f08d5fad4052ba990e7171382cd49c3471b8b954f7f",
+      "expected_git_blob": "e1bd692dfee5b6a7b7c2ff9edb17cb6a86a2c36e",
+      "bytes": 63082,
+      "git_lf_bytes": 63082
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-raw-archive.2026-10-21T16-45.json",
+      "working_sha256": "c79b51f613b05fdee7625274402ff1d43fb53b0f328e410e652593bb782b99a5",
+      "git_lf_sha256": "c79b51f613b05fdee7625274402ff1d43fb53b0f328e410e652593bb782b99a5",
+      "expected_git_blob": "b1ddc8730468851a5dc7cada9e8fae2a83fb5b68",
+      "bytes": 31449,
+      "git_lf_bytes": 31449
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-staging-qualification.2026-10-21T16-47.json",
+      "working_sha256": "da043c09f0a390944de842f57909fbb9834a79dfecd57b158bb2029a27ac5bba",
+      "git_lf_sha256": "da043c09f0a390944de842f57909fbb9834a79dfecd57b158bb2029a27ac5bba",
+      "expected_git_blob": "74fc60a305c730ee9f71b10258c97e44b8ef2563",
+      "bytes": 42359,
+      "git_lf_bytes": 42359
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-package-confirmation.2026-10-21T16-53.json",
+      "working_sha256": "15cb990a8412270b37106c68d30b9997930250c9828571444367808e1851f86f",
+      "git_lf_sha256": "15cb990a8412270b37106c68d30b9997930250c9828571444367808e1851f86f",
+      "expected_git_blob": "51db9a356a8bc302616b3452e4512bcac6cf7210",
+      "bytes": 7449,
+      "git_lf_bytes": 7449
+    }
+  ],
+  "committed_dependencies": [],
+  "separately_staged_entry_dependency": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-entry-confirmation.2026-10-21T16-48.json",
+    "working_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+    "git_lf_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+    "expected_git_blob": "c04283d99ddc5fe54900b8f7ce384df52875f2f5",
+    "bytes": 19465,
+    "git_lf_bytes": 19465
+  },
+  "self_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-package-staging-union.2026-10-21T16-53.json",
+    "included": true,
+    "treatment": "The manifest is included in stage_paths; its working/Git-LF hash is returned externally to avoid recursive self hashing."
+  },
+  "exclusions": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-packaged-public-exposure.2026-10-21T16-45.json",
+    "Other owners' adapter source/tests and mutable outputs",
+    "Ignored package scratch/venv/wheel/build caches and canonical checkpoint"
+  ],
+  "raw_preservation": "Original process streams and the excluded observer receipt remain losslessly archived and unchanged; only the qualified decoded-origin readable view is staged.",
+  "task_acceptance": false
+}

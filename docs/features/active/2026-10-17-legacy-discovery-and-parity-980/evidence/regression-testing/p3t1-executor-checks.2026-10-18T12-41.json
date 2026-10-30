@@ -1,0 +1,1283 @@
+{
+  "task": "P3-T1",
+  "head": "99e88cd08c9539f2972366a413cf7072ea725089",
+  "timestamp_utc": "2026-10-18T12:40:14.210493+00:00",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "sha256": "db2aca8bf68f64333b509ca12cbe8445d1a0dadc0532064d93581acb1afb422c",
+      "git_blob": "198a767936b5a960505b80e74f93c860fc644642"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "sha256": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+      "git_blob": "0ca4ad457491f0cdb6896a8fa7f46a5677f37fbf"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+      "git_blob": "9f4f634cc22444edd28ac23256c59a547fe30088"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "git_blob": "4d6960a8975d91df8dea3c11ec39a74438073ce7"
+    },
+    {
+      "path": "tests/discovery_runtime/mutation_test_support.py",
+      "sha256": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+      "git_blob": "322118bba523350bccd006ae46e66acc756bb14e"
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_commit.py",
+      "sha256": "31c0dff2382bbbf563f1b63c96a24e505b6cc9cd2e33c379a5034b82a1249c42",
+      "git_blob": "39c6aa14c2e4ee08cab40ebb25d927688f2c21ad"
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_filesystem.py",
+      "sha256": "5f57206cb69c35e39cff7a0c5f4b57f71b200c1a66ed678df4a3a69dad12f5ba",
+      "git_blob": "ccb5aaa1b633b10091469019f74ca5cf86535ef7"
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "sha256": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+      "git_blob": "b160f59fd8188db6f5df81b1468666405b1a9b4e"
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "sha256": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed",
+      "git_blob": "2b9ada06226170a88f70b5c468b93a7122e9b603"
+    }
+  ],
+  "new_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "tests/discovery_runtime/mutation_test_support.py",
+    "tests/discovery_runtime/test_mutation_commit.py",
+    "tests/discovery_runtime/test_mutation_filesystem.py",
+    "tests/discovery_runtime/test_mutation_plan.py"
+  ],
+  "authorized_prior_paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "git_blob": "4d6960a8975d91df8dea3c11ec39a74438073ce7"
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "sha256": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed",
+      "git_blob": "2b9ada06226170a88f70b5c468b93a7122e9b603"
+    }
+  ],
+  "focused_tests_passed": 89,
+  "reversed_tests_passed": 89,
+  "unchanged_prior_paths": 209,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": 436,
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": 418,
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": 386,
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": 179,
+    "tests/discovery_runtime/mutation_test_support.py": 294,
+    "tests/discovery_runtime/test_mutation_commit.py": 332,
+    "tests/discovery_runtime/test_mutation_filesystem.py": 426,
+    "tests/discovery_runtime/test_mutation_plan.py": 453,
+    "tests/discovery_runtime/test_validation_modes.py": 355
+  },
+  "coverage_lines": "484/489",
+  "coverage_branch_arcs": "135/142",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": [
+      {
+        "name": "Directory",
+        "line": 30,
+        "statements": 7,
+        "covered_lines": 7
+      },
+      {
+        "name": "_WindowsCall",
+        "line": 58,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "_ordinary",
+        "line": 69,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "pin_windows_path",
+        "line": 77,
+        "statements": 23,
+        "covered_lines": 23
+      },
+      {
+        "name": "NativeDirectory",
+        "line": 118,
+        "statements": 56,
+        "covered_lines": 56
+      },
+      {
+        "name": "open_local_directory",
+        "line": 230,
+        "statements": 17,
+        "covered_lines": 16
+      },
+      {
+        "name": "exclusive_workspace_lock",
+        "line": 260,
+        "statements": 6,
+        "covered_lines": 6
+      },
+      {
+        "name": "LocalMutationPrimitives",
+        "line": 270,
+        "statements": 79,
+        "covered_lines": 78
+      },
+      {
+        "name": "identity",
+        "line": 33,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "child",
+        "line": 37,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "read",
+        "line": 41,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "stage",
+        "line": 45,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "publish",
+        "line": 49,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "remove",
+        "line": 53,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "__call__",
+        "line": 64,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "__init__",
+        "line": 121,
+        "statements": 3,
+        "covered_lines": 3
+      },
+      {
+        "name": "identity",
+        "line": 126,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "_name",
+        "line": 130,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "child",
+        "line": 140,
+        "statements": 5,
+        "covered_lines": 5
+      },
+      {
+        "name": "read",
+        "line": 149,
+        "statements": 19,
+        "covered_lines": 19
+      },
+      {
+        "name": "stage",
+        "line": 177,
+        "statements": 15,
+        "covered_lines": 15
+      },
+      {
+        "name": "publish",
+        "line": 202,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "remove",
+        "line": 224,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "__init__",
+        "line": 279,
+        "statements": 15,
+        "covered_lines": 15
+      },
+      {
+        "name": "metadata",
+        "line": 311,
+        "statements": 9,
+        "covered_lines": 9
+      },
+      {
+        "name": "read_bytes",
+        "line": 341,
+        "statements": 7,
+        "covered_lines": 7
+      },
+      {
+        "name": "guard",
+        "line": 354,
+        "statements": 10,
+        "covered_lines": 10
+      },
+      {
+        "name": "create_exclusive",
+        "line": 370,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "replace_if_digest",
+        "line": 374,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "_publish",
+        "line": 382,
+        "statements": 32,
+        "covered_lines": 31
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": [
+      {
+        "name": "capture_workspace",
+        "line": 43,
+        "statements": 10,
+        "covered_lines": 10
+      },
+      {
+        "name": "MutationWriter",
+        "line": 82,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "MutationPrimitives",
+        "line": 109,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "GuardedMutationWriter",
+        "line": 132,
+        "statements": 22,
+        "covered_lines": 22
+      },
+      {
+        "name": "MutationArtifact",
+        "line": 191,
+        "statements": 6,
+        "covered_lines": 6
+      },
+      {
+        "name": "MutationResult",
+        "line": 202,
+        "statements": 7,
+        "covered_lines": 7
+      },
+      {
+        "name": "_artifact",
+        "line": 218,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "_same_state",
+        "line": 235,
+        "statements": 3,
+        "covered_lines": 3
+      },
+      {
+        "name": "_after_write",
+        "line": 245,
+        "statements": 12,
+        "covered_lines": 12
+      },
+      {
+        "name": "commit_mutation",
+        "line": 279,
+        "statements": 48,
+        "covered_lines": 47
+      },
+      {
+        "name": "inspect",
+        "line": 59,
+        "statements": 6,
+        "covered_lines": 6
+      },
+      {
+        "name": "capture",
+        "line": 93,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "invalidate_authority",
+        "line": 97,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "atomic_write",
+        "line": 104,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "guard",
+        "line": 117,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "create_exclusive",
+        "line": 121,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "replace_if_digest",
+        "line": 125,
+        "statements": 1,
+        "covered_lines": 1
+      },
+      {
+        "name": "__init__",
+        "line": 135,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "capture",
+        "line": 147,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "invalidate_authority",
+        "line": 151,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "atomic_write",
+        "line": 155,
+        "statements": 13,
+        "covered_lines": 13
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": [
+      {
+        "name": "MutationError",
+        "line": 40,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "MutationChange",
+        "line": 52,
+        "statements": 12,
+        "covered_lines": 12
+      },
+      {
+        "name": "CapturedWorkspace",
+        "line": 82,
+        "statements": 25,
+        "covered_lines": 24
+      },
+      {
+        "name": "PlannedWrite",
+        "line": 129,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "MutationPlan",
+        "line": 138,
+        "statements": 7,
+        "covered_lines": 7
+      },
+      {
+        "name": "_PinnedReader",
+        "line": 153,
+        "statements": 13,
+        "covered_lines": 13
+      },
+      {
+        "name": "_Overlay",
+        "line": 178,
+        "statements": 23,
+        "covered_lines": 23
+      },
+      {
+        "name": "project_snapshot",
+        "line": 235,
+        "statements": 4,
+        "covered_lines": 4
+      },
+      {
+        "name": "plan_mutation",
+        "line": 269,
+        "statements": 41,
+        "covered_lines": 40
+      },
+      {
+        "name": "__init__",
+        "line": 43,
+        "statements": 3,
+        "covered_lines": 3
+      },
+      {
+        "name": "__post_init__",
+        "line": 65,
+        "statements": 6,
+        "covered_lines": 6
+      },
+      {
+        "name": "__post_init__",
+        "line": 93,
+        "statements": 5,
+        "covered_lines": 5
+      },
+      {
+        "name": "inspect",
+        "line": 105,
+        "statements": 16,
+        "covered_lines": 15
+      },
+      {
+        "name": "__init__",
+        "line": 156,
+        "statements": 3,
+        "covered_lines": 3
+      },
+      {
+        "name": "identity",
+        "line": 163,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "read_file",
+        "line": 167,
+        "statements": 7,
+        "covered_lines": 7
+      },
+      {
+        "name": "__init__",
+        "line": 185,
+        "statements": 16,
+        "covered_lines": 16
+      },
+      {
+        "name": "inspect",
+        "line": 224,
+        "statements": 2,
+        "covered_lines": 2
+      },
+      {
+        "name": "read",
+        "line": 228,
+        "statements": 4,
+        "covered_lines": 4
+      }
+    ]
+  },
+  "independent_boundary_cases": [
+    {
+      "name": "create-posix",
+      "passed": true,
+      "details": {
+        "ok": true,
+        "root": "/workspace",
+        "writes": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ]
+      }
+    },
+    {
+      "name": "create-windows",
+      "passed": true,
+      "details": {
+        "ok": true,
+        "root": "C:/workspace",
+        "writes": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ]
+      }
+    },
+    {
+      "name": "create-unc",
+      "passed": true,
+      "details": {
+        "ok": true,
+        "root": "//server/share/workspace",
+        "writes": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ]
+      }
+    },
+    {
+      "name": "unchanged-skip",
+      "passed": true,
+      "details": {
+        "ok": true,
+        "status": "skipped"
+      }
+    },
+    {
+      "name": "digest-replacement",
+      "passed": true,
+      "details": {
+        "status": "updated"
+      }
+    },
+    {
+      "name": "repeatable-dry-run",
+      "passed": true,
+      "details": {
+        "repeatable": true,
+        "writes": 0,
+        "revocations": 0
+      }
+    },
+    {
+      "name": "plan-invalid-prospective",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_IDENTITY",
+        "message": "MUTATION_IDENTITY: Proposed artifact kind/ID differs"
+      }
+    },
+    {
+      "name": "plan-wrong-id",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_IDENTITY",
+        "message": "MUTATION_IDENTITY: Proposed artifact kind/ID differs"
+      }
+    },
+    {
+      "name": "plan-wrong-kind",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_INVALID",
+        "message": "MUTATION_INVALID: Prospective graph is invalid"
+      }
+    },
+    {
+      "name": "plan-missing-grant",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_GRANT",
+        "message": "MUTATION_GRANT: No exact kind/ID/path write grant"
+      }
+    },
+    {
+      "name": "plan-grant-id",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_GRANT",
+        "message": "MUTATION_GRANT: No exact kind/ID/path write grant"
+      }
+    },
+    {
+      "name": "plan-grant-kind",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_GRANT",
+        "message": "MUTATION_GRANT: No exact kind/ID/path write grant"
+      }
+    },
+    {
+      "name": "plan-grant-path",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_GRANT",
+        "message": "MUTATION_GRANT: No exact kind/ID/path write grant"
+      }
+    },
+    {
+      "name": "plan-stale-digest",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_PRECONDITION",
+        "message": "MUTATION_PRECONDITION: Original content digest differs"
+      }
+    },
+    {
+      "name": "plan-missing-original-digest",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_PRECONDITION",
+        "message": "MUTATION_PRECONDITION: Original content digest differs"
+      }
+    },
+    {
+      "name": "plan-empty-changes",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_LIMIT",
+        "message": "MUTATION_LIMIT: Provide a bounded nonempty change set"
+      }
+    },
+    {
+      "name": "plan-duplicate-path",
+      "passed": true,
+      "details": {
+        "rejected": "PathPolicyError",
+        "code": "PATH_COLLISION",
+        "message": "PATH_COLLISION: 'docs/migration/discovery/product-decisions.yaml': Remove duplicate or aliased paths."
+      }
+    },
+    {
+      "name": "plan-oversize",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_LIMIT",
+        "message": "MUTATION_LIMIT: Proposed content exceeds document limit"
+      }
+    },
+    {
+      "name": "plan-production",
+      "passed": true,
+      "details": {
+        "rejected": "PathPolicyError",
+        "code": "PATH_WRITE_DENIED",
+        "message": "PATH_WRITE_DENIED: 'src/changed.py': Use the artifact kind's exact configured file or child location."
+      }
+    },
+    {
+      "name": "plan-profile",
+      "passed": true,
+      "details": {
+        "rejected": "PathPolicyError",
+        "code": "PATH_WRITE_DENIED",
+        "message": "PATH_WRITE_DENIED: 'docs/migration/discovery/domain-profile.yaml': Use the artifact kind's exact configured file or child location."
+      }
+    },
+    {
+      "name": "plan-outside",
+      "passed": true,
+      "details": {
+        "rejected": "PathPolicyError",
+        "code": "PATH_WRITE_DENIED",
+        "message": "PATH_WRITE_DENIED: 'other/decisions.yaml': Use the artifact kind's exact configured file or child location."
+      }
+    },
+    {
+      "name": "stale-bytes",
+      "passed": true,
+      "details": {
+        "result": false,
+        "revocations": 1,
+        "findings": [
+          "MUTATION_STALE: Complete input state changed; reload"
+        ]
+      }
+    },
+    {
+      "name": "stale-addition",
+      "passed": true,
+      "details": {
+        "result": false,
+        "revocations": 1,
+        "findings": [
+          "MUTATION_STALE: Complete input state changed; reload"
+        ]
+      }
+    },
+    {
+      "name": "stale-deletion",
+      "passed": true,
+      "details": {
+        "result": false,
+        "revocations": 1,
+        "findings": [
+          "MUTATION_STALE: Complete input state changed; reload"
+        ]
+      }
+    },
+    {
+      "name": "stale-identity",
+      "passed": true,
+      "details": {
+        "result": false,
+        "revocations": 1,
+        "findings": [
+          "MUTATION_STALE: Complete input state changed; reload"
+        ]
+      }
+    },
+    {
+      "name": "stale-parent-link",
+      "passed": true,
+      "details": {
+        "result": false,
+        "revocations": 1,
+        "findings": [
+          "PATH_LINK: 'docs/migration/discovery': Use ordinary local paths."
+        ]
+      }
+    },
+    {
+      "name": "stale-collision",
+      "passed": true,
+      "details": {
+        "result": false,
+        "revocations": 1,
+        "findings": [
+          "MUTATION_STALE: Complete input state changed; reload"
+        ]
+      }
+    },
+    {
+      "name": "stale-dry-run",
+      "passed": true,
+      "details": {
+        "result": false,
+        "revocations": 0,
+        "findings": [
+          "MUTATION_STALE: Complete input state changed; reload"
+        ]
+      }
+    },
+    {
+      "name": "guarded-race-collision",
+      "passed": true,
+      "details": {
+        "uncertain": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "name": "guarded-race-input-edit",
+      "passed": true,
+      "details": {
+        "uncertain": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "name": "guarded-race-parent-replacement",
+      "passed": true,
+      "details": {
+        "uncertain": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "name": "post-write-raise-after-write",
+      "passed": true,
+      "details": {
+        "uncertain": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ],
+        "findings": [
+          "Uncertain native result"
+        ]
+      }
+    },
+    {
+      "name": "post-write-extra-file",
+      "passed": true,
+      "details": {
+        "uncertain": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ],
+        "findings": [
+          "MUTATION_POSTCONDITION: Committed input bytes differ from the plan"
+        ]
+      }
+    },
+    {
+      "name": "post-write-parent-identity",
+      "passed": true,
+      "details": {
+        "uncertain": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ],
+        "findings": [
+          "MUTATION_POSTCONDITION: An unrelated input identity changed"
+        ]
+      }
+    },
+    {
+      "name": "authority-invalidation-failure",
+      "passed": true,
+      "details": {
+        "writes": 0,
+        "authority_invalidated": false
+      }
+    },
+    {
+      "name": "partial-write-stop",
+      "passed": true,
+      "details": {
+        "statuses": [
+          "created",
+          "conflict"
+        ],
+        "writes": [
+          "docs/migration/discovery/product-decisions.yaml"
+        ],
+        "uncertain": [
+          "docs/migration/discovery/unspecified-behaviors.yaml"
+        ]
+      }
+    },
+    {
+      "name": "tampered-plan",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_PLAN",
+        "message": "MUTATION_PLAN: Plan fields differ from their validated reconstruction"
+      }
+    },
+    {
+      "name": "allowed-role",
+      "passed": true,
+      "details": {
+        "ok": true,
+        "role": "requirements-reconciler",
+        "writes": [
+          "docs/migration/discovery/product-decisions.yaml",
+          "docs/migration/discovery/reports/required-output-manifest.json"
+        ]
+      }
+    },
+    {
+      "name": "wrong-role",
+      "passed": true,
+      "details": {
+        "rejected": "MutationError",
+        "code": "MUTATION_INVALID",
+        "message": "MUTATION_INVALID: Prospective graph is invalid"
+      }
+    },
+    {
+      "name": "concrete-writer-create",
+      "passed": true,
+      "details": {
+        "ok": true,
+        "events": [
+          "enter",
+          "create",
+          "exit"
+        ]
+      }
+    },
+    {
+      "name": "concrete-writer-replace",
+      "passed": true,
+      "details": {
+        "ok": true,
+        "events": [
+          "enter",
+          "replace",
+          "exit"
+        ]
+      }
+    },
+    {
+      "name": "concrete-writer-guard-race",
+      "passed": true,
+      "details": {
+        "ok": false,
+        "events": [
+          "enter",
+          "exit"
+        ]
+      }
+    },
+    {
+      "name": "Owned partial stage is removed on failure",
+      "passed": true,
+      "details": {
+        "close_calls": 1,
+        "remove_calls": 1,
+        "message": "Injected partial write",
+        "foreign_remove_calls": 0
+      }
+    },
+    {
+      "name": "Opened parent identity must match recorded stamp",
+      "passed": true,
+      "details": {
+        "error": "Opened mutation parent identity changed",
+        "resulting_content": "original",
+        "events": [
+          [
+            "enter",
+            "."
+          ],
+          [
+            "enter",
+            "docs"
+          ],
+          [
+            "enter",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs"
+          ],
+          [
+            "exit",
+            "."
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Configured larger original is not rejected by a fixed default limit",
+      "passed": true,
+      "details": {
+        "error": null,
+        "original_size": 16777217,
+        "profile_schema_maximum": 67108864,
+        "events": [
+          [
+            "enter",
+            "."
+          ],
+          [
+            "enter",
+            "docs"
+          ],
+          [
+            "enter",
+            "docs/observations"
+          ],
+          [
+            "stage",
+            "docs/observations/.drm-mutation-owned-stage"
+          ],
+          [
+            "read-limit",
+            33554432
+          ],
+          [
+            "publish",
+            "docs/observations/value.txt"
+          ],
+          [
+            "remove",
+            "docs/observations/.drm-mutation-owned-stage"
+          ],
+          [
+            "exit",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs"
+          ],
+          [
+            "exit",
+            "."
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Opaque payload grant cannot create a structured evidence record",
+      "passed": true,
+      "rejected": "MUTATION_IDENTITY",
+      "message": "MUTATION_IDENTITY: Proposed artifact kind/ID differs"
+    },
+    {
+      "name": "Directory enumeration order is semantically irrelevant",
+      "passed": true,
+      "stable_snapshot": "5e57fe61e126bf065d2bb1ea3a975da7145c99afc87814dab18119bb9ae3c1b2",
+      "shuffled_snapshot": "5e57fe61e126bf065d2bb1ea3a975da7145c99afc87814dab18119bb9ae3c1b2"
+    },
+    {
+      "name": "Valid paired JSON and Markdown report is a permitted artifact mutation",
+      "passed": true,
+      "writes": [
+        "docs/migration/discovery/reports/coverage-report.json",
+        "docs/migration/discovery/reports/coverage-report.md"
+      ]
+    }
+  ],
+  "retained_unaffected_proof_binding": {
+    "task": "P3-T1",
+    "timestamp_utc": "2026-10-18T12:11:58.092717+00:00",
+    "status": "AFFECTED_CORRECTION_VERIFIED",
+    "unchanged_semantic_modules": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+      "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+      "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2"
+    },
+    "previous_provider_sha256": "3d4ebf82948d07f6d7404c1b17e6a0caa6c8c0bcce7360b4e46a35486a2ab2ba",
+    "corrected_provider_sha256": "db2aca8bf68f64333b509ca12cbe8445d1a0dadc0532064d93581acb1afb422c",
+    "corrected_provider_test_sha256": "a8bb146259743bb2196963a45634da73234e88ca94313962c22705619393fc99",
+    "bounded_delta": "Only native access 0x80 to 0x81 and its explanatory comment; reversing both restores the exact prior raw provider SHA.",
+    "retained_mutation_cases": 42,
+    "corrected_provider_cases": [
+      {
+        "name": "Owned partial stage is removed on failure",
+        "passed": true,
+        "details": {
+          "close_calls": 1,
+          "remove_calls": 1,
+          "message": "Injected partial write",
+          "foreign_remove_calls": 0
+        }
+      },
+      {
+        "name": "Opened parent identity must match recorded stamp",
+        "passed": true,
+        "details": {
+          "error": "Opened mutation parent identity changed",
+          "resulting_content": "original",
+          "events": [
+            [
+              "enter",
+              "."
+            ],
+            [
+              "enter",
+              "docs"
+            ],
+            [
+              "enter",
+              "docs/observations"
+            ],
+            [
+              "exit",
+              "docs/observations"
+            ],
+            [
+              "exit",
+              "docs"
+            ],
+            [
+              "exit",
+              "."
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Configured larger original is not rejected by a fixed default limit",
+        "passed": true,
+        "details": {
+          "error": null,
+          "original_size": 16777217,
+          "profile_schema_maximum": 67108864,
+          "events": [
+            [
+              "enter",
+              "."
+            ],
+            [
+              "enter",
+              "docs"
+            ],
+            [
+              "enter",
+              "docs/observations"
+            ],
+            [
+              "stage",
+              "docs/observations/.drm-mutation-owned-stage"
+            ],
+            [
+              "read-limit",
+              33554432
+            ],
+            [
+              "publish",
+              "docs/observations/value.txt"
+            ],
+            [
+              "remove",
+              "docs/observations/.drm-mutation-owned-stage"
+            ],
+            [
+              "exit",
+              "docs/observations"
+            ],
+            [
+              "exit",
+              "docs"
+            ],
+            [
+              "exit",
+              "."
+            ]
+          ]
+        }
+      }
+    ],
+    "native_diagnostic": "Six checks reported by the specialist; final ordered integration result still required.",
+    "task_checked": false,
+    "findings": []
+  },
+  "architecture_scope": "Six ordered tests cover the original extracted modules. Independent current-task inspection and AST checks cover the three new mutation modules' package/stdlib imports; mutation planning remains memory-only and concrete I/O remains isolated.",
+  "prerequisite_invariants": [
+    {
+      "name": "Actual reports directory creation preserves semantic report digest",
+      "passed": true
+    },
+    {
+      "name": "Actual reports directory creation remains bound by complete snapshot digest",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for docs/migration/discovery/reports",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for docs/migration/discovery/reports/later.json",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for docs/migration/discovery/reports-neighbor",
+      "passed": true
+    },
+    {
+      "name": "Missing path exclusion is exact for src/unreadable.cs",
+      "passed": true
+    },
+    {
+      "name": "Captured bytes exclusion is exact for docs/migration/discovery/reports/coverage-report.md",
+      "passed": true
+    },
+    {
+      "name": "Captured bytes exclusion is exact for docs/migration/discovery/reports-neighbor/view.md",
+      "passed": true
+    },
+    {
+      "name": "Captured bytes exclusion is exact for src/current.cs",
+      "passed": true
+    }
+  ],
+  "windows_provider_smoke": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-windows-provider-smoke.2026-10-18T12-37.json",
+  "native_checks": [
+    {
+      "name": "exclusive-create-and-retained-parent",
+      "passed": true
+    },
+    {
+      "name": "digest-checked-replacement",
+      "passed": true
+    },
+    {
+      "name": "stale-digest-rejection",
+      "passed": true
+    },
+    {
+      "name": "exclusive-collision-rejection",
+      "passed": true
+    },
+    {
+      "name": "authorized-concurrent-exclusion",
+      "passed": true
+    },
+    {
+      "name": "retained-handle-and-stage-cleanup",
+      "passed": true
+    }
+  ],
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-coverage-metrics.2026-10-18T12-38.json",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-coverage.2026-10-18T12-38.json",
+  "concurrency_scope": "Optimistic digest verification, cooperative authorized-writer exclusion and per-file atomic publication; no multi-file transaction or kernel digest-conditioned rename against arbitrary same-user processes.",
+  "findings": [],
+  "evidence_written_utc": "2026-10-18 12:41:05 UTC",
+  "compatibility_tests_passed": 232,
+  "ordered_pass": 13,
+  "minimum_callable_line_percent": 93.75,
+  "ordered_receipts": [
+    "p3t1-format-pass13.2026-10-18T12-26.md",
+    "p3t1-lint-pass13.2026-10-18T12-26.md",
+    "p3t1-types-pass13.2026-10-18T12-26.md",
+    "p3t1-architecture-pass13.2026-10-18T12-27.md",
+    "p3t1-tests-pass13.2026-10-18T12-36.md",
+    "p3t1-reverse-pass13.2026-10-18T12-32.md",
+    "p3t1-contract-pass13.2026-10-18T12-37.md",
+    "p3t1-windows-final-pass13.2026-10-18T12-37.md"
+  ]
+}

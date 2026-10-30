@@ -1,0 +1,59 @@
+{
+  "Timestamp": "2026-10-21T16-01",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "status": "READY_FOR_CHECKED_NATIVE_PRESERVATION",
+  "entries": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+      "sha256": "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108",
+      "bytes": 16043
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+      "sha256": "34900a9a4dcd074497a38770bfa57ee550c229b4a05afb56bb8e0234464617bc",
+      "bytes": 265367
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-stopped-staging-union.2026-10-21T15-38.json",
+      "sha256": "3ce94b2a984de994089fc6d8a192e3dead696c1ca639553c1efe4252bcb50311",
+      "bytes": 1037
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-help-byte-diagnosis.2026-10-21T15-41.json",
+      "sha256": "e210ac0913f97bdcd254b2321645435f9b334938fc2e7d4156e8caf2fd81c508",
+      "bytes": 6459
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-help-offline-carry.2026-10-21T15-50.json",
+      "sha256": "6bcc1f33157e663c5d881c680779b0c7d93ee26e38286330e132b9f0cf1935dc",
+      "bytes": 7502
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-51.json",
+      "sha256": "9eb507e6bafc517e1ed4069639bae3c0ed545bb4d0f0364cfc42a3cfb522c70f",
+      "bytes": 28585
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-51.json",
+      "sha256": "c1a4d46a8a9a93fe46af91698dcc527e14cd0e06048558235bcd9d910b760fee",
+      "bytes": 278380
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-offline-closure-raw.2026-10-21T16-01.json",
+      "sha256": "493e643ab31ff7b0aae6473de69b03e07456ac8109bc2bb1925a92e2683e7924",
+      "bytes": 25673
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-offline-closure.2026-10-21T16-01.json",
+      "sha256": "d3efb7c4a9702489fb55e8ed99e49e832a8b979465739ced5aef24139dd390c5",
+      "bytes": 10600
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-preservation-union.2026-10-21T16-01.json",
+      "binding": "self",
+      "sha256": null
+    }
+  ],
+  "scope": "Only native-owner evidence; package and independent-review evidence remain separately owned. No staging or Git action performed."
+}

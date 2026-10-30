@@ -1,0 +1,43 @@
+{
+  "batch": "repair-6",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T06:26:02.010552+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-repair-6-lint-062602.2026-10-19T06-26.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-repair-6-lint-062602.2026-10-19T06-26.stdout.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "seconds": 0.105178,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "aeb4b0c3d2d33023554b9806a4579ac827fbdb910c2a567dc2174781395b581d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "a5e4bd8200de5f779cc3491aa62f799455cffd8aff877e364108e2bdbf6d5f1f",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "aeb4b0c3d2d33023554b9806a4579ac827fbdb910c2a567dc2174781395b581d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "a5e4bd8200de5f779cc3491aa62f799455cffd8aff877e364108e2bdbf6d5f1f",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T06:26:01.905374+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-26"
+}

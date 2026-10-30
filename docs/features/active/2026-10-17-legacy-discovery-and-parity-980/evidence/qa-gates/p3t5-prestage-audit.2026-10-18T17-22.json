@@ -1,0 +1,284 @@
+{
+  "written_at_utc": "2026-10-18T17:22:32.230386+00:00",
+  "task": "P3-T5",
+  "stage": "prestage",
+  "baseline": "1cc73b60cd636f186ca0269bf3942d32acd18105",
+  "head": "5046c52468b9509557a0f48de805d926ef70854b",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "sha256": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "git_blob": "ff34edd78af35c96c248afbe1bef2eeba87fa428",
+      "physical_lines": 343
+    },
+    {
+      "path": "tests/discovery_runtime/test_evidence_linking.py",
+      "sha256": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "git_blob": "41ec2ff1ade98dbd310a6ab2b2192e238d34965b",
+      "physical_lines": 480
+    },
+    {
+      "path": "tests/discovery_runtime/test_evidence_payloads.py",
+      "sha256": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "git_blob": "5cb36ba8ede51e5352a1a83d3124ca2173ed8576",
+      "physical_lines": 354
+    },
+    {
+      "path": "tests/discovery_runtime/evidence_test_support.py",
+      "sha256": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+      "git_blob": "c27690845012691a680cdadb5f4646ae8ecee1e4",
+      "physical_lines": 117
+    }
+  ],
+  "prior_count": 251,
+  "frozen_count": 24,
+  "tests": {
+    "pass1": {
+      "tests": "61",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "130.162",
+      "timestamp": "2026-10-18T13:17:42.780862-04:00"
+    },
+    "reverse1": {
+      "tests": "61",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "51.960",
+      "timestamp": "2026-10-18T13:19:55.618797-04:00"
+    },
+    "pass1-contracts": {
+      "tests": "543",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "26.337",
+      "timestamp": "2026-10-18T13:20:48.941475-04:00"
+    }
+  },
+  "coverage_audit": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t5-pass1-coverage-audit.2026-10-18T17-19.json",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t5-prestage-raw-coverage.2026-10-18T17-22.json",
+  "test_bindings": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t5-prestage-test-bindings.2026-10-18T17-22.json",
+  "ordered_sequence": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t5-prestage-ordered-sequence.2026-10-18T17-22.json",
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": {
+      "covered_lines": 108,
+      "lines": 108,
+      "line_percent": 100.0,
+      "covered_branches": 38,
+      "branches": 38,
+      "branch_percent": 100.0
+    }
+  },
+  "callable_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": [
+      {
+        "name": "EvidencePayload",
+        "start": 31,
+        "end": 45,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "EvidenceLink",
+        "start": 49,
+        "end": 92,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_default_path",
+        "start": 95,
+        "end": 116,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_append_link",
+        "start": 119,
+        "end": 141,
+        "covered": 15,
+        "statements": 15,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_linked_document",
+        "start": 144,
+        "end": 185,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "evidence_changes",
+        "start": 188,
+        "end": 283,
+        "covered": 30,
+        "statements": 30,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "plan_evidence_link",
+        "start": 286,
+        "end": 320,
+        "covered": 8,
+        "statements": 8,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "link_evidence",
+        "start": 323,
+        "end": 343,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 41,
+        "end": 45,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 66,
+        "end": 92,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      }
+    ]
+  },
+  "minimum_callable": 100.0,
+  "integration": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-composed-final.2026-10-18T17-22.json",
+  "integration_checks": [
+    {
+      "name": "dry-run-has-no-write-directory-or-authority-effects",
+      "passed": true
+    },
+    {
+      "name": "dry-run-identifies-three-exact-outputs",
+      "passed": true
+    },
+    {
+      "name": "record-payload-and-link-publish-exact-bytes",
+      "passed": true
+    },
+    {
+      "name": "exclusive-create-and-digest-checked-update-dispositions",
+      "passed": true
+    },
+    {
+      "name": "completion-authority-invalidated-once",
+      "passed": true
+    },
+    {
+      "name": "only-selected-link-array-changed",
+      "passed": true
+    },
+    {
+      "name": "observation-remains-unknown-with-null-statement",
+      "passed": true
+    },
+    {
+      "name": "unrelated-input-bytes-preserved",
+      "passed": true
+    },
+    {
+      "name": "exact-local-evidence-is-verifiable",
+      "passed": true
+    },
+    {
+      "name": "guard-and-retained-anchors-released",
+      "passed": true
+    },
+    {
+      "name": "duplicate-registration-rejects-without-effects",
+      "passed": true
+    },
+    {
+      "name": "partial-publication-reports-created-and-conflict",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-invalidates-completion-authority",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-retains-findings-and-uncertainty",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-preserves-unrelated-and-uncommitted-bytes",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-releases-guard-and-parent-anchors",
+      "passed": true
+    },
+    {
+      "name": "bound-source-bytes-stable",
+      "passed": true
+    }
+  ],
+  "integration_timings": {
+    "preview_seconds": 7.343463199998951,
+    "commit_seconds": 37.89777049999975,
+    "partial_failure_seconds": 18.544830200000433
+  },
+  "staged_task": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+    "tests/discovery_runtime/evidence_test_support.py",
+    "tests/discovery_runtime/test_evidence_linking.py",
+    "tests/discovery_runtime/test_evidence_payloads.py"
+  ],
+  "findings": [],
+  "compatibility_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t5-prestage-compatibility-coverage.2026-10-18T17-22.json",
+  "compatibility_coverage_deltas": {
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\evidence_rules.py": {
+      "covered_lines": 0,
+      "covered_branches": 0,
+      "num_statements": 0,
+      "num_branches": 0
+    },
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\revision_rules.py": {
+      "covered_lines": 0,
+      "covered_branches": 0,
+      "num_statements": 0,
+      "num_branches": 0
+    }
+  },
+  "limits": [
+    "No new native provider; composed proof uses existing guarded writer and local primitives with memory OS seams.",
+    "Trusted context/grant and native permitted-route wiring remain later host/service work.",
+    "Full installed CLI/host proof and exhaustive property/mutation inventory remain P11 work."
+  ],
+  "gate_receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-architecture.2026-10-18T17-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-contracts.2026-10-18T17-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-coverage-check.2026-10-18T17-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-format.2026-10-18T17-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-integration.2026-10-18T17-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-lint.2026-10-18T17-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-reverse.2026-10-18T17-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-tests.2026-10-18T17-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t5-pass1-types.2026-10-18T17-17.md"
+  ]
+}

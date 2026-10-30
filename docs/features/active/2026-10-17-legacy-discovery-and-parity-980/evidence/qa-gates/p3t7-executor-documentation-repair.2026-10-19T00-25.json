@@ -1,0 +1,90 @@
+{
+  "task": "P3-T7",
+  "status": "DOCUMENTATION_CANDIDATE_CONFIRMED_NOT_TASK_ACCEPTANCE",
+  "accepted_baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+  "checked_wip": "d3f3ad06d13a5995db5725161cc97427649478f8",
+  "authority": {
+    "delegation_id": "atomic_execution_p3t7_capacity_retry",
+    "profile": "atomic-executor-c4",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "max",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true
+  },
+  "command": "poetry run python SCRATCH/issue-980-p3t7-documentation-confirmation.py",
+  "exit_code": 0,
+  "files": [
+    {
+      "file": "migration_conversion.py",
+      "old_sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "candidate_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "physical_lines": 326,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "production_executable_ast_equivalent": true
+    },
+    {
+      "file": "migration_models.py",
+      "old_sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "candidate_sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "physical_lines": 358,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "production_executable_ast_equivalent": true
+    },
+    {
+      "file": "migration_v1.py",
+      "old_sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "candidate_sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "physical_lines": 413,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "production_executable_ast_equivalent": true
+    },
+    {
+      "file": "test_migration_unknowns.py",
+      "old_sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+      "candidate_sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "physical_lines": 478,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "production_executable_ast_equivalent": null
+    },
+    {
+      "file": "test_migration_v1.py",
+      "old_sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+      "candidate_sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "physical_lines": 496,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "production_executable_ast_equivalent": null
+    }
+  ],
+  "pooled_test_definition_count": 29,
+  "pooled_test_definitions_equivalent": true,
+  "approved_relocation": {
+    "test": "test_dry_run_never_bootstraps_or_revokes",
+    "from": "tests/discovery_runtime/test_migration_v1.py",
+    "to": "tests/discovery_runtime/test_migration_unknowns.py",
+    "assertions_unchanged": true,
+    "imports": [
+      "drm_copilot_discovery.migration_v1",
+      "tests.discovery_runtime.test_migration_v1.unit_commit_case"
+    ]
+  },
+  "manual_confirmation": [
+    "Consolidated nontrivial comprehension/projection intent comments present",
+    "Seven-kind conversion, collection storage and publication branch rationale present",
+    "Production callable parameter/return/exception/side-effect contracts documented",
+    "Nested test helpers documented",
+    "No new behavior, assertions, production scope or policy changes"
+  ],
+  "limitations": [
+    "AST equivalence ignores docstrings and location metadata; module documentation changes are intentional",
+    "Final ordered gates and actual current-byte bindings remain required",
+    "No task or feature acceptance criterion is checked by this receipt"
+  ],
+  "findings": []
+}

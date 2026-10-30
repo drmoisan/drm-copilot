@@ -1,0 +1,19 @@
+{
+  "task": "P5-T5",
+  "recorded_utc": "2026-10-20T12:44:50.152427+00:00",
+  "approval": "workspace_operations_p5t5_repair_20261020",
+  "absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+    "tests/discovery_runtime/test_acceptance_render_limits.py"
+  ],
+  "baseline": "evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+  "baseline_sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475",
+  "review": "evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.json",
+  "review_sha256": "21701357b3dbc458b29f395246ca49cc025422835d39e3afd3ee6215ab3b9477",
+  "moves": {
+    "gherkin._Output": "acceptance_render_text.AcceptanceTextOutput",
+    "gherkin._plain": "acceptance_render_text._plain"
+  },
+  "test_scope": "All original 62 nodes stay in their original modules; new RR1/RR2/RC1 controls only in the approved limits module.",
+  "unused_path": "tests/discovery_runtime/test_gherkin_limits.py remains unauthorized and absent."
+}

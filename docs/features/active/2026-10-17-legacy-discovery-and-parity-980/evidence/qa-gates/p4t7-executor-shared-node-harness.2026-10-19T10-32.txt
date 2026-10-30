@@ -1,0 +1,213 @@
+"""Confirm only retained shared findings and bind the completed Node review."""
+
+import ast
+import hashlib
+import inspect
+import json
+import multiprocessing
+import time
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+REG = FEATURE / 'evidence/regression-testing'
+QA = FEATURE / 'evidence/qa-gates'
+R = 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/'
+
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def binding(path, expected=None):
+    raw = (ROOT / path).read_bytes()
+    digest = sha(raw)
+    if expected is not None:
+        assert digest == expected, str(path)
+    return {'path': str(path).replace('\\', '/'), 'sha256': digest, 'bytes': len(raw)}
+
+
+def read(path, expected=None):
+    result = binding(path, expected)
+    return json.loads((ROOT / path).read_bytes()), result
+
+
+def version_child(connection, repetitions):
+    from drm_copilot_discovery.analyzer.dependency_inputs import dependency_value
+    value = '1-' + 'a-' * repetitions + '!'
+    started = time.perf_counter()
+    result = dependency_value(value)
+    connection.send({'seconds': time.perf_counter() - started, 'kind': result.kind})
+    connection.close()
+
+
+class ObservedText(str):
+    def encode(self, encoding='utf-8', errors='strict'):
+        result = super().encode(encoding, errors)
+        self.observations.append(len(result))
+        return result
+
+
+def executable_tree(raw):
+    tree = ast.parse(raw)
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+                node.body = node.body[1:]
+    return ast.dump(tree, include_attributes=False)
+
+
+def main():
+    shared, shared_binding = read(REG / 'p4t7-shared-repair-freeze.2026-10-19T10-28.json', 'de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749')
+    node, node_binding = read(REG / 'p4t7-node-freeze.2026-10-19T10-24.json', 'd8bc7e62f27dadfa1093122e36482de9da1e0016f41c405516743c2e66ed1642')
+    current = {item['path']: item['sha256'] for item in shared['source_files'] + node['files']}
+    checked_sources = []
+    for path, expected in current.items():
+        item = binding(path, expected)
+        raw = (ROOT / path).read_bytes()
+        item['lines'] = len(raw.splitlines())
+        assert item['lines'] <= 500 and b'\r' not in raw
+        checked_sources.append(item)
+
+    gates = []
+    for group, expected_stages in ((shared['ordered_focused_gates'], ['format', 'lint', 'types', 'unit']), (node['ordered_receipts'], ['format', 'lint', 'types', 'tests'])):
+        assert [item['stage'] for item in group] == expected_stages
+        for item in group:
+            gate, gate_binding = read(item['path'], item['sha256'])
+            assert gate['exit_code'] == 0 and gate['source_before'] == gate['source_after']
+            for path, value in gate['source_before'].items():
+                assert (value['sha256'] if isinstance(value, dict) else value) == current[path]
+            if 'shared_before' in gate:
+                assert gate['shared_before'] == gate['shared_after'] == node['shared_sources_used']
+            gates.append(gate_binding)
+
+    raw, raw_binding = read(shared['coverage']['path'], shared['coverage']['sha256'])
+    totals = raw['totals']
+    assert totals['covered_lines'] == totals['num_statements'] == 275
+    assert totals['covered_branches'] == totals['num_branches'] == 142
+    ranges = [value for module in shared['coverage_ranges'].values() for kind in ('functions', 'classes') for value in module[kind].values()]
+    assert len(ranges) == 24 and all(item['missing_lines'] == item['missing_branches'] == 0 for item in ranges)
+    assert shared['test_count'] == 191 and len(shared['test_nodes_in_execution_order']) == 191
+    assert shared['original_cases_preserved'] == 152 and shared['new_cases'] == 39
+    node_ranges, node_ranges_binding = read(node['coverage_ranges']['path'], node['coverage_ranges']['sha256'])
+    assert node_ranges['summary']['covered_lines'] == node_ranges['summary']['num_statements'] == 103
+    assert node_ranges['summary']['covered_branches'] == node_ranges['summary']['num_branches'] == 52
+    assert len(node_ranges['units']) == 8
+    assert all(not item['missing_lines'] and not item['missing_branches'] for item in node_ranges['units'])
+    assert node['test_count'] == 111
+    node_coverage_binding = binding(node_ranges['coverage']['path'], node_ranges['coverage']['sha256'])
+
+    size, size_binding = read(REG / 'p4t7-shared-repair-size.2026-10-19T10-28.json')
+    after = (ROOT / size['path']).read_bytes()
+    assert sha(after) == size['after_sha256'] == current[size['path']]
+    # Recover the qualified prior bytes by the one recorded blank-line delta only.
+    parts = after.splitlines(keepends=True)
+    matches = []
+    for index in range(len(parts) + 1):
+        before = b''.join(parts[:index]) + b'\n' + b''.join(parts[index:])
+        if sha(before) == size['before_sha256']:
+            matches.append((index + 1, before))
+    assert len(matches) == 1
+    blank_line, before = matches[0]
+    assert executable_tree(before) == executable_tree(after)
+    assert node['shared_sources_used'][size['path']] == sha(before)
+    assert node['shared_sources_used'][R + 'dependency_values.py'] == current[R + 'dependency_values.py']
+
+    from drm_copilot_discovery.analyzer import dependency_inputs as shared_api
+    from drm_copilot_discovery.analyzer import dependency_values as values
+    for name in ('DependencyValue', 'Ecosystem', 'safe_identifier', 'dependency_value'):
+        assert getattr(shared_api, name) is getattr(values, name)
+    for name, expected in shared['public_signatures'].items():
+        value = shared_api
+        for part in name.split('.'):
+            value = getattr(value, part)
+        assert str(inspect.signature(value)) == expected
+
+    observations = []
+    context = multiprocessing.get_context('spawn')
+    # Repeat exactly the retained short reproductions with independent timeout caps.
+    for repetitions in (8, 12, 16, 20, 28):
+        parent, child = context.Pipe(duplex=False)
+        process = context.Process(target=version_child, args=(child, repetitions))
+        process.start()
+        child.close()
+        process.join(timeout=2)
+        if process.is_alive():
+            process.terminate()
+            process.join(timeout=2)
+            raise AssertionError('Retained bounded version reproduction did not finish')
+        assert process.exitcode == 0 and parent.poll()
+        observed = parent.recv()
+        parent.close()
+        assert observed['kind'] == 'unsupported'
+        observations.append({**observed, 'repetitions': repetitions, 'input_characters': 3 + 2 * repetitions})
+    text = ObservedText('\U0001f600' * 3)
+    text.observations = []
+    budget = shared_api.DependencyBudget(shared_api.DependencyLimits(max_text_bytes=5))
+    try:
+        budget.add(kind='declaration', ecosystem='python', name=text, version=None, role='install', anchor=shared_api.DependencyAnchor('text', 'requirements', line=1))
+    except shared_api.DependencyInputError as error:
+        assert error.code == 'dependency-limit'
+    else:
+        raise AssertionError('Expected prospective rejection')
+    assert text.observations == []
+    try:
+        budget.result()
+    except shared_api.DependencyInputError:
+        pass
+    else:
+        raise AssertionError('Partial result was exposed')
+    classification = []
+    for text in ('1.2.3', '*', '1.*', '1.x', '1.2.*', '1.X'):
+        value = shared_api.dependency_value(text)
+        assert value.kind == ('literal' if text == '1.2.3' else 'constraint')
+        classification.append({'input': text, 'kind': value.kind})
+
+    original = binding(QA / 'p4t7-executor-shared-review.2026-10-19T10-07.json', '0bd89530074639e96b6c31027546c6124f0c1ebd6b4278bb85c9d2b8b1b396a8')
+    old_probe = binding(QA / 'p4t7-executor-shared-probe.2026-10-19T10-05.json', '9b9f3fd13f7e2e6a13a8deda91d2e7278a080d360c01f696df6ed2ce831bb106')
+    for path, expected in current.items():
+        binding(path, expected)
+    now = datetime.now(UTC)
+    stamp = now.strftime('%Y-%m-%dT%H-%M')
+    harness_path = QA / ('p4t7-executor-shared-node-harness.' + stamp + '.txt')
+    (ROOT / harness_path).write_bytes(Path(__file__).read_bytes())
+    result = {
+        'status': 'SHARED_REPAIR_CONFIRMED_NODE_REVIEW_CLEAR', 'task': 'P4-T7',
+        'timestamp': stamp, 'published_utc': datetime.now(UTC).isoformat(),
+        'command': 'poetry run python SCRATCH/issue-980-p4t7-shared-node-confirmation.py', 'exit_code': 0,
+        'authority': {'receipt': 'atomic_execution_p4t7_shared_node_review', 'profile_sha256': 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9', 'native_routing_launch_provenance': True},
+        'scope': 'Four shared repair source/test paths plus three frozen Node source/test paths only.',
+        'source_test_bindings': checked_sources, 'freezes': [shared_binding, node_binding],
+        'focused_receipts_reused': gates, 'coverage_reconciled': [raw_binding, node_ranges_binding, node_coverage_binding],
+        'proof_reused': {'shared_cases': 191, 'original_shared_cases': 152, 'added_shared_cases': 39, 'shared_statements': '275/275', 'shared_branches': '142/142', 'shared_ranges': 24, 'node_cases': 111, 'node_statements': '103/103', 'node_branches': '52/52', 'node_ranges': 8},
+        'shared_closure': {'SR1': 'Forward-only version scans and bounded partitioning replace nested ambiguous regex; deterministic counted regressions cover work.', 'SR2': 'UTF-8 scalar widths are counted without encoding allocation; original 12-byte input/5-byte capacity reproduction rejects with zero encode calls and poisons result.', 'SR3': 'All four originally misclassified wildcard spellings now return constraint; literal control remains literal.', 'SR4': 'Reviewed changed shared/helper/test contracts now document typed inputs, results, errors and side effects; all four files are at most 500 lines.'},
+        'retained_version_reproductions': observations, 'allocation_reproduction': {'encode_calls': 0, 'partial_result_refused': True},
+        'version_classifications': classification, 'timing_qualification': 'Only operational two-second caps; elapsed measurements are diagnostics, never unit-test thresholds. Worker deterministic work-count tests are retained.',
+        'public_signatures_and_reexport_identity': 'Independently confirmed against frozen manifest.',
+        'node_review': {'findings': [], 'boundaries': ['finite package-json and lock v2/v3 maps', 'declared/locked/edge distinction without target resolution', 'redacted dynamic location keys and explicit alias ambiguity', 'closed container and normalized ordinal anchors', 'separate normalization/extraction/text/candidate bounds and whole-result failures', 'typed public contracts, comments, size and isolated tests']},
+        'node_shared_byte_qualification': {'receipt': size_binding, 'before_sha256': sha(before), 'after_sha256': sha(after), 'removed_blank_line': blank_line, 'exact_single_blank_line_mapping_verified': True, 'normalized_executable_ast_equal': True, 'historical_501_line_diagnostic_preserved': True, 'node_suite_not_replayed': True, 'later_composed_final_gates_required': True},
+        'original_review': original, 'original_failed_probe_preserved': old_probe,
+        'open_probes': [], 'remaining_findings': [],
+        'limitations': ['This closes only shared SR1-SR4 and the first Node subset review; full P4-T7 acceptance is pending.', 'The Python/.NET format repairs and central integration were excluded from this step.', 'No predecessor suite was replayed or manifest recaptured; retained 62-stream baseline proof remains referenced by the subset freezes.', 'Registry/CLI exposure remains P4-T9; no host or non-Windows proof is asserted.'],
+        'exact_executed_harness': binding(harness_path), 'task_or_ac_checkoff': False,
+    }
+    json_path = QA / ('p4t7-executor-shared-node-confirmation.' + stamp + '.json')
+    (ROOT / json_path).write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8', newline='\n')
+    md_now = datetime.now(UTC)
+    md_path = QA / ('p4t7-executor-shared-node-confirmation.' + md_now.strftime('%Y-%m-%dT%H-%M') + '.md')
+    lines = ['# P4-T7 shared repair confirmation and Node review', '',
+             'Timestamp: ' + md_now.strftime('%Y-%m-%dT%H-%M'), 'Published UTC: ' + md_now.isoformat(),
+             'Command: `poetry run python SCRATCH/issue-980-p4t7-shared-node-confirmation.py`', 'EXIT_CODE: 0', '',
+             'Output Summary: SHARED_REPAIR_CONFIRMED_NODE_REVIEW_CLEAR. Shared SR1-SR4 are closed within the frozen scope; Node has no new finding. No probe remains open.', '',
+             'The five retained adversarial version inputs complete as unsupported, the original UTF-8 over-capacity case makes no encoding allocation and refuses partial results, and all wildcard controls have the required category. Public signatures and moved-object import identities match. Typed contracts and the 500-line ceiling are satisfied.', '',
+             'Reused proof: shared 191 cases (152 retained plus 39 added), 275/275 statements, 142/142 branches, 24 ranges; Node 111 cases, 103/103 statements, 52/52 branches, eight ranges. No suite replay occurred.', '',
+             'Node used the preceding 501-line shared stream. Its only difference is the qualified blank line removed inside a docstring; exact before/after hashes and executable AST equality are independently verified. The earlier size diagnostic remains preserved. Composed final gates will bind the final current streams.', '',
+             'Python/.NET repairs, central integration and full task acceptance remain pending. No source, test, checkpoint, Git, task checkbox or acceptance criterion was changed.', '',
+             'Exact bindings and retained probe observations: `' + json_path.as_posix() + '`.']
+    (ROOT / md_path).write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+    print(json.dumps({'status': result['status'], 'artifacts': [binding(json_path), binding(md_path), binding(harness_path)], 'remaining_findings': []}, indent=2))
+
+
+if __name__ == '__main__':
+    main()

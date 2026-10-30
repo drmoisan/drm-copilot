@@ -1,0 +1,79 @@
+{
+  "note": "Canonical sources and focused contract test only; no predecessor suite replay. Existing bytes captured losslessly where present.",
+  "head": "59b322c528ade7d8a7a1a2d9c748182f290677d1",
+  "scope": [
+    {
+      "exists": false,
+      "path": ".github/skills/inventory-legacy-system/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/extract-feature-contract/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/characterize-runtime-behavior/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/reconcile-parity-matrix/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/review-discovery-coverage/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/adjudicate-unspecified-behavior/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/generate-acceptance-scenarios/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/initialize-discovery-workspace/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/validate-discovery-artifacts/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/discovery-workflow/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/discovery-repo-inventory/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/discovery-coverage-ledger/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/discovery-runtime-characterization/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/discovery-parity-matrix/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/discovery-behavior-reconciliation/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": ".github/skills/discovery-validate-artifacts/SKILL.md"
+    },
+    {
+      "exists": false,
+      "path": "tests/scripts/dev_tools/test_discovery_workflow_contracts.py"
+    }
+  ],
+  "authority": "source_inspection_p7t2_tests_20261021T175800",
+  "retained_preparation": "evidence/other/p7-service-interface-delta.2026-10-20T17-14.md",
+  "task": "P7-T2",
+  "accepted_predecessor": "59b322c528ade7d8a7a1a2d9c748182f290677d1",
+  "status": "BASELINE_FROZEN"
+}

@@ -1,0 +1,51 @@
+{
+  "Timestamp": "2026-10-21T06-32",
+  "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short tests/discovery_runtime/test_service_boundaries.py::test_reversed_source_line_range_is_rejected_before_inspection",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "-vv",
+    "--tb=short",
+    "tests/discovery_runtime/test_service_boundaries.py::test_reversed_source_line_range_is_rejected_before_inspection"
+  ],
+  "EXIT_CODE": 0,
+  "elapsed_seconds": 7.186387,
+  "input_hashes_before": {
+    "tests/discovery_runtime/test_service_boundaries.py": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea"
+  },
+  "input_hashes_after": {
+    "tests/discovery_runtime/test_service_boundaries.py": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_reversed_source_line_range_is_rejected_before_inspection",
+      "outcome": "PASSED"
+    }
+  ],
+  "streams": {
+    "stdout": {
+      "base64": "PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gdGVzdCBzZXNzaW9uIHN0YXJ0cyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KcGxhdGZvcm0gd2luMzIgLS0gUHl0aG9uIDMuMTMuMTIsIHB5dGVzdC05LjAuMiwgcGx1Z2d5LTEuNi4wIC0tIEM6XFVzZXJzXERhbk1vaXNhblxyZXBvc1xkcm0tY29waWxvdC13dFwyMDI2LTEwLTE3VDIyLTMwXC52ZW52XFNjcmlwdHNccHl0aG9uLmV4ZQ0Kcm9vdGRpcjogQzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzANCmNvbmZpZ2ZpbGU6IHB5cHJvamVjdC50b21sDQpwbHVnaW5zOiBhbnlpby00LjEyLjEsIGNvdi03LjAuMA0KY29sbGVjdGluZyAuLi4gY29sbGVjdGVkIDEgaXRlbQ0KDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9yZXZlcnNlZF9zb3VyY2VfbGluZV9yYW5nZV9pc19yZWplY3RlZF9iZWZvcmVfaW5zcGVjdGlvbiBQQVNTRUQgWzEwMCVdDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSAxIHBhc3NlZCBpbiA2Ljc3cyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCg==",
+      "sha256": "8183f8aa2279e84884bf7b7057a432553a9eed3e770570885432d03e9d18c5e4",
+      "bytes": 604
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

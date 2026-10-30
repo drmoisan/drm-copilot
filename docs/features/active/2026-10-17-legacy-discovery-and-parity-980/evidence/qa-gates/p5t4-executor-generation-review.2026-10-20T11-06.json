@@ -1,0 +1,378 @@
+{
+  "task": "P5-T4",
+  "status": "CONSOLIDATED_FINDINGS_COMPLETE_REPAIR_REQUIRED",
+  "published_at_utc": "2026-10-20T11:06:50.329272+00:00",
+  "authority": {
+    "route": "atomic_execution_p5t4_generation_review_20261020",
+    "phase": "S5_P5T4_generation_review",
+    "agent": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "max",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_launch_authority": "Verified in this review before work; no fallback or redelegation."
+  },
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "sha256": "b0ffeacb101d240d9c6585f3ae9b4d973ebf75030f0d09a998ed14b6a63287af",
+      "bytes": 19848,
+      "git_lf_sha256": "b0ffeacb101d240d9c6585f3ae9b4d973ebf75030f0d09a998ed14b6a63287af"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "sha256": "0edcab9fd33f17f85127d86aab89ea60868a1cb23d49eee7647418414e1562d0",
+      "bytes": 21406,
+      "git_lf_sha256": "0edcab9fd33f17f85127d86aab89ea60868a1cb23d49eee7647418414e1562d0"
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "sha256": "85c334d7e66841b1b45f73bc57af517f3b7d8c67187412a572f490b6bee2043f",
+      "bytes": 17448,
+      "git_lf_sha256": "85c334d7e66841b1b45f73bc57af517f3b7d8c67187412a572f490b6bee2043f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "sha256": "bc7dfa0ff12f5cc68355f35dc60ef575b1d806d7345dc7249aa8b803a99be308",
+      "bytes": 16959,
+      "git_lf_sha256": "bc7dfa0ff12f5cc68355f35dc60ef575b1d806d7345dc7249aa8b803a99be308"
+    }
+  ],
+  "references": {
+    "contract": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+      "sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51",
+      "bytes": 13811,
+      "git_lf_sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51"
+    },
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+      "sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3",
+      "bytes": 6948,
+      "git_lf_sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3"
+    },
+    "accepted_model_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json",
+      "sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea",
+      "bytes": 11394,
+      "git_lf_sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea"
+    },
+    "static_binding": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-focused8-pyright.2026-10-20T10-51.json",
+      "sha256": "ec90114b8e842782ffa9f6a818d2966557bf38f5291d038c64968053050766d0",
+      "bytes": 5430,
+      "git_lf_sha256": "ec90114b8e842782ffa9f6a818d2966557bf38f5291d038c64968053050766d0"
+    },
+    "stopped_behavior": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-focused8-tests.2026-10-20T10-55.json",
+      "sha256": "5f1a90831ec9d8d24fb3a48b6caeffa8837790972e4cecf495c874ad97808de7",
+      "bytes": 17221,
+      "git_lf_sha256": "5f1a90831ec9d8d24fb3a48b6caeffa8837790972e4cecf495c874ad97808de7"
+    },
+    "behavior_raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-focused8-tests-raw.2026-10-20T10-55.json",
+      "sha256": "f6d397398b954131eee183d4023d5c18a8afc10f2aefc605e2758225a9883df0",
+      "bytes": 6327,
+      "git_lf_sha256": "f6d397398b954131eee183d4023d5c18a8afc10f2aefc605e2758225a9883df0"
+    }
+  },
+  "proof_reuse": "Accepted model review/70-case proof and accepted public rule interfaces are reused without source re-review or suite replay. This review covers only the two new generation/context modules and their two frozen tests.",
+  "owner_gates": {
+    "format": "PASS",
+    "lint": "PASS",
+    "scoped_types": "PASS",
+    "test_population": 45,
+    "passed": 25,
+    "failed": 3,
+    "unexecuted": 17,
+    "stopped_on": "maxfail=3",
+    "timeout": false,
+    "harness_seconds": 214.574392,
+    "scope_before_after_equal": true,
+    "coverage_status": "Stopped-run coverage is diagnostic; no complete module/per-unit acceptance claimed."
+  },
+  "independent_probe": {
+    "executed_once": true,
+    "command": "poetry run python SCRATCH/issue-980-p5t4-selector-probe.py",
+    "exit_code": 0,
+    "result": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-probe.2026-10-20T11-06.json",
+      "sha256": "f55c4f27a4952e83d7126e5e5f556bcb3cb2cd5b39682912c6feb73a1b1a3ef5",
+      "bytes": 2425,
+      "git_lf_sha256": "f55c4f27a4952e83d7126e5e5f556bcb3cb2cd5b39682912c6feb73a1b1a3ef5"
+    },
+    "harness": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-probe-harness.2026-10-20T11-06.txt",
+      "sha256": "57c5c8f398f18fd1dcef0077b60be00cd9c5527f17e04d16fc1c209ee60d2b76",
+      "bytes": 5774,
+      "git_lf_sha256": "57c5c8f398f18fd1dcef0077b60be00cd9c5527f17e04d16fc1c209ee60d2b76"
+    },
+    "elapsed_time_assertion": false
+  },
+  "cleared_properties": [
+    "Source and target ownership remain explicit; no fallback client/mode or implementation AC mutation is introduced.",
+    "Immutable original-byte references and accepted source/decision digest API are used, with final provenance composition proof still required by GT2.",
+    "Decision, dimension, evidence, revision and acceptance authority comes from existing public rule interfaces.",
+    "At most two whole-batch prospective acceptance passes; final public ready membership and retained blocking findings gate result.ready.",
+    "Output bytes/records, prospective manifest paths and exact identity conflicts have explicit fail-closed handling.",
+    "No I/O or publication is performed by the generator; tests use memory snapshots and accepted catalog fixtures."
+  ],
+  "findings": [
+    {
+      "id": "GR1",
+      "severity": "blocking",
+      "kind": "resource",
+      "title": "Reserve repeated identifier text comparisons before coordinate expansion",
+      "locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+          "lines": [
+            355,
+            375,
+            377,
+            381
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "identifier_characters": 32,
+          "platform_count": 16,
+          "mode_count": 16,
+          "coordinate_count": 256,
+          "remaining_work_before": 7000,
+          "charged_work": 1314,
+          "equal_calls": 256,
+          "equal_characters": 8192,
+          "hash_calls": 256,
+          "candidate_count": 0,
+          "returned_without_limit_error": true
+        },
+        {
+          "identifier_characters": 4096,
+          "platform_count": 16,
+          "mode_count": 16,
+          "coordinate_count": 256,
+          "remaining_work_before": 7000,
+          "charged_work": 1314,
+          "equal_calls": 256,
+          "equal_characters": 1048576,
+          "hash_calls": 256,
+          "candidate_count": 0,
+          "returned_without_limit_error": true
+        },
+        {
+          "identifier_characters": 4096,
+          "platform_count": 32,
+          "mode_count": 32,
+          "coordinate_count": 1024,
+          "remaining_work_before": 7000,
+          "charged_work": 5186,
+          "equal_calls": 1024,
+          "equal_characters": 4194304,
+          "hash_calls": 1024,
+          "candidate_count": 0,
+          "returned_without_limit_error": true
+        }
+      ],
+      "cause": "The per-criterion product reservation depends on selector element counts, not identifier lengths. Public criterion_applies rebuilds selector sets and compares the positive client selector on every coordinate before a later platform mismatch. No candidate is produced, so output text reservations never account for these repeated comparisons. Initial input-byte reservation is one-time and does not grow with this product.",
+      "qualification": "Isolated actual _Generation.expand with real immutable record/criterion/requirements and public criterion_applies. Call-local context/client seams supply already-assessed values; no whole-snapshot or suite execution. CountedIdentifier delegates str equality/hash unchanged. Equal-character counts are the summed lengths of compared equal strings, not elapsed time or a claim about CPU instructions. Input text hashing may be cached; the observed repeated positive equality still compares equal distinct strings. The positive client match is followed by a platform mismatch, so no output copy or serialized-output reservation can cover this repeated text work.",
+      "required_change": "Reserve a conservative aggregate text-comparison/hash/traversal bound before the product, or eliminate repeated work with a prospectively bounded selection stage that preserves public applicability semantics. Include a deterministic long-identifier negative with zero candidates, a sufficient-capacity positive control, and rejection before counted comparisons when capacity is short. Do not use elapsed-time assertions."
+    },
+    {
+      "id": "GT1",
+      "severity": "blocking",
+      "kind": "test-fixtures",
+      "title": "Repair invalid fixture inputs without weakening existing schema or decision rules",
+      "locations": [
+        {
+          "path": "tests/discovery_runtime/test_acceptance_generation.py",
+          "lines": [
+            428,
+            438,
+            441
+          ]
+        },
+        {
+          "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+          "lines": [
+            42,
+            59,
+            94,
+            100,
+            272,
+            331
+          ]
+        }
+      ],
+      "observed_failures": [
+        {
+          "node_suffix": "test_empty_actual_population_does_not_create_fallback_scenarios[no-modes]",
+          "cause": "Configured ProfileV2 required_modes=[] violates domain-profile.schema.json:94 before generation.",
+          "repair": "Use valid configured modes with an explicitly empty eligible intersection, or retain the invalid constructor case as an expected ProfileError. Do not invent a mode or permit an invalid configured profile."
+        },
+        {
+          "node_suffix": "test_only_current_approved_scoped_policy_can_supply_target_expectations[approved]",
+          "cause": "The decision fixture approval owner-alpha is absent from profile decision_owners, which contains owner-example. Public decision approval correctly withholds target Then.",
+          "repair": "Bind approval to an actual configured owner while preserving timestamp, separate decision evidence and scoped approval checks."
+        },
+        {
+          "node_suffix": "test_linked_scenarios_discriminate_ids_without_replacing_criterion_expectations",
+          "cause": "observation() leaves result_status=observed but replaces runs with an empty list; runtime schema requires at least one run.",
+          "repair": "Retain a real observed run and coherently rebind its environment and run/pre/post evidence to the captured fixture. Do not weaken the observed schema or manufacture execution success."
+        }
+      ],
+      "unexecuted_invalid_setups": [
+        "test_mobile_and_custom_modes_follow_actual_configuration sets criterion.modes=[]",
+        "test_two_complete_rule_passes_are_independent_of_candidate_count sets criterion.modes=[]"
+      ],
+      "required_change": "Replace those empty criterion lists with explicit valid configured mode selectors; feature-contract.schema.json:123 requires at least one. Preserve the assertions' original mobile/custom-mode and two-batch intent. Preserve the stopped run and all 17 unexecuted identities."
+    },
+    {
+      "id": "GT2",
+      "severity": "blocking",
+      "kind": "critical-proof-gap",
+      "title": "Exercise imported source provenance with a distinct target owner",
+      "locations": [
+        {
+          "path": "tests/discovery_runtime/test_acceptance_generation.py",
+          "lines": [
+            91,
+            116,
+            184
+          ]
+        }
+      ],
+      "cause": "The primary target fixture combines local source/target ownership; its owner assertion equals the same source pin. It cannot detect replacing the imported original path/pin/hash with local storage identity or assigning the generated target artifact to its source repository.",
+      "required_change": "Add one compact in-memory control with distinct source and target repository IDs/pins, imported storage path different from origin_path, and exact captured raw bytes. Assert target artifact ownership, source_contract_refs original path/revision/raw SHA, exact source identity, public final ready membership and input immutability."
+    },
+    {
+      "id": "PC1",
+      "severity": "blocking",
+      "kind": "intent-contract",
+      "title": "Complete the finite changed-scope intent contracts",
+      "policy": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
+      "policy_requirements": [
+        "Every function/method documents return meaning/shape (None for procedures), contract errors and side effects.",
+        "Nontrivial loops/comprehensions have an immediately preceding intent comment.",
+        "Nontrivial branching has a decision-logic comment."
+      ],
+      "docstring_locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+          "lines": [
+            135,
+            141
+          ],
+          "change": "candidate: state None return, local candidate/collision/budget mutations, optional FeatureObligation/ClientProfile and nullable platform types."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+          "lines": [
+            141,
+            144
+          ],
+          "change": "blocked: replace the inaccurate no-effects claim with local work-budget consumption and possible ReportLimitError."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+          "lines": [
+            210,
+            218
+          ],
+          "change": "linked: state tuple-of-ArtifactRecord return shape and local budget consumption/ReportLimitError rather than an unqualified no-mutation claim."
+        }
+      ],
+      "intent_locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+          "lines": [
+            167,
+            213,
+            296
+          ],
+          "change": "Explain scenario-versus-contract action selection, explicit mobile/default classification, and whole conflicting-identity rejection."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+          "lines": [
+            356,
+            361,
+            370
+          ],
+          "change": "Immediately explain waived-coordinate filters and prospective selector-cost aggregation."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+          "lines": [
+            234,
+            283,
+            405,
+            469
+          ],
+          "change": "Explain physical-link comparison, source-versus-generic reference wire shape, derived-report exclusion in the prospective index, and final ready filtering."
+        },
+        {
+          "path": "tests/discovery_runtime/test_acceptance_generation.py",
+          "lines": [
+            250,
+            372,
+            438
+          ],
+          "change": "Explain the content/revision/raw-byte routing, integrity-corruption routing, and valid empty-population routing."
+        },
+        {
+          "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+          "lines": [
+            82,
+            167,
+            172,
+            264,
+            401
+          ],
+          "change": "Explain inactive-policy handling, exact policy selection/conflict routing, mobile source selection, and source reference selection for the capacity check."
+        }
+      ],
+      "required_change": "Apply these bounded comments/docstrings while preserving assertions and executable semantics except the separately authorized GR1/fixture repairs. All four current files are below 500 lines; preserve that limit, using only a coordinator-approved split if necessary."
+    }
+  ],
+  "open_behavioral_probes": [],
+  "approved_repair_prerequisite": {
+    "path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+    "authorization": "Coordinator approved the absent test-only path during this review.",
+    "scope": "Move existing selector/capacity/two-pass controls with explicit old/new node mapping and unchanged behavioral assertions; add GR1 counted controls there. The two production modules and accepted model scope remain unchanged in ownership."
+  },
+  "remaining_before_candidate_acceptance": [
+    "Coordinator-released finite GR1/GT1/GT2/PC1 repair and exact original-to-repaired bindings.",
+    "Focused counted/fixture controls followed by the required complete clean ordered scoped sequence.",
+    "Full executed node list, actual changed/relocated/new per-range coverage, <=500-line and frozen dependency proof."
+  ],
+  "plan_checkoffs": "None; P5-T4 and all later tasks remain pending.",
+  "next_five": [
+    {
+      "id": "P5-T4",
+      "task": "Generate stable ready or pending acceptance records."
+    },
+    {
+      "id": "P5-T5",
+      "task": "Render traceable Markdown and executable-ready Gherkin only."
+    },
+    {
+      "id": "P6-T1",
+      "task": "Expose the versioned Python service and fixed gateway."
+    },
+    {
+      "id": "P6-T2",
+      "task": "Register every required noninteractive console command."
+    },
+    {
+      "id": "P6-T3",
+      "task": "Finish safe legacy entry-point compatibility and remove checkout coupling."
+    }
+  ],
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-raw.2026-10-20T11-06.json",
+    "sha256": "1e0ae92a6da437b2c9f684b852a0efdc80d87625e0491ad639529d853de31456",
+    "bytes": 42908,
+    "git_lf_sha256": "1e0ae92a6da437b2c9f684b852a0efdc80d87625e0491ad639529d853de31456"
+  }
+}

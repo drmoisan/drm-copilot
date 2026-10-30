@@ -1,0 +1,136 @@
+{
+  "Timestamp": "2026-10-20T03-47",
+  "Command": "Read frozen P5-T1 producer sources; .venv/Scripts/python.exe SCRATCH/issue-980-p5t1-producer-probes.py",
+  "EXIT_CODE": 1,
+  "Output Summary": "CHANGES_REQUIRED: complete producer-only finding set PR1-PR4; no open behavioral probes.",
+  "task": "P5-T1",
+  "status": "PRODUCER_SOURCE_REVIEW_CHANGES_REQUIRED",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "sha256": "f1da578149f69f9353e2f286d108a4ba6f5cefc255210c31f2fe7cb1d773fadc",
+      "bytes": 14810,
+      "physical_lines": 359
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "sha256": "1b716c64b0dea1a41bb49fa079932af138b37b136ec22ea19a2adcb004841f74",
+      "bytes": 12062,
+      "physical_lines": 272
+    }
+  ],
+  "routing": {
+    "delegation_id": "atomic_execution_p5t1_frozen_producer_source_review_20261020",
+    "phase": "S5_P5T1_frozen_producer_source_review",
+    "profile": "atomic-executor-c4",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "model": "gpt-6-astra",
+    "reasoning": "max",
+    "native_routing_launch_provenance_verified": true
+  },
+  "plan": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+  "requirements": "P5-T1; spec.md generated reports section and Coverage required-fields row",
+  "findings": [
+    {
+      "id": "P5-T1-PR1",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "lines": [
+        172,
+        195,
+        203,
+        208
+      ],
+      "title": "Absent ledger erases known inventory and scope populations",
+      "actual": "Two known scope-selected inventory components yield total/inventoried/missing_ledger=2/2/2 with an empty ledger, but 0/0/0 when only the ledger artifact is removed. population_state remains available; the accepted COVERAGE_LEDGER finding is still visible.",
+      "impact": "Incomplete discovery is reported as zero components rather than known undispositioned work. The overall failure blocker does not make these counts accurate.",
+      "required_change": "Retain populations established by trusted scope/inventory independently of ledger rows where accepted interfaces permit; otherwise explicitly mark the affected population unavailable instead of asserting zero. Preserve missing-ledger blockers, trusted ownership and selection rules without fabricated ledger authority.",
+      "regression": "Compare an empty ledger with an absent ledger against the same captured nonempty inventory and scope. Include missing/ambiguous scope controls and preserve null percentages for unavailable or zero denominators."
+    },
+    {
+      "id": "P5-T1-PR2",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "lines": [
+        156,
+        174
+      ],
+      "title": "Scope-selection reservation omits repeated selector work",
+      "actual": "64 components and 1,024 roots pass preflight and perform 66,560 actual root comparisons with work capacity 32,768; collect charges only 897 and returns. At 16/128 roots, comparisons are 1,040/8,320 while the same 897 units are charged.",
+      "impact": "Configured aggregate work limits do not bound the repeated accepted scope query invoked by the new producer.",
+      "required_change": "Reserve the complete repeated scope-selection workload prospectively, including root/selector and relevant exclusion/diagnostic membership terms, or use an equivalently bounded shared query result. Reject before traversing work beyond the available budget, without partial report output. Keep accepted validation semantics unchanged.",
+      "regression": "Use deterministic counted root/path work and pre-call rejection guards across increasing selectors; do not use elapsed-time thresholds."
+    },
+    {
+      "id": "P5-T1-PR3",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "lines": [
+        115,
+        136,
+        288,
+        309
+      ],
+      "title": "Required runtime observed/verified/missing distinctions are incomplete",
+      "actual": "The projection exposes component required/supported/undetermined counts, supported scenario/feature totals and authored result_counts, but has no explicit missing or evidence-backed verified runtime count. The owner confirmed there is no approved waiver for the specification fields.",
+      "impact": "Consumers cannot read the required runtime coverage distinctions directly, and authored passed status must not substitute for verified proof.",
+      "required_change": "Add explicit, documented runtime required/observed/verified/missing measures with named units and denominators. Missing must include selected nonexcluded runtime-required components without supported source proof; verification must remain distinct from observed support and must not be inferred from authored passed alone.",
+      "regression": "Cover required components without scenarios, observed proof, valid verified claims, authored passed without usable proof, duplicate runs and unknown requirements. Keep feature, component and scenario units separate."
+    },
+    {
+      "id": "P5-T1-PR4",
+      "severity": "blocking-policy",
+      "paths": {
+        "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": [
+          "CoveragePopulation.__init__"
+        ],
+        "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": [
+          "_CoverageProjection.__init__",
+          "coverage_summary"
+        ]
+      },
+      "rule": ".agents/skills/self-explanatory-code-commenting/SKILL.md: Mandatory Function and Method Docstrings",
+      "actual": "These contracts refer collectively to typed snapshot/rule results or assessments but do not state the explicit parameter types and meanings for the snapshot/index/evidence/claims/dimensions inputs. Annotations do not replace the required docstring parameter contract.",
+      "required_change": "Expand only the named constructor/composition docstrings with concise parameter types, meanings and accepted-assessment provenance; preserve existing no-authority/no-I/O and failure contracts."
+    }
+  ],
+  "open_probes": [],
+  "probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-probes.2026-10-20T03-47.json",
+    "sha256": "29ff98234455993fbcdb2242d41929e6c4d05cec09d8854ca3b02edf788ed761",
+    "bytes": 7608
+  },
+  "exact_payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-probes-payload.2026-10-20T03-47.json",
+    "sha256": "f2b0f0dba4fec41f83981fc19cfbd3d0e474a073b7cdfe8293d2794013d1a192",
+    "bytes": 56262
+  },
+  "retained_proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+      "sha256": "db5f95182b86745dbf345e2acab31e038804e7919cb2f115f9cf78bf664b370f",
+      "bytes": 18320
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-repair-confirmation.2026-10-20T03-30.json",
+      "sha256": "fb25f0e49056abadb87213a488d54ada7643f24413e635c050f9d6a69f712977",
+      "bytes": 4838
+    }
+  ],
+  "cleared_source_properties": [
+    "No I/O, execution or publication in the two producer modules.",
+    "Captured repository/pin ownership is used for source identities.",
+    "Evidence availability, authored confidence and verified feature claims are distinct.",
+    "Duplicate ledger identities, unjustified exclusions and missing rows remain visible when a resolvable ledger population exists.",
+    "Required unique features and feature/client obligations are separate counts.",
+    "Immutable JSON is the Markdown source through the accepted helper; ratios retain null zero-denominator percentages.",
+    "Output ordering and integer/set aggregation are deterministic; no report timestamps are invented.",
+    "Report/completion digest and full validator nonrecursion remain the separate integration owner's pending proof, not asserted here.",
+    "Both reviewed production files are below 500 physical lines."
+  ],
+  "excluded": "Moving graph tests and validator candidate; accepted helper/predecessor implementation re-review; final toolchain and whole-task acceptance.",
+  "behavioral_suites_replayed": false,
+  "source_test_modified": false,
+  "task_or_ac_checkoffs": false,
+  "next_step": "Coordinator may authorize a bounded producer repair after this immutable receipt; final composed review waits for frozen graph and caller tests."
+}

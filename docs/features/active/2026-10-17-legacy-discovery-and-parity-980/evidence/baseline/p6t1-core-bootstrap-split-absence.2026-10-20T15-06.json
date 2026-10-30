@@ -1,0 +1,17 @@
+{
+  "task": "P6-T1",
+  "observed_at": "2026-10-20T15:06:53.724393+00:00",
+  "approved_path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+  "absent": true,
+  "shared_baseline": {
+    "path": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+    "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+  },
+  "prior_split": "evidence/baseline/p6t1-core-inspection-split-absence.2026-10-20T14-55.json",
+  "source_before_split": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+    "sha256": "8a37c61cbcfc5ea0de0e9497d04ec95cb14911e406c3d92d2e4d37ca77bec42f",
+    "formatted_lines": 487
+  },
+  "scope": "Only init/configure/migrate and physical-input/result mapping; existing two service test modules; no new operation."
+}

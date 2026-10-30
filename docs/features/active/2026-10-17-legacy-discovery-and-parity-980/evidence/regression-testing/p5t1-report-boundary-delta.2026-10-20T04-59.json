@@ -1,0 +1,201 @@
+{
+  "baseline": {
+    "bytes": 38794,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.json",
+    "sha256": "d82d917a2db50d3b6bcf808a2fb2f7726b7f5598bf11310b161eeecf8c7fa5a8"
+  },
+  "binder_qualification": "Two evidence-only attempts failed before artifact writes: the first expected two comprehension filters instead of one Boolean conjunction; the second decoded the existing Unicode test fixture using the Windows default encoding. The corrected binder removes the second conjunction operand and explicitly reads UTF-8. Both rejected scripts and UTF-8 transcriptions of their tool diagnostics are archived. No source, test, or completed gate changed.",
+  "coverage_qualification": "This nine-case proof measures the changed predicate only. The predecessor full-module142/142 statement and78/78 branch proof is historical; affected final scope and caller coverage must be re-established by the final owner.",
+  "focused_inventory_range": {
+    "end": 276,
+    "executed_branches": [
+      [
+        163,
+        164
+      ],
+      [
+        163,
+        242
+      ],
+      [
+        171,
+        180
+      ],
+      [
+        183,
+        191
+      ],
+      [
+        191,
+        228
+      ],
+      [
+        228,
+        163
+      ],
+      [
+        242,
+        249
+      ],
+      [
+        259,
+        270
+      ],
+      [
+        270,
+        -157
+      ],
+      [
+        270,
+        271
+      ]
+    ],
+    "executed_lines": [
+      157,
+      161,
+      162,
+      163,
+      164,
+      165,
+      171,
+      180,
+      181,
+      182,
+      183,
+      191,
+      228,
+      242,
+      249,
+      259,
+      270,
+      271
+    ],
+    "missing_branches": [
+      [
+        171,
+        174
+      ],
+      [
+        183,
+        184
+      ],
+      [
+        191,
+        192
+      ],
+      [
+        193,
+        194
+      ],
+      [
+        193,
+        195
+      ],
+      [
+        195,
+        196
+      ],
+      [
+        195,
+        202
+      ],
+      [
+        203,
+        204
+      ],
+      [
+        203,
+        216
+      ],
+      [
+        205,
+        210
+      ],
+      [
+        205,
+        216
+      ],
+      [
+        216,
+        191
+      ],
+      [
+        216,
+        221
+      ],
+      [
+        228,
+        229
+      ],
+      [
+        230,
+        228
+      ],
+      [
+        230,
+        236
+      ],
+      [
+        242,
+        -157
+      ],
+      [
+        259,
+        260
+      ],
+      [
+        260,
+        259
+      ],
+      [
+        260,
+        269
+      ]
+    ],
+    "missing_lines": [
+      174,
+      184,
+      192,
+      193,
+      194,
+      195,
+      196,
+      202,
+      203,
+      204,
+      205,
+      210,
+      216,
+      221,
+      229,
+      230,
+      236,
+      260,
+      269
+    ],
+    "start": 157
+  },
+  "focused_predicate_executed_lines": [
+    249
+  ],
+  "focused_predicate_missing_lines": [],
+  "inventory_delta": "Removing the single added expected-input predicate restores the original _inventory AST exactly.",
+  "original_test_function_count": 8,
+  "original_test_functions_unchanged": true,
+  "source": {
+    "bytes": 16758,
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+    "sha256": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02"
+  },
+  "source_diff": "--- before/coverage_scope_rules.py\n+++ after/coverage_scope_rules.py\n@@ -245,10 +245,15 @@\n         and selection.scope.artifact.repository.revision\n         == snapshot.profile.repository.revision\n     ):\n+        # Generated report views are outputs; authored documentation remains input.\n         expected = {\n             file.path\n             for file in snapshot.manifest.files\n             if file.category in {\"source\", \"test\", \"documentation\"}\n+            and not (\n+                file.category == \"documentation\"\n+                and within_roots(file.path, (snapshot.profile.artifacts[\"reports\"],))\n+            )\n         }\n         # Skipped paths need explicit inventory exclusion records.\n         for path in snapshot.excluded_paths:\n",
+  "task": "P5-T1",
+  "unchanged_functions_normalized_ast": [
+    "object_rows",
+    "strings",
+    "_configuration",
+    "inventory_configuration_digest",
+    "excluded",
+    "_confirmation",
+    "select_coverage_scope"
+  ]
+}

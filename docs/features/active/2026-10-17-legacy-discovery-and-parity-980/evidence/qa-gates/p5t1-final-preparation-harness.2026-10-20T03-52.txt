@@ -1,0 +1,203 @@
+"""Record read-only P5-T1 final verification preparation; execute no suites."""
+
+from __future__ import annotations
+
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+R = "packages/discovery-runtime/src/drm_copilot_discovery/"
+PT = "tests/discovery_runtime/"
+ROUTE = "workspace_operations_p5t1_final_gate_preparation_20261020"
+PROFILE_HASH = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+
+
+def sha(content: bytes) -> str:
+    """Return the SHA-256 identity of supplied bytes without external effects."""
+    return hashlib.sha256(content).hexdigest()
+
+
+def reference(path: Path) -> dict[str, object]:
+    """Read one existing artifact and return its relative identity and size."""
+    content = path.read_bytes()
+    return {"path": path.as_posix(), "sha256": sha(content), "bytes": len(content)}
+
+
+def save(path: Path, content: bytes) -> None:
+    """Create one LF-only preparation artifact without replacing any prior file."""
+    assert not path.exists(), path
+    assert b"\r" not in content
+    assert content.endswith(b"\n") and not content.endswith(b"\n\n")
+    assert all(line.rstrip() == line for line in content.splitlines())
+    path.write_bytes(content)
+
+
+state = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+route = next(item for item in state["codex_model_routing_receipts"] if item["delegation_id"] == ROUTE)
+assert route["profile_sha256"] == PROFILE_HASH
+assert route["model"] == "gpt-6-astra" and route["model_reasoning_effort"] == "max"
+assert sha(Path(route["profile_path"]).read_bytes()) == PROFILE_HASH
+attestation_path = (
+    Path.home()
+    / ".codex/authority/epic-entry"
+    / "0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3"
+    / "01a15153-48ad-74d1-9f2d-e3ad413dafb4"
+    / "codex-routing-attestation.f50a381e7b3554fe77176b5c0429a53b56579adb36427614259db5bc6770a5d6.json"
+)
+attestation = json.loads(attestation_path.read_bytes())
+assert all(attestation[key] is True for key in ("routing_valid", "launch_authority_valid", "provenance_valid"))
+assert attestation["profile_sha256"] == PROFILE_HASH
+baseline_path = FEATURE / "evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json"
+helper_path = FEATURE / "evidence/regression-testing/p5t1-models-freeze.2026-10-20T03-23.json"
+helper = json.loads(helper_path.read_bytes())
+retained = helper["owned_source_test_bindings"]
+assert all(sha(Path(path).read_bytes()) == entry["sha256"] for path, entry in retained.items())
+remaining = [
+    R + "coverage_report.py", R + "coverage_population.py", R + "validation.py",
+    PT + "test_coverage_report.py", PT + "test_coverage_report_contract.py",
+    PT + "test_validation_modes.py", PT + "test_agent_output.py", PT + "test_mutation_plan.py",
+]
+observations = []
+for path in remaining:
+    data = Path(path).read_bytes()
+    observations.append({
+        "path": path, "sha256": sha(data), "physical_lines": len(data.splitlines()),
+        "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+    })
+targets = [
+    "drm_copilot_discovery.coverage_report",
+    "drm_copilot_discovery.coverage_population",
+    "drm_copilot_discovery.validation",
+]
+graph = [PT + "test_coverage_report_contract.py", PT + "test_coverage_report.py"]
+callers = [PT + "test_mutation_plan.py", PT + "test_agent_output.py", PT + "test_validation_modes.py"]
+contracts = [
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+    PT + "test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    PT + "test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+]
+review_path = QA / "p5t1-executor-producer-source-review.2026-10-20T03-47.json"
+review = json.loads(review_path.read_bytes())
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+prefix = "p5t1-final-preparation." + stamp
+snapshot = QA / ("p5t1-final-preparation-harness." + stamp + ".txt")
+harness_bytes = Path(__file__).read_bytes()
+save(snapshot, harness_bytes)
+value = {
+    "Timestamp": stamp,
+    "Command": "poetry run python SCRATCH/issue-980-p5t1-final-preparation.py",
+    "EXIT_CODE": 0,
+    "Output Summary": "Preparation only: no suites, source/test changes, or execution release.",
+    "task": "P5-T1",
+    "status": "PREPARED_AWAITING_REPAIRED_FROZEN_CANDIDATE",
+    "execution_released": False,
+    "task_accepted": False,
+    "authority": {
+        "route": route, "native_attestation_sha256": sha(attestation_path.read_bytes()),
+        "routing_valid": True, "launch_authority_valid": True, "provenance_valid": True,
+        "qualification": "Existing native attestation rechecked against the current profile and fresh route; no new SubagentStart event claimed.",
+    },
+    "baseline": reference(baseline_path),
+    "accepted_baseline_commit": "2920686f68849957d91e2c94f525a32e466d1d8e",
+    "retained_helper_proof": {
+        "freeze": reference(helper_path),
+        "coverage_closure": helper["coverage_closure"],
+        "confirmation": reference(QA / "p5t1-executor-helper-repair-confirmation.2026-10-20T03-30.json"),
+        "checked_commit": "493236fa88374eaee3fc6d12c038f40728c4c665",
+        "source_test_paths": list(retained),
+        "current_hashes_match": True, "tests": 114, "statements": "179/179", "branches": "68/68",
+        "replay_planned": False,
+        "condition": "Reuse while exact helper/legacy bytes and their recorded local dependency closure remain valid.",
+    },
+    "remaining_files": remaining,
+    "observed_not_frozen": observations,
+    "measured_modules": targets,
+    "case_counts": {"graph": None, "callers": None, "distinct_total": None, "reason": "Owners have not frozen complete verbose node populations; no provisional count is authority."},
+    "ordered_stages": [
+        {"number": 1, "name": "format", "argv": ["poetry", "run", "python", "-m", "black", "--check", *remaining]},
+        {"number": 2, "name": "lint", "argv": ["poetry", "run", "python", "-m", "ruff", "check", *remaining]},
+        {"number": 3, "name": "types", "argv": ["poetry", "run", "python", "-m", "pyright"], "scope": "Whole repository using the accepted Poetry environment."},
+        {"number": 4, "name": "architecture-size-isolation", "argv": ["poetry", "run", "python", "SCRATCH/issue-980-p5t1-final-architecture.py"], "status": "Harness adaptation pending final candidate.", "checks": ["All 13 task source/test paths <=500 physical lines; immutable helper evidence retained.", "Only the eight remaining files are checked for new policy/intent/type-contract deltas.", "Pure producers do not import repository tooling or introduce filesystem/process/network operations.", "Five current tests use in-memory seams and no temporary-file/process fixtures.", "No new dependencies, schema changes, policy changes or publication surface."]},
+        {"number": 5, "name": "affected-tests-and-coverage", "batches": [
+            {"name": "graph-reverse", "argv": ["poetry", "run", "python", "-m", "pytest", "-o", "addopts=", "-p", "no:cacheprovider", "-v", *graph, *["--cov=" + item for item in targets], "--cov-branch", "--cov-report=term-missing", "--cov-report=json:SCRATCH/issue-980-p5t1-final-graph-coverage.json"]},
+            {"name": "callers-reverse", "argv": ["poetry", "run", "python", "-m", "pytest", "-o", "addopts=", "-p", "no:cacheprovider", "-v", *callers, *["--cov=" + item for item in targets], "--cov-branch", "--cov-report=term-missing", "--cov-report=json:SCRATCH/issue-980-p5t1-final-callers-coverage.json"]},
+        ], "coverage_data": "Separate COVERAGE_FILE per isolated process; retain both raw streams/databases, then combine only these exact bound databases for final module and named-unit totals.", "node_contract": "Match exact deduplicated owner node sets, including parameter IDs with spaces, and record actual reversed module order. No extra collection/replay is needed for preparation."},
+        {"number": 6, "name": "affected-contracts", "argv": ["poetry", "run", "python", "-m", "pytest", "-o", "addopts=", "-p", "no:cacheprovider", "-v", *contracts], "case_count": 4, "reason": "Existing installed-package/type/coverage and T2-tier contracts apply to the new runtime modules. Report recomputation is covered in the five affected modules. No report schema was added, and no unrelated inventory/parser schema sweep is planned."},
+        {"number": 7, "name": "bounded-native-composition", "argv": ["poetry", "run", "python", "SCRATCH/issue-980-p5t1-final-native.py"], "status": "Operational fixture and executable harness await final producer semantics and release.", "assertions": [
+            "Actual capture_workspace/load_snapshot retains exactly the materialized profile, scope, inventory, ledger and checksummed confirmation evidence.",
+            "The complete configured confirmed-no-scope fixture validates structurally using the actual trusted catalog.",
+            "Public build_coverage_report keeps a justified no-scope result distinct from an unconfigured or uninventoried graph.",
+            "Empty supported populations expose zero named counts and null zero-denominator percentages, including repaired runtime fields and units.",
+            "Public generated document equals report_projection for the same kind, identifier and mode.",
+            "to_dict, parsed to_json, and the exact embedded JSON of to_markdown agree field for field.",
+            "Repeated generation over identical captured inputs is byte-deterministic.",
+            "Generation and validation preserve the immutable snapshot digest and retained input bytes.",
+            "A pre-existing generated report in a separately prepared fixture does not change the semantic report input digest or coverage counts.",
+            "A changed authored input alters semantic identity or yields its actual validation finding; prior report success cannot be retained.",
+            "An authored report with forged counts is rejected by recomputation with REPORT_RESULT rather than accepted as authority.",
+            "A configured uninventoried fixture keeps discovery failure and actionable blockers rather than reporting completion.",
+            "Malformed authored scope bytes yield unavailable coverage populations and retain original structural findings.",
+            "All fixture/source/Git bytes and status remain unchanged during the read-only operation interval; no report publication or mutation commit is attempted.",
+        ], "fixture_preconditions": ["Derive the complete schema-valid seed from validation_test_support.no_scope_snapshot; replace the synthetic repository pin with an actual local fixture commit before preparing linked artifacts.", "All fixture construction is outside the workspace in SCRATCH, before readonly before/after captures. No unit-test filesystem fixture is added.", "Use existing accepted metadata/byte-reader and bounded LocalGitReader contracts; no private loader shortcut or permissive validator.", "Prepare finite positive/derived-report/forged-report/missing-inventory/malformed-input variants before operations, then bind exact files and expected findings.", "This is Windows/Git public composition only, not installed coding-agent host, non-Windows, or publication proof."]},
+    ],
+    "coverage_contract": {
+        "validation_baseline": {"statements": "133/133", "branches": "42/42", "source": "Shared baseline references accepted P2-T9 proof."},
+        "floors": "Each new/changed module/class/callable >=90% lines; every changed production module >=75% branches; no decrease against its applicable baseline; no uncovered changed executable line.",
+        "range_convention": "Bind current AST qualified names/ranges separately from coverage.py named summaries. Raw AST ranges intersect module executable/missing lines and originating branch lines; do not equate them to named-unit summary denominators because declaration exclusions differ.",
+        "raw_range_qualification": reference(QA / "p5t1-executor-helper-checker-qualification.2026-10-20T03-30.json"),
+        "line_mapping": "Map accepted validation qualified units and changed executable lines to the final bytes. Preserve raw coverage rather than manufacturing a declaration-inclusive denominator.",
+        "overall_scope": "Retained helper114 proof plus final remaining graph/caller proof; no repository-wide coverage percentage or whole-feature completion claim.",
+    },
+    "review_prerequisite": reference(review_path),
+    "required_repair_ids": [item["id"] for item in review["findings"]],
+    "regression_binding": "Bind the owners' existing consolidated PR1 population, PR2 counted-work, PR3 runtime-measure and PR4 documentation repairs; this preparation authors no tests or expanded matrix.",
+    "execution_prerequisites": [
+        "Both producer modules repaired under their owner and bounded review confirmation completed.",
+        "Validation owner freezes current source and all three caller tests with exact passing nodes/coverage.",
+        "Graph owner freezes both test modules and exact passing nodes/coverage against the repaired source.",
+        "Eight-file final candidate, helper closure, borrowed fixtures/catalog/schema/config dependencies and executed harnesses are hash-bound.",
+        "Current source/test size and test-isolation checks satisfy the unchanged policy.",
+        "Coordinator explicitly releases the final ordered sequence; stage 7 additionally requires its fixture/harness binding.",
+    ],
+    "evidence_contract": {
+        "harnesses": "Adapt accepted final runner/static/native conventions into new LF-only P5-T1 scratch scripts; snapshot exact executed bytes and never rewrite historical scripts.",
+        "reference_runner": reference(QA / "p4t9-final-gates-harness.2026-10-19T14-04.txt"),
+        "reference_handoff": reference(QA / "p4t9-final-handoff.2026-10-19T14-20.json"),
+        "before_after": "Check exact candidate, borrowed dependency, schema and retained proof hashes before and after every command.",
+        "raw": "Preserve separate stdout/stderr, exit codes, actual UTC command/write times, elapsed durations, exact node order, raw coverage/database and Git attributes/working/index qualifications.",
+        "rendered": "Canonical JSON/Markdown use portable paths, LF and one terminal newline; any necessary raw normalization gets original hash/length and a decode-verified lossless archive.",
+        "failure": "Preserve a failed command/result; consolidate the concrete finding before any authorized correction and required full ordered restart.",
+    },
+    "preparation_harness": reference(snapshot),
+    "suite_execution": False,
+    "source_test_mutations": False,
+    "checkpoint_plan_git_mutations": False,
+}
+json_path, md_path = QA / (prefix + ".json"), QA / (prefix + ".md")
+save(json_path, (json.dumps(value, indent=2, sort_keys=True) + "\n").encode())
+text = f"""# P5-T1 final verification preparation
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-p5t1-final-preparation.py`
+EXIT_CODE: 0
+Output Summary: Prepared only; no suites or source/test mutations. Execution is not released.
+
+The remaining scope is eight files: runtime coverage_report.py, coverage_population.py and validation.py, plus test_coverage_report.py, test_coverage_report_contract.py, test_validation_modes.py, test_agent_output.py and test_mutation_plan.py. The adjacent JSON records exact paths and observed hashes; these are not a frozen execution candidate.
+
+The five committed helper/legacy files match their retained 114-case proof, with 179/179 statements and 68/68 branches. Their checks are reused while exact bytes and the recorded dependency closure remain valid.
+
+The proposed sequence is scoped Black, scoped Ruff, whole-repository Pyright, static architecture/size/isolation, two isolated reversed graph/caller batches with three-module coverage, four exact package/tier contract cases, then 14 bounded public capture/load/report/render/recompute checks. Graph and caller node counts remain explicitly unresolved until their owner receipts are frozen.
+
+The original validation baseline is 133/133 statements and 42/42 branches. Coverage will retain separate AST-range and coverage.py qualified-unit summaries, enforce no-loss/changed-line gates, and make no repository-wide coverage claim.
+
+Execution requires completed PR1-PR4 repair confirmation, exact frozen caller/graph manifests, a final hash-bound candidate and coordinator release. Native composition additionally requires prepared outside-workspace fixtures with actual repository pins. It proves read-only Windows/Git composition, not publication or installed coding-agent host behavior.
+
+Exact scope, commands, contract selectors, composition assertions, prerequisite references and evidence rules: `{json_path.name}`.
+"""
+save(md_path, text.encode())
+print(json.dumps({"status": value["status"], "json": reference(json_path), "markdown": reference(md_path), "harness": reference(snapshot), "suites_run": False, "stage_paths": [p.as_posix() for p in (json_path, md_path, snapshot)]}))

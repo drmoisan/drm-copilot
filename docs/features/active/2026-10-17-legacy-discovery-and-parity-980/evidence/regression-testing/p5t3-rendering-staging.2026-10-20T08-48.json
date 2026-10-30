@@ -1,0 +1,61 @@
+{
+  "Timestamp": "2026-10-20T08-48",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-rendering-observer-supplement.2026-10-20T08-41.json",
+      "sha256": "64b99ab47e4c693080e9370ab288950ae2137a1b8126762caf16e96ec9608d99"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-rendering-gate-harness.2026-10-20T08-45.txt",
+      "sha256": "9ceb6d2dbf96aa0e21f39e0f9edeab09fd311aabd6a5df860033c7538fcb4bba"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering-freeze.2026-10-20T08-45.json",
+      "sha256": "d1ba1c6b9b0692dcdfa910c2f2b69b8c96ad509d0b6e4c5bb63415db864032f2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering1-gates.2026-10-20T08-43.json",
+      "sha256": "435e374cc5eb76132aa01a3a4fad7e8ca78576494200018707c716305e273036"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering2-gates.2026-10-20T08-44.json",
+      "sha256": "8cb8e341dd0bfb75680cb5e4d409f1899cf87ca80334e81e1a0355f74ee02fe4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering3-coverage.2026-10-20T08-44.json",
+      "sha256": "caab3863e8384c2f4b4bcb410be11e17057b722b987fc9fa38cb38711b366dce"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering3-gates.2026-10-20T08-44.json",
+      "sha256": "257888af7f5d7b1cc96b87012d725bcc4c66c2d00426551b26393daee6557510"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2"
+    },
+    {
+      "path": "tests/discovery_runtime/test_report_models.py",
+      "sha256": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3"
+    },
+    {
+      "path": "tests/discovery_runtime/test_report_rendering.py",
+      "sha256": "547573ffd847b5629d73b43c2b3d5bb1fd21868a029b0cc9e93e5cdfd8e249a0"
+    }
+  ],
+  "freeze": "evidence/regression-testing/p5t3-rendering-freeze.2026-10-20T08-45.json",
+  "normalization": {
+    "canonical_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering2-gates.2026-10-20T08-44.json",
+    "change": "Only readable workspace-prefix substitution became case-insensitive. Raw stdout/stderr references/hashes, command, before/after hashes, exit codes, timings and diagnostics unchanged.",
+    "original": "SCRATCH/issue-980-p5t3-rendering2-gates-original.2026-10-20T08-44.json",
+    "original_sha256": "4a458ddc44725b366808565205aeeac264ae8bd0c7afbcfc7f2b9e2bc1504c58",
+    "published_sha256": "8cb8e341dd0bfb75680cb5e4d409f1899cf87ca80334e81e1a0355f74ee02fe4"
+  },
+  "not_included": [
+    "Legacy adapter source/test and legacy baseline remain pending helper integration."
+  ],
+  "status": "independent-rendering-subset-staging-list"
+}

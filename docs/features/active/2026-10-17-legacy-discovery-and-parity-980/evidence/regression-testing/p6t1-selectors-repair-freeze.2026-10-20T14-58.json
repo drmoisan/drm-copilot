@@ -1,0 +1,867 @@
+{
+  "Timestamp": "2026-10-20T14-58",
+  "status": "REPAIR_READY_FOR_BOUNDED_CONFIRMATION_NOT_P6T1_ACCEPTANCE",
+  "finding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-selectors-review.2026-10-20T14-40.json",
+    "sha256": "ef3db7b1e9a32bde92a4e07e0105a5004f941c9fcca2ad6b089fee8493d52888",
+    "bytes": 11347,
+    "physical_lines": 157
+  },
+  "owned": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "bytes": 12432,
+      "physical_lines": 304
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_inventory_selection.py",
+      "sha256": "a4f581f553f99d1b52f3dfed50b6d21d075ed224700fc45b99082e3de4db30cd",
+      "bytes": 16304,
+      "physical_lines": 420
+    }
+  ],
+  "unchanged_registry": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+    "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+    "bytes": 9683,
+    "physical_lines": 232
+  },
+  "scope": "Only returned-identifier consistency: exact str and length1..19 before equality. One property read retained. No claim of publication/security bypass.",
+  "test_count": 40,
+  "nodes": [
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[True]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[False]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[oversized]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[empty]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[non-string]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[subclass]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_valid_injection_reads_identity_and_analyzes_once",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers2]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers1]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers0]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_optional_subset_imports_only_after_complete_consent",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids2]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids1]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[None]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_oversized_selector_is_rejected_before_member_work",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids11]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids10]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[repository]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids8]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids7]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids6]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids5]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids4]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids3]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids2]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids1]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids0]"
+  ],
+  "new_nodes": [
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[empty]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[non-string]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[oversized]",
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[subclass]"
+  ],
+  "population_rationale": "All27 selector tests and all13 pipeline caller tests exercise injected/default/canonical reconstruction paths. Original35 registry/dispatch nodes remain historical unchanged-registry proof, not replayed.",
+  "precheck": "Four malformed-ID controls plus existing one-read/one-analysis control passed before the affected40-case batch.",
+  "ordered_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-format.2026-10-20T14-45.json",
+      "sha256": "e7405a8e064fe7540d1e9eb2be0ff97544c2b0238dea90446586ee6b0fbcb3fb",
+      "bytes": 7875,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-lint.2026-10-20T14-45.json",
+      "sha256": "f7d7eb0810c55ca834ae54f78409df298bb139617706655f9c72faea5fbd1e6f",
+      "bytes": 7745,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-tests.2026-10-20T14-50.json",
+      "sha256": "ab9995f57d2388b160346ced5a4b8770786e5028ca9ec3afa505154c97e65fd8",
+      "bytes": 109409,
+      "physical_lines": 3170
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-types.2026-10-20T14-45.json",
+      "sha256": "3c1c2ee506363dd65316fdfbb1619469376fe38384341ac08a08c49e24390159",
+      "bytes": 8155,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-format.2026-10-20T14-43.json",
+      "sha256": "a377022ac5ee9a4a7ec70f71810b75121f49078e43ecfb2b9adf32a9133a9ebd",
+      "bytes": 7873,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-lint.2026-10-20T14-43.json",
+      "sha256": "83f1c034bc695597a5f7c479c56f92c6640a25b138a20f6b4cf67cc682336ff0",
+      "bytes": 7744,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-tests.2026-10-20T14-44.json",
+      "sha256": "c3d049a3098c158427830c033b5e086e4fc48c48324809fdab3d52855b574089",
+      "bytes": 71258,
+      "physical_lines": 2510
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-types.2026-10-20T14-43.json",
+      "sha256": "1a70b93c358f5be145a23d2ef84d8fb47e9628f8c11bcc47c2ccdea489e2d12a",
+      "bytes": 8156,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-format.2026-10-20T14-52.json",
+      "sha256": "031b66ba8779adff0849e6d38ca5d55852c3cec0da7ae48e2b1e3fba5abd88b6",
+      "bytes": 7875,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-lint.2026-10-20T14-52.json",
+      "sha256": "1e9480f0ec2a743e0b4a86c432aae9c96975dac4de40ecf78e9be668aca0beca",
+      "bytes": 7745,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-tests.2026-10-20T14-58.json",
+      "sha256": "f15f10b2fe7fa5279df78693f23ebfd3e0505648bb3ce04d165e2c37806382ff",
+      "bytes": 102515,
+      "physical_lines": 3170
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-types.2026-10-20T14-52.json",
+      "sha256": "5f0b20a84cb8fafdab7a3fb1b63f3262e09c2001cfb77112248b3bf884b3065a",
+      "bytes": 8155,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-format.2026-10-20T14-51.json",
+      "sha256": "fdaa6c0c488a106880837375748fb1d4c3b608ebe9402eae4df48106ec6e1549",
+      "bytes": 7874,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-lint.2026-10-20T14-51.json",
+      "sha256": "f5132aebb1864c5997f81230a1d436532822bfad7ce33a7f44259b7240c9d923",
+      "bytes": 7745,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-tests.2026-10-20T14-51.json",
+      "sha256": "0627df73178ae948b3ca121f83f90fc34a8085461bce50ed5040346905887c9c",
+      "bytes": 67193,
+      "physical_lines": 2427
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-types.2026-10-20T14-51.json",
+      "sha256": "3c8a0fe5203bb1ab4ee611e1312efbcbde85e386fae40824e7871dde6b3a8998",
+      "bytes": 8156,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-consolidate-format.2026-10-20T14-43.json",
+      "sha256": "1525fbee724a82619be89b8b0dc6516355edc4dc4914383a46c4373b26266d92",
+      "bytes": 8232,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-consolidate-lint.2026-10-20T14-43.json",
+      "sha256": "917abdeec36d0bf4b700e3fad25ca3ddc26ffdc82365e2bb4397b33c6a2c237e",
+      "bytes": 7751,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-initial-archive.2026-10-20T14-50.json",
+      "sha256": "192323b11d87183489981bffab86367f86eb919492eb254d4d4f6ee2a93d8d00",
+      "bytes": 38915,
+      "physical_lines": 19
+    }
+  ],
+  "test_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-tests.2026-10-20T14-58.json",
+    "sha256": "f15f10b2fe7fa5279df78693f23ebfd3e0505648bb3ce04d165e2c37806382ff",
+    "bytes": 102515,
+    "physical_lines": 3170
+  },
+  "duration_seconds": 335.5331901999889,
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py": {
+      "sha256": "a4f581f553f99d1b52f3dfed50b6d21d075ed224700fc45b99082e3de4db30cd",
+      "physical_lines": 420
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": {
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "physical_lines": 293
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": {
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": {
+      "sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "physical_lines": 374
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7",
+      "physical_lines": 405
+    },
+    "tests/discovery_runtime/analyzer/test_pipeline.py": {
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "physical_lines": 353
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": {
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "physical_lines": 166
+    }
+  },
+  "resource_window": {
+    "refresh": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-resource-refresh.2026-10-20T14-35.json",
+      "sha256": "d02cd1a08abc9859fdaecc5a10347253f3aab6f0a5fc0b088337de7cb65e942c",
+      "bytes": 891,
+      "physical_lines": 16
+    },
+    "qualification": "Current generated service-result/manifest and catalog were explicitly instrumented before/after both repaired runs, held by shared owner. They are not claimed equal to the prior resource window."
+  },
+  "pipeline_coverage": {
+    "raw_summary": {
+      "covered_lines": 53,
+      "num_statements": 70,
+      "percent_covered": 73.86363636363636,
+      "percent_covered_display": "74",
+      "missing_lines": 17,
+      "excluded_lines": 29,
+      "percent_statements_covered": 75.71428571428571,
+      "percent_statements_covered_display": "76",
+      "num_branches": 18,
+      "num_partial_branches": 0,
+      "covered_branches": 12,
+      "missing_branches": 6,
+      "percent_branches_covered": 66.66666666666667,
+      "percent_branches_covered_display": "67"
+    },
+    "raw_missing_lines": [
+      112,
+      116,
+      120,
+      121,
+      123,
+      124,
+      126,
+      127,
+      128,
+      130,
+      131,
+      135,
+      143,
+      171,
+      172,
+      173,
+      174
+    ],
+    "raw_missing_branches": [
+      [
+        123,
+        124
+      ],
+      [
+        123,
+        131
+      ],
+      [
+        126,
+        123
+      ],
+      [
+        126,
+        127
+      ],
+      [
+        127,
+        128
+      ],
+      [
+        127,
+        130
+      ]
+    ],
+    "qualified_missing_lines": [],
+    "qualified_missing_branches": [],
+    "named_units": [
+      {
+        "name": "AnalyzerFileSystem",
+        "range": [
+          49,
+          75
+        ],
+        "statements": 6,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "AnalyzerFileSystem.exists",
+        "range": [
+          57,
+          59
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "AnalyzerFileSystem.is_dir",
+        "range": [
+          61,
+          63
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "AnalyzerFileSystem.walk_files",
+        "range": [
+          65,
+          67
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "AnalyzerFileSystem.read_bytes",
+        "range": [
+          69,
+          71
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "AnalyzerFileSystem.write_text",
+        "range": [
+          73,
+          75
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "Analyzer",
+        "range": [
+          78,
+          104
+        ],
+        "statements": 6,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "Analyzer.parse",
+        "range": [
+          88,
+          90
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "Analyzer.classify",
+        "range": [
+          92,
+          94
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "Analyzer.map",
+        "range": [
+          96,
+          98
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "Analyzer.emit",
+        "range": [
+          100,
+          104
+        ],
+        "statements": 1,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "RealAnalyzerFileSystem",
+        "range": [
+          107,
+          145
+        ],
+        "statements": 19,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "RealAnalyzerFileSystem.exists",
+        "range": [
+          110,
+          112
+        ],
+        "statements": 2,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "RealAnalyzerFileSystem.is_dir",
+        "range": [
+          114,
+          116
+        ],
+        "statements": 2,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "RealAnalyzerFileSystem.walk_files",
+        "range": [
+          118,
+          131
+        ],
+        "statements": 10,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "RealAnalyzerFileSystem.read_bytes",
+        "range": [
+          133,
+          135
+        ],
+        "statements": 2,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "RealAnalyzerFileSystem.write_text",
+        "range": [
+          137,
+          145
+        ],
+        "statements": 2,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "run_analyzer",
+        "range": [
+          148,
+          174
+        ],
+        "statements": 5,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "run_inventory",
+        "range": [
+          177,
+          235
+        ],
+        "statements": 15,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      },
+      {
+        "name": "plan_inventory",
+        "range": [
+          238,
+          304
+        ],
+        "statements": 15,
+        "qualified_missing_lines": [],
+        "percent": 100.0
+      }
+    ]
+  },
+  "pipeline_accepted_body_mapping": [
+    {
+      "name": "AnalyzerFileSystem",
+      "current_range": [
+        49,
+        75
+      ],
+      "accepted_range": [
+        48,
+        74
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "3077b6248380ecf89f1f16c87dab01416042b754f8559e87c6ac370713bee779"
+    },
+    {
+      "name": "AnalyzerFileSystem.exists",
+      "current_range": [
+        57,
+        59
+      ],
+      "accepted_range": [
+        56,
+        58
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "1ff49aa5806b242a23d994d1e3009627804ddcf96b5f27d4447a6929e4be4d65"
+    },
+    {
+      "name": "AnalyzerFileSystem.is_dir",
+      "current_range": [
+        61,
+        63
+      ],
+      "accepted_range": [
+        60,
+        62
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "e8b976d072142c79ef3e96510def2745d209f80bc2f594ddca2226e921d3c5a3"
+    },
+    {
+      "name": "AnalyzerFileSystem.walk_files",
+      "current_range": [
+        65,
+        67
+      ],
+      "accepted_range": [
+        64,
+        66
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "fcf2e23c0b334846c29ae638ece5530d5135fe305317e9ee12f4534459743564"
+    },
+    {
+      "name": "AnalyzerFileSystem.read_bytes",
+      "current_range": [
+        69,
+        71
+      ],
+      "accepted_range": [
+        68,
+        70
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "bed205631eabefc68a6c6b2dcb65b6d82373841edfc3a27a92c28dbcd745ffb3"
+    },
+    {
+      "name": "AnalyzerFileSystem.write_text",
+      "current_range": [
+        73,
+        75
+      ],
+      "accepted_range": [
+        72,
+        74
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "bcd5220fd9498b82785ec62506755debc5912c89731f0335ce4cc8923963b32d"
+    },
+    {
+      "name": "Analyzer",
+      "current_range": [
+        78,
+        104
+      ],
+      "accepted_range": [
+        77,
+        103
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "1ec2de92a68fde87017c181ded9abf0a5f0c748e6b59ee27a9abc9cdaa998202"
+    },
+    {
+      "name": "Analyzer.parse",
+      "current_range": [
+        88,
+        90
+      ],
+      "accepted_range": [
+        87,
+        89
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "ccfeee5126b8c10c01ce15b5a965352c474919108130d4dd4a5ed2e9618db95d"
+    },
+    {
+      "name": "Analyzer.classify",
+      "current_range": [
+        92,
+        94
+      ],
+      "accepted_range": [
+        91,
+        93
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "dbe02807fd6a8ba0ea3c8a1031f76a4871a46402ff014dc1f62c8d8c1d864c4e"
+    },
+    {
+      "name": "Analyzer.map",
+      "current_range": [
+        96,
+        98
+      ],
+      "accepted_range": [
+        95,
+        97
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "9eab08739422e8ac2c10761c52c69f1c48635beeec2ee2cfd76a7701ffbd4682"
+    },
+    {
+      "name": "Analyzer.emit",
+      "current_range": [
+        100,
+        104
+      ],
+      "accepted_range": [
+        99,
+        103
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "7ebc5fa75656c1b9f2129454cac7087958ec1e53918ae12d76885d12571a88fa"
+    },
+    {
+      "name": "RealAnalyzerFileSystem",
+      "current_range": [
+        107,
+        145
+      ],
+      "accepted_range": [
+        106,
+        144
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "1ba2a779296759d02907ea9ca0a86fdc231b93cdd2f853f9bda0a0163bca1cda"
+    },
+    {
+      "name": "RealAnalyzerFileSystem.exists",
+      "current_range": [
+        110,
+        112
+      ],
+      "accepted_range": [
+        109,
+        111
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "4fd35bf4163380673e00fb4b1b5cebb44f212a2c099f313d1dc32e731f15af34"
+    },
+    {
+      "name": "RealAnalyzerFileSystem.is_dir",
+      "current_range": [
+        114,
+        116
+      ],
+      "accepted_range": [
+        113,
+        115
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "50ef9edd898ba916974c3490d69dd147bae2b8334eb60905e44cb4c1b7d2c6e6"
+    },
+    {
+      "name": "RealAnalyzerFileSystem.walk_files",
+      "current_range": [
+        118,
+        131
+      ],
+      "accepted_range": [
+        117,
+        130
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "48b557de5be8b5fe2ec4fe50c7b0cbc238ade78c0b9b8648ca67c73be34393de"
+    },
+    {
+      "name": "RealAnalyzerFileSystem.read_bytes",
+      "current_range": [
+        133,
+        135
+      ],
+      "accepted_range": [
+        132,
+        134
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "abb23be82c62867a485130f49fd109f4cc9a93a47e85297ab49c57bc09e364d7"
+    },
+    {
+      "name": "RealAnalyzerFileSystem.write_text",
+      "current_range": [
+        137,
+        145
+      ],
+      "accepted_range": [
+        136,
+        144
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "19fadf25a37ca8b95dab6938f86b609bc7d4c051b820cd3e7c708bff73d56cab"
+    },
+    {
+      "name": "run_analyzer",
+      "current_range": [
+        148,
+        174
+      ],
+      "accepted_range": [
+        147,
+        173
+      ],
+      "accepted_ast_identical": true,
+      "current_ast_sha256": "5950d788cbd5e4b94c51b01c63a4642fff8533a5288d2c65ca66e429e9996a7b"
+    },
+    {
+      "name": "run_inventory",
+      "current_range": [
+        177,
+        235
+      ],
+      "accepted_range": [
+        176,
+        207
+      ],
+      "accepted_ast_identical": false,
+      "current_ast_sha256": "f594afaf175a5efc8bd77275eb92d04f6c42f8135e40fed17a91c828ae8b9b7a"
+    },
+    {
+      "name": "plan_inventory",
+      "current_range": [
+        238,
+        304
+      ],
+      "accepted_range": [
+        210,
+        270
+      ],
+      "accepted_ast_identical": false,
+      "current_ast_sha256": "4fa0da54290eb53cabc25d1a73b2b67be2cc1ad03e706f81cd8f2fae6ce928a9"
+    }
+  ],
+  "retained_unchanged_proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-coverage.2026-10-19T02-49.json",
+      "sha256": "a960cfad811d277b12690c2bc92e8eaccff62c105f908ffd6760affc524ceb23",
+      "bytes": 72291,
+      "physical_lines": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+      "sha256": "20ceec2f6b7a2b9cb3da00b2a7c6e3893df049efd5500ef8e68e5b40fa83d7ad",
+      "bytes": 55234,
+      "physical_lines": 1548
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-pass1-tests.2026-10-20T14-29.json",
+      "sha256": "36e5fb341adc51ccdedbb19903d81244379905fefef04b05c4cea25a56408a6f",
+      "bytes": 127887,
+      "physical_lines": 3672
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-freeze.2026-10-20T14-31.json",
+      "sha256": "a5709cb2c1389d622d14c10f9ed45f8551178c3d5b99015eeca548e56708a487",
+      "bytes": 40454,
+      "physical_lines": 1088
+    }
+  ],
+  "registry_qualification": "Byte-identical registry retains original71-case80/80statement38/38branch proof. Raw registry subset in repaired run remains unmodified.",
+  "test_qualification": "All original assertions/decorators and all test bodies except the approved optional-import observation seam are unchanged. That seam counts the exact requested import, forbids any premature optional import, and tolerates legitimate consented transitive imports. Four new parameter cases added; failed39/40 proof and pre-correction bytes retained. Final40-node execution reverses the earlier population for isolation.",
+  "archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-archive.2026-10-20T14-58.json",
+    "sha256": "71094cbd4b61d747c02b3ea5cf0e234e11c91269a5da4aac939177c737f87d86",
+    "bytes": 19021,
+    "physical_lines": 44
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout, including observed drive-letter case variants",
+    "SCRATCH=task-specific external harness directory"
+  ],
+  "effects": "No Git/checkpoint/plan/AC mutation or delegation.",
+  "route": {
+    "c3_overlay_applied": true,
+    "c3_overlay_reason": "c4_orchestration_ceiling",
+    "complexity_band": "C3",
+    "deployment_agent": "python-typed-engineer-c3-elevated",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "high",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P6T1_analyzer_selector_repair",
+    "delegation_id": "source_inspection_p6t1_selector_repair_20261020",
+    "profile_path": ".codex/agents/python-typed-engineer-c3-elevated.toml",
+    "profile_sha256": "6a4be9ed26fba66f7a437895b20c0b4f2d1534d1a6098c39c9fc796aa64bf363"
+  }
+}

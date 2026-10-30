@@ -1,0 +1,8000 @@
+{
+  "convention": {
+    "current": "Preserve exact raw counters; compare fresh combined coverage to every matching final focused proof.",
+    "qualification": "Task-level proof, not a new repository-wide coverage measurement or feature acceptance.",
+    "retained": "Reference helper44, unchanged ReportBudget/helper114 and unchanged validator bodies only after exact executable-AST identity and line/branch-origin mapping.",
+    "thresholds": "Each module/class/callable at least90% statement coverage; touched module branches at least75%; no lost previously covered behavior; separately named prior proof never alters raw JSON."
+  },
+  "deltas": [
+    {
+      "focused_proofs": [
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-pc1-coverage.2026-10-20T06-33.json",
+          "sha256": "fd7256dad1e375c2c2503738d3638f98d05de95b3cfc82d0255a0a115a16ce6a"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py"
+    },
+    {
+      "focused_proofs": [
+        {
+          "bytes": 116133,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-15.json",
+          "sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py"
+    },
+    {
+      "focused_proofs": [
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-pc1-coverage.2026-10-20T06-33.json",
+          "sha256": "fd7256dad1e375c2c2503738d3638f98d05de95b3cfc82d0255a0a115a16ce6a"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py"
+    },
+    {
+      "focused_proofs": [
+        {
+          "bytes": 116133,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-15.json",
+          "sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py"
+    },
+    {
+      "focused_proofs": [
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-pc1-coverage.2026-10-20T06-33.json",
+          "sha256": "fd7256dad1e375c2c2503738d3638f98d05de95b3cfc82d0255a0a115a16ce6a"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py"
+    },
+    {
+      "focused_proofs": [
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-pc1-coverage.2026-10-20T06-33.json",
+          "sha256": "fd7256dad1e375c2c2503738d3638f98d05de95b3cfc82d0255a0a115a16ce6a"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py"
+    },
+    {
+      "focused_proofs": [
+        {
+          "bytes": 116133,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-15.json",
+          "sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py"
+    },
+    {
+      "focused_proofs": [
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-pass2-result.2026-10-20T06-46.json",
+          "selector": [
+            "coverage_raw"
+          ],
+          "sha256": "d4f9ff28c477f3c69a6cea3aee518ec251a27b905f8fc5dc383a5006df49ad57"
+        },
+        {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-freeze.2026-10-20T06-50.json",
+          "selector": [
+            "coverage_raw_unchanged"
+          ],
+          "sha256": "5d8d5c2ddaf692f8b8557ba3a31d63cdd47d51f6a722911ec5b4258928dd739d"
+        }
+      ],
+      "lost_previously_executed_branches": [],
+      "lost_previously_executed_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py"
+    }
+  ],
+  "modules": [
+    {
+      "current_raw_summary": {
+        "covered_branches": 53,
+        "covered_lines": 137,
+        "excluded_lines": 11,
+        "missing_branches": 3,
+        "missing_lines": 2,
+        "num_branches": 56,
+        "num_partial_branches": 3,
+        "num_statements": 139,
+        "percent_branches_covered": 94.64285714285714,
+        "percent_branches_covered_display": "95",
+        "percent_covered": 97.43589743589743,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 98.56115107913669,
+        "percent_statements_covered_display": "99"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "proof_branch_total": 56,
+      "proof_covered_branches": 53,
+      "proof_covered_statements": 137,
+      "proof_statement_total": 139,
+      "remaining_unproved_branches": [
+        [
+          220,
+          193
+        ],
+        [
+          267,
+          268
+        ],
+        [
+          320,
+          321
+        ]
+      ],
+      "remaining_unproved_lines": [
+        268,
+        321
+      ],
+      "separately_qualified_branches": [],
+      "separately_qualified_lines": []
+    },
+    {
+      "current_raw_summary": {
+        "covered_branches": 51,
+        "covered_lines": 151,
+        "excluded_lines": 10,
+        "missing_branches": 5,
+        "missing_lines": 0,
+        "num_branches": 56,
+        "num_partial_branches": 5,
+        "num_statements": 151,
+        "percent_branches_covered": 91.07142857142857,
+        "percent_branches_covered_display": "91",
+        "percent_covered": 97.58454106280193,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "proof_branch_total": 56,
+      "proof_covered_branches": 51,
+      "proof_covered_statements": 151,
+      "proof_statement_total": 151,
+      "remaining_unproved_branches": [
+        [
+          120,
+          119
+        ],
+        [
+          125,
+          128
+        ],
+        [
+          147,
+          124
+        ],
+        [
+          301,
+          297
+        ],
+        [
+          321,
+          325
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "separately_qualified_branches": [],
+      "separately_qualified_lines": []
+    },
+    {
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 35,
+        "excluded_lines": 4,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 35,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "proof_branch_total": 0,
+      "proof_covered_branches": 0,
+      "proof_covered_statements": 35,
+      "proof_statement_total": 35,
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "separately_qualified_branches": [],
+      "separately_qualified_lines": []
+    },
+    {
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 25,
+        "excluded_lines": 10,
+        "missing_branches": 8,
+        "missing_lines": 20,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 45,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 47.16981132075472,
+        "percent_covered_display": "47",
+        "percent_statements_covered": 55.55555555555556,
+        "percent_statements_covered_display": "56"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "proof_branch_total": 8,
+      "proof_covered_branches": 8,
+      "proof_covered_statements": 45,
+      "proof_statement_total": 45,
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "separately_qualified_branches": [
+        [
+          118,
+          119
+        ],
+        [
+          118,
+          120
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          122
+        ],
+        [
+          132,
+          133
+        ],
+        [
+          132,
+          134
+        ],
+        [
+          151,
+          154
+        ],
+        [
+          151,
+          156
+        ]
+      ],
+      "separately_qualified_lines": [
+        118,
+        119,
+        120,
+        121,
+        122,
+        131,
+        132,
+        133,
+        134,
+        135,
+        148,
+        149,
+        150,
+        151,
+        154,
+        156,
+        157,
+        170,
+        172,
+        173
+      ]
+    },
+    {
+      "current_raw_summary": {
+        "covered_branches": 38,
+        "covered_lines": 104,
+        "excluded_lines": 8,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 38,
+        "num_partial_branches": 0,
+        "num_statements": 104,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "proof_branch_total": 38,
+      "proof_covered_branches": 38,
+      "proof_covered_statements": 104,
+      "proof_statement_total": 104,
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "separately_qualified_branches": [],
+      "separately_qualified_lines": []
+    },
+    {
+      "current_raw_summary": {
+        "covered_branches": 48,
+        "covered_lines": 99,
+        "excluded_lines": 6,
+        "missing_branches": 2,
+        "missing_lines": 0,
+        "num_branches": 50,
+        "num_partial_branches": 2,
+        "num_statements": 99,
+        "percent_branches_covered": 96.0,
+        "percent_branches_covered_display": "96",
+        "percent_covered": 98.65771812080537,
+        "percent_covered_display": "99",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "proof_branch_total": 50,
+      "proof_covered_branches": 48,
+      "proof_covered_statements": 99,
+      "proof_statement_total": 99,
+      "remaining_unproved_branches": [
+        [
+          101,
+          98
+        ],
+        [
+          157,
+          164
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "separately_qualified_branches": [],
+      "separately_qualified_lines": []
+    },
+    {
+      "current_raw_summary": {
+        "covered_branches": 45,
+        "covered_lines": 111,
+        "excluded_lines": 0,
+        "missing_branches": 19,
+        "missing_lines": 31,
+        "num_branches": 64,
+        "num_partial_branches": 13,
+        "num_statements": 142,
+        "percent_branches_covered": 70.3125,
+        "percent_branches_covered_display": "70",
+        "percent_covered": 75.72815533980582,
+        "percent_covered_display": "76",
+        "percent_statements_covered": 78.16901408450704,
+        "percent_statements_covered_display": "78"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "proof_branch_total": 64,
+      "proof_covered_branches": 64,
+      "proof_covered_statements": 142,
+      "proof_statement_total": 142,
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "separately_qualified_branches": [
+        [
+          50,
+          51
+        ],
+        [
+          94,
+          95
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          100,
+          101
+        ],
+        [
+          114,
+          119
+        ],
+        [
+          141,
+          142
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          150,
+          151
+        ],
+        [
+          161,
+          162
+        ],
+        [
+          166,
+          167
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          202,
+          203
+        ],
+        [
+          214,
+          222
+        ],
+        [
+          292,
+          -287
+        ],
+        [
+          292,
+          295
+        ],
+        [
+          305,
+          306
+        ],
+        [
+          305,
+          307
+        ],
+        [
+          324,
+          327
+        ],
+        [
+          324,
+          329
+        ]
+      ],
+      "separately_qualified_lines": [
+        51,
+        95,
+        99,
+        101,
+        119,
+        142,
+        148,
+        151,
+        162,
+        167,
+        172,
+        203,
+        222,
+        292,
+        295,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        321,
+        322,
+        323,
+        324,
+        327,
+        329,
+        330,
+        343,
+        345,
+        346
+      ]
+    },
+    {
+      "current_raw_summary": {
+        "covered_branches": 50,
+        "covered_lines": 155,
+        "excluded_lines": 6,
+        "missing_branches": 6,
+        "missing_lines": 7,
+        "num_branches": 56,
+        "num_partial_branches": 6,
+        "num_statements": 162,
+        "percent_branches_covered": 89.28571428571429,
+        "percent_branches_covered_display": "89",
+        "percent_covered": 94.03669724770643,
+        "percent_covered_display": "94",
+        "percent_statements_covered": 95.67901234567901,
+        "percent_statements_covered_display": "96"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "proof_branch_total": 56,
+      "proof_covered_branches": 56,
+      "proof_covered_statements": 162,
+      "proof_statement_total": 162,
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "separately_qualified_branches": [
+        [
+          194,
+          195
+        ],
+        [
+          356,
+          357
+        ],
+        [
+          377,
+          382
+        ],
+        [
+          385,
+          390
+        ],
+        [
+          422,
+          423
+        ],
+        [
+          430,
+          431
+        ]
+      ],
+      "separately_qualified_lines": [
+        195,
+        357,
+        382,
+        390,
+        397,
+        423,
+        431
+      ]
+    }
+  ],
+  "qualifications": [
+    {
+      "coverage": {
+        "bytes": 16942,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-coverage.2026-10-20T06-00.json",
+        "sha256": "2fcb1c2c7e5c85ac3c2653891ba1854d1ee59dc9ff4fdac459a0900aff418a80"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          118,
+          119
+        ],
+        [
+          118,
+          120
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          122
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        112,
+        118,
+        119,
+        120,
+        121,
+        122
+      ],
+      "name": "_legacy_version",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 16942,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-coverage.2026-10-20T06-00.json",
+        "sha256": "2fcb1c2c7e5c85ac3c2653891ba1854d1ee59dc9ff4fdac459a0900aff418a80"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          132,
+          133
+        ],
+        [
+          132,
+          134
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        125,
+        131,
+        132,
+        133,
+        134,
+        135
+      ],
+      "name": "parse_parity_matrix",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 16942,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-coverage.2026-10-20T06-00.json",
+        "sha256": "2fcb1c2c7e5c85ac3c2653891ba1854d1ee59dc9ff4fdac459a0900aff418a80"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          151,
+          154
+        ],
+        [
+          151,
+          156
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        138,
+        148,
+        149,
+        150,
+        151,
+        154,
+        156,
+        157
+      ],
+      "name": "build_parity_rows",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 16942,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-coverage.2026-10-20T06-00.json",
+        "sha256": "2fcb1c2c7e5c85ac3c2653891ba1854d1ee59dc9ff4fdac459a0900aff418a80"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        162,
+        170,
+        172,
+        173
+      ],
+      "name": "render_parity_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        21,
+        28,
+        30
+      ],
+      "name": "ReportLimitError",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        28,
+        30
+      ],
+      "name": "ReportLimitError.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          50,
+          51
+        ],
+        [
+          50,
+          52
+        ],
+        [
+          69,
+          70
+        ],
+        [
+          69,
+          71
+        ],
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          80
+        ],
+        [
+          88,
+          89
+        ],
+        [
+          88,
+          90
+        ],
+        [
+          92,
+          -82
+        ],
+        [
+          92,
+          93
+        ],
+        [
+          94,
+          95
+        ],
+        [
+          94,
+          96
+        ],
+        [
+          96,
+          97
+        ],
+        [
+          96,
+          98
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          98,
+          100
+        ],
+        [
+          100,
+          101
+        ],
+        [
+          100,
+          103
+        ],
+        [
+          114,
+          119
+        ],
+        [
+          114,
+          120
+        ],
+        [
+          122,
+          123
+        ],
+        [
+          122,
+          145
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          124,
+          126
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          128,
+          136
+        ],
+        [
+          140,
+          -107
+        ],
+        [
+          140,
+          141
+        ],
+        [
+          141,
+          142
+        ],
+        [
+          141,
+          143
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          157
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          150,
+          151
+        ],
+        [
+          150,
+          155
+        ],
+        [
+          155,
+          -107
+        ],
+        [
+          155,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          159,
+          160
+        ],
+        [
+          159,
+          164
+        ],
+        [
+          161,
+          162
+        ],
+        [
+          161,
+          163
+        ],
+        [
+          164,
+          165
+        ],
+        [
+          164,
+          169
+        ],
+        [
+          166,
+          167
+        ],
+        [
+          166,
+          168
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        33,
+        44,
+        50,
+        51,
+        52,
+        57,
+        58,
+        59,
+        60,
+        61,
+        63,
+        69,
+        70,
+        71,
+        73,
+        78,
+        79,
+        80,
+        82,
+        88,
+        89,
+        90,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        103,
+        107,
+        114,
+        119,
+        120,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        136,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        172
+      ],
+      "name": "ReportBudget",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          50,
+          51
+        ],
+        [
+          50,
+          52
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        44,
+        50,
+        51,
+        52,
+        57,
+        58,
+        59,
+        60,
+        61
+      ],
+      "name": "ReportBudget.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          69,
+          70
+        ],
+        [
+          69,
+          71
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        63,
+        69,
+        70,
+        71
+      ],
+      "name": "ReportBudget.work",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          80
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        73,
+        78,
+        79,
+        80
+      ],
+      "name": "ReportBudget.spend",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          88,
+          89
+        ],
+        [
+          88,
+          90
+        ],
+        [
+          92,
+          -82
+        ],
+        [
+          92,
+          93
+        ],
+        [
+          94,
+          95
+        ],
+        [
+          94,
+          96
+        ],
+        [
+          96,
+          97
+        ],
+        [
+          96,
+          98
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          98,
+          100
+        ],
+        [
+          100,
+          101
+        ],
+        [
+          100,
+          103
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        82,
+        88,
+        89,
+        90,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        103
+      ],
+      "name": "ReportBudget.text",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          114,
+          119
+        ],
+        [
+          114,
+          120
+        ],
+        [
+          122,
+          123
+        ],
+        [
+          122,
+          145
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          124,
+          126
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          128,
+          136
+        ],
+        [
+          140,
+          -107
+        ],
+        [
+          140,
+          141
+        ],
+        [
+          141,
+          142
+        ],
+        [
+          141,
+          143
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          157
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          150,
+          151
+        ],
+        [
+          150,
+          155
+        ],
+        [
+          155,
+          -107
+        ],
+        [
+          155,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          159,
+          160
+        ],
+        [
+          159,
+          164
+        ],
+        [
+          161,
+          162
+        ],
+        [
+          161,
+          163
+        ],
+        [
+          164,
+          165
+        ],
+        [
+          164,
+          169
+        ],
+        [
+          166,
+          167
+        ],
+        [
+          166,
+          168
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        107,
+        114,
+        119,
+        120,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        136,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        172
+      ],
+      "name": "ReportBudget.check",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          181,
+          182
+        ],
+        [
+          181,
+          188
+        ],
+        [
+          188,
+          190
+        ],
+        [
+          188,
+          193
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        175,
+        181,
+        182,
+        183,
+        187,
+        188,
+        190,
+        193
+      ],
+      "name": "_freeze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          202,
+          203
+        ],
+        [
+          202,
+          204
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        196,
+        202,
+        203,
+        204,
+        205
+      ],
+      "name": "bounded_object",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          214,
+          222
+        ],
+        [
+          214,
+          223
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        208,
+        214,
+        222,
+        223
+      ],
+      "name": "ratio",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        250,
+        255
+      ],
+      "name": "DiscoveryReport.__post_init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        259,
+        261
+      ],
+      "name": "DiscoveryReport.to_dict",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        263,
+        265
+      ],
+      "name": "DiscoveryReport.to_json",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          292,
+          -287
+        ],
+        [
+          292,
+          295
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        287,
+        292,
+        295
+      ],
+      "name": "_legacy_version",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          305,
+          306
+        ],
+        [
+          305,
+          307
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        298,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309
+      ],
+      "name": "parse_coverage_ledger",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          324,
+          327
+        ],
+        [
+          324,
+          329
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        312,
+        321,
+        322,
+        323,
+        324,
+        327,
+        329,
+        330
+      ],
+      "name": "build_coverage_rows",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "bytes": 45829,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage.2026-10-20T03-23.json",
+        "sha256": "5f802b0797d03fa38290594d2d93026591fba4348d5ddcde868b53d97e74be12"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        335,
+        343,
+        345,
+        346
+      ],
+      "name": "render_coverage_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "raw_counters_augmented": false,
+      "source_ref": "2b069afb0d88ae1a3c17ef10f7a52c3936800462"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-combined-coverage.2026-10-20T05-24.json",
+        "sha256": "f1dceba57a661ed4e03244bbc7c897ae07d837bc1dbab22d4bc6597f749934b3"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        76,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        93,
+        94,
+        96
+      ],
+      "name": "SnapshotValidation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "raw_counters_augmented": false,
+      "source_ref": "7012d20245cd27d29bf66ede6ac9756dec354ed4"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-combined-coverage.2026-10-20T05-24.json",
+        "sha256": "f1dceba57a661ed4e03244bbc7c897ae07d837bc1dbab22d4bc6597f749934b3"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          70,
+          71
+        ],
+        [
+          70,
+          72
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        66,
+        68,
+        70,
+        71,
+        72
+      ],
+      "name": "_findings",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "raw_counters_augmented": false,
+      "source_ref": "7012d20245cd27d29bf66ede6ac9756dec354ed4"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-combined-coverage.2026-10-20T05-24.json",
+        "sha256": "f1dceba57a661ed4e03244bbc7c897ae07d837bc1dbab22d4bc6597f749934b3"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        94,
+        96
+      ],
+      "name": "SnapshotValidation.ok",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "raw_counters_augmented": false,
+      "source_ref": "7012d20245cd27d29bf66ede6ac9756dec354ed4"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-combined-coverage.2026-10-20T05-24.json",
+        "sha256": "f1dceba57a661ed4e03244bbc7c897ae07d837bc1dbab22d4bc6597f749934b3"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          184,
+          185
+        ],
+        [
+          184,
+          186
+        ],
+        [
+          192,
+          193
+        ],
+        [
+          192,
+          194
+        ],
+        [
+          194,
+          195
+        ],
+        [
+          194,
+          196
+        ],
+        [
+          196,
+          197
+        ],
+        [
+          196,
+          199
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        182,
+        184,
+        185,
+        186,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        199,
+        200,
+        201
+      ],
+      "name": "_Validation.evaluate",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "raw_counters_augmented": false,
+      "source_ref": "7012d20245cd27d29bf66ede6ac9756dec354ed4"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-combined-coverage.2026-10-20T05-24.json",
+        "sha256": "f1dceba57a661ed4e03244bbc7c897ae07d837bc1dbab22d4bc6597f749934b3"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          354,
+          355
+        ],
+        [
+          354,
+          356
+        ],
+        [
+          356,
+          357
+        ],
+        [
+          356,
+          366
+        ],
+        [
+          369,
+          370
+        ],
+        [
+          369,
+          421
+        ],
+        [
+          373,
+          374
+        ],
+        [
+          373,
+          415
+        ],
+        [
+          374,
+          375
+        ],
+        [
+          374,
+          377
+        ],
+        [
+          377,
+          382
+        ],
+        [
+          377,
+          383
+        ],
+        [
+          385,
+          390
+        ],
+        [
+          385,
+          398
+        ],
+        [
+          401,
+          402
+        ],
+        [
+          401,
+          409
+        ],
+        [
+          409,
+          373
+        ],
+        [
+          409,
+          414
+        ],
+        [
+          415,
+          416
+        ],
+        [
+          415,
+          421
+        ],
+        [
+          421,
+          422
+        ],
+        [
+          421,
+          430
+        ],
+        [
+          422,
+          423
+        ],
+        [
+          422,
+          429
+        ],
+        [
+          430,
+          431
+        ],
+        [
+          430,
+          437
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        343,
+        354,
+        355,
+        356,
+        357,
+        366,
+        367,
+        368,
+        369,
+        370,
+        371,
+        373,
+        374,
+        375,
+        377,
+        382,
+        383,
+        384,
+        385,
+        390,
+        397,
+        398,
+        401,
+        402,
+        409,
+        414,
+        415,
+        416,
+        419,
+        420,
+        421,
+        422,
+        423,
+        429,
+        430,
+        431,
+        437,
+        440,
+        441
+      ],
+      "name": "validate_snapshot",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "raw_counters_augmented": false,
+      "source_ref": "7012d20245cd27d29bf66ede6ac9756dec354ed4"
+    }
+  ],
+  "ranges": [
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        46,
+        53
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 56,
+      "kind": "functions",
+      "name": "_declares",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 46
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 53,
+        "covered_lines": 115,
+        "excluded_lines": 0,
+        "missing_branches": 3,
+        "missing_lines": 2,
+        "num_branches": 56,
+        "num_partial_branches": 3,
+        "num_statements": 117,
+        "percent_branches_covered": 94.64285714285714,
+        "percent_branches_covered_display": "95",
+        "percent_covered": 97.10982658959537,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 98.2905982905983,
+        "percent_statements_covered_display": "98"
+      },
+      "current_raw_executed_branches": [
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          103
+        ],
+        [
+          117,
+          124
+        ],
+        [
+          117,
+          131
+        ],
+        [
+          151,
+          157
+        ],
+        [
+          151,
+          164
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          164
+        ],
+        [
+          158,
+          157
+        ],
+        [
+          158,
+          163
+        ],
+        [
+          193,
+          194
+        ],
+        [
+          193,
+          222
+        ],
+        [
+          210,
+          212
+        ],
+        [
+          210,
+          220
+        ],
+        [
+          212,
+          216
+        ],
+        [
+          212,
+          220
+        ],
+        [
+          220,
+          221
+        ],
+        [
+          225,
+          226
+        ],
+        [
+          225,
+          232
+        ],
+        [
+          267,
+          269
+        ],
+        [
+          281,
+          282
+        ],
+        [
+          281,
+          284
+        ],
+        [
+          285,
+          286
+        ],
+        [
+          285,
+          292
+        ],
+        [
+          294,
+          295
+        ],
+        [
+          294,
+          303
+        ],
+        [
+          320,
+          322
+        ],
+        [
+          352,
+          353
+        ],
+        [
+          352,
+          354
+        ],
+        [
+          355,
+          356
+        ],
+        [
+          355,
+          372
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          365,
+          372
+        ],
+        [
+          373,
+          375
+        ],
+        [
+          373,
+          418
+        ],
+        [
+          379,
+          380
+        ],
+        [
+          379,
+          386
+        ],
+        [
+          386,
+          387
+        ],
+        [
+          386,
+          394
+        ],
+        [
+          403,
+          405
+        ],
+        [
+          403,
+          417
+        ],
+        [
+          410,
+          403
+        ],
+        [
+          410,
+          411
+        ],
+        [
+          423,
+          424
+        ],
+        [
+          423,
+          430
+        ],
+        [
+          445,
+          447
+        ],
+        [
+          445,
+          460
+        ],
+        [
+          447,
+          448
+        ],
+        [
+          447,
+          460
+        ],
+        [
+          448,
+          447
+        ],
+        [
+          448,
+          453
+        ],
+        [
+          462,
+          463
+        ],
+        [
+          462,
+          473
+        ]
+      ],
+      "current_raw_executed_lines": [
+        59,
+        69,
+        91,
+        92,
+        93,
+        94,
+        95,
+        97,
+        101,
+        102,
+        103,
+        104,
+        106,
+        114,
+        115,
+        116,
+        117,
+        124,
+        130,
+        131,
+        133,
+        141,
+        143,
+        151,
+        157,
+        158,
+        163,
+        164,
+        170,
+        172,
+        186,
+        187,
+        190,
+        191,
+        193,
+        194,
+        209,
+        210,
+        212,
+        216,
+        220,
+        221,
+        222,
+        225,
+        226,
+        232,
+        234,
+        241,
+        245,
+        246,
+        255,
+        258,
+        267,
+        269,
+        270,
+        271,
+        272,
+        273,
+        281,
+        282,
+        283,
+        284,
+        285,
+        286,
+        292,
+        293,
+        294,
+        295,
+        301,
+        302,
+        303,
+        305,
+        318,
+        319,
+        320,
+        322,
+        323,
+        328,
+        331,
+        334,
+        335,
+        338,
+        345,
+        352,
+        353,
+        354,
+        355,
+        356,
+        364,
+        365,
+        366,
+        372,
+        373,
+        375,
+        379,
+        380,
+        386,
+        387,
+        388,
+        394,
+        395,
+        396,
+        403,
+        405,
+        409,
+        410,
+        411,
+        417,
+        418,
+        423,
+        424,
+        430,
+        438,
+        444,
+        445,
+        447,
+        448,
+        453,
+        460,
+        462,
+        463,
+        468,
+        473
+      ],
+      "current_raw_missing_branches": [
+        [
+          220,
+          193
+        ],
+        [
+          267,
+          268
+        ],
+        [
+          320,
+          321
+        ]
+      ],
+      "current_raw_missing_lines": [
+        268,
+        321
+      ],
+      "end": 473,
+      "kind": "classes",
+      "name": "ParityEntryRules",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [
+        [
+          220,
+          193
+        ],
+        [
+          267,
+          268
+        ],
+        [
+          320,
+          321
+        ]
+      ],
+      "remaining_unproved_lines": [
+        268,
+        321
+      ],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 59
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 2,
+        "covered_lines": 10,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 10,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          103
+        ]
+      ],
+      "current_raw_executed_lines": [
+        69,
+        91,
+        92,
+        93,
+        94,
+        95,
+        97,
+        101,
+        102,
+        103,
+        104
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 104,
+      "kind": "functions",
+      "name": "ParityEntryRules.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 69
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 2,
+        "covered_lines": 7,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 7,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          117,
+          124
+        ],
+        [
+          117,
+          131
+        ]
+      ],
+      "current_raw_executed_lines": [
+        106,
+        114,
+        115,
+        116,
+        117,
+        124,
+        130,
+        131
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 131,
+      "kind": "functions",
+      "name": "ParityEntryRules.source",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 106
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 6,
+        "covered_lines": 8,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "num_statements": 8,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          151,
+          157
+        ],
+        [
+          151,
+          164
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          164
+        ],
+        [
+          158,
+          157
+        ],
+        [
+          158,
+          163
+        ]
+      ],
+      "current_raw_executed_lines": [
+        133,
+        141,
+        143,
+        151,
+        157,
+        158,
+        163,
+        164,
+        170
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 170,
+      "kind": "functions",
+      "name": "ParityEntryRules.target",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 133
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 9,
+        "covered_lines": 16,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 0,
+        "num_branches": 10,
+        "num_partial_branches": 1,
+        "num_statements": 16,
+        "percent_branches_covered": 90.0,
+        "percent_branches_covered_display": "90",
+        "percent_covered": 96.15384615384616,
+        "percent_covered_display": "96",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          193,
+          194
+        ],
+        [
+          193,
+          222
+        ],
+        [
+          210,
+          212
+        ],
+        [
+          210,
+          220
+        ],
+        [
+          212,
+          216
+        ],
+        [
+          212,
+          220
+        ],
+        [
+          220,
+          221
+        ],
+        [
+          225,
+          226
+        ],
+        [
+          225,
+          232
+        ]
+      ],
+      "current_raw_executed_lines": [
+        172,
+        186,
+        187,
+        190,
+        191,
+        193,
+        194,
+        209,
+        210,
+        212,
+        216,
+        220,
+        221,
+        222,
+        225,
+        226,
+        232
+      ],
+      "current_raw_missing_branches": [
+        [
+          220,
+          193
+        ]
+      ],
+      "current_raw_missing_lines": [],
+      "end": 232,
+      "kind": "functions",
+      "name": "ParityEntryRules.approval",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [
+        [
+          220,
+          193
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 172
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 7,
+        "covered_lines": 24,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 8,
+        "num_partial_branches": 1,
+        "num_statements": 25,
+        "percent_branches_covered": 87.5,
+        "percent_branches_covered_display": "88",
+        "percent_covered": 93.93939393939394,
+        "percent_covered_display": "94",
+        "percent_statements_covered": 96.0,
+        "percent_statements_covered_display": "96"
+      },
+      "current_raw_executed_branches": [
+        [
+          267,
+          269
+        ],
+        [
+          281,
+          282
+        ],
+        [
+          281,
+          284
+        ],
+        [
+          285,
+          286
+        ],
+        [
+          285,
+          292
+        ],
+        [
+          294,
+          295
+        ],
+        [
+          294,
+          303
+        ]
+      ],
+      "current_raw_executed_lines": [
+        234,
+        241,
+        245,
+        246,
+        255,
+        258,
+        267,
+        269,
+        270,
+        271,
+        272,
+        273,
+        281,
+        282,
+        283,
+        284,
+        285,
+        286,
+        292,
+        293,
+        294,
+        295,
+        301,
+        302,
+        303
+      ],
+      "current_raw_missing_branches": [
+        [
+          267,
+          268
+        ]
+      ],
+      "current_raw_missing_lines": [
+        268
+      ],
+      "end": 303,
+      "kind": "functions",
+      "name": "ParityEntryRules.entry",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [
+        [
+          267,
+          268
+        ]
+      ],
+      "remaining_unproved_lines": [
+        268
+      ],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 234
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 19,
+        "covered_lines": 40,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 20,
+        "num_partial_branches": 1,
+        "num_statements": 41,
+        "percent_branches_covered": 95.0,
+        "percent_branches_covered_display": "95",
+        "percent_covered": 96.72131147540983,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 97.5609756097561,
+        "percent_statements_covered_display": "98"
+      },
+      "current_raw_executed_branches": [
+        [
+          320,
+          322
+        ],
+        [
+          352,
+          353
+        ],
+        [
+          352,
+          354
+        ],
+        [
+          355,
+          356
+        ],
+        [
+          355,
+          372
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          365,
+          372
+        ],
+        [
+          373,
+          375
+        ],
+        [
+          373,
+          418
+        ],
+        [
+          379,
+          380
+        ],
+        [
+          379,
+          386
+        ],
+        [
+          386,
+          387
+        ],
+        [
+          386,
+          394
+        ],
+        [
+          403,
+          405
+        ],
+        [
+          403,
+          417
+        ],
+        [
+          410,
+          403
+        ],
+        [
+          410,
+          411
+        ],
+        [
+          423,
+          424
+        ],
+        [
+          423,
+          430
+        ]
+      ],
+      "current_raw_executed_lines": [
+        305,
+        318,
+        319,
+        320,
+        322,
+        323,
+        328,
+        331,
+        334,
+        335,
+        338,
+        345,
+        352,
+        353,
+        354,
+        355,
+        356,
+        364,
+        365,
+        366,
+        372,
+        373,
+        375,
+        379,
+        380,
+        386,
+        387,
+        388,
+        394,
+        395,
+        396,
+        403,
+        405,
+        409,
+        410,
+        411,
+        417,
+        418,
+        423,
+        424,
+        430
+      ],
+      "current_raw_missing_branches": [
+        [
+          320,
+          321
+        ]
+      ],
+      "current_raw_missing_lines": [
+        321
+      ],
+      "end": 436,
+      "kind": "functions",
+      "name": "ParityEntryRules.assess",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [
+        [
+          320,
+          321
+        ]
+      ],
+      "remaining_unproved_lines": [
+        321
+      ],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 305
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 8,
+        "covered_lines": 10,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 10,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          445,
+          447
+        ],
+        [
+          445,
+          460
+        ],
+        [
+          447,
+          448
+        ],
+        [
+          447,
+          460
+        ],
+        [
+          448,
+          447
+        ],
+        [
+          448,
+          453
+        ],
+        [
+          462,
+          463
+        ],
+        [
+          462,
+          473
+        ]
+      ],
+      "current_raw_executed_lines": [
+        438,
+        444,
+        445,
+        447,
+        448,
+        453,
+        460,
+        462,
+        463,
+        468,
+        473
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 473,
+      "kind": "functions",
+      "name": "ParityEntryRules.finish",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 438
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        44,
+        50
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 56,
+      "kind": "functions",
+      "name": "_reference",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 44
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 51,
+        "covered_lines": 137,
+        "excluded_lines": 0,
+        "missing_branches": 5,
+        "missing_lines": 0,
+        "num_branches": 56,
+        "num_partial_branches": 5,
+        "num_statements": 137,
+        "percent_branches_covered": 91.07142857142857,
+        "percent_branches_covered_display": "91",
+        "percent_covered": 97.40932642487047,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          109,
+          110
+        ],
+        [
+          109,
+          122
+        ],
+        [
+          115,
+          116
+        ],
+        [
+          115,
+          117
+        ],
+        [
+          119,
+          109
+        ],
+        [
+          119,
+          120
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          124,
+          154
+        ],
+        [
+          125,
+          126
+        ],
+        [
+          133,
+          134
+        ],
+        [
+          133,
+          141
+        ],
+        [
+          142,
+          143
+        ],
+        [
+          142,
+          145
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          150,
+          124
+        ],
+        [
+          150,
+          151
+        ],
+        [
+          190,
+          191
+        ],
+        [
+          190,
+          192
+        ],
+        [
+          194,
+          195
+        ],
+        [
+          194,
+          197
+        ],
+        [
+          202,
+          203
+        ],
+        [
+          202,
+          279
+        ],
+        [
+          231,
+          232
+        ],
+        [
+          231,
+          248
+        ],
+        [
+          248,
+          249
+        ],
+        [
+          248,
+          255
+        ],
+        [
+          289,
+          290
+        ],
+        [
+          289,
+          291
+        ],
+        [
+          297,
+          298
+        ],
+        [
+          297,
+          303
+        ],
+        [
+          301,
+          302
+        ],
+        [
+          307,
+          308
+        ],
+        [
+          307,
+          334
+        ],
+        [
+          321,
+          322
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          323,
+          325
+        ],
+        [
+          327,
+          307
+        ],
+        [
+          327,
+          328
+        ],
+        [
+          331,
+          327
+        ],
+        [
+          331,
+          332
+        ],
+        [
+          332,
+          331
+        ],
+        [
+          332,
+          333
+        ],
+        [
+          337,
+          338
+        ],
+        [
+          337,
+          356
+        ],
+        [
+          361,
+          362
+        ],
+        [
+          361,
+          363
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          365,
+          376
+        ],
+        [
+          367,
+          365
+        ],
+        [
+          367,
+          372
+        ]
+      ],
+      "current_raw_executed_lines": [
+        59,
+        67,
+        87,
+        90,
+        91,
+        92,
+        96,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        109,
+        110,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        122,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        150,
+        151,
+        152,
+        153,
+        154,
+        167,
+        180,
+        181,
+        188,
+        189,
+        190,
+        191,
+        192,
+        194,
+        195,
+        197,
+        198,
+        199,
+        200,
+        202,
+        203,
+        204,
+        206,
+        208,
+        210,
+        215,
+        216,
+        217,
+        218,
+        224,
+        231,
+        232,
+        237,
+        243,
+        248,
+        249,
+        250,
+        253,
+        255,
+        256,
+        257,
+        277,
+        278,
+        279,
+        281,
+        288,
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        297,
+        298,
+        301,
+        302,
+        303,
+        304,
+        305,
+        307,
+        308,
+        309,
+        310,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        322,
+        323,
+        324,
+        325,
+        327,
+        328,
+        329,
+        331,
+        332,
+        333,
+        334,
+        335,
+        337,
+        338,
+        340,
+        354,
+        355,
+        356,
+        357,
+        361,
+        362,
+        363,
+        365,
+        366,
+        367,
+        372,
+        373,
+        374,
+        376,
+        386
+      ],
+      "current_raw_missing_branches": [
+        [
+          120,
+          119
+        ],
+        [
+          125,
+          128
+        ],
+        [
+          147,
+          124
+        ],
+        [
+          301,
+          297
+        ],
+        [
+          321,
+          325
+        ]
+      ],
+      "current_raw_missing_lines": [],
+      "end": 413,
+      "kind": "classes",
+      "name": "ParityProjection",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "remaining_unproved_branches": [
+        [
+          120,
+          119
+        ],
+        [
+          125,
+          128
+        ],
+        [
+          147,
+          124
+        ],
+        [
+          301,
+          297
+        ],
+        [
+          321,
+          325
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 59
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        67,
+        87,
+        90,
+        91,
+        92
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 94,
+      "kind": "functions",
+      "name": "ParityProjection.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 67
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 17,
+        "covered_lines": 40,
+        "excluded_lines": 0,
+        "missing_branches": 3,
+        "missing_lines": 0,
+        "num_branches": 20,
+        "num_partial_branches": 3,
+        "num_statements": 40,
+        "percent_branches_covered": 85.0,
+        "percent_branches_covered_display": "85",
+        "percent_covered": 95.0,
+        "percent_covered_display": "95",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          109,
+          110
+        ],
+        [
+          109,
+          122
+        ],
+        [
+          115,
+          116
+        ],
+        [
+          115,
+          117
+        ],
+        [
+          119,
+          109
+        ],
+        [
+          119,
+          120
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          124,
+          154
+        ],
+        [
+          125,
+          126
+        ],
+        [
+          133,
+          134
+        ],
+        [
+          133,
+          141
+        ],
+        [
+          142,
+          143
+        ],
+        [
+          142,
+          145
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          150,
+          124
+        ],
+        [
+          150,
+          151
+        ]
+      ],
+      "current_raw_executed_lines": [
+        96,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        109,
+        110,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        122,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        150,
+        151,
+        152,
+        153,
+        154
+      ],
+      "current_raw_missing_branches": [
+        [
+          120,
+          119
+        ],
+        [
+          125,
+          128
+        ],
+        [
+          147,
+          124
+        ]
+      ],
+      "current_raw_missing_lines": [],
+      "end": 165,
+      "kind": "functions",
+      "name": "ParityProjection.entries",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "remaining_unproved_branches": [
+        [
+          120,
+          119
+        ],
+        [
+          125,
+          128
+        ],
+        [
+          147,
+          124
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 96
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 10,
+        "covered_lines": 38,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 10,
+        "num_partial_branches": 0,
+        "num_statements": 38,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          190,
+          191
+        ],
+        [
+          190,
+          192
+        ],
+        [
+          194,
+          195
+        ],
+        [
+          194,
+          197
+        ],
+        [
+          202,
+          203
+        ],
+        [
+          202,
+          279
+        ],
+        [
+          231,
+          232
+        ],
+        [
+          231,
+          248
+        ],
+        [
+          248,
+          249
+        ],
+        [
+          248,
+          255
+        ]
+      ],
+      "current_raw_executed_lines": [
+        167,
+        180,
+        181,
+        188,
+        189,
+        190,
+        191,
+        192,
+        194,
+        195,
+        197,
+        198,
+        199,
+        200,
+        202,
+        203,
+        204,
+        206,
+        208,
+        210,
+        215,
+        216,
+        217,
+        218,
+        224,
+        231,
+        232,
+        237,
+        243,
+        248,
+        249,
+        250,
+        253,
+        255,
+        256,
+        257,
+        277,
+        278,
+        279
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 279,
+      "kind": "functions",
+      "name": "ParityProjection.axes",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 167
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 24,
+        "covered_lines": 55,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 0,
+        "num_branches": 26,
+        "num_partial_branches": 2,
+        "num_statements": 55,
+        "percent_branches_covered": 92.3076923076923,
+        "percent_branches_covered_display": "92",
+        "percent_covered": 97.53086419753086,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          289,
+          290
+        ],
+        [
+          289,
+          291
+        ],
+        [
+          297,
+          298
+        ],
+        [
+          297,
+          303
+        ],
+        [
+          301,
+          302
+        ],
+        [
+          307,
+          308
+        ],
+        [
+          307,
+          334
+        ],
+        [
+          321,
+          322
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          323,
+          325
+        ],
+        [
+          327,
+          307
+        ],
+        [
+          327,
+          328
+        ],
+        [
+          331,
+          327
+        ],
+        [
+          331,
+          332
+        ],
+        [
+          332,
+          331
+        ],
+        [
+          332,
+          333
+        ],
+        [
+          337,
+          338
+        ],
+        [
+          337,
+          356
+        ],
+        [
+          361,
+          362
+        ],
+        [
+          361,
+          363
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          365,
+          376
+        ],
+        [
+          367,
+          365
+        ],
+        [
+          367,
+          372
+        ]
+      ],
+      "current_raw_executed_lines": [
+        281,
+        288,
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        297,
+        298,
+        301,
+        302,
+        303,
+        304,
+        305,
+        307,
+        308,
+        309,
+        310,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        322,
+        323,
+        324,
+        325,
+        327,
+        328,
+        329,
+        331,
+        332,
+        333,
+        334,
+        335,
+        337,
+        338,
+        340,
+        354,
+        355,
+        356,
+        357,
+        361,
+        362,
+        363,
+        365,
+        366,
+        367,
+        372,
+        373,
+        374,
+        376,
+        386
+      ],
+      "current_raw_missing_branches": [
+        [
+          301,
+          297
+        ],
+        [
+          321,
+          325
+        ]
+      ],
+      "current_raw_missing_lines": [],
+      "end": 413,
+      "kind": "functions",
+      "name": "ParityProjection.project",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "remaining_unproved_branches": [
+        [
+          301,
+          297
+        ],
+        [
+          321,
+          325
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 281
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        15,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 35,
+      "kind": "classes",
+      "name": "ParityDimensionOutcome",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 15
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        39,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 71,
+      "kind": "classes",
+      "name": "ParityEntryOutcome",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 39
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        75,
+        85,
+        86
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 86,
+      "kind": "classes",
+      "name": "ParityValidation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 75
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        31,
+        38
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 38,
+      "kind": "functions",
+      "name": "parity_preflight",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 31
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        41,
+        47
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 58,
+      "kind": "functions",
+      "name": "unavailable_parity_summary",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 41
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        61,
+        81,
+        82
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 84,
+      "kind": "functions",
+      "name": "parity_summary",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 61
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        87,
+        100,
+        102,
+        103,
+        106
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 109,
+      "kind": "functions",
+      "name": "build_parity_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 87
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 4,
+        "missing_lines": 5,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 5,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        112
+      ],
+      "current_raw_missing_branches": [
+        [
+          118,
+          119
+        ],
+        [
+          118,
+          120
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          122
+        ]
+      ],
+      "current_raw_missing_lines": [
+        118,
+        119,
+        120,
+        121,
+        122
+      ],
+      "end": 122,
+      "kind": "functions",
+      "name": "_legacy_version",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        118,
+        119,
+        120,
+        121,
+        122
+      ],
+      "start": 112
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 5,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 5,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        125
+      ],
+      "current_raw_missing_branches": [
+        [
+          132,
+          133
+        ],
+        [
+          132,
+          134
+        ]
+      ],
+      "current_raw_missing_lines": [
+        131,
+        132,
+        133,
+        134,
+        135
+      ],
+      "end": 135,
+      "kind": "functions",
+      "name": "parse_parity_matrix",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        131,
+        132,
+        133,
+        134,
+        135
+      ],
+      "start": 125
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 7,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 7,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        138
+      ],
+      "current_raw_missing_branches": [
+        [
+          151,
+          154
+        ],
+        [
+          151,
+          156
+        ]
+      ],
+      "current_raw_missing_lines": [
+        148,
+        149,
+        150,
+        151,
+        154,
+        156,
+        157
+      ],
+      "end": 159,
+      "kind": "functions",
+      "name": "build_parity_rows",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        148,
+        149,
+        150,
+        151,
+        154,
+        156,
+        157
+      ],
+      "start": 138
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 3,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        162
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [
+        170,
+        172,
+        173
+      ],
+      "end": 173,
+      "kind": "functions",
+      "name": "render_parity_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        170,
+        172,
+        173
+      ],
+      "start": 162
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 26,
+        "covered_lines": 55,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 26,
+        "num_partial_branches": 0,
+        "num_statements": 55,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          112,
+          113
+        ],
+        [
+          112,
+          117
+        ],
+        [
+          119,
+          120
+        ],
+        [
+          119,
+          136
+        ],
+        [
+          121,
+          119
+        ],
+        [
+          121,
+          122
+        ],
+        [
+          128,
+          119
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          231
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          146,
+          148
+        ],
+        [
+          152,
+          153
+        ],
+        [
+          152,
+          178
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          179,
+          180
+        ],
+        [
+          179,
+          200
+        ],
+        [
+          193,
+          194
+        ],
+        [
+          193,
+          200
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          213
+        ],
+        [
+          231,
+          232
+        ],
+        [
+          231,
+          239
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          254
+        ]
+      ],
+      "current_raw_executed_lines": [
+        45,
+        54,
+        68,
+        69,
+        71,
+        89,
+        90,
+        91,
+        92,
+        95,
+        108,
+        110,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        122,
+        124,
+        128,
+        129,
+        130,
+        136,
+        141,
+        142,
+        143,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        166,
+        169,
+        170,
+        172,
+        178,
+        179,
+        180,
+        193,
+        194,
+        200,
+        206,
+        207,
+        213,
+        231,
+        232,
+        239,
+        240,
+        254,
+        255
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 255,
+      "kind": "classes",
+      "name": "_ParityRules",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 45
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        54,
+        68,
+        69
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 69,
+      "kind": "functions",
+      "name": "_ParityRules.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 54
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 26,
+        "covered_lines": 53,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 26,
+        "num_partial_branches": 0,
+        "num_statements": 53,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          112,
+          113
+        ],
+        [
+          112,
+          117
+        ],
+        [
+          119,
+          120
+        ],
+        [
+          119,
+          136
+        ],
+        [
+          121,
+          119
+        ],
+        [
+          121,
+          122
+        ],
+        [
+          128,
+          119
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          231
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          146,
+          148
+        ],
+        [
+          152,
+          153
+        ],
+        [
+          152,
+          178
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          179,
+          180
+        ],
+        [
+          179,
+          200
+        ],
+        [
+          193,
+          194
+        ],
+        [
+          193,
+          200
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          213
+        ],
+        [
+          231,
+          232
+        ],
+        [
+          231,
+          239
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          254
+        ]
+      ],
+      "current_raw_executed_lines": [
+        71,
+        89,
+        90,
+        91,
+        92,
+        95,
+        108,
+        110,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        122,
+        124,
+        128,
+        129,
+        130,
+        136,
+        141,
+        142,
+        143,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        166,
+        169,
+        170,
+        172,
+        178,
+        179,
+        180,
+        193,
+        194,
+        200,
+        206,
+        207,
+        213,
+        231,
+        232,
+        239,
+        240,
+        254,
+        255
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 255,
+      "kind": "functions",
+      "name": "_ParityRules.classifications",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 71
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 12,
+        "covered_lines": 27,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "num_statements": 27,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          302,
+          303
+        ],
+        [
+          302,
+          305
+        ],
+        [
+          303,
+          302
+        ],
+        [
+          303,
+          304
+        ],
+        [
+          331,
+          332
+        ],
+        [
+          331,
+          336
+        ],
+        [
+          332,
+          331
+        ],
+        [
+          332,
+          334
+        ],
+        [
+          334,
+          331
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          339,
+          340
+        ],
+        [
+          339,
+          345
+        ]
+      ],
+      "current_raw_executed_lines": [
+        258,
+        278,
+        279,
+        282,
+        287,
+        292,
+        299,
+        300,
+        302,
+        303,
+        304,
+        305,
+        308,
+        309,
+        310,
+        317,
+        319,
+        320,
+        331,
+        332,
+        334,
+        335,
+        336,
+        337,
+        339,
+        340,
+        342,
+        345
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 345,
+      "kind": "functions",
+      "name": "validate_parity",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 258
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        22,
+        24,
+        25,
+        29
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 29,
+      "kind": "functions",
+      "name": "_payload_paths",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 22
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 48,
+        "covered_lines": 78,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 0,
+        "num_branches": 50,
+        "num_partial_branches": 2,
+        "num_statements": 78,
+        "percent_branches_covered": 96.0,
+        "percent_branches_covered_display": "96",
+        "percent_covered": 98.4375,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          81
+        ],
+        [
+          81,
+          82
+        ],
+        [
+          81,
+          89
+        ],
+        [
+          82,
+          81
+        ],
+        [
+          82,
+          88
+        ],
+        [
+          96,
+          98
+        ],
+        [
+          96,
+          109
+        ],
+        [
+          98,
+          96
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          99,
+          100
+        ],
+        [
+          99,
+          101
+        ],
+        [
+          101,
+          108
+        ],
+        [
+          131,
+          132
+        ],
+        [
+          131,
+          165
+        ],
+        [
+          135,
+          155
+        ],
+        [
+          135,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          158,
+          159
+        ],
+        [
+          158,
+          160
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          162,
+          163
+        ],
+        [
+          162,
+          164
+        ],
+        [
+          178,
+          180
+        ],
+        [
+          178,
+          229
+        ],
+        [
+          180,
+          181
+        ],
+        [
+          180,
+          187
+        ],
+        [
+          187,
+          188
+        ],
+        [
+          187,
+          206
+        ],
+        [
+          189,
+          194
+        ],
+        [
+          189,
+          195
+        ],
+        [
+          195,
+          187
+        ],
+        [
+          195,
+          205
+        ],
+        [
+          207,
+          208
+        ],
+        [
+          207,
+          225
+        ],
+        [
+          221,
+          224
+        ],
+        [
+          221,
+          225
+        ],
+        [
+          225,
+          228
+        ],
+        [
+          225,
+          229
+        ],
+        [
+          229,
+          230
+        ],
+        [
+          229,
+          236
+        ],
+        [
+          252,
+          253
+        ],
+        [
+          252,
+          262
+        ],
+        [
+          262,
+          263
+        ],
+        [
+          262,
+          270
+        ],
+        [
+          278,
+          283
+        ],
+        [
+          278,
+          284
+        ]
+      ],
+      "current_raw_executed_lines": [
+        32,
+        35,
+        42,
+        43,
+        44,
+        46,
+        52,
+        54,
+        55,
+        67,
+        69,
+        70,
+        78,
+        79,
+        81,
+        82,
+        88,
+        89,
+        91,
+        96,
+        98,
+        99,
+        100,
+        101,
+        108,
+        109,
+        111,
+        129,
+        131,
+        132,
+        135,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        167,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        178,
+        180,
+        181,
+        187,
+        188,
+        189,
+        194,
+        195,
+        205,
+        206,
+        207,
+        208,
+        221,
+        224,
+        225,
+        228,
+        229,
+        230,
+        236,
+        238,
+        247,
+        248,
+        249,
+        250,
+        252,
+        253,
+        262,
+        263,
+        269,
+        270,
+        272,
+        276,
+        277,
+        278,
+        283,
+        284,
+        286
+      ],
+      "current_raw_missing_branches": [
+        [
+          101,
+          98
+        ],
+        [
+          157,
+          164
+        ]
+      ],
+      "current_raw_missing_lines": [],
+      "end": 303,
+      "kind": "classes",
+      "name": "TargetProof",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [
+        [
+          101,
+          98
+        ],
+        [
+          157,
+          164
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 32
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        35,
+        42,
+        43,
+        44,
+        46
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 50,
+      "kind": "functions",
+      "name": "TargetProof.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 35
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        52,
+        54,
+        55
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 65,
+      "kind": "functions",
+      "name": "TargetProof.blocked",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 52
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 6,
+        "covered_lines": 8,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "num_statements": 8,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          81
+        ],
+        [
+          81,
+          82
+        ],
+        [
+          81,
+          89
+        ],
+        [
+          82,
+          81
+        ],
+        [
+          82,
+          88
+        ]
+      ],
+      "current_raw_executed_lines": [
+        67,
+        69,
+        70,
+        78,
+        79,
+        81,
+        82,
+        88,
+        89
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 89,
+      "kind": "functions",
+      "name": "TargetProof.identity",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 67
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 7,
+        "covered_lines": 7,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 0,
+        "num_branches": 8,
+        "num_partial_branches": 1,
+        "num_statements": 7,
+        "percent_branches_covered": 87.5,
+        "percent_branches_covered_display": "88",
+        "percent_covered": 93.33333333333333,
+        "percent_covered_display": "93",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          96,
+          98
+        ],
+        [
+          96,
+          109
+        ],
+        [
+          98,
+          96
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          99,
+          100
+        ],
+        [
+          99,
+          101
+        ],
+        [
+          101,
+          108
+        ]
+      ],
+      "current_raw_executed_lines": [
+        91,
+        96,
+        98,
+        99,
+        100,
+        101,
+        108,
+        109
+      ],
+      "current_raw_missing_branches": [
+        [
+          101,
+          98
+        ]
+      ],
+      "current_raw_missing_lines": [],
+      "end": 109,
+      "kind": "functions",
+      "name": "TargetProof.source_payload",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [
+        [
+          101,
+          98
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 91
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 11,
+        "covered_lines": 15,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 0,
+        "num_branches": 12,
+        "num_partial_branches": 1,
+        "num_statements": 15,
+        "percent_branches_covered": 91.66666666666667,
+        "percent_branches_covered_display": "92",
+        "percent_covered": 96.29629629629629,
+        "percent_covered_display": "96",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          131,
+          132
+        ],
+        [
+          131,
+          165
+        ],
+        [
+          135,
+          155
+        ],
+        [
+          135,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          158,
+          159
+        ],
+        [
+          158,
+          160
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          162,
+          163
+        ],
+        [
+          162,
+          164
+        ]
+      ],
+      "current_raw_executed_lines": [
+        111,
+        129,
+        131,
+        132,
+        135,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165
+      ],
+      "current_raw_missing_branches": [
+        [
+          157,
+          164
+        ]
+      ],
+      "current_raw_missing_lines": [],
+      "end": 165,
+      "kind": "functions",
+      "name": "TargetProof.evidence",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [
+        [
+          157,
+          164
+        ]
+      ],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 111
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 18,
+        "covered_lines": 26,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 18,
+        "num_partial_branches": 0,
+        "num_statements": 26,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          178,
+          180
+        ],
+        [
+          178,
+          229
+        ],
+        [
+          180,
+          181
+        ],
+        [
+          180,
+          187
+        ],
+        [
+          187,
+          188
+        ],
+        [
+          187,
+          206
+        ],
+        [
+          189,
+          194
+        ],
+        [
+          189,
+          195
+        ],
+        [
+          195,
+          187
+        ],
+        [
+          195,
+          205
+        ],
+        [
+          207,
+          208
+        ],
+        [
+          207,
+          225
+        ],
+        [
+          221,
+          224
+        ],
+        [
+          221,
+          225
+        ],
+        [
+          225,
+          228
+        ],
+        [
+          225,
+          229
+        ],
+        [
+          229,
+          230
+        ],
+        [
+          229,
+          236
+        ]
+      ],
+      "current_raw_executed_lines": [
+        167,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        178,
+        180,
+        181,
+        187,
+        188,
+        189,
+        194,
+        195,
+        205,
+        206,
+        207,
+        208,
+        221,
+        224,
+        225,
+        228,
+        229,
+        230,
+        236
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 236,
+      "kind": "functions",
+      "name": "TargetProof.implementation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 167
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 4,
+        "covered_lines": 10,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 10,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          252,
+          253
+        ],
+        [
+          252,
+          262
+        ],
+        [
+          262,
+          263
+        ],
+        [
+          262,
+          270
+        ]
+      ],
+      "current_raw_executed_lines": [
+        238,
+        247,
+        248,
+        249,
+        250,
+        252,
+        253,
+        262,
+        263,
+        269,
+        270
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 270,
+      "kind": "functions",
+      "name": "TargetProof.links",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 238
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 2,
+        "covered_lines": 6,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 6,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          278,
+          283
+        ],
+        [
+          278,
+          284
+        ]
+      ],
+      "current_raw_executed_lines": [
+        272,
+        276,
+        277,
+        278,
+        283,
+        284,
+        286
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 303,
+      "kind": "functions",
+      "name": "TargetProof.coordinate",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 272
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        21,
+        28,
+        30
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 30,
+      "kind": "classes",
+      "name": "ReportLimitError",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 21
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        28,
+        30
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 30,
+      "kind": "functions",
+      "name": "ReportLimitError.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 28
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 39,
+        "covered_lines": 58,
+        "excluded_lines": 0,
+        "missing_branches": 11,
+        "missing_lines": 11,
+        "num_branches": 50,
+        "num_partial_branches": 11,
+        "num_statements": 69,
+        "percent_branches_covered": 78.0,
+        "percent_branches_covered_display": "78",
+        "percent_covered": 81.5126050420168,
+        "percent_covered_display": "82",
+        "percent_statements_covered": 84.05797101449275,
+        "percent_statements_covered_display": "84"
+      },
+      "current_raw_executed_branches": [
+        [
+          50,
+          52
+        ],
+        [
+          69,
+          70
+        ],
+        [
+          69,
+          71
+        ],
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          80
+        ],
+        [
+          88,
+          89
+        ],
+        [
+          88,
+          90
+        ],
+        [
+          92,
+          -82
+        ],
+        [
+          92,
+          93
+        ],
+        [
+          94,
+          96
+        ],
+        [
+          96,
+          97
+        ],
+        [
+          96,
+          98
+        ],
+        [
+          98,
+          100
+        ],
+        [
+          100,
+          103
+        ],
+        [
+          114,
+          120
+        ],
+        [
+          122,
+          123
+        ],
+        [
+          122,
+          145
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          124,
+          126
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          128,
+          136
+        ],
+        [
+          140,
+          -107
+        ],
+        [
+          140,
+          141
+        ],
+        [
+          141,
+          143
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          157
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          150,
+          155
+        ],
+        [
+          155,
+          -107
+        ],
+        [
+          155,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          159,
+          160
+        ],
+        [
+          159,
+          164
+        ],
+        [
+          161,
+          163
+        ],
+        [
+          164,
+          165
+        ],
+        [
+          164,
+          169
+        ],
+        [
+          166,
+          168
+        ],
+        [
+          169,
+          170
+        ]
+      ],
+      "current_raw_executed_lines": [
+        33,
+        44,
+        50,
+        52,
+        57,
+        58,
+        59,
+        60,
+        61,
+        63,
+        69,
+        70,
+        71,
+        73,
+        78,
+        79,
+        80,
+        82,
+        88,
+        89,
+        90,
+        92,
+        93,
+        94,
+        96,
+        97,
+        98,
+        100,
+        103,
+        107,
+        114,
+        120,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        136,
+        140,
+        141,
+        143,
+        144,
+        145,
+        146,
+        147,
+        149,
+        150,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        163,
+        164,
+        165,
+        166,
+        168,
+        169,
+        170
+      ],
+      "current_raw_missing_branches": [
+        [
+          50,
+          51
+        ],
+        [
+          94,
+          95
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          100,
+          101
+        ],
+        [
+          114,
+          119
+        ],
+        [
+          141,
+          142
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          150,
+          151
+        ],
+        [
+          161,
+          162
+        ],
+        [
+          166,
+          167
+        ],
+        [
+          169,
+          172
+        ]
+      ],
+      "current_raw_missing_lines": [
+        51,
+        95,
+        99,
+        101,
+        119,
+        142,
+        148,
+        151,
+        162,
+        167,
+        172
+      ],
+      "end": 172,
+      "kind": "classes",
+      "name": "ReportBudget",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        51,
+        95,
+        99,
+        101,
+        119,
+        142,
+        148,
+        151,
+        162,
+        167,
+        172
+      ],
+      "start": 33
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 1,
+        "covered_lines": 7,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 2,
+        "num_partial_branches": 1,
+        "num_statements": 8,
+        "percent_branches_covered": 50.0,
+        "percent_branches_covered_display": "50",
+        "percent_covered": 80.0,
+        "percent_covered_display": "80",
+        "percent_statements_covered": 87.5,
+        "percent_statements_covered_display": "88"
+      },
+      "current_raw_executed_branches": [
+        [
+          50,
+          52
+        ]
+      ],
+      "current_raw_executed_lines": [
+        44,
+        50,
+        52,
+        57,
+        58,
+        59,
+        60,
+        61
+      ],
+      "current_raw_missing_branches": [
+        [
+          50,
+          51
+        ]
+      ],
+      "current_raw_missing_lines": [
+        51
+      ],
+      "end": 61,
+      "kind": "functions",
+      "name": "ReportBudget.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        51
+      ],
+      "start": 44
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 2,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          69,
+          70
+        ],
+        [
+          69,
+          71
+        ]
+      ],
+      "current_raw_executed_lines": [
+        63,
+        69,
+        70,
+        71
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 71,
+      "kind": "functions",
+      "name": "ReportBudget.work",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 63
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 2,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          80
+        ]
+      ],
+      "current_raw_executed_lines": [
+        73,
+        78,
+        79,
+        80
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 80,
+      "kind": "functions",
+      "name": "ReportBudget.spend",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 73
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 9,
+        "covered_lines": 11,
+        "excluded_lines": 0,
+        "missing_branches": 3,
+        "missing_lines": 3,
+        "num_branches": 12,
+        "num_partial_branches": 3,
+        "num_statements": 14,
+        "percent_branches_covered": 75.0,
+        "percent_branches_covered_display": "75",
+        "percent_covered": 76.92307692307692,
+        "percent_covered_display": "77",
+        "percent_statements_covered": 78.57142857142857,
+        "percent_statements_covered_display": "79"
+      },
+      "current_raw_executed_branches": [
+        [
+          88,
+          89
+        ],
+        [
+          88,
+          90
+        ],
+        [
+          92,
+          -82
+        ],
+        [
+          92,
+          93
+        ],
+        [
+          94,
+          96
+        ],
+        [
+          96,
+          97
+        ],
+        [
+          96,
+          98
+        ],
+        [
+          98,
+          100
+        ],
+        [
+          100,
+          103
+        ]
+      ],
+      "current_raw_executed_lines": [
+        82,
+        88,
+        89,
+        90,
+        92,
+        93,
+        94,
+        96,
+        97,
+        98,
+        100,
+        103
+      ],
+      "current_raw_missing_branches": [
+        [
+          94,
+          95
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          100,
+          101
+        ]
+      ],
+      "current_raw_missing_lines": [
+        95,
+        99,
+        101
+      ],
+      "end": 105,
+      "kind": "functions",
+      "name": "ReportBudget.text",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        95,
+        99,
+        101
+      ],
+      "start": 82
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 25,
+        "covered_lines": 34,
+        "excluded_lines": 0,
+        "missing_branches": 7,
+        "missing_lines": 7,
+        "num_branches": 32,
+        "num_partial_branches": 7,
+        "num_statements": 41,
+        "percent_branches_covered": 78.125,
+        "percent_branches_covered_display": "78",
+        "percent_covered": 80.82191780821918,
+        "percent_covered_display": "81",
+        "percent_statements_covered": 82.92682926829268,
+        "percent_statements_covered_display": "83"
+      },
+      "current_raw_executed_branches": [
+        [
+          114,
+          120
+        ],
+        [
+          122,
+          123
+        ],
+        [
+          122,
+          145
+        ],
+        [
+          124,
+          125
+        ],
+        [
+          124,
+          126
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          128,
+          136
+        ],
+        [
+          140,
+          -107
+        ],
+        [
+          140,
+          141
+        ],
+        [
+          141,
+          143
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          157
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          150,
+          155
+        ],
+        [
+          155,
+          -107
+        ],
+        [
+          155,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          159,
+          160
+        ],
+        [
+          159,
+          164
+        ],
+        [
+          161,
+          163
+        ],
+        [
+          164,
+          165
+        ],
+        [
+          164,
+          169
+        ],
+        [
+          166,
+          168
+        ],
+        [
+          169,
+          170
+        ]
+      ],
+      "current_raw_executed_lines": [
+        107,
+        114,
+        120,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        136,
+        140,
+        141,
+        143,
+        144,
+        145,
+        146,
+        147,
+        149,
+        150,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        163,
+        164,
+        165,
+        166,
+        168,
+        169,
+        170
+      ],
+      "current_raw_missing_branches": [
+        [
+          114,
+          119
+        ],
+        [
+          141,
+          142
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          150,
+          151
+        ],
+        [
+          161,
+          162
+        ],
+        [
+          166,
+          167
+        ],
+        [
+          169,
+          172
+        ]
+      ],
+      "current_raw_missing_lines": [
+        119,
+        142,
+        148,
+        151,
+        162,
+        167,
+        172
+      ],
+      "end": 172,
+      "kind": "functions",
+      "name": "ReportBudget.check",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        119,
+        142,
+        148,
+        151,
+        162,
+        167,
+        172
+      ],
+      "start": 107
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 4,
+        "covered_lines": 7,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 7,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          181,
+          182
+        ],
+        [
+          181,
+          188
+        ],
+        [
+          188,
+          190
+        ],
+        [
+          188,
+          193
+        ]
+      ],
+      "current_raw_executed_lines": [
+        175,
+        181,
+        182,
+        183,
+        187,
+        188,
+        190,
+        193
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 193,
+      "kind": "functions",
+      "name": "_freeze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 175
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 1,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 2,
+        "num_partial_branches": 1,
+        "num_statements": 4,
+        "percent_branches_covered": 50.0,
+        "percent_branches_covered_display": "50",
+        "percent_covered": 66.66666666666667,
+        "percent_covered_display": "67",
+        "percent_statements_covered": 75.0,
+        "percent_statements_covered_display": "75"
+      },
+      "current_raw_executed_branches": [
+        [
+          202,
+          204
+        ]
+      ],
+      "current_raw_executed_lines": [
+        196,
+        202,
+        204,
+        205
+      ],
+      "current_raw_missing_branches": [
+        [
+          202,
+          203
+        ]
+      ],
+      "current_raw_missing_lines": [
+        203
+      ],
+      "end": 205,
+      "kind": "functions",
+      "name": "bounded_object",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        203
+      ],
+      "start": 196
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 1,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 2,
+        "num_partial_branches": 1,
+        "num_statements": 3,
+        "percent_branches_covered": 50.0,
+        "percent_branches_covered_display": "50",
+        "percent_covered": 60.0,
+        "percent_covered_display": "60",
+        "percent_statements_covered": 66.66666666666667,
+        "percent_statements_covered_display": "67"
+      },
+      "current_raw_executed_branches": [
+        [
+          214,
+          223
+        ]
+      ],
+      "current_raw_executed_lines": [
+        208,
+        214,
+        223
+      ],
+      "current_raw_missing_branches": [
+        [
+          214,
+          222
+        ]
+      ],
+      "current_raw_missing_lines": [
+        222
+      ],
+      "end": 233,
+      "kind": "functions",
+      "name": "ratio",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        222
+      ],
+      "start": 208
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 9,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 9,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        237,
+        247,
+        248,
+        250,
+        255,
+        259,
+        261,
+        263,
+        265,
+        267,
+        275,
+        280,
+        281,
+        282,
+        283,
+        284
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 284,
+      "kind": "classes",
+      "name": "DiscoveryReport",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 237
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        250,
+        255
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 257,
+      "kind": "functions",
+      "name": "DiscoveryReport.__post_init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 250
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        259,
+        261
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 261,
+      "kind": "functions",
+      "name": "DiscoveryReport.to_dict",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 259
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        263,
+        265
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 265,
+      "kind": "functions",
+      "name": "DiscoveryReport.to_json",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 263
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 6,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 6,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        267,
+        275,
+        280,
+        281,
+        282,
+        283,
+        284
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 284,
+      "kind": "functions",
+      "name": "DiscoveryReport.to_markdown",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 267
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 2,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        287
+      ],
+      "current_raw_missing_branches": [
+        [
+          292,
+          -287
+        ],
+        [
+          292,
+          295
+        ]
+      ],
+      "current_raw_missing_lines": [
+        292,
+        295
+      ],
+      "end": 295,
+      "kind": "functions",
+      "name": "_legacy_version",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        292,
+        295
+      ],
+      "start": 287
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 6,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 6,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        298
+      ],
+      "current_raw_missing_branches": [
+        [
+          305,
+          306
+        ],
+        [
+          305,
+          307
+        ]
+      ],
+      "current_raw_missing_lines": [
+        304,
+        305,
+        306,
+        307,
+        308,
+        309
+      ],
+      "end": 309,
+      "kind": "functions",
+      "name": "parse_coverage_ledger",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        304,
+        305,
+        306,
+        307,
+        308,
+        309
+      ],
+      "start": 298
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 2,
+        "missing_lines": 7,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 7,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        312
+      ],
+      "current_raw_missing_branches": [
+        [
+          324,
+          327
+        ],
+        [
+          324,
+          329
+        ]
+      ],
+      "current_raw_missing_lines": [
+        321,
+        322,
+        323,
+        324,
+        327,
+        329,
+        330
+      ],
+      "end": 332,
+      "kind": "functions",
+      "name": "build_coverage_rows",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        321,
+        322,
+        323,
+        324,
+        327,
+        329,
+        330
+      ],
+      "start": 312
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 3,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        335
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [
+        343,
+        345,
+        346
+      ],
+      "end": 346,
+      "kind": "functions",
+      "name": "render_coverage_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        343,
+        345,
+        346
+      ],
+      "start": 335
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 2,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          70,
+          71
+        ],
+        [
+          70,
+          72
+        ]
+      ],
+      "current_raw_executed_lines": [
+        66,
+        68,
+        70,
+        71,
+        72
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 72,
+      "kind": "functions",
+      "name": "_findings",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 66
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        76,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        93,
+        94,
+        96
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 100,
+      "kind": "classes",
+      "name": "SnapshotValidation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 76
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        94,
+        96
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 100,
+      "kind": "functions",
+      "name": "SnapshotValidation.ok",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 94
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 15,
+        "covered_lines": 57,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 16,
+        "num_partial_branches": 1,
+        "num_statements": 58,
+        "percent_branches_covered": 93.75,
+        "percent_branches_covered_display": "94",
+        "percent_covered": 97.29729729729729,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 98.27586206896552,
+        "percent_statements_covered_display": "98"
+      },
+      "current_raw_executed_branches": [
+        [
+          184,
+          185
+        ],
+        [
+          184,
+          186
+        ],
+        [
+          192,
+          193
+        ],
+        [
+          192,
+          194
+        ],
+        [
+          194,
+          196
+        ],
+        [
+          196,
+          197
+        ],
+        [
+          196,
+          199
+        ],
+        [
+          211,
+          212
+        ],
+        [
+          211,
+          256
+        ],
+        [
+          268,
+          269
+        ],
+        [
+          268,
+          279
+        ],
+        [
+          306,
+          307
+        ],
+        [
+          306,
+          340
+        ],
+        [
+          311,
+          312
+        ],
+        [
+          311,
+          322
+        ]
+      ],
+      "current_raw_executed_lines": [
+        103,
+        110,
+        112,
+        113,
+        115,
+        123,
+        124,
+        125,
+        126,
+        129,
+        132,
+        135,
+        138,
+        145,
+        154,
+        172,
+        176,
+        179,
+        180,
+        182,
+        184,
+        185,
+        186,
+        192,
+        193,
+        194,
+        196,
+        197,
+        199,
+        200,
+        201,
+        203,
+        209,
+        211,
+        212,
+        214,
+        224,
+        231,
+        238,
+        247,
+        256,
+        257,
+        258,
+        267,
+        268,
+        269,
+        278,
+        279,
+        281,
+        288,
+        290,
+        293,
+        306,
+        307,
+        308,
+        311,
+        312,
+        322,
+        332,
+        333,
+        337,
+        340
+      ],
+      "current_raw_missing_branches": [
+        [
+          194,
+          195
+        ]
+      ],
+      "current_raw_missing_lines": [
+        195
+      ],
+      "end": 340,
+      "kind": "classes",
+      "name": "_Validation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        195
+      ],
+      "start": 103
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 0,
+        "covered_lines": 17,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 17,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [],
+      "current_raw_executed_lines": [
+        110,
+        112,
+        113,
+        115,
+        123,
+        124,
+        125,
+        126,
+        129,
+        132,
+        135,
+        138,
+        145,
+        154,
+        172,
+        176,
+        179,
+        180
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 180,
+      "kind": "functions",
+      "name": "_Validation.__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 110
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 7,
+        "covered_lines": 11,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 8,
+        "num_partial_branches": 1,
+        "num_statements": 12,
+        "percent_branches_covered": 87.5,
+        "percent_branches_covered_display": "88",
+        "percent_covered": 90.0,
+        "percent_covered_display": "90",
+        "percent_statements_covered": 91.66666666666667,
+        "percent_statements_covered_display": "92"
+      },
+      "current_raw_executed_branches": [
+        [
+          184,
+          185
+        ],
+        [
+          184,
+          186
+        ],
+        [
+          192,
+          193
+        ],
+        [
+          192,
+          194
+        ],
+        [
+          194,
+          196
+        ],
+        [
+          196,
+          197
+        ],
+        [
+          196,
+          199
+        ]
+      ],
+      "current_raw_executed_lines": [
+        182,
+        184,
+        185,
+        186,
+        192,
+        193,
+        194,
+        196,
+        197,
+        199,
+        200,
+        201
+      ],
+      "current_raw_missing_branches": [
+        [
+          194,
+          195
+        ]
+      ],
+      "current_raw_missing_lines": [
+        195
+      ],
+      "end": 201,
+      "kind": "functions",
+      "name": "_Validation.evaluate",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        195
+      ],
+      "start": 182
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 4,
+        "covered_lines": 16,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 16,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          211,
+          212
+        ],
+        [
+          211,
+          256
+        ],
+        [
+          268,
+          269
+        ],
+        [
+          268,
+          279
+        ]
+      ],
+      "current_raw_executed_lines": [
+        203,
+        209,
+        211,
+        212,
+        214,
+        224,
+        231,
+        238,
+        247,
+        256,
+        257,
+        258,
+        267,
+        268,
+        269,
+        278,
+        279
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 279,
+      "kind": "functions",
+      "name": "_Validation.complete",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 203
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 4,
+        "covered_lines": 13,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 13,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          306,
+          307
+        ],
+        [
+          306,
+          340
+        ],
+        [
+          311,
+          312
+        ],
+        [
+          311,
+          322
+        ]
+      ],
+      "current_raw_executed_lines": [
+        281,
+        288,
+        290,
+        293,
+        306,
+        307,
+        308,
+        311,
+        312,
+        322,
+        332,
+        333,
+        337,
+        340
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 340,
+      "kind": "functions",
+      "name": "_Validation.report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 281
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 21,
+        "covered_lines": 32,
+        "excluded_lines": 0,
+        "missing_branches": 5,
+        "missing_lines": 6,
+        "num_branches": 26,
+        "num_partial_branches": 5,
+        "num_statements": 38,
+        "percent_branches_covered": 80.76923076923077,
+        "percent_branches_covered_display": "81",
+        "percent_covered": 82.8125,
+        "percent_covered_display": "83",
+        "percent_statements_covered": 84.21052631578948,
+        "percent_statements_covered_display": "84"
+      },
+      "current_raw_executed_branches": [
+        [
+          354,
+          355
+        ],
+        [
+          354,
+          356
+        ],
+        [
+          356,
+          366
+        ],
+        [
+          369,
+          370
+        ],
+        [
+          369,
+          421
+        ],
+        [
+          373,
+          374
+        ],
+        [
+          373,
+          415
+        ],
+        [
+          374,
+          375
+        ],
+        [
+          374,
+          377
+        ],
+        [
+          377,
+          383
+        ],
+        [
+          385,
+          398
+        ],
+        [
+          401,
+          402
+        ],
+        [
+          401,
+          409
+        ],
+        [
+          409,
+          373
+        ],
+        [
+          409,
+          414
+        ],
+        [
+          415,
+          416
+        ],
+        [
+          415,
+          421
+        ],
+        [
+          421,
+          422
+        ],
+        [
+          421,
+          430
+        ],
+        [
+          422,
+          429
+        ],
+        [
+          430,
+          437
+        ]
+      ],
+      "current_raw_executed_lines": [
+        343,
+        354,
+        355,
+        356,
+        366,
+        367,
+        368,
+        369,
+        370,
+        371,
+        373,
+        374,
+        375,
+        377,
+        383,
+        384,
+        385,
+        398,
+        401,
+        402,
+        409,
+        414,
+        415,
+        416,
+        419,
+        420,
+        421,
+        422,
+        429,
+        430,
+        437,
+        440,
+        441
+      ],
+      "current_raw_missing_branches": [
+        [
+          356,
+          357
+        ],
+        [
+          377,
+          382
+        ],
+        [
+          385,
+          390
+        ],
+        [
+          422,
+          423
+        ],
+        [
+          430,
+          431
+        ]
+      ],
+      "current_raw_missing_lines": [
+        357,
+        382,
+        390,
+        397,
+        423,
+        431
+      ],
+      "end": 450,
+      "kind": "functions",
+      "name": "validate_snapshot",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [
+        357,
+        382,
+        390,
+        397,
+        423,
+        431
+      ],
+      "start": 343
+    },
+    {
+      "coverage_named_summary": {
+        "covered_branches": 12,
+        "covered_lines": 15,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "num_statements": 15,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "current_raw_executed_branches": [
+        [
+          463,
+          464
+        ],
+        [
+          463,
+          466
+        ],
+        [
+          466,
+          467
+        ],
+        [
+          466,
+          468
+        ],
+        [
+          468,
+          469
+        ],
+        [
+          468,
+          470
+        ],
+        [
+          471,
+          474
+        ],
+        [
+          471,
+          498
+        ],
+        [
+          474,
+          475
+        ],
+        [
+          474,
+          497
+        ],
+        [
+          475,
+          476
+        ],
+        [
+          475,
+          477
+        ]
+      ],
+      "current_raw_executed_lines": [
+        453,
+        463,
+        464,
+        466,
+        467,
+        468,
+        469,
+        470,
+        471,
+        474,
+        475,
+        476,
+        477,
+        478,
+        497,
+        498
+      ],
+      "current_raw_missing_branches": [],
+      "current_raw_missing_lines": [],
+      "end": 498,
+      "kind": "functions",
+      "name": "report_projection",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "retained_unchanged_body_covered_lines": [],
+      "start": 453
+    }
+  ],
+  "raw_coverage_sha256": "b96768ec9ff7dd07ba44ea0330933ab0de2a79510a02988a74eab80c635eefc9"
+}

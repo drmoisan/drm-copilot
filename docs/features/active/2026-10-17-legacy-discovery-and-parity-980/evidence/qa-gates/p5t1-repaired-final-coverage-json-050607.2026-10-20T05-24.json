@@ -1,0 +1,38 @@
+{
+  "binding_after": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "binding_before": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage json -o SCRATCH\\issue-980-p5t1-repaired-final-050607-combined-coverage.raw.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T05:24:16.481287+00:00",
+  "label": "coverage-json",
+  "last_node": null,
+  "pid": 66208,
+  "raw": [
+    {
+      "bytes": 157,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-json.stdout",
+      "sha256": "b4b82ea9218fd06bad6b86b0dba542f9e0cd333e8a9348e8feacad0a0764a91d"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-json.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 225,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-json.progress.json",
+      "sha256": "b45dfb501dfe26b4e85768a142c3f0a087fbe22c73970388813488c7597916b7"
+    }
+  ],
+  "seconds": 1.01,
+  "stage": 6,
+  "started_at": "2026-10-20T05:24:15.471527+00:00",
+  "stderr": "",
+  "stdout": "Wrote JSON report to SCRATCH\\issue-980-p5t1-repaired-final-050607-combined-coverage.raw.json\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T05-24"
+}

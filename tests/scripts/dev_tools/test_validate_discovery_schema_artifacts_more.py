@@ -1,63 +1,39 @@
-"""Additional unit tests for the final three discovery schema validators.
-
-Purpose:
-    Cover `validate_unspecified_behavior_text`, `validate_product_decision_text`,
-    and `validate_evidence_reference_text` with a `decision_id`-requiring
-    inline literal schema, split from `test_validate_discovery_schema_artifacts.py`
-    per the repository's 500-line file cap.
-"""
+"""Exercise remaining legacy wrappers using actual frozen schema fixtures."""
 
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
 import scripts.dev_tools.validate_discovery_schema_artifacts as discovery_schema
+from tests.scripts.dev_tools.test_validate_discovery_schema_artifacts import (
+    fixture_text,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from pathlib import Path
-
-    from _pytest.monkeypatch import MonkeyPatch
-
-_DECISION_ID_SCHEMA: dict[str, object] = {
-    "type": "object",
-    "required": ["decision_id"],
-    "properties": {"decision_id": {"type": "string"}},
-}
-
-
-def _decision_id_schema(_uri: str, _cache_dir: Path) -> dict[str, object]:
-    """Stand in for `load_schema` requiring `decision_id`."""
-    return _DECISION_ID_SCHEMA
 
 
 @pytest.mark.parametrize(
-    "validator",
+    ("validator", "kind"),
     [
-        discovery_schema.validate_unspecified_behavior_text,
-        discovery_schema.validate_product_decision_text,
-        discovery_schema.validate_evidence_reference_text,
+        (discovery_schema.validate_unspecified_behavior_text, "unspecified-behavior"),
+        (discovery_schema.validate_product_decision_text, "product-decision"),
+        (discovery_schema.validate_evidence_reference_text, "evidence-reference"),
     ],
 )
-def test_final_three_schema_validators_accept_and_reject_fixtures(
-    validator: Callable[[str], list[str]], monkeypatch: MonkeyPatch
+def test_final_three_schema_validators_accept_and_reject_real_fixtures(
+    validator: Callable[[str], list[str]],
+    kind: str,
 ) -> None:
-    """Each of these three validators should accept a conforming fixture and
-    reject a fixture missing the required `decision_id` field."""
-    monkeypatch.setattr(discovery_schema, "load_schema", _decision_id_schema)
+    """Each wrapper preserves positive and required-property negative behavior."""
+    text = fixture_text(kind)
+    document = cast("dict[str, object]", json.loads(text))
+    del document["id"]
 
-    conforming_errors = validator(
-        json.dumps(
-            {"$schema": "https://example.test/schema.json", "decision_id": "abc"}
-        )
-    )
-    assert conforming_errors == []
-
-    non_conforming_errors = validator(
-        json.dumps({"$schema": "https://example.test/schema.json"})
-    )
-    assert len(non_conforming_errors) == 1
-    assert "decision_id" in non_conforming_errors[0]
+    assert validator(text) == []
+    errors = validator(json.dumps(document))
+    assert len(errors) == 1
+    assert "'id' is a required property" in errors[0]

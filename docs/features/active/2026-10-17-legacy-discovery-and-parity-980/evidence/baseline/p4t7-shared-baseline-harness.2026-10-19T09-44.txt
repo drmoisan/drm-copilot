@@ -1,0 +1,76 @@
+"""Bind the accepted task and approved absent paths without replaying tests."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+repo = Path.cwd()
+feature = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+evidence = feature / "evidence"
+started = datetime.datetime.now(datetime.timezone.utc)
+head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+assert head == "28b03c185f32fdeb9ccfdafd1bb7decce959161d"
+checkpoint = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+partition = checkpoint["execution_progress"]["p4t7_execution_preparation"]["partition_approval"]
+paths = partition["production"] + partition["tests"]
+assert len(paths) == len(set(paths)) == 10
+assert all(not Path(path).exists() for path in paths)
+baseline_path = evidence / "baseline/p4t6-shared-baseline.2026-10-19T08-29.json"
+handoff_path = evidence / "qa-gates/p4t6-final-handoff.2026-10-19T09-23.json"
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+assert sha(baseline_path.read_bytes()) == "bdf686a47676d9599c1bf2172068118caa8f0b092b9e37287108028d51b62ed4"
+assert sha(handoff_path.read_bytes()) == "04d81716b7a914ce69d411a4695c9e83e13b83d191bc69dff09aa89558a2c76c"
+baseline = json.loads(baseline_path.read_bytes())
+handoff = json.loads(handoff_path.read_bytes())
+prior = baseline["preserved_files"] + handoff["source_files"]
+assert len(prior) == 62
+preserved = []
+for item in prior:
+    name = item["path"]
+    raw = Path(name).read_bytes()
+    expected = item.get("sha256", item.get("working_sha256"))
+    assert sha(raw) == expected, name
+    committed = subprocess.check_output(["git", "show", "HEAD:" + name])
+    indexed = subprocess.check_output(["git", "show", ":" + name])
+    assert raw == indexed == committed or raw.replace(b"\r\n", b"\n") == indexed == committed, name
+    preserved.append({"path": name, "sha256": sha(raw), "index_sha256": sha(indexed),
+                      "commit_sha256": sha(committed), "stream_relation": "identical" if raw == indexed else "CRLF-to-LF-only",
+                      "attributes": subprocess.check_output(["git", "check-attr", "--all", "--", name], text=True).strip()})
+profile = Path(".codex/agents/python-typed-engineer-c4.toml")
+assert sha(profile.read_bytes()) == "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+finished = datetime.datetime.now(datetime.timezone.utc)
+stamp = finished.strftime("%Y-%m-%dT%H-%M")
+prefix = evidence / ("baseline/p4t7-shared-baseline." + stamp)
+harness = evidence / ("baseline/p4t7-shared-baseline-harness." + stamp + ".txt")
+assert not harness.exists()
+harness.write_bytes(Path(__file__).read_bytes())
+record = {"started": started.isoformat(), "finished": finished.isoformat(), "head": head,
+          "command": "poetry run python SCRATCH/issue-980-p4t7-shared-baseline.py", "exit_code": 0,
+          "scope": "P4-T7 shared baseline only; no source/test mutation or accepted-suite rerun",
+          "absent_paths": [{"path": name, "exists": False, "tracked_at_head": bool(subprocess.check_output(["git", "ls-tree", "HEAD", "--", name]))} for name in paths],
+          "preserved_files": preserved, "accepted_baseline": reference(baseline_path), "accepted_handoff": reference(handoff_path),
+          "profile": reference(profile), "authority": {"delegation_id": "workspace_operations_p4t7_shared", "phase": "S5_P4T7_shared_contract_and_integration", "native_routing_valid": True, "native_launch_authority_valid": True, "native_provenance_valid": True},
+          "reused_proof": "P4-T6 accepted ordered seven-stage receipts bind 245 reversed unit cases, 209 contracts, 13 Windows/Git assertions, and 26 class/callable ranges; no applicable predecessor changed.",
+          "new_paths_baseline": "Absent: no executable lines or previous callable coverage exist.",
+          "harness": reference(harness), "source_test_mutations": False, "git_mutations": False}
+assert not any(item["tracked_at_head"] for item in record["absent_paths"])
+out = Path(str(prefix) + ".json")
+assert not out.exists()
+out.write_bytes((json.dumps(record, indent=2) + "\n").encode())
+md = Path(str(prefix) + ".md")
+assert not md.exists()
+md.write_bytes((f"# P4-T7 shared baseline\n\nTimestamp: {stamp}\nCommand: {record['command']}\nEXIT_CODE: 0\nOutput Summary: PASS; all ten approved paths are absent, and all 62 accepted predecessor streams remain unchanged.\n\n"
+               f"Accepted commit: `{head}`. Existing ordered format, lint, type, unit, contract and native proof is referenced through the immutable P4-T6 handoff. New paths have no prior executable lines. No suite was replayed.\n\n"
+               "The paired JSON binds exact working/index/commit streams and actual Git attributes, preserving CRLF-to-LF distinctions. Native routing, launch authority and provenance were rechecked before this baseline; the current C4 profile matches its durable receipt.\n\n"
+               "The lead owns the shared input contract and integration only; the three format parser/test pairs remain reserved and unreleased. This baseline does not authorize policy, registry, schema, dependency or predecessor changes.\n").encode())
+print(json.dumps({"baseline": reference(out), "markdown": reference(md), "harness": reference(harness), "preserved": len(preserved), "absent": len(paths)}, indent=2))

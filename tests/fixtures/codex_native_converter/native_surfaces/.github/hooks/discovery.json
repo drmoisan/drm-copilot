@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "powershell": "pwsh -NoProfile -File .github/hooks/discovery-pre-tool.ps1",
+        "bash": "pwsh -NoProfile -File .github/hooks/discovery-pre-tool.ps1",
+        "timeout": 30
+      }
+    ]
+  }
+}

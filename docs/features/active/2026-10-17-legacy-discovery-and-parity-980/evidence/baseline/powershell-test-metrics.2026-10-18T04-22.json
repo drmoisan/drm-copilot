@@ -1,0 +1,68 @@
+{
+  "suites": 410,
+  "tests": 11320,
+  "passed": 11310,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 10,
+  "coverage": {
+    "covered_lines": 17730,
+    "missed_lines": 1412,
+    "total_lines": 19142,
+    "line_percent": 92.62355030822276,
+    "branch": "not measured by this Pester output"
+  },
+  "failures": [],
+  "junit_totals": {
+    "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "junit_schema_4.xsd",
+    "name": "Pester",
+    "tests": "11320",
+    "errors": "0",
+    "failures": "0",
+    "disabled": "10",
+    "time": "602.703"
+  },
+  "skip_records": [
+    {
+      "name": "BlastRadius regression corpus for issue 452.Tolerance branch.keeps a scheduling edge for every must-conflict case at the strictest tolerance",
+      "diagnostic": "<skipped message=\"Exception: is skipped, because Issue #722 tolerance layer absent at execution start (Phase 0 detection NOT FOUND); detection-level verdicts for every must-conflict case are recorded as evidence instead.\" />\n    "
+    },
+    {
+      "name": "new-claude-worktree-session.ps1 - Start-ClaudeBackground.Process launch behavior.uses claude as FilePath on non-Windows hosts",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "new-claude-worktree-session.ps1 - Start-ClaudeBackground.Process launch behavior.ArgumentList does not contain /c on non-Windows hosts",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "Install-PoshQCTool.When PSGallery is not registered.Should register PSGallery when not found",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "Install-PoshQCTool.When PSGallery is not trusted.Should attempt to set PSGallery as trusted",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "Install-PoshQCTool.When PSGallery is not trusted.Should handle failure to set PSGallery as trusted gracefully",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "Install-PoshQCTool.When modules need to be installed.Should install missing modules",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "Install-PoshQCTool.When modules need to be installed.Should verify module installation after install",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "Install-PoshQCTool.When modules need to be installed.Should throw when module installation fails",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    },
+    {
+      "name": "Install-PoshQCTool.When modules are already installed.Should skip installation for already-present modules",
+      "diagnostic": "<skipped message=\"\" />\n    "
+    }
+  ],
+  "coverage_files": 215
+}

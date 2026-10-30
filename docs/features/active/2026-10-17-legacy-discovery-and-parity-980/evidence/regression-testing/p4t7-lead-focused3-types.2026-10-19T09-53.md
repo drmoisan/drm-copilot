@@ -1,0 +1,12 @@
+# p4t7-lead-focused3-types
+
+Timestamp: 2026-10-19T09-53
+Command: poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_inputs.py
+EXIT_CODE: 0
+Output Summary: scoped types; duration 1.968 seconds. Raw stdout/stderr hashes and SCRATCH-relative locations are separate from sanitized presentation.
+
+```text
+0 errors, 0 warnings, 0 informations
+WARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+```

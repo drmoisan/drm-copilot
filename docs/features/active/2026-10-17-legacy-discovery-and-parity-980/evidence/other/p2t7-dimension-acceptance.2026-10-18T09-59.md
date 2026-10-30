@@ -1,0 +1,40 @@
+# P2-T7 dimension and acceptance handoff
+
+Timestamp: 2026-10-18T09-59
+Command: poetry run python SCRATCH/issue-980-p2t7-task-audit.py 11
+EXIT_CODE: 0
+Output Summary: Five staged paths; 95 focused/95 reversed tests; 246/249 production lines and 104/108 branch arcs; all 23 callable/class ranges >= 90.000000%; 193 prior and 24 frozen paths unchanged; no findings.
+
+## Scope and interfaces
+
+- packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py: 309 physical lines
+- packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py: 489 physical lines
+- tests/discovery_runtime/test_dimension_rules.py: 425 physical lines
+- tests/discovery_runtime/test_acceptance_rules.py: 458 physical lines
+- tests/discovery_runtime/test_acceptance_scope.py: 214 physical lines
+
+Only P2-T7 is implemented. The plan line 28 same-component split places zero-feature, applicability and scoped-decision regressions in test_acceptance_scope.py to preserve the 500-line limit; both prescribed test modules remain. The coordinator stages the exact five additions for diff review. No earlier accepted production/test/schema path, dependency, suppression, coverage setting, plan/AC or checkpoint was changed by this worker.
+
+validate_dimensions(snapshot, complete=False, index=None, evidence=None, decisions=None) returns immutable DimensionValidation findings and FeatureObligation values. Each feature/client obligation retains the monotonic profile/client/feature/scope union and its explicit approved waivers. validate_acceptance(snapshot, complete=False, index=None, evidence=None, decisions=None, dimensions=None) returns immutable AcceptanceValidation findings and supported ready records. Reused immutable index/evidence/decision values avoid duplicate catalog construction. These rule results remain separate from schema/reference/revision/claim/coverage composition in P2-T9; ready specifications never claim implementation execution or target test passes.
+
+Required fixed dimensions have explicit applicability. Required not-applicable dispositions need a linked current approval covering the feature/client/platform/mode/dimension request plus rationale. A waiver records disposition, never an observation or verification pass. A verified feature summary cannot conceal an unknown, contradictory or inferred required dimension anywhere in the inherited union; this truth check precedes completion switches and waivers. Pending/unclassified drafts stay structurally valid where they do not assert false readiness. Unconfigured optional dimensions create no requirements or fabricated successful results.
+
+Custom operating modes and platform IDs use the existing acceptance client_id/platform_id/mode_id coordinates, with no new schema fields. Each inherited tuple needs supported coverage. Criterion selectors independently constrain where its known expectation applies; broader profile requirements cannot widen observed source proof. Current approved decision criteria add obligations only inside their approved scope and retain their originating approval. Reusing a source criterion ID cannot discharge a different approved target expectation with source-only readiness. A supported same-ID approved target scenario satisfies the scoped replacement without requiring a contradictory historical target scenario. Inherited source/profile coverage remains required outside that scope. Pending and superseded scenarios cannot satisfy ready coverage. Confirmed no-scope or a fully accounted supporting-only inventory can justify zero-feature completion; empty graphs, draft scopes and incomplete inventory accounting cannot.
+
+Ready Then is exactly the one-element array containing criterion.expected_result. The selected criterion must be ready with a known expectation; the scenario must have substantive When and no pending reasons, exact feature/criterion linkage, matching client/platform/mode applicability, and correct source or target owner/pin. Verified-source criteria and scenarios require source-pin observation evidence. Approved target expectations require a current linked decision covering the scenario context. Approved target policy preserves separate still-open legacy-observation questions and never promotes historical uncertainty to verified.
+
+acceptance_source_digest(sources, decisions=()) is the reusable P5 generation contract: SHA-256 over a bracketed, comma-joined ordinal-sorted set of canonical JSON objects containing each referenced record's trusted repository, pinned revision and complete normalized document. canonical_json retains its trailing newline. Repeated references and input order do not change the digest; document/pin changes do. Raw source-reference artifact checksums remain independent revision rules. No scenario ID generation or rendering is implemented here.
+
+## Verification
+
+Clean ordered pass 11: Black/Ruff pass all five files; full repository Pyright reports zero diagnostics; 95 focused tests pass. Reversed module order passes 95 tests. Static docstrings, 500-line limits, suppressions, whitespace and unit external-I/O checks pass. Tracked quality-tier and package-resource contracts pass. Shared fixtures contain immutable profiles/catalogs only; mutable documents, captured payloads and graph values are rebuilt per test. Unit tests create no temporary files and invoke no processes or network.
+
+Accepted Phase 0 baseline: zero Ruff/Pyright diagnostics, 7,336 passing tests with six existing skips, 94.111715% line and 88.783742% branch coverage. New modules have zero baseline executable lines; lint/type/test-failure deltas are zero. All accepted prior per-path hashes remain unchanged, preserving earlier changed-line evidence. Full repository test/coverage QA remains Phase 11 and was not repeated here.
+
+Retained failures: early lint passes found import/text formatting; pass 3 typing identified narrow synthetic containers; pass 5 required typed fallback empty sets. The independent 34-case review established three semantic gaps: ready criteria accepted out-of-applicability tuples, verified summaries hid client-required uncertainty, and decision criteria leaked beyond approved client scope. Current-task corrections and direct regressions address all three. Pass 6 then recorded 83 passes/9 fixture failures: synthetic features omitted the baseline trigger/output dimensions, source specifications omitted the configured browser platform, and a scoped-client test unintentionally inherited that global platform. Corrected fixture inputs preserve production semantics; raw failed coverage is retained. Pass 7 retained 91 passes/one negative-fixture mismatch after the platform helper correction; its explicit wrong platform was restored. Pass 8 passed 94 tests. The same-ID scoped-criterion variant then confirmed a remaining origin gap in pass 10 (one control passed, one regression failed); required decision coverage now retains the eligible originating approval, with positive approved replacement and negative source-only cases. Pass 9 formatting failed and its subsequent diagnostic-only commands are not counted as a clean gate; the loop restarted from formatting. Later focused commands override only the inherited LCOV report destination so transient coverage stays in SCRATCH and final evidence remains canonical; no coverage threshold or measurement was weakened. Final independent acceptance remains executor-owned.
+
+Metrics and hashes: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t7-coverage-metrics.2026-10-18T09-59.json
+Raw coverage: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t7-coverage.2026-10-18T09-59.json
+Separate command receipts: evidence/regression-testing/p2t7-<step>-pass11.*.md; earlier failed passes retained individually. Independent initial proof: p2t7-executor-review.2026-10-18T09-42.json/md. Corrected bounded proof: p2t7-executor-probes.2026-10-18T09-49.json/md and any later final-byte binding.
+
+TASK_READY_FOR_VERIFICATION. P2-T8 and later tasks remain unreleased.

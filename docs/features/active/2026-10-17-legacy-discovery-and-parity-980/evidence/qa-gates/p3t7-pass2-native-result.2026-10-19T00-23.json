@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "checks": [
+    "all seven kinds form a structurally valid draft",
+    "dry run preserves exact original tree and authority",
+    "native guarded publication reports every created artifact",
+    "original bytes survive native publication",
+    "persisted report remains an immutable projection",
+    "mapped output hashes match exact native bytes",
+    "exact repeat skips publication without changing bytes",
+    "repeat preserves identical immutable mapping",
+    "different existing output fails without overwrite",
+    "controlled native partial publication returns failure",
+    "partial failure retains uncertainty and originals",
+    "persisted report never claims partial completion",
+    "migration never activates the draft root"
+  ],
+  "duration_seconds": 603.085,
+  "platform": "win32",
+  "native_provider": "InitializationIO.local",
+  "partial_failure": "Injected final primitive refusal; other operations use native provider",
+  "scratch": "SCRATCH",
+  "source_files": 7
+}

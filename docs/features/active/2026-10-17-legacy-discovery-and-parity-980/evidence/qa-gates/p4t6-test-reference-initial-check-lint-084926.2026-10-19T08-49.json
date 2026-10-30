@@ -1,0 +1,35 @@
+{
+  "batch": "initial-check",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T08:49:26.935185+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-initial-check-lint-084926.2026-10-19T08-49.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-initial-check-lint-084926.2026-10-19T08-49.stdout.txt",
+      "sha256": "2c99038e7dcfedd16d376027b49afe1452703c0b5dd0c5335fdb5345ef71d9b0"
+    }
+  },
+  "seconds": 0.104741,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "7aef0052209fbd4c06b50d30cba47c24a711b9e6e1c776683af27c3df262cb4a",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "90cbf0a670d4430faa2e1485ae151d54f6e537ae7bbc96070c121880eb83ef76",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "791a915dcd92df92cb55c6829109075c1bc7054760dcdb9f74996c79a8d8df86"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "7aef0052209fbd4c06b50d30cba47c24a711b9e6e1c776683af27c3df262cb4a",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "90cbf0a670d4430faa2e1485ae151d54f6e537ae7bbc96070c121880eb83ef76",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "791a915dcd92df92cb55c6829109075c1bc7054760dcdb9f74996c79a8d8df86"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T08:49:26.830444+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (116 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py:84:89\n   |\n82 |         code,\n83 |         path,\n84 |         \"Inspect configured scope, retained syntax and exact source pins; binding and execution remain unresolved.\",\n   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n85 |         analyzer=_IDENTIFIER,\n86 |         blocking=blocking,\n   |\n\nTC003 Move standard library import `collections.abc.Iterator` into a type-checking block\n --> tests\\discovery_runtime\\analyzer\\test_test_reference_syntax.py:5:29\n  |\n3 | from __future__ import annotations\n4 |\n5 | from collections.abc import Iterator\n  |                             ^^^^^^^^\n6 | from typing import cast\n  |\nhelp: Move into type-checking block\n\nE501 Line too long (101 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_test_reference_syntax.py:65:89\n   |\n63 |     \"xml\",\n64 |     [\n65 |         '<Project><Target><ItemGroup><ProjectReference Include=\"x\"/></ItemGroup></Target></Project>',\n   |                                                                                         ^^^^^^^^^^^^^\n66 |         '<Project><ProjectReference Include=\"x\"/></Project>',\n67 |         '<Project><ItemGroup><Other Include=\"x\"/></ItemGroup></Project>',\n   |\n\nE501 Line too long (102 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_test_reference_syntax.py:68:89\n   |\n66 |         '<Project><ProjectReference Include=\"x\"/></Project>',\n67 |         '<Project><ItemGroup><Other Include=\"x\"/></ItemGroup></Project>',\n68 |         '<Project><ItemGroup><ProjectReference xmlns=\"urn:other\" Include=\"x\"/></ItemGroup></Project>',\n   |                                                                                         ^^^^^^^^^^^^^^\n69 |     ],\n70 | )\n   |\n\nE501 Line too long (125 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_test_reference_syntax.py:159:89\n    |\n157 |     Attributes remain literal without project target evaluation or I/O.\n158 |     \"\"\"\n159 |     content = b'<Project>\\r\\n<ItemGroup><ProjectReference Include=\"x\"/><ProjectReference Include=\"x\"/></ItemGroup></Project>'\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n160 |     sites = tuple(project_reference_sites(content, max_bytes=1024, limit=100))\n161 |     assert sites == (\n    |\n\nE501 Line too long (249 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_test_reference_syntax.py:180:89\n    |\n178 | \u2026\n179 | \u2026\n180 | \u2026p{attribute if condition == \"group\" else \"\"}><ProjectReference {operation}=\"../src/app.csproj\"{attribute if condition == \"reference\" else \"\"}/></ItemGroup></Project>'\n    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n181 | \u2026\n182 | \u2026\n    |\n\nE501 Line too long (104 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_test_references.py:156:89\n    |\n154 |     Returns None; observed same-spelling type contexts retain unresolved binding.\n155 |     \"\"\"\n156 |     text = \"using Widget = Other.Type; class Test { class Widget {} }\\n#if FALSE\\nnew Widget();\\n#endif\"\n    |                                                                                         ^^^^^^^^^^^^^^^^\n157 |     result = analyze(catalog, text)\n158 |     assert (\n    |\n\nE501 Line too long (93 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_test_references.py:232:89\n    |\n230 |     Returns None; no raw values or value-derived IDs are exposed.\n231 |     \"\"\"\n232 |     xml = f'<Project><ItemGroup><ProjectReference Include=\"{target}\"/></ItemGroup></Project>'\n    |                                                                                         ^^^^^\n233 |     result = ReferenceAnalyzer().analyze(\n234 |         inputs(catalog, ((\"tests/a.csproj\", xml.encode()),))\n    |\n\nE501 Line too long (95 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_test_references.py:248:89\n    |\n246 |         \"<Project><ItemGroup><ProjectReference/></ItemGroup></Project>\",\n247 |         '<Project><ItemGroup><ProjectReference Include=\" \"/></ItemGroup></Project>',\n248 |         '<Project><ItemGroup><ProjectReference Include=\"x\" Update=\"y\"/></ItemGroup></Project>',\n    |                                                                                         ^^^^^^^\n249 |         '<!DOCTYPE Project [<!ENTITY x \"VALUE_SENTINEL\">]><Project/>',\n250 |         \"<Project VALUE_SENTINEL\",\n    |\n\nFound 9 errors.\nNo fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-49"
+}

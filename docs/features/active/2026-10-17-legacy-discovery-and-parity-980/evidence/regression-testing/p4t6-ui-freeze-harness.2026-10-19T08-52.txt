@@ -1,0 +1,178 @@
+"""Freeze the checked P4-T6 UI subset without source changes or behavioral reruns."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+evidence = feature / "evidence"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+command = "poetry run python SCRATCH/issue-980-p4t6-ui-freeze.py"
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+]
+
+
+def digest(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def metadata(path):
+    return {"path": path.relative_to(repo).as_posix(), "sha256": digest(path.read_bytes())}
+
+
+def write(path, content):
+    assert not path.exists(), path.name
+    path.write_bytes(content.encode("utf-8"))
+
+
+def write_json(path, value):
+    write(path, json.dumps(value, indent=2) + "\n")
+
+
+def markdown(title, summary, body):
+    return (f"# {title}\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n"
+            "Output Summary: " + summary + "\n\n" + body.rstrip() + "\n")
+
+
+baseline_path = evidence / "baseline/p4t6-shared-baseline.2026-10-19T08-29.json"
+baseline = json.loads(baseline_path.read_bytes())
+assert digest(baseline_path.read_bytes()) == "bdf686a47676d9599c1bf2172068118caa8f0b092b9e37287108028d51b62ed4"
+assert all(digest((repo / item["path"]).read_bytes()) == item["sha256"] for item in baseline["preserved_files"])
+assert len(baseline["preserved_files"]) == 55
+absence_path = evidence / "baseline/p4t6-ui-test-split-absence.2026-10-19T08-39.json"
+sources, structures = [], []
+for name in paths:
+    path = repo / name
+    raw = path.read_bytes()
+    text = raw.decode("utf-8")
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.AsyncFor, ast.While))]
+    assert len(lines) <= 500, name
+    assert all(ast.get_docstring(node) for node in definitions), name
+    assert all(lines[node.lineno - 2].strip().startswith("#") for node in loops), name
+    if name.startswith("tests/"):
+        assert re.search(r"\b(?:tmp_path|tmpdir|tempfile|NamedTemporaryFile)\b", text) is None
+    else:
+        assert re.search(r"\b(?:TaskMaster|TMW|VSTO|Outlook|MAPI)\b", text, flags=re.I) is None
+        assert re.search(r"\b(?:read_bytes|write_bytes|subprocess|socket|requests|eval|exec)\s*\(", text) is None
+    attributes = subprocess.run(["git", "check-attr", "--all", "--", name], check=True, capture_output=True, text=True).stdout.splitlines()
+    sources.append({"path": name, "sha256": digest(raw), "physical_lines": len(lines), "crlf_count": raw.count(b"\r\n"),
+                    "lf_normalized_sha256": digest(raw.replace(b"\r\n", b"\n")), "git_attributes": attributes})
+    structures.append({"path": name, "definitions_with_docstrings": len(definitions), "loops_with_immediate_intent_comments": len(loops),
+                       "physical_lines": len(lines), "no_unit_temp_files": True})
+
+ordered = []
+for stage in ("format", "lint", "types", "unit"):
+    path = max((evidence / "regression-testing").glob("p4t6-ui-focused4-" + stage + ".*.json"))
+    receipt = json.loads(path.read_bytes())
+    assert receipt["exit_code"] == 0
+    for source in sources:
+        assert receipt["source_before"][source["path"]]["sha256"] == source["sha256"]
+        assert receipt["source_after"][source["path"]]["sha256"] == source["sha256"]
+    ordered.append({**metadata(path), "stage": stage, "started": receipt["started"], "finished": receipt["finished"],
+                    "duration_seconds": receipt["duration_seconds"]})
+assert "107 passed" in receipt["output"]
+assert all(first["finished"] <= second["started"] for first, second in zip(ordered, ordered[1:]))
+coverage_raw = (scratch / "issue-980-p4t6-ui-coverage.json").read_bytes()
+failed_raw = (scratch / "issue-980-p4t6-ui-focused2-failed-coverage.json").read_bytes()
+assert digest(failed_raw) == "7a28790b4a3fb4d3034e0ed01415476cfe8432521fc264d68fbb5f1f419d5576"
+coverage = json.loads(coverage_raw)
+assert len(coverage["files"]) == 1
+summaries = []
+for name, data in coverage["files"].items():
+    assert data["missing_lines"] == data["missing_branches"] == []
+    functions = {key: value["summary"] for key, value in data["functions"].items() if key}
+    classes = {key: value["summary"] for key, value in data["classes"].items() if key}
+    assert all(row["covered_lines"] == row["num_statements"] for row in (*functions.values(), *classes.values()))
+    summaries.append({"path": name.replace("\\", "/"), "module": data["summary"], "functions": functions, "classes": classes})
+assert sum(item["module"]["covered_lines"] for item in summaries) == 164
+assert sum(item["module"]["covered_branches"] for item in summaries) == 58
+
+harness_inputs = []
+for filename, label in (("issue-980-p4t6-ui-prepare.py", "prepare"),
+                        ("issue-980-p4t6-ui-test-split.py", "test-split"),
+                        ("issue-980-p4t6-ui-structure-precheck.py", "structure-precheck"),
+                        ("issue-980-p4t6-ui-gate.py", "gate"),
+                        (Path(__file__).name, "freeze")):
+    raw = (scratch / filename).read_bytes()
+    assert re.search(rb"(?<![A-Za-z])[A-Za-z]:[\\/]", raw) is None, filename
+    harness_inputs.append((filename, label, raw))
+
+coverage_path = evidence / f"regression-testing/p4t6-ui-coverage.{stamp}.json"
+failed_path = evidence / f"regression-testing/p4t6-ui-failed-coverage.{stamp}.json"
+for path, raw in ((coverage_path, coverage_raw), (failed_path, failed_raw)):
+    assert not path.exists()
+    path.write_bytes(raw)
+structure_path = evidence / f"regression-testing/p4t6-ui-coverage-structure.{stamp}.json"
+write_json(structure_path, {"timestamp": stamp, "command": command, "exit_code": 0, "source_files": sources,
+                           "coverage": metadata(coverage_path), "summaries": summaries, "structures": structures,
+                           "executed_cases": 107, "predecessor_streams_preserved": 55,
+                           "changed_line_coverage": "100%; this is a new module, with every executable line and branch measured.",
+                           "manual_intent_review": "Pure candidate and adapter transforms, all explicit loops, metadata comprehensions, branch routing and nested helpers were inspected before the clean focused sequence.",
+                           "scope": "Focused UI subset proof only; repository-wide and combined P4-T6 final gates remain with the coordinator."})
+harnesses = []
+for filename, label, raw in harness_inputs:
+    path = evidence / f"regression-testing/p4t6-ui-{label}-harness.{stamp}.txt"
+    assert not path.exists()
+    path.write_bytes(raw)
+    harnesses.append({**metadata(path), "raw_sha256": digest(raw), "scratch_identifier": "SCRATCH/" + filename,
+                      "crlf_count": raw.count(b"\r\n"), "lf_normalized_sha256": digest(raw.replace(b"\r\n", b"\n")),
+                      "sanitization": "none; snapshot equals the executed bytes"})
+
+handoff_path = evidence / f"regression-testing/p4t6-ui-handoff.{stamp}.md"
+write(handoff_path, markdown("P4-T6 UI callback subset handoff",
+    "FROZEN_READY for checked WIP and consolidated review: 107 tests passed; 164/164 statements and 58/58 branches covered.",
+    "The scoped implementation is `analyzer/ui_callbacks.py` with `test_ui_callbacks.py` and the approved `test_ui_callback_limits.py`. "
+    "The shared baseline records 55 unchanged predecessor streams at accepted commit `6804041b88ea80e386948a0327dca8f0d7a89471`. "
+    "The split-absence supplement binds the additional test path before creation. The freeze includes every focused attempt and exact executed harness bytes.\n\n"
+    "`callback_candidates(path, content, *, max_bytes, max_elements, max_depth, max_candidates)` returns shared immutable detections. "
+    "`UiCallbackAnalyzer.analyze(capture)` returns the accepted Analysis type without filesystem, process, network, compiler or UI operations. "
+    "The exact WPF namespace, Window/Page/UserControl roots, finite element/event pairs and ordinary containers are supported. "
+    "Resources, templates, styles, foreign/custom/property subtrees, commands, bindings, inline code and unsupported handler forms cannot become callback facts. "
+    "Literal x:Class and event attributes are detected declarations. The conventional retained `.xaml.cs` file and simple lexical class/method spelling provide "
+    "inferred relevance with nullable targets, unresolved binding and unverified execution. x:Class remains a class identity, never a filename. "
+    "This distinction follows the official [WPF code-behind contract](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/code-behind-and-xaml-in-wpf).\n\n"
+    "Retained inputs and pins are indexed once. Independent count, byte, parse/index work, result-row and output-text reservations apply before bounded allocations. "
+    "Duplicate provenance remains visible to the exact accepted pin comparison; failed or exhausted inputs produce fixed redacted diagnostics. "
+    "Aggregate exhaustion discards partial output. Tests cover counted aggregate lookup work, malformed/DTD/encoding input, exclusions, ambiguous methods/classes, "
+    "missing/wrong pins, original-byte hashes, repeated declarations, deterministic ordering, no source reads and resource boundaries.\n\n"
+    "The first unit run passed 103 cases and failed three new anchor expectations; its receipt and raw coverage are retained. "
+    "Those fixtures assumed physical opening-tag positions. They now assert accepted parser-reported containing-element anchors, retaining distinct occurrence IDs "
+    "and original-byte hashes; a distinct single-line element control was added. Multiline tags and bare CR have limited line precision. "
+    "No predecessor parser was changed. The final clean ordered Black, Ruff, Pyright and Pytest sequence binds identical current source bytes. "
+    "Pytest reports 107 passed in 42.02 seconds; actual whole-command durations are separate in the receipts. "
+    "Every measured production class and callable is 100% covered; no coverage exclusions or dependency changes were added.\n\n"
+    "Command receipts contain combined stdout/stderr with workspace and scratch paths sanitized; they are not separate raw streams. "
+    "Raw coverage and harness snapshots preserve their exact bytes. Working hashes and LF-normalized hashes are recorded with actual Git attributes; "
+    "no working/index equality is asserted for files not yet staged. Coverage's local timestamp is not reinterpreted as UTC.\n\n"
+    "This is scoped checked WIP, not P4-T6 or feature acceptance. The consolidated independent review and one combined final ordered sequence remain pending. "
+    "Registry/CLI/MCP exposure belongs to later tasks. Other XAML/UI dialects, Unicode identifiers, generated/partial/namespace binding, runtime callback execution "
+    "and behavioral coverage remain unsupported or unresolved. No checkpoint, plan, AC, policy, predecessor or Git mutation was performed by this worker.\n"))
+artifact_paths = sorted(set((evidence / "baseline").glob("p4t6-ui-*"))
+                        | set((evidence / "regression-testing").glob("p4t6-ui-*")))
+freeze_path = evidence / f"regression-testing/p4t6-ui-freeze.{stamp}.json"
+manifest = {"timestamp": stamp, "status": "FROZEN_READY", "accepted_baseline": baseline["head"],
+            "authority": "workspace_operations_p4t6_ui_callbacks; exact Python C4 profile and native authority reverified before mutation",
+            "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+            "scope_absence": metadata(absence_path), "baseline": metadata(baseline_path), "source_files": sources,
+            "ordered_focused_gates": ordered, "coverage": metadata(coverage_path), "retained_failed_coverage": metadata(failed_path),
+            "coverage_structure": metadata(structure_path), "harnesses": harnesses, "handoff": metadata(handoff_path),
+            "evidence_files": [metadata(path) for path in artifact_paths], "tests": {"passed": 107, "failed": 0},
+            "stage_paths": paths + [path.relative_to(repo).as_posix() for path in artifact_paths] + [freeze_path.relative_to(repo).as_posix()],
+            "shared_baseline_staging": "Coordinator adds the three existing shared baseline artifacts separately; they are referenced, not duplicated.",
+            "pending": ["consolidated independent candidate review", "combined final ordered gates", "independent task acceptance"],
+            "source_test_mutations_during_freeze": False, "behavioral_reruns_during_freeze": False, "git_mutations": False}
+write_json(freeze_path, manifest)
+assert all(digest((repo / item["path"]).read_bytes()) == item["sha256"] for item in sources)
+print(json.dumps({"freeze": metadata(freeze_path), "source_files": sources, "stage_count": len(manifest["stage_paths"]),
+                  "coverage": metadata(coverage_path), "coverage_structure": metadata(structure_path), "handoff": metadata(handoff_path)}, indent=2))

@@ -1,0 +1,2785 @@
+{
+  "Timestamp": "2026-10-20T17:02:46.591137+00:00",
+  "Command": "Refresh the exact historical preservation union for 43 qualified readable views and five new evidence paths",
+  "EXIT_CODE": 0,
+  "task": "P6-T1",
+  "status": "READY_FOR_COMBINED_PRESERVATION_COMMIT",
+  "task_accepted": false,
+  "head": "5ce0a9edc840d1e5f2b7cf0c95baeaaf90602874",
+  "historical_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-preservation-staging.2026-10-20T16-48.json",
+    "sha256": "04d5cbbbe2ceebd52596601c1362f28884ececd71dad72c2c7cf8f60083592b9",
+    "bytes": 169432
+  },
+  "confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-readable-confirmation.2026-10-20T17-02.json",
+    "sha256": "b487557d69e9603a8d5e87b28269ead4399e741e788685b71d94bfec227f4f91",
+    "bytes": 40526
+  },
+  "owner_delta": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-readable-normalization.2026-10-20T17-00.json",
+    "sha256": "167c541f2b3872772c76b46ba76b312ac2d71af239ae030628b491bcf8376bef",
+    "bytes": 40778
+  },
+  "stage_path_count": 323,
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-bootstrap-split-absence.2026-10-20T15-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-boundary-test-split-absence.2026-10-20T15-18.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-inspection-split-absence.2026-10-20T14-55.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-split-absence.2026-10-20T14-35.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-evidence-inventory.2026-10-20T16-25.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-evidence-inventory.2026-10-20T16-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-repair-preparation.2026-10-20T15-58.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-split.2026-10-20T14-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-original-tests-reconstructed.2026-10-20T16-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-preservation-staging.2026-10-20T16-34.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-source-freeze.2026-10-20T15-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-timeout-diagnosis.2026-10-20T16-34.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-confirmation-reader.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-probe.2026-10-20T15-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-review.2026-10-20T15-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-review.2026-10-20T15-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation-staging.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation-reader.2026-10-20T16-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation.2026-10-20T16-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation.2026-10-20T16-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue-staging.2026-10-20T16-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-preservation-staging.2026-10-20T16-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-probe.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-preservation-qualified-staging.2026-10-20T17-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-readable-confirmation.2026-10-20T17-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-readable-confirmation.2026-10-20T17-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract-ast.2026-10-20T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-black.2026-10-20T16-36.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-black.2026-10-20T16-36.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-ruff.2026-10-20T16-36.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-ruff.2026-10-20T16-36.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-tests.2026-10-20T16-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-tests.2026-10-20T16-39.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-types.2026-10-20T16-36.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-types.2026-10-20T16-36.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-black.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-black.2026-10-20T16-07.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-ruff.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-ruff.2026-10-20T16-07.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-types.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-types.2026-10-20T16-07.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-first-black.2026-10-20T14-54.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-first-black.2026-10-20T14-54.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-handoff.2026-10-20T15-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-handoff.2026-10-20T15-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-black.2026-10-20T14-55.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-black.2026-10-20T14-55.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-ruff.2026-10-20T14-55.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-ruff.2026-10-20T14-55.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-black.2026-10-20T14-55.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-black.2026-10-20T14-55.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-ruff.2026-10-20T14-55.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-ruff.2026-10-20T14-55.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-types.2026-10-20T14-55.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-types.2026-10-20T14-55.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black-format.2026-10-20T15-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black-format.2026-10-20T15-02.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black.2026-10-20T15-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black.2026-10-20T15-03.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-inputs.2026-10-20T15-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-inputs.2026-10-20T15-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-ruff.2026-10-20T15-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-ruff.2026-10-20T15-03.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-tests.2026-10-20T15-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-tests.2026-10-20T15-06.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-types.2026-10-20T15-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-types.2026-10-20T15-03.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black-format.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black-format.2026-10-20T15-16.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black.2026-10-20T15-16.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-ruff.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-ruff.2026-10-20T15-16.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-black.2026-10-20T15-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-black.2026-10-20T15-17.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-ruff.2026-10-20T15-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-ruff.2026-10-20T15-17.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-types.2026-10-20T15-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-types.2026-10-20T15-17.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-black.2026-10-20T15-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-black.2026-10-20T15-23.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-ruff.2026-10-20T15-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-ruff.2026-10-20T15-23.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-types.2026-10-20T15-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-types.2026-10-20T15-23.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop7-black-format.2026-10-20T15-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop7-black-format.2026-10-20T15-28.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-ruff.2026-10-20T15-29.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-ruff.2026-10-20T15-29.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-readable-normalization.2026-10-20T17-00.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair1-black.2026-10-20T16-11.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair1-black.2026-10-20T16-11.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-black.2026-10-20T16-11.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-black.2026-10-20T16-11.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-ruff.2026-10-20T16-11.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-ruff.2026-10-20T16-11.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-black.2026-10-20T16-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-black.2026-10-20T16-13.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-ruff.2026-10-20T16-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-ruff.2026-10-20T16-13.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-types.2026-10-20T16-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-types.2026-10-20T16-13.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-black.2026-10-20T16-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-black.2026-10-20T16-14.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-format.2026-10-20T16-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-format.2026-10-20T16-14.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-black.2026-10-20T16-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-black.2026-10-20T16-14.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-prechecks.2026-10-20T16-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-prechecks.2026-10-20T16-14.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-probes.2026-10-20T16-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-probes.2026-10-20T16-14.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-ruff.2026-10-20T16-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-ruff.2026-10-20T16-14.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-types.2026-10-20T16-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-types.2026-10-20T16-14.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-black.2026-10-20T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-black.2026-10-20T16-19.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-prechecks.2026-10-20T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-prechecks.2026-10-20T16-19.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-probes.2026-10-20T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-probes.2026-10-20T16-19.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-ruff.2026-10-20T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-ruff.2026-10-20T16-19.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-types.2026-10-20T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-types.2026-10-20T16-19.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-black.2026-10-20T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-black.2026-10-20T16-19.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-prechecks.2026-10-20T16-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-prechecks.2026-10-20T16-20.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-ruff.2026-10-20T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-ruff.2026-10-20T16-19.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-tests.2026-10-20T16-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-tests.2026-10-20T16-22.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-types.2026-10-20T16-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-types.2026-10-20T16-20.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black-raw.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright-raw.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff-raw.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black-raw.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright-raw.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff-raw.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks-raw.2026-10-20T15-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests-raw.2026-10-20T15-54.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks-raw.2026-10-20T16-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black-raw.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck-raw.2026-10-20T16-11.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright-raw.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection-raw.2026-10-20T16-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff-raw.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests-raw.2026-10-20T16-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-originals.2026-10-20T16-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-archive.2026-10-20T16-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-coverage.2026-10-20T15-35.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-freeze.2026-10-20T15-35.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-archive.2026-10-20T16-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-freeze.2026-10-20T16-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-freeze.2026-10-20T16-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.raw.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+    "tests/discovery_runtime/gateway_test_support.py",
+    "tests/discovery_runtime/test_doctor.py",
+    "tests/discovery_runtime/test_gateway.py",
+    "tests/discovery_runtime/test_gateway_boundaries.py",
+    "tests/discovery_runtime/test_gateway_local.py",
+    "tests/discovery_runtime/test_service.py",
+    "tests/discovery_runtime/test_service_boundaries.py",
+    "tests/discovery_runtime/test_service_publication.py"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-bootstrap-split-absence.2026-10-20T15-06.json",
+      "sha256": "554860df8dde6311953117a4339eeefa5865fb01bcfa35f458d2193d90c7c542",
+      "bytes": 829,
+      "git_filtered_blob_oid": "43ce1fcb353227fb14c8a71e87e6a4d35bf66699",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-boundary-test-split-absence.2026-10-20T15-18.json",
+      "sha256": "cc2fdbe370b9c85eca2a78155ffbb1a3c8ac9154c3cb0944b9d107b4f00d1439",
+      "bytes": 470,
+      "git_filtered_blob_oid": "f9ce514e99227acf0e60e52566c5438e2152f7ae",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-inspection-split-absence.2026-10-20T14-55.json",
+      "sha256": "d0af236b851167295baf9d6b161721633efde6b01468043d4795191459a49bb6",
+      "bytes": 573,
+      "git_filtered_blob_oid": "9a11308340f2caa1a229ad1d14bc5b1c3037dd66",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-split-absence.2026-10-20T14-35.json",
+      "sha256": "3f2baf9985c6a161ad732f1eae317517103fefa23304d0141459124fa452dd30",
+      "bytes": 871,
+      "git_filtered_blob_oid": "30b25c9188e607549fe126a083aabe6e2046d26d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+      "sha256": "afa9611038e4981c166eb4b712d86277cd2b23c45900d4a82f4c305995c2c575",
+      "bytes": 34097,
+      "git_filtered_blob_oid": "eb4e2ed987d3eab2d230ba2b4106bf353646dd3b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.md",
+      "sha256": "fdc8ce7f9b45acf8fc0df0c193908001b09587b9f1130d3a5d503f7b7189677a",
+      "bytes": 6016,
+      "git_filtered_blob_oid": "1b38d3db1dd8854c2d3c85d7ae31f40d8bfd3221",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-evidence-inventory.2026-10-20T16-25.json",
+      "sha256": "c9a5144615d6eed2e4ae9928359885ed5ac44924bf712b4a50729c40b8e2e124",
+      "bytes": 26427,
+      "git_filtered_blob_oid": "0bce3cb838b394a2525c833eed510881a65aa9e4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-evidence-inventory.2026-10-20T16-39.json",
+      "sha256": "9f540ff85014b2d3b92e1691fd3d2df1974d79bc0e2d5db1b9e1bbc81be4e8f4",
+      "bytes": 28955,
+      "git_filtered_blob_oid": "6ab87dd3a9c28716908b998cc60ca16d09fccc35",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json",
+      "sha256": "8c92fae965783f63ccc81c2b07fe04a2351ea50ab343636bf6fdfb7e26ba88f1",
+      "bytes": 55671,
+      "git_filtered_blob_oid": "372bd7ddade010107ad6ab5172c6d204eacdc0a9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-repair-preparation.2026-10-20T15-58.json",
+      "sha256": "f8b453dec6c2a2f0448092f8b106cd6f6eb7ff7a33959e7879987b65772b84d0",
+      "bytes": 1315,
+      "git_filtered_blob_oid": "7e93f73a67d757a1562bb711ec69166d354776d7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-split.2026-10-20T14-46.json",
+      "sha256": "273b7b3c49bbfd86bed2622c670027cf3d6ff5f6ff57b5301552b4b6ae1b1032",
+      "bytes": 874,
+      "git_filtered_blob_oid": "ef09316c18d9d5de77ceb4c90d4817e110bba4f3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-original-tests-reconstructed.2026-10-20T16-02.json",
+      "sha256": "16956928b5d15f378318768d05d908f89dfc25ddba4639198c8ac3b31bf2c0ef",
+      "bytes": 21902,
+      "git_filtered_blob_oid": "518459ac12e249e4960617a1a24fd7c0b45b9344",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-preservation-staging.2026-10-20T16-34.json",
+      "sha256": "b4ee7a3c5deaee558d0f5d01e74f9691a38d520ff1faf4e9445eb7e459da8bb0",
+      "bytes": 70529,
+      "git_filtered_blob_oid": "9ae0df8811cc3b0799f1915fe74af43b6d80b547",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-source-freeze.2026-10-20T15-20.json",
+      "sha256": "2daa4d244d233ef48280461dd1bbf8821ce252e3fa61c524cd58a3d65bd78985",
+      "bytes": 2632,
+      "git_filtered_blob_oid": "d4ac7a9120f06675589010285336102b695acd94",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-timeout-diagnosis.2026-10-20T16-34.json",
+      "sha256": "15bbbff7bfad0bc219fb7e05aa1e21bf49bc5f20bdce80000c426c57e3f3de3a",
+      "bytes": 11564,
+      "git_filtered_blob_oid": "70921ba9249f7aa2e5f3766ee2143212fc81cd26",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-confirmation-reader.2026-10-20T16-07.json",
+      "sha256": "37d8458d220295a3516c69cd8de375f3ebf72745d6122c990caf014e1bd0349a",
+      "bytes": 9327,
+      "git_filtered_blob_oid": "540937c41a4bc64a9cfcd12ff6223667489fbec9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-probe.2026-10-20T15-39.json",
+      "sha256": "e6edb4e40f1018ffd47171799d8c29a0e11d42f9a1299a9a2e0aa2026e9977de",
+      "bytes": 43248,
+      "git_filtered_blob_oid": "dae0ac07ff9cdfe4f423c1f35933e0c502325d76",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-review.2026-10-20T15-39.json",
+      "sha256": "8b5a0497423d1e407d4c6f35d22fc691f697b883816957e67997d306f002a3fb",
+      "bytes": 13653,
+      "git_filtered_blob_oid": "71625009c1c203b6e61315840e71b77a58fb4d4b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-review.2026-10-20T15-39.md",
+      "sha256": "ea8a6a743e2aba74ffcb85b35920d50c692eeabd5585e43d33f7f38cf6544b82",
+      "bytes": 1821,
+      "git_filtered_blob_oid": "b2ed901c74e2b75cf23d197f9c2e1f0f727a1e4c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation-staging.2026-10-20T16-07.json",
+      "sha256": "e20fbdcf158a3fa4eaa5b91675127cb43dddcbdc67c455d5d09c53f5272f2bc4",
+      "bytes": 1784,
+      "git_filtered_blob_oid": "67f6afc64dda66597c29a86845b59b0bf03daefd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.json",
+      "sha256": "0691f8816124bb027470a9235dc814bfd8c682d60cd1f56a4962108ade0bb368",
+      "bytes": 8862,
+      "git_filtered_blob_oid": "256a3b937558ef85dee1168aa6e5f42eb2a8c8d4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.md",
+      "sha256": "cb757c9a1865bcfda606f7fdcf91cc5d2918e882a40b2cc72e6cfef9a94b3a7c",
+      "bytes": 1559,
+      "git_filtered_blob_oid": "783f17c62fd80de4966bf044e73af588658bc51b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation-reader.2026-10-20T16-48.json",
+      "sha256": "c5614fd48d8657c18d46016eb9e663572cc0cb7c70d88db123292e833f6399d0",
+      "bytes": 38808,
+      "git_filtered_blob_oid": "cf64d1bde4332b0df8983452b9abd4596f314f63",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation.2026-10-20T16-48.json",
+      "sha256": "4ed0410876eb30448e35e5489515a9b0fb99b3e288daefcc26aeef972bf3dd78",
+      "bytes": 10863,
+      "git_filtered_blob_oid": "c447f4f76a07e4c07147aa5c2528a88e842e2c11",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation.2026-10-20T16-48.md",
+      "sha256": "c74945c802e7bbae2c50b5ec7d4b6e345c39bd72a68141f7b9b3774cefb9a640",
+      "bytes": 2571,
+      "git_filtered_blob_oid": "029b37dd4eab11d468aa8c43213375437ce7acb5",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue-staging.2026-10-20T16-32.json",
+      "sha256": "50426567bacb8aff58c43aad5236e643da2a4ed4d24e45138928ef905c87ec85",
+      "bytes": 1416,
+      "git_filtered_blob_oid": "89b9d6dff02ddf8855f81b3ea763b800fd27ac13",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.json",
+      "sha256": "3307257a35f936e3be5501ff116552734b060cd99ba283ad14eb45fbad3ecde7",
+      "bytes": 9642,
+      "git_filtered_blob_oid": "d7611d1e996765d296c828c21fbdd43f74df5a2f",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.md",
+      "sha256": "cd133a0fa359c0fb06640cf27973927f7dd2b29cfa93ac44ce74841ae89e3d4f",
+      "bytes": 2586,
+      "git_filtered_blob_oid": "f7ac9383b903e98ccaa61371b89339b3fb433a17",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-preservation-staging.2026-10-20T16-48.json",
+      "sha256": "04d5cbbbe2ceebd52596601c1362f28884ececd71dad72c2c7cf8f60083592b9",
+      "bytes": 169432,
+      "git_filtered_blob_oid": "a484e195885f1795da03e98908e4f8ca9f1f50b8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-probe.2026-10-20T15-52.json",
+      "sha256": "6dd9f01571209147eda24121bf55c7160ce4cf26bf35b16edd70919a2883f199",
+      "bytes": 40134,
+      "git_filtered_blob_oid": "9d3e2d5bad0d33219fbe6e644be6d8a84b1f1864",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.json",
+      "sha256": "8b091fecd4f8fd0f2a832705577f3310671d4a26f6664cf18378b191143c9d5c",
+      "bytes": 75013,
+      "git_filtered_blob_oid": "5134b5c89a3c9517f45fb38327e25a3e14741bbb",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.md",
+      "sha256": "00cc9030a7915a79d2f7f4f9d2dfe342335c60f7b35b2cc4a0bd46faad14d6c3",
+      "bytes": 1740,
+      "git_filtered_blob_oid": "cd16dbb1f04aa66b44feb509cd3aefc95318a2a6",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-readable-confirmation.2026-10-20T17-02.json",
+      "sha256": "b487557d69e9603a8d5e87b28269ead4399e741e788685b71d94bfec227f4f91",
+      "bytes": 40526,
+      "git_filtered_blob_oid": "c969cf235eedc66b68a087ecd44785543feae376",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-readable-confirmation.2026-10-20T17-02.md",
+      "sha256": "d484b45b69d1488cbc9d2af4ed9797af82b5caa0c57bb80ee01803cc61b5513e",
+      "bytes": 1554,
+      "git_filtered_blob_oid": "df1e1c0e8030e61362bd4d1249bfe12d27e2ff1b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract-ast.2026-10-20T16-36.json",
+      "sha256": "290173c30dafcab935d1d3ca72ed361b5b4a23b0cd6ed79583a40cf2ee6bc8e6",
+      "bytes": 30824,
+      "git_filtered_blob_oid": "1ef375cb23a89c2d9c49ac39d9eb6d5533a17626",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-black.2026-10-20T16-36.md",
+      "sha256": "b943f1629c894a15f1259278d502d18e830478ddccb486de44bba84792a28bf6",
+      "bytes": 649,
+      "git_filtered_blob_oid": "d56a9f83d41526c7542696a9ea64c37923b37576",
+      "head_blob_oid": null,
+      "historical_sha256": "c3e22bf0b396fe0af514aaca3893d0a8e917a0e1b8749c77d29ee4ff6fce2208",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-black.2026-10-20T16-36.raw.json",
+      "sha256": "47e0b9fd5ce499411271f1efe8a73122c4a656eeb34f51da6856fdac428e6b93",
+      "bytes": 6265,
+      "git_filtered_blob_oid": "3fea2b7a0fbdab8cc22fd0085ff0c456e4dd5c4e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-ruff.2026-10-20T16-36.md",
+      "sha256": "f0a7e2ed0473e3df90386d43e9b55d30090725e6ac60350fc8574ff7359c753e",
+      "bytes": 617,
+      "git_filtered_blob_oid": "751f7f317d3d11eae1d53018b144c203b373ef5e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-ruff.2026-10-20T16-36.raw.json",
+      "sha256": "b79968bbc9fbbcb6ae1f78b843840e19af8e8328f886ec7b52c1befc3ec03397",
+      "bytes": 6210,
+      "git_filtered_blob_oid": "92994c9b00793ab1a5c5ec3f84b256f4ba9d0d72",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-tests.2026-10-20T16-39.md",
+      "sha256": "23bb203f602259e673b2e8561ee1b0f53f87d9ddf177ce39bd79231f65e12a1e",
+      "bytes": 2405,
+      "git_filtered_blob_oid": "573790fd22163a9cdddcf86ed01d1f0ad389d8d1",
+      "head_blob_oid": null,
+      "historical_sha256": "6c3d01332e0ba8f3c28ae82264c31018d940432846a1532ec6b08d87734160da",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-tests.2026-10-20T16-39.raw.json",
+      "sha256": "d9b067b52b7cbd79492aea938d755812c1a57372949f7ee6f84ff1dbd993cca0",
+      "bytes": 8797,
+      "git_filtered_blob_oid": "b8069b165d028e0ce208fbd605baa3a39775aba9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-types.2026-10-20T16-36.md",
+      "sha256": "ba94979586487e2a593b4bafb6e81d4b149739723ade5a0fbef3158d587e9971",
+      "bytes": 778,
+      "git_filtered_blob_oid": "6f9c52aba04a5eef267edd3f0b513f2e3468d08f",
+      "head_blob_oid": null,
+      "historical_sha256": "5d43c7b68eed599de9c7e54fffbd189d488f12599035e2888b5dae92d6433213",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-types.2026-10-20T16-36.raw.json",
+      "sha256": "77effb3bba8ba531cebd4afea386a218c193211b38fe4b37f90701d5c0677281",
+      "bytes": 6440,
+      "git_filtered_blob_oid": "c826cd050f447a5242872bcd040f9ddbb2bd7b31",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-black.2026-10-20T16-07.md",
+      "sha256": "d142ca264604a1beee4466e3210494b289988978df1c2a450b87f3438ff5efd4",
+      "bytes": 294,
+      "git_filtered_blob_oid": "699034346c2d054d70a2cda5822a4f8894a85959",
+      "head_blob_oid": null,
+      "historical_sha256": "f2fd63f02cc238c5a845aed15091bbf2a70b8741e53d676a57432e5ac6559ecb",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-black.2026-10-20T16-07.raw.json",
+      "sha256": "f4b8f63fa5a9e74e449a11fd2902ad916ad5bae041a155cda58228c4fd0beca8",
+      "bytes": 5401,
+      "git_filtered_blob_oid": "2d8481f1aa6739b4d780ddcb58c2d92eba31bfe0",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-ruff.2026-10-20T16-07.md",
+      "sha256": "887e3c66b611606ca86f5bc845a3f68237e0a6960558e78d985ae07d583e919f",
+      "bytes": 263,
+      "git_filtered_blob_oid": "2c13d0c7de30a52fc81ea0a94a95f152148b5edf",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-ruff.2026-10-20T16-07.raw.json",
+      "sha256": "0820c98ca1af0a96b0e88235a6d2c187626317f31e8798adf9a6584095534ecf",
+      "bytes": 5350,
+      "git_filtered_blob_oid": "1657a4d2725f3c6454dd2d85d27677e71d55a41c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-types.2026-10-20T16-07.md",
+      "sha256": "f43c6e774a979b3abc310fa5265c47bb1d4ebbdfd12bcc2fb1a2926cad0107bb",
+      "bytes": 424,
+      "git_filtered_blob_oid": "2198edc5462d23457b7c52bf9494abef7e0b37c9",
+      "head_blob_oid": null,
+      "historical_sha256": "f4218cb09f946d4bd52d9ae4ae8b1a4544835f0d88cb5d0abb0804b95dedfd62",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-types.2026-10-20T16-07.raw.json",
+      "sha256": "e0e01d52e53e5a38c3ec45fd54806906eb0ca17d1591636b204428c2b9a0dc8b",
+      "bytes": 5580,
+      "git_filtered_blob_oid": "f9c1978cbc11134e6bc163604d8bc9d36a86738a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-first-black.2026-10-20T14-54.md",
+      "sha256": "1963e6d442c3e79e4e17fe35868b2814cba1965bcb50227642f630f0a350b5a3",
+      "bytes": 869,
+      "git_filtered_blob_oid": "deb5f571708f6d5e1d20862cef1a9c203a483a15",
+      "head_blob_oid": null,
+      "historical_sha256": "c1c81c486f1850e68bec5d54c6edf36456bf7afb810ff3d886ed0f1f7df8a8d2",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-first-black.2026-10-20T14-54.raw.json",
+      "sha256": "8eace15f2c6dd71a6cd21ccf4004fa395ee25fabd02b6a63c89a511bbfc74ff7",
+      "bytes": 1669,
+      "git_filtered_blob_oid": "17887605100f5ab0a813ed6ab178e60fcbc274cc",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-handoff.2026-10-20T15-39.json",
+      "sha256": "2b4131888a8e9e580b3cdf58d63e5f7d6180016487f63d592728b22ba02b592b",
+      "bytes": 10875,
+      "git_filtered_blob_oid": "79e17b8b01056896a6733f6b86715660c7f5091d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-handoff.2026-10-20T15-39.md",
+      "sha256": "25edc6717a5c3800010c7db9de4dd1bd5d6cc0a9779135722043d8014e7fd60d",
+      "bytes": 5183,
+      "git_filtered_blob_oid": "8b5220a5bf3799cd8446d7083f38e3a2e540464c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-black.2026-10-20T14-55.md",
+      "sha256": "ba61533a267bb7c48aeb0a701c1c08f59934d11aa87c3c63583e5b9e836e6722",
+      "bytes": 546,
+      "git_filtered_blob_oid": "cd01b90bcfeb97a284f0f34231beb82938dc4366",
+      "head_blob_oid": null,
+      "historical_sha256": "a3697241a8bfad5289d92fdd36a86622a5fcd4ecd371d40b153a42fcc25c5747",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-black.2026-10-20T14-55.raw.json",
+      "sha256": "cc5098e9d047f065a31cdb683e39356364ada275daaa1ba70e423c4df23c77dd",
+      "bytes": 1228,
+      "git_filtered_blob_oid": "1d99585393a62ef197c1d32832db7ba0a2ed6ec1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-ruff.2026-10-20T14-55.md",
+      "sha256": "8eef4642543dffd33eef889034d6f7722b1c141b432e280a56e3fa4889c63574",
+      "bytes": 3736,
+      "git_filtered_blob_oid": "30aaf5a6813559522b829d829cd778c75c1783b4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-ruff.2026-10-20T14-55.raw.json",
+      "sha256": "c6db9284008e82af2217c10b17b86efacd376596ac2f72c4b4d47ef38ee61255",
+      "bytes": 5371,
+      "git_filtered_blob_oid": "f7f1bea468f2e0e9b9240459a1e082c8f2e786d7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-black.2026-10-20T14-55.md",
+      "sha256": "f2f6dab3060c41c30bd2f29dbe1099cf57816a3d962c07bb98ca3d67f5adfbb2",
+      "bytes": 546,
+      "git_filtered_blob_oid": "deeeb86c265c4027d85beeb9bd2c6573ec968e60",
+      "head_blob_oid": null,
+      "historical_sha256": "5cb5940178f79167c2b619971b34462a93291425107ec860c1b64c81e0cc0cba",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-black.2026-10-20T14-55.raw.json",
+      "sha256": "cc5098e9d047f065a31cdb683e39356364ada275daaa1ba70e423c4df23c77dd",
+      "bytes": 1228,
+      "git_filtered_blob_oid": "1d99585393a62ef197c1d32832db7ba0a2ed6ec1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-ruff.2026-10-20T14-55.md",
+      "sha256": "bb6a2f62a412f12f3f799890a12d65f44e2cc7b36574f88b68e0052f66a25646",
+      "bytes": 514,
+      "git_filtered_blob_oid": "60063a89567de71c539d34d0e3c4d7f70f94fe24",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-ruff.2026-10-20T14-55.raw.json",
+      "sha256": "726bfbea6d260a1778786e91de9be1522fb8c1fbd1b08e99dace189dd9011ff8",
+      "bytes": 1173,
+      "git_filtered_blob_oid": "618ba4ee88616ae82825f5c8bfdb8c61bfcbbb0b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-types.2026-10-20T14-55.md",
+      "sha256": "09f3b631e1fcee2f0de07d5ad5a198a852ec9ec6c04291490cbc5a3dbb35f0ed",
+      "bytes": 5304,
+      "git_filtered_blob_oid": "1a2de1f17831ae4c67578c379c27a5dec98a88d4",
+      "head_blob_oid": null,
+      "historical_sha256": "343365b5fefb00be2b78b478c699b3b39f34f3c9a2f06614a4f60c17a9600333",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-types.2026-10-20T14-55.raw.json",
+      "sha256": "12146cf8ca6210d9ff0f40ba7645402625224ae14ab3e9f613b09f424daf7e7b",
+      "bytes": 9080,
+      "git_filtered_blob_oid": "a2eed7121658b81cb7e3a99de7ad0b1c498b0fc3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black-format.2026-10-20T15-02.md",
+      "sha256": "b35c8d42b09b09d60a26781f03888c4e289d9f720dbadf3a4293f42faa876c42",
+      "bytes": 668,
+      "git_filtered_blob_oid": "c4548ec286aa79f9aed61cdf693fe32a877ea748",
+      "head_blob_oid": null,
+      "historical_sha256": "f187dcabf383697d1631966ce9ee3dbfbbaf615ace51c02fa3210f39af59f78d",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black-format.2026-10-20T15-02.raw.json",
+      "sha256": "6b835339adc426d4519f21680384ab2f135d069977c53e1a673831d3af2e56dc",
+      "bytes": 1389,
+      "git_filtered_blob_oid": "2515378eeb2e03408b1415704c12d75166f7eba9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black.2026-10-20T15-03.md",
+      "sha256": "c7c30d880f1757fb8e4d1af76769768e57cae7f4d0a1aa00289d65adc973baee",
+      "bytes": 546,
+      "git_filtered_blob_oid": "4e4d6b7edebe44ff4042537f262c64335b81d8d5",
+      "head_blob_oid": null,
+      "historical_sha256": "51a3b54774c30d889f5fed462e04e69dd12c5269a04f2504563851209a57e699",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black.2026-10-20T15-03.raw.json",
+      "sha256": "c6d70a2e4111c1e645448c46aa784b03c48d9ce9d43a5df947c4707c31ee36de",
+      "bytes": 1228,
+      "git_filtered_blob_oid": "917b826c7fc349cf2339a201d712a65f07535361",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-inputs.2026-10-20T15-07.json",
+      "sha256": "3f46e8af4aa96fe4e9da5df7aa7e62566f2fc5da1ab20e15b538fb77dcf6cd8f",
+      "bytes": 2487,
+      "git_filtered_blob_oid": "ba0f9ac29190bc390651c1f0f44effaace9207b7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-inputs.2026-10-20T15-21.json",
+      "sha256": "44699e912fb2cabf4e829f516bfabea4f50da8be5c497ebc66452517e84a8e06",
+      "bytes": 3225,
+      "git_filtered_blob_oid": "c72995c935dbc03e0186029ba7f7e85b09674041",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-ruff.2026-10-20T15-03.md",
+      "sha256": "3bf0f838089e2334162bd1349283522568f00688dcb910fc3a9ca2b5dc9c4ef8",
+      "bytes": 514,
+      "git_filtered_blob_oid": "135f3df28beac324b57bb8268a7fdb087661c481",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-ruff.2026-10-20T15-03.raw.json",
+      "sha256": "87d7783ace12eb31da8278b07da42340b5bb576b66568c683c5646cc449351f5",
+      "bytes": 1173,
+      "git_filtered_blob_oid": "2776b254d6dfb4bf5689b6b0f5c0eeccaf60bdd6",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-tests.2026-10-20T15-06.md",
+      "sha256": "13eeafa06e8e9b446fefe32a16449e312e58e00f4e30ebaa2a1279b35206cd40",
+      "bytes": 30743,
+      "git_filtered_blob_oid": "1c2a847c698882d885ff2673433854bdf36ea9b4",
+      "head_blob_oid": null,
+      "historical_sha256": "42d10c5a762f2b27bbe3af848e98e2ad8a5a64c6f4d959f051384981c0f9a098",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-tests.2026-10-20T15-06.raw.json",
+      "sha256": "3011215aef3321ae2f8ffceb1a12500a58411cf6cf0cf15b6ae94b8799e30a90",
+      "bytes": 42465,
+      "git_filtered_blob_oid": "9739329c4c669eca5ad27ed1034d9d6c13dc7787",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-types.2026-10-20T15-03.md",
+      "sha256": "b5979483d21f8266139fd508e7a6665e91d1ced992d38e737476e74d2fbed8a9",
+      "bytes": 675,
+      "git_filtered_blob_oid": "49ef81f2133a2c5e7fe1aa17c0111de767d4a862",
+      "head_blob_oid": null,
+      "historical_sha256": "2c7bd57136eef0aed77f479584cb8778692ad367094da0361025a456a902b781",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-types.2026-10-20T15-03.raw.json",
+      "sha256": "2df2e1f6d75d7477d19beb5697cc405df1fc6d068c47fb197e0433f87265c0b1",
+      "bytes": 1403,
+      "git_filtered_blob_oid": "f07f2165d23f1ed5fedd8dd92b3c419b34bab9b7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black-format.2026-10-20T15-16.md",
+      "sha256": "f5b33c5e7a7d900c698520406c48ef22c09cd45931ca16d363fe95dcb33157c7",
+      "bytes": 875,
+      "git_filtered_blob_oid": "8af45986039ae3766c3694a1d9055aeabf5889b2",
+      "head_blob_oid": null,
+      "historical_sha256": "7dd8baff4e8ad45db7ba135f20686739c04db7c1da3d72f2e210a0d6a71df4fe",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black-format.2026-10-20T15-16.raw.json",
+      "sha256": "f67e5d9539b649a8ead3e1ea2e6c2180f8ebee2f923f1fa7171d9548e3b46fb6",
+      "bytes": 1669,
+      "git_filtered_blob_oid": "ab6d77c21402f7158005a72127f0278ce7a7c2d7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black.2026-10-20T15-16.md",
+      "sha256": "86c4bc2e05f68e60b4484d1c03a834ab031abf3258d0542dd1ef2fd9759bd1d0",
+      "bytes": 546,
+      "git_filtered_blob_oid": "5fe98585990fc271df41d7668b7f0d3296a684e8",
+      "head_blob_oid": null,
+      "historical_sha256": "ece026357b8b45c51d30388d99db0001b453809d645955763fbd69496ef70f49",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black.2026-10-20T15-16.raw.json",
+      "sha256": "fbe00126a3dc2a14b4f04f7679dd760908813a62d42da7b4c872dc043f97e3f2",
+      "bytes": 1228,
+      "git_filtered_blob_oid": "1256d6f3e7c5e4df68714250a85e21e7082d13a1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-ruff.2026-10-20T15-16.md",
+      "sha256": "5e84d60608aa1de563a3f0f063f92be9c37acd83201bdb6125d2276dc06bee3e",
+      "bytes": 966,
+      "git_filtered_blob_oid": "653e369c26026a0300761caa37bb365b7d24a5de",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-ruff.2026-10-20T15-16.raw.json",
+      "sha256": "a67b578862dd0bd64290fac1d98c19b875ac6349a7f890964ec0eb194ea64784",
+      "bytes": 1762,
+      "git_filtered_blob_oid": "da18900d573d2fbb27b1aabfb4a66a05754704db",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-black.2026-10-20T15-17.md",
+      "sha256": "d9860ad0609f2c7d14edadb12370611a95885db7d7ca8a7f3bd8ad63342d2056",
+      "bytes": 546,
+      "git_filtered_blob_oid": "64a2b523203db85baab20eabb3ef7637cd8cd0d0",
+      "head_blob_oid": null,
+      "historical_sha256": "4a01d1c9d9383d6c19571459cfc2fab5f9a96989de2953bc5cb441669ba9d11a",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-black.2026-10-20T15-17.raw.json",
+      "sha256": "ab47222605a583047c5d06b89faa3c53cf33986894db75f8edce9ee47d80c518",
+      "bytes": 1228,
+      "git_filtered_blob_oid": "51987b16921151c7425aa2ba6d3e01ea43d9f5c0",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-ruff.2026-10-20T15-17.md",
+      "sha256": "a8969a8574e6d0d401ad45ec57eb7a6ee3653dd2613b9564e6abb98ac0c72e6e",
+      "bytes": 514,
+      "git_filtered_blob_oid": "437107aeb4a3906c24cf72a711377601bad4074e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-ruff.2026-10-20T15-17.raw.json",
+      "sha256": "0986460b90c4c9f25a0df10fa0bc3286f340c2dfc1f29345e11cc8dd32a52012",
+      "bytes": 1173,
+      "git_filtered_blob_oid": "5924f3d2c0bfb5c9930e2f12a948cda45e3879b0",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-types.2026-10-20T15-17.md",
+      "sha256": "98e229fcdba99d141f02a4c30aedeb8d93fac552c23d59896e0111168150e4f1",
+      "bytes": 675,
+      "git_filtered_blob_oid": "36d8fc2ed045edd4dfc67a7e95b7bc21c4977c17",
+      "head_blob_oid": null,
+      "historical_sha256": "7da92f78b8d69e30bef6bc585295b948574a888acbf617a71c52c4cb7cdf6234",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-types.2026-10-20T15-17.raw.json",
+      "sha256": "15f958151fce43a99a1ba470215f2e1faefe4234f63f1f65104b2b0d48c673ef",
+      "bytes": 1403,
+      "git_filtered_blob_oid": "868aefdd7fbf131f20f9b1762044ba9309fda7a4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-black.2026-10-20T15-23.md",
+      "sha256": "3674674cfa284036f4b3b9f60cccd2413b152f1c3e4356d566137795d5fa160b",
+      "bytes": 546,
+      "git_filtered_blob_oid": "88d24887393a62ea9e2f433a8bda2a1daab96304",
+      "head_blob_oid": null,
+      "historical_sha256": "086c57d33a0b3e1ae6839298b429f2b7beea6b8dab9c708224a86f5b022bcf15",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-black.2026-10-20T15-23.raw.json",
+      "sha256": "a7d992c4989535ca07d40dd1a415f7040ba1e06fd781b4ce0156fc161b0f1608",
+      "bytes": 5664,
+      "git_filtered_blob_oid": "51280282615adf457feafa561c87e2a2a58e2fff",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-ruff.2026-10-20T15-23.md",
+      "sha256": "3645b718a202b8f0025b97528c854a0832fd4f29b8d84127ae74ed1fd1d44e08",
+      "bytes": 514,
+      "git_filtered_blob_oid": "78a41cf75786833e31ac2121dc026aa15b71f4eb",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-ruff.2026-10-20T15-23.raw.json",
+      "sha256": "6a84d9f2e266f472209dd22245abfc6a9dfa2e64c6b731f9a58cb30e62f1aca7",
+      "bytes": 5609,
+      "git_filtered_blob_oid": "219ac1da47523ed6764790797ebcd4089b474365",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-types.2026-10-20T15-23.md",
+      "sha256": "b993a713042f08bc5748918b7ddb8605dbae1e84040301953ed513a72d4e0989",
+      "bytes": 675,
+      "git_filtered_blob_oid": "d2cc156923b9ad82eb537acb3f1e981110339b82",
+      "head_blob_oid": null,
+      "historical_sha256": "45af11faefb100894ba7331c3b0c6f3ce5c22eb555d3056450c66d56241994fe",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-types.2026-10-20T15-23.raw.json",
+      "sha256": "0e5f8c2425b4064379d7449be6f29202a0c25835b0f00d48c1276ba89ba4d439",
+      "bytes": 5839,
+      "git_filtered_blob_oid": "944e4f08e3617aad73ce003a0975ec34d923f46d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop7-black-format.2026-10-20T15-28.md",
+      "sha256": "4bb1cb26fe290f70c60267345b2053399b547ba862c6fa18e6110590fe0882ca",
+      "bytes": 609,
+      "git_filtered_blob_oid": "0816107b77cbd1e71e74e07a6c72d38885586de6",
+      "head_blob_oid": null,
+      "historical_sha256": "098508a6486b223681b5c426d4d7123c8debbeb0b14b4b12cb6126eab46b22e6",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop7-black-format.2026-10-20T15-28.raw.json",
+      "sha256": "5feffe51bf55a94943c4b8d7cd13d1a905c00d27ee0af216eecb49ac9e20e366",
+      "bytes": 5746,
+      "git_filtered_blob_oid": "739b1837e2a228c0ce17c80bf767c56f5df44609",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.md",
+      "sha256": "bfa0eb790cf043132f8acadf7c0ed538dfd1119a96c6ebefdfef2720e03da311",
+      "bytes": 546,
+      "git_filtered_blob_oid": "ecc7db10641f3a0dc7b7318b14ec16245c03fbff",
+      "head_blob_oid": null,
+      "historical_sha256": "7c98c5fffa3366f851cd0d8e31fc056951004043e901e2c66b520e35ec8f5425",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.raw.json",
+      "sha256": "1a6baa81d2c60cb72b5ce2e60a9f90db21a51b8e0e2491acc9afb0ca8f41ee62",
+      "bytes": 5664,
+      "git_filtered_blob_oid": "4f8479d56368550673c120faf97b1c7a6c11b751",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-ruff.2026-10-20T15-29.md",
+      "sha256": "70f2e46a635663b9d669c4fa71667875d461f79395baf8d7860ff62b94a75d24",
+      "bytes": 514,
+      "git_filtered_blob_oid": "e65d2108b5be80e09e72d5a73f53f6802ad40a03",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-ruff.2026-10-20T15-29.raw.json",
+      "sha256": "624885d3f96676caa28a66f02adfd55373116e6145b8613bf69ed97f8df4e2ba",
+      "bytes": 5609,
+      "git_filtered_blob_oid": "c1bdb6e8f414e2235b2b28e38390f7f9cfaafd73",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.md",
+      "sha256": "d0f6f479f69895584a34bce9f901f0bef2da3e98ea15a1f1d8ef51ce630bf368",
+      "bytes": 2262,
+      "git_filtered_blob_oid": "51b8db2e1313a6f1639f783a3df3cad830972f95",
+      "head_blob_oid": null,
+      "historical_sha256": "09d7ff97c994d97db44d0e1df4b0ebb646b2f6405f49bae0450ca523ae351fa1",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.raw.json",
+      "sha256": "b5e5b49de0ad387f15d6fecb878bdb3825e72a768bd490109f33832f780945d4",
+      "bytes": 8128,
+      "git_filtered_blob_oid": "77246276ef636682f2b719d2c8dc40f51b1e38f3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.md",
+      "sha256": "ee1b1147f8f1f5c196e85126b4b621b556e94b18b6534c91befd304fbf19d9aa",
+      "bytes": 675,
+      "git_filtered_blob_oid": "ef39a846e466771881ac3c09c2dff6fcb3dbe9c6",
+      "head_blob_oid": null,
+      "historical_sha256": "9caed1e7eefe3e2aed99d22f3158398406a70e41c604b5e7751fd0815894b477",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.raw.json",
+      "sha256": "0d982d315105e48015f75009ea536595104dd2981acdbec93b50b91e96a675ff",
+      "bytes": 5839,
+      "git_filtered_blob_oid": "d096392a7759a6078ff177406c49b5468df837fd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-readable-normalization.2026-10-20T17-00.json",
+      "sha256": "167c541f2b3872772c76b46ba76b312ac2d71af239ae030628b491bcf8376bef",
+      "bytes": 40778,
+      "git_filtered_blob_oid": "c1acab8598396fd124fb3c98e97851e4115aea5c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair1-black.2026-10-20T16-11.md",
+      "sha256": "8e17ce28fdb48be7dd2fc688ece7de257c878ac33d9de81b733b614755dfb016",
+      "bytes": 825,
+      "git_filtered_blob_oid": "294325fe2fca6f31253bee9a78bd62f51905576b",
+      "head_blob_oid": null,
+      "historical_sha256": "286ff96c3c67d547de0835a1b8973f5f7a38e052775245b9bb6010ec5ddb56ea",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair1-black.2026-10-20T16-11.raw.json",
+      "sha256": "9bc35748e18cd6a4f2b04863323e054e9d40767199888ce50654c2a0a6af62bd",
+      "bytes": 6511,
+      "git_filtered_blob_oid": "1192928a981abdee8d08844a8a23acbf24edc7cd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-black.2026-10-20T16-11.md",
+      "sha256": "252d76227f48d260fcbee46d23933da1361cc56e8d5a41f4363ca5f2656fa4c8",
+      "bytes": 647,
+      "git_filtered_blob_oid": "32d041ce7857676816e44b8313233b420b1ed91d",
+      "head_blob_oid": null,
+      "historical_sha256": "2cf6eeafcf0d0b3341c308f0645d0495a5cf49088be1314a0d2259bf2a4836dc",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-black.2026-10-20T16-11.raw.json",
+      "sha256": "0e6128c88aea01da05ced3ffc89ca7af6ab36f7f6534d15f298c109b83cffa1c",
+      "bytes": 6265,
+      "git_filtered_blob_oid": "a0e89155b6acba51d0252da73eeb65ada7f3f1e0",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-ruff.2026-10-20T16-11.md",
+      "sha256": "99748d0bea7b4557407de9108fe373146740ed5d84b2383099033d7648af02d2",
+      "bytes": 8304,
+      "git_filtered_blob_oid": "83a5d9c48ef59a836de9bbea884bbbf53649d875",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-ruff.2026-10-20T16-11.raw.json",
+      "sha256": "719c82a000d20d4c5b6c00d7a3bc71e05a007071c2ec8eff865a5e1a6831608f",
+      "bytes": 16255,
+      "git_filtered_blob_oid": "f79ebe0c104bbca5c560732d538c10451cbdf56a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-black.2026-10-20T16-13.md",
+      "sha256": "77b9f254df7592e44b683780b1557ad2a705733cf694e41dfd17610da74340e8",
+      "bytes": 647,
+      "git_filtered_blob_oid": "b89cd23431cc54b2591b1d99d1969a8a51ca4448",
+      "head_blob_oid": null,
+      "historical_sha256": "c42294447b226c71788840a13d5339c65fe4ec346f3aad00e40c97972b6f07fb",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-black.2026-10-20T16-13.raw.json",
+      "sha256": "823d36f5615f6dc3b7e203b3fc5953cced59af426ff4eeddebb63c8ccd921012",
+      "bytes": 6265,
+      "git_filtered_blob_oid": "bd2c98e8b4a9757f56ada3eaa00732ce4ed92268",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-ruff.2026-10-20T16-13.md",
+      "sha256": "f41b89f6e1f777129ce209523be69c3c0ef5765fd71e151527b91f888cea9e38",
+      "bytes": 615,
+      "git_filtered_blob_oid": "cffcfb0d2f05437daa03b341be9b7e0e2b94af9b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-ruff.2026-10-20T16-13.raw.json",
+      "sha256": "917c8dbf92ac5287ae2e67f87a310e6f35c9a97e352b6b6db5588db04c674647",
+      "bytes": 6210,
+      "git_filtered_blob_oid": "803d2a5c8a3c51d65400eb1513c43a98f9844b79",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-types.2026-10-20T16-13.md",
+      "sha256": "f4060b30bd269fc1b57184acb4cb618d391b26345df11ddddab41bf4358efc3b",
+      "bytes": 1843,
+      "git_filtered_blob_oid": "16453507ba75870cc28b291993e1214a6289c0ab",
+      "head_blob_oid": null,
+      "historical_sha256": "928b6cf6945630b5a2d1e4b8795d93e758a834cab9fd0d4dedc1cf04c89dc72f",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-types.2026-10-20T16-13.raw.json",
+      "sha256": "58547e7e983e0cff39b5cf7596c5a29aeed89549228a07d8960ee6a6fbc110e5",
+      "bytes": 8241,
+      "git_filtered_blob_oid": "ffee27f83e87c6b6914ffa7ab49ebad14ae2430c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-black.2026-10-20T16-14.md",
+      "sha256": "947631f82029b17efa2348a92995f32664199e2bd591669d1bae4d89d4361582",
+      "bytes": 742,
+      "git_filtered_blob_oid": "5e673594c44c553cb61ab8fd49c0171889f52e13",
+      "head_blob_oid": null,
+      "historical_sha256": "34afd9467d4a92ab16d38dc8ddcd2fa4b673679c2de83e968e6bfa671e7d2d04",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-black.2026-10-20T16-14.raw.json",
+      "sha256": "81f773b872bd52e0b00de0b26876514595749053b92b0f1622a30d13de9ecc5e",
+      "bytes": 6394,
+      "git_filtered_blob_oid": "8bb62fb9fc2d3f63638c4ab76a2f5cdc229ab8c4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-format.2026-10-20T16-14.md",
+      "sha256": "ea4cc09405e2773d8e9edf60c1613277ac582cd52cc5f3d998846f989fad3107",
+      "bytes": 321,
+      "git_filtered_blob_oid": "6f9550ab5607415d90d3796f08a6f8771ea2582a",
+      "head_blob_oid": null,
+      "historical_sha256": "696a42b3c3d80b4ead88b9983ffadc0fb7e3774b30406be656adcf31f29b4a65",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-format.2026-10-20T16-14.raw.json",
+      "sha256": "db588e3108d437893a4b5342265d5a868c7439cce30f4a3670fdd3ccb7d78c22",
+      "bytes": 5957,
+      "git_filtered_blob_oid": "d37665dc557b121d9f274481139b10e155ab31d8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-black.2026-10-20T16-14.md",
+      "sha256": "c7aab8f7641b078fef713a4b00a540ca7f69673509f630fb4faaf1f1213e7ba0",
+      "bytes": 647,
+      "git_filtered_blob_oid": "f5c76ef1e1e78fe15efe643a857bdd06b9eed096",
+      "head_blob_oid": null,
+      "historical_sha256": "88e712de05d093a3d5350da26d19f4d21db956c87042be95133cb500d0df1951",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-black.2026-10-20T16-14.raw.json",
+      "sha256": "f1f7cdfbc5897b51a2ee843bc974f124dd1fbe1884cf746542f2a1555fabbdf6",
+      "bytes": 6265,
+      "git_filtered_blob_oid": "f88c3a80e19d0aeac42f2220c0d6819d31d95440",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-prechecks.2026-10-20T16-14.md",
+      "sha256": "5f6f39ed37880ca776ac3ad4ed8c67c4fca2b3c1057231d6de8571cc5c11a8ec",
+      "bytes": 7834,
+      "git_filtered_blob_oid": "82b78cdb8931a1f7ae1546da1a89f8541192c2ac",
+      "head_blob_oid": null,
+      "historical_sha256": "8aac31ecb2235e5807703bf410ab8f8bd189abf7c1cca7ddd08ef730f667ab87",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-prechecks.2026-10-20T16-14.raw.json",
+      "sha256": "1b1968b1f57a228d73075fddd98e3c251021a4c2a034aef95dc7ebd01d73953c",
+      "bytes": 16314,
+      "git_filtered_blob_oid": "34219edf109bb4d3c7b37450a22a3a67514f1cfa",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-probes.2026-10-20T16-14.md",
+      "sha256": "ec41cbc6661736c0b4b005006a95d9e93db1babaa4e854e414b818b0bad01107",
+      "bytes": 4933,
+      "git_filtered_blob_oid": "adfd52da15694abcedfe948177205ef4eb95c950",
+      "head_blob_oid": null,
+      "historical_sha256": "70cbd760679014ba865387bb1a9320fa1aa5cec08f01329dc611d2694cc6cf46",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-probes.2026-10-20T16-14.raw.json",
+      "sha256": "b6d73c709f57bf67aa00256879edba3d5dc725dffb2f7a02c61beb14db4516f4",
+      "bytes": 12241,
+      "git_filtered_blob_oid": "23234e94f51638ba82a06f36c762474763a9e110",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-ruff.2026-10-20T16-14.md",
+      "sha256": "1fc347ba5346dba148da2093fe15ee538c5a6e28bb9b4725421a453723208441",
+      "bytes": 615,
+      "git_filtered_blob_oid": "59d05bf3ed82d2976df3d0a5ce13703ca027552a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-ruff.2026-10-20T16-14.raw.json",
+      "sha256": "15180325bd5bb567812c3af7be243b0317e02c95cd7b711ef082e3a4227915ed",
+      "bytes": 6210,
+      "git_filtered_blob_oid": "e460c89cb3110159a27a023534442a507b0b59fe",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-types.2026-10-20T16-14.md",
+      "sha256": "60d233d27a361820faa1af2199fc9b83d86249568a71219105ddf18817c0d8ae",
+      "bytes": 776,
+      "git_filtered_blob_oid": "c091d1eb6447f7d87183a0052bfe2c66dea01866",
+      "head_blob_oid": null,
+      "historical_sha256": "fac2c4c2ddde62538bd1151b25a608d8222a7537ebbb5d3bfc13788170b962d5",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-types.2026-10-20T16-14.raw.json",
+      "sha256": "691215d6350eb9c2f3f710edae1550528217e1c8f929f7efa45dfee2c609deb2",
+      "bytes": 6440,
+      "git_filtered_blob_oid": "1cec03cfb9ef9b23ee1171a3fd93e7b8032fd492",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-black.2026-10-20T16-19.md",
+      "sha256": "34932f079c65ea6279799e74225091a5f33dace7f58617540b7848d26c3278fa",
+      "bytes": 647,
+      "git_filtered_blob_oid": "1fdcebe5182177a14e1487995628577c8ebccecd",
+      "head_blob_oid": null,
+      "historical_sha256": "aa1a725b4e2e406a2497b68f4913f9386f58c5702da35caa15dabeebbb61c28f",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-black.2026-10-20T16-19.raw.json",
+      "sha256": "82f071533c0391337e968010fb5b53a70599d0137499152edb09edd4dad75fbf",
+      "bytes": 6265,
+      "git_filtered_blob_oid": "8bfc50bb450b138d77a94aec125bf33c77cc91fb",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-prechecks.2026-10-20T16-19.md",
+      "sha256": "24c4c6c8b8680ddea273499f2e49af7dc4e48cb2c3da2402177c8127b87fa716",
+      "bytes": 4489,
+      "git_filtered_blob_oid": "aaf20f7afc74ce97b2d64accff3c4608c8f8d55e",
+      "head_blob_oid": null,
+      "historical_sha256": "d7ccf969c72ed98f70e6050d7d4882f2f61f8b6b9133d2c2e8d8c8852174134a",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-prechecks.2026-10-20T16-19.raw.json",
+      "sha256": "5e71a218a37c512336f05ccdc50d35ec8b580cf27c310b11650506dd3fcf2b1e",
+      "bytes": 11734,
+      "git_filtered_blob_oid": "f2918559921e8597ce768e4bd845775873e893dd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-probes.2026-10-20T16-19.md",
+      "sha256": "c663d150eeafa3dec4ea8ba4b161bfd303d6be5a3985f5d6a8ed536c164b9337",
+      "bytes": 4933,
+      "git_filtered_blob_oid": "77037ba687cf5242bb8df8ccf1e32fb75b72d76f",
+      "head_blob_oid": null,
+      "historical_sha256": "52f4d6c6f4271fc7dd50069815a9e277b2d4750992cdcfc8b3d22facd03a2713",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-probes.2026-10-20T16-19.raw.json",
+      "sha256": "6e8c3d619c7c5b0f4c0af74764d8a157d9614b44517f16791d839b3a080028ff",
+      "bytes": 12241,
+      "git_filtered_blob_oid": "08df0393aa8902c996642ba22f2a61259724ea55",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-ruff.2026-10-20T16-19.md",
+      "sha256": "0fea21c3133bfff52c14771de687b1591d9df29098522aa01ec345822227a23a",
+      "bytes": 615,
+      "git_filtered_blob_oid": "cf863102c91997f3fba1a65d6a91c0b24f7e9b9c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-ruff.2026-10-20T16-19.raw.json",
+      "sha256": "d8d013d6e00c9f2aedd8eda33836a14a80b94d178c09f4ebea18f51ca4e0b64d",
+      "bytes": 6210,
+      "git_filtered_blob_oid": "4d48f8d653af9fc5d913a3efe603472f996c1862",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-types.2026-10-20T16-19.md",
+      "sha256": "d0fb97a193cfe16353aeb1e85a61c3df223bf9a76c9fd4f20175022ed2a226ad",
+      "bytes": 776,
+      "git_filtered_blob_oid": "005de950f8570837db0976a3049169dc1cb3a6fe",
+      "head_blob_oid": null,
+      "historical_sha256": "b55c0b2eb6f671c1b7033dee4604ccf658f887fdfffd89132c1f31d6a918db2c",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-types.2026-10-20T16-19.raw.json",
+      "sha256": "468f2198cbca3abfec39ef742f3e9dda570bc6be9017c86d5e51b087cb42815f",
+      "bytes": 6440,
+      "git_filtered_blob_oid": "8b96e9b46c4db3f8a80a54402331b75abe00d3e4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-black.2026-10-20T16-19.md",
+      "sha256": "bfd54d61970ad3312e82994af0b920d6ac5b48489eb2560fa4364e27e85b7ad6",
+      "bytes": 647,
+      "git_filtered_blob_oid": "dcaf9c85cbafcb71344f4261ca04de75c1bbebc4",
+      "head_blob_oid": null,
+      "historical_sha256": "2dcc14a10d058a56484dd0b4e6477916f9ec87b7d032f06a36b89080c30bac77",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-black.2026-10-20T16-19.raw.json",
+      "sha256": "27cb1c812529372ac167072502fb6c26382d8d0360e4e58226eec1f36896c996",
+      "bytes": 6265,
+      "git_filtered_blob_oid": "23f6ef963e6988a71a70d40fdc8d9b62aef5d031",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-prechecks.2026-10-20T16-20.md",
+      "sha256": "e02765f5178d6065dae9262ce8d1bcf44312967a68d105b90697e377b9e681b7",
+      "bytes": 631,
+      "git_filtered_blob_oid": "ee08ae871908442155b2e75c72e8cdb5c684d474",
+      "head_blob_oid": null,
+      "historical_sha256": "1cb9e87c3d781f9998272e895883938f6cbe9783d2a5790d6b04f8a4df03ad67",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-prechecks.2026-10-20T16-20.raw.json",
+      "sha256": "0dc9abf4d60e94670d3dc1f9daeee306c5fd6526bc1bac3d1b026dffd3358337",
+      "bytes": 6433,
+      "git_filtered_blob_oid": "d9b568f3a7692c114d30647c005491ce324fa203",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.md",
+      "sha256": "1a67e1908fc24da81d4dd558433e9950729103379f4578e475c798989a04676d",
+      "bytes": 4933,
+      "git_filtered_blob_oid": "013aa4bccee0d1f2aa07185ac6bf4dce1604526f",
+      "head_blob_oid": null,
+      "historical_sha256": "89b46eb25c36ea919b1addbf3354349906f99d5ea5f50d99a3ff99a97cd99b6c",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.raw.json",
+      "sha256": "40da3cbd370a5933020f20e2092a0c9a588681182f0607ffcb6cf5b0febd9aca",
+      "bytes": 12241,
+      "git_filtered_blob_oid": "25de9866849db7f98fec35415376d343c7bba76d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-ruff.2026-10-20T16-19.md",
+      "sha256": "9ddecba5ffb910dcdbbf3deaee7a2f91947dabc90982010c78b265e656eb8076",
+      "bytes": 615,
+      "git_filtered_blob_oid": "bed4f5baedbdd7d7472bea41e827c130a6f30bd8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-ruff.2026-10-20T16-19.raw.json",
+      "sha256": "5584b2e1e83f8e1ecc87a1b15f50d7748e14a875f0da44d8d7df38201fd1c447",
+      "bytes": 6210,
+      "git_filtered_blob_oid": "aa55c6c94ec1396a80b7baab09d20a2777124ad7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-tests.2026-10-20T16-22.md",
+      "sha256": "e28d5921d8d39bc7deb1226becd99b25d7c8428c4b5a3a1a7c757ff8ffdb696a",
+      "bytes": 2399,
+      "git_filtered_blob_oid": "f87d1d9a15b4524ea717532b20730aba675a97a3",
+      "head_blob_oid": null,
+      "historical_sha256": "8b4a1093991a04c2351eb79de83f15401ce6c8a10e700fff26ef4f3d7c182a21",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-tests.2026-10-20T16-22.raw.json",
+      "sha256": "9fd82c5b6586aaca2a9a33147399e5cf3cf9b1f6193f746a24dadccb59792a34",
+      "bytes": 8791,
+      "git_filtered_blob_oid": "9c68ec167f02a62fc21270a4916a4c6c97bc088e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-types.2026-10-20T16-20.md",
+      "sha256": "be010a833f649ee1c05c5c3d31082da9c6fc6a84205b8d28ad51018bb3ed9ffc",
+      "bytes": 776,
+      "git_filtered_blob_oid": "ad7df06abdcf917390a199b92925d2c85137fa08",
+      "head_blob_oid": null,
+      "historical_sha256": "435095f5701bd20d9f1339f80d3898cb3e4b36e8f67a966e3ddaea21577b264a",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-types.2026-10-20T16-20.raw.json",
+      "sha256": "89add53248f865df507f3c8147439bb5647dd573e1db19ff0677093c8703ce0d",
+      "bytes": 6440,
+      "git_filtered_blob_oid": "730dff25a0a8c9164b63766c27ac5755f39eeaed",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black-raw.2026-10-20T15-31.json",
+      "sha256": "c0bb7b583ac4f1e9fa85039fffee68089577990a1c410b9901c3a7cd563011dd",
+      "bytes": 4690,
+      "git_filtered_blob_oid": "c57a0b530714d5231e445199fcf379fb9321c0a2",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.json",
+      "sha256": "280852bef695e5920692caaed11d32a84ea788136b7fa2cc6705b6c87ed3aaf4",
+      "bytes": 13223,
+      "git_filtered_blob_oid": "76ef5e9eefef74e7edb73417f9b0be8fe4e2e208",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.md",
+      "sha256": "daf693aabb8753afa27617d33e6c0f0885b6892382e9156263695614694d4e93",
+      "bytes": 921,
+      "git_filtered_blob_oid": "2d063782736572ce1fdc8e54aec2365aad6a39de",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix-raw.2026-10-20T15-13.json",
+      "sha256": "4b8235eb77cc5919a825103f8f5b5df184a5d533a5dd986d23c006679357773c",
+      "bytes": 4698,
+      "git_filtered_blob_oid": "fadc554aacaff7fb22d260d15bdab45e76fb0d7e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.json",
+      "sha256": "2104501370bdcf1e598113a98123b2f52943042ddb31f831a1c3792a2650929b",
+      "bytes": 12334,
+      "git_filtered_blob_oid": "00a07bb2e5a3b1c4dae4e1dbe287a3c662e35206",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.md",
+      "sha256": "fb72400f532a4014c3a386c3e64403554485a6238970f0236cb132032104f387",
+      "bytes": 1028,
+      "git_filtered_blob_oid": "79713922616eb1e9fd4a8ce83f752b41143e1f9c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black-raw.2026-10-20T15-15.json",
+      "sha256": "05f16c8d612bb64969765d2bb4b6fd52990a839d03879228a7dcc0da2529dd04",
+      "bytes": 4646,
+      "git_filtered_blob_oid": "a68e68264b4cacb94fc31f13ec735a7fd38ee6f1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.json",
+      "sha256": "90f858e2231cc819cd372de6ca847f25ddb90e6cd82cc3d2f1466425b0578f51",
+      "bytes": 12107,
+      "git_filtered_blob_oid": "45b5ebc3929e4e5f9e27d9614d8fac70ea6bde9f",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.md",
+      "sha256": "52d8c60ff65bbd0fe86f3c0b6dfc6af412d91818ca91cf68a0e5b5ec0dac7c96",
+      "bytes": 826,
+      "git_filtered_blob_oid": "b0592e576d7c2f2331e8aa422dd5516792d9e6bd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black-raw.2026-10-20T15-19.json",
+      "sha256": "e9fac7c1f06a1af80de6c21c28cb6e93a18b557ca1baea34a7737c34c836b285",
+      "bytes": 4654,
+      "git_filtered_blob_oid": "9b2c0904da499827fc6199a407a78587beee28e6",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.json",
+      "sha256": "a364d18119c802f1e28fde46ae6bd785b2fc05714b781f1cd084da7106255813",
+      "bytes": 12117,
+      "git_filtered_blob_oid": "3bcf94a14da645e53d2dcc8cdfdfd7d564c38d99",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.md",
+      "sha256": "7639f234c239f3c5b085fc038ca7fe6f9e6f5441b2b0fc6841318a308a36c36d",
+      "bytes": 837,
+      "git_filtered_blob_oid": "15ce00be7aba184bcbc75b3db4d1c3ed04360e8b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black-raw.2026-10-20T15-13.json",
+      "sha256": "f837ee760088209ad77785686cd2405b9fed0eb2bd60bb9cdd89ff93b7be0a97",
+      "bytes": 4517,
+      "git_filtered_blob_oid": "5c154b6e7e2d6c188454bf5d3a2bef211339cebd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.json",
+      "sha256": "38f84f539fda1ea576452ed29dfe28e0739299e0f297066bf6944918e01fa98d",
+      "bytes": 12023,
+      "git_filtered_blob_oid": "02c9301e12f32353b27ee8ae8e346f38152cdea1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.md",
+      "sha256": "8d6b892e148b7abefcdc411dc10a0ce7f504b44888c89b19aa6fbddfcba42619",
+      "bytes": 729,
+      "git_filtered_blob_oid": "9396d6d19d525e07d4c8157609056ceb32a632ec",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff-raw.2026-10-20T15-13.json",
+      "sha256": "495ef825a0deb4eee6181e2ae8b5c2fc407204e6b573702301a7eac481e82635",
+      "bytes": 8324,
+      "git_filtered_blob_oid": "abae9ce216eaa03e5031d838ea3a2545ca9cf01c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.json",
+      "sha256": "ead8490c3bfe312f527e804bbdd9b2fc545519219d46d81ef296770cb7c26d90",
+      "bytes": 23640,
+      "git_filtered_blob_oid": "c4478754512c98d6de7f5bcaecd58eca712a3881",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.md",
+      "sha256": "be2ba66ce7c2b80579ea52d27d0153c00ec2413e99a5602684d69ce2c24a9011",
+      "bytes": 11932,
+      "git_filtered_blob_oid": "9549df776370435b7bc13984f47d3ef1b3465121",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black-raw.2026-10-20T15-14.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553,
+      "git_filtered_blob_oid": "30bb41d758eb9846da1cf39dbc47180f43ef98c9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.json",
+      "sha256": "7de57f0c20b91b862d3869b91ffb57b5b2dd677fd44252be266378ec1633284c",
+      "bytes": 12024,
+      "git_filtered_blob_oid": "1210c063d3bcca1ba2840fc38639efd3093221d4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.md",
+      "sha256": "f56250733172b59a6413803bd196cb9e17dca9e88dba0dd2831337a994f5510d",
+      "bytes": 729,
+      "git_filtered_blob_oid": "961d8b5225d82616a6d3c085f74775ccd3b69f92",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright-raw.2026-10-20T15-14.json",
+      "sha256": "5bc20d4e648ccade49c2ffd3c5e16a0bdf9d528f200f12d9b7cb96cd56652e73",
+      "bytes": 5851,
+      "git_filtered_blob_oid": "d1392b1cba0671aac25240d17e36f32eeba7dc6e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.json",
+      "sha256": "cf4b58bcd5131a07bc27bfc35493611bcdddd0004ab327b0230ddf263ebce15b",
+      "bytes": 18168,
+      "git_filtered_blob_oid": "e67dedf5669e8d6ad110b66b71f384300811cb1b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.md",
+      "sha256": "069f5f2d8e7ef5a346ebe092b0669f1cac16c2d754bd4b184c97bd0035a3ee4d",
+      "bytes": 5923,
+      "git_filtered_blob_oid": "f67ca49e4cb7effa72823d140d53fcf71a078208",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff-raw.2026-10-20T15-14.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501,
+      "git_filtered_blob_oid": "e796732e7f918a1b02d4002dbf46821de383a5d8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.json",
+      "sha256": "2ef05b142946c882f1e84aeedb755d2a429b39ebe8ad3d387e3969709dc3c779",
+      "bytes": 11967,
+      "git_filtered_blob_oid": "e4ca051992189bb37e4048d0a607dd4354fc9760",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.md",
+      "sha256": "11433400ac0869ab68d3c7cf6fdb1712eb4ae8c043235846cfdfc911c7a64483",
+      "bytes": 688,
+      "git_filtered_blob_oid": "2745e0040bc3c8d9f57803d1f19f23e435fd98a6",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black-raw.2026-10-20T15-15.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553,
+      "git_filtered_blob_oid": "30bb41d758eb9846da1cf39dbc47180f43ef98c9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.json",
+      "sha256": "65b74fa3c3bd88bb2ec235994be91bbf1c638fba2ee9de92bc91d4974682632e",
+      "bytes": 12024,
+      "git_filtered_blob_oid": "bf95a1b7e2f390e8601de682b571ffb2b2bc1a15",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.md",
+      "sha256": "34e9e1a0562b5e14623d1e647416ece00d0d5168ce9a21c30781d43454e4bb0b",
+      "bytes": 729,
+      "git_filtered_blob_oid": "dce280979f437513076593cb0e321d829ecd0b39",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright-raw.2026-10-20T15-15.json",
+      "sha256": "30ebf9435e5bd56276143596f65df581b57e760ca9ed2c017eedd3135ac69893",
+      "bytes": 4938,
+      "git_filtered_blob_oid": "5b5fea7ba1343148100a61a916b0bd63e3ba91fe",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.json",
+      "sha256": "15e3134114e6db3ce8ded83303b0999096e27358e34b7fb8757c84ad43915193",
+      "bytes": 12713,
+      "git_filtered_blob_oid": "feacbf5dc86e21500cda208d1d3deda984f4b88c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.md",
+      "sha256": "60d5eb054daebb1b3f4d1ba2b8835637db2b0746f3a5b748fb4e692d2756b901",
+      "bytes": 1360,
+      "git_filtered_blob_oid": "9ac5b075ce66eddba506131cae001e5d3adfa438",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff-raw.2026-10-20T15-15.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501,
+      "git_filtered_blob_oid": "e796732e7f918a1b02d4002dbf46821de383a5d8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.json",
+      "sha256": "d9bf52f42c1effc3a1d870412084d8b3565ec7f5e50a37b18f61e4a77db0b523",
+      "bytes": 11967,
+      "git_filtered_blob_oid": "23c03212571be1af5ef1035c7b265cd33826c5b9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.md",
+      "sha256": "a7e895dced2936ddecf62755530a99e2f265f795c29aa5559e0cf1b5006b3f4b",
+      "bytes": 688,
+      "git_filtered_blob_oid": "7b88d6e7ec1bc50456cc6b7d28835cecab9ed43a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black-raw.2026-10-20T15-16.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553,
+      "git_filtered_blob_oid": "30bb41d758eb9846da1cf39dbc47180f43ef98c9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.json",
+      "sha256": "d863f0f0ff689697c27b1bdfcba62aac30ff5fab9240c111c856090027c2286f",
+      "bytes": 12024,
+      "git_filtered_blob_oid": "6d643a348be75dc38e8ffe8a7e1ce64a455acb72",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.md",
+      "sha256": "0f5da0038e66ee97d37f40445df968889396c9c011d9ea3d710ed2989c287810",
+      "bytes": 729,
+      "git_filtered_blob_oid": "ae406f2b0d3c58a22f80a7e13c454ffbafec6906",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright-raw.2026-10-20T15-16.json",
+      "sha256": "f25ce98166bceb2ca8097b9779a582f80358b6268a6c382fcdf2d5c641ff0150",
+      "bytes": 4690,
+      "git_filtered_blob_oid": "ec92ccd426a7af7a5a228159821db2ac1d44473c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.json",
+      "sha256": "b438af3d680ea9626323ee7c2e6ba701cb0c5b78f2cafc029e24f5bf438930c1",
+      "bytes": 12136,
+      "git_filtered_blob_oid": "e5ecbd082d17ebefb7d16586f281e0c300e54717",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.md",
+      "sha256": "afc971a8047fe27d71b85605822a34b5969348f3020d3cf38a5918c1221d8ded",
+      "bytes": 859,
+      "git_filtered_blob_oid": "26ac1c8abee9113cf8afcb99c9f8291ff4e76be7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff-raw.2026-10-20T15-16.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501,
+      "git_filtered_blob_oid": "e796732e7f918a1b02d4002dbf46821de383a5d8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.json",
+      "sha256": "a344b9550cebbf369a742499d75e357d7836003ab6a8a698dab07cf1c6d2f32c",
+      "bytes": 11967,
+      "git_filtered_blob_oid": "60eae0b50a641928a786d60b7db75e17a7ea18a4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.md",
+      "sha256": "723993d75d57de8fde92a6b36e186b5bb041ef5c0a6923e08c5b137a936145d1",
+      "bytes": 688,
+      "git_filtered_blob_oid": "6ca41d123b0e751a446020408e8be41674e8982a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black-raw.2026-10-20T15-19.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553,
+      "git_filtered_blob_oid": "30bb41d758eb9846da1cf39dbc47180f43ef98c9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.json",
+      "sha256": "dd2e43675c1229259e945ea74a9549a4584bbe141a26230b3d5b5bf55335e049",
+      "bytes": 12024,
+      "git_filtered_blob_oid": "775d237573899e1e37df7a5ecf92dce11edf1e3c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.md",
+      "sha256": "770910c17daff1bd3831f69d91e032b7376caa1c40826f3ac76d8b0ce4d4fdf5",
+      "bytes": 729,
+      "git_filtered_blob_oid": "2d1187807484b7c42bef505d1994662c7fcdd704",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright-raw.2026-10-20T15-19.json",
+      "sha256": "f25ce98166bceb2ca8097b9779a582f80358b6268a6c382fcdf2d5c641ff0150",
+      "bytes": 4690,
+      "git_filtered_blob_oid": "ec92ccd426a7af7a5a228159821db2ac1d44473c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.json",
+      "sha256": "4c8b64719158414b7e60777a9f4a5dc5d12d014be08e438983c70dd7b94904e7",
+      "bytes": 12136,
+      "git_filtered_blob_oid": "ea1becc8510cb4b20af9f36732aed407d017cd8b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.md",
+      "sha256": "2bbb39f5ee8d3ff9ec61ba6ac2463d9bda4f9b7e2872647342b9cddc9f88e640",
+      "bytes": 859,
+      "git_filtered_blob_oid": "0f9f3993b8868218f9de2bf60e4dbfb9385824b2",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff-raw.2026-10-20T15-19.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501,
+      "git_filtered_blob_oid": "e796732e7f918a1b02d4002dbf46821de383a5d8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.json",
+      "sha256": "ee4d394410c914f7fbe15ac54de372d2be77582b912fc57bf8d34bb9a0d18003",
+      "bytes": 11967,
+      "git_filtered_blob_oid": "c3ac095d369218278324e53659609045c252381f",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.md",
+      "sha256": "f46ce5b39da590e238b802e2438509357d485ed90ee42fdfc25a5612dc5e62f7",
+      "bytes": 688,
+      "git_filtered_blob_oid": "b4254d24e8a84d75875e008105d604bcd4542c53",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black-raw.2026-10-20T15-31.json",
+      "sha256": "46612ec9a5210c6dc9c0e1faae1daf36514d12799f797fa4b144bfe1891ec280",
+      "bytes": 4601,
+      "git_filtered_blob_oid": "fc20d99df19276c7e633438511a36ad9654dd12a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.json",
+      "sha256": "38167f06cbc3d8dc3179e37d5bca9bc78f372ca6cc5402dc993248673bd769ec",
+      "bytes": 13098,
+      "git_filtered_blob_oid": "65791a56f7b1046e0c3a46a9e3bbe3ca32dc8f3d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.md",
+      "sha256": "ca80028ab2ae1d8cb0dc51ed23d468fd0f06a4cf4421ad1898377d970c5f509c",
+      "bytes": 784,
+      "git_filtered_blob_oid": "741bafcc22d4ac838780d5b3e6a7e421d7208c7a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright-raw.2026-10-20T15-31.json",
+      "sha256": "9645e912b3c9c6a7ca713427262b9910d9e281d6e8c58ee6ff1b9b561fa9657e",
+      "bytes": 5383,
+      "git_filtered_blob_oid": "a1bb748ec871d70b08b3ecdcd1f3d8840604a337",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.json",
+      "sha256": "f0f6981588e649235f7217da1f6ada0a3859062187fe353a2ba3aa8abff500df",
+      "bytes": 15248,
+      "git_filtered_blob_oid": "31d961249aa88015bc424b3fd59ee2968214b1c4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.md",
+      "sha256": "f9420082951788ea7dc5a13162d350694d600e02693f7289506f0d6c50d23204",
+      "bytes": 2789,
+      "git_filtered_blob_oid": "c131321b373250acd201b5027769fff2dae1febe",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff-raw.2026-10-20T15-31.json",
+      "sha256": "4a4dc5ebb553d812aca58d5b6ca08a9f8455c4c3a7b184461af52d4b62afab68",
+      "bytes": 4549,
+      "git_filtered_blob_oid": "5e4e9d09d5cad5b3ec5a3f0a4436286b87a96242",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.json",
+      "sha256": "84452063ec379e348914bea78aedf42dacb7c937ea6132d7ec63df8ffde1770e",
+      "bytes": 13040,
+      "git_filtered_blob_oid": "2675f93b09b4dc4c7e57228feb862423a583ac79",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.md",
+      "sha256": "90fe1046026ee542f94152f660c3b369f7a0860337a259156f036fca791353c9",
+      "bytes": 743,
+      "git_filtered_blob_oid": "921f15965f1b850a45a0f7620d237614e2569998",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black-raw.2026-10-20T15-13.json",
+      "sha256": "cbff265a3a7edb9c551192bb1cf6966c6da3d49ff51570202e882fada8cb81b7",
+      "bytes": 4674,
+      "git_filtered_blob_oid": "0e9f039a68f2c790ae8fabb7c902c13f7d0c617b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.json",
+      "sha256": "90d605bdb2bbb1ae3062b523c7768355b68a4d92c687c01bb4d4bfcfd2e37868",
+      "bytes": 12649,
+      "git_filtered_blob_oid": "e376b21f5809429ce5d95dfe9471908cfac69704",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.md",
+      "sha256": "1704a9292dc955bbc9d5cd92661eb24f68e39b5d5992c3fd9dbbd0676f9fb447",
+      "bytes": 1341,
+      "git_filtered_blob_oid": "55f43fe1f7b208093aa7a066dfeb02ad5bea2da7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black-raw.2026-10-20T15-52.json",
+      "sha256": "28ad4499f8c78b3dd4c0754ec639986d9ef741e90e62e55d85bc568b39854f59",
+      "bytes": 5226,
+      "git_filtered_blob_oid": "352ef50c0abc785ff3ea1a6d2353536ffe070020",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.json",
+      "sha256": "d80f0ec1b42fd32e16359626d26e66caf80f25fed61569adf8d7d07d6228f35c",
+      "bytes": 13383,
+      "git_filtered_blob_oid": "011c2c7d39043f2db839909a004006cb61ba80a9",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.md",
+      "sha256": "16453655f4f0fa2c18c47386c7c1d8ea047f054b67da8d938301b9c21f3a4e8a",
+      "bytes": 1076,
+      "git_filtered_blob_oid": "d3cf978c98b4a222525204d7b02fecc4002f424f",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix-raw.2026-10-20T15-52.json",
+      "sha256": "ed2847a03a387ef78e0e33075375af5f45c0b6ebd0ec648af25b59445a66f442",
+      "bytes": 5166,
+      "git_filtered_blob_oid": "4fea4ba0df35f47df0edaa434df5888a305843d8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.json",
+      "sha256": "29d4c4e8860d4f04c4f0447eee3acae534de431333f0a609bfdeb3668339fca1",
+      "bytes": 13197,
+      "git_filtered_blob_oid": "16f84a565cf7430784f5c3122cd77e257d1bc746",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.md",
+      "sha256": "2c58d345a9ac19d4ff179e51f72eaeb7e0033e67449d70f194bbbcc004319aa9",
+      "bytes": 893,
+      "git_filtered_blob_oid": "138a55aded92c92b37fed0ff6db1461d779fe89e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black-raw.2026-10-20T15-52.json",
+      "sha256": "b53c3bef4879da78fa958b16391abe78718f07b308fefd2aa85156c9e05808db",
+      "bytes": 5081,
+      "git_filtered_blob_oid": "64ad9377ff5c099c27de3e2ec9741328bf8046ea",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.json",
+      "sha256": "267d73ad86f7ca8c1159bb9284534b500150b77762417ba4d99abbf11813558e",
+      "bytes": 13090,
+      "git_filtered_blob_oid": "3c4fb374fa36beeeb201307178e306cae0a06ca1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.md",
+      "sha256": "22c037d3e1311547d6851beca044ea3ed6ca4bcbf0c867cbbce131dc1e6f776a",
+      "bytes": 784,
+      "git_filtered_blob_oid": "2e57301fb66bd0855cd7c342dfd8acde1a117612",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage-raw.2026-10-20T15-57.json",
+      "sha256": "2e51aa9e4de41eb93bbd7f5db381ac0531f269f67c94d98c8daf346717acaeb8",
+      "bytes": 1361,
+      "git_filtered_blob_oid": "291faf4d67cd3c481cf6cc5f8f8131a144103231",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.json",
+      "sha256": "4d91f1428c68421bbc9df0b48d67522ac340398221ec172c4f28b166b232b5c9",
+      "bytes": 12540,
+      "git_filtered_blob_oid": "e9c2673bf67783b252458d6e25a780ca5543cea3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.md",
+      "sha256": "1c1c8668e86325863c72f9694c7f6fb7cc55014d9a2126a2038b3ddc679ef04a",
+      "bytes": 286,
+      "git_filtered_blob_oid": "2ff51572e364a0b4ad7d1fca8e21b0925f0b39d5",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks-raw.2026-10-20T15-53.json",
+      "sha256": "73e847c2327e513a7d51b702ad290e405a89c071f2e67abbbbd60e1c9905eb2c",
+      "bytes": 5771,
+      "git_filtered_blob_oid": "d956d16ee74734a6dedb56043495358358e74d44",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.json",
+      "sha256": "05f17461e1e3996420e7db6f3bde115cf1008aa6a88cdb56daca00a9da6f1fce",
+      "bytes": 16571,
+      "git_filtered_blob_oid": "0921437adb67cda6bc17a8fd1623ca197c1a55b3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.md",
+      "sha256": "99548d06657a8c980e113ea4e64348e03c008ac40017e7f3905a5347b726d761",
+      "bytes": 2769,
+      "git_filtered_blob_oid": "7887c22127c48cbacdbbcbc2fd297b4bf4f6607f",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1-raw.2026-10-20T15-52.json",
+      "sha256": "08aecee2d4e251661752260efdaf677246ee1a6f15f551d9a419cf4011dcfc87",
+      "bytes": 9941,
+      "git_filtered_blob_oid": "aec2182eda7ef519aa05495aa0e7308c24c7688d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.json",
+      "sha256": "ef01554ddc57ac8e53eb86614aa38e798ee856c26af4d11c3ae0fce9a122a9f7",
+      "bytes": 16872,
+      "git_filtered_blob_oid": "3e1fa5d1b60ff745fd81bdea230d4ffa37a5e9a1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.md",
+      "sha256": "59424cfcd9d32139caf397a30928c5f42e7af594b18335557806e56be52cc4d7",
+      "bytes": 4376,
+      "git_filtered_blob_oid": "574a1dc65383aba3bb17f1906c2f0d09786c253f",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2-raw.2026-10-20T15-52.json",
+      "sha256": "a047dea7aab10fe81666c4aa49d3415098e584b8721b6bb65d3dc335d76389b9",
+      "bytes": 9629,
+      "git_filtered_blob_oid": "9fc55eea387dc0806cf98b43446b1baf4d54040e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.json",
+      "sha256": "59999a625afcbd14583e7273f1bc5261bb932e65df5e8538fe998e95fadae181",
+      "bytes": 16267,
+      "git_filtered_blob_oid": "5662b96662f9ca0dd088562472b859fbdfa3d327",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.md",
+      "sha256": "dc6d0ad8b6b3f6a691cc3ba37ebb413c1a322195d360a914ff590cd72a55ba4a",
+      "bytes": 3850,
+      "git_filtered_blob_oid": "20034cf660ce6b310019b178e8c12d76ac489998",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright-raw.2026-10-20T15-52.json",
+      "sha256": "b2070cf2c7d71e94da29fc34430c590b5e68aa4645c62c2db77cee721b4328a1",
+      "bytes": 5218,
+      "git_filtered_blob_oid": "f510aa8eeab216637929c528c00e115f9f4359d0",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.json",
+      "sha256": "49a0b0e3920d5873c1ad757e2d98833db5960a12e4d0912db8a7c8d4e6fa112a",
+      "bytes": 13202,
+      "git_filtered_blob_oid": "5da2b942b40612b4a288971b652b719e482d00c4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.md",
+      "sha256": "66585f66b7132bd5cf235bfd1abd34cb4895e56cdd7ddf757dd4221e7446e915",
+      "bytes": 914,
+      "git_filtered_blob_oid": "202331692b3fd1cff8d3a06ad4887c12f80f713d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff-raw.2026-10-20T15-52.json",
+      "sha256": "f94f9b0d654cc2fd3ed4566c56d75a4434e4dc7305751044436dc242bc8fb082",
+      "bytes": 5029,
+      "git_filtered_blob_oid": "01e0fc51ee8cb13365900a8b434d47c63d615ffc",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.json",
+      "sha256": "f4e6643dec61e2f2be9248eb62e654740d254623dae6469671319121adc06ed5",
+      "bytes": 13033,
+      "git_filtered_blob_oid": "93f748fc6729976ad076edb09ca366282b4eb8b2",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.md",
+      "sha256": "e3e0bf7886dd5e87782c8cb9791e41d17d333af0ec85670751b1d04e7aa6bc44",
+      "bytes": 743,
+      "git_filtered_blob_oid": "71b8f072be003eaa22a93fe2064f6594efb974bd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests-raw.2026-10-20T15-54.json",
+      "sha256": "ba58878c53b21fd6d0c7a7bb1ec4d756d6cf74c75fee1b3b3f93f9faad8622f0",
+      "bytes": 7318,
+      "git_filtered_blob_oid": "78ef32d8bc74b8b3bd80d30c2131bcf2afa28eb5",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.json",
+      "sha256": "6d0b56b922545e0d225d28beca4e88c280a9db1ea01d5c62f829483f7114f9de",
+      "bytes": 30424,
+      "git_filtered_blob_oid": "a26a08bdcb6c0474c7367492c53a05888c708bc5",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.md",
+      "sha256": "495a274f44b7fb9efad0211568a9d8072795767db342b5b6f53d5f5f5f4e66da",
+      "bytes": 15497,
+      "git_filtered_blob_oid": "a3d8309521b916b9dc716f5486c2b1cb26a691e3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black-raw.2026-10-20T15-57.json",
+      "sha256": "34073c2e3ad98b5dd92f34f1f1afbe6ecee119f7d2a506e69896407e01470f4a",
+      "bytes": 5257,
+      "git_filtered_blob_oid": "32f74af02877982b2474663ea4c5a3923e3073d2",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.json",
+      "sha256": "b3ea6643222d6670d1bd5737584285d6538d0ef5d312609e302c04a229ba661f",
+      "bytes": 13097,
+      "git_filtered_blob_oid": "28e1fd540d48bb2fdc3ed5e479c6c07665575b2c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.md",
+      "sha256": "c8fedd268b08f7e193d525103acb158abd085203b9ce2b541a5dfb4919641cc1",
+      "bytes": 784,
+      "git_filtered_blob_oid": "72645f40ed11c4f2f115c30348082c27ba637cf8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright-raw.2026-10-20T15-57.json",
+      "sha256": "3ab123e272984b01b9c40f718efc314e50935ca6475ed8668e70a10cf908d746",
+      "bytes": 5394,
+      "git_filtered_blob_oid": "ba82ff99c42ac4f4f5e7d40f9cec83bbe3a50331",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.json",
+      "sha256": "06d8f5d20f2c1dda4f41fdd6385d9be765a914e804edd037e817a383bbcae1bc",
+      "bytes": 13209,
+      "git_filtered_blob_oid": "37ad0a4c8d6e6ea1d9a54d25cfc19b571ce372cf",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.md",
+      "sha256": "9cb4c9670d5c5e6c738e5bff6d0047abaa3024a1b5585fd3b908e712c056615b",
+      "bytes": 914,
+      "git_filtered_blob_oid": "3a481f0acafcdc0f61681a7779c6a1c3d773bd53",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff-raw.2026-10-20T15-57.json",
+      "sha256": "a26a36ab97f538746bdbbc6dc317a792a892ffd2d8fbc46596fbf1a1fff48eca",
+      "bytes": 5205,
+      "git_filtered_blob_oid": "c41e415c9f5f25e507d9e47ed2efa36853970c1a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.json",
+      "sha256": "4bb78a3052f3885406fe3510c2b80846c293852d96e0c25aec07ab74ba63e8a7",
+      "bytes": 13040,
+      "git_filtered_blob_oid": "f3665346db57d3da161589d6a782da9d2d48712c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.md",
+      "sha256": "1cdaa8d96f35a9e90aefcf8b9022bb0e8e10c748ce093a1043798e5a2a2fda0a",
+      "bytes": 743,
+      "git_filtered_blob_oid": "036ae69d46d83065b1077aac041dd1893480d9f6",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black-raw.2026-10-20T16-07.json",
+      "sha256": "34073c2e3ad98b5dd92f34f1f1afbe6ecee119f7d2a506e69896407e01470f4a",
+      "bytes": 5257,
+      "git_filtered_blob_oid": "32f74af02877982b2474663ea4c5a3923e3073d2",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.json",
+      "sha256": "9ae4e1e853dfac0219dc31c3488338e78eec380c3a5104644ef7337c0175ec43",
+      "bytes": 13090,
+      "git_filtered_blob_oid": "6443e46c80103c50486524dfd1a3451db7011582",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.md",
+      "sha256": "9bea6338d45e1edeb9b169b82b9559a70ac431bb410dde5166e2988eb33f4473",
+      "bytes": 784,
+      "git_filtered_blob_oid": "fe9ac576e2a590fdd5933ca6e3bb49f813d6d64f",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks-raw.2026-10-20T16-09.json",
+      "sha256": "06a6973d84376f2b0ad2d484e57cb446ccf86eb2a7abc91a518d456ffc8a097e",
+      "bytes": 6735,
+      "git_filtered_blob_oid": "d7a6e22f1ba4c211c0062abb2e8a7b1d6be66670",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.json",
+      "sha256": "077abae4e12d5040000a964fa4a6737f23d77e3e7331156b2260826a96c05c21",
+      "bytes": 19798,
+      "git_filtered_blob_oid": "b840a97570fc5cc86ca10e263d488b5f7a8922c3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.md",
+      "sha256": "10182efc5db285747e5ce015e33f51800128223441bc044a22aac257d62086bd",
+      "bytes": 5436,
+      "git_filtered_blob_oid": "7e72608833d9f4c31027bc1bbb9598816ce4c212",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1-raw.2026-10-20T16-07.json",
+      "sha256": "9935f3e8109de4c1b86601271c1ab7151b4560d681fe665eb76c85e54dd15060",
+      "bytes": 10113,
+      "git_filtered_blob_oid": "655a2f404d5e74173fb52b72e99f5ed11872a82c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.json",
+      "sha256": "5451917e626d52cac5285adc4cda2a6726430d63e15ef1655bd2984b24300e0c",
+      "bytes": 16872,
+      "git_filtered_blob_oid": "0f9077083fe220314b5ec77539e8a9557764cfa7",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.md",
+      "sha256": "c71b50da5ab7c3d3d9497ab00767ecd29f8adf1a6926f835c2f9caa150ec754e",
+      "bytes": 4376,
+      "git_filtered_blob_oid": "bc06df0b98169b6bb6f36899696c56cde7ca0ad1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2-raw.2026-10-20T16-07.json",
+      "sha256": "7ef5c8f86dc5e54be00ba44c65a8df17cd5acbfc37259486cae81578d0b1c819",
+      "bytes": 9805,
+      "git_filtered_blob_oid": "e29b181ce89088d25799a9777ea7633b8f9deb8b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.json",
+      "sha256": "7b477a725b5cf6141f5c8162590af9c7c6c580fa7ec04bbfe4b04f31ebd40107",
+      "bytes": 16268,
+      "git_filtered_blob_oid": "6bf4e51fc663465025e9d3190e31c0309d79120e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.md",
+      "sha256": "9cdfaedffcddc27cdb7f4131124614d9597b7271bbf905937c4eb21934b8c934",
+      "bytes": 3850,
+      "git_filtered_blob_oid": "bc200f398b4370771ac947b0800fee33c3fe8eae",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright-raw.2026-10-20T16-07.json",
+      "sha256": "3ab123e272984b01b9c40f718efc314e50935ca6475ed8668e70a10cf908d746",
+      "bytes": 5394,
+      "git_filtered_blob_oid": "ba82ff99c42ac4f4f5e7d40f9cec83bbe3a50331",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.json",
+      "sha256": "1ecaf78b36bd1d777178d129eee0599515df795e0568eb682658d5b2c587eddf",
+      "bytes": 13202,
+      "git_filtered_blob_oid": "9ba872405f1da32c59b08388f5cacc0ac1f8bae8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.md",
+      "sha256": "a99a443adbaee5634a95737268abcc0cb86215d472c10aceb6c6693dfe276cd6",
+      "bytes": 914,
+      "git_filtered_blob_oid": "0bc98adc7e436ce155b5a79bbf2f8386c139e82c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff-raw.2026-10-20T16-07.json",
+      "sha256": "a26a36ab97f538746bdbbc6dc317a792a892ffd2d8fbc46596fbf1a1fff48eca",
+      "bytes": 5205,
+      "git_filtered_blob_oid": "c41e415c9f5f25e507d9e47ed2efa36853970c1a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.json",
+      "sha256": "5f139301420418557efd4b7848832c4654160ea3f64882f87162a5c921b38886",
+      "bytes": 13032,
+      "git_filtered_blob_oid": "a96ed786424f9a00563bdf769b8f8a74f4db0062",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.md",
+      "sha256": "2343c6012bff38a260652317d8bc1ade109b22753c439a14293c833ed16d1dea",
+      "bytes": 743,
+      "git_filtered_blob_oid": "743a0ba10c125c0b0357fbcb42362edd1c737699",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black-raw.2026-10-20T16-10.json",
+      "sha256": "7a8e56599fd6456109d151d7935b321535c593191e6aaf67f486e2e510aa8c4b",
+      "bytes": 5357,
+      "git_filtered_blob_oid": "a5fc9fcd3cdf2aee024aca039f166c206869a35b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.json",
+      "sha256": "8abfbc64bcddb98ab5fdd02407bb9915c06ab3a81ddfe6e3918af3304c5e35de",
+      "bytes": 13089,
+      "git_filtered_blob_oid": "d43bedd5cb8cb7c556bfb726699a0743b83ae869",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.md",
+      "sha256": "075e8830838e646cd17699c7029d53903b9ed312dea909ceade67c2bf7783adb",
+      "bytes": 784,
+      "git_filtered_blob_oid": "d57787ad6c1e4d72f740ef30744a6e2f8d746797",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck-raw.2026-10-20T16-11.json",
+      "sha256": "2ff34e844b89674809a7d559ed9d6e0a473188db8bac11938262f3aacc33bde7",
+      "bytes": 5690,
+      "git_filtered_blob_oid": "eb012dc4d198caf74fe5f647ba75f07553765395",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.json",
+      "sha256": "87de01da7084ebd96b50ae6a757cc0b4c630b6eefbe0ef976166a5bf77935d8c",
+      "bytes": 13179,
+      "git_filtered_blob_oid": "3715b1b065bca027e6afdc8e25818c62c1054201",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.md",
+      "sha256": "1930684ae23cf0811ad6bbd6d803bbaac12354c784465b9458620ea24896dc00",
+      "bytes": 777,
+      "git_filtered_blob_oid": "fcdc1b44ce778996771eb5b8d6c12677ed6b633a",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright-raw.2026-10-20T16-10.json",
+      "sha256": "09e73d3a571125643e5a5239bf7627ada651158189e74a0bb49d51f56007ea10",
+      "bytes": 5494,
+      "git_filtered_blob_oid": "2a44b16f357459ab2eeb6505f4bd65cf6ee253aa",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.json",
+      "sha256": "b655742c87f88a848ca4d8ffa311d3fded45e97380c4ae0ec67e021a4ee3bfb2",
+      "bytes": 13201,
+      "git_filtered_blob_oid": "cfe74d039aa5bc9537944dca7c4d63c6dc23c3c2",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.md",
+      "sha256": "7772e47694ccef3bedd6b272f3e93f2cad77e0cb60f942c88a4864aaba5ffc5d",
+      "bytes": 914,
+      "git_filtered_blob_oid": "2bbffa0d3d44f8bf48e27db51042ae8d82ac1737",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection-raw.2026-10-20T16-27.json",
+      "sha256": "54ab78e29659bdc6b28031f255681846098a49d818240c21c9f7df7fb3593d5f",
+      "bytes": 5556,
+      "git_filtered_blob_oid": "92d278f7d987ddefb2deb8af58308418afb20633",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.json",
+      "sha256": "6ccd937d0e015cce9dbf4c6c1990919fdd63dc4db88191605cb014f327b858b4",
+      "bytes": 28977,
+      "git_filtered_blob_oid": "646867c6336119f6af1103d0209fe1c0ae9514bc",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.md",
+      "sha256": "c19a37f94cab81fb27b2b33a2194670f56551d843e891ba853a5676a399f2bbb",
+      "bytes": 15972,
+      "git_filtered_blob_oid": "b8215e4d3a670ec94e3654cb70c2a7bb73f6e9d5",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff-raw.2026-10-20T16-10.json",
+      "sha256": "b21fc4180eceb347159066e65933179dadea7d7871606aa4e73f7279b9f976d6",
+      "bytes": 5305,
+      "git_filtered_blob_oid": "c7e27db2618bbebff995bf92688ad616c76eab3e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.json",
+      "sha256": "a694f30d3f60bccc9dc9303f566231198df792868ac79b9b6f340bac811d9fe0",
+      "bytes": 13033,
+      "git_filtered_blob_oid": "ca7d33b74889b92c360542964d49a482414d145b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.md",
+      "sha256": "eab05fdf2fe017a699b1069c7c6ac4933efc8b5f1e62c61108883a398cd96ce3",
+      "bytes": 743,
+      "git_filtered_blob_oid": "47333a2655a31240ffa705d0ad59b878f1ffd312",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests-raw.2026-10-20T16-26.json",
+      "sha256": "83e75c67ed7c2198e1ad7e99c04d5f3dfb08b3789592701c746262504256ea65",
+      "bytes": 6719,
+      "git_filtered_blob_oid": "a15aa714de95edd851c25d1ed8559570d7cba054",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.json",
+      "sha256": "db6184162247ad392b2aaf6c2fa32a865c3b1bba4a69140efb1e22bd6726f314",
+      "bytes": 23199,
+      "git_filtered_blob_oid": "be5747515594fe84e3d5069fd07b6151e1d76070",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.md",
+      "sha256": "c0f6d8865a4ba4b3478ea3f83d530bc0de2c7132250d5d9052a2e3fb06d8a497",
+      "bytes": 6075,
+      "git_filtered_blob_oid": "7cb988aa27bc1319e1c1ea4de09b4f8aa998452c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-originals.2026-10-20T16-27.json",
+      "sha256": "be0e6f69d6e1f05f6f37f93f371fbb107da582a7ebe9702758327776eb6817ee",
+      "bytes": 63118,
+      "git_filtered_blob_oid": "1ec907c2f590a64c1da5b8ecf1c873c6fcb8a6cf",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+      "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653",
+      "bytes": 47888,
+      "git_filtered_blob_oid": "c03e2ce0c8f4cf29cbabf9592b84acaac148af6d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-archive.2026-10-20T16-39.json",
+      "sha256": "bbe502a3a661da66a13cd2d4d2158cd316b24ba332212f2f46cb1cec0400b089",
+      "bytes": 51117,
+      "git_filtered_blob_oid": "ccee98248ee2088f25345b582e746a42f69ed70e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+      "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1",
+      "bytes": 19332,
+      "git_filtered_blob_oid": "e1920792e74310b25607582faa316944492c5afd",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.md",
+      "sha256": "7305e42f8b4848e18cd875a64e376097f9be2b70d09c0262463d8116bb28de1f",
+      "bytes": 2197,
+      "git_filtered_blob_oid": "8a309aacac4a544e6950d24b80c43b6124152d04",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-coverage.2026-10-20T15-35.raw.json",
+      "sha256": "9adcb10275228c698f8e33efcaf62417c2f1838c69cc542b86848b750f0b4a97",
+      "bytes": 38945,
+      "git_filtered_blob_oid": "afebf89851313e101f0e065fed2c506e4abba533",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-freeze.2026-10-20T15-35.json",
+      "sha256": "939ef244f98bbd91ad6f9cfb4e679c2c08784a7e25ca90cb726d4ff21ff22184",
+      "bytes": 10571,
+      "git_filtered_blob_oid": "5dab3888c64511058c126557e295a54ee000287d",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-archive.2026-10-20T16-23.json",
+      "sha256": "9a74510a5c7223b8a2b26776d88c6df722ded75e6452522810f7119a1e427154",
+      "bytes": 109083,
+      "git_filtered_blob_oid": "bdd29c19f32ee396958d495d61148b404865b6d3",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-freeze.2026-10-20T16-23.json",
+      "sha256": "f68c7e17a2084f1c2ebfdcc192efeb3cc6b46d60cfb53ab11935e8e9ce7af110",
+      "bytes": 20217,
+      "git_filtered_blob_oid": "336c333c6bfad45843b7f7ee0e479fdc5da7bee0",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-freeze.2026-10-20T16-23.md",
+      "sha256": "4a1797610c0c47228ccf73c98661d7b93a2b1d7914990f5342c3c846fe3fdf1b",
+      "bytes": 3861,
+      "git_filtered_blob_oid": "9a6c495f7a7945474f18fab343d724edbe221c2b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.md",
+      "sha256": "bb0b40dc2d32e8b7eb3fe84657f0c4e4aba7470e7ace81e463e92035b86978a9",
+      "bytes": 1016,
+      "git_filtered_blob_oid": "a49373bde01b454b4fd6b89a840dbedbb58d4024",
+      "head_blob_oid": null,
+      "historical_sha256": "e2409e2d647cc15daa52bc2be0eac3ae541c2c839e9430c0a28cde2198e30be9",
+      "original_byte_authority": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.raw.json",
+      "sha256": "510b6a8e983ddd09044e24ca7b39c2c06e1d8f3cf63b03a4b4b12c785d06a99d",
+      "bytes": 6437,
+      "git_filtered_blob_oid": "822c76f88af056283689a52c6d92c0583e56319c",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "sha256": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+      "bytes": 12590,
+      "git_filtered_blob_oid": "58573615e8ac359b8193a70adcc862364d5a2488",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "bytes": 14986,
+      "git_filtered_blob_oid": "596f5125647c8d919969c9ff39647506b53ff2f1",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+      "bytes": 16991,
+      "git_filtered_blob_oid": "f8b02b8573c57ef3f8625f7217d00347b19c347b",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "bytes": 20995,
+      "git_filtered_blob_oid": "1916a4fd2edbe024c0f2f186f9b4f122ec65fd66",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "bytes": 12628,
+      "git_filtered_blob_oid": "1f1ff113b624820dd1a1a2d84ff0894c3b2dfdae",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "bytes": 14164,
+      "git_filtered_blob_oid": "fe8555e2211b4266f35d10bda93459da49cf5061",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+      "sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+      "bytes": 11194,
+      "git_filtered_blob_oid": "516df78cbeea019313103a769fa132a4680fa8ae",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "sha256": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+      "bytes": 10379,
+      "git_filtered_blob_oid": "1ead53ab3e7e50d73894adba945abac1ddb59dc0",
+      "head_blob_oid": null
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "bytes": 8966,
+      "git_filtered_blob_oid": "a5644c09dffd77bc6fef56229cb2841f0abac0f5",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "sha256": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+      "bytes": 12799,
+      "git_filtered_blob_oid": "5e7f44d997073155d19354fdef13eb55b9ceec4e",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/test_doctor.py",
+      "sha256": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+      "bytes": 17639,
+      "git_filtered_blob_oid": "4ba376988963ab9c9185d0e5e234ac828edb74c2",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "sha256": "3aa18d3bebef593ff3942a8d0154194e7bec045ab8b49aba26c41e296fdb77b5",
+      "bytes": 17118,
+      "git_filtered_blob_oid": "b1736213faf8970a135c34b74695cd5f1469fdd4",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+      "bytes": 11812,
+      "git_filtered_blob_oid": "2341972c882192db0bace6e4c681d0368e9eeb31",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+      "bytes": 20246,
+      "git_filtered_blob_oid": "b5d721c65a872f7448610ebef4f02c397f3dc170",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/test_service.py",
+      "sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "bytes": 19962,
+      "git_filtered_blob_oid": "851ab57a8f36e51809d8859365d2bf1e04b7abde",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "sha256": "380bb0bef28e759aac7929a61a5467ce1bda51e9cbc5cb5ff7e6990d183c4c89",
+      "bytes": 20119,
+      "git_filtered_blob_oid": "074a570f89915fc6588110bbe84627ea451cdbe8",
+      "head_blob_oid": null
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "bf5b712119e569acb8b90c329a7f0e62bdc7f7449bcfeb9e0ba74963bc7928d0",
+      "bytes": 17541,
+      "git_filtered_blob_oid": "3982bba1789fa2de30b8ad5e398bdbcbfb3dd113",
+      "head_blob_oid": null
+    }
+  ],
+  "retained_committed_reference_count": 10,
+  "retained_committed_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+      "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1",
+      "bytes": 23481,
+      "git_filtered_blob_oid": "bd4437d1d0f9a1174026cc45886c3bcecb9df000",
+      "head_blob_oid": "bd4437d1d0f9a1174026cc45886c3bcecb9df000"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "bytes": 7301,
+      "git_filtered_blob_oid": "27e6a9c29a0ab30b002b00a252357496f2b76b0c",
+      "head_blob_oid": "27e6a9c29a0ab30b002b00a252357496f2b76b0c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "bytes": 8893,
+      "git_filtered_blob_oid": "37e4733a5ff259c3019232a196ae51fc22f7580f",
+      "head_blob_oid": "37e4733a5ff259c3019232a196ae51fc22f7580f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "bytes": 20032,
+      "git_filtered_blob_oid": "4d3cb9d2a9e79783bf5f4adb44d2485869842c5a",
+      "head_blob_oid": "4d3cb9d2a9e79783bf5f4adb44d2485869842c5a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "bytes": 9683,
+      "git_filtered_blob_oid": "fc813ed46504b3f4a9468f44cf873cad6fc7d66e",
+      "head_blob_oid": "fc813ed46504b3f4a9468f44cf873cad6fc7d66e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+      "sha256": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+      "bytes": 18795,
+      "git_filtered_blob_oid": "3a894b7f7e0849ecf7ed4d3255d8bb653295711c",
+      "head_blob_oid": "3a894b7f7e0849ecf7ed4d3255d8bb653295711c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "bytes": 17125,
+      "git_filtered_blob_oid": "65c32127f47b9f5a6c907138e5c28f50ece969ee",
+      "head_blob_oid": "65c32127f47b9f5a6c907138e5c28f50ece969ee"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "bytes": 10018,
+      "git_filtered_blob_oid": "00baeb653fa044792fc090fb2e520b1dd515826c",
+      "head_blob_oid": "00baeb653fa044792fc090fb2e520b1dd515826c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "bytes": 16674,
+      "git_filtered_blob_oid": "39487b5a32fa839e1c6620d8b6939b99f5729a63",
+      "head_blob_oid": "39487b5a32fa839e1c6620d8b6939b99f5729a63"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "sha256": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+      "bytes": 15086,
+      "git_filtered_blob_oid": "53de4aa1a3e9405693573fe8f1a3cc5b323166d7",
+      "head_blob_oid": "53de4aa1a3e9405693573fe8f1a3cc5b323166d7"
+    }
+  ],
+  "total_union_path_count": 333,
+  "manifest_includes_itself": true,
+  "self_binding": "The manifest path is included; its SHA-256 and Git filtered blob OID are reported externally to avoid recursive self-binding.",
+  "hash_semantics": "sha256/bytes bind exact working bytes. git_filtered_blob_oid uses read-only git hash-object with repository attributes; HEAD-equal streams are retained references. No staging, object write or commit occurred.",
+  "unaccepted_core_source_test_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+    "tests/discovery_runtime/test_service.py",
+    "tests/discovery_runtime/test_service_publication.py",
+    "tests/discovery_runtime/test_service_boundaries.py"
+  ],
+  "excluded": [
+    "Active core 69-node continuation and new native fixture preparation",
+    "Checkpoint, plan/AC checkoffs, unrelated successor work"
+  ],
+  "qualification": "Only the 43 current readable-view byte identities change. The original 318-path manifest remains historical and its original streams are recoverable. This union adds two owner evidence artifacts, this confirmation JSON/Markdown and this manifest. It does not accept core or P6-T1."
+}

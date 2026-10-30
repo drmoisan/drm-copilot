@@ -1,0 +1,8 @@
+# P13-T3 PowerShell shard and completeness shape
+
+Timestamp: 2026-10-29T02-03
+Task: [P13-T3] Repeat the PowerShell gates when PowerShell changed after P11-T4.
+Command: Invoke-PoshQCTest -Root <worktree> -ShardIndex N -ShardCount 3 -ShardFileListPath artifacts/shards/poshqc-test-results-shard-N/shard-files.json -DisableKoverageCopy for N in 1..3; then Test-PoshQCShardCompleteness over the three manifests, a discovery-only Invoke-Pester over the manifest's `all` list, Test-PoshQCShardTestCount against the three JUnit totals, and Merge-PoshQCCoverageReport over the three coverage reports (the `poshqc / PowerShell QC shard 1..3` and `poshqc / PowerShell QC` job shapes)
+EXIT_CODE: 0, 0, 0 (shards), 0 (completeness and merge, pass 2)
+Output Summary: Shard 1: 3854 tests, 0 failed; shard 2: 3653 tests, 0 failed, 2 skipped; shard 3: 4695 tests, 0 failed, 8 skipped. "Shard completeness verified: 3 shards, 443 test files, shard tests 3854 + 3653 + 4695 = discovery 12202." "Merged PowerShell line coverage: 19556 of 20996 lines (93.14%), 1440 missed", equal to the single-process figure, so no shard is missing and no test file is selected twice. The first merge attempt failed with "Coverage report 2 lists line ... DiscoveryAuthorization.psm1 ... which report 1 does not list". The cause was the line-count repair landing between shard 1 and shard 2 of the first pass, not a merge defect, and the restarted pass merged cleanly. Retained files: `p13-powershell-junit-shard-{1,2,3}.2026-10-29T02-02.xml`, `p13-powershell-shard-files-{1,2,3}.2026-10-29T02-02.json`, `p13-powershell-coverage-merged.2026-10-29T02-02.xml`.
+Result: PASS

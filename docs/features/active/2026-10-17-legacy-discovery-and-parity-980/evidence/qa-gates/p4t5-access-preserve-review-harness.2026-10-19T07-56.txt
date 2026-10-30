@@ -1,0 +1,57 @@
+"""Preserve the immutable reviewed access candidate before its authorized repair."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+root = Path.cwd()
+scratch = Path(__file__).parent
+feature = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+manifest_path = feature / 'evidence/qa-gates/p4t5-access-candidate-freeze.2026-10-19T07-30.json'
+manifest = json.loads(manifest_path.read_bytes())
+print(list(manifest), flush=True)
+snapshot = scratch / 'access-reviewed-original'
+snapshot.mkdir(exist_ok=True)
+names = (
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py',
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py',
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py',
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py',
+    'tests/discovery_runtime/analyzer/test_filesystem_access.py',
+    'tests/discovery_runtime/analyzer/test_registry_access.py',
+)
+expected = (
+    '0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011',
+    '8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8',
+    'dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5',
+    '5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c',
+    '9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7',
+    '82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db',
+)
+rows = []
+for path, digest in zip(names, expected, strict=True):
+    content = (root / path).read_bytes()
+    assert hashlib.sha256(content).hexdigest() == digest
+    destination = snapshot / (Path(path).name + '.txt')
+    if destination.exists():
+        assert destination.read_bytes() == content
+    else:
+        destination.write_bytes(content)
+    rows.append({'path': path, 'sha256': digest, 'original_copy': 'SCRATCH/access-reviewed-original/' + destination.name})
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+document = {
+    'task': 'P4-T5', 'timestamp': stamp, 'recorded_at': now.isoformat(),
+    'state': 'ORIGINAL_REVIEWED_BYTES_PRESERVED_BEFORE_AUTHORIZED_R1_R2_REPAIR',
+    'review': 'evidence/qa-gates/p4t5-executor-candidate-review.2026-10-19T07-42.json',
+    'review_sha256': '95773ccf65e1e9f7891338871b4699e13ac51515979bc57943389d4e3fd71726',
+    'original_manifest': manifest_path.relative_to(root).as_posix(),
+    'original_manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+    'source_copies': rows,
+    'original_probe_results': 'evidence/qa-gates/p4t5-executor-candidate-probes.2026-10-19T07-34.json',
+    'original_probe_harness': 'evidence/qa-gates/p4t5-executor-candidate-probe-harness.2026-10-19T07-34.txt',
+    'source_mutations': 0,
+}
+destination = feature / 'evidence/qa-gates' / ('p4t5-access-original-review-binding.' + stamp + '.json')
+destination.write_text(json.dumps(document, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+print(json.dumps({'receipt': destination.relative_to(root).as_posix(), 'sha256': hashlib.sha256(destination.read_bytes()).hexdigest()}))

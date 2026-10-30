@@ -1,6 +1,6 @@
 ---
 name: execution-environment
-description: 'Execution-environment brief for research, planning, preflight, execution, and orchestration. Use before planning or delegating work so tool routes, command-text restrictions, the batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks are known and are not restated in plans.'
+description: 'Execution-environment brief for research, planning, preflight, execution, and orchestration. Use before planning or delegating work so tool routes, command-text restrictions, the batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, test runtime, and test-isolation checks are known and are not restated in plans.'
 ---
 
 # Execution-Environment Brief
@@ -123,6 +123,15 @@ These pass every validator rule and are found only by reading the plan against t
 - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
 - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
 - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
+
+## Test Runtime
+
+- A unit test runs in milliseconds. A full suite above about 15 minutes, or a single unit test above about 10 seconds, indicates repeated work in the code under test or its fixtures, not missing parallelism.
+- Diagnose before proposing sharding or parallel workers. First aggregate per-test and per-module time from the JUnit report that the full run already writes (`--junitxml`); a small fraction of tests usually holds most of the time. Then run the slowest test under a profiler (`python -m cProfile -o <file> -m pytest <node id>`) and read the profile with `pstats`.
+- Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
+- Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
+- Parallel shards reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
+- A candidate fix can be measured before the tree is edited by loading a pytest plugin module from `SCRATCH` with `-p <module>` and `PYTHONPATH`.
 
 ## Test Isolation Checks
 

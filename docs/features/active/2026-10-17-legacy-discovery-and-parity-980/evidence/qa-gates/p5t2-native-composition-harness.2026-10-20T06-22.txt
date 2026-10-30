@@ -1,0 +1,240 @@
+"""Qualify a native fixture; publication requires an explicit frozen release file."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import time
+
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.mutation_io import (
+    GuardedMutationWriter, capture_workspace, commit_mutation,
+)
+from drm_copilot_discovery.mutation_plan import MutationChange, MutationError, plan_mutation
+from drm_copilot_discovery.path_models import WriteGrant
+from drm_copilot_discovery.repository_reader import LocalGitReader
+from drm_copilot_discovery.validation import report_input_digest, report_projection, validate_snapshot
+
+SCRATCH = Path(__file__).resolve().parent
+
+
+def tree(root):
+    """Hash exact fixture file/Git bytes without asking Git to refresh its index."""
+    return {
+        path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(root.rglob("*")) if path.is_file()
+    }
+
+
+def bounded_git(argv, *, output_limit):
+    """Use the predecessor bounded process seam and fixed operational errors."""
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        data = process.stdout.read(output_limit + 1)
+        if len(data) > output_limit:
+            process.kill()
+            raise OSError("Native Git output exceeded its bounded read")
+        if process.wait() != 0:
+            raise OSError("Native Git read failed")
+        return data
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+
+def main():
+    """Execute qualification only by default; require explicit hash-bound release to publish."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("fixture_receipt")
+    parser.add_argument("output")
+    parser.add_argument("--release")
+    args = parser.parse_args()
+    descriptor_path = Path(args.fixture_receipt).resolve()
+    if descriptor_path.parent != SCRATCH:
+        raise ValueError("Fixture receipt must be directly inside operational SCRATCH")
+    descriptor = json.loads(descriptor_path.read_bytes())
+    root = (SCRATCH / descriptor["fixture"].removeprefix("SCRATCH/")).resolve()
+    if root.parent != SCRATCH:
+        raise ValueError("Fixture must be directly inside operational SCRATCH")
+    started = time.monotonic()
+    checks, durations, invalidations = [], {}, []
+    result = {"task": "P5-T2", "state": "running-qualification", "checks": checks,
+              "operation_seconds": durations, "fixture": descriptor["fixture"],
+              "fixture_receipt_sha256": hashlib.sha256(descriptor_path.read_bytes()).hexdigest()}
+
+    def measured(label, operation):
+        """Record actual operation time including a raised error."""
+        clock = time.monotonic()
+        try:
+            return operation()
+        finally:
+            durations[label] = time.monotonic() - clock
+
+    def check(label, condition):
+        """Persist granular checks; never combine digest, membership and result checks."""
+        checks.append({"label": label, "passed": bool(condition)})
+        print(("PASS " if condition else "FAIL ") + label, flush=True)
+        if not condition:
+            raise AssertionError(label)
+
+    try:
+        check("fixture-byte-identity-before", tree(root) == descriptor["files"])
+        catalog = load_catalog()
+        primitives = LocalMutationPrimitives(
+            workspace_root=str(root), lock_path=str(SCRATCH / (root.name + ".lock")))
+        repository = LocalGitReader(workspace_root=str(root),
+            repository_id=descriptor["expected_source_id"], run=bounded_git)
+
+        def capture():
+            """Reload metadata, immutable bytes and real pinned Git objects without caching."""
+            return capture_workspace(
+                workspace_root=str(root), profile_path=descriptor["profile_path"],
+                metadata=primitives.metadata, read_bytes=primitives.read_bytes,
+                catalog=catalog, repository=repository)
+
+        baseline = measured("capture-baseline", capture)
+        snapshot = baseline.snapshot
+        source_identity = (descriptor["expected_source_id"], descriptor["revision"])
+        check("checkout-identity", (snapshot.checkout.id, snapshot.checkout.revision) == source_identity)
+        expected_members = {
+            descriptor["profile_path"], descriptor["source_path"],
+            descriptor["authored_documentation"], descriptor["feature_path"], descriptor["matrix_path"],
+            "docs/migration/discovery/scope.yaml",
+            "docs/migration/discovery/coverage-ledger.json",
+            "docs/migration/discovery/inventory/empty.json",
+            "docs/migration/discovery/evidence/source.json",
+            "docs/migration/discovery/evidence/confirmation.json",
+            "docs/migration/discovery/evidence/confirmation.txt",
+        }
+        check("actual-loaded-membership", expected_members <= {item.path for item in snapshot.manifest.files})
+        check("known-captured-bytes", all(
+            hashlib.sha256(item.content).hexdigest() == descriptor["files"][item.path]
+            for item in snapshot.manifest.files))
+        check("source-and-target-role-pins",
+              {(item.id, item.revision) for item in snapshot.manifest.source_repositories} == {source_identity}
+              and {(item.id, item.revision) for item in snapshot.manifest.target_repositories} == {source_identity})
+        check("client-scope", len(snapshot.profile.clients) == 1
+              and snapshot.profile.clients[0].id == descriptor["client_id"]
+              and snapshot.profile.clients[0].target_repository == source_identity[0]
+              and tuple(snapshot.profile.clients[0].modes) == ("online",))
+        structural = measured("structural-contract", lambda: validate_snapshot(snapshot, mode="structural"))
+        result["structural_findings"] = [item.to_dict() for item in structural.findings]
+        check("structural-contract", structural.ok)
+        result["snapshot_sha256"] = snapshot.sha256
+        result["input_sha256"] = report_input_digest(snapshot)
+        check("qualification-read-only", tree(root) == descriptor["files"])
+        if args.release is None:
+            result["state"] = "fixture-qualified-publication-not-run"
+            return
+
+        release = json.loads(Path(args.release).read_bytes())
+        if release.get("task") != "P5-T2" or release.get("execution_released") is not True:
+            raise ValueError("Candidate execution release is required")
+        if release["fixture_receipt_sha256"] != result["fixture_receipt_sha256"]:
+            raise ValueError("Release does not bind this fixture")
+        check("harness-release-hash", release["harness_sha256"] == hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+        # The coordinator freezes actual imported candidate bytes after the ordered static gates.
+        for path, digest in release["source_bindings"].items():
+            check("candidate:" + path, hashlib.sha256(Path(path).read_bytes()).hexdigest() == digest)
+        from drm_copilot_discovery.parity_report import build_parity_report
+
+        report = measured("derive-parity", lambda: build_parity_report(snapshot))
+        data = report.to_dict()
+        projection = measured("authoritative-projection", lambda: report_projection(
+            snapshot, kind="parity-report", identifier="parity", mode="parity-complete"))
+        check("metric-projection-identity", data == projection)
+        check("explicit-failure-result", data["parity_result"] == "fail" and data["validation_result"] == "fail")
+        check("explicit-failure-findings", bool(data["parity_findings"]))
+        check("nonempty-population-available", data["parity"]["population_state"] == "available")
+        result["report"] = data
+        # Freeze exact metric expectations with the completed producer shape, not guessed field names.
+        for pointer, expected in release["expected_metrics"].items():
+            current = data
+            for key in pointer.strip("/").split("/"):
+                current = current[int(key)] if isinstance(current, list) else current[key]
+            check("metric:" + pointer, current == expected)
+        check("json-view-identity", json.loads(report.to_json()) == data)
+        check("markdown-view-identity", json.loads(
+            report.to_markdown().split("```json\n", 1)[1].rsplit("```", 1)[0]) == data)
+        check("captured-input-immutability", snapshot.sha256 == result["snapshot_sha256"])
+        output_root = snapshot.profile.artifacts["reports"]
+        outputs = {
+            output_root + "/parity-report.json": report.to_json().encode("utf-8"),
+            output_root + "/parity-report.md": report.to_markdown().encode("utf-8"),
+        }
+
+        def changes_for(captured):
+            """Bind each intended report byte sequence to its actual prior digest or absence."""
+            prior = {item.path: item for item in captured.snapshot.manifest.files}
+            return tuple(MutationChange(
+                artifact_kind="parity-report", artifact_id="parity", path=path,
+                content=content, expected_sha256=prior[path].sha256 if path in prior else None)
+                for path, content in sorted(outputs.items()))
+
+        changes = changes_for(baseline)
+        grants = tuple(WriteGrant(artifact_kind=item.artifact_kind,
+                       artifact_id=item.artifact_id, path=item.path) for item in changes)
+        plan = measured("plan-publication", lambda: plan_mutation(baseline, changes, grants=grants))
+        # This callback only counts the seam invocation; no installed host authority is claimed.
+        writer = GuardedMutationWriter(capture=capture,
+            invalidate_authority=lambda: invalidations.append("fixture-only"), primitives=primitives)
+        dry = measured("dry-run", lambda: commit_mutation(plan, writer=writer, dry_run=True))
+        check("dry-run-dispositions", dry.ok and all(item.status == "planned" for item in dry.artifacts))
+        check("dry-run-no-write", tree(root) == descriptor["files"] and not invalidations)
+        published = measured("publish-report", lambda: commit_mutation(plan, writer=writer))
+        result["publication_findings"] = [item.to_dict() for item in published.findings]
+        check("publication-result", published.ok)
+        check("publication-output-membership", {item.path for item in published.artifacts} == set(outputs))
+        check("publication-invalidation-seam", len(invalidations) == 1)
+        reloaded = measured("recapture-published", capture)
+        check("generated-json-membership", reloaded.snapshot.file(output_root + "/parity-report.json") is not None)
+        check("generated-markdown-membership", reloaded.snapshot.file(output_root + "/parity-report.md") is not None)
+        check("semantic-digest-stability", report_input_digest(reloaded.snapshot) == result["input_sha256"])
+        check("full-snapshot-changed", reloaded.snapshot.sha256 != snapshot.sha256)
+        check("pinned-input-identity-stability", reloaded.snapshot.repository_files == snapshot.repository_files)
+        check("authored-file-identity-stability", all(
+            baseline.inspect(path).identity == reloaded.inspect(path).identity
+            for path in expected_members))
+        recomputed = measured("recompute-published", lambda: build_parity_report(reloaded.snapshot))
+        check("recomputed-report-identity", recomputed.to_dict() == data)
+        validated = measured("validate-published", lambda: validate_snapshot(reloaded.snapshot, mode="structural"))
+        check("published-structural-validation", validated.ok)
+        check("failure-semantics-preserved", recomputed.to_dict()["parity_result"] == "fail")
+        prior_invalidations = len(invalidations)
+        repeated_plan = measured("plan-idempotent", lambda: plan_mutation(
+            reloaded, changes_for(reloaded), grants=grants))
+        repeated = measured("commit-idempotent", lambda: commit_mutation(repeated_plan, writer=writer))
+        check("idempotent-dispositions", repeated.ok and all(item.status == "skipped" for item in repeated.artifacts))
+        check("idempotent-no-invalidation", len(invalidations) == prior_invalidations)
+        denied = False
+        try:
+            plan_mutation(reloaded, changes_for(reloaded), grants=())
+        except MutationError as error:
+            denied = error.code == "MUTATION_GRANT"
+        check("missing-grant-rejected", denied)
+        stale = measured("stale-original-dry-run", lambda: commit_mutation(plan, writer=writer, dry_run=True))
+        check("stale-original-rejected", not stale.ok)
+        after = tree(root)
+        expected_after = {**descriptor["files"], **{
+            path: hashlib.sha256(content).hexdigest() for path, content in outputs.items()}}
+        check("only-granted-report-bytes-changed", after == expected_after)
+        result["after"] = after
+        result["state"] = "native-composition-passed"
+    finally:
+        result["elapsed_seconds"] = time.monotonic() - started
+        result["qualifications"] = [
+            "Real Windows/Git local fixture; no consumer repository or network.",
+            "Fixture setup is separate from the measured guarded publication.",
+            "Missing target parity is intentionally incomplete, not passing proof.",
+            "Authority invalidation callback is fixture instrumentation, not an installed host gate.",
+        ]
+        Path(args.output).write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
+                                    encoding="utf-8", newline="\n")
+
+
+if __name__ == "__main__":
+    main()

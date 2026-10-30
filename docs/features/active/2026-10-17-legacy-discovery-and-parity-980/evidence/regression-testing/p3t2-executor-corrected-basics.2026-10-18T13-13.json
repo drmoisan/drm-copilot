@@ -1,0 +1,55 @@
+{
+  "timestamp_utc": "2026-10-18T13:12:38.961837+00:00",
+  "results": [
+    {
+      "name": "dry-run-preserves-physical-state",
+      "passed": true,
+      "detail": {
+        "outputs": 14
+      }
+    },
+    {
+      "name": "first-initialize-and-idempotent-repeat",
+      "passed": true,
+      "detail": {
+        "outputs": 14,
+        "files": 5,
+        "invalidations": 2
+      }
+    },
+    {
+      "name": "default-required-mode-is-online",
+      "passed": true,
+      "detail": [
+        "online"
+      ]
+    },
+    {
+      "name": "honest-empty-draft-fails-completion",
+      "passed": true,
+      "detail": {
+        "codes": [
+          "ACCEPTANCE_SCOPE",
+          "COMPLETION_INPUT",
+          "COMPLETION_PROFILE",
+          "COMPLETION_SOURCE",
+          "COVERAGE_CONFIRMATION",
+          "COVERAGE_INVENTORY"
+        ]
+      }
+    }
+  ],
+  "passed": 4,
+  "total": 4,
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "f3930fae6a90ab427c4514648cf9bbb60db5e5cd28107e99de41b0df8da1e9d1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "1d066420b9617f3da87a87df0026e9e8e128a89d57e938cbeed8572874446b21",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "899a7d308ae4adca430a271661883f2918e8641ebe89a97f170c3561c7fb3445"
+  },
+  "final_source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "f3930fae6a90ab427c4514648cf9bbb60db5e5cd28107e99de41b0df8da1e9d1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "1d066420b9617f3da87a87df0026e9e8e128a89d57e938cbeed8572874446b21",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "899a7d308ae4adca430a271661883f2918e8641ebe89a97f170c3561c7fb3445"
+  },
+  "source_stable": true
+}

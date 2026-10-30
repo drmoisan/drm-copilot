@@ -1,0 +1,38 @@
+{
+  "binding_after": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "binding_before": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+  "candidate_sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\issue-980-p5t1-final-native.py SCRATCH\\issue-980-p5t1-final-043934-native-result.raw.json",
+  "completed_nodes": 0,
+  "exit_code": 1,
+  "finished_at": "2026-10-20T04:39:55.654899+00:00",
+  "label": "native",
+  "last_node": null,
+  "pid": 29124,
+  "raw": [
+    {
+      "bytes": 539,
+      "path": "SCRATCH/issue-980-p5t1-final-043934-native.stdout",
+      "sha256": "8016261d7c4df369940483f36c9db5d818b7bb8273752abbcd744b51bc473712"
+    },
+    {
+      "bytes": 953,
+      "path": "SCRATCH/issue-980-p5t1-final-043934-native.stderr",
+      "sha256": "0ba264c1c44fa4adfb6f76e57c4d0fa2956321cf753a4a1fe1ef969b45fe9d93"
+    },
+    {
+      "bytes": 220,
+      "path": "SCRATCH/issue-980-p5t1-final-043934-native.progress.json",
+      "sha256": "84b958ec4f2fc2c13e55f199405d4f074ed08a58274cb55a1606fb9d368e6248"
+    }
+  ],
+  "seconds": 21.048,
+  "stage": 7,
+  "started_at": "2026-10-20T04:39:34.607280+00:00",
+  "stderr": "Traceback (most recent call last):\r\n  File \"SCRATCH\\issue-980-p5t1-final-native.py\", line 182, in <module>\r\n    check(\"previous JSON and Markdown outputs do not alter semantic identity or counts\",\r\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n          report_input_digest(previous) == report_input_digest(snapshot)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n          and previous_report.document == report.document and previous.sha256 != snapshot.sha256)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"SCRATCH\\issue-980-p5t1-final-native.py\", line 35, in check\r\n    raise AssertionError(name)\r\nAssertionError: previous JSON and Markdown outputs do not alter semantic identity or counts\r\n",
+  "stdout": "PASS actual loader retains profile, scope, inventory, ledger and checksummed evidence\r\nPASS materialized complete no-scope graph is structurally valid\r\nPASS confirmed no-scope reports justified discovery completion\r\nPASS empty denominators retain null ratios and explicit zero runtime obligations\r\nPASS producer and authoritative public projection agree exactly\r\nPASS JSON and Markdown render the same detached fields\r\nPASS identical captured input renders deterministically\r\nPASS generation and validation preserve the immutable capture\r\n",
+  "timed_out": false,
+  "timeout_seconds": 600,
+  "timestamp": "2026-10-20T04-39"
+}

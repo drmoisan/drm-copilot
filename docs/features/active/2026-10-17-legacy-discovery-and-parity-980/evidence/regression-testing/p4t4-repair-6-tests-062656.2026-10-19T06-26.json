@@ -1,0 +1,43 @@
+{
+  "batch": "repair-6",
+  "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py --cov=drm_copilot_discovery.analyzer.configuration --cov=drm_copilot_discovery.analyzer.configuration_input --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t4-repair-6-coverage.raw.json",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T06:26:56.364122+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-repair-6-tests-062656.2026-10-19T06-26.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-repair-6-tests-062656.2026-10-19T06-26.stdout.txt",
+      "sha256": "7fdc44432addd3dc1418742433d6d65a13370f6bf5dd44a5e88f84138bdd8176"
+    }
+  },
+  "seconds": 53.389459,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "aeb4b0c3d2d33023554b9806a4579ac827fbdb910c2a567dc2174781395b581d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "a5e4bd8200de5f779cc3491aa62f799455cffd8aff877e364108e2bdbf6d5f1f",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "aeb4b0c3d2d33023554b9806a4579ac827fbdb910c2a567dc2174781395b581d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "a5e4bd8200de5f779cc3491aa62f799455cffd8aff877e364108e2bdbf6d5f1f",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "tests",
+  "started_at": "2026-10-19T06:26:02.974663+00:00",
+  "stderr": "",
+  "stdout": "........................................................................ [ 80%]\r\n..................                                                       [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                   Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration.py            89      0     32      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py     204      3     90      6    97%   199->222, 208->210, 216->222, 324, 382, 386\r\n----------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                    293      3    122      6    98%\r\nCoverage JSON written to file SCRATCH\\p4t4-repair-6-coverage.raw.json\r\n90 passed in 52.79s\r\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-26"
+}

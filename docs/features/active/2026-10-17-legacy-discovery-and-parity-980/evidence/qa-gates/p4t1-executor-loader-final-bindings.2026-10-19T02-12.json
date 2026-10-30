@@ -1,0 +1,390 @@
+{
+  "task": "P4-T1",
+  "portion": "approved loader prerequisite only",
+  "timestamp": "2026-10-19T02:12:19.073989+00:00",
+  "accepted_baseline": "a94c44fa31e66d830d01203ee9cc068fce2deef1",
+  "bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "physical_lines": 496,
+      "reviewed_original_sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "executable_ast_sha256": "db01815eb3e8986d1a7a235f1356d063acf7a41281c49253243d29bd06c4a974",
+      "executable_equivalent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py",
+      "sha256": "e97619ae60491fc70534842c3393593c40b5d46708d7d76375da63a7effe3d1c",
+      "physical_lines": 71,
+      "reviewed_original_sha256": "52e51eff8a1882ec233fc7e06e268918924d4cb407a7836076f90a4d73f57777",
+      "executable_ast_sha256": "f2288bb88e08a70fbd4310d68ff49711849b65253acba92cad3296b54f449437",
+      "executable_equivalent": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading_inventory.py",
+      "sha256": "ab27caeb5be94197f3ced6a8ff4bcda84136c035746d14cda3734b80b494e34c",
+      "physical_lines": 353,
+      "reviewed_original_sha256": "531469bfde10fd8abb7c8b5278157be9485469781bca2db9af218c4021a7713d",
+      "executable_ast_sha256": "aa1eb20bfa6739a54705af3b8ed4cf9237a054d56575b1415960f5d8a64181ba",
+      "executable_equivalent": true
+    }
+  ],
+  "preserved_test_bindings": [
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading.py",
+      "sha256": "c615612ec23f74b476e390e78c64c55fa8322c01df00c4a86419026ebe7ee44a",
+      "git_blob": "591ae8635d9f73c32b3088df7321de73dbda8a80"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_imports.py",
+      "sha256": "6922505d950c574395ea8ef7e0b6c18defa86614c35695df10e49712f8f3346c",
+      "git_blob": "b234639d012e5308aa28a6a15541e68f8c972e68"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-black.2026-10-19T02-02.md",
+      "sha256": "c89e88699be2e9fa5c668dcc6a427e19feb1ba448ea29bc095f333afc98f4c60"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-ruff.2026-10-19T02-02.md",
+      "sha256": "b7d8edfcb44b65e8868aef829f0e94856b9bce80a1a5fc089cff47ce31a6f1ad"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pyright.2026-10-19T02-02.md",
+      "sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pytest-reversed.2026-10-19T02-05.md",
+      "sha256": "8cd8f67735b8d0bef692c9fbb1f34e732d8241e4ba66583033104d608cd34ba6"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-executor-prior-manifest.2026-10-19T01-45.json",
+      "sha256": "298b39de4fa4e2f2be0b87b756c93e0b2851aabeeae1b8dc9a8949144a012b2d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-executor-loader-policy-confirmation.2026-10-19T02-01.json",
+      "sha256": "955269b885a0b16446f5f82c03d17a0df3c94e8e7b17c6400d3b4269191d14b5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-baseline.2026-10-19T01-53.json",
+      "sha256": "c178cb88b627ea96bf86c05aa16c9d833734d252704b882af9582e92299599af"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-coverage.2026-10-19T02-05.json",
+      "sha256": "c971862343f439670d195061cab1577e04e04bd0c5833c03eda9a72faf4f7702"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-comparison.2026-10-19T02-05.json",
+      "sha256": "5c254e3ea1b5f0a420b33a1b82f26a9300e87cb9874e6919253cfc7045f495b2"
+    }
+  ],
+  "coverage": {
+    "loader": {
+      "before_lines": [
+        202,
+        202
+      ],
+      "after_lines": [
+        204,
+        204
+      ],
+      "before_and_after_branches": [
+        112,
+        118
+      ],
+      "retained_covered_lines": 202,
+      "added_covered_lines": [
+        28,
+        414
+      ],
+      "mapped_executed_and_missing_branches_equal_after_explicit_insertion_adjustment": true,
+      "branch_adjustment": {
+        "mapped_previous_loop_exit": [
+          404,
+          423
+        ],
+        "final_loop_exit": [
+          404,
+          414
+        ],
+        "reason": "Approved new straight-line helper call precedes the former _git statement",
+        "approved_additions_only_ast_proof": true
+      }
+    },
+    "helper": {
+      "lines": [
+        22,
+        22
+      ],
+      "branches": [
+        14,
+        14
+      ]
+    }
+  },
+  "measured_units": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": [
+      {
+        "name": "_Loader",
+        "first": 61,
+        "last": 477,
+        "covered": 184,
+        "total": 184,
+        "line_percent": 100
+      },
+      {
+        "name": "load_snapshot",
+        "first": 480,
+        "last": 496,
+        "covered": 3,
+        "total": 3,
+        "line_percent": 100
+      },
+      {
+        "name": "__init__",
+        "first": 64,
+        "last": 86,
+        "covered": 13,
+        "total": 13,
+        "line_percent": 100
+      },
+      {
+        "name": "_finding",
+        "first": 88,
+        "last": 97,
+        "covered": 2,
+        "total": 2,
+        "line_percent": 100
+      },
+      {
+        "name": "_category",
+        "first": 99,
+        "last": 110,
+        "covered": 8,
+        "total": 8,
+        "line_percent": 100
+      },
+      {
+        "name": "_read",
+        "first": 112,
+        "last": 128,
+        "covered": 9,
+        "total": 9,
+        "line_percent": 100
+      },
+      {
+        "name": "_expect",
+        "first": 130,
+        "last": 146,
+        "covered": 5,
+        "total": 5,
+        "line_percent": 100
+      },
+      {
+        "name": "_classify",
+        "first": 148,
+        "last": 186,
+        "covered": 27,
+        "total": 27,
+        "line_percent": 100
+      },
+      {
+        "name": "_parse",
+        "first": 188,
+        "last": 228,
+        "covered": 14,
+        "total": 14,
+        "line_percent": 100
+      },
+      {
+        "name": "_manifest",
+        "first": 230,
+        "last": 284,
+        "covered": 23,
+        "total": 23,
+        "line_percent": 100
+      },
+      {
+        "name": "_evidence",
+        "first": 286,
+        "last": 309,
+        "covered": 17,
+        "total": 17,
+        "line_percent": 100
+      },
+      {
+        "name": "load",
+        "first": 311,
+        "last": 443,
+        "covered": 47,
+        "total": 47,
+        "line_percent": 100
+      },
+      {
+        "name": "_git",
+        "first": 445,
+        "last": 477,
+        "covered": 18,
+        "total": 18,
+        "line_percent": 100
+      },
+      {
+        "name": "excluded",
+        "first": 341,
+        "last": 348,
+        "covered": 2,
+        "total": 2,
+        "line_percent": 100
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py": [
+      {
+        "name": "local_inventory_requests",
+        "first": 15,
+        "last": 71,
+        "covered": 20,
+        "total": 20,
+        "line_percent": 100
+      }
+    ]
+  },
+  "pytest": {
+    "baseline": 44,
+    "candidate": 18,
+    "final": 62,
+    "final_seconds": 169.44,
+    "isolation": "baseline module order reversed with new module first; not a claim of exact reversed individual node order"
+  },
+  "source_review_reused": true,
+  "behavioral_reruns_by_verifier": 0,
+  "findings": [],
+  "status": "PREREQUISITE_VERIFIED_PENDING_TASK_COMPOSITION",
+  "evidence_normalization": {
+    "verified_at": "2026-10-19T02:13:40.730407+00:00",
+    "manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-evidence-normalization.2026-10-19T02-09.json",
+    "manifest_sha256": "1fb8f3931a800bf801b83f1625c19a0ed75acf72b255bd23dacec12f85bffd5e",
+    "verified_originals": [
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-baseline.2026-10-19T01-53.coverage",
+        "sha256": "ed81f6185844d19d4c2ee57442211f496c678b3a97b93a396e4182ef7ca53ccc",
+        "published_sha256": null
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-baseline.2026-10-19T01-53.json",
+        "sha256": "c178cb88b627ea96bf86c05aa16c9d833734d252704b882af9582e92299599af",
+        "published_sha256": "c178cb88b627ea96bf86c05aa16c9d833734d252704b882af9582e92299599af"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-baseline.2026-10-19T01-53.md",
+        "sha256": "869f34028ef30e3a98a720610b8a1ac437532dee6bd2341ea100c6d7f91f1212",
+        "published_sha256": "b1eeb12b10c104cde3a0faa6c8ba5d464e83806298e7b40e8508d84c377d305d"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-pyright.2026-10-19T01-59.md",
+        "sha256": "c9120a4953d0a39f1ec8c8e8b671dd2f219831dd91d9bc6c857316d8943b4b1b",
+        "published_sha256": "c9120a4953d0a39f1ec8c8e8b671dd2f219831dd91d9bc6c857316d8943b4b1b"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-ruff.2026-10-19T01-59.md",
+        "sha256": "d73a1ffbaa942aade0209f71936cf23c6593f6add6be676b3dbeb6f7d80eaef1",
+        "published_sha256": "d73a1ffbaa942aade0209f71936cf23c6593f6add6be676b3dbeb6f7d80eaef1"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-candidate-manifest.2026-10-19T01-58.json",
+        "sha256": "484049b155f537b391b8c3cb234add72429aaa564010b907ab292c49c2ccb6c6",
+        "published_sha256": "484049b155f537b391b8c3cb234add72429aaa564010b907ab292c49c2ccb6c6"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-candidate.2026-10-19T01-58.md",
+        "sha256": "624b908b599757a3d1f9a1e8a570e349f9052d31d96d85348a1b6be32257a02a",
+        "published_sha256": "d29507c36ece2ede9853ade848468ba4b3aeae8613df219d2953b48ebdc3ffcf"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-diffs.2026-10-19T02-02.md",
+        "sha256": "a524e0441cf5869cd44238b3a50037ab018bfb962994eea58f3318349ae8a783",
+        "published_sha256": "a524e0441cf5869cd44238b3a50037ab018bfb962994eea58f3318349ae8a783"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-black.2026-10-19T02-02.md",
+        "sha256": "c89e88699be2e9fa5c668dcc6a427e19feb1ba448ea29bc095f333afc98f4c60",
+        "published_sha256": "c89e88699be2e9fa5c668dcc6a427e19feb1ba448ea29bc095f333afc98f4c60"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-comparison.2026-10-19T02-05.json",
+        "sha256": "5c254e3ea1b5f0a420b33a1b82f26a9300e87cb9874e6919253cfc7045f495b2",
+        "published_sha256": "5c254e3ea1b5f0a420b33a1b82f26a9300e87cb9874e6919253cfc7045f495b2"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-coverage.2026-10-19T02-05.json",
+        "sha256": "c971862343f439670d195061cab1577e04e04bd0c5833c03eda9a72faf4f7702",
+        "published_sha256": "c971862343f439670d195061cab1577e04e04bd0c5833c03eda9a72faf4f7702"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-handoff.2026-10-19T02-05.md",
+        "sha256": "a2ff23052d2627226c58f75451386e9660d15236ec38173f931dc94eca4a2a4b",
+        "published_sha256": "7402299011e26adf47d5383806f085ef3c86f40758e497d8833f9b741b0dd823"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-pyright.2026-10-19T02-02.md",
+        "sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733",
+        "published_sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-pytest-reversed.2026-10-19T02-05.md",
+        "sha256": "1209b0f6f711a0bd3f7914829b939dfa90f8a22a9a8ece3d9604c8a74ba98032",
+        "published_sha256": "8cd8f67735b8d0bef692c9fbb1f34e732d8241e4ba66583033104d608cd34ba6"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-ruff.2026-10-19T02-02.md",
+        "sha256": "b7d8edfcb44b65e8868aef829f0e94856b9bce80a1a5fc089cff47ce31a6f1ad",
+        "published_sha256": "b7d8edfcb44b65e8868aef829f0e94856b9bce80a1a5fc089cff47ce31a6f1ad"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final.2026-10-19T02-05.coverage",
+        "sha256": "4cb767259374d559a57508888f9860a0ba0422a5e5e83344a52d8a478150ca67",
+        "published_sha256": null
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-policy-candidate-manifest.2026-10-19T02-00.json",
+        "sha256": "1b277e07adad8570bee8f91139ac28912ff5f1abb6eb8712ffc32fb9402cbfd5",
+        "published_sha256": "1b277e07adad8570bee8f91139ac28912ff5f1abb6eb8712ffc32fb9402cbfd5"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/regression-testing/p4t1-loader-candidate.2026-10-19T01-57.coverage",
+        "sha256": "ad4e4771c587e20a2b3aec6c2e51ca763dd5ed93aaaa1d1afc62d5816da7fdc8",
+        "published_sha256": null
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/regression-testing/p4t1-loader-candidate.2026-10-19T01-57.json",
+        "sha256": "c2db952c35fceb9850f2e2b36c88ce509464da81947f310af488095c9e09eeb0",
+        "published_sha256": "c2db952c35fceb9850f2e2b36c88ce509464da81947f310af488095c9e09eeb0"
+      },
+      {
+        "reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/regression-testing/p4t1-loader-rejected-baseline-command.2026-10-19T01-59.md",
+        "sha256": "a85c1ae34bdcba2fa28ce3284c15749e615a7f216230bf4a00c271cde7351994",
+        "published_sha256": "a85c1ae34bdcba2fa28ce3284c15749e615a7f216230bf4a00c271cde7351994"
+      }
+    ],
+    "moved_sqlite": [
+      "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-baseline.2026-10-19T01-53.coverage",
+      "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final.2026-10-19T02-05.coverage",
+      "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/regression-testing/p4t1-loader-candidate.2026-10-19T01-57.coverage"
+    ],
+    "normalized_markdown": [
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-baseline.2026-10-19T01-53.md",
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-candidate.2026-10-19T01-58.md",
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-handoff.2026-10-19T02-05.md",
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pytest-reversed.2026-10-19T02-05.md"
+    ],
+    "raw_json_unchanged": true,
+    "source_tests_unchanged": true,
+    "behavioral_reruns": 0
+  },
+  "checker_correction": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-executor-loader-checker-correction.2026-10-19T02-12.json",
+    "sha256": "091b8723c0032afebab424cd382de43efae58ff2b5c4885c6d1b3b516e72e8c8"
+  }
+}

@@ -1,0 +1,643 @@
+{
+  "Timestamp": "2026-10-21T17:08:18.845888+00:00",
+  "approved_argument_contract": {
+    "bounded_report_tuple_and_caller_nonmutation": 3,
+    "original_object_identity": 6,
+    "zero_argument_wrappers_process_tokens_and_vector_nonmutation": 8
+  },
+  "archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-originals.2026-10-21T17-08.json",
+    "sha256": "f38862c106169a21ec8217eae32f2a3dafa5d169448b1b332bf30d6683d1ecc2"
+  },
+  "baseline_test": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+    "selector": [
+      "test"
+    ],
+    "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+  },
+  "body_reader_sha256": "4d75a6812aad7d0aed01ea13ef605dac6d6eb7dc729f98000d3d53e345b0c8a8",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-candidate-formatted.2026-10-21T17-06.json",
+    "sha256": "fa3ba925bb0c225b5e7904e263d6982e1571e478c4f9e0e224023e91ed0f4c84"
+  },
+  "composition": "Each actual adapter reaches real run_installed_cli; only final cli.run_cli is replaced. The existing provider traps retain no-effect assertions. Six routes preserve argv identity, three capture exact immutable tokens without changing the caller, eight fixed wrappers preserve process tokens/vector.",
+  "coverage_qualification": "This 22-case integration subset does not replace full CLI module coverage. Production bytes are identical to the accepted 40-case public prerequisite with fresh changed BODY and retained 41-definition proof.",
+  "dependency_count": 260,
+  "existing_five_nodes": [
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_preserves_explicit_arguments_and_process_state[False]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_preserves_explicit_arguments_and_process_state[True]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_default_arguments_preserve_process_vector",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_rejects_explicit_count_before_argument_access",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_unknown_installed_command_refuses_before_provider_access"
+  ],
+  "failed": 0,
+  "final_execution_released": false,
+  "fresh_public_body": {
+    "contexts": {
+      "1": [
+        ""
+      ],
+      "102": [
+        ""
+      ],
+      "103": [
+        ""
+      ],
+      "107": [
+        ""
+      ],
+      "11": [
+        ""
+      ],
+      "113": [
+        ""
+      ],
+      "115": [
+        ""
+      ],
+      "118": [
+        ""
+      ],
+      "12": [
+        ""
+      ],
+      "125": [
+        ""
+      ],
+      "126": [
+        ""
+      ],
+      "127": [
+        ""
+      ],
+      "128": [
+        ""
+      ],
+      "131": [
+        ""
+      ],
+      "132": [
+        ""
+      ],
+      "133": [
+        ""
+      ],
+      "135": [
+        ""
+      ],
+      "136": [
+        ""
+      ],
+      "137": [
+        ""
+      ],
+      "138": [
+        ""
+      ],
+      "139": [
+        ""
+      ],
+      "149": [
+        ""
+      ],
+      "150": [
+        ""
+      ],
+      "152": [
+        ""
+      ],
+      "153": [
+        ""
+      ],
+      "154": [
+        ""
+      ],
+      "155": [
+        ""
+      ],
+      "156": [
+        ""
+      ],
+      "157": [
+        ""
+      ],
+      "158": [
+        ""
+      ],
+      "159": [
+        ""
+      ],
+      "18": [
+        ""
+      ],
+      "19": [
+        ""
+      ],
+      "20": [
+        ""
+      ],
+      "208": [
+        ""
+      ],
+      "21": [
+        ""
+      ],
+      "22": [
+        ""
+      ],
+      "220": [
+        ""
+      ],
+      "231": [
+        ""
+      ],
+      "24": [
+        ""
+      ],
+      "241": [
+        ""
+      ],
+      "246": [
+        ""
+      ],
+      "247": [
+        ""
+      ],
+      "249": [
+        ""
+      ],
+      "250": [
+        ""
+      ],
+      "251": [
+        ""
+      ],
+      "252": [
+        ""
+      ],
+      "253": [
+        ""
+      ],
+      "272": [
+        ""
+      ],
+      "281": [
+        ""
+      ],
+      "282": [
+        ""
+      ],
+      "285": [
+        ""
+      ],
+      "286": [
+        ""
+      ],
+      "287": [
+        ""
+      ],
+      "289": [
+        ""
+      ],
+      "290": [
+        ""
+      ],
+      "291": [
+        ""
+      ],
+      "292": [
+        ""
+      ],
+      "293": [
+        ""
+      ],
+      "294": [
+        ""
+      ],
+      "295": [
+        ""
+      ],
+      "296": [
+        ""
+      ],
+      "297": [
+        ""
+      ],
+      "298": [
+        ""
+      ],
+      "3": [
+        ""
+      ],
+      "300": [
+        ""
+      ],
+      "301": [
+        ""
+      ],
+      "302": [
+        ""
+      ],
+      "306": [
+        ""
+      ],
+      "315": [
+        ""
+      ],
+      "320": [
+        ""
+      ],
+      "325": [
+        ""
+      ],
+      "330": [
+        ""
+      ],
+      "335": [
+        ""
+      ],
+      "340": [
+        ""
+      ],
+      "345": [
+        ""
+      ],
+      "350": [
+        ""
+      ],
+      "355": [
+        ""
+      ],
+      "360": [
+        ""
+      ],
+      "365": [
+        ""
+      ],
+      "370": [
+        ""
+      ],
+      "375": [
+        ""
+      ],
+      "380": [
+        ""
+      ],
+      "385": [
+        ""
+      ],
+      "390": [
+        ""
+      ],
+      "395": [
+        ""
+      ],
+      "40": [
+        ""
+      ],
+      "400": [
+        ""
+      ],
+      "405": [
+        ""
+      ],
+      "41": [
+        ""
+      ],
+      "410": [
+        ""
+      ],
+      "415": [
+        ""
+      ],
+      "42": [
+        ""
+      ],
+      "420": [
+        ""
+      ],
+      "425": [
+        ""
+      ],
+      "430": [
+        ""
+      ],
+      "435": [
+        ""
+      ],
+      "440": [
+        ""
+      ],
+      "445": [
+        ""
+      ],
+      "450": [
+        ""
+      ],
+      "455": [
+        ""
+      ],
+      "460": [
+        ""
+      ],
+      "465": [
+        ""
+      ],
+      "5": [
+        ""
+      ],
+      "54": [
+        ""
+      ],
+      "55": [
+        ""
+      ],
+      "56": [
+        ""
+      ],
+      "57": [
+        ""
+      ],
+      "58": [
+        ""
+      ],
+      "59": [
+        ""
+      ],
+      "6": [
+        ""
+      ],
+      "62": [
+        ""
+      ],
+      "63": [
+        ""
+      ],
+      "64": [
+        ""
+      ],
+      "66": [
+        ""
+      ],
+      "67": [
+        ""
+      ],
+      "68": [
+        ""
+      ],
+      "69": [
+        ""
+      ],
+      "7": [
+        ""
+      ],
+      "78": [
+        ""
+      ],
+      "79": [
+        ""
+      ],
+      "8": [
+        ""
+      ],
+      "80": [
+        ""
+      ],
+      "81": [
+        ""
+      ],
+      "82": [
+        ""
+      ],
+      "83": [
+        ""
+      ],
+      "84": [
+        ""
+      ],
+      "85": [
+        ""
+      ],
+      "86": [
+        ""
+      ],
+      "87": [
+        ""
+      ],
+      "88": [
+        ""
+      ],
+      "89": [
+        ""
+      ],
+      "9": [
+        ""
+      ],
+      "92": [
+        ""
+      ],
+      "93": [
+        ""
+      ],
+      "94": [
+        ""
+      ]
+    },
+    "excluded_lines": [],
+    "executed_branches": [
+      [
+        285,
+        286
+      ],
+      [
+        285,
+        289
+      ]
+    ],
+    "executed_lines": [
+      281,
+      282,
+      285,
+      286,
+      289
+    ],
+    "missing_branches": [],
+    "missing_lines": [],
+    "start_line": 272,
+    "summary": {
+      "covered_branches": 2,
+      "covered_lines": 5,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 2,
+      "num_partial_branches": 0,
+      "num_statements": 5,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  },
+  "new_nodes": [
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[profile]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[init]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[inventory]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[dotnet]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[vsto]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[acceptance]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[coverage]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[parity]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[completion]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[profile]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[feature]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[coverage]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[runtime]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[parity]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[unknown]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[decision]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[evidence]"
+  ],
+  "nodes": [
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_preserves_explicit_arguments_and_process_state[False]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_preserves_explicit_arguments_and_process_state[True]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_default_arguments_preserve_process_vector",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_rejects_explicit_count_before_argument_access",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_unknown_installed_command_refuses_before_provider_access",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[profile]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[init]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[inventory]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[dotnet]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[vsto]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[acceptance]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[coverage]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[parity]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[completion]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[profile]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[feature]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[coverage]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[runtime]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[parity]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[unknown]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[decision]",
+    "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[evidence]"
+  ],
+  "normalization": {
+    "mapping": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-originals.2026-10-21T17-08.json",
+      "selector": [
+        "observed_path_aliases"
+      ],
+      "sha256": "f38862c106169a21ec8217eae32f2a3dafa5d169448b1b332bf30d6683d1ecc2"
+    },
+    "raw_bytes_unchanged": true,
+    "raw_coverage_terminal_newline": false,
+    "raw_readable_equality_verified": true
+  },
+  "passed": 22,
+  "preservation": "All original top-level test/fixture definitions retain complete parameter/decorator/docstring/assertion/executable AST identity. The original five exact node IDs are the first five executed nodes.",
+  "production_and_package_unchanged": true,
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-coverage-raw.2026-10-21T17-06.json",
+    "raw_sha256": "a1ed6eeb25fef3c9e8e3dc4f7f1b88a708dc17f1466f5c4e8817503ebd462ca1",
+    "selector": [
+      "coverage_json"
+    ],
+    "sha256": "20ba29b215d13600f1e34d85a9fd9133d624ed7e59014afeba46598686d28840"
+  },
+  "raw_summary": {
+    "covered_branches": 7,
+    "covered_lines": 82,
+    "excluded_lines": 8,
+    "missing_branches": 5,
+    "missing_lines": 65,
+    "num_branches": 12,
+    "num_partial_branches": 3,
+    "num_statements": 147,
+    "percent_branches_covered": 58.333333333333336,
+    "percent_branches_covered_display": "58",
+    "percent_covered": 55.9748427672956,
+    "percent_covered_display": "56",
+    "percent_statements_covered": 55.78231292517007,
+    "percent_statements_covered_display": "56"
+  },
+  "retained_attempts": "The pass1 formatter changed only the owned test; its original receipt/raw streams remain. Pass2 is the complete clean ordered pass.",
+  "retained_body": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-body.2026-10-21T16-44.json",
+    "sha256": "2c57f16369e735a7df83f4d94de85265e035b4a2940ac3d0fbce2e4c64386dd6"
+  },
+  "source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+    "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3"
+  },
+  "stages": [
+    {
+      "elapsed_seconds": 0.408047,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-black.2026-10-21T17-06.json",
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-black-raw.2026-10-21T17-06.json",
+        "sha256": "50dddffa3c74c2d15434bb624ead84c99cceac671e866af92d81271beae19117"
+      },
+      "sha256": "f5b14701c2b6b23535bc6ad9f273f02cfd9a67336a13dbf72dc58ac08459cd5b",
+      "stage": "black"
+    },
+    {
+      "elapsed_seconds": 0.207233,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-ruff.2026-10-21T17-06.json",
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-ruff-raw.2026-10-21T17-06.json",
+        "sha256": "454f6d9e1763719e097692003ecf57ba28e2afeb9a6127bd42a7405214c0d870"
+      },
+      "sha256": "868b98d73c136553384bc93454b3019be8e480feaf5602e457785e66210e99c0",
+      "stage": "ruff"
+    },
+    {
+      "elapsed_seconds": 1.008888,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-pyright.2026-10-21T17-06.json",
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-pyright-raw.2026-10-21T17-06.json",
+        "sha256": "e624a4a3847e729d28582e5b67ae31f026064bbed7924b0c6e9bfeb911ca09d4"
+      },
+      "sha256": "530bb028de5ddccf27c8511d60919a5b50dfd3923e34c6479e2be47e33e234e7",
+      "stage": "pyright"
+    },
+    {
+      "elapsed_seconds": 4.41624,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-tests.2026-10-21T17-06.json",
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-tests-raw.2026-10-21T17-06.json",
+        "sha256": "70356527f78ff3367c4bf8b6b816102119033d52fde4eb8b7e271ea698ff33bc"
+      },
+      "sha256": "da23c555add91baacc26949ec26d5e7a4221b23beb8d4c8fe6041e0f67fd2d2f",
+      "stage": "tests"
+    },
+    {
+      "elapsed_seconds": 0.409891,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-coverage.2026-10-21T17-06.json",
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-coverage-raw.2026-10-21T17-06.json",
+        "sha256": "20ba29b215d13600f1e34d85a9fd9133d624ed7e59014afeba46598686d28840"
+      },
+      "sha256": "2a95b2c2618ae41e061681fe7a9408c5c005aed9bbb1be06b2fcdaca7b11539d",
+      "stage": "coverage"
+    }
+  ],
+  "status": "COMPOSED_TEST_SUBSET_PASSED_INDEPENDENT_CONFIRMATION_PENDING",
+  "task": "P6-T3",
+  "task_accepted": false,
+  "test": {
+    "path": "tests/discovery_runtime/test_legacy_adapters.py",
+    "physical_lines": 384,
+    "sha256": "cad3cb12e171f938b8b91860d9f1f3e0700d6a0568a2570ce8f00773c67944ea"
+  },
+  "unchanged_existing_definitions": {
+    "installed_boundary": "928d5dc9a197fba9c95ce441b4b152fbc8bdb7626a9aac2b6da45dcfe31331e8",
+    "test_installed_entry_default_arguments_preserve_process_vector": "7711f3e5f4a6b078b5ca5668183849ac168795acb42f91e2c54001fae6e8c49b",
+    "test_installed_entry_preserves_explicit_arguments_and_process_state": "be0594e5abca48000812625a26418ad1d3d83ef6a145306791d37c4d6ec44f4e",
+    "test_installed_entry_rejects_explicit_count_before_argument_access": "4befa1a53213260620982f60eac23c08fe40aa02f26590873e68934125bd8dde",
+    "test_unknown_installed_command_refuses_before_provider_access": "bd06360ccd6ed8488c3ab032dd3704b710fe13dd0839e33047c09e6b5de7a5e3"
+  }
+}

@@ -1,0 +1,859 @@
+{
+  "final_acceptance": false,
+  "focused_receipt": {
+    "coverage_selector": [
+      "coverage.json"
+    ],
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-tests.2026-10-21T12-15.json",
+    "sha256": "976e1f64a23f19986ce05de488fd2e75d5bf4e3da866a199ebbbca64a98b41e4"
+  },
+  "raw_counters_augmented": false,
+  "reader": {
+    "function": "covered_file; coverage.py functions[qualified_name] actual BODY coordinates",
+    "name": "p6t1_final_nio1_coverage.py",
+    "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+  },
+  "remaining_gap": "113 / 112->113 remains the already-classified redundant missing-baseline guard; no forced inconsistent context mutation.",
+  "retained329": {
+    "member": "coverage_json",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json-raw.2026-10-21T11-43.json",
+    "raw_coverage_sha256": "2aba1fdd995dfdd75a2ab4280f62b5aae645de099aa977ac8459f0d2d6878103",
+    "sha256": "c3aa5a742c864eb1b7702ac499d4c82d5c04a77f01cc3845b295951ee0d7b020"
+  },
+  "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+  "source_sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+  "status": "DIAGNOSTIC_UNION_ONLY",
+  "task": "P6-T1",
+  "units": [
+    {
+      "diagnostic_union": {
+        "branches": 8,
+        "covered_branches": 8,
+        "covered_statements": 27,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": 27
+      },
+      "focused9": {
+        "executed_branches": [
+          [
+            34,
+            35
+          ],
+          [
+            34,
+            38
+          ],
+          [
+            43,
+            44
+          ],
+          [
+            43,
+            45
+          ],
+          [
+            47,
+            50
+          ],
+          [
+            61,
+            62
+          ],
+          [
+            61,
+            65
+          ]
+        ],
+        "executed_lines": [
+          29,
+          30,
+          31,
+          33,
+          34,
+          35,
+          36,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          50,
+          56,
+          57,
+          60,
+          61,
+          62,
+          65
+        ],
+        "missing_branches": [
+          [
+            47,
+            48
+          ]
+        ],
+        "missing_lines": [
+          48,
+          58,
+          59
+        ]
+      },
+      "name": "_profile",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            34,
+            38
+          ],
+          [
+            43,
+            45
+          ],
+          [
+            47,
+            48
+          ],
+          [
+            47,
+            50
+          ],
+          [
+            61,
+            62
+          ],
+          [
+            61,
+            65
+          ]
+        ],
+        "executed_lines": [
+          29,
+          30,
+          31,
+          33,
+          34,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          45,
+          46,
+          47,
+          48,
+          50,
+          56,
+          58,
+          59,
+          60,
+          61,
+          62,
+          65
+        ],
+        "missing_branches": [
+          [
+            34,
+            35
+          ],
+          [
+            43,
+            44
+          ]
+        ],
+        "missing_lines": [
+          35,
+          36,
+          44,
+          57
+        ]
+      }
+    },
+    {
+      "diagnostic_union": {
+        "branches": 4,
+        "covered_branches": 3,
+        "covered_statements": 22,
+        "missing_branches": [
+          [
+            112,
+            113
+          ]
+        ],
+        "missing_lines": [
+          113
+        ],
+        "statements": 23
+      },
+      "focused9": {
+        "executed_branches": [
+          [
+            111,
+            112
+          ],
+          [
+            111,
+            122
+          ],
+          [
+            112,
+            114
+          ]
+        ],
+        "executed_lines": [
+          80,
+          81,
+          82,
+          84,
+          87,
+          88,
+          91,
+          92,
+          95,
+          103,
+          104,
+          105,
+          111,
+          112,
+          114,
+          122,
+          123,
+          124,
+          125,
+          126
+        ],
+        "missing_branches": [
+          [
+            112,
+            113
+          ]
+        ],
+        "missing_lines": [
+          93,
+          94,
+          113
+        ]
+      },
+      "name": "_inventory",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            111,
+            122
+          ]
+        ],
+        "executed_lines": [
+          80,
+          81,
+          82,
+          84,
+          87,
+          88,
+          91,
+          93,
+          94,
+          95,
+          103,
+          104,
+          105,
+          111,
+          122,
+          123,
+          124,
+          125,
+          126
+        ],
+        "missing_branches": [
+          [
+            111,
+            112
+          ],
+          [
+            112,
+            113
+          ],
+          [
+            112,
+            114
+          ]
+        ],
+        "missing_lines": [
+          92,
+          112,
+          113,
+          114
+        ]
+      }
+    },
+    {
+      "diagnostic_union": {
+        "branches": 2,
+        "covered_branches": 2,
+        "covered_statements": 4,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": 4
+      },
+      "focused9": {
+        "executed_branches": [
+          [
+            164,
+            168
+          ]
+        ],
+        "executed_lines": [
+          163,
+          164,
+          168
+        ],
+        "missing_branches": [
+          [
+            164,
+            169
+          ]
+        ],
+        "missing_lines": [
+          169
+        ]
+      },
+      "name": "_source.read",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            164,
+            169
+          ]
+        ],
+        "executed_lines": [
+          163,
+          164,
+          169
+        ],
+        "missing_branches": [
+          [
+            164,
+            168
+          ]
+        ],
+        "missing_lines": [
+          168
+        ]
+      }
+    },
+    {
+      "diagnostic_union": {
+        "branches": 30,
+        "covered_branches": 29,
+        "covered_statements": 113,
+        "missing_branches": [
+          [
+            112,
+            113
+          ]
+        ],
+        "missing_lines": [
+          113
+        ],
+        "statements": 114
+      },
+      "focused9": {
+        "executed_branches": [
+          [
+            34,
+            35
+          ],
+          [
+            34,
+            38
+          ],
+          [
+            43,
+            44
+          ],
+          [
+            43,
+            45
+          ],
+          [
+            47,
+            50
+          ],
+          [
+            61,
+            62
+          ],
+          [
+            61,
+            65
+          ],
+          [
+            111,
+            112
+          ],
+          [
+            111,
+            122
+          ],
+          [
+            112,
+            114
+          ],
+          [
+            151,
+            153
+          ],
+          [
+            164,
+            168
+          ],
+          [
+            237,
+            238
+          ],
+          [
+            237,
+            239
+          ],
+          [
+            239,
+            240
+          ],
+          [
+            239,
+            241
+          ],
+          [
+            241,
+            242
+          ],
+          [
+            241,
+            243
+          ],
+          [
+            243,
+            249
+          ],
+          [
+            259,
+            271
+          ],
+          [
+            271,
+            272
+          ]
+        ],
+        "executed_lines": [
+          3,
+          5,
+          7,
+          8,
+          9,
+          14,
+          21,
+          29,
+          30,
+          31,
+          33,
+          34,
+          35,
+          36,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          50,
+          56,
+          57,
+          60,
+          61,
+          62,
+          65,
+          72,
+          80,
+          81,
+          82,
+          84,
+          87,
+          88,
+          91,
+          92,
+          95,
+          103,
+          104,
+          105,
+          111,
+          112,
+          114,
+          122,
+          123,
+          124,
+          125,
+          126,
+          133,
+          141,
+          143,
+          144,
+          148,
+          150,
+          151,
+          153,
+          154,
+          155,
+          157,
+          163,
+          164,
+          168,
+          171,
+          180,
+          181,
+          191,
+          192,
+          193,
+          194,
+          195,
+          226,
+          233,
+          234,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          249,
+          258,
+          259,
+          271,
+          272
+        ],
+        "missing_branches": [
+          [
+            47,
+            48
+          ],
+          [
+            112,
+            113
+          ],
+          [
+            151,
+            152
+          ],
+          [
+            164,
+            169
+          ],
+          [
+            200,
+            201
+          ],
+          [
+            200,
+            216
+          ],
+          [
+            243,
+            244
+          ],
+          [
+            259,
+            260
+          ],
+          [
+            271,
+            273
+          ]
+        ],
+        "missing_lines": [
+          48,
+          58,
+          59,
+          93,
+          94,
+          113,
+          152,
+          169,
+          196,
+          197,
+          198,
+          200,
+          201,
+          202,
+          214,
+          215,
+          216,
+          244,
+          246,
+          260,
+          261,
+          270,
+          273,
+          274
+        ]
+      },
+      "name": "MODULE",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            34,
+            38
+          ],
+          [
+            43,
+            45
+          ],
+          [
+            47,
+            48
+          ],
+          [
+            47,
+            50
+          ],
+          [
+            61,
+            62
+          ],
+          [
+            61,
+            65
+          ],
+          [
+            111,
+            122
+          ],
+          [
+            151,
+            152
+          ],
+          [
+            151,
+            153
+          ],
+          [
+            164,
+            169
+          ],
+          [
+            200,
+            201
+          ],
+          [
+            200,
+            216
+          ],
+          [
+            237,
+            238
+          ],
+          [
+            237,
+            239
+          ],
+          [
+            239,
+            240
+          ],
+          [
+            239,
+            241
+          ],
+          [
+            241,
+            242
+          ],
+          [
+            241,
+            243
+          ],
+          [
+            243,
+            244
+          ],
+          [
+            243,
+            249
+          ],
+          [
+            259,
+            260
+          ],
+          [
+            259,
+            271
+          ],
+          [
+            271,
+            273
+          ]
+        ],
+        "executed_lines": [
+          3,
+          5,
+          7,
+          8,
+          9,
+          14,
+          21,
+          29,
+          30,
+          31,
+          33,
+          34,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          45,
+          46,
+          47,
+          48,
+          50,
+          56,
+          58,
+          59,
+          60,
+          61,
+          62,
+          65,
+          72,
+          80,
+          81,
+          82,
+          84,
+          87,
+          88,
+          91,
+          93,
+          94,
+          95,
+          103,
+          104,
+          105,
+          111,
+          122,
+          123,
+          124,
+          125,
+          126,
+          133,
+          141,
+          143,
+          144,
+          148,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          157,
+          163,
+          164,
+          169,
+          171,
+          180,
+          181,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          200,
+          201,
+          202,
+          214,
+          215,
+          216,
+          226,
+          233,
+          234,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          246,
+          249,
+          258,
+          259,
+          260,
+          261,
+          270,
+          271,
+          273,
+          274
+        ],
+        "missing_branches": [
+          [
+            34,
+            35
+          ],
+          [
+            43,
+            44
+          ],
+          [
+            111,
+            112
+          ],
+          [
+            112,
+            113
+          ],
+          [
+            112,
+            114
+          ],
+          [
+            164,
+            168
+          ],
+          [
+            271,
+            272
+          ]
+        ],
+        "missing_lines": [
+          35,
+          36,
+          44,
+          57,
+          92,
+          112,
+          113,
+          114,
+          168,
+          191,
+          192,
+          272
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "task": "P3-T1",
+  "timestamp_utc": "2026-10-18T12:11:58.092717+00:00",
+  "status": "AFFECTED_CORRECTION_VERIFIED",
+  "unchanged_semantic_modules": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2"
+  },
+  "previous_provider_sha256": "3d4ebf82948d07f6d7404c1b17e6a0caa6c8c0bcce7360b4e46a35486a2ab2ba",
+  "corrected_provider_sha256": "db2aca8bf68f64333b509ca12cbe8445d1a0dadc0532064d93581acb1afb422c",
+  "corrected_provider_test_sha256": "a8bb146259743bb2196963a45634da73234e88ca94313962c22705619393fc99",
+  "bounded_delta": "Only native access 0x80 to 0x81 and its explanatory comment; reversing both restores the exact prior raw provider SHA.",
+  "retained_mutation_cases": 42,
+  "corrected_provider_cases": [
+    {
+      "name": "Owned partial stage is removed on failure",
+      "passed": true,
+      "details": {
+        "close_calls": 1,
+        "remove_calls": 1,
+        "message": "Injected partial write",
+        "foreign_remove_calls": 0
+      }
+    },
+    {
+      "name": "Opened parent identity must match recorded stamp",
+      "passed": true,
+      "details": {
+        "error": "Opened mutation parent identity changed",
+        "resulting_content": "original",
+        "events": [
+          [
+            "enter",
+            "."
+          ],
+          [
+            "enter",
+            "docs"
+          ],
+          [
+            "enter",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs"
+          ],
+          [
+            "exit",
+            "."
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Configured larger original is not rejected by a fixed default limit",
+      "passed": true,
+      "details": {
+        "error": null,
+        "original_size": 16777217,
+        "profile_schema_maximum": 67108864,
+        "events": [
+          [
+            "enter",
+            "."
+          ],
+          [
+            "enter",
+            "docs"
+          ],
+          [
+            "enter",
+            "docs/observations"
+          ],
+          [
+            "stage",
+            "docs/observations/.drm-mutation-owned-stage"
+          ],
+          [
+            "read-limit",
+            33554432
+          ],
+          [
+            "publish",
+            "docs/observations/value.txt"
+          ],
+          [
+            "remove",
+            "docs/observations/.drm-mutation-owned-stage"
+          ],
+          [
+            "exit",
+            "docs/observations"
+          ],
+          [
+            "exit",
+            "docs"
+          ],
+          [
+            "exit",
+            "."
+          ]
+        ]
+      }
+    }
+  ],
+  "native_diagnostic": "Six checks reported by the specialist; final ordered integration result still required.",
+  "task_checked": false,
+  "findings": []
+}

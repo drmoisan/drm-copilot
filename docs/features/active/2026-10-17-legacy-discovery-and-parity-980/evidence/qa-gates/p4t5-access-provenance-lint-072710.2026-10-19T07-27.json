@@ -1,0 +1,39 @@
+{
+  "batch": "provenance",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T07:27:10.483086+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t5-access-provenance-lint-072710.2026-10-19T07-27.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t5-access-provenance-lint-072710.2026-10-19T07-27.stdout.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "seconds": 0.100529,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T07:27:10.382557+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-27"
+}

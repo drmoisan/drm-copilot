@@ -1,0 +1,117 @@
+{
+  "stage": "unit",
+  "label": "p5t1-legacy-pass4-unit",
+  "started": "2026-10-19T14:53:11.614924+00:00",
+  "finished": "2026-10-19T14:53:13.620199+00:00",
+  "command": "poetry run pytest tests/scripts/dev_tools/discovery/test_coverage_report.py tests/scripts/dev_tools/discovery/test_rendering.py -o addopts= -v --cov=scripts.dev_tools.discovery.coverage_report --cov-config=SCRATCH/coverage.ini --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/coverage.json",
+  "exit_code": 0,
+  "duration_seconds": 2.005,
+  "source_before": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "b835528fe89deb20969ad8fff8de59b69a93382e38bea0802a6bb0747e80dcb1",
+      "physical_lines": 421
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "b835528fe89deb20969ad8fff8de59b69a93382e38bea0802a6bb0747e80dcb1",
+      "physical_lines": 421
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass4-unit-145313.stdout.bin",
+      "raw_sha256": "c1e8ff7172c6d64bf16c4afd0940948234b571a72b7e1d7a22c49ece4dd44aff",
+      "raw_bytes": 6227,
+      "presentation": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\\.venv\\Scripts\\python.exe\r\ncachedir: .pytest_cache\r\nrootdir: .\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 37 items\r\n\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_build_and_render_coverage_report_sorts_and_counts_entries PASSED [  2%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_render_coverage_report_is_deterministic PASSED [  5%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_1_and_prints_errors_on_validation_failure PASSED [  8%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_build_coverage_rows_handles_missing_entries_key PASSED [ 10%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_0_on_success PASSED [ 13%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_1_on_failure PASSED [ 16%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_writes_to_stdout_when_output_omitted PASSED [ 18%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_true_v1_preserves_unit_fields_without_completion_claims[1.0.0] PASSED [ 21%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_true_v1_preserves_unit_fields_without_completion_claims[1.2.3] PASSED [ 24%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[secret malformed text] PASSED [ 27%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[null] PASSED [ 29%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[[]] PASSED [ 32%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": null}] PASSED [ 35%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": {}}] PASSED [ 37%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [\"secret\"]}] PASSED [ 40%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [], \"entries\": []}] PASSED [ 43%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [{\"secret\": NaN}]}] PASSED [ 45%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"2.0.0\", \"entries\": []}] PASSED [ 48%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"2.99.0\", \"entries\": []}] PASSED [ 51%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"unknown\", \"entries\": []}] PASSED [ 54%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[parse_coverage_ledger] PASSED [ 56%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[build_coverage_rows] PASSED [ 59%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[render_coverage_report] PASSED [ 62%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_path_and_validator_seams_preserve_call_order PASSED [ 64%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_default_validator_and_sys_argv_remain_injectable PASSED [ 67%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments0] PASSED [ 70%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments1] PASSED [ 72%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments2] PASSED [ 75%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_io_errors_propagate_without_a_success_report[read_artifact_text] PASSED [ 78%]\r\ntests/scripts/dev_tools/discovery/test_coverage_report.py::test_io_errors_propagate_without_a_success_report[write_report] PASSED [ 81%]\r\ntests/scripts/dev_tools/discovery/test_rendering.py::test_sort_rows_sorts_ascending_by_id_field PASSED [ 83%]\r\ntests/scripts/dev_tools/discovery/test_rendering.py::test_sort_rows_falls_back_to_joined_field_sort_when_id_absent PASSED [ 86%]\r\ntests/scripts/dev_tools/discovery/test_rendering.py::test_sort_rows_falls_back_when_id_field_partially_present PASSED [ 89%]\r\ntests/scripts/dev_tools/discovery/test_rendering.py::test_render_pretty_json_exact_literal_output PASSED [ 91%]\r\ntests/scripts/dev_tools/discovery/test_rendering.py::test_render_pretty_json_is_deterministic PASSED [ 94%]\r\ntests/scripts/dev_tools/discovery/test_rendering.py::test_coverage_adapter_retains_pretty_json_escaping_and_single_lf PASSED [ 97%]\r\ntests/scripts/dev_tools/discovery/test_rendering.py::test_explicit_v1_unit_sort_preserves_rows_and_original_order PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                             Stmts   Miss Branch BrPart  Cover   Missing\r\n--------------------------------------------------------------------------------------------\r\nscripts\\dev_tools\\discovery\\coverage_report.py      38      0      4      0   100%\r\n--------------------------------------------------------------------------------------------\r\nTOTAL                                               38      0      4      0   100%\r\nCoverage JSON written to file SCRATCH/coverage.json\r\n============================= 37 passed in 0.28s ==============================\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass4-unit-145313.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "P5-T1 legacy coverage adapter subset"
+}

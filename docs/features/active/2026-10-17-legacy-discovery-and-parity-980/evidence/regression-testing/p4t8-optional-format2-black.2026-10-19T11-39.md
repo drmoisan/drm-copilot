@@ -1,0 +1,13 @@
+# p4t8-optional-format2 black
+
+Timestamp: 2026-10-19T11-39
+Command: .\.venv\Scripts\python.exe -m black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py tests/discovery_runtime/analyzer/test_optional_adapter.py tests/discovery_runtime/analyzer/test_optional_limits.py
+EXIT_CODE: 0
+Output Summary: scoped black, 0.641 seconds; source changed=True. Separate exact raw streams qualify sanitized presentation.
+
+```text
+reformatted tests\discovery_runtime\analyzer\test_optional_adapter.py
+
+All done! ✨ 🍰 ✨
+1 file reformatted, 5 files left unchanged.
+```

@@ -1,0 +1,43 @@
+"""Record the approved pure-validator helper absence before creation."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+root = Path.cwd()
+scratch = Path(__file__).parent
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+state = json.loads(Path('artifacts/orchestration/orchestrator-state.json').read_bytes())
+
+
+def records(value):
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from records(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from records(child)
+
+
+route = next(item for item in records(state) if item.get('delegation_id') == 'workspace_operations_p4t9_core_implementation' and item.get('profile_sha256'))
+profile_sha = hashlib.sha256(Path('.codex/agents/python-typed-engineer-c4.toml').read_bytes()).hexdigest()
+assert route['profile_sha256'] == profile_sha == '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+attestation_path = Path('C:/Users/DanMoisan/.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.f50a381e7b3554fe77176b5c0429a53b56579adb36427614259db5bc6770a5d6.json')
+attestation = json.loads(attestation_path.read_bytes())
+assert all(attestation[key] for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+assert attestation['profile_sha256'] == profile_sha
+path = 'packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py'
+assert not Path(path).exists()
+baseline = feature / 'evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json'
+digest = hashlib.sha256(baseline.read_bytes()).hexdigest()
+assert digest == '4db1465e45dc14de9ae028e1f0ab04eed05f165f31f796fa73a19729af357e2a'
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+base = feature / ('evidence/baseline/p4t9-core-helper-absence.' + stamp)
+value = {'timestamp': now.isoformat(), 'absent': path, 'baseline': {'path': baseline.as_posix(), 'sha256': digest}, 'authority': route['delegation_id'], 'profile_sha256': profile_sha, 'scope': 'Pure schema/member/provenance/accounting validation; no publication authority.', 'exit_code': 0}
+base.with_suffix('.json').write_bytes((json.dumps(value, indent=2) + '\n').encode())
+base.with_suffix('.md').write_bytes((f'# P4-T9 approved helper absence\n\nTimestamp: {stamp}\n\nCommand: `python SCRATCH/p4t9-core-scope.py`\n\nEXIT_CODE: 0\n\nOutput Summary: Verified the approved helper was absent before creation. Current routing and native authority match the exact C4 profile. The immutable shared baseline is reused; no source/test mutation or suite replay occurred.\n').encode())
+snapshot = feature / ('evidence/baseline/p4t9-core-scope-harness.' + stamp + '.txt')
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'receipt': base.with_suffix('.json').as_posix(), 'sha256': hashlib.sha256(base.with_suffix('.json').read_bytes()).hexdigest()}))

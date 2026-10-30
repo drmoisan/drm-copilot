@@ -1,0 +1,198 @@
+{
+  "Timestamp": "2026-10-21T12:18:07.986907+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "current_head": "77d9c7e464f4516765c9697e18909d927ab036d5",
+  "scope": "CG1-CG7 context test only; finite CG-DOC1 correction and completed receipts.",
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-context-guards-review.2026-10-21T12-11.json",
+    "working_sha256": "0ec9c640d54d42faea1ef79f2f7aad1fda64bf1efbd09f46872e4b507754a070",
+    "git_lf_sha256": "0ec9c640d54d42faea1ef79f2f7aad1fda64bf1efbd09f46872e4b507754a070",
+    "expected_git_blob": "f365e574f0b7c80f366b79d219da4d77965e6dc6",
+    "bytes": 20382,
+    "git_lf_bytes": 20382
+  },
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc-freeze.2026-10-21T12-15.json",
+    "working_sha256": "e0f460e71eea7ff0fff3f7de17fe271c96a0e8ca50b375daab023c45c94f8168",
+    "git_lf_sha256": "e0f460e71eea7ff0fff3f7de17fe271c96a0e8ca50b375daab023c45c94f8168",
+    "expected_git_blob": "60b15eed7fcd3ee0c06c3f1167f9f062b4e264ad",
+    "bytes": 5031,
+    "git_lf_bytes": 5031
+  },
+  "doc_qualification": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-context-guards-doc-qualification.2026-10-21T12-13.json",
+    "working_sha256": "8938794d5e696543d093d3e87a0bb4e6c28ae9d9af18be72383c9ce07c9b99a1",
+    "git_lf_sha256": "8938794d5e696543d093d3e87a0bb4e6c28ae9d9af18be72383c9ce07c9b99a1",
+    "expected_git_blob": "6ff3b6da9a108d1e7c57322015901bd51f8c1e92",
+    "bytes": 8164,
+    "git_lf_bytes": 8164
+  },
+  "owned_test": {
+    "path": "tests/discovery_runtime/test_service_context_guards.py",
+    "working_sha256": "1782569926171ae2f2aee129b171477c1eb5f9d8ecf147009e87d5dd0ffcab12",
+    "git_lf_sha256": "1782569926171ae2f2aee129b171477c1eb5f9d8ecf147009e87d5dd0ffcab12",
+    "expected_git_blob": "4d7deee2ecc88af3be47186cfb7b9b64e299415b",
+    "bytes": 14477,
+    "git_lf_bytes": 14477
+  },
+  "docstring_confirmation": {
+    "changed_functions": [
+      "test_configured_uncaptured_read_refuses_before_physical_io",
+      "test_configured_uncaptured_read_refuses_before_physical_io.read_uncaptured",
+      "test_required_read_none_contract_violation_refuses_fabricated_bytes",
+      "test_required_read_none_contract_violation_refuses_fabricated_bytes.absent_bytes",
+      "test_naive_trusted_clock_refuses_before_capture_or_publication",
+      "test_missing_activation_profile_refuses_without_graph_authority",
+      "test_missing_activation_profile_refuses_without_graph_authority.select_without_profile",
+      "test_profile_change_between_selection_and_capture_refuses_publication",
+      "test_profile_change_between_selection_and_capture_refuses_publication.select_then_change_profile",
+      "test_changed_reauthorization_actor_refuses_dispatch_and_writes",
+      "test_changed_reauthorization_actor_refuses_dispatch_and_writes.changed_actor",
+      "test_changed_reauthorization_actor_refuses_dispatch_and_writes.reject_dispatch",
+      "test_bootstrap_rejects_wrong_operation_family_without_effects"
+    ],
+    "count": 13,
+    "explicit_types_returns_effects_reviewed": true,
+    "only_docstrings_changed": true,
+    "executable_assertion_decorator_parameter_ast_equal": true,
+    "original_bytes_recoverable": {
+      "member": "test_source",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-originals.2026-10-21T12-07.json",
+      "sha256": "a207ad4eabd19ca9d103950c159b08f22acb5873bb26d7b84c29d37b39dd097e"
+    }
+  },
+  "functional_review": "Previously clear; no behavior finding reopened.",
+  "findings": [],
+  "ordered_gates": [
+    {
+      "stage": "black",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-black.2026-10-21T12-13.json",
+        "sha256": "beac5096b6b4bd914dd88cc3502dd986d8b0c725b567dfffb61e41472c99894b"
+      },
+      "elapsed_seconds": 0.408014,
+      "exit_code": 0,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-black-raw.2026-10-21T12-13.json",
+      "raw_archive_sha256": "26e704f853806d4894ddc85ca7590dc06d2e8500de3af94e2f0fadd70c441235"
+    },
+    {
+      "stage": "ruff",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-ruff.2026-10-21T12-13.json",
+        "sha256": "91511ccce2ccb4572dce60ee5687280d265b8cd0409a4e2d2c7b5500b531c951"
+      },
+      "elapsed_seconds": 0.206986,
+      "exit_code": 0,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-ruff-raw.2026-10-21T12-13.json",
+      "raw_archive_sha256": "1774621e26079369377f676c8c79997225ef5c106d3c88b8b6f025b88d70fb6b"
+    },
+    {
+      "stage": "pyright",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-pyright.2026-10-21T12-13.json",
+        "sha256": "c5a91dbd86b441192664f3c7c67db6b87255dea596c2b22aca29c026a0f255a2"
+      },
+      "elapsed_seconds": 1.008357,
+      "exit_code": 0,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-pyright-raw.2026-10-21T12-13.json",
+      "raw_archive_sha256": "8bacb35ed4ecf2e26d509bab0166645de4d5441ba3de209c3642b83185c7bd55"
+    },
+    {
+      "stage": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-tests.2026-10-21T12-14.json",
+        "sha256": "71ee055af55c41f5d8971b4dac2248fd3f1de6833352450e0aff15931362ffea"
+      },
+      "elapsed_seconds": 51.706182,
+      "exit_code": 0,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-tests-raw.2026-10-21T12-14.json",
+      "raw_archive_sha256": "e32c4fa05d24c09beed40b130d70e97ea1b0c7169a7925cfb3f988b60dd88f85"
+    },
+    {
+      "stage": "coverage",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-coverage.2026-10-21T12-14.json",
+        "sha256": "54b3819f11fe1ba1e6ec8ca892e16bc6eb083a2a881b50220290504998771e20"
+      },
+      "elapsed_seconds": 0.408957,
+      "exit_code": 0,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc1-coverage-raw.2026-10-21T12-14.json",
+      "raw_archive_sha256": "5e3cc2a08b23b1afdb78f7f800376e6c615f4d4f6c3188ecef35cd3b0b02c995"
+    }
+  ],
+  "exact_nodes": [
+    "tests/discovery_runtime/test_service_context_guards.py::test_configured_uncaptured_read_refuses_before_physical_io",
+    "tests/discovery_runtime/test_service_context_guards.py::test_required_read_none_contract_violation_refuses_fabricated_bytes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_naive_trusted_clock_refuses_before_capture_or_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_missing_activation_profile_refuses_without_graph_authority",
+    "tests/discovery_runtime/test_service_context_guards.py::test_profile_change_between_selection_and_capture_refuses_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_changed_reauthorization_actor_refuses_dispatch_and_writes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_bootstrap_rejects_wrong_operation_family_without_effects"
+  ],
+  "counts": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 7
+  },
+  "body_confirmation": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "name": "OperationContext.read",
+      "source_sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "raw_measurement_equal_to_original_focused7": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "name": "_context",
+      "source_sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "raw_measurement_equal_to_original_focused7": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "name": "bootstrap",
+      "source_sha256": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01",
+      "raw_measurement_equal_to_original_focused7": true
+    }
+  ],
+  "retained_body_union": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-context-guards-body-preflight.2026-10-21T12-07.json",
+    "sha256": "51f3a0e82f75e3a02f0fe8d04d4edd13a0a3411d596915561d2a8b4369aec4d6"
+  },
+  "coverage_qualification": "Fresh seven raw named bodies equal the reviewed pass3 measurements. Retained329 plus focused7 is diagnostic preflight only; raw counters remain separate and unaugmented. Final combined reversed isolation and four contracts remain pending.",
+  "historical_qualifications": [
+    "Original 13-docstring finding and original test bytes remain unchanged in their archives.",
+    "Original freeze stage array was filename-sorted; retained order qualification supplies actual chronology.",
+    "Historical staging test hash is superseded only by the proven prose-only current test binding."
+  ],
+  "evidence_closure": {
+    "owner_staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-doc-staging.2026-10-21T12-15.json",
+      "working_sha256": "debb0026b83e3eddd5b9ac1cf16471b8fcd4c4f2a0da23d85b0e2dd0ed3978ad",
+      "git_lf_sha256": "debb0026b83e3eddd5b9ac1cf16471b8fcd4c4f2a0da23d85b0e2dd0ed3978ad",
+      "expected_git_blob": "e7fdbcaee301805b289ad4f23e3a393f27554724",
+      "bytes": 15532,
+      "git_lf_bytes": 15532
+    },
+    "owner_file_entries": 58,
+    "owner_manifest_listed_in_own_files": false,
+    "staging_union": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-context-guards-staging-union.2026-10-21T12-18.json"
+  },
+  "excluded": [
+    "Other owners moving test subsets and active receipts",
+    "Production, existing329 tests, package, readers, checkpoint and accepted checkboxes"
+  ],
+  "task_acceptance": false,
+  "counts_unchanged": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

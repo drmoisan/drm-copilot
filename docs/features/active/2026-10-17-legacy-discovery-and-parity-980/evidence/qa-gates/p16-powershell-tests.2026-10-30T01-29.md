@@ -1,0 +1,16 @@
+# P16-T3 PowerShell test gate on the remediated tree
+
+Timestamp: 2026-10-30T01-29
+Task: [P16-T3] Run the PowerShell gates and regenerate the canonical coverage file from the full run.
+Command: Import-Module scripts/powershell/PoshQC/PoshQC.psm1; Invoke-PoshQCTest -Root <worktree> (scan folders from config/poshqc-scan.json, coverage population from config/poshqc-coverage.json, repository pester.runsettings.psd1; run from a SCRATCH launcher in PowerShell 7, never through the MCP tool)
+EXIT_CODE: 0
+Output Summary: Read from the actual JUnit file: 12744 tests over 455 test files, 12734 passed, 0 failed, 0 errors, 10 skipped (the same ten pre-existing skips as P13-T3 and P14-T8). Line coverage, read from the actual coverage file: 20188 of 21629 lines (93.34%), 1441 missed; P14-T8 recorded 20003 of 21443 (93.28%). Pester measures no branch coverage, and none is recorded. The population includes `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` (5 tests, 0 failures) and `tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1` (3 tests, 0 failures). One clean pass with no fix and no restart (single process 2026-10-30T00-51 to 01-06 UTC).
+
+Per-file line coverage of the discovery PowerShell production files, read from the coverage file: DiscoveryAuthorization.psm1 177/185 (95.68%), DiscoveryAuthority.psm1 139/147 (94.56%), DiscoveryCapability.psm1 174/175 (99.43%), DiscoveryObservation.psm1 65/65 (100%), DiscoveryPayload.psm1 88/88 (100%), DiscoveryPlanning.psm1 127/130 (97.69%), DiscoveryRootGrant.psm1 49/49 (100%), DiscoveryStart.psm1 137/140 (97.86%), DiscoveryStartRecord.psm1 97/102 (95.10%), DiscoveryStop.psm1 131/135 (97.04%), DiscoveryToolRouting.psm1 70/71 (98.59%), DiscoveryValidation.psm1 78/78 (100%), CodexDiscoveryRouting.psm1 68/68 (100%); Claude hooks: capability probe 32/33, artifact gate 33/33, planning gate 27/27, start 38/38, stop 32/32; Codex hooks: capability probe 27/28, start attestation 76/76, artifact gate 55/55, planning gate 48/48, agent output 56/56; Copilot hooks: agent start 34/34, agent stop 39/39, capability probe 27/28, planning 25/25, pre-tool 30/30.
+
+Retained files, made repository-relative with the host and user identity fields redacted and no result value changed: `p16-powershell-junit.2026-10-30T01-29.xml` and `p16-powershell-coverage.2026-10-30T01-29.xml`. Every later consumer (P16-T4, P16-T8) reads these evidence copies.
+
+## Canonical coverage file
+
+The single-process run wrote `artifacts/pester/powershell-coverage.xml` and `artifacts/pester/pester-junit.xml` at 01-06 UTC and the launcher copied both to SCRATCH immediately. The three shard runs that followed write their results to the same canonical paths before the launcher copies them into `artifacts/shards/`, so at the end of the loop the canonical file held shard 3's partial report. The launcher's retained single-run copy, which is byte-for-byte the full run's output, was copied back to the canonical paths (`cmp` of `artifacts/pester/powershell-coverage.xml` against the SCRATCH single-run copy: identical, `CANONICAL_RESTORED_FROM_FULL_RUN`). The canonical total therefore equals the evidence copy's total: 20188 of 21629 lines (93.34%). Both canonical paths are git-ignored (`git check-ignore` lists them).
+Result: PASS

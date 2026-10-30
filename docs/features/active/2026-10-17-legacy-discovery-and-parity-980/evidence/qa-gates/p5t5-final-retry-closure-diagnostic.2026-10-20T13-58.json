@@ -1,0 +1,26 @@
+{
+  "task": "P5-T5",
+  "timestamp": "2026-10-20T13-58",
+  "state": "METADATA_INVOCATION_DIAGNOSTIC_RETAINED",
+  "exit_code": 1,
+  "source": "Original exec-command tool result retained in task history",
+  "diagnostic": "ValueError in p5t5_close_retry.py ref(): the relative handoff path cannot be made relative_to the absolute WORKSPACE root.",
+  "correction": "Invoke the unchanged closure harness with the absolute handoff path. No reader, source, test, threshold, or behavioral execution change.",
+  "successful_gate_handoff": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-handoff.2026-10-20T13-57.json",
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-closure-harness.2026-10-20T13-57.txt",
+      "sha256": "d206a2360adb22e68aa65053c8bc60c748c77fdd37feff73bca9d4520bfba105"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-remaining-raw.2026-10-20T13-57.json",
+      "sha256": "14f4787e66c7b4faaeb4df681738da13b6dbfd6c2b6feabc5f52311bbd6954a1"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-closure-harness.2026-10-20T13-57.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-remaining-raw.2026-10-20T13-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-closure-diagnostic.2026-10-20T13-58.json"
+  ],
+  "qualification": "Portable readable diagnostic; original tool traceback remains retained in task history. Partial exact-byte archive and executed harness are unchanged."
+}

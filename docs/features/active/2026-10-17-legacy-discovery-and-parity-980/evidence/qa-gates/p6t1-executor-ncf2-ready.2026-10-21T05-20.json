@@ -1,0 +1,118 @@
+{
+  "issue_number": 980,
+  "task": "P6-T1",
+  "Timestamp": "2026-10-21T05:20:20.247469+00:00",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -B SCRATCH/issue-980-ncf2-close.py",
+  "EXIT_CODE": 0,
+  "status": "READY_FOR_CHECKED_WIP",
+  "head": "429ed4b7695077b165cc5c160f456e5114e8ca5d",
+  "route": "atomic_execution_p6t1_ncf2_repair_confirmation_20261021T051148",
+  "findings": [],
+  "open_probes": [],
+  "source_and_carry_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf2-source-confirmation.2026-10-21T05-17.json",
+    "sha256": "85c902e1f024aeac5e3e97bee94dead14a6e29f957d2d35baf93f4dfa9012143",
+    "bytes": 6043,
+    "git_lf_sha256": "85c902e1f024aeac5e3e97bee94dead14a6e29f957d2d35baf93f4dfa9012143"
+  },
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-ncf2-freeze.2026-10-21T05-15.json",
+    "sha256": "1dbbe6c61c09e6d1ca11c03b25f65e7406d83e1cb5c594875dfa2d6bcc77b262",
+    "bytes": 46582,
+    "git_lf_sha256": "1dbbe6c61c09e6d1ca11c03b25f65e7406d83e1cb5c594875dfa2d6bcc77b262"
+  },
+  "owner_paths_including_self": 27,
+  "body_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf2-proof.2026-10-21T05-13.json",
+    "sha256": "e76050016e60ff846a91adddc289cdff466e6f9e565ea4e1f4274d249857cde6",
+    "bytes": 56065,
+    "git_lf_sha256": "e76050016e60ff846a91adddc289cdff466e6f9e565ea4e1f4274d249857cde6"
+  },
+  "reconciliation": {
+    "passed": 34,
+    "new_nodes": 8,
+    "retained_nodes": 26,
+    "ordered_stages": [
+      "loop1-black",
+      "loop1-ruff",
+      "loop1-pyright",
+      "loop1-focused"
+    ],
+    "unchanged_callable_asts": 14,
+    "test_delta": "Two appended functions/eight nodes; every previous module AST node, assertion and parameter decorator is identical.",
+    "decoded_current_source_coverage_helper_streams": 6,
+    "decoded_original_source_streams": 2,
+    "decoded_gate_streams": 20,
+    "protected_bindings_unchanged": 13
+  },
+  "coverage": {
+    "fresh_changed_body": "8/8 executable lines; 2/2 branches; declaration excluded",
+    "raw_fresh_file": "62/140 lines; 8/40 branches",
+    "qualified_fresh_and_retained": "139/140 lines; 39/40 branches",
+    "unchanged_missing": {
+      "lines": [
+        145
+      ],
+      "branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "raw_counter_augmentation": false,
+    "retained_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+      "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907",
+      "bytes": 158561
+    },
+    "qualification": "The changed helper claims fresh declaration-exclusive BODY coverage. Qualified whole-file coverage composes exact AST-identical unchanged ranges with retained NCF1 proof; this is not a new whole-module run. No previous helper coverage is carried into the changed body."
+  },
+  "package": {
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf2-handoff.2026-10-21T05-12.json",
+      "sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29",
+      "bytes": 37027,
+      "git_lf_sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29"
+    },
+    "build_sha256": "bf4ba791fb68329eca134a4ad108dd69703f8c220dbe4b9b50ee8cc47b51998e",
+    "source_inputs": 211,
+    "payload_members": 168,
+    "outputs": 6,
+    "decoded_archive_streams": 8,
+    "source_delta": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+        "before": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+        "after": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a"
+      }
+    },
+    "prior_manifest_preserved": true
+  },
+  "historical_failures": "Initial formatting correction and required one-node fail-before remain in the owner freeze. NCF1 native failure and its complete-state operand diagnosis remain explicit; no previous result was rewritten.",
+  "presentation": {
+    "readable_markdown_paths_checked": 17,
+    "encoding": "UTF-8; exact raw bytes checked separately from LF readable views",
+    "source_diff": "Both sides normalized only for the retained readable diff. Original bytes and raw coverage are preserved."
+  },
+  "native_disposition": "Historical initialization carry is exactly the separate 05:17 receipt, subject to fresh fixture/link and rebuilt installed-identity checks. No current native suffix result or native/task acceptance is claimed by this repair checkpoint.",
+  "excluded": [
+    "Unrelated disabled final-runner preparation",
+    "Concurrent native execution outputs",
+    "Predecessor source or evidence restaging",
+    "Plan/AC/checkpoint edits"
+  ],
+  "reviewer_execution": "Read-only source/evidence reconciliation and owned evidence authoring; no factory/service/native/test/build execution or Git/index mutation.",
+  "task_accepted": false,
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf2-staging.2026-10-21T05-20.json"
+}

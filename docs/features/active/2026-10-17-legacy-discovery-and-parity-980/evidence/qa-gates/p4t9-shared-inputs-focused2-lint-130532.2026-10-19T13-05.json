@@ -1,0 +1,51 @@
+{
+  "batch": "focused2",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py tests/discovery_runtime/test_extension_inputs.py tests/discovery_runtime/test_extension_input_limits.py tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+  "dependencies_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "dependencies_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "exit_code": 1,
+  "finished_at": "2026-10-19T13:05:32.431966+00:00",
+  "harness": {
+    "path": "SCRATCH/issue-980-shared-inputs-focused.py",
+    "sha256": "244b9a2728fd848f053ccb8a3b827a6163a2c09df28190c36dc5adde5b455b7f"
+  },
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t9-shared-inputs-focused2-lint-130532.2026-10-19T13-05.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t9-shared-inputs-focused2-lint-130532.2026-10-19T13-05.stdout.txt",
+      "sha256": "618d1b2698770ba215436fb5bd3036f5d5be6d56fff229ee162226b2cf8401a9"
+    }
+  },
+  "seconds": 0.106256,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "6f5e21d6585aca1e9279c7320c4221b0d45185450e0af2dbcad7709c3fd62803",
+    "tests/discovery_runtime/test_extension_input_limits.py": "be22b69ef1dcc043d8db356ed821fcb0b9498b89e4496f2f30de74b00d3ec729",
+    "tests/discovery_runtime/test_extension_inputs.py": "db4c827845711c73c0142f2359e4da324d356c342637fdd7286d8820c83f0c21"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "6f5e21d6585aca1e9279c7320c4221b0d45185450e0af2dbcad7709c3fd62803",
+    "tests/discovery_runtime/test_extension_input_limits.py": "be22b69ef1dcc043d8db356ed821fcb0b9498b89e4496f2f30de74b00d3ec729",
+    "tests/discovery_runtime/test_extension_inputs.py": "db4c827845711c73c0142f2359e4da324d356c342637fdd7286d8820c83f0c21"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T13:05:32.325710+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_emitter_extensions.py:376:89\n    |\n375 |     def identities() -> tuple[JsonObject, ...]:\n376 |         \"\"\"Return the isolated reserved descriptor without I/O or implementation imports.\n    |                                                                                         ^\n377 |\n378 |         No parameters; returns tuple[JsonObject, ...]. No exceptions expected.\n    |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\test_extension_input_limits.py:3:1\n   |\n 1 |   \"\"\"Verify finite projection resources and exact canonical serialization boundaries.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | import hashlib\n 6 | | from dataclasses import replace\n 7 | | from typing import TYPE_CHECKING, cast\n 8 | |\n 9 | | import pytest\n10 | | from drm_copilot_discovery import extension_inputs as subject\n11 | | from drm_copilot_discovery.analyzer.findings import row\n12 | | from drm_copilot_discovery.analyzer.models import InventoryCapture, InventoryInput\n13 | | from drm_copilot_discovery.models import (\n14 | |     JsonObject,\n15 | |     JsonValue,\n16 | |     ParseLimits,\n17 | |     canonical_json,\n18 | | )\n19 | | from drm_copilot_discovery.snapshot import SnapshotFile\n20 | | from tests.discovery_runtime.analyzer.test_repository import (\n21 | |     analyzer_catalog as analyzer_catalog,\n22 | | )\n23 | | from tests.discovery_runtime.analyzer.test_repository import inventory_profile\n24 | | from tests.discovery_runtime.test_extension_inputs import capture_case\n   | |______________________________________________________________________^\n25 |\n26 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nFound 2 errors.\n[*] 1 fixable with the `--fix` option.\n",
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T13-05"
+}

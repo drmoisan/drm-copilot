@@ -1,0 +1,39 @@
+{
+  "task": "P5-T1",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-model-probes.2026-10-19T14-59.json",
+      "sha256": "fdd4eebc96fc98614b4669701b551ef56fde1fad8ae9657a97d431abc3d6d331",
+      "bytes": 4415
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-model-probes-payload.2026-10-19T14-59.json",
+      "sha256": "5f4f4934efa95a63a1fcd188254cd04e4bc4630e7102aed98fd5172ee88958eb",
+      "bytes": 13233
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-legacy-review.2026-10-19T15-02.json",
+      "sha256": "f52dfc84e6edea287f79c28c64c52a5f4728a914833effb4452651620479d76d",
+      "bytes": 7467
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-legacy-review.2026-10-19T15-02.md",
+      "sha256": "76b9deb9fa6463f7b5708c5b02aa4db0f203d9ea12f7df9d3326ac86de940904",
+      "bytes": 1896
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-legacy-review-payload.2026-10-19T15-02.json",
+      "sha256": "dde5d9b9da9b427ce77ef75516b010c14c4689949991b07bffd6c00e6e8b8e0a",
+      "bytes": 12999
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-model-probes.2026-10-19T14-59.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-model-probes-payload.2026-10-19T14-59.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-legacy-review.2026-10-19T15-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-legacy-review.2026-10-19T15-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-legacy-review-payload.2026-10-19T15-02.json"
+  ],
+  "include_staging_itself": true,
+  "count_without_self": 5
+}

@@ -1,24 +1,9 @@
-"""Console entry point that loads and displays a resolved discovery profile.
+"""Forward profile commands while retaining pure historical v1 display helpers.
 
-Purpose:
-    Provide the ``dev.discovery.profile`` command. It loads a domain-profile
-    file, applies defaults for every omitted optional field, and prints the
-    resolved profile as aligned ``key: value`` text or as JSON.
-
-Responsibilities:
-    - Parse a flat argument surface (one optional positional path and a
-      ``--json`` flag).
-    - Delegate loading and validation to ``load_domain_profile``.
-    - Render the resolved profile and map ``DomainProfileError`` to exit code 1
-      with the full multi-error message on stderr.
-
-Invariants / Constraints:
-    - Only ``DomainProfileError`` is caught; there is no broad exception handler.
-    - Exit codes: ``0`` on success, ``1`` on ``DomainProfileError``, and ``2``
-      for argparse usage errors (argparse's built-in behavior).
-
-Side Effects:
-    Reads one file (via ``load_domain_profile``); writes to stdout and stderr.
+``main`` uses the installed CLI's bounded parser, typed results and trusted I/O.
+``parse_args`` only describes the old syntax; its namespace grants no authority.
+The renderers accept an already parsed v1 DomainProfile and perform no I/O.
+Actual v1 readers remain available from the installed domain_profile module.
 """
 
 from __future__ import annotations
@@ -26,37 +11,30 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import json
-import sys
-from pathlib import Path
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools.discovery.domain_profile import (
-    DEFAULT_PROFILE_FILENAME,
-    load_domain_profile,
-)
-from scripts.dev_tools.discovery.domain_profile_models import (
-    DomainProfile,
-    DomainProfileError,
-)
+from drm_copilot_discovery import cli as runtime_cli
+from drm_copilot_discovery.domain_profile import DEFAULT_PROFILE_FILENAME
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    from drm_copilot_discovery.domain_profile_models import DomainProfile
 
 _NONE_DISPLAY = "(none)"
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    """Parse the flat command-line surface.
+    """Describe historical v1 arguments without reading or authorizing a profile.
 
-    Args:
-        argv: Argument vector; ``None`` uses ``sys.argv[1:]``.
-
-    Returns:
-        A namespace with ``profile_path`` (str) and ``json`` (bool).
+    argv (Sequence[str] | None) supplies tokens or uses process arguments.
+    Return argparse.Namespace with profile_path (str) and json (bool).
+    Argparse may emit help/errors and raise SystemExit; no files are accessed.
+    ``main`` never consumes this legacy namespace.
     """
     parser = argparse.ArgumentParser(
         prog="dev.discovery.profile",
-        description="Load and display a resolved discovery domain profile.",
+        description="Inspect historical v1 profile syntax without executing it.",
     )
     parser.add_argument(
         "profile_path",
@@ -75,29 +53,33 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 
 def _format_scalar(value: object) -> str:
-    """Format an optional scalar value for aligned text output."""
+    """Return display str for value (object), including None; no I/O or mutation."""
     if value is None:
         return _NONE_DISPLAY
     return str(value)
 
 
 def _format_sequence(values: tuple[str, ...]) -> str:
-    """Format a tuple of strings for aligned text output."""
+    """Return display str for values (tuple[str, ...]); no I/O or mutation."""
     if not values:
         return _NONE_DISPLAY
     return ", ".join(values)
 
 
 def _format_conventions(profile: DomainProfile) -> str:
-    """Format the artifact conventions mapping for aligned text output."""
+    """Return conventions text for profile (DomainProfile); no I/O or mutation."""
     conventions = profile.artifacts.conventions_map
     if not conventions:
         return _NONE_DISPLAY
+    # Preserve the resolved v1 convention order in the historical display.
     return ", ".join(f"{key}={value}" for key, value in conventions.items())
 
 
 def _resolved_rows(profile: DomainProfile) -> list[tuple[str, str]]:
-    """Return the ordered ``(dotted_key, value)`` rows of the resolved profile."""
+    """Return ordered list[tuple[str, str]] for profile (DomainProfile).
+
+    Each row describes a resolved v1 value; no I/O or input mutation occurs.
+    """
     return [
         ("profile_version", str(profile.profile_version)),
         ("profile_name", _format_scalar(profile.profile_name)),
@@ -118,36 +100,28 @@ def _resolved_rows(profile: DomainProfile) -> list[tuple[str, str]]:
 
 
 def render_text(profile: DomainProfile) -> str:
-    """Render the resolved profile as aligned ``key: value`` text."""
+    """Return aligned text str for profile (DomainProfile); no I/O or mutation."""
     rows = _resolved_rows(profile)
+    # A shared width preserves alignment independently of optional field values.
     width = max(len(key) for key, _ in rows)
+    # Keep the declared v1 field order rather than implying v2 result semantics.
     return "\n".join(f"{key.ljust(width)} : {value}" for key, value in rows)
 
 
 def render_json(profile: DomainProfile) -> str:
-    """Render the resolved profile as JSON with sorted keys."""
+    """Return sorted JSON str for profile (DomainProfile); no I/O or mutation."""
     return json.dumps(dataclasses.asdict(profile), sort_keys=True, indent=2)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Load a profile and print its resolved form.
+    """Forward argv (Sequence[str] | None) unchanged to installed profile CLI.
 
-    Args:
-        argv: Argument vector; ``None`` uses ``sys.argv[1:]``.
-
-    Returns:
-        ``0`` on success, ``1`` when the profile is missing, unreadable, or
-        invalid.
+    Return its typed int exit (0/1/2/3). None retains bounded process-argument
+    handling. The installed boundary owns streams and trusted workspace I/O;
+    unsupported positional/legacy flags refuse before providers. No legacy
+    path lookup, rendering, or error reinterpretation occurs here.
     """
-    args = parse_args(argv)
-    try:
-        profile = load_domain_profile(Path(args.profile_path))
-    except DomainProfileError as exc:
-        print(str(exc), file=sys.stderr)
-        return 1
-    output = render_json(profile) if args.json else render_text(profile)
-    print(output)
-    return 0
+    return runtime_cli.run_installed_cli("profile", argv)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,24 @@
+"""Bind untouched paused integration drafts before the authorized resumption."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+evidence = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence")
+scope = json.loads((evidence / "baseline/p4t7-shared-repair-scope.2026-10-19T10-15.json").read_bytes())
+assert all(hashlib.sha256(Path(item["path"]).read_bytes()).hexdigest() == item["sha256"] for item in scope["paused_integration"])
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+record = {"timestamp": stamp, "recorded_utc": now.isoformat(), "command": "poetry run python SCRATCH/issue-980-p4t7-integration-resume.py", "exit_code": 0,
+    "paused_drafts_preserved": scope["paused_integration"], "route": "workspace_operations_p4t7_integration_resume",
+    "profile_sha256": hashlib.sha256(Path(".codex/agents/python-typed-engineer-c4.toml").read_bytes()).hexdigest(),
+    "native_authority": "routing_valid, launch_authority_valid and provenance_valid reread true",
+    "checked_wip": "42c2c4d2ba23128914c6f6afad20010c439d61bc",
+    "shared_freeze": "evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json",
+    "shared_sha256": "de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749",
+    "predecessor_baseline": "evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "qualification": "No code mutation or predecessor suite replay; only the three preserved integration drafts are now released."}
+prefix = evidence / "baseline" / ("p4t7-integration-resume." + stamp)
+Path(str(prefix) + ".json").write_bytes((json.dumps(record, indent=2) + "\n").encode())
+Path(str(prefix) + ".md").write_bytes((f"# Dependency integration resumption\n\nTimestamp: {stamp}\nCommand: {record['command']}\nEXIT_CODE: 0\nOutput Summary: all three paused draft hashes match their preserved copies. Native authority and current C4 profile were verified; frozen shared/parser sources remain outside integration ownership.\n").encode())
+print(str(prefix) + ".json")

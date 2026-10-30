@@ -1,0 +1,123 @@
+{
+  "all_other_reader_ast_identical": true,
+  "call": "self.io.read_bytes(path, limit=limit)",
+  "checker_controls": [
+    {
+      "actual_accepted": true,
+      "control": "exact reviewed InitializationIO receiver",
+      "expected_accepted": true,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "pathlib native bytes",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "qualified pathlib native text",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "native glob",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "different receiver",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "different injected field",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "different read method",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "changed allocation limit",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "different qualified callable",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "different source file",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "changed source bytes",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "changed enclosing definition",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "missing qualification",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": false,
+      "control": "changed candidate binding",
+      "expected_accepted": false,
+      "passed": true
+    },
+    {
+      "actual_accepted": true,
+      "control": "prior exact approved receiver remains accepted",
+      "expected_accepted": true,
+      "passed": true
+    }
+  ],
+  "constructor_ast_sha256": "da2290917488a7c86afcd3d45c4374dca70e42abdda916d3ba9ddb83b835d6a2",
+  "execution_released": false,
+  "native_pass_confirmed": false,
+  "original_diagnostic": {
+    "final_static_stage_was_not_run": true,
+    "kind": "prospective exact predicate rejection",
+    "original_reader_rejected_reviewed_injected_call": true
+  },
+  "originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-reader-qualification-originals.2026-10-21T10-18.json",
+    "sha256": "64b8c160e6f793ae1fef90a735cbd979ba1485903440970e775fb65648812071"
+  },
+  "qualified_name": "_Supplement.read",
+  "reader_after_sha256": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9",
+  "reader_before_sha256": "6220ec9b754ce290bfd783b6ca2ecbe4bb6b42873fee1b2944752929902d7dc4",
+  "reader_physical_lines": 216,
+  "receiver_type": "InitializationIO",
+  "record": {
+    "call_ast_sha256": "6b91c367c6392c863f5740a9b3657da54a02e54b3d97de158f39e1cfb462c080",
+    "definition_ast_sha256": "5f83983984e605d1e20827097344fb241e7f5e03ea851dd87bd1ac099eb47cab",
+    "receiver_ast_sha256": "3bca7249ae3e3c2cf8e9132bffc487df774e4c32af83947d9652c54f2a7a6a56",
+    "source_sha256": "ffb07582f5aa78c99d16f6ddfc4e815702e520d49ccc415d3bb011d8dbdbaf28"
+  },
+  "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+  "source_test_package_changes": false,
+  "status": "EXACT_INJECTED_READER_QUALIFICATION_PASSED",
+  "task": "P6-T1"
+}

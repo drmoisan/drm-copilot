@@ -1,0 +1,166 @@
+"""Close the repaired final pass with exact streams and qualified retained proof."""
+import base64
+import datetime
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+complete_path = Path(sys.argv[1])
+complete = json.loads(complete_path.read_bytes())
+candidate_path = Path(complete["candidate"])
+candidate = json.loads(candidate_path.read_bytes())
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def sha(data):
+    """Return exact-byte SHA-256."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def ref(path):
+    """Return one portable exact-byte reference."""
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def write(path, value):
+    """Write new readable LF JSON without rewriting history."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+assert complete["unit_count"] == 213 and len(complete["contract_nodes"]) == 4
+assert complete["candidate_sha256"] == sha(candidate_path.read_bytes())
+assert not complete["native_pending"]
+assert all(row["exit_code"] == 0 for row in complete["receipts"])
+assert all(sha(Path(path).read_bytes()) == expected for path, expected in candidate["bindings"].items())
+native = json.loads(Path(complete["native"]["path"]).read_bytes())
+assert native["passed"] == len(native["checks"]) == 14
+assert native["source_and_git_before"] == native["source_and_git_after"]
+coverage = json.loads(Path(complete["coverage"]["path"]).read_bytes())
+ranges = json.loads(Path(complete["ranges"]["path"]).read_bytes())
+raw = {}
+for record in complete["raw_files"]:
+    path = scratch / record["path"].removeprefix("SCRATCH/")
+    value = path.read_bytes()
+    assert sha(value) == record["sha256"] and len(value) == record["bytes"], path.name
+    raw[record["path"]] = value
+# Preserve current exact harnesses; prior native/preparation originals remain referenced.
+for name, record in candidate["harnesses"].items():
+    path = scratch / name
+    value = path.read_bytes()
+    assert sha(value) == record["sha256"]
+    raw["SCRATCH/" + name] = value
+raw["SCRATCH/" + Path(__file__).name] = Path(__file__).read_bytes()
+entries = []
+for name, value in sorted(raw.items()):
+    encoded = base64.b64encode(gzip.compress(value, compresslevel=9, mtime=0)).decode("ascii")
+    assert gzip.decompress(base64.b64decode(encoded)) == value
+    entries.append({"identifier": name, "sha256": sha(value), "bytes": len(value),
+                    "encoding": "base64(gzip(original bytes)); gzip mtime=0",
+                    "decode_verified": True, "payload": encoded})
+archive = qa / ("p5t1-repaired-final-original-streams." + stamp + ".json")
+write(archive, {"task": "P5-T1", "timestamp": stamp, "entries": entries,
+    "qualification": "Original stdout/stderr/progress, native result, coverage databases/JSON and exact executed/preparatory scripts. Readable receipt path redaction does not alter recoverable original streams."})
+script = qa / ("p5t1-repaired-handoff-harness." + stamp + ".txt")
+assert not script.exists()
+script.write_bytes(Path(__file__).read_bytes())
+current_ranges = [row for row in ranges["ranges"] if not row.get("retained_exact_unchanged_body_proof")]
+retained_ranges = [row for row in ranges["ranges"] if row.get("retained_exact_unchanged_body_proof")]
+summary = {
+    "task": "P5-T1", "timestamp": stamp,
+    "status": "repaired-final-gates-passed-independent-acceptance-pending",
+    "task_accepted": False, "feature_complete": False,
+    "candidate": ref(candidate_path), "complete_sequence": ref(complete_path),
+    "checked_repair_head": candidate["head"], "route": candidate["route"],
+    "preparation": candidate["preparation"],
+    "repair_confirmation": candidate["repair_confirmation"],
+    "historical_held_proof": candidate["held_handoff"],
+    "historical_native_finding": candidate["held_native_failure"],
+    "historical_raw_archive": candidate["held_raw_archive"],
+    "raw_archive": ref(archive), "closing_harness": ref(script),
+    "stage_results": complete["receipts"],
+    "fresh_population": {"direct_scope": 17, "graph": 58, "callers": 138,
+                         "unit_total": 213, "contracts": 4, "native_assertions": 14},
+    "node_orders": complete["batches"], "contract_nodes": complete["contract_nodes"],
+    "source_test_scope": candidate["files"],
+    "current_raw_coverage": {path: data["summary"] for path, data in coverage["files"].items()},
+    "coverage_raw": complete["coverage"], "coverage_ranges": complete["ranges"],
+    "current_range_count": len(current_ranges),
+    "retained_unchanged_scope_range_count": len(retained_ranges),
+    "coverage_regressions": ranges["regressions"],
+    "retained_helper": {"freeze": candidate["retained_helper"],
+                        "closure": candidate["retained_helper_closure"],
+                        "cases": 114, "statements": "179/179", "branches": "68/68",
+                        "replayed": False},
+    "scope_baseline_qualification": candidate["scope_proof"],
+    "native": {"result": complete["native"], "whole_composition_seconds": native["elapsed_seconds"],
+               "operation_seconds": native["operation_seconds"], "assertions": native["checks"]},
+    "qualifications": [
+        "All original 14 native assertions ran before the long replay, including previously unexecuted assertions 10-14.",
+        "Current coverage JSON contains only this frozen repaired pass. Previous exact unchanged-body scope coverage remains separately referenced.",
+        "Changed _inventory proof requires no loss of mapped prior executed lines/branch destinations and no uncovered changed executable lines.",
+        "Raw AST ranges and named coverage.py summaries retain different executable-declaration denominators.",
+        "Working source streams and committed LF streams remain separately bound; no source/test edits occurred.",
+        "Whole caller/native batch durations are not individual API timings or installed-host timeout limits.",
+        "Read-only Windows/Git composition proves actual local capture/loading/render/recompute semantics; no publication, installed-host or non-Windows claim.",
+        "No plan, acceptance criteria, checkpoint or Git mutations were performed by this final-gate worker.",
+    ],
+}
+handoff = qa / ("p5t1-repaired-final-handoff." + stamp + ".json")
+write(handoff, summary)
+rows = "\n".join(f'| {row["stage"]} | {row["label"]} | {row["exit_code"]} | {row["seconds"]:.3f} |'
+                 for row in complete["receipts"])
+coverage_rows = "\n".join(f'| `{path.rsplit("/", 1)[-1]}` | {data["summary"]["covered_lines"]}/{data["summary"]["num_statements"]} | '
+                          f'{data["summary"]["covered_branches"]}/{data["summary"]["num_branches"]} |'
+                          for path, data in coverage["files"].items())
+markdown = f"""# P5-T1 repaired final handoff
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-p5t1-repaired-handoff.py <complete-sequence>`
+EXIT_CODE: 0
+Output Summary: The released repaired final sequence passed; independent acceptance remains pending.
+
+The nine-path candidate passed Black, Ruff, whole-repository Pyright and static checks. The unchanged native harness then passed all 14 assertions before 17 direct scope, 58 graph and 138 caller cases, coverage reconciliation and four contracts. Source and dependency hashes stayed fixed.
+
+| Stage | Gate | Exit | Seconds |
+| --- | --- | --- | --- |
+{rows}
+
+Current raw coverage is reported below. Exact unchanged scope bodies retain separately linked P2-T6 proof; those retained counters are never inserted into this current raw JSON.
+
+| Module | Current statements | Current branches |
+| --- | --- | --- |
+{coverage_rows}
+
+The changed inventory-accounting callable and changed executable lines have current proof with no loss of mapped previously covered statements or branches. The retained 114-case helper proof remains unchanged and was not replayed. Known population gaps and raw versus named callable denominators remain explicit in the paired ranges record.
+
+Actual local capture/loading now verifies generated JSON and Markdown report outputs without changing semantic coverage results. All previously unexecuted native cases also passed, including stale/forged reports, uninventoried input, malformed scope and unchanged fixture/Git bytes.
+
+Original failed native proof and historical 187-case results remain immutable. The new lossless archive preserves original stdout/stderr/progress, coverage and exact harness bytes. Readable views contain portable paths, LF line endings and one terminal newline.
+
+No source/test, checkpoint, plan, acceptance-criteria or Git mutation was performed here. This result does not claim publication, installed-host execution, non-Windows execution or feature completion.
+"""
+handoff.with_suffix(".md").write_text(markdown.rstrip() + "\n", encoding="utf-8", newline="\n")
+untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard", "--", qa.as_posix()],
+                           capture_output=True, check=True).stdout.decode().splitlines()
+paths = sorted(path for path in untracked if Path(path).name.startswith("p5t1-repaired-"))
+assert handoff.as_posix() in paths and archive.as_posix() in paths
+for path in paths:
+    value = Path(path).read_bytes()
+    assert b"\r" not in value and value.endswith(b"\n") and not value.endswith(b"\n\n"), path
+    assert all(line == line.rstrip() for line in value.splitlines()), path
+    assert str(root).encode() not in value and root.as_posix().encode() not in value
+    assert str(scratch).encode() not in value and scratch.as_posix().encode() not in value
+closure = qa / ("p5t1-repaired-final-staging-closure." + stamp + ".json")
+write(closure, {"task": "P5-T1", "timestamp": stamp, "handoff": ref(handoff),
+                "stage_paths": [*paths, closure.as_posix()],
+                "bindings": [ref(Path(path)) for path in paths],
+                "qualification": "Only this worker's new repaired-final evidence; parent owns staging and acceptance. Self path is listed without a recursive self-hash."})
+print(json.dumps({"handoff": ref(handoff), "closure": ref(closure), "paths": len(paths) + 1,
+                  "raw_streams": len(entries), "current_ranges": len(current_ranges),
+                  "retained_scope_ranges": len(retained_ranges)}, indent=2))

@@ -1,0 +1,924 @@
+{
+  "assertion_counts_preserved": {
+    "tests/discovery_runtime/test_parity_metrics.py": 40,
+    "tests/discovery_runtime/test_parity_report.py": 21,
+    "tests/discovery_runtime/test_report_models.py": 25
+  },
+  "borrowed": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": "b32b37c76be125dde75be8b0470c4e287ef123cd7af666981c811317973d7566",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "49d0e022bbe32f42c39d7c54c019496b82836afe181f3d7ba7b8ad761b1b0b02"
+  },
+  "case_count": 58,
+  "executed_nodes": [
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[passed-online]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[passed-offline]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[passed-mobile]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[failed-online]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[failed-offline]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[failed-mobile]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[blocked-online]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[blocked-offline]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[blocked-mobile]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[not-run-online]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[not-run-offline]",
+    "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[not-run-mobile]",
+    "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[passed]",
+    "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[failed]",
+    "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[blocked]",
+    "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[not-run]",
+    "tests/discovery_runtime/test_parity_axes.py::test_conflicting_representations_never_select_an_authored_status[verification]",
+    "tests/discovery_runtime/test_parity_axes.py::test_conflicting_representations_never_select_an_authored_status[applicability]",
+    "tests/discovery_runtime/test_parity_axes.py::test_conflicting_representations_never_select_an_authored_status[retained]",
+    "tests/discovery_runtime/test_parity_axes.py::test_custom_mode_membership_has_prospective_linear_work[8]",
+    "tests/discovery_runtime/test_parity_axes.py::test_custom_mode_membership_has_prospective_linear_work[32]",
+    "tests/discovery_runtime/test_parity_axes.py::test_custom_mode_membership_has_prospective_linear_work[64]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_verified_full_parity_keeps_four_population_units",
+    "tests/discovery_runtime/test_parity_metrics.py::test_undeclared_optional_axis_is_not_required_and_never_passed[offline]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_undeclared_optional_axis_is_not_required_and_never_passed[mobile]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[unassessed]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[partial]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[missing]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[conflicting]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[intentionally-changed]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[retired]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_invalid_source_stays_visible_without_verified_numerator[repository_id-wrong]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_invalid_source_stays_visible_without_verified_numerator[artifact_sha256-0000000000000000000000000000000000000000000000000000000000000000]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_invalid_source_stays_visible_without_verified_numerator[feature_id-absent]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_duplicate_rows_are_all_invalid_and_count_one_missing_completion",
+    "tests/discovery_runtime/test_parity_metrics.py::test_multiple_clients_do_not_multiply_source_feature_identity",
+    "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[proposed-1]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[blocked-1]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[approved-1]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[rejected-0]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[superseded-0]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_all_authored_blockers_preserve_row_location",
+    "tests/discovery_runtime/test_parity_metrics.py::test_missing_source_authority_is_unavailable_not_zero[coverage-ledger]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_missing_source_authority_is_unavailable_not_zero[inventory-snapshot]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_confirmed_empty_scope_has_real_zeros_and_null_percentages",
+    "tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes0]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes1]",
+    "tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes2]",
+    "tests/discovery_runtime/test_parity_report.py::test_graph_entrypoints_reject_non_snapshot_inputs[None]",
+    "tests/discovery_runtime/test_parity_report.py::test_graph_entrypoints_reject_non_snapshot_inputs[value1]",
+    "tests/discovery_runtime/test_parity_report.py::test_graph_entrypoints_reject_non_snapshot_inputs[1]",
+    "tests/discovery_runtime/test_parity_report.py::test_graph_preflight_reserves_input_before_projection",
+    "tests/discovery_runtime/test_parity_report.py::test_public_builder_reuses_complete_projection_with_independent_root_mode",
+    "tests/discovery_runtime/test_report_models.py::test_heading_uses_only_closed_artifact_kind[parity-report-parity]",
+    "tests/discovery_runtime/test_report_models.py::test_heading_uses_only_closed_artifact_kind[coverage-report-coverage]",
+    "tests/discovery_runtime/test_report_models.py::test_heading_uses_only_closed_artifact_kind[authored\\n# misleading-coverage]",
+    "tests/discovery_runtime/test_parity_report.py::test_graph_work_rejects_before_retaining_entry_locations",
+    "tests/discovery_runtime/test_parity_report.py::test_axis_output_budget_rejects_before_processing_remaining_rows"
+  ],
+  "harnesses": [
+    {
+      "bytes": 5709,
+      "identical_to_executed_bytes": true,
+      "original": "SCRATCH/p5t2-graph-GR-first-runner.py.txt",
+      "original_sha256": "1106ef1392646e19ee69c09815da7f07242ae2e721a9f5626eff5ded6ece6131",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-first-runner.py-harness.2026-10-20T07-15.txt",
+      "sha256": "1106ef1392646e19ee69c09815da7f07242ae2e721a9f5626eff5ded6ece6131"
+    },
+    {
+      "bytes": 5918,
+      "identical_to_executed_bytes": true,
+      "original": "SCRATCH/p5t2-graph-GR-focused.py",
+      "original_sha256": "496a5b3def061a9f10f56963512904c75d9518628357b4026bde0c6e2f74ce0f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-focused-harness.2026-10-20T07-15.txt",
+      "sha256": "496a5b3def061a9f10f56963512904c75d9518628357b4026bde0c6e2f74ce0f"
+    },
+    {
+      "bytes": 11894,
+      "identical_to_executed_bytes": true,
+      "original": "SCRATCH/p5t2-graph-GR-freeze-first-checker.py.txt",
+      "original_sha256": "077412a401a5487464a40c917c67cfb120ac6469e197ded1653c47b5ac8fb2a5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze-first-checker.py-harness.2026-10-20T07-15.txt",
+      "sha256": "077412a401a5487464a40c917c67cfb120ac6469e197ded1653c47b5ac8fb2a5"
+    },
+    {
+      "bytes": 12070,
+      "identical_to_executed_bytes": true,
+      "original": "SCRATCH/p5t2-graph-GR-freeze.py",
+      "original_sha256": "a6fb44861b62c9fc85773eeea1def0b2800c58f4af0c4ae43c11d51bfd365036",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze-harness.2026-10-20T07-15.txt",
+      "sha256": "a6fb44861b62c9fc85773eeea1def0b2800c58f4af0c4ae43c11d51bfd365036"
+    },
+    {
+      "bytes": 904,
+      "identical_to_executed_bytes": true,
+      "original": "SCRATCH/p5t2-graph-GR-harness-prepare.py",
+      "original_sha256": "512484c2ee11debb95487d0fe080f53d2cf6a242d415f940dbb813218e230dfd",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-harness-prepare-harness.2026-10-20T07-15.txt",
+      "sha256": "512484c2ee11debb95487d0fe080f53d2cf6a242d415f940dbb813218e230dfd"
+    },
+    {
+      "bytes": 711,
+      "identical_to_executed_bytes": true,
+      "original": "SCRATCH/p5t2-graph-GR-precheck-prepare.py",
+      "original_sha256": "8e334e5d8e74b57887ed8556211f8d93eaac3e6f0eb0dea8ea769cd9cdf04a48",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-precheck-prepare-harness.2026-10-20T07-15.txt",
+      "sha256": "8e334e5d8e74b57887ed8556211f8d93eaac3e6f0eb0dea8ea769cd9cdf04a48"
+    }
+  ],
+  "narrow_precheck_cases": 3,
+  "native_pointer_confirmation": {
+    "basis": "One required source, one browser obligation, missing row, undeclared optional axes.",
+    "expected_metrics": {
+      "/parity/clients/0/dimensions/mobile/not_required": 1,
+      "/parity/clients/0/dimensions/mobile/required": 0,
+      "/parity/clients/0/dimensions/mobile/verification/percentage": null,
+      "/parity/clients/0/dimensions/mobile/verified": 0,
+      "/parity/clients/0/dimensions/offline/not_required": 1,
+      "/parity/clients/0/dimensions/offline/required": 0,
+      "/parity/clients/0/dimensions/offline/verification/percentage": null,
+      "/parity/clients/0/dimensions/offline/verified": 0,
+      "/parity/entries/complete": 0,
+      "/parity/entries/state_counts/missing": 1,
+      "/parity/entries/total": 1,
+      "/parity/feature_client_obligations/completed_required": 0,
+      "/parity/feature_client_obligations/required": 1,
+      "/parity/source_features/completed_required": 0,
+      "/parity/source_features/required": 1,
+      "/parity/source_features/total": 1
+    },
+    "preparation": {
+      "bytes": 26969,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-native-preparation.2026-10-20T06-22.json",
+      "sha256": "10eebf1a2675266f349a479ad0925b84f198611d96385e95e48da6fb5888ae82"
+    },
+    "qualification": "Read-only contract confirmation only; no native execution or fixture mutation.",
+    "status": "ALL_16_UNCHANGED_BY_SOURCE_AND_FIXTURE_REVIEW"
+  },
+  "new_raw_archive": {
+    "bytes": 196467,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-raw-archive.2026-10-20T07-15.json",
+    "sha256": "f6f9edf2ed5e33c322967a34be860b9dd2c6929c916d6d07e57398da80606725"
+  },
+  "original_36_preserved": true,
+  "per_unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": {
+      "changed_executable_lines": [
+        3,
+        5,
+        6,
+        8,
+        12,
+        13,
+        33,
+        44,
+        50,
+        59,
+        67,
+        87,
+        90,
+        91,
+        92,
+        96,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        109,
+        110,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        122,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        150,
+        151,
+        152,
+        153,
+        154,
+        167,
+        180,
+        181,
+        188,
+        189,
+        190,
+        191,
+        192,
+        194,
+        195,
+        197,
+        198,
+        199,
+        200,
+        202,
+        203,
+        204,
+        206,
+        208,
+        210,
+        215,
+        216,
+        217,
+        218,
+        224,
+        231,
+        232,
+        237,
+        243,
+        248,
+        249,
+        250,
+        253,
+        255,
+        256,
+        257,
+        277,
+        278,
+        279,
+        281,
+        288,
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        297,
+        298,
+        301,
+        302,
+        303,
+        304,
+        305,
+        307,
+        308,
+        309,
+        310,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        322,
+        323,
+        324,
+        325,
+        327,
+        328,
+        329,
+        331,
+        332,
+        333,
+        334,
+        335,
+        337,
+        338,
+        340,
+        354,
+        355,
+        356,
+        357,
+        361,
+        362,
+        363,
+        365,
+        366,
+        367,
+        372,
+        373,
+        374,
+        376,
+        386
+      ],
+      "changed_lines_currently_covered": true,
+      "ranges": [
+        {
+          "current_covered": 2,
+          "end": 56,
+          "name": "_reference",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 44,
+          "statements": 2,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 142,
+          "end": 413,
+          "name": "ParityProjection",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 59,
+          "statements": 142,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 5,
+          "end": 94,
+          "name": "ParityProjection.__init__",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 67,
+          "statements": 5,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 41,
+          "end": 165,
+          "name": "ParityProjection.entries",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 96,
+          "statements": 41,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 39,
+          "end": 279,
+          "name": "ParityProjection.axes",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 167,
+          "statements": 39,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 56,
+          "end": 413,
+          "name": "ParityProjection.project",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 281,
+          "statements": 56,
+          "unsupported_lines": []
+        }
+      ],
+      "raw_summary": {
+        "covered_branches": 51,
+        "covered_lines": 151,
+        "excluded_lines": 10,
+        "missing_branches": 5,
+        "missing_lines": 0,
+        "num_branches": 56,
+        "num_partial_branches": 5,
+        "num_statements": 151,
+        "percent_branches_covered": 91.07142857142857,
+        "percent_branches_covered_display": "91",
+        "percent_covered": 97.58454106280193,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "retained_proof": "See pre-repair freeze exact-AST body mappings",
+      "unsupported_module_lines": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "changed_executable_lines": [
+        6,
+        8,
+        10,
+        13,
+        31,
+        38,
+        41,
+        47,
+        61,
+        81,
+        82,
+        87,
+        100,
+        102,
+        103,
+        106
+      ],
+      "changed_lines_currently_covered": true,
+      "ranges": [
+        {
+          "current_covered": 2,
+          "end": 38,
+          "name": "parity_preflight",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 31,
+          "statements": 2,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 2,
+          "end": 58,
+          "name": "unavailable_parity_summary",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 41,
+          "statements": 2,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 3,
+          "end": 84,
+          "name": "parity_summary",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 61,
+          "statements": 3,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 5,
+          "end": 109,
+          "name": "build_parity_report",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 87,
+          "statements": 5,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 122,
+          "name": "_legacy_version",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            118,
+            119,
+            120,
+            121,
+            122
+          ],
+          "start": 112,
+          "statements": 6,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 135,
+          "name": "parse_parity_matrix",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            131,
+            132,
+            133,
+            134,
+            135
+          ],
+          "start": 125,
+          "statements": 6,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 159,
+          "name": "build_parity_rows",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            148,
+            149,
+            150,
+            151,
+            154,
+            156,
+            157
+          ],
+          "start": 138,
+          "statements": 8,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 173,
+          "name": "render_parity_report",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            170,
+            172,
+            173
+          ],
+          "start": 162,
+          "statements": 4,
+          "unsupported_lines": []
+        }
+      ],
+      "raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 25,
+        "excluded_lines": 10,
+        "missing_branches": 8,
+        "missing_lines": 20,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 45,
+        "percent_branches_covered": 0.0,
+        "percent_branches_covered_display": "0",
+        "percent_covered": 47.16981132075472,
+        "percent_covered_display": "47",
+        "percent_statements_covered": 55.55555555555556,
+        "percent_statements_covered_display": "56"
+      },
+      "retained_proof": "See pre-repair freeze exact-AST body mappings",
+      "unsupported_module_lines": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "changed_executable_lines": [
+        275,
+        280
+      ],
+      "changed_lines_currently_covered": true,
+      "ranges": [
+        {
+          "current_covered": 3,
+          "end": 30,
+          "name": "ReportLimitError",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 21,
+          "statements": 3,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 2,
+          "end": 30,
+          "name": "ReportLimitError.__init__",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 28,
+          "statements": 2,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 63,
+          "end": 172,
+          "name": "ReportBudget",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            51,
+            95,
+            99,
+            101,
+            119,
+            125,
+            142,
+            148,
+            151,
+            162,
+            167,
+            172
+          ],
+          "start": 33,
+          "statements": 75,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 8,
+          "end": 61,
+          "name": "ReportBudget.__init__",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            51
+          ],
+          "start": 44,
+          "statements": 9,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 4,
+          "end": 71,
+          "name": "ReportBudget.work",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 63,
+          "statements": 4,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 4,
+          "end": 80,
+          "name": "ReportBudget.spend",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 73,
+          "statements": 4,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 12,
+          "end": 105,
+          "name": "ReportBudget.text",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            95,
+            99,
+            101
+          ],
+          "start": 82,
+          "statements": 15,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 34,
+          "end": 172,
+          "name": "ReportBudget.check",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            119,
+            125,
+            142,
+            148,
+            151,
+            162,
+            167,
+            172
+          ],
+          "start": 107,
+          "statements": 42,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 8,
+          "end": 193,
+          "name": "_freeze",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 175,
+          "statements": 8,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 4,
+          "end": 205,
+          "name": "bounded_object",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            203
+          ],
+          "start": 196,
+          "statements": 5,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 3,
+          "end": 233,
+          "name": "ratio",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            222
+          ],
+          "start": 208,
+          "statements": 4,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 16,
+          "end": 284,
+          "name": "DiscoveryReport",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 237,
+          "statements": 16,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 2,
+          "end": 257,
+          "name": "DiscoveryReport.__post_init__",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 250,
+          "statements": 2,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 2,
+          "end": 261,
+          "name": "DiscoveryReport.to_dict",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 259,
+          "statements": 2,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 2,
+          "end": 265,
+          "name": "DiscoveryReport.to_json",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 263,
+          "statements": 2,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 7,
+          "end": 284,
+          "name": "DiscoveryReport.to_markdown",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [],
+          "start": 267,
+          "statements": 7,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 295,
+          "name": "_legacy_version",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            292,
+            295
+          ],
+          "start": 287,
+          "statements": 3,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 309,
+          "name": "parse_coverage_ledger",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            304,
+            305,
+            306,
+            307,
+            308,
+            309
+          ],
+          "start": 298,
+          "statements": 7,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 332,
+          "name": "build_coverage_rows",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            321,
+            322,
+            323,
+            324,
+            327,
+            329,
+            330
+          ],
+          "start": 312,
+          "statements": 8,
+          "unsupported_lines": []
+        },
+        {
+          "current_covered": 1,
+          "end": 346,
+          "name": "render_coverage_report",
+          "qualified_line_percentage": 100.0,
+          "retained_additional": [
+            343,
+            345,
+            346
+          ],
+          "start": 335,
+          "statements": 4,
+          "unsupported_lines": []
+        }
+      ],
+      "raw_summary": {
+        "covered_branches": 44,
+        "covered_lines": 110,
+        "excluded_lines": 0,
+        "missing_branches": 20,
+        "missing_lines": 32,
+        "num_branches": 64,
+        "num_partial_branches": 14,
+        "num_statements": 142,
+        "percent_branches_covered": 68.75,
+        "percent_branches_covered_display": "69",
+        "percent_covered": 74.75728155339806,
+        "percent_covered_display": "75",
+        "percent_statements_covered": 77.46478873239437,
+        "percent_statements_covered_display": "77"
+      },
+      "retained_proof": "See pre-repair freeze exact-AST body mappings",
+      "unsupported_module_lines": []
+    }
+  },
+  "pre_repair_freeze": {
+    "bytes": 28976,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json",
+    "sha256": "a7da6a30daee32b5d7fb9b2e7261a2cd4075f31b7a25b867a9cf3d76e0f51bb7"
+  },
+  "raw_coverage": {
+    "bytes": 116133,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-15.json",
+    "sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892"
+  },
+  "review_closure_claim": "GR1/GR2 focused behavior passes; independent confirmation and full task gates pending.",
+  "source_delta": "ParityProjection.axes only; public test-helper rename",
+  "sources_and_tests": [
+    {
+      "bytes": 7219,
+      "lf_sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "physical_lines": 173,
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036"
+    },
+    {
+      "bytes": 18617,
+      "lf_sha256": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "physical_lines": 413,
+      "sha256": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334"
+    },
+    {
+      "bytes": 14576,
+      "lf_sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "physical_lines": 346,
+      "sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903"
+    },
+    {
+      "bytes": 16430,
+      "lf_sha256": "51fdeee1e65a4f236e4ea8a9a0d19b38dd792c982d8f5d69f9cb3f28ff3b39cf",
+      "path": "tests/discovery_runtime/test_parity_report.py",
+      "physical_lines": 399,
+      "sha256": "51fdeee1e65a4f236e4ea8a9a0d19b38dd792c982d8f5d69f9cb3f28ff3b39cf"
+    },
+    {
+      "bytes": 18070,
+      "lf_sha256": "6590e14597260daab9cca0282af4744bb6ccfca5c8671e4cbf4edbe4a6a18c17",
+      "path": "tests/discovery_runtime/test_parity_metrics.py",
+      "physical_lines": 497,
+      "sha256": "6590e14597260daab9cca0282af4744bb6ccfca5c8671e4cbf4edbe4a6a18c17"
+    },
+    {
+      "bytes": 14299,
+      "lf_sha256": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2",
+      "path": "tests/discovery_runtime/test_report_models.py",
+      "physical_lines": 375,
+      "sha256": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2"
+    },
+    {
+      "bytes": 10353,
+      "lf_sha256": "b5c23d4f638efa2d215e1c1a0698145ebf9cc41d76b5d635ae5bda8fdc716ef5",
+      "path": "tests/discovery_runtime/test_parity_axes.py",
+      "physical_lines": 245,
+      "sha256": "b5c23d4f638efa2d215e1c1a0698145ebf9cc41d76b5d635ae5bda8fdc716ef5"
+    }
+  ],
+  "stage_receipts": [
+    {
+      "bytes": 5218,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-black.2026-10-20T07-07.json",
+      "sha256": "68e68d772d64df6f8bfa5c5b36fb5f4ad8c493eb630e5d6283e04cee1299b1cb"
+    },
+    {
+      "bytes": 5632,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-counted-controls.2026-10-20T07-07.json",
+      "sha256": "d16060992a48e47977eb449f736d381e874a4eec6b30e3450e428cb84f5a0c92"
+    },
+    {
+      "bytes": 4868,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-coverage.2026-10-20T07-07.json",
+      "sha256": "fccd1e4217c55e8fa473a99585bcb5061e96c1af3232a1d58f36b9179655646b"
+    },
+    {
+      "bytes": 5334,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-pyright.2026-10-20T07-07.json",
+      "sha256": "4453bedf6ac070c8a21a84bf50f6baefe8b2e2316568ebea4b4251d8d2248115"
+    },
+    {
+      "bytes": 5159,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-ruff.2026-10-20T07-07.json",
+      "sha256": "43cffa1f296a990a3b56861813ffe9dc126011fe6bbefa934f2f9ea974a9f811"
+    },
+    {
+      "bytes": 14671,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-tests.2026-10-20T07-07.json",
+      "sha256": "0d7a19956bd139d3f3d74630a3d16c129182a12b5fe95aaa711daf290f9a7d87"
+    }
+  ],
+  "status": "FOCUSED_PASS_AWAITING_BOUNDED_CONFIRMATION",
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T07:15:45.693504+00:00"
+}

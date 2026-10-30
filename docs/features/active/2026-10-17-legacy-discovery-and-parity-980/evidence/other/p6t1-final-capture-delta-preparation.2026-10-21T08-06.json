@@ -1,0 +1,155 @@
+{
+  "actions_not_performed": [
+    "No checks/tests/collection/native/service/package execution.",
+    "No source/test/package/runner/reader edits.",
+    "No checkpoint/staging/Git mutations."
+  ],
+  "actions_performed": [
+    "Read only retained candidate, approved supplement and route metadata.",
+    "Requested exact eventual owner freeze and committed boundary references.",
+    "Wrote this disabled preparation metadata."
+  ],
+  "automatic_retry": false,
+  "base_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-source-range.2026-10-21T06-39.json",
+    "sha256": "8f51055aff12c244cc0dfbba1fdef348ce03d371461b1fd9e4be08b11d36da8a"
+  },
+  "boundary_repair_commit": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+  "contracts": [
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+  ],
+  "coverage": {
+    "add_only": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+    "changed_bootstrap_body_proof": "Pending fresh measured body and exact unchanged responsibilities mapping",
+    "existing_production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py"
+    ],
+    "new_module_absence_and_current_body_proof": "Pending owner frozen references",
+    "raw_and_retained_metrics_remain_separate": true
+  },
+  "delta": {
+    "actual_node_ids_pending": true,
+    "already_authored_additions_reported": 10,
+    "changed_production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py"
+    ],
+    "changed_tests": [
+      "tests/discovery_runtime/test_service_boundaries.py",
+      "tests/discovery_runtime/test_service_publication.py"
+    ],
+    "expected_additional_nodes": 21,
+    "expected_final_count": 315,
+    "final_hashes_pending": true,
+    "new_production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py"
+    ],
+    "new_tests": [
+      "tests/discovery_runtime/test_service_migration.py"
+    ],
+    "proposed_seam_controls_pending_freeze": 11,
+    "unchanged_init_io_sha256": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853"
+  },
+  "execution_released": false,
+  "metadata_only": true,
+  "native_pass_for_new_package_claimed": false,
+  "operational_bound_seconds": 7200,
+  "ordered_stages": [
+    "Black",
+    "Ruff",
+    "whole Pyright",
+    "scoped static",
+    "one reversed full-population coverage process",
+    "BODY and zero-regression proof",
+    "four contracts"
+  ],
+  "pending_inputs": [
+    "Frozen exact added node IDs and module order from owner output; all294 original identities preserved.",
+    "Exact two-production/two-publication-test repair bindings, independently reviewed boundary test binding, and existing new-path absence receipt.",
+    "Current named executable BODY and zero-regression mappings for service_bootstrap and migration_capture; retained history remains separate.",
+    "Designated packaging owner regenerated manifest/input closure/build/policy/wheel identity.",
+    "Explicit unchanged-function/init_io native carry qualification and coordinator native disposition.",
+    "Independent candidate-ready references and explicit final execution release."
+  ],
+  "planned_forward_module_order": [
+    "tests/discovery_runtime/test_service.py",
+    "tests/discovery_runtime/test_service_publication.py",
+    "tests/discovery_runtime/test_service_migration.py",
+    "tests/discovery_runtime/test_service_boundaries.py",
+    "tests/discovery_runtime/test_gateway.py",
+    "tests/discovery_runtime/test_gateway_local.py",
+    "tests/discovery_runtime/test_doctor.py",
+    "tests/discovery_runtime/test_gateway_boundaries.py",
+    "tests/discovery_runtime/test_gateway_factory.py"
+  ],
+  "planned_reversed_module_order": [
+    "tests/discovery_runtime/test_gateway_factory.py",
+    "tests/discovery_runtime/test_gateway_boundaries.py",
+    "tests/discovery_runtime/test_doctor.py",
+    "tests/discovery_runtime/test_gateway_local.py",
+    "tests/discovery_runtime/test_gateway.py",
+    "tests/discovery_runtime/test_service_boundaries.py",
+    "tests/discovery_runtime/test_service_migration.py",
+    "tests/discovery_runtime/test_service_publication.py",
+    "tests/discovery_runtime/test_service.py"
+  ],
+  "preserved_harnesses": {
+    "p6t1_final_ncf2_gates.py": {
+      "physical_lines": 255,
+      "runtime_path": "SCRATCH/p6t1_final_ncf2_gates.py",
+      "sha256": "d679d6efd91254996251528718ace3bd491b3029d8976811b8f399ed612190b1"
+    },
+    "p6t1_final_nio1_coverage.py": {
+      "physical_lines": 234,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+      "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+    },
+    "p6t1_final_nio1_static.py": {
+      "physical_lines": 209,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+      "sha256": "6220ec9b754ce290bfd783b6ca2ecbe4bb6b42873fee1b2944752929902d7dc4"
+    }
+  },
+  "preserved_node_count": 294,
+  "preserved_original_binding_count": 235,
+  "progress_seconds": 20,
+  "retained_failures_and_diagnostic": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-16.json",
+      "sha256": "f9bb1f9fcac9f677470dfe8e838ccf0a64fe02481e48df0b4cb9118666325900"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-46.json",
+      "sha256": "4dcb9e8c2e6ac67978f1a16e806bce8a458820dbe86374f2daa89b76ce58a8ab"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-handoff.2026-10-21T07-13.json",
+      "sha256": "d600b11962ac26b29dca954ee84430a89e2d3a6204ddadeeca3c1238162486d4"
+    }
+  ],
+  "route": "inventory_analyzers_p6t1_final_capture_delta_20261021T080400",
+  "runner_delta_after_freeze": [
+    "Version existing255-line launcher; preserve original bytes and polling/archive/UTF-8/path-alias/cleanup bodies.",
+    "Replace only the294 assertion and NCF2-only node-union block with exact frozen294+actual capture-repair additions; preserve every old ID and the four contracts.",
+    "Bind actual new and changed files, new migration_capture measurement and owner-provided current BODY/baseline qualifications; no reader floor change.",
+    "Bind designated owner regenerated package identity; retain unaffected native-route proof only with explicit unchanged-function/init_io qualification."
+  ],
+  "scope_qualification": "Expected315 is provisional until actual frozen owner nodes are supplied. This receipt neither binds moving source bytes nor authorizes execution.",
+  "status": "PREPARED_SCOPE_AWAITING_EXACT_REPAIR_FREEZE",
+  "supplement": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-capture-supplement.2026-10-21T07-55.json",
+    "sha256": "df19757a72db2a607cbac1a1a69368ca6fe90b83d442558a36005845ba993fde"
+  },
+  "task": "P6-T1"
+}

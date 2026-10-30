@@ -1,0 +1,41 @@
+"""Inspect planned formatting, intent markers and paused-byte preservation."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import black
+
+repo = Path.cwd()
+evidence = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence"
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+]
+results = []
+for path in paths:
+    source = (repo / path).read_text("utf-8")
+    tree = ast.parse(source)
+    try:
+        formatted = black.format_file_contents(source, fast=False, mode=black.Mode(line_length=88))
+    except black.NothingChanged:
+        formatted = source
+    lines = source.splitlines()
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.ClassDef))]
+    missing_docs = [node.name for node in definitions if not ast.get_docstring(node)]
+    uncommented_loops = [node.lineno for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While)) and not lines[node.lineno - 2].lstrip().startswith("#")]
+    results.append({"path": path, "physical_lines": len(lines), "prospective_black_lines": len(formatted.splitlines()),
+                    "missing_docstrings": missing_docs, "uncommented_explicit_loops": uncommented_loops,
+                    "sha256": hashlib.sha256((repo / path).read_bytes()).hexdigest()})
+baseline = json.loads(next((evidence / "baseline").glob("p4t7-shared-repair-scope.*.json")).read_text("utf-8"))
+preserved = all(hashlib.sha256((repo / item["path"]).read_bytes()).hexdigest() == item["sha256"] for item in baseline["paused_integration"])
+record = {"results": results, "paused_integration_preserved": preserved, "advisory_only": "No formatting or tests executed; actual checks follow."}
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+record.update(timestamp=stamp, command="poetry run python SCRATCH/issue-980-p4t7-shared-repair-structure.py", exit_code=0)
+target = evidence / "regression-testing" / ("p4t7-shared-repair-structure." + stamp + ".json")
+assert not target.exists()
+target.write_bytes((json.dumps(record, indent=2) + "\n").encode())
+print(json.dumps(record, indent=2))

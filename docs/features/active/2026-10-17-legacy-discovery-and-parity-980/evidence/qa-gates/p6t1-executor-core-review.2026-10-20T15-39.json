@@ -1,0 +1,262 @@
+{
+  "task": "P6-T1",
+  "timestamp": "2026-10-20T15-39",
+  "status": "SCOPED_FINDINGS_COMPLETE",
+  "routing": "atomic_execution_p6t1_core_source_review_20261020 / S5_P6T1_core_source_review",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-source-freeze.2026-10-20T15-20.json",
+    "sha256": "2daa4d244d233ef48280461dd1bbf8821ce252e3fa61c524cd58a3d65bd78985",
+    "bytes": 2632
+  },
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "sha256": "948ad510bf5a36337db3d23e5b78af76b100acfdcc0d58779dd1b49066710238",
+      "lines": 294
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "sha256": "4a947f198db4fd20683f9713c165a5537225a197e992a9841969290dc2dfee74",
+      "lines": 472
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+      "sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+      "lines": 278
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "lines": 217
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "sha256": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+      "lines": 246
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "lines": 337
+    }
+  ],
+  "probe_and_original_sources": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-probe.2026-10-20T15-39.json",
+    "sha256": "e6edb4e40f1018ffd47171799d8c29a0e11d42f9a1299a9a2e0aa2026e9977de",
+    "bytes": 43248
+  },
+  "retained": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+      "sha256": "afa9611038e4981c166eb4b712d86277cd2b23c45900d4a82f4c305995c2c575",
+      "bytes": 34097
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-contract-decisions.2026-10-20T12-25.json",
+      "sha256": "0db96ff2158109d58384ad8ff4b7e52f9de5423a6a9f82d70cbeeadc6983176b",
+      "bytes": 14663
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.json",
+      "sha256": "e17cb15a5550b54975c7986de62ef68c676459d403869a51af3e011a0053c30d",
+      "bytes": 12430
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.json",
+      "sha256": "f0f6981588e649235f7217da1f6ada0a3859062187fe353a2ba3aa8abff500df",
+      "bytes": 15248
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright-raw.2026-10-20T15-31.json",
+      "sha256": "9645e912b3c9c6a7ca713427262b9910d9e281d6e8c58ee6ff1b9b561fa9657e",
+      "bytes": 5383
+    }
+  ],
+  "dependency_window": {
+    "bindings": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015"
+    },
+    "qualification": "Both executed probes bind identical current repaired shared dependencies before/after. This review does not replace the separate shared repair confirmation."
+  },
+  "reviewed_conclusions": [
+    "Six frozen core modules were reviewed against the fixed 30-operation matrix and approved failure contract. Dispatch is closed; required modes and write/dry-run routing are explicit.",
+    "Local-user derivation is limited to exact already-computed changes, nonempty provider grants must match, and host authority cannot derive a fallback. Prepare/finalize remain unavailable pending P8; their failure packaging is covered by CR1.",
+    "Original capture remains the publication/prospective-graph authority; identity-only proposals exclude only fixed report kinds. Individual validation retains graph-wide blockers. Accepted snapshot/path/mutation/report/generator implementations were not re-reviewed.",
+    "All six production files are within 500 lines; no additional source policy finding was identified in this scope."
+  ],
+  "verification": {
+    "source_statics": [
+      {
+        "path": "evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.json",
+        "sha256": "dd2e43675c1229259e945ea74a9549a4584bbe141a26230b3d5b5bf55335e049"
+      },
+      {
+        "path": "evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.json",
+        "sha256": "4c8b64719158414b7e60777a9f4a5dc5d12d014be08e438983c70dd7b94904e7"
+      },
+      {
+        "path": "evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.json",
+        "sha256": "ee4d394410c914f7fbe15ac54de372d2be77582b912fc57bf8d34bb9a0d18003"
+      }
+    ],
+    "bounded_probe_executions": 2,
+    "probe_exit_codes": [
+      0,
+      0
+    ],
+    "core_behavior_population_run": false,
+    "suite_replay": false
+  },
+  "findings": [
+    {
+      "id": "CR1",
+      "classification": "source",
+      "severity": "blocking",
+      "title": "Early and freshness failures can escape the typed result boundary",
+      "locations": [
+        "service.py:49 _problem; service.py:62 _failure; service.py:127 _context; service.py:204 execute",
+        "operations.py:33 operation_problem; operations.py:191 manifest; operations.py:216 result"
+      ],
+      "evidence": {
+        "failure_envelopes": {
+          "operation_provider": {
+            "pointers": [
+              ""
+            ],
+            "returned": false,
+            "error_type": "ValueError",
+            "error": "Pre-execution failure cannot claim evaluated output"
+          },
+          "core_io": {
+            "pointers": [
+              ""
+            ],
+            "returned": false,
+            "error_type": "ValueError",
+            "error": "Pre-execution failure cannot claim evaluated output"
+          },
+          "shared_runtime_positive_control": {
+            "pointers": [
+              "/runtime"
+            ],
+            "returned": true,
+            "exit_code": 3,
+            "result_type": "DiscoveryResult"
+          }
+        },
+        "catalog_before_request": {
+          "returned": false,
+          "error_type": "ValueError",
+          "error": "Service result context is unavailable for this outcome"
+        },
+        "public_execute_provider_mismatch": {
+          "returned": false,
+          "error_type": "ValueError",
+          "error": "Pre-execution failure cannot claim evaluated output"
+        },
+        "bootstrap_failure_packaging": {
+          "captured_bytes_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "current_bytes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "first_freshness_failure": {
+            "returned": false,
+            "error_type": "OSError",
+            "error": "Snapshot bytes changed at 'input.json'; reload"
+          },
+          "failure_envelope": {
+            "returned": false,
+            "error_type": "OSError",
+            "error": "Snapshot bytes changed at 'input.json'; reload"
+          }
+        }
+      },
+      "impact": "Provider/I-O findings have an empty pointer and the unavailable result constructor rejects them. Catalog failure before request parsing combines unknown operation/mode with exit 3 and also fails construction. Bootstrap error packaging repeats the freshness check that just failed and rethrows OSError. These paths return no typed DiscoveryResult; no authentication or publication bypass was demonstrated.",
+      "repair": "Use actionable schema-compatible failure pointers; classify unknown context consistently with the approved nullable failure contract without inventing evaluated context. Preserve original findings and observed capture/absence without re-running a failed freshness operation while serializing the failure, and do not claim fresh authority or successful effects. Preserve safe fixed errors, public signatures and strict schema checks; do not hide programming errors with a broad ValueError catch.",
+      "minimum_controls": "Public provider mismatch and early catalog failure, valid shared-runtime failure positive, and changed captured bootstrap input. Require typed outcomes, no authority fallback or extra write, and truthful observed input context."
+    },
+    {
+      "id": "CR2",
+      "classification": "source",
+      "severity": "blocking",
+      "title": "Projection and finding ordering exceed their prospective work reservation",
+      "locations": [
+        "operations.py:216 result (reservation/order at 238-241)",
+        "operations.py:326 projected (decode/hash/carrier projection through 359)"
+      ],
+      "evidence": {
+        "projection_work": {
+          "configured_total_work": 2048,
+          "available_work_before": 1,
+          "content_bytes": 4096,
+          "outcome": {
+            "returned": true,
+            "exit_code": null,
+            "result_type": "tuple"
+          },
+          "hash_calls": [
+            {
+              "bytes": 4096,
+              "work_left": 0
+            }
+          ],
+          "work_after": 0
+        },
+        "coordinator_ordering_only": {
+          "configured_total_work": 2048,
+          "reserved_work": 768,
+          "outcome": {
+            "returned": true,
+            "exit_code": 1
+          },
+          "observations": [
+            {
+              "count": 96,
+              "equality_calls": 4560
+            }
+          ]
+        },
+        "initial_combined_observation": {
+          "findings": 96,
+          "configured_total_work": 2048,
+          "declared_order_reservation": 768,
+          "outcome": {
+            "returned": true,
+            "exit_code": 1,
+            "result_type": "DiscoveryResult"
+          },
+          "actual_equality_calls": 9120
+        }
+      },
+      "impact": "With a 2,048-unit configured budget and one unit remaining, projection hashes 4,096 actual bytes at zero work remaining and returns an artifact. Ordering 96 distinct findings reserves 768 units but the coordinator collector alone performs 4,560 equality calls and returns a result. The initial 9,120 count also included constructor normalization; the isolated 4,560 count excludes that second pass.",
+      "repair": "Reserve actual cumulative decode/hash/projection/carrier and collector comparison/sort/text work before performing it. Account for the accepted collector's actual incremental work rather than assuming n-log-n behavior. Preserve accepted deduplication, ordering, truncation and byte semantics; no predecessor implementation review is required.",
+      "minimum_controls": "Counted tight-budget rejection before hashing/decoding/ordering and sufficient-capacity controls preserving exact artifacts/findings. Use deterministic operation counts, not timing.",
+      "qualification": "Resource probes exercise real core OperationContext methods with inert trusted ports and a profile-limit interface; they are bounded unit composition observations, not full public capture or authorization acceptance. Repaired shared dependencies are explicitly bound in raw probes; their acceptance remains separate."
+    },
+    {
+      "id": "CT1",
+      "classification": "fixture typing",
+      "severity": "required",
+      "title": "Correct two existing test fixture expressions before behavior",
+      "evidence": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.json",
+        "sha256": "f0f6981588e649235f7217da1f6ada0a3859062187fe353a2ba3aa8abff500df",
+        "bytes": 15248
+      },
+      "corrections": [
+        {
+          "location": "test_service_boundaries.py:198",
+          "repair": "Supply the required Finding.next_action in the fixture."
+        },
+        {
+          "location": "test_service_boundaries.py:353-354",
+          "repair": "Narrow counts to the expected tuple/JsonObject and integer shapes before iteration and comparison, retaining the positive-effects assertion."
+        }
+      ],
+      "qualification": "Eight Pyright diagnostics arise from these two expressions. Moving tests are otherwise outside this source review; no core behavioral population has run. Do not add suppressions or change production semantics."
+    }
+  ],
+  "open_probes": [],
+  "scope_qualification": "Complete finite source finding set; changes required before checked core readiness. No task acceptance, test coverage acceptance or checkoff. Parent controls coordinated repair release.",
+  "preservation": "No production/test/schema/config/Git/checkpoint/plan/AC changes. Existing owner receipts and prior shared review remain unchanged; no candidate staging union is constructed at this finding boundary."
+}

@@ -1,0 +1,10 @@
+<Project>
+  <Choose>
+    <When Condition="'$(Platform)' == 'x64'">
+      <ItemGroup><PackageReference Include="Synthetic.Platform" Version="1" /></ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup><PackageReference Remove="Synthetic.Platform" /></ItemGroup>
+    </Otherwise>
+  </Choose>
+</Project>

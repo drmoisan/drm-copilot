@@ -1,275 +1,134 @@
-"""Tests for `scripts.dev_tools.discovery.init_flow`."""
+"""Retain legacy diagnostics/imports while rejecting unchecked v1 initialization."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import TYPE_CHECKING
 
-import jsonschema
 import pytest
+from drm_copilot_discovery import init_flow as runtime
 
 from scripts.dev_tools.discovery import init_flow as mod
-from scripts.dev_tools.discovery.domain_profile import parse_domain_profile_text
-from scripts.dev_tools.discovery.init_models import (
-    DOMAIN_PROFILE_RELATIVE_PATH,
-    EXPECTED_TEMPLATE_RELATIVE_PATHS,
-    OUTPUT_RELATIVE_PATHS,
-    resolve_default_template_root,
-)
-
-if TYPE_CHECKING:
-    from scripts.dev_tools.discovery.init_models import FileSystem
+from scripts.dev_tools.discovery.init_models import EXPECTED_TEMPLATE_RELATIVE_PATHS
 
 
 class FakeFileSystem:
-    """In-memory `FileSystem` test double with no real disk I/O."""
+    """Represent the legacy unchecked interface entirely in test-owned memory."""
 
     def __init__(self) -> None:
+        """Start with no files, directories or writes from another test."""
         self.files: dict[Path, str] = {}
         self.dirs: set[Path] = set()
 
     def exists(self, path: Path) -> bool:
+        """Read this test's exact namespace membership."""
         return path in self.files or path in self.dirs
 
     def is_dir(self, path: Path) -> bool:
+        """Distinguish files from directories without native filesystem calls."""
         return path in self.dirs
 
     def list_dir(self, path: Path) -> list[Path]:
-        children: list[Path] = []
-        for candidate in {*self.files, *self.dirs}:
-            if candidate != path and candidate.parent == path:
-                children.append(candidate)
-        return children
+        """Enumerate complete immediate memory children."""
+        # Exclude descendants so parent checks see the same shape as native reads.
+        return [
+            item
+            for item in {*self.files, *self.dirs}
+            if item != path and item.parent == path
+        ]
 
     def ensure_dir(self, path: Path) -> None:
+        """Expose the old unchecked capability so rejection can prove it is unused."""
         self.dirs.add(path)
 
     def read_text(self, path: Path) -> str:
+        """Return exact fixture text or the established missing-file error."""
         if path not in self.files:
             raise FileNotFoundError(path)
         return self.files[path]
 
     def write_text(self, path: Path, content: str) -> None:
+        """Model the overwrite capability that must never grant v2 authority."""
         self.files[path] = content
 
 
-def _seed_template_root(fs: FakeFileSystem, template_root: Path) -> None:
-    """Seed `fs` with a complete, 8-file expected template set under `template_root`."""
-    fs.dirs.add(template_root)
-    for relative_path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
-        fs.files[template_root / relative_path] = f"template:{relative_path}"
+def seed_templates(fs: FakeFileSystem, root: Path) -> None:
+    """Retain the complete legacy template shape for helper compatibility tests."""
+    fs.dirs.add(root)
+    # Preserve every old declared path for diagnostics without reading disk.
+    for path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
+        fs.files[root / path] = "legacy fixture"
 
 
-def test_substitute_placeholders_no_tokens_returns_unchanged() -> None:
-    """With `tokens=None`, the input text is returned unchanged."""
-    text = "<legacy-source-path> stays intact"
-    assert mod.substitute_placeholders(text) == text
-    assert mod.substitute_placeholders(text, None) == text
+def test_public_exports_are_thin_runtime_aliases() -> None:
+    """Every supported old import resolves to the authoritative runtime function."""
+    # Verify the whole explicit export contract instead of one representative name.
+    for name in mod.__all__:
+        assert getattr(mod, name) is getattr(runtime, name)
 
 
-def test_substitute_placeholders_replaces_every_occurrence() -> None:
-    """Every occurrence of each mapped token is replaced by its value."""
-    text = "<a> and <a> and <b>"
-    result = mod.substitute_placeholders(text, {"<a>": "1", "<b>": "2"})
-    assert result == "1 and 1 and 2"
+@pytest.mark.parametrize("tokens", [None, {}, {"<a>": "one", "<b>": "two"}])
+def test_literal_substitution_helper_remains_compatible(
+    tokens: dict[str, str] | None,
+) -> None:
+    """Repeated literal replacements remain independent of typed v2 rendering."""
+    result = mod.substitute_placeholders("<a> <a> <b>", tokens)
+    assert result == ("one one two" if tokens else "<a> <a> <b>")
 
 
-def test_create_discovery_workspace_success_full_layout() -> None:
-    """A complete template set scaffolds exactly the 8 expected output files."""
+@pytest.mark.parametrize("force", [False, True])
+@pytest.mark.parametrize("nonempty", [False, True])
+def test_legacy_calls_require_explicit_v2_context_and_never_write(
+    force: bool, nonempty: bool
+) -> None:
+    """Deprecated force cannot turn the unchecked legacy FileSystem into authority."""
     fs = FakeFileSystem()
-    template_root = Path("/templates")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-    _seed_template_root(fs, template_root)
+    target, root = Path("/consumer/discovery"), Path("/templates")
+    fs.dirs.update((target.parent, target))
+    seed_templates(fs, root)
+    if nonempty:
+        fs.files[target / "keep.txt"] = "preserve original bytes"
+    before = (dict(fs.files), set(fs.dirs))
 
-    mod.create_discovery_workspace(target_dir, template_root, fs)
+    with pytest.raises(ValueError, match="initialize_workspace") as failure:
+        mod.create_discovery_workspace(target, root, fs, force=force)
 
-    written = {path for path in fs.files if path != template_root}
-    expected_paths = {
-        target_dir / output_relative for output_relative in OUTPUT_RELATIVE_PATHS
-    }
-    assert written.issuperset(expected_paths)
-    assert len(expected_paths) == 8
-    for template_relative, output_relative in zip(
-        EXPECTED_TEMPLATE_RELATIVE_PATHS, OUTPUT_RELATIVE_PATHS, strict=True
-    ):
-        assert fs.files[target_dir / output_relative] == f"template:{template_relative}"
+    assert "system ID/name" in str(failure.value)
+    assert "force never permits overwriting" in str(failure.value)
+    assert (fs.files, fs.dirs) == before
 
 
-def test_create_discovery_workspace_template_root_override() -> None:
-    """An alternate template root is read from, instead of any default root."""
-    fs = FakeFileSystem()
-    default_root = Path("/default-templates")
-    alternate_root = Path("/alternate-templates")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-    _seed_template_root(fs, default_root)
-    fs.dirs.add(alternate_root)
-    for relative_path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
-        fs.files[alternate_root / relative_path] = f"alternate:{relative_path}"
-
-    mod.create_discovery_workspace(target_dir, alternate_root, fs)
-
-    for template_relative, output_relative in zip(
-        EXPECTED_TEMPLATE_RELATIVE_PATHS, OUTPUT_RELATIVE_PATHS, strict=True
-    ):
-        assert (
-            fs.files[target_dir / output_relative] == f"alternate:{template_relative}"
-        )
+def test_template_override_and_complete_missing_template_diagnostics() -> None:
+    """Helpers retain caller-selected roots and report every missing template."""
+    fs, root = FakeFileSystem(), Path("/alternate-templates")
+    with pytest.raises(FileNotFoundError, match="alternate-templates"):
+        mod.validate_template_set(root, fs)
+    seed_templates(fs, root)
+    mod.validate_template_set(root, fs)
+    missing = EXPECTED_TEMPLATE_RELATIVE_PATHS[-2:]
+    # Remove two independent declarations to prove diagnostics are complete.
+    for path in missing:
+        del fs.files[root / path]
+    with pytest.raises(FileNotFoundError) as failure:
+        mod.validate_template_set(root, fs)
+    assert all(str(path) in str(failure.value) for path in missing)
 
 
-def test_target_path_not_a_directory_raises() -> None:
-    """A target path that exists as a file raises `NotADirectoryError`."""
-    fs = FakeFileSystem()
-    template_root = Path("/templates")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-    fs.files[target_dir] = "not a directory"
-    _seed_template_root(fs, template_root)
-    pre_seeded_files = set(fs.files)
-
-    with pytest.raises(NotADirectoryError):
-        mod.create_discovery_workspace(target_dir, template_root, fs)
-
-    assert set(fs.files) == pre_seeded_files
+def test_target_type_and_parent_errors_remain_actionable() -> None:
+    """An invalid parent or file target fails before the migration diagnostic."""
+    fs, target = FakeFileSystem(), Path("/consumer/discovery")
+    with pytest.raises(FileNotFoundError, match="parent"):
+        mod.validate_target_path(target, fs, force=False)
+    fs.dirs.add(target.parent)
+    fs.files[target] = "existing file"
+    with pytest.raises(NotADirectoryError, match="not a directory"):
+        mod.validate_target_path(target, fs, force=True)
 
 
-def test_target_parent_missing_raises() -> None:
-    """A target whose parent directory does not exist raises `FileNotFoundError`."""
-    fs = FakeFileSystem()
-    template_root = Path("/templates")
-    target_dir = Path("/consumer/discovery")
-    _seed_template_root(fs, template_root)
-    pre_seeded_files = set(fs.files)
-
-    with pytest.raises(FileNotFoundError):
-        mod.create_discovery_workspace(target_dir, template_root, fs)
-
-    assert set(fs.files) == pre_seeded_files
-
-
-def test_target_non_empty_without_force_raises() -> None:
-    """A non-empty target without `force` raises `FileExistsError`."""
-    fs = FakeFileSystem()
-    template_root = Path("/templates")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-    fs.dirs.add(target_dir)
-    pre_seeded = target_dir / "existing.txt"
-    fs.files[pre_seeded] = "already here"
-    _seed_template_root(fs, template_root)
-    pre_seeded_files = set(fs.files)
-
-    with pytest.raises(FileExistsError):
-        mod.create_discovery_workspace(target_dir, template_root, fs)
-
-    assert set(fs.files) == pre_seeded_files
-
-
-def test_target_non_empty_with_force_succeeds() -> None:
-    """A non-empty target with `force=True` succeeds and writes the full output set."""
-    fs = FakeFileSystem()
-    template_root = Path("/templates")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-    fs.dirs.add(target_dir)
-    pre_seeded = target_dir / "existing.txt"
-    fs.files[pre_seeded] = "already here"
-    _seed_template_root(fs, template_root)
-
-    mod.create_discovery_workspace(target_dir, template_root, fs, force=True)
-
-    expected_paths = {
-        target_dir / output_relative for output_relative in OUTPUT_RELATIVE_PATHS
-    }
-    assert expected_paths.issubset(set(fs.files))
-    assert pre_seeded in fs.files
-
-
-def test_missing_template_root_raises() -> None:
-    """A wholly missing template root raises `FileNotFoundError` and writes nothing."""
-    fs: FileSystem = FakeFileSystem()
-    template_root = Path("/templates")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-
-    with pytest.raises(FileNotFoundError):
-        mod.create_discovery_workspace(target_dir, template_root, fs)
-
-    assert not fs.files
-
-
-def test_partial_template_set_raises() -> None:
-    """A template root missing one file raises `FileNotFoundError` naming it."""
-    fs = FakeFileSystem()
-    template_root = Path("/templates")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-    _seed_template_root(fs, template_root)
-    missing_relative = EXPECTED_TEMPLATE_RELATIVE_PATHS[-1]
-    del fs.files[template_root / missing_relative]
-    pre_seeded_files = set(fs.files)
-
-    with pytest.raises(FileNotFoundError) as excinfo:
-        mod.create_discovery_workspace(target_dir, template_root, fs)
-
-    assert str(missing_relative) in str(excinfo.value)
-    assert set(fs.files) == pre_seeded_files
-
-
-def test_domain_profile_template_parses_with_real_loader() -> None:
-    """The bundled domain-profile template parses under the real #360 loader.
-
-    Reads the in-repo domain-profile template, renders it both with no tokens and
-    with a representative domain-neutral token mapping, and asserts the real
-    ``parse_domain_profile_text`` returns a ``DomainProfile`` with
-    ``profile_version == 1`` in each case. The only filesystem access is reading
-    the in-repo template file.
-    """
-    template_path = resolve_default_template_root() / DOMAIN_PROFILE_RELATIVE_PATH
-    template_text = template_path.read_text(encoding="utf-8")
-    tokens = {
-        "<legacy-source-path>": "legacy/src",
-        "<target-path>": "modern/src",
-        "<technology-stack>": "example-runtime",
-        "<artifact-output-dir>": "discovery/artifacts",
-    }
-
-    for rendered in (
-        mod.substitute_placeholders(template_text),
-        mod.substitute_placeholders(template_text, tokens),
-    ):
-        profile = parse_domain_profile_text(rendered)
-        assert profile.profile_version == 1
-
-
-def test_generated_artifacts_conform_to_real_schemas() -> None:
-    """Each generated artifact validates against its merged v1 JSON schema.
-
-    Seeds an in-memory filesystem with the real bundled template texts, scaffolds
-    a workspace via `create_discovery_workspace`, then loads each of the seven
-    rendered artifact instances and validates it against the corresponding merged
-    schema file under `schemas/discovery/v1/`. The only filesystem access is
-    reading the in-repo template and schema files.
-    """
-    template_root = resolve_default_template_root()
-    schema_root = template_root.parents[2] / "schemas" / "discovery" / "v1"
-    fs = FakeFileSystem()
-    fs.dirs.add(template_root)
-    for relative_path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
-        fs.files[template_root / relative_path] = (
-            template_root / relative_path
-        ).read_text(encoding="utf-8")
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-
-    mod.create_discovery_workspace(target_dir, template_root, fs)
-
-    # OUTPUT_RELATIVE_PATHS[0] is the non-JSON domain-profile.yaml; the remaining
-    # seven entries are the artifact JSON instances validated here.
-    for output_relative in OUTPUT_RELATIVE_PATHS[1:]:
-        instance = json.loads(fs.files[target_dir / output_relative])
-        schema_name = output_relative.stem + ".schema.json"
-        schema = json.loads((schema_root / schema_name).read_text(encoding="utf-8"))
-        jsonschema.validate(instance=instance, schema=schema)
+@pytest.mark.parametrize("force", [False, True])
+def test_nonempty_target_is_not_itself_a_conflict(force: bool) -> None:
+    """Conflict assessment belongs to complete v2 artifact validation."""
+    fs, target = FakeFileSystem(), Path("/consumer/discovery")
+    fs.dirs.update((target.parent, target))
+    fs.files[target / "unrelated.txt"] = "keep"
+    mod.validate_target_path(target, fs, force=force)
+    assert fs.files[target / "unrelated.txt"] == "keep"

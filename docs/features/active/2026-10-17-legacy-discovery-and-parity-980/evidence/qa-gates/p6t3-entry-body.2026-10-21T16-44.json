@@ -1,0 +1,2587 @@
+{
+  "fresh_changed_bodies": [
+    "run_installed_cli",
+    "_main"
+  ],
+  "named_body_ranges": [
+    {
+      "body_branches": [],
+      "body_executable_lines": [],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 59,
+      "fresh_required": false,
+      "kind": "classes",
+      "name": "CliPorts",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 41
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        78
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 104,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_failure",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 62
+    },
+    {
+      "body_branches": [
+        [
+          113,
+          114
+        ],
+        [
+          113,
+          115
+        ]
+      ],
+      "body_executable_lines": [
+        113,
+        114,
+        115
+      ],
+      "current_raw_summary": {
+        "covered_branches": 1,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 2,
+        "num_partial_branches": 1,
+        "num_statements": 3,
+        "percent_branches_covered": 50.0,
+        "percent_branches_covered_display": "50",
+        "percent_covered": 60.0,
+        "percent_covered_display": "60",
+        "percent_statements_covered": 66.66666666666667,
+        "percent_statements_covered_display": "67"
+      },
+      "end": 115,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_write",
+      "qualified_missing_branches": [
+        [
+          113,
+          114
+        ]
+      ],
+      "qualified_missing_lines": [
+        114
+      ],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 107
+    },
+    {
+      "body_branches": [
+        [
+          126,
+          127
+        ],
+        [
+          126,
+          128
+        ]
+      ],
+      "body_executable_lines": [
+        125,
+        126,
+        127,
+        128
+      ],
+      "current_raw_summary": {
+        "covered_branches": 2,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 128,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_emit",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 118
+    },
+    {
+      "body_branches": [
+        [
+          152,
+          153
+        ],
+        [
+          152,
+          155
+        ],
+        [
+          155,
+          156
+        ],
+        [
+          155,
+          161
+        ]
+      ],
+      "body_executable_lines": [
+        149,
+        150,
+        152,
+        153,
+        154,
+        155,
+        156,
+        161,
+        162,
+        163,
+        164,
+        167,
+        168,
+        169,
+        173,
+        174,
+        179,
+        180,
+        181,
+        184,
+        185,
+        190,
+        197,
+        198,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205
+      ],
+      "current_raw_summary": {
+        "covered_branches": 4,
+        "covered_lines": 19,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 11,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 30,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 67.6470588235294,
+        "percent_covered_display": "68",
+        "percent_statements_covered": 63.333333333333336,
+        "percent_statements_covered_display": "63"
+      },
+      "end": 205,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "run_cli",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [
+        180,
+        181,
+        184,
+        185,
+        198,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205
+      ],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 131
+    },
+    {
+      "body_branches": [
+        [
+          215,
+          216
+        ],
+        [
+          215,
+          217
+        ]
+      ],
+      "body_executable_lines": [
+        214,
+        215,
+        216,
+        217
+      ],
+      "current_raw_summary": {
+        "covered_branches": 2,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 217,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_resolve_workspace",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 208
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        226
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 228,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_repository",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 220
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        238
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 238,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_create_io",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 231
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        243
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 243,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_clock",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 241
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        261,
+        263
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 269,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "_execute",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 246
+    },
+    {
+      "body_branches": [
+        [
+          285,
+          286
+        ],
+        [
+          285,
+          289
+        ]
+      ],
+      "body_executable_lines": [
+        281,
+        282,
+        285,
+        286,
+        289
+      ],
+      "current_raw_summary": {
+        "covered_branches": 2,
+        "covered_lines": 5,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 5,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 303,
+      "fresh_required": true,
+      "kind": "functions",
+      "name": "run_installed_cli",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 272
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        312
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 312,
+      "fresh_required": true,
+      "kind": "functions",
+      "name": "_main",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 306
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        317
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 317,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_init",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 315
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        322
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 322,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_configure",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 320
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        327
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 327,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_profile",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 325
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        332
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 332,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_inventory",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 330
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        337
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 337,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_dotnet",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 335
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        342
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 342,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_vsto",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 340
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        347
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 347,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_new_contract",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 345
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        352
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 352,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_new_scenario",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 350
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        357
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 357,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_update_artifact",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 355
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        362
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 362,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_link_evidence",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 360
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        367
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 367,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_profile",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 365
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        372
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 372,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_feature_contract",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 370
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        377
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 377,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_coverage_ledger",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 375
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        382
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 382,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_runtime_scenario",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 380
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        387
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 387,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_parity_matrix",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 385
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        392
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 392,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_unspecified_behavior",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 390
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        397
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 397,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_product_decision",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 395
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        402
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 402,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_evidence_reference",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 400
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        407
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 407,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_decisions",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 405
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        412
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 412,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate_all",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 410
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        417
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 417,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_validate",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 415
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        422
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 422,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_coverage_report",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 420
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        427
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 427,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_parity_report",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 425
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        432
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 432,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_completion_report",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 430
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        437
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 437,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_generate_acceptance",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 435
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        442
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 442,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_generate_acceptance_scenarios",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 440
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        447
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 447,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_snapshot_export",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 445
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        452
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 452,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_snapshot_import",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 450
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        457
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 457,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_import_inventory",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 455
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        462
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 462,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_migrate",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 460
+    },
+    {
+      "body_branches": [],
+      "body_executable_lines": [
+        467
+      ],
+      "current_raw_summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "end": 467,
+      "fresh_required": false,
+      "kind": "functions",
+      "name": "main_doctor",
+      "qualified_missing_branches": [],
+      "qualified_missing_lines": [],
+      "remaining_unproved_branches": [],
+      "remaining_unproved_lines": [],
+      "start": 465
+    }
+  ],
+  "qualified_module": {
+    "branches": [
+      12,
+      12
+    ],
+    "remaining_unproved_branches": [],
+    "remaining_unproved_lines": [],
+    "statements": [
+      147,
+      147
+    ]
+  },
+  "raw_counters_augmented": false,
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-entry-pass4-coverage-raw.2026-10-21T16-38.json",
+    "raw_sha256": "c609063cac5e678db5ab342ec75224b003a9a86f50cbd038c9fd758de10abc71",
+    "selector": [
+      "coverage_json"
+    ],
+    "sha256": "21902a0ee2d5fee9a6b371df40dac1bbfd6f51079b553a4922d1473b39b4a3ab"
+  },
+  "raw_summary": {
+    "covered_branches": 11,
+    "covered_lines": 135,
+    "excluded_lines": 8,
+    "missing_branches": 1,
+    "missing_lines": 12,
+    "num_branches": 12,
+    "num_partial_branches": 1,
+    "num_statements": 147,
+    "percent_branches_covered": 91.66666666666667,
+    "percent_branches_covered_display": "92",
+    "percent_covered": 91.82389937106919,
+    "percent_covered_display": "92",
+    "percent_statements_covered": 91.83673469387755,
+    "percent_statements_covered_display": "92"
+  },
+  "reader": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+      "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+    },
+    "selector": [
+      "body_reader"
+    ],
+    "sha256": "4d75a6812aad7d0aed01ea13ef605dac6d6eb7dc729f98000d3d53e345b0c8a8"
+  },
+  "retained_accepted_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+    "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+  },
+  "source_binding": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+    "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3"
+  },
+  "task": "P6-T3",
+  "test_binding": {
+    "path": "tests/discovery_runtime/test_legacy_adapters.py",
+    "sha256": "e17f4db20b7b4909cd2d29d429246317c4665de113bd9dd121366df7c7d769db"
+  },
+  "unchanged_qualified_definitions": [
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        41,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59
+      ],
+      "name": "CliPorts",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "CliPorts",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        241,
+        243
+      ],
+      "name": "_clock",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_clock",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        231,
+        238
+      ],
+      "name": "_create_io",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_create_io",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          126,
+          127
+        ],
+        [
+          126,
+          128
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        118,
+        125,
+        126,
+        127,
+        128
+      ],
+      "name": "_emit",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_emit",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        246,
+        261,
+        263
+      ],
+      "name": "_execute",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_execute",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        62,
+        78
+      ],
+      "name": "_failure",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_failure",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        220,
+        226
+      ],
+      "name": "_repository",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_repository",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          215,
+          216
+        ],
+        [
+          215,
+          217
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        208,
+        214,
+        215,
+        216,
+        217
+      ],
+      "name": "_resolve_workspace",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_resolve_workspace",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          113,
+          114
+        ],
+        [
+          113,
+          115
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        107,
+        113,
+        114,
+        115
+      ],
+      "name": "_write",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "_write",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        430,
+        432
+      ],
+      "name": "main_completion_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_completion_report",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        320,
+        322
+      ],
+      "name": "main_configure",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_configure",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        420,
+        422
+      ],
+      "name": "main_coverage_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_coverage_report",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        465,
+        467
+      ],
+      "name": "main_doctor",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_doctor",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        335,
+        337
+      ],
+      "name": "main_dotnet",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_dotnet",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        435,
+        437
+      ],
+      "name": "main_generate_acceptance",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_generate_acceptance",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        440,
+        442
+      ],
+      "name": "main_generate_acceptance_scenarios",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_generate_acceptance_scenarios",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        455,
+        457
+      ],
+      "name": "main_import_inventory",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_import_inventory",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        315,
+        317
+      ],
+      "name": "main_init",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_init",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        330,
+        332
+      ],
+      "name": "main_inventory",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_inventory",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        360,
+        362
+      ],
+      "name": "main_link_evidence",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_link_evidence",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        460,
+        462
+      ],
+      "name": "main_migrate",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_migrate",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        345,
+        347
+      ],
+      "name": "main_new_contract",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_new_contract",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        350,
+        352
+      ],
+      "name": "main_new_scenario",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_new_scenario",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        425,
+        427
+      ],
+      "name": "main_parity_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_parity_report",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        325,
+        327
+      ],
+      "name": "main_profile",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_profile",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        445,
+        447
+      ],
+      "name": "main_snapshot_export",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_snapshot_export",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        450,
+        452
+      ],
+      "name": "main_snapshot_import",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_snapshot_import",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        355,
+        357
+      ],
+      "name": "main_update_artifact",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_update_artifact",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        415,
+        417
+      ],
+      "name": "main_validate",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        410,
+        412
+      ],
+      "name": "main_validate_all",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_all",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        375,
+        377
+      ],
+      "name": "main_validate_coverage_ledger",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_coverage_ledger",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        405,
+        407
+      ],
+      "name": "main_validate_decisions",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_decisions",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        400,
+        402
+      ],
+      "name": "main_validate_evidence_reference",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_evidence_reference",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        370,
+        372
+      ],
+      "name": "main_validate_feature_contract",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_feature_contract",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        385,
+        387
+      ],
+      "name": "main_validate_parity_matrix",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_parity_matrix",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        395,
+        397
+      ],
+      "name": "main_validate_product_decision",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_product_decision",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        365,
+        367
+      ],
+      "name": "main_validate_profile",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_profile",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        380,
+        382
+      ],
+      "name": "main_validate_runtime_scenario",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_runtime_scenario",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        390,
+        392
+      ],
+      "name": "main_validate_unspecified_behavior",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_validate_unspecified_behavior",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [],
+      "mapped_previously_executed_lines": [
+        340,
+        342
+      ],
+      "name": "main_vsto",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "main_vsto",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    },
+    {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+      },
+      "mapped_previously_executed_branches": [
+        [
+          152,
+          153
+        ],
+        [
+          152,
+          155
+        ],
+        [
+          155,
+          156
+        ],
+        [
+          155,
+          161
+        ]
+      ],
+      "mapped_previously_executed_lines": [
+        131,
+        149,
+        150,
+        152,
+        153,
+        154,
+        155,
+        156,
+        161,
+        162,
+        163,
+        164,
+        167,
+        168,
+        169,
+        173,
+        174,
+        179,
+        180,
+        181,
+        184,
+        185,
+        190,
+        197,
+        198,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205
+      ],
+      "name": "run_cli",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "raw_counters_augmented": false,
+      "source_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-originals.2026-10-21T16-44.json",
+        "selector": [
+          "preimage_reader_view"
+        ],
+        "sha256": "83a37ef8ccfdaa1129dbfed4ebdf6c8cdfd63a6fd368fc3aaae3d65acd5e332f"
+      },
+      "source_name": "run_cli",
+      "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "source_ref": "e926b481d9958b174a4012fb3bb268a390fa8fc2"
+    }
+  ],
+  "zero_loss": "All old definitions except _main have exact full AST identity and accepted 100% proof; changed/new bodies have fresh 100% BODY coverage. Raw subset counters remain separate."
+}

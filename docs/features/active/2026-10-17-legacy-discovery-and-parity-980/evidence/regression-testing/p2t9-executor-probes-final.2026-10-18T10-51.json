@@ -1,0 +1,1048 @@
+{
+  "task": "P2-T9",
+  "timestamp": "2026-10-18T10:50:57.519238+00:00",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "8158901bda32ca5e265c2a8c89d6dbfd536aa3c0e51696c2452eba8b6e4feff3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "9cff1c614cfe3e1871671c77227473a91ff8f857cbc3bc6b0be930e95f20028d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992"
+  },
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "8158901bda32ca5e265c2a8c89d6dbfd536aa3c0e51696c2452eba8b6e4feff3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "9cff1c614cfe3e1871671c77227473a91ff8f857cbc3bc6b0be930e95f20028d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992"
+  },
+  "source_stable": true,
+  "passed": 38,
+  "total": 38,
+  "results": [
+    {
+      "name": "complete fixture structural",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "structural",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "complete fixture discovery-complete",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "discovery-complete",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "complete fixture parity-complete",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "parity-complete",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "complete fixture planning",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "planning",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "draft fixture structural",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "structural",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "draft fixture discovery-complete",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "discovery-complete",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs."
+        },
+        {
+          "code": "COMPLETION_INPUT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Source workspace-example lacks required inventory-snapshot.",
+          "next_action": "Capture the source discovery artifacts."
+        },
+        {
+          "code": "COMPLETION_PROFILE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires a configured profile.",
+          "next_action": "Configure the profile and capture its inputs."
+        },
+        {
+          "code": "COMPLETION_SOURCE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires full source revision pins.",
+          "next_action": "Configure and capture the required source snapshots."
+        },
+        {
+          "code": "COVERAGE_INVENTORY",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires pinned current inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "pointer": "/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires confirmed scope.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "draft fixture parity-complete",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "parity-complete",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs."
+        },
+        {
+          "code": "COMPLETION_INPUT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Source workspace-example lacks required inventory-snapshot.",
+          "next_action": "Capture the source discovery artifacts."
+        },
+        {
+          "code": "COMPLETION_PROFILE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires a configured profile.",
+          "next_action": "Configure the profile and capture its inputs."
+        },
+        {
+          "code": "COMPLETION_SOURCE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires full source revision pins.",
+          "next_action": "Configure and capture the required source snapshots."
+        },
+        {
+          "code": "COMPLETION_TARGET",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Parity requires full target revision pins.",
+          "next_action": "Configure and capture target repository identities."
+        },
+        {
+          "code": "COVERAGE_INVENTORY",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires pinned current inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "pointer": "/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires confirmed scope.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "draft fixture planning",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "planning",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs."
+        },
+        {
+          "code": "COMPLETION_INPUT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Source workspace-example lacks required inventory-snapshot.",
+          "next_action": "Capture the source discovery artifacts."
+        },
+        {
+          "code": "COMPLETION_PROFILE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires a configured profile.",
+          "next_action": "Configure the profile and capture its inputs."
+        },
+        {
+          "code": "COMPLETION_SOURCE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires full source revision pins.",
+          "next_action": "Configure and capture the required source snapshots."
+        },
+        {
+          "code": "COVERAGE_INVENTORY",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires pinned current inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "pointer": "/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires confirmed scope.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "explicit none planning preserves honest draft",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "planning",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "missing loaded profile fails",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "structural",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "PROFILE_REQUIRED",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "A loaded v2 snapshot is required.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        }
+      ]
+    },
+    {
+      "name": "missing captured profile fails",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "structural",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "PROFILE_REQUIRED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/domain-profile.yaml",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Captured profile bytes are missing.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        }
+      ]
+    },
+    {
+      "name": "agent output needs trusted separate context",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_CONTEXT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Role-output validation requires caller-bound invocation context.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        }
+      ]
+    },
+    {
+      "name": "malformed unreferenced captured input fails",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "structural",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "SNAPSHOT_UNCLASSIFIED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/unreferenced.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Captured structured input lacks an expected artifact kind.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        }
+      ]
+    },
+    {
+      "name": "v1 bytes cannot satisfy aggregate structural mode",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "structural",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "SCHEMA_IDENTITY",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "/schema_version",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Expected exact schema_version 2.0.0",
+          "next_action": "Use the expected kind and supported version."
+        }
+      ]
+    },
+    {
+      "name": "scope confirmation gate True",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "discovery-complete",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "pointer": "/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires confirmed scope.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "current inventory gate True",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "discovery-complete",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COVERAGE_CONFIGURATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/inventory/inventory-alpha.json",
+          "pointer": "/scan_configuration_sha256",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Inventory scan configuration differs from the current profile.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "all dispositions gate True",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "discovery-complete",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COVERAGE_INCOMPLETE",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "/components/0",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Selected components require completed inspection/disposition.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "acceptance scenario gate True",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "discovery-complete",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "/acceptance_criteria",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Missing ready criterion/client/platform/mode: */browser-example/browser/online.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "/acceptance_criteria",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Missing ready criterion/client/platform/mode: criterion-alpha/browser-example/browser/online.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "runtime declared feature gate True",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "discovery-complete",
+      "ok": false,
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COMPLETION_RUNTIME",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Declared runtime need lacks valid source characterization.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "scope confirmation gate False",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "discovery-complete",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "current inventory gate False",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "discovery-complete",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "all dispositions gate False",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "discovery-complete",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "acceptance scenario gate False",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "discovery-complete",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "runtime declared feature gate False",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "discovery-complete",
+      "ok": true,
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "report retains loader warnings in exact findings",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "projected_findings": [
+        {
+          "code": "INPUT_WARNING",
+          "severity": "warning",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "An input requires review.",
+          "next_action": "Review this input."
+        }
+      ],
+      "actual_findings": [
+        {
+          "code": "INPUT_WARNING",
+          "severity": "warning",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "An input requires review.",
+          "next_action": "Review this input."
+        }
+      ]
+    },
+    {
+      "name": "legacy unchanged selected contract output",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "agent-output",
+      "ok": true,
+      "output_valid": true,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "wrong role cannot deliver contract output",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_ROLE",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "The invocation role cannot produce this artifact kind.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "wrong invocation in output manifest fails",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_BINDING",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Output manifest differs from the caller's invocation binding.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "stale baseline precondition fails",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_PRECONDITION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Output baseline content precondition does not match.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "ungranted captured input change fails",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_UNEXPECTED",
+          "severity": "error",
+          "artifact_path": "src/Processor.cs",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "An ungranted captured input changed.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        },
+        {
+          "code": "REVISION_SOURCE_CHANGED",
+          "severity": "error",
+          "artifact_path": "src/Processor.cs",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Inspected source/test bytes differ from pinned bytes.",
+          "next_action": "Capture bytes at the full pin and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "selected ledger member may change",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "agent-output",
+      "ok": true,
+      "output_valid": true,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "unselected ledger member cannot change",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_UNSELECTED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "An unselected shared-artifact member changed.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "reviewer passing completion report is valid output",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "agent-output",
+      "ok": true,
+      "output_valid": true,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "reviewer failing completion report is valid output",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "mode": "agent-output",
+      "ok": true,
+      "output_valid": true,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs."
+        },
+        {
+          "code": "COMPLETION_INPUT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Source workspace-example lacks required inventory-snapshot.",
+          "next_action": "Capture the source discovery artifacts."
+        },
+        {
+          "code": "COMPLETION_PROFILE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires a configured profile.",
+          "next_action": "Configure the profile and capture its inputs."
+        },
+        {
+          "code": "COMPLETION_SOURCE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires full source revision pins.",
+          "next_action": "Configure and capture the required source snapshots."
+        },
+        {
+          "code": "COVERAGE_INVENTORY",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires pinned current inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "pointer": "/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires confirmed scope.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "reviewer failing report remains result fail",
+      "passed": true,
+      "expected": true,
+      "actual": true,
+      "output_valid": true,
+      "validation_result": "fail",
+      "retained_review_findings": 6
+    },
+    {
+      "name": "forged reviewer pass is rejected",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs."
+        },
+        {
+          "code": "COMPLETION_INPUT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Source workspace-example lacks required inventory-snapshot.",
+          "next_action": "Capture the source discovery artifacts."
+        },
+        {
+          "code": "COMPLETION_PROFILE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires a configured profile.",
+          "next_action": "Configure the profile and capture its inputs."
+        },
+        {
+          "code": "COMPLETION_SOURCE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires full source revision pins.",
+          "next_action": "Configure and capture the required source snapshots."
+        },
+        {
+          "code": "COVERAGE_INVENTORY",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires pinned current inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "REPORT_RESULT",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/reports/review-report.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Report fields disagree with recomputed input results.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "pointer": "/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires confirmed scope.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "omitted reviewer findings are rejected",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs."
+        },
+        {
+          "code": "COMPLETION_INPUT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Source workspace-example lacks required inventory-snapshot.",
+          "next_action": "Capture the source discovery artifacts."
+        },
+        {
+          "code": "COMPLETION_PROFILE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires a configured profile.",
+          "next_action": "Configure the profile and capture its inputs."
+        },
+        {
+          "code": "COMPLETION_SOURCE",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Completion requires full source revision pins.",
+          "next_action": "Configure and capture the required source snapshots."
+        },
+        {
+          "code": "COVERAGE_INVENTORY",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/coverage-ledger.json",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires pinned current inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "REPORT_RESULT",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/reports/review-report.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Report fields disagree with recomputed input results.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "pointer": "/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Discovery completion requires confirmed scope.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "incorrect reviewer counts are rejected",
+      "passed": true,
+      "expected": false,
+      "actual": false,
+      "mode": "agent-output",
+      "ok": false,
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "REPORT_RESULT",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/reports/review-report.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Report fields disagree with recomputed input results.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        }
+      ]
+    }
+  ]
+}

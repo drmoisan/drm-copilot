@@ -1,61 +1,41 @@
 <#
 .SYNOPSIS
-    Portable discovery-artifact validation for the Claude enforcement hooks (#475).
+    Bounded compatibility surface of the retired PowerShell discovery-artifact validator (#475, #980).
 .DESCRIPTION
-    Validates the domain-profile document and the seven schema-governed discovery
-    artifact types WITHOUT invoking a Python interpreter. Both discovery hooks
-    previously shelled out to `python -m scripts.dev_tools.validate_discovery_artifacts`;
-    the `.claude/**` payload ships to destinations with no guaranteed Python, Poetry,
-    or `scripts/dev_tools`, where that call fails obscurely or blocks everything.
+    Until issue #980 this module evaluated discovery artifacts itself: a placeholder
+    profile contract and `Test-Json -SchemaFile` checks against the v1 schemas. One
+    Python engine now owns artifact meaning, the installed TypeScript gateway is the
+    only writer of protected validation receipts, and the native hooks under
+    `.claude/hooks`, `.codex/hooks` and `.github/hooks` verify protected current
+    authority through the sibling Discovery* modules. This module therefore keeps
+    its exported names for compatibility and directs every semantic question to
+    the authoritative service:
 
-    REQUIRES POWERSHELL 7.4 OR LATER. Schema validation uses `Test-Json -SchemaFile`,
-    whose JSON Schema Draft 2020-12 support was added in PowerShell 7.4. All seven
-    schemas under `schemas/discovery/v1/` declare Draft 2020-12 (verified 7 of 7), so
-    the floor is unavoidable. Verified present in PowerShell 7.6.3 in this environment.
-    DESTINATION RISK: on PowerShell 7.0-7.3 every entry point fails CLOSED with an
-    explicit, actionable message naming the required version, the `Test-Json -SchemaFile`
-    Draft 2020-12 reason, and issue #475. It never degrades silently and never fails
-    open. The repo standard in `.claude/rules/powershell.md` is "PowerShell 7+", which
-    is below this floor; that rule file is NOT modified by this change.
+    - the artifact-type table and the destination PowerShell floor are retained
+      (the floor is still the hook runtime requirement, and an unsupported host
+      fails closed with the same actionable message);
+    - every former validation entry returns a validation-required result naming
+      `validate_discovery_artifacts`; none parses a profile or a schema, none
+      returns an empty error list, and `Invoke-DiscoveryArtifactValidation` never
+      returns `ExitCode = 0`, so an old entry name cannot mint a passing gate;
+    - `Get-DiscoveryValidationAuthority` reports whether the workspace holds a
+      protected activation on a supported host, which is the only authority a
+      native hook consults.
 
-    This help is the destination-visible statement of that requirement: the module ships
-    inside `.claude/**`, and the pushed-down pack holds only `config/` and
-    `pack-manifests/` beside it, with no pack README to carry the statement.
+    No Python interpreter or other process is invoked anywhere in this module.
 .NOTES
-    Issue #475.
-
-    RESULT CONTRACT (defect D-2 avoidance). Success is SILENT: a passing validation
-    returns `ExitCode = 0` with EMPTY `Output`. Both hooks deny on a non-zero exit code
-    OR on non-empty output, so the previous Python CLI's success line
-    ("<type> validation passed: <path>") turned a PASSING validation into a DENY.
-
-    PARITY with `validate_discovery_profile.py` / `validate_discovery_schema_artifacts.py`. Error
-    families are preserved: `invalid JSON (...)`, `JSON root must be an object for validation`,
-    `schema resolution failed (...)`, `Profile document is empty.`,
-    `Profile document root must be a mapping.`, `Missing required field: <field>.` Schema
-    location resolves solely from each artifact's own `$schema`, as in the reference; the
-    type-to-file table below is documentation and artifact-type validation only. Deliberate
-    divergences: an `http(s)://` `$schema` is NOT fetched (no guaranteed destination network,
-    so a non-`file` scheme is reported fail-closed in the `schema resolution failed (...)`
-    family), and `file://` resolves through `[uri]::LocalPath` rather than the reference's
-    `Path(parsed.path)`, which mishandles a Windows `file:///C:/...` path. Unavoidable
-    divergence: per-violation wording comes from `Test-Json`, not `jsonschema`, so violation
-    strings differ while family and verdict match. The profile check reproduces the
-    placeholder contract without a YAML parser (PowerShell ships none); see
-    `Get-DiscoveryProfileValidationError` for what is and is not detected.
-.EXAMPLE
-    Invoke-DiscoveryArtifactValidation -ValidatorArgs @('evidence-reference', $path)
-
-    Returns @{ ExitCode = 0; Output = '' } when the artifact conforms.
+    Issues #475 and #980. Requires PowerShell 7.4 or later on a destination host.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'DiscoveryAuthority.psm1') -ErrorAction Stop
+
 # Schema-governed artifact types mapped to their filenames under `schemas/discovery/v1/`.
-# Verified against `validate_discovery_artifacts.py`: `runtime-scenario`,
-# `product-decision`, and `unspecified-behavior` do NOT share their token's stem.
+# Retained as documentation and artifact-type recognition only; no schema is evaluated here.
 $script:DiscoverySchemaArtifactFile = [ordered]@{
     'feature-contract'     = 'feature-contract.schema.json'
     'coverage-ledger'      = 'coverage-ledger.schema.json'
@@ -65,47 +45,25 @@ $script:DiscoverySchemaArtifactFile = [ordered]@{
     'product-decision'     = 'product-decision-record.schema.json'
     'evidence-reference'   = 'evidence-reference.schema.json'
 }
-
-# `Test-Json -SchemaFile` gained Draft 2020-12 support in PowerShell 7.4 and all seven
-# schemas declare Draft 2020-12, so this floor is unavoidable. Verified on 7.6.3 here.
 $script:MinimumPowerShellVersion = [version]'7.4'
-
-# TODO(#9001): replace with the finalized field contract once #9001 ships. Mirrors
-# `_PLACEHOLDER_REQUIRED_FIELDS` in `validate_discovery_profile.py`, whose own
-# TODO(#9001) marks it as the single seam that changes when #9001 lands.
-$script:ProfileRequiredField = @('legacy_source_path')
+$script:ValidationRequiredPrefix = 'DISCOVERY_VALIDATION_REQUIRED:'
+$script:ServiceOperation = 'validate_discovery_artifacts'
 
 function Get-DiscoveryRuntimeVersionError {
     <#
     .SYNOPSIS
-        Returns the fail-closed message when the host PowerShell is below 7.4, or
-        $null when the host meets the floor.
+        Returns the fail-closed message when the host PowerShell is below 7.4, or $null when the host meets the floor.
     .DESCRIPTION
-        The destination version floor (issue #475). `Test-Json -SchemaFile` gained
-        JSON Schema Draft 2020-12 support in PowerShell 7.4, and all seven discovery
-        schemas declare Draft 2020-12, so an older host cannot validate them.
-
-        This runs BEFORE any schema validation so an unsupported host fails with one
-        explicit, actionable message instead of a raw `Test-Json` parameter error. It
-        never degrades silently: no partial validation, no fail-open path.
-
-        `PowerShellVersion` is the injectable seam, defaulting to the real
-        `$PSVersionTable.PSVersion` and only ever READ; nothing here writes
-        `$PSVersionTable`, so tests pass a version rather than mutating host state.
-    .OUTPUTS
-        [string] The fail-closed message, or $null when the host is supported.
+        The destination version floor (issue #475) is unchanged: the native hooks
+        and this module require PowerShell 7.4 or later. `PowerShellVersion` is the
+        injectable seam, defaulting to the real `$PSVersionTable.PSVersion` and only
+        ever read.
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $false)]
-        [version]$PowerShellVersion = $PSVersionTable.PSVersion
-    )
+    param([Parameter(Mandatory = $false)][version]$PowerShellVersion = $PSVersionTable.PSVersion)
 
-    if ($PowerShellVersion -ge $script:MinimumPowerShellVersion) {
-        return $null
-    }
-
+    if ($PowerShellVersion -ge $script:MinimumPowerShellVersion) { return $null }
     return (
         "Discovery-artifact validation requires PowerShell $($script:MinimumPowerShellVersion) or later " +
         "(this host is PowerShell $PowerShellVersion). Reason: schema validation uses " +
@@ -118,302 +76,167 @@ function Get-DiscoveryRuntimeVersionError {
 function Get-DiscoverySchemaArtifactType {
     <#
     .SYNOPSIS
-        Returns the seven schema-governed artifact-type tokens, in dispatch order.
+        Returns the seven schema-governed artifact-type tokens.
     #>
     [CmdletBinding()]
-    [OutputType([object[]])]
+    [OutputType([string[]])]
     param()
 
-    return , @($script:DiscoverySchemaArtifactFile.Keys)
+    return [string[]]@($script:DiscoverySchemaArtifactFile.Keys)
 }
 
 function Get-DiscoverySchemaFileName {
     <#
     .SYNOPSIS
-        Returns the schema filename an artifact-type token corresponds to, or $null
-        when the token is not a schema-governed type. Documentation and artifact-type
-        validation only: schema RESOLUTION is driven by the artifact's `$schema`.
+        Returns the v1 schema filename of a schema-governed artifact type, or $null for any other token.
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string]$ArtifactType
-    )
+    param([Parameter(Mandatory = $true)][AllowEmptyString()][string]$ArtifactType)
 
-    if ($script:DiscoverySchemaArtifactFile.Contains($ArtifactType)) {
-        return [string]$script:DiscoverySchemaArtifactFile[$ArtifactType]
-    }
+    if ($script:DiscoverySchemaArtifactFile.Contains($ArtifactType)) { return [string]$script:DiscoverySchemaArtifactFile[$ArtifactType] }
     return $null
-}
-
-function Get-DiscoveryProfileTopLevelKey {
-    <#
-    .SYNOPSIS
-        Extracts the top-level mapping keys of a YAML profile document by line
-        inspection, without a YAML parser.
-    .DESCRIPTION
-        A top-level key is an unindented `key:` line. Blank lines, comment lines, and
-        the `---`/`...` document markers are skipped. Nested keys are indented and are
-        therefore ignored, which is exactly the scope the placeholder contract needs.
-        Returns $null when the document presents no top-level mapping key, which the
-        caller reports as a non-mapping root.
-    #>
-    [CmdletBinding()]
-    [OutputType([object[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string]$Text
-    )
-
-    $keys = [System.Collections.Generic.List[string]]::new()
-    $sawContent = $false
-
-    foreach ($line in ($Text -split '\r?\n')) {
-        $trimmed = $line.Trim()
-        if ($trimmed.Length -eq 0 -or $trimmed.StartsWith('#')) {
-            continue
-        }
-        if ($trimmed -eq '---' -or $trimmed -eq '...') {
-            continue
-        }
-        $sawContent = $true
-
-        # Only unindented lines can carry a top-level key.
-        if ($line -match '^(?<key>[A-Za-z_][A-Za-z0-9_.-]*)\s*:(\s|$)') {
-            $keys.Add($Matches['key'])
-        }
-    }
-
-    # Content that never presented an unindented `key:` is not a mapping root
-    # (a sequence root, a bare scalar, or a flow document).
-    if (-not $sawContent -or $keys.Count -eq 0) {
-        return $null
-    }
-    return , $keys.ToArray()
-}
-
-function Get-DiscoveryProfileValidationError {
-    <#
-    .SYNOPSIS
-        Validates domain-profile document text against the placeholder contract,
-        mirroring `validate_profile_text` in `validate_discovery_profile.py`.
-    .DESCRIPTION
-        Reproduced checks: empty/whitespace-only document; non-mapping root; and the
-        placeholder required-field set (`legacy_source_path`), reported one error per
-        absent field.
-
-        NOT reproduced: detection of arbitrary YAML syntax errors. PowerShell ships no
-        YAML parser and this module must not add a dependency, so the reference's
-        `Profile document is not valid YAML: <exc>` branch has no direct analogue. The
-        substitute is fail-CLOSED: any document not presenting an unindented `key:`
-        line is reported as a non-mapping root rather than accepted, so a malformed
-        document is still rejected and only the diagnostic wording differs.
-    .OUTPUTS
-        [object[]] Zero or more error strings; empty when the document conforms.
-    #>
-    [CmdletBinding()]
-    [OutputType([object[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string]$Text,
-
-        [Parameter(Mandatory = $false)]
-        [version]$PowerShellVersion = $PSVersionTable.PSVersion
-    )
-
-    $errors = [System.Collections.Generic.List[string]]::new()
-
-    # The floor is enforced at EVERY validation entry point, not only the schema path,
-    # so an unsupported host can never receive a partial pass from this module.
-    $versionError = Get-DiscoveryRuntimeVersionError -PowerShellVersion $PowerShellVersion
-    if ($null -ne $versionError) {
-        $errors.Add($versionError)
-        return , $errors.ToArray()
-    }
-
-    if ([string]::IsNullOrWhiteSpace($Text)) {
-        $errors.Add('Profile document is empty.')
-        return , $errors.ToArray()
-    }
-
-    $keys = Get-DiscoveryProfileTopLevelKey -Text $Text
-    if ($null -eq $keys) {
-        $errors.Add('Profile document root must be a mapping.')
-        return , $errors.ToArray()
-    }
-
-    # Report every absent field so a maintainer can fix the document in one pass.
-    foreach ($field in $script:ProfileRequiredField) {
-        if ($keys -notcontains $field) {
-            $errors.Add("Missing required field: $field.")
-        }
-    }
-
-    return , $errors.ToArray()
 }
 
 function Resolve-DiscoverySchemaFilePath {
     <#
     .SYNOPSIS
-        Resolves an artifact's `$schema` URI to a local schema file path.
+        Returns the repository path of a schema-governed artifact type's v1 schema file, or $null.
     .DESCRIPTION
-        Mirrors the Python reference's resolution rules for the cases a destination
-        can service: only a `file://` URI resolves. A scheme-less or non-`file` URI is
-        rejected, and an `http(s)://` URI is deliberately NOT fetched.
-    .OUTPUTS
-        [hashtable] `@{ Path = <string>; Error = <string> }`; exactly one is non-null.
+        Documentation lookup only; the schema is never evaluated here. Artifact
+        `$schema` references are not resolved or fetched by this module any more.
     #>
     [CmdletBinding()]
-    [OutputType([hashtable])]
+    [OutputType([string])]
     param(
-        [Parameter(Mandatory = $true)]
-        [AllowNull()]
-        [object]$SchemaUri
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$ArtifactType,
+        [Parameter(Mandatory = $true)][string]$RepositoryRoot
     )
 
-    if ($SchemaUri -isnot [string] -or [string]::IsNullOrEmpty([string]$SchemaUri)) {
-        return @{ Path = $null; Error = 'schema resolution failed (missing $schema)' }
-    }
+    $fileName = Get-DiscoverySchemaFileName -ArtifactType $ArtifactType
+    if ($null -eq $fileName) { return $null }
+    return "$($RepositoryRoot.TrimEnd('/', '\'))/schemas/discovery/v1/$fileName"
+}
 
-    $uri = $null
-    if (-not [System.Uri]::TryCreate([string]$SchemaUri, [System.UriKind]::Absolute, [ref]$uri)) {
-        # A scheme-less value cannot resolve: these pure text validators receive no
-        # document path to resolve a relative reference against.
-        return @{ Path = $null; Error = 'schema resolution failed (Unsupported schema URI scheme: missing)' }
-    }
+function Get-DiscoveryValidationRequiredMessage {
+    <#
+    .SYNOPSIS
+        Returns the validation-required message that directs an artifact question to the authoritative service.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$ArtifactType = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$Path = $null
+    )
 
-    if ($uri.Scheme -ine 'file') {
-        $message = "schema resolution failed (Unsupported schema URI scheme: $($uri.Scheme))"
-        return @{ Path = $null; Error = $message }
-    }
+    $subject = $(if ([string]::IsNullOrWhiteSpace($ArtifactType)) { 'the artifact' } else { "the $ArtifactType artifact" })
+    if (-not [string]::IsNullOrWhiteSpace($Path)) { $subject = "$subject at $Path" }
+    return "$($script:ValidationRequiredPrefix) $subject is validated only by the installed discovery service ($($script:ServiceOperation)); " +
+    'this compatibility module no longer evaluates profile or schema semantics and cannot authorize a gate. ' +
+    'Native hooks verify the protected validation receipt the gateway writes.'
+}
 
-    # LocalPath, not the raw URI path, so a Windows `file:///C:/...` URI resolves.
-    $localPath = $uri.LocalPath
-    if (-not (Test-Path -LiteralPath $localPath -PathType Leaf)) {
-        return @{ Path = $null; Error = "schema resolution failed (Schema file not found: $localPath)" }
-    }
+function Add-DiscoveryCompatibilityError {
+    <#
+    .SYNOPSIS
+        Appends the never-empty compatibility errors shared by the retired validation entries to a caller's list.
+    .DESCRIPTION
+        The version floor is appended alone when the host is below it. Otherwise an
+        unrecognized artifact type is appended first (when requested) and the
+        validation-required message always follows, so the list is never left empty.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][System.Collections.Generic.List[string]]$ErrorList,
+        [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$ArtifactType = $null,
+        [Parameter(Mandatory = $false)][version]$PowerShellVersion = $PSVersionTable.PSVersion,
+        [Parameter(Mandatory = $false)][switch]$ReportUnrecognizedType
+    )
 
-    return @{ Path = $localPath; Error = $null }
+    $floor = Get-DiscoveryRuntimeVersionError -PowerShellVersion $PowerShellVersion
+    if ($null -ne $floor) {
+        $ErrorList.Add($floor)
+        return
+    }
+    if ($ReportUnrecognizedType) { $ErrorList.Add("Unrecognized discovery artifact type '$ArtifactType'.") }
+    $ErrorList.Add((Get-DiscoveryValidationRequiredMessage -ArtifactType $ArtifactType))
+}
+
+function Get-DiscoveryProfileTopLevelKey {
+    <#
+    .SYNOPSIS
+        Compatibility export: profile parsing is retired, so no top-level key is ever reported.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param([Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text)
+
+    # The text is deliberately not read; the service owns profile semantics.
+    $null = $Text
+    return [string[]]@()
+}
+
+function Get-DiscoveryProfileValidationError {
+    <#
+    .SYNOPSIS
+        Returns the version-floor error below PowerShell 7.4, otherwise the validation-required message for the profile.
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text,
+        [Parameter(Mandatory = $false)][version]$PowerShellVersion = $PSVersionTable.PSVersion
+    )
+
+    $null = $Text
+    $errors = [System.Collections.Generic.List[string]]::new()
+    Add-DiscoveryCompatibilityError -ErrorList $errors -ArtifactType 'profile' -PowerShellVersion $PowerShellVersion
+    return , $errors.ToArray()
 }
 
 function Get-DiscoverySchemaArtifactValidationError {
     <#
     .SYNOPSIS
-        Validates a schema-governed discovery artifact against its declared `$schema`,
-        mirroring `_validate_against_schema` in `validate_discovery_schema_artifacts.py`.
-    .DESCRIPTION
-        Order of checks, matching the reference: JSON parse, object-root check,
-        `$schema` extraction and resolution, then Draft 2020-12 schema validation via
-        `Test-Json -SchemaFile`.
-    .OUTPUTS
-        [object[]] Zero or more error strings; empty when the artifact conforms.
+        Returns the version-floor error below PowerShell 7.4, otherwise the validation-required message for a schema-governed artifact.
     #>
     [CmdletBinding()]
     [OutputType([object[]])]
     param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string]$Text,
-
-        [Parameter(Mandatory = $false)]
-        [version]$PowerShellVersion = $PSVersionTable.PSVersion
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text,
+        [Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$ArtifactType = $null,
+        [Parameter(Mandatory = $false)][version]$PowerShellVersion = $PSVersionTable.PSVersion
     )
 
+    $null = $Text
     $errors = [System.Collections.Generic.List[string]]::new()
-
-    # Fail closed before any schema work: on an unsupported host `Test-Json -SchemaFile`
-    # would otherwise fail with an opaque parameter error.
-    $versionError = Get-DiscoveryRuntimeVersionError -PowerShellVersion $PowerShellVersion
-    if ($null -ne $versionError) {
-        $errors.Add($versionError)
-        return , $errors.ToArray()
-    }
-
-    $parsed = $null
-    try {
-        $parsed = ConvertFrom-Json -InputObject $Text -Depth 100 -ErrorAction Stop
-    }
-    catch {
-        $errors.Add("invalid JSON ($($_.Exception.Message))")
-        return , $errors.ToArray()
-    }
-
-    if ($parsed -isnot [System.Management.Automation.PSCustomObject]) {
-        $errors.Add('JSON root must be an object for validation')
-        return , $errors.ToArray()
-    }
-
-    $schemaProperty = $parsed.PSObject.Properties['$schema']
-    $schemaUri = if ($null -eq $schemaProperty) { $null } else { $schemaProperty.Value }
-
-    $resolution = Resolve-DiscoverySchemaFilePath -SchemaUri $schemaUri
-    if ($null -ne $resolution.Error) {
-        $errors.Add([string]$resolution.Error)
-        return , $errors.ToArray()
-    }
-
-    # Test-Json emits one non-terminating error per schema violation; collect them
-    # all rather than stopping at the first, matching the reference's behavior.
-    $schemaErrors = $null
-    $isValid = Test-Json -Json $Text -SchemaFile ([string]$resolution.Path) `
-        -ErrorAction SilentlyContinue -ErrorVariable schemaErrors
-    if (-not $isValid) {
-        foreach ($schemaError in @($schemaErrors)) {
-            $errors.Add([string]$schemaError.Exception.Message)
-        }
-        # Guarantee a non-empty result so a failure is never reported as a pass.
-        if ($errors.Count -eq 0) {
-            $errors.Add('JSON is not valid with the schema')
-        }
-    }
-
+    Add-DiscoveryCompatibilityError -ErrorList $errors -ArtifactType $ArtifactType -PowerShellVersion $PowerShellVersion
     return , $errors.ToArray()
 }
 
 function Get-DiscoveryArtifactValidationError {
     <#
     .SYNOPSIS
-        Validates artifact text of any supported type, dispatching on the type token.
+        Returns the compatibility error list for an artifact: the floor, an unrecognized type, and always the validation-required message.
     .DESCRIPTION
-        Dispatches `profile` to the placeholder-contract check and each of the seven
-        schema-governed types to the `$schema`-driven check. An unrecognized token is
-        reported rather than silently accepted.
-    .OUTPUTS
-        [object[]] Zero or more error strings; empty when the artifact conforms.
+        The list is never empty. The version floor is reported alone when the host is
+        below it; otherwise an unrecognized artifact type is reported before the
+        validation-required message so the caller sees both defects.
     #>
     [CmdletBinding()]
     [OutputType([object[]])]
     param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string]$ArtifactType,
-
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string]$Text,
-
-        [Parameter(Mandatory = $false)]
-        [version]$PowerShellVersion = $PSVersionTable.PSVersion
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$ArtifactType,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text,
+        [Parameter(Mandatory = $false)][version]$PowerShellVersion = $PSVersionTable.PSVersion
     )
 
-    # Assign before returning, never `@(Get-...)`. These helpers emit their array as
-    # a SINGLE object (the unary-comma no-enumerate idiom), so wrapping the call in
-    # `@()` collects that one object into a nested one-element array.
-    if ($ArtifactType -ieq 'profile') {
-        $profileErrors = Get-DiscoveryProfileValidationError -Text $Text -PowerShellVersion $PowerShellVersion
-        return , $profileErrors
-    }
-
-    if ($script:DiscoverySchemaArtifactFile.Contains($ArtifactType)) {
-        $schemaErrors = Get-DiscoverySchemaArtifactValidationError -Text $Text -PowerShellVersion $PowerShellVersion
-        return , $schemaErrors
-    }
-
-    return , @("Unsupported artifact type: $ArtifactType")
+    $null = $Text
+    $unrecognized = ($ArtifactType -ne 'profile' -and $null -eq (Get-DiscoverySchemaFileName -ArtifactType $ArtifactType))
+    $errors = [System.Collections.Generic.List[string]]::new()
+    Add-DiscoveryCompatibilityError -ErrorList $errors -ArtifactType $ArtifactType -PowerShellVersion $PowerShellVersion -ReportUnrecognizedType:$unrecognized
+    return , $errors.ToArray()
 }
 
 function ConvertTo-DiscoveryValidationResult {
@@ -421,69 +244,91 @@ function ConvertTo-DiscoveryValidationResult {
     .SYNOPSIS
         Shapes an error list into the hook seam's `@{ ExitCode; Output }` result.
     .DESCRIPTION
-        The defect D-2 contract in one place: an EMPTY error list yields `ExitCode = 0`
-        with an EMPTY `Output`. Both hooks deny on a non-zero exit code OR on non-empty
-        output, so success chatter here would turn a passing validation into a deny.
-        Kept separate from the on-disk entry point so the contract is unit-testable
-        without touching the filesystem.
-    .OUTPUTS
-        [hashtable] `@{ ExitCode = <int>; Output = <string> }`.
+        The defect D-2 contract in one place: an empty list yields `ExitCode = 0` with
+        empty `Output`. No entry of this module produces an empty list any more; the
+        shape is kept for callers that assemble their own lists.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [string[]]$ValidationError
-    )
+    param([Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]]$ValidationError)
 
-    if (@($ValidationError).Count -eq 0) {
-        return @{ ExitCode = 0; Output = '' }
-    }
+    if (@($ValidationError).Count -eq 0) { return @{ ExitCode = 0; Output = '' } }
     return @{ ExitCode = 1; Output = ($ValidationError -join [System.Environment]::NewLine) }
 }
 
 function Invoke-DiscoveryArtifactValidation {
     <#
     .SYNOPSIS
-        Validates a discovery artifact on disk and returns the hook seam's result shape.
+        Compatibility entry of the retired validator: reports the floor, a missing artifact or the validation-required result, never a pass.
     .DESCRIPTION
-        The entry point both discovery hooks call from `Invoke-DiscoveryValidatorExe`.
-        `ValidatorArgs` keeps the CLI-style shape the seam already passed:
-        `@(<artifact-type>, <path>)`. Success returns `ExitCode = 0` with EMPTY
-        `Output` (defect D-2 avoidance); see `ConvertTo-DiscoveryValidationResult`.
-    .OUTPUTS
-        [hashtable] `@{ ExitCode = <int>; Output = <string> }`.
+        `ValidatorArgs` keeps the CLI shape `@(<artifact-type>, <path>)`. The result
+        always carries `ExitCode = 1`: the version floor first, then too few
+        arguments, then a missing artifact file (actionable), then the
+        validation-required message naming the authoritative service.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$ValidatorArgs,
-
-        [Parameter(Mandatory = $false)]
-        [version]$PowerShellVersion = $PSVersionTable.PSVersion
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]]$ValidatorArgs,
+        [Parameter(Mandatory = $false)][version]$PowerShellVersion = $PSVersionTable.PSVersion,
+        [Parameter(Mandatory = $false)][scriptblock]$TestArtifactPath = { param([string]$Candidate) Test-Path -LiteralPath $Candidate -PathType Leaf }
     )
 
+    $floor = Get-DiscoveryRuntimeVersionError -PowerShellVersion $PowerShellVersion
+    if ($null -ne $floor) { return ConvertTo-DiscoveryValidationResult -ValidationError @($floor) }
     if (@($ValidatorArgs).Count -lt 2) {
-        return @{ ExitCode = 1; Output = 'Discovery validation requires an artifact type and a path.' }
+        return ConvertTo-DiscoveryValidationResult -ValidationError @('Discovery validation requires an artifact type and a path.')
     }
-
     $artifactType = [string]$ValidatorArgs[0]
     $path = [string]$ValidatorArgs[1]
-
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        return @{ ExitCode = 1; Output = "Artifact not found: $path" }
+    if (-not (& $TestArtifactPath $path)) {
+        return ConvertTo-DiscoveryValidationResult -ValidationError @("Artifact not found: $path")
     }
+    return ConvertTo-DiscoveryValidationResult -ValidationError @((Get-DiscoveryValidationRequiredMessage -ArtifactType $artifactType -Path $path))
+}
 
-    $text = Get-Content -LiteralPath $path -Raw -ErrorAction Stop
-    if ($null -eq $text) {
-        $text = ''
+function Get-DiscoveryValidationAuthority {
+    <#
+    .SYNOPSIS
+        Reports the only authority a native hook consults: the protected activation of the workspace on a supported host.
+    .DESCRIPTION
+        Status is `active`, `missing`, `inactive`, `invalid` or `unsupported-host`;
+        Supported is true only for `active`. The message is actionable in every case
+        and names the authoritative service. No artifact is read.
+    .OUTPUTS
+        [pscustomobject] Status, Supported, Message, Service, Directory.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][string]$WorkspaceRoot,
+        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadText = $null
+    )
+
+    try {
+        if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
+        $location = Resolve-DiscoveryAuthorityLocation -WorkspaceRoot $WorkspaceRoot -Platform $HostEnvironment.Platform `
+            -UserHome $HostEnvironment.UserHome -LocalAppData $HostEnvironment.LocalAppData -XdgStateHome $HostEnvironment.XdgStateHome
+    } catch {
+        return [pscustomobject]@{ Status = 'unsupported-host'; Supported = $false; Service = $script:ServiceOperation; Directory = $null; Message = "$($script:ValidationRequiredPrefix) this host cannot resolve the protected discovery authority ($($_.Exception.Message)); discovery agents are fail-closed here and no artifact can be validated locally." }
     }
-
-    $errors = Get-DiscoveryArtifactValidationError -ArtifactType $artifactType -Text $text `
-        -PowerShellVersion $PowerShellVersion
-    return ConvertTo-DiscoveryValidationResult -ValidationError $errors
+    $parameters = @{ Location = $location }
+    if ($null -ne $ReadText) { $parameters['ReadText'] = $ReadText }
+    $activation = Read-DiscoveryActivationState @parameters
+    $message = switch ($activation.Status) {
+        'active' { "the workspace holds an active protected activation; run $($script:ServiceOperation) through the installed service to validate artifacts and let the native hooks verify the protected receipt." }
+        'missing' { "no protected activation exists for this workspace; initialize or configure discovery through the installed service before any artifact gate can pass." }
+        'inactive' { 'discovery was deliberately deactivated for this workspace; only a root-owned activation can restore artifact gates.' }
+        default { "the protected activation record is unreadable ($($activation.Reason)); the gate fails closed until the service rewrites it." }
+    }
+    return [pscustomobject]@{
+        Status    = $activation.Status
+        Supported = ($activation.Status -eq 'active')
+        Service   = $script:ServiceOperation
+        Directory = $location.Directory
+        Message   = "$($script:ValidationRequiredPrefix) $message"
+    }
 }
 
 Export-ModuleMember -Function @(
@@ -496,5 +341,7 @@ Export-ModuleMember -Function @(
     'Get-DiscoverySchemaArtifactValidationError',
     'Get-DiscoveryArtifactValidationError',
     'ConvertTo-DiscoveryValidationResult',
-    'Invoke-DiscoveryArtifactValidation'
+    'Invoke-DiscoveryArtifactValidation',
+    'Get-DiscoveryValidationRequiredMessage',
+    'Get-DiscoveryValidationAuthority'
 )

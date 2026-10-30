@@ -138,6 +138,48 @@ describe("resolveCodexDeployment", () => {
   });
 
   it.each([
+    "legacy-parity-analyst",
+    "runtime-characterization-analyst",
+    "requirements-reconciler",
+    "migration-coverage-reviewer",
+  ])(
+    "routes the %s discovery family through the unchanged policy",
+    (family) => {
+      // Arrange / Act
+      const standalone = resolveCodexDeployment(
+        family,
+        "C1",
+        "standalone",
+        "C1",
+      );
+      const elevated = resolveCodexDeployment(
+        family,
+        "C3",
+        "epic_execution_child",
+        "C4",
+      );
+
+      // Assert: exact base profile, exact overlay, and no profile-as-role alias.
+      expect(standalone.deployment_agent).toBe(`${family}-c1`);
+      expect(standalone.model).toBe("gpt-6-luna");
+      expect(elevated.deployment_agent).toBe(`${family}-c3-elevated`);
+      expect(elevated.c3_overlay_reason).toBe("epic_context_and_c4_ceiling");
+      expect(() =>
+        resolveCodexDeployment(`${family}-c1`, "C1", "standalone", "C1"),
+      ).toThrow("Unsupported Codex logical agent");
+      expect(() =>
+        resolveCodexDeployment(
+          family,
+          "C1",
+          "standalone",
+          "C1",
+          new Set(["gpt-6-astra"]),
+        ),
+      ).toThrow(ModelUnavailableError);
+    },
+  );
+
+  it.each([
     ["unknown", "C1", "standalone", "C1", "Unsupported Codex logical agent"],
     ["orchestrator", "C5", "standalone", "C4", "complexity_band"],
     ["orchestrator", "C1", "other", "C1", "execution_context"],

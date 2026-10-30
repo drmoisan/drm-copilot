@@ -1,0 +1,31 @@
+{
+  "batch": "tokenizer",
+  "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_csharp_tokens.py --cov=drm_copilot_discovery.analyzer.csharp_tokens --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t3-tokenizer-coverage.raw.json",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T04:30:39.780931+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-tokenizer-tests-043039.2026-10-19T04-30.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-tokenizer-tests-043039.2026-10-19T04-30.stdout.txt",
+      "sha256": "d1463eac195ec9c784b75cb0a1a30ef9d3175c17f1e66b6e3cb794469cfa6512"
+    }
+  },
+  "seconds": 0.74592,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f"
+  },
+  "stage": "tests",
+  "started_at": "2026-10-19T04:30:39.035011+00:00",
+  "stderr": "",
+  "stdout": "..........................................................               [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                             Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\csharp_tokens.py      98      1     48      1    99%   149\r\n----------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                               98      1     48      1    99%\r\nCoverage JSON written to file SCRATCH\\p4t3-tokenizer-coverage.raw.json\r\n58 passed in 0.17s\r\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-30"
+}

@@ -1,0 +1,45 @@
+{
+  "stage": "format",
+  "label": "p4t7-python-format-fix2",
+  "started": "2026-10-19T10:08:55.555179+00:00",
+  "finished": "2026-10-19T10:08:57.523365+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py tests/discovery_runtime/analyzer/test_dependency_python.py",
+  "exit_code": 0,
+  "duration_seconds": 1.968,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "31b1d096ac933773e9a03cabe01317f74985dfd5c8551ff8b81a3e5750ec6f05",
+      "physical_lines": 265
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "1948dee9573eb8bd76e85c5b5ff0e7dd8b15433a1a0cbd0ac8becc0801888ebe",
+      "physical_lines": 305
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "31b1d096ac933773e9a03cabe01317f74985dfd5c8551ff8b81a3e5750ec6f05",
+      "physical_lines": 265
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "38ea6ef8bcee5ee763d89558dc1b06654d25f531f40d4a986a439bacaf1a363e",
+      "physical_lines": 308
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-format-fix2-100857.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-format-fix2-100857.stderr.bin",
+      "raw_sha256": "a1e7bff94a5dc94868d5ee8158e550850c52b9cca93e29c23471a67526344478",
+      "raw_bytes": 142,
+      "presentation": "reformatted tests\\discovery_runtime\\analyzer\\test_dependency_python.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n1 file reformatted, 1 file left unchanged.\r\n"
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 Python parser only"
+}

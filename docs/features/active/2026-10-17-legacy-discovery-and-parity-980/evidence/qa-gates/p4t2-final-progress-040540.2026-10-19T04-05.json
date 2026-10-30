@@ -1,0 +1,47 @@
+{
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-format-040541.2026-10-19T04-05.json",
+      "sha256": "20c82d37c493ab8c15f9473816afb3178e679de2d1f594dbbabd3e09a42a9403",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-lint-040541.2026-10-19T04-05.json",
+      "sha256": "ad4fce1049011c89bf1edc254d99ddf8cfbb019f7705cd8f32ce6276d233c8b8",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-types-040552.2026-10-19T04-05.json",
+      "sha256": "2d321cbb42ffc8385994e90ee81c10ca34072c455ba84c6a7b5c496c4efef4eb",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-architecture-040552.2026-10-19T04-05.json",
+      "sha256": "c57cf1c9f3a707eb6b81fa6db8d00e06fedbd2d2e165d009a29178b4f237e358",
+      "stage": 4
+    }
+  ],
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  }
+}

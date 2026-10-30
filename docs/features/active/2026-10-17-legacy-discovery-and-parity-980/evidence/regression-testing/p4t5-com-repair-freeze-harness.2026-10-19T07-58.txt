@@ -1,0 +1,175 @@
+"""Bind the isolated COM R1/R3 repair and exact focused evidence without reruns."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+evidence = feature / "evidence"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+command = "poetry run python SCRATCH/issue-980-p4t5-com-repair-freeze.py"
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+    "tests/discovery_runtime/analyzer/test_com_interop.py",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py",
+]
+
+
+def digest(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def metadata(path):
+    return {"path": path.relative_to(repo).as_posix(), "sha256": digest(path.read_bytes())}
+
+
+def write(path, content):
+    assert not path.exists(), path.name
+    path.write_bytes(content.encode("utf-8"))
+
+
+def write_json(path, value):
+    write(path, json.dumps(value, indent=2) + "\n")
+
+
+def markdown(title, summary, body):
+    return (f"# {title}\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n"
+            "Output Summary: " + summary + "\n\n" + body.rstrip() + "\n")
+
+
+baseline_path = evidence / "baseline/p4t5-shared-baseline.2026-10-19T06-59.json"
+baseline = json.loads(baseline_path.read_bytes())
+assert digest(baseline_path.read_bytes()) == "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7"
+assert all(digest((repo / row["path"]).read_bytes()) == row["sha256"] for row in baseline["preserved_files"])
+absence_path = max((evidence / "baseline").glob("p4t5-com-syntax-split-absence.*.json"))
+absence = json.loads(absence_path.read_bytes())
+preserved = scratch / absence["preserved_directory"].removeprefix("SCRATCH/")
+sources, structures, syntax_trees = [], [], {}
+for name in paths:
+    path = repo / name
+    raw = path.read_bytes()
+    text = raw.decode()
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    syntax_trees[path.name] = tree
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.AsyncFor, ast.While))]
+    assert len(lines) <= 500
+    assert all(ast.get_docstring(node) for node in definitions)
+    assert all(lines[node.lineno - 2].strip().startswith("#") for node in loops)
+    retained = []
+    if name.startswith("tests/"):
+        current = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+        for node in ast.parse((preserved / path.name).read_text()).body:
+            if isinstance(node, ast.FunctionDef):
+                assert ast.dump(node) == ast.dump(current[node.name]), node.name
+                retained.append(node.name)
+        assert re.search(r"\b(?:tmp_path|tmpdir|tempfile|NamedTemporaryFile)\b", text) is None
+    else:
+        assert re.search(r"\b(?:TaskMaster|TMW|VSTO|Outlook|MAPI)\b", text, flags=re.I) is None
+        assert re.search(r"\b(?:read_bytes|write_bytes|subprocess|socket|requests|eval|exec)\s*\(", text) is None
+    attributes = subprocess.run(["git", "check-attr", "--all", "--", name], check=True, capture_output=True, text=True).stdout.splitlines()
+    sources.append({"path": name, "sha256": digest(raw), "physical_lines": len(lines), "crlf_count": raw.count(b"\r\n"),
+                    "lf_normalized_sha256": digest(raw.replace(b"\r\n", b"\n")), "git_attributes": attributes})
+    structures.append({"path": name, "definitions_with_docstrings": len(definitions), "loops_with_immediate_intent_comments": len(loops),
+                       "retained_original_test_definitions": retained, "physical_lines": len(lines)})
+old_tree = ast.parse((preserved / "com_interop.py").read_text())
+old_definitions = {node.name: node for node in old_tree.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+new_definitions = {node.name: node for tree in (syntax_trees["com_interop.py"], syntax_trees["com_syntax.py"])
+                   for node in tree.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+retained_production = [name for name in old_definitions if name != "com_source_candidates"]
+assert all(ast.dump(old_definitions[name]) == ast.dump(new_definitions[name]) for name in retained_production)
+
+ordered = []
+for stage in ("format", "lint", "types", "unit"):
+    path = max((evidence / "regression-testing").glob("p4t5-com-repair2-" + stage + ".*.json"))
+    receipt = json.loads(path.read_bytes())
+    assert receipt["exit_code"] == 0
+    for source in sources:
+        assert receipt["source_before"][source["path"]]["sha256"] == source["sha256"]
+        assert receipt["source_after"][source["path"]]["sha256"] == source["sha256"]
+    ordered.append({**metadata(path), "stage": stage, "started": receipt["started"], "finished": receipt["finished"],
+                    "duration_seconds": receipt["duration_seconds"]})
+assert all(first["finished"] <= second["started"] for first, second in zip(ordered, ordered[1:]))
+coverage_raw = (scratch / "issue-980-p4t5-com-repair-coverage.json").read_bytes()
+coverage_path = evidence / f"regression-testing/p4t5-com-repair-coverage.{stamp}.json"
+assert not coverage_path.exists()
+coverage_path.write_bytes(coverage_raw)
+coverage = json.loads(coverage_raw)
+assert len(coverage["files"]) == 2
+summaries = []
+for name, data in coverage["files"].items():
+    assert data["missing_lines"] == data["missing_branches"] == []
+    functions = {key: value["summary"] for key, value in data["functions"].items() if key}
+    classes = {key: value["summary"] for key, value in data["classes"].items() if key}
+    assert all(row["covered_lines"] == row["num_statements"] for row in (*functions.values(), *classes.values()))
+    summaries.append({"path": name.replace("\\", "/"), "module": data["summary"], "functions": functions, "classes": classes})
+assert sum(item["module"]["covered_lines"] for item in summaries) == 206
+assert sum(item["module"]["covered_branches"] for item in summaries) == 88
+structure_path = evidence / f"regression-testing/p4t5-com-repair-coverage-structure.{stamp}.json"
+write_json(structure_path, {"timestamp": stamp, "command": command, "exit_code": 0, "source_files": sources,
+                           "coverage": metadata(coverage_path), "summaries": summaries, "structures": structures,
+                           "retained_production_definitions": retained_production, "retained_original_cases": 111,
+                           "added_cases": 26, "executed_cases": 137, "predecessor_streams_preserved": len(baseline["preserved_files"]),
+                           "changed_line_coverage": "100%; all previously covered executable behavior and all newly introduced context checks are measured.",
+                           "manual_intent_review": "R3 ordinal/operation/embed_interop_types assertions each have an immediate intent comment. New projection/branch logic was inspected before gates."})
+
+# Snapshot only newly executed harness bytes; prior baseline evidence stays referenced.
+harnesses = []
+for filename, label in (("issue-980-p4t5-com-syntax-split.py", "syntax-split"),
+                        ("issue-980-p4t5-com-repair-prepare.py", "prepare"),
+                        ("issue-980-p4t5-com-repair-gate.py", "gate"),
+                        (Path(__file__).name, "freeze")):
+    raw = (scratch / filename).read_bytes()
+    assert re.search(rb"(?<![A-Za-z])[A-Za-z]:[\\/]", raw) is None
+    path = evidence / f"regression-testing/p4t5-com-repair-{label}-harness.{stamp}.txt"
+    assert not path.exists()
+    path.write_bytes(raw)
+    harnesses.append({**metadata(path), "raw_sha256": digest(raw), "scratch_identifier": "SCRATCH/" + filename,
+                      "crlf_count": raw.count(b"\r\n"), "lf_normalized_sha256": digest(raw.replace(b"\r\n", b"\n")),
+                      "sanitization": "none; snapshot equals the executed bytes"})
+handoff_path = evidence / f"regression-testing/p4t5-com-repair-handoff.{stamp}.md"
+write(handoff_path, markdown("P4-T5 isolated COM R1/R3 repair handoff",
+    "FROZEN_READY for bounded confirmation: 137 tests passed; 206/206 lines and 88/88 branches covered across both production modules.",
+    "## Repair and preserved behavior\n\nThe approved `com_syntax.py` module owns pure C# candidates. "
+    "`com_interop.com_source_candidates` explicitly re-exports the identical callable, with original signature/defaults and shared `Detection` identity. "
+    "All other original production definitions are AST-identical after relocation. XML, provenance, redaction and aggregate budgets remain unchanged. "
+    "Every original test definition/decorator/assertion is AST-identical; 111 cases remain and 26 direct/adapter regression/control cases were added. "
+    "R3 supplies immediate intent comments for each metadata extraction assertion without changing it.\n\n"
+    "R1 pairs delimiters once, propagates bracket declaration continuations right-to-left, and checks a known call's closing parenthesis continuation in constant work. "
+    "Argument collection expressions and explicit method declarations no longer create attribute/call findings. Genuine declaration, parameter, assembly/module and lambda attributes, "
+    "attribute chains and calls nested in declaration bodies remain detected as inferred syntax. Incomplete bracket-only fragments are conservatively omitted. "
+    "No compiler binding or runtime execution is claimed. These cases follow the distinction between "
+    "[collection expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/collection-expressions) and "
+    "[explicit interface member declarations](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces).\n\n"
+    "## Evidence and scope\n\nThe freeze manifest binds four source/test paths, ordered focused Black/Ruff/Pyright/Pytest receipts, exact raw coverage, "
+    "per-module/class/callable totals, structure checks, the preserved 45-path baseline and exact executed harness snapshots. All named ranges are 100% covered. "
+    "The original review/probes, 111-case proof and freeze manifests remain unchanged. The failed first repair lint attempt is preserved; the final clean sequence uses unchanged source bytes. "
+    "Pytest reported 33.39 seconds; whole-command elapsed times are retained separately. Coverage's local timestamp is not reinterpreted as UTC; command receipts provide UTC execution times.\n\n"
+    "## Remaining gates\n\nAwait the executor's bounded R1/R3 confirmation and the inventory owner's one combined final ordered sequence. "
+    "No predecessor suite was replayed, no optional caller/registry/CLI/MCP exposure was added, and no plan, AC, checkpoint or Git state was edited by this worker. "
+    "No task/feature acceptance is claimed. Existing lexical limitations on alias resolution, preprocessing, generic forms, compiler validity and runtime behavior remain explicit.\n"))
+review_path = evidence / "qa-gates/p4t5-executor-candidate-review.2026-10-19T07-42.json"
+assert digest(review_path.read_bytes()) == "95773ccf65e1e9f7891338871b4699e13ac51515979bc57943389d4e3fd71726"
+artifact_paths = sorted(set((evidence / "regression-testing").glob("p4t5-com-repair*"))
+                        | set((evidence / "baseline").glob("p4t5-com-syntax-split-*")))
+freeze_path = evidence / f"regression-testing/p4t5-com-repair-freeze.{stamp}.json"
+manifest = {"timestamp": stamp, "status": "FROZEN_READY", "accepted_baseline": baseline["head"],
+            "authority": "workspace_operations_p4t5_review_repair + workspace_operations_p4t5_com_syntax_split; unchanged exact Python C4 profile/native authority",
+            "review": metadata(review_path), "scope_absence": metadata(absence_path), "baseline": metadata(baseline_path),
+            "source_files": sources, "ordered_focused_gates": ordered, "coverage": metadata(coverage_path),
+            "coverage_structure": metadata(structure_path), "harnesses": harnesses, "handoff": metadata(handoff_path),
+            "evidence_files": [metadata(path) for path in artifact_paths], "tests": {"original": 111, "added": 26, "passed": 137, "failed": 0},
+            "stage_paths": paths + [path.relative_to(repo).as_posix() for path in artifact_paths] + [freeze_path.relative_to(repo).as_posix()],
+            "pending": ["bounded executor repair confirmation", "combined final ordered gates", "independent task acceptance"],
+            "source_test_mutations_during_freeze": False, "behavioral_reruns_during_freeze": False, "git_mutations": False}
+write_json(freeze_path, manifest)
+assert all(digest((repo / item["path"]).read_bytes()) == item["sha256"] for item in sources)
+print(json.dumps({"freeze": metadata(freeze_path), "source_files": sources, "stage_count": len(manifest["stage_paths"]),
+                  "coverage": metadata(coverage_path), "handoff": metadata(handoff_path)}, indent=2))

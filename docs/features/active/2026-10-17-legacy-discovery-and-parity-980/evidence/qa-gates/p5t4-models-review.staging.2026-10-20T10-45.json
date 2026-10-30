@@ -1,0 +1,111 @@
+{
+  "Timestamp": "2026-10-20T10-45",
+  "status": "READY_FOR_CHECKED_MODEL_SUBSET_COMMIT",
+  "task": "P5-T4",
+  "task_acceptance": false,
+  "paths": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "working_sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "expected_git_blob": "0271204c051a7ac929f8a6922fbe65471ae70534"
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "working_sha256": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac",
+      "expected_git_blob": "115720aa5145623db99f7d4b58ba7751c2e3c3bf"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-consolidate-consolidate.2026-10-20T10-34.json": {
+      "working_sha256": "48ab5af6d1c1182562995a9d59a6e76a5e0cd9f2f3f8ab3916ae133044f286de",
+      "expected_git_blob": "7824170273d7f792fb86f29fae785dffbff512f5"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-consolidate2-format.2026-10-20T10-36.json": {
+      "working_sha256": "b678d8af51c6816ae8c9d4791f347948f024c9f4305f44e253f4f66c2c7b1295",
+      "expected_git_blob": "f30bec6e089c0a3c934349e4bb8ff87b9619d9e3"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-freeze.2026-10-20T10-38.json": {
+      "working_sha256": "18fbd8e8ee34d2d6cece03f9a586aa4970c2c2d38c824cc3fb5bfc91ca47bb6b",
+      "expected_git_blob": "dc7c4abbcaee4bdc1c9541cb43220188be43a469"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-lossless-archive.2026-10-20T10-38.json": {
+      "working_sha256": "7a822a7b18d3eeb85539bdcc1c6f97e5dd5e757fd772a64698750c5a13e2371b",
+      "expected_git_blob": "61a581617bed6e03e9b2d19ef71565da088ed2b2"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass1-format.2026-10-20T10-34.json": {
+      "working_sha256": "3d486d993ea7aa90b0fc72a89813a900d3aeb9b21d80cf27a2235086f2ce0b8a",
+      "expected_git_blob": "60d00b9c60fcbf3fcf1086c5ff8ab1f7a4b90eb9"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass1-lint.2026-10-20T10-34.json": {
+      "working_sha256": "02d5ddecd7694c66c6fb25fbce36e02a3f42cb5f84d7f12996270f966fca0caf",
+      "expected_git_blob": "2d282e9d942b61baafd9292b45e0f5532513c85e"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-format.2026-10-20T10-35.json": {
+      "working_sha256": "baf258e16e0859c33c295d58b72f273930cbc5311a989b3d850ec545a8019ed0",
+      "expected_git_blob": "64dab6c3a3d3ee578678909a267dff5726556883"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-lint.2026-10-20T10-35.json": {
+      "working_sha256": "46bac883ccd5716e44603b34df9ace34698d28a35f140751288587c2db985dfb",
+      "expected_git_blob": "eb5700dcf77af3b8fd6ee89902eb96c43f7270ab"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-tests.2026-10-20T10-35.json": {
+      "working_sha256": "9d75d140548cc73b33eda48b69d0409322660b3e5b04c0dcf8a2c90c63f62795",
+      "expected_git_blob": "97514ef8fe368172a0ef8396dacd016c80042f15"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-types.2026-10-20T10-35.json": {
+      "working_sha256": "87565aeb5f16a2395eb7d72900cbb2ad644dc0816ce8f5e1265f52dfe47273be",
+      "expected_git_blob": "35def2e2b789353864d8db3706a3b656894d5da9"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-format.2026-10-20T10-36.json": {
+      "working_sha256": "e27fa50a54f0e12335c69e7ac29ce17a4e3f26c827bc92e2782f6c88cea34c7d",
+      "expected_git_blob": "66ee9a480d09771fbac844397c1ec4894f5b0204"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-lint.2026-10-20T10-36.json": {
+      "working_sha256": "84b04921a5b04d77c980adda9cafc59667fee5758aabc29d79c2cb1ccfa192ff",
+      "expected_git_blob": "d1440d689bd4cb19b922e52b1e54e665e7b3b266"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-tests.2026-10-20T10-36.json": {
+      "working_sha256": "b1628621295a97de5b2f47f2846c31e28f161502d53040931f14884809e4ef48",
+      "expected_git_blob": "3ff7bfab71f8fafa37bb74856da6b8f477a131cd"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-types.2026-10-20T10-36.json": {
+      "working_sha256": "c635a7aef216a8ebead2a1a38c0bedcff7827fbb4e317c0b6a4cfc60a6a0ecf9",
+      "expected_git_blob": "0ff5302d75927498e1b96d9831df5c45af836ad7"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-staging.2026-10-20T10-38.json": {
+      "working_sha256": "5e0612662c9446bfad51964d37468ed060a8ba1ac9f23fc6c244c59ab831ee00",
+      "expected_git_blob": "9a85b64a90d60c439e2c5330d2b92d67001f9b8a"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": {
+      "working_sha256": "9c0eff6ffad0d0711fa0e000f8cbb78e7f4715ac2a8b28440bef0de4b6a78baf",
+      "expected_git_blob": "53f6c6af060467d08b9c4de4594df3a126a8497a"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json": {
+      "working_sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3",
+      "expected_git_blob": "351e774016dc8126ce9eba8fe8cae28dfc93e80e"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-shared-contract.2026-10-20T10-26.json": {
+      "working_sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51",
+      "expected_git_blob": "124ee900641249823bb18f993b73d5419200da9d"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-specification-identity.2026-10-20T10-17.json": {
+      "working_sha256": "986e18df66cf9a5444603517606ab726b3ff6a498fdd6bbaf88250384551bed2",
+      "expected_git_blob": "05f79b391a40e95cf1aae6142ea4a360ac1aa596"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-preparation-delta.2026-10-20T09-40.json": {
+      "working_sha256": "c12e4839dad279a2d64c6989962a43a2515f1dfd189b2fe0b17bf0cd8e9c2e52",
+      "expected_git_blob": "1ec2bfb1844196472ca109c54f8330d413521417"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-preparation-delta.2026-10-20T10-08.json": {
+      "working_sha256": "505ded2a0c83147a08a860c8dd16479c172bd782c969f4ccb76db5f8f41d93b3",
+      "expected_git_blob": "4e59f07b21eb7db59191b0c9bae6f740316b4c43"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json": {
+      "working_sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea",
+      "expected_git_blob": "d589fff5ee66ac09cd4eff1f4b5dc2de0824cf19"
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.md": {
+      "working_sha256": "d1062b925320c9774d4cd3a2b39e0e847f83874a1fa9942fffbe8ce463528956",
+      "expected_git_blob": "192664f905106ffd30504dc0cd58ff49dc3d24ee"
+    }
+  },
+  "include_manifest_itself": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.staging.2026-10-20T10-45.json",
+  "expected_total_paths": 26,
+  "qualification": "Finite model subset plus shared specification/baseline/contract/preparation dependencies and review. Unfinished generation/context, their tests/evidence and all unrelated changes excluded. Parent owns staging/commit and task acceptance."
+}

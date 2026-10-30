@@ -1,0 +1,127 @@
+{
+  "status": "OPTIONAL_CANDIDATE_REVIEW_CLEAR",
+  "task": "P4-T8",
+  "timestamp": "2026-10-19T11-55",
+  "published_utc": "2026-10-19T11:55:03.158812+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t8-optional-review.py",
+  "exit_code": 0,
+  "authority_receipt": "atomic_execution_p4t8_candidate_review",
+  "native_authority_valid": true,
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-optional-freeze.2026-10-19T11-52.json",
+    "sha256": "bc5e0282808ff51b21ca2973ec78d908be376a450ee157341344754500090ad1"
+  },
+  "reviewed_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py",
+      "sha256": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570",
+      "physical_lines": 1,
+      "lf_normalized_sha256": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570",
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 0,
+      "loops_with_immediate_intent_comments": 0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py",
+      "sha256": "e94f05ed63e7b1cd4facbfa5564e58228fbd0b329e5f4c33876a28ca32b379c2",
+      "physical_lines": 456,
+      "lf_normalized_sha256": "e94f05ed63e7b1cd4facbfa5564e58228fbd0b329e5f4c33876a28ca32b379c2",
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 12,
+      "loops_with_immediate_intent_comments": 4
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py",
+      "sha256": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd",
+      "physical_lines": 71,
+      "lf_normalized_sha256": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd",
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 0,
+      "loops_with_immediate_intent_comments": 0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py",
+      "sha256": "e5b2c1402eb1df247cd8404d1733688673d4934278138eaa1172ef9cd6e7eb9c",
+      "physical_lines": 443,
+      "lf_normalized_sha256": "e5b2c1402eb1df247cd8404d1733688673d4934278138eaa1172ef9cd6e7eb9c",
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 6,
+      "loops_with_immediate_intent_comments": 8
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_optional_adapter.py",
+      "sha256": "da2e28c4be44e289d14ec951d3b85dc3412832dcfde413428041505e90834c06",
+      "physical_lines": 360,
+      "lf_normalized_sha256": "da2e28c4be44e289d14ec951d3b85dc3412832dcfde413428041505e90834c06",
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_optional_adapter.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_optional_adapter.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 12,
+      "loops_with_immediate_intent_comments": 0
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_optional_limits.py",
+      "sha256": "4d215605cccff4dc9f25bd4443f8398ab885b5dd08c3a6445e5045643f8f4bcb",
+      "physical_lines": 290,
+      "lf_normalized_sha256": "4d215605cccff4dc9f25bd4443f8398ab885b5dd08c3a6445e5045643f8f4bcb",
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_optional_limits.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_optional_limits.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 10,
+      "loops_with_immediate_intent_comments": 0
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2006.xml.txt",
+      "sha256": "43b8d8fa0caf93e6725f747b54be09f346de052255962b4cbcf2fc3bdd00a97f"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2009.xml.txt",
+      "sha256": "1aef9447cd9809c5629a9f672744c7507ab1cd6759c1a9763b45b7369f5c36a2"
+    }
+  ],
+  "checks": [
+    "Configured typed consent precedes source processing at each public classifier and adapter entry point.",
+    "Positive integer capacities are independently narrowed by profile byte, record and depth limits.",
+    "Aggregate input/work/pin/output reservations reject excessive analysis and discard partial rows.",
+    "Secure XML consumes original captured bytes; shared generic COM and C# syntax seams are reused.",
+    "Project/Ribbon namespaces and inherited opaque subtrees preserve finite declaration scope.",
+    "Pinned original source hashes are preserved; syntax relevance and callback binding do not imply execution.",
+    "Fixed diagnostics withhold source values; output names and metadata are bounded.",
+    "Legacy pattern exports are inert compatibility data; no consumer product semantics were introduced.",
+    "Intent documentation, immutable fixture usage, memory-only tests and source/test size limits reviewed."
+  ],
+  "retained_focused_proof": {
+    "cases": 100,
+    "statements": "305/305",
+    "branches": "126/126",
+    "measured_ranges": 18
+  },
+  "findings": [],
+  "open_behavioral_probes": [],
+  "new_behavioral_runs": 0,
+  "pending": [
+    "Combined compatibility review and final evidence reconciliation",
+    "Ordered combined final gates and independent task acceptance"
+  ],
+  "qualification": "This is the optional source/test portion of one consolidated task review. The combined receipt will bind the retained failed-output archive; no original evidence is changed and no task/AC checkoff is authorized here."
+}

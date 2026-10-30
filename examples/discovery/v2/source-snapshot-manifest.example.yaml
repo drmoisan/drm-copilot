@@ -1,0 +1,37 @@
+$schema: urn:drm-copilot:discovery:2.0.0:source-snapshot-manifest
+schema_version: 2.0.0
+artifact_kind: source-snapshot-manifest
+id: export-alpha
+source_repository:
+  id: synthetic-source
+  revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+schema_versions: [2.0.0]
+tool: {id: discovery, version: 2.0.0}
+artifacts:
+  - artifact_kind: feature-contract
+    id: feature-alpha
+    schema_version: 2.0.0
+    path: feature-contracts/feature-alpha.yaml
+    sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    size: 64
+  - artifact_kind: evidence-reference
+    id: runtime-alpha
+    schema_version: 2.0.0
+    path: evidence/runtime-alpha.yaml
+    sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+    size: 96
+payloads:
+  - path: evidence/capture-alpha.json
+    sha256: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+    size: 32
+manifest_sha256: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+transport:
+  method: local-files
+  exported_at: "2026-01-01T00:00:00Z"
+  exported_by: {kind: tool, id: discovery}
+  verification_status: pending
+  verified_at: null
+  verified_by: null
+  artifact_count: 2
+  payload_count: 1
+extensions: {}

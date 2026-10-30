@@ -1,0 +1,1217 @@
+{
+  "task": "P6-T1",
+  "subset": "shared",
+  "status": "FOCUSED_PASS_PENDING_REVIEWED_CHECKPOINT",
+  "created_utc": "2026-10-20T15:34:39.620197+00:00",
+  "candidate": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "lf_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "bytes": 17125,
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "lf_sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "bytes": 16674,
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "lf_sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "bytes": 10018,
+      "physical_lines": 279
+    },
+    "tests/discovery_runtime/test_service_request_rules.py": {
+      "path": "tests/discovery_runtime/test_service_request_rules.py",
+      "sha256": "68301e4319fa0daad720c8037614ce9171cb9102efdc0be37ceaf1e101dc2a82",
+      "lf_sha256": "68301e4319fa0daad720c8037614ce9171cb9102efdc0be37ceaf1e101dc2a82",
+      "bytes": 11018,
+      "physical_lines": 307
+    },
+    "tests/discovery_runtime/test_service_failures.py": {
+      "path": "tests/discovery_runtime/test_service_failures.py",
+      "sha256": "cb8a485429557cf04ac5d7f1d2e64f081b45ca8cba31fc969c3f68d6fbc569ae",
+      "lf_sha256": "cb8a485429557cf04ac5d7f1d2e64f081b45ca8cba31fc969c3f68d6fbc569ae",
+      "bytes": 13633,
+      "physical_lines": 383
+    },
+    "tests/discovery_runtime/test_service_result_limits.py": {
+      "path": "tests/discovery_runtime/test_service_result_limits.py",
+      "sha256": "19714270a2513980c7b874a4bc988064a97dc64f14e2c27d1eb9c7f5f0827ef3",
+      "lf_sha256": "19714270a2513980c7b874a4bc988064a97dc64f14e2c27d1eb9c7f5f0827ef3",
+      "bytes": 7846,
+      "physical_lines": 212
+    },
+    "tests/schemas/discovery/test_v2_service_result_failures.py": {
+      "path": "tests/schemas/discovery/test_v2_service_result_failures.py",
+      "sha256": "d48580b67fae4d22c91021298b4da7937dafda255344e44e96022d2abbb3b598",
+      "lf_sha256": "d48580b67fae4d22c91021298b4da7937dafda255344e44e96022d2abbb3b598",
+      "bytes": 5698,
+      "physical_lines": 175
+    },
+    "schemas/discovery/v2/service-result.schema.json": {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "lf_sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "bytes": 8893,
+      "physical_lines": 166
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "lf_sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "bytes": 8893,
+      "physical_lines": 166
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "lf_sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "bytes": 7301,
+      "physical_lines": 201
+    }
+  },
+  "ordered_stages": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-black.2026-10-20T15-24.json",
+      "sha256": "08f8906a7dbf7cfc5b591ab2c42e459e7339c0d981104ac76291adb331236a32",
+      "stage": "black",
+      "elapsed_seconds": 2.010964,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-black-raw.2026-10-20T15-24.json",
+        "sha256": "d714c428984283087b4e4b124f8ffa883e13eff8c1c3360e573089edd98086a1"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-ruff.2026-10-20T15-24.json",
+      "sha256": "3c30c94e44262f3ba3bf0984cd3c63956f15c99a3d702bfd489f29939c59d1c8",
+      "stage": "ruff",
+      "elapsed_seconds": 1.446269,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-ruff-raw.2026-10-20T15-24.json",
+        "sha256": "f780f32d7ab1fe05b1b3d3a4f4f9763c9b617d9ead512b464adaaa6195fa7706"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-pyright.2026-10-20T15-24.json",
+      "sha256": "87471cb9e564e2d10236a9fa162cb9b5c438f1d4487069f0e9d5ace75d42b60b",
+      "stage": "pyright",
+      "elapsed_seconds": 2.42219,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-pyright-raw.2026-10-20T15-24.json",
+        "sha256": "d96fede13c61e8f4290e2cd01f8b982aebd79f6ec208ac5c892438cc79e256a1"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-reprobe.2026-10-20T15-24.json",
+      "sha256": "c30ca07461eeca0c1af633e559829bc74c6f2fad57a5f05365d472217d353bd0",
+      "stage": "reprobe",
+      "elapsed_seconds": 1.611063,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-reprobe-raw.2026-10-20T15-24.json",
+        "sha256": "0251b22dfd2b7fd6a8f13eefb621051c9b1d360f86230ae7520a135c2093bb0b"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-precheck.2026-10-20T15-24.json",
+      "sha256": "b4999734b2613a3a1aa95045fe685cf923cb729dd38a0d37a8ba3b16ffb3432a",
+      "stage": "precheck",
+      "elapsed_seconds": 5.017324,
+      "completed_nodes": 23,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-precheck-raw.2026-10-20T15-24.json",
+        "sha256": "19180be89dc7dc04e45efc0b41141ae8ce337ea3796c5d0d931ab526c303741e"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-tests.2026-10-20T15-27.json",
+      "sha256": "a4ec4337c3a8d47668d13be5c64a9bff8912fad33034fa72952c6a08778d4b96",
+      "stage": "tests",
+      "elapsed_seconds": 129.475245,
+      "completed_nodes": 145,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-tests-raw.2026-10-20T15-27.json",
+        "sha256": "180c4e896e8a26177c451676ea2fcc29e7c88c47bfae6a51ffe979f318315631"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-coverage.2026-10-20T15-27.json",
+      "sha256": "1f145261ea3e72042dfe27ff407b14aedd65bb898172c404c01edf88f94f3194",
+      "stage": "coverage",
+      "elapsed_seconds": 1.611003,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-coverage-raw.2026-10-20T15-27.json",
+        "sha256": "ba84977dd17f8019240da8e49ecfc1d5117a16fa962ce101ac08b13eba897b49"
+      }
+    }
+  ],
+  "exact_nodes": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-tests.2026-10-20T15-27.json",
+    "sha256": "a4ec4337c3a8d47668d13be5c64a9bff8912fad33034fa72952c6a08778d4b96",
+    "key": "executed_nodes",
+    "count": 145
+  },
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "source_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "module": {
+        "covered_lines": 132,
+        "num_statements": 132,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 19,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 26,
+        "num_partial_branches": 0,
+        "covered_branches": 26,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "missing_lines": [],
+      "missing_branches": [],
+      "functions": {
+        "RuntimeIdentity.__post_init__": {
+          "start_line": 95,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceRuntimeError.__init__": {
+          "start_line": 120,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceRequest.__post_init__": {
+          "start_line": 164,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceRequestError.__init__": {
+          "start_line": 177,
+          "summary": {
+            "covered_lines": 6,
+            "num_statements": 6,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceArtifact.__post_init__": {
+          "start_line": 213,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "DiscoveryResult.__post_init__": {
+          "start_line": 238,
+          "summary": {
+            "covered_lines": 8,
+            "num_statements": 8,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "DiscoveryResult.to_dict": {
+          "start_line": 273,
+          "summary": {
+            "covered_lines": 2,
+            "num_statements": 2,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "DiscoveryResult.to_json": {
+          "start_line": 286,
+          "summary": {
+            "covered_lines": 2,
+            "num_statements": 2,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceAuthority.__post_init__": {
+          "start_line": 313,
+          "summary": {
+            "covered_lines": 10,
+            "num_statements": 10,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceIO.initialization": {
+          "start_line": 358,
+          "summary": {
+            "covered_lines": 0,
+            "num_statements": 0,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 1,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceIO.activation": {
+          "start_line": 363,
+          "summary": {
+            "covered_lines": 0,
+            "num_statements": 0,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 1,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceIO.runtime_identity": {
+          "start_line": 367,
+          "summary": {
+            "covered_lines": 0,
+            "num_statements": 0,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 1,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceIO.authorize": {
+          "start_line": 371,
+          "summary": {
+            "covered_lines": 0,
+            "num_statements": 0,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 1,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceIO.writer": {
+          "start_line": 382,
+          "summary": {
+            "covered_lines": 0,
+            "num_statements": 0,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 1,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "parse_service_request": {
+          "start_line": 393,
+          "summary": {
+            "covered_lines": 6,
+            "num_statements": 6,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "validate_service_result": {
+          "start_line": 430,
+          "summary": {
+            "covered_lines": 3,
+            "num_statements": 3,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        }
+      },
+      "classes": {
+        "RuntimeIdentity": {
+          "start_line": 80,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceRuntimeError": {
+          "start_line": 112,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceRequest": {
+          "start_line": 142,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceRequestError": {
+          "start_line": 169,
+          "summary": {
+            "covered_lines": 6,
+            "num_statements": 6,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceArtifact": {
+          "start_line": 199,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "DiscoveryResult": {
+          "start_line": 219,
+          "summary": {
+            "covered_lines": 12,
+            "num_statements": 12,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceAuthority": {
+          "start_line": 298,
+          "summary": {
+            "covered_lines": 10,
+            "num_statements": 10,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "ServiceIO": {
+          "start_line": 349,
+          "summary": {
+            "covered_lines": 0,
+            "num_statements": 0,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 5,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        }
+      },
+      "retained_proof_mapping": {
+        "prior_source_sha256": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+        "exact_bytes_unchanged": false,
+        "mapped_previously_covered_lines": 126,
+        "lost_previously_covered_lines": [],
+        "current_changed_executable_lines": [
+          124,
+          189,
+          194
+        ],
+        "uncovered_changed_lines": []
+      }
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "source_sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "module": {
+        "covered_lines": 154,
+        "num_statements": 154,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 3,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 56,
+        "num_partial_branches": 0,
+        "covered_branches": 56,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "missing_lines": [],
+      "missing_branches": [],
+      "functions": {
+        "_reserve": {
+          "start_line": 64,
+          "summary": {
+            "covered_lines": 19,
+            "num_statements": 19,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 14,
+            "num_partial_branches": 0,
+            "covered_branches": 14,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "wire_object": {
+          "start_line": 94,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_finding_fields": {
+          "start_line": 109,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "normalize_findings": {
+          "start_line": 123,
+          "summary": {
+            "covered_lines": 15,
+            "num_statements": 15,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "covered_branches": 8,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_artifact_fields": {
+          "start_line": 149,
+          "summary": {
+            "covered_lines": 4,
+            "num_statements": 4,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "artifact_document": {
+          "start_line": 162,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_request_fields": {
+          "start_line": 184,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "check_request": {
+          "start_line": 205,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "checked_request_document": {
+          "start_line": 231,
+          "summary": {
+            "covered_lines": 9,
+            "num_statements": 9,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_manifest": {
+          "start_line": 264,
+          "summary": {
+            "covered_lines": 18,
+            "num_statements": 18,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "covered_branches": 8,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "result_document": {
+          "start_line": 297,
+          "summary": {
+            "covered_lines": 43,
+            "num_statements": 43,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 16,
+            "num_partial_branches": 0,
+            "covered_branches": 16,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "checked_result_document": {
+          "start_line": 395,
+          "summary": {
+            "covered_lines": 6,
+            "num_statements": 6,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        }
+      },
+      "classes": {},
+      "retained_proof_mapping": {
+        "prior_source_sha256": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+        "exact_bytes_unchanged": false,
+        "mapped_previously_covered_lines": 119,
+        "lost_previously_covered_lines": [],
+        "current_changed_executable_lines": [
+          275,
+          276,
+          281,
+          285,
+          291,
+          293,
+          309,
+          310,
+          332,
+          333,
+          334,
+          372,
+          373,
+          374,
+          375,
+          378,
+          379,
+          380,
+          383,
+          384,
+          385,
+          386,
+          388,
+          389,
+          390,
+          391,
+          392
+        ],
+        "uncovered_changed_lines": []
+      }
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "source_sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "module": {
+        "covered_lines": 71,
+        "num_statements": 74,
+        "percent_covered": 95.45454545454545,
+        "percent_covered_display": "95",
+        "missing_lines": 3,
+        "excluded_lines": 2,
+        "percent_statements_covered": 95.94594594594595,
+        "percent_statements_covered_display": "96",
+        "num_branches": 58,
+        "num_partial_branches": 3,
+        "covered_branches": 55,
+        "missing_branches": 3,
+        "percent_branches_covered": 94.82758620689656,
+        "percent_branches_covered_display": "95"
+      },
+      "missing_lines": [
+        181,
+        252,
+        272
+      ],
+      "missing_branches": [
+        [
+          176,
+          181
+        ],
+        [
+          251,
+          252
+        ],
+        [
+          271,
+          272
+        ]
+      ],
+      "functions": {
+        "_conditions": {
+          "start_line": 169,
+          "summary": {
+            "covered_lines": 35,
+            "num_statements": 36,
+            "percent_covered": 97.29729729729729,
+            "percent_covered_display": "97",
+            "missing_lines": 1,
+            "excluded_lines": 0,
+            "percent_statements_covered": 97.22222222222223,
+            "percent_statements_covered_display": "97",
+            "num_branches": 38,
+            "num_partial_branches": 1,
+            "covered_branches": 37,
+            "missing_branches": 1,
+            "percent_branches_covered": 97.36842105263158,
+            "percent_branches_covered_display": "97"
+          },
+          "missing_lines": [
+            181
+          ],
+          "missing_branches": [
+            [
+              176,
+              181
+            ]
+          ]
+        },
+        "check_combinations": {
+          "start_line": 240,
+          "summary": {
+            "covered_lines": 26,
+            "num_statements": 28,
+            "percent_covered": 91.66666666666667,
+            "percent_covered_display": "92",
+            "missing_lines": 2,
+            "excluded_lines": 0,
+            "percent_statements_covered": 92.85714285714286,
+            "percent_statements_covered_display": "93",
+            "num_branches": 20,
+            "num_partial_branches": 2,
+            "covered_branches": 18,
+            "missing_branches": 2,
+            "percent_branches_covered": 90.0,
+            "percent_branches_covered_display": "90"
+          },
+          "missing_lines": [
+            252,
+            272
+          ],
+          "missing_branches": [
+            [
+              251,
+              252
+            ],
+            [
+              271,
+              272
+            ]
+          ]
+        }
+      },
+      "classes": {},
+      "retained_proof_mapping": {
+        "prior_source_sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+        "exact_bytes_unchanged": true,
+        "mapped_previously_covered_lines": 71,
+        "lost_previously_covered_lines": [],
+        "current_changed_executable_lines": [],
+        "uncovered_changed_lines": []
+      }
+    }
+  },
+  "coverage_attribution": "Current coverage.py named function/class bodies, excluding declaration lines. Raw module coverage remains separate. Protocol declarations have zero executable bodies. No historical coverage is added to current totals.",
+  "source_stability": {
+    "reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-tests.2026-10-20T15-27.json",
+      "sha256": "a4ec4337c3a8d47668d13be5c64a9bff8912fad33034fa72952c6a08778d4b96"
+    },
+    "keys": [
+      "before",
+      "after"
+    ],
+    "each_ordered_stage_identical": true,
+    "current_bindings_match": true
+  },
+  "retained": {
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+      "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+    },
+    "original_failed_candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-candidate.2026-10-20T14-58.json",
+      "sha256": "1081c36750ce9cce889436fe6b5c2a90acb6845d8ffd2c995ebf723c5e04c934"
+    },
+    "finite_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.json",
+      "sha256": "e17cb15a5550b54975c7986de62ef68c676459d403869a51af3e011a0053c30d"
+    },
+    "original_probe": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-probe.2026-10-20T15-13.json",
+      "sha256": "ca11517c8d775d10c3b8938701c4c1c3f9d027357f7ee890dde6b8c08297b4cc"
+    },
+    "matrix": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-matrix-audit.2026-10-20T14-51.json",
+      "sha256": "33478654441cd68d4afd8897800c38589fa145f1341fb94395bb7928db9a397e"
+    }
+  },
+  "preservation": {
+    "original_116_identities_retained": true,
+    "added_nodes": [
+      "tests/discovery_runtime/test_service_failures.py::test_result_direct_boundaries_reject_before_retaining_invalid_values[artifact-type]",
+      "tests/discovery_runtime/test_service_failures.py::test_result_direct_boundaries_reject_before_retaining_invalid_values[artifact-count]",
+      "tests/discovery_runtime/test_service_failures.py::test_result_direct_boundaries_reject_before_retaining_invalid_values[finding-tuple]",
+      "tests/discovery_runtime/test_service_failures.py::test_result_direct_boundaries_reject_before_retaining_invalid_values[finding-count]",
+      "tests/discovery_runtime/test_service_failures.py::test_result_direct_boundaries_reject_before_retaining_invalid_values[finding-type]",
+      "tests/discovery_runtime/test_service_failures.py::test_result_direct_boundaries_reject_before_retaining_invalid_values[summary-fields]",
+      "tests/discovery_runtime/test_service_failures.py::test_direct_request_and_schema_validation_reject_invalid_types",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[principal-False]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[principal-True]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[code-False]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[code-True]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[request-operation-False]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[request-operation-True]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[request-mode-False]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[request-mode-True]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[operation-False]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[operation-True]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[mode-False]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_enum_boundaries_reject_or_redact_before_equality[mode-True]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[path]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[missing]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[source-pin]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[target-pin]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[summary]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[finding]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[artifact]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[content]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_aggregate_work_rejects_before_projection_hash_or_encoding[aggregate-content]",
+      "tests/discovery_runtime/test_service_result_limits.py::test_small_manifest_preserves_digest_and_both_roles_with_sufficient_work"
+    ],
+    "old_assertions_and_two_ST1_fixtures": "Confirmed by the independent finite review; no repeated behavioral or source review during assembly."
+  },
+  "raw_originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-freeze-originals.2026-10-20T15-34.json",
+    "sha256": "30a865bf03a46727281c04a2a452be6a804dcd5423473d9a3a0f4960e410d755"
+  },
+  "archive_decode_verified": true,
+  "presentation": {
+    "readable": "Explicit UTF-8; authored JSON/Markdown use LF and exactly one terminal newline.",
+    "raw": "Original source, scripts, coverage database and coverage JSON are unchanged. Raw coverage JSON's missing terminal newline and original script/source CRLF or terminal blank lines are retained inside the archive.",
+    "raw_to_readable": "Each executed stage retains stdout/stderr/harness/runner_base in its existing archive. The archived runner's readable() replaces the two path aliases, normalizes CR/LF, strips line-end whitespace and trims the final readable stream.",
+    "aliases": {
+      "archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-freeze-originals.2026-10-20T15-34.json",
+        "sha256": "30a865bf03a46727281c04a2a452be6a804dcd5423473d9a3a0f4960e410d755"
+      },
+      "member": "path-aliases.json"
+    }
+  },
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-staging.2026-10-20T15-34.json",
+  "limitations": "Subset proof only. P6-T1 composed final gates and independent acceptance remain with the coordinator. No operation handlers, host authority, publication or live build-manifest verification is claimed."
+}

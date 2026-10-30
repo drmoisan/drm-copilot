@@ -1,0 +1,22 @@
+{
+  "Command": "poetry run python SCRATCH/issue-980-p6t3-subsets-freeze.py",
+  "EXIT_CODE": 1,
+  "Output Summary": "Initial evidence-only assembly stopped at presentation qualification; no source/test mutation or execution.",
+  "Timestamp": "2026-10-21T16:56:07.461411+00:00",
+  "cause": "The evidence glob included an immutable reviewer-owned CRLF artifact; the authored-evidence LF rule must not rewrite or reject that external original.",
+  "correction": "Use the exact authored command/body/freeze patterns; preserve reviewer original bytes and references.",
+  "observed_diagnostics": [
+    "AssertionError: p6t3-validator-review-preservation-union.2026-10-21T16-49.json",
+    "AssertionError: p6t3-validator-valr1-confirmation.2026-10-21T16-54.json"
+  ],
+  "retained_failed_scripts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-raw.2026-10-21T16-54.json",
+      "sha256": "0213afd00fc29e8914ef29a887b993882056d4cf2358a6ec98e21a447c7a2f3b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-raw.2026-10-21T16-55.json",
+      "sha256": "c892b22b52dd0fabec74d900cb2b221d7f4ed7865bf3f8275c468b459dda6b3f"
+    }
+  ]
+}

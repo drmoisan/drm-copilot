@@ -1,0 +1,34 @@
+$schema: urn:drm-copilot:discovery:2.0.0:domain-profile
+schema_version: 2.0.0
+artifact_kind: domain-profile
+id: "{{profile_id}}"
+profile_version: 2
+profile_state: draft
+system: {id: "{{system_id}}", name: "{{system_name}}", role: "{{role}}"}
+repository: {id: "{{repository_id}}", vcs: git, revision: "{{revision}}", revision_policy: working-tree-at-pin}
+production_roots: "{{production_roots}}"
+test_roots: "{{test_roots}}"
+project_entry_points: []
+documentation_roots: "{{documentation_roots}}"
+evidence_roots: "{{evidence_roots}}"
+repositories: []
+clients: []
+required_platforms: []
+required_modes: [online]
+required_feature_dimensions: []
+runtime: {capability: none, required_feature_ids: []}
+analyzers: {enabled: [], options: {}, ignored_paths: [], extension_result_manifests: []}
+excluded_paths: []
+artifacts: "{{artifacts}}"
+completion_gates:
+  require_confirmed_scope: true
+  require_current_inventory: true
+  require_all_dispositions: true
+  require_feature_evidence: true
+  require_acceptance_scenarios: true
+  require_runtime_for_declared_features: true
+  block_on_unresolved_required_behavior: true
+  require_approved_deviations: true
+  planning_prerequisite: discovery-complete
+decision_owners: []
+extensions: {}

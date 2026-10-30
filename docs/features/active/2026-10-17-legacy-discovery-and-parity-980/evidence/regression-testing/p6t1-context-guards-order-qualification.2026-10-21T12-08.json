@@ -1,0 +1,55 @@
+{
+  "actual_ordered_stages": [
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-black.2026-10-21T12-04.json",
+        "sha256": "11c0043253aed68c5d21a3380a77382f130803fd1696f8303c646c5befd17a73"
+      },
+      "stage": "black",
+      "started_utc": "2026-10-21T12:04:38.048353+00:00"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-ruff.2026-10-21T12-04.json",
+        "sha256": "365f666551124a144f599165b2731c2bbdca2b3c8636162ef83d5a8a53bc677a"
+      },
+      "stage": "ruff",
+      "started_utc": "2026-10-21T12:04:38.492138+00:00"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-pyright.2026-10-21T12-04.json",
+        "sha256": "f937fd30dce162f511bb3505ffecbcf3443a43c8d6b3245737fb8f084437c0db"
+      },
+      "stage": "pyright",
+      "started_utc": "2026-10-21T12:04:38.741488+00:00"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-tests.2026-10-21T12-05.json",
+        "sha256": "70b2c5d27c15895c2d6d8bd66f6c2c04c7d3c7d9ff2c99692389a84feddf1a39"
+      },
+      "stage": "tests",
+      "started_utc": "2026-10-21T12:04:39.998250+00:00"
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-coverage.2026-10-21T12-05.json",
+        "sha256": "8db9081e075e130522bb204739f649489017f1f23db7a7a919e3624cc86943cf"
+      },
+      "stage": "coverage",
+      "started_utc": "2026-10-21T12:05:35.195021+00:00"
+    }
+  ],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-freeze.2026-10-21T12-07.json",
+    "sha256": "80b69e65e8e9c8f7aa8eb9a0539e9f280e1dc023a23a177e370a9d20d4b04506"
+  },
+  "prior_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-staging.2026-10-21T12-07.json",
+    "sha256": "250146ffd838c6af08fdaeeb7defc45420fc6098aca3e0bed0589d2a959ccb70"
+  },
+  "qualification": "The frozen ordered_stages references were filename-sorted for presentation. Actual execution order is proven by each immutable started_utc and is explicitly listed here; no command or test rerun.",
+  "staging_addition": "This qualification file only; prior listed paths remain unchanged.",
+  "task": "P6-T1"
+}

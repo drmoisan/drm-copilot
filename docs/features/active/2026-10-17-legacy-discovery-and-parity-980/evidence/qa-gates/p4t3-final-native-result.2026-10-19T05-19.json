@@ -1,0 +1,129 @@
+{
+  "checks": [
+    "native capture retains all four selected C# byte inputs",
+    "real Git identity and captured source bytes agree",
+    "native lexical adapters retain physical declarations without blockers",
+    "wide encoding and inactive branches retain names while raw string traps stay absent",
+    "composed inventory identity is independent of analyzer order and capture clock",
+    "ambiguous handler relationships remain inferred with unresolved targets",
+    "ledger proposals remain uninspected and unassigned",
+    "analysis preserves the native source tree and Git status"
+  ],
+  "component_count": 12,
+  "finding_count": 42,
+  "git_status_unchanged": true,
+  "inputs": {
+    "src/Conditional.cs": "25ad73f737b1afd3223088bca7d142cc5e027970432bddf6997fa410cfa67a5e",
+    "src/Unicode.CS": "f633c9cf87fa18340e4cc9a247cf53f7e1a47ae39ffe1636674f6dc34e9a72ca",
+    "src/csharp_declarations.cs": "f4aafeabc426e18b1a0a5fdd7855fec257d8ffe30d3e2c10e28643397148d6b8",
+    "src/csharp_events.cs": "49e3c125889094ff9dd9438e318f4276672a7ab7509314e061bc9be16e429cf7"
+  },
+  "inventory_id": "inventory-e4b7e65b89a9d68a24897abf63af82bd34e882e678f2abb0db73f60784304393",
+  "platform": "win32",
+  "profile": {
+    "$schema": "urn:drm-copilot:discovery:2.0.0:domain-profile",
+    "analyzers": {
+      "enabled": [
+        "repository",
+        "csharp-symbols",
+        "event-subscriptions"
+      ],
+      "extension_result_manifests": [],
+      "ignored_paths": [],
+      "options": {
+        "max_file_bytes": 16384
+      }
+    },
+    "artifact_kind": "domain-profile",
+    "artifacts": {
+      "acceptance": "docs/migration/discovery/acceptance",
+      "characterization": "docs/migration/discovery/characterization",
+      "coverage_ledger": "docs/migration/discovery/coverage-ledger.json",
+      "evidence": "docs/migration/discovery/evidence",
+      "feature_contracts": "docs/migration/discovery/feature-contracts",
+      "implementation_records": "docs/migration/discovery/implementation-records",
+      "inventory": "docs/migration/discovery/inventory",
+      "parity_matrix": "docs/migration/discovery/parity-matrix.json",
+      "product_decisions": "docs/migration/discovery/product-decisions.yaml",
+      "profile": "docs/migration/discovery/domain-profile.yaml",
+      "reports": "docs/migration/discovery/reports",
+      "root": "docs/migration/discovery",
+      "scope": "docs/migration/discovery/scope.yaml",
+      "source_snapshots": "docs/migration/discovery/source-snapshots",
+      "unspecified_behaviors": "docs/migration/discovery/unspecified-behaviors.yaml"
+    },
+    "clients": [],
+    "completion_gates": {
+      "block_on_unresolved_required_behavior": true,
+      "planning_prerequisite": "discovery-complete",
+      "require_acceptance_scenarios": true,
+      "require_all_dispositions": true,
+      "require_approved_deviations": true,
+      "require_confirmed_scope": true,
+      "require_current_inventory": true,
+      "require_feature_evidence": true,
+      "require_runtime_for_declared_features": true
+    },
+    "decision_owners": [
+      {
+        "id": "owner-example",
+        "required_evidence_types": [
+          "decision"
+        ]
+      }
+    ],
+    "documentation_roots": [],
+    "evidence_roots": [
+      "docs/migration/discovery/evidence"
+    ],
+    "excluded_paths": [],
+    "extensions": {
+      "example.discovery": {
+        "catalog_label": "Synthetic fixture",
+        "revision_notes": []
+      }
+    },
+    "id": "profile-example",
+    "production_roots": [
+      "src"
+    ],
+    "profile_state": "configured",
+    "profile_version": 2,
+    "project_entry_points": [],
+    "repositories": [],
+    "repository": {
+      "id": "workspace-example",
+      "revision": "f189dff17cbb65bc768637289b4411f28d5fd253",
+      "revision_policy": "working-tree-at-pin",
+      "vcs": "git"
+    },
+    "required_feature_dimensions": [
+      "trigger",
+      "observable_outputs"
+    ],
+    "required_modes": [
+      "online"
+    ],
+    "required_platforms": [
+      "browser"
+    ],
+    "runtime": {
+      "capability": "manual",
+      "required_feature_ids": []
+    },
+    "schema_version": "2.0.0",
+    "system": {
+      "id": "processing-example",
+      "name": "Example processing system",
+      "role": "legacy-source"
+    },
+    "test_roots": []
+  },
+  "relationship_count": 5,
+  "revision": "f189dff17cbb65bc768637289b4411f28d5fd253",
+  "scratch_repository": "SCRATCH/native-csharp-a99d06eaecbc4f55a2ee75535409efa0",
+  "semantic_sha256": "e4b7e65b89a9d68a24897abf63af82bd34e882e678f2abb0db73f60784304393",
+  "source_tree_unchanged": true,
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T05:19:00.966274+00:00"
+}

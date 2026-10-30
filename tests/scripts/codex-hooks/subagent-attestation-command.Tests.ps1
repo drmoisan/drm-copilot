@@ -53,6 +53,18 @@ Describe 'Subagent attestation command with deterministic input boundaries' {
         }
     }
 
+    It 'keeps the ordinary and epic start path for <AgentType> without consulting the discovery attestation' -ForEach @(
+        @{ AgentType = 'epic-planner' }; @{ AgentType = 'atomic-executor-c3' }
+    ) {
+        Mock Get-CodexDiscoveryStartAttestation { throw 'discovery attestation must not run for an ordinary start' }
+        $script:PayloadRaw = "{`"session_id`":`"one`",`"turn_id`":`"turn`",`"agent_id`":`"child`",`"agent_type`":`"$AgentType`",`"model`":`"gpt-6-astra`"}"
+        $result = Invoke-CodexSubagentAttestationCommand @script:CommandParameters
+        $result.exit_code | Should -Be 0
+        $script:Inputs.Payload.agent_type | Should -Be $AgentType
+        Should -Invoke Get-CodexDiscoveryStartAttestation -Times 0 -Exactly
+        Should -Invoke Get-CodexSubagentAttestationFromAuthority -Times 1 -Exactly
+    }
+
     It 'keeps valid checkpoints and ignores optional malformed checkpoint content' {
         Mock Test-Path { $true }
         $script:CheckpointText = @{

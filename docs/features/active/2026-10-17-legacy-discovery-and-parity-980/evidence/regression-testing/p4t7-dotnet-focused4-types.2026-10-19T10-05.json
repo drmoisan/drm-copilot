@@ -1,0 +1,47 @@
+{
+  "stage": "types",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:05:53.155265+00:00",
+  "finished": "2026-10-19T10:05:55.133584+00:00",
+  "duration_seconds": 1.979,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "29581b603ac837da31beb5fde6a8a711b87ddccc66f7feda42ca4c942bbbdcce",
+      "physical_lines": 375
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "29581b603ac837da31beb5fde6a8a711b87ddccc66f7feda42ca4c942bbbdcce",
+      "physical_lines": 375
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused4-types.100555133584.stdout.bin",
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_bytes": 194,
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused4-types.100555133584.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "e5954b7ef4514589ed5a1f764d4fd701f73600c3007966366463ae6a1402744c"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}

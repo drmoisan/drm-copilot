@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-19T02:23:02Z",
+  "rejected_calls": 2,
+  "actions": [
+    "Write two local scratch Python QA helper files",
+    "Write a local receipt for the prior rejected invocation"
+  ],
+  "executed": false,
+  "exit_code": null,
+  "mutated_files": [],
+  "rejection_code": "PROMOTION_MCP_ONLY_BLOCKED",
+  "intended_github_actions": [],
+  "correction": "Normal apply_patch file edits within already authorized scratch and evidence scope",
+  "hook_or_policy_changes": false,
+  "gate_execution_started": false,
+  "frozen_source_test_paths": 26
+}

@@ -1,0 +1,61 @@
+{
+  "stage": "lint",
+  "label": "p4t7-shared-repair1-lint",
+  "started": "2026-10-19T10:21:17.341905+00:00",
+  "finished": "2026-10-19T10:21:18.517803+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py tests/discovery_runtime/analyzer/test_dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+  "exit_code": 1,
+  "duration_seconds": 1.176,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "264bb245cae70838d0cac38b4dd35a63d89a64fb64726030b29c443b46d45588",
+      "physical_lines": 495
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "fab39386ca40b332bf45847fc2d04c993079300ea5b05dcc9771004cc80f9948",
+      "physical_lines": 376
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "038b8ca40a54e7ca270eadd95186827e58d783d675257e7aab9b91b4d38fa85b",
+      "physical_lines": 361
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "264bb245cae70838d0cac38b4dd35a63d89a64fb64726030b29c443b46d45588",
+      "physical_lines": 495
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "fab39386ca40b332bf45847fc2d04c993079300ea5b05dcc9771004cc80f9948",
+      "physical_lines": 376
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "038b8ca40a54e7ca270eadd95186827e58d783d675257e7aab9b91b4d38fa85b",
+      "physical_lines": 361
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair1-lint-102118.stdout.bin",
+      "raw_sha256": "0648327fb2de52d77931a52986e01d94ac2dfdb15013d964d8fd188c79db1d60",
+      "raw_bytes": 2677,
+      "presentation": "I001 [*] Import block is un-sorted or un-formatted\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_inputs.py:3:1\n   |\n 1 |   \"\"\"Bound and sanitize dependency declarations before format-specific projection.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from dataclasses import dataclass\n 6 | | from typing import Literal, cast\n 7 | |\n 8 | | from .dependency_values import (\n 9 | |     DependencyValue as DependencyValue,\n10 | |     Ecosystem as Ecosystem,\n11 | |     dependency_value as dependency_value,\n12 | |     safe_identifier as safe_identifier,\n13 | | )\n   | |_^\n14 |\n15 |   DependencyKind = Literal[\"declaration\", \"locked-package\", \"declared-lock-edge\"]\n   |\nhelp: Organize imports\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_input_limits.py:3:1\n   |\n 1 |   \"\"\"Verify dependency work and allocation boundaries using only memory values.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from collections.abc import Iterator\n 6 | | from dataclasses import replace\n 7 | | from typing import Self, SupportsIndex, cast\n 8 | |\n 9 | | import pytest\n10 | | from drm_copilot_discovery.analyzer import dependency_values\n11 | | from drm_copilot_discovery.analyzer.dependency_inputs import (\n12 | |     DependencyBudget,\n13 | |     DependencyInputError,\n14 | |     DependencyLimits,\n15 | |     DependencyResult,\n16 | |     dependency_value,\n17 | |     safe_identifier,\n18 | | )\n19 | | from tests.discovery_runtime.analyzer.test_dependency_inputs import add\n   | |_______________________________________________________________________^\n   |\nhelp: Organize imports\n\nTC003 Move standard library import `collections.abc.Iterator` into a type-checking block\n --> tests\\discovery_runtime\\analyzer\\test_dependency_input_limits.py:5:29\n  |\n3 | from __future__ import annotations\n4 |\n5 | from collections.abc import Iterator\n  |                             ^^^^^^^^\n6 | from dataclasses import replace\n7 | from typing import Self, SupportsIndex, cast\n  |\nhelp: Move into type-checking block\n\nF401 [*] `drm_copilot_discovery.analyzer.dependency_inputs.DependencyInputError` imported but unused\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_inputs.py:11:5\n   |\n 9 |     DependencyBudget,\n10 |     DependencyCandidate,\n11 |     DependencyInputError,\n   |     ^^^^^^^^^^^^^^^^^^^^\n12 |     DependencyLimits,\n13 |     DependencyResult,\n   |\nhelp: Remove unused import: `drm_copilot_discovery.analyzer.dependency_inputs.DependencyInputError`\n\nFound 4 errors.\n[*] 3 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair1-lint-102118.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared SR1-SR4 repair only"
+}

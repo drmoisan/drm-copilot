@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-10-19T10-05",
+  "published_utc": "2026-10-19T10:05:04.882031+00:00",
+  "exit_code": 0,
+  "command": "poetry run python SCRATCH/issue-980-p4t7-shared-probe.py",
+  "scope": "Immutable dependency_inputs shared subset only; no worker or predecessor suite.",
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": "474422ef600bf8e68c8804cd0193aea6fe3b2ecaef8e64818d7e3548fb4ba39a"
+  },
+  "regex_input_recipe": "'1-' + 'a-' * repetitions + '!'",
+  "regex_observations": [
+    {
+      "seconds": 0.00017340001068077981,
+      "kind": "unsupported",
+      "status": "returned",
+      "repetitions": 8,
+      "input_characters": 19,
+      "parent_elapsed_seconds": 0.1368023999966681
+    },
+    {
+      "seconds": 0.0004022000066470355,
+      "kind": "unsupported",
+      "status": "returned",
+      "repetitions": 12,
+      "input_characters": 27,
+      "parent_elapsed_seconds": 0.1343197000096552
+    },
+    {
+      "seconds": 0.003800899983616546,
+      "kind": "unsupported",
+      "status": "returned",
+      "repetitions": 16,
+      "input_characters": 35,
+      "parent_elapsed_seconds": 0.14047959999879822
+    },
+    {
+      "seconds": 0.057026299997232854,
+      "kind": "unsupported",
+      "status": "returned",
+      "repetitions": 20,
+      "input_characters": 43,
+      "parent_elapsed_seconds": 0.19100660001276992
+    },
+    {
+      "status": "operational-timeout",
+      "child_budget_seconds": 2.0,
+      "repetitions": 28,
+      "input_characters": 59,
+      "parent_elapsed_seconds": 2.0197768000070937
+    }
+  ],
+  "timing_qualification": "Diagnostic measurements with operational termination only; no unit-test timing threshold or whole-task acceptance claim.",
+  "prospective_encoding": {
+    "configured_text_capacity": 5,
+    "observations": [
+      {
+        "characters": 3,
+        "allocated_bytes": 12
+      }
+    ],
+    "result_code": "dependency-limit",
+    "partial_result_refused": true
+  },
+  "version_classifications": [
+    {
+      "input": "1.2.3",
+      "kind": "literal",
+      "value": "1.2.3"
+    },
+    {
+      "input": "*",
+      "kind": "constraint",
+      "value": "*"
+    },
+    {
+      "input": "1.*",
+      "kind": "literal",
+      "value": "1.*"
+    },
+    {
+      "input": "1.x",
+      "kind": "literal",
+      "value": "1.x"
+    },
+    {
+      "input": "1.2.*",
+      "kind": "literal",
+      "value": "1.2.*"
+    },
+    {
+      "input": "1.X",
+      "kind": "literal",
+      "value": "1.X"
+    }
+  ],
+  "exact_executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe-harness.2026-10-19T10-05.txt",
+    "sha256": "21a03f97c8eff10082e1f72f705bf2b4c3ffbb82d08ea9152c1988636fc69fe6"
+  }
+}

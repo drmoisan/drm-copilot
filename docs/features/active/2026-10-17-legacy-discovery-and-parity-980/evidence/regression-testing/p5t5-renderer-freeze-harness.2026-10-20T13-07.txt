@@ -1,0 +1,203 @@
+"""Close the fixed renderer proof and exact staging scope without suite execution."""
+import ast
+import base64
+import gzip
+import hashlib
+import json
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+sys.stdout.reconfigure(encoding="utf-8")
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+QA, REG, OTHER = (FEATURE / "evidence" / name for name in ("qa-gates", "regression-testing", "other"))
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def sha(raw):
+    """Return the exact byte-stream identity."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def read(path):
+    """Read authored UTF-8 JSON explicitly, without touching its bytes."""
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def save(path, value):
+    """Write one authored UTF-8/LF JSON receipt with exactly one terminal LF."""
+    path.write_text(json.dumps(value, indent=2, ensure_ascii=True) + "\n",
+                    encoding="utf-8", newline="\n")
+
+
+def ref(path):
+    """Bind an existing workspace artifact by exact bytes."""
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes())}
+
+
+audit_path = QA / "p5t5-renderer-repair-audit.2026-10-20T13-01.json"
+audit = read(audit_path)
+proof_path = REG / "p5t5-renderer-repair2-tests.2026-10-20T13-00.json"
+proof = read(proof_path)
+examples_path = OTHER / "p5t5-renderer-examples.2026-10-20T13-03.json"
+examples = read(examples_path)
+owned = list(audit["candidate"])
+assert audit["status"] == examples["status"] == "PASS"
+assert proof["clean"] and len(proof["executed_nodes"]) == 77
+assert all(sha((ROOT / path).read_bytes()) == row["sha256"] for path, row in audit["candidate"].items())
+assert all(sha((ROOT / path).read_bytes()) == value for path, value in proof["after"].items()
+           if not path.startswith("<SCRATCH>"))
+assert all(sha((ROOT / row["path"]).read_bytes()) == row["sha256"]
+           for case in examples["cases"] for row in case["files"])
+precheck_path = REG / "p5t5-renderer-repair2-precheck.2026-10-20T12-59.json"
+assert len(read(precheck_path)["executed_nodes"]) == 2
+originals = read(QA / "p5t5-renderer-repair1-originals.2026-10-20T12-57.json")
+coefficient_changes = []
+for path in owned:
+    old = gzip.decompress(base64.b64decode(originals[path]["data"]))
+    current = (ROOT / path).read_bytes()
+    if old != current:
+        coefficient_changes.append(path)
+assert coefficient_changes == [
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+    "tests/discovery_runtime/test_acceptance_render_limits.py",
+]
+assert read(REG / "p5t5-renderer-repair1-tests.2026-10-20T12-51.json")["executed_nodes"] == proof["executed_nodes"]
+streams = {path: (ROOT / path).read_bytes() for path in owned}
+for name in ("p5t5-renderer-repair2.coverage", "p5t5-renderer-repair2-coverage.json",
+             "p5t5-renderer-repair2-precheck.coverage", "p5t5-renderer-repair2-precheck-coverage.json",
+             "p5t5-renderer-gates.py", "p5t5-renderer-repair-gates.py",
+             "p5t5-renderer-repair-audit.py", "p5t5-renderer-examples.py",
+             "p5t5-renderer-examples-diagnostic.py", "p5t5-renderer-repair1-preserve.py"):
+    streams["<SCRATCH>/" + name] = (SCRATCH / name).read_bytes()
+streams["freeze-harness.py"] = Path(__file__).read_bytes()
+archive = {
+    name: {"encoding": "gzip-base64", "bytes": len(raw), "sha256": sha(raw),
+           "data": base64.b64encode(gzip.compress(raw, mtime=0)).decode("ascii")}
+    for name, raw in streams.items()
+}
+assert all(gzip.decompress(base64.b64decode(row["data"])) == streams[name] for name, row in archive.items())
+archive_path = REG / f"p5t5-renderer-freeze-originals.{STAMP}.json"
+save(archive_path, archive)
+harness_path = REG / f"p5t5-renderer-freeze-harness.{STAMP}.txt"
+harness_path.write_bytes(Path(__file__).read_bytes())
+stages = []
+for name in ("black", "ruff", "pyright", "precheck", "precheck-coverage", "tests", "coverage"):
+    path = sorted(REG.glob(f"p5t5-renderer-repair2-{name}.20*.json"))[-1]
+    stage = read(path)
+    assert stage["clean"] and stage["before"] == stage["after"]
+    assert all(stage["after"][path] == proof["after"][path] for path in owned)
+    stages.append({**ref(path), "stage": name, "elapsed_seconds": stage["elapsed_seconds"],
+                   "completed_nodes": len(stage["executed_nodes"])})
+authoring_path = REG / "p5t5-renderer-examples-authoring.2026-10-20T13-03.json"
+assert read(authoring_path)["clean"]
+purity = {}
+for path in owned:
+    tree = ast.parse((ROOT / path).read_text(encoding="utf-8"))
+    forbidden = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            name = ast.unparse(node.func)
+            if name in {"open", "subprocess.run", "subprocess.Popen", "tempfile.TemporaryDirectory",
+                        "tempfile.NamedTemporaryFile", "socket.socket", "requests.get"}:
+                forbidden.append({"line": node.lineno, "call": name})
+    assert not forbidden
+    purity[path] = {"forbidden_io_calls": forbidden}
+freeze_path = REG / f"p5t5-renderer-freeze.{STAMP}.json"
+markdown_path = freeze_path.with_suffix(".md")
+stage_path = REG / f"p5t5-renderer-staging.{STAMP}.json"
+freeze = {
+    "task": "P5-T5", "status": "FROZEN_FOCUSED_PASS_PENDING_INDEPENDENT_CONFIRMATION",
+    "created_utc": datetime.now(timezone.utc).isoformat(),
+    "candidate": audit["candidate"], "coverage_and_node_audit": ref(audit_path),
+    "nodes_key": "current_nodes", "nodes": 77, "retained_original_nodes": 62,
+    "added_resource_nodes": 15, "ordered_stages": stages,
+    "coverage": audit["coverage_summary"], "all_17_raw_ranges_at_least_90_percent": True,
+    "previously_covered_statement_losses": [], "changed_uncovered_statements": [],
+    "source_and_assertion_preservation": "The audit binds exact original archive, qualified extracted function mapping, all 62 original node identities and assertion/decorator ASTs. No model/generator or predecessor suite replay.",
+    "rr2_final_delta": {
+        "from": ref(QA / "p5t5-renderer-repair1-originals.2026-10-20T12-57.json"),
+        "changed_paths": coefficient_changes,
+        "coefficient": 16,
+        "fixed_upper_bound": {"encoder": 2, "block_concatenation": 2,
+                              "markdown_concatenation": 7, "final_encoding": 1,
+                              "public_file_decoding": 1, "total": 13},
+        "qualification": "Candidate-block joins occur on shorter paths. The 16-unit reservation is independent of input-character traversal and key-sort reserves.",
+    },
+    "raw_originals": ref(archive_path), "purity": purity,
+    "examples": ref(examples_path), "example_authoring": ref(authoring_path),
+    "example_paths": examples["stage_paths"],
+    "retained_failure_and_review": [
+        ref(QA / "p5t5-renderer-candidate.2026-10-20T12-30.json"),
+        ref(QA / "p5t5-executor-renderer-review.2026-10-20T12-39.json"),
+        ref(OTHER / "p5t5-renderer-examples-diagnostic.2026-10-20T13-03.json"),
+    ],
+    "retained_baseline": ref(FEATURE / "evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json"),
+    "split_absence": ref(FEATURE / "evidence/baseline/p5t5-renderer-split.2026-10-20T12-44.json"),
+    "public_composition_selectors": [
+        "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_approved_target_trace_retains_original_decision_and_owner",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_unknown_expected_behavior_remains_pending_markdown",
+    ],
+    "presentation": {
+        "authored_receipts": "UTF-8, LF, exactly one final newline; no trailing whitespace.",
+        "raw_coverage": "Exact coverage.py JSON lacks terminal LF and is preserved only in its lossless archive, without rewriting tool output.",
+        "working_vs_git": "Candidate supplies both exact working SHA-256 and CRLF-to-LF SHA-256. Only newline normalization is qualified.",
+        "failure_stream_limit": "The first example authoring error retained its tool-rendered summary, exact script and verified no-write result; it did not capture separate raw subprocess streams.",
+    },
+    "scope_limits": "Renderer data only: no step implementation, host execution, grant minting, publication, plan/AC checkoff, or Git/checkpoint mutation.",
+    "staging_manifest": stage_path.relative_to(ROOT).as_posix(),
+}
+save(freeze_path, freeze)
+markdown_path.write_text(
+    "# P5-T5 renderer focused freeze\n\n"
+    "Black, Ruff and scoped Pyright passed. Both final counted prechecks passed; "
+    "the complete unchanged 77-case population passed in 29.513 seconds. All 62 "
+    "original nodes and assertions remain preserved. All 17 current raw AST "
+    "ranges meet 90%; no previously covered statement was lost.\n\n"
+    "Gherkin: 146/148 statements and 56/58 branches. Text helper: 90/94 statements "
+    "and 46/50 branches. The final coefficient reserves 16 escaped-byte traversals "
+    "against the documented fixed upper bound of 13.\n\n"
+    "Three declared synthetic fixture sets produced seven exactly verified rendered "
+    "files and a README. Captured inputs and output identities are retained in the "
+    "linked example receipt. Rendering does not confer runtime or publication authority.\n\n"
+    f"Exact bindings, original failures and raw-stream qualifications: `{freeze_path.name}`.\n"
+    f"Stage only the explicit paths in `{stage_path.name}`. Independent confirmation "
+    "and the combined final task gates remain pending.\n",
+    encoding="utf-8", newline="\n",
+)
+evidence_paths = sorted(path for path in (FEATURE / "evidence").rglob("p5t5-renderer-*") if path.is_file())
+presentation = []
+for path in evidence_paths:
+    raw = path.read_bytes()
+    if path.suffix in {".json", ".md"}:
+        assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), path
+        assert all(line == line.rstrip() for line in raw.splitlines()), path
+    else:
+        if b"\r" in raw or not raw.endswith(b"\n") or raw.endswith(b"\n\n"):
+            presentation.append({**ref(path), "qualification": "Exact raw executed harness snapshot preserved."})
+untracked = subprocess.run(
+    ["git", "ls-files", "--others", "--exclude-standard", "-z", "--",
+     (FEATURE / "evidence").relative_to(ROOT).as_posix()],
+    check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+).stdout.decode("utf-8").split("\0")
+untracked_set = set(untracked)
+stage_files = set(owned + examples["stage_paths"])
+stage_files.update(path.relative_to(ROOT).as_posix() for path in evidence_paths
+                   if path.relative_to(ROOT).as_posix() in untracked_set)
+bindings = {path: {"sha256": sha((ROOT / path).read_bytes()),
+                   "lf_sha256": sha((ROOT / path).read_bytes().replace(b"\r\n", b"\n")),
+                   "bytes": (ROOT / path).stat().st_size}
+            for path in sorted(stage_files)}
+save(stage_path, {"task": "P5-T5", "created_utc": datetime.now(timezone.utc).isoformat(),
+                  "freeze": ref(freeze_path),
+                  "stage_paths": [*sorted(stage_files), stage_path.relative_to(ROOT).as_posix()],
+                  "working_bindings": bindings, "raw_snapshot_qualifications": presentation,
+                  "self_binding": "Include this manifest; its exact hash is returned separately to the coordinator.",
+                  "ownership": "Only the five repaired source/test paths, declared examples and untracked p5t5-renderer evidence. Shared/Set E/reviewer records remain separately owned."})
+assert all(sha((ROOT / path).read_bytes()) == row["sha256"] for path, row in audit["candidate"].items())
+print(json.dumps({"freeze": ref(freeze_path), "staging": ref(stage_path),
+                  "stage_paths": len(stage_files) + 1, "examples": len(examples["stage_paths"])}))

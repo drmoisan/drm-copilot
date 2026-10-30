@@ -153,8 +153,22 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
         @($live | Where-Object Surface -eq 'codex').Count | Should -BeGreaterThan 0
     }
 
+    It 'S9: no registered hook loads the retired DiscoveryValidation compatibility module (issue #980)' {
+        # Artifact meaning belongs to the Python engine; native hooks verify protected authority through
+        # the sibling Discovery* modules. A hook that imported the compatibility module, directly or
+        # transitively, could only ever receive a validation-required result, so no closure may carry it.
+        $loaders = foreach ($row in @($script:HookRows)) {
+            $registration = Get-SyntheticRegistration -RootPath $row.RootPath -Surface $row.Surface -HookEvent $row.Event -Hook $row.Hook
+            foreach ($edge in @(Get-HookDependencyClosure -Registration $registration | Where-Object { $_.Leaf -eq 'DiscoveryValidation.psm1' })) {
+                "$($row.Root) $($row.Surface) $($edge.Via):$($edge.Line)"
+            }
+        }
+        @($script:HookRows).Count | Should -BeGreaterThan 0 -Because 'the registration discovery is non-empty'
+        @($loaders).Count | Should -Be 0 -Because ('hooks loading the retired validator: ' + (@($loaders) -join ', '))
+    }
+
     It 'S8: names every exemption with its justification' {
-        @($script:Exemptions | Where-Object { $_.Kind -eq 'Design' } | ForEach-Object Id) | Should -Be @('D2', 'D3')
+        @($script:Exemptions | Where-Object { $_.Kind -eq 'Design' } | ForEach-Object Id) | Should -Be @('D2', 'D3', 'D4')
         foreach ($entry in $script:Exemptions) {
             $entry.Justification.StartsWith($entry.Id, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "exemption $($entry.Id) must carry its named justification"
             $entry.Justification.Length | Should -BeGreaterThan 40

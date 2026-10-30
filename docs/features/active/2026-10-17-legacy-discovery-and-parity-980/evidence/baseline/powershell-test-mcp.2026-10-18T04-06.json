@@ -1,0 +1,9 @@
+{
+  "tool": "run_poshqc_test",
+  "ok": true,
+  "workspace_root": ".",
+  "scan_folders": [
+    "tests/scripts/claude-lib/discovery-validation"
+  ],
+  "limitation": "Invocation receipt only. This selected library suite exercises the installed MCP route; the full branch-current configured baseline is a separate invocation."
+}

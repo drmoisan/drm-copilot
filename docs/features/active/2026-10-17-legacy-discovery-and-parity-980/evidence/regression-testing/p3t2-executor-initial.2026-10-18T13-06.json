@@ -1,0 +1,48 @@
+{
+  "timestamp_utc": "2026-10-18T13:05:49.589603+00:00",
+  "results": [
+    {
+      "name": "dry-run-preserves-physical-state",
+      "passed": false,
+      "error": "'ArtifactRoots' object has no attribute 'items'",
+      "type": "AttributeError",
+      "traceback": "Traceback (most recent call last):\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 43, in case\n    detail = action()\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 55, in dry_run\n    result = initialize_workspace(request, io=io, templates=templates, dry_run=True)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 201, in initialize_workspace\n    plan = plan_initialization(request, io=io, templates=templates)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 84, in plan_initialization\n    directories = tuple(sorted(value for key, value in profile.artifacts.items() if key not in FILE_KEYS))\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ArtifactRoots' object has no attribute 'items'\n"
+    },
+    {
+      "name": "first-initialize-and-idempotent-repeat",
+      "passed": false,
+      "error": "'ArtifactRoots' object has no attribute 'items'",
+      "type": "AttributeError",
+      "traceback": "Traceback (most recent call last):\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 43, in case\n    detail = action()\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 65, in first_repeat\n    result = initialize_workspace(request, io=io, templates=templates)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 201, in initialize_workspace\n    plan = plan_initialization(request, io=io, templates=templates)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 84, in plan_initialization\n    directories = tuple(sorted(value for key, value in profile.artifacts.items() if key not in FILE_KEYS))\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ArtifactRoots' object has no attribute 'items'\n"
+    },
+    {
+      "name": "default-required-mode-is-online",
+      "passed": false,
+      "error": "'ArtifactRoots' object has no attribute 'items'",
+      "type": "AttributeError",
+      "traceback": "Traceback (most recent call last):\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 43, in case\n    detail = action()\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 80, in default_mode\n    plan = plan_initialization(request, io=io, templates=templates)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 84, in plan_initialization\n    directories = tuple(sorted(value for key, value in profile.artifacts.items() if key not in FILE_KEYS))\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ArtifactRoots' object has no attribute 'items'\n"
+    },
+    {
+      "name": "honest-empty-draft-fails-completion",
+      "passed": false,
+      "error": "'ArtifactRoots' object has no attribute 'items'",
+      "type": "AttributeError",
+      "traceback": "Traceback (most recent call last):\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 43, in case\n    detail = action()\n  File \"SCRATCH\\issue-980-p3t2-probes.py\", line 87, in completion\n    plan = plan_initialization(request, io=io, templates=templates)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 84, in plan_initialization\n    directories = tuple(sorted(value for key, value in profile.artifacts.items() if key not in FILE_KEYS))\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ArtifactRoots' object has no attribute 'items'\n"
+    }
+  ],
+  "passed": 0,
+  "total": 4,
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "6460f7b5df40c66b2292b90121cda331538ed1c59f0fd62508970e29d8d7473a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "00310e02d6dc33a3fee922507b22e6ff0d1bb0b524a56238857024c09f2e5459",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "1b72e902fc25e712527121c8c6131864fb8c699b57979dafb7571892baddf869"
+  },
+  "final_source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "6460f7b5df40c66b2292b90121cda331538ed1c59f0fd62508970e29d8d7473a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "00310e02d6dc33a3fee922507b22e6ff0d1bb0b524a56238857024c09f2e5459",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "1b72e902fc25e712527121c8c6131864fb8c699b57979dafb7571892baddf869"
+  },
+  "source_stable": true,
+  "evidence_written_utc": "2026-10-18 13:06:26 UTC",
+  "interpretation": "Pre-gate draft wiring review, not final task acceptance. All four cases stop at the same missing ArtifactRoots.items API before their assertions."
+}

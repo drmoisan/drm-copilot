@@ -1,0 +1,87 @@
+{
+  "stage": "pyright",
+  "started": "2026-10-19T13:05:02.656273+00:00",
+  "finished": "2026-10-19T13:05:03.729162+00:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m pyright packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py tests/discovery_runtime/test_extension_results.py tests/discovery_runtime/test_extension_inventory_merge.py",
+  "exit_code": 1,
+  "duration_seconds": 1.073,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "86c44b7a0cc3cbc91c57c08e1a519c07cdb5069ec07a1e82591a9b0ef403c4a1",
+      "physical_lines": 374
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "04d6ed1d5c39442fd3043b170595ca0761b6cbf3be92e0d2128c0ebdc6d8d445",
+      "physical_lines": 299
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "dcdd3731a41247fdbbebd9d094bb101dee91a1de4fdd4e790bee8d58aa9308a1",
+      "physical_lines": 438
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "7182eebd5fcd0042fe0f9a63de7638563666d73c8295ce8f09549160212e0974",
+      "physical_lines": 421
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "86c44b7a0cc3cbc91c57c08e1a519c07cdb5069ec07a1e82591a9b0ef403c4a1",
+      "physical_lines": 374
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "04d6ed1d5c39442fd3043b170595ca0761b6cbf3be92e0d2128c0ebdc6d8d445",
+      "physical_lines": 299
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "dcdd3731a41247fdbbebd9d094bb101dee91a1de4fdd4e790bee8d58aa9308a1",
+      "physical_lines": 438
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "7182eebd5fcd0042fe0f9a63de7638563666d73c8295ce8f09549160212e0974",
+      "physical_lines": 421
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+      "physical_lines": 428
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+      "physical_lines": 428
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused4-pyright-130503.stdout.bin",
+      "raw_sha256": "ce41a9bf2078c1035b1940b0db313329bdfc7d4d02900776a3f817953b196cdd",
+      "raw_bytes": 1082,
+      "presentation": ".\\tests\\discovery_runtime\\test_extension_inventory_merge.py\n  .\\tests\\discovery_runtime\\test_extension_inventory_merge.py:243:47 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(*args: Unknown, **kwargs: Unknown) -> tuple[ValidatedExtension, ...]\" (reportUnknownArgumentType)\n  .\\tests\\discovery_runtime\\test_extension_inventory_merge.py:243:55 - error: Type of parameter \"args\" is partially unknown (reportUnknownLambdaType)\n  .\\tests\\discovery_runtime\\test_extension_inventory_merge.py:243:63 - error: Type of parameter \"kwargs\" is partially unknown (reportUnknownLambdaType)\n3 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused4-pyright-130503.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065"
+}

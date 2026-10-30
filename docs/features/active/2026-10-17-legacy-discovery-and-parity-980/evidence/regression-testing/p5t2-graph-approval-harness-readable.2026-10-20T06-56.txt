@@ -1,0 +1,10 @@
+from pathlib import Path
+scratch=Path(__file__).parent
+path=scratch/'p5t2-graph-focused.py'; raw=path.read_bytes()
+(scratch/'p5t2-graph-focused-budget-version.py.txt').write_bytes(raw)
+text=raw.decode()
+text=text.replace('    ("tests", ["poetry",', '''    ("approval-controls", ["poetry", "run", "pytest", "-v", "--tb=short", "-o", "addopts=", "-p", "no:cacheprovider",
+         TESTS[1] + "::test_authored_states_do_not_imply_approved_completion[intentionally-changed]",
+         TESTS[1] + "::test_authored_states_do_not_imply_approved_completion[retired]"]),
+    ("tests", ["poetry",''')
+path.write_text(text.rstrip()+'\n',encoding='utf-8',newline='\n')

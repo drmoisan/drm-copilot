@@ -1,0 +1,154 @@
+"""Reconcile frozen P4-T6 proof without executing worker suites or changing code."""
+from __future__ import annotations
+
+import base64
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+SCRATCH = Path(os.environ["LOCALAPPDATA"]) / "Temp/issue-980-p4t6"
+AUTH = Path.home() / ".codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json"
+EXPECTED_PROFILE = "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+HEAD = "75e732b91a45ebace5cf1fce37b7988eec1907d5"
+checked = []
+
+
+def sha(data: bytes) -> str:
+    """Return the exact supplied byte digest; no normalization or I/O."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def bound(item: dict) -> bytes:
+    """Read one named proof and assert its frozen hash; retain its binding."""
+    data = Path(item["path"]).read_bytes()
+    assert sha(data) == item["sha256"], item["path"]
+    checked.append({"path": item["path"], "sha256": item["sha256"]})
+    return data
+
+
+def stamp() -> str:
+    """Read the actual UTC write minute immediately before an evidence write."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+started = datetime.now(timezone.utc)
+state = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+receipt = next(r for r in state["codex_model_routing_receipts"] if r.get("delegation_id") == "atomic_execution_p4t6_candidate_review")
+authority = json.loads(AUTH.read_bytes())
+assert receipt["model"] == authority["actual_model"] == "gpt-6-astra"
+assert receipt["model_reasoning_effort"] == authority["actual_reasoning_effort"] == "max"
+assert receipt["profile_sha256"] == authority["profile_sha256"] == EXPECTED_PROFILE
+assert all(authority[key] is True for key in ("routing_valid", "launch_authority_valid", "provenance_valid"))
+assert sha(Path(receipt["profile_path"]).read_bytes()) == EXPECTED_PROFILE
+assert subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip() == HEAD
+manifest_refs = [
+    {"path": (FEATURE / "evidence/regression-testing/p4t6-ui-freeze.2026-10-19T08-52.json").as_posix(), "sha256": "7d990c2859f1b2b4968ae6dee52193b54c55791636bf988a0ba91d5f9f282eb9"},
+    {"path": (FEATURE / "evidence/regression-testing/p4t6-test-reference-freeze.2026-10-19T09-07.json").as_posix(), "sha256": "463f2dcb604a4290825909da78096ebaecdd1a9fbe25ec020343a1f8a582bdc1"},
+]
+ui, refs = (json.loads(bound(item)) for item in manifest_refs)
+source_files = ui["source_files"] + refs["files"]
+# Bind current working, index and pushed combined commit representations separately.
+source_bindings = []
+for item in source_files:
+    path = item["path"]
+    data = bound(item)
+    index = subprocess.check_output(["git", "show", ":" + path])
+    commit = subprocess.check_output(["git", "show", HEAD + ":" + path])
+    assert data == index == commit and b"\r" not in data
+    assert len(data.splitlines()) <= 500
+    source_bindings.append({"path": path, "working_sha256": sha(data), "index_sha256": sha(index), "commit_sha256": sha(commit), "lines": len(data.splitlines()), "relationship": "exact byte identity; LF-only"})
+focused = json.loads(bound(refs["focused_binding"]))
+ui_expected = {r["path"]: r["sha256"] for r in ui["source_files"]}
+ref_expected = {r["path"]: r["sha256"] for r in refs["files"]}
+assert focused["sources"] == ref_expected
+# Each successful four-stage loop must use its exact reviewed subset bytes.
+stage_summaries = []
+for family, stages, expected in (("ui", ui["ordered_focused_gates"], ui_expected), ("test-references", refs["ordered_receipts"], ref_expected)):
+    assert [r["stage"] for r in stages] == ["format", "lint", "types", "unit" if family == "ui" else "tests"]
+    previous = None
+    for stage in stages:
+        data = json.loads(bound(stage))
+        assert data["exit_code"] == 0
+        before = data["source_before"]
+        after = data["source_after"]
+        normalize = lambda records: {p: v["sha256"] if isinstance(v, dict) else v for p, v in records.items()}
+        assert normalize(before) == normalize(after) == expected
+        start = datetime.fromisoformat(data.get("started", data.get("started_at")))
+        end = datetime.fromisoformat(data.get("finished", data.get("finished_at")))
+        assert end >= start and (previous is None or start >= previous)
+        previous = end
+        if family == "test-references":
+            for stream in data["raw"].values():
+                raw = (SCRATCH / stream["path"].removeprefix("SCRATCH/").replace("\\", "/")).read_bytes()
+                assert sha(raw) == stream["sha256"]
+        stage_summaries.append({"subset": family, "stage": stage["stage"], "path": stage["path"], "exit_code": 0})
+# Decode exact retained harness bytes without running them.
+for item in ui["harnesses"]:
+    assert sha(bound(item)) == item["raw_sha256"]
+for item in refs["harnesses"]:
+    snapshot = json.loads(bound(item))
+    assert sha(base64.b64decode(snapshot["content_base64"], validate=True)) == snapshot["raw_sha256"]
+ui_coverage = json.loads(bound(ui["coverage"]))
+ui_structure = json.loads(bound(ui["coverage_structure"]))
+assert ui_coverage["totals"]["covered_lines"] == ui_coverage["totals"]["num_statements"] == 164
+assert ui_coverage["totals"]["covered_branches"] == ui_coverage["totals"]["num_branches"] == 58
+ui_ranges = []
+for module in ui_structure["summaries"]:
+    raw_module = next(v for p, v in ui_coverage["files"].items() if p.replace("\\", "/") == module["path"])
+    assert raw_module["summary"] == module["module"]
+    for kind in ("functions", "classes"):
+        for name, summary in module[kind].items():
+            assert raw_module[kind][name]["summary"] == summary
+            assert summary["percent_statements_covered"] >= 90
+            ui_ranges.append({"kind": kind, "name": name, "percent": summary["percent_statements_covered"]})
+ref_coverage = json.loads(bound(focused["coverage"]))
+raw_coverage = (SCRATCH / focused["coverage"]["raw_path"].removeprefix("SCRATCH/")).read_bytes()
+assert sha(raw_coverage) == focused["coverage"]["raw_sha256"]
+assert json.loads(raw_coverage)["totals"] == ref_coverage["totals"]
+ranges = json.loads(bound(refs["coverage_ranges"]))
+assert ranges["totals"] == ref_coverage["totals"]
+assert [ranges["totals"][key] for key in ("covered_lines", "num_statements", "covered_branches", "num_branches")] == [218, 222, 92, 96]
+for unit in ranges["units"]:
+    module = next(v for p, v in ref_coverage["files"].items() if p.replace("\\", "/") == unit["path"])
+    covered = [n for n in module["executed_lines"] if unit["start"] <= n <= unit["end"]]
+    missing = [n for n in module["missing_lines"] if unit["start"] <= n <= unit["end"]]
+    assert len(covered) == unit["covered_statements"] and missing == unit["missing_lines"]
+    assert len(covered) + len(missing) == unit["statements"]
+    assert len(covered) / unit["statements"] >= .9
+test_receipt = json.loads(Path(refs["ordered_receipts"][-1]["path"]).read_bytes())
+nodes = re.findall(r"^(tests/.*) PASSED \[\s*\d+%\]\r?$", test_receipt["stdout"], re.M)
+assert nodes == ranges["test_node_order"] and len(nodes) == len(set(nodes)) == 138
+assert "107 passed" in json.loads(Path(ui["ordered_focused_gates"][-1]["path"]).read_bytes())["output"]
+assert len(ui_ranges) == 11 and len(ranges["units"]) == 15
+baseline = refs["shared_baseline"]
+bound(baseline)
+probe_path = QA / "p4t6-executor-ui-output-probe.2026-10-19T09-08.json"
+probe = json.loads(probe_path.read_bytes())
+assert all(case["canonical_bound_satisfied"] for case in probe["cases"])
+finished = datetime.now(timezone.utc)
+name = stamp()
+harness = QA / f"p4t6-executor-candidate-binding-harness.{name}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+name = stamp()
+result_path = QA / f"p4t6-executor-candidate-binding.{name}.json"
+result = {
+    "timestamp": name, "command": "poetry run python SCRATCH/issue-980-p4t6-candidate-binding.py", "exit_code": 0,
+    "started_utc": started.isoformat(), "finished_utc": finished.isoformat(), "task": "P4-T6", "status": "PASS_CANDIDATE_BINDINGS",
+    "routing_receipt": receipt, "native_authority": {"sha256": sha(AUTH.read_bytes()), "routing_valid": True, "launch_authority_valid": True, "provenance_valid": True},
+    "combined_head": HEAD, "manifests": manifest_refs, "source_bindings": source_bindings, "stage_summaries": stage_summaries,
+    "coverage": {"ui": [164, 164, 58, 58], "test_references": [218, 222, 92, 96], "ui_ranges": 11, "test_reference_ranges": 15, "all_ranges_at_least_90_percent": True},
+    "tests": {"ui": 107, "test_references": 138, "replayed": 0, "node_order_qualification": ranges["node_order_qualification"]},
+    "shared_baseline": baseline, "predecessor_proof_reused": "55 unchanged accepted streams retained in both frozen manifests; no predecessor suite or implementation review repeated.",
+    "probe": {"path": probe_path.as_posix(), "sha256": sha(probe_path.read_bytes()), "passed": 3},
+    "checked_proof": checked, "harness": {"path": harness.as_posix(), "sha256": sha(harness.read_bytes())},
+    "inspection_diagnostic": "A prior interactive metadata read requested the absent output field on a test-reference receipt. Those receipts use stdout/stderr; the read-only error did not change any evidence. This checker uses the actual fields and retained raw streams.",
+    "limitations": refs["limitations"], "open_behavioral_probes": [], "task_or_ac_checkoff": False,
+}
+result_path.write_bytes((json.dumps(result, indent=2, ensure_ascii=True) + "\n").encode())
+print(json.dumps({"path": result_path.as_posix(), "sha256": sha(result_path.read_bytes()), "status": result["status"], "files": len(source_bindings), "ranges": 26}))

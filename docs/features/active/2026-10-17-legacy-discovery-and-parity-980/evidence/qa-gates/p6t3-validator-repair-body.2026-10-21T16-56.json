@@ -1,0 +1,406 @@
+{
+  "Timestamp": "2026-10-21T16:56:07.490262+00:00",
+  "assembly_readers": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-raw.2026-10-21T16-56.json",
+    "sha256": "955a7a0d956ec9fe4e1d6bbd8713a58eef0c6ba7cdea343d4721e72eec3a6d98"
+  },
+  "modules": {
+    "scripts/dev_tools/validate_discovery_artifacts.py": {
+      "branch_percent": 100.0,
+      "branches": [
+        32,
+        32
+      ],
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "statements": [
+        103,
+        103
+      ]
+    }
+  },
+  "named_BODY": [
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          8,
+          8
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          19,
+          19
+        ]
+      },
+      "ast_range": [
+        62,
+        90
+      ],
+      "name": "compatibility_arguments",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          6,
+          6
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          13,
+          13
+        ]
+      },
+      "ast_range": [
+        93,
+        119
+      ],
+      "name": "report_arguments",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        122,
+        143
+      ],
+      "name": "_read_text",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          6,
+          6
+        ]
+      },
+      "ast_range": [
+        146,
+        180
+      ],
+      "name": "build_parser",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          6,
+          6
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          6,
+          6
+        ]
+      },
+      "ast_range": [
+        183,
+        211
+      ],
+      "name": "_validate_from_args",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          22,
+          22
+        ]
+      },
+      "ast_range": [
+        214,
+        251
+      ],
+      "name": "main",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        254,
+        256
+      ],
+      "name": "main_profile",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        259,
+        261
+      ],
+      "name": "main_feature_contract",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        264,
+        266
+      ],
+      "name": "main_coverage_ledger",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        269,
+        271
+      ],
+      "name": "main_runtime_scenario",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        274,
+        276
+      ],
+      "name": "main_parity_matrix",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        279,
+        281
+      ],
+      "name": "main_unspecified_behavior",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        284,
+        286
+      ],
+      "name": "main_product_decision",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        289,
+        291
+      ],
+      "name": "main_evidence_reference",
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py"
+    }
+  ],
+  "no_loss": "All current module and named BODY executable statements/arcs are freshly covered. Preserved bodies have no missing points. No raw counters were augmented.",
+  "preimages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validation-reports-preimages.2026-10-21T16-35.json",
+    "sha256": "4ec1f7ac1b99b152b79f3d86cf53131a738fddec73a5eba75bd91e6913b293de"
+  },
+  "preserved_bodies": {
+    "scripts/dev_tools/validate_discovery_artifacts.py": {
+      "changed_existing_body_names": [
+        "compatibility_arguments"
+      ],
+      "preimage_sha256": "5f1211cd606da0cafe4f54bebf96f2cc6dfcc565d5c4e59a7dedbf1e57cd9f2c",
+      "removed": [],
+      "same_executable_body_names": [
+        "report_arguments",
+        "_read_text",
+        "build_parser",
+        "_validate_from_args",
+        "main",
+        "main_profile",
+        "main_feature_contract",
+        "main_coverage_ledger",
+        "main_runtime_scenario",
+        "main_parity_matrix",
+        "main_unspecified_behavior",
+        "main_product_decision",
+        "main_evidence_reference"
+      ]
+    },
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py": {
+      "changed_existing_body_names": [],
+      "preimage_sha256": "0e8a16f4e26e8c053e5eb763631100b05548ec1bafd995ff66986e7a2a228578",
+      "removed": [],
+      "same_executable_body_names": [
+        "test_validate_from_args_returns_unsupported_artifact_type",
+        "test_main_profile_returns_zero_for_conforming_fixture",
+        "test_main_profile_returns_one_for_missing_authoritative_profile_contract",
+        "test_main_feature_contract_returns_zero_for_conforming_fixture",
+        "test_main_feature_contract_returns_one_for_non_conforming_fixture",
+        "test_main_all_refuses_file_probing_before_reading",
+        "test_main_all_refuses_file_probing_before_reading.read",
+        "test_direct_all_dispatch_is_an_actionable_refusal",
+        "test_main_artifact_wrappers_dispatch_with_correct_argv_prefix",
+        "test_main_artifact_wrappers_dispatch_with_correct_argv_prefix.installed",
+        "test_canonical_kind_route_forwards_exact_flags",
+        "test_canonical_kind_route_forwards_exact_flags.installed",
+        "test_legacy_argument_errors_do_not_read",
+        "test_legacy_argument_errors_do_not_read.read",
+        "test_malformed_arguments_are_redacted",
+        "test_argument_count_refusal_precedes_text_measurement",
+        "test_argument_count_refusal_precedes_text_measurement.measure",
+        "test_argument_text_work_is_reserved_before_scan",
+        "test_argument_text_work_is_reserved_before_scan.limits",
+        "test_argument_text_work_is_reserved_before_scan.measure",
+        "test_process_arguments_are_captured_without_mutation",
+        "test_report_route_uses_only_explicit_options",
+        "test_report_mixed_routes_refuse_before_callbacks",
+        "test_selected_file_reader_preserves_utf8_and_errors",
+        "test_selected_file_reader_preserves_utf8_and_errors.read"
+      ]
+    }
+  },
+  "qualification": "Existing count/definition/coverage readers; BODY counters exclude declarations. Validator comparison uses the retained 38-pass source; reports use accepted pre-edit sources. The one report test adaptation retains its three identities and exit/no-read contract, distinguishing canonical injection refusal from legacy argparse.",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-165224-tests-raw.2026-10-21T16-52.json",
+    "sha256": "0160215bb5d35dff77709d8386d62eccc317606c17c156e3005f27fad4593024"
+  },
+  "raw_coverage_sha256": "1fea62aa977221ea82691ab578bf32fde9c160593c8f39a69bb98129ccb7f911",
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-165224-tests.2026-10-21T16-52.json",
+    "sha256": "988d5140193a9b4489cfc15c7bcbdf856cda6380f50cfd80056f8daec87ba000"
+  },
+  "subset": "validator-repair",
+  "task": "P6-T3"
+}

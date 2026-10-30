@@ -1,0 +1,118 @@
+"""Bind the approved P5-T1 baseline without repeating accepted test populations."""
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+EVIDENCE = FEATURE / 'evidence'
+RUNTIME = 'packages/discovery-runtime/src/drm_copilot_discovery/'
+TESTS = 'tests/discovery_runtime/'
+EXISTING = [
+    RUNTIME + 'validation.py',
+    'scripts/dev_tools/discovery/coverage_report.py',
+    TESTS + 'test_validation_modes.py', TESTS + 'test_agent_output.py',
+    TESTS + 'test_mutation_plan.py',
+    'tests/scripts/dev_tools/discovery/test_coverage_report.py',
+    'tests/scripts/dev_tools/discovery/test_rendering.py',
+]
+ABSENT = [RUNTIME+'coverage_report.py',RUNTIME+'report_models.py',TESTS+'test_coverage_report.py']
+DEPENDENCIES = [
+    RUNTIME + name + '.py' for name in (
+        'models','snapshot','profile_v2','profile_models','references',
+        'coverage_scope_rules','coverage_rules','claim_rules','runtime_claim_rules',
+        'evidence_rules','dimension_rules','validation_inputs','decision_rules',
+        'revision_rules','findings','rendering',
+    )
+]
+
+def digest(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+def git(*args: str) -> bytes:
+    return subprocess.check_output(['git', *args])
+
+def file_binding(path: str) -> dict[str, object]:
+    raw = (ROOT/path).read_bytes()
+    committed = git('show', 'HEAD:'+path)
+    normalized = raw.replace(b'\r\n',b'\n')
+    assert normalized == committed.replace(b'\r\n',b'\n'), path
+    return {
+        'path':path,'sha256':digest(raw),'git_blob':git('rev-parse','HEAD:'+path).decode().strip(),
+        'committed_sha256':digest(committed),'normalized_sha256':digest(normalized),
+        'normalization':'exact' if raw == committed else 'CRLF-to-LF only',
+        'physical_lines':len(raw.splitlines()),
+    }
+
+def receipt(path: Path) -> dict[str, str]:
+    return {'path':path.as_posix(),'sha256':digest(path.read_bytes())}
+
+head = git('rev-parse','HEAD').decode().strip()
+assert head == '2920686f68849957d91e2c94f525a32e466d1d8e', head
+for path in ABSENT:
+    assert not (ROOT/path).exists(), path
+bindings = [file_binding(path) for path in EXISTING+DEPENDENCIES]
+initial_path=EVIDENCE/'baseline/initial-file-inventory.2026-10-18T03-48.json'
+initial=json.loads(initial_path.read_text())
+initial_files={row['path']:row for row in initial['files']}
+prior_path=EVIDENCE/'regression-testing/p2t9-coverage-metrics.2026-10-18T10-57.json'
+prior=json.loads(prior_path.read_text())
+assert bindings[0]['sha256']==prior['owned_sha256'][EXISTING[0]]
+for path in (EXISTING[1],EXISTING[5]):
+    assert digest((ROOT/path).read_bytes())==initial_files[path]['sha256']
+coverage_path=EVIDENCE/'baseline/python-coverage.2026-10-18T03-51.json'
+coverage=json.loads(coverage_path.read_text())
+legacy=next(value for path,value in coverage['files'].items() if path.replace('\\','/')==EXISTING[1])
+historical_refs=[initial_path,prior_path,coverage_path,
+    EVIDENCE/'baseline/p4t1-executor-prior-manifest.2026-10-19T01-45.json',
+    EVIDENCE/'regression-testing/p2t9-coverage.2026-10-18T10-57.json',
+    EVIDENCE/'regression-testing/p2t9-pass7-black.2026-10-18T10-47.md',
+    EVIDENCE/'regression-testing/p2t9-pass7-ruff.2026-10-18T10-47.md',
+    EVIDENCE/'regression-testing/p2t9-pass7-pyright.2026-10-18T10-47.md',
+    EVIDENCE/'regression-testing/p2t9-pass7-tests.2026-10-18T10-54.md',
+    EVIDENCE/'baseline/python-format.2026-10-18T03-49.md',
+    EVIDENCE/'baseline/python-lint.2026-10-18T03-49.md',
+    EVIDENCE/'baseline/python-types.2026-10-18T03-49.md',
+    EVIDENCE/'baseline/python-tests.2026-10-18T03-51.md',
+]
+profile_path='.codex/agents/python-typed-engineer-c4.toml'
+assert digest((ROOT/profile_path).read_bytes())=='0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+stamp=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+prefix=EVIDENCE/'baseline'/f'p5t1-shared-baseline.{stamp}'
+script_path=EVIDENCE/'baseline'/f'p5t1-shared-baseline-harness.{stamp}.txt'
+script_path.write_bytes(Path(__file__).read_bytes())
+result={
+    'task':'P5-T1','timestamp_utc':datetime.now(timezone.utc).isoformat(),
+    'head':head,'status':'BASELINE_READY','exit_code':0,
+    'route':'inventory_analyzers_p5t1_coverage_implementation',
+    'profile':{'path':profile_path,'sha256':digest((ROOT/profile_path).read_bytes())},
+    'existing':bindings,'absent':ABSENT,
+    'coverage':{
+        EXISTING[0]:prior['coverage'][EXISTING[0]],
+        EXISTING[1]:legacy['summary'],
+    },
+    'proof_policy':'Exact unchanged production-byte proof reused; no accepted suites replayed. Test callers are rebound at current accepted HEAD and remain in the affected post-change population.',
+    'retained_evidence':[receipt(path) for path in historical_refs],
+    'harness':receipt(script_path),
+    'planned_population':EXISTING[2:]+ABSENT[2:],
+    'deferred':['test_parity_report.py','test_completion_report.py','test_io.py'],
+    'projection_contract':{
+        'summary':'coverage_summary(snapshot, *, index, evidence, claims, dimensions, findings) -> JsonObject',
+        'generation':'build_coverage_report(snapshot, *, identifier="coverage", mode="discovery-complete") -> CoverageReport',
+        'authority':'validation._Validation.report invokes the same coverage_summary; public generation invokes report_projection; no recursion or injected validator authority.',
+        'json_value':'Existing JsonObject is a frozen dataclass Mapping, not a dict alias.',
+        'counts':'Source-owned selected inventory identities; missing-ledger gaps; independent inspection/disposition; valid exclusions; unique required features versus client obligations; explicit runtime and evidence proof units.',
+        'empty':'Null zero-denominator percentages. Separate discovery result/findings retain empty or uninventoried blockers independently from requested structural mode.',
+        'invalid':'Coverage generation retains structural failures with unavailable population; other report kinds retain existing invalid-input behavior.',
+        'resources':'Prospective input/traversal and escaped UTF-8 output budgets before copying/encoding; fixed failure without partial success.',
+        'legacy':'Pure v1 parse/build/render helpers in report_models; legacy adapter keeps only CLI/I/O routing. v2 never derives completeness from a dict or injected validator.',
+    },
+}
+Path(str(prefix)+'.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+text=(f'# P5-T1 shared baseline\n\nTimestamp: {stamp}\nCommand: poetry run python SCRATCH/baseline.py\nEXIT_CODE: 0\nOutput Summary: Accepted HEAD and 23 existing streams bound; three new paths absent. Retained validation coverage 133/133 statements, 42/42 branches; legacy coverage 38/40 statements, 4/4 branches. No accepted suite replay.\n\nThe paired JSON is authoritative for scope, exact bytes, normalization, retained evidence and shared projection contract. Baseline test callers remain in the post-change population. Legacy adapter ownership can transfer independently after the pure v1 helper signatures are fixed.\n')
+Path(str(prefix)+'.md').write_text(text,encoding='utf-8',newline='\n')
+print(json.dumps({'path':Path(str(prefix)+'.json').as_posix(),'sha256':digest(Path(str(prefix)+'.json').read_bytes()),'existing':len(bindings),'absent':len(ABSENT)}))

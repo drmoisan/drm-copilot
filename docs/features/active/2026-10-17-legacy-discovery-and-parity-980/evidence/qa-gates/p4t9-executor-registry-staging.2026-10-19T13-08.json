@@ -1,0 +1,32 @@
+{
+  "task": "P4-T9",
+  "status": "REGISTRY_SUBSET_REVIEW_PASS",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review.2026-10-19T13-08.json",
+      "sha256": "6844dd6514fc230ec6e7f5ad43a7a4912726aef5fa86bfd0436372ef21187f30"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review.2026-10-19T13-08.md",
+      "sha256": "094d591bb06de60dcf25e465046aff3d3840acd112b839191d2a53c9c6fad51b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review-harness.2026-10-19T13-08.txt",
+      "sha256": "37a6c83561a4b6cfe7161ef94b8e94605fa0b21c646054381bb5326ec462101f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-checker-before-correction.2026-10-19T13-08.txt",
+      "sha256": "f0b2c002c8768de8448a45b391e46167e0c084fa446ff397f78e7ab493c182dd"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review.2026-10-19T13-08.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review.2026-10-19T13-08.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review-harness.2026-10-19T13-08.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-checker-before-correction.2026-10-19T13-08.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-staging.2026-10-19T13-08.json"
+  ],
+  "source_test_plan_ac_checkpoint_git_mutations": false,
+  "timestamp": "2026-10-19T13-08",
+  "published_utc": "2026-10-19T13:08:52.497043+00:00"
+}

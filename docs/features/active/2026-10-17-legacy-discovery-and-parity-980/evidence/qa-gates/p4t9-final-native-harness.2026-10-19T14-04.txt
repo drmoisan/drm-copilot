@@ -1,0 +1,283 @@
+"""Exercise actual Windows/Git capture and inert extension merge, without publication."""
+from dataclasses import replace
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+from uuid import uuid4
+
+import yaml
+from drm_copilot_discovery.analyzer.emitter import inventory_result
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.input_capture import capture_snapshot, pin_inventory_sources
+from drm_copilot_discovery.analyzer.models import Analysis
+from drm_copilot_discovery.analyzer.pipeline import run_inventory
+from drm_copilot_discovery.analyzer.registry import builtin_analyzer_identities, select_analyzers
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.extension_inputs import extension_input_digest, extension_manifest_digest
+from drm_copilot_discovery.extension_results import ExtensionResultError, merge_extension_inventory, validate_extension_results
+from drm_copilot_discovery.models import JsonObject, canonical_json, to_plain_value
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.mutation_io import capture_workspace
+from drm_copilot_discovery.parsing import parse_document
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+
+scratch = Path(__file__).resolve().parent
+root = scratch / ('issue-980-p4t9-native-' + uuid4().hex)
+root.mkdir()
+assert root.resolve().parent == scratch
+started = time.monotonic()
+checks, operation_seconds = [], {}
+STAMP = '2026-01-01T00:00:00Z'
+AUTHOR = row(kind='agent', id='synthetic')
+ADAPTER = row(id='local-example', version='7.1')
+MANIFEST = 'docs/migration/discovery/inventory/extension.json'
+MEMBER = 'docs/migration/discovery/inventory/member.json'
+
+
+def check(name, condition):
+    """Record an explicit assertion; failure terminates without a success result."""
+    if not condition:
+        raise AssertionError(name)
+    checks.append(name)
+    print('PASS ' + name, flush=True)
+
+
+def put(path, content):
+    """Create synthetic setup bytes only, before the read-only checkpoint."""
+    destination = root / path
+    assert root in destination.resolve().parents
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(content)
+
+
+def tree():
+    """Hash every fixture file, including Git internals, without changing it."""
+    return {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(root.rglob('*')) if path.is_file()}
+
+
+def git(*arguments):
+    """Run explicit fixture-only Git operations with optional index writes disabled."""
+    return subprocess.run(['git', '--no-optional-locks', '-C', str(root), *arguments],
+                          capture_output=True, check=True).stdout
+
+
+def run_git(argv, *, output_limit):
+    """Provide the accepted bounded Git-reader seam; never evaluate shell text."""
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        content = process.stdout.read(output_limit + 1)
+        if len(content) > output_limit:
+            process.kill()
+            raise OSError('Native Git output exceeded its bounded read')
+        if process.wait() != 0:
+            raise OSError('Native Git read failed')
+        return content
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+
+def immutable(value):
+    """Parse synthetic detached JSON through the public immutable-value boundary."""
+    parsed = parse_document(json.dumps(value), format='json')
+    assert parsed.ok and isinstance(parsed.value, JsonObject)
+    return parsed.value
+
+
+def capture():
+    """Use actual workspace loading and retained pinned source bytes."""
+    workspace = capture_workspace(workspace_root=str(root), profile_path=profile.artifacts['profile'],
+        metadata=primitives.metadata, read_bytes=primitives.read_bytes, catalog=catalog, repository=repository)
+    assert workspace.snapshot.ok, [(item.code, item.path) for item in workspace.snapshot.findings]
+    return pin_inventory_sources(workspace, repository)
+
+
+def variant(manifest_changes=None, member_changes=None, *, seal=True):
+    """Make an immutable adversarial capture; never write or alter loaded artifacts."""
+    manifest = json.loads(snapshot.file(MANIFEST).content)
+    member = json.loads(snapshot.file(MEMBER).content)
+    if member_changes:
+        member_changes(member)
+    member_bytes = canonical_json(immutable(member))
+    manifest['result_files'][0].update(sha256=hashlib.sha256(member_bytes).hexdigest(), size=len(member_bytes))
+    if manifest_changes:
+        manifest_changes(manifest)
+    if seal:
+        manifest['manifest_sha256'] = extension_manifest_digest(immutable(manifest))
+    changes = {MANIFEST: canonical_json(immutable(manifest)), MEMBER: member_bytes}
+    return replace(snapshot, manifest=replace(snapshot.manifest,
+        files=tuple(replace(item, content=changes[item.path]) if item.path in changes else item
+                    for item in snapshot.manifest.files)))
+
+
+def reject(name, changed, expected, *, merge=False):
+    """Require a fixed error from raw retained-byte reconstruction, without effects."""
+    observed = None
+    try:
+        if merge:
+            merge_extension_inventory(changed, timestamp=STAMP, author_or_agent=AUTHOR)
+        else:
+            validate_extension_results(changed)
+    except ExtensionResultError as error:
+        observed = error.code
+        assert 'PRIVATE_VALUE' not in str(error)
+    check(name, observed == expected)
+
+
+payloads = {
+    'src/main.cs': b'class Example {}\r\n',
+    'tests/main.cs': b'new Example();\n',
+    'docs/guide.md': 'Guide é\n'.encode('utf-8'),
+    'src/package.json': b'{"dependencies":{"example-lib":"^1"}}\n',
+}
+# Create a standalone fixture commit before any measured read-only operation.
+for path, content in payloads.items():
+    put(path, content)
+put('.gitattributes', b'src/** -text\ntests/** -text\ndocs/** -text\n')
+git('init', '--quiet')
+git('config', 'core.autocrlf', 'false')
+git('add', 'src', 'tests', 'docs', '.gitattributes')
+git('-c', 'user.name=Discovery fixture', '-c', 'user.email=discovery@example.invalid',
+    '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'Synthetic extension source inputs')
+revision = git('rev-parse', 'HEAD').decode('ascii').strip()
+catalog = load_catalog()
+value = yaml.safe_load(Path('examples/discovery/v2/domain-profile.example.yaml').read_text('utf-8'))
+value.pop('extension_schemas')
+value['system']['role'] = 'legacy-source'
+value['repository']['revision'] = revision
+value['repositories'], value['clients'] = [], []
+value['production_roots'], value['test_roots'], value['documentation_roots'] = ['src'], ['tests'], ['docs']
+value['project_entry_points'], value['excluded_paths'] = [], []
+value['analyzers'] = {'enabled': ['repository', 'dependencies'], 'options': {'max_file_bytes': 16384},
+                     'ignored_paths': [], 'extension_result_manifests': [MANIFEST]}
+profile = ProfileV2(json.dumps(value), format='json', catalog=catalog)
+put(profile.artifacts['profile'], canonical_json(profile.document))
+primitives = LocalMutationPrimitives(workspace_root=str(root), lock_path=str(scratch / ('issue-980-p4t9-lock-' + uuid4().hex)))
+repository = LocalGitReader(workspace_root=str(root), repository_id=profile.repository.id, run=run_git)
+seed = capture()
+seed_capture = capture_snapshot(seed.snapshot)
+check('pre-output actual capture retains four original source/test/documentation inputs',
+      {item.path: item.file.content for item in seed_capture.inputs if item.file} == payloads)
+reference = row(repository=profile.repository.id, revision=revision, path='src/main.cs',
+                sha256=hashlib.sha256(payloads['src/main.cs']).hexdigest())
+component = row(component_id='local-component', component_type='type', source=reference, analyzer=ADAPTER,
+                classification='inferred', confidence='low', properties=(), extensions=row())
+finding = row(finding_id='local-finding', component_id='local-component', kind='mention', source=reference,
+              analyzer=ADAPTER, classification='inferred', confidence='unknown', properties=(), extensions=row())
+relationship = row(relationship_id='local-relation', from_component_id='local-component', to_component_id=None,
+    target_description='Unresolved target', kind='relevance', source=reference, analyzer=ADAPTER,
+    classification='inferred', confidence='low', extensions=row())
+external = inventory_result(seed_capture, (Analysis(components=(component,), findings=(finding,), relationships=(relationship,)),),
+    analyzer_ids=(), extension_adapters=(ADAPTER,), timestamp=STAMP, author_or_agent=AUTHOR, catalog=catalog)
+member = to_plain_value(external.document)
+member['tool'] = to_plain_value(ADAPTER)
+member_bytes = canonical_json(immutable(member))
+manifest = row(**{'$schema': 'urn:drm-copilot:discovery:2.0.0:extension-result-manifest'}, schema_version='2.0.0',
+    artifact_kind='extension-result-manifest', id='local-manifest', adapter=ADAPTER,
+    repository=row(id=profile.repository.id, revision=revision), input_manifest_sha256=extension_input_digest(seed_capture),
+    source_inputs=tuple(row(path=item.path, sha256=item.sha256, size=len(item.file.content))
+        for item in seed_capture.inputs if item.file and item.file.category in {'source', 'test'}),
+    result_files=(row(artifact_kind='inventory-snapshot', id=external.document['id'], schema_version='2.0.0',
+        path=MEMBER, sha256=hashlib.sha256(member_bytes).hexdigest(), size=len(member_bytes)),),
+    manifest_sha256='0' * 64, generated_at=STAMP, generated_by=AUTHOR, diagnostics=(), extensions=row())
+manifest = JsonObject(tuple((key, extension_manifest_digest(manifest) if key == 'manifest_sha256' else item)
+                           for key, item in manifest.members))
+put(MEMBER, member_bytes)
+put(MANIFEST, canonical_json(manifest))
+status_before = git('status', '--porcelain').decode('utf-8')
+before = tree()
+
+# All setup writes are complete; every remaining operation must preserve fixture bytes.
+operation_start = time.monotonic()
+loaded = capture()
+operation_seconds['actual_capture_loading_and_pin'] = time.monotonic() - operation_start
+snapshot = loaded.snapshot
+captured = capture_snapshot(snapshot)
+check('configured manifest and result members receive actual loader categories',
+      snapshot.file(MANIFEST).category == 'extension-result' and snapshot.file(MEMBER).category == 'inventory')
+check('actual loading preserves original raw member and source hashes',
+      snapshot.file(MEMBER).content == member_bytes and all(snapshot.file(path).content == content for path, content in payloads.items()))
+check('actual local Git capture preserves every retained source identity and byte stream',
+      {item.path: item.content for item in snapshot.repository_files} == payloads
+      and all(item.repository.id == profile.repository.id and item.repository.revision == revision for item in snapshot.repository_files))
+check('extension input digest excludes transport outputs while complete capture changes',
+      extension_input_digest(captured) == extension_input_digest(seed_capture) and snapshot.sha256 != seed.snapshot.sha256)
+check('public fixed dispatch selects configured built-ins without importing optional code',
+      [item.identifier for item in select_analyzers(profile)] == ['dependencies', 'repository']
+      and len(builtin_analyzer_identities()) == 12
+      and not any(name.startswith('drm_copilot_discovery.analyzer.optional') for name in sys.modules))
+operation_start = time.monotonic()
+validated = validate_extension_results(snapshot)
+operation_seconds['validate_extension_results'] = time.monotonic() - operation_start
+check('inert validation binds exact manifest/member bytes and independent input digest',
+      len(validated) == 1 and validated[0].manifest_sha256 == snapshot.file(MANIFEST).sha256
+      and validated[0].result_files == (snapshot.file(MEMBER),)
+      and validated[0].input_manifest_sha256 == extension_input_digest(captured))
+core = run_inventory(captured, timestamp=STAMP, author_or_agent=AUTHOR, catalog=catalog)
+operation_start = time.monotonic()
+merged = merge_extension_inventory(snapshot, timestamp=STAMP, author_or_agent=AUTHOR)
+operation_seconds['merge_extension_inventory'] = time.monotonic() - operation_start
+check('merge preserves every authoritative core row and diagnostic unchanged',
+      all(all(item in merged.document[family] for item in core.document[family])
+          for family in ('components', 'findings', 'relationships', 'diagnostics')))
+check('merge preserves complete input accounting including documentation',
+      merged.document['files'] == core.document['files'] and merged.document['exclusions'] == core.document['exclusions']
+      and {item['path'] for item in merged.document['files']} == set(payloads))
+check('external observations retain confidence and unresolved target without binding claims',
+      component in merged.document['components'] and finding in merged.document['findings']
+      and relationship in merged.document['relationships'])
+check('adapter identity and version remain explicit alongside fixed built-ins',
+      ADAPTER in merged.document['analyzers'] and all(item in merged.document['analyzers'] for item in core.document['analyzers']))
+check('ledger proposals remain uninspected and unassigned',
+      bool(merged.ledger_components) and all(item['inspection_status'] == 'uninspected'
+          and item['disposition'] == 'unassigned' for item in merged.ledger_components))
+operation_start = time.monotonic()
+repeated = merge_extension_inventory(snapshot, timestamp=STAMP, author_or_agent=AUTHOR)
+operation_seconds['repeated_merge_extension_inventory'] = time.monotonic() - operation_start
+check('identical retained capture produces deterministic inventory and ledger bytes', repeated == merged)
+reject('wrong result member hash is rejected from retained raw data',
+       variant(lambda item: item['result_files'][0].update(sha256='0' * 64)), 'EXTENSION_MEMBER')
+reject('wrong manifest self-digest is rejected',
+       variant(lambda item: item.update(manifest_sha256='0' * 64), seal=False), 'EXTENSION_DIGEST')
+
+
+def collision(item):
+    """Create a coherent imported component collision, without unrelated broken links."""
+    identity = core.document['components'][0]['component_id']
+    item['components'][0]['component_id'] = identity
+    item['findings'][0]['component_id'] = identity
+    item['relationships'][0]['from_component_id'] = identity
+
+
+reject('core component identity collisions fail before merged output is returned', variant(member_changes=collision), 'EXTENSION_COLLISION', merge=True)
+reject('executable manifest fields are rejected without importing or executing their value',
+       variant(lambda item: item.update(module='PRIVATE_VALUE')), 'EXTENSION_SCHEMA')
+reject('documentation remains accounted but cannot become an extension source claim',
+       variant(lambda item: item['source_inputs'].append({'path': 'docs/guide.md',
+           'sha256': hashlib.sha256(payloads['docs/guide.md']).hexdigest(), 'size': len(payloads['docs/guide.md'])})), 'EXTENSION_SOURCE')
+check('all read-only captures and validations preserve source/artifact/Git bytes and state',
+      tree() == before and git('rev-parse', 'HEAD').decode('ascii').strip() == revision
+      and git('status', '--porcelain').decode('utf-8') == status_before)
+check('no optional implementation was imported by generic extension validation',
+      not any(name.startswith('drm_copilot_discovery.analyzer.optional') for name in sys.modules))
+assert len(checks) == 20
+result = {'task': 'P4-T9', 'checks': checks, 'passed': len(checks), 'elapsed_seconds': time.monotonic() - started,
+    'operation_seconds': operation_seconds, 'fixture': 'SCRATCH/' + root.name,
+    'revision': revision, 'input_manifest_sha256': extension_input_digest(captured),
+    'complete_snapshot_sha256': snapshot.sha256, 'merged_semantic_sha256': merged.semantic_sha256,
+    'source_and_git_tree_before': before, 'source_and_git_tree_after': tree(),
+    'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'qualifications': ['Setup creates an isolated synthetic repository before read-only measurements.',
+        'Positive composition uses actual capture_workspace/load_snapshot, LocalGitReader and pin_inventory_sources.',
+        'Negative cases alter retained immutable raw bytes only; they do not claim a second filesystem-loader run.',
+        'No plan_mutation, commit_mutation or publication. No installed coding-agent host or non-Windows execution.']}
+Path(sys.argv[1]).write_text(json.dumps(result, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'passed': len(checks), 'elapsed_seconds': result['elapsed_seconds'], 'operation_seconds': operation_seconds}), flush=True)

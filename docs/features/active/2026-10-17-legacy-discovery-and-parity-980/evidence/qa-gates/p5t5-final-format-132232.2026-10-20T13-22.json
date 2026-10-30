@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m black --check packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py tests/discovery_runtime/test_gherkin.py tests/discovery_runtime/test_acceptance_tags.py tests/discovery_runtime/test_acceptance_render_limits.py tests/scripts/dev_tools/test_generate_acceptance_scenarios.py tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T13:22:33.332735+00:00",
+  "label": "format",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-format-132232-raw.2026-10-20T13-22.json",
+    "sha256": "f54f596efcb6c7d5cd7ea0c6830855f1833f2e42a3c0b49736eb61940f6de3a1"
+  },
+  "seconds": 1.022,
+  "stage": 1,
+  "started_at": "2026-10-20T13:22:32.310668+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\n7 files would be left unchanged.\n",
+  "stdout": "",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-22"
+}

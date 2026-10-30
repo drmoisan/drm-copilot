@@ -1,0 +1,43 @@
+{
+  "batch": "repair-3",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T06:23:36.376327+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-repair-3-lint-062336.2026-10-19T06-23.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-repair-3-lint-062336.2026-10-19T06-23.stdout.txt",
+      "sha256": "7dbbc6fda3e21dbb3de7e6e18ab075e75145ee28c4f7528a8fa776381e1d7a08"
+    }
+  },
+  "seconds": 0.108378,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "0d0fe3358286eaaa86a3019ff374a588475d5aebf028177b17d773c61cb39380",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "c9034584f25cb86f9eb7266a0041637871a14533933570c81b4a281c3dad3f97",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "0d0fe3358286eaaa86a3019ff374a588475d5aebf028177b17d773c61cb39380",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "c9034584f25cb86f9eb7266a0041637871a14533933570c81b4a281c3dad3f97",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T06:23:36.267949+00:00",
+  "stderr": "",
+  "stdout": "B009 [*] Do not call `getattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_configuration.py:407:9\n    |\n405 |         \"Callable[[InventoryCapture, InventoryInput, ConfigurationFormat, \"\n406 |         \"tuple[ConfigurationKey, ...]], Analysis]\",\n407 |         getattr(configuration_module, \"_project\"),\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n408 |     )\n    |\nhelp: Replace `getattr` with attribute access\n\nB009 [*] Do not call `getattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_configuration_input.py:297:44\n    |\n295 |     \"\"\"\n296 |     parser_type = cast(\n297 |         \"type[configparser.ConfigParser]\", getattr(input_module, \"_IniParser\")\n    |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n298 |     )\n299 |     original = parser_type.OPTCRE\n    |\nhelp: Replace `getattr` with attribute access\n\nFound 2 errors.\n[*] 2 fixable with the `--fix` option.\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-23"
+}

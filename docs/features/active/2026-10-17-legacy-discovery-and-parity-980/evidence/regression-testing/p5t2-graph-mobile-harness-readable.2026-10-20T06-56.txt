@@ -1,0 +1,5 @@
+from pathlib import Path
+p=Path(__file__).parent/'p5t2-graph-focused.py'; raw=p.read_bytes()
+p.with_name('p5t2-graph-focused-approved-version.py.txt').write_bytes(raw)
+text=raw.decode().replace('TESTS[1] + "::test_authored_states_do_not_imply_approved_completion[retired]"]),','TESTS[1] + "::test_authored_states_do_not_imply_approved_completion[retired]",\n         TESTS[1] + "::test_multiple_clients_do_not_multiply_source_feature_identity"]),')
+p.write_text(text,encoding='utf-8',newline='\n')

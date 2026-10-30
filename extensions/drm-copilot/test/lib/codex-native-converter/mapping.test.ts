@@ -103,6 +103,45 @@ describe("planTargetPaths", () => {
     );
   });
 
+  it("publishes a shared helper verbatim under .codex/lib with its library-relative name", () => {
+    const planned = planTargetPaths(
+      record({
+        sourcePath: ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
+        sourceEcosystem: SourceEcosystem.CLAUDE,
+        sourceKind: SourceKind.HOST_ADAPTER_REFERENCE,
+        conversionClass: ConversionClass.DIRECT,
+        targetRole: TargetRole.HOOK,
+      }),
+      { enableRepoPrompts: false },
+    );
+    expect(planned.targetPath).toBe(
+      ".codex/lib/discovery-validation/DiscoveryValidation.psm1",
+    );
+  });
+
+  it("routes GitHub hook handlers to native hooks and registrations to native config", () => {
+    const handler = planTargetPaths(
+      record({
+        sourcePath: ".github/hooks/discovery_pre_tool.ps1",
+        sourceKind: SourceKind.HOOK_DEFINITION,
+        conversionClass: ConversionClass.DIRECT,
+        targetRole: TargetRole.HOOK,
+      }),
+      { enableRepoPrompts: false },
+    );
+    const registration = planTargetPaths(
+      record({
+        sourcePath: ".github/hooks/discovery.json",
+        sourceKind: SourceKind.PERMISSIONS_OR_SETTINGS,
+        conversionClass: ConversionClass.DECOMPOSED,
+        targetRole: TargetRole.MCP_CONFIG,
+      }),
+      { enableRepoPrompts: false },
+    );
+    expect(handler.targetPath).toBe(".codex/hooks/discovery-pre-tool.ps1");
+    expect(registration.targetPath).toBe(".codex/config.toml");
+  });
+
   it("maps an approval rule to a .codex/rules target", () => {
     const planned = planTargetPaths(
       record({

@@ -1,0 +1,19 @@
+# Synthetic one-use root grant written by a native PreToolUse adapter for a root
+# call of prepare_discovery_agent (payload without agent identity). Values are
+# illustrative; a copy of this file never establishes authority.
+$schema: urn:drm-copilot:discovery:2.0.0:root-grant
+schema_version: 2.0.0
+artifact_kind: root-grant
+id: grant-0123456789abcdef0123
+grant_ref: grant-0123456789abcdef0123
+host: claude-code
+session_id: session-alpha
+parent_agent_id: root
+tool: prepare_discovery_agent
+operation: prepare-agent
+input_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+tool_use_id: toolu-0123456789abcdef
+handler_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+issued_at: "2026-01-01T00:00:00Z"
+expires_at: "2026-01-01T00:05:00Z"
+state: issued

@@ -1,0 +1,11 @@
+from pathlib import Path
+import ast
+import black
+paths = ["packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py", "tests/discovery_runtime/analyzer/test_ui_callbacks.py", "tests/discovery_runtime/analyzer/test_ui_callback_limits.py"]
+for value in paths:
+    source = Path(value).read_text("utf-8")
+    lines = source.splitlines()
+    print(value, "formatted_lines", len(black.format_str(source, mode=black.Mode()).splitlines()))
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp, ast.For, ast.While)):
+            print(node.lineno, type(node).__name__, lines[node.lineno-1].strip()[:120])

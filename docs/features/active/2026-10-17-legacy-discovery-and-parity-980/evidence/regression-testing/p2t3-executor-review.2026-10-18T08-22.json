@@ -1,0 +1,125 @@
+{
+  "task": "P2-T3",
+  "command": "poetry run python SCRATCH/issue-980-review-p2t3.py",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": "223629bd9b6219c97fc803dd5f222e88185a2d689d3ddbd6d18250b27fa23166",
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": "b253efac71e1f66fdcc1ae423aae44eb7baf8701ab6cea321fb2f727d389c9e4"
+  },
+  "passed": 8,
+  "failed": 4,
+  "cases": [
+    {
+      "name": "authoritative timestamp 2026-01-01T00:00:00Z",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "authoritative timestamp 2026-01-01t00:00:00z",
+      "status": "fail",
+      "error": "AssertionError: [('EVIDENCE_TIMESTAMP', '/timestamp')]"
+    },
+    {
+      "name": "authoritative timestamp 2016-12-31T23:59:60Z",
+      "status": "fail",
+      "error": "AssertionError: [('EVIDENCE_TIMESTAMP', '/timestamp')]"
+    },
+    {
+      "name": "authoritative timestamp 2017-01-01T00:59:60+01:00",
+      "status": "fail",
+      "error": "AssertionError: [('EVIDENCE_TIMESTAMP', '/timestamp')]"
+    },
+    {
+      "name": "one-based inclusive",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true,
+        "codes": []
+      }
+    },
+    {
+      "name": "integer-valued JSON numbers",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true,
+        "codes": []
+      }
+    },
+    {
+      "name": "out-of-range span",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": false,
+        "codes": [
+          "EVIDENCE_LINE_RANGE"
+        ]
+      }
+    },
+    {
+      "name": "reversed span",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": false,
+        "codes": [
+          "EVIDENCE_LINE_RANGE"
+        ]
+      }
+    },
+    {
+      "name": "very large integer bound",
+      "status": "fail",
+      "error": "OverflowError: int too large to convert to float"
+    },
+    {
+      "name": "separate identical runtime payload",
+      "status": "pass",
+      "detail": {
+        "locally_verified": true,
+        "codes": []
+      }
+    },
+    {
+      "name": "replaced runtime payload",
+      "status": "pass",
+      "detail": {
+        "locally_verified": false,
+        "codes": [
+          "EVIDENCE_CHECKSUM"
+        ]
+      }
+    },
+    {
+      "name": "documentation-only HEAD advancement",
+      "status": "pass",
+      "detail": {
+        "findings": 0,
+        "remote_freshness": "unknown"
+      }
+    }
+  ],
+  "findings": [
+    {
+      "id": "P2T3-R1",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "symbol": "_metadata",
+      "description": "Schema-valid RFC3339 lowercase t/z and known leap-second timestamps are rejected by datetime.fromisoformat, contradicting the accepted authoritative format checker.",
+      "required_change": "Reuse the authoritative RFC3339 predicate with an explicit string requirement; retain lowercase t/z and UTC/offset leap-second regressions."
+    },
+    {
+      "id": "P2T3-R2",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "symbol": "_line_number",
+      "description": "A schema-valid line_range end of 10**400 raises OverflowError through math.isfinite(integer) instead of producing a bounded EVIDENCE_LINE_RANGE finding.",
+      "required_change": "Handle integer bounds without float coercion; preserve integer-valued JSON floats, reject booleans/fractions, and test enormous out-of-range integers."
+    }
+  ],
+  "timestamp": "2026-10-18T08-22"
+}

@@ -1,0 +1,1177 @@
+{
+  "Timestamp": "2026-10-21T04-39",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-ncf1-proof.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "26 focused controls passed; both changed/new bodies reach 100%; unchanged AST/range history preserves file coverage.",
+  "input_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-ncf1-inputs.2026-10-21T04-30.json",
+    "sha256": "9873fb731c0e4f3ac8e69fef36bd048d831db6fc59cf81a88d7547a44d771fe0",
+    "bytes": 18045
+  },
+  "retained_coverage_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-proof.2026-10-20T18-10.json",
+    "sha256": "e045acce696bc66fd7df51c83eefdeb3d03cb552272a283943893a59d0ae23ba",
+    "bytes": 128460
+  },
+  "fresh_behavior": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.raw.json",
+    "sha256": "962a5dafae80036e43cd1d685f32d4244e1623ecfa60f1ab62f625e0ac4bac97",
+    "bytes": 17242
+  },
+  "new_node_ids": [
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[existing-canonical]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[existing-alias]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[missing-leaf-canonical]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[missing-leaf-alias]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[relative]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[../state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[C:state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[\\\\state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[parent]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_internal_state_cannot_become_trusted_storage[lexical]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_internal_state_cannot_become_trusted_storage[resolved]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[layout]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[partition]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[store-race]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[workspace]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[base]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[noncanonical-workspace]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[missing-workspace]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[host]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_composed_ports_reject_host_references[invocation]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_composed_ports_reject_host_references[authorization]"
+  ],
+  "retained_node_ids": [
+    "tests/discovery_runtime/test_gateway_local.py::test_installed_factory_wires_only_trusted_outer_host_values",
+    "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[canonical]",
+    "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[alias]",
+    "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[internal]"
+  ],
+  "changed_existing_callables": [
+    "installed_local_io"
+  ],
+  "new_callables": [
+    "_canonical_state_location"
+  ],
+  "unchanged_callable_mapping": {
+    "LocalServiceIO.__init__": {
+      "old_range": [
+        46,
+        83
+      ],
+      "new_range": [
+        46,
+        83
+      ],
+      "executable_ast_sha256": "dc49f8eb817a88701916654d87dca87a0fc2fe2ddd5a5c28fdf158d297c2956f"
+    },
+    "LocalServiceIO.activation": {
+      "old_range": [
+        86,
+        88
+      ],
+      "new_range": [
+        86,
+        88
+      ],
+      "executable_ast_sha256": "23031e59a2befc59e80b36f35afabdd86a5b2d501b057473333b3f789642bcac"
+    },
+    "LocalServiceIO.initialization": {
+      "old_range": [
+        91,
+        93
+      ],
+      "new_range": [
+        91,
+        93
+      ],
+      "executable_ast_sha256": "d5c297b495d135c0b4e4032d1a2d9e7b27bcc090951269f3bdf4609755d235c6"
+    },
+    "LocalServiceIO.runtime_identity": {
+      "old_range": [
+        95,
+        97
+      ],
+      "new_range": [
+        95,
+        97
+      ],
+      "executable_ast_sha256": "16278dcbe2d7f90cc3a3e8d6b1de077d3250c7fb7d7384ab3df39b101104f414"
+    },
+    "LocalServiceIO._matches_workspace": {
+      "old_range": [
+        99,
+        110
+      ],
+      "new_range": [
+        99,
+        110
+      ],
+      "executable_ast_sha256": "90b86fa1710cb3a57501aa18afc65cac64881e5f2c15303411de06bce8d559f1"
+    },
+    "LocalServiceIO.authorize": {
+      "old_range": [
+        112,
+        161
+      ],
+      "new_range": [
+        112,
+        161
+      ],
+      "executable_ast_sha256": "18ee131a4ace64487af13284c1a2eaf6458a49ba05f56a8f46d83750f4ca9156"
+    },
+    "LocalServiceIO.writer": {
+      "old_range": [
+        163,
+        189
+      ],
+      "new_range": [
+        163,
+        189
+      ],
+      "executable_ast_sha256": "2d0a33fabb539e4adc35221cec5cb7af1e053fa7e0742be75acf3ea8e1594562"
+    },
+    "LocalServiceIO._recapture": {
+      "old_range": [
+        191,
+        223
+      ],
+      "new_range": [
+        191,
+        223
+      ],
+      "executable_ast_sha256": "67bac85c09f454e91c98fcba634776ccd6661764c30129bdc7da880316c2f039"
+    },
+    "_repository_selection": {
+      "old_range": [
+        226,
+        254
+      ],
+      "new_range": [
+        226,
+        254
+      ],
+      "executable_ast_sha256": "7e9b071e5358416dacd3e397a7ba5e482d94f176b9ac83b06a3356bbb946ff27"
+    },
+    "run_local_git": {
+      "old_range": [
+        257,
+        341
+      ],
+      "new_range": [
+        257,
+        341
+      ],
+      "executable_ast_sha256": "cd1fd67ac05fff406d7a957e675db82a54d85bf3cc3c4d93a7a4a6ede2d67150"
+    },
+    "run_local_git.expire": {
+      "old_range": [
+        303,
+        316
+      ],
+      "new_range": [
+        303,
+        316
+      ],
+      "executable_ast_sha256": "24fd1fec7aa4a2fd70c89647a0c9daf9bdad81e0c2781737cb5b5292fffd50db"
+    },
+    "_authorize_local_root": {
+      "old_range": [
+        344,
+        345
+      ],
+      "new_range": [
+        344,
+        345
+      ],
+      "executable_ast_sha256": "efce186aa0ae7690ed7e12cf4b511bd96a311b55ef5bb562d1c3d913cbc37aea"
+    },
+    "_invalidate_empty_authority": {
+      "old_range": [
+        348,
+        356
+      ],
+      "new_range": [
+        348,
+        356
+      ],
+      "executable_ast_sha256": "e0cbc8e2b547c8c3e66b5c25164db577c2e9b8c957cf0a612336dd09763fa332"
+    }
+  },
+  "declaration_exclusive_named_body_coverage": {
+    "_canonical_state_location": {
+      "declaration_line": 359,
+      "body_first_line": 368,
+      "body_last_line": 375,
+      "executable_ast_sha256": "430948c1436e8e65267cd0905758be49724b9f83bd6b9e6b51894c2a36942a5e",
+      "covered_lines": 6,
+      "statements": 6,
+      "line_percent": 100.0,
+      "covered_branches": 2,
+      "branches": 2,
+      "branch_percent": 100.0,
+      "missing_lines": [],
+      "missing_branches": [],
+      "executed_body_lines": [
+        368,
+        371,
+        372,
+        373,
+        374,
+        375
+      ],
+      "executed_body_branches": [
+        [
+          373,
+          374
+        ],
+        [
+          373,
+          375
+        ]
+      ]
+    },
+    "installed_local_io": {
+      "declaration_line": 378,
+      "body_first_line": 395,
+      "body_last_line": 423,
+      "executable_ast_sha256": "2b06807bec7f03997d783264e2f00342ef4733d1b21aa6037b73a785e0f8ea46",
+      "covered_lines": 9,
+      "statements": 9,
+      "line_percent": 100.0,
+      "covered_branches": 4,
+      "branches": 4,
+      "branch_percent": 100.0,
+      "missing_lines": [],
+      "missing_branches": [],
+      "executed_body_lines": [
+        395,
+        396,
+        397,
+        398,
+        399,
+        400,
+        405,
+        412,
+        418
+      ],
+      "executed_body_branches": [
+        [
+          396,
+          397
+        ],
+        [
+          396,
+          398
+        ],
+        [
+          398,
+          399
+        ],
+        [
+          398,
+          400
+        ]
+      ]
+    }
+  },
+  "file_coverage": {
+    "fresh_26_controls": {
+      "covered_lines": 60,
+      "statements": 138,
+      "line_percent": 43.47826086956522,
+      "covered_branches": 8,
+      "branches": 40,
+      "branch_percent": 20.0,
+      "missing_lines": [
+        65,
+        97,
+        105,
+        106,
+        109,
+        110,
+        140,
+        142,
+        143,
+        144,
+        145,
+        146,
+        151,
+        153,
+        154,
+        155,
+        160,
+        161,
+        178,
+        184,
+        185,
+        199,
+        200,
+        208,
+        212,
+        213,
+        214,
+        215,
+        219,
+        220,
+        221,
+        222,
+        223,
+        238,
+        239,
+        240,
+        241,
+        243,
+        244,
+        252,
+        253,
+        254,
+        269,
+        270,
+        278,
+        280,
+        285,
+        293,
+        301,
+        303,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        318,
+        319,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341
+      ],
+      "missing_branches": [
+        [
+          64,
+          65
+        ],
+        [
+          128,
+          140
+        ],
+        [
+          142,
+          143
+        ],
+        [
+          142,
+          161
+        ],
+        [
+          144,
+          145
+        ],
+        [
+          144,
+          146
+        ],
+        [
+          153,
+          154
+        ],
+        [
+          153,
+          160
+        ],
+        [
+          178,
+          184
+        ],
+        [
+          178,
+          185
+        ],
+        [
+          212,
+          213
+        ],
+        [
+          212,
+          221
+        ],
+        [
+          213,
+          214
+        ],
+        [
+          213,
+          215
+        ],
+        [
+          221,
+          222
+        ],
+        [
+          221,
+          223
+        ],
+        [
+          243,
+          244
+        ],
+        [
+          243,
+          254
+        ],
+        [
+          270,
+          278
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          313,
+          -303
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          323,
+          325
+        ],
+        [
+          326,
+          327
+        ],
+        [
+          326,
+          328
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          334,
+          337
+        ],
+        [
+          337,
+          338
+        ],
+        [
+          337,
+          339
+        ],
+        [
+          339,
+          340
+        ],
+        [
+          339,
+          341
+        ]
+      ]
+    },
+    "retained_baseline": {
+      "covered_lines": 130,
+      "statements": 131,
+      "line_percent": 99.23664122137404,
+      "covered_branches": 37,
+      "branches": 38,
+      "branch_percent": 97.36842105263158,
+      "missing_lines": [
+        145
+      ],
+      "missing_branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "qualified_fresh_plus_unchanged_history": {
+      "covered_lines": 137,
+      "statements": 138,
+      "line_percent": 99.27536231884058,
+      "covered_branches": 39,
+      "branches": 40,
+      "branch_percent": 97.5,
+      "missing_lines": [
+        145
+      ],
+      "missing_branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "retained_only_lines": [
+      65,
+      97,
+      105,
+      106,
+      109,
+      110,
+      140,
+      142,
+      143,
+      144,
+      146,
+      151,
+      153,
+      154,
+      155,
+      160,
+      161,
+      178,
+      184,
+      185,
+      199,
+      200,
+      208,
+      212,
+      213,
+      214,
+      215,
+      219,
+      220,
+      221,
+      222,
+      223,
+      238,
+      239,
+      240,
+      241,
+      243,
+      244,
+      252,
+      253,
+      254,
+      269,
+      270,
+      278,
+      280,
+      285,
+      293,
+      301,
+      303,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      318,
+      319,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      340,
+      341
+    ],
+    "retained_only_branches": [
+      [
+        64,
+        65
+      ],
+      [
+        128,
+        140
+      ],
+      [
+        142,
+        143
+      ],
+      [
+        142,
+        161
+      ],
+      [
+        144,
+        146
+      ],
+      [
+        153,
+        154
+      ],
+      [
+        153,
+        160
+      ],
+      [
+        178,
+        184
+      ],
+      [
+        178,
+        185
+      ],
+      [
+        212,
+        213
+      ],
+      [
+        212,
+        221
+      ],
+      [
+        213,
+        214
+      ],
+      [
+        213,
+        215
+      ],
+      [
+        221,
+        222
+      ],
+      [
+        221,
+        223
+      ],
+      [
+        243,
+        244
+      ],
+      [
+        243,
+        254
+      ],
+      [
+        270,
+        278
+      ],
+      [
+        270,
+        280
+      ],
+      [
+        313,
+        -303
+      ],
+      [
+        313,
+        314
+      ],
+      [
+        323,
+        324
+      ],
+      [
+        323,
+        325
+      ],
+      [
+        326,
+        327
+      ],
+      [
+        326,
+        328
+      ],
+      [
+        334,
+        335
+      ],
+      [
+        334,
+        337
+      ],
+      [
+        337,
+        338
+      ],
+      [
+        337,
+        339
+      ],
+      [
+        339,
+        340
+      ],
+      [
+        339,
+        341
+      ]
+    ]
+  },
+  "exact_old_to_new_retained_line_map": {
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
+    "10": 10,
+    "11": 11,
+    "12": 12,
+    "13": 13,
+    "14": 14,
+    "15": 15,
+    "16": 16,
+    "17": 17,
+    "18": 18,
+    "19": 19,
+    "20": 20,
+    "21": 21,
+    "22": 22,
+    "23": 23,
+    "24": 24,
+    "25": 25,
+    "26": 26,
+    "27": 27,
+    "28": 28,
+    "29": 29,
+    "30": 30,
+    "31": 31,
+    "32": 32,
+    "33": 33,
+    "34": 34,
+    "35": 35,
+    "36": 36,
+    "37": 37,
+    "38": 38,
+    "39": 39,
+    "40": 40,
+    "41": 41,
+    "42": 42,
+    "43": 43,
+    "44": 44,
+    "45": 45,
+    "46": 46,
+    "47": 47,
+    "48": 48,
+    "49": 49,
+    "50": 50,
+    "51": 51,
+    "52": 52,
+    "53": 53,
+    "54": 54,
+    "55": 55,
+    "56": 56,
+    "57": 57,
+    "58": 58,
+    "59": 59,
+    "60": 60,
+    "61": 61,
+    "62": 62,
+    "63": 63,
+    "64": 64,
+    "65": 65,
+    "66": 66,
+    "67": 67,
+    "68": 68,
+    "69": 69,
+    "70": 70,
+    "71": 71,
+    "72": 72,
+    "73": 73,
+    "74": 74,
+    "75": 75,
+    "76": 76,
+    "77": 77,
+    "78": 78,
+    "79": 79,
+    "80": 80,
+    "81": 81,
+    "82": 82,
+    "83": 83,
+    "84": 84,
+    "85": 85,
+    "86": 86,
+    "87": 87,
+    "88": 88,
+    "89": 89,
+    "90": 90,
+    "91": 91,
+    "92": 92,
+    "93": 93,
+    "94": 94,
+    "95": 95,
+    "96": 96,
+    "97": 97,
+    "98": 98,
+    "99": 99,
+    "100": 100,
+    "101": 101,
+    "102": 102,
+    "103": 103,
+    "104": 104,
+    "105": 105,
+    "106": 106,
+    "107": 107,
+    "108": 108,
+    "109": 109,
+    "110": 110,
+    "111": 111,
+    "112": 112,
+    "113": 113,
+    "114": 114,
+    "115": 115,
+    "116": 116,
+    "117": 117,
+    "118": 118,
+    "119": 119,
+    "120": 120,
+    "121": 121,
+    "122": 122,
+    "123": 123,
+    "124": 124,
+    "125": 125,
+    "126": 126,
+    "127": 127,
+    "128": 128,
+    "129": 129,
+    "130": 130,
+    "131": 131,
+    "132": 132,
+    "133": 133,
+    "134": 134,
+    "135": 135,
+    "136": 136,
+    "137": 137,
+    "138": 138,
+    "139": 139,
+    "140": 140,
+    "141": 141,
+    "142": 142,
+    "143": 143,
+    "144": 144,
+    "145": 145,
+    "146": 146,
+    "147": 147,
+    "148": 148,
+    "149": 149,
+    "150": 150,
+    "151": 151,
+    "152": 152,
+    "153": 153,
+    "154": 154,
+    "155": 155,
+    "156": 156,
+    "157": 157,
+    "158": 158,
+    "159": 159,
+    "160": 160,
+    "161": 161,
+    "162": 162,
+    "163": 163,
+    "164": 164,
+    "165": 165,
+    "166": 166,
+    "167": 167,
+    "168": 168,
+    "169": 169,
+    "170": 170,
+    "171": 171,
+    "172": 172,
+    "173": 173,
+    "174": 174,
+    "175": 175,
+    "176": 176,
+    "177": 177,
+    "178": 178,
+    "179": 179,
+    "180": 180,
+    "181": 181,
+    "182": 182,
+    "183": 183,
+    "184": 184,
+    "185": 185,
+    "186": 186,
+    "187": 187,
+    "188": 188,
+    "189": 189,
+    "190": 190,
+    "191": 191,
+    "192": 192,
+    "193": 193,
+    "194": 194,
+    "195": 195,
+    "196": 196,
+    "197": 197,
+    "198": 198,
+    "199": 199,
+    "200": 200,
+    "201": 201,
+    "202": 202,
+    "203": 203,
+    "204": 204,
+    "205": 205,
+    "206": 206,
+    "207": 207,
+    "208": 208,
+    "209": 209,
+    "210": 210,
+    "211": 211,
+    "212": 212,
+    "213": 213,
+    "214": 214,
+    "215": 215,
+    "216": 216,
+    "217": 217,
+    "218": 218,
+    "219": 219,
+    "220": 220,
+    "221": 221,
+    "222": 222,
+    "223": 223,
+    "224": 224,
+    "225": 225,
+    "226": 226,
+    "227": 227,
+    "228": 228,
+    "229": 229,
+    "230": 230,
+    "231": 231,
+    "232": 232,
+    "233": 233,
+    "234": 234,
+    "235": 235,
+    "236": 236,
+    "237": 237,
+    "238": 238,
+    "239": 239,
+    "240": 240,
+    "241": 241,
+    "242": 242,
+    "243": 243,
+    "244": 244,
+    "245": 245,
+    "246": 246,
+    "247": 247,
+    "248": 248,
+    "249": 249,
+    "250": 250,
+    "251": 251,
+    "252": 252,
+    "253": 253,
+    "254": 254,
+    "255": 255,
+    "256": 256,
+    "257": 257,
+    "258": 258,
+    "259": 259,
+    "260": 260,
+    "261": 261,
+    "262": 262,
+    "263": 263,
+    "264": 264,
+    "265": 265,
+    "266": 266,
+    "267": 267,
+    "268": 268,
+    "269": 269,
+    "270": 270,
+    "271": 271,
+    "272": 272,
+    "273": 273,
+    "274": 274,
+    "275": 275,
+    "276": 276,
+    "277": 277,
+    "278": 278,
+    "279": 279,
+    "280": 280,
+    "281": 281,
+    "282": 282,
+    "283": 283,
+    "284": 284,
+    "285": 285,
+    "286": 286,
+    "287": 287,
+    "288": 288,
+    "289": 289,
+    "290": 290,
+    "291": 291,
+    "292": 292,
+    "293": 293,
+    "294": 294,
+    "295": 295,
+    "296": 296,
+    "297": 297,
+    "298": 298,
+    "299": 299,
+    "300": 300,
+    "301": 301,
+    "302": 302,
+    "303": 303,
+    "304": 304,
+    "305": 305,
+    "306": 306,
+    "307": 307,
+    "308": 308,
+    "309": 309,
+    "310": 310,
+    "311": 311,
+    "312": 312,
+    "313": 313,
+    "314": 314,
+    "315": 315,
+    "316": 316,
+    "317": 317,
+    "318": 318,
+    "319": 319,
+    "320": 320,
+    "321": 321,
+    "322": 322,
+    "323": 323,
+    "324": 324,
+    "325": 325,
+    "326": 326,
+    "327": 327,
+    "328": 328,
+    "329": 329,
+    "330": 330,
+    "331": 331,
+    "332": 332,
+    "333": 333,
+    "334": 334,
+    "335": 335,
+    "336": 336,
+    "337": 337,
+    "338": 338,
+    "339": 339,
+    "340": 340,
+    "341": 341,
+    "342": 342,
+    "343": 343,
+    "344": 344,
+    "345": 345,
+    "346": 346,
+    "347": 347,
+    "348": 348,
+    "349": 349,
+    "350": 350,
+    "351": 351,
+    "352": 352,
+    "353": 353,
+    "354": 354,
+    "355": 355,
+    "356": 356,
+    "357": 357,
+    "358": 358
+  },
+  "coverage_qualification": "Only the two named changed/new bodies claim fresh coverage. Qualified whole-file coverage composes exact AST-identical unchanged ranges with retained proof; it is not a new whole-file test run.",
+  "legacy_fixture_delta": {
+    "changed_nested_callable": "test_installed_factory_wires_only_trusted_outer_host_values.resolve",
+    "outer_ast_equal_without_that_nested_callable": true,
+    "all_other_callable_asts_equal": true
+  },
+  "scoped_unified_diffs": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "--- before/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n+++ after/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n@@ -1,403 +1,423 @@\n-\"\"\"Compose trusted local-user discovery over accepted native storage and Git seams.\"\"\"\r\n-\r\n-from __future__ import annotations\r\n-\r\n-import os\r\n-import shutil\r\n-import subprocess\r\n-import sys\r\n-import threading\r\n-from dataclasses import replace\r\n-from pathlib import Path\r\n-from typing import TYPE_CHECKING, Literal, cast\r\n-\r\n-from drm_copilot_discovery.activation_filesystem import RegistryLocation\r\n-from drm_copilot_discovery.activation_store import ActivationStore\r\n-from drm_copilot_discovery.build_identity import load_build_identity\r\n-from drm_copilot_discovery.catalog import load_catalog\r\n-from drm_copilot_discovery.init_io import InitializationIO\r\n-from drm_copilot_discovery.mutation_io import GuardedMutationWriter, capture_workspace\r\n-from drm_copilot_discovery.path_models import PathPolicyError\r\n-from drm_copilot_discovery.path_policy import PathPolicy, workspace_identity\r\n-from drm_copilot_discovery.report_models import ReportBudget\r\n-from drm_copilot_discovery.service_contracts import ServiceAuthority\r\n-from drm_copilot_discovery.source_read_models import ReadGrant, ReadSelection\r\n-\r\n-if TYPE_CHECKING:\r\n-    from collections.abc import Callable\r\n-\r\n-    from drm_copilot_discovery.mutation_plan import CapturedWorkspace\r\n-    from drm_copilot_discovery.repository_reader import (\r\n-        RepositoryIdentity,\r\n-        RepositoryReader,\r\n-    )\r\n-    from drm_copilot_discovery.service_contracts import RuntimeIdentity, ServiceRequest\r\n-\r\n-\r\n-class LocalServiceIO:\r\n-    \"\"\"Bind explicit local-user authorization to accepted native I/O boundaries.\r\n-\r\n-    Construct from a trusted ActivationStore, exact RepositoryReader and verified\r\n-    identity provider. Initialization and writer captures share the same readers\r\n-    and guarded primitives. Request markers never supply host authorization.\r\n-    Construction performs no I/O; methods read only or return guarded writers.\r\n-    \"\"\"\r\n-\r\n-    def __init__(\r\n-        self,\r\n-        *,\r\n-        activation: ActivationStore,\r\n-        repository: RepositoryReader | None,\r\n-        principal: Literal[\"local-user\", \"host\"],\r\n-        author_id: str,\r\n-        identity: Callable[[], RuntimeIdentity] = load_build_identity,\r\n-    ) -> None:\r\n-        \"\"\"Bind trusted ports; reject unavailable principal with PermissionError.\r\n-\r\n-        activation (ActivationStore): trusted activation store to preserve. repository\r\n-        (RepositoryReader | None): exact optional repository reader. principal\r\n-        (Literal['local-user', 'host']): explicit outer principal; host is unavailable.\r\n-        author_id (str): explicit local author identity. identity (Callable[[],\r\n-        RuntimeIdentity]): verified installed identity provider. Returns None; local\r\n-        fields are initialized without I/O. Invalid principal raises PermissionError.\r\n-        \"\"\"\r\n-        if principal != \"local-user\":\r\n-            raise PermissionError(\"Native host authority is unavailable\")\r\n-        self._authority = ServiceAuthority(\r\n-            principal=principal,\r\n-            author_or_agent=author_id,\r\n-            invocation=None,\r\n-            grants=(),\r\n-            read_selection=None,\r\n-        )\r\n-        self._activation, self._identity = activation, identity\r\n-        self._initialization = InitializationIO(\r\n-            workspace_root=activation.location.workspace,\r\n-            catalog=activation.catalog,\r\n-            metadata=activation.metadata,\r\n-            read_bytes=activation.read_bytes,\r\n-            primitives=activation.primitives,\r\n-            open_directory=activation.open_directory,\r\n-            invalidate_authority=activation.invalidate_authority,\r\n-            repository=repository,\r\n-        )\r\n-\r\n-    @property\r\n-    def activation(self) -> ActivationStore:\r\n-        \"\"\"Return the exact trusted store; no observation or mutation occurs.\"\"\"\r\n-        return self._activation\r\n-\r\n-    @property\r\n-    def initialization(self) -> InitializationIO:\r\n-        \"\"\"Return the bound initialization ports; no replacement reader is created.\"\"\"\r\n-        return self._initialization\r\n-\r\n-    def runtime_identity(self) -> RuntimeIdentity:\r\n-        \"\"\"Return verified installed identity; propagate typed failure unchanged.\"\"\"\r\n-        return self._identity()\r\n-\r\n-    def _matches_workspace(self, path: str) -> bool:\r\n-        \"\"\"Compare path (str) to the bound root with strict platform identity.\r\n-\r\n-        Return False for an invalid or different root; callers deny authority\r\n-        with PermissionError. Parsing is lexical and performs no I/O.\r\n-        \"\"\"\r\n-        try:\r\n-            return workspace_identity(path) == workspace_identity(\r\n-                self.initialization.workspace_root\r\n-            )\r\n-        except PathPolicyError:\r\n-            return False\r\n-\r\n-    def authorize(\r\n-        self, request: ServiceRequest, *, baseline: CapturedWorkspace | None\r\n-    ) -> ServiceAuthority:\r\n-        \"\"\"Authenticate a parsed request against this explicit outer local principal.\r\n-\r\n-        Return local authority with bounded exact read selection when needed. Host\r\n-        markers, substituted roots and cross-workspace captures raise PermissionError\r\n-        before source I/O. Core derives exact local write grants only from its accepted\r\n-        planned changes; this method grants no root wildcard.\r\n-\r\n-        request (ServiceRequest): parsed operation input; no authority is inferred from\r\n-        it. baseline (CapturedWorkspace | None): captured workspace, or None before\r\n-        capture. Returns ServiceAuthority; invalid or different root identity raises\r\n-        PermissionError. Scoped-selection path failures propagate; reads metadata only\r\n-        for scoped selection.\r\n-        \"\"\"\r\n-        if (\r\n-            request.invocation_ref is not None\r\n-            or request.authorization_ref is not None\r\n-            or request.mode == \"agent-output\"\r\n-            or request.operation in (\"prepare-agent\", \"finalize-agent\")\r\n-            or not self._matches_workspace(request.workspace_root)\r\n-            or (\r\n-                baseline is not None\r\n-                and not self._matches_workspace(baseline.workspace_root)\r\n-            )\r\n-        ):\r\n-            raise PermissionError(\"Request has no local-user authority\")\r\n-        selection: ReadSelection | None = None\r\n-        # Only a captured profile can delimit an authenticated local read selection.\r\n-        if request.operation == \"read-source\" and baseline is not None:\r\n-            paths = cast(\"tuple[str, ...]\", request.inputs[\"paths\"])\r\n-            if not 1 <= len(paths) <= 10000:\r\n-                raise PermissionError(\"Read selection exceeds its bound\")\r\n-            policy = PathPolicy(\r\n-                baseline.snapshot.profile,\r\n-                workspace_root=baseline.workspace_root,\r\n-                metadata=self.initialization.metadata,\r\n-            )\r\n-            grants: list[ReadGrant] = []\r\n-            # Exact requested paths still require independent configured read scope.\r\n-            for path in paths:\r\n-                target = policy.resolve_read(path)\r\n-                grants.append(\r\n-                    ReadGrant(\r\n-                        path=path, directory=target.observations[-1].kind == \"directory\"\r\n-                    )\r\n-                )\r\n-            selection = ReadSelection(grants=tuple(grants))\r\n-        return replace(self._authority, read_selection=selection)\r\n-\r\n-    def writer(\r\n-        self, baseline: CapturedWorkspace, *, authority: ServiceAuthority\r\n-    ) -> GuardedMutationWriter:\r\n-        \"\"\"Return a same-root guarded recapturing writer without publishing bytes.\r\n-\r\n-        Baseline and authority are trusted core values. Reject foreign identity with\r\n-        PermissionError. Fresh captures retain this reader; accepted mutation validation\r\n-        remains responsible for exact grants and complete CAS.\r\n-\r\n-        baseline (CapturedWorkspace): required accepted capture for this same-root\r\n-        guarded writer.\r\n-        authority (ServiceAuthority): authenticated local identity and exact grants.\r\n-        Returns GuardedMutationWriter; invalid or different root identity raises\r\n-        PermissionError. No publication occurs until the writer is invoked.\r\n-        \"\"\"\r\n-        if (\r\n-            not self._matches_workspace(baseline.workspace_root)\r\n-            or authority.principal != self._authority.principal\r\n-            or authority.author_or_agent != self._authority.author_or_agent\r\n-            or authority.invocation is not None\r\n-        ):\r\n-            raise PermissionError(\"Writer authority differs from local context\")\r\n-        return GuardedMutationWriter(\r\n-            capture=lambda: self._recapture(baseline),\r\n-            invalidate_authority=self.initialization.invalidate_authority,\r\n-            primitives=self.initialization.primitives,\r\n-        )\r\n-\r\n-    def _recapture(self, baseline: CapturedWorkspace) -> CapturedWorkspace:\r\n-        \"\"\"Reload the same profile and repository through the bound trusted reader.\r\n-\r\n-        baseline (CapturedWorkspace): required prior capture whose profile and\r\n-        repository are reloaded.\r\n-        Returns CapturedWorkspace; I/O, path and budget failures propagate. Reads the\r\n-        exact bound workspace and repository.\r\n-        \"\"\"\r\n-        io = self.initialization\r\n-        current = capture_workspace(\r\n-            workspace_root=io.workspace_root,\r\n-            profile_path=baseline.snapshot.profile.artifacts[\"profile\"],\r\n-            metadata=io.metadata,\r\n-            read_bytes=io.read_bytes,\r\n-            catalog=io.catalog,\r\n-            repository=io.repository,\r\n-        )\r\n-        selected, loaded = _repository_selection(baseline), _repository_selection(\r\n-            current\r\n-        )\r\n-        # Inventory alone adds source pins; repeat that exact accepted selection.\r\n-        if set(selected) - set(loaded):\r\n-            if io.repository is None:\r\n-                raise OSError(\"Pinned repository reader is unavailable\")\r\n-            from drm_copilot_discovery.analyzer.input_capture import (\r\n-                pin_inventory_sources,\r\n-            )\r\n-\r\n-            current = pin_inventory_sources(current, io.repository)\r\n-            loaded = _repository_selection(current)\r\n-        if loaded != selected:\r\n-            raise OSError(\"Writer source selection differs from baseline\")\r\n-        return current\r\n-\r\n-\r\n-def _repository_selection(\r\n-    capture: CapturedWorkspace,\r\n-) -> tuple[tuple[RepositoryIdentity, str], ...]:\r\n-    \"\"\"Project exact identity/path pins after reserving aggregate copy/hash work.\r\n-\r\n-    Use the captured profile's trusted parse limits. Raise ReportLimitError before\r\n-    excessive allocation; retain no blob copies and perform no external reads.\r\n-\r\n-    capture (CapturedWorkspace): accepted workspace with pinned repository inputs.\r\n-    Returns tuple of repository/path pairs; ReportLimitError precedes excessive\r\n-    allocation. No external effects.\r\n-    \"\"\"\r\n-    pins = capture.snapshot.repository_files\r\n-    budget = ReportBudget(capture.snapshot.profile.limits.parse_limits())\r\n-    budget.work(8 * len(pins))\r\n-    result: list[tuple[RepositoryIdentity, str]] = []\r\n-    # Validate encoded key capacity before appending or hashing any selected pair.\r\n-    for item in pins:\r\n-        budget.work(\r\n-            8\r\n-            * (\r\n-                len(item.repository.id)\r\n-                + len(item.repository.revision or \"\")\r\n-                + len(item.path)\r\n-            )\r\n-        )\r\n-        budget.check((item.repository.id, item.repository.revision, item.path))\r\n-        result.append((item.repository, item.path))\r\n-    return tuple(result)\r\n-\r\n-\r\n-def run_local_git(argv: tuple[str, ...], *, output_limit: int) -> bytes:\r\n-    \"\"\"Execute only LocalGitReader argv with bounded stdout and discarded stderr.\r\n-\r\n-    Resolve fixed git through PATH; reject unbounded sizes and other executables. The\r\n-    process never receives stdin, a shell or inherited Git redirection/config. Raise\r\n-    fixed OSError on failure/overflow; tests replace process/which seams.\r\n-\r\n-    argv (tuple[str, ...]): fixed outer argument sequence. output_limit (int): positive\r\n-    stdout byte ceiling, at most 64 MiB. Returns bytes from successful Git; OSError\r\n-    reports timeout, overflow or failure. Starts, bounds and reaps one fixed native\r\n-    process.\r\n-    \"\"\"\r\n-    executable = shutil.which(\"git\")\r\n-    if (\r\n-        not executable\r\n-        or Path(executable).suffix.casefold() in (\".cmd\", \".bat\")\r\n-        or not argv\r\n-        or argv[0] != \"git\"\r\n-        or type(output_limit) is not int\r\n-        or not 0 < output_limit <= 67108864\r\n-    ):\r\n-        raise OSError(\"Bounded installed Git is unavailable\")\r\n-    # Exclude ambient Git overrides so the fixed -C root remains authoritative.\r\n-    environment = {\r\n-        key: value\r\n-        for key, value in os.environ.items()\r\n-        if not key.upper().startswith(\"GIT_\")\r\n-    }\r\n-    environment.update(\r\n-        {\r\n-            \"GIT_CONFIG_NOSYSTEM\": \"1\",\r\n-            \"GIT_CONFIG_GLOBAL\": os.devnull,\r\n-            \"GIT_TERMINAL_PROMPT\": \"0\",\r\n-            \"GIT_OPTIONAL_LOCKS\": \"0\",\r\n-        }\r\n-    )\r\n-    with subprocess.Popen(  # noqa: S603 - static analysis can't verify runtime validation\r\n-        (executable, *argv[1:]),\r\n-        stdin=subprocess.DEVNULL,\r\n-        stdout=subprocess.PIPE,\r\n-        stderr=subprocess.DEVNULL,\r\n-        shell=False,\r\n-        env=environment,\r\n-    ) as process:\r\n-        expired = threading.Event()\r\n-\r\n-        def expire() -> None:\r\n-            \"\"\"Cancel the bounded Git read at its deadline; return None.\r\n-\r\n-            Signal the local Event and kill the fixed child if still running.\r\n-            Killing closes its pipe writer, releasing a pending bounded read.\r\n-            ProcessLookupError means the child already exited; no other error\r\n-            is suppressed. No request-selected process can enter this callback.\r\n-            \"\"\"\r\n-            expired.set()\r\n-            try:\r\n-                if process.poll() is None:\r\n-                    process.kill()\r\n-            except ProcessLookupError:\r\n-                return\r\n-\r\n-        deadline = threading.Timer(30, expire)\r\n-        deadline.daemon = True\r\n-        # Arm cancellation before touching stdout, so a silent pipe cannot bypass it.\r\n-        deadline.start()\r\n-        try:\r\n-            if process.stdout is None:\r\n-                raise OSError(\"Git stdout is unavailable\")\r\n-            content = process.stdout.read(output_limit + 1)\r\n-            if len(content) > output_limit:\r\n-                raise OSError(\"Git output exceeds its bound\")\r\n-            code = process.wait(timeout=30)\r\n-        except subprocess.TimeoutExpired:\r\n-            raise OSError(\"Git read timed out\") from None\r\n-        finally:\r\n-            deadline.cancel()\r\n-            deadline.join()\r\n-            if process.poll() is None:\r\n-                process.kill()\r\n-                process.wait()\r\n-        if expired.is_set():\r\n-            raise OSError(\"Git read timed out\")\r\n-        if code != 0:\r\n-            raise OSError(\"Git read failed\")\r\n-        return content\r\n-\r\n-\r\n-def _authorize_local_root() -> None:\r\n-    \"\"\"Accept the authenticated explicit local-user root; return None without I/O.\"\"\"\r\n-\r\n-\r\n-def _invalidate_empty_authority() -> None:\r\n-    \"\"\"Invalidate the empty local authority set without claiming native revocation.\r\n-\r\n-    Only the trusted local-user factory installs this P6 callback. It cannot\r\n-    issue or accept native grants/receipts; host references and prepare/finalize\r\n-    are rejected. P8 must replace this callback before native capability use.\r\n-    Guarded writers still call it before every write and propagate failures.\r\n-    Return None; no storage or external authority is mutated.\r\n-    \"\"\"\r\n-\r\n-\r\n-def installed_local_io(\r\n-    root: str, repository: RepositoryReader | None, principal: str, author_id: str\r\n-) -> LocalServiceIO:\r\n-    \"\"\"Compose fixed installed ports from trusted outer host values; create no files.\r\n-\r\n-    Root must already be absolute/canonical. Host state paths come from platform\r\n-    settings, never request JSON. Invalid paths/principals raise fixed errors; catalog\r\n-    and runtime-provider failures retain their existing typed boundaries.\r\n-\r\n-    root (str): trusted absolute canonical workspace. repository (RepositoryReader |\r\n-    None): exact optional repository reader. principal (str): explicit outer principal;\r\n-    host is unavailable. author_id (str): explicit local author identity. Returns\r\n-    LocalServiceIO; invalid roots/principals raise ValueError/PermissionError and\r\n-    catalog failures propagate. Reads installed metadata without creating workspace\r\n-    files.\r\n-    \"\"\"\r\n-    workspace = Path(root)\r\n-    if not workspace.is_absolute() or workspace.resolve(strict=True) != workspace:\r\n-        raise ValueError(\"Select an absolute canonical workspace\")\r\n-    if principal != \"local-user\":\r\n-        raise PermissionError(\"Native host capability is unavailable\")\r\n-    platform: Literal[\"windows\", \"macos\", \"linux\"] = (\r\n-        \"windows\"\r\n-        if os.name == \"nt\"\r\n-        else \"macos\" if sys.platform == \"darwin\" else \"linux\"\r\n-    )\r\n-    location = RegistryLocation.for_host(\r\n-        workspace_root=workspace.as_posix(),\r\n-        platform=platform,\r\n-        user_home=str(Path.home()),\r\n-        local_app_data=os.environ.get(\"LOCALAPPDATA\"),\r\n-        xdg_state_home=os.environ.get(\"XDG_STATE_HOME\"),\r\n-    )\r\n-    activation = ActivationStore.local(\r\n-        location=location,\r\n-        catalog=load_catalog(),\r\n-        authorize_root=_authorize_local_root,\r\n-        invalidate_authority=_invalidate_empty_authority,\r\n-    )\r\n-    return LocalServiceIO(\r\n-        activation=activation,\r\n-        repository=repository,\r\n-        principal=principal,\r\n-        author_id=author_id,\r\n-    )\r\n+\"\"\"Compose trusted local-user discovery over accepted native storage and Git seams.\"\"\"\n+\n+from __future__ import annotations\n+\n+import os\n+import shutil\n+import subprocess\n+import sys\n+import threading\n+from dataclasses import replace\n+from pathlib import Path\n+from typing import TYPE_CHECKING, Literal, cast\n+\n+from drm_copilot_discovery.activation_filesystem import RegistryLocation\n+from drm_copilot_discovery.activation_store import ActivationStore\n+from drm_copilot_discovery.build_identity import load_build_identity\n+from drm_copilot_discovery.catalog import load_catalog\n+from drm_copilot_discovery.init_io import InitializationIO\n+from drm_copilot_discovery.mutation_io import GuardedMutationWriter, capture_workspace\n+from drm_copilot_discovery.path_models import PathPolicyError\n+from drm_copilot_discovery.path_policy import PathPolicy, workspace_identity\n+from drm_copilot_discovery.report_models import ReportBudget\n+from drm_copilot_discovery.service_contracts import ServiceAuthority\n+from drm_copilot_discovery.source_read_models import ReadGrant, ReadSelection\n+\n+if TYPE_CHECKING:\n+    from collections.abc import Callable\n+\n+    from drm_copilot_discovery.mutation_plan import CapturedWorkspace\n+    from drm_copilot_discovery.repository_reader import (\n+        RepositoryIdentity,\n+        RepositoryReader,\n+    )\n+    from drm_copilot_discovery.service_contracts import RuntimeIdentity, ServiceRequest\n+\n+\n+class LocalServiceIO:\n+    \"\"\"Bind explicit local-user authorization to accepted native I/O boundaries.\n+\n+    Construct from a trusted ActivationStore, exact RepositoryReader and verified\n+    identity provider. Initialization and writer captures share the same readers\n+    and guarded primitives. Request markers never supply host authorization.\n+    Construction performs no I/O; methods read only or return guarded writers.\n+    \"\"\"\n+\n+    def __init__(\n+        self,\n+        *,\n+        activation: ActivationStore,\n+        repository: RepositoryReader | None,\n+        principal: Literal[\"local-user\", \"host\"],\n+        author_id: str,\n+        identity: Callable[[], RuntimeIdentity] = load_build_identity,\n+    ) -> None:\n+        \"\"\"Bind trusted ports; reject unavailable principal with PermissionError.\n+\n+        activation (ActivationStore): trusted activation store to preserve. repository\n+        (RepositoryReader | None): exact optional repository reader. principal\n+        (Literal['local-user', 'host']): explicit outer principal; host is unavailable.\n+        author_id (str): explicit local author identity. identity (Callable[[],\n+        RuntimeIdentity]): verified installed identity provider. Returns None; local\n+        fields are initialized without I/O. Invalid principal raises PermissionError.\n+        \"\"\"\n+        if principal != \"local-user\":\n+            raise PermissionError(\"Native host authority is unavailable\")\n+        self._authority = ServiceAuthority(\n+            principal=principal,\n+            author_or_agent=author_id,\n+            invocation=None,\n+            grants=(),\n+            read_selection=None,\n+        )\n+        self._activation, self._identity = activation, identity\n+        self._initialization = InitializationIO(\n+            workspace_root=activation.location.workspace,\n+            catalog=activation.catalog,\n+            metadata=activation.metadata,\n+            read_bytes=activation.read_bytes,\n+            primitives=activation.primitives,\n+            open_directory=activation.open_directory,\n+            invalidate_authority=activation.invalidate_authority,\n+            repository=repository,\n+        )\n+\n+    @property\n+    def activation(self) -> ActivationStore:\n+        \"\"\"Return the exact trusted store; no observation or mutation occurs.\"\"\"\n+        return self._activation\n+\n+    @property\n+    def initialization(self) -> InitializationIO:\n+        \"\"\"Return the bound initialization ports; no replacement reader is created.\"\"\"\n+        return self._initialization\n+\n+    def runtime_identity(self) -> RuntimeIdentity:\n+        \"\"\"Return verified installed identity; propagate typed failure unchanged.\"\"\"\n+        return self._identity()\n+\n+    def _matches_workspace(self, path: str) -> bool:\n+        \"\"\"Compare path (str) to the bound root with strict platform identity.\n+\n+        Return False for an invalid or different root; callers deny authority\n+        with PermissionError. Parsing is lexical and performs no I/O.\n+        \"\"\"\n+        try:\n+            return workspace_identity(path) == workspace_identity(\n+                self.initialization.workspace_root\n+            )\n+        except PathPolicyError:\n+            return False\n+\n+    def authorize(\n+        self, request: ServiceRequest, *, baseline: CapturedWorkspace | None\n+    ) -> ServiceAuthority:\n+        \"\"\"Authenticate a parsed request against this explicit outer local principal.\n+\n+        Return local authority with bounded exact read selection when needed. Host\n+        markers, substituted roots and cross-workspace captures raise PermissionError\n+        before source I/O. Core derives exact local write grants only from its accepted\n+        planned changes; this method grants no root wildcard.\n+\n+        request (ServiceRequest): parsed operation input; no authority is inferred from\n+        it. baseline (CapturedWorkspace | None): captured workspace, or None before\n+        capture. Returns ServiceAuthority; invalid or different root identity raises\n+        PermissionError. Scoped-selection path failures propagate; reads metadata only\n+        for scoped selection.\n+        \"\"\"\n+        if (\n+            request.invocation_ref is not None\n+            or request.authorization_ref is not None\n+            or request.mode == \"agent-output\"\n+            or request.operation in (\"prepare-agent\", \"finalize-agent\")\n+            or not self._matches_workspace(request.workspace_root)\n+            or (\n+                baseline is not None\n+                and not self._matches_workspace(baseline.workspace_root)\n+            )\n+        ):\n+            raise PermissionError(\"Request has no local-user authority\")\n+        selection: ReadSelection | None = None\n+        # Only a captured profile can delimit an authenticated local read selection.\n+        if request.operation == \"read-source\" and baseline is not None:\n+            paths = cast(\"tuple[str, ...]\", request.inputs[\"paths\"])\n+            if not 1 <= len(paths) <= 10000:\n+                raise PermissionError(\"Read selection exceeds its bound\")\n+            policy = PathPolicy(\n+                baseline.snapshot.profile,\n+                workspace_root=baseline.workspace_root,\n+                metadata=self.initialization.metadata,\n+            )\n+            grants: list[ReadGrant] = []\n+            # Exact requested paths still require independent configured read scope.\n+            for path in paths:\n+                target = policy.resolve_read(path)\n+                grants.append(\n+                    ReadGrant(\n+                        path=path, directory=target.observations[-1].kind == \"directory\"\n+                    )\n+                )\n+            selection = ReadSelection(grants=tuple(grants))\n+        return replace(self._authority, read_selection=selection)\n+\n+    def writer(\n+        self, baseline: CapturedWorkspace, *, authority: ServiceAuthority\n+    ) -> GuardedMutationWriter:\n+        \"\"\"Return a same-root guarded recapturing writer without publishing bytes.\n+\n+        Baseline and authority are trusted core values. Reject foreign identity with\n+        PermissionError. Fresh captures retain this reader; accepted mutation validation\n+        remains responsible for exact grants and complete CAS.\n+\n+        baseline (CapturedWorkspace): required accepted capture for this same-root\n+        guarded writer.\n+        authority (ServiceAuthority): authenticated local identity and exact grants.\n+        Returns GuardedMutationWriter; invalid or different root identity raises\n+        PermissionError. No publication occurs until the writer is invoked.\n+        \"\"\"\n+        if (\n+            not self._matches_workspace(baseline.workspace_root)\n+            or authority.principal != self._authority.principal\n+            or authority.author_or_agent != self._authority.author_or_agent\n+            or authority.invocation is not None\n+        ):\n+            raise PermissionError(\"Writer authority differs from local context\")\n+        return GuardedMutationWriter(\n+            capture=lambda: self._recapture(baseline),\n+            invalidate_authority=self.initialization.invalidate_authority,\n+            primitives=self.initialization.primitives,\n+        )\n+\n+    def _recapture(self, baseline: CapturedWorkspace) -> CapturedWorkspace:\n+        \"\"\"Reload the same profile and repository through the bound trusted reader.\n+\n+        baseline (CapturedWorkspace): required prior capture whose profile and\n+        repository are reloaded.\n+        Returns CapturedWorkspace; I/O, path and budget failures propagate. Reads the\n+        exact bound workspace and repository.\n+        \"\"\"\n+        io = self.initialization\n+        current = capture_workspace(\n+            workspace_root=io.workspace_root,\n+            profile_path=baseline.snapshot.profile.artifacts[\"profile\"],\n+            metadata=io.metadata,\n+            read_bytes=io.read_bytes,\n+            catalog=io.catalog,\n+            repository=io.repository,\n+        )\n+        selected, loaded = _repository_selection(baseline), _repository_selection(\n+            current\n+        )\n+        # Inventory alone adds source pins; repeat that exact accepted selection.\n+        if set(selected) - set(loaded):\n+            if io.repository is None:\n+                raise OSError(\"Pinned repository reader is unavailable\")\n+            from drm_copilot_discovery.analyzer.input_capture import (\n+                pin_inventory_sources,\n+            )\n+\n+            current = pin_inventory_sources(current, io.repository)\n+            loaded = _repository_selection(current)\n+        if loaded != selected:\n+            raise OSError(\"Writer source selection differs from baseline\")\n+        return current\n+\n+\n+def _repository_selection(\n+    capture: CapturedWorkspace,\n+) -> tuple[tuple[RepositoryIdentity, str], ...]:\n+    \"\"\"Project exact identity/path pins after reserving aggregate copy/hash work.\n+\n+    Use the captured profile's trusted parse limits. Raise ReportLimitError before\n+    excessive allocation; retain no blob copies and perform no external reads.\n+\n+    capture (CapturedWorkspace): accepted workspace with pinned repository inputs.\n+    Returns tuple of repository/path pairs; ReportLimitError precedes excessive\n+    allocation. No external effects.\n+    \"\"\"\n+    pins = capture.snapshot.repository_files\n+    budget = ReportBudget(capture.snapshot.profile.limits.parse_limits())\n+    budget.work(8 * len(pins))\n+    result: list[tuple[RepositoryIdentity, str]] = []\n+    # Validate encoded key capacity before appending or hashing any selected pair.\n+    for item in pins:\n+        budget.work(\n+            8\n+            * (\n+                len(item.repository.id)\n+                + len(item.repository.revision or \"\")\n+                + len(item.path)\n+            )\n+        )\n+        budget.check((item.repository.id, item.repository.revision, item.path))\n+        result.append((item.repository, item.path))\n+    return tuple(result)\n+\n+\n+def run_local_git(argv: tuple[str, ...], *, output_limit: int) -> bytes:\n+    \"\"\"Execute only LocalGitReader argv with bounded stdout and discarded stderr.\n+\n+    Resolve fixed git through PATH; reject unbounded sizes and other executables. The\n+    process never receives stdin, a shell or inherited Git redirection/config. Raise\n+    fixed OSError on failure/overflow; tests replace process/which seams.\n+\n+    argv (tuple[str, ...]): fixed outer argument sequence. output_limit (int): positive\n+    stdout byte ceiling, at most 64 MiB. Returns bytes from successful Git; OSError\n+    reports timeout, overflow or failure. Starts, bounds and reaps one fixed native\n+    process.\n+    \"\"\"\n+    executable = shutil.which(\"git\")\n+    if (\n+        not executable\n+        or Path(executable).suffix.casefold() in (\".cmd\", \".bat\")\n+        or not argv\n+        or argv[0] != \"git\"\n+        or type(output_limit) is not int\n+        or not 0 < output_limit <= 67108864\n+    ):\n+        raise OSError(\"Bounded installed Git is unavailable\")\n+    # Exclude ambient Git overrides so the fixed -C root remains authoritative.\n+    environment = {\n+        key: value\n+        for key, value in os.environ.items()\n+        if not key.upper().startswith(\"GIT_\")\n+    }\n+    environment.update(\n+        {\n+            \"GIT_CONFIG_NOSYSTEM\": \"1\",\n+            \"GIT_CONFIG_GLOBAL\": os.devnull,\n+            \"GIT_TERMINAL_PROMPT\": \"0\",\n+            \"GIT_OPTIONAL_LOCKS\": \"0\",\n+        }\n+    )\n+    with subprocess.Popen(  # noqa: S603 - static analysis can't verify runtime validation\n+        (executable, *argv[1:]),\n+        stdin=subprocess.DEVNULL,\n+        stdout=subprocess.PIPE,\n+        stderr=subprocess.DEVNULL,\n+        shell=False,\n+        env=environment,\n+    ) as process:\n+        expired = threading.Event()\n+\n+        def expire() -> None:\n+            \"\"\"Cancel the bounded Git read at its deadline; return None.\n+\n+            Signal the local Event and kill the fixed child if still running.\n+            Killing closes its pipe writer, releasing a pending bounded read.\n+            ProcessLookupError means the child already exited; no other error\n+            is suppressed. No request-selected process can enter this callback.\n+            \"\"\"\n+            expired.set()\n+            try:\n+                if process.poll() is None:\n+                    process.kill()\n+            except ProcessLookupError:\n+                return\n+\n+        deadline = threading.Timer(30, expire)\n+        deadline.daemon = True\n+        # Arm cancellation before touching stdout, so a silent pipe cannot bypass it.\n+        deadline.start()\n+        try:\n+            if process.stdout is None:\n+                raise OSError(\"Git stdout is unavailable\")\n+            content = process.stdout.read(output_limit + 1)\n+            if len(content) > output_limit:\n+                raise OSError(\"Git output exceeds its bound\")\n+            code = process.wait(timeout=30)\n+        except subprocess.TimeoutExpired:\n+            raise OSError(\"Git read timed out\") from None\n+        finally:\n+            deadline.cancel()\n+            deadline.join()\n+            if process.poll() is None:\n+                process.kill()\n+                process.wait()\n+        if expired.is_set():\n+            raise OSError(\"Git read timed out\")\n+        if code != 0:\n+            raise OSError(\"Git read failed\")\n+        return content\n+\n+\n+def _authorize_local_root() -> None:\n+    \"\"\"Accept the authenticated explicit local-user root; return None without I/O.\"\"\"\n+\n+\n+def _invalidate_empty_authority() -> None:\n+    \"\"\"Invalidate the empty local authority set without claiming native revocation.\n+\n+    Only the trusted local-user factory installs this P6 callback. It cannot\n+    issue or accept native grants/receipts; host references and prepare/finalize\n+    are rejected. P8 must replace this callback before native capability use.\n+    Guarded writers still call it before every write and propagate failures.\n+    Return None; no storage or external authority is mutated.\n+    \"\"\"\n+\n+\n+def _canonical_state_location(location: RegistryLocation) -> RegistryLocation:\n+    \"\"\"Resolve validated host storage while preserving its workspace partition.\n+\n+    location (RegistryLocation): output of for_host after its absolute, platform,\n+    parent-component and external-root checks. Return a location with the same\n+    workspace identity and fixed layout under the resolved host base. Reads path\n+    metadata only; an absent leaf is permitted. Resolution errors propagate;\n+    ValueError rejects a derived path redirected outside that exact layout.\n+    \"\"\"\n+    state = Path(location.directory)\n+    # The accepted builder appends drm-copilot/discovery/workspaces/workspace-digest.\n+    # Resolve its trusted base, then verify the complete path against that layout.\n+    base = state.parents[3]\n+    expected = base.resolve() / state.relative_to(base)\n+    if state.resolve() != expected:\n+        raise ValueError(\"Host state must retain its fixed workspace partition\")\n+    return replace(location, directory=expected.as_posix())\n+\n+\n+def installed_local_io(\n+    root: str, repository: RepositoryReader | None, principal: str, author_id: str\n+) -> LocalServiceIO:\n+    \"\"\"Compose fixed installed ports from trusted outer host values; create no files.\n+\n+    Root must already be absolute/canonical. Host state paths come from platform\n+    settings, never request JSON. Validate their spelling before resolving aliases,\n+    preserving the fixed state partition and strict store guard. Invalid paths or\n+    principals raise fixed errors; resolution and catalog failures propagate.\n+\n+    root (str): trusted absolute canonical workspace. repository (RepositoryReader |\n+    None): exact optional repository reader. principal (str): explicit outer principal;\n+    host is unavailable. author_id (str): explicit local author identity. Returns\n+    LocalServiceIO; invalid roots/principals raise ValueError/PermissionError and\n+    catalog failures propagate. Reads installed metadata without creating workspace\n+    files.\n+    \"\"\"\n+    workspace = Path(root)\n+    if not workspace.is_absolute() or workspace.resolve(strict=True) != workspace:\n+        raise ValueError(\"Select an absolute canonical workspace\")\n+    if principal != \"local-user\":\n+        raise PermissionError(\"Native host capability is unavailable\")\n+    platform: Literal[\"windows\", \"macos\", \"linux\"] = (\n+        \"windows\"\n+        if os.name == \"nt\"\n+        else \"macos\" if sys.platform == \"darwin\" else \"linux\"\n+    )\n+    location = RegistryLocation.for_host(\n+        workspace_root=workspace.as_posix(),\n+        platform=platform,\n+        user_home=str(Path.home()),\n+        local_app_data=os.environ.get(\"LOCALAPPDATA\"),\n+        xdg_state_home=os.environ.get(\"XDG_STATE_HOME\"),\n+    )\n+    activation = ActivationStore.local(\n+        location=_canonical_state_location(location),\n+        catalog=load_catalog(),\n+        authorize_root=_authorize_local_root,\n+        invalidate_authority=_invalidate_empty_authority,\n+    )\n+    return LocalServiceIO(\n+        activation=activation,\n+        repository=repository,\n+        principal=principal,\n+        author_id=author_id,\n+    )\n",
+    "tests/discovery_runtime/test_gateway_local.py": "--- before/tests/discovery_runtime/test_gateway_local.py\n+++ after/tests/discovery_runtime/test_gateway_local.py\n@@ -1,494 +1,494 @@\n-\"\"\"Prove local gateway authority, capture and native wiring with memory-only seams.\"\"\"\r\n-\r\n-from __future__ import annotations\r\n-\r\n-from dataclasses import replace\r\n-from pathlib import Path\r\n-from typing import TYPE_CHECKING\r\n-\r\n-import pytest\r\n-from drm_copilot_discovery import gateway_local\r\n-from drm_copilot_discovery.agent_output import InvocationContext\r\n-from drm_copilot_discovery.gateway_local import LocalServiceIO\r\n-from drm_copilot_discovery.models import JsonObject\r\n-from drm_copilot_discovery.repository_reader import RepositoryFile, RepositoryIdentity\r\n-from drm_copilot_discovery.service_contracts import ServiceRuntimeError\r\n-\r\n-from tests.discovery_runtime.gateway_test_support import MemoryProcess, memory_io\r\n-from tests.discovery_runtime.gateway_test_support import (\r\n-    fixed_deadline as fixed_deadline,\r\n-)\r\n-from tests.discovery_runtime.initialization_test_support import MemoryRepository\r\n-from tests.discovery_runtime.test_activation_store import ConfigurationCase\r\n-from tests.discovery_runtime.test_configuration import config_catalog as config_catalog\r\n-from tests.discovery_runtime.test_doctor import IDENTITY, doctor_request\r\n-\r\n-if TYPE_CHECKING:\r\n-    from collections.abc import Callable\r\n-\r\n-    from drm_copilot_discovery.activation_filesystem import RegistryLocation\r\n-    from drm_copilot_discovery.activation_store import ActivationStore\r\n-    from drm_copilot_discovery.catalog import SchemaCatalog\r\n-    from drm_copilot_discovery.mutation_plan import CapturedWorkspace\r\n-    from drm_copilot_discovery.repository_reader import RepositoryReader\r\n-    from drm_copilot_discovery.service_contracts import RuntimeIdentity\r\n-\r\n-\r\n-def test_local_ports_share_exact_readers_and_guard(\r\n-    config_catalog: SchemaCatalog,\r\n-) -> None:\r\n-    \"\"\"Local composition retains one store and one explicitly selected repository.\r\n-    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\r\n-    memory-only effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    repository = MemoryRepository()\r\n-    case, local, _ = memory_io(config_catalog, repository=repository)\r\n-\r\n-    assert local.activation is case.service\r\n-    assert local.initialization.repository is repository\r\n-    assert local.initialization.metadata is case.service.metadata\r\n-    assert local.initialization.read_bytes is case.service.read_bytes\r\n-    assert local.initialization.primitives is case.service.primitives\r\n-    assert local.runtime_identity() is IDENTITY\r\n-    assert not case.revocations and not case.registry.writes\r\n-\r\n-\r\n-def test_missing_identity_never_fabricates_runtime(\r\n-    config_catalog: SchemaCatalog,\r\n-) -> None:\r\n-    \"\"\"A typed installed-provider failure passes through the local adapter unchanged.\r\n-    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\r\n-    memory-only effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case = ConfigurationCase(config_catalog)\r\n-\r\n-    def unavailable() -> RuntimeIdentity:\r\n-        \"\"\"Model a missing manifest without reading an actual installation.\"\"\"\r\n-        raise ServiceRuntimeError(code=\"RUNTIME_UNAVAILABLE\")\r\n-\r\n-    local = LocalServiceIO(\r\n-        activation=case.service,\r\n-        repository=None,\r\n-        principal=\"local-user\",\r\n-        author_id=\"test-user\",\r\n-        identity=unavailable,\r\n-    )\r\n-\r\n-    with pytest.raises(ServiceRuntimeError, match=\"RUNTIME_UNAVAILABLE\"):\r\n-        local.runtime_identity()\r\n-\r\n-\r\n-def test_host_principal_is_never_converted_to_local_user(\r\n-    config_catalog: SchemaCatalog,\r\n-) -> None:\r\n-    \"\"\"Explicit unavailable host authority fails before any workspace observation.\r\n-    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\r\n-    memory-only effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case = ConfigurationCase(config_catalog)\r\n-\r\n-    with pytest.raises(PermissionError, match=\"host\"):\r\n-        LocalServiceIO(\r\n-            activation=case.service,\r\n-            repository=None,\r\n-            principal=\"host\",\r\n-            author_id=\"test-agent\",\r\n-        )\r\n-    assert not case.registry.writes and not case.authorization_calls\r\n-\r\n-\r\n-@pytest.mark.parametrize(\r\n-    \"marker\",\r\n-    [\"invocation\", \"authorization\", \"mode\", \"workspace\", \"prepare\", \"finalize\"],\r\n-)\r\n-def test_request_markers_cannot_expand_local_authority(\r\n-    config_catalog: SchemaCatalog,\r\n-    marker: str,\r\n-) -> None:\r\n-    \"\"\"Opaque references and a substituted root cannot acquire local permissions.\r\n-    config_catalog (SchemaCatalog): verified immutable schema fixture. marker (str):\r\n-    selected forbidden host-context marker. Returns None; memory-only effects;\r\n-    AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case, local, _ = memory_io(config_catalog)\r\n-    request = doctor_request(case)\r\n-    # Each otherwise valid request isolates a forbidden authority source or mode.\r\n-    if marker == \"invocation\":\r\n-        request = replace(request, invocation_ref=\"opaque-invocation-0001\")\r\n-    elif marker == \"authorization\":\r\n-        request = replace(request, authorization_ref=\"opaque-authorization-0001\")\r\n-    elif marker == \"mode\":\r\n-        request = replace(\r\n-            request,\r\n-            operation=\"inventory\",\r\n-            mode=\"agent-output\",\r\n-            invocation_ref=\"opaque-invocation-0001\",\r\n-        )\r\n-    elif marker == \"workspace\":\r\n-        request = replace(request, workspace_root=\"/other-workspace\")\r\n-    elif marker == \"prepare\":\r\n-        request = replace(\r\n-            request,\r\n-            operation=\"prepare-agent\",\r\n-            inputs=JsonObject(\r\n-                (\r\n-                    (\"skill_id\", \"analyst\"),\r\n-                    (\"selected_ids\", (\"feature\",)),\r\n-                    (\"paths\", (\"src\",)),\r\n-                    (\r\n-                        \"expected_outputs\",\r\n-                        (\r\n-                            JsonObject(\r\n-                                (\r\n-                                    (\"artifact_kind\", \"feature-contract\"),\r\n-                                    (\"id\", \"feature\"),\r\n-                                    (\"path\", \"docs/feature.json\"),\r\n-                                    (\"format\", \"json\"),\r\n-                                    (\"expected_sha256\", None),\r\n-                                )\r\n-                            ),\r\n-                        ),\r\n-                    ),\r\n-                    (\"execution_context\", \"standalone\"),\r\n-                    (\"complexity\", \"C1\"),\r\n-                )\r\n-            ),\r\n-        )\r\n-    else:\r\n-        request = replace(\r\n-            request,\r\n-            operation=\"finalize-agent\",\r\n-            mode=\"agent-output\",\r\n-            invocation_ref=\"opaque-invocation-0001\",\r\n-        )\r\n-\r\n-    with pytest.raises(PermissionError, match=\"authority\"):\r\n-        local.authorize(request, baseline=None)\r\n-    assert not case.registry.writes and not case.revocations\r\n-\r\n-\r\n-def test_cross_workspace_baseline_and_writer_are_rejected(\r\n-    config_catalog: SchemaCatalog,\r\n-) -> None:\r\n-    \"\"\"Reject a foreign capture before authorization or mutation. config_catalog\r\n-    (SchemaCatalog): verified immutable schema fixture. Returns None; memory-only\r\n-    effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case, local, baseline = memory_io(config_catalog)\r\n-    foreign = replace(baseline, workspace_root=\"/other-workspace\")\r\n-    authority = local.authorize(doctor_request(case), baseline=baseline)\r\n-\r\n-    with pytest.raises(PermissionError, match=\"authority\"):\r\n-        local.authorize(doctor_request(case), baseline=foreign)\r\n-    with pytest.raises(PermissionError, match=\"authority\"):\r\n-        local.writer(foreign, authority=authority)\r\n-    with pytest.raises(PermissionError, match=\"authority\"):\r\n-        local.writer(\r\n-            baseline, authority=replace(authority, author_or_agent=\"other-user\")\r\n-        )\r\n-    with pytest.raises(PermissionError, match=\"authority\"):\r\n-        local.writer(baseline, authority=replace(authority, principal=\"host\"))\r\n-    invocation = InvocationContext(\r\n-        baseline=baseline.snapshot,\r\n-        role=\"analyst\",\r\n-        invocation_id=\"native-reference\",\r\n-        workspace=JsonObject(()),\r\n-        required_outputs=JsonObject(()),\r\n-    )\r\n-    with pytest.raises(PermissionError, match=\"authority\"):\r\n-        local.writer(baseline, authority=replace(authority, invocation=invocation))\r\n-\r\n-\r\n-def test_writer_recaptures_real_memory_state_and_invalidates(\r\n-    config_catalog: SchemaCatalog,\r\n-) -> None:\r\n-    \"\"\"The local adapter forwards actual capture and revocation calls. config_catalog\r\n-    (SchemaCatalog): verified immutable schema fixture. Returns None; memory-only\r\n-    effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case, local, baseline = memory_io(config_catalog)\r\n-    authority = local.authorize(doctor_request(case), baseline=baseline)\r\n-\r\n-    writer = local.writer(baseline, authority=authority)\r\n-    observed = writer.capture()\r\n-    writer.invalidate_authority()\r\n-\r\n-    assert observed == baseline and case.revocations == 1\r\n-    assert not authority.grants and authority.invocation is None\r\n-    assert not case.registry.writes\r\n-\r\n-\r\n-def test_read_selection_is_exact_and_profile_scoped(\r\n-    config_catalog: SchemaCatalog,\r\n-) -> None:\r\n-    \"\"\"Explicit local reads receive only the requested configured file grant.\r\n-    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\r\n-    memory-only effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case, local, baseline = memory_io(config_catalog)\r\n-    path = baseline.snapshot.profile.artifacts[\"profile\"]\r\n-    request = replace(\r\n-        doctor_request(case),\r\n-        operation=\"read-source\",\r\n-        inputs=JsonObject(((\"read_operation\", \"read\"), (\"paths\", (path,)))),\r\n-    )\r\n-\r\n-    authority = local.authorize(request, baseline=baseline)\r\n-\r\n-    assert authority.read_selection is not None\r\n-    assert authority.read_selection.allows(path)\r\n-    assert not authority.read_selection.allows(\"docs/other.json\")\r\n-    assert not authority.grants\r\n-\r\n-\r\n-@pytest.mark.parametrize(\"mismatch\", [False, True])\r\n-def test_inventory_writer_preserves_exact_pinned_selection(\r\n-    config_catalog: SchemaCatalog,\r\n-    monkeypatch: pytest.MonkeyPatch,\r\n-    mismatch: bool,\r\n-) -> None:\r\n-    \"\"\"Inventory recapture uses the same reader and refuses unrelated extra objects.\r\n-    config_catalog (SchemaCatalog): verified immutable schema fixture. monkeypatch\r\n-    (pytest.MonkeyPatch): test-local restoration of injected seams. mismatch (bool):\r\n-    whether recapture returns a different selection. Returns None; memory-only effects;\r\n-    AssertionError on mismatch.\r\n-    \"\"\"\r\n-    repository = MemoryRepository()\r\n-    case, local, baseline = memory_io(config_catalog, repository=repository)\r\n-    pin = RepositoryFile(\r\n-        repository=RepositoryIdentity(id=\"consumer-repository\", revision=\"a\" * 40),\r\n-        path=\"application/one.py\",\r\n-        content=b\"one\",\r\n-    )\r\n-    pinned = replace(\r\n-        baseline, snapshot=replace(baseline.snapshot, repository_files=(pin,))\r\n-    )\r\n-    observed: list[RepositoryReader] = []\r\n-\r\n-    def recapture(**values: object) -> CapturedWorkspace:\r\n-        \"\"\"Return the unchanged unaugmented capture and record selected reader. values\r\n-        (object): captured keyword values for the read seam. Returns CapturedWorkspace;\r\n-        memory-only effects; AssertionError on mismatch.\r\n-        \"\"\"\r\n-        assert values[\"repository\"] is repository\r\n-        return baseline\r\n-\r\n-    def augment(\r\n-        current: CapturedWorkspace, reader: RepositoryReader\r\n-    ) -> CapturedWorkspace:\r\n-        \"\"\"Model only the accepted inventory source-pin transform. current\r\n-        (CapturedWorkspace): fresh captured workspace. reader (RepositoryReader): exact\r\n-        expected repository reader. Returns CapturedWorkspace; memory-only effects;\r\n-        AssertionError on mismatch.\r\n-        \"\"\"\r\n-        assert current is baseline\r\n-        observed.append(reader)\r\n-        return baseline if mismatch else pinned\r\n-\r\n-    monkeypatch.setattr(gateway_local, \"capture_workspace\", recapture)\r\n-    monkeypatch.setattr(\r\n-        \"drm_copilot_discovery.analyzer.input_capture.pin_inventory_sources\", augment\r\n-    )\r\n-    writer = local.writer(\r\n-        pinned, authority=local.authorize(doctor_request(case), baseline=pinned)\r\n-    )\r\n-\r\n-    if mismatch:\r\n-        with pytest.raises(OSError, match=\"selection\"):\r\n-            writer.capture()\r\n-    else:\r\n-        assert writer.capture() is pinned\r\n-    assert observed == [repository]\r\n-\r\n-\r\n-def test_extra_pins_require_the_bound_repository_reader(\r\n-    config_catalog: SchemaCatalog,\r\n-) -> None:\r\n-    \"\"\"A missing reader cannot be replaced by a working-tree or caller source.\r\n-    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\r\n-    memory-only effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case, local, baseline = memory_io(config_catalog)\r\n-    pin = RepositoryFile(\r\n-        repository=RepositoryIdentity(id=\"consumer-repository\", revision=\"a\" * 40),\r\n-        path=\"application/one.py\",\r\n-        content=b\"one\",\r\n-    )\r\n-    pinned = replace(\r\n-        baseline, snapshot=replace(baseline.snapshot, repository_files=(pin,))\r\n-    )\r\n-    writer = local.writer(\r\n-        pinned, authority=local.authorize(doctor_request(case), baseline=pinned)\r\n-    )\r\n-\r\n-    with pytest.raises(OSError, match=\"unavailable\"):\r\n-        writer.capture()\r\n-\r\n-\r\n-@pytest.mark.usefixtures(\"fixed_deadline\")\r\n-@pytest.mark.parametrize(\r\n-    \"content,code,pipe,valid\",\r\n-    [\r\n-        (b\"data\", 0, True, True),\r\n-        (b\"excess\", 0, True, False),\r\n-        (b\"\", 1, True, False),\r\n-        (b\"\", 0, False, False),\r\n-        (b\"\", -2, True, False),\r\n-    ],\r\n-)\r\n-def test_fixed_git_runner_bounds_output_and_cleans_process(\r\n-    monkeypatch: pytest.MonkeyPatch,\r\n-    content: bytes,\r\n-    code: int,\r\n-    pipe: bool,\r\n-    valid: bool,\r\n-) -> None:\r\n-    \"\"\"Fixed Git argv stays shell-free and strips inherited Git overrides. monkeypatch\r\n-    (pytest.MonkeyPatch): test-local restoration of injected seams. content (bytes):\r\n-    immutable input or simulated output bytes. code (int): selected fixed failure or\r\n-    simulated process status. pipe (bool): whether simulated stdout is available. valid\r\n-    (bool): whether the selected process outcome is accepted. Returns None; memory-only\r\n-    effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    process = MemoryProcess(content, code=code, pipe=pipe)\r\n-    recorded: list[dict[str, object]] = []\r\n-    monkeypatch.setenv(\"GIT_DIR\", \"untrusted-location\")\r\n-    monkeypatch.setattr(\r\n-        \"drm_copilot_discovery.gateway_local.subprocess.TimeoutExpired\", TimeoutError\r\n-    )\r\n-\r\n-    def which(name: str) -> str:\r\n-        \"\"\"Resolve only the fixed trusted executable name in memory. name (str): fixed\r\n-        executable name to resolve. Returns str; memory-only effects; AssertionError on\r\n-        mismatch.\r\n-        \"\"\"\r\n-        assert name == \"git\"\r\n-        return \"/trusted/git\"\r\n-\r\n-    monkeypatch.setattr(\"drm_copilot_discovery.gateway_local.shutil.which\", which)\r\n-\r\n-    def start(argv: tuple[str, ...], **options: object) -> MemoryProcess:\r\n-        \"\"\"Record arguments without starting a process. argv (tuple[str,\r\n-        ...]): fixed outer argument sequence. options (object): captured fixed keyword\r\n-        options. Returns MemoryProcess; memory-only effects; AssertionError on mismatch.\r\n-        \"\"\"\r\n-        assert argv == (\"/trusted/git\", \"--version\")\r\n-        recorded.append(options)\r\n-        return process\r\n-\r\n-    monkeypatch.setattr(\"drm_copilot_discovery.gateway_local.subprocess.Popen\", start)\r\n-    # Only bounded successful output survives; every failure must still clean up.\r\n-    if valid:\r\n-        assert (\r\n-            gateway_local.run_local_git((\"git\", \"--version\"), output_limit=4) == content\r\n-        )\r\n-    else:\r\n-        with pytest.raises(OSError):\r\n-            gateway_local.run_local_git((\"git\", \"--version\"), output_limit=4)\r\n-\r\n-    assert recorded[0][\"shell\"] is False\r\n-    assert \"GIT_DIR\" not in str(recorded[0][\"env\"])\r\n-    assert process.finished\r\n-    assert process.killed == (not pipe or len(content) > 4 or code == -2)\r\n-\r\n-\r\n-@pytest.mark.parametrize(\r\n-    \"argv,limit,executable\",\r\n-    [\r\n-        ((), 4, \"/trusted/git\"),\r\n-        ((\"other\",), 4, \"/trusted/git\"),\r\n-        ((\"git\",), 0, \"/trusted/git\"),\r\n-        ((\"git\",), True, \"/trusted/git\"),\r\n-        ((\"git\",), 4, None),\r\n-        ((\"git\",), 4, \"/trusted/git.cmd\"),\r\n-        ((\"git\",), 4, \"/trusted/git.bat\"),\r\n-    ],\r\n-)\r\n-def test_git_runner_rejects_unavailable_or_unbounded_selection(\r\n-    monkeypatch: pytest.MonkeyPatch,\r\n-    argv: tuple[str, ...],\r\n-    limit: int,\r\n-    executable: str | None,\r\n-) -> None:\r\n-    \"\"\"No invalid runner selection reaches the process boundary. monkeypatch\r\n-    (pytest.MonkeyPatch): test-local restoration of injected seams. argv (tuple[str,\r\n-    ...]): fixed outer argument sequence. limit (int): positive read capacity in bytes.\r\n-    executable (str | None): simulated resolved Git path or absence. Returns None;\r\n-    memory-only effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-\r\n-    def which(name: str) -> str | None:\r\n-        \"\"\"Return the selected installed-executable availability. name (str): fixed\r\n-        executable name to resolve. Returns str | None; memory-only effects;\r\n-        AssertionError on mismatch.\r\n-        \"\"\"\r\n-        assert name == \"git\"\r\n-        return executable\r\n-\r\n-    monkeypatch.setattr(\"drm_copilot_discovery.gateway_local.shutil.which\", which)\r\n-\r\n-    with pytest.raises(OSError, match=\"unavailable\"):\r\n-        gateway_local.run_local_git(argv, output_limit=limit)\r\n-\r\n-\r\n-def test_installed_factory_wires_only_trusted_outer_host_values(\r\n-    config_catalog: SchemaCatalog,\r\n-    monkeypatch: pytest.MonkeyPatch,\r\n-) -> None:\r\n-    \"\"\"Compose real ports through patched native boundaries. config_catalog\r\n-    (SchemaCatalog): verified immutable schema fixture. monkeypatch\r\n-    (pytest.MonkeyPatch): test-local restoration of injected seams. Returns None;\r\n-    memory-only effects; AssertionError on mismatch.\r\n-    \"\"\"\r\n-    case = ConfigurationCase(config_catalog)\r\n-\r\n-    def resolve(self: Path, strict: bool = False) -> Path:\r\n-        \"\"\"Retain the fake trusted absolute root without touching disk. strict (bool):\r\n-        whether canonical resolution must require existence. Returns Path; memory-only\r\n-        effects; AssertionError on mismatch.\r\n-        \"\"\"\r\n-        assert strict\r\n-        return self\r\n-\r\n-    def home(cls: type[Path]) -> Path:\r\n-        \"\"\"Return deterministic user storage without accessing host settings.\"\"\"\r\n-        return cls(case.location.directory).parent\r\n-\r\n-    monkeypatch.setattr(Path, \"resolve\", resolve)\r\n-    monkeypatch.setattr(Path, \"home\", classmethod(home))\r\n-    monkeypatch.setattr(gateway_local, \"load_catalog\", lambda: config_catalog)\r\n-\r\n-    def activate(\r\n-        *,\r\n-        location: RegistryLocation,\r\n-        catalog: SchemaCatalog,\r\n-        authorize_root: Callable[[], None],\r\n-        invalidate_authority: Callable[[], None],\r\n-    ) -> ActivationStore:\r\n-        \"\"\"Check factory collaborators and return the isolated memory store. location\r\n-        (RegistryLocation): trusted host/workspace registry location. catalog\r\n-        (SchemaCatalog): verified immutable schema catalog. authorize_root (Callable[[],\r\n-        None]): explicit local-root authorization callback. invalidate_authority\r\n-        (Callable[[], None]): separate empty-authority P6 callback. Returns\r\n-        ActivationStore; memory-only effects; AssertionError on mismatch.\r\n-        \"\"\"\r\n-        assert location.workspace == case.disk.root and catalog is config_catalog\r\n-        assert authorize_root is not invalidate_authority\r\n-        authorize_root()\r\n-        invalidate_authority()\r\n-        return case.service\r\n-\r\n-    monkeypatch.setattr(\r\n-        \"drm_copilot_discovery.gateway_local.ActivationStore.local\", activate\r\n-    )\r\n-    monkeypatch.setenv(\"LOCALAPPDATA\", \"C:/state\")\r\n-\r\n-    local = gateway_local.installed_local_io(\r\n-        case.disk.root, None, \"local-user\", \"test-user\"\r\n-    )\r\n-\r\n-    assert local.activation is case.service and not case.registry.writes\r\n-    with pytest.raises(PermissionError, match=\"unavailable\"):\r\n-        gateway_local.installed_local_io(case.disk.root, None, \"host\", \"test-agent\")\r\n-    with pytest.raises(ValueError, match=\"absolute\"):\r\n-        gateway_local.installed_local_io(\"relative\", None, \"local-user\", \"test-user\")\r\n+\"\"\"Prove local gateway authority, capture and native wiring with memory-only seams.\"\"\"\n+\n+from __future__ import annotations\n+\n+from dataclasses import replace\n+from pathlib import Path\n+from typing import TYPE_CHECKING\n+\n+import pytest\n+from drm_copilot_discovery import gateway_local\n+from drm_copilot_discovery.agent_output import InvocationContext\n+from drm_copilot_discovery.gateway_local import LocalServiceIO\n+from drm_copilot_discovery.models import JsonObject\n+from drm_copilot_discovery.repository_reader import RepositoryFile, RepositoryIdentity\n+from drm_copilot_discovery.service_contracts import ServiceRuntimeError\n+\n+from tests.discovery_runtime.gateway_test_support import MemoryProcess, memory_io\n+from tests.discovery_runtime.gateway_test_support import (\n+    fixed_deadline as fixed_deadline,\n+)\n+from tests.discovery_runtime.initialization_test_support import MemoryRepository\n+from tests.discovery_runtime.test_activation_store import ConfigurationCase\n+from tests.discovery_runtime.test_configuration import config_catalog as config_catalog\n+from tests.discovery_runtime.test_doctor import IDENTITY, doctor_request\n+\n+if TYPE_CHECKING:\n+    from collections.abc import Callable\n+\n+    from drm_copilot_discovery.activation_filesystem import RegistryLocation\n+    from drm_copilot_discovery.activation_store import ActivationStore\n+    from drm_copilot_discovery.catalog import SchemaCatalog\n+    from drm_copilot_discovery.mutation_plan import CapturedWorkspace\n+    from drm_copilot_discovery.repository_reader import RepositoryReader\n+    from drm_copilot_discovery.service_contracts import RuntimeIdentity\n+\n+\n+def test_local_ports_share_exact_readers_and_guard(\n+    config_catalog: SchemaCatalog,\n+) -> None:\n+    \"\"\"Local composition retains one store and one explicitly selected repository.\n+    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\n+    memory-only effects; AssertionError on mismatch.\n+    \"\"\"\n+    repository = MemoryRepository()\n+    case, local, _ = memory_io(config_catalog, repository=repository)\n+\n+    assert local.activation is case.service\n+    assert local.initialization.repository is repository\n+    assert local.initialization.metadata is case.service.metadata\n+    assert local.initialization.read_bytes is case.service.read_bytes\n+    assert local.initialization.primitives is case.service.primitives\n+    assert local.runtime_identity() is IDENTITY\n+    assert not case.revocations and not case.registry.writes\n+\n+\n+def test_missing_identity_never_fabricates_runtime(\n+    config_catalog: SchemaCatalog,\n+) -> None:\n+    \"\"\"A typed installed-provider failure passes through the local adapter unchanged.\n+    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\n+    memory-only effects; AssertionError on mismatch.\n+    \"\"\"\n+    case = ConfigurationCase(config_catalog)\n+\n+    def unavailable() -> RuntimeIdentity:\n+        \"\"\"Model a missing manifest without reading an actual installation.\"\"\"\n+        raise ServiceRuntimeError(code=\"RUNTIME_UNAVAILABLE\")\n+\n+    local = LocalServiceIO(\n+        activation=case.service,\n+        repository=None,\n+        principal=\"local-user\",\n+        author_id=\"test-user\",\n+        identity=unavailable,\n+    )\n+\n+    with pytest.raises(ServiceRuntimeError, match=\"RUNTIME_UNAVAILABLE\"):\n+        local.runtime_identity()\n+\n+\n+def test_host_principal_is_never_converted_to_local_user(\n+    config_catalog: SchemaCatalog,\n+) -> None:\n+    \"\"\"Explicit unavailable host authority fails before any workspace observation.\n+    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\n+    memory-only effects; AssertionError on mismatch.\n+    \"\"\"\n+    case = ConfigurationCase(config_catalog)\n+\n+    with pytest.raises(PermissionError, match=\"host\"):\n+        LocalServiceIO(\n+            activation=case.service,\n+            repository=None,\n+            principal=\"host\",\n+            author_id=\"test-agent\",\n+        )\n+    assert not case.registry.writes and not case.authorization_calls\n+\n+\n+@pytest.mark.parametrize(\n+    \"marker\",\n+    [\"invocation\", \"authorization\", \"mode\", \"workspace\", \"prepare\", \"finalize\"],\n+)\n+def test_request_markers_cannot_expand_local_authority(\n+    config_catalog: SchemaCatalog,\n+    marker: str,\n+) -> None:\n+    \"\"\"Opaque references and a substituted root cannot acquire local permissions.\n+    config_catalog (SchemaCatalog): verified immutable schema fixture. marker (str):\n+    selected forbidden host-context marker. Returns None; memory-only effects;\n+    AssertionError on mismatch.\n+    \"\"\"\n+    case, local, _ = memory_io(config_catalog)\n+    request = doctor_request(case)\n+    # Each otherwise valid request isolates a forbidden authority source or mode.\n+    if marker == \"invocation\":\n+        request = replace(request, invocation_ref=\"opaque-invocation-0001\")\n+    elif marker == \"authorization\":\n+        request = replace(request, authorization_ref=\"opaque-authorization-0001\")\n+    elif marker == \"mode\":\n+        request = replace(\n+            request,\n+            operation=\"inventory\",\n+            mode=\"agent-output\",\n+            invocation_ref=\"opaque-invocation-0001\",\n+        )\n+    elif marker == \"workspace\":\n+        request = replace(request, workspace_root=\"/other-workspace\")\n+    elif marker == \"prepare\":\n+        request = replace(\n+            request,\n+            operation=\"prepare-agent\",\n+            inputs=JsonObject(\n+                (\n+                    (\"skill_id\", \"analyst\"),\n+                    (\"selected_ids\", (\"feature\",)),\n+                    (\"paths\", (\"src\",)),\n+                    (\n+                        \"expected_outputs\",\n+                        (\n+                            JsonObject(\n+                                (\n+                                    (\"artifact_kind\", \"feature-contract\"),\n+                                    (\"id\", \"feature\"),\n+                                    (\"path\", \"docs/feature.json\"),\n+                                    (\"format\", \"json\"),\n+                                    (\"expected_sha256\", None),\n+                                )\n+                            ),\n+                        ),\n+                    ),\n+                    (\"execution_context\", \"standalone\"),\n+                    (\"complexity\", \"C1\"),\n+                )\n+            ),\n+        )\n+    else:\n+        request = replace(\n+            request,\n+            operation=\"finalize-agent\",\n+            mode=\"agent-output\",\n+            invocation_ref=\"opaque-invocation-0001\",\n+        )\n+\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.authorize(request, baseline=None)\n+    assert not case.registry.writes and not case.revocations\n+\n+\n+def test_cross_workspace_baseline_and_writer_are_rejected(\n+    config_catalog: SchemaCatalog,\n+) -> None:\n+    \"\"\"Reject a foreign capture before authorization or mutation. config_catalog\n+    (SchemaCatalog): verified immutable schema fixture. Returns None; memory-only\n+    effects; AssertionError on mismatch.\n+    \"\"\"\n+    case, local, baseline = memory_io(config_catalog)\n+    foreign = replace(baseline, workspace_root=\"/other-workspace\")\n+    authority = local.authorize(doctor_request(case), baseline=baseline)\n+\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.authorize(doctor_request(case), baseline=foreign)\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.writer(foreign, authority=authority)\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.writer(\n+            baseline, authority=replace(authority, author_or_agent=\"other-user\")\n+        )\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.writer(baseline, authority=replace(authority, principal=\"host\"))\n+    invocation = InvocationContext(\n+        baseline=baseline.snapshot,\n+        role=\"analyst\",\n+        invocation_id=\"native-reference\",\n+        workspace=JsonObject(()),\n+        required_outputs=JsonObject(()),\n+    )\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.writer(baseline, authority=replace(authority, invocation=invocation))\n+\n+\n+def test_writer_recaptures_real_memory_state_and_invalidates(\n+    config_catalog: SchemaCatalog,\n+) -> None:\n+    \"\"\"The local adapter forwards actual capture and revocation calls. config_catalog\n+    (SchemaCatalog): verified immutable schema fixture. Returns None; memory-only\n+    effects; AssertionError on mismatch.\n+    \"\"\"\n+    case, local, baseline = memory_io(config_catalog)\n+    authority = local.authorize(doctor_request(case), baseline=baseline)\n+\n+    writer = local.writer(baseline, authority=authority)\n+    observed = writer.capture()\n+    writer.invalidate_authority()\n+\n+    assert observed == baseline and case.revocations == 1\n+    assert not authority.grants and authority.invocation is None\n+    assert not case.registry.writes\n+\n+\n+def test_read_selection_is_exact_and_profile_scoped(\n+    config_catalog: SchemaCatalog,\n+) -> None:\n+    \"\"\"Explicit local reads receive only the requested configured file grant.\n+    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\n+    memory-only effects; AssertionError on mismatch.\n+    \"\"\"\n+    case, local, baseline = memory_io(config_catalog)\n+    path = baseline.snapshot.profile.artifacts[\"profile\"]\n+    request = replace(\n+        doctor_request(case),\n+        operation=\"read-source\",\n+        inputs=JsonObject(((\"read_operation\", \"read\"), (\"paths\", (path,)))),\n+    )\n+\n+    authority = local.authorize(request, baseline=baseline)\n+\n+    assert authority.read_selection is not None\n+    assert authority.read_selection.allows(path)\n+    assert not authority.read_selection.allows(\"docs/other.json\")\n+    assert not authority.grants\n+\n+\n+@pytest.mark.parametrize(\"mismatch\", [False, True])\n+def test_inventory_writer_preserves_exact_pinned_selection(\n+    config_catalog: SchemaCatalog,\n+    monkeypatch: pytest.MonkeyPatch,\n+    mismatch: bool,\n+) -> None:\n+    \"\"\"Inventory recapture uses the same reader and refuses unrelated extra objects.\n+    config_catalog (SchemaCatalog): verified immutable schema fixture. monkeypatch\n+    (pytest.MonkeyPatch): test-local restoration of injected seams. mismatch (bool):\n+    whether recapture returns a different selection. Returns None; memory-only effects;\n+    AssertionError on mismatch.\n+    \"\"\"\n+    repository = MemoryRepository()\n+    case, local, baseline = memory_io(config_catalog, repository=repository)\n+    pin = RepositoryFile(\n+        repository=RepositoryIdentity(id=\"consumer-repository\", revision=\"a\" * 40),\n+        path=\"application/one.py\",\n+        content=b\"one\",\n+    )\n+    pinned = replace(\n+        baseline, snapshot=replace(baseline.snapshot, repository_files=(pin,))\n+    )\n+    observed: list[RepositoryReader] = []\n+\n+    def recapture(**values: object) -> CapturedWorkspace:\n+        \"\"\"Return the unchanged unaugmented capture and record selected reader. values\n+        (object): captured keyword values for the read seam. Returns CapturedWorkspace;\n+        memory-only effects; AssertionError on mismatch.\n+        \"\"\"\n+        assert values[\"repository\"] is repository\n+        return baseline\n+\n+    def augment(\n+        current: CapturedWorkspace, reader: RepositoryReader\n+    ) -> CapturedWorkspace:\n+        \"\"\"Model only the accepted inventory source-pin transform. current\n+        (CapturedWorkspace): fresh captured workspace. reader (RepositoryReader): exact\n+        expected repository reader. Returns CapturedWorkspace; memory-only effects;\n+        AssertionError on mismatch.\n+        \"\"\"\n+        assert current is baseline\n+        observed.append(reader)\n+        return baseline if mismatch else pinned\n+\n+    monkeypatch.setattr(gateway_local, \"capture_workspace\", recapture)\n+    monkeypatch.setattr(\n+        \"drm_copilot_discovery.analyzer.input_capture.pin_inventory_sources\", augment\n+    )\n+    writer = local.writer(\n+        pinned, authority=local.authorize(doctor_request(case), baseline=pinned)\n+    )\n+\n+    if mismatch:\n+        with pytest.raises(OSError, match=\"selection\"):\n+            writer.capture()\n+    else:\n+        assert writer.capture() is pinned\n+    assert observed == [repository]\n+\n+\n+def test_extra_pins_require_the_bound_repository_reader(\n+    config_catalog: SchemaCatalog,\n+) -> None:\n+    \"\"\"A missing reader cannot be replaced by a working-tree or caller source.\n+    config_catalog (SchemaCatalog): verified immutable schema fixture. Returns None;\n+    memory-only effects; AssertionError on mismatch.\n+    \"\"\"\n+    case, local, baseline = memory_io(config_catalog)\n+    pin = RepositoryFile(\n+        repository=RepositoryIdentity(id=\"consumer-repository\", revision=\"a\" * 40),\n+        path=\"application/one.py\",\n+        content=b\"one\",\n+    )\n+    pinned = replace(\n+        baseline, snapshot=replace(baseline.snapshot, repository_files=(pin,))\n+    )\n+    writer = local.writer(\n+        pinned, authority=local.authorize(doctor_request(case), baseline=pinned)\n+    )\n+\n+    with pytest.raises(OSError, match=\"unavailable\"):\n+        writer.capture()\n+\n+\n+@pytest.mark.usefixtures(\"fixed_deadline\")\n+@pytest.mark.parametrize(\n+    \"content,code,pipe,valid\",\n+    [\n+        (b\"data\", 0, True, True),\n+        (b\"excess\", 0, True, False),\n+        (b\"\", 1, True, False),\n+        (b\"\", 0, False, False),\n+        (b\"\", -2, True, False),\n+    ],\n+)\n+def test_fixed_git_runner_bounds_output_and_cleans_process(\n+    monkeypatch: pytest.MonkeyPatch,\n+    content: bytes,\n+    code: int,\n+    pipe: bool,\n+    valid: bool,\n+) -> None:\n+    \"\"\"Fixed Git argv stays shell-free and strips inherited Git overrides. monkeypatch\n+    (pytest.MonkeyPatch): test-local restoration of injected seams. content (bytes):\n+    immutable input or simulated output bytes. code (int): selected fixed failure or\n+    simulated process status. pipe (bool): whether simulated stdout is available. valid\n+    (bool): whether the selected process outcome is accepted. Returns None; memory-only\n+    effects; AssertionError on mismatch.\n+    \"\"\"\n+    process = MemoryProcess(content, code=code, pipe=pipe)\n+    recorded: list[dict[str, object]] = []\n+    monkeypatch.setenv(\"GIT_DIR\", \"untrusted-location\")\n+    monkeypatch.setattr(\n+        \"drm_copilot_discovery.gateway_local.subprocess.TimeoutExpired\", TimeoutError\n+    )\n+\n+    def which(name: str) -> str:\n+        \"\"\"Resolve only the fixed trusted executable name in memory. name (str): fixed\n+        executable name to resolve. Returns str; memory-only effects; AssertionError on\n+        mismatch.\n+        \"\"\"\n+        assert name == \"git\"\n+        return \"/trusted/git\"\n+\n+    monkeypatch.setattr(\"drm_copilot_discovery.gateway_local.shutil.which\", which)\n+\n+    def start(argv: tuple[str, ...], **options: object) -> MemoryProcess:\n+        \"\"\"Record arguments without starting a process. argv (tuple[str,\n+        ...]): fixed outer argument sequence. options (object): captured fixed keyword\n+        options. Returns MemoryProcess; memory-only effects; AssertionError on mismatch.\n+        \"\"\"\n+        assert argv == (\"/trusted/git\", \"--version\")\n+        recorded.append(options)\n+        return process\n+\n+    monkeypatch.setattr(\"drm_copilot_discovery.gateway_local.subprocess.Popen\", start)\n+    # Only bounded successful output survives; every failure must still clean up.\n+    if valid:\n+        assert (\n+            gateway_local.run_local_git((\"git\", \"--version\"), output_limit=4) == content\n+        )\n+    else:\n+        with pytest.raises(OSError):\n+            gateway_local.run_local_git((\"git\", \"--version\"), output_limit=4)\n+\n+    assert recorded[0][\"shell\"] is False\n+    assert \"GIT_DIR\" not in str(recorded[0][\"env\"])\n+    assert process.finished\n+    assert process.killed == (not pipe or len(content) > 4 or code == -2)\n+\n+\n+@pytest.mark.parametrize(\n+    \"argv,limit,executable\",\n+    [\n+        ((), 4, \"/trusted/git\"),\n+        ((\"other\",), 4, \"/trusted/git\"),\n+        ((\"git\",), 0, \"/trusted/git\"),\n+        ((\"git\",), True, \"/trusted/git\"),\n+        ((\"git\",), 4, None),\n+        ((\"git\",), 4, \"/trusted/git.cmd\"),\n+        ((\"git\",), 4, \"/trusted/git.bat\"),\n+    ],\n+)\n+def test_git_runner_rejects_unavailable_or_unbounded_selection(\n+    monkeypatch: pytest.MonkeyPatch,\n+    argv: tuple[str, ...],\n+    limit: int,\n+    executable: str | None,\n+) -> None:\n+    \"\"\"No invalid runner selection reaches the process boundary. monkeypatch\n+    (pytest.MonkeyPatch): test-local restoration of injected seams. argv (tuple[str,\n+    ...]): fixed outer argument sequence. limit (int): positive read capacity in bytes.\n+    executable (str | None): simulated resolved Git path or absence. Returns None;\n+    memory-only effects; AssertionError on mismatch.\n+    \"\"\"\n+\n+    def which(name: str) -> str | None:\n+        \"\"\"Return the selected installed-executable availability. name (str): fixed\n+        executable name to resolve. Returns str | None; memory-only effects;\n+        AssertionError on mismatch.\n+        \"\"\"\n+        assert name == \"git\"\n+        return executable\n+\n+    monkeypatch.setattr(\"drm_copilot_discovery.gateway_local.shutil.which\", which)\n+\n+    with pytest.raises(OSError, match=\"unavailable\"):\n+        gateway_local.run_local_git(argv, output_limit=limit)\n+\n+\n+def test_installed_factory_wires_only_trusted_outer_host_values(\n+    config_catalog: SchemaCatalog,\n+    monkeypatch: pytest.MonkeyPatch,\n+) -> None:\n+    \"\"\"Compose real ports through patched native boundaries. config_catalog\n+    (SchemaCatalog): verified immutable schema fixture. monkeypatch\n+    (pytest.MonkeyPatch): test-local restoration of injected seams. Returns None;\n+    memory-only effects; AssertionError on mismatch.\n+    \"\"\"\n+    case = ConfigurationCase(config_catalog)\n+\n+    def resolve(self: Path, strict: bool = False) -> Path:\n+        \"\"\"Preserve synthetic paths without I/O. strict (bool) requires the workspace\n+        to exist while state may be absent. Return Path; AssertionError on the wrong\n+        existence policy; memory-only effects.\n+        \"\"\"\n+        assert strict == (self == Path(case.disk.root))\n+        return self\n+\n+    def home(cls: type[Path]) -> Path:\n+        \"\"\"Return deterministic user storage without accessing host settings.\"\"\"\n+        return cls(case.location.directory).parent\n+\n+    monkeypatch.setattr(Path, \"resolve\", resolve)\n+    monkeypatch.setattr(Path, \"home\", classmethod(home))\n+    monkeypatch.setattr(gateway_local, \"load_catalog\", lambda: config_catalog)\n+\n+    def activate(\n+        *,\n+        location: RegistryLocation,\n+        catalog: SchemaCatalog,\n+        authorize_root: Callable[[], None],\n+        invalidate_authority: Callable[[], None],\n+    ) -> ActivationStore:\n+        \"\"\"Check factory collaborators and return the isolated memory store. location\n+        (RegistryLocation): trusted host/workspace registry location. catalog\n+        (SchemaCatalog): verified immutable schema catalog. authorize_root (Callable[[],\n+        None]): explicit local-root authorization callback. invalidate_authority\n+        (Callable[[], None]): separate empty-authority P6 callback. Returns\n+        ActivationStore; memory-only effects; AssertionError on mismatch.\n+        \"\"\"\n+        assert location.workspace == case.disk.root and catalog is config_catalog\n+        assert authorize_root is not invalidate_authority\n+        authorize_root()\n+        invalidate_authority()\n+        return case.service\n+\n+    monkeypatch.setattr(\n+        \"drm_copilot_discovery.gateway_local.ActivationStore.local\", activate\n+    )\n+    monkeypatch.setenv(\"LOCALAPPDATA\", \"C:/state\")\n+\n+    local = gateway_local.installed_local_io(\n+        case.disk.root, None, \"local-user\", \"test-user\"\n+    )\n+\n+    assert local.activation is case.service and not case.registry.writes\n+    with pytest.raises(PermissionError, match=\"unavailable\"):\n+        gateway_local.installed_local_io(case.disk.root, None, \"host\", \"test-agent\")\n+    with pytest.raises(ValueError, match=\"absolute\"):\n+        gateway_local.installed_local_io(\"relative\", None, \"local-user\", \"test-user\")\n",
+    "tests/discovery_runtime/test_gateway_factory.py": "--- before/tests/discovery_runtime/test_gateway_factory.py\n+++ after/tests/discovery_runtime/test_gateway_factory.py\n@@ -0,0 +1,345 @@\n+\"\"\"Exercise trusted state canonicalization through the real store constructor.\"\"\"\n+\n+from __future__ import annotations\n+\n+from pathlib import Path\n+from types import SimpleNamespace\n+from typing import TYPE_CHECKING, NoReturn\n+\n+import pytest\n+from drm_copilot_discovery import activation_store, gateway_local, mutation_filesystem\n+from drm_copilot_discovery.activation_filesystem import NativeRegistry, RegistryLocation\n+from drm_copilot_discovery.models import JsonObject\n+from drm_copilot_discovery.service_contracts import ServiceRequest\n+\n+from tests.discovery_runtime.test_configuration import config_catalog as config_catalog\n+\n+if TYPE_CHECKING:\n+    from drm_copilot_discovery.catalog import SchemaCatalog\n+    from drm_copilot_discovery.gateway_local import LocalServiceIO\n+\n+\n+class FactoryCase:\n+    \"\"\"Model native path resolution for one isolated factory invocation.\n+\n+    Tests populate aliases, missing paths or errors, then compose the real local\n+    store. Resolution records distinguish required workspace existence from absent\n+    state support. No filesystem is consulted; denied ports fail before effects.\n+    Mutable mappings and observation lists belong only to this test instance.\n+    \"\"\"\n+\n+    def __init__(self) -> None:\n+        \"\"\"Create fixed native-flavor paths and empty observations; return None.\n+\n+        Pure lexical Path operations select the current platform flavor. No host\n+        environment, current directory, filesystem or external process is read.\n+        \"\"\"\n+        windows = Path(\"C:/\").is_absolute()\n+        anchor = Path(\"C:/\") if windows else Path(\"/\")\n+        self.platform = \"windows\" if windows else \"linux\"\n+        self.root, self.home, self.base = (\n+            anchor / \"workspace\",\n+            anchor / \"user\",\n+            anchor / \"state\",\n+        )\n+        self.canonical_base = anchor / \"canonical-state\"\n+        self.location = RegistryLocation.for_host(\n+            workspace_root=self.root.as_posix(),\n+            platform=\"windows\" if windows else \"linux\",\n+            user_home=self.home.as_posix(),\n+            local_app_data=self.base.as_posix(),\n+            xdg_state_home=self.base.as_posix(),\n+        )\n+        self.state = Path(self.location.directory)\n+        self.aliases: dict[Path, Path] = {}\n+        self.errors: dict[Path, OSError] = {}\n+        self.missing: set[Path] = set()\n+        self.answers: dict[Path, list[Path]] = {}\n+        self.resolutions: list[tuple[Path, bool]] = []\n+        self.effects: list[str] = []\n+\n+    def resolve(self, path: Path, *, strict: bool) -> Path:\n+        \"\"\"Resolve path (Path) through test-local metadata; strict requires presence.\n+\n+        Return the configured canonical Path and record the read. OSError entries\n+        and strict missing paths raise unchanged; no actual filesystem is touched.\n+        \"\"\"\n+        self.resolutions.append((path, strict))\n+        if path in self.errors:\n+            raise self.errors[path]\n+        if strict and path in self.missing:\n+            raise FileNotFoundError(\"Synthetic missing path\")\n+        if self.answers.get(path):\n+            return self.answers[path].pop(0)\n+        # Prefer the most specific alias so tests can model a redirected partition.\n+        for source in sorted(\n+            self.aliases, key=lambda item: len(item.parts), reverse=True\n+        ):\n+            if path == source or source in path.parents:\n+                return self.aliases[source] / path.relative_to(source)\n+        return path\n+\n+    def deny(self, *_args: object, **_kwargs: object) -> NoReturn:\n+        \"\"\"Reject any native port call; object arguments are deliberately ignored.\n+\n+        Record the attempted effect and raise AssertionError; no I/O is performed\n+        and no value is returned. Construction may retain these ports but not call.\n+        \"\"\"\n+        self.effects.append(\"forbidden-port\")\n+        raise AssertionError(\"Construction must not invoke a native port\")\n+\n+    def compose(self, *, principal: str = \"local-user\") -> LocalServiceIO:\n+        \"\"\"Construct installed ports for this root and principal (str).\n+\n+        Return LocalServiceIO from the real factory/store composition; propagate\n+        its validation/resolution errors. Only injected memory reads may occur.\n+        \"\"\"\n+        return gateway_local.installed_local_io(\n+            self.root.as_posix(), None, principal, \"test-user\"\n+        )\n+\n+\n+@pytest.fixture\n+def factory_case(\n+    config_catalog: SchemaCatalog, monkeypatch: pytest.MonkeyPatch\n+) -> FactoryCase:\n+    \"\"\"Bind real constructors to memory-only native seams for one test.\n+\n+    config_catalog (SchemaCatalog) supplies immutable schemas; monkeypatch\n+    (pytest.MonkeyPatch) restores every seam. Return FactoryCase; assertions\n+    reject unexpected native calls. No service/store constructor is replaced.\n+    \"\"\"\n+    case = FactoryCase()\n+\n+    def resolve(path: Path, strict: bool = False) -> Path:\n+        \"\"\"Read fake metadata for path (Path), honoring strict (bool); return Path.\n+\n+        Propagate modeled resolution errors; only case observations are mutated.\n+        \"\"\"\n+        return case.resolve(path, strict=strict)\n+\n+    def home(cls: type[Path]) -> Path:\n+        \"\"\"Return a fixed home as cls (type[Path]); no environment or I/O access.\"\"\"\n+        return cls(case.home)\n+\n+    def catalog() -> SchemaCatalog:\n+        \"\"\"Return the exact immutable schema fixture without installed I/O.\"\"\"\n+        return config_catalog\n+\n+    monkeypatch.setattr(Path, \"resolve\", resolve)\n+    monkeypatch.setattr(Path, \"home\", classmethod(home))\n+    monkeypatch.setattr(gateway_local, \"load_catalog\", catalog)\n+    monkeypatch.setattr(gateway_local, \"sys\", SimpleNamespace(platform=\"linux\"))\n+    monkeypatch.setenv(\"LOCALAPPDATA\", case.base.as_posix())\n+    monkeypatch.setenv(\"XDG_STATE_HOME\", case.base.as_posix())\n+    # Reject effects at the native ports while keeping all constructors real.\n+    monkeypatch.setattr(activation_store, \"open_local_directory\", case.deny)\n+    monkeypatch.setattr(mutation_filesystem, \"open_local_directory\", case.deny)\n+    monkeypatch.setattr(mutation_filesystem, \"exclusive_workspace_lock\", case.deny)\n+    monkeypatch.setattr(NativeRegistry, \"guard\", case.deny)\n+    monkeypatch.setattr(NativeRegistry, \"write\", case.deny)\n+    monkeypatch.setattr(\n+        mutation_filesystem.LocalMutationPrimitives, \"create_exclusive\", case.deny\n+    )\n+    monkeypatch.setattr(\n+        mutation_filesystem.LocalMutationPrimitives, \"replace_if_digest\", case.deny\n+    )\n+    return case\n+\n+\n+@pytest.mark.parametrize(\"alias\", [False, True], ids=[\"canonical\", \"alias\"])\n+@pytest.mark.parametrize(\"missing\", [False, True], ids=[\"existing\", \"missing-leaf\"])\n+def test_factory_preserves_partition_through_real_store(\n+    factory_case: FactoryCase, alias: bool, missing: bool\n+) -> None:\n+    \"\"\"Compose canonical/aliased state and optional absence without write effects.\n+\n+    factory_case (FactoryCase) owns memory seams; alias/missing (bool) select the\n+    state shape. Return None; assertions require exact identity and native wiring.\n+    \"\"\"\n+    case = factory_case\n+    if alias:\n+        case.aliases[case.base] = case.canonical_base\n+    expected = (case.canonical_base if alias else case.base) / case.state.relative_to(\n+        case.base\n+    )\n+    if missing:\n+        case.missing.update((case.state, expected))\n+\n+    local = case.compose()\n+\n+    assert isinstance(local.activation, activation_store.ActivationStore)\n+    assert isinstance(local.activation.registry, NativeRegistry)\n+    assert local.activation.location.directory == expected.as_posix()\n+    assert local.activation.location.workspace == case.location.workspace\n+    assert local.activation.location.workspace_sha256 == case.location.workspace_sha256\n+    assert local.initialization.primitives is local.activation.primitives\n+    assert local.initialization.workspace_root == case.location.workspace\n+    assert (case.root, True) in case.resolutions and (\n+        expected,\n+        False,\n+    ) in case.resolutions\n+    # Missing state may be observed without requiring or creating its leaf.\n+    assert not case.effects and not any(\n+        strict for path, strict in case.resolutions if path in case.missing\n+    )\n+\n+\n+@pytest.mark.parametrize(\n+    \"spelling\", [\"relative\", \"../state\", \"C:state\", \"\\\\state\", \"parent\"]\n+)\n+def test_invalid_state_spelling_is_rejected_before_resolution(\n+    factory_case: FactoryCase, monkeypatch: pytest.MonkeyPatch, spelling: str\n+) -> None:\n+    \"\"\"Reject unsupported/relative/parent spelling before normalization erases it.\n+\n+    factory_case (FactoryCase), monkeypatch (pytest.MonkeyPatch) and spelling (str)\n+    supply one host input. Return None; ValueError and absence of state reads are\n+    asserted. Only memory environment seams and observations change.\n+    \"\"\"\n+    value = (\n+        (factory_case.base / \"..\" / \"state\").as_posix()\n+        if spelling == \"parent\"\n+        else spelling\n+    )\n+    monkeypatch.setenv(\"LOCALAPPDATA\", value)\n+    monkeypatch.setenv(\"XDG_STATE_HOME\", value)\n+\n+    with pytest.raises(ValueError, match=\"absolute and canonical\"):\n+        factory_case.compose()\n+\n+    assert factory_case.resolutions == [(factory_case.root, True)]\n+    assert not factory_case.effects\n+\n+\n+@pytest.mark.parametrize(\"internal\", [\"lexical\", \"resolved\"])\n+def test_internal_state_cannot_become_trusted_storage(\n+    factory_case: FactoryCase, monkeypatch: pytest.MonkeyPatch, internal: str\n+) -> None:\n+    \"\"\"Retain external-location checks before and after canonicalization.\n+\n+    factory_case (FactoryCase) and monkeypatch (pytest.MonkeyPatch) supply memory\n+    paths; internal (str) chooses lexical/resolved input. Return None; assertions\n+    require ValueError and no effects, including no alternate storage fallback.\n+    \"\"\"\n+    case = factory_case\n+    # Raw internal input fails before normalization; an alias is checked afterward.\n+    if internal == \"lexical\":\n+        monkeypatch.setenv(\"LOCALAPPDATA\", case.root.as_posix())\n+        monkeypatch.setenv(\"XDG_STATE_HOME\", case.root.as_posix())\n+    else:\n+        case.aliases[case.base] = case.root\n+\n+    with pytest.raises(ValueError, match=\"outside|external\"):\n+        case.compose()\n+\n+    assert not case.effects\n+\n+\n+@pytest.mark.parametrize(\"redirect\", [\"layout\", \"partition\", \"store-race\"])\n+def test_distinct_or_changing_derived_state_is_refused(\n+    factory_case: FactoryCase, redirect: str\n+) -> None:\n+    \"\"\"Reject redirection that changes fixed layout or the final canonical guard.\n+\n+    factory_case (FactoryCase) supplies memory resolution; redirect (str) selects\n+    the differing component or between-check change. Return None; assertions\n+    require ValueError without native calls or replacement authority.\n+    \"\"\"\n+    case = factory_case\n+    # Layout/digest redirections violate derivation; a later change reaches the store.\n+    if redirect == \"layout\":\n+        case.aliases[case.state.parent] = case.base / \"unexpected\"\n+    elif redirect == \"partition\":\n+        case.aliases[case.state] = case.state.with_name(\"other-workspace\")\n+    else:\n+        case.answers[case.state] = [case.state, case.state.with_name(\"changed\")]\n+\n+    with pytest.raises(ValueError, match=\"partition|canonical\"):\n+        case.compose()\n+\n+    assert not case.effects\n+\n+\n+@pytest.mark.parametrize(\"target\", [\"workspace\", \"base\", \"state\"])\n+def test_resolution_errors_propagate_without_fallback(\n+    factory_case: FactoryCase, target: str\n+) -> None:\n+    \"\"\"Preserve the exact I/O failure for one resolution target (str).\n+\n+    factory_case (FactoryCase) binds the synthetic OSError. Return None;\n+    assertions require that same exception and no effects or alternate location.\n+    \"\"\"\n+    case = factory_case\n+    path = {\"workspace\": case.root, \"base\": case.base, \"state\": case.state}[target]\n+    error = OSError(\"Synthetic resolution failure\")\n+    case.errors[path] = error\n+\n+    with pytest.raises(OSError) as caught:\n+        case.compose()\n+\n+    assert caught.value is error and not case.effects\n+\n+\n+@pytest.mark.parametrize(\n+    \"condition\", [\"noncanonical-workspace\", \"missing-workspace\", \"host\"]\n+)\n+def test_factory_rejects_invalid_outer_authority(\n+    factory_case: FactoryCase, condition: str\n+) -> None:\n+    \"\"\"Refuse changed/missing workspace identity or host principal before state I/O.\n+\n+    factory_case (FactoryCase) supplies memory observations; condition (str)\n+    selects the denied authority. Return None; assertions require the applicable\n+    fixed exception without state reads or effects.\n+    \"\"\"\n+    case = factory_case\n+    # Workspace guards precede host authorization and state-location derivation.\n+    if condition == \"noncanonical-workspace\":\n+        case.aliases[case.root] = case.root.with_name(\"different-workspace\")\n+        exception = ValueError\n+    elif condition == \"missing-workspace\":\n+        case.missing.add(case.root)\n+        exception = FileNotFoundError\n+    else:\n+        exception = PermissionError\n+\n+    with pytest.raises(exception):\n+        case.compose(principal=\"host\" if condition == \"host\" else \"local-user\")\n+\n+    assert case.resolutions == [(case.root, True)] and not case.effects\n+\n+\n+@pytest.mark.parametrize(\"marker\", [\"invocation\", \"authorization\"])\n+def test_composed_ports_reject_host_references(\n+    factory_case: FactoryCase, marker: str\n+) -> None:\n+    \"\"\"Preserve host-reference refusal after real trusted-state composition.\n+\n+    factory_case (FactoryCase) provides memory ports; marker (str) selects the\n+    opaque reference. Return None; assertions require PermissionError and no\n+    native reads/writes. Request data never supplies the host storage location.\n+    \"\"\"\n+    case = factory_case\n+    local = case.compose()\n+    request = ServiceRequest(\n+        id=\"doctor\",\n+        request_id=\"request\",\n+        operation=\"doctor\",\n+        mode=\"structural\",\n+        workspace_root=case.root.as_posix(),\n+        profile_path=None,\n+        dry_run=False,\n+        write=False,\n+        format=\"json\",\n+        inputs=JsonObject(()),\n+        invocation_ref=\"opaque-invocation-0001\" if marker == \"invocation\" else None,\n+        authorization_ref=(\n+            \"opaque-authorization-0001\" if marker == \"authorization\" else None\n+        ),\n+    )\n+\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.authorize(request, baseline=None)\n+\n+    assert not case.effects\n"
+  },
+  "source_and_raw_coverage_archives": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "bytes": 18766,
+      "gzip_base64": "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"
+    },
+    "tests/discovery_runtime/test_gateway_local.py": {
+      "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693",
+      "bytes": 20279,
+      "gzip_base64": "H4sIAAAAAAAC/+1cbW/cRpL+HiD/ocH7wjFmaCfw7YcxZnE6x8lpz7EFx7uHhSAQHLJH0zGH5LJJSRPsj9+q6neS8yJbxgbByYZmRHZXd1dXPfXSRUZRdNXWd5yVdZ6V7Dbr+H22Z1nfbetWdPs5y7Om61vOsqpgVdYJaHsvWlHdwke3ZTu+q9v9oq7KPZM828kkiqJvv/n2m01b71iabnrsnaZM7Jq67YBMVXdApq6kbVVkXZaXmZRcmmYtb8os57pBk3XbUqzNzSv4U9/p9g1ORd/4+PerN+nr/3nz+n8v3/2E5PX1Zt9x2ZnR2l2a140o6y4thMxh9e3eUNAMSIkdxzok2S2vurTuu6bvTO/L6g764eJe11XHH44OmQRjGRJv8Y9feHsncn75/mj/XV3w0nLsL7Ku3q9/5fnxQYGxtRQd7Fna8qzgren/wd74UZR87v19WcBKQRaO0pVqynCn6tos7+y89Fo+9EBjx9+0bd3ajcddkYklkraqkeUM3k9l3xAhTe9nEjgQ2pxLOdfyl4r6C0jG337D4GcjHniRFsCVUlQg8HJwZf7tN7MTo4hKdCIrxW8kBEfm77h7giKRAH6KO0VSQh9uaIGUbcRt3yqRyyQ/h1judzKU1MUUhDcr61tce3jlHMJFncPkrC788Obdx8uPf58zdR3E7R89aSGo5SZU1aXeABwir8sShBgBIsnWuV1qVpbZuuTY3bY9oJmOWxsQZbmXHd85Mb8Vsmv3b7WiPoZawPsLe/0XvHySjmGtUYt8y3fZa8PdE513vcLMFFCxciwhZC7+r24/yYbQ8gSZM5T/A10/Semgums9d5iB/wq+IdFRUJdiQ5nKbQaGgT9Abz0bmYKRSW/7rC20SoZCuAy5hvrIFn9m7+qKawkC20MACh13tCIU8ZZ3magkg2ZMbSHaMvyLPzSlyEVHtguljhfM8SiZmgOLgznMlgz4ITYCeoodbhPIKJPUBOEDNygB9sInzABn+kpR9e0m32xgbPmKXYAJbHHOBJMwRbYTcpd1+Tax61Nf3CzZagQp8UzPHBBhriz7nKXQ0IJlHC5q7tFbua8zo2wZzUtR8hSCCUljGGmYaBwCoieA2Lf1QPBUzx1sIvoJwzHtjXMGz4p0ja7AiIi7dZpM04qdQD9oTMbdmiCjsTIVWjXiGfY3MBl0ABdJEW65cSikcsDcDQVjyT14aVwO1AykRoJbZIdKKw5Smm6ydSuAHJcGuD9fzS7Q9UKhryS0KnmxaMCPFIgpm0yU6DE2yqPrtm3d327h03iZsF9NBw37Kt9m1S0vfs+ahuwG1RmZ2oEKWV3BTeir7A6YgDOMiXcDVNRs1OP8jH4cy5jeNbbLKrGBbSQHGxxMhtKJNwD6Qfl6dBYV15VA2qkSMGQC5jvhdMF8C76KPvwVxO3nN+lf31387eLy7cV/v30T2bmr7VkNnNDYUXe6v/IFf+6N74AE98C7A8pR5aLJylVE4yx66B15DVTQAUK7ilCKR/eNNK889urbdgUUkyh3PyFWyHiCF+A24lYf4Ia3O4c0d6Bv2xp+2fWlQmqFAxGBD7AqaVdr24eL+nyte6MNli9hDEd3ERupn2RrvlGWbs/ujX/A6jVumJKaP5DKTWz6FW9JnfRodsORV8EOHxT188T9uMgPxJ4GH9weCj2FlX6j2SHLEBiA0DpoYdBRCCyw1BbivzSXdln7KWmyNgPrCe2MHYjwulO660jYgDaasyggixcwAsVPK2H4RwP8AM8Ov25EhXaTRzcqdrIKo2OBVI0nYYqYFgBnsEEPUGmKlegz1YUEj+gtwc1rpxXofZPByLBlG97yKteMy5js1xJUuycPsCY+4oxAAv7Ri9YYrsZKlXw6/VFzZjHM2QimdUZBh9eiANghJV/kKquguwxUb1LrFL3Hqd5ZLuPM+KG0kdAwjPJiJKTb/Ad7k+VbVoMD0N6jdboDoShsVyHrMiMR9pbr4EzWfYvQ1TKUNj1fCCA121Yr5kvp0rdEZmo6mRTrK3PmOsB8N6uoJqlYuMuLFy9efBfp+fMyHC5Ug/NGDDXSHzS4c3Rc0rajww1xSQ0eXq1BiBWkId8AbGB7h6C0I1eBoGihMlzDFmdycIxjw0U56DiPkbZ9imq6ip6TWC0cmQPjGFR6Sv5pmmPMVhwCtsmVS8sNqOPPxCW6HMlPogQ/oiDUBQzdo9WaH2yt4QI6SOgRRxueIbZE89nhTphTVa1lmx9rOX2ZUAPwWg2shERG88ONj9DBn6N8eiQtt8gMUG+DCYZPoiJmas4sTN7iIFfHtIRP4BH9kNHYEwBSPtfdk19huY+gAcAIcI1UHtnR7pDcZt//55+AAtqKc/rPjjc5RuLQvcPCyB943itnRZk4XCqEOFUBtqbiR2QfEz0lfwBLgV1efzfZdLCW2RQsSf6U0GA8n2ls+Er4+mhv2FrZiaDH2CUPe9dg0zERTm7u5/ilXjpjEEHlbS1l6sDdDEUZQSLVppgubPmvJM+fH0J9IArK2eDitrIHXCZi8u0xuR0695qMUuIkgV8aMflum5bFz4uYrNtmeHfaezMscGJu+p5vaJ2nthpJzpRP6ImR+fL1RPfEBPT6Z086upLWWNOeOwat7LevMmAIIG4j3fhmk73TXR1+wn9CIwAa2mVKvcxGKPm0Ez5zisMAeqYn47AQJG908uqxYyRviayyRm5rH7/bukRI1r6Wn3VySIxBujoCX9gA0m9qdcP3+uLAs0JJhHjSekzTLf+d7HbrXbmvs2HGS0NyyzV6SjzCKVONN2C5OwXdQAKDPYzvPh+yP44yx6Bc91lbSJMP9YsUnJFhlPn4A+L2k2Iu7aQldERYhvClsonAsZUmkuhtMOdP+qqTAS+nMzxbcsRWjhG4naNzEGjw3cj3sIST2zarOp3WsRc9rBBq/87yXgZCT6dEKtgiOJD69BIFvWlrPGxOZQ5eYPEEGV4l8DgkHpTlHAtvKLWD5yh6d4Fd5jQfk0UwPqPl/96Tu58h8hhFMScaFsITzfjEhHryOtKXopthjmrszE9qi7vtefS4EwuVjArNwwjGY2qb2r4YmOAVCE38uBu/QNjtg/5p7R774iOF1jLthD8UW1QAlPeREhzqkACI1veS5js7onjTvVTYS16FDnpP6u6JVHVkJAuYeP1jVqI4fWx7fuMnmG1qy1iqBmwUAozR2UZUFffm+5gkc1194vsGp7A05vlnunaF10wrPcslW9d1Oa3sl2aWzBpS1qszU1BFWDHTZRrKrm3oXl+1HBOmBQM3p80AOVHsnjIh7danbeV4kUCJjisMSmFdhY6YNqATKkjTBYGWFSxGVhgH5X7LUSq8pbcabDJWiA35Vx1zAvUVst2Pr6I4A7AOF1MQjgl0V8Niu3jy+HRcgBejAwqDyX4HPrprGuGQd0ISTmURe8ZevvBRDDUXbjRoWWiTngMHkyZI+1LeBQKAdYT5ltAPVboyiZ/OTzCAvBqGks7b9lanKrNWMZCeG4d+4FYsWQm2+HpYmnQD87i+8U/brQDFz56BpwH4uNRKQSo3KpMKT9+VVJHG2XoEPF7tb3fAD7SwgW+Z123hFwvhlBKmhnV0Yz3+0vQuGGjOPfZVTdGD1ZY8U3ri5Hs04VeO8OcZ30DoPfRVc7mOPFG6mSrMUZJJfDK76m+A5pUnFnnfovYux2uZa54tD9ScnbNlqmDCOkNZnvOmo1oUA6fKTi9Q2QAiK4n508TMytum0UCwYxtAs63bNxvUJQaM4+HMoRMZFUfYpF19hDGycnibj2DaWbh2aJv1unFn3fZZF0erWwL4wKsiVtOcHdx4OnszgI5pUw0PRiA865FIDoFg18ZBpTN4Q5q5qX9ubLV4dpiOt8wDxZoYv/9GMQe4ZammmMAMPY9ACQf6YFpww6B7Mh7ywJRW68dFj4zAFIHZwOnzuOoJ+0QG4P0vYeRvDWQQ+Xvh1yAoG2S6tYgM26KsmH09EKVdO9m+GQRK5JigiyVTnfBIQVHTdd1DpDQqQv2SIjRTM6VVU5/ar7kxVQVb78GfQEGDZouu5XSUjIkBaK4k4Y8YLf2/l3HCy/g3qfkZCu2VdgUqPVbnUZgE8YGWRQi8wocXMO46Vf2jd2eOlYLzRjR8TokbWw7kGc51hDW3IBIvVPClfvviAE34Az6j4TeicG3QCu5/d+L+C33nYIPF95MUhmVHiiW3osP61wqiQkIkqZOxlMfJSw7+AqZzcO7xYyI+zT4I+LCFvVjwJXgmJteMbLUhIV4gFh8LEn/ESbOfBATK7e0dk122l0xueVkuNghn6JdK2MdGwjAQUIlON0eT2IqCy68Q0um1AvuRjhFTh4xkfxFppdj1KlrVj0pRh4T4wmLgCwzryp1oqaZ+uNYuoSOhdwV50PVABJlpgkobT7rmsiuwfBZMmdWoRPFbM2HQk6JuMxczFlDIa4jEkYp2NL9GJtgMtwofcIqNThLDVqSZtOwV/rJFWBiV2IipEHl3jRVwOgq6MSHThFvFq7s4+unyY/rD5QfMU/VV1/aYWCQxUG7FF/hjgeOXyH6tl5l8FDsOnH3z0OBpCIxsLqjnwwLMRPW934p8G1eAWFTcR2oCn8NQTtalnyZV8qRXxFSRAYknEgIZ1TuXqL9VBZ7q5LvyYa+uRt3AcZwYQMdXZ1p6L5Q7z3mnQbGCCWArGnnl0XO9uufq9uG9Om+Htn0nwBoit2FT6DPYB9C8tosRiAAt+qbkStCSJLmZs2fP6oZy9EH8HcjzcMMonAZyPfrh0la80zBU8m4UI1HoF7tBHSUc3Wwc6ismzDRJ0GcwzxVGb3puU7G56qkjdD/7qx5Ds/scLOXVEwfjtD7Y6DjcU1DKxQK2Snq66Cu9idv0ZMeBm2bgl8uG096rGoaEmdE22SrP98gHsqiIvX2OTTd9aYBf9u0dPhrzinF64tbA/A7WCpREWTIyvqxvXJWnso4jXg0Ou8OJgm3XJcTAvziOxlyc6zmlJT6vs3o5Q75rpD1VGnTYgxvGX188q0FG3+z49Yub64gcAJWtIZcnaGkRnfLrgHOgL3HQHXA/uglT8WZzN6ISQL2YvIl1iSr8i5E0GWCQ8pJXxlLN2J/ZS4qx0MJDw8X3s/OKz1EB5rT2uQPdKeczBla9nA+wL3AKY1XHEM3PaEkbMSMn86x2ys88q+nLcbldeDegkuS7Ijq37Tpzow7dXM/BVfVSMvWCCiz26Cutp6MDkPNc3WkDoB8iwh30XV63mWS72T+Zfkxiwtl9VzN9XMzUCtwBAMb4EG+rwxHjLtEyMjThT+7iTtub82wN8cC4t+pB1Dud6wWjk+V4uAdqqXzhIZfIEdFcQu/Y+rPa71DePR2Igppla6nGfNrkw0nXS0/wYDLdOtLuCUFviVoaRYnHfk/gfunZfLUU6nEvzE3y63pgX5A9OGaMCHhD40O/h0U/didTPGinw1WBpT/I7FSDU0o6oZ6IU8cLT3qyOgEZr+lRb9KuktGj5faRU6LE7XtLNFgI/oQ1QU8OO7+PJ1i1jsWgxZslvXBlTkmGvFOpCqCnMi24H3g7xIErfdrO5L4CMOhETnjlHPzL5+8TTVCH4aY0TuH7ffhOA/wBzecPAh+L3WKhC9WYgdTvMdtLINgZ5tGEpjhElNu6uvXxBUgigILolCLfTyLICXDQ60CnCPmFX3AGlBLEl2V8SrCEdjZ2zbG1z/VtvYNdKSF+woerr5HIzQEO65UWEMK3O/TYkMdYtkmvOMhuuWV1Ro44BlP0oCigEUZWcvDYsCIHY6tZm+gfpg9+I51fo8tG/vFhhFNyEmnhoYQxfZud7IIrh/b0FiBwC7d1EeOl2ez8Q6Wyzgojy0CqzHbrIluyI0KuH+/0M83P5mH1JPJgOXppiJ/RPoZnXjXPb6qOemlfZHJ9faO8w5uw2HRUKnekC8nG4EUkoZi83vL8E9NwTe9WydYIPnUr9YG2Ndj6ObxCK4B6VUZiueC5pUN2IL7pHAuK2HP3wLGpp7NUEhYg7iNRV/dNBkzFc1zHIUeZWEWHs35N3YK6hGX+eB60zvJPyeQOBAfGw62g/CVGM4BGfNd0+4Wr37r6k0dZA7vnjIQb99T5BMtytx0Y5QaYpCss9Ztp5KRVHJeIGbbrSrLjLAv7xLPjwh6PQTJ8w8iTJSMH3CfEK/FMWINCcFo0lTV9+/71xduLq6sfLj5e0LNHy+dkk8avUwgHdl6U8sBE7RdOBNujRIywzb0wgXlvRxhWDp73npYTrxJ5ZOn5eR7nxKoPrFU9Jc/8x+EP18P/DV3MQSn8GoCs7x45mYiK6gRZrRNMh9n8C9qSAFs3TwAA"
+    },
+    "tests/discovery_runtime/test_gateway_factory.py": {
+      "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3",
+      "bytes": 14191,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf1-coverage.json": {
+      "sha256": "2ee1fc57730853a77c195d135f10d5eb4cd6494e3889f1516b54695680c3753a",
+      "bytes": 14814,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf1-inputs.py": {
+      "sha256": "7578bf4694fb62e5bcbcfcdf3e3e2189d56d5f698cc6f30cb8e7bdfa29e057ab",
+      "bytes": 2620,
+      "gzip_base64": "H4sIAAAAAAAC/5VWXW/bNhR9168gCASQWkv+QOplKfIwZB26h67F6ocNSSDQ0pXNTRJVkrLjBPnvO6Qkx06yoPWDJfJeHpLnnnuvOOdfNBnSG2J/XP42ZbJuWsuM1SQqw0Sds5q2cSFLYmJpqM6IbaVdKzgthaFS1sQ0NaXYJZzzQFaN0p1pfhoUWlUsF5asrIj1tmE8Yu7/TtU0rFrdyWZ4XwuzLuVyGP5jVN3BNcI6w4D2BcMg0EpZduEHSbbNwygoSNhWUz8Z8lxlZtxPmrHIrNzQeDaZzePpJJ7+FJe0EtkuzqXJ1Ib0LsbV40ZoaXfxz2cTHgW6rf01LhhvRPavWAHn0b23jo3Oxrmu0kw1slQ23XuMeaC2NeVYfzVAvWV8BTa2YpeWKhNl0uz4iHFLxh5gpwO2m0+fLbgJEKHU0eKO9l1rC9xf6Z1bHQiD6FtWg8DQ0zhmA16U0K0EHOgMcirYUrV1HnrLecDw02KLPYdl3RIIJ0+XO+yHZd6JwHnN7rmz83PvhkuatZi9m2PcRzrpJkJgRsmabnMJgm0YwdWjwbOk2psfgoBqqyUZ7H7/EBRKe1SIl3mOf+B0PdCVM984uDdvDq6JzZ3CDzZPTFNK6yfDKBp5jGc/7pScdkmApd1LspyfIn9UTqEzJ5mqGmjRONQRq1yULiZRlOTkfbgwmZQcl220spTZp9KpBR7u6v4FVw+Dbu8uyL2WvNKFlapOXRKbnbFUPbcZ6IH66aq1Ly7o4B0vaaNKmQ1buOohM4LkwSUwzZN5PKUo5Z0HfWLT9K11ytQttjrYBQajWp0hxypRywI+iasBPLo54OMtCPlfxfNXOPLZ8Bo13gEXKuSq1YcHP8ojrxTh9OOsOJqmgrQrkk6ZV6ii4VCHxv4IToColRnCe33t4MY8eul8tJG5gxkPNXbczO00RopoyuNhMhnq12yymJ6iinUUjZ5gfBOxO7DpMPqzx7VU0xhUquII5gwvL8NoWjm5gorYkSDr1QuAhSa6o6eIs+85GN1S1kKG8UA7xZloDXVjXXVR2CNPF5PTeDbbq8JYUTVgfWgvSa224dBhktZmUYJ4FG4m5Cd/xydVfJIvTj7GJ59ccUfSaZdg93wBDw+GzPVPhOlSVZBhjhn+9fLPXxaXH728fGtJvXrSNEpcEOH84a/fF+nl518/wH1yWCH459a67vq1BZreObTFVjGl5UrWotx3XVRMgfDm75loEKEN+SbMHOtdE7bvUa/ZktZiIyGeZ434aFONXk1ur0G1aIWgOXWkp3VWTFOrW0g/RxGABzKvEVKnjujpxNM8ezebH2P2VROo/Ruu7bqGZ6L/ToDxfugk52yhW3o4wtincbqUdQ45Obirg+LLDuv63vvm+HI9Velj5r2G8uh1g7ratczHDH1UprJr0hxTIT/WOOiK/SeSSZwAOtGhjfcyDPqe40ZJ3lYNqrtX1gi7A9pezCLnfg3fpG8GvLVFfIa17rvqSbtSDboOv12iSgjT66Nrbt17ssUHCvmmiLIoa3u481HHTYRB1Tby1nfUH2i+x2G1vA9lFAX/AVDZxWo8CgAA"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf1-run.py": {
+      "sha256": "583a042dbb90028ca12cc89580e8bd2c5c1009186b194bdc470ab6a04f3595f7",
+      "bytes": 3891,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf1-proof-analysis1.py": {
+      "sha256": "571a1e113eaaf7c32e96c7bc84bb0136b7d29cebef8a2ae73ddba38bcd50708b",
+      "bytes": 12280,
+      "gzip_base64": "H4sIAAAAAAAC/6VaW3fbNhJ+56/gYk92yUSiZTlxE3e156RJetqHXrbxw+5RdBiKhCw2FMkSpG3V6/++M4MLAYpyXa8fEhEYDAaDuXwYgDH2TV5mfrvl/iYv85b7P7779tSvm6ra+G3lbxoutv66ynIu/AQouzLdJuUVz/yGt0lewo+0uuZNcsUjxpjn5bu6alo/Ea3+uU4EP3+pv9Kq3nubptr5WdLyNt9xX/Xo74mP//5elVyPyfLNpsjX+vPq97zWv7eJ2Fpdv4qqlNzrpMUOzfxn+PQ8WFY78UXaJG269RfUGqU3WRBO6HcQx5u84HEcRnXS8LL1Njxpu4Yr2oBlVSpOVKM4SdI2v+Yn89n8fHo6m55+NS34VZLup1kuSC37KShtCrzydj9983rGQq/pSlr1wmd1kn4BxYmTnlz1nogmPcmaXQzqyouqjQ3FCfNE1TUpMtCsXvjsCpR3k+zjokqTIqr3zJOS4DQtF601R6znwPb4cGDJb2LsevTQDaihavY0OC/rrhUxah/Ga+2d+Ixf5xkvU35SgbE1J/V5ezpVDKZlujmdypGR1uX89HL2cno2i3BLmVc3edU8xPa3hNiJAee8Op2SNfeMZ5enr+GHYrzm2+T6abxR6qKq6rPppko7wbOh8OdRk9yoebSX6Hm0EcI8uRAdR+uYHvI3ziW5eF7GN77YJgFwDi88H/7AEbum1J4QQef81Tn1R1t+m+VgYG0QqqFdiUYXgGk3ez0+uQF50KmijKfVrgbLFoH02mh9/hIbMy6HLBnSxbKTrcKQOCRCcPAxLZa/WPiKWgrDVragQKKEQVF4driUOz3uwvCc+Gy9hy2ApoKXsomG6D9HsAu/Fx92EMWn9ZnVwfiJv0NTXszCMFJLZIlI85yF90q+ddWVWYAb5qgqwDACG0cdUcOTLCbZgtBdBPaDKPhflIBPVCK/xUjzqNWhDGkBmvV/4TswgvcQeAKIqtGPIOllk5RiUzU73ijJUNwrXvImT+PrXORtIHixmfglUCsS/MNPNL6u5k0QRu4IojWk+caH1lK0CbgA9U18EuCHKusK+MDf71DC93wjv76F7NDmVWka3op9mVqtoSWKmgMZR5Bg9pReBjNSx3K2ktw+3NbNgAH+XSdFh4uyB0TUeEDqrolo1DoqamzDoRREEylK0Y7Nr/UqV2HLcXqxMtTKKrBTWRfMG3/h+8DaIkWEEmXdrg6srQ8juUmYP8FeeY0/5Fgwn7xMiy7jcdK2Tb7uwJQW3yaF4NrtN2oPhONsoiswyt/dGxPqDWECIIBv8tsFY9aajxrFn976MqEcKCeBDEZaw0aHSsq4xPaVUq3Tr4YvJDvIgxEz/bwYk9a22oFIWpZFL8yAJbicn27zAkxE7hIgpiamlhjHiGDgb2Sfct+QSCtVepnsQDYAEASnrXFCiFy92kKTQBChWNuInwI0gAkiKqokk3u8ZNThht6S37YByLyjleACwXTwE5ZD5LigHRgbeSZ0Q3SriwSUxz59YhClThhFd4lAtHEJ3gri6loxRCA52ZLxW56CUWZxAYgRZAKLPd4JOpcdO0iMeXnVD3LUigx2SR20XV2oZVi81hAh0y0Ne+K4AzFslnrpOw7+Bt5Jm8MzDBGQvXeQ/cTE1wPA6IrCDB+mOjVUrVImANVGucIwVH19wzADIocYAnsKnUB8Opv5zx12kLMGHHCf+09wGcFx3ICxFtFoQEpiVoTpy+1yFjzgJttHBTVDlKQOG5TVbjgmrWs2kGQB/wPKsJY59Y2Cx4daq1GjnYmnZmspTUvk6rqgxggWHnahQqgg7QBSGJg7ABYWxDLjyBUZn718laQpP39zvk7PzzfZV9nm1Wn6+ozzTcbXZ9nsLF2/ejWffzVP5q/P3rw8e/3mLHn1JpslfH62ThS2dsXv5zAAeXx9DnwerlAJrWmW7MO/v7+M3/30/gO4F8g+o2zbd5OyYgSyXMTmpAkhrIKIu9DYVaoUfBYgZo7uuJThaGUmJHJDT2sBKEpEMcwY81s4scQmoCYNBOdrl1PaNXj+s7ZGxTx3W2Cm2OTWia9G9U14oDCpF4jBVfpvRQ2TqSP1wqdMZ4IzhmVnBnIBBRucDpkhQ/8vC9N/IIuiWXlJltFk2jEgIB4Qh2Dk2OHM0m+pkRhEZpRhiwJjGB4i47yC7cWdVRMhTZwmZVXm2E2OSKTIFHYXonENXieRCK59DZ1fcPHq4B995L91eBL7AY9MgFyTBcilUXsYibrIW3J3hNfrhVrNMYKka6tfu/KLgkiAgtt4h5zJ9XFuIFPJFaSpNhvQBIrT4KIDoohE/rud6NUalrIzgeShhr3wTxG5yPa10673PZbm7W7oqFY9aKhuaPPucDkXkNFvSEj8mtAXyKmEcZJ5ZTYNp4uQvqz8fyxoJP5v9/JS5qOygviGchEntE8XhTzBw6QRho6NB6RG9vHdL28v3313cuw8jGd5WOHgTDx5/GBdshpwCCnAxConoGOA4YdRB2PK4HnQwxs4WJDcGjIZzYQyElgpZiFRkaGAoeHyVE5k8sgDM80fnslJR6Nzna1UgtFrJbBN+0QlLt3cBz1bCVFXYzkucFksmdZgXJXF3gAzZ1V6qIWxHuZi4yodXzSuskSa+K6K5XePsYZqoew4nPm3LoFTQQ5TU2UzrovOyjTxNhdYyQJHg9Rna86p3rgpQJZIF4f43IwPvT8BD/VuEtvQM6oiXaPfqxCwxIaV8X1tJNqIweV1sxpw7//Nml7j16SOwdnrKi9bedYdnETlWAyRqhs5yxP3PzGBEwabapmm1LNCGvnTml+S/ohlXa9f1tAXKP6DmE078XmZ6WVpMilcneQIRwJHehoE0d1phB/qSAUi4dwUCIEpscAcRT+klINZlBpcOSPIaQGOCT1jSyDK4Bzg/9d3N258522yI4cF7RBmsqUL81e4DU+18iGvkckGYP3/nG7IzcMMkPWJXycECRxe6Jwk94Ni4UJeSUAQ05lS5xTPqm8dwT5Eoqo0jyytUCHHM2Um454Upe3iJ+xaoItPh8mVCgp9VnXcVjKG5CD5kUpMxeOOAYgpkoawEo2GMwlxk5zw6AWzQtBpAPepfleOyVjFSo4qkn7QQERgLA/FyRqyBdI5VUuneBWpGuvwqK3+nj/X7vFcrjU0zNHwSRD3rKZUMluNMxwMPjytqfHzVXhv75Gl2jE3ejOTYMfcnBw9cEgK2DC8KzHk+qQgG0ZOCrLDPjD044+fGRSBc3Tox4Uev615isqQ3kJJgi5u4h5Cqiua+CYH75Fpt206gaOqDmtY2wropdrYqM79/4clqEJUxTVn9zrE3I0edA5UMTjvDPtHjj1jGlVk93QxMdCWR8Lqu66nqswr+AYyVpNfbVvCAnYkGZWceGAhbBB1xsRXtDJEYoRDzGzNqHK2XYRemiqfhpB9rzoOWKVRpDko4Ye+Gi0roaBjprfRZAqtdRSGAJdukHJ5VBTF448545OWZWFT9Hyw2EO0xGR+Lo+PEFKxcclAAWm147JqwH5++/Hjh/fMt9UhB5M/6jmXsnyHn3GesdWBNsi8BkQRwQhxk7fbwFyEvvDZxQUeE2xp9UxS4jmg7aoly4KpZTLAyyO6NZZz0HUQYNz+VgxHyj7TYsuo447hHK/zMoODHWFuJYvp9PQhC/0fd+xC36/puISNgxKNewyTB4GJCmAyOqECIIpq5ktz0GKYnx1YrHNWf61nQWBnogevPNVFcL3HgvNDhE1XSqrB1T2tU7rEuNgDQYP+LnZERR5YxK4Gav0+ISqrm0A/UYjAMkMwmmaDLQF79p/ps930WXb57Lvpsx/wup+nVUMQR55TL4GMOGK2wv9hke+q3Q4MHlocMUeWBcR9De3CV6VP9lPXgs78jx3wAaQFfMCF1KU0bBLkraoQsFwwmexrgAftVkOrEywZqPcdsGxQwuls9uxr653H24+XJ1T48BWQwzsMMD20NBTNev+hpJFlPKV6giPoCXYldOL3Z8DehvCa3pBblVDFVoJLHUkMoVuBBM7aM8GfERIYR1VszMQWzZNChT5KmAlWagYNfPktKAxrSinEA4RROJXqVHLaPQR6FYsePWuKWBV1gPDOsy/R4JthhqE9wrU46HCA6lYHuZ3EMGOPAGfD7lj/gzM8AUfeO1du0vJ1qHfqZMMLK70pSn3E5l4p1UbS/DaFUwrYZ0ygUAJJUxO5kFBRG55TL0F9S1Ocn8fat6D1KVdB40jLNlJ8x6AA+lOPXUcneSSDi/48+MfyWnUhg8YHNYxjty9H2R3i+8PygX0lo7ZN1iDRWtoqJiu35UB/wr2E0B3gd3iklqorIMrONHMTtZRuVDEbIu9PIDI9qGtvKmlGY7EWLDHfqed1JoD6/zIlhZttVfCpE199fL1SCbz4wpVhYJ7iA6UWq+r2wzx5CkAI0z/So+D6NYQwgH3kIwkt0JqGkA6mVB3GNQzNb/FBVJzxok3I+rWBwGa2VoSCPoml8c5cI0WIcxIto6NzVFaMgkFb3G6TdoTHZdPxY4ah7QOdiN6R9eER+As5geKhd0oAroYZulKaOl4piJEgylj0a5WXgb5ysOmD4OhJUB1AdPSxUJuhkYWvNWPh6IUEyhr+wYLtvxE01+K1PsVOSBAL1rWb6Ws2MomPLyNxsxdszcHSuUFDE7+tZEeygd0y7WF4EIgfRopOwLUuBGww2F8HXBiABnZyCHOtO8CLHui6zGl7MXVZeFtK/kiJddYWvMbkAIaeJ1dlJXIUj12CIwt+zUvpJPQ61hCAe+3AvYTlfHhuAeMW4JgQBIgEq4V/F+RucLTI8Vzp87LbcZmKjL/hg61YPeTBBdPt1MS79x7xMpFBa8AOIbJ8+oi7KVEsuqa88/DUxTPd6eJjIxFIqIqPiTCqLOYhkn8CWp2XtWV5FFvcZ3CwC2XAbtcshDMgvpTiyU5icPk7umkghNLTFO865zT3hv1ValRDVRL3U/mpNCiZIjT8f4+tCidf+J81TL4bwcj3n5HWwGRAyfjdP+IZoOULPG4eYOT5nDaMMMf37+Xb5w2YUB9RqRW2Q2oN69sYlYt9NJjtG0TbMtD3QEinAYCu9IThmawG0nU45TErKaAJQg6aFmCGhY85mftXXdLgO7Xe8iLfmhOHYOrspaXoLklxWN6C8DWo+xr6ZAz2VcjG8nu3Hq7i8+fPaCnQBkZh2cwdM/gpJ4eWwOkQNEk1HVw+3R+YG8zkzv3CjD2SdFfaTg/tMsKWWHQbyGIBi3YZCx9tqmilQ8unVxtlGzgaGBxc9DFkXC8W6Bpo6EGUZU41+oVNX3+YDM40hkJWJ6YD8ntYxP8AtRRvSvgvAAA="
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf1-proof.py": {
+      "sha256": "837d22cd4f969566f353b0f2b07805a516f0648842d39e4a4731f79a9e9506ff",
+      "bytes": 12807,
+      "gzip_base64": "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"
+    }
+  },
+  "protected_bindings_unchanged": true,
+  "proof_builder_diagnostic": {
+    "original_script": "SCRATCH/issue-980-p6t1-gateway-ncf1-proof-analysis1.py",
+    "exception": "AssertionError",
+    "line": 125,
+    "cause": "Internal tuple branch pairs were compared directly with retained JSON list pairs. Serialized metrics were identical. Normalize only this metadata shape; no coverage observation or source/test byte changed."
+  },
+  "source_scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "bytes": 18766
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693",
+      "bytes": 20279
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3",
+      "bytes": 14191
+    }
+  ],
+  "separate_diagnosis": "The seven-file NCF1 diagnosis remains unchanged and outside this repair's new artifact enumeration.",
+  "self_included": false
+}

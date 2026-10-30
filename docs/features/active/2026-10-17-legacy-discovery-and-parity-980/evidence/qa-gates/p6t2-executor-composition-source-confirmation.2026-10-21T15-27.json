@@ -1,0 +1,117 @@
+{
+  "issue": 980,
+  "Timestamp": "2026-10-21T15:27:42.925303+00:00",
+  "task": "P6-T2",
+  "Command": ".venv/Scripts/python.exe -B SCRATCH/issue-980-p6t2-composition-repair-check.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "The exact CC1/CT1/CT2 source and fixture repair is confirmed; four previously failing controls pass. Full focused coverage and task acceptance remain pending.",
+  "status": "SOURCE_CLEAR_FOR_PACKAGE_REGENERATION",
+  "route": "atomic_execution_p6t2_composition_review_20261021T150200",
+  "source_head": "aff219e1b4cbce8113378e35d7520b8a8ce789dd",
+  "original_findings": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-composition-review.2026-10-21T15-16.json",
+    "working_sha256": "9a2932fc62efff7200fb523d104c0c85a7f351e0a955df4d29eead0c840c999a",
+    "git_lf_sha256": "9a2932fc62efff7200fb523d104c0c85a7f351e0a955df4d29eead0c840c999a",
+    "expected_git_blob": "42385029c1fab91d507a53c9f1f3593bdabe1e77",
+    "bytes": 10104,
+    "git_lf_bytes": 10104
+  },
+  "bounded_reconciliation": {
+    "references": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150621-tests.2026-10-21T15-13.json",
+        "working_sha256": "4f0360f7ac78e9ad4e74c11f99e725dddd4fdbc103e1885bf0b26ce650912da2",
+        "git_lf_sha256": "4f0360f7ac78e9ad4e74c11f99e725dddd4fdbc103e1885bf0b26ce650912da2",
+        "expected_git_blob": "8ebd0be399b0b8dd86abe6372d31878fcc94681f",
+        "bytes": 94266,
+        "git_lf_bytes": 94266
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151920-types.2026-10-21T15-19.json",
+        "working_sha256": "f066bf5b1c765aa7666d93241349aa2f06e6323dfaf97fc785653300289bfcb5",
+        "git_lf_sha256": "f066bf5b1c765aa7666d93241349aa2f06e6323dfaf97fc785653300289bfcb5",
+        "expected_git_blob": "df037aee23b7483819cbe06daaba8f606b45d1f3",
+        "bytes": 74782,
+        "git_lf_bytes": 74782
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151927-precheck.2026-10-21T15-20.json",
+        "working_sha256": "c574b75a61839cfc1d4eac373ce131fb85690a84d61987c02f656832c3ddc7f6",
+        "git_lf_sha256": "c574b75a61839cfc1d4eac373ce131fb85690a84d61987c02f656832c3ddc7f6",
+        "expected_git_blob": "93da9d93a3aedb164004f8b35a3682fc97573a4d",
+        "bytes": 77736,
+        "git_lf_bytes": 77736
+      }
+    ],
+    "changes": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": {
+        "functions": [
+          "_failure"
+        ],
+        "lines": 453,
+        "sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0"
+      },
+      "tests/discovery_runtime/test_cli_dry_run.py": {
+        "functions": [
+          "test_help_and_unsupported_authority_never_call_providers",
+          "test_preexecution_failures_are_redacted_and_do_not_execute",
+          "test_process_argument_copy_is_bounded",
+          "test_validate_all_default_pair_uses_real_planner"
+        ],
+        "lines": 493,
+        "sha256": "1147d9de3942555ab4e2c578dc0d32b9ae89b84784b779a2ee3c374e7c223b53"
+      }
+    },
+    "other_owned_paths_exact": 4,
+    "original_failed_result": {
+      "passed": 54,
+      "failed": 4
+    },
+    "precheck": {
+      "passed": 4,
+      "elapsed_seconds": 74.978517,
+      "nodes": [
+        "tests/discovery_runtime/test_cli_dry_run.py::test_help_and_unsupported_authority_never_call_providers[argv1-2]",
+        "tests/discovery_runtime/test_cli_dry_run.py::test_preexecution_failures_are_redacted_and_do_not_execute[canonical]",
+        "tests/discovery_runtime/test_cli_dry_run.py::test_process_argument_copy_is_bounded",
+        "tests/discovery_runtime/test_cli_dry_run.py::test_validate_all_default_pair_uses_real_planner[True]"
+      ]
+    },
+    "raw_readable_verified": true,
+    "full_58_and_body_pending": true,
+    "reader_qualification": "The initial metadata-only expected-name assertion used two descriptive aliases rather than actual function names. The diff, byte and AST checks had passed. The expected names were corrected to the existing source definitions; no source, test, raw receipt or behavioral execution changed."
+  },
+  "confirmation": {
+    "CC1": "Only _failure and its intent docstring change in production. It preserves the supplied parser diagnostics and always appends the existing fixed '/' error, satisfying the unchanged pre-execution result invariant. Post-execution result/output behavior is unchanged.",
+    "CT1": "The existing canonical parameter now supplies an empty trusted-resolver output to exercise the documented builder rejection. Its parameter identity and redaction/provider/executor assertions are retained; installed canonicalization and service path authority are unchanged.",
+    "CT2": "The real validate-all control expects one guarded writer factory construction for dry and real paths while preserving exact pair paths, planned/created statuses, unchanged dry-run bytes and actual write effects.",
+    "test_scope": "Only four existing test functions differ. Original function signatures and decorators are identical. The two argument controls add explicit original-diagnostic/anchor and forbidden-provider assertions. The other four owned source/test/metadata streams are exact.",
+    "intent_and_size": "The changed _failure and new nested forbidden helper state input, return/error and effects contracts. cli.py is 453 physical lines and test_cli_dry_run.py is 493. No unresolved finding remains within this finite repair."
+  },
+  "open_findings": [],
+  "open_probes": [],
+  "reviewer_behavior_executions": 0,
+  "package_limit": "This confirms the frozen runtime source for the designated package owner. No build, install, native invocation or regenerated identity is asserted by this receipt.",
+  "pending": [
+    "Owner's unchanged 58-case batch and raw named-BODY/no-loss reconciliation",
+    "Regenerated package and installed entry-point proof",
+    "One final P6-T2 reversed affected population and required contracts",
+    "P6-T2 task-only acceptance"
+  ],
+  "task_accepted": false,
+  "task_counts": {
+    "accepted": 47,
+    "total": 84
+  },
+  "ac_counts": {
+    "accepted": 23,
+    "total": 66
+  },
+  "next_five_tasks": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

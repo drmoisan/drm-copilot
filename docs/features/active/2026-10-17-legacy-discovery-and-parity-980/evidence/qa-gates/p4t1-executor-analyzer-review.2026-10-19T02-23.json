@@ -1,0 +1,169 @@
+{
+  "task": "P4-T1",
+  "stage": "single consolidated stable-candidate review",
+  "timestamp": "2026-10-19T02:23:56.846306+00:00",
+  "accepted_baseline": "a94c44fa31e66d830d01203ee9cc068fce2deef1",
+  "candidate_manifest_sha256": "52093ffebba8542dd1f8ac99e31910bb17b97125588cfafa5a399323085abe86",
+  "candidate_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "5f26c523a410f0a3b4e39bd79382d3e6df04b7dfc54d00df2939576da3faaeed"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "sha256": "2a6214a07abf504f2cebdea3b8cf8e2ce4e5304ca3412ecd2446af9e1e21e2d2"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "sha256": "a765771497c22cb420e9d4698642e5c8f8eea7d428bba292f682786a984d1eba"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+    }
+  ],
+  "probe_artifact": "evidence/qa-gates/p4t1-executor-analyzer-candidate-probes.2026-10-19T02-22.json",
+  "probe_artifact_sha256": "04b196966adb3c645fc6ca8c0a3df759e52245a41346a8ed6790fb1895790d78",
+  "probe_script": "SCRATCH/issue-980-p4t1-analyzer-candidate-probes.py",
+  "probe_script_sha256": "fd46d229e13ab77622bcc3329ee7543c255000accb050860b604cc01d34aa51a",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "unit": "capture_snapshot",
+      "problem": "Snapshot-derived inputs do not apply exclusion_rules before assigning inspected state. Actual capture_workspace classifies generated report Markdown as documentation, so a generated report becomes a source component and pin_inventory_sources requests it from Git.",
+      "repair": "Apply the same configured output/evidence/authored exclusion semantics to snapshot-derived inputs. Retain truthful excluded accounting and rationale; do not create a component, digest, or Git request for excluded output. Preserve accepted loader and coverage-rule behavior.",
+      "verification": "Add an in-memory ordinary capture_workspace case with an existing generated report/acceptance document under the artifact root. Confirm excluded accounting, absence of components/Git requests for the output, and guarded first/repeated publication without broadening source scope."
+    },
+    {
+      "id": "R2",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "unit": "pin_inventory_sources",
+      "problem": "The trusted reader identity is verified before missing blobs are read but never after those reads. A reader changing checkout during the final read returns an apparently valid captured workspace.",
+      "repair": "Recheck the repository identity after the bounded immutable reads and reject a changed id/revision before returning the enriched capture.",
+      "verification": "Add a fake reader that returns the correct last blob then changes checkout identity. Require an actionable failure; preserve stable-reader and existing-object reuse behavior."
+    },
+    {
+      "id": "R3",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "unit": "capture_inputs",
+      "problem": "The entry budget is checked only when popping visited paths and separately per directory. A profile limit of four permits seven queued paths before rejection; larger trees can allocate a frontier proportional to the square of the configured budget.",
+      "repair": "Enforce an aggregate discovered/pending-entry bound before enqueueing further paths, with duplicate and overlapping-root handling consistent with deterministic traversal. Preserve early exclusion pruning and truthful frontier accounting.",
+      "verification": "Add a branching-tree fake whose individual directories each fit the limit but whose aggregate frontier exceeds it. Assert rejection before the pending/discovered budget is exceeded, with unchanged deterministic duplicate/root behavior."
+    }
+  ],
+  "reviewed_scope": [
+    "eight canonical analyzer modules",
+    "four compatibility reexport adapters",
+    "four new in-memory test modules",
+    "ten bound existing test modules and their narrow changes"
+  ],
+  "reviewed_guarantees": [
+    "no source/test mutation by verifier",
+    "thin explicit compatibility reexports",
+    "legacy dispatch/error/detection/masking/neutrality assertions preserved except approved marker/read-only expectation changes",
+    "new/changed callable contracts and intent comments reviewed; no additional policy repair identified",
+    "all 26 bound files at or below 500 physical lines",
+    "deterministic sorted identifiers and semantic digest separate from capture clock",
+    "facts distinguished from incomplete immutable provenance",
+    "uninspected/unassigned ledger proposals without scope mutation",
+    "explicit publication reconstructs result and delegates to existing exact-grant mutation",
+    "unit seams use in-memory collaborators and immutable installed resources"
+  ],
+  "retained_loader_acceptance": "evidence/qa-gates/p4t1-executor-loader-final-bindings.2026-10-19T02-12.json",
+  "loader_review_repeated": false,
+  "baseline_or_worker_suites_repeated": false,
+  "task_checked_off": false,
+  "final_ordered_gates_pending": true
+}

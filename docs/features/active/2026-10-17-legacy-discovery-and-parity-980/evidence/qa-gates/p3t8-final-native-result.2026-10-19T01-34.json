@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "native pagination returns sorted selected files",
+    "native original hashes and Unicode CRLF spans are retained",
+    "configured revision is not asserted for working bytes",
+    "native literal search returns exact ordered match spans",
+    "native exact project entry read is supported",
+    "denied selection reads no target bytes",
+    "successful and denied operations preserve native tree",
+    "native adapter enforces the requested byte limit",
+    "native continuation rejects changed source bytes",
+    "native imported evidence retains immutable source identity",
+    "native imported reads preserve every artifact byte",
+    "unrequested corrupted payload blocks requested member release",
+    "all native opens receive positive bounded byte limits",
+    "no activation or mutation lock is created"
+  ],
+  "count": 14,
+  "elapsed_seconds": 1.906,
+  "platform": "win32",
+  "workspace": "SCRATCH/native-source-reads",
+  "native_read_calls": 30,
+  "files": {
+    "build/Example.csproj": "400b35829b2a391f4048da02e1108b98db09431b2947e806a184743bd1b33c3a",
+    "docs/migration/discovery/source-snapshots/native-source/contracts/feature.yaml": "06648cd96f84279737d83c5c7f38663f98b53086e164068dd929d47016d2cc85",
+    "docs/migration/discovery/source-snapshots/native-source/evidence/capture.txt": "8810ad581e59f2bc3928b261707a71308f7e139eb04820366dc4d5c18d980225",
+    "docs/migration/discovery/source-snapshots/native-source/manifest.json": "1bb2b419be71fdeee0982d4a680a54b235cf993417422cfc3266d23ebf51ac29",
+    "private/hidden.txt": "52fd89397eac355934ccfb0643cd30c803f83123b1db9efe4ede60534d67e6be",
+    "src/a.cs": "8b0c0ee084b6c2291af255946c406b54e96d80a44d2c654e17129c5d51178016",
+    "src/b.cs": "16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4"
+  }
+}

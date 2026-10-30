@@ -1,0 +1,425 @@
+{
+  "status": "FOCUSED_PASS_PENDING_INDEPENDENT_REVIEW",
+  "owned": [
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__init__.py",
+      "sha256": "3905cd4b6c8f7498267d1b1789fdc0802341d56b54ec0b6ebde833ac404b1e45"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__main__.py",
+      "sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/cli.py",
+      "sha256": "8ef3a6bb2422af14f88c39f16a167bf04393fd5976a822b7e3da0b84b0fb0dee"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "835bfb91eb9d04a2a2541a1cb55404608187734f47dcf829b90ae7b2a487ca51"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "120d7696a04d1e0a86b2de74f29f47fa39cab212196d84d7fa9f73582f593cc7"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "00a1ff1417324c0f443be57caa3877c3c82e95040670614b1d3f611fa8b4610c"
+    }
+  ],
+  "sizes": {
+    "scripts/dev_tools/discovery/analyzer/__init__.py": 31,
+    "scripts/dev_tools/discovery/analyzer/__main__.py": 12,
+    "scripts/dev_tools/discovery/analyzer/cli.py": 88,
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": 50,
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py": 202,
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": 184
+  },
+  "nodes": [
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-3]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-3]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-3]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_module_entry_point_imports_cli_main",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[clock]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[fs]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[schema_path]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv0-0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv1-2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv2-2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv3-2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv4-2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[False]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[True]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_precharges_process_copy",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_dotnet-dotnet-dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_vsto-vsto-office-vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_dotnet-dotnet-dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_vsto-vsto-office-vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_dotnet-dotnet-dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_vsto-vsto-office-vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_dotnet-dotnet-dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_vsto-vsto-office-vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_reexports_public_surface",
+    "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_unknown_attribute_raises_attribute_error",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[stack_cli.py]"
+  ],
+  "population": "54 owned adapter cases plus2 unchanged package controls and4 exact own-path neutrality rows;47 unrelated parametrizations deselected.",
+  "test_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-tests.2026-10-21T16-37.json",
+    "sha256": "b007697d88ee9af742f5ba91a09c9d31334dc058dfddaaf09f5601ebb8c63755"
+  },
+  "ordered_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-format.2026-10-21T16-36.json",
+      "sha256": "ded29927e7e2fe5310efc6ac767e165ae5cf43b2f3f4a0fff52d620f81e58f0d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-lint.2026-10-21T16-36.json",
+      "sha256": "2694d1b8cd998a527f87ab21f0402669ca641d47501336d3220bf3c730f40d1b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-tests.2026-10-21T16-37.json",
+      "sha256": "b007697d88ee9af742f5ba91a09c9d31334dc058dfddaaf09f5601ebb8c63755"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-types.2026-10-21T16-37.json",
+      "sha256": "1f672b22d5887e03090ba55856f2c1d5e4f683ef7a4207f6c5396fe646042330"
+    }
+  ],
+  "consolidation_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-format.2026-10-21T16-36.json",
+      "sha256": "4afed8fc4c80abb5118187f761dc12f1be1ea56f9d0f946e5d01f7d9360ef734"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-lint.2026-10-21T16-36.json",
+      "sha256": "24780e91c4ad8567bf9f99a6836af1010150bf8c639af7d0922bd5627b351801"
+    }
+  ],
+  "preedit_originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-preedit-originals.2026-10-21T16-30.json",
+    "sha256": "2d8470e0b1a9a32ca3e8ead9c64b48f22e018073d4572663bf5089c6f50a2376"
+  },
+  "originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-originals.2026-10-21T16-39.json",
+    "sha256": "1a608616f0ad2568362c4974fa0afd90ef7f85b1214ba1055d2ade353f09e1ee"
+  },
+  "coverage": {
+    "scripts/dev_tools/discovery/analyzer/__init__.py": {
+      "module": {
+        "covered_lines": 11,
+        "num_statements": 11,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 3,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_bodies": {
+        "__getattr__": {
+          "covered_lines": 7,
+          "num_statements": 7,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    },
+    "scripts/dev_tools/discovery/analyzer/__main__.py": {
+      "module": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 2,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_bodies": {}
+    },
+    "scripts/dev_tools/discovery/analyzer/cli.py": {
+      "module": {
+        "covered_lines": 19,
+        "num_statements": 19,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 5,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_bodies": {
+        "parse_args": {
+          "covered_lines": 5,
+          "num_statements": 5,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "forward_analyzer": {
+          "covered_lines": 5,
+          "num_statements": 5,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "main": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    },
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": {
+      "module": {
+        "covered_lines": 7,
+        "num_statements": 7,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_bodies": {
+        "main_dotnet": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "main_vsto": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    }
+  },
+  "coverage_selector": [
+    "coverage.json"
+  ],
+  "coverage_qualification": "All4 owned modules/all6 named BODY ranges100% statements and branches; unchanged __main__ bytes preserved. Raw coverage includes imported package modules, which are not claimed as new changed-unit proof or included in this slice threshold. Obsolete removed context/loader bodies are mapped explicitly, not treated as zero-coverage new code.",
+  "dependencies": {
+    "scripts/dev_tools/discovery/analyzer/__init__.py": {
+      "sha256": "3905cd4b6c8f7498267d1b1789fdc0802341d56b54ec0b6ebde833ac404b1e45",
+      "physical_lines": 31
+    },
+    "scripts/dev_tools/discovery/analyzer/__main__.py": {
+      "sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7",
+      "physical_lines": 12
+    },
+    "scripts/dev_tools/discovery/analyzer/cli.py": {
+      "sha256": "8ef3a6bb2422af14f88c39f16a167bf04393fd5976a822b7e3da0b84b0fb0dee",
+      "physical_lines": 88
+    },
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": {
+      "sha256": "835bfb91eb9d04a2a2541a1cb55404608187734f47dcf829b90ae7b2a487ca51",
+      "physical_lines": 50
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py": {
+      "sha256": "120d7696a04d1e0a86b2de74f29f47fa39cab212196d84d7fa9f73582f593cc7",
+      "physical_lines": 202
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": {
+      "sha256": "00a1ff1417324c0f443be57caa3877c3c82e95040670614b1d3f611fa8b4610c",
+      "physical_lines": 184
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": {
+      "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+      "physical_lines": 467
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "physical_lines": 405
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "physical_lines": 241
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py": {
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "physical_lines": 145
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": {
+      "sha256": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3",
+      "physical_lines": 174
+    }
+  },
+  "test_elapsed_seconds": 31.19013120001182,
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-shared-interface-reconciliation.2026-10-21T16-07.json",
+    "sha256": "a107250172c377fdfe85426f8a6a42ae47d23d4cb874a3a31dfc4123d194bba2"
+  },
+  "entry_dependency": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-source-freeze.2026-10-21T16-35.json",
+    "sha256": "a6040de0de31179f687d448402868ca89cb356f94d818ee0ca80c19cb95218b3"
+  },
+  "approved_expectation_mapping": {
+    "inventory_old_default_clock_context": "Removed private wall-clock/context construction; canonical installed entry receives all arguments unchanged and owns its clock. Direct custom clock now refuses before call.",
+    "inventory_and_stack_old_profile_source_success": "Replaced obsolete v1 injected-loader pipeline success with exact fixed canonical forwarding, selected request flags, installed exit preservation and no-independent-write checks. Existing runtime pipeline semantics retained outside scope.",
+    "old_output_dir_override": "Canonical parser rejects unrestricted legacy output-dir before providers; explicit write/dry-run are forwarded unchanged.",
+    "old_malformed_and_unreachable_loader": "Old loader/context seams no longer exist; fixed malformed argv and unsupported seam refusal remains no-effect, installed errors are forwarded unchanged.",
+    "old_help_usage_SystemExit": "Installed entry returns0/2 and canonical help/typed error envelope, rather than argparse SystemExit.",
+    "optional_migration_refusal": "Canonical fixed vsto alias now reaches the authoritative installed selector; unsupported legacy fs/clock/schema inputs still refuse. Explicit alias cannot substitute another analyzer. Invalid/help inputs prove no optional import or provider callback.",
+    "package_and_module": "Exact runtime legacy Analyzer/run_analyzer identities, __all__, lazy main, unknown AttributeError and unchanged __main__ binding preserved.",
+    "remaining_accepted_proof": "No old analyzer/parser/service suites replayed; only two package-export controls and four current owned-path neutrality rows are included."
+  },
+  "gate_delta": "Zero lint/type/test failures; full coverage of all changed bodies. Shared baseline/predecessor proof reused without another suite.",
+  "tool_qualification": "Initial scratch harness creation command was rejected by PROMOTION_MCP_ONLY_BLOCKED despite containing no GitHub operation. The identical local harness was created with apply_patch, then executed normally. No behavior/source correction was needed and no forbidden operation occurred.",
+  "limits": "Unit proof uses memory callbacks/streams; four retained neutrality controls read only repository source under their existing contract. No temporary-file unit tests, subprocess/network unit effects, package/state/Git or unrelated source edits.",
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ]
+}

@@ -1,0 +1,250 @@
+"""Freeze the narrow output-scope repair and already completed focused checks."""
+import ast
+import base64
+import difflib
+import hashlib
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+EVIDENCE = FEATURE / "evidence/regression-testing"
+SCRATCH = Path(__file__).parent
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+SOURCE = "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py"
+TEST = "tests/discovery_runtime/test_coverage_report_contract.py"
+BASELINE = FEATURE / "evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.json"
+
+
+def bind(path):
+    path = Path(path)
+    raw = path.read_bytes()
+    return {
+        "path": path.as_posix(),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "bytes": len(raw),
+    }
+
+
+def write_json(path, value):
+    Path(path).write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+    )
+
+
+def archived(name, raw):
+    return {
+        "name": name,
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "base64": base64.b64encode(raw).decode(),
+    }
+
+
+originals = json.loads(BASELINE.read_text(encoding="utf-8"))["owned"]
+bindings = {name: bind(name) for name in (SOURCE, TEST)}
+stages = []
+archive = []
+for stage in ("format", "lint", "types", "tests"):
+    paths = sorted(EVIDENCE.glob(f"p5t1-report-boundary4-{stage}.*.json"))
+    assert len(paths) == 1
+    path = paths[0]
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    assert receipt["exit_code"] == 0
+    assert receipt["source_before"] == receipt["source_after"]
+    for name, value in bindings.items():
+        assert receipt["source_before"][name] == value["sha256"]
+    for stream in ("stdout", "stderr"):
+        raw = base64.b64decode(receipt[stream]["base64"])
+        assert hashlib.sha256(raw).hexdigest() == receipt[stream]["sha256"]
+        assert raw == (SCRATCH / f"report-boundary4-{stage}.{stream}").read_bytes()
+    assert bind(receipt["harness"]["path"])["sha256"] == receipt["harness"]["sha256"]
+    stages.append(
+        {
+            **bind(path),
+            "stage": stage,
+            "duration_seconds": receipt["duration_seconds"],
+            "started_at": receipt["started_at"],
+            "harness": receipt["harness"],
+        }
+    )
+stdout = (SCRATCH / "report-boundary4-tests.stdout").read_text(encoding="utf-8")
+nodes = re.findall(r"^(tests/.*) PASSED\s+\[", stdout, re.M)
+assert len(nodes) == len(set(nodes)) == 9
+
+old_source = base64.b64decode(originals[SOURCE]["base64"]).decode()
+new_source = Path(SOURCE).read_text(encoding="utf-8")
+old_tree = ast.parse(old_source)
+new_tree = ast.parse(new_source)
+old_functions = {
+    node.name: node for node in old_tree.body if isinstance(node, ast.FunctionDef)
+}
+new_functions = {
+    node.name: node for node in new_tree.body if isinstance(node, ast.FunctionDef)
+}
+unchanged_functions = []
+for name, node in old_functions.items():
+    if name != "_inventory":
+        assert ast.dump(node) == ast.dump(new_functions[name]), name
+        unchanged_functions.append(name)
+expected = next(
+    node
+    for node in ast.walk(new_functions["_inventory"])
+    if isinstance(node, ast.Assign)
+    and any(isinstance(target, ast.Name) and target.id == "expected" for target in node.targets)
+)
+assert isinstance(expected.value, ast.SetComp)
+assert len(expected.value.generators[0].ifs) == 1
+predicate = expected.value.generators[0].ifs[0]
+assert isinstance(predicate, ast.BoolOp) and isinstance(predicate.op, ast.And)
+assert len(predicate.values) == 2
+expected.value.generators[0].ifs[0] = predicate.values[0]
+assert ast.dump(new_functions["_inventory"]) == ast.dump(old_functions["_inventory"])
+old_tests = {
+    node.name: ast.dump(node)
+    for node in ast.parse(base64.b64decode(originals[TEST]["base64"]).decode()).body
+    if isinstance(node, ast.FunctionDef)
+}
+new_tests = {
+    node.name: ast.dump(node)
+    for node in ast.parse(Path(TEST).read_text(encoding="utf-8")).body
+    if isinstance(node, ast.FunctionDef)
+}
+assert all(new_tests[name] == value for name, value in old_tests.items())
+
+raw_coverage = (SCRATCH / "report-boundary4-coverage.json").read_bytes()
+coverage = json.loads(raw_coverage)
+coverage["files"] = {
+    name.replace("\\", "/"): value for name, value in coverage["files"].items()
+}
+measured = coverage["files"][SOURCE]
+inventory = next(
+    node
+    for node in ast.parse(new_source).body
+    if isinstance(node, ast.FunctionDef) and node.name == "_inventory"
+)
+origin = next(
+    node
+    for node in ast.walk(inventory)
+    if isinstance(node, ast.Assign)
+    and any(isinstance(target, ast.Name) and target.id == "expected" for target in node.targets)
+)
+predicate_lines = [
+    line for line in measured["executed_lines"] if origin.lineno <= line <= origin.end_lineno
+]
+predicate_missing = [
+    line for line in measured["missing_lines"] if origin.lineno <= line <= origin.end_lineno
+]
+assert predicate_lines and not predicate_missing
+coverage_path = EVIDENCE / f"p5t1-report-boundary-coverage.{STAMP}.json"
+write_json(coverage_path, coverage)
+for name in (SOURCE, TEST):
+    archive.append(archived(name, Path(name).read_bytes()))
+archive.append(archived("report-boundary4-coverage.json", raw_coverage))
+for name in (
+    "report-boundary3-coverage.json",
+    "test_coverage_report_contract.py.before-helper-correction",
+    "freeze_report_boundary.before-conjunction-fix.py",
+    "freeze_report_boundary.before-conjunction-fix.stderr",
+    "freeze_report_boundary.before-utf8-fix.py",
+    "freeze_report_boundary.before-utf8-fix.stderr",
+):
+    archive.append(archived(name, (SCRATCH / name).read_bytes()))
+archive_path = EVIDENCE / f"p5t1-report-boundary-archive.{STAMP}.json"
+write_json(archive_path, {"task": "P5-T1", "entries": archive})
+mapping = {
+    "task": "P5-T1",
+    "source": bindings[SOURCE],
+    "baseline": bind(BASELINE),
+    "unchanged_functions_normalized_ast": unchanged_functions,
+    "inventory_delta": "Removing the single added expected-input predicate restores the original _inventory AST exactly.",
+    "original_test_function_count": len(old_tests),
+    "original_test_functions_unchanged": True,
+    "focused_predicate_executed_lines": predicate_lines,
+    "focused_predicate_missing_lines": predicate_missing,
+    "focused_inventory_range": {
+        "start": inventory.lineno,
+        "end": inventory.end_lineno,
+        "executed_lines": [
+            line for line in measured["executed_lines"] if inventory.lineno <= line <= inventory.end_lineno
+        ],
+        "missing_lines": [
+            line for line in measured["missing_lines"] if inventory.lineno <= line <= inventory.end_lineno
+        ],
+        "executed_branches": [
+            edge for edge in measured["executed_branches"] if inventory.lineno <= edge[0] <= inventory.end_lineno
+        ],
+        "missing_branches": [
+            edge for edge in measured["missing_branches"] if inventory.lineno <= edge[0] <= inventory.end_lineno
+        ],
+    },
+    "coverage_qualification": "This nine-case proof measures the changed predicate only. The predecessor full-module142/142 statement and78/78 branch proof is historical; affected final scope and caller coverage must be re-established by the final owner.",
+    "binder_qualification": "Two evidence-only attempts failed before artifact writes: the first expected two comprehension filters instead of one Boolean conjunction; the second decoded the existing Unicode test fixture using the Windows default encoding. The corrected binder removes the second conjunction operand and explicitly reads UTF-8. Both rejected scripts and UTF-8 transcriptions of their tool diagnostics are archived. No source, test, or completed gate changed.",
+    "source_diff": "".join(
+        difflib.unified_diff(
+            old_source.splitlines(True),
+            new_source.splitlines(True),
+            fromfile="before/coverage_scope_rules.py",
+            tofile="after/coverage_scope_rules.py",
+        )
+    ),
+}
+mapping_path = EVIDENCE / f"p5t1-report-boundary-delta.{STAMP}.json"
+write_json(mapping_path, mapping)
+harness = EVIDENCE / f"p5t1-report-boundary-freeze-harness.{STAMP}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+manifest = {
+    "task": "P5-T1",
+    "status": "FROZEN_NARROW_REPAIR_FOR_BOUNDED_CONFIRMATION",
+    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "owned": bindings,
+    "physical_lines": {
+        name: len(Path(name).read_text(encoding="utf-8").splitlines()) for name in (SOURCE, TEST)
+    },
+    "baseline": bind(BASELINE),
+    "finding": bind(FEATURE / "evidence/qa-gates/p5t1-final-native-finding.2026-10-20T04-44.json"),
+    "stages": stages,
+    "nodes": nodes,
+    "test_count": 9,
+    "delta": bind(mapping_path),
+    "coverage": bind(coverage_path),
+    "archive": bind(archive_path),
+    "harness": bind(harness),
+    "limitations": [
+        "Boundary3 retained seven passes and two test-helper failures after the generated report/digest equality controls passed. Only the authored-document assertion route changed to the public projection before the clean boundary4 restart.",
+        "Only configured-report documentation is excluded. Source/test categories, case-sensitive path segments, authored documentation elsewhere and loader/path/grant validation remain unchanged.",
+        "The original49 graph nodes remain present; nine regressions were added. The shared114 helper/legacy cases were not replayed.",
+        "Final owner will run the unchanged14 native assertions as the first regression precheck after fresh ordered static gates, before long caller replay. Task acceptance remains pending.",
+    ],
+}
+manifest_path = EVIDENCE / f"p5t1-report-boundary-freeze.{STAMP}.json"
+write_json(manifest_path, manifest)
+readable = EVIDENCE / f"p5t1-report-boundary-freeze.{STAMP}.md"
+readable.write_text(
+    f"# P5-T1 report-output boundary repair\n\nTimestamp: {STAMP}\n\n"
+    "Command: Bind completed focused ordered receipts and exact source/test delta.\n\n"
+    "EXIT_CODE: 0\n\nOutput Summary: Black, Ruff, Pyright and all nine focused cases pass. "
+    "The single predicate excludes configured report documentation without weakening "
+    "authored-document, source/test or exact path-boundary accounting.\n\n"
+    "The actual in-memory loader classifies generated JSON and Markdown under default "
+    "and nested custom report roots. Recomputed reports remain equal; a genuine authored "
+    "document still produces COVERAGE_INPUTS and failed discovery. Exact sibling, case "
+    "and input-category controls pass.\n\n"
+    "All original test function ASTs are unchanged. Removing the added predicate restores "
+    "the accepted _inventory AST; all other production functions remain identical. Raw "
+    "coverage, sources, command streams and exact executed harnesses are preserved. This "
+    "focused repair proof does not replace the pending native and complete downstream "
+    "final checks.\n",
+    encoding="utf-8",
+    newline="\n",
+)
+stage_paths = {
+    SOURCE,
+    TEST,
+    *(path.as_posix() for path in EVIDENCE.glob("p5t1-report-boundary*")),
+    *(path.as_posix() for path in (FEATURE / "evidence/baseline").glob("p5t1-report-boundary*")),
+}
+staging = EVIDENCE / f"p5t1-report-boundary-staging.{STAMP}.json"
+write_json(staging, {"manifest": bind(manifest_path), "stage_paths": sorted(stage_paths), "bindings": [bind(path) for path in sorted(stage_paths)]})
+assert bindings == {name: bind(name) for name in (SOURCE, TEST)}
+print(json.dumps({"manifest": bind(manifest_path), "staging": bind(staging), "owned": bindings, "tests": 9}))

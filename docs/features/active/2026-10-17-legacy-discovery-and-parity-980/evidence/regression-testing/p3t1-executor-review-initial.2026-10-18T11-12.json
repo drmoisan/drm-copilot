@@ -1,0 +1,54 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:11:41.912006+00:00",
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "a25f18ea2eb10c5e2f2eecc673c10a664dea9521e2d54c260f0795d2bb424e80",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "a5f2d3b0a4162ccda77fb5671c45eded1a2c19f5619ae9f490f0069fc70f4bca"
+  },
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "a1e94fff9365e9158fbb5a044ac503f537ab4eec2150e05a86f378092b85dadc",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "a5f2d3b0a4162ccda77fb5671c45eded1a2c19f5619ae9f490f0069fc70f4bca"
+  },
+  "source_stable": false,
+  "passed": 2,
+  "total": 4,
+  "results": [
+    {
+      "name": "Exact new collection creation preserves unrelated inputs",
+      "passed": true,
+      "ok": true,
+      "authority_invalidated": true,
+      "artifacts": [
+        "created"
+      ],
+      "findings": []
+    },
+    {
+      "name": "Unchanged bytes skip without authority invalidation",
+      "passed": true,
+      "ok": true,
+      "revocations": 0,
+      "writes": [],
+      "statuses": [
+        "skipped"
+      ]
+    },
+    {
+      "name": "Opaque payload grant cannot create a structured evidence record",
+      "passed": false,
+      "unexpectedly_accepted": true,
+      "granted_kind": "evidence-payload",
+      "granted_id": "granted-payload",
+      "actual_kind": "evidence-reference",
+      "actual_id": "actual-evidence",
+      "validation_ok": true
+    },
+    {
+      "name": "Directory enumeration order is semantically irrelevant",
+      "passed": false,
+      "exception": "OSError",
+      "message": "Metadata changed during workspace capture",
+      "only_change": "Immediate child enumeration order"
+    }
+  ]
+}

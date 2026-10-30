@@ -1,0 +1,597 @@
+{
+  "task": "P5-T5",
+  "Timestamp": "2026-10-20T12-11",
+  "status": "BASELINE_INTERFACE_FROZEN",
+  "accepted_head": "8f58c3d5248c06bbabf789d64ef0a72ce8ceb368",
+  "authority": {
+    "route": {
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C4",
+      "deployment_agent": "python-typed-engineer-c4",
+      "execution_context": "standalone",
+      "logical_agent": "python-typed-engineer",
+      "model": "gpt-6-astra",
+      "model_reasoning_effort": "max",
+      "orchestration_complexity_ceiling": "C4",
+      "phase": "S5_P5T5_renderer",
+      "delegation_id": "workspace_operations_p5t5_renderer_20261020",
+      "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+      "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+    },
+    "native_sha256": "2d2ed086137673ee0e3d2644d29f055377f7d07b5b443e8bd8187d61a1a72423",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true
+  },
+  "absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "tests/discovery_runtime/test_gherkin.py",
+    "tests/discovery_runtime/test_acceptance_tags.py",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+  ],
+  "absent_example_prefix": "examples/discovery/v2/acceptance/",
+  "existing": [
+    {
+      "path": "examples/discovery/v2/acceptance-specification.example.yaml",
+      "sha256": "19669dbbceaf429a9c76525201a3d46d6ffdba1a8239f020429fb7c4a678fced",
+      "bytes": 1179,
+      "physical_lines": 36
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "bytes": 21193,
+      "physical_lines": 494
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "sha256": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+      "bytes": 21912,
+      "physical_lines": 488
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "bytes": 18102,
+      "physical_lines": 418
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+      "bytes": 19460,
+      "physical_lines": 489
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+      "bytes": 8869,
+      "physical_lines": 231
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "bytes": 3878,
+      "physical_lines": 102
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "bytes": 14299,
+      "physical_lines": 339
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "bytes": 1555,
+      "physical_lines": 36
+    },
+    {
+      "path": "schemas/discovery/v2/acceptance-specification.schema.json",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "bytes": 4787,
+      "physical_lines": 64
+    },
+    {
+      "path": "schemas/discovery/v2/common.schema.json",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+      "bytes": 10229,
+      "physical_lines": 177
+    },
+    {
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+      "bytes": 18105,
+      "physical_lines": 492
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "sha256": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+      "bytes": 16114,
+      "physical_lines": 400
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "sha256": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+      "bytes": 18922,
+      "physical_lines": 486
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_io.py",
+      "sha256": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+      "bytes": 11071,
+      "physical_lines": 277
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "37996647e6c8136fd853d8db30cb3a3357b3a8d8535b27c06f4ee611c16f59d3",
+      "bytes": 17017,
+      "physical_lines": 488
+    }
+  ],
+  "legacy_proof": {
+    "original_inventory": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/initial-file-inventory.2026-10-18T03-48.json",
+      "sha256": "2d0a28299ece3f26d04255f915bc496b6bc31086292a1660fc8db1ad66e0a35c",
+      "bytes": 519020,
+      "physical_lines": 12443
+    },
+    "junit": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-junit.2026-10-18T03-51.xml",
+      "sha256": "135dbc11385cddc25abf5535ade679bef1d127bf5abbc7ef7edfe755b79419c8",
+      "bytes": 1271670,
+      "physical_lines": 1
+    },
+    "coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-coverage-metrics.2026-10-18T03-51.json",
+      "sha256": "cd0e73584cc13ceacb319a620be0652241a733ae6e859afd4e55a3494dc4f16c",
+      "bytes": 7455,
+      "physical_lines": 252
+    },
+    "metrics": {
+      "covered_lines": 186,
+      "num_statements": 186,
+      "covered_branches": 42,
+      "num_branches": 42,
+      "line_percent": 100.0,
+      "branch_percent": 100.0
+    },
+    "nodes": [
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_raises_naming_convention_when_tree_absent",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_keyword_only_parameters",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_downstream_calls_resolver",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_falls_back_to_convention_when_absent",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_returns_path_when_schema_present",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_feature_contract_positive",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_parity_matrix_positive",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_runtime_characterization_positive",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_non_list_string_field_ignored",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document0-must be an array]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document1-must be an object]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document2-must be an array]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document3-must be an object]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_adapters_ignore_unknown_fields",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_maps_given_when_then",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_derives_stable_id",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_top_level_fields",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_null_refs_when_none_match",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_byte_identical_repeat",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_invariant_to_input_ordering",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_source_digest_stable",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_domain_neutrality_module_source_and_output_fields",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_file-not found]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_non_object_root-root must be an object]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_parse_error-invalid JSON]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_field-feature_ref]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_parse_args_defaults_and_flags",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_collect_input_paths_sorted",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_writes_output",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_stdout",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_matches",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_mismatch",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_requires_output",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_target_absent"
+    ],
+    "preserved_definitions": [
+      {
+        "name": "_feature_doc",
+        "start": 23,
+        "end": 38,
+        "ast_sha256": "54278946c00546956084a6c46670ebbd778b674b26f5fc758b9c0c1a67ecbbab",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_parity_doc",
+        "start": 41,
+        "end": 51,
+        "ast_sha256": "980dd213d3f550077168c7f4358bb4831bcbb59cb452798fb5f76fbe849609e0",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_characterization_doc",
+        "start": 54,
+        "end": 67,
+        "ast_sha256": "5aa8764bff4eddc7e545ae5abd8d8a086e0dc3b390f95f46c69b24d81e48390d",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_write_json",
+        "start": 70,
+        "end": 71,
+        "ast_sha256": "ed2352fbdba51845eca7b4f5abd3e0c9581425f9a8f9ed4ee16747c730070289",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_cli_args",
+        "start": 74,
+        "end": 82,
+        "ast_sha256": "adc222aa366e48497f0ecd4d5ce47246e16565f5a0ffd2979e8fe6fd85290a7a",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_seed_inputs",
+        "start": 85,
+        "end": 92,
+        "ast_sha256": "fa189a773235ad1723e356685d98c911ca720c527edc8848e1b6542759b1ea30",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_out_args",
+        "start": 95,
+        "end": 99,
+        "ast_sha256": "bc47294e90f3265ca6339e729eb9b9e5087632de76a32aa33e8a3b7ef246c552",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "test_seam_raises_naming_convention_when_tree_absent",
+        "start": 102,
+        "end": 107,
+        "ast_sha256": "96ef2836462b3ac157768bdf25d6f13c4a95e49c67b0211b4a5d27760159644f",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_seam_keyword_only_parameters",
+        "start": 110,
+        "end": 112,
+        "ast_sha256": "0ea29e22194f2897acb22ae0a08427fcb7edd49bb916deaada284375dfa121c3",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "test_seam_downstream_calls_resolver",
+        "start": 115,
+        "end": 126,
+        "ast_sha256": "5f1f84997bddd7e3b8070795230388f8c34bfe63b5a982663f36ae4cd2445327",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_seam_falls_back_to_convention_when_absent",
+        "start": 129,
+        "end": 132,
+        "ast_sha256": "bdf83864defb5f768df1d65a40eebe3220e524ee424d917180784507b568ef26",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_seam_returns_path_when_schema_present",
+        "start": 135,
+        "end": 140,
+        "ast_sha256": "a93bc3f723909edaa5b8e26c3c3970385ac6a791b8f6a865bceb8099a72e44f3",
+        "assertions": 1,
+        "decorators": []
+      },
+      {
+        "name": "test_projection_feature_contract_positive",
+        "start": 143,
+        "end": 150,
+        "ast_sha256": "fce9ee758c72f860cb286d5cb23b45404a24b6313135b4f0efa186274d5b1766",
+        "assertions": 5,
+        "decorators": []
+      },
+      {
+        "name": "test_projection_parity_matrix_positive",
+        "start": 153,
+        "end": 163,
+        "ast_sha256": "8c08322314b550b1787f4924a419afa0ce3acf98c7ae98b70bf5ecede41de7b7",
+        "assertions": 3,
+        "decorators": []
+      },
+      {
+        "name": "test_projection_runtime_characterization_positive",
+        "start": 166,
+        "end": 180,
+        "ast_sha256": "7ef30c3f261185e3e2c9c0d9f9d28fa73d91121a2cb653b5027433b81f69d44e",
+        "assertions": 3,
+        "decorators": []
+      },
+      {
+        "name": "test_projection_non_list_string_field_ignored",
+        "start": 183,
+        "end": 187,
+        "ast_sha256": "c36baed81cfcac85a9e1d173cf26ad832c7a3d0b418d30a4126a887afa3128e9",
+        "assertions": 1,
+        "decorators": []
+      },
+      {
+        "name": "test_projection_structural_errors_raise",
+        "start": 199,
+        "end": 206,
+        "ast_sha256": "3bdccfaa8bf02264acdb993593b8480828f8f57b021081e6c3ee3c0c8898a939",
+        "assertions": 1,
+        "decorators": [
+          "Call(func=Attribute(value=Attribute(value=Name(id='pytest', ctx=Load()), attr='mark', ctx=Load()), attr='parametrize', ctx=Load()), args=[Tuple(elts=[Constant(value='call'), Constant(value='document'), Constant(value='expected')], ctx=Load()), List(elts=[Tuple(elts=[Attribute(value=Name(id='gen', ctx=Load()), attr='project_parity_matrix', ctx=Load()), Dict(keys=[Constant(value='rows')], values=[Dict()]), Constant(value='must be an array')], ctx=Load()), Tuple(elts=[Attribute(value=Name(id='gen', ctx=Load()), attr='project_parity_matrix', ctx=Load()), Dict(keys=[Constant(value='rows')], values=[List(elts=[Constant(value=1)], ctx=Load())]), Constant(value='must be an object')], ctx=Load()), Tuple(elts=[Attribute(value=Name(id='gen', ctx=Load()), attr='project_runtime_characterization', ctx=Load()), Dict(keys=[Constant(value='scenarios')], values=[Dict()]), Constant(value='must be an array')], ctx=Load()), Tuple(elts=[Attribute(value=Name(id='gen', ctx=Load()), attr='project_runtime_characterization', ctx=Load()), Dict(keys=[Constant(value='scenarios')], values=[List(elts=[Constant(value=1)], ctx=Load())]), Constant(value='must be an object')], ctx=Load())], ctx=Load())])"
+        ]
+      },
+      {
+        "name": "test_projection_adapters_ignore_unknown_fields",
+        "start": 209,
+        "end": 223,
+        "ast_sha256": "bf10b20fcde74a39011231c374cc7fa00eec5462db2653d55baf51cf2fb01747",
+        "assertions": 3,
+        "decorators": []
+      },
+      {
+        "name": "test_positive_generation_maps_given_when_then",
+        "start": 226,
+        "end": 246,
+        "ast_sha256": "56f9c46333283329611ca106c82b17f892bc41fc874cc23c09619d111b1bbc02",
+        "assertions": 4,
+        "decorators": []
+      },
+      {
+        "name": "test_positive_generation_derives_stable_id",
+        "start": 249,
+        "end": 255,
+        "ast_sha256": "4179c0c6a5c1903ef58c38b555f81e09dde880142e0d4812c3988ea076f2ce9b",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_positive_generation_top_level_fields",
+        "start": 258,
+        "end": 269,
+        "ast_sha256": "c8ee225be27e8a0703d260fdff38a0019a9e2c0de48509ee2bbabf8c578deaeb",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_positive_generation_null_refs_when_none_match",
+        "start": 272,
+        "end": 278,
+        "ast_sha256": "f4e97fc4028ea91b9e4de3e83439765ced34fe70888a1eb961930f7ae4144afe",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_determinism_byte_identical_repeat",
+        "start": 281,
+        "end": 293,
+        "ast_sha256": "0ad1e056834e81f3acba49f933b41fa70dfacd1a28314af1eabe3965878a1d86",
+        "assertions": 3,
+        "decorators": []
+      },
+      {
+        "name": "test_determinism_invariant_to_input_ordering",
+        "start": 296,
+        "end": 325,
+        "ast_sha256": "4c81f5e273be1a8295b30a5500b3cb4144cb678fb4aeba4c930188e0b737f0e6",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_determinism_source_digest_stable",
+        "start": 328,
+        "end": 340,
+        "ast_sha256": "f5e9db6ca7040c08cb3817ef537ce80f27ec3e3c2ee1ca4a582ce4000b66eb78",
+        "assertions": 3,
+        "decorators": []
+      },
+      {
+        "name": "test_domain_neutrality_module_source_and_output_fields",
+        "start": 343,
+        "end": 364,
+        "ast_sha256": "00ce658896a7156e94b0b3ed0b92d8e6193b0c5c6b4207efce98cb1228afeec4",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "_mutate_missing_file",
+        "start": 367,
+        "end": 368,
+        "ast_sha256": "86e0f50f247a970798159736664040ea344c6f7be1dcc5fba1d61ca0e8d99daa",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_mutate_non_object_root",
+        "start": 371,
+        "end": 373,
+        "ast_sha256": "cdd5a6ed063b29be608f625be9f3dc2fa9678d6fe24c409f7da894aa299d2947",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_mutate_parse_error",
+        "start": 376,
+        "end": 378,
+        "ast_sha256": "c517b2f7ff11a9ceee7f209ff1ff6e36f899648a4bc4ed9e35aabd46bc423d6a",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "_mutate_missing_field",
+        "start": 381,
+        "end": 383,
+        "ast_sha256": "a666812ead7f04b9e6b854e23492a767bf1f042f59f8d3538085c2f71912fa37",
+        "assertions": 0,
+        "decorators": []
+      },
+      {
+        "name": "test_negative_inputs_return_one_with_message",
+        "start": 395,
+        "end": 404,
+        "ast_sha256": "0296f22cfe2bee93ea38a19d29d5d24be3b894d62dc0b2667fdaff8293743f6d",
+        "assertions": 2,
+        "decorators": [
+          "Call(func=Attribute(value=Attribute(value=Name(id='pytest', ctx=Load()), attr='mark', ctx=Load()), attr='parametrize', ctx=Load()), args=[Tuple(elts=[Constant(value='mutate'), Constant(value='expected')], ctx=Load()), List(elts=[Tuple(elts=[Name(id='_mutate_missing_file', ctx=Load()), Constant(value='not found')], ctx=Load()), Tuple(elts=[Name(id='_mutate_non_object_root', ctx=Load()), Constant(value='root must be an object')], ctx=Load()), Tuple(elts=[Name(id='_mutate_parse_error', ctx=Load()), Constant(value='invalid JSON')], ctx=Load()), Tuple(elts=[Name(id='_mutate_missing_field', ctx=Load()), Constant(value='feature_ref')], ctx=Load())], ctx=Load())])"
+        ]
+      },
+      {
+        "name": "test_cli_parse_args_defaults_and_flags",
+        "start": 407,
+        "end": 416,
+        "ast_sha256": "e85266e4a2823d646c83be78d22d35d4658b80b501b101702b632b9610cdca72",
+        "assertions": 5,
+        "decorators": []
+      },
+      {
+        "name": "test_cli_collect_input_paths_sorted",
+        "start": 419,
+        "end": 425,
+        "ast_sha256": "1507505aa3f0203453a202d3a0c2bed1972e81ce378fa23445eea46f10b29bc3",
+        "assertions": 1,
+        "decorators": []
+      },
+      {
+        "name": "test_cli_main_success_writes_output",
+        "start": 428,
+        "end": 441,
+        "ast_sha256": "09fcbcbfa9f745b8c99fb9637c62c24784ccdac1a9fce24e3c153b215a2a09df",
+        "assertions": 3,
+        "decorators": []
+      },
+      {
+        "name": "test_cli_main_success_stdout",
+        "start": 444,
+        "end": 451,
+        "ast_sha256": "28547d08bfe9858c6b08d3f7391589e0f9f5a81f254dff358b4303d4679e132d",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_cli_check_matches",
+        "start": 454,
+        "end": 458,
+        "ast_sha256": "2b6c87ac9175269718c6e8a84a63b65355302840f22a74338be82580b8ef58cf",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_cli_check_mismatch",
+        "start": 461,
+        "end": 469,
+        "ast_sha256": "9321af8a0bad81b2cf0fd724eddcb6aac7312e47dbdad2ac0e036c66ce0b95ea",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_cli_check_requires_output",
+        "start": 472,
+        "end": 478,
+        "ast_sha256": "d3887d97f91029418d9e53abcba62dd04864040844c981abe30ae270932d6fbb",
+        "assertions": 2,
+        "decorators": []
+      },
+      {
+        "name": "test_cli_check_target_absent",
+        "start": 481,
+        "end": 488,
+        "ast_sha256": "161b77583bf7d53eda3d83a84890d75592bb7e995566147caa2de1540e0230da",
+        "assertions": 2,
+        "decorators": []
+      }
+    ],
+    "raw_originals": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline-originals.2026-10-20T12-11.json",
+      "sha256": "1588e9bc3b66c73d204a392b37e3ba79bbd4eae3332b1e89b99071289e0818e3",
+      "bytes": 12582,
+      "physical_lines": 21
+    },
+    "scope": "All 34 legacy cases remain compatibility-only; executable assertions/decorators/helpers are preserved. No suite replay."
+  },
+  "accepted_generation_proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-handoff.2026-10-20T11-46.json",
+      "sha256": "3cd8f6080ee99f629d17831d2f2fce41ecb5794153abcdc764573fc2c6ad3bb9",
+      "bytes": 31512,
+      "physical_lines": 455
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-final-acceptance.2026-10-20T11-57.json",
+      "sha256": "e454e73f509ca24c0f6e6ebb784be9c9c95166740ce9d6e45d5105c257ce1ad6",
+      "bytes": 9032,
+      "physical_lines": 198
+    }
+  ],
+  "contract_source": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-contract-delta.2026-10-20T11-11.json",
+    "sha256": "c2030f0a0e27111ced7bd24ce4f46963bceecf516611d4940c92e208218d0aef",
+    "bytes": 10602,
+    "physical_lines": 95
+  },
+  "preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-preparation-delta.2026-10-20T10-08.json",
+    "sha256": "505ded2a0c83147a08a860c8dd16479c172bd782c969f4ccb76db5f8f41d93b3",
+    "bytes": 13500,
+    "physical_lines": 163
+  },
+  "public_api": {
+    "module": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "file": "@dataclass(frozen=True, kw_only=True) AcceptanceRenderedFile: path: str; content: bytes",
+    "bundle": "@dataclass(frozen=True, kw_only=True) AcceptanceRenderBundle: files: tuple[AcceptanceRenderedFile, ...]",
+    "render": "render_acceptance(generation: AcceptanceGeneration) -> AcceptanceRenderBundle",
+    "contract": "Pure function; exact carrier type only, no ready override, raw document sequence, path root, snapshot reload, validation mode or caller-injected validator. Inherit generation.limits for aggregate output capacity. Invalid shape/encoding/collisions raise ValueError or existing PathPolicyError; capacity raises ReportLimitError. Return no partial bundle; no I/O, grants, acceptance changes or step definitions.",
+    "authority": "Only generation.ready emits executable scenarios. A document readiness=ready outside that subset remains withheld and visible in Markdown. Model construction checks consistency, not semantic proof: trusted service must call generate_acceptance on a captured snapshot, then render that exact result. Renderer output and Python type checks never become host/gate authority; untrusted serialized ready lists cannot enter via an adapter."
+  },
+  "output_contract": {
+    "names": "Always acceptance.md. For each validated ready item: <kind>/<scenario_id>.feature, where kind is the closed legacy-characterization or target-acceptance value and scenario_id is the existing scn-<fullSHA256>. No user title/path determines a filename. Files tuple sorts ordinally by path; check portable collisions prospectively. No .feature file for empty ready population.",
+    "markdown": "acceptance.md is the complete traceable view and companion pending report: fixed summary/findings section plus canonically ordered ready and non-executable sections. Include source content digest, separate repository owner/pin, identity, complete source/evidence/decision refs, original given/when/then, pending reasons and retained findings/actions. Explicitly distinguish actual pending state from a ready-looking record withheld by validation; never relabel or drop either.",
+    "gherkin": "One file per ready specification. Fixed Feature title based on scenario_id; exact generated tags immediately before Scenario; Scenario name is scenario_id. Emit Given then And for ordered given statements, exactly one When, then Then/And for ordered expected statements. Empty given emits no invented setup. No Background, Rule, Examples, Scenario Outline, data table or doc string.",
+    "statement_convention": "Every authored statement is represented as one JSON string literal immediately after the fixed Gherkin keyword, using ensure_ascii=True and no physical newline. Example: Given \"processor idle\". Backslash, quote, control, CR/LF and non-ASCII characters escape reversibly; pipes and triple quotes remain inside that one quoted step text, never table/doc-string syntax. Preserve original strings in Markdown traceability. This is a declared display/step-text convention, not an assertion that an arbitrary consumer runner unescapes JSON or that matching step definitions exist.",
+    "traceability": "Gherkin comment lines use a fixed # prefix followed by one bounded ASCII-escaped sorted-key JSON object retaining owner, identity, digest and all source/evidence/decision refs; authored values cannot produce a second physical comment/tag/step line. Markdown uses fixed headings and JSON literal blocks rather than raw authored links, HTML or prose. JSON escaping keeps embedded newline/fence/control text inside a quoted value; no source reference is replaced by an imported destination or reconstructed hash.",
+    "bounds": "Use ReportBudget for structural/work reservations, but measure the selected ASCII JSON-string escaping and actual wrapper/keyword/comment/indent/LF bytes before creating strings or encoding. Reserve aggregate path and tag scans, record/statement/ref/finding traversal, maximum comparisons and all files+Markdown retained bytes before allocation. Same generation.limits caps the whole bundle, not each file independently. Validate Unicode scalars; fail without any partial files on exhaustion."
+  },
+  "shared_fixture": {
+    "module": "tests.discovery_runtime.test_acceptance_generation",
+    "helpers": [
+      "generation_snapshot",
+      "capture_documents",
+      "amended",
+      "imported_snapshot",
+      "source_criterion"
+    ],
+    "decision_helpers": "tests.discovery_runtime.test_acceptance_decisions.policy_snapshot/observation",
+    "catalog": "tests.discovery_runtime.test_snapshot_io.snapshot_catalog",
+    "factory": "drm_copilot_discovery.acceptance_generation.generate_acceptance",
+    "proof": "Accepted 123-case final P5-T4 union; no baseline replay. Factories retain schema-valid captured bytes/pins and require no temporary files."
+  },
+  "owners": {
+    "workspace_operations": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "tests/discovery_runtime/test_gherkin.py",
+      "tests/discovery_runtime/test_acceptance_tags.py",
+      "examples/discovery/v2/acceptance/"
+    ],
+    "source_inspection_preparation": [
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+    ]
+  },
+  "set_e_independence": "Four new v2 projection test functions consume accepted generation/model/validate_document APIs only; no renderer import. Unknown/missing data cannot establish ready membership. Renderer file-output controls remain with its owner.",
+  "remaining_gates": "Coordinator implementation release; ordered owned format/lint/types/tests and per-unit coverage; one consolidated review/final reversed union. No production/test mutations in this capture.",
+  "executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline-harness.2026-10-20T12-11.txt",
+    "sha256": "d83608ef0cb34dcff474198c6f9501741cca17dc4370ff32f506b9f1e3125e85",
+    "bytes": 9475,
+    "physical_lines": 179
+  }
+}

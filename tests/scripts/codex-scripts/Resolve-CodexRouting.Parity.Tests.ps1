@@ -10,6 +10,10 @@
     blocks in process. Parity normalization: CRLF to LF, trailing whitespace
     stripped, byte-equal stdout, equal parsed objects, equal exit codes; error
     cases require empty stdout and, for exit 1, the Python message substring.
+    Issue #980 adds all discovery rows to these same process and in-process
+    populations. Exit 2 is parser rejection, not a resolver receipt. These are
+    operational CLI compatibility controls; they never invoke Python or write
+    fixture files. The separate resolver suites remain process-free unit tests.
 #>
 
 BeforeDiscovery {
@@ -212,5 +216,19 @@ Describe 'Codex routing PowerShell wrappers match the Python CLI corpus (issue #
 
         $result.ExitCode | Should -Be 0 -Because "stderr was '$($result.Stderr)'"
         Assert-CorpusOutcome -Record $record -ExitCode $result.ExitCode -Stdout $result.Stdout -Stderr $result.Stderr
+    }
+
+    It 'includes each frozen discovery row in both wrapper populations' {
+        # The discovery-time case lists are not available at run time, so the
+        # committed corpus is read again here through the run-scope repo root.
+        $corpusRoot = Join-Path $script:RepoRoot 'tests/fixtures/codex_routing'
+        $topologyRows = @(Get-Content -Raw -LiteralPath (Join-Path $corpusRoot 'topology.json') | ConvertFrom-Json -AsHashtable)
+        $deploymentRows = @(Get-Content -Raw -LiteralPath (Join-Path $corpusRoot 'deployment.json') | ConvertFrom-Json -AsHashtable)
+        $topologyRows.Count | Should -Be 43
+        $deploymentRows.Count | Should -Be 33
+        @($topologyRows.id | Sort-Object -Unique).Count | Should -Be 43
+        @($deploymentRows.id | Sort-Object -Unique).Count | Should -Be 33
+        @($topologyRows | Where-Object id -Like 'topo-discovery-*').Count | Should -Be 23
+        @($deploymentRows | Where-Object id -Like 'dep-discovery-*').Count | Should -Be 24
     }
 }

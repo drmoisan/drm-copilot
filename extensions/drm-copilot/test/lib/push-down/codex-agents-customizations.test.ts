@@ -5,6 +5,7 @@ import {
   ROOT_FOLDERS,
   passthroughRewrite,
   pushDownCustomizations,
+  VIRTUAL_ROOT_FOLDERS,
 } from "../../../src/lib/push-down/codex-agents-customizations";
 import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
@@ -21,6 +22,8 @@ const VIRTUAL_CONTENT: Readonly<Record<string, string>> = {
   "config/orchestration-handoff.schema.json": '{"schema":1}\n',
   ".codex/lib/codex-routing/CodexTopology.psm1": "# topology module\n",
   ".codex/lib/codex-routing/CodexDeployment.psm1": "# deployment module\n",
+  ".codex/lib/codex-routing/CodexDiscoveryRouting.psm1":
+    "# discovery routing module\n",
 };
 
 /**
@@ -87,6 +90,7 @@ describe("pushDownCustomizations (codex/agents)", () => {
       "config/orchestration-handoff.schema.json",
       "config/orchestration-routing.json",
       ".codex/lib/codex-routing/CodexDeployment.psm1",
+      ".codex/lib/codex-routing/CodexDiscoveryRouting.psm1",
       ".codex/lib/codex-routing/CodexTopology.psm1",
     ]);
     expect(fs.readTextFile("/dest/config/orchestration-routing.json")).toBe(
@@ -154,6 +158,70 @@ describe("pushDownCustomizations (codex/agents)", () => {
     for (const [destination, content] of Object.entries(VIRTUAL_CONTENT)) {
       expect(fs.readTextFile(`/dest/${destination}`)).toBe(content);
     }
+  });
+
+  it("publishes every file stored under a mapped helper directory", () => {
+    // Arrange: two helpers with distinct bytes prove the mapping is per file.
+    const helpers: Record<string, string> = {
+      "lib/discovery-validation/DiscoveryValidation.psm1": "# validation\n",
+      "lib/discovery-validation/DiscoveryAuthority.psd1": "# authority\n",
+    };
+    const seeds: Record<string, string> = {
+      ...seedVirtualResources(RESOURCES),
+      "/src/.codex/config.md": "body",
+    };
+    for (const [resource, content] of Object.entries(helpers)) {
+      seeds[`${RESOURCES}/${resource}`] = content;
+    }
+    const fs = buildInMemoryFileSystem(seeds, ["/dest"]);
+
+    // Act
+    const summary = pushDownCustomizations({
+      repoRoot: "/src",
+      destinationRoot: "/dest",
+      fs,
+      sourceRoot: "/src",
+      artifactRoot: "/dest",
+      bundleRoot: BUNDLE_ROOT,
+      clock: CLOCK,
+    });
+
+    // Assert: each stored helper publishes under `.codex/lib/discovery-validation`.
+    const published = summary.files.map((f) => f.relativePath);
+    for (const [resource, content] of Object.entries(helpers)) {
+      const destination = `.codex/${resource}`;
+      expect(published).toContain(destination);
+      expect(fs.readTextFile(`/dest/${destination}`)).toBe(content);
+    }
+    expect(VIRTUAL_ROOT_FOLDERS).toContain(".codex/lib/discovery-validation");
+  });
+
+  it("publishes nothing under the helper directory until resources are stored", () => {
+    // Arrange: no helper resources exist under `lib/discovery-validation`.
+    const fs = buildInMemoryFileSystem(
+      { ...seedVirtualResources(RESOURCES), "/src/.codex/config.md": "body" },
+      ["/dest"],
+    );
+
+    // Act
+    const summary = pushDownCustomizations({
+      repoRoot: "/src",
+      destinationRoot: "/dest",
+      fs,
+      sourceRoot: "/src",
+      artifactRoot: "/dest",
+      bundleRoot: BUNDLE_ROOT,
+      clock: CLOCK,
+    });
+
+    // Assert: the mapped directory lists nothing and creates no destination tree.
+    const published = summary.files.map((f) => f.relativePath);
+    expect(
+      published.some((path) =>
+        path.startsWith(".codex/lib/discovery-validation/"),
+      ),
+    ).toBe(false);
+    expect(fs.isDir("/dest/.codex/lib/discovery-validation")).toBe(false);
   });
 
   it("does not publish an unmapped file under a virtual root or resource directory", () => {

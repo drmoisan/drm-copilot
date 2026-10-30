@@ -1,0 +1,346 @@
+{
+  "Timestamp": "2026-10-21T18-12",
+  "task": "P7-T2",
+  "status": "FROZEN_PENDING_INDEPENDENT_REVIEW",
+  "accepted_head": "59b322c528ade7d8a7a1a2d9c748182f290677d1",
+  "route": "source_inspection_p7t2_tests_20261021T175800",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p7t2-workflow-shared-baseline.2026-10-21T17-59.json",
+    "sha256": "0f7a117f88e82508899f3d83635ea5868bbfd7eb5abd2bb166c51cecbafd54c1",
+    "bytes": 2340
+  },
+  "documents": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7t2-canonical-skills-source-freeze.2026-10-21T18-09.json",
+    "sha256": "c3fa408a67222c98034d2d149488c6abebecb0fa311f852d595641ef4c807153",
+    "bytes": 6070
+  },
+  "owned_sources": [
+    {
+      "path": ".github/skills/inventory-legacy-system/SKILL.md",
+      "sha256": "697e04ad7a16fe3f1f9d35ac09605075233dfba0d4f285feebd9d6717e5aaaff",
+      "bytes": 8532,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/extract-feature-contract/SKILL.md",
+      "sha256": "c7d46a2d4e9efdccdbdade35b4281d8ebdcf3f5d2d4a7c991534f4fc222fbda4",
+      "bytes": 8726,
+      "lines": 133
+    },
+    {
+      "path": ".github/skills/characterize-runtime-behavior/SKILL.md",
+      "sha256": "75ac4af39feb85330a8816761606f6d647adb72c935997ee144eb409ca4b9887",
+      "bytes": 8903,
+      "lines": 134
+    },
+    {
+      "path": ".github/skills/reconcile-parity-matrix/SKILL.md",
+      "sha256": "bcb19f19ccdd55e776a2beb75a02540286a3e917d2fc73cce71de48088ba48b2",
+      "bytes": 8443,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/review-discovery-coverage/SKILL.md",
+      "sha256": "e73b19f1ed2f1f76f5df2a610e91562bda13a3ba19d85eca447843a0f6909849",
+      "bytes": 8187,
+      "lines": 129
+    },
+    {
+      "path": ".github/skills/adjudicate-unspecified-behavior/SKILL.md",
+      "sha256": "37bd93207253c28ed79beca4e56c7f8c3dfa97b7571c6eb40a75bd27e1401e45",
+      "bytes": 9354,
+      "lines": 135
+    },
+    {
+      "path": ".github/skills/generate-acceptance-scenarios/SKILL.md",
+      "sha256": "3fb78114ca75a6de8d2d4b1055df77654c7ee988bad56026e9e733d70ed57ccf",
+      "bytes": 8763,
+      "lines": 132
+    },
+    {
+      "path": ".github/skills/initialize-discovery-workspace/SKILL.md",
+      "sha256": "9252381ca701197c8fab6ff5387de78839f52a6daea53a569fc4b6bae58beaa6",
+      "bytes": 9240,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/validate-discovery-artifacts/SKILL.md",
+      "sha256": "da6db6789ea9c173d405d636bcfca1159291744b6662794fdcbcc22455008c19",
+      "bytes": 8318,
+      "lines": 127
+    },
+    {
+      "path": ".github/skills/discovery-workflow/SKILL.md",
+      "sha256": "b46d9c502f6ff694023fd3a79ceb95772f1b8f1edbafe3d4b39e4aa8e2e5cba0",
+      "bytes": 3038,
+      "lines": 62
+    },
+    {
+      "path": ".github/skills/discovery-repo-inventory/SKILL.md",
+      "sha256": "38dedd3a4d3414229b734ee3622f02e3fd68d51f62528c42e63317f31a9a70be",
+      "bytes": 1770,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-coverage-ledger/SKILL.md",
+      "sha256": "100361719990e26f3013ee964b568dfc990018c24d0d00d7a7b005a4b338cd5c",
+      "bytes": 2190,
+      "lines": 50
+    },
+    {
+      "path": ".github/skills/discovery-runtime-characterization/SKILL.md",
+      "sha256": "914b9ee9fbfcad269acaaa0aa219c6736d45e89473ca58bc9072bc44aa766663",
+      "bytes": 1830,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-parity-matrix/SKILL.md",
+      "sha256": "3248b2f3a50717952aa85bf9dbcc487e5c5c45c4b49990fedd630e94b0b372b9",
+      "bytes": 1794,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-behavior-reconciliation/SKILL.md",
+      "sha256": "64a53ec1bcecd0911aa7b07269bdadb41e3c631cfb5844c2c7468d113b7982ca",
+      "bytes": 1809,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-validate-artifacts/SKILL.md",
+      "sha256": "8792fb05fcea406b66d751126c9dd68eeb65226a7be4bffe2fcae3c718fd3961",
+      "bytes": 1786,
+      "lines": 46
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_workflow_contracts.py",
+      "sha256": "195d24080dcf9b1954589888b48922df3351198f4349b598ed4fc7e71cec4d24",
+      "bytes": 18307,
+      "lines": 467
+    }
+  ],
+  "test_scope": "One new static Markdown-contract test module; no predecessor semantic or Set K suite replay.",
+  "actual_executed_nodes": [
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[inventory-legacy-system]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[extract-feature-contract]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[characterize-runtime-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[reconcile-parity-matrix]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[review-discovery-coverage]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[adjudicate-unspecified-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[generate-acceptance-scenarios]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[initialize-discovery-workspace]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[validate-discovery-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[discovery-workflow]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[discovery-repo-inventory]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[discovery-coverage-ledger]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[discovery-runtime-characterization]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[discovery-parity-matrix]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[discovery-behavior-reconciliation]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_skill_metadata_uses_invoked_canonical_template[discovery-validate-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[inventory-legacy-system]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[extract-feature-contract]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[characterize-runtime-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[reconcile-parity-matrix]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[review-discovery-coverage]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[adjudicate-unspecified-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[generate-acceptance-scenarios]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[initialize-discovery-workspace]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_inputs_and_role_are_explicit_closed_contracts[validate-discovery-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[inventory-legacy-system]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[extract-feature-contract]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[characterize-runtime-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[reconcile-parity-matrix]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[review-discovery-coverage]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[adjudicate-unspecified-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[generate-acceptance-scenarios]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[initialize-discovery-workspace]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_output_rows_cannot_expand_the_accepted_role[validate-discovery-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_alias_is_dispatch_only_with_closed_canonical_targets[discovery-workflow]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_alias_is_dispatch_only_with_closed_canonical_targets[discovery-repo-inventory]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_alias_is_dispatch_only_with_closed_canonical_targets[discovery-coverage-ledger]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_alias_is_dispatch_only_with_closed_canonical_targets[discovery-runtime-characterization]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_alias_is_dispatch_only_with_closed_canonical_targets[discovery-parity-matrix]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_alias_is_dispatch_only_with_closed_canonical_targets[discovery-behavior-reconciliation]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_alias_is_dispatch_only_with_closed_canonical_targets[discovery-validate-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[inventory-legacy-system]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[extract-feature-contract]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[characterize-runtime-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[reconcile-parity-matrix]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[review-discovery-coverage]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[adjudicate-unspecified-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[generate-acceptance-scenarios]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[initialize-discovery-workspace]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_lifecycle_prepares_exact_role_before_finalization[validate-discovery-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[inventory-legacy-system]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[extract-feature-contract]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[characterize-runtime-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[reconcile-parity-matrix]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[review-discovery-coverage]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[adjudicate-unspecified-behavior]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[generate-acceptance-scenarios]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[initialize-discovery-workspace]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_workflow_grants_and_missing_capabilities_fail_closed[validate-discovery-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_inventory_detection_and_runtime_plans_preserve_evidence_distinctions",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_reconciliation_and_adjudication_cannot_self_approve_or_rewrite_sources",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_generation_retains_identity_pending_expectations_and_validated_tags",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_initialization_is_root_owned_before_any_reviewer_delegation",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_review_validation_cannot_repair_facts_or_turn_valid_failure_into_pass[review-discovery-coverage]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_review_validation_cannot_repair_facts_or_turn_valid_failure_into_pass[validate-discovery-artifacts]",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py::test_umbrella_and_coverage_alias_selectors_cannot_introduce_roles_or_grants"
+  ],
+  "node_count": 66,
+  "bound_input_count": 25,
+  "bindings": {
+    ".github/skills/inventory-legacy-system/SKILL.md": "697e04ad7a16fe3f1f9d35ac09605075233dfba0d4f285feebd9d6717e5aaaff",
+    ".github/skills/extract-feature-contract/SKILL.md": "c7d46a2d4e9efdccdbdade35b4281d8ebdcf3f5d2d4a7c991534f4fc222fbda4",
+    ".github/skills/characterize-runtime-behavior/SKILL.md": "75ac4af39feb85330a8816761606f6d647adb72c935997ee144eb409ca4b9887",
+    ".github/skills/reconcile-parity-matrix/SKILL.md": "bcb19f19ccdd55e776a2beb75a02540286a3e917d2fc73cce71de48088ba48b2",
+    ".github/skills/review-discovery-coverage/SKILL.md": "e73b19f1ed2f1f76f5df2a610e91562bda13a3ba19d85eca447843a0f6909849",
+    ".github/skills/adjudicate-unspecified-behavior/SKILL.md": "37bd93207253c28ed79beca4e56c7f8c3dfa97b7571c6eb40a75bd27e1401e45",
+    ".github/skills/generate-acceptance-scenarios/SKILL.md": "3fb78114ca75a6de8d2d4b1055df77654c7ee988bad56026e9e733d70ed57ccf",
+    ".github/skills/initialize-discovery-workspace/SKILL.md": "9252381ca701197c8fab6ff5387de78839f52a6daea53a569fc4b6bae58beaa6",
+    ".github/skills/validate-discovery-artifacts/SKILL.md": "da6db6789ea9c173d405d636bcfca1159291744b6662794fdcbcc22455008c19",
+    ".github/skills/discovery-workflow/SKILL.md": "b46d9c502f6ff694023fd3a79ceb95772f1b8f1edbafe3d4b39e4aa8e2e5cba0",
+    ".github/skills/discovery-repo-inventory/SKILL.md": "38dedd3a4d3414229b734ee3622f02e3fd68d51f62528c42e63317f31a9a70be",
+    ".github/skills/discovery-coverage-ledger/SKILL.md": "100361719990e26f3013ee964b568dfc990018c24d0d00d7a7b005a4b338cd5c",
+    ".github/skills/discovery-runtime-characterization/SKILL.md": "914b9ee9fbfcad269acaaa0aa219c6736d45e89473ca58bc9072bc44aa766663",
+    ".github/skills/discovery-parity-matrix/SKILL.md": "3248b2f3a50717952aa85bf9dbcc487e5c5c45c4b49990fedd630e94b0b372b9",
+    ".github/skills/discovery-behavior-reconciliation/SKILL.md": "64a53ec1bcecd0911aa7b07269bdadb41e3c631cfb5844c2c7468d113b7982ca",
+    ".github/skills/discovery-validate-artifacts/SKILL.md": "8792fb05fcea406b66d751126c9dd68eeb65226a7be4bffe2fcae3c718fd3961",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py": "195d24080dcf9b1954589888b48922df3351198f4349b598ed4fc7e71cec4d24",
+    ".github/agents/legacy-parity-analyst.agent.md": "d509368846ec2202fff7e839018b25ff0bfa288ce1c629c1ffda67a1a6ab5afb",
+    ".github/agents/runtime-characterization-analyst.agent.md": "bbc9dacd58b4a85c235b3ee280e3d4650dfe081d7144a19ad947c617a5087d10",
+    ".github/agents/requirements-reconciler.agent.md": "0f3e4ea4164f669ea6e0c4621150dd56a79c581d319ebbac60ca45cc58fec0df",
+    ".github/agents/migration-coverage-reviewer.agent.md": "67b9d95b3c4ffecc2b88b632d9bd39560b369204badfc15061c42e25e42def71",
+    "tests/conftest.py": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+    "pyproject.toml": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": "9af963db8e83af6d36fdb7214bf6d6a3313f6206ca7e0a58b67fccac879da718",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7-service-interface-delta.2026-10-20T17-14.md": "41f4e54da8277a4650d4b5412818c2230826a891446bec01a6374968f6c0e143"
+  },
+  "ordered_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-black.2026-10-21T18-10.json",
+      "sha256": "ca544aba87346acdcda11252707a52d0db05f67821662c301cd27976706b480a",
+      "bytes": 7425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-ruff.2026-10-21T18-10.json",
+      "sha256": "94ae2e1b7e60a1c127d700f563dd496d619411f3ba93d3c17ef2f842b4d5e027",
+      "bytes": 7381
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-pyright.2026-10-21T18-10.json",
+      "sha256": "d67cccaaeb28d46df9f7bc1d792f2f5318791c65bba185a24c56915a88b9a368",
+      "bytes": 7565
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10.json",
+      "sha256": "15b11fd0ece593b2423a5ce1191cc0ac837aeca23b61b2fda9ccc5e119e77522",
+      "bytes": 29084
+    }
+  ],
+  "test_elapsed_seconds": 0.5403358999756165,
+  "coverage_qualification": "No executable production Python changes. Canonical Markdown is asserted by all 66 cases; tests are excluded from runtime coverage. Accepted role/runtime semantic proof is retained, not remeasured or claimed as fresh.",
+  "preserved_diagnostics": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04-raw.json",
+      "sha256": "8de5e2003f77d0b9b8868cc3278e8d820909e295e86ef332d45cf2c6b20aa7ea",
+      "bytes": 3455
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04.json",
+      "sha256": "b3cdf7c704972e90555aea4a04e977520ce32f946dba0a691d5ad88180da4441",
+      "bytes": 6637
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09-raw.json",
+      "sha256": "1224ebd09da2ce1ed6a3c1b84c834ec5c7f0b552048d539424793764b3a158cf",
+      "bytes": 3471
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09.json",
+      "sha256": "938f4b852131db43161ccd6a80afaa4138eef00cfa85d7f543d316c9b401d204",
+      "bytes": 7506
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09-raw.json",
+      "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09.json",
+      "sha256": "03a7deab20b489f4ba20bdd257c6741dcccec3ba8abd1c1cb8ba48af5875168d",
+      "bytes": 7424
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09-raw.json",
+      "sha256": "c0335de8029f47e536e44419d667942b8b0cfaddc166c08edb4c96f21569b106",
+      "bytes": 4492
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09.json",
+      "sha256": "b810660d0ce61c774afdf60015fc595bf9b13fab9af842e9d60ec4d3ffd119e0",
+      "bytes": 10425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09-raw.json",
+      "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09.json",
+      "sha256": "f2a3b2e46755c922866ce8b5267a364610e6030c15bba6b0c5a7116bdf39ead3",
+      "bytes": 7425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09-raw.json",
+      "sha256": "c19cc41cd1e4fd293c4e8c68d3ae9a7d1a1a45bc767c2a3aaf4de16eda1983f2",
+      "bytes": 3541
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09.json",
+      "sha256": "61d0e4d4f1d7add6cccd38ad767c0f76832b82e9ab145c8edffaa8bb1604f195",
+      "bytes": 7565
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09-raw.json",
+      "sha256": "374819d9dee523736a49165fb827974c3e0bf7018ed8d7c1f450ed083a8c7673",
+      "bytes": 3362
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09.json",
+      "sha256": "9d3d4287c7962c3d0f9ac536f458ba50b78d1eab88690ec6367f886637c390a0",
+      "bytes": 7382
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09-raw.json",
+      "sha256": "38d4f7d391fb6023f255bb2613801b1ab42ce8c3cb7b3cdcd47e957f8d475375",
+      "bytes": 6868
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09.json",
+      "sha256": "a6b501266e7040f5e1e09382c048d7cb2539dd1a34994d1e8405250a747e8dca",
+      "bytes": 32308
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-console-qualification.2026-10-21T18-08.json",
+      "sha256": "8be4022a500dd0f1165824a6517591cd82feb154dbafb7421b21774eb17c2ad6",
+      "bytes": 795
+    }
+  ],
+  "diagnostic_resolution": [
+    "Black autoformat required restart; Ruff five overlong test string literals were split without changing values.",
+    "Scratch console output explicitly configured as UTF-8 after cp1252 printing failure; exact original harness and Black streams preserved.",
+    "First behavioral result 65/66: initialization test expected earlier equivalent wording. Only the literal was aligned to the unchanged frozen exact report-only/no-config statement; same 66 nodes then passed."
+  ],
+  "source_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-source-originals.2026-10-21T18-12.json",
+    "sha256": "ae701b370d8c1b31647dbe340987c30f92905f3502a086ef5b8da49ce09fe2eb",
+    "bytes": 62061
+  },
+  "presentation_qualification": "Raw stage receipts retain gzip-base64 exact stdout/stderr and executed harness bytes, including original CR/CR/LF and executable payload terminal newlines. Readable JSON replaces only observed WORKSPACE/SCRATCH path prefixes; embedded CR/LF remain JSON escapes. Authored JSON uses LF with exactly one terminal newline; no source trailing whitespace/terminal blank padding found.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "repository root",
+    "SCRATCH": "external task-specific runner directory"
+  },
+  "held_gates": "No task acceptance, generated publication or native enforcement success is claimed. Independent review and parent acceptance remain required."
+}

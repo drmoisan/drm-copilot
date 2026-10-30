@@ -1,0 +1,213 @@
+{
+  "timestamp": "2026-10-18T13-24",
+  "status": "FROZEN_WIP_NOT_ACCEPTED",
+  "acceptance_baseline": "a74cb240a7698c1454a8e6018ac23862cd91dab0",
+  "head": "cba0ee0870018c1a2a57556be877ec1d7475ae08",
+  "authored_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+    "scripts/dev_tools/discovery/init_flow.py",
+    "tests/discovery_runtime/test_initialization.py",
+    "tests/discovery_runtime/test_initialization_conflicts.py",
+    "tests/discovery_runtime/initialization_test_support.py",
+    "tests/scripts/dev_tools/discovery/test_init_flow.py",
+    "tests/scripts/dev_tools/discovery/test_init_cli.py",
+    "tests/scripts/dev_tools/discovery/test_init_models.py",
+    "tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+    "packages/discovery-runtime/resource-manifest.json",
+    "docs/discovery/templates/v2/domain-profile.yaml",
+    "docs/discovery/templates/v2/scope.yaml",
+    "docs/discovery/templates/v2/coverage-ledger.json",
+    "docs/discovery/templates/v2/unspecified-behaviors.yaml",
+    "docs/discovery/templates/v2/product-decisions.yaml",
+    "docs/discovery/templates/v2/parity-matrix.json"
+  ],
+  "mechanical_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json"
+  ],
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "sha256": "7064bdcdb2bcd241420e1070ff6ae7a00f4b7453b3de09d5eca2340b73627f6e",
+      "physical_lines": 461
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "sha256": "ee42b463f6cabd0f827b58a6f9a3bac3585ce346ddfabf9f66b6e5e5b1f6ea76",
+      "physical_lines": 393
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "sha256": "ac5e428a06a555c587e82cf1d010edd7c6b869b78409a4e4c1832ab6ed70ee77",
+      "physical_lines": 451
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_flow.py",
+      "sha256": "8b0f3edd7a15393629bb91a676691ef64c886ef432d41e16f22cc1df5f77234e",
+      "physical_lines": 15
+    },
+    {
+      "path": "tests/discovery_runtime/test_initialization.py",
+      "sha256": "7562de04b1412d6cb79272e3d6deaf4fd92dd49e326aa9178c14b4ddb265283a",
+      "physical_lines": 301
+    },
+    {
+      "path": "tests/discovery_runtime/test_initialization_conflicts.py",
+      "sha256": "16b972e5d562bbeb8c522144da758fa5ecd6658bcc0a9ef4df2d8d7441161517",
+      "physical_lines": 411
+    },
+    {
+      "path": "tests/discovery_runtime/initialization_test_support.py",
+      "sha256": "50b5e2afeec74a92b9e3199dd7e325e5af854c168bb5cb21072777df3cb19cb0",
+      "physical_lines": 138
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "sha256": "3268b592ed48cd30d919f382bc3a7f7e36760ee1f2dfd7262bc32744cd22e4e8",
+      "physical_lines": 130
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "sha256": "5e7c528b883c9688c3426366fd7211a837323bd82cb37fb53c4215e0fd9ac0db",
+      "physical_lines": 152
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_models.py",
+      "sha256": "0417f2572148099316bf99bb214abec9fd326b4461fe6eaa607759701e57cb34",
+      "physical_lines": 107
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "sha256": "f792747f83199f70d3eeb1ecf205075f260e82f079524d388f82afa452b8ad0f",
+      "physical_lines": 76
+    },
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "sha256": "04d4519350221015ec201089abacf1a47dbf99bc73c6e64579cc57668c82c02b",
+      "physical_lines": 49
+    },
+    {
+      "path": "docs/discovery/templates/v2/domain-profile.yaml",
+      "sha256": "c04bd95b1827f73f47aecf9dae3e33b9715ead0899e1c8cc5d8bd591298499da",
+      "physical_lines": 34
+    },
+    {
+      "path": "docs/discovery/templates/v2/scope.yaml",
+      "sha256": "89bd691ebdd070f890bc80eac95397e1c0d3813655adace0f170123ce219d2b5",
+      "physical_lines": 16
+    },
+    {
+      "path": "docs/discovery/templates/v2/coverage-ledger.json",
+      "sha256": "21b7d9d211d0d943062e3802703e3c1a63dd4ceb0117e5292a3391cf1564071a",
+      "physical_lines": 12
+    },
+    {
+      "path": "docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "sha256": "aaa963c7abe7470a3b343098df2e4821b665396973de76f37dd6ebe503d7791d",
+      "physical_lines": 6
+    },
+    {
+      "path": "docs/discovery/templates/v2/product-decisions.yaml",
+      "sha256": "4644fffb292e210dde77959d31ce5f043a4a5467bc42e372cecc988376b30aba",
+      "physical_lines": 6
+    },
+    {
+      "path": "docs/discovery/templates/v2/parity-matrix.json",
+      "sha256": "e40f3c72fa288331cf3775ab17d1306ad2832db7e4581116525ca889d67d0b99",
+      "physical_lines": 10
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "sha256": "c04bd95b1827f73f47aecf9dae3e33b9715ead0899e1c8cc5d8bd591298499da",
+      "physical_lines": 34
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "sha256": "89bd691ebdd070f890bc80eac95397e1c0d3813655adace0f170123ce219d2b5",
+      "physical_lines": 16
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "sha256": "21b7d9d211d0d943062e3802703e3c1a63dd4ceb0117e5292a3391cf1564071a",
+      "physical_lines": 12
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "sha256": "aaa963c7abe7470a3b343098df2e4821b665396973de76f37dd6ebe503d7791d",
+      "physical_lines": 6
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "sha256": "4644fffb292e210dde77959d31ce5f043a4a5467bc42e372cecc988376b30aba",
+      "physical_lines": 6
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "sha256": "e40f3c72fa288331cf3775ab17d1306ad2832db7e4581116525ca889d67d0b99",
+      "physical_lines": 10
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "sha256": "3c3edf7c867f5bc06399e4f488542d4444653eb8b61ad1051b40760e29f63c4c",
+      "physical_lines": 201
+    }
+  ],
+  "stageable_worker_evidence": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-batch2-first-run-diagnostic.2026-10-18T13-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-batch2-format.2026-10-18T13-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-batch2-lint.2026-10-18T13-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-batch2-types.2026-10-18T13-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-format-clean.2026-10-18T13-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-format2.2026-10-18T13-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-format3.2026-10-18T13-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-format4.2026-10-18T13-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-format5.2026-10-18T13-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-lint-fix.2026-10-18T13-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-lint.2026-10-18T13-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-lint3.2026-10-18T13-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-lint4.2026-10-18T13-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-lint5.2026-10-18T13-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-pass6-format.2026-10-18T13-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-pass6-lint.2026-10-18T13-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-pass6-types.2026-10-18T13-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-regressions.2026-10-18T13-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-correction-types4.2026-10-18T13-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-corrections-format.2026-10-18T13-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-first-batch-format-clean.2026-10-18T13-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-first-batch-format.2026-10-18T13-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-first-batch-lint.2026-10-18T13-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-first-batch-types-diagnostic.2026-10-18T13-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-resources-stage.2026-10-18T13-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t2-bootstrap-wip.2026-10-18T13-24.json"
+  ],
+  "unchanged_prior_paths": 215,
+  "unexpected_prior_changes": [],
+  "checks": {
+    "format": "11 files unchanged",
+    "lint": "0 findings",
+    "types": "0 errors / 0 warnings",
+    "bounded_regressions": "4 passed / 20 deselected in 4.94 seconds",
+    "resource_builder": "39 resources generated; six canonical template mirrors byte-identical"
+  },
+  "diagnostic": {
+    "cases": "4 passed in 577.45 seconds",
+    "binding": "Obsolete imported-source diagnostic only: source changed after import; import-time hashes were not captured; no final acceptance authority",
+    "process": "already completed, no process remains"
+  },
+  "pending": [
+    "Full stable seven-stage pass",
+    "All task unit tests and numeric module/class/function coverage",
+    "Reversed-order isolation",
+    "Contract/schema compatibility",
+    "Final real Windows integration",
+    "Final staged-byte/prior/frozen audit"
+  ],
+  "source_edits_frozen": true
+}

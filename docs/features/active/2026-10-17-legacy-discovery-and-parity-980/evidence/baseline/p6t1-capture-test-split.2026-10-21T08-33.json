@@ -1,0 +1,60 @@
+{
+  "task": "P6-T1",
+  "recorded_utc": "2026-10-21T08:33:21Z",
+  "route": "workspace_operations_p6t1_capture_review_repair_20261021T083300",
+  "new_path": "tests/discovery_runtime/test_migration_capture.py",
+  "absent_before_creation": true,
+  "absence_observation": "PowerShell Test-Path returned False before creation",
+  "source_test_sha256": "1e11c2d4a2142ba7f1a13411b82ad8a5583c0811f09baa3ab4e29b9a0d8ede13",
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-capture-review.2026-10-21T08-31.json",
+    "sha256": "320d0bb4294c8e47baa378508b4011782866cce480ad852aa6dd71ee3a6271c8"
+  },
+  "moved_nodes": [
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_empty_selection_preserves_original_io",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_empty_selection_preserves_original_io"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_retains_exact_files_and_trusted_ports",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_retains_exact_files_and_trusted_ports"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_rejects_invalid_selection[duplicate]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[duplicate]"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_rejects_invalid_selection[traversal]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[traversal]"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_rejects_invalid_selection[link]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[link]"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_rejects_changed_originals[changed]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[changed]"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_rejects_changed_originals[missing]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[missing]"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_rejects_conflicting_observations",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_conflicting_observations"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_reserves_before_reads[file-count]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[file-count]"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_reserves_before_reads[work]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[work]"
+    },
+    {
+      "from": "tests/discovery_runtime/test_service_migration.py::test_migration_capture_reserves_before_reads[bytes]",
+      "to": "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[bytes]"
+    }
+  ],
+  "preservation": "Move eleven capture nodes and migration_capture_case helper intact except MT1 recomputed-default operand. Nine schema controls stay in the original file. Exactly eight new boundary controls authorized."
+}

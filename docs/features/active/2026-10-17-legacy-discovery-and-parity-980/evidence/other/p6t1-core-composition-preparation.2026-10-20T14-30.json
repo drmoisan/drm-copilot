@@ -1,0 +1,659 @@
+{
+  "Timestamp": "2026-10-20T14-30",
+  "status": "PREPARATION_READY_PENDING_IMPLEMENTATION_RELEASE",
+  "route": "inventory_analyzers_p6t1_service_preparation_20261020 / S5_P6T1_service_composition_preparation",
+  "scope": "Read-only finite service composition preparation; only this evidence pair is written. No baseline, runtime import, suite, native execution, production/test/Git/checkpoint/plan/AC mutation.",
+  "retained": [
+    {
+      "path": "evidence/other/p6t1-release-preparation.2026-10-20T13-26.json",
+      "sha256": "9b3fdf7cbdabed00de84c1ebe61c81814ad9e17b9475fc4e9a7e75b150dbe19d"
+    },
+    {
+      "path": "evidence/other/p6t1-service-preparation-delta.2026-10-20T12-13.json",
+      "sha256": "da4d4993ad1f2b84e590a922bdfee9dd6939b7bff2d922ab196b53b7dbdf2aac"
+    },
+    {
+      "path": "evidence/other/p6t1-contract-decisions.2026-10-20T12-25.json",
+      "sha256": "0db96ff2158109d58384ad8ff4b7e52f9de5423a6a9f82d70cbeeadc6983176b"
+    },
+    {
+      "path": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+      "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+    },
+    {
+      "path": "evidence/other/p6t1-shared-declarations.2026-10-20T14-25.json",
+      "sha256": "414aece69a6ca96be7c193423b47ba04a9d2042525f3000174b1308a19307fb7"
+    }
+  ],
+  "operation_count": 30,
+  "map_status": "Concrete implementation proposal for shared parser/core coordination; parent-approved artifact/directory and first-page/graph-wide qualifications are included. Mode/flag/argument choices are explicit rather than inferred from schema permissiveness.",
+  "operations": [
+    {
+      "operation": "init",
+      "required": [
+        "system_id",
+        "system_name",
+        "system_role",
+        "repository_id"
+      ],
+      "optional": [
+        "production_roots",
+        "test_roots",
+        "draft"
+      ],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "InitializationRequest; plan_initialization; commit_initialization",
+      "result": "InitializationResult: preserve validation, conflicts, partial creations, uncertain paths and invalidation.",
+      "publication": "Intrinsic no-overwrite mutation; dry_run plans only. File rows require supported kind and real digest. Directory effects use fixed counters/path findings.",
+      "conditional": "Non-draft requires nonempty production_roots. Top-level profile_path maps the exact profile override. No synthetic revision."
+    },
+    {
+      "operation": "configure",
+      "required": [
+        "configuration_action"
+      ],
+      "optional": [
+        "input_path"
+      ],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "ActivationStore.configure(ConfigurationRequest)",
+      "result": "ConfigurationResult: exact changed/uncertain paths and invalidation; no fabricated file digests.",
+      "publication": "Intrinsic protected local-user configuration transaction; dry_run does not activate or mutate.",
+      "conditional": "activate requires an explicit input_path or top-level profile_path selecting existing validated bytes; deactivate rejects input_path."
+    },
+    {
+      "operation": "profile",
+      "required": [],
+      "optional": [
+        "input_path"
+      ],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "ActivationStore.select; bounded exact-version profile parser",
+      "result": "Normalized selected profile plus schema/version status, real captured input manifest.",
+      "publication": "Read-only.",
+      "conditional": "input_path overrides profile_path only when unambiguous; mismatched simultaneous selections reject."
+    },
+    {
+      "operation": "inventory",
+      "required": [],
+      "optional": [
+        "analyzer_ids"
+      ],
+      "modes": [
+        "structural",
+        "agent-output"
+      ],
+      "existing_api": "pin_inventory_sources; capture_snapshot; run_inventory; plan_inventory; commit_mutation",
+      "result": "InventoryResult and proposed ledger entries; no automatic inspection/disposition.",
+      "publication": "write requests canonical subset reconstruction and exact grants; dry_run preserves all inputs.",
+      "conditional": "Omission means configured-all. Explicit IDs must be nonempty, unique, enabled and consented. Same normalized selection reaches planning."
+    },
+    {
+      "operation": "new-contract",
+      "required": [
+        "feature_id",
+        "name"
+      ],
+      "optional": [
+        "capability_group",
+        "input_path"
+      ],
+      "modes": [
+        "structural",
+        "agent-output"
+      ],
+      "existing_api": "ContractDraft; contract_changes / plan_contract",
+      "result": "Draft contract plus required unresolved records from captured structured fields.",
+      "publication": "Intrinsic guarded mutation; dry_run plans all linked changes together.",
+      "conditional": ""
+    },
+    {
+      "operation": "new-scenario",
+      "required": [
+        "scenario_id",
+        "feature_ids",
+        "input_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural",
+        "agent-output"
+      ],
+      "existing_api": "ScenarioDraft; scenario_changes / plan_scenario",
+      "result": "Draft observation plan; unknown expectations remain unknown.",
+      "publication": "Intrinsic guarded mutation; dry_run plans only.",
+      "conditional": "feature_ids must be nonempty; input_path is captured structured fields, not executable code."
+    },
+    {
+      "operation": "update-artifact",
+      "required": [
+        "artifact_kind",
+        "artifact_path",
+        "input_path",
+        "expected_sha256",
+        "update_action"
+      ],
+      "optional": [
+        "artifact_id",
+        "approval_owner",
+        "approval_evidence_refs"
+      ],
+      "modes": [
+        "structural",
+        "agent-output"
+      ],
+      "existing_api": "validate_document; MutationChange; plan_mutation; commit_mutation",
+      "result": "Whole-document replacement with exact prior-byte precondition and prospective graph validation.",
+      "publication": "Intrinsic guarded mutation; no text patch.",
+      "conditional": "approve-decision requires approval_owner and nonempty approval_evidence_refs and exact decision identity/kind. Use supplied whole document; validate authored approval against those explicit inputs, never invent observed facts. replace rejects approval-only fields."
+    },
+    {
+      "operation": "link-evidence",
+      "required": [
+        "artifact_kind",
+        "artifact_id",
+        "evidence_path",
+        "expected_sha256"
+      ],
+      "optional": [],
+      "modes": [
+        "structural",
+        "agent-output"
+      ],
+      "existing_api": "EvidenceLink; evidence_changes / plan_evidence_link",
+      "result": "Captured evidence record and requested entity linkage with real validation findings.",
+      "publication": "Intrinsic guarded mutation of all intended records/payloads as one plan.",
+      "conditional": "Existing target requires non-null expected_sha256. No network acquisition from URI-only evidence."
+    },
+    {
+      "operation": "validate-profile",
+      "required": [],
+      "optional": [
+        "input_path"
+      ],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document exact kind/version; parse_domain_profile_text / ProfileV2",
+      "result": "Preserve true-v1 compatibility; v2 configured requirement applies only to full graph operations.",
+      "publication": "Read-only.",
+      "conditional": "Explicit input_path or selected profile; no kind probing and no fake v2 graph for v1."
+    },
+    {
+      "operation": "validate-feature-contract",
+      "required": [
+        "artifact_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document(expected_kind=feature-contract); validate_snapshot(mode=structural)",
+      "result": "Expected-kind/path result plus honestly graph-wide configured-snapshot findings, including unrelated blockers.",
+      "publication": "Read-only.",
+      "conditional": "Never infer target validity by filtering a truncated finding list. Exact record/collection compatibility stays with accepted schemas."
+    },
+    {
+      "operation": "validate-coverage-ledger",
+      "required": [
+        "artifact_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document(expected_kind=coverage-ledger); validate_snapshot(mode=structural)",
+      "result": "Expected-kind/path result plus honestly graph-wide configured-snapshot findings, including unrelated blockers.",
+      "publication": "Read-only.",
+      "conditional": "Never infer target validity by filtering a truncated finding list. Exact record/collection compatibility stays with accepted schemas."
+    },
+    {
+      "operation": "validate-runtime-scenario",
+      "required": [
+        "artifact_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document(expected_kind=runtime-characterization-scenario); validate_snapshot(mode=structural)",
+      "result": "Expected-kind/path result plus honestly graph-wide configured-snapshot findings, including unrelated blockers.",
+      "publication": "Read-only.",
+      "conditional": "Never infer target validity by filtering a truncated finding list. Exact record/collection compatibility stays with accepted schemas."
+    },
+    {
+      "operation": "validate-parity-matrix",
+      "required": [
+        "artifact_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document(expected_kind=parity-matrix); validate_snapshot(mode=structural)",
+      "result": "Expected-kind/path result plus honestly graph-wide configured-snapshot findings, including unrelated blockers.",
+      "publication": "Read-only.",
+      "conditional": "Never infer target validity by filtering a truncated finding list. Exact record/collection compatibility stays with accepted schemas."
+    },
+    {
+      "operation": "validate-unspecified-behavior",
+      "required": [
+        "artifact_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document(expected_kind=unspecified-behavior); validate_snapshot(mode=structural)",
+      "result": "Expected-kind/path result plus honestly graph-wide configured-snapshot findings, including unrelated blockers.",
+      "publication": "Read-only.",
+      "conditional": "Never infer target validity by filtering a truncated finding list. Exact record/collection compatibility stays with accepted schemas."
+    },
+    {
+      "operation": "validate-product-decision",
+      "required": [
+        "artifact_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document(expected_kind=product-decision); validate_snapshot(mode=structural)",
+      "result": "Expected-kind/path result plus honestly graph-wide configured-snapshot findings, including unrelated blockers.",
+      "publication": "Read-only.",
+      "conditional": "Never infer target validity by filtering a truncated finding list. Exact record/collection compatibility stays with accepted schemas."
+    },
+    {
+      "operation": "validate-evidence-reference",
+      "required": [
+        "artifact_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_document(expected_kind=evidence-reference); validate_snapshot(mode=structural)",
+      "result": "Expected-kind/path result plus honestly graph-wide configured-snapshot findings, including unrelated blockers.",
+      "publication": "Read-only.",
+      "conditional": "Never infer target validity by filtering a truncated finding list. Exact record/collection compatibility stays with accepted schemas."
+    },
+    {
+      "operation": "validate-decisions",
+      "required": [],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_snapshot; accepted decision/unresolved collection assessments",
+      "result": "Configured graph findings retain approvals, scopes, supersession, references and both collections.",
+      "publication": "Read-only.",
+      "conditional": ""
+    },
+    {
+      "operation": "validate-all",
+      "required": [],
+      "optional": [
+        "output_prefix"
+      ],
+      "modes": [
+        "structural",
+        "discovery-complete",
+        "parity-complete",
+        "planning"
+      ],
+      "existing_api": "validate_snapshot; report_projection(kind=validation-report); DiscoveryReport; plan_mutation",
+      "result": "Selected root mode status and one authoritative paired report projection.",
+      "publication": "Canonical JSON/Markdown reports are default outputs; dry_run returns plans. output_prefix requires exact root-authorized report grants.",
+      "conditional": "Malformed structural core cannot publish a validation report; preserve failed validation result. Structural mode is not completion."
+    },
+    {
+      "operation": "coverage-report",
+      "required": [],
+      "optional": [],
+      "modes": [
+        "structural",
+        "discovery-complete",
+        "parity-complete",
+        "planning"
+      ],
+      "existing_api": "build_coverage_report",
+      "result": "Selected root mode, blockers, unavailable/null populations and exact paired projection.",
+      "publication": "Read-only unless write. Paired outputs use existing report projection, exact grants/CAS and mutation validation; dry_run cannot publish.",
+      "conditional": "agent-output is rejected by public report_projection. Malformed diagnostic reports do not authorize publication. Report IDs use fixed established defaults."
+    },
+    {
+      "operation": "parity-report",
+      "required": [],
+      "optional": [],
+      "modes": [
+        "structural",
+        "discovery-complete",
+        "parity-complete",
+        "planning"
+      ],
+      "existing_api": "build_parity_report",
+      "result": "Selected root mode, blockers, unavailable/null populations and exact paired projection.",
+      "publication": "Read-only unless write. Paired outputs use existing report projection, exact grants/CAS and mutation validation; dry_run cannot publish.",
+      "conditional": "agent-output is rejected by public report_projection. Malformed diagnostic reports do not authorize publication. Report IDs use fixed established defaults."
+    },
+    {
+      "operation": "completion-report",
+      "required": [],
+      "optional": [],
+      "modes": [
+        "structural",
+        "discovery-complete",
+        "parity-complete",
+        "planning"
+      ],
+      "existing_api": "build_completion_report / plan_completion_report",
+      "result": "Selected root mode, blockers, unavailable/null populations and exact paired projection.",
+      "publication": "Read-only unless write. Paired outputs use existing report projection, exact grants/CAS and mutation validation; dry_run cannot publish.",
+      "conditional": "agent-output is rejected by public report_projection. Malformed diagnostic reports do not authorize publication. Report IDs use fixed established defaults."
+    },
+    {
+      "operation": "generate-acceptance",
+      "required": [
+        "acceptance_kind"
+      ],
+      "optional": [
+        "feature_ids",
+        "repository_id",
+        "client_ids",
+        "mode_ids",
+        "platform_ids",
+        "output_format"
+      ],
+      "modes": [
+        "structural",
+        "agent-output"
+      ],
+      "existing_api": "resolve_feature_ids; generate_acceptance; select_acceptance_platforms; render_acceptance; plan_mutation",
+      "result": "Exact immutable structured specifications, readiness and all findings; rendered ready views retain source identity.",
+      "publication": "Prepare structured source and selected views together. Publication only through exact controlled grants and prospective mutation validation; dry_run/write semantics below.",
+      "conditional": "Feature selectors require unique source ownership; platform filter retains original objects and all findings. Unknown output from a blocking generation remains exit1, not selector exit2. Pending questions never become Then steps."
+    },
+    {
+      "operation": "snapshot-export",
+      "required": [
+        "selected_ids"
+      ],
+      "optional": [
+        "paths"
+      ],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "ReferenceIndex; SnapshotExport; prepare_snapshot_export / plan_snapshot_export",
+      "result": "Immutable source contract/evidence closure with full revision and manifest.",
+      "publication": "Intrinsic configured local export; dry_run plans only; no external copy destination.",
+      "conditional": "Resolve selected IDs to exact kind/ID pairs in authoritative index, optionally constrained by exact paths; reject missing/ambiguous identities. request.id supplies export ID; trusted clock/principal supply attribution."
+    },
+    {
+      "operation": "snapshot-import",
+      "required": [
+        "manifest_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "bind_transport; SnapshotImport; prepare_snapshot_import / plan_snapshot_import",
+      "result": "Exact locally captured manifest, source identity and checksummed members.",
+      "publication": "Intrinsic no-overwrite copy into configured source-snapshot root; dry_run only.",
+      "conditional": "Source identity comes from validated transport matched to configured sources, not guessed from a name. No network or sibling scan."
+    },
+    {
+      "operation": "import-inventory",
+      "required": [
+        "manifest_path"
+      ],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "validate_extension_results; merge_extension_inventory; MutationChange; plan_mutation",
+      "result": "Validated data-only external inventory plus preserved source-input and row accounting.",
+      "publication": "write requests bounded merged inventory publication; dry_run plans only.",
+      "conditional": "Do not pass a merged result to core-only plan_inventory reconstruction. Never import or execute plugin/module names from data."
+    },
+    {
+      "operation": "migrate",
+      "required": [
+        "from_version",
+        "to_version",
+        "destination",
+        "system_id",
+        "system_name",
+        "system_role",
+        "repository_id"
+      ],
+      "optional": [
+        "input_path",
+        "paths",
+        "production_roots",
+        "test_roots",
+        "draft"
+      ],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "MigrationRequest(InitializationRequest, MigrationSource, bindings=()); plan_migration; commit_migration",
+      "result": "No-overwrite v1-to-v2 conversion, unresolved-field report and exact partial/uncertain effects.",
+      "publication": "Intrinsic creation under explicit new relative destination; dry_run only.",
+      "conditional": "Exactly one of input_path or nonempty paths. Exact supported v1 kind/version per captured source. Missing bindings/environment stay unresolved; no invented mapping or source pin."
+    },
+    {
+      "operation": "doctor",
+      "required": [],
+      "optional": [],
+      "modes": [
+        "structural"
+      ],
+      "existing_api": "verified installed RuntimeIdentity; resource/catalog verification; ActivationStore.select",
+      "result": "Read-only installed/profile/locator checks; native capability explicitly unavailable until P8.",
+      "publication": "No write, receipt, activation or synthetic attestation.",
+      "conditional": ""
+    },
+    {
+      "operation": "read-source",
+      "required": [
+        "read_operation",
+        "paths"
+      ],
+      "optional": [
+        "query",
+        "regex",
+        "max_bytes",
+        "line_start",
+        "line_end"
+      ],
+      "modes": [
+        "structural",
+        "agent-output"
+      ],
+      "existing_api": "SourceReader(... authenticated ReadSelection ...).inspect(SourceReadRequest)",
+      "result": "Exact authorized source items/line ranges, total, returned and explicit truncation.",
+      "publication": "Read-only bounded first page; no authority derived from request paths.",
+      "conditional": "search requires query; list/read reject search-only fields; line range applies to read. Fixed page size because wire lacks cursor/page_size. max_bytes can only tighten accepted limits. Truncation asks caller to narrow paths/query; never claims full enumeration."
+    },
+    {
+      "operation": "prepare-agent",
+      "required": [
+        "skill_id",
+        "selected_ids",
+        "paths",
+        "expected_outputs",
+        "execution_context",
+        "complexity"
+      ],
+      "optional": [],
+      "modes": [
+        "structural",
+        "discovery-complete",
+        "parity-complete",
+        "planning"
+      ],
+      "existing_api": "No native host adapter until P8",
+      "result": "Explicit unavailable authority failure; preserve recognized operation/mode.",
+      "publication": "No source reads, writes or protected receipt; no local-user fallback.",
+      "conditional": ""
+    },
+    {
+      "operation": "finalize-agent",
+      "required": [],
+      "optional": [],
+      "modes": [
+        "agent-output"
+      ],
+      "existing_api": "No native host adapter until P8",
+      "result": "Explicit unavailable authority failure; no synthetic completion.",
+      "publication": "No protected receipt or publication.",
+      "conditional": "Top-level invocation_ref is mandatory and non-null; opaque text alone is not authority."
+    }
+  ],
+  "common_contract": {
+    "parse": "Use shared bounded parser/schema before collaborator calls; reject extra/inapplicable fields, exact-capacity type errors, unsupported mode/format/flag combinations and ambiguous selectors. Paths remain workspace-relative within explicit trusted outer root.",
+    "modes": "Structural-only operations do not silently reinterpret a requested completion gate. agent-output is permitted only on listed role-aware operations with non-null invocation_ref and authenticated invocation; current installed host implementation remains unavailable/fail-closed. All report APIs are root-mode only.",
+    "flags": "Intrinsic mutators act without requiring write=true; dry_run suppresses all effects. Optional publication operations inventory/import-inventory/generate-acceptance/reports publish only with write=true; dry_run+write=true plans without writing. validate-all is the explicit default-publication exception. Pure inspection/individual validation/doctor/read-source and unavailable host operations reject write or dry_run requests that have no supported plan meaning.",
+    "format": "Service transport always emits JSON. json/markdown/both selects report representation only for validate-all and coverage/parity/completion reports. Other operations use format=json; acceptance output_format separately selects markdown/gherkin/both views while retaining structured source.",
+    "capture": "Use trusted ActivationStore selection and InitializationIO/actual capture. RepositoryReader must match the bound I/O repository selection, and writer recapture must retain the same bounded pin selection. No extra ad-hoc source reads. Bootstrap or v1 results use a real manifest of observed bytes/absence without inventing a v2 graph or source identity.",
+    "authority": "ServiceAuthority is an injected trusted carrier, not deserialized JSON. Trusted author ID maps local-user to human and host to agent in existing JsonObject author_or_agent consumers. No request markers, invocation token text, or successful result can grant protected host authority.",
+    "runtime": "Require verified installed code-inclusive RuntimeIdentity; absent/stale/corrupt installed identity yields exit3 with unavailable context, never resource-only/zero digest fallback. Actual package manifest waits for the final serialized build-owner window.",
+    "result": "ServiceArtifact only for supported file kind and valid real digest. Preserve directory/conflict/partial/uncertain effects through fixed counts and actionable findings. Known gate failure remains exit1 even when diagnostic report publication succeeds. Null/unavailable report measures are not converted to zero service counts.",
+    "exits": {
+      "0": "Selected operation/gate passes and any requested effects complete.",
+      "1": "Blocking artifact or selected completion findings; can include successfully published truthful failed report.",
+      "2": "Malformed request or invalid invocation/configuration/path/version; preserve only recognized context.",
+      "3": "Installed runtime/dependency/I/O/authentication/authority failure, including interrupted writes; retain partial effect details when context exists."
+    },
+    "errors": "Use typed existing error codes and shared errors; do not parse human sentences or classify every downstream ValueError as an invocation error. Fixed safe diagnostics exclude source snippets/raw exception messages.",
+    "budgets": "Reserve operation input traversal, selected records, aggregate UTF-8 serialization/output and repeated lookup work before allocation. Reuse accepted limits and shared serialization; no new broad parser, repeated whole-graph assessment, or immutable Mapping.items quadratic traversal."
+  },
+  "concrete_findings": [
+    {
+      "id": "initialization-file-artifacts",
+      "state": "PARENT_APPROVED",
+      "decision": "Directory/nullable-hash output cannot enter ServiceArtifact. Preserve true initialization result; fixed counters/path-specific findings retain directory/conflict/uncertain effects."
+    },
+    {
+      "id": "trusted-attribution",
+      "state": "SHARED_OWNER_CONFIRMED",
+      "decision": "Keep approved author_or_agent str; convert using authenticated principal to existing kind/id JsonObject."
+    },
+    {
+      "id": "individual-validation",
+      "state": "PARENT_APPROVED",
+      "decision": "Expected-kind/path check then honest graph-wide findings, with no truncated-findings filtering; exact v1 profile compatibility preserved."
+    },
+    {
+      "id": "source-read-first-page",
+      "state": "PARENT_APPROVED",
+      "decision": "Fixed bounded first page; exact requested line range/selection plus total/returned/truncation, no completeness claim."
+    },
+    {
+      "id": "canonical-analyzer-publication",
+      "state": "SELECTOR_OWNER_CONFIRMED",
+      "decision": "InventoryRegistry.select and run_inventory injection match; plan_inventory remains installed-only and uses same explicit normalized selection."
+    },
+    {
+      "id": "gateway-local-boundary",
+      "state": "IMPLEMENTATION_OBLIGATION",
+      "decision": "Bind a real installed local ServiceIO composition, verified build identity, protected ActivationStore and local-user authority. Do not ship a placeholder provider that rejects every operation or treats missing host authority as local authorization."
+    }
+  ],
+  "ownership_and_size_proposal": {
+    "retain": [
+      "R/service.py",
+      "R/operations.py",
+      "PT/test_service.py",
+      "R/gateway.py",
+      "R/doctor.py",
+      "PT/test_gateway.py",
+      "PT/test_doctor.py"
+    ],
+    "request_before_creation": [
+      "R/service_reports.py",
+      "R/service_mutations.py",
+      "PT/test_service_publication.py"
+    ],
+    "rationale": "Thirty fixed routes include ten intrinsic/transport mutators and five report/generation compositions. Putting all typed handlers, prospective publication/result mapping and immediate-intent documentation in operations.py is forecast to exceed 500 lines. These are the two already anticipated cohesive handler splits, plus one publication-focused test split; no accepted-module edits or generic dispatch framework.",
+    "boundaries": {
+      "service.py": "Lifecycle, trusted context, actual capture, typed error/exit mapping and final shared result validation.",
+      "operations.py": "Fixed operation dispatch, profile/individual graph validation, inventory/read-source and unavailable host routes.",
+      "service_reports.py": "Four authoritative report projections and acceptance generation/rendering with controlled paired/source/view plans.",
+      "service_mutations.py": "Initialization/configuration, draft/CAS/evidence and source-transport/migration composition using existing planners; no raw writer.",
+      "gateway.py": "Bounded single stdin/stdout JSON plus installed local ServiceIO adapter; no shell or request-selected imports.",
+      "doctor.py": "Read-only identity/resource/profile/capability health projection."
+    },
+    "forecast": "Planning estimate, not a formatted measurement: service 250-350, operations 300-420, reports 250-350, mutations 400-480, gateway 250-400, doctor 100-180 lines. All implementation files must remain <=500 after Black; request another exact split only on concrete size evidence.",
+    "shared_owners_unchanged": "workspace_operations owns shared contracts/serialization/failure schema/acceptance selector; source_inspection_preparation owns analyzer selectors; snapshot_inventory_capture owns build identity. No duplicate lists, ports, baseline or accepted API edits."
+  },
+  "focused_test_plan": {
+    "rule": "These are proposed behavioral groups, not collected or passed nodes. Exact final node lists come from the frozen implementation. Do not rerun accepted suites to create this baseline.",
+    "service_routes": "One explicit parameter row for each of the 30 operations. The 28 implemented routes use real validators/planners and isolated captured memory fixtures; prepare/finalize assert typed unavailable with no side effects.",
+    "service_boundaries": [
+      "four exit classes and recognized/unavailable context",
+      "local-user versus unavailable host and spoofed opaque reference",
+      "same repository reader/pins through capture and writer recapture",
+      "exact analyzer subset and canonical planner reconstruction",
+      "expected kind/path plus unrelated graph blocker retention",
+      "true-v1 profile compatibility with real input manifest",
+      "source read first-page totals/truncation/line range",
+      "prospective bounded dispatch/output and deterministic error ordering"
+    ],
+    "publication": [
+      "normal/dry-run/idempotent exact outputs",
+      "initialization directories/conflict and interrupted partial effects",
+      "exact grants and stale CAS refuse before write",
+      "failed selected gate may publish truthful report but remains exit1",
+      "malformed core cannot authorize any publication",
+      "acceptance ready/pending source plus views share one prospective plan",
+      "transport/migration no overwrite and exact captured source identity"
+    ],
+    "gateway": [
+      "one bounded JSON document and no extra stdout",
+      "duplicate/truncated/nonfinite/unsupported request produces schema-valid exit2",
+      "runtime identity absent/stale produces exit3",
+      "no arbitrary executable/import/path selector",
+      "exact process exit agrees with result and errors remain redacted"
+    ],
+    "doctor": [
+      "installed version/code/resource integrity",
+      "active/inactive/conflicting profile/locator selection",
+      "read-only behavior",
+      "explicit unavailable native capability without host receipt"
+    ],
+    "reuse_fixtures": [
+      "initialization_test_support.InitializationCase/MemoryRepository/seed_proposal",
+      "mutation_test_support.MemoryDisk/capture/mutation_case",
+      "draft_test_support.draft_case/transition_case",
+      "evidence_test_support.link_baseline/request_for/memory_writer",
+      "source_snapshot_test_support.source_capture/import_case/target_capture",
+      "validation_test_support.no_scope_snapshot/replace_document/output_context",
+      "accepted parity/acceptance memory graph fixtures only where the routed operation needs them"
+    ],
+    "isolation": "Fresh mutable memory stores, fixed injected clock and read-only immutable schemas/templates. No unit tempfiles/process/network. Shared contract/failure tests remain with their owner; no duplicated test suite."
+  },
+  "native_first_proposal": {
+    "state": "PREPARATION_ONLY_NOT_EXECUTED",
+    "reuse": "Accepted P5-T2/P5-T3 Windows/Git fixture/capture/grant/publication mechanics; preserved original evidence. Do not mutate the fixture during preparation.",
+    "release": "All code/schema/resource owners frozen; independent candidate review closed; serialized actual build/resource staging completed; checked commit/push and explicit native execution release after clean Black/Ruff/types/static.",
+    "checks": [
+      "verify actual installed module identity and one real service/gateway read-only capture/result; no checkout-path identity substitute",
+      "inventory explicit subset binds exact captured Git/source bytes and schema-valid result, without writes",
+      "report dry-run retains selected mode/known failing gate and leaves fixture unchanged",
+      "guarded paired report publication returns exact statuses/hashes; recapture/recompute and rerun are idempotent",
+      "wrong/stale grant or CAS and unavailable host principal refuse without authored writes",
+      "malformed request and missing/corrupt identity produce exact exit2/exit3 wire envelopes"
+    ],
+    "expectations": "Use independently stated fixture facts/statuses and retained source hashes, not values copied from generated output. This is Windows local/Git/installed runtime composition only, not an installed coding-agent host-hook or cross-platform claim."
+  },
+  "qa_handoff": "Future ordered Black -> Ruff -> Pyright -> tests/coverage with scoped architecture/intent/size/isolation and applicable contracts. New module/class/callable >=90%; unchanged accepted proof reused by exact bindings. Native-first composition precedes long caller batches. No QA execution or completion claim is made by this preparation."
+}

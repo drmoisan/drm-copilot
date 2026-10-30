@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "base64": "ew0KICAiY3VycmVudF9jb3ZlcmFnZSI6IHsNCiAgICAicGF0aCI6ICJkb2NzL2ZlYXR1cmVzL2FjdGl2ZS8yMDI2LTEwLTE3LWxlZ2FjeS1kaXNjb3ZlcnktYW5kLXBhcml0eS05ODAvZXZpZGVuY2UvcWEtZ2F0ZXMvcDV0My1maW5hbC1jdXJyZW50LWNvdmVyYWdlLjIwMjYtMTAtMjBUMDktNTcuanNvbiIsDQogICAgInNoYTI1NiI6ICI5NDJhYzVlZjM5ZGExZTM0MWEyMGQyMDQ5ZjA5ODQ3NzQ4MmIwNDgwZWFjNmEwODc2NmNiZGEyMTg0OGIyZjVlIg0KICB9LA0KICAiY292ZXJhZ2VfcmFuZ2VzIjogew0KICAgICJwYXRoIjogImRvY3MvZmVhdHVyZXMvYWN0aXZlLzIwMjYtMTAtMTctbGVnYWN5LWRpc2NvdmVyeS1hbmQtcGFyaXR5LTk4MC9ldmlkZW5jZS9xYS1nYXRlcy9wNXQzLWZpbmFsLWNvdmVyYWdlLXJhbmdlcy4yMDI2LTEwLTIwVDA5LTU3Lmpzb24iLA0KICAgICJzaGEyNTYiOiAiYzkxMmYwNTBkMGU2ZGVlMGY5ZDI2MzAwZTI4ZGEwY2M2NGU0NmQyOGJjMGIwNjdmNDM5ZWU4YzYyM2Y1YWEwMiINCiAgfSwNCiAgInJhbmdlX2NvdW50IjogNDIsDQogICJtb2R1bGVfY291bnQiOiA2LA0KICAicXVhbGlmaWVkX3ByaW9yX3Byb29mX2NvdW50IjogMjMsDQogICJjdXJyZW50X3Jhd19jb3VudGVyc19hdWdtZW50ZWQiOiBmYWxzZQ0KfQ0K",
+      "bytes": 651,
+      "path": "SCRATCH/p5t3-final-coverage-proof-094649.stdout",
+      "sha256": "cf931794eafb0d8b7796fde19b248a80f0c16e3a9259b9a4824ae3d7f2c803a0"
+    },
+    {
+      "base64": "",
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-coverage-proof-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDYsICJsYWJlbCI6ICJjb3ZlcmFnZS1wcm9vZiIsICJzdGF0dXMiOiAiZmluaXNoZWQiLCAiY29tcGxldGVkIjogMCwgImxhc3Rfbm9kZSI6IG51bGwsICJzdGFydGVkX2F0IjogIjIwMjYtMTAtMjBUMDk6NTc6MTMuMjc4OTMyKzAwOjAwIiwgInRpbWVvdXRfc2Vjb25kcyI6IDMwMCwgInBpZCI6IDg5Nzc2LCAiZWxhcHNlZF9zZWNvbmRzIjogMi4wNDcsICJleGl0X2NvZGUiOiAwfQo=",
+      "bytes": 227,
+      "path": "SCRATCH/p5t3-final-coverage-proof-094649.progress.json",
+      "sha256": "50a498e7ed2155b50d72c2f1268605b706478dc4fc08eed59ad150ac3c8f888b"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}

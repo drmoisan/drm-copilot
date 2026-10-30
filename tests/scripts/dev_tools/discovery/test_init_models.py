@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools.discovery import init_models as mod
+from drm_copilot_discovery import init_models as mod
+
+from scripts.dev_tools.discovery.init_models import resolve_default_template_root
 
 if TYPE_CHECKING:
     import pytest
@@ -18,27 +20,33 @@ def test_real_file_system_delegates_to_pathlib(
     calls: list[str] = []
 
     def fake_exists(self: Path) -> bool:  # noqa: ARG001
+        """Record the existence query without inspecting a real path."""
         calls.append("exists")
         return True
 
     def fake_is_dir(self: Path) -> bool:  # noqa: ARG001
+        """Return the fixture's directory classification without disk access."""
         calls.append("is_dir")
         return True
 
     def fake_iterdir(self: Path):  # noqa: ARG001
+        """Supply immutable child names and record the enumeration request."""
         calls.append("iterdir")
         return iter([Path("a"), Path("b")])
 
     def fake_mkdir(self: Path, parents: bool, exist_ok: bool) -> None:  # noqa: ARG001
+        """Record directory creation while leaving the real filesystem untouched."""
         calls.append("mkdir")
 
     def fake_read_text(self: Path, encoding: str) -> str:  # noqa: ARG001
+        """Return fixed text through the adapter's normal read interface."""
         calls.append("read_text")
         return "content"
 
     def fake_write_text(
         self: Path, content: str, encoding: str
     ) -> None:  # noqa: ARG001
+        """Record publication without writing the supplied text anywhere."""
         calls.append("write_text")
 
     monkeypatch.setattr(Path, "exists", fake_exists, raising=True)
@@ -70,7 +78,7 @@ def test_real_file_system_delegates_to_pathlib(
 
 
 def test_expected_template_relative_paths_has_eight_entries() -> None:
-    """The template/output path constants have the expected, index-aligned shape."""
+    """Frozen v1 constants remain import-compatible; they do not select v2 outputs."""
     assert len(mod.EXPECTED_TEMPLATE_RELATIVE_PATHS) == 8
     assert len(mod.ARTIFACT_RELATIVE_PATHS) == 7
     assert len(mod.OUTPUT_RELATIVE_PATHS) == 8
@@ -78,6 +86,7 @@ def test_expected_template_relative_paths_has_eight_entries() -> None:
     assert mod.EXPECTED_TEMPLATE_RELATIVE_PATHS[0] == mod.DOMAIN_PROFILE_RELATIVE_PATH
     assert mod.OUTPUT_RELATIVE_PATHS[0] == Path("domain-profile.yaml")
 
+    # Preserve the frozen v1 path correspondence independently of v2 projection.
     for template_path, output_path in zip(
         mod.EXPECTED_TEMPLATE_RELATIVE_PATHS[1:],
         mod.OUTPUT_RELATIVE_PATHS[1:],
@@ -90,5 +99,16 @@ def test_expected_template_relative_paths_has_eight_entries() -> None:
 
 def test_resolve_default_template_root_returns_expected_path() -> None:
     """The default template root ends in `docs/discovery/templates`."""
-    result = mod.resolve_default_template_root()
-    assert result.parts[-3:] == ("docs", "discovery", "templates")
+    result = resolve_default_template_root()
+    repository = Path(__file__).resolve().parents[4]
+    assert result == repository / "docs" / "discovery" / "templates"
+
+
+def test_v2_template_layout_is_separate_from_frozen_legacy_constants() -> None:
+    """The new root workflow selects six closed templates without changing v1 paths."""
+    from drm_copilot_discovery.init_projection import ARTIFACT_TEMPLATES, TEMPLATE_NAMES
+
+    assert len(TEMPLATE_NAMES) == 6
+    assert TEMPLATE_NAMES[0] == "domain-profile.yaml"
+    assert {name for _, _, name in ARTIFACT_TEMPLATES} == set(TEMPLATE_NAMES[1:])
+    assert not any("feature-contract" in name for name in TEMPLATE_NAMES)

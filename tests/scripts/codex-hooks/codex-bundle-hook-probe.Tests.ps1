@@ -23,6 +23,7 @@ Describe 'Bundled Codex PreToolUse hooks run from the bundle location (issue #69
             'authorize-root-epic-invocation.ps1',
             'record-subagent-routing-attestation.ps1',
             'validate-codex-subagent-routing.ps1',
+            'validate-discovery-agent-output.ps1',
             'validate-feature-review-coverage.ps1'
         )
 
@@ -155,13 +156,13 @@ Describe 'Bundled Codex PreToolUse hooks run from the bundle location (issue #69
         $script:PreToolUseRegistrations = @($script:Registrations | Where-Object Event -EQ 'PreToolUse')
     }
 
-    It 'derives 18 PreToolUse hooks and excludes 4 non-PreToolUse registrations from the bundle config' {
+    It 'derives 20 PreToolUse hooks and excludes 5 non-PreToolUse registrations from the bundle config' {
         $allHooks = @($script:Registrations | ForEach-Object HookName | Sort-Object -Unique)
         $preToolUseHooks = @($script:PreToolUseRegistrations | ForEach-Object HookName | Sort-Object -Unique)
         $excludedHooks = @($allHooks | Where-Object { $_ -notin $preToolUseHooks } | Sort-Object)
 
-        $allHooks.Count | Should -Be 22
-        $preToolUseHooks.Count | Should -Be 18
+        $allHooks.Count | Should -Be 25
+        $preToolUseHooks.Count | Should -Be 20
         $excludedHooks | Should -Be @($script:ExpectedExcludedHooks | Sort-Object)
         ($preToolUseHooks.Count + $excludedHooks.Count) | Should -Be $allHooks.Count
         foreach ($name in $preToolUseHooks) {
@@ -191,7 +192,7 @@ Describe 'Bundled Codex PreToolUse hooks run from the bundle location (issue #69
             }
         }
 
-        $invocations | Should -Be 43
+        $invocations | Should -Be 47
         $failures -join "`n" | Should -BeNullOrEmpty -Because 'every bundled hook must allow a benign admitted payload from the bundle location'
     }
 

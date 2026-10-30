@@ -1,0 +1,132 @@
+{
+  "timestamp": "2026-10-19T09-18",
+  "recorded_at": "2026-10-19T09:18:21.567257+00:00",
+  "task": "P4-T6",
+  "command": "poetry run python SCRATCH/issue-980-p4t6-publish-review.py",
+  "exit_code": 0,
+  "status": "CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+    "tests/discovery_runtime/analyzer/test_test_references.py",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py"
+  ],
+  "combined_head": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+  "accepted_baseline": "6804041b88ea80e386948a0327dca8f0d7a89471",
+  "binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-binding.2026-10-19T09-15.json",
+    "sha256": "f2580ca269f112a97bb21344f9d5185cf58c7b34d90836f20793067e55ab7af4"
+  },
+  "subset_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-ui-freeze.2026-10-19T08-52.json",
+      "sha256": "7d990c2859f1b2b4968ae6dee52193b54c55791636bf988a0ba91d5f9f282eb9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-test-reference-freeze.2026-10-19T09-07.json",
+      "sha256": "463f2dcb604a4290825909da78096ebaecdd1a9fbe25ec020343a1f8a582bdc1"
+    }
+  ],
+  "checks": [
+    "The finite WPF namespace, roots, elements and event pairs emit declaration facts. Opaque resources/templates/custom subtrees remain uninterpreted; conventional retained code-behind relevance is inferred with null target, explicit ambiguity and unresolved binding/execution.",
+    "Configured test roots establish test scope; production and entrypoint ownership take precedence. Literal construction and typeof/default/sizeof contexts provide inferred relevance, including same-name ambiguity, without behavioral coverage or passing-test claims.",
+    "Direct MSBuild ItemGroup ProjectReference operations remain syntax facts. Update/Remove, expressions, wildcards and inherited conditions do not become activated edges; raw expressions and conditions are withheld.",
+    "Retained immutable input bytes and exact repository/revision/path/content pin matching determine provenance. Source references use the accepted cached InventoryInput digest; no repeated source reads or per-finding payload rehash is introduced.",
+    "Scope matching, pins, selected input, lexical index, parse/token work, projected records and encoded text have finite independent bounds. Aggregate exhaustion discards partial claims behind fixed diagnostics. Duplicate pins preserve any-exact-match semantics.",
+    "Occurrence-based source anchors and IDs preserve duplicates and deterministic input ordering. C# offsets retain literal spelling and physical lines; XML anchors explicitly retain accepted parser precision.",
+    "Seven reviewed files remain within 500 lines, with intent docstrings/comments and isolated deterministic tests. The implementation imports accepted primitives only, performs no publication or runtime/compiler operations, and does not expose a registry before P4-T9.",
+    "The two focused ordered loops remain bound to exact reviewed bytes: 107 UI cases and 138 test-reference cases. Raw coverage, 26 named class/callable ranges and all executed harness snapshots reconcile; no worker suite or predecessor review was replayed.",
+    "Three additional memory-only output probes covered maximum supported UI class/handler names with long ASCII/BMP/astral paths. Every canonical UTF-8 result remained within its prospective text reservation; the concrete concern is closed."
+  ],
+  "findings": [],
+  "open_behavioral_probes": [],
+  "open_evidence_discrepancies": [],
+  "coverage": {
+    "ui": [
+      164,
+      164,
+      58,
+      58
+    ],
+    "test_references": [
+      218,
+      222,
+      92,
+      96
+    ],
+    "ui_ranges": 11,
+    "test_reference_ranges": 15,
+    "all_ranges_at_least_90_percent": true
+  },
+  "known_uncovered_lines": {
+    "test_references.py": [
+      257,
+      358,
+      392
+    ],
+    "test_reference_syntax.py": [
+      55
+    ]
+  },
+  "qualification": [
+    "Candidate review only: final ordered gates, native composition and independent task acceptance are still pending. No task or AC checkbox changed; counts remain 37/84 and 13/66.",
+    "The original UI 103-pass/3-failure anchor expectations and test-reference initial diagnostics remain preserved. Parser-reported line semantics were accepted explicitly; no predecessor parser was modified.",
+    "Reconstructed from the exact retained verbose stdout with space-bearing parameter identifiers preserved. The preliminary focused receipt test_node_order field used a non-whitespace pattern and is not the authoritative full node list.",
+    "UI focused receipts retain combined sanitized command output; test-reference receipts retain separately hashed raw streams. These evidence formats are not conflated.",
+    "The first successful binding check had machine-specific path literals in its harness. Its exact receipt and harness were archived under session SCRATCH. Only path discovery changed to portable environment/home references; the bounded metadata check passed again without behavioral execution.",
+    "The first review publication command exited 1 because the hygiene assertion matched its own literal forbidden-path pattern in the saved harness (line 100, AssertionError). Its complete three output files remain byte-preserved in the archive. The check now constructs the same forbidden bytes from separate constants; no behavioral check, review finding or source changed.",
+    "A prior interactive metadata read requested the absent output field on a test-reference receipt. Those receipts use stdout/stderr; the read-only error did not change any evidence. This checker uses the actual fields and retained raw streams."
+  ],
+  "original_binding_archive": [
+    {
+      "path": "SCRATCH/p4t6-binding-originals/p4t6-executor-candidate-binding-harness.2026-10-19T09-14.txt",
+      "sha256": "5d21f35c43b3fcc8ee6557a4ee621970105f8d1b4a55b1ef607936fca2be2af8"
+    },
+    {
+      "path": "SCRATCH/p4t6-binding-originals/p4t6-executor-candidate-binding.2026-10-19T09-14.json",
+      "sha256": "9a2cb5452d5599ed7459a5e672f4d19bb6e58569d33090fbe7056dc5bec34d38"
+    },
+    {
+      "path": "SCRATCH/p4t6-binding-originals/p4t6-executor-candidate-review.2026-10-19T09-17.json",
+      "sha256": "c7004c7224fe8bc49d5e58aadd8f9c2b238ebbbe1249a92be04591efd1667ab2"
+    },
+    {
+      "path": "SCRATCH/p4t6-binding-originals/p4t6-executor-candidate-review.2026-10-19T09-17.md",
+      "sha256": "b00c3da86b8406b7d2c5afa326fac2bf51716bb724ab5e3f7608d233dd833174"
+    },
+    {
+      "path": "SCRATCH/p4t6-binding-originals/p4t6-executor-review-publication-harness.2026-10-19T09-17.txt",
+      "sha256": "52e7f17b545a37468a2b5cdf64d015dd56e0af4783c837c052f8c7e039ae4cc2"
+    }
+  ],
+  "limitations": [
+    "Configured test roots define test scope; production/entrypoint ownership wins overlaps.",
+    "Only explicit construction and typeof/default/sizeof contexts produce inferred lexical relevance; variable type declarations, static calls, target-typed construction and object-initializer-only syntax are omitted.",
+    "Namespace/alias/shadowing/partial/nested/generic binding and conditional compilation remain unresolved, including unique spelling matches.",
+    "Direct ItemGroup ProjectReference Include/Update/Remove is declared syntax; raw expressions, wildcard targets and conditions are withheld; activation and target binding remain unresolved.",
+    "C# anchors are exact retained lexical token positions; XML anchors are the accepted parser line and node ordinal, not a fabricated physical opening-tag span.",
+    "No compiler, runtime execution, passing-test, behavioral-coverage or discovery-completion claim; every relationship is inferred with a null cross-adapter target.",
+    "Public registry exposure remains P4-T9. No native coding-agent host or non-Windows proof; combined final gates and independent acceptance remain pending."
+  ],
+  "proposed_final_gate_scope": [
+    "Scoped Black --check then Ruff over the seven frozen source/test files.",
+    "Whole-repository Pyright and the established scoped architecture, optional-import, I/O, test-isolation and file-size checks.",
+    "Two isolated reversed-module unit batches: UI limits before UI callbacks (107 cases), and test-reference syntax before adapter tests (138 cases), with all three production modules measured and per-range/changed-line coverage retained.",
+    "Applicable inventory-v2/schema/resource/quality-tier and actual dependent neutrality contracts, using the established selector rather than replaying earlier analyzer suites.",
+    "Bounded synthetic Windows/Git capture and immutable inventory composition for both adapters. Verify exact pins, deterministic results, inferred null targets, uninspected/unassigned ledger seeds and no UI/compiler/network execution or source mutation. Host and non-Windows verification remain later tasks."
+  ],
+  "publication_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-review-publication-harness.2026-10-19T09-18.txt",
+    "sha256": "0bb8e02980169452c4195628d7d6b6bd6a7693c1ef45f0c598d252495b1606c4"
+  },
+  "next_five_tasks": [
+    "P4-T7",
+    "P4-T8",
+    "P4-T9",
+    "P5-T1",
+    "P5-T2"
+  ]
+}

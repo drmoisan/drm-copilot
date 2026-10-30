@@ -1,0 +1,39 @@
+{
+  "batch": "provenance",
+  "command": "poetry run python -m black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T07:26:45.343554+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t5-access-provenance-format-072645.2026-10-19T07-26.stderr.txt",
+      "sha256": "ee3b1f99f4a72e8dd95b873f18150810c8296b9c06eaf570c2792e990a789646"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t5-access-provenance-format-072645.2026-10-19T07-26.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.698305,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "2340e4a3d24bc71d50f71a9873ac710f19fbc3f2a89402827aed70234ba047a1",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "334fe3023f7fca45e1f0bc3d4e83b3a2b968ad2359f76c52e2203a6d370eeb95",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T07:26:44.645249+00:00",
+  "stderr": "reformatted tests\\discovery_runtime\\analyzer\\test_filesystem_access.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n1 file reformatted, 5 files left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-26"
+}

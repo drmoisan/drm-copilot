@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:scope",
+  "title": "Discovery v2 scope",
+  "description": "Explicit consumer discovery selection and confirmation. A structurally valid draft is not a completed inventory or migration.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "status", "repository", "included_roots", "included_components", "included_features", "exclusions", "inventory_snapshot_refs", "confirmed_by", "required_coverage", "disposition", "no_scope_rationale", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:scope"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "scope"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "status": {"enum": ["draft", "confirmed"]},
+    "repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/draft-repository-reference"},
+    "included_roots": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+    "included_components": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+    "included_features": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/feature-references"},
+    "exclusions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/exclusions"},
+    "inventory_snapshot_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/inventory-references"},
+    "confirmed_by": {"anyOf": [{"$ref": "#/$defs/confirmation"}, {"type": "null"}]},
+    "required_coverage": {
+      "type": "object", "additionalProperties": false, "required": ["feature_refs", "client_ids", "modes"],
+      "properties": {
+        "feature_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/feature-references"},
+        "client_ids": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "modes": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"}
+      }
+    },
+    "disposition": {"enum": ["in-scope", "no-scope"]},
+    "no_scope_rationale": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "confirmed"}}, "required": ["status"]},
+      "then": {
+        "properties": {
+          "repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"},
+          "confirmed_by": {"$ref": "#/$defs/confirmation"}
+        }
+      },
+      "else": {"properties": {"confirmed_by": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"disposition": {"const": "no-scope"}}, "required": ["disposition"]},
+      "then": {
+        "properties": {
+          "no_scope_rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+          "included_roots": {"maxItems": 0},
+          "included_components": {"maxItems": 0},
+          "included_features": {"maxItems": 0},
+          "required_coverage": {"properties": {"feature_refs": {"maxItems": 0}}}
+        }
+      },
+      "else": {"properties": {"no_scope_rationale": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "confirmed"}, "disposition": {"const": "in-scope"}}, "required": ["status", "disposition"]},
+      "then": {
+        "anyOf": [
+          {"properties": {"included_roots": {"minItems": 1}}},
+          {"properties": {"included_components": {"minItems": 1}}},
+          {"properties": {"included_features": {"minItems": 1}}}
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "confirmation": {
+      "type": "object", "additionalProperties": false, "required": ["owner", "timestamp", "evidence_refs"],
+      "properties": {
+        "owner": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "timestamp": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references", "minItems": 1}
+      }
+    }
+  }
+}

@@ -1,0 +1,175 @@
+"""Bind the completed isolated proof without repeating any quality gate."""
+import ast
+import base64
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+feature = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+evidence = feature / 'evidence'
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+batch = sys.argv[1]
+binding_path = sorted((evidence / 'qa-gates').glob('p4t9-shared-inputs-' + batch + '-binding.*.json'))[-1]
+binding = json.loads(binding_path.read_bytes())
+baseline = evidence / 'baseline/p4t9-shared-baseline.2026-10-19T12-41.json'
+baseline_data = json.loads(baseline.read_bytes())
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def ref(path):
+    return {'path': path.relative_to(root).as_posix(), 'sha256': sha(path.read_bytes())}
+
+def emit(kind, stem, data):
+    target = evidence / kind / (stem + '.' + stamp + '.json')
+    with target.open('xb') as stream:
+        stream.write((json.dumps(data, indent=2, sort_keys=True)+'\n').encode('utf-8'))
+    return target
+
+def markdown(kind, stem, content):
+    target = evidence / kind / (stem + '.' + stamp + '.md')
+    with target.open('xb') as stream:
+        stream.write(('\n'.join(line.rstrip() for line in content.splitlines())+'\n').encode('utf-8'))
+    return target
+
+def git(*args):
+    return subprocess.run(['git', *args], capture_output=True, check=True).stdout
+
+emitter_path = 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py'
+original_emitter = git('show', baseline_data['head'] + ':' + emitter_path)
+original_functions = {node.name: node for node in ast.parse(original_emitter).body if isinstance(node, ast.FunctionDef)}
+current_functions = {node.name: node for node in ast.parse((root / emitter_path).read_bytes()).body if isinstance(node, ast.FunctionDef)}
+unchanged = ('compute_schema_ref', 'serialize_record', '_ordered')
+for name in unchanged:
+    assert ast.dump(original_functions[name]) == ast.dump(current_functions[name]), name
+disposition = {'original_emitter_sha256': sha(original_emitter), 'unchanged_function_ast': list(unchanged), 'changed_function': 'inventory_result', 'new_emitter_function': '_analyzer_metadata', 'new_module': 'extension_inputs.py', 'record_limit_relocation': 'The pre-aggregation cumulative row check enforces the original post-aggregation limit before allocation; the duplicate late branch was removed.', 'baseline_coverage': next(item for item in baseline_data['coverage_baselines'] if item['path'] == emitter_path)}
+
+prior_run_path = evidence / 'regression-testing/p4t9-shared-inputs-focused8-tests-132643.2026-10-19T13-26.json'
+prior_run = json.loads(prior_run_path.read_bytes())
+projection_path = 'packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py'
+projection_text = (root / projection_path).read_text(encoding='utf-8')
+projection_tree = ast.parse(projection_text)
+budget_node = next(node for node in projection_tree.body if isinstance(node, ast.ClassDef) and node.name == '_Budget')
+doc_node = budget_node.body[0]
+old_doc = '    """Reserve canonical text, value nodes, mapping records and traversal work."""\n'
+projection_lines = projection_text.splitlines(keepends=True)
+reconstructed_projection = ''.join(projection_lines[:doc_node.lineno - 1]) + old_doc + ''.join(projection_lines[doc_node.end_lineno:])
+assert sha(reconstructed_projection.encode('utf-8')) == prior_run['source_after'][projection_path]
+
+class StripDocs(ast.NodeTransformer):
+    def generic_visit(self, node):
+        node = super().generic_visit(node)
+        if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+            node.body = node.body[1:]
+        return node
+
+assert ast.dump(StripDocs().visit(ast.parse(reconstructed_projection))) == ast.dump(StripDocs().visit(projection_tree))
+fixture_path = 'tests/discovery_runtime/test_extension_input_limits.py'
+fixture_text = (root / fixture_path).read_text(encoding='utf-8')
+fixture_delta = '    # An explicit limits policy itself adds a mapping to profiles that omit it.\n    final_shape = row(\n        **(dict(initial.profile.document) | {"limits": row(artifact_records=1)})\n    )\n'
+assert fixture_text.count(fixture_delta) == 1
+reconstructed_fixture = fixture_text.replace(fixture_delta, '').replace('mappings(final_shape) + 2', 'mappings(initial.profile.document) + 2')
+assert sha(reconstructed_fixture.encode('utf-8')) == prior_run['source_after'][fixture_path]
+for path, expected in prior_run['source_after'].items():
+    if path not in (projection_path, fixture_path):
+        assert sha((root / path).read_bytes()) == expected
+repair = {'review': ref(evidence / 'qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json'), 'prior_focused_run': ref(prior_run_path), 'changed_paths': [projection_path, fixture_path], 'projection_docstring_stripped_ast_equal': True, 'fixture_change': 'Count the exact final profile mapping population including its explicit limits object; retain the two-created-rows assertion and all original cases.', 'prior_byte_reconstruction': 'The preceding class docstring and capacity expression are reconstructed by this retained harness and hash-match the immutable focused8 source_after bindings; no claim of a separate pre-edit file capture is made.'}
+prior_source_target = evidence / 'qa-gates' / ('p4t9-shared-inputs-pre-r1-source.' + stamp + '.txt')
+with prior_source_target.open('xb') as stream:
+    stream.write(reconstructed_projection.encode('utf-8'))
+repair['pre_repair_source'] = ref(prior_source_target)
+
+sources = []
+for path, expected in binding['sources'].items():
+    content = (root / path).read_bytes()
+    assert sha(content) == expected
+    assert len(content.splitlines()) <= 500
+    indexed = subprocess.run(['git', 'show', ':' + path], capture_output=True)
+    sources.append({'path': path, 'sha256': expected, 'lines': len(content.splitlines()), 'working_git_object': git('hash-object', '--no-filters', path).decode().strip(), 'filtered_git_object': git('hash-object', '--path=' + path, path).decode().strip(), 'index_sha256': sha(indexed.stdout) if indexed.returncode == 0 else None})
+for path, expected in binding['dependencies'].items():
+    assert sha((root / path).read_bytes()) == expected
+receipts = []
+for item in binding['receipts']:
+    path = root / item['path']
+    assert sha(path.read_bytes()) == item['sha256']
+    record = json.loads(path.read_bytes())
+    assert record['exit_code'] == 0
+    assert record['source_before'] == record['source_after'] == binding['sources']
+    assert record['dependencies_before'] == record['dependencies_after'] == binding['dependencies']
+    receipts.append(record)
+assert [item['stage'] for item in receipts] == ['format', 'lint', 'types', 'tests-fixture-precheck', 'tests']
+assert len(receipts[-2]['test_node_order']) == 1
+nodes = receipts[-1]['test_node_order']
+assert nodes and len(nodes) == len(set(nodes))
+coverage = json.loads((root / binding['coverage']['path']).read_bytes())
+units = []
+modules = []
+for path, measured in coverage['files'].items():
+    tree = ast.parse((root / path).read_bytes())
+    ranges = {}
+    def visit(items, parent=''):
+        for node in items:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                ranges[parent + node.name] = {'start': node.lineno, 'end': node.end_lineno}
+                visit(node.body, parent + node.name + '.')
+    visit(tree.body)
+    assert measured['summary']['percent_statements_covered'] >= 90
+    assert measured['summary']['percent_branches_covered'] >= 75
+    modules.append({'path': path, 'summary': measured['summary'], 'missing_lines': measured['missing_lines'], 'missing_branches': measured.get('missing_branches', [])})
+    for kind in ('classes', 'functions'):
+        for name, value in measured[kind].items():
+            if not name:
+                continue
+            if value['summary']['num_statements']:
+                assert value['summary']['percent_statements_covered'] >= 90, (path, name, value['summary'])
+            units.append({'path': path, 'kind': kind, 'name': name, 'range': ranges[name], 'summary': value['summary'], 'missing_lines': value['missing_lines'], 'missing_branches': value.get('missing_branches', [])})
+ranges_path = emit('regression-testing', 'p4t9-shared-inputs-coverage-ranges', {'task': 'P4-T9', 'timestamp': stamp, 'coverage': binding['coverage'], 'modules': modules, 'units': units, 'baseline': ref(baseline), 'disposition': disposition, 'repair': repair, 'qualification': 'Emitter legacy helpers retain accepted predecessor behavior; new projection and identity logic are measured here. Repository-wide/final task gates remain pending.'})
+harnesses = []
+for path in sorted(scratch.glob('issue-980-shared-inputs-*.py')):
+    destination = evidence / 'qa-gates' / ('p4t9-shared-inputs-harness-' + path.stem.removeprefix('issue-980-shared-inputs-') + '.' + stamp + '.txt')
+    with destination.open('xb') as stream:
+        stream.write(path.read_bytes())
+    harnesses.append({'scratch_path': 'SCRATCH/' + path.name, **ref(destination)})
+streams = []
+for path in sorted(evidence.rglob('p4t9-shared-inputs-*.json')):
+    value = json.loads(path.read_bytes())
+    if 'stage' not in value or 'raw' not in value:
+        continue
+    for label, item in value['raw'].items():
+        content = (scratch / Path(item['path']).name).read_bytes()
+        assert sha(content) == item['sha256']
+        streams.append({'receipt': ref(path), 'stream': label, 'path': item['path'], 'sha256': item['sha256'], 'base64': base64.b64encode(content).decode('ascii')})
+for path in sorted(scratch.glob('*.raw.json')):
+    content = path.read_bytes()
+    streams.append({'path': 'SCRATCH/' + path.name, 'sha256': sha(content), 'base64': base64.b64encode(content).decode('ascii')})
+raw_path = emit('qa-gates', 'p4t9-shared-inputs-lossless-streams', {'task': 'P4-T9', 'timestamp': stamp, 'encoding': 'Base64 preserves exact raw bytes; readable receipts use portable paths.', 'streams': streams})
+handoff = markdown('regression-testing', 'p4t9-shared-inputs-handoff', f'''# P4-T9 shared contract handoff
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-shared-inputs-freeze.py {batch}`
+EXIT_CODE: 0
+Output Summary: Five owned files are frozen after {len(nodes)} passing focused cases and the ordered Black/Ruff/scoped Pyright loop. Independent review and final task gates remain pending.
+
+The pure extension input projection includes configured profile/version data, source/test/documentation input status and hashes, exclusion records, source/target repository pins and retained local Git descriptors. Generated output paths are excluded; manifest paths must first be inside the configured inventory root. Complete snapshot and mutation freshness semantics are unchanged. Canonical hashing uses the existing UTF-8 serializer; manifest hashing excludes only the root manifest_sha256 member.
+
+Projection reserves structural records/nodes, depth, canonical text and whole-capture path comparison work before allocation. Selected working-source bytes and retained local pin bytes each have an independent document_bytes budget. Projected row overhead uses conservative byte reservations; Unicode controls and supplementary scalars follow ensure_ascii=False UTF-8 semantics. The manifest helper uses standard ParseLimits defaults. No raw source payload or invented checkout/missing-path metadata is emitted.
+
+inventory_result accepts built-in IDs through analyzer_ids and external exact id/version records through extension_adapters. None and empty external tuples preserve the old output. Reserved metadata comes exclusively from builtin_analyzer_identities; external IDs cannot impersonate it. Every source-bearing row must match an exact declared pair. This boundary does not authorize or execute extensions.
+
+The emitter prospectively reserves batch/row cardinality and new identity metadata. Complete externally supplied row text and input-by-diagnostic work are reserved by the separate extension-result validation/merge preflight before invoking this existing generic serialization surface. The minimal emitter change does not independently grant a new untrusted-row ingestion contract.
+
+Exact commands, durations, test order, raw streams, range coverage, dependencies and working/index identities are bound in the manifest. The testing phase first repeats the corrected mapping-capacity case alone, then runs the unchanged full population only on that success. Existing emitter callers were included; unrelated predecessor suites were not replayed. No plan/AC checkoff, native coding-agent-host claim, non-Windows proof or complete-feature claim is made.
+''')
+manifest_path = evidence / 'regression-testing' / ('p4t9-shared-inputs-freeze.' + stamp + '.json')
+all_evidence = sorted(path for path in evidence.rglob('p4t9-shared-inputs-*') if path.is_file())
+manifest = {'task': 'P4-T9', 'timestamp': stamp, 'written_at': now.isoformat(), 'state': 'FOCUSED_SUBSET_FROZEN_REVIEW_PENDING', 'current_head': git('rev-parse', 'HEAD').decode().strip(), 'baseline': ref(baseline), 'source_bindings': sources, 'dependencies': binding['dependencies'], 'focused_binding': ref(binding_path), 'coverage_ranges': ref(ranges_path), 'harnesses': harnesses, 'raw_streams': ref(raw_path), 'handoff': ref(handoff), 'test_count': len(nodes), 'test_node_order': nodes, 'stage_seconds': {item['stage']: item['seconds'] for item in receipts}, 'git_attributes': git('check-attr', 'text', 'eol', '--', *binding['sources']).decode().splitlines(), 'evidence': [ref(path) for path in all_evidence], 'stage_paths': sorted([*binding['sources'], *[path.relative_to(root).as_posix() for path in all_evidence], manifest_path.relative_to(root).as_posix(), manifest_path.with_suffix('.md').relative_to(root).as_posix()])}
+with manifest_path.open('xb') as stream:
+    stream.write((json.dumps(manifest, indent=2, sort_keys=True)+'\n').encode('utf-8'))
+markdown('regression-testing', 'p4t9-shared-inputs-freeze', f'# P4-T9 Shared Input Freeze\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-shared-inputs-freeze.py {batch}`\nEXIT_CODE: 0\nOutput Summary: {len(nodes)} focused cases pass; five owned paths are frozen for consolidated review.\n\nManifest SHA-256: `{sha(manifest_path.read_bytes())}`. The JSON binds commands, exact source/test/registry bytes, coverage ranges, raw streams and staging paths.\n')
+print(json.dumps({'manifest': ref(manifest_path), 'test_count': len(nodes), 'unit_ranges': len(units), 'stage_paths': len(manifest['stage_paths']), 'modules': modules}))

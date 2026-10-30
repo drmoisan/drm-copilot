@@ -1,0 +1,38 @@
+{
+  "binding_after": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "binding_before": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+  "candidate_sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage combine --keep SCRATCH\\issue-980-p5t1-final-042253-graph.coverage SCRATCH\\issue-980-p5t1-final-042253-callers.coverage",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T04:39:15.552767+00:00",
+  "label": "coverage-combine",
+  "last_node": null,
+  "pid": 49796,
+  "raw": [
+    {
+      "bytes": 250,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-coverage-combine.stdout",
+      "sha256": "467162a3f029296e02ee411c676aaeb6648edeeb43b39b1e118e5572bac29012"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-coverage-combine.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 228,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-coverage-combine.progress.json",
+      "sha256": "787813508e1bc35cbb904d46a2ba8c809eb977ad8d48703d381881cede5feea6"
+    }
+  ],
+  "seconds": 1.01,
+  "stage": 5,
+  "started_at": "2026-10-20T04:39:14.542612+00:00",
+  "stderr": "",
+  "stdout": "Combined data file ..\\..\\..\\AppData\\Local\\Temp\\codex-legacy-discovery\\issue-980\\issue-980-p5t1-final-042253-callers.coverage\r\nCombined data file ..\\..\\..\\AppData\\Local\\Temp\\codex-legacy-discovery\\issue-980\\issue-980-p5t1-final-042253-graph.coverage\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T04-39"
+}

@@ -1,0 +1,41 @@
+{
+  "results": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "physical_lines": 499,
+      "prospective_black_lines": 495,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "sha256": "6df4b7908b1c018d4dedac6041e7bbf999390fdaefd90ea982067ee7cb678898"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "physical_lines": 187,
+      "prospective_black_lines": 208,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "sha256": "ea3985d69d3666b83079f5fef5c5abe318efcb5d3b376432ea86ce1cb162257a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "physical_lines": 392,
+      "prospective_black_lines": 376,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "sha256": "edbc286b7087a0ca9c21995146f608ccfa3c0fa03d72bc44a43b385b4d08b988"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+      "physical_lines": 337,
+      "prospective_black_lines": 361,
+      "missing_docstrings": [],
+      "uncommented_explicit_loops": [],
+      "sha256": "a340c03b40a740c93a7bff2b98eb1b3582b33d558560fd4a17f5d5dab4ea557e"
+    }
+  ],
+  "paused_integration_preserved": true,
+  "advisory_only": "No formatting or tests executed; actual checks follow.",
+  "timestamp": "2026-10-19T10-20",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-shared-repair-structure.py",
+  "exit_code": 0
+}

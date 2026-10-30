@@ -1,0 +1,679 @@
+{
+  "cli_preservation": [
+    {
+      "definition": "_utc_now",
+      "executable_ast_equal": true
+    },
+    {
+      "definition": "_default_schema_path",
+      "executable_ast_equal": true
+    },
+    {
+      "definition": "_build_parser",
+      "executable_ast_equal": true
+    },
+    {
+      "definition": "_run",
+      "executable_ast_equal": true
+    },
+    {
+      "definition": "main_dotnet",
+      "executable_ast_equal": true
+    }
+  ],
+  "command": "poetry run python SCRATCH/issue-980-compatibility-structure.py",
+  "exit_code": 0,
+  "harness_sha256": "76efe6f8ad9b772d394e0b4a01b67d0e38efa4a2005aaca301dd0667699b86e2",
+  "issues": [],
+  "qualification": "Mechanical docstring presence supports, but does not replace, manual typed-contract and intent review.",
+  "scope": [
+    {
+      "definitions": [
+        {
+          "end": 55,
+          "has_docstring": true,
+          "name": "_require_consent",
+          "start": 37
+        },
+        {
+          "end": 87,
+          "has_docstring": true,
+          "name": "classify_csharp",
+          "start": 58
+        },
+        {
+          "end": 123,
+          "has_docstring": true,
+          "name": "classify_xml",
+          "start": 90
+        },
+        {
+          "end": 159,
+          "has_docstring": true,
+          "name": "classify_project",
+          "start": 126
+        },
+        {
+          "end": 241,
+          "has_docstring": true,
+          "name": "VstoOfficeAnalyzer",
+          "start": 162
+        },
+        {
+          "end": 185,
+          "has_docstring": true,
+          "name": "__init__",
+          "start": 175
+        },
+        {
+          "end": 205,
+          "has_docstring": true,
+          "name": "analyze",
+          "start": 187
+        },
+        {
+          "end": 213,
+          "has_docstring": true,
+          "name": "parse",
+          "start": 207
+        },
+        {
+          "end": 221,
+          "has_docstring": true,
+          "name": "classify",
+          "start": 215
+        },
+        {
+          "end": 230,
+          "has_docstring": true,
+          "name": "map",
+          "start": 223
+        },
+        {
+          "end": 241,
+          "has_docstring": true,
+          "name": "emit",
+          "start": 232
+        }
+      ],
+      "lines": 241,
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "sha256": "3664e41b738e962ed9a3035f2c81af44c62b6a855e16f4437cb21db5bb95c24a"
+    },
+    {
+      "definitions": [
+        {
+          "end": 58,
+          "has_docstring": true,
+          "name": "__getattr__",
+          "start": 47
+        }
+      ],
+      "lines": 58,
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "sha256": "48957ece4f9ebdbc66b99a7efadf3c3d916a1e7bef3dd83ec609bd502c91571b"
+    },
+    {
+      "definitions": [
+        {
+          "end": 47,
+          "has_docstring": true,
+          "name": "_utc_now",
+          "start": 42
+        },
+        {
+          "end": 57,
+          "has_docstring": true,
+          "name": "_default_schema_path",
+          "start": 50
+        },
+        {
+          "end": 90,
+          "has_docstring": true,
+          "name": "_build_parser",
+          "start": 60
+        },
+        {
+          "end": 157,
+          "has_docstring": true,
+          "name": "_run",
+          "start": 93
+        },
+        {
+          "end": 182,
+          "has_docstring": true,
+          "name": "main_dotnet",
+          "start": 160
+        },
+        {
+          "end": 209,
+          "has_docstring": true,
+          "name": "main_vsto",
+          "start": 185
+        }
+      ],
+      "lines": 209,
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "8dee57ce119d934b882815297843df0dcc5b5bf3faaf3f55892c59efabbc3678"
+    },
+    {
+      "definitions": [
+        {
+          "end": 36,
+          "has_docstring": true,
+          "name": "InventoryAdapter",
+          "start": 18
+        },
+        {
+          "end": 72,
+          "has_docstring": true,
+          "name": "select_analyzers",
+          "start": 39
+        },
+        {
+          "end": 27,
+          "has_docstring": true,
+          "name": "identifier",
+          "start": 22
+        },
+        {
+          "end": 36,
+          "has_docstring": true,
+          "name": "analyze",
+          "start": 29
+        }
+      ],
+      "lines": 72,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "b4239d408343abc7675c9dff63ecbd31d3ffcd3c5ac2206d50b7abb8dfb9ecff"
+    },
+    {
+      "definitions": [
+        {
+          "end": 80,
+          "has_docstring": true,
+          "name": "test_registry_loads_only_explicit_core_adapters",
+          "start": 37
+        },
+        {
+          "end": 135,
+          "has_docstring": true,
+          "name": "test_registry_rejects_unavailable_selections_without_fallback",
+          "start": 93
+        },
+        {
+          "end": 169,
+          "has_docstring": true,
+          "name": "test_registry_selects_only_consented_fixed_optional_adapter",
+          "start": 142
+        },
+        {
+          "end": 179,
+          "has_docstring": true,
+          "name": "test_registry_rejects_wrong_profile_type",
+          "start": 172
+        },
+        {
+          "end": 213,
+          "has_docstring": true,
+          "name": "test_registry_requires_configured_consent_before_any_import",
+          "start": 182
+        },
+        {
+          "end": 253,
+          "has_docstring": true,
+          "name": "test_input_model_rejects_dishonest_or_ambiguous_accounting",
+          "start": 235
+        },
+        {
+          "end": 285,
+          "has_docstring": true,
+          "name": "test_models_reject_untyped_rows_profile_inputs_and_collisions",
+          "start": 256
+        },
+        {
+          "end": 310,
+          "has_docstring": true,
+          "name": "test_draft_and_input_count_limits_fail_closed",
+          "start": 288
+        },
+        {
+          "end": 73,
+          "has_docstring": true,
+          "name": "observe_import",
+          "start": 53
+        },
+        {
+          "end": 131,
+          "has_docstring": true,
+          "name": "observe",
+          "start": 116
+        },
+        {
+          "end": 209,
+          "has_docstring": true,
+          "name": "forbidden",
+          "start": 203
+        }
+      ],
+      "lines": 310,
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "e77b6a9ed10854b182f5440617c6fedaededb200a546126905d7b47f64f606a2"
+    },
+    {
+      "definitions": [
+        {
+          "end": 44,
+          "has_docstring": true,
+          "name": "_fixture_text",
+          "start": 38
+        },
+        {
+          "end": 53,
+          "has_docstring": true,
+          "name": "_symbols",
+          "start": 47
+        },
+        {
+          "end": 61,
+          "has_docstring": true,
+          "name": "_extra_map",
+          "start": 56
+        },
+        {
+          "end": 184,
+          "has_docstring": true,
+          "name": "TestRibbonDetection",
+          "start": 64
+        },
+        {
+          "end": 378,
+          "has_docstring": true,
+          "name": "TestComInteropDetection",
+          "start": 187
+        },
+        {
+          "end": 88,
+          "has_docstring": true,
+          "name": "test_customui_uri_and_root",
+          "start": 72
+        },
+        {
+          "end": 117,
+          "has_docstring": true,
+          "name": "test_ribbon_extensibility_signals",
+          "start": 108
+        },
+        {
+          "end": 131,
+          "has_docstring": true,
+          "name": "test_cs_comment_ribbon_trap_ignored_but_xml_unstripped",
+          "start": 119
+        },
+        {
+          "end": 169,
+          "has_docstring": true,
+          "name": "test_ribbon_fixtures",
+          "start": 133
+        },
+        {
+          "end": 184,
+          "has_docstring": true,
+          "name": "test_original_two_root_fixture_is_rejected",
+          "start": 171
+        },
+        {
+          "end": 216,
+          "has_docstring": true,
+          "name": "test_com_attribute_forms",
+          "start": 206
+        },
+        {
+          "end": 229,
+          "has_docstring": true,
+          "name": "test_standalone_guid_is_not_com_evidence",
+          "start": 218
+        },
+        {
+          "end": 245,
+          "has_docstring": true,
+          "name": "test_marshal_member_captured_into_symbol",
+          "start": 232
+        },
+        {
+          "end": 265,
+          "has_docstring": true,
+          "name": "test_arbitrary_marshal_member_is_not_com_evidence",
+          "start": 248
+        },
+        {
+          "end": 276,
+          "has_docstring": true,
+          "name": "test_progid_activation",
+          "start": 267
+        },
+        {
+          "end": 298,
+          "has_docstring": true,
+          "name": "test_interop_using_captures_target_as_data",
+          "start": 286
+        },
+        {
+          "end": 310,
+          "has_docstring": true,
+          "name": "test_string_literal_attribute_trap_rejected",
+          "start": 300
+        },
+        {
+          "end": 342,
+          "has_docstring": true,
+          "name": "test_project_com_references",
+          "start": 327
+        },
+        {
+          "end": 378,
+          "has_docstring": true,
+          "name": "test_com_fixtures",
+          "start": 344
+        }
+      ],
+      "lines": 378,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "370eb179db31ae629a817ad79dbdd92470c330430e4440d8515eecb6b3098fd8"
+    },
+    {
+      "definitions": [
+        {
+          "end": 41,
+          "has_docstring": true,
+          "name": "_clock",
+          "start": 39
+        },
+        {
+          "end": 55,
+          "has_docstring": true,
+          "name": "_profile",
+          "start": 44
+        },
+        {
+          "end": 65,
+          "has_docstring": true,
+          "name": "_build_source",
+          "start": 58
+        },
+        {
+          "end": 80,
+          "has_docstring": true,
+          "name": "_patch_loader",
+          "start": 68
+        },
+        {
+          "end": 174,
+          "has_docstring": true,
+          "name": "TestSuccessPaths",
+          "start": 84
+        },
+        {
+          "end": 256,
+          "has_docstring": true,
+          "name": "TestErrorPaths",
+          "start": 178
+        },
+        {
+          "end": 292,
+          "has_docstring": true,
+          "name": "test_optional_cli_rejects_before_profile_clock_or_filesystem",
+          "start": 262
+        },
+        {
+          "end": 305,
+          "has_docstring": true,
+          "name": "test_optional_cli_preserves_help_and_usage",
+          "start": 296
+        },
+        {
+          "end": 78,
+          "has_docstring": true,
+          "name": "_fake_loader",
+          "start": 75
+        },
+        {
+          "end": 112,
+          "has_docstring": true,
+          "name": "test_success_keeps_default_run_read_only",
+          "start": 87
+        },
+        {
+          "end": 145,
+          "has_docstring": true,
+          "name": "test_json_summary",
+          "start": 114
+        },
+        {
+          "end": 174,
+          "has_docstring": true,
+          "name": "test_output_dir_override",
+          "start": 147
+        },
+        {
+          "end": 216,
+          "has_docstring": true,
+          "name": "test_malformed_profile_exits_one",
+          "start": 181
+        },
+        {
+          "end": 245,
+          "has_docstring": true,
+          "name": "test_unreachable_root_exits_one",
+          "start": 218
+        },
+        {
+          "end": 256,
+          "has_docstring": true,
+          "name": "test_usage_error_exits_two",
+          "start": 247
+        },
+        {
+          "end": 277,
+          "has_docstring": true,
+          "name": "forbidden",
+          "start": 274
+        },
+        {
+          "end": 202,
+          "has_docstring": true,
+          "name": "_raise",
+          "start": 196
+        }
+      ],
+      "lines": 305,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e0b10c734cedf004dd49a1b8cfcb09999583a9ee8ba1db016a1b28db95560529"
+    },
+    {
+      "definitions": [
+        {
+          "end": 85,
+          "has_docstring": true,
+          "name": "_existing_stack_modules",
+          "start": 69
+        },
+        {
+          "end": 93,
+          "has_docstring": true,
+          "name": "_fixture_files",
+          "start": 88
+        },
+        {
+          "end": 116,
+          "has_docstring": true,
+          "name": "test_stack_modules_present",
+          "start": 96
+        },
+        {
+          "end": 138,
+          "has_docstring": true,
+          "name": "test_module_has_no_consumer_identifier_or_app_hardcoding",
+          "start": 120
+        },
+        {
+          "end": 154,
+          "has_docstring": true,
+          "name": "test_fixture_has_no_consumer_identifier",
+          "start": 142
+        },
+        {
+          "end": 174,
+          "has_docstring": true,
+          "name": "test_permitted_stack_literals_do_not_trip_the_ban",
+          "start": 157
+        }
+      ],
+      "lines": 174,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3"
+    },
+    {
+      "definitions": [
+        {
+          "end": 110,
+          "has_docstring": true,
+          "name": "_registry_without_routing_metadata",
+          "start": 48
+        },
+        {
+          "end": 130,
+          "has_docstring": true,
+          "name": "_production_modules",
+          "start": 113
+        },
+        {
+          "end": 148,
+          "has_docstring": true,
+          "name": "test_production_modules_exist",
+          "start": 133
+        },
+        {
+          "end": 169,
+          "has_docstring": true,
+          "name": "test_module_contains_no_banned_identifier",
+          "start": 152
+        },
+        {
+          "end": 190,
+          "has_docstring": true,
+          "name": "test_registry_allowance_preserves_unrelated_source",
+          "start": 175
+        },
+        {
+          "end": 210,
+          "has_docstring": true,
+          "name": "test_registry_allowance_rejects_business_logic_inside_optional_branch",
+          "start": 193
+        }
+      ],
+      "lines": 210,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "653c804f505684a2ffee38d806f9a21a49c0b25bbebd189481fad230966cfe80"
+    },
+    {
+      "definitions": [
+        {
+          "end": 56,
+          "has_docstring": true,
+          "name": "office_profile",
+          "start": 42
+        },
+        {
+          "end": 87,
+          "has_docstring": true,
+          "name": "_block_optional",
+          "start": 59
+        },
+        {
+          "end": 103,
+          "has_docstring": true,
+          "name": "test_ordinary_legacy_module_execution_has_no_optional_import",
+          "start": 91
+        },
+        {
+          "end": 144,
+          "has_docstring": true,
+          "name": "test_classifiers_reject_unconsented_profiles_before_import",
+          "start": 115
+        },
+        {
+          "end": 173,
+          "has_docstring": true,
+          "name": "test_v1_pipeline_rejects_before_inspecting_inputs_or_filesystem",
+          "start": 148
+        },
+        {
+          "end": 188,
+          "has_docstring": true,
+          "name": "test_shim_requires_real_capture_before_import",
+          "start": 177
+        },
+        {
+          "end": 226,
+          "has_docstring": true,
+          "name": "test_shim_delegates_exact_capture_with_optional_constructor_profile",
+          "start": 192
+        },
+        {
+          "end": 257,
+          "has_docstring": true,
+          "name": "test_shim_checks_both_supplied_and_capture_profiles",
+          "start": 232
+        },
+        {
+          "end": 270,
+          "has_docstring": true,
+          "name": "test_pattern_exports_forward_identical_inert_data",
+          "start": 260
+        },
+        {
+          "end": 286,
+          "has_docstring": true,
+          "name": "test_unknown_pattern_export_does_not_import",
+          "start": 274
+        },
+        {
+          "end": 331,
+          "has_docstring": true,
+          "name": "test_classifiers_forward_exact_profile_source_and_capacities",
+          "start": 292
+        },
+        {
+          "end": 351,
+          "has_docstring": true,
+          "name": "test_wrappers_preserve_canonical_capacity_errors",
+          "start": 338
+        },
+        {
+          "end": 84,
+          "has_docstring": true,
+          "name": "observe",
+          "start": 68
+        },
+        {
+          "end": 221,
+          "has_docstring": true,
+          "name": "analyze",
+          "start": 211
+        },
+        {
+          "end": 317,
+          "has_docstring": true,
+          "name": "classify",
+          "start": 308
+        }
+      ],
+      "lines": 351,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_compatibility.py",
+      "sha256": "c0add50ff7f90b0cb4d8596abd6a5b5b26588d0d4dcb176eab701af5cdb5eaa9"
+    }
+  ],
+  "task": "P4-T8",
+  "timestamp": "2026-10-19T11-48"
+}

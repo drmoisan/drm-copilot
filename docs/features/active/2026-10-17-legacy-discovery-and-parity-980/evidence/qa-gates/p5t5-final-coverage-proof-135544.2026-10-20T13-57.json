@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "1c2d83d20f5fd0bfb19538f88a3a34d990c9d2c75e91b71867f357696be6930e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "1c2d83d20f5fd0bfb19538f88a3a34d990c9d2c75e91b71867f357696be6930e"
+  },
+  "candidate": "SCRATCH\\candidate-retry-released.json",
+  "candidate_sha256": "1be8286990a30757fc032bbcda1cc1984a237f1eb732eb92ae6acf7bf979b32d",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\p5t5_final_coverage.py SCRATCH\\candidate-retry-released.json SCRATCH\\p5t5-final-135544-combined-coverage.json SCRATCH\\p5t5-final-135544-coverage-result.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T13:57:23.007663+00:00",
+  "label": "coverage-proof",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-proof-135544-raw.2026-10-20T13-57.json",
+    "sha256": "8c1a21748943bae8552409b53b3b5f043e14ac76a61d8c4040111b521ea720a2"
+  },
+  "seconds": 1.017,
+  "stage": 6,
+  "started_at": "2026-10-20T13:57:21.990681+00:00",
+  "stderr": "",
+  "stdout": "{\n  \"current_coverage\": {\n    \"path\": \"docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-current-coverage.2026-10-20T13-57.json\",\n    \"sha256\": \"ede1daae2a2fc956c4d64236dd171a5d9fa789043c17d7a8a4621478118f7e8f\"\n  },\n  \"coverage_ranges\": {\n    \"path\": \"docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-ranges.2026-10-20T13-57.json\",\n    \"sha256\": \"c071bef696606c10ca71a2614779b031dcf38c40ffb0a7444809072ff4c1a4fd\"\n  },\n  \"range_count\": 42,\n  \"module_count\": 3,\n  \"qualified_prior_proof_count\": 0,\n  \"current_raw_counters_augmented\": false\n}\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-57"
+}

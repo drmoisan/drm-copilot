@@ -1,0 +1,163 @@
+"""Bind the explicitly released final candidate from existing immutable freezes."""
+
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+NATIVE = Path(os.environ["TEMP"]) / "codex-legacy-discovery" / "issue-980"
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+REG = FEATURE / "evidence/regression-testing"
+RUNTIME = "packages/discovery-runtime/src/drm_copilot_discovery/"
+HEAD = "ff09cf47094f3212c831fbaf1d45e2ddbac8d46e"
+
+
+def sha(data):
+    """Hash exact source, script or evidence bytes."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def read(path, expected=None):
+    """Read an existing JSON receipt without locale or terminal-newline assumptions."""
+    raw = path.read_bytes()
+    if expected is not None:
+        assert sha(raw) == expected, path
+    return json.loads(raw), {"path": path.as_posix(), "sha256": sha(raw)}
+
+
+def write(path, document):
+    """Create a new LF UTF-8 release document without changing historical receipts."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+assert subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, check=True).stdout.decode("ascii").strip() == HEAD
+prep, prep_ref = read(QA / "p5t2-final-preparation.2026-10-20T07-04.json",
+                      "5a541fe2225c24bf4772d107d352a142cd0718de25da2b5f66450472b6619357")
+ready, ready_ref = read(QA / "p5t2-executor-candidate-ready.2026-10-20T07-21.json",
+                        "defe2e6db240ef825c34b41db6ccf09afb2190cc187402ed1c947f1d3cf90827")
+outcome, outcome_ref = read(REG / "p5t2-outcomes-pc1-freeze.2026-10-20T06-33.json",
+                            "57e5489513c8a7706ac294a023f398da5b959839a7ffd294214a0e1429a6fdde")
+original_outcome, _ = read(REG / "p5t2-outcomes-freeze.2026-10-20T06-25.json",
+                            "5bf765cd3e16f77beb9e86ad58555b5e50c045d43c00e8ea36de5f922c45f0a0")
+graph, graph_ref = read(REG / "p5t2-graph-GR-freeze.2026-10-20T07-15.json",
+                        "d8a99afce40d8d088b8dd45c1995e3f7886292c2300211b00c3ac68a586b3ceb")
+_, graph_qualification = read(REG / "p5t2-graph-GR-evidence-qualification.2026-10-20T07-17.json",
+                              "d2de9a88f518bb02b39392d963c02e684043bd28952e62e0b2a08a791dfea521")
+old_graph, old_graph_ref = read(REG / "p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json",
+                               "a7da6a30daee32b5d7fb9b2e7261a2cd4075f31b7a25b867a9cf3d76e0f51bb7")
+integration, integration_ref = read(REG / "p5t2-projection-final-freeze.2026-10-20T06-50.json",
+                                    "5d8d5c2ddaf692f8b8557ba3a31d63cdd47d51f6a722911ec5b4258928dd739d")
+_, hygiene = read(QA / "p5t2-final-reader-hygiene.2026-10-20T07-18.json",
+                   "48d885859dc2a182a48bbcb804b7a1506a2bc2f83a109c22d2577b63e92b9505")
+nodes = {"outcomes": outcome["executed_nodes"], "graph": graph["executed_nodes"],
+         "integration": integration["final_population"]}
+assert [len(value) for value in nodes.values()] == [91, 58, 26]
+all_nodes = [node for group in nodes.values() for node in group]
+assert len(all_nodes) == len(set(all_nodes)) == 175
+bindings = {path: record["sha256"] for path, record in integration["bindings"].items()}
+observations = []
+# The repaired owner freeze supersedes only the explicitly historical borrowed bytes.
+for item in graph["sources_and_tests"]:
+    prior = bindings.get(item["path"])
+    if prior is not None and prior != item["sha256"]:
+        observations.append({"path": item["path"], "historical_dependency_sha256": prior,
+                             "final_owner_sha256": item["sha256"], "authority": graph_ref})
+    bindings[item["path"]] = item["sha256"]
+for path, record in outcome["owned_bindings"].items():
+    bindings[path] = record["working_sha256"]
+for path, record in original_outcome["preserved_callers_and_target_proof"].items():
+    bindings[path] = record["working_sha256"]
+for path, digest in bindings.items():
+    assert sha(Path(path).read_bytes()) == digest, path
+files = sorted(set(outcome["owned_bindings"]) | {item["path"] for item in graph["sources_and_tests"]}
+               | set(integration["owned_paths"]) | {
+                   "scripts/dev_tools/discovery/parity_report.py",
+                   "tests/scripts/dev_tools/discovery/test_parity_report.py"})
+production = [RUNTIME + name + ".py" for name in (
+    "parity_models", "parity_rules", "parity_entry_rules", "parity_target_rules",
+    "parity_report", "parity_metrics", "report_models", "validation")]
+current_proofs = [
+    {"coverage": outcome["coverage"], "source_bindings": {path: bindings[path] for path in production[:4]}},
+    {"coverage": graph["raw_coverage"], "source_bindings": {
+        RUNTIME + name + ".py": bindings[RUNTIME + name + ".py"]
+        for name in ("parity_report", "parity_metrics", "report_models")}},
+    {"coverage": {**integration["original_25_case_result"], "selector": ["coverage_raw"]},
+     "source_bindings": {RUNTIME + "validation.py": bindings[RUNTIME + "validation.py"]}},
+    {"coverage": {**integration_ref, "selector": ["coverage_raw_unchanged"]},
+     "source_bindings": {RUNTIME + "validation.py": bindings[RUNTIME + "validation.py"]}},
+]
+retained = []
+# Consume the owner's already reviewed unchanged helper-body mapping, not a new review.
+for proof in old_graph["retained_unchanged_body_proof"]:
+    for unit in proof["exact_ast_unchanged"]:
+        retained.append({"path": proof["source"], "name": unit["name"],
+                         "source_ref": proof["baseline_commit"], "source_sha256": proof["baseline_source_sha256"],
+                         "coverage": proof["coverage"], "qualified_by": old_graph_ref})
+validation_source = subprocess.run(["git", "show", "7012d20245cd27d29bf66ede6ac9756dec354ed4:" + RUNTIME + "validation.py"],
+                                   capture_output=True, check=True).stdout
+for unit in integration["coverage_ranges_with_separate_accepted_proof"]:
+    if unit["symbol"] and unit["unchanged_executable_ast_from_accepted_base"]:
+        retained.append({"path": RUNTIME + "validation.py", "name": unit["symbol"],
+                         "source_ref": "7012d20245cd27d29bf66ede6ac9756dec354ed4",
+                         "source_sha256": sha(validation_source), "coverage": integration["accepted_baseline_coverage"],
+                         "qualified_by": integration_ref})
+harnesses = {}
+for record in prep["harnesses"]:
+    path = SCRATCH / record["runtime_path"].removeprefix("SCRATCH/")
+    assert sha(path.read_bytes()) == record["sha256"], path.name
+    harnesses[path.name] = record
+native = prep["native"]
+native_harness = NATIVE / "issue-980-p5t2-native-composition.py"
+assert sha(native_harness.read_bytes()) == native["harness_sha256"]
+harnesses["native"] = {"runtime_path": native["harness_path"], "sha256": native["harness_sha256"],
+                        "path": (QA / "p5t2-native-composition-harness.2026-10-20T06-22.txt").as_posix()}
+descriptor = NATIVE / Path(native["fixture_receipt"]).name
+assert sha(descriptor.read_bytes()) == native["fixture_receipt_sha256"]
+assert graph["native_pointer_confirmation"], "Final native metric confirmation absent"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+native_release_path = NATIVE / ("issue-980-p5t2-native-release." + stamp + ".json")
+native_release = {"task": "P5-T2", "execution_released": True,
+                  "fixture_receipt_sha256": native["fixture_receipt_sha256"],
+                  "harness_sha256": native["harness_sha256"], "source_bindings": bindings,
+                  "expected_metrics": native["expected_metrics_pending_final_producer_confirmation"]}
+write(native_release_path, native_release)
+native_release_copy = QA / native_release_path.name
+write(native_release_copy, native_release)
+manifest = {
+    "task": "P5-T2", "timestamp": stamp, "execution_released": True, "final_review_closed": True,
+    "route": "inventory_analyzers_p5t2_final_gates_20261020", "head": HEAD,
+    "checked_tree": "eeab8e1f8176ad27f0b8cd5b2dd21b72875d4eaf",
+    "reviewed_union_sha256": "47239e8a80507c331ef5a6c0260206b8cdb6579a87882b49516fb6d46d1a8509",
+    "review": ready_ref, "preparation": prep_ref, "hygiene": hygiene,
+    "files": files, "production": production, "bindings": bindings, "harnesses": harnesses,
+    "nodes": nodes, "node_count": 175, "batch_order": ["outcomes", "graph", "integration"],
+    "coverage_targets": prep["coverage_targets"], "current_coverage_proofs": current_proofs,
+    "retained_units": retained, "retained_loop_qualifications": {},
+    "coverage_convention": prep["coverage_policy"], "contracts": prep["contracts"],
+    "timeouts": prep["timeouts_seconds"], "superseded_dependency_observations": observations,
+    "retained_proof": {"outcomes": outcome_ref, "graph": graph_ref, "graph_qualification": graph_qualification,
+                       "integration": integration_ref, "helper": prep["retained_references"]["helper"],
+                       "graph_helper_mappings": old_graph_ref},
+    "native": {"harness_path": native["harness_path"], "fixture_receipt": native["fixture_receipt"],
+               "release_path": "NATIVE_SCRATCH/" + native_release_path.name,
+               "release": {"path": native_release_copy.as_posix(), "sha256": sha(native_release_copy.read_bytes())},
+               "result_path": "NATIVE_SCRATCH/issue-980-p5t2-native-result." + stamp + ".json"},
+    "limitations": ["Task verification only; no feature acceptance or successor implementation.",
+                    "Native proof uses a bounded Windows/Git fixture, not installed coding-agent-host or non-Windows execution.",
+                    "Prior unchanged-body proof is kept separate; fresh raw coverage is not augmented.",
+                    "No source/test, checkpoint, Git or acceptance-criteria changes are authorized."],
+}
+destination = QA / ("p5t2-final-candidate." + stamp + ".json")
+write(destination, manifest)
+snapshot = QA / ("p5t2-final-release-binding-harness." + stamp + ".txt")
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"candidate": destination.as_posix(), "sha256": sha(destination.read_bytes()),
+                  "nodes": {name: len(value) for name, value in nodes.items()}, "files": len(files),
+                  "production": len(production), "bindings": len(bindings), "retained_units": len(retained)}))

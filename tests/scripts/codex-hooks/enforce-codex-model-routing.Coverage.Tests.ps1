@@ -91,6 +91,17 @@ Describe 'Codex enforce-codex-model-routing coverage (issue #786)' {
         It 'allows an unrouted agent without an attestation' {
             Invoke-CodexModelRoutingDecision -PayloadRaw '{"agent_type":"general-purpose"}' -AttestationRaw '' | Should -BeNullOrEmpty
         }
+
+        It 'gates discovery specialist <AgentType> on its SubagentStart attestation (issue #980)' -ForEach @(
+            @{ AgentType = 'legacy-parity-analyst' }, @{ AgentType = 'migration-coverage-reviewer-c3-elevated' }
+        ) {
+            Test-CodexModelGateAgentType -AgentType $AgentType | Should -BeTrue
+            $denied = Invoke-CodexModelRoutingDecision -PayloadRaw "{`"agent_type`":`"$AgentType`",`"model`":`"m`"}" -AttestationRaw ''
+            $denied.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $denied.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*no matching SubagentStart attestation*'
+            Mock Test-CodexModelGateProfileAttestation { $true }
+            Invoke-CodexModelRoutingDecision -PayloadRaw "{`"agent_type`":`"$AgentType`",`"model`":`"m`"}" -AttestationRaw '{"schema_version":2,"receipt_kind":"discovery-invocation"}' | Should -BeNullOrEmpty
+        }
     }
 
     Context 'entry point' {

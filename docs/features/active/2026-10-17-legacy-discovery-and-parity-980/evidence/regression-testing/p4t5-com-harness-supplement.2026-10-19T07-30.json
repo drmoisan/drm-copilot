@@ -1,0 +1,67 @@
+{
+  "timestamp": "2026-10-19T07-30",
+  "command": "python SCRATCH/issue-980-p4t5-com-harness-binding.py",
+  "exit_code": 0,
+  "freeze_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-wip-freeze.2026-10-19T07-27.json",
+    "sha256": "7cb5dc86803a76495cec0e9501a9b5553e992c99a1bf71bbb1ce9422c805d2b7"
+  },
+  "harnesses": [
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t5-com-gate.py",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-focused-run-harness.2026-10-19T07-30.txt",
+      "raw_sha256": "b117e627605a074dde5f11924a2c062fed8834feda757e8800a5be38990b7ea0",
+      "snapshot_sha256": "b117e627605a074dde5f11924a2c062fed8834feda757e8800a5be38990b7ea0",
+      "disposition": "new exact raw snapshot; no sanitizer required",
+      "crlf_count": 0,
+      "lf_normalized_sha256": "b117e627605a074dde5f11924a2c062fed8834feda757e8800a5be38990b7ea0"
+    },
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t5-com-split.py",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-test-split-harness.2026-10-19T07-30.txt",
+      "raw_sha256": "7a352af09cfc69f335bdc7580af5a8d8bfb93a0828bba5f457a16c23a910427a",
+      "snapshot_sha256": "7a352af09cfc69f335bdc7580af5a8d8bfb93a0828bba5f457a16c23a910427a",
+      "disposition": "new exact raw snapshot; no sanitizer required",
+      "crlf_count": 0,
+      "lf_normalized_sha256": "7a352af09cfc69f335bdc7580af5a8d8bfb93a0828bba5f457a16c23a910427a"
+    },
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t5-com-freeze.py",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-coverage-structure-freeze-harness.2026-10-19T07-30.txt",
+      "raw_sha256": "618579d490dd8fcec22446519f6fbefea11650103d6a45c325f3c1ac19b8ba3a",
+      "snapshot_sha256": "618579d490dd8fcec22446519f6fbefea11650103d6a45c325f3c1ac19b8ba3a",
+      "disposition": "new exact raw snapshot; no sanitizer required",
+      "crlf_count": 0,
+      "lf_normalized_sha256": "618579d490dd8fcec22446519f6fbefea11650103d6a45c325f3c1ac19b8ba3a"
+    },
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t5-com-harness-binding.py",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-harness-binding-harness.2026-10-19T07-30.txt",
+      "raw_sha256": "1ee98d3a960c4b3759af761316b7b800113123343c5af076a2eaf8fec08a3340",
+      "snapshot_sha256": "1ee98d3a960c4b3759af761316b7b800113123343c5af076a2eaf8fec08a3340",
+      "disposition": "new exact raw snapshot; no sanitizer required",
+      "crlf_count": 0,
+      "lf_normalized_sha256": "1ee98d3a960c4b3759af761316b7b800113123343c5af076a2eaf8fec08a3340"
+    }
+  ],
+  "additional_stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-focused-run-harness.2026-10-19T07-30.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-test-split-harness.2026-10-19T07-30.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-coverage-structure-freeze-harness.2026-10-19T07-30.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-harness-binding-harness.2026-10-19T07-30.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-harness-supplement.2026-10-19T07-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-harness-supplement.2026-10-19T07-30.md"
+  ],
+  "source_test_passing_receipt_mutations": false,
+  "behavioral_reruns": false,
+  "initial_binding_failure": {
+    "error": "AssertionError in host-path detector: an HTTPS URL was mistaken for a drive prefix.",
+    "preserved_harness": "SCRATCH/issue-980-p4t5-com-harness-binding-failed.py",
+    "sha256": "7b3a5e28e77da6416884f7c7f316714c34ab85fce59976443a850c77f3b4c706",
+    "partial_snapshots_preserved": [
+      "focused-run",
+      "test-split"
+    ],
+    "source_test_or_gate_mutation": false
+  }
+}

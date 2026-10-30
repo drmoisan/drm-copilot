@@ -1,0 +1,87 @@
+{
+  "Timestamp": "2026-10-21T04-22",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -B SCRATCH/issue-980-configure-cause-confirmation.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "NCF1 confirmed: trusted-host state-path composition must satisfy the unchanged canonical constructor contract; bounded repair may proceed.",
+  "task": "P6-T1",
+  "status": "READY_FOR_BOUNDED_REPAIR",
+  "route": "atomic_execution_p6t1_configure_cause_confirmation_20261021T041728",
+  "phase": "S5_P6T1_configure_cause_confirmation",
+  "reviewed_head": "bb249a0751b8e74d2e42a1e6ee1b4fca2dcf2e17",
+  "owner_finding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-configure-construction-finding.2026-10-21T04-20.json",
+    "sha256": "377f297c36e1d24ffaae84ea351fa2e10c99867c91fa18ad43e1cca9c5330c50"
+  },
+  "retained_binding_policy": "Reuse the owner's exact five source/installed bindings and six evidence bindings plus its manifest. No duplicate inventory or changed raw/readable representation.",
+  "finding": {
+    "id": "NCF1",
+    "classification": "PRODUCTION_TRUSTED_HOST_COMPOSITION_DEFECT",
+    "location": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:385-392",
+    "cause": "installed_local_io derives the registry directory lexically from trusted host settings and passes it to a constructor requiring already canonical paths. The bound reproduction reaches activation_store.py:113 because the derived state path differs from its resolved path; the workspace comparison passes.",
+    "contract_basis": [
+      "activation_filesystem.py:24-30 assigns alias resolution to the trusted host; RegistryLocation.for_host remains a pure lexical derivation with absolute, parent-component and external-root validation.",
+      "activation_store.py:108-116 requires host-resolved paths and rejects a noncanonical or internal registry. This guard is correct and must remain unchanged.",
+      "gateway_local.py:359-403 owns installed host composition from platform settings, not request-selected state paths."
+    ],
+    "impact": "The current installed configure factory fails before service dispatch, Git access or write-capable port use. The historical configure-dry response is exit 3 / SERVICE_FAILURE with null runtime; configure success and its 14 following calls are unproven.",
+    "request_sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+    "test_gap": "The existing installed-factory test forces Path.resolve identity and replaces ActivationStore.local, so it does not exercise trusted state input and the strict constructor together.",
+    "limitations": [
+      "The historical safe response has no traceback. The bound current reproduction establishes the constructor failure, not identical unrecorded historical host settings.",
+      "No particular alias spelling, short name, junction or symlink is proven. Eight examined ancestors have no observed reparse flag; this does not identify the differing component.",
+      "Normalizing only the platform base is not demonstrated sufficient by these observations. That implementation choice must satisfy the complete derived-state constructor contract in the focused repair proof."
+    ]
+  },
+  "finite_repair_contract": {
+    "production_scope": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py"
+    ],
+    "intent": "Canonicalize validated trusted host state-location input using established path handling before the strict store constructor. Preserve the workspace identity/digest and fixed per-workspace registry derivation. Do not change request roots or introduce a fallback location.",
+    "must_preserve": [
+      "Validate absolute/platform/parent-component constraints before any normalization that could erase invalid spelling.",
+      "Keep ActivationStore.local's canonical and external-workspace checks unchanged; the final derived state must satisfy both.",
+      "Retain explicit local-user authority, host-marker refusal, no native capability and no construction writes.",
+      "Permit the existing missing registry leaf without creating it; propagate resolution errors rather than selecting an alternate state location.",
+      "Do not equate genuinely distinct locations by case/text shortcuts or suppress a failing guard."
+    ],
+    "focused_controls": [
+      "Canonical trusted host input and an equivalent state alias compose with the expected external workspace-partitioned location.",
+      "Missing registry leaf remains supported without construction effects.",
+      "Relative, parent-component or otherwise unsupported input remains rejected under the existing rules; resolution errors remain errors.",
+      "A resolved internal state, a genuinely distinct unexpected location, noncanonical workspace and host principal are not accepted as equivalent authority.",
+      "Existing direct ActivationStore.local alias/internal-location refusals remain unchanged."
+    ],
+    "test_scope": "Use the owner's named factory/boundary controls and retained direct constructor controls; respect the 500-line cap. No unrelated gateway or predecessor review is requested."
+  },
+  "native_proof_disposition": {
+    "historical_init": "Retain successful identity/init-dry/init-real only as proof on package 2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66. Do not relabel them as executed on a rebuilt package.",
+    "conditional_carry": "Historical init may support the continuation only after the exact repair delta proves that it changes trusted state canonicalization alone, preserves initialization/capture/publication/authorization behavior and introduces no construction effects, and the retained initialized fixture state still matches. A shared-factory change does not grant unconditional carry.",
+    "suffix_preparation": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-suffix-preparation.2026-10-21T04-13.json",
+      "sha256": "88bb68a61f10b7a84c00867737113fa9ee93f319c4077e3f8e1aae5101c94916"
+    },
+    "pending": "Rebuild and verify installed identity after the reviewed repair, then coordinator-authorized continuation of the existing 15-call suffix. No native execution or final task acceptance is released by this confirmation."
+  },
+  "review_execution": {
+    "new_factory_or_path_probes": 0,
+    "service_native_test_or_build_runs": 0,
+    "production_test_package_fixture_state_changes": 0,
+    "checkpoint_git_staging_changes": 0,
+    "open_contract_questions": [],
+    "additional_diagnostics_required": false,
+    "toolchain": "Not run: this is bounded read-only diagnosis and evidence authoring. Repair verification remains owner/coordinator work."
+  },
+  "plan_status": {
+    "completed_tasks": "46/84",
+    "completed_acceptance_criteria": "23/66",
+    "current_task": "P6-T1 remains unchecked",
+    "next_five": [
+      "P6-T1",
+      "P6-T2",
+      "P6-T3",
+      "P7-T1",
+      "P7-T2"
+    ]
+  },
+  "self_binding": "Caller receives this immutable JSON's SHA-256 and the companion Markdown's SHA-256; no self hash is embedded."
+}

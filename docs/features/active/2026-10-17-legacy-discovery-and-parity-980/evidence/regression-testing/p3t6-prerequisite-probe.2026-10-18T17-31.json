@@ -1,0 +1,42 @@
+{
+  "checks": [
+    {
+      "name": "ordinary-kind-cannot-publish-transport-member",
+      "passed": true,
+      "actual": "PATH_WRITE_DENIED"
+    },
+    {
+      "name": "identical-export-replica-collides-with-source-original",
+      "passed": true,
+      "actual": [
+        "DUPLICATE_ID",
+        "REFERENCE_AMBIGUOUS"
+      ],
+      "repository": {
+        "id": "workspace-example",
+        "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "origin": "docs/migration/discovery/feature-contracts/feature.json",
+      "kind": "feature-contract",
+      "id": "feature",
+      "both_sha256": "0c21868d38153eb39aa9d63fdde08c4b435c9ae5b0eb5a5dacaf4f6b6a24b59a"
+    }
+  ],
+  "kind": "read-only prerequisite reproduction; fresh memory model",
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "e12502eaf48dbb337def7288141e9f331b7d3ee76d05ac66d153583ad0444b96",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "3d71c88775f69f014982ebb35e79ecc05ba3c21bb9d015184de61291ce3444b0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "78999a275d83aae7e5cc13136e3ff38f75f5ff5d4c36c6afc2749137a606c7a9"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "e12502eaf48dbb337def7288141e9f331b7d3ee76d05ac66d153583ad0444b96",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "3d71c88775f69f014982ebb35e79ecc05ba3c21bb9d015184de61291ce3444b0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "78999a275d83aae7e5cc13136e3ff38f75f5ff5d4c36c6afc2749137a606c7a9"
+  },
+  "source_stable": true,
+  "written_at_utc": "2026-10-18T17:31:43.629252+00:00"
+}

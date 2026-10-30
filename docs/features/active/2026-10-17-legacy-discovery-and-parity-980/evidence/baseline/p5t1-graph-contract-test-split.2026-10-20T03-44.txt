@@ -1,0 +1,83 @@
+"""Preserve the approved test-only split baseline before extracting exact functions."""
+import ast
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path.cwd()
+path = Path("tests/discovery_runtime/test_coverage_report.py")
+target = path.with_name("test_coverage_report_contract.py")
+assert not target.exists()
+data = path.read_bytes()
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+folder = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline")
+prefix = folder / f"p5t1-graph-contract-test-split.{stamp}"
+receipt = {
+    "task": "P5-T1", "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "absent_path": target.as_posix(), "source_path": path.as_posix(),
+    "source_sha256": hashlib.sha256(data).hexdigest(),
+    "source_lines": 380, "black_forecast_lines": 543,
+    "baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+    "scope": "Public reporting, rendering, input, digest and resource contracts only.",
+}
+prefix.with_suffix(".json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+prefix.with_suffix(".md").write_text(
+    f"# P5-T1 graph test contract split\n\nTimestamp: {stamp}\n\n"
+    f"Absent path verified before creation: `{target.as_posix()}`.\n\n"
+    "Black forecasts 543 lines for the 380-line draft. The approved test-only split "
+    "retains all authored functions and leaves production ownership unchanged.\n",
+    encoding="utf-8", newline="\n")
+names = {
+    "test_public_report_renders_exact_fields_and_null_empty_percentages",
+    "test_public_report_never_promotes_missing_or_invalid_graphs",
+    "test_report_outputs_do_not_change_input_digest_or_semantic_counts",
+    "test_arbitrary_objects_cannot_supply_graph_authority",
+    "test_aggregate_preflight_limits_nonascii_input_before_validation",
+    "test_preflight_excludes_large_report_output_but_not_authored_artifacts",
+}
+source = data.decode("utf-8")
+lines = source.splitlines(keepends=True)
+extracted = []
+removed = set()
+for node in ast.parse(source).body:
+    if isinstance(node, ast.FunctionDef) and node.name in names:
+        start = min([node.lineno, *(item.lineno for item in node.decorator_list)]) - 1
+        stop = node.end_lineno
+        extracted.append("".join(lines[start:stop]))
+        removed.update(range(start, stop))
+header = '''"""Verify public coverage-report rendering and authority boundaries in memory."""
+
+from __future__ import annotations
+
+import json
+from dataclasses import replace
+from typing import TYPE_CHECKING, cast
+
+import pytest
+from drm_copilot_discovery.coverage_report import build_coverage_report, coverage_preflight
+from drm_copilot_discovery.models import to_plain_value
+from drm_copilot_discovery.report_models import ReportLimitError
+from drm_copilot_discovery.validation import report_input_digest
+
+from tests.discovery_runtime.test_coverage_report import change
+from tests.discovery_runtime.test_coverage_rules import coverage_snapshot
+from tests.discovery_runtime.test_coverage_scope import profile_with
+from tests.discovery_runtime.test_references import artifact
+from tests.discovery_runtime.test_snapshot import snapshot_profile as snapshot_profile
+from tests.discovery_runtime.test_snapshot_io import snapshot_catalog as snapshot_catalog
+from tests.discovery_runtime.validation_test_support import (
+    ROOT, captured, document_record, mode_profile, no_scope_snapshot, replace_document,
+)
+from tests.schemas.discovery.v2_schema_test_support import as_object
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.catalog import SchemaCatalog
+    from drm_copilot_discovery.profile_v2 import ProfileV2
+    from drm_copilot_discovery.snapshot import DiscoverySnapshot
+
+
+'''
+target.write_text(header + "\n\n\n".join(extracted) + "\n", encoding="utf-8", newline="\n")
+path.write_text("".join(line for position, line in enumerate(lines) if position not in removed), encoding="utf-8", newline="\n")
+print(json.dumps({"baseline": prefix.as_posix(), "moved_functions": len(extracted), "source": path.as_posix(), "target": target.as_posix()}))

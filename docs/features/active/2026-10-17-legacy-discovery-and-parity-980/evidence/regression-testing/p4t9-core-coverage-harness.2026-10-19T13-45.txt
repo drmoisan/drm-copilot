@@ -1,0 +1,38 @@
+"""Inspect retained focused coverage and exact owned callable/comment structure."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+label = sys.argv[1]
+scratch = Path(__file__).parent
+raw = json.loads((scratch / (label + '-coverage.json')).read_bytes())
+files = {path.replace('\\', '/'): value for path, value in raw['files'].items()}
+paths = ['packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py',
+         'packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py',
+         'tests/discovery_runtime/test_extension_results.py',
+         'tests/discovery_runtime/test_extension_inventory_merge.py']
+summaries, findings = [], []
+for path in paths:
+    content = Path(path).read_bytes()
+    lines = content.decode('utf-8').splitlines()
+    tree = ast.parse(content)
+    if len(lines) > 500:
+        findings.append({'path': path, 'kind': 'size', 'lines': len(lines)})
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and not ast.get_docstring(node):
+            findings.append({'path': path, 'kind': 'docstring', 'line': node.lineno})
+        if isinstance(node, (ast.For, ast.While)):
+            preceding = next((line.strip() for line in reversed(lines[:node.lineno-1]) if line.strip()), '')
+            if not preceding.startswith('#'):
+                findings.append({'path': path, 'kind': 'loop-intent', 'line': node.lineno})
+    if path not in files:
+        continue
+    data = files[path]
+    summaries.append({'path': path, 'sha256': hashlib.sha256(content).hexdigest(),
+        'lines': len(lines), 'summary': data['summary'], 'missing_lines': data['missing_lines'],
+        'missing_branches': data['missing_branches'], 'ranges': [
+            {'family': family, 'name': name, 'summary': unit['summary'], 'missing_lines': unit['missing_lines']}
+            for family in ('functions', 'classes') for name, unit in data[family].items() if name]})
+print(json.dumps({'summaries': summaries, 'structure_findings': findings}, indent=2))

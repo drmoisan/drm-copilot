@@ -1,0 +1,157 @@
+{
+  "Timestamp": "2026-10-20T08-54",
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "scripts/dev_tools/discovery/completion_report.py": "cccb1a4787c664a015c78db3354f5673823c182a7f28162ce578aa73db1240a6",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": "60e6557aa4508e3714c6a93833d186875d0108fbfa188c21585484cf9523dc25",
+    "tests/scripts/dev_tools/discovery/test_io.py": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "scripts/dev_tools/discovery/completion_report.py": "cccb1a4787c664a015c78db3354f5673823c182a7f28162ce578aa73db1240a6",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": "60e6557aa4508e3714c6a93833d186875d0108fbfa188c21585484cf9523dc25",
+    "tests/scripts/dev_tools/discovery/test_io.py": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f"
+  },
+  "coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy3-coverage.2026-10-20T08-54.json",
+  "dependencies": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py"
+  ],
+  "harness_sha256": "f36ddd4ef2566965f9c013042a090a5c06b3ac5ba1e4fb7768c542a4379c9a9c",
+  "label": "legacy3",
+  "raw_policy": "Exact binary streams in SCRATCH; JSON readable strings replace only workspace/scratch absolute paths; CR/LF preserved as escapes.",
+  "results": [
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.4982511000125669,
+      "stage": "format",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-format-2026-10-20T08-54.stderr.bin",
+          "readable": "All done! \\u2728 \\U0001f370 \\u2728\r\n3 files would be left unchanged.\r\n",
+          "sha256": "814c0f4c496423065215825ae383556f90c7a25251a3476981901eadca298486"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-format-2026-10-20T08-54.stdout.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.15516070000012405,
+      "stage": "lint",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-lint-2026-10-20T08-54.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-lint-2026-10-20T08-54.stdout.bin",
+          "readable": "All checks passed!\n",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9150516999943648,
+      "stage": "types",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-types-2026-10-20T08-54.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-types-2026-10-20T08-54.stdout.bin",
+          "readable": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+          "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py",
+        "--cov=scripts.dev_tools.discovery.completion_report",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p5t3-legacy3-coverage.2026-10-20T08-54.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7986159999854863,
+      "stage": "tests",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-tests-2026-10-20T08-54.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-legacy3-tests-2026-10-20T08-54.stdout.bin",
+          "readable": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollected 31 items\r\n\r\ntests\\scripts\\dev_tools\\discovery\\test_completion_report.py ............ [ 38%]\r\n...............                                                          [ 87%]\r\ntests\\scripts\\dev_tools\\discovery\\test_io.py ....                        [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                               Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------\r\nscripts\\dev_tools\\discovery\\completion_report.py      53      0      6      0   100%\r\n----------------------------------------------------------------------------------------------\r\nTOTAL                                                 53      0      6      0   100%\r\nCoverage JSON written to file WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p5t3-legacy3-coverage.2026-10-20T08-54.json\r\n============================= 31 passed in 0.26s ==============================\r\n",
+          "sha256": "ca67d227e8a1219801e89092ce27fa4694fe6431912118188cda65a06520d977"
+        }
+      }
+    }
+  ],
+  "scope": [
+    "scripts/dev_tools/discovery/completion_report.py",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py",
+    "tests/scripts/dev_tools/discovery/test_io.py"
+  ],
+  "status": "focused-pass-not-task-acceptance"
+}

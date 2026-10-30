@@ -1,0 +1,87 @@
+{
+  "stage": "ruff",
+  "started": "2026-10-19T13:04:41.069191+00:00",
+  "finished": "2026-10-19T13:04:41.175015+00:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py tests/discovery_runtime/test_extension_results.py tests/discovery_runtime/test_extension_inventory_merge.py",
+  "exit_code": 1,
+  "duration_seconds": 0.106,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "11d06a4fc35e191fd28d2771dcc3dda7870fa53ddeb549d46bd65188c87593e3",
+      "physical_lines": 374
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "04d6ed1d5c39442fd3043b170595ca0761b6cbf3be92e0d2128c0ebdc6d8d445",
+      "physical_lines": 299
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "dcdd3731a41247fdbbebd9d094bb101dee91a1de4fdd4e790bee8d58aa9308a1",
+      "physical_lines": 438
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "7182eebd5fcd0042fe0f9a63de7638563666d73c8295ce8f09549160212e0974",
+      "physical_lines": 421
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "11d06a4fc35e191fd28d2771dcc3dda7870fa53ddeb549d46bd65188c87593e3",
+      "physical_lines": 374
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "04d6ed1d5c39442fd3043b170595ca0761b6cbf3be92e0d2128c0ebdc6d8d445",
+      "physical_lines": 299
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "dcdd3731a41247fdbbebd9d094bb101dee91a1de4fdd4e790bee8d58aa9308a1",
+      "physical_lines": 438
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "7182eebd5fcd0042fe0f9a63de7638563666d73c8295ce8f09549160212e0974",
+      "physical_lines": 421
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+      "physical_lines": 428
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+      "physical_lines": 428
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused3-ruff-130441.stdout.bin",
+      "raw_sha256": "c9a0f0a253682d3bfd0bdc6309096ce55e52a8f967f248a07a04b7434e6a33b1",
+      "raw_bytes": 524,
+      "presentation": "E501 Line too long (91 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\extension_validation.py:236:89\n    |\n235 |     def read(self, path: str, kind: str) -> tuple[SnapshotFile, JsonObject]:\n236 |         \"\"\"Validate bounded retained bytes for path/kind; return file and trusted document.\n    |                                                                                         ^^^\n237 |\n238 |         Rejects reuse, missing files and unsupported schemas with fixed diagnostics.\n    |\n\nFound 1 error.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused3-ruff-130441.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065"
+}

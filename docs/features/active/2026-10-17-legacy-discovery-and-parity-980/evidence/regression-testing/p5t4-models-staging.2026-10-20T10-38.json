@@ -1,0 +1,28 @@
+{
+  "Timestamp": "2026-10-20T10-38",
+  "status": "EXACT_OWNED_STAGING_CLOSURE_NO_GIT_MUTATION",
+  "paths": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "tests/discovery_runtime/test_acceptance_properties.py": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-consolidate-consolidate.2026-10-20T10-34.json": "48ab5af6d1c1182562995a9d59a6e76a5e0cd9f2f3f8ab3916ae133044f286de",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-consolidate2-format.2026-10-20T10-36.json": "b678d8af51c6816ae8c9d4791f347948f024c9f4305f44e253f4f66c2c7b1295",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-freeze.2026-10-20T10-38.json": "18fbd8e8ee34d2d6cece03f9a586aa4970c2c2d38c824cc3fb5bfc91ca47bb6b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-lossless-archive.2026-10-20T10-38.json": "7a822a7b18d3eeb85539bdcc1c6f97e5dd5e757fd772a64698750c5a13e2371b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass1-format.2026-10-20T10-34.json": "3d486d993ea7aa90b0fc72a89813a900d3aeb9b21d80cf27a2235086f2ce0b8a",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass1-lint.2026-10-20T10-34.json": "02d5ddecd7694c66c6fb25fbce36e02a3f42cb5f84d7f12996270f966fca0caf",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-format.2026-10-20T10-35.json": "baf258e16e0859c33c295d58b72f273930cbc5311a989b3d850ec545a8019ed0",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-lint.2026-10-20T10-35.json": "46bac883ccd5716e44603b34df9ace34698d28a35f140751288587c2db985dfb",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-tests.2026-10-20T10-35.json": "9d75d140548cc73b33eda48b69d0409322660b3e5b04c0dcf8a2c90c63f62795",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-types.2026-10-20T10-35.json": "87565aeb5f16a2395eb7d72900cbb2ad644dc0816ce8f5e1265f52dfe47273be",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-format.2026-10-20T10-36.json": "e27fa50a54f0e12335c69e7ac29ce17a4e3f26c827bc92e2782f6c88cea34c7d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-lint.2026-10-20T10-36.json": "84b04921a5b04d77c980adda9cafc59667fee5758aabc29d79c2cb1ccfa192ff",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-tests.2026-10-20T10-36.json": "b1628621295a97de5b2f47f2846c31e28f161502d53040931f14884809e4ef48",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-types.2026-10-20T10-36.json": "c635a7aef216a8ebead2a1a38c0bedcff7827fbb4e317c0b6a4cfc60a6a0ecf9"
+  },
+  "prerequisite_refs": [
+    "evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+    "evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+    "evidence/other/p5t4-specification-identity.2026-10-20T10-17.json"
+  ],
+  "dependency_closure": "Runtime imports are accepted predecessor APIs. No import or dependency on in-progress acceptance_generation or its context exists."
+}

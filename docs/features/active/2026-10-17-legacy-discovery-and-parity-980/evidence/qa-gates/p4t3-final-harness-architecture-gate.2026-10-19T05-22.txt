@@ -1,0 +1,45 @@
+"""Verify P4-T3 purity, legacy I/O boundaries and in-memory test ownership."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+manifest=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+checked=[]
+for entry in manifest['files']:
+    path=Path(entry['path']); content=path.read_bytes()
+    assert hashlib.sha256(content).hexdigest()==entry['sha256'],path
+    assert len(content.splitlines())<=500,path
+    tree=ast.parse(content)
+    parents={child:node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)}
+    imports=[]
+    for node in ast.walk(tree):
+        if isinstance(node,ast.ImportFrom) and node.module: imports.append(node.module)
+        elif isinstance(node,ast.Import): imports.extend(value.name for value in node.names)
+    if path.as_posix().startswith('packages/'):
+        assert not any(value.startswith(('scripts','subprocess','socket','requests','http','urllib','os','io')) for value in imports),(path,imports)
+        assert not any('office' in value or 'vsto' in value for value in imports),path
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call):
+                called=ast.unparse(node.func)
+                assert called not in {'open','eval','exec','compile','import_module'},(path,called)
+                if called.endswith(('.read_bytes','.read_text','.write_bytes','.write_text','.unlink','.mkdir','.glob','.rglob')):
+                    ancestor=node
+                    while not isinstance(ancestor,(ast.FunctionDef,ast.Module)): ancestor=parents[ancestor]
+                    assert path.name=='dotnet_inventory.py' and isinstance(ancestor,ast.FunctionDef) and ancestor.name=='parse' and called=='self._fs.read_bytes',(path,called)
+        checked.append({'path':path.as_posix(),'boundary':'pure lexical adapters; only legacy parse may read its injected seam'})
+    elif path.as_posix().startswith('scripts/'):
+        assert all(isinstance(node,(ast.Expr,ast.ImportFrom)) for node in tree.body),path
+        assert all(value=='drm_copilot_discovery.analyzer.'+path.stem for value in imports),path
+        checked.append({'path':path.as_posix(),'boundary':'identity-preserving re-export only'})
+    else:
+        text=content.decode('utf-8')
+        assert not any(word in text for word in ('tmp_path','tmpdir','TemporaryDirectory','NamedTemporaryFile','tempfile','subprocess','requests','socket')),path
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call) and ast.unparse(node.func).endswith(('.write_bytes','.write_text','.mkdir','.unlink')):
+                ancestor=node
+                while not isinstance(ancestor,(ast.FunctionDef,ast.Module)): ancestor=parents[ancestor]
+                assert isinstance(ancestor,ast.FunctionDef) and 'mem_fs_path' in [arg.arg for arg in ancestor.args.args],(path,ast.unparse(node.func))
+        checked.append({'path':path.as_posix(),'boundary':'in-memory units; writes confined to mem_fs_path fake; resources read-only'})
+print(json.dumps({'checks':checked,'passed':len(checked)},indent=2))

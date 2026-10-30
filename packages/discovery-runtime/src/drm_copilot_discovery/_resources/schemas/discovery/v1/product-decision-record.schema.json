@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/discovery/v1/product-decision-record.schema.json",
+  "version": "1.0.0",
+  "title": "Product Decision Record",
+  "description": "A reconciled product decision made during discovery. Domain-neutral: no source or target technology is named in this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "id",
+    "title",
+    "decision",
+    "status",
+    "rationale"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Scheme-less relative path from the instance file to its schema file."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Instance schema version. Major component pinned to the v1 directory; minor and patch are free."
+    },
+    "id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short human-readable name of the decision."
+    },
+    "decision": {
+      "type": "string",
+      "description": "The decision that was made."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "accepted",
+        "superseded",
+        "rejected"
+      ],
+      "description": "Lifecycle state of the decision."
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why the decision was made."
+    },
+    "decided_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "description",
+          "reason_rejected"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "The alternative considered."
+          },
+          "reason_rejected": {
+            "type": "string",
+            "description": "Why the alternative was rejected."
+          }
+        }
+      },
+      "description": "Optional alternatives that were considered and rejected."
+    },
+    "feature_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "description": "Feature Contract id values this decision affects."
+    },
+    "behavior_record_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "description": "Unspecified Behavior Record id values this decision resolves."
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "description": "Evidence Reference id values grounding this decision."
+    },
+    "superseded_by": {
+      "$ref": "#/$defs/identifier"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "description": "Shared identifier grammar. Lowercase alphanumeric start; dots, underscores, and hyphens permitted."
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+      "description": "ISO-8601 timestamp enforced by regex because the validator runs without a FormatChecker."
+    },
+    "metadata": {
+      "type": "object",
+      "title": "Free-form consumer metadata",
+      "description": "Sanctioned extension point. Additional properties are permitted here only."
+    }
+  }
+}

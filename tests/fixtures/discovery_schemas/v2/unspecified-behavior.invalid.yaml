@@ -1,0 +1,22 @@
+$schema: urn:drm-copilot:discovery:2.0.0:unspecified-behavior
+schema_version: 2.0.0
+artifact_kind: unspecified-behavior
+id: behavior-alpha
+behavior_id: behavior-alpha
+feature_refs:
+  - {artifact_kind: feature-contract, id: feature-alpha}
+dimensions: [timing]
+question: When does the observable state become active?
+evidence_refs: []
+competing_interpretations: []
+impact: Acceptance timing remains unresolved.
+status: open
+decision_owner: null
+decision_ref: null
+decision: null
+rationale: null
+approved_target_behavior: An unapproved expectation.
+acceptance_test_implications: [Keep the timing expectation pending.]
+resolution_basis: null
+resolution_evidence_refs: []
+extensions: {}

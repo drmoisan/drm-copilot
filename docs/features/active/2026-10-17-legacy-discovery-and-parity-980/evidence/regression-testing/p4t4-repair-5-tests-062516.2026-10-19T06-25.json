@@ -1,0 +1,43 @@
+{
+  "batch": "repair-5",
+  "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py --cov=drm_copilot_discovery.analyzer.configuration --cov=drm_copilot_discovery.analyzer.configuration_input --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t4-repair-5-coverage.raw.json",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T06:25:16.224868+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-repair-5-tests-062516.2026-10-19T06-25.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-repair-5-tests-062516.2026-10-19T06-25.stdout.txt",
+      "sha256": "0ddf94df3c53e6358940e59ba9f8450420cf8cd4223a4819eff29e85ddecc09c"
+    }
+  },
+  "seconds": 53.406672,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "fd6247859c4ea160ee28314309cdfde01041e0679c32cb2f7450d60f55d273bd",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "75ef4ea1d950495fd2dfb3b340a000badaeecfa128df5a3d3325f1b49e3e2cb9",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "fd6247859c4ea160ee28314309cdfde01041e0679c32cb2f7450d60f55d273bd",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "75ef4ea1d950495fd2dfb3b340a000badaeecfa128df5a3d3325f1b49e3e2cb9",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "tests",
+  "started_at": "2026-10-19T06:24:22.818196+00:00",
+  "stderr": "",
+  "stdout": "........................................................................ [ 80%]\r\n.....F............                                                       [100%]\r\n================================== FAILURES ===================================\r\n____ test_inherited_ini_paths_cannot_exceed_accumulated_text_reservations _____\r\n\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000121BB0209F0>\r\n\r\n    def test_inherited_ini_paths_cannot_exceed_accumulated_text_reservations(\r\n        monkeypatch: pytest.MonkeyPatch,\r\n    ) -> None:\r\n        \"\"\"Patch fixture observes bounded INI pointer allocations across inherited keys.\r\n    \r\n        Returns None; count encoded prospective paths before the real helper runs,\r\n        and require fixed failure with no returned partial declaration collection.\r\n        \"\"\"\r\n        # Each individually small section inherits the same escaped Unicode default.\r\n        content = (\r\n            \"[DEFAULT]\\n\u03a9/~=VALUE_SENTINEL\\n\"\r\n            + \"\\n\".join(\"[\" + \"Section\" * 8 + str(index) + \"]\" for index in range(8))\r\n        ).encode()\r\n        remaining = 12000\r\n        created = 0\r\n        original = child_pointer\r\n    \r\n        def bounded_pointer(parent: str, part: str | int) -> str:\r\n            \"\"\"Check str/int path arguments against byte budget; return real pointer.\r\n    \r\n            Mutates only counters; assertion fails before any prohibited allocation.\r\n            \"\"\"\r\n            nonlocal remaining, created\r\n            segment = str(part)\r\n            cost = 12 * (\r\n                len(parent) + 1 + len(segment) + segment.count(\"~\") + segment.count(\"/\")\r\n            )\r\n            assert cost <= remaining\r\n            remaining -= cost\r\n            created += 1\r\n            return original(parent, part)\r\n    \r\n        monkeypatch.setattr(input_module, \"child_pointer\", bounded_pointer)\r\n        with pytest.raises(ConfigurationInputError) as caught:\r\n            parse_configuration(\r\n                content, format=\"ini\", max_bytes=8192, max_keys=100, max_text_bytes=12000\r\n            )\r\n>       assert caught.value.code == \"configuration-text-limit\" and created > 10\r\nE       AssertionError: assert ('configuration-text-limit' == 'configuration-text-limit'\r\nE         \r\nE           configuration-text-limit and 9 > 10)\r\n\r\ntests\\discovery_runtime\\analyzer\\test_configuration_input.py:241: AssertionError\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                   Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration.py            89      2     32      1    98%   270-271\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py     204      3     90      6    97%   199->222, 208->210, 216->222, 324, 382, 386\r\n----------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                    293      5    122      7    97%\r\nCoverage JSON written to file SCRATCH\\p4t4-repair-5-coverage.raw.json\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/analyzer/test_configuration_input.py::test_inherited_ini_paths_cannot_exceed_accumulated_text_reservations\r\n1 failed, 89 passed in 52.79s\r\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-25"
+}

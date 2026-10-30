@@ -1,0 +1,43 @@
+{
+  "batch": "focused-2",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T05:51:38.855328+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-focused-2-types-055138.2026-10-19T05-51.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-focused-2-types-055138.2026-10-19T05-51.stdout.txt",
+      "sha256": "fe3a359b6f0a6679ff23622677a66185f18609ce1fab7f1e8fa554c593252724"
+    }
+  },
+  "seconds": 0.924134,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "66b567c926d37ce8ea5aa7f99337a0c2c963c4ad08ba9e8598f0c09c9cc536a0",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "66b567c926d37ce8ea5aa7f99337a0c2c963c4ad08ba9e8598f0c09c9cc536a0",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T05:51:37.931194+00:00",
+  "stderr": "",
+  "stdout": "WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:216:8 - error: Index 0 is out of range for type tuple[()] (reportGeneralTypeIssues)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:281:26 - error: Cannot assign to attribute \"optionxform\" for class \"ConfigParser\"\n  \u00a0\u00a0No overloaded function matches type \"(optionstr: str) -> str\" (reportAttributeAccessIssue)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:302:17 - error: Argument of type \"str | None\" cannot be assigned to parameter \"name\" of type \"str\" in function \"add\"\n  \u00a0\u00a0Type \"str | None\" is not assignable to type \"str\"\n  \u00a0\u00a0\u00a0\u00a0\"None\" is not assignable to \"str\" (reportArgumentType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:308:33 - error: Argument of type \"str | None\" cannot be assigned to parameter \"key\" of type \"str\" in function \"setdefault\"\n  \u00a0\u00a0Type \"str | None\" is not assignable to type \"str\"\n  \u00a0\u00a0\u00a0\u00a0\"None\" is not assignable to \"str\" (reportArgumentType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:316:21 - error: Argument of type \"str | None\" cannot be assigned to parameter \"name\" of type \"str\" in function \"add\"\n  \u00a0\u00a0Type \"str | None\" is not assignable to type \"str\"\n  \u00a0\u00a0\u00a0\u00a0\"None\" is not assignable to \"str\" (reportArgumentType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:317:43 - error: Argument of type \"str | None\" cannot be assigned to parameter \"part\" of type \"str | int\" in function \"child_pointer\"\n  \u00a0\u00a0Type \"str | None\" is not assignable to type \"str | int\"\n  \u00a0\u00a0\u00a0\u00a0Type \"None\" is not assignable to type \"str | int\"\n  \u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"None\" is not assignable to \"str\"\n  \u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"None\" is not assignable to \"int\" (reportArgumentType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:321:39 - error: Argument of type \"str | None\" cannot be assigned to parameter \"element\" of type \"str\" in function \"add\"\n  \u00a0\u00a0Type \"str | None\" is not assignable to type \"str\"\n  \u00a0\u00a0\u00a0\u00a0\"None\" is not assignable to \"str\" (reportArgumentType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration_input.py:323:21 - error: Argument of type \"str | None\" cannot be assigned to parameter \"key\" of type \"str\" in function \"__setitem__\"\n  \u00a0\u00a0Type \"str | None\" is not assignable to type \"str\"\n  \u00a0\u00a0\u00a0\u00a0\"None\" is not assignable to \"str\" (reportArgumentType)\n8 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T05-51"
+}

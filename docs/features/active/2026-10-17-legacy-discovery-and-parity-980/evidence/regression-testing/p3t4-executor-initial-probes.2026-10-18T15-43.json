@@ -1,0 +1,178 @@
+{
+  "task": "P3-T4",
+  "elapsed_seconds": 25.135,
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "a391f83f9902764bcd29b5ac84c069936ef094fe9e1b398fe6bb0b25b7f53e0f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "8df17c2a4b0b0264dc655d6ef52ac5a43608f61d099a3b6b4d9a456d3d77ef09"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "7003513ca632ca68af14aa0b560974f8c63b8315984ad48ebca5561ef3c89273",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "5744462e41f52f774bbaebf757dc62ee10f69483327b7599eb09bbfa001bb204"
+  },
+  "source_stable": false,
+  "checks": [
+    {
+      "name": "contract-deterministic",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "contract-null-unknowns",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "contract-exact-question-links",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "contract-no-evidence-approval",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "optional-offline-mobile-not-required",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "real-contract-planner-positive",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "contract-missing-exact-grant",
+      "passed": true,
+      "detail": {
+        "error": "MUTATION_GRANT: No exact kind/ID/path write grant",
+        "findings": []
+      }
+    },
+    {
+      "name": "contract-rejects-observation_state",
+      "passed": true,
+      "detail": {
+        "error": "DRAFT_CLAIM: Creation cannot change observation_state",
+        "findings": []
+      }
+    },
+    {
+      "name": "contract-rejects-lifecycle",
+      "passed": true,
+      "detail": {
+        "error": "DRAFT_CLAIM: Creation cannot change lifecycle",
+        "findings": []
+      }
+    },
+    {
+      "name": "contract-rejects-product_decision_status",
+      "passed": true,
+      "detail": {
+        "error": "DRAFT_CLAIM: Creation cannot change product_decision_status",
+        "findings": []
+      }
+    },
+    {
+      "name": "custom-paths",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "inherited-requirements-monotonic",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "custom-real-planner-positive",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "append-preserves-prior-question",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "existing-feature-collision",
+      "passed": true,
+      "detail": {
+        "error": "MUTATION_PRECONDITION: Original content digest differs",
+        "findings": []
+      }
+    },
+    {
+      "name": "scenario-multifeature-links",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "scenario-null-expectation-no-execution",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "scenario-question-planned-dimension",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "scenario-real-planner-positive",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "scenario-missing-feature",
+      "passed": true,
+      "detail": {
+        "error": "MUTATION_INVALID: Prospective graph is invalid",
+        "findings": [
+          "REFERENCE_MISSING",
+          "REFERENCE_MISSING"
+        ]
+      }
+    },
+    {
+      "name": "scenario-rejects-result_status",
+      "passed": true,
+      "detail": {
+        "error": "DRAFT_CLAIM: Creation cannot change result_status",
+        "findings": []
+      }
+    },
+    {
+      "name": "scenario-rejects-runs",
+      "passed": true,
+      "detail": {
+        "error": "DRAFT_CLAIM: Creation cannot change runs",
+        "findings": []
+      }
+    },
+    {
+      "name": "scenario-rejects-pre_state_capture",
+      "passed": true,
+      "detail": {
+        "error": "DRAFT_CLAIM: A new observation plan cannot claim captured execution",
+        "findings": []
+      }
+    },
+    {
+      "name": "scenario-unknown-cannot-invent-expectation",
+      "passed": true,
+      "detail": {
+        "error": "MUTATION_INVALID: Prospective graph is invalid",
+        "findings": [
+          "SCHEMA_INVALID"
+        ]
+      }
+    },
+    {
+      "name": "nested-verified-phase-rejected-by-draft-creation",
+      "passed": false,
+      "detail": "Unexpected acceptance"
+    }
+  ],
+  "passed": 24,
+  "failed": 1,
+  "Timestamp": "2026-10-18T15-43"
+}

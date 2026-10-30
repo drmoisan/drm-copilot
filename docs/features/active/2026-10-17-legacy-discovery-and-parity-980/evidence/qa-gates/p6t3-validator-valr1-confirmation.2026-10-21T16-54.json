@@ -1,0 +1,70 @@
+{
+  "issue": 980,
+  "task": "P6-T3",
+  "timestamp": "2026-10-21T16:54:46.331279+00:00",
+  "route": "build_identity_p6t3_valr1_20261021T165300",
+  "status": "VAL_R1_CLOSED_SOURCE_CLEAR_READY_FOR_CHECKED_SUBSET",
+  "task_acceptance": false,
+  "original_finding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-independent-review.2026-10-21T16-49.json",
+    "sha256": "ade6938ae9d150bcde81fa3e354846c8afc700407018e26751ffbb0b3f7f2128"
+  },
+  "scope": [
+    {
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py",
+      "sha256": "c5bcf32874dfb52485c54b0a403e00b6feca661c5f0510d425840074d7652af7"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "sha256": "2677be37ee363766902ae20c0916fd841dfc5cb3183387e115ac79447cd87dbb"
+    }
+  ],
+  "closed_findings": [
+    "VAL-R1"
+  ],
+  "findings": [],
+  "open_probes": [],
+  "delta": "Capture end = len(active) once; count = end - start and range(start, end) use the same validated and prepaid bound. No other production statement changed.",
+  "regression": "A memory-only Sequence returns length 1 on first observation and limit+1 thereafter. Test requires exact tuple containing one empty token, length_reads == 1, and index_reads == [0]. No slices or external effects. This fails against the original repeated-length helper.",
+  "retained_test_qualification": "All 17 preexisting top-level test function ASTs are identical. Necessary Sequence/overload imports and one new regression are the only test delta. UTF-8 bytes were used for the exact comparison.",
+  "proof": {
+    "ordered_gates": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-165206-format-check.2026-10-21T16-52.json",
+        "sha256": "a5c4dad185075d7a90869f56f942aaaa79c8f00dd83dc1e163979a1b7a6d2ce4"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-165210-lint.2026-10-21T16-52.json",
+        "sha256": "48550c420a862c9f54b4795165c60cd6e15cd13e5bc8ddaa9854c9474f3289b1"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-165213-types.2026-10-21T16-52.json",
+        "sha256": "615eff29e53ffc1b22ef4c8040d93bfb17af063fbba1a58d773a06e02628d8d5"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-165224-tests.2026-10-21T16-52.json",
+        "sha256": "988d5140193a9b4489cfc15c7bcbdf856cda6380f50cfd80056f8daec87ba000"
+      }
+    ],
+    "all_exit_codes": 0,
+    "nodes": 39,
+    "old_nodes_retained": 38,
+    "added_nodes": 1,
+    "current_before_after_dependencies_identical": 27,
+    "statements": [
+      103,
+      103
+    ],
+    "branches": [
+      32,
+      32
+    ],
+    "test_elapsed_seconds": 6.821564,
+    "raw_gzip_members_verified": true
+  },
+  "limitations": [
+    "Original 38-case source review and source-derived failed bound trace remain immutable. No old failure has been relabeled as passing.",
+    "No source/test edit, behavioral probe, test replay, report inspection, Git/staging/checkpoint mutation performed.",
+    "Owner repaired freeze/staging is pending handoff; this receipt confirms source/39-case closure independently. Final report population, integration and reversed isolation remain coordinator-owned."
+  ]
+}

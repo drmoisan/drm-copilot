@@ -1,0 +1,165 @@
+"""Bind the released P5-T1 candidate without executing behavioral suites."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+feature = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+qa, regression = feature / "evidence/qa-gates", feature / "evidence/regression-testing"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def digest(data):
+    """Return SHA-256 for exact supplied bytes."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def ref(path):
+    """Bind one existing portable path to its actual bytes."""
+    return {"path": path.as_posix(), "sha256": digest(path.read_bytes())}
+
+
+def save(path, value):
+    """Create portable LF JSON without replacing previous evidence."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+def read(path, expected=None):
+    """Read a JSON receipt and optionally assert its immutable identity."""
+    data = path.read_bytes()
+    assert expected is None or digest(data) == expected, path
+    return json.loads(data)
+
+
+state = read(Path("artifacts/orchestration/orchestrator-state.json"))
+route = next(x for x in state["codex_model_routing_receipts"] if x["delegation_id"] == "workspace_operations_p5t1_final_gates_20261020")
+profile_hash = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+assert route["profile_sha256"] == digest(Path(route["profile_path"]).read_bytes()) == profile_hash
+authority_path = Path.home() / ".codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.f50a381e7b3554fe77176b5c0429a53b56579adb36427614259db5bc6770a5d6.json"
+authority = read(authority_path)
+assert all(authority[k] is True for k in ("routing_valid", "launch_authority_valid", "provenance_valid"))
+assert authority["profile_sha256"] == profile_hash
+preparation_path = qa / "p5t1-final-preparation.2026-10-20T03-52.json"
+preparation = read(preparation_path, "acc20396907bd7d605d5b956e9b8941bbce5c42535d5dbae891c45dbfe0e6478")
+review_path = qa / "p5t1-executor-consolidated-candidate-review.2026-10-20T04-12.json"
+review = read(review_path, "bff0d6838743044beec6af16f10b28670383e4f8aa134f510a197c4f4330ea43")
+assert not review["findings"] and not review["open_probes"]
+union_path = qa / "p5t1-executor-checked-candidate-union.2026-10-20T04-12.json"
+read(union_path, "68210a0e42106644f792dded8e25889e4b0eefc970225d4669e8702c87532b8c")
+graph_path = regression / "p5t1-graph-freeze.2026-10-20T04-07.json"
+graph = read(graph_path, "42e2d4f046db82a9aaf3bf9799ec778cb0e34b013989c25d916f476acf27a8b1")
+caller_path = regression / "p5t1-projection-repair-freeze.2026-10-20T04-03.json"
+caller = read(caller_path, "9ab59c5939f4b8fb1f157cfd467bbcb1d01cbd68f017de4ee92d001769fd1841")
+helper_path = Path(preparation["retained_helper_proof"]["freeze"]["path"])
+helper = read(helper_path, preparation["retained_helper_proof"]["freeze"]["sha256"])
+closure = read(Path(helper["coverage_closure"]["path"]), helper["coverage_closure"]["sha256"])
+for entry in closure["import_closure"]:
+    assert digest(Path(entry["path"]).read_bytes()) == entry["working_sha256"], entry["path"]
+initial = read(Path(caller["original_failed_result"]["path"]), caller["original_failed_result"]["sha256"])
+old_unit = read(Path(initial["unit_receipt"]["path"]), initial["unit_receipt"]["sha256"])
+old_nodes = re.findall(r"^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)", old_unit["streams"]["stdout"]["presentation"], re.M)
+assert len(old_nodes) == len(set(old_nodes)) == 136
+replaced = {node for node in old_nodes if "::test_valid_failed_review_can_finish_without_authorizing_planning[" in node}
+assert len(replaced) == 2
+new_nodes = (set(old_nodes) - replaced) | set(caller["nodes"])
+assert len(new_nodes) == 138
+assert len(graph["nodes"]) == len(set(graph["nodes"])) == 49
+bound = {}
+files = []
+head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, check=True).stdout.decode().strip()
+assert head == "f5a37bc6d237668174069d8e7c8a0f057d685bbf"
+for path in preparation["remaining_files"]:
+    raw = Path(path).read_bytes()
+    entry = review["current_scope"][path]
+    assert digest(raw) == entry["sha256"]
+    committed = subprocess.run(["git", "show", f"{head}:{path}"], capture_output=True, check=True).stdout
+    assert committed == raw or committed == raw.replace(b"\r\n", b"\n"), path
+    files.append({**ref(Path(path)), "physical_lines": len(raw.splitlines()),
+                  "git_blob": subprocess.run(["git", "rev-parse", f"{head}:{path}"], capture_output=True, check=True).stdout.decode().strip(),
+                  "git_sha256": digest(committed), "git_attributes": entry["git_attributes"],
+                  "normalization": "exact" if raw == committed else "CRLF-to-LF only"})
+    bound[path] = digest(raw)
+for path, entry in helper["owned_source_test_bindings"].items():
+    assert digest(Path(path).read_bytes()) == entry["sha256"], path
+    bound[path] = entry["sha256"]
+for path, entry in caller["bindings"].items():
+    assert digest(Path(path).read_bytes()) == entry["sha256"], path
+    bound[path] = entry["sha256"]
+for entry in closure["import_closure"]:
+    bound[entry["path"]] = entry["working_sha256"]
+# Bind only the transitive repository-local import closure of the actual scope.
+queue = [Path(path) for path in bound if path.endswith(".py")]
+seen = set()
+search_roots = [Path("."), Path("packages/discovery-runtime/src")]
+while queue:
+    path = queue.pop()
+    key = path.as_posix()
+    if key in seen:
+        continue
+    seen.add(key)
+    bound[key] = digest(path.read_bytes())
+    tree = ast.parse(path.read_bytes())
+    for node in ast.walk(tree):
+        modules = []
+        if isinstance(node, ast.Import):
+            modules = [item.name for item in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+            modules = [node.module] + [node.module + "." + item.name for item in node.names]
+        for module in modules:
+            for source in search_roots:
+                candidate = source / Path(*module.split("."))
+                for local in (candidate.with_suffix(".py"), candidate / "__init__.py"):
+                    if local.is_file():
+                        queue.append(local)
+for path in [Path("pyproject.toml"), Path("poetry.lock"), Path("quality-tiers.yml"), Path("packages/discovery-runtime/pyproject.toml")]:
+    bound[path.as_posix()] = digest(path.read_bytes())
+for directory in ("schemas/discovery", "tests/fixtures/discovery", "examples/discovery/v2"):
+    for path in Path(directory).rglob("*"):
+        if path.is_file() and path.suffix in {".json", ".yaml", ".yml", ".txt"}:
+            bound[path.as_posix()] = digest(path.read_bytes())
+baseline_path = Path(preparation["baseline"]["path"])
+baseline = read(baseline_path, preparation["baseline"]["sha256"])
+old_coverage_ref = next(x for x in baseline["retained_evidence"] if "/p2t9-coverage." in x["path"])
+old_coverage = read(Path(old_coverage_ref["path"]), old_coverage_ref["sha256"])
+validation_path = "packages/discovery-runtime/src/drm_copilot_discovery/validation.py"
+old_validation = next(value for path, value in old_coverage["files"].items() if path.replace("\\", "/") == validation_path)
+graph_coverage = read(Path(graph["coverage"]["path"]), graph["coverage"]["sha256"])
+contracts = preparation["ordered_stages"][5]["argv"][10:]
+assert len(contracts) == 4
+harnesses = {}
+for name in ("issue-980-p5t1-final-bind.py", "issue-980-p5t1-final-gates.py", "issue-980-p5t1-final-architecture.py"):
+    payload = (scratch / name).read_bytes()
+    assert b"\r" not in payload and payload.endswith(b"\n") and not payload.endswith(b"\n\n"), name
+    destination = qa / (name.removeprefix("issue-980-").removesuffix(".py") + "-harness." + stamp + ".txt")
+    assert not destination.exists()
+    destination.write_bytes(payload)
+    harnesses[name] = ref(destination)
+manifest = {
+    "task": "P5-T1", "timestamp": stamp, "head": head, "execution_released": True,
+    "route": route, "authority_sha256": digest(authority_path.read_bytes()),
+    "preparation": ref(preparation_path), "review": ref(review_path), "review_union": ref(union_path),
+    "baseline": ref(baseline_path), "accepted_baseline": baseline["head"],
+    "owner_freezes": [ref(graph_path), ref(caller_path)], "retained_helper": ref(helper_path),
+    "retained_helper_closure": helper["coverage_closure"], "retained_helper_cases": 114,
+    "files": files, "bindings": bound, "harnesses": harnesses,
+    "forward_test_module_order": {
+        "graph": ["tests/discovery_runtime/test_coverage_report.py", "tests/discovery_runtime/test_coverage_report_contract.py"],
+        "callers": ["tests/discovery_runtime/test_validation_modes.py", "tests/discovery_runtime/test_agent_output.py", "tests/discovery_runtime/test_mutation_plan.py"]},
+    "nodes": {"graph": graph["nodes"], "callers": sorted(new_nodes)},
+    "caller_node_basis": {"old": initial["unit_receipt"], "replaced": sorted(replaced), "added_from_narrow": sorted(new_nodes - set(old_nodes)), "qualification": "136 original executed nodes; two single-mode IDs replaced by four executed mode-qualified IDs, giving 138. No additional collection run."},
+    "coverage_targets": preparation["measured_modules"], "production": preparation["remaining_files"][:3],
+    "validation_baseline": old_validation, "graph_coverage": graph_coverage,
+    "contract_selection": contracts, "node_counts": {"graph": 49, "callers": 138},
+    "timeout_seconds": {"graph": 600, "callers": 1800, "native": 600},
+    "coverage_convention": preparation["coverage_contract"],
+    "native_assertions": preparation["ordered_stages"][6]["assertions"],
+    "native_pending": True, "whole_feature_acceptance": False,
+}
+path = qa / ("p5t1-final-candidate." + stamp + ".json")
+save(path, manifest)
+print(json.dumps({"candidate": ref(path), "bindings": len(bound), "cases": 187, "harnesses": harnesses}, indent=2))

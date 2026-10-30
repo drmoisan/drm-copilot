@@ -119,6 +119,28 @@ function Test-CodexAgentProfileBinding {
     return $true
 }
 
+function ConvertTo-CodexSharedAgentProfile {
+    <#
+    .SYNOPSIS
+        Projects a Codex profile attestation into the shared discovery agent-profile shape.
+    .DESCRIPTION
+        The shared DiscoveryStart decision compares ProfileName, ProfileSha256,
+        ProfileModel and ProfileReasoningEffort against the protected invocation;
+        this projection keeps the Codex TOML reader as the single source of those values.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory)] $AgentProfile)
+
+    return [pscustomobject]@{
+        ProfilePath            = [string]$AgentProfile.profile_path
+        ProfileSha256          = [string]$AgentProfile.profile_sha256
+        ProfileName            = [string]$AgentProfile.profile_name
+        ProfileModel           = [string]$AgentProfile.profile_model
+        ProfileReasoningEffort = [string]$AgentProfile.profile_reasoning_effort
+    }
+}
+
 function Test-CodexRoutedAgentType {
     [CmdletBinding()]
     [OutputType([bool])]

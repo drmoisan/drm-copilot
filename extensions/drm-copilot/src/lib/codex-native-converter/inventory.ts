@@ -36,6 +36,7 @@ const SUPPORTED_ROOTS: Readonly<
     ".github/skills",
     ".github/agents",
     ".github/prompts",
+    ".github/hooks",
   ],
   [SourceEcosystem.CLAUDE]: [
     "CLAUDE.md",
@@ -44,6 +45,7 @@ const SUPPORTED_ROOTS: Readonly<
     ".claude/hooks",
     ".claude/settings.json",
     ".claude/rules",
+    ".claude/lib",
   ],
 };
 

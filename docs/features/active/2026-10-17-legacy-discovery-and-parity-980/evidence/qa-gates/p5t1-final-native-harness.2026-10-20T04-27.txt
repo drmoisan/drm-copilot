@@ -1,0 +1,224 @@
+"""Exercise actual local capture, coverage projection and rendering without publication."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+from uuid import uuid4
+
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.coverage_report import build_coverage_report
+from drm_copilot_discovery.models import canonical_json, to_plain_value
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.mutation_io import capture_workspace
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+from drm_copilot_discovery.validation import report_input_digest, report_projection, validate_snapshot
+from tests.discovery_runtime.validation_test_support import mode_profile, no_scope_snapshot
+
+scratch = Path(__file__).resolve().parent
+suite = scratch / ("issue-980-p5t1-native-" + uuid4().hex)
+suite.mkdir()
+root = suite / "base"
+root.mkdir()
+started = time.monotonic()
+checks, durations = [], {}
+report_path = "docs/migration/discovery/reports/coverage-report.json"
+
+
+def check(name, condition):
+    """Record one explicit result; false conditions terminate without success."""
+    if not condition:
+        raise AssertionError(name)
+    checks.append(name)
+    print("PASS " + name, flush=True)
+
+
+def put(directory, path, data):
+    """Create fixture setup bytes before the measured read-only interval."""
+    target = directory / path
+    assert directory in target.resolve().parents
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(data)
+
+
+def git(directory, *arguments):
+    """Execute fixture-scoped Git with optional index writes disabled."""
+    return subprocess.run(["git", "--no-optional-locks", "-C", str(directory), *arguments],
+                          capture_output=True, check=True).stdout
+
+
+def bounded_git(argv, *, output_limit):
+    """Supply the accepted bounded Git seam with fixed operational errors."""
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        data = process.stdout.read(output_limit + 1)
+        if len(data) > output_limit:
+            process.kill()
+            raise OSError("Native Git output exceeded its bounded read")
+        if process.wait() != 0:
+            raise OSError("Native Git read failed")
+        return data
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+
+def tree(directory):
+    """Hash fixture source/artifact/Git bytes without refreshing Git state."""
+    return {path.relative_to(directory).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(directory.rglob("*")) if path.is_file()}
+
+
+def capture(directory, label):
+    """Use real metadata, byte reads, pinned Git identity and the accepted loader."""
+    primitives = LocalMutationPrimitives(workspace_root=str(directory),
+        lock_path=str(suite / (directory.name + ".lock")))
+    repository = LocalGitReader(workspace_root=str(directory),
+        repository_id=profile.repository.id, run=bounded_git)
+    clock = time.monotonic()
+    value = capture_workspace(workspace_root=str(directory),
+        profile_path=profile.artifacts["profile"], metadata=primitives.metadata,
+        read_bytes=primitives.read_bytes, catalog=catalog, repository=repository).snapshot
+    durations[label] = time.monotonic() - clock
+    return value
+
+
+def measured(label, operation):
+    """Measure one actual API operation without confusing it with the whole suite."""
+    clock = time.monotonic()
+    value = operation()
+    durations[label] = time.monotonic() - clock
+    return value
+
+
+# Prepare one real source revision and the existing complete synthetic no-scope graph.
+put(root, ".gitattributes", b"* -text\n")
+put(root, "fixture-note.txt", b"Synthetic empty source selection.\n")
+git(root, "init", "--quiet")
+git(root, "config", "core.autocrlf", "false")
+git(root, "add", ".gitattributes", "fixture-note.txt")
+git(root, "-c", "user.name=Discovery fixture", "-c", "user.email=discovery@example.invalid",
+    "-c", "commit.gpgsign=false", "commit", "--quiet", "-m", "Synthetic coverage fixture")
+revision = git(root, "rev-parse", "HEAD").decode("ascii").strip()
+catalog = load_catalog()
+value = to_plain_value(mode_profile(catalog).document)
+value["repository"]["revision"] = revision
+value["analyzers"]["enabled"] = ["repository"]
+value["analyzers"]["extension_result_manifests"] = []
+profile = ProfileV2(json.dumps(value), format="json", catalog=catalog)
+seed = no_scope_snapshot(catalog, profile=profile)
+for item in seed.manifest.files:
+    put(root, item.path, item.content)
+for directory in (*profile.production_roots, *profile.test_roots):
+    (root / directory).mkdir(parents=True, exist_ok=True)
+seed_loaded = capture(root, "setup_capture")
+seed_report = measured("setup_report_for_previous_view", lambda: build_coverage_report(seed_loaded))
+seed_data = seed_report.to_dict()
+
+# Every variant is materialized before any measured read-only verification.
+variants = {"base": root}
+for name in ("previous", "changed", "forged", "invalid"):
+    variants[name] = suite / name
+    shutil.copytree(root, variants[name])
+    if name != "invalid":
+        put(variants[name], report_path, seed_report.to_json().encode("utf-8"))
+put(variants["previous"], report_path[:-5] + ".md", seed_report.to_markdown().encode("utf-8"))
+scope = json.loads((root / profile.artifacts["scope"]).read_bytes())
+scope["no_scope_rationale"] = "Updated documented inspection rationale."
+put(variants["changed"], profile.artifacts["scope"], (json.dumps(scope) + "\n").encode())
+forged_data = json.loads(seed_report.to_json())
+forged_data["coverage"]["components"]["total"] = 9
+put(variants["forged"], report_path, (json.dumps(forged_data) + "\n").encode())
+put(variants["invalid"], profile.artifacts["scope"], b"{}\n")
+variants["uninventoried"] = suite / "uninventoried"
+variants["uninventoried"].mkdir()
+shutil.copytree(root / ".git", variants["uninventoried"] / ".git")
+for path in (".gitattributes", "fixture-note.txt", profile.artifacts["profile"]):
+    put(variants["uninventoried"], path, (root / path).read_bytes())
+for directory in (*profile.production_roots, *profile.test_roots):
+    (variants["uninventoried"] / directory).mkdir(parents=True, exist_ok=True)
+before = {name: tree(directory) for name, directory in variants.items()}
+status_before = {name: git(directory, "status", "--porcelain").decode() for name, directory in variants.items()}
+
+# The following operations use only captured immutable data and read-only filesystem seams.
+snapshot = capture(root, "capture_complete_graph")
+snapshot_hash = snapshot.sha256
+expected = {item.path: item.content for item in seed.manifest.files}
+check("actual loader retains profile, scope, inventory, ledger and checksummed evidence",
+      all(snapshot.file(path).content == data for path, data in expected.items())
+      and snapshot.checkout.id == profile.repository.id and snapshot.checkout.revision == revision)
+structural = measured("structural_validation", lambda: validate_snapshot(snapshot, mode="structural"))
+check("materialized complete no-scope graph is structurally valid", structural.ok)
+report = measured("build_coverage_report", lambda: build_coverage_report(snapshot))
+data = report.to_dict()
+check("confirmed no-scope reports justified discovery completion",
+      data["validation_result"] == data["discovery_result"] == "pass" and data["completion_findings"] == [])
+counts = data["coverage"]
+runtime = counts["runtime"]
+check("empty denominators retain null ratios and explicit zero runtime obligations",
+      counts["components"]["total"] == 0
+      and all(item["percentage"] is None for item in counts["metrics"].values())
+      and all(runtime[key] == 0 for key in ("denominator", "required", "observed", "verified", "missing"))
+      and runtime["unit"] == "selected nonexcluded runtime-required component identities")
+projection = measured("public_report_projection", lambda: report_projection(snapshot,
+    kind="coverage-report", identifier="coverage", mode="discovery-complete"))
+check("producer and authoritative public projection agree exactly", projection == data)
+check("JSON and Markdown render the same detached fields",
+      data == json.loads(report.to_json())
+      == json.loads(report.to_markdown().split("```json\n", 1)[1].rsplit("```", 1)[0]))
+repeated = measured("repeated_report", lambda: build_coverage_report(snapshot))
+check("identical captured input renders deterministically",
+      repeated.to_json() == report.to_json() and repeated.to_markdown() == report.to_markdown())
+check("generation and validation preserve the immutable capture",
+      snapshot.sha256 == snapshot_hash and all(snapshot.file(path).content == raw for path, raw in expected.items()))
+previous = capture(variants["previous"], "capture_previous_view")
+previous_report = measured("report_with_previous_view", lambda: build_coverage_report(previous))
+check("previous JSON and Markdown outputs do not alter semantic identity or counts",
+      report_input_digest(previous) == report_input_digest(snapshot)
+      and previous_report.document == report.document and previous.sha256 != snapshot.sha256)
+changed = capture(variants["changed"], "capture_changed_authoring")
+changed_validation = measured("validate_stale_report", lambda: validate_snapshot(changed, mode="structural"))
+check("changed authored input invalidates the retained previous report",
+      report_input_digest(changed) != report_input_digest(snapshot)
+      and any(item.code == "REPORT_RESULT" for item in changed_validation.findings))
+forged = capture(variants["forged"], "capture_forged_report")
+forged_validation = measured("validate_forged_report", lambda: validate_snapshot(forged, mode="structural"))
+check("authored success counts cannot replace recomputation",
+      not forged_validation.ok and any(item.code == "REPORT_RESULT" for item in forged_validation.findings))
+uninventoried = capture(variants["uninventoried"], "capture_uninventoried")
+missing_report = measured("report_uninventoried", lambda: build_coverage_report(uninventoried)).to_dict()
+check("configured uninventoried input retains actionable failure and unavailable population",
+      missing_report["discovery_result"] == "fail" and bool(missing_report["completion_findings"])
+      and missing_report["coverage"]["population_state"] == "unavailable"
+      and missing_report["coverage"]["components"] is None)
+invalid = capture(variants["invalid"], "capture_invalid_scope")
+invalid_report = measured("report_invalid_scope", lambda: build_coverage_report(invalid)).to_dict()
+check("malformed scope retains original structural findings and unavailable counts",
+      invalid_report["discovery_result"] == "fail" and invalid_report["coverage"]["components"] is None
+      and bool(invalid.findings)
+      and {item.code for item in invalid.findings} <= {item["code"] for item in invalid_report["findings"]})
+after = {name: tree(directory) for name, directory in variants.items()}
+check("all read-only operations preserve fixture source, artifacts and Git bytes",
+      before == after
+      and all(git(directory, "status", "--porcelain").decode() == status_before[name]
+              and git(directory, "rev-parse", "HEAD").decode().strip() == revision
+              for name, directory in variants.items()))
+assert len(checks) == 14
+result = {"task": "P5-T1", "passed": len(checks), "checks": checks,
+    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    "elapsed_seconds": time.monotonic() - started, "operation_seconds": durations,
+    "fixture": "SCRATCH/" + suite.name, "revision": revision,
+    "source_and_git_before": before, "source_and_git_after": after,
+    "input_sha256": report_input_digest(snapshot), "report": data,
+    "qualifications": ["Synthetic setup writes precede the measured read-only interval.",
+        "Every variant is loaded through actual capture_workspace/load_snapshot and LocalGitReader.",
+        "No plan_mutation, commit_mutation, publication, installed coding-agent host or non-Windows claim."]}
+Path(sys.argv[1]).write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+print(json.dumps({"passed": 14, "elapsed_seconds": result["elapsed_seconds"],
+                  "operation_seconds": durations}), flush=True)

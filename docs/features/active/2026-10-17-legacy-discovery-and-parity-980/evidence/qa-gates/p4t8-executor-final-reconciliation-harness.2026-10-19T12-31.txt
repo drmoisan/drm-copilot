@@ -1,0 +1,220 @@
+"""Reconcile only new P4-T8 final proof against its retained independent review."""
+from pathlib import Path
+import base64
+import datetime as dt
+import gzip
+import hashlib
+import json
+import re
+import subprocess
+
+F = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+Q = F / 'evidence/qa-gates'
+sha = lambda data: hashlib.sha256(data).hexdigest()
+git = lambda *args: subprocess.check_output(['git', *args])
+
+
+def ref(path):
+    return {'path': Path(path).as_posix(), 'sha256': sha(Path(path).read_bytes())}
+
+
+def load(path, digest=None):
+    data = Path(path).read_bytes()
+    assert digest is None or sha(data) == digest, str(path)
+    return json.loads(data)
+
+
+def bound(item):
+    return load(item['path'], item['sha256'])
+
+
+def walk(value):
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from walk(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from walk(child)
+
+
+receipt_id = 'atomic_execution_p4t8_final_acceptance'
+routes = [x for x in walk(load('artifacts/orchestration/orchestrator-state.json')) if x.get('delegation_id') == receipt_id and x.get('deployment_agent')]
+assert len(routes) == 1
+route = routes[0]
+assert (route['deployment_agent'], route['model'], route['model_reasoning_effort']) == ('atomic-executor-c4', 'gpt-6-astra', 'max')
+profile_sha = sha(Path('.codex/agents/atomic-executor-c4.toml').read_bytes())
+assert route['profile_sha256'] == profile_sha == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+authority = load(Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json')
+assert authority['profile_sha256'] == profile_sha
+assert all(authority[key] is True for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+
+handoff_path = Q / 'p4t8-final-handoff.2026-10-19T12-25.json'
+h = load(handoff_path, 'ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785')
+closure_path = Q / 'p4t8-final-stage-closure.2026-10-19T12-26.json'
+closure = load(closure_path, 'd0de86c66c89a97d589fcd751131accedd6968be20e4e8f9ff7d4cbd3068f216')
+assert sha(closure_path.with_suffix('.md').read_bytes()) == 'f149126030dd7bebd5762db967e9d80503e32becab10d6b7eb7aa8ad430302bc'
+assert len(closure['stage_paths']) == len(set(closure['stage_paths'])) == 91
+assert len(closure['files']) == 89
+for item in closure['files']:
+    data = Path(item['path']).read_bytes()
+    assert sha(data) == item['sha256'] and len(data) == item['bytes'], item['path']
+
+candidate = bound(h['candidate'])
+review = bound(h['retained_review'])
+assert h['retained_review']['sha256'] == 'ad62b8f8e9b77504aa956f00e7fdaeea94b016479ee042ac1654099dd110bc45'
+assert review['findings'] == review['open_behavioral_probes'] == []
+head = git('rev-parse', 'HEAD').decode().strip()
+assert head == h['checked_candidate_commit'] == 'c388b3a5e4200c9781ff850bc242f39ee80d1758'
+source_map = {item['path']: item['sha256'] for item in h['source_files']}
+review_map = {item['path']: item['sha256'] for item in review['reviewed_current_source_bindings']}
+assert len(source_map) == 16
+for item in h['source_files']:
+    path = item['path']
+    assert sha(Path(path).read_bytes()) == item['sha256'] == review_map[path]
+    assert sha(git('show', ':' + path)) == item['index_sha256'] == item['sha256']
+    assert sha(git('show', head + ':' + path)) == item['commit_sha256'] == item['sha256']
+for item in h['fixture_bindings']:
+    assert sha(Path(item['path']).read_bytes()) == item['sha256'] == review_map[item['path']]
+assert len(candidate['preserved_files']) == h['preserved_predecessors'] == 79
+for item in candidate['preserved_files']:
+    assert sha(Path(item['path']).read_bytes()) == item['sha256'], item['path']
+
+ordered = bound(h['ordered_stages'])
+assert ordered['source_hashes'] == source_map
+raw_archive = bound(h['canonical_raw_streams'])
+streams = {}
+for entry in raw_archive['entries']:
+    assert entry['encoding'] == 'gzip+base64'
+    raw = gzip.decompress(base64.b64decode(entry['payload'], validate=True))
+    assert sha(raw) == entry['original_sha256'] and len(raw) == entry['original_bytes']
+    streams[(entry['receipt'], entry['stream'])] = raw
+assert len(streams) == 16
+harnesses = bound(h['executed_harnesses'])
+executed = {}
+for item in harnesses['snapshots']:
+    raw = base64.b64decode(item['executed_content_base64'], validate=True)
+    assert sha(raw) == item['executed_sha256']
+    companion = Path(item['readable_lf_companion']['path']).read_bytes()
+    assert sha(companion) == item['readable_lf_companion']['sha256'] and companion == raw.replace(b'\r\n', b'\n')
+    executed[item['executed_path']] = item['executed_sha256']
+assert len(executed) == 7
+for path, digest in ordered['harness_hashes'].items():
+    assert executed[path] == digest
+assert executed['SCRATCH/issue-980-p4t8-final-gates.py'] == '0d66c0eaa7f18bb5b2b0ff840b70f5442a52a2b8f684f8e0db2d039a85a67ece'
+labels = ['format', 'lint', 'types', 'architecture', 'tests-optional-reverse', 'tests-compatibility-reverse', 'contracts', 'native']
+assert [x['label'] for x in h['ordered_receipts']] == labels
+last = None
+for item in h['ordered_receipts']:
+    current = bound(item)
+    assert sha(Path(item['markdown']['path']).read_bytes()) == item['markdown']['sha256']
+    assert current['label'] == item['label'] and current['exit_code'] == item['exit_code'] == 0
+    assert current['source_before'] == current['source_after'] == source_map
+    assert current['harness_hashes'] == ordered['harness_hashes']
+    start, finish = (dt.datetime.fromisoformat(current[key]) for key in ('started_at', 'finished_at'))
+    assert start <= finish and (last is None or last <= start)
+    last = finish
+    for name in ('raw_stdout', 'raw_stderr'):
+        assert sha(streams[(item['path'], name)]) == current[name]['sha256']
+    expected = {'tests-optional-reverse': 100, 'tests-compatibility-reverse': 166, 'contracts': 177}.get(item['label'])
+    if expected:
+        assert f'{expected} passed'.encode() in streams[(item['path'], 'raw_stdout')]
+assert ordered['test_node_count'] == len(ordered['test_nodes']) == len(set(ordered['test_nodes'])) == 266
+all_nodes = []
+for batch, subset in zip(ordered['coverage_batches'], h['subset_manifests'], strict=True):
+    retained = bound(subset)
+    prior = retained.get('test_nodes_in_execution_order', retained.get('test_node_order'))
+    assert len(batch['test_nodes']) == len(prior) and set(batch['test_nodes']) == set(prior)
+    all_nodes.extend(batch['test_nodes'])
+    item = next(x for x in h['ordered_receipts'] if x['label'] == 'tests-' + batch['batch'] + '-reverse')
+    output = streams[(item['path'], 'raw_stdout')].decode('utf-8')
+    offset = 0
+    for node in batch['test_nodes']:
+        offset = output.index(node + ' PASSED', offset) + len(node)
+assert all_nodes == ordered['test_nodes']
+
+ranges = bound(h['coverage_ranges'])
+qualification = bound(h['unchanged_callable_qualification'])
+assert h['unchanged_callable_qualification']['sha256'] == '8b4a2467cddba5d0bd91bb35cf59994aeb6be344b3bb157833259da3fbed4edc'
+allowed = {(x['path'], x['kind'], x['name']): x for x in qualification['qualified_unchanged_units']}
+assert {key[2] for key in allowed} == {'_utc_now', '_default_schema_path'}
+assert sorted(line for x in allowed.values() for line in x['current_missing_lines']) == [47, 56, 57]
+assert sorted(line for x in allowed.values() for line in x['baseline_missing_lines']) == [75, 80, 81]
+assert len(ranges['unit_ranges']) == 40 and len(ranges['module_summaries']) == 8
+coverage_files = {}
+for batch in ranges['coverage_batches']:
+    data = bound(batch)
+    raw_data = bound(batch['canonical_original'])
+    assert batch['canonical_original']['sha256'] == batch['raw']['sha256']
+    assert data['totals'] == raw_data['totals'] == batch['totals']
+    coverage_files.update({path.replace('\\', '/'): value for path, value in data['files'].items()})
+for path, summary in ranges['module_summaries'].items():
+    assert coverage_files[path]['summary'] == summary
+for unit in ranges['unit_ranges']:
+    family = {'FunctionDef': 'functions', 'ClassDef': 'classes'}[unit['kind']]
+    measured = coverage_files[unit['path']][family][unit['name']]
+    assert measured['summary'] == unit['summary']
+    key = (unit['path'], family, unit['name'])
+    if key in allowed:
+        assert measured['missing_lines'] == allowed[key]['current_missing_lines']
+        assert measured['summary']['num_statements'] == allowed[key]['baseline_summary']['num_statements']
+    elif measured['summary']['num_statements']:
+        assert measured['summary']['percent_statements_covered'] >= 90
+totals = {key: sum(x[key] for x in ranges['module_summaries'].values()) for key in ('covered_lines', 'num_statements', 'covered_branches', 'num_branches')}
+assert tuple(totals.values()) == (439, 442, 146, 146)
+assert sum(x['changed_statement_count'] for x in h['changed_line_measurement']) == 374
+assert all(not x['missing_changed_lines'] for x in h['changed_line_measurement'])
+correction_path = Q / 'p4t8-final-harness-correction.2026-10-19T12-23.json'
+correction = load(correction_path, 'e92db824532d3dea5674cbf873535f81be2e00684d375633da1b6f88aa740cce')
+assert correction['checks']['all_eight_modules_validate_from_preserved_coverage'] is True
+assert set(correction['checks']['negative_guard_probes']) == {'extra-unchanged-gap', 'module-regression', 'changed-callable-gap'}
+diff_path = Path(correction['delta']['path'])
+diff = diff_path.read_bytes()
+assert sha(diff) == correction['delta']['sha256'] == '92efac20b106a6adee075e3b8fc4a9edada82ada5358d2da0a6037bb4375abab'
+assert [i for i, line in enumerate(diff.splitlines(), 1) if line == b' '] == [22, 23, 59, 60]
+assert all(not line.endswith((b' ', b'\t')) or line == b' ' for line in diff.splitlines())
+native = bound(h['native_result'])
+assert len(native['checks']) == 22 and native['source_tree_unchanged'] and native['git_status_unchanged']
+assert native['publication'] == 'not-attempted' and native['platform'] == 'win32'
+assert h['native_result']['sha256'] == ordered['raw_native']['sha256']
+
+plan_path = F / 'plan.2026-10-17T22-38.md'
+plan = plan_path.read_text(encoding='utf-8')
+tasks = re.findall(r'^- \[([ x])\] \[(P\d+-T\d+)\]', plan, re.M)
+assert len(tasks) == 84 and sum(flag == 'x' for flag, _ in tasks) == 39
+assert (' ', 'P4-T8') in tasks
+ac = []
+for name in ('spec.md', 'user-story.md'):
+    path = F / name
+    section = re.search(r'^## Acceptance Criteria\s*\n(.*?)(?=^## |\Z)', path.read_text(encoding='utf-8'), re.M | re.S)
+    assert section is not None
+    flags = re.findall(r'^- \[([ x])\]', section.group(1), re.M)
+    assert len(flags) == 66 and flags.count('x') == 13
+    ac.append({**ref(path), 'accepted': 13, 'total': 66})
+
+result = {
+    'status': 'FINAL_RECONCILIATION_PASS', 'task': 'P4-T8', 'command': 'poetry run python SCRATCH/issue-980-p4t8-final-reconcile.py', 'exit_code': 0,
+    'authority_receipt': receipt_id, 'profile_sha256': profile_sha, 'native_authority_valid': True,
+    'handoff': ref(handoff_path), 'final_evidence_closure': ref(closure_path), 'retained_review': h['retained_review'], 'checked_candidate': head,
+    'verified_bindings': {'source_test_working_index_commit': 16, 'fixtures': 2, 'preserved_predecessor_hashes': 79, 'final_owned_paths': 91, 'raw_command_streams': 16, 'executed_harness_snapshots': 7},
+    'gates': {'clean_ordered_stages': 7, 'unit_cases': 266, 'contract_cases': 177, 'native_windows_git_assertions': 22, 'coverage': totals, 'class_callable_ranges': 40, 'changed_statements_covered': 374, 'changed_statements_total': 374},
+    'unchanged_legacy_gaps': h['unchanged_callable_qualification'], 'harness_correction': ref(correction_path),
+    'raw_diff_whitespace_qualification': {'artifact': ref(diff_path), 'single_space_context_marker_lines': [22, 23, 59, 60], 'interpretation': 'Exact unified-diff empty context-line prefixes; raw bytes retained. Qualification applies only to this artifact and these four markers, not other whitespace or source/test content.'},
+    'task_acceptance': 'Optional adapter requires explicit configured consent; ordinary paths avoid optional imports, legacy v1 paths fail closed, and bounded captured-byte inventory preserves evidence and fact/inference distinctions.',
+    'ac_mapping': {'sources': ac, 'new_checkoffs': [], 'reason': 'Optional analyzer task is complete. Global analyzer/neutrality/publishing/quality criteria remain broader than this subset; P4-T9 and later phases remain outstanding.'},
+    'plan_before': ref(plan_path), 'plan_count_before': '39/84', 'authorized_next_edit': 'Only the P4-T8 checkbox',
+    'findings': [], 'new_behavioral_runs': 0, 'retained_limitations': ['Finite static declarations do not prove runtime binding or execution.', 'Native proof is local Windows Python/Git only; no publication or installed coding-agent-host/non-Windows proof.', 'Whole-repository coverage and feature-wide final gates remain outstanding.', 'Earlier preliminary structure-rendering loss and exact synthetic-output archive qualifications remain as documented in the retained candidate review.'],
+}
+now = dt.datetime.now(dt.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+result.update(timestamp=stamp, published_utc=now.isoformat())
+proof = Q / f'p4t8-executor-final-reconciliation.{stamp}.json'
+harness = Q / f'p4t8-executor-final-reconciliation-harness.{stamp}.txt'
+initial = Q / f'p4t8-executor-final-initial-checker.{stamp}.txt'
+original = Path(__file__).with_name('issue-980-p4t8-final-reconcile-initial-checker.py').read_bytes()
+result['checker_only_correction'] = {'initial_exit_code': 1, 'observed_diagnostic': "KeyError: 'FunctionDef' at the raw coverage lookup; no acceptance artifacts had been written.", 'diagnostic_qualification': 'Observed tool diagnostic transcribed; no separate original command-output byte capture is claimed.', 'correction': 'Map AST FunctionDef/ClassDef range kinds to the existing raw coverage functions/classes namespaces.', 'original_executed_checker': {'path': initial.as_posix(), 'sha256': sha(original)}, 'behavioral_reruns': 0}
+assert not proof.exists() and not harness.exists() and not initial.exists()
+proof.write_bytes((json.dumps(result, indent=2) + '\n').encode())
+harness.write_bytes(Path(__file__).read_bytes())
+initial.write_bytes(original)
+print(json.dumps({'status': result['status'], 'reconciliation': ref(proof), 'harness': ref(harness), 'initial_checker': ref(initial), 'plan_before': result['plan_before'], 'next': 'Apply only P4-T8 checkbox then publish acceptance/staging closure.'}))

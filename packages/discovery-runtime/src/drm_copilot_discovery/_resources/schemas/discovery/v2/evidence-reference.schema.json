@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:evidence-reference",
+  "title": "Discovery v2 evidence reference",
+  "description": "Typed provenance for source facts and runtime captures. Schema validity alone does not verify referenced bytes or authorize a completion claim.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "evidence_id", "evidence_type", "repository", "revision", "path", "runtime_artifact", "timestamp", "environment", "checksum", "author_or_agent", "confidence", "notes", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:evidence-reference"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "evidence-reference"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "evidence_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "evidence_type": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-type"},
+    "repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "revision": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"}, {"type": "null"}]},
+    "path": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"}, {"type": "null"}]},
+    "uri": {"type": "string", "format": "uri", "pattern": "^https?://", "description": "Descriptive external reference only; never fetched or accepted as local proof by itself."},
+    "symbol": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+    "line_range": {
+      "type": "object", "additionalProperties": false, "required": ["start", "end"],
+      "properties": {"start": {"type": "integer", "minimum": 1}, "end": {"type": "integer", "minimum": 1}},
+      "description": "One-based inclusive endpoints; semantic validation also enforces end >= start against the referenced file."
+    },
+    "runtime_artifact": {"anyOf": [{"$ref": "#/$defs/runtime-artifact"}, {"type": "null"}]},
+    "timestamp": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "environment": {"anyOf": [{"$ref": "#/$defs/environment"}, {"type": "null"}]},
+    "checksum": {"anyOf": [{"$ref": "#/$defs/checksum"}, {"type": "null"}]},
+    "author_or_agent": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "id"],
+      "properties": {
+        "kind": {"enum": ["human", "agent", "tool"]},
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"}
+      }
+    },
+    "confidence": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/confidence"},
+    "notes": {"type": "string"},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"path": {"type": "null"}}, "required": ["path"]},
+      "then": {"required": ["uri"]},
+      "else": {"properties": {"checksum": {"$ref": "#/$defs/checksum"}}}
+    },
+    {
+      "if": {"properties": {"evidence_type": {"enum": ["source", "test"]}}, "required": ["evidence_type"]},
+      "then": {"properties": {
+        "revision": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"},
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "runtime_artifact": {"type": "null"}
+      }}
+    },
+    {
+      "if": {"properties": {"evidence_type": {"enum": ["runtime", "observation"]}}, "required": ["evidence_type"]},
+      "then": {"properties": {
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "runtime_artifact": {"$ref": "#/$defs/runtime-artifact"},
+        "environment": {"$ref": "#/$defs/environment"},
+        "checksum": {"$ref": "#/$defs/checksum"}
+      }}
+    }
+  ],
+  "$defs": {
+    "checksum": {
+      "type": "object", "additionalProperties": false, "required": ["algorithm", "value"],
+      "properties": {"algorithm": {"const": "sha256"}, "value": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}}
+    },
+    "environment": {
+      "type": "object", "additionalProperties": false, "required": ["id", "platform", "operating_mode", "client_id", "extensions"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "platform": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "operating_mode": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "client_id": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"}, {"type": "null"}]},
+        "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+      }
+    },
+    "runtime-artifact": {
+      "type": "object", "additionalProperties": false, "required": ["path", "capture_method"],
+      "properties": {
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "capture_method": {"enum": ["manual", "semi-automated", "automated"]}
+      }
+    }
+  }
+}

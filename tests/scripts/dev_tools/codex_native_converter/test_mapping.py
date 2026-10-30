@@ -102,3 +102,53 @@ def test_plan_target_paths_emits_powershell_hook_targets() -> None:
     planned_record = plan_target_paths(mapping_record, enable_repo_prompts=False)
 
     assert planned_record.target_path == ".codex/hooks/check-python-test-purity.ps1"
+
+
+def test_plan_target_paths_publishes_helpers_under_codex_lib_verbatim() -> None:
+    """Keep a shared helper's library-relative name under the `.codex/lib` root."""
+
+    mapping_record = MappingRecord(
+        source_path=".claude/lib/discovery-validation/DiscoveryValidation.psm1",
+        source_ecosystem=SourceEcosystem.CLAUDE,
+        source_kind=SourceKind.HOST_ADAPTER_REFERENCE,
+        conversion_class=ConversionClass.DIRECT,
+        target_role=TargetRole.HOOK,
+        target_path=None,
+    )
+
+    planned_record = plan_target_paths(mapping_record, enable_repo_prompts=False)
+
+    assert (
+        planned_record.target_path
+        == ".codex/lib/discovery-validation/DiscoveryValidation.psm1"
+    )
+
+
+def test_plan_target_paths_routes_github_hook_surfaces_per_host() -> None:
+    """Map GitHub hook handlers to native hooks and registrations to native config."""
+
+    handler = plan_target_paths(
+        MappingRecord(
+            source_path=".github/hooks/discovery_pre_tool.ps1",
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            source_kind=SourceKind.HOOK_DEFINITION,
+            conversion_class=ConversionClass.DIRECT,
+            target_role=TargetRole.HOOK,
+            target_path=None,
+        ),
+        enable_repo_prompts=False,
+    )
+    registration = plan_target_paths(
+        MappingRecord(
+            source_path=".github/hooks/discovery.json",
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            source_kind=SourceKind.PERMISSIONS_OR_SETTINGS,
+            conversion_class=ConversionClass.DECOMPOSED,
+            target_role=TargetRole.MCP_CONFIG,
+            target_path=None,
+        ),
+        enable_repo_prompts=False,
+    )
+
+    assert handler.target_path == ".codex/hooks/discovery-pre-tool.ps1"
+    assert registration.target_path == ".codex/config.toml"

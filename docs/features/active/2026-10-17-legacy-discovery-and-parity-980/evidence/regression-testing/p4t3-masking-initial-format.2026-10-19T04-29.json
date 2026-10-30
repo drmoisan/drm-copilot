@@ -1,0 +1,46 @@
+{
+  "stage": 1,
+  "label": "p4t3-masking-initial-format",
+  "started": "2026-10-19T04:29:39.514784+00:00",
+  "finished": "2026-10-19T04:29:41.448081+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py",
+  "exit_code": 0,
+  "duration_seconds": 1.933,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ddcf6cb429631a4b56d7634d3d2bead16bbaf725256427fd7e1d1bb3e825d3d9",
+      "physical_lines": 33
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "8736a0be0ad4193b992acc985f107dda1d62d7e1bb1df9be81134eeae0fc175e",
+      "physical_lines": 392
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "7dee03a36263b74d8b7860d755277e4cd34da49c8c3aed512a8a6696f4b00c9c",
+      "physical_lines": 167
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ddcf6cb429631a4b56d7634d3d2bead16bbaf725256427fd7e1d1bb3e825d3d9",
+      "physical_lines": 33
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "98810131c8658af63a146da43eb54395f9c27ab03a8a952285b23f8e367adbe5",
+      "physical_lines": 411
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "bbbe4fc7b08bfde95508817893ead60307cac95c96b9b3cfb71dd436f1033ea7",
+      "physical_lines": 204
+    }
+  },
+  "output": "reformatted tests\\discovery_runtime\\analyzer\\test_source_masking.py\nreformatted tests\\scripts\\dev_tools\\discovery\\analyzer\\test_source_text.py\n\nAll done! \u2728 \ud83c\udf70 \u2728\n2 files reformatted, 2 files left unchanged.\n"
+}

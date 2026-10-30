@@ -1,0 +1,205 @@
+{
+  "issue": 980,
+  "Timestamp": "2026-10-21T15:35:30.356515+00:00",
+  "task": "P6-T2",
+  "status": "READY_FOR_CHECKED_WIP",
+  "Command": ".venv/Scripts/python.exe -B SCRATCH/issue-980-p6t2-composition-final.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "CC1/CT1/CT2 and the complete 58-case focused proof are confirmed. All 42 named BODY scopes and module coverage are complete; original failures remain preserved.",
+  "current_head": "aff219e1b4cbce8113378e35d7520b8a8ce789dd",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-freeze.2026-10-21T15-31.json",
+    "working_sha256": "5dbaff1f3d5ec8b6a60e49fbee5c812b2ed19ab1385be72ef1d2893b940f21a6",
+    "git_lf_sha256": "5dbaff1f3d5ec8b6a60e49fbee5c812b2ed19ab1385be72ef1d2893b940f21a6",
+    "expected_git_blob": "5d3a8e5b7f27a07618c7ff33de968a207f9dcf47",
+    "bytes": 69730,
+    "git_lf_bytes": 69730
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-staging.2026-10-21T15-31.json",
+    "working_sha256": "bf4d233020c13a6fc98377f979c611264fc3a668005998a4b98bb95356ab740e",
+    "git_lf_sha256": "bf4d233020c13a6fc98377f979c611264fc3a668005998a4b98bb95356ab740e",
+    "expected_git_blob": "87b919076a7e23cae78bbc5673f53278d2566704",
+    "bytes": 17399,
+    "git_lf_bytes": 17399
+  },
+  "source_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-composition-source-confirmation.2026-10-21T15-27.json",
+    "working_sha256": "8952eaeabc7e27a0a1c068b2a78cb7bc57a91e78ad3e8b88f693c0655c9e4eb1",
+    "git_lf_sha256": "8952eaeabc7e27a0a1c068b2a78cb7bc57a91e78ad3e8b88f693c0655c9e4eb1",
+    "expected_git_blob": "72d9846556c2181fd6c3d495f2722dd825ffd28e",
+    "bytes": 6461,
+    "git_lf_bytes": 6461
+  },
+  "confirmed_owned": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "working_sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0",
+      "git_lf_sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0",
+      "expected_git_blob": "b6c7f335314b2ad9ccde07d8558578f95981623f",
+      "bytes": 16081,
+      "git_lf_bytes": 16081
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_dry_run.py",
+      "working_sha256": "1147d9de3942555ab4e2c578dc0d32b9ae89b84784b779a2ee3c374e7c223b53",
+      "git_lf_sha256": "1147d9de3942555ab4e2c578dc0d32b9ae89b84784b779a2ee3c374e7c223b53",
+      "expected_git_blob": "3f65e080e451ad2ca4e0d9090e21297b812c434b",
+      "bytes": 19763,
+      "git_lf_bytes": 19763
+    },
+    {
+      "path": "tests/discovery_runtime/cli_test_support.py",
+      "working_sha256": "1c193d50f6c45047053a10eb9868cf1c3d2f861cb1f6efd65409a88c8c728b36",
+      "git_lf_sha256": "1c193d50f6c45047053a10eb9868cf1c3d2f861cb1f6efd65409a88c8c728b36",
+      "expected_git_blob": "8669a385a43e8935f882c8a244d9be8d06dd056e",
+      "bytes": 2577,
+      "git_lf_bytes": 2577
+    },
+    {
+      "path": "pyproject.toml",
+      "working_sha256": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+      "git_lf_sha256": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+      "expected_git_blob": "bb4048df7092b716c09f9851eadc9b7a7c3d5320",
+      "bytes": 7015,
+      "git_lf_bytes": 7015
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "working_sha256": "22d79f77a64d38387f45a015cebc799e4589bd076bbdb3cb9383dbeb9bb3bb76",
+      "git_lf_sha256": "22d79f77a64d38387f45a015cebc799e4589bd076bbdb3cb9383dbeb9bb3bb76",
+      "expected_git_blob": "f5fb5cb67575e6c23b5de0f38fa878d845afc77e",
+      "bytes": 3267,
+      "git_lf_bytes": 3267
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "working_sha256": "b967a992e83dedacf2d18469e9e1d57bd78aeaae78da49c6f327cb6ef3263139",
+      "git_lf_sha256": "ee5e23e1f40f0b819bc7b9f87c21c3c527e9d084a01b631fdae87377d2f3f3ec",
+      "expected_git_blob": "87acd7e4674561be232d132e2c36da1cf9167911",
+      "bytes": 5243,
+      "git_lf_bytes": 5089
+    }
+  ],
+  "ordered_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151905-format-check.2026-10-21T15-19.json",
+      "sha256": "57cc03a842f05941580ce95fcd3953db99da2e01a1ec01244b68857610c7b4d7",
+      "stage": "format-check",
+      "started_utc": "2026-10-21T15:19:05.638351+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 1.501536,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151905-format-check-raw.2026-10-21T15-19.json",
+        "sha256": "d6e2f169e3601bb028940f4095996623646ef2dab6b4d4457cc7acd335279af3"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151917-lint.2026-10-21T15-19.json",
+      "sha256": "430831b2a91603dbe340b21833f6184aac9a86f53ef8551feebf706719c0532e",
+      "stage": "lint",
+      "started_utc": "2026-10-21T15:19:17.626205+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.271451,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151917-lint-raw.2026-10-21T15-19.json",
+        "sha256": "c1127037ac78dd4232deaaabc6d95cead40c2b3e84a8c8df809b364e2c7e315d"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151920-types.2026-10-21T15-19.json",
+      "sha256": "f066bf5b1c765aa7666d93241349aa2f06e6323dfaf97fc785653300289bfcb5",
+      "stage": "types",
+      "started_utc": "2026-10-21T15:19:20.160533+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 1.224436,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151920-types-raw.2026-10-21T15-19.json",
+        "sha256": "a303fb0336f104012406028c65c1b4c17b2d02cb8d31afa959f9cc2504512fa9"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151927-precheck.2026-10-21T15-20.json",
+      "sha256": "c574b75a61839cfc1d4eac373ce131fb85690a84d61987c02f656832c3ddc7f6",
+      "stage": "precheck",
+      "started_utc": "2026-10-21T15:19:27.685059+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 74.978517,
+      "passed": 4,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-151927-precheck-raw.2026-10-21T15-20.json",
+        "sha256": "bea52c6e163e30fb413c47fde470a7862cf04f90362751b743a1052f107a425b"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-152323-tests.2026-10-21T15-30.json",
+      "sha256": "d0f1c591a7575a16d9946a8582e20952dbc86fb5a56edba7f7a146af5cefc862",
+      "stage": "tests",
+      "started_utc": "2026-10-21T15:23:23.484020+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 441.516552,
+      "passed": 58,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-152323-tests-raw.2026-10-21T15-30.json",
+        "sha256": "59c7ad644081ede217778b68f32af09f217200798cf1a8477e2085507b472315"
+      }
+    }
+  ],
+  "proof": {
+    "passed": 58,
+    "failed": 0,
+    "original_node_order_preserved": true,
+    "harness_seconds": 441.516552,
+    "module_statements": [
+      143,
+      143
+    ],
+    "module_branches": [
+      10,
+      10
+    ],
+    "named_scopes": 42,
+    "named_floor_gaps": [],
+    "changed_production_bodies": [
+      "_failure"
+    ],
+    "lost_covered_lines_or_arcs": 0,
+    "raw_counter_augmentation": false
+  },
+  "coverage_qualification": "All current module and BODY counters come only from the final passing 58-case coverage. The failed 54/4 stream is a separately retained no-loss comparison, never a coverage union. CliPorts has an explicit zero executable-body denominator; declaration-inclusive module counts remain separate. Exact archived covered_file/definitions/executable/counts functions were reused unchanged.",
+  "raw_qualification": "Raw gzip-base64 members retain original bytes, hashes, EOF and Windows newlines. UTF-8 readable streams match through the recorded OBSERVED_PATH_ALIASES and established newline/trailing-blank normalization. No source, test, original receipt or raw stream was rewritten.",
+  "reader_diagnostics": [
+    "The initial metadata-only expected-name assertion used two descriptive aliases rather than actual function names. The diff, byte and AST checks had passed. The expected names were corrected to the existing source definitions; no source, test, raw receipt or behavioral execution changed.",
+    "An initial metadata-only inspection assumed a bindings array; the owner staging schema is paths plus explicit append-self qualification. The corrected read preserves all original 70 bindings. This did not affect behavior or evidence bytes."
+  ],
+  "build_manifest_qualification": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+    "at_run_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+    "meaning": "This is the identical before/after generated manifest used by the passing run. Its later coordinator-authorized regeneration is separate; current package output is not retroactively substituted into this proof or staged by this union."
+  },
+  "preserved_failures": "All owner-listed original static attempts, four failed composition assertions, their source/test streams and raw coverage remain in the staging closure. The prior provisional source-only statement remains qualified by the immutable three-finding review.",
+  "task_accepted": false,
+  "pending": [
+    "Designated regenerated package/installed entry-point proof",
+    "Final reversed P6-T2 affected population and required contracts",
+    "P6-T2 acceptance/checkoff"
+  ],
+  "task_counts": {
+    "accepted": 47,
+    "total": 84
+  },
+  "ac_counts": {
+    "accepted": 23,
+    "total": 66
+  },
+  "next_five_tasks": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

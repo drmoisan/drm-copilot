@@ -1,0 +1,33 @@
+{
+  "status": "REVIEWABLE_STAGING_LIST_ONLY",
+  "timestamp": "2026-10-19T10-32",
+  "files": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-coverage.2026-10-19T10-32.json": "16f45876ed3b4640480ed5c15102761b04929d29cd5a6bcc6a96fbb684b230ce",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused1-format.2026-10-19T10-30.json": "2d80237d067f8d27bc8250d7521c4ae5f7685a61e41644afc8227bbfb4455ecd",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused1-format.2026-10-19T10-30.md": "20bde3d03608906ebddce25958ae357db75bb7c56fc32028dc7a50accb2c0703",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused1-lint.2026-10-19T10-30.json": "e9540f52da3bd482cf2776dfa96d24d219307a7930295387dd2083eee84c2f40",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused1-lint.2026-10-19T10-30.md": "3b413a31ad516daa9efd93b1530885b48fc2bf8daf033adf6e8f98c3f4538eb7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused1-types.2026-10-19T10-30.json": "f9dcba663ab21cdae00eca8636731fd224879f7d6cee8f59105ad2f17fc5b656",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused1-types.2026-10-19T10-30.md": "cb1cfabb1fe03405c71734eb66434de7923b3d611e10eba3209525c57110e26e",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-format.2026-10-19T10-31.json": "7a9126c44aed899e4989bb228e4d3181238fe76f8e97c52344be785b0782e3f7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-format.2026-10-19T10-31.md": "c33712a3bcaadd2618d4285bf901c54f78bc356b42eb19ed9da26bff8f396b66",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-lint.2026-10-19T10-31.json": "c7a42421ab686844bdd72fd0f862751f1cb8b616453c3eeac564787432b7b475",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-lint.2026-10-19T10-31.md": "3613740f0563139544d57bc431935b0402c260a24b0a50984d669ae3963ca845",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-types.2026-10-19T10-31.json": "31e6f0371a061ef584d6bef709ff0ef71346225fe97955f1441fe8c42df46b48",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-types.2026-10-19T10-31.md": "e83142996271f8614740baf2c7981cc09f10b37b51bc70a79d60c75b38c2bbd7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-unit.2026-10-19T10-31.json": "c631d77e6ad5d94f9248802e37a293017bee61bc7def8e28d9d1e870b0b596b5",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-unit.2026-10-19T10-31.md": "8d2afe65a283898e64825eede0d1e3ad5d15f1b3203bee2343c9261f91293c0f",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-freeze-harness.2026-10-19T10-32.txt": "8b1bc083a1d8bc75e3decac9b211d37182d30e5093d2be3cb6372db916c4f801",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-freeze.2026-10-19T10-32.json": "f1dcbc459210449e2a4bc938f26d391b04921725175e0e89885b3305a8309ec7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-full-file-1.2026-10-19T10-32.txt": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-full-file-2.2026-10-19T10-32.txt": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-gate-harness.2026-10-19T10-32.txt": "21787e73aba9cc3169a31d2e6025a75493c3a8d72be08438fba550065c7460b7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-handoff.2026-10-19T10-32.md": "aa5e7ffebce044f283efb96ca98d928f317ffd54592966a7e60ade55a2162737",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-initial-format.2026-10-19T10-29.json": "712c1993f13f492defdad6289dae510e43f5c7d1376fe34525708e2742d28084",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-initial-format.2026-10-19T10-29.md": "f4eab684087a27df7d21115908f371ae92236fb82b4628af5df508e36108ff53",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-instrumentation-format.2026-10-19T10-30.json": "46f88603462b00f74c6707be8f6c41c10f3f7fcd58fa50bf7db8bf74e173ee94",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-instrumentation-format.2026-10-19T10-30.md": "5474e098d75e274ec9507f0fe257adc32a0cfbdc14713891bcda186f1c5cb784"
+  }
+}

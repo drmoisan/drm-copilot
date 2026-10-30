@@ -1,0 +1,72 @@
+"""Freeze the isolated Python parser proof without running predecessor tests."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+evidence = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+paths = ["packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py", "tests/discovery_runtime/analyzer/test_dependency_python.py"]
+shared = "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py"
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+records = sorted(evidence.glob("p4t7-python-focused7-*.json"))
+assert len(records) == 4
+bindings = {path: {"sha256": digest(repo / path), "physical_lines": len((repo / path).read_text("utf-8").splitlines())} for path in paths + [shared]}
+for path in records:
+    record = json.loads(path.read_text("utf-8"))
+    assert record["exit_code"] == 0
+    assert record["source_before"] == record["source_after"] == bindings
+    for stream in record["streams"].values():
+        assert digest(scratch / stream["scratch_identifier"].removeprefix("SCRATCH/")) == stream["raw_sha256"]
+
+# Correct earlier presentation path spelling only; raw streams and hashes stay intact.
+for path in evidence.glob("p4t7-python-*"):
+    if path.suffix in {".md", ".json"}:
+        original = path.read_text("utf-8")
+        normalized = re.sub(r"C:(?:\\\\|\\)/?Users(?:\\\\|\\)DANMOI~1(?:\\\\|\\)AppData(?:\\\\|\\)Local(?:\\\\|\\)Temp/issue-980-p4t7-python", "SCRATCH", original, flags=re.I)
+        if normalized != original:
+            path.write_bytes(normalized.encode("utf-8"))
+
+coverage = json.loads((scratch / "issue-980-p4t7-python-coverage.json").read_text("utf-8"))
+covered = next(iter(coverage["files"].values()))
+assert covered["summary"]["missing_lines"] == 0
+assert covered["summary"]["missing_branches"] == 0
+(evidence / f"p4t7-python-coverage.{stamp}.json").write_bytes((json.dumps(coverage, indent=2) + "\n").encode())
+for suffix in ("gate", "freeze"):
+    source = scratch / f"issue-980-p4t7-python-{suffix}.py"
+    (evidence / f"p4t7-python-{suffix}-harness.{stamp}.txt").write_bytes(source.read_bytes())
+for index, path in enumerate(paths):
+    (evidence / f"p4t7-python-full-file-{index + 1}.{stamp}.txt").write_bytes((repo / path).read_bytes())
+unit = json.loads(next(evidence.glob("p4t7-python-focused7-unit.*.json")).read_text("utf-8"))
+nodes = re.findall(r"^(tests/.*) PASSED", unit["streams"]["stdout"]["presentation"], re.M)
+assert len(nodes) == 98
+artifact_paths = sorted(evidence.glob("p4t7-python-*"))
+manifest = {
+    "status": "FROZEN_READY_CHECKED_SUBSET_NOT_TASK_ACCEPTANCE",
+    "timestamp": stamp,
+    "command": "poetry run python SCRATCH/issue-980-p4t7-python-freeze.py",
+    "exit_code": 0,
+    "shared_commit": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+    "baseline": "Parent 09:44 shared baseline: ten absent paths; 62 accepted streams retained, not rerun.",
+    "bindings": bindings,
+    "gate_records": [p.relative_to(repo).as_posix() for p in records],
+    "nodes": nodes,
+    "coverage_summary": covered["summary"],
+    "callable_coverage": {k: v["summary"] for k, v in covered["functions"].items()},
+    "class_coverage": {k: v["summary"] for k, v in covered.get("classes", {}).items()},
+    "durations_seconds": {json.loads(p.read_text())["stage"]: json.loads(p.read_text())["duration_seconds"] for p in records},
+    "artifacts": {p.relative_to(repo).as_posix(): digest(p) for p in artifact_paths},
+    "limitations": ["Finite requirements/setup.cfg subset only; no full PEP508 or marker evaluation.", "No includes/options/editable/continuations/dynamic attr or file expansion.", "Flat format; max_depth does not govern recursive traversal.", "New shared SR1-SR4 repair is not part of this proof; composed verification remains pending.", "No whole-repository acceptance or overall coverage claim.", "Earlier mixed-separator scratch path presentations normalized; raw hashes unchanged."],
+}
+target = evidence / f"p4t7-python-freeze.{stamp}.json"
+target.write_bytes((json.dumps(manifest, indent=2) + "\n").encode())
+print(target.relative_to(repo).as_posix())
+print(json.dumps({"bindings": bindings, "summary": covered["summary"], "callables": manifest["callable_coverage"]}, indent=2))

@@ -1,0 +1,2432 @@
+{
+  "timestamp": "2026-10-18T23:35:33.057942+00:00",
+  "task": "P3-T6",
+  "baseline": "27753e5f8b9a6cd1d85b9d1d28d2999800af209a",
+  "head": "3bd1dadeab42799fc7afd9fa151130775417f352",
+  "owned_sha256": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+    "tests/discovery_runtime/test_snapshot_export.py": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+    "tests/discovery_runtime/test_snapshot_import.py": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+    "tests/discovery_runtime/test_snapshot_replica_resolution.py": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e"
+  },
+  "checks_passed": 547,
+  "checks": [
+    "physical line ceiling: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "original task baseline new/authorized status: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "no added suppression: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "documented class/function units: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "physical line ceiling: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "original task baseline new/authorized status: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "no added suppression: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "documented class/function units: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "physical line ceiling: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "original task baseline new/authorized status: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "no added suppression: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "documented class/function units: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "physical line ceiling: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "original task baseline new/authorized status: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "no added suppression: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "documented class/function units: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "physical line ceiling: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "original task baseline new/authorized status: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "no added suppression: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "documented class/function units: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "physical line ceiling: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "original task baseline new/authorized status: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "no added suppression: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "documented class/function units: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "physical line ceiling: tests/discovery_runtime/source_snapshot_test_support.py",
+    "original task baseline new/authorized status: tests/discovery_runtime/source_snapshot_test_support.py",
+    "no added suppression: tests/discovery_runtime/source_snapshot_test_support.py",
+    "documented class/function units: tests/discovery_runtime/source_snapshot_test_support.py",
+    "physical line ceiling: tests/discovery_runtime/test_snapshot_export.py",
+    "original task baseline new/authorized status: tests/discovery_runtime/test_snapshot_export.py",
+    "no added suppression: tests/discovery_runtime/test_snapshot_export.py",
+    "documented class/function units: tests/discovery_runtime/test_snapshot_export.py",
+    "physical line ceiling: tests/discovery_runtime/test_snapshot_import.py",
+    "original task baseline new/authorized status: tests/discovery_runtime/test_snapshot_import.py",
+    "no added suppression: tests/discovery_runtime/test_snapshot_import.py",
+    "documented class/function units: tests/discovery_runtime/test_snapshot_import.py",
+    "physical line ceiling: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "original task baseline new/authorized status: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "no added suppression: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "documented class/function units: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "exact ten-path task delta across WIP commits",
+    "original accepted predecessor identity/count",
+    "prior preservation: docs/discovery/templates/v2/coverage-ledger.json",
+    "prior preservation: docs/discovery/templates/v2/domain-profile.yaml",
+    "prior preservation: docs/discovery/templates/v2/parity-matrix.json",
+    "prior preservation: docs/discovery/templates/v2/product-decisions.yaml",
+    "prior preservation: docs/discovery/templates/v2/scope.yaml",
+    "prior preservation: docs/discovery/templates/v2/unspecified-behaviors.yaml",
+    "prior preservation: examples/discovery/v2/acceptance-specification.example.yaml",
+    "prior preservation: examples/discovery/v2/coverage-ledger.example.yaml",
+    "prior preservation: examples/discovery/v2/domain-profile.example.yaml",
+    "prior preservation: examples/discovery/v2/evidence-reference.example.yaml",
+    "prior preservation: examples/discovery/v2/extension-result-manifest.example.yaml",
+    "prior preservation: examples/discovery/v2/feature-contract.example.yaml",
+    "prior preservation: examples/discovery/v2/implementation-record.example.yaml",
+    "prior preservation: examples/discovery/v2/inventory-snapshot.example.yaml",
+    "prior preservation: examples/discovery/v2/parity-matrix.example.yaml",
+    "prior preservation: examples/discovery/v2/product-decision-collection.example.yaml",
+    "prior preservation: examples/discovery/v2/product-decision.example.yaml",
+    "prior preservation: examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+    "prior preservation: examples/discovery/v2/scope.example.yaml",
+    "prior preservation: examples/discovery/v2/source-snapshot-manifest.example.yaml",
+    "prior preservation: examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+    "prior preservation: examples/discovery/v2/unspecified-behavior.example.yaml",
+    "prior preservation: packages/discovery-runtime/README.md",
+    "prior preservation: packages/discovery-runtime/pyproject.toml",
+    "prior preservation: packages/discovery-runtime/resource-manifest.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+    "prior preservation: packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+    "prior preservation: poetry.lock",
+    "prior preservation: pyproject.toml",
+    "prior preservation: quality-tiers.yml",
+    "prior preservation: schemas/discovery/v2/acceptance-specification.schema.json",
+    "prior preservation: schemas/discovery/v2/activation.schema.json",
+    "prior preservation: schemas/discovery/v2/capability-attestation.schema.json",
+    "prior preservation: schemas/discovery/v2/common.schema.json",
+    "prior preservation: schemas/discovery/v2/coverage-ledger.schema.json",
+    "prior preservation: schemas/discovery/v2/discovery-invocation.schema.json",
+    "prior preservation: schemas/discovery/v2/domain-profile.schema.json",
+    "prior preservation: schemas/discovery/v2/evidence-reference.schema.json",
+    "prior preservation: schemas/discovery/v2/extension-result-manifest.schema.json",
+    "prior preservation: schemas/discovery/v2/feature-contract.schema.json",
+    "prior preservation: schemas/discovery/v2/implementation-record.schema.json",
+    "prior preservation: schemas/discovery/v2/inventory-snapshot.schema.json",
+    "prior preservation: schemas/discovery/v2/migration-report.schema.json",
+    "prior preservation: schemas/discovery/v2/parity-matrix.schema.json",
+    "prior preservation: schemas/discovery/v2/product-decision-collection.schema.json",
+    "prior preservation: schemas/discovery/v2/product-decision.schema.json",
+    "prior preservation: schemas/discovery/v2/required-output-manifest.schema.json",
+    "prior preservation: schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+    "prior preservation: schemas/discovery/v2/scope.schema.json",
+    "prior preservation: schemas/discovery/v2/service-request.schema.json",
+    "prior preservation: schemas/discovery/v2/service-result.schema.json",
+    "prior preservation: schemas/discovery/v2/source-snapshot-manifest.schema.json",
+    "prior preservation: schemas/discovery/v2/tool-authorization.schema.json",
+    "prior preservation: schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+    "prior preservation: schemas/discovery/v2/unspecified-behavior.schema.json",
+    "prior preservation: schemas/discovery/v2/validation-receipt.schema.json",
+    "prior preservation: scripts/dev_tools/build_discovery_runtime.py",
+    "prior preservation: scripts/dev_tools/discovery/__init__.py",
+    "prior preservation: scripts/dev_tools/discovery/domain_profile.py",
+    "prior preservation: scripts/dev_tools/discovery/domain_profile_models.py",
+    "prior preservation: scripts/dev_tools/discovery/init_flow.py",
+    "prior preservation: scripts/dev_tools/discovery/init_models.py",
+    "prior preservation: scripts/dev_tools/discovery/io.py",
+    "prior preservation: scripts/dev_tools/discovery/rendering.py",
+    "prior preservation: scripts/dev_tools/quality_tiers_contract.py",
+    "prior preservation: scripts/dev_tools/validate_discovery_profile.py",
+    "prior preservation: scripts/dev_tools/validate_discovery_schema_artifacts.py",
+    "prior preservation: tests/discovery_runtime/draft_test_support.py",
+    "prior preservation: tests/discovery_runtime/evidence_test_support.py",
+    "prior preservation: tests/discovery_runtime/initialization_test_support.py",
+    "prior preservation: tests/discovery_runtime/mutation_test_support.py",
+    "prior preservation: tests/discovery_runtime/parity_test_support.py",
+    "prior preservation: tests/discovery_runtime/test_acceptance_rules.py",
+    "prior preservation: tests/discovery_runtime/test_acceptance_scope.py",
+    "prior preservation: tests/discovery_runtime/test_activation_filesystem.py",
+    "prior preservation: tests/discovery_runtime/test_activation_store.py",
+    "prior preservation: tests/discovery_runtime/test_agent_output.py",
+    "prior preservation: tests/discovery_runtime/test_catalog.py",
+    "prior preservation: tests/discovery_runtime/test_completion_rules.py",
+    "prior preservation: tests/discovery_runtime/test_configuration.py",
+    "prior preservation: tests/discovery_runtime/test_coverage_rules.py",
+    "prior preservation: tests/discovery_runtime/test_coverage_scope.py",
+    "prior preservation: tests/discovery_runtime/test_decision_rules.py",
+    "prior preservation: tests/discovery_runtime/test_decision_supersession.py",
+    "prior preservation: tests/discovery_runtime/test_dimension_rules.py",
+    "prior preservation: tests/discovery_runtime/test_draft_contracts.py",
+    "prior preservation: tests/discovery_runtime/test_draft_scenarios.py",
+    "prior preservation: tests/discovery_runtime/test_evidence_linking.py",
+    "prior preservation: tests/discovery_runtime/test_evidence_payloads.py",
+    "prior preservation: tests/discovery_runtime/test_evidence_rules.py",
+    "prior preservation: tests/discovery_runtime/test_findings.py",
+    "prior preservation: tests/discovery_runtime/test_initialization.py",
+    "prior preservation: tests/discovery_runtime/test_initialization_conflicts.py",
+    "prior preservation: tests/discovery_runtime/test_mutation_commit.py",
+    "prior preservation: tests/discovery_runtime/test_mutation_filesystem.py",
+    "prior preservation: tests/discovery_runtime/test_mutation_plan.py",
+    "prior preservation: tests/discovery_runtime/test_observation_claims.py",
+    "prior preservation: tests/discovery_runtime/test_package_contract.py",
+    "prior preservation: tests/discovery_runtime/test_parity_clients.py",
+    "prior preservation: tests/discovery_runtime/test_parity_rules.py",
+    "prior preservation: tests/discovery_runtime/test_parsing.py",
+    "prior preservation: tests/discovery_runtime/test_parsing_limits.py",
+    "prior preservation: tests/discovery_runtime/test_path_collisions.py",
+    "prior preservation: tests/discovery_runtime/test_path_policy.py",
+    "prior preservation: tests/discovery_runtime/test_path_resolution.py",
+    "prior preservation: tests/discovery_runtime/test_profile_dimensions.py",
+    "prior preservation: tests/discovery_runtime/test_profile_v2.py",
+    "prior preservation: tests/discovery_runtime/test_reference_uniqueness.py",
+    "prior preservation: tests/discovery_runtime/test_references.py",
+    "prior preservation: tests/discovery_runtime/test_repository_reader.py",
+    "prior preservation: tests/discovery_runtime/test_resources.py",
+    "prior preservation: tests/discovery_runtime/test_revision_rules.py",
+    "prior preservation: tests/discovery_runtime/test_runtime_claims.py",
+    "prior preservation: tests/discovery_runtime/test_schema_formats.py",
+    "prior preservation: tests/discovery_runtime/test_schema_validation.py",
+    "prior preservation: tests/discovery_runtime/test_snapshot.py",
+    "prior preservation: tests/discovery_runtime/test_snapshot_imports.py",
+    "prior preservation: tests/discovery_runtime/test_snapshot_io.py",
+    "prior preservation: tests/discovery_runtime/test_snapshot_loading.py",
+    "prior preservation: tests/discovery_runtime/test_validation_modes.py",
+    "prior preservation: tests/discovery_runtime/validation_test_support.py",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+    "prior preservation: tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+    "prior preservation: tests/schemas/discovery/test_v2_acceptance_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_authority_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_common_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_control_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_decision_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_format_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_inventory_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_observation_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_profile_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_runtime_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_target_schemas.py",
+    "prior preservation: tests/schemas/discovery/test_v2_transport_schemas.py",
+    "prior preservation: tests/schemas/discovery/v2_control_test_support.py",
+    "prior preservation: tests/schemas/discovery/v2_schema_test_support.py",
+    "prior preservation: tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+    "prior preservation: tests/scripts/dev_tools/discovery/test_domain_profile.py",
+    "prior preservation: tests/scripts/dev_tools/discovery/test_init_cli.py",
+    "prior preservation: tests/scripts/dev_tools/discovery/test_init_flow.py",
+    "prior preservation: tests/scripts/dev_tools/discovery/test_init_models.py",
+    "prior preservation: tests/scripts/dev_tools/discovery/test_io.py",
+    "prior preservation: tests/scripts/dev_tools/discovery/test_rendering.py",
+    "prior preservation: tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "prior preservation: tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+    "prior preservation: tests/scripts/dev_tools/test_quality_tiers_contract.py",
+    "prior preservation: tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+    "prior preservation: tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+    "prior preservation: tests/scripts/dev_tools/test_validate_discovery_profile.py",
+    "prior preservation: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+    "prior preservation: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+    "frozen compatibility bytes: examples/discovery/v1/coverage-ledger.example.json",
+    "frozen compatibility bytes: examples/discovery/v1/evidence-reference.example.json",
+    "frozen compatibility bytes: examples/discovery/v1/feature-contract.example.json",
+    "frozen compatibility bytes: examples/discovery/v1/parity-matrix.example.json",
+    "frozen compatibility bytes: examples/discovery/v1/product-decision-record.example.json",
+    "frozen compatibility bytes: examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "frozen compatibility bytes: examples/discovery/v1/unspecified-behavior-record.example.json",
+    "frozen compatibility bytes: schemas/discovery/v1/coverage-ledger.schema.json",
+    "frozen compatibility bytes: schemas/discovery/v1/evidence-reference.schema.json",
+    "frozen compatibility bytes: schemas/discovery/v1/feature-contract.schema.json",
+    "frozen compatibility bytes: schemas/discovery/v1/parity-matrix.schema.json",
+    "frozen compatibility bytes: schemas/discovery/v1/product-decision-record.schema.json",
+    "frozen compatibility bytes: schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "frozen compatibility bytes: schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "frozen compatibility bytes: tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "frozen compatibility bytes: tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "frozen compatibility bytes: tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "frozen compatibility bytes: tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "frozen compatibility bytes: tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "frozen compatibility bytes: tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "frozen compatibility bytes: tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "frozen compatibility bytes: tests/schemas/discovery/test_v1_fixtures.py",
+    "frozen compatibility bytes: tests/schemas/discovery/test_v1_schema_documents.py",
+    "frozen compatibility bytes: tests/scripts/dev_tools/discovery/test_package_exports.py",
+    "four authorized predecessor exceptions and 24 frozen paths",
+    "exact authorized prior change declarations",
+    "prior/current exception hash binding: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "prior/current exception hash binding: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "prior/current exception hash binding: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "prior/current exception hash binding: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "raw coverage complete current-source binding",
+    "worker coverage audit clean",
+    "exact six production modules in raw coverage",
+    "raw module numeric reconciliation: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "module line/branch thresholds: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:43:capture_workspace",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:82:MutationWriter",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:109:MutationPrimitives",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:132:GuardedMutationWriter",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:204:MutationArtifact",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:215:MutationResult",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:231:_artifact",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:248:_same_state",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:258:_after_write",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:293:commit_mutation",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:59:inspect",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:93:capture",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:97:invalidate_authority",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:104:atomic_write",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:117:guard",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:121:create_exclusive",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:125:replace_if_digest",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:135:__init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:147:capture",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:151:invalidate_authority",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py:155:atomic_write",
+    "complete class/function population: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "accepted raw baseline numeric binding: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "no accepted module or mapped-line coverage regression: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "mapped changed-range measurement and thresholds: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "raw module numeric reconciliation: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "module line/branch thresholds: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:41:MutationError",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:53:MutationChange",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:83:CapturedWorkspace",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:130:PlannedWrite",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:140:MutationPlan",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:156:_PinnedReader",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:181:_Overlay",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:238:project_snapshot",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:272:plan_mutation",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:44:__init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:66:__post_init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:94:__post_init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:106:inspect",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:159:__init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:166:identity",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:170:read_file",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:188:__init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:227:inspect",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py:231:read",
+    "complete class/function population: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "accepted raw baseline numeric binding: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "no accepted module or mapped-line coverage regression: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "mapped changed-range measurement and thresholds: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "raw module numeric reconciliation: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "module line/branch thresholds: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:85:_absolute",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:116:_overlaps",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:121:_reserved_output",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:142:PathPolicy",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:153:__init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:184:_validate_layout",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:239:_inspect",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:281:_walk",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:364:validate_configuration",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:401:resolve_read",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:423:resolve_write",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:465:revalidate_write",
+    "complete class/function population: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "accepted raw baseline numeric binding: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "no accepted module or mapped-line coverage regression: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "mapped changed-range measurement and thresholds: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "raw module numeric reconciliation: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "module line/branch thresholds: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:58:ArtifactRecord",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:83:ReferenceResolution",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:94:ReferenceIndex",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:252:_records",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:304:_duplicates",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:330:_local_duplicates",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:366:index_references",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:67:id",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:72:repository",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:77:path",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:105:__post_init__",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:127:candidates",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:143:resolve",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/references.py:223:_replica_targets",
+    "complete class/function population: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "accepted raw baseline numeric binding: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "no accepted module or mapped-line coverage regression: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "mapped changed-range measurement and thresholds: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "raw module numeric reconciliation: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "module line/branch thresholds: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:39:SnapshotExport",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:53:SnapshotImport",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:67:SnapshotProposal",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:78:_closure",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:145:_payloads",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:189:_proposal",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:222:prepare_snapshot_export",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:309:_captured_transport",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:331:prepare_snapshot_import",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:409:plan_snapshot_export",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:427:plan_snapshot_import",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:445:export_snapshot",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py:462:import_snapshot",
+    "complete class/function population: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "mapped changed-range measurement and thresholds: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "raw module numeric reconciliation: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "module line/branch thresholds: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:26:transport_digest",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:53:TransportMember",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:67:TransportRoute",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:115:bind_transport",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:215:replica_aliases",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:79:allows",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:88:check",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:97:check_files",
+    "raw AST unit: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py:107:revalidate",
+    "complete class/function population: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "mapped changed-range measurement and thresholds: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "minimum callable percentage independently reconciled",
+    "final raw range/baseline provenance",
+    "unchanged nine-path independent preparation binding with approved added test",
+    "all ten frozen WIP bytes retain reviewed four-context assertions",
+    "retained complete 44-case API proof",
+    "retained API executable source equivalence: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "retained API executable source equivalence: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "retained API executable source equivalence: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "retained API executable source equivalence: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "retained API executable source equivalence: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "corrected reference proof current exact inputs: p3t6-executor-r1-rebind.2026-10-18T18-34.json",
+    "corrected reference proof current exact inputs: p3t6-executor-closure-rebind.2026-10-18T18-34.json",
+    "final task identity and clean audit",
+    "final preservation counts",
+    "exact indexed inventory",
+    "working byte/size binding: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "only exact Git-declared checkout normalization: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "exact index SHA and Git blob: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "truthful index normalization report: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "working byte/size binding: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "only exact Git-declared checkout normalization: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "exact index SHA and Git blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "truthful index normalization report: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "working byte/size binding: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "only exact Git-declared checkout normalization: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "exact index SHA and Git blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "truthful index normalization report: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "working byte/size binding: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "only exact Git-declared checkout normalization: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "exact index SHA and Git blob: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "truthful index normalization report: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "working byte/size binding: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "only exact Git-declared checkout normalization: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "exact index SHA and Git blob: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "truthful index normalization report: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "working byte/size binding: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "only exact Git-declared checkout normalization: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "exact index SHA and Git blob: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "truthful index normalization report: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "working byte/size binding: tests/discovery_runtime/test_snapshot_export.py",
+    "only exact Git-declared checkout normalization: tests/discovery_runtime/test_snapshot_export.py",
+    "exact index SHA and Git blob: tests/discovery_runtime/test_snapshot_export.py",
+    "truthful index normalization report: tests/discovery_runtime/test_snapshot_export.py",
+    "working byte/size binding: tests/discovery_runtime/test_snapshot_import.py",
+    "only exact Git-declared checkout normalization: tests/discovery_runtime/test_snapshot_import.py",
+    "exact index SHA and Git blob: tests/discovery_runtime/test_snapshot_import.py",
+    "truthful index normalization report: tests/discovery_runtime/test_snapshot_import.py",
+    "working byte/size binding: tests/discovery_runtime/source_snapshot_test_support.py",
+    "only exact Git-declared checkout normalization: tests/discovery_runtime/source_snapshot_test_support.py",
+    "exact index SHA and Git blob: tests/discovery_runtime/source_snapshot_test_support.py",
+    "truthful index normalization report: tests/discovery_runtime/source_snapshot_test_support.py",
+    "working byte/size binding: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "only exact Git-declared checkout normalization: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "exact index SHA and Git blob: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "truthful index normalization report: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+    "no unstaged task source changes",
+    "staged whitespace clean",
+    "failed historical loops are not final acceptance",
+    "exact final forward/reverse binding population",
+    "complete current test binding: pass3",
+    "all affected unchanged/owned test bytes: pass3",
+    "complete expanded affected test population: pass3",
+    "complete current test binding: reverse3",
+    "all affected unchanged/owned test bytes: reverse3",
+    "complete expanded affected test population: reverse3",
+    "exact reversed order and coverage invocation binding",
+    "original full 430 cases preserved plus exact four new resolver cases",
+    "complete test counters: pass3",
+    "complete test counters: reverse3",
+    "complete test counters: pass3-contracts",
+    "eleven exact final composed invariants",
+    "final composed nine consumed inputs and current result provenance",
+    "explicit integration exclusion of unrelated new unit-test file",
+    "whole ordered sequence current-source binding",
+    "all nine clean ordered commands across seven stages",
+    "one final command receipt: format",
+    "complete command receipt fields: format",
+    "one final command receipt: lint",
+    "complete command receipt fields: lint",
+    "one final command receipt: types",
+    "complete command receipt fields: types",
+    "one final command receipt: architecture",
+    "complete command receipt fields: architecture",
+    "one final command receipt: tests",
+    "complete command receipt fields: tests",
+    "receipt counter matches test artifact: tests",
+    "explicit pytest report containment: tests",
+    "one final command receipt: coverage-check",
+    "complete command receipt fields: coverage-check",
+    "one final command receipt: reverse",
+    "complete command receipt fields: reverse",
+    "receipt counter matches test artifact: reverse",
+    "explicit pytest report containment: reverse",
+    "one final command receipt: contracts",
+    "complete command receipt fields: contracts",
+    "receipt counter matches test artifact: contracts",
+    "explicit pytest report containment: contracts",
+    "one final command receipt: integration",
+    "complete command receipt fields: integration",
+    "all seven stages pass in one chronological loop",
+    "current sources stable throughout final audit"
+  ],
+  "findings": [],
+  "prior_count": 255,
+  "unchanged_prior": 251,
+  "authorized_prior_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py"
+  ],
+  "frozen_paths": 24,
+  "coverage_raw_sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc",
+  "coverage_audit": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-pass3-coverage-audit.2026-10-18T19-09.json",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "covered_lines": 135,
+      "lines": 136,
+      "line_percent": 99.26470588235294,
+      "covered_branches": 35,
+      "branches": 36,
+      "branch_percent": 97.22222222222223
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "covered_lines": 161,
+      "lines": 163,
+      "line_percent": 98.77300613496932,
+      "covered_branches": 63,
+      "branches": 66,
+      "branch_percent": 95.45454545454545
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "covered_lines": 156,
+      "lines": 156,
+      "line_percent": 100.0,
+      "covered_branches": 84,
+      "branches": 84,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "covered_lines": 169,
+      "lines": 171,
+      "line_percent": 98.83040935672514,
+      "covered_branches": 82,
+      "branches": 84,
+      "branch_percent": 97.61904761904762
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": {
+      "covered_lines": 150,
+      "lines": 152,
+      "line_percent": 98.6842105263158,
+      "covered_branches": 50,
+      "branches": 52,
+      "branch_percent": 96.15384615384616
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": {
+      "covered_lines": 112,
+      "lines": 115,
+      "line_percent": 97.3913043478261,
+      "covered_branches": 45,
+      "branches": 48,
+      "branch_percent": 93.75
+    }
+  },
+  "callable_range_count": 88,
+  "minimum_callable_percent": 92.5,
+  "raw_totals": {
+    "covered_lines": 883,
+    "num_statements": 893,
+    "percent_covered": 98.3372921615202,
+    "percent_covered_display": "98",
+    "missing_lines": 10,
+    "excluded_lines": 47,
+    "percent_statements_covered": 98.88017917133259,
+    "percent_statements_covered_display": "99",
+    "num_branches": 370,
+    "num_partial_branches": 11,
+    "covered_branches": 359,
+    "missing_branches": 11,
+    "percent_branches_covered": 97.02702702702703,
+    "percent_branches_covered_display": "97"
+  },
+  "baseline_comparisons": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-coverage.2026-10-18T12-38.json",
+      "line_delta": 0.028064660978898814,
+      "branch_delta": 0.34722222222222854,
+      "mapped_line_regressions": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-coverage.2026-10-18T12-38.json",
+      "line_delta": 0.1152880141639514,
+      "branch_delta": 0.8116883116883145,
+      "mapped_line_regressions": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t11-coverage.2026-10-18T07-30.json",
+      "line_delta": 0.0,
+      "branch_delta": 0.0,
+      "mapped_line_regressions": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-coverage.2026-10-18T08-15.json",
+      "line_delta": 0.1291106554264445,
+      "branch_delta": 0.2506265664160452,
+      "mapped_line_regressions": []
+    }
+  },
+  "changed_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "executable_lines": [
+        160,
+        161,
+        165,
+        186,
+        187
+      ],
+      "covered": [
+        160,
+        161,
+        165,
+        186,
+        187
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          168
+        ],
+        [
+          186,
+          187
+        ],
+        [
+          186,
+          192
+        ]
+      ],
+      "covered_branches": [
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          168
+        ],
+        [
+          186,
+          187
+        ],
+        [
+          186,
+          192
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "executable_lines": [
+        136,
+        153,
+        290,
+        291,
+        292,
+        295,
+        299,
+        300,
+        305,
+        310,
+        348,
+        349,
+        350,
+        351
+      ],
+      "covered": [
+        136,
+        153,
+        290,
+        291,
+        292,
+        295,
+        299,
+        300,
+        305,
+        310,
+        348,
+        349,
+        350,
+        351
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          290,
+          291
+        ],
+        [
+          290,
+          317
+        ],
+        [
+          291,
+          292
+        ],
+        [
+          291,
+          295
+        ],
+        [
+          300,
+          305
+        ],
+        [
+          300,
+          310
+        ],
+        [
+          348,
+          349
+        ],
+        [
+          348,
+          354
+        ],
+        [
+          350,
+          351
+        ],
+        [
+          350,
+          354
+        ]
+      ],
+      "covered_branches": [
+        [
+          290,
+          291
+        ],
+        [
+          290,
+          317
+        ],
+        [
+          291,
+          292
+        ],
+        [
+          291,
+          295
+        ],
+        [
+          300,
+          305
+        ],
+        [
+          300,
+          310
+        ],
+        [
+          348,
+          349
+        ],
+        [
+          348,
+          354
+        ],
+        [
+          350,
+          351
+        ],
+        [
+          350,
+          354
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "executable_lines": [
+        168,
+        436,
+        442,
+        444,
+        448,
+        449
+      ],
+      "covered": [
+        168,
+        436,
+        442,
+        444,
+        448,
+        449
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          436,
+          437
+        ],
+        [
+          436,
+          442
+        ],
+        [
+          442,
+          444
+        ],
+        [
+          442,
+          448
+        ]
+      ],
+      "covered_branches": [
+        [
+          436,
+          437
+        ],
+        [
+          436,
+          442
+        ],
+        [
+          442,
+          444
+        ],
+        [
+          442,
+          448
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "executable_lines": [
+        23,
+        100,
+        120,
+        175,
+        176,
+        223,
+        233,
+        239,
+        240,
+        242,
+        243,
+        245,
+        246,
+        248,
+        249,
+        373,
+        382,
+        388,
+        394
+      ],
+      "covered": [
+        23,
+        100,
+        120,
+        175,
+        176,
+        223,
+        233,
+        239,
+        240,
+        242,
+        243,
+        245,
+        246,
+        248,
+        249,
+        373,
+        382,
+        388,
+        394
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          179
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          242
+        ],
+        [
+          242,
+          243
+        ],
+        [
+          242,
+          245
+        ],
+        [
+          245,
+          246
+        ],
+        [
+          245,
+          249
+        ],
+        [
+          394,
+          395
+        ],
+        [
+          394,
+          434
+        ]
+      ],
+      "covered_branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          179
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          242
+        ],
+        [
+          242,
+          243
+        ],
+        [
+          242,
+          245
+        ],
+        [
+          245,
+          246
+        ],
+        [
+          245,
+          249
+        ],
+        [
+          394,
+          395
+        ],
+        [
+          394,
+          434
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": {
+      "executable_lines": [
+        8,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        38,
+        39,
+        46,
+        47,
+        48,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        78,
+        86,
+        87,
+        88,
+        89,
+        91,
+        92,
+        95,
+        96,
+        99,
+        100,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        111,
+        115,
+        120,
+        121,
+        127,
+        133,
+        134,
+        135,
+        136,
+        141,
+        142,
+        145,
+        153,
+        154,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        166,
+        167,
+        168,
+        169,
+        170,
+        172,
+        173,
+        180,
+        181,
+        185,
+        186,
+        189,
+        197,
+        198,
+        200,
+        201,
+        204,
+        205,
+        206,
+        207,
+        210,
+        219,
+        222,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        238,
+        248,
+        250,
+        251,
+        252,
+        253,
+        256,
+        257,
+        270,
+        296,
+        297,
+        306,
+        309,
+        311,
+        312,
+        317,
+        323,
+        325,
+        328,
+        331,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        349,
+        350,
+        352,
+        360,
+        362,
+        369,
+        370,
+        372,
+        378,
+        379,
+        380,
+        387,
+        390,
+        392,
+        393,
+        398,
+        399,
+        400,
+        406,
+        409,
+        417,
+        418,
+        427,
+        435,
+        436,
+        445,
+        455,
+        462,
+        472
+      ],
+      "covered": [
+        8,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        38,
+        39,
+        46,
+        47,
+        48,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        78,
+        86,
+        87,
+        88,
+        89,
+        91,
+        92,
+        95,
+        96,
+        99,
+        100,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        111,
+        115,
+        120,
+        121,
+        127,
+        133,
+        134,
+        135,
+        136,
+        141,
+        142,
+        145,
+        153,
+        154,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        166,
+        167,
+        168,
+        169,
+        170,
+        172,
+        173,
+        180,
+        185,
+        186,
+        189,
+        197,
+        198,
+        200,
+        201,
+        204,
+        205,
+        206,
+        207,
+        210,
+        219,
+        222,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        238,
+        248,
+        250,
+        251,
+        252,
+        256,
+        257,
+        270,
+        296,
+        297,
+        306,
+        309,
+        311,
+        312,
+        317,
+        323,
+        325,
+        328,
+        331,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        349,
+        350,
+        352,
+        360,
+        362,
+        369,
+        370,
+        372,
+        378,
+        379,
+        380,
+        387,
+        390,
+        392,
+        393,
+        398,
+        399,
+        400,
+        406,
+        409,
+        417,
+        418,
+        427,
+        435,
+        436,
+        445,
+        455,
+        462,
+        472
+      ],
+      "missing": [
+        181,
+        253
+      ],
+      "line_percent": 98.6842105263158,
+      "branches": [
+        [
+          86,
+          87
+        ],
+        [
+          86,
+          88
+        ],
+        [
+          91,
+          92
+        ],
+        [
+          91,
+          100
+        ],
+        [
+          95,
+          96
+        ],
+        [
+          95,
+          99
+        ],
+        [
+          102,
+          103
+        ],
+        [
+          102,
+          142
+        ],
+        [
+          105,
+          106
+        ],
+        [
+          105,
+          107
+        ],
+        [
+          107,
+          111
+        ],
+        [
+          107,
+          115
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          127
+        ],
+        [
+          133,
+          102
+        ],
+        [
+          133,
+          134
+        ],
+        [
+          134,
+          133
+        ],
+        [
+          134,
+          135
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          141
+        ],
+        [
+          156,
+          157
+        ],
+        [
+          156,
+          186
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          166
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          172,
+          156
+        ],
+        [
+          172,
+          173
+        ],
+        [
+          180,
+          185
+        ],
+        [
+          200,
+          201
+        ],
+        [
+          200,
+          219
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          210
+        ],
+        [
+          232,
+          233
+        ],
+        [
+          232,
+          234
+        ],
+        [
+          250,
+          251
+        ],
+        [
+          250,
+          270
+        ],
+        [
+          252,
+          256
+        ],
+        [
+          341,
+          342
+        ],
+        [
+          341,
+          343
+        ],
+        [
+          345,
+          346
+        ],
+        [
+          345,
+          349
+        ],
+        [
+          369,
+          370
+        ],
+        [
+          369,
+          372
+        ],
+        [
+          378,
+          379
+        ],
+        [
+          378,
+          392
+        ],
+        [
+          380,
+          387
+        ],
+        [
+          380,
+          390
+        ],
+        [
+          180,
+          181
+        ],
+        [
+          252,
+          253
+        ]
+      ],
+      "covered_branches": [
+        [
+          86,
+          87
+        ],
+        [
+          86,
+          88
+        ],
+        [
+          91,
+          92
+        ],
+        [
+          91,
+          100
+        ],
+        [
+          95,
+          96
+        ],
+        [
+          95,
+          99
+        ],
+        [
+          102,
+          103
+        ],
+        [
+          102,
+          142
+        ],
+        [
+          105,
+          106
+        ],
+        [
+          105,
+          107
+        ],
+        [
+          107,
+          111
+        ],
+        [
+          107,
+          115
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          127
+        ],
+        [
+          133,
+          102
+        ],
+        [
+          133,
+          134
+        ],
+        [
+          134,
+          133
+        ],
+        [
+          134,
+          135
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          141
+        ],
+        [
+          156,
+          157
+        ],
+        [
+          156,
+          186
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          166
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          172,
+          156
+        ],
+        [
+          172,
+          173
+        ],
+        [
+          180,
+          185
+        ],
+        [
+          200,
+          201
+        ],
+        [
+          200,
+          219
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          210
+        ],
+        [
+          232,
+          233
+        ],
+        [
+          232,
+          234
+        ],
+        [
+          250,
+          251
+        ],
+        [
+          250,
+          270
+        ],
+        [
+          252,
+          256
+        ],
+        [
+          341,
+          342
+        ],
+        [
+          341,
+          343
+        ],
+        [
+          345,
+          346
+        ],
+        [
+          345,
+          349
+        ],
+        [
+          369,
+          370
+        ],
+        [
+          369,
+          372
+        ],
+        [
+          378,
+          379
+        ],
+        [
+          378,
+          392
+        ],
+        [
+          380,
+          387
+        ],
+        [
+          380,
+          390
+        ]
+      ],
+      "branch_percent": 96.15384615384616
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": {
+      "executable_lines": [
+        8,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+        26,
+        32,
+        34,
+        42,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        76,
+        77,
+        79,
+        82,
+        88,
+        91,
+        92,
+        95,
+        97,
+        99,
+        100,
+        101,
+        102,
+        104,
+        105,
+        107,
+        109,
+        112,
+        115,
+        124,
+        125,
+        126,
+        127,
+        135,
+        136,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        190,
+        202,
+        204,
+        209,
+        210,
+        215,
+        222,
+        223,
+        224,
+        226,
+        227,
+        231,
+        232,
+        233,
+        240,
+        243,
+        245,
+        247,
+        248,
+        249,
+        258,
+        259,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        275,
+        276,
+        278,
+        280,
+        281,
+        282,
+        283,
+        285,
+        290
+      ],
+      "covered": [
+        8,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+        26,
+        32,
+        34,
+        42,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        76,
+        77,
+        79,
+        82,
+        88,
+        91,
+        92,
+        95,
+        97,
+        99,
+        100,
+        101,
+        102,
+        104,
+        105,
+        107,
+        109,
+        112,
+        115,
+        124,
+        125,
+        127,
+        135,
+        136,
+        139,
+        140,
+        141,
+        142,
+        144,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        156,
+        157,
+        159,
+        160,
+        161,
+        162,
+        163,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        190,
+        202,
+        204,
+        209,
+        210,
+        215,
+        222,
+        223,
+        224,
+        226,
+        227,
+        231,
+        232,
+        233,
+        240,
+        243,
+        245,
+        247,
+        248,
+        249,
+        258,
+        259,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        275,
+        276,
+        278,
+        280,
+        281,
+        282,
+        283,
+        285,
+        290
+      ],
+      "missing": [
+        126,
+        143,
+        158
+      ],
+      "line_percent": 97.3913043478261,
+      "branches": [
+        [
+          92,
+          -88
+        ],
+        [
+          92,
+          95
+        ],
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          104
+        ],
+        [
+          104,
+          -97
+        ],
+        [
+          104,
+          105
+        ],
+        [
+          109,
+          -107
+        ],
+        [
+          109,
+          112
+        ],
+        [
+          125,
+          127
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          139
+        ],
+        [
+          142,
+          144
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          152,
+          156
+        ],
+        [
+          152,
+          157
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          165,
+          166
+        ],
+        [
+          165,
+          190
+        ],
+        [
+          167,
+          168
+        ],
+        [
+          167,
+          169
+        ],
+        [
+          170,
+          171
+        ],
+        [
+          170,
+          172
+        ],
+        [
+          204,
+          209
+        ],
+        [
+          204,
+          210
+        ],
+        [
+          226,
+          227
+        ],
+        [
+          226,
+          259
+        ],
+        [
+          227,
+          231
+        ],
+        [
+          227,
+          232
+        ],
+        [
+          247,
+          226
+        ],
+        [
+          247,
+          248
+        ],
+        [
+          249,
+          247
+        ],
+        [
+          249,
+          258
+        ],
+        [
+          263,
+          264
+        ],
+        [
+          263,
+          276
+        ],
+        [
+          264,
+          265
+        ],
+        [
+          264,
+          266
+        ],
+        [
+          266,
+          267
+        ],
+        [
+          266,
+          268
+        ],
+        [
+          278,
+          280
+        ],
+        [
+          278,
+          290
+        ],
+        [
+          282,
+          278
+        ],
+        [
+          282,
+          283
+        ],
+        [
+          125,
+          126
+        ],
+        [
+          142,
+          143
+        ],
+        [
+          157,
+          158
+        ]
+      ],
+      "covered_branches": [
+        [
+          92,
+          -88
+        ],
+        [
+          92,
+          95
+        ],
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          104
+        ],
+        [
+          104,
+          -97
+        ],
+        [
+          104,
+          105
+        ],
+        [
+          109,
+          -107
+        ],
+        [
+          109,
+          112
+        ],
+        [
+          125,
+          127
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          139
+        ],
+        [
+          142,
+          144
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          152,
+          156
+        ],
+        [
+          152,
+          157
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          165,
+          166
+        ],
+        [
+          165,
+          190
+        ],
+        [
+          167,
+          168
+        ],
+        [
+          167,
+          169
+        ],
+        [
+          170,
+          171
+        ],
+        [
+          170,
+          172
+        ],
+        [
+          204,
+          209
+        ],
+        [
+          204,
+          210
+        ],
+        [
+          226,
+          227
+        ],
+        [
+          226,
+          259
+        ],
+        [
+          227,
+          231
+        ],
+        [
+          227,
+          232
+        ],
+        [
+          247,
+          226
+        ],
+        [
+          247,
+          248
+        ],
+        [
+          249,
+          247
+        ],
+        [
+          249,
+          258
+        ],
+        [
+          263,
+          264
+        ],
+        [
+          263,
+          276
+        ],
+        [
+          264,
+          265
+        ],
+        [
+          264,
+          266
+        ],
+        [
+          266,
+          267
+        ],
+        [
+          266,
+          268
+        ],
+        [
+          278,
+          280
+        ],
+        [
+          278,
+          290
+        ],
+        [
+          282,
+          278
+        ],
+        [
+          282,
+          283
+        ]
+      ],
+      "branch_percent": 93.75
+    }
+  },
+  "max_physical_lines": 489,
+  "physical_lines": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": 437,
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": 426,
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": 483,
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": 436,
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": 476,
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": 290,
+    "tests/discovery_runtime/source_snapshot_test_support.py": 460,
+    "tests/discovery_runtime/test_snapshot_export.py": 489,
+    "tests/discovery_runtime/test_snapshot_import.py": 489,
+    "tests/discovery_runtime/test_snapshot_replica_resolution.py": 75
+  },
+  "audit": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-audit.2026-10-18T23-34.json",
+  "test_counts": {
+    "pass3": 434,
+    "reverse3": 434,
+    "pass3-contracts": 475
+  },
+  "integration": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-final-composed.2026-10-18T23-34.json",
+  "integration_checks": 11,
+  "integration_elapsed_seconds": 123.40642499999376,
+  "integration_source_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "tests/discovery_runtime/source_snapshot_test_support.py",
+    "tests/discovery_runtime/test_snapshot_export.py",
+    "tests/discovery_runtime/test_snapshot_import.py"
+  ],
+  "integration_binding_disposition": "The unchanged composed harness binds all nine consumed task files. The added isolated replica-resolution test is not consumed by that harness; forward/reverse and ordered sequence bind all ten owned paths.",
+  "gate_receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-architecture.2026-10-18T18-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-contracts.2026-10-18T19-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-coverage-check.2026-10-18T19-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-format.2026-10-18T18-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-integration.2026-10-18T19-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-lint.2026-10-18T18-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-reverse.2026-10-18T19-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-tests.2026-10-18T19-08.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-types.2026-10-18T18-56.md"
+  ],
+  "retained_api_cases": 44,
+  "corrected_reference_context_cases": 13,
+  "corrected_closure_cases": 7,
+  "final_ordered_label": "pass3"
+}

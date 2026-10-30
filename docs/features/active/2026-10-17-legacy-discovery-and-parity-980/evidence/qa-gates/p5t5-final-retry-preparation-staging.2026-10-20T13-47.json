@@ -1,0 +1,21 @@
+{
+  "binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-binding.2026-10-20T13-47.json",
+    "sha256": "29f7005134d55e052d1939a8ee7ae9b908e781abfdbf7eedfb066d2daaf73ba9"
+  },
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-candidate-disabled.2026-10-20T13-47.json",
+      "sha256": "7bc11d13d04864528768d69554785518e6cea41e16c1d8f1e5552d583350adfb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-binding-harness.2026-10-20T13-47.txt",
+      "sha256": "69a6bb3ff632f4fbdb8da4316b9af210f01740b1d6b5fd0b5c84c21137de0ea1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-binding.2026-10-20T13-47.json",
+      "sha256": "29f7005134d55e052d1939a8ee7ae9b908e781abfdbf7eedfb066d2daaf73ba9"
+    }
+  ],
+  "task": "P5-T5"
+}

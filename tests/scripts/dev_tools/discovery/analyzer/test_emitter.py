@@ -159,8 +159,10 @@ def test_captured_at_derives_from_injected_clock() -> None:
     assert document["captured_at"] == clock()
 
 
-def test_emit_writes_instances_through_seam(mem_fs_path: Path) -> None:
-    """emit writes one JSON instance per record via the filesystem seam."""
+def test_emit_rejects_unguarded_writes_and_retains_serialization(
+    mem_fs_path: Path,
+) -> None:
+    """Legacy records still serialize, while direct publication fails before I/O."""
     # Arrange
     (mem_fs_path / "src").mkdir(parents=True, exist_ok=True)
     (mem_fs_path / "src" / "main.txt").write_text("abc", encoding="utf-8")
@@ -177,11 +179,17 @@ def test_emit_writes_instances_through_seam(mem_fs_path: Path) -> None:
 
     # Act
     records = analyzer.map(analyzer.classify(analyzer.parse(ctx)))
-    written = analyzer.emit(records, fs)
+    with pytest.raises(ValueError, match="guarded v2"):
+        analyzer.emit(records, fs)
+    with pytest.raises(ValueError, match="guarded v2"):
+        fs.write_text(ctx.artifact_root / "denied.json", "{}")
 
     # Assert
-    assert len(written) == 1
-    document = json.loads(written[0].read_text(encoding="utf-8"))
+    assert len(records) == 1
+    assert not ctx.artifact_root.exists()
+    document = json.loads(
+        serialize_record(records[0], ctx.artifact_root / "record.json", ctx.schema_path)
+    )
     assert document["kind"] == "file"
     assert document["location"] == "src/main.txt"
     assert document["metadata"]["unit_type"] == UnitType.FILE.value

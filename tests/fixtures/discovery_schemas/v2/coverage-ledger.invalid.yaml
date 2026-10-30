@@ -1,0 +1,30 @@
+$schema: urn:drm-copilot:discovery:2.0.0:coverage-ledger
+schema_version: 2.0.0
+artifact_kind: coverage-ledger
+id: ledger-alpha
+repository: synthetic-source
+revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+inventory_snapshot_refs:
+  - {artifact_kind: inventory-snapshot, id: inventory-alpha}
+scope_ref: {artifact_kind: scope, id: scope-alpha}
+components:
+  - component_id: processor-alpha
+    component_type: type
+    path: src/Processor.cs
+    source_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    inspection_status: uninspected
+    disposition: excluded
+    feature_refs: []
+    tests_found: []
+    runtime_validation_requirement: undetermined
+    runtime_rationale: null
+    exclusion_rationale: null
+    exclusion_scope_ref: {artifact_kind: scope, id: scope-alpha}
+    supporting_rationale: null
+    blocked_reason: null
+    responsible_workflow: review-discovery-coverage
+    responsible_agent: null
+    last_updated_evidence_refs:
+      - {artifact_kind: evidence-reference, id: source-alpha}
+    extensions: {}
+extensions: {}

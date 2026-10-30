@@ -1,0 +1,26 @@
+{
+  "binding_after_sha256": "3610dc89f5153197b091eae34ea728192e70573aac42662129744ffa8d7f12a9",
+  "binding_before_sha256": "3610dc89f5153197b091eae34ea728192e70573aac42662129744ffa8d7f12a9",
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-restart-preparation.2026-10-19T14-10.json",
+  "candidate_sha256": "4c6165f0efa7b952b074ef3c0c1a4af2cbdc7b7315bc7de0d151c4d16f9dd945",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py tests/discovery_runtime/analyzer/test_emitter_extensions.py tests/discovery_runtime/analyzer/test_registry.py tests/discovery_runtime/analyzer/test_registry_dispatch.py tests/discovery_runtime/test_extension_input_limits.py tests/discovery_runtime/test_extension_inputs.py tests/discovery_runtime/test_extension_inventory_merge.py tests/discovery_runtime/test_extension_results.py tests/discovery_runtime/test_extension_validation_limits.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T14:10:37.944446+00:00",
+  "label": "format",
+  "raw_stderr": {
+    "bytes": 59,
+    "path": "SCRATCH/issue-980-p4t9-final-format-141037.2026-10-19T14-10.stderr.txt",
+    "sha256": "4c182caf6248ee7b4faaf0e95fb24779a3f5368c16cc0ab59f942831dfb48e75"
+  },
+  "raw_stdout": {
+    "bytes": 0,
+    "path": "SCRATCH/issue-980-p4t9-final-format-141037.2026-10-19T14-10.stdout.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "seconds": 0.582145,
+  "stage": 1,
+  "started_at": "2026-10-19T14:10:37.362301+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n15 files would be left unchanged.\r\n",
+  "stdout": "",
+  "timestamp": "2026-10-19T14-10"
+}

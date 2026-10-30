@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "04e475da4d094aa121bcc94fb7c703390245e182f51bf5967cbfc3f6f17aae66",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py tests/discovery_runtime/test_acceptance_properties.py tests/discovery_runtime/test_acceptance_generation.py tests/discovery_runtime/test_acceptance_decisions.py tests/discovery_runtime/test_acceptance_generation_limits.py",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T11:40:35.722447+00:00",
+  "label": "lint",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-lint-114033-raw.2026-10-20T11-40.json",
+    "sha256": "0ecdde5b353961043eefb49c3d6c16465d66957736c71fbd74b12b34a3e87198"
+  },
+  "seconds": 1.01,
+  "stage": 2,
+  "started_at": "2026-10-20T11:40:34.711997+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T11-40"
+}

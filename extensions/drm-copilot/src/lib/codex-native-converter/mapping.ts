@@ -114,6 +114,23 @@ function plannedHookName(mappingRecord: MappingRecord): string {
   return normalizedName(mappingRecord.sourcePath);
 }
 
+const CLAUDE_HELPER_ROOT = ".claude/lib";
+const CODEX_HELPER_ROOT = ".codex/lib";
+
+/**
+ * Map one `.claude/lib` helper onto the native `.codex/lib` library root.
+ *
+ * Mirrors `_planned_helper_path`: the library-relative path is preserved
+ * verbatim so published hooks can import the helper by its original name.
+ *
+ * @param sourcePath Source-root-relative helper path.
+ * @returns The `.codex/lib` target path.
+ */
+function plannedHelperPath(sourcePath: string): string {
+  const relative = sourcePath.slice(`${CLAUDE_HELPER_ROOT}/`.length);
+  return `${CODEX_HELPER_ROOT}/${relative}`;
+}
+
 /**
  * Resolve the approved Codex-native target path for one mapping record.
  *
@@ -154,6 +171,14 @@ export function planTargetPaths(
   }
 
   if (mappingRecord.targetRole === TargetRole.HOOK) {
+    // A shared helper keeps its library-relative name because hooks import it
+    // by file name; a handler script becomes a native `.ps1` hook.
+    if (mappingRecord.sourceKind === SourceKind.HOST_ADAPTER_REFERENCE) {
+      return {
+        ...mappingRecord,
+        targetPath: plannedHelperPath(mappingRecord.sourcePath),
+      };
+    }
     const hookName = plannedHookName(mappingRecord);
     return { ...mappingRecord, targetPath: `.codex/hooks/${hookName}.ps1` };
   }

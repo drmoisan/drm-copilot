@@ -1,0 +1,196 @@
+{
+  "timestamp": "2026-10-18T23-37",
+  "command": "poetry run python SCRATCH/issue-980-p3t6-publish-reconciliation.py",
+  "exit_code": 0,
+  "current_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "working_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "index_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "normalized_working_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "exact_working_index_equality": true,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py: eol: lf"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "working_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "index_sha256": "0a3b2c3b8f4f504693b934630c9d942e397e9d924a371730b13a8557ac9667ee",
+      "normalized_working_sha256": "0a3b2c3b8f4f504693b934630c9d942e397e9d924a371730b13a8557ac9667ee",
+      "exact_working_index_equality": false,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py: eol: lf"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "working_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "index_sha256": "09a0c144a9428496aac13d9cbab6da65eb28471f1124cc49570036b4d32f4fa8",
+      "normalized_working_sha256": "09a0c144a9428496aac13d9cbab6da65eb28471f1124cc49570036b4d32f4fa8",
+      "exact_working_index_equality": false,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py: eol: lf"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "working_sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "index_sha256": "4bc17ac3fe8adc617076a1ed302956f28def4c08eb71e8f08918260287ded122",
+      "normalized_working_sha256": "4bc17ac3fe8adc617076a1ed302956f28def4c08eb71e8f08918260287ded122",
+      "exact_working_index_equality": false,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/references.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/references.py: eol: lf"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "working_sha256": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+      "index_sha256": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+      "normalized_working_sha256": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+      "exact_working_index_equality": true,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py: eol: lf"
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "working_sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "index_sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "normalized_working_sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "exact_working_index_equality": true,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_export.py",
+      "working_sha256": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+      "index_sha256": "dc9a098ed9d114b7c59bda93b69b142282428ec40fb33b2cf92752d146665b98",
+      "normalized_working_sha256": "dc9a098ed9d114b7c59bda93b69b142282428ec40fb33b2cf92752d146665b98",
+      "exact_working_index_equality": false,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "tests/discovery_runtime/test_snapshot_export.py: text: auto",
+        "tests/discovery_runtime/test_snapshot_export.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_import.py",
+      "working_sha256": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+      "index_sha256": "6e27fd525291f93d23f6931a6a1cff0352c53ccaff9d418a2e0762fbc6faecbe",
+      "normalized_working_sha256": "6e27fd525291f93d23f6931a6a1cff0352c53ccaff9d418a2e0762fbc6faecbe",
+      "exact_working_index_equality": false,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "tests/discovery_runtime/test_snapshot_import.py: text: auto",
+        "tests/discovery_runtime/test_snapshot_import.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/source_snapshot_test_support.py",
+      "working_sha256": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+      "index_sha256": "db0c1c1110212437ead67bbfe014a7958571db219a788af746efe6e231e6250a",
+      "normalized_working_sha256": "db0c1c1110212437ead67bbfe014a7958571db219a788af746efe6e231e6250a",
+      "exact_working_index_equality": false,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "tests/discovery_runtime/source_snapshot_test_support.py: text: auto",
+        "tests/discovery_runtime/source_snapshot_test_support.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "working_sha256": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e",
+      "index_sha256": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e",
+      "normalized_working_sha256": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e",
+      "exact_working_index_equality": true,
+      "exact_crlf_to_lf_mapping": true,
+      "executable_ast_equal": true,
+      "git_attributes": [
+        "tests/discovery_runtime/test_snapshot_replica_resolution.py: text: auto",
+        "tests/discovery_runtime/test_snapshot_replica_resolution.py: eol: lf"
+      ]
+    }
+  ],
+  "retained_api_historical_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "historical_recorded_working_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "current_working_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "historical_git_index_sha256": "09a0c144a9428496aac13d9cbab6da65eb28471f1124cc49570036b4d32f4fa8",
+      "exact_historical_working_preserved": true,
+      "exact_crlf_to_lf_mapping": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "historical_recorded_working_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "current_working_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "historical_git_index_sha256": "0a3b2c3b8f4f504693b934630c9d942e397e9d924a371730b13a8557ac9667ee",
+      "exact_historical_working_preserved": true,
+      "exact_crlf_to_lf_mapping": true
+    }
+  ],
+  "native_attestation": {
+    "agent_id": "01a1515b-b801-7cf3-80f1-5b49a05606f3",
+    "agent_type": "atomic-executor-c4",
+    "actual_model": "gpt-6-astra",
+    "actual_reasoning_effort": "max",
+    "profile_name": "atomic-executor-c4",
+    "profile_path": ".codex/agents/atomic-executor-c4.toml",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true,
+    "recorded_at": "2026-10-18T23:32:09.6943830+00:00"
+  },
+  "routing_receipt": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "deployment_agent": "atomic-executor-c4",
+    "execution_context": "standalone",
+    "logical_agent": "atomic-executor",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_p3t6_usage_reset_reconciliation",
+    "delegation_id": "atomic_execution_p3t6_reset_reconcile",
+    "profile_path": ".codex/agents/atomic-executor-c4.toml",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+  },
+  "final_checker_sha256": "8db16e67b5fb177477af135f47161f325bed56373eebd131acd972f925d3d743",
+  "ac_counts": {
+    "spec.md": {
+      "checked": 11,
+      "remaining": 55,
+      "total": 66
+    },
+    "user-story.md": {
+      "checked": 11,
+      "remaining": 55,
+      "total": 66
+    }
+  }
+}

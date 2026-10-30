@@ -1,0 +1,30 @@
+{
+  "task": "P4-T9",
+  "status": "CORE_R2_R3_CONFIRMED_READY_FOR_CHECKED_COMMIT_AND_FINAL_GATES",
+  "published_utc": "2026-10-19T13:52:22.539471+00:00",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-confirmation-executed-payloads.2026-10-19T13-52.json",
+      "sha256": "358a509e5ba595006eee2f4bb4099233c183e19872b99fc6dfde5156de2c459d",
+      "bytes": 53899
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-repair-confirmation.2026-10-19T13-52.json",
+      "sha256": "dba30c862c35f1a6f7780c49f65ffe76ceab1873ca511cb7ff29f5faf6027d19",
+      "bytes": 7037
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-repair-confirmation.2026-10-19T13-52.md",
+      "sha256": "c14f08359b31deb51f77138c8723451430d717013bc79e9df3e97e570ec59038",
+      "bytes": 1555
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-confirmation-executed-payloads.2026-10-19T13-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-repair-confirmation.2026-10-19T13-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-repair-confirmation.2026-10-19T13-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-confirmation-staging.2026-10-19T13-52.json"
+  ],
+  "original_review_closure": "evidence/qa-gates/p4t9-executor-shared-core-staging.2026-10-19T13-31.json",
+  "mutations": "Verification evidence only"
+}

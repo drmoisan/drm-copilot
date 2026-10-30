@@ -1,0 +1,427 @@
+{
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T05:00:20.853230+00:00",
+  "status": "CANDIDATE_REVISIONS_REQUIRED",
+  "command": "Single consolidated candidate review; poetry run python SCRATCH/issue-980-p4t3-candidate-probes.py; poetry run python SCRATCH/issue-980-p4t3-review-bindings.py",
+  "exit_code": 0,
+  "exit_code_meaning": "Review/probe/binding execution succeeded; three blocking candidate findings remain. This is not task acceptance.",
+  "authority": {
+    "receipt": "atomic_execution_p4t3_candidate_review",
+    "phase": "S5_P4T3_candidate_review",
+    "deployment_agent": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "max",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_attestation_key": "bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true
+  },
+  "accepted_baseline": "6a94e5789e8622d4f1aaa2f3aa2c45e1a9c92f89",
+  "checked_wip": "ec2745639ee52f1f3cd683d82d61e9535d3e79ec",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-candidate-freeze.2026-10-19T04-46.json",
+    "sha256": "a078045ecbba053eb113419bd50d9e14767a616c4f8f90626c31993bb1daff32"
+  },
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "working_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "physical_lines": 330,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "index_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "working_sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "physical_lines": 189,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: working-tree-encoding: unspecified",
+      "index_sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "working_sha256": "fab11585ff2b24a083dc3fc13d29cb7a847c1efea73235ccd2806b099dfe7209",
+      "physical_lines": 350,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "working_sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "physical_lines": 132,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "working_sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "physical_lines": 460,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "working_sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26,
+      "attributes": "scripts/dev_tools/discovery/analyzer/source_text.py: text: auto\nscripts/dev_tools/discovery/analyzer/source_text.py: eol: lf\nscripts/dev_tools/discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "index_sha256": "b4c33a5741ded64fb8320bbd8da328bc378b45493235f8e330463e6fdfdf2fe3",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "working_sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+      "physical_lines": 12,
+      "attributes": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py: text: auto\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: eol: lf\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "index_sha256": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "working_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "physical_lines": 205,
+      "attributes": "tests/discovery_runtime/analyzer/test_source_masking.py: text: auto\ntests/discovery_runtime/analyzer/test_source_masking.py: eol: lf\ntests/discovery_runtime/analyzer/test_source_masking.py: working-tree-encoding: unspecified",
+      "index_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "working_sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "physical_lines": 221,
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_tokens.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: working-tree-encoding: unspecified",
+      "index_sha256": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "working_sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "physical_lines": 470,
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_declarations.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "working_sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "physical_lines": 179,
+      "attributes": "tests/discovery_runtime/analyzer/test_event_subscriptions.py: text: auto\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: eol: lf\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "working_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "physical_lines": 413,
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: working-tree-encoding: unspecified",
+      "index_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "working_sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "physical_lines": 142,
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: working-tree-encoding: unspecified",
+      "index_sha256": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "P4-T3-R1",
+      "severity": "blocking",
+      "category": "false detected declaration",
+      "title": "Distinguish the contextual record identifier from a declaration keyword",
+      "location": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+        "line": 329,
+        "related_lines": [
+          121,
+          136,
+          138
+        ]
+      },
+      "input": "class C { void Run(object[] items) { foreach (var record in items) { } } }",
+      "observed": "The valid foreach variable named record yields an additional type finding with symbol in and symbol_kind record at offset 50.",
+      "impact": "The v2 projection treats this type as detected syntax and assigns high confidence when its bytes are pinned. A compiler-binding limitation does not qualify an incorrect lexical declaration.",
+      "projection_location": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+        "line": 245,
+        "related_lines": [
+          246,
+          267,
+          288
+        ]
+      },
+      "required_correction": "Require a defensible declaration context/name for contextual record syntax and exclude reserved words used here as names; preserve actual record, record class and record struct declarations. Add the retained foreach reproduction and a projection assertion proving no false detected type is emitted.",
+      "proof_case": "context_cases[0]",
+      "reproduced": true
+    },
+    {
+      "id": "P4-T3-R2",
+      "severity": "blocking",
+      "category": "false detected declaration",
+      "title": "Stop named-delegate extraction before an anonymous delegate body",
+      "location": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+        "line": 174,
+        "related_lines": [
+          178,
+          182,
+          191,
+          195
+        ]
+      },
+      "input": "class C { void Run() { System.Action a = delegate { Work(); }; } void Work() {} }",
+      "observed": "The parameterless anonymous delegate produces a delegate declaration named Work from its first body invocation at offset 41.",
+      "impact": "No named delegate is declared. The projected finding is nevertheless detected syntax with high confidence for pinned bytes, contrary to the helper contract that anonymous delegates are omitted.",
+      "projection_location": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+        "line": 245,
+        "related_lines": [
+          246,
+          267,
+          288
+        ]
+      },
+      "required_correction": "Reject both anonymous-delegate forms before named-declaration scanning can cross into their body; retain actual named/generic delegates and the existing function-pointer exclusion. Add the retained parameterless anonymous-body reproduction and a projection assertion.",
+      "proof_case": "context_cases[1]",
+      "reproduced": true
+    },
+    {
+      "id": "P4-T3-R3",
+      "severity": "blocking",
+      "category": "aggregate work bound",
+      "title": "Bound repeated declaration-prefix and generic rescans",
+      "location": {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+        "line": 66,
+        "related_lines": [
+          182,
+          323
+        ]
+      },
+      "observed": "Small adversarial generic/event-prefix inputs repeatedly scan shared token suffixes. Increasing repetitions 64 to 128 to 256 grows generic token indexing 8,832 to 34,048 to 133,632 and event-prefix indexing 4,671 to 17,535 to 67,839. Every call completes without a work-limit diagnostic.",
+      "impact": "Token/input/output limits do not bound aggregate scan work proportionately. Repeated suffix scans approach quadratic work before the existing 100,000-token cap; the member/event-subscription work limits do not cover these declaration helpers.",
+      "required_correction": "Apply one deterministic aggregate work bound to declaration rescans (or use equivalent one-pass spans), including generic and event/delegate prefix traversal. Reject excessive work with the established source-work-limit failure and no partial output claims. Add small deterministic regressions for both retained input families; do not add a large stress test or compiler dependency.",
+      "proof_case": "bounded_work_cases[0:6]",
+      "reproduced": true,
+      "instrumentation": "A tuple subclass counts integer token reads; only tokenizer return is replaced with the identical token tuple in-process. Production bytes are unchanged."
+    }
+  ],
+  "finding_count": 3,
+  "reviewed_areas": [
+    "Iterative raw/verbatim/interpolated/character masking, conservative incomplete-literal behavior, preservation of decoded offsets and physical CR/LF line boundaries, Unicode cases, and deep nesting without recursive calls.",
+    "Strict BOM-aware decoding and lexical token limits; rejection of invalid encodings, NUL/surrogate input, and invalid Unicode escapes; the independent aggregate declaration-work defect is recorded as R3.",
+    "Namespaces, types, records, delegates, events, inferred members and handler candidates; arithmetic +=/-= exclusions and explicit unresolved identifier binding. R1 and R2 cover the confirmed false-declaration cases.",
+    "Captured original payload digests, immutable repository references, pin confidence, deterministic offset-based identities, source anchors, no reread in legacy evidence projection, and explicit rejection of unguarded legacy emission.",
+    "Runtime/legacy carrier and helper object identity, preserved constructors/defaults/slots, retained existing direct callers and optional analyzer imports, and deferred registry exposure.",
+    "Domain neutrality in reusable source, intent documentation, <=500 physical lines, read-only parser boundaries, in-memory test seams, and preserved existing assertions."
+  ],
+  "other_blocking_findings": [],
+  "retained_proof": {
+    "binding": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-review-bindings.2026-10-19T04-57.json",
+      "sha256": "262c9caef486e27b99e0043ab623eb1d1c6a520181a1c6bc077afd2eabb37c0d"
+    },
+    "probes": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-probes.2026-10-19T04-51.json",
+      "sha256": "5cbf1766c668e57aa55a8ed0528c672f3f872686cae54cd63e6b10986305a41a"
+    },
+    "source_paths": 13,
+    "unchanged_predecessor_paths": 38,
+    "preserved_caller_fixture_paths": 12,
+    "comment_docstring_ast_comparisons": 9,
+    "focused_gate_receipts": 12,
+    "preserved_public_and_original_test_ast_contracts": 11,
+    "focused_test_counts": {
+      "tokenizer": 58,
+      "masking": 108,
+      "scanners": 111,
+      "dependent_callers": 83
+    },
+    "coverage": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+        "summary": {
+          "covered_lines": 97,
+          "num_statements": 98,
+          "percent_covered": 98.63013698630137,
+          "percent_covered_display": "99",
+          "missing_lines": 1,
+          "excluded_lines": 0,
+          "percent_statements_covered": 98.9795918367347,
+          "percent_statements_covered_display": "99",
+          "num_branches": 48,
+          "num_partial_branches": 1,
+          "covered_branches": 47,
+          "missing_branches": 1,
+          "percent_branches_covered": 97.91666666666667,
+          "percent_branches_covered_display": "98"
+        },
+        "measured_unit_count": 8
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+        "summary": {
+          "covered_lines": 161,
+          "num_statements": 161,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 94,
+          "num_partial_branches": 0,
+          "covered_branches": 94,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "measured_unit_count": 9
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+        "summary": {
+          "covered_lines": 137,
+          "num_statements": 137,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 4,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 36,
+          "num_partial_branches": 0,
+          "covered_branches": 36,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "measured_unit_count": 14
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+        "summary": {
+          "covered_lines": 47,
+          "num_statements": 47,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 28,
+          "num_partial_branches": 0,
+          "covered_branches": 28,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "measured_unit_count": 4
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+        "summary": {
+          "covered_lines": 145,
+          "num_statements": 145,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 50,
+          "num_partial_branches": 0,
+          "covered_branches": 50,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "measured_unit_count": 18
+      },
+      {
+        "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+        "summary": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "measured_unit_count": 0
+      }
+    ],
+    "per_unit_scope": "53 measured class/callable ranges; all >=90%. The tokenizer has one unexecuted defensive 64 MiB guard (97/98 lines,47/48 branches). Other measured modules are 100%.",
+    "baseline_comparison": "Original masking 144/144 lines50/52 branches; replacement masking145/145+50/50 and adapter8/8. Original inventory114/126+38/44; split declarations/event/projection161/161+94/94,47/47+28/28,137/137+36/36. Existing contract/carrier test ASTs and unchanged callers retained; aggregate percentages do not substitute for the three new semantic regressions."
+  },
+  "harnesses": [
+    {
+      "original": "SCRATCH/issue-980-p4t3-candidate-probes.py",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-probes-harness.2026-10-19T05-00.txt",
+      "sha256": "648f9f23112c29b2c5c1dfab1f7d97363c2d754736cc2e008100e25239d284cc",
+      "qualification": "Exact inert copy of the executed scratch harness; no source/test execution is added."
+    },
+    {
+      "original": "SCRATCH/issue-980-p4t3-review-bindings.py",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-review-bindings-harness.2026-10-19T05-00.txt",
+      "sha256": "a1d8a6ff7b7ae395b2e1769e92cafde94dac5e5970213fd8d6eb219b711ec8da",
+      "qualification": "Portable inert representation: only the worker scratch-root literal is replaced by SCRATCH/worker. The exact executed original remains at the named SCRATCH original, with its separate raw checksum; no behavioral changes or rerun.",
+      "raw_executed_sha256": "5aeceb44c5d08a052917a70cd27602e157752b2ebf04c46a98c2ffaeb5cc8574"
+    }
+  ],
+  "git_binding_qualification": "Working bytes are the reviewed candidate. Actual index hashes are reported separately: untracked/new and substantive unstaged files are not represented as equal. The legacy source_text adapter differs from its index only by exact CRLF-to-LF normalization under text=auto/eol=lf. Historical masking evidence original/index qualification is retained at evidence/regression-testing/p4t3-masking-index-binding.2026-10-19T04-39.json (22 exact,21 normalized paths); no raw identity is claimed for normalized blobs.",
+  "retained_limitations": [
+    "Lexical analysis does not perform compiler binding, evaluate preprocessing or #line directives, resolve namespace aliases, or implement complete C# grammar.",
+    "Member/handler relationships remain inferred and unresolved; no runtime activation or product behavior is inferred.",
+    "Registry exposure and final ordered task gates remain pending; no task or acceptance criterion is checked off.",
+    "Windows service/host proof remains separate from these in-memory unit proofs."
+  ],
+  "administrative_reads": [
+    "The parent-supplied qa-gates path for masking-index-binding was absent; rg located the existing receipt under regression-testing. No evidence was modified.",
+    "A fixture-definition search included a nonexistent nested conftest path; the actual in-memory fixture was confirmed in tests/conftest.py:146. These are read-location diagnostics, not behavioral gate failures.",
+    "Before release, the binding-harness snapshot had its one host scratch-root literal replaced with SCRATCH/worker. Exact original and prior review rendering are preserved under verifier SCRATCH; the published representation and executed-original hashes are qualified separately."
+  ],
+  "preservation": "No production, tests, checkpoint, plan, AC, staging or commit mutations. All thirteen working hashes were rechecked immediately before publishing this complete receipt. Failed prior worker diagnostics remain retained. No behavioral suite or final gate was rerun.",
+  "next_step": "Parent authorizes one bounded repair for this complete three-finding set. Then verifier confirms only repaired paths and the retained reproductions plus preserved hashes; final gates follow on the corrected frozen bytes.",
+  "plan_status": {
+    "completed_tasks": 34,
+    "total_tasks": 84,
+    "completed_ac": 13,
+    "total_ac": 66,
+    "current": "P4-T3 candidate review",
+    "next_five": [
+      "P4-T3",
+      "P4-T4",
+      "P4-T5",
+      "P4-T6",
+      "P4-T7"
+    ]
+  }
+}

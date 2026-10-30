@@ -1,0 +1,38 @@
+{
+  "binding_after": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "binding_before": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage combine --keep SCRATCH\\issue-980-p5t1-repaired-final-050607-scope.coverage SCRATCH\\issue-980-p5t1-repaired-final-050607-graph.coverage SCRATCH\\issue-980-p5t1-repaired-final-050607-callers.coverage",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T05:24:15.425320+00:00",
+  "label": "coverage-combine",
+  "last_node": null,
+  "pid": 55676,
+  "raw": [
+    {
+      "bytes": 401,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-combine.stdout",
+      "sha256": "b14206b273e92c91f4d2e45a210ad6e5ba822afc0c673f08d17a0bd6436a5a29"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-combine.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 228,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-combine.progress.json",
+      "sha256": "bf968610a2c29dedc5599319718a7f8a7e41244a810c3567aac4dad0995e2112"
+    }
+  ],
+  "seconds": 1.01,
+  "stage": 6,
+  "started_at": "2026-10-20T05:24:14.415387+00:00",
+  "stderr": "",
+  "stdout": "Combined data file ..\\..\\..\\AppData\\Local\\Temp\\codex-legacy-discovery\\issue-980\\issue-980-p5t1-repaired-final-050607-callers.coverage\r\nCombined data file ..\\..\\..\\AppData\\Local\\Temp\\codex-legacy-discovery\\issue-980\\issue-980-p5t1-repaired-final-050607-graph.coverage\r\nCombined data file ..\\..\\..\\AppData\\Local\\Temp\\codex-legacy-discovery\\issue-980\\issue-980-p5t1-repaired-final-050607-scope.coverage\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T05-24"
+}

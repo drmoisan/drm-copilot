@@ -1,0 +1,3170 @@
+{
+  "Timestamp": "2026-10-20T14-50",
+  "Command": "poetry run python SCRATCH\\issue-980-p6t1-selectors-repair-tests.py repair-full",
+  "EXIT_CODE": 1,
+  "Output Summary": "tests exit 1",
+  "started": "2026-10-20T14:45:11.323089+00:00",
+  "finished": "2026-10-20T14:50:32.288804+00:00",
+  "duration_seconds": 320.9658468000125,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py": {
+      "sha256": "ffeeb22e96e38e399add183b695411e5dba38c706efa0cc5cc50c2494db41ab4",
+      "physical_lines": 413
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": {
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "physical_lines": 293
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": {
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": {
+      "sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "physical_lines": 374
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7",
+      "physical_lines": 405
+    },
+    "tests/discovery_runtime/analyzer/test_pipeline.py": {
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "physical_lines": 353
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": {
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "physical_lines": 166
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_inventory_selection.py": {
+      "sha256": "ffeeb22e96e38e399add183b695411e5dba38c706efa0cc5cc50c2494db41ab4",
+      "physical_lines": 413
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": {
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "physical_lines": 293
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": {
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": {
+      "sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "physical_lines": 374
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7",
+      "physical_lines": 405
+    },
+    "tests/discovery_runtime/analyzer/test_pipeline.py": {
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "physical_lines": 353
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": {
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "physical_lines": 166
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "054113e1e95038bde32133ed004d7323bb75019dfb9487130f1f19b077270022",
+      "raw_base64": "Li4uLi4uLi4uLi4uLi4uLkYuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSBGQUlMVVJFUyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fXyB0ZXN0X29wdGlvbmFsX3N1YnNldF9pbXBvcnRzX29ubHlfYWZ0ZXJfY29tcGxldGVfY29uc2VudCBfX19fX19fX19fXw0KDQphbmFseXplcl9jYXRhbG9nID0gU2NoZW1hQ2F0YWxvZyhkb2N1bWVudHM9KCgnc2NoZW1hcy9kaXNjb3ZlcnkvdjEvY292ZXJhZ2UtbGVkZ2VyLnNjaGVtYS5qc29uJywgSnNvbk9iamVjdChtZW1iZXJzPSgoJyRkZWZzJywgSnNvbk9iamVjdC4uLidpc3N1ZWRfYXQnLCAnd3JpdGVyJykpLCAoJ3RpdGxlJywgJ0Rpc2NvdmVyeSB2MiBwcm90ZWN0ZWQgdmFsaWRhdGlvbiByZWNlaXB0JyksICgndHlwZScsICdvYmplY3QnKSkpKSksIGV4dGVuc2lvbnM9KCkpDQptb25rZXlwYXRjaCA9IDxfcHl0ZXN0Lm1vbmtleXBhdGNoLk1vbmtleVBhdGNoIG9iamVjdCBhdCAweDAwMDAwMUJBQjgwNzk0NTA+DQoNCiAgICBkZWYgdGVzdF9vcHRpb25hbF9zdWJzZXRfaW1wb3J0c19vbmx5X2FmdGVyX2NvbXBsZXRlX2NvbnNlbnQoDQogICAgICAgIGFuYWx5emVyX2NhdGFsb2c6IFNjaGVtYUNhdGFsb2csIG1vbmtleXBhdGNoOiBweXRlc3QuTW9ua2V5UGF0Y2gNCiAgICApIC0+IE5vbmU6DQogICAgICAgICIiIlVzZSBTY2hlbWFDYXRhbG9nL01vbmtleVBhdGNoIHRvIG9ic2VydmUgdGhlIGNvbXBsZXRlIG9wdGlvbmFsIGltcG9ydCBnYXRlLg0KICAgIA0KICAgICAgICBSZXR1cm5zIE5vbmU7IGFzc2VydGlvbnMgZGV0ZWN0IGltcG9ydHMgb24gaW52YWxpZCByZXF1ZXN0cyBvciBvbWl0dGVkIG9wdGlvbmFsDQogICAgICAgIHNlbGVjdGlvbi4gT3JpZ2luYWwgaW1wb3J0IGJlaGF2aW9yIGlzIHJlc3RvcmVkIGJlZm9yZSBweXRlc3QgcmVwb3J0aW5nLg0KICAgICAgICAiIiINCiAgICAgICAgcHJvZmlsZSA9IGludmVudG9yeV9wcm9maWxlKA0KICAgICAgICAgICAgYW5hbHl6ZXJfY2F0YWxvZywgYW5hbHl6ZXJzPXNlbGVjdGlvbigoIm9mZmljZS12c3RvIiwgInJlcG9zaXRvcnkiKSkNCiAgICAgICAgKQ0KICAgICAgICBzZWVuOiBsaXN0W3N0cl0gPSBbXQ0KICAgICAgICBvcmlnaW5hbCA9IGJ1aWx0aW5zLl9faW1wb3J0X18NCiAgICANCiAgICAgICAgZGVmIG9ic2VydmUoDQogICAgICAgICAgICBuYW1lOiBzdHIsDQogICAgICAgICAgICBnbG9iYWxzOiBkaWN0W3N0ciwgb2JqZWN0XSB8IE5vbmUgPSBOb25lLA0KICAgICAgICAgICAgbG9jYWxzOiBkaWN0W3N0ciwgb2JqZWN0XSB8IE5vbmUgPSBOb25lLA0KICAgICAgICAgICAgZnJvbWxpc3Q6IHR1cGxlW3N0ciwgLi4uXSA9ICgpLA0KICAgICAgICAgICAgbGV2ZWw6IGludCA9IDAsDQogICAgICAgICkgLT4gTW9kdWxlVHlwZToNCiAgICAgICAgICAgICIiIkZvcndhcmQgaW1wb3J0IHBhcmFtZXRlcnMgYW5kIHJldGFpbiBvcHRpb25hbCBuYW1lczsgcmV0dXJuIE1vZHVsZVR5cGUuDQogICAgDQogICAgICAgICAgICBJbXBvcnQgZXJyb3JzIHByb3BhZ2F0ZTsgb25seSBsb2NhbCBsaXN0IGNoYW5nZXMsIG5vIHNvdXJjZSBJL08gb2NjdXJzLg0KICAgICAgICAgICAgIiIiDQogICAgICAgICAgICBpZiAiLmFuYWx5emVyLm9wdGlvbmFsIiBpbiBuYW1lOg0KICAgICAgICAgICAgICAgIHNlZW4uYXBwZW5kKG5hbWUpDQogICAgICAgICAgICByZXR1cm4gb3JpZ2luYWwobmFtZSwgZ2xvYmFscywgbG9jYWxzLCBmcm9tbGlzdCwgbGV2ZWwpDQogICAgDQogICAgICAgIHdpdGggbW9ua2V5cGF0Y2guY29udGV4dCgpIGFzIGNvbnRleHQ6DQogICAgICAgICAgICBjb250ZXh0LnNldGF0dHIoYnVpbHRpbnMsICJfX2ltcG9ydF9fIiwgb2JzZXJ2ZSkNCiAgICAgICAgICAgIHdpdGggcHl0ZXN0LnJhaXNlcyhWYWx1ZUVycm9yKToNCiAgICAgICAgICAgICAgICBzZWxlY3RfYW5hbHl6ZXJzKHByb2ZpbGUsIGFuYWx5emVyX2lkcz0oIm9mZmljZS12c3RvIiwgInVua25vd24iKSkNCiAgICAgICAgICAgIHNlbGVjdF9hbmFseXplcnMocHJvZmlsZSwgYW5hbHl6ZXJfaWRzPSgicmVwb3NpdG9yeSIsKSkNCiAgICAgICAgICAgIGFzc2VydCBub3Qgc2Vlbg0KICAgICAgICAgICAgc2VsZWN0ZWQgPSBJbnN0YWxsZWRJbnZlbnRvcnlSZWdpc3RyeSgpLnNlbGVjdCgNCiAgICAgICAgICAgICAgICBwcm9maWxlLCBhbmFseXplcl9pZHM9KCJvZmZpY2UtdnN0byIsKQ0KICAgICAgICAgICAgKQ0KPiAgICAgICBhc3NlcnQgc2VsZWN0ZWRbMF0uaWRlbnRpZmllciA9PSAib2ZmaWNlLXZzdG8iIGFuZCBsZW4oc2VlbikgPT0gMQ0KRSAgICAgICBBc3NlcnRpb25FcnJvcjogYXNzZXJ0ICgnb2ZmaWNlLXZzdG8nID09ICdvZmZpY2UtdnN0bycNCkUgICAgICAgICANCkUgICAgICAgICAgIG9mZmljZS12c3RvIGFuZCAzID09IDEpDQpFICAgICAgICArICB3aGVyZSAzID0gbGVuKFsnZHJtX2NvcGlsb3RfZGlzY292ZXJ5LmFuYWx5emVyLm9wdGlvbmFsLnZzdG9fb2ZmaWNlJywgJ2RybV9jb3BpbG90X2Rpc2NvdmVyeS5hbmFseXplci5vcHRpb25hbCcsICdkcm1fY29waWxvdF9kaXNjb3ZlcnkuYW5hbHl6ZXIub3B0aW9uYWwudnN0b19wYXR0ZXJucyddKQ0KDQp0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVxhbmFseXplclx0ZXN0X2ludmVudG9yeV9zZWxlY3Rpb24ucHk6Mjc1OiBBc3NlcnRpb25FcnJvcg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSB0ZXN0cyBjb3ZlcmFnZSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fX19fX18gY292ZXJhZ2U6IHBsYXRmb3JtIHdpbjMyLCBweXRob24gMy4xMy4xMi1maW5hbC0wIF9fX19fX19fX19fX19fXw0KDQpOYW1lICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU3RtdHMgICBNaXNzIEJyYW5jaCBCclBhcnQgIENvdmVyICAgTWlzc2luZw0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCnBhY2thZ2VzXGRpc2NvdmVyeS1ydW50aW1lXHNyY1xkcm1fY29waWxvdF9kaXNjb3ZlcnlcYW5hbHl6ZXJccGlwZWxpbmUucHkgICAgICA3MCAgICAgMTcgICAgIDE4ICAgICAgMCAgICA3NCUgICAxMTIsIDExNiwgMTIwLTEzMSwgMTM1LCAxNDMsIDE3MS0xNzQNCnBhY2thZ2VzXGRpc2NvdmVyeS1ydW50aW1lXHNyY1xkcm1fY29waWxvdF9kaXNjb3ZlcnlcYW5hbHl6ZXJccmVnaXN0cnkucHkgICAgICA4MCAgICAgMjQgICAgIDM4ICAgICAgNyAgICA2NyUgICA4Mi04NCwgODYtODgsIDkwLTk0LCA5Ni0xMDAsIDEwNS0xMjgsIDE0NCwgMTYxDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KVE9UQUwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMTUwICAgICA0MSAgICAgNTYgICAgICA3ICAgIDcwJQ0KQ292ZXJhZ2UgSlNPTiB3cml0dGVuIHRvIGZpbGUgQzpcVXNlcnNcRGFuTW9pc2FuXEFwcERhdGFcTG9jYWxcVGVtcFxpc3N1ZS05ODAtcDZ0MS1zZWxlY3RvcnNcY292ZXJhZ2UuanNvbg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09IHNob3J0IHRlc3Qgc3VtbWFyeSBpbmZvID09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KRkFJTEVEIHRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL2FuYWx5emVyL3Rlc3RfaW52ZW50b3J5X3NlbGVjdGlvbi5weTo6dGVzdF9vcHRpb25hbF9zdWJzZXRfaW1wb3J0c19vbmx5X2FmdGVyX2NvbXBsZXRlX2NvbnNlbnQNCjEgZmFpbGVkLCAzOSBwYXNzZWQgaW4gMzE4LjkycyAoMDowNToxOCkNCg==",
+      "presentation": "................F.......................                                 [100%]\r\n================================== FAILURES ===================================\r\n__________ test_optional_subset_imports_only_after_complete_consent ___________\r\n\r\nanalyzer_catalog = SchemaCatalog(documents=(('schemas/discovery/v1/coverage-ledger.schema.json', JsonObject(members=(('$defs', JsonObject...'issued_at', 'writer')), ('title', 'Discovery v2 protected validation receipt'), ('type', 'object'))))), extensions=())\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BAB8079450>\r\n\r\n    def test_optional_subset_imports_only_after_complete_consent(\r\n        analyzer_catalog: SchemaCatalog, monkeypatch: pytest.MonkeyPatch\r\n    ) -> None:\r\n        \"\"\"Use SchemaCatalog/MonkeyPatch to observe the complete optional import gate.\r\n    \r\n        Returns None; assertions detect imports on invalid requests or omitted optional\r\n        selection. Original import behavior is restored before pytest reporting.\r\n        \"\"\"\r\n        profile = inventory_profile(\r\n            analyzer_catalog, analyzers=selection((\"office-vsto\", \"repository\"))\r\n        )\r\n        seen: list[str] = []\r\n        original = builtins.__import__\r\n    \r\n        def observe(\r\n            name: str,\r\n            globals: dict[str, object] | None = None,\r\n            locals: dict[str, object] | None = None,\r\n            fromlist: tuple[str, ...] = (),\r\n            level: int = 0,\r\n        ) -> ModuleType:\r\n            \"\"\"Forward import parameters and retain optional names; return ModuleType.\r\n    \r\n            Import errors propagate; only local list changes, no source I/O occurs.\r\n            \"\"\"\r\n            if \".analyzer.optional\" in name:\r\n                seen.append(name)\r\n            return original(name, globals, locals, fromlist, level)\r\n    \r\n        with monkeypatch.context() as context:\r\n            context.setattr(builtins, \"__import__\", observe)\r\n            with pytest.raises(ValueError):\r\n                select_analyzers(profile, analyzer_ids=(\"office-vsto\", \"unknown\"))\r\n            select_analyzers(profile, analyzer_ids=(\"repository\",))\r\n            assert not seen\r\n            selected = InstalledInventoryRegistry().select(\r\n                profile, analyzer_ids=(\"office-vsto\",)\r\n            )\r\n>       assert selected[0].identifier == \"office-vsto\" and len(seen) == 1\r\nE       AssertionError: assert ('office-vsto' == 'office-vsto'\r\nE         \r\nE           office-vsto and 3 == 1)\r\nE        +  where 3 = len(['drm_copilot_discovery.analyzer.optional.vsto_office', 'drm_copilot_discovery.analyzer.optional', 'drm_copilot_discovery.analyzer.optional.vsto_patterns'])\r\n\r\ntests\\discovery_runtime\\analyzer\\test_inventory_selection.py:275: AssertionError\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                        Stmts   Miss Branch BrPart  Cover   Missing\r\n-----------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\pipeline.py      70     17     18      0    74%   112, 116, 120-131, 135, 143, 171-174\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\registry.py      80     24     38      7    67%   82-84, 86-88, 90-94, 96-100, 105-128, 144, 161\r\n-----------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                         150     41     56      7    70%\r\nCoverage JSON written to file SCRATCH\\coverage.json\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/analyzer/test_inventory_selection.py::test_optional_subset_imports_only_after_complete_consent\r\n1 failed, 39 passed in 318.92s (0:05:18)\r\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout, including observed drive-letter case variants",
+    "SCRATCH=task-specific external harness directory"
+  ],
+  "nodes.json": {
+    "args": [
+      "-ra",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py",
+      "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "-q",
+      "-o",
+      "addopts=-ra",
+      "--cov=drm_copilot_discovery.analyzer.registry",
+      "--cov=drm_copilot_discovery.analyzer.pipeline",
+      "--cov-branch",
+      "--cov-report=term-missing",
+      "--cov-report=json:C:\\Users\\DanMoisan\\AppData\\Local\\Temp\\issue-980-p6t1-selectors\\coverage.json"
+    ],
+    "nodes": [
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids0]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids1]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids2]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids3]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids4]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids5]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids6]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids7]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids8]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[repository]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids10]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids11]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_oversized_selector_is_rejected_before_member_work",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[None]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids1]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids2]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_optional_subset_imports_only_after_complete_consent",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers0]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers1]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers2]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_valid_injection_reads_identity_and_analyzes_once",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[subclass]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[non-string]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[empty]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[oversized]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[False]",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[True]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding"
+    ],
+    "reports": [
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.8344919000228401
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.6535798000113573
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002682000049389899
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000380899989977479
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.7430733000219334
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00033650000113993883
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005345999961718917
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9224569999787491
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003186000103596598
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000517400010721758
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9235553999897093
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003020000003743917
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids4]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005246000073384494
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids4]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9194279999937862
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids4]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003395999956410378
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids5]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000542099995072931
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids5]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9185156000021379
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids5]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000312299991492182
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids6]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006307000003289431
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids6]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9235026999958791
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids6]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00046919999294914305
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids7]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005630000086966902
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids7]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9178492999926675
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids7]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00029329999233596027
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids8]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000523900002008304
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids8]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9091263000154868
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids8]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002937000244855881
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[repository]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005760999920312315
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[repository]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9704053999739699
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[repository]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003473999968264252
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids10]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005475000070873648
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids10]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9225560999766458
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids10]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002961000136565417
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids11]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000521400012075901
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids11]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.0129988999979105
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_invalid_selection_precedes_injected_callbacks[ids11]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003564999788068235
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_oversized_selector_is_rejected_before_member_work",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005768000264652073
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_oversized_selector_is_rejected_before_member_work",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.0043550000118557
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_oversized_selector_is_rejected_before_member_work",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004751000087708235
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[None]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006406000175047666
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[None]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 4.119510199991055
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[None]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0007227000023704022
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007899000192992389
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 6.0249713999801315
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004260999849066138
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007485999958589673
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 3.9424737000081223
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_selection_is_sorted_and_preserves_profile_and_default_bytes[ids2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003029000072274357
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_optional_subset_imports_only_after_complete_consent",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004451999848242849
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_optional_subset_imports_only_after_complete_consent",
+        "when": "call",
+        "outcome": "failed",
+        "duration": 0.9361839999910444
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_optional_subset_imports_only_after_complete_consent",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003161000204272568
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005861000099685043
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9227645999926608
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000291000003926456
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005028999876230955
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9211930999881588
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000295600009849295
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005135999817866832
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9261818999948446
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_injected_identity_mismatch_never_analyzes[identifiers2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00032610000926069915
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_valid_injection_reads_identity_and_analyzes_once",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000455000001238659
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_valid_injection_reads_identity_and_analyzes_once",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.7544104999979027
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_valid_injection_reads_identity_and_analyzes_once",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00028849998489022255
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[subclass]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005535999953281134
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[subclass]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9732080000103451
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[subclass]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0006283000111579895
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[non-string]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007130999874789268
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[non-string]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9665948000038043
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[non-string]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00029590001213364303
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[empty]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005138000124134123
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[empty]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.922266400011722
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[empty]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003110000106971711
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[oversized]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005107000179123133
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[oversized]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9307619000028353
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_returned_identifier_shape_precedes_equality_and_analysis[oversized]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003163000219501555
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[False]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000521700014360249
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[False]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 15.957887800002936
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[False]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00038610000046901405
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[True]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008032999758142978
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[True]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 11.878564299986465
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_inventory_selection.py::test_publication_reconstructs_exact_subset_with_installed_registry[True]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003583999932743609
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 1.0732298000075389
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.770098400011193
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00029129997710697353
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000521400012075901
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 72.94128709999495
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000322499981848523
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005457000224851072
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 71.01625430001877
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00040619997889734805
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006775999790988863
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 70.65234259999124
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003315999929327518
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00047980001545511186
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 18.615486800001236
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00033340000663883984
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004805999924428761
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 5.739405900007114
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0005247000080998987
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006830999918747693
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.0573987999814562
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003981000045314431
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006520000169984996
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.953440999990562
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003547999949660152
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005923999997321516
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.8517879999999423
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00030819998937658966
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005932000058237463
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.8933877999952529
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004631999763660133
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000756800000090152
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.900886299990816
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003330000035930425
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005298999894876033
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9265575000026729
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00032759999157860875
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046640000073239207
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.0979268999944907
+      },
+      {
+        "nodeid": "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003622000222094357
+      }
+    ],
+    "exit_code": 1
+  },
+  "coverage.json": {
+    "meta": {
+      "format": 3,
+      "version": "7.13.2",
+      "timestamp": "2026-10-20T10:50:32.028357",
+      "branch_coverage": true,
+      "show_contexts": false
+    },
+    "files": {
+      "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\pipeline.py": {
+        "executed_lines": [
+          23,
+          25,
+          27,
+          48,
+          49,
+          57,
+          61,
+          65,
+          69,
+          73,
+          78,
+          86,
+          88,
+          92,
+          96,
+          100,
+          107,
+          110,
+          114,
+          118,
+          133,
+          137,
+          148,
+          177,
+          204,
+          205,
+          210,
+          211,
+          214,
+          215,
+          216,
+          218,
+          220,
+          221,
+          222,
+          225,
+          226,
+          228,
+          238,
+          263,
+          264,
+          265,
+          271,
+          273,
+          280,
+          281,
+          284,
+          288,
+          291,
+          292,
+          294,
+          297,
+          304
+        ],
+        "summary": {
+          "covered_lines": 53,
+          "num_statements": 70,
+          "percent_covered": 73.86363636363636,
+          "percent_covered_display": "74",
+          "missing_lines": 17,
+          "excluded_lines": 29,
+          "percent_statements_covered": 75.71428571428571,
+          "percent_statements_covered_display": "76",
+          "num_branches": 18,
+          "num_partial_branches": 0,
+          "covered_branches": 12,
+          "missing_branches": 6,
+          "percent_branches_covered": 66.66666666666667,
+          "percent_branches_covered_display": "67"
+        },
+        "missing_lines": [
+          112,
+          116,
+          120,
+          121,
+          123,
+          124,
+          126,
+          127,
+          128,
+          130,
+          131,
+          135,
+          143,
+          171,
+          172,
+          173,
+          174
+        ],
+        "excluded_lines": [
+          29,
+          30,
+          32,
+          33,
+          41,
+          42,
+          43,
+          44,
+          45,
+          59,
+          60,
+          63,
+          64,
+          67,
+          68,
+          71,
+          72,
+          75,
+          76,
+          77,
+          90,
+          91,
+          94,
+          95,
+          98,
+          99,
+          104,
+          105,
+          106
+        ],
+        "executed_branches": [
+          [
+            215,
+            216
+          ],
+          [
+            215,
+            218
+          ],
+          [
+            220,
+            221
+          ],
+          [
+            220,
+            225
+          ],
+          [
+            221,
+            220
+          ],
+          [
+            221,
+            222
+          ],
+          [
+            225,
+            226
+          ],
+          [
+            225,
+            228
+          ],
+          [
+            280,
+            281
+          ],
+          [
+            280,
+            284
+          ],
+          [
+            284,
+            288
+          ],
+          [
+            284,
+            291
+          ]
+        ],
+        "missing_branches": [
+          [
+            123,
+            124
+          ],
+          [
+            123,
+            131
+          ],
+          [
+            126,
+            123
+          ],
+          [
+            126,
+            127
+          ],
+          [
+            127,
+            128
+          ],
+          [
+            127,
+            130
+          ]
+        ],
+        "functions": {
+          "AnalyzerFileSystem.exists": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              59
+            ],
+            "start_line": 57,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "AnalyzerFileSystem.is_dir": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              63
+            ],
+            "start_line": 61,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "AnalyzerFileSystem.walk_files": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              67
+            ],
+            "start_line": 65,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "AnalyzerFileSystem.read_bytes": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              71
+            ],
+            "start_line": 69,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "AnalyzerFileSystem.write_text": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              75
+            ],
+            "start_line": 73,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "Analyzer.parse": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              90
+            ],
+            "start_line": 88,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "Analyzer.classify": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              94
+            ],
+            "start_line": 92,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "Analyzer.map": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              98
+            ],
+            "start_line": 96,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "Analyzer.emit": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              104
+            ],
+            "start_line": 100,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "RealAnalyzerFileSystem.exists": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 1,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 1,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              112
+            ],
+            "excluded_lines": [],
+            "start_line": 110,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "RealAnalyzerFileSystem.is_dir": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 1,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 1,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              116
+            ],
+            "excluded_lines": [],
+            "start_line": 114,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "RealAnalyzerFileSystem.walk_files": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 9,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 9,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 6,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 6,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              120,
+              121,
+              123,
+              124,
+              126,
+              127,
+              128,
+              130,
+              131
+            ],
+            "excluded_lines": [],
+            "start_line": 118,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                123,
+                124
+              ],
+              [
+                123,
+                131
+              ],
+              [
+                126,
+                123
+              ],
+              [
+                126,
+                127
+              ],
+              [
+                127,
+                128
+              ],
+              [
+                127,
+                130
+              ]
+            ]
+          },
+          "RealAnalyzerFileSystem.read_bytes": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 1,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 1,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              135
+            ],
+            "excluded_lines": [],
+            "start_line": 133,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "RealAnalyzerFileSystem.write_text": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 1,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 1,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              143
+            ],
+            "excluded_lines": [],
+            "start_line": 137,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "run_analyzer": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 4,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 4,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              171,
+              172,
+              173,
+              174
+            ],
+            "excluded_lines": [],
+            "start_line": 148,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "run_inventory": {
+            "executed_lines": [
+              204,
+              205,
+              210,
+              211,
+              214,
+              215,
+              216,
+              218,
+              220,
+              221,
+              222,
+              225,
+              226,
+              228
+            ],
+            "summary": {
+              "covered_lines": 14,
+              "num_statements": 14,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 8,
+              "num_partial_branches": 0,
+              "covered_branches": 8,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 177,
+            "executed_branches": [
+              [
+                215,
+                216
+              ],
+              [
+                215,
+                218
+              ],
+              [
+                220,
+                221
+              ],
+              [
+                220,
+                225
+              ],
+              [
+                221,
+                220
+              ],
+              [
+                221,
+                222
+              ],
+              [
+                225,
+                226
+              ],
+              [
+                225,
+                228
+              ]
+            ],
+            "missing_branches": []
+          },
+          "plan_inventory": {
+            "executed_lines": [
+              263,
+              264,
+              265,
+              271,
+              273,
+              280,
+              281,
+              284,
+              288,
+              291,
+              292,
+              294,
+              297,
+              304
+            ],
+            "summary": {
+              "covered_lines": 14,
+              "num_statements": 14,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 4,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 238,
+            "executed_branches": [
+              [
+                280,
+                281
+              ],
+              [
+                280,
+                284
+              ],
+              [
+                284,
+                288
+              ],
+              [
+                284,
+                291
+              ]
+            ],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              23,
+              25,
+              27,
+              48,
+              49,
+              57,
+              61,
+              65,
+              69,
+              73,
+              78,
+              86,
+              88,
+              92,
+              96,
+              100,
+              107,
+              110,
+              114,
+              118,
+              133,
+              137,
+              148,
+              177,
+              238
+            ],
+            "summary": {
+              "covered_lines": 25,
+              "num_statements": 25,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 20,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              29,
+              30,
+              32,
+              33,
+              41,
+              42,
+              43,
+              44,
+              45,
+              60,
+              64,
+              68,
+              72,
+              76,
+              77,
+              91,
+              95,
+              99,
+              105,
+              106
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "AnalyzerFileSystem": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 5,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              59,
+              63,
+              67,
+              71,
+              75
+            ],
+            "start_line": 49,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "Analyzer": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 4,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              90,
+              94,
+              98,
+              104
+            ],
+            "start_line": 78,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "RealAnalyzerFileSystem": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 13,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 13,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 6,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 6,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              112,
+              116,
+              120,
+              121,
+              123,
+              124,
+              126,
+              127,
+              128,
+              130,
+              131,
+              135,
+              143
+            ],
+            "excluded_lines": [],
+            "start_line": 107,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                123,
+                124
+              ],
+              [
+                123,
+                131
+              ],
+              [
+                126,
+                123
+              ],
+              [
+                126,
+                127
+              ],
+              [
+                127,
+                128
+              ],
+              [
+                127,
+                130
+              ]
+            ]
+          },
+          "": {
+            "executed_lines": [
+              23,
+              25,
+              27,
+              48,
+              49,
+              57,
+              61,
+              65,
+              69,
+              73,
+              78,
+              86,
+              88,
+              92,
+              96,
+              100,
+              107,
+              110,
+              114,
+              118,
+              133,
+              137,
+              148,
+              177,
+              204,
+              205,
+              210,
+              211,
+              214,
+              215,
+              216,
+              218,
+              220,
+              221,
+              222,
+              225,
+              226,
+              228,
+              238,
+              263,
+              264,
+              265,
+              271,
+              273,
+              280,
+              281,
+              284,
+              288,
+              291,
+              292,
+              294,
+              297,
+              304
+            ],
+            "summary": {
+              "covered_lines": 53,
+              "num_statements": 57,
+              "percent_covered": 94.20289855072464,
+              "percent_covered_display": "94",
+              "missing_lines": 4,
+              "excluded_lines": 20,
+              "percent_statements_covered": 92.98245614035088,
+              "percent_statements_covered_display": "93",
+              "num_branches": 12,
+              "num_partial_branches": 0,
+              "covered_branches": 12,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              171,
+              172,
+              173,
+              174
+            ],
+            "excluded_lines": [
+              29,
+              30,
+              32,
+              33,
+              41,
+              42,
+              43,
+              44,
+              45,
+              60,
+              64,
+              68,
+              72,
+              76,
+              77,
+              91,
+              95,
+              99,
+              105,
+              106
+            ],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                215,
+                216
+              ],
+              [
+                215,
+                218
+              ],
+              [
+                220,
+                221
+              ],
+              [
+                220,
+                225
+              ],
+              [
+                221,
+                220
+              ],
+              [
+                221,
+                222
+              ],
+              [
+                225,
+                226
+              ],
+              [
+                225,
+                228
+              ],
+              [
+                280,
+                281
+              ],
+              [
+                280,
+                284
+              ],
+              [
+                284,
+                288
+              ],
+              [
+                284,
+                291
+              ]
+            ],
+            "missing_branches": []
+          }
+        }
+      },
+      "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\registry.py": {
+        "executed_lines": [
+          7,
+          9,
+          11,
+          12,
+          13,
+          14,
+          19,
+          35,
+          44,
+          50,
+          53,
+          54,
+          61,
+          71,
+          79,
+          80,
+          81,
+          85,
+          89,
+          95,
+          101,
+          102,
+          104,
+          131,
+          143,
+          145,
+          146,
+          147,
+          148,
+          149,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          158,
+          159,
+          160,
+          165,
+          166,
+          167,
+          170,
+          178,
+          190,
+          198,
+          206,
+          209,
+          219,
+          220,
+          222,
+          224,
+          225,
+          229,
+          231,
+          232
+        ],
+        "summary": {
+          "covered_lines": 56,
+          "num_statements": 80,
+          "percent_covered": 66.94915254237289,
+          "percent_covered_display": "67",
+          "missing_lines": 24,
+          "excluded_lines": 10,
+          "percent_statements_covered": 70.0,
+          "percent_statements_covered_display": "70",
+          "num_branches": 38,
+          "num_partial_branches": 7,
+          "covered_branches": 23,
+          "missing_branches": 15,
+          "percent_branches_covered": 60.526315789473685,
+          "percent_branches_covered_display": "61"
+        },
+        "missing_lines": [
+          82,
+          84,
+          86,
+          88,
+          90,
+          94,
+          96,
+          100,
+          105,
+          106,
+          110,
+          111,
+          112,
+          116,
+          117,
+          118,
+          120,
+          121,
+          122,
+          124,
+          126,
+          128,
+          144,
+          161
+        ],
+        "excluded_lines": [
+          16,
+          17,
+          59,
+          60,
+          68,
+          69,
+          70,
+          187,
+          188,
+          189
+        ],
+        "executed_branches": [
+          [
+            79,
+            80
+          ],
+          [
+            79,
+            81
+          ],
+          [
+            81,
+            85
+          ],
+          [
+            85,
+            89
+          ],
+          [
+            89,
+            95
+          ],
+          [
+            95,
+            101
+          ],
+          [
+            101,
+            102
+          ],
+          [
+            143,
+            145
+          ],
+          [
+            148,
+            149
+          ],
+          [
+            148,
+            151
+          ],
+          [
+            151,
+            152
+          ],
+          [
+            151,
+            154
+          ],
+          [
+            152,
+            151
+          ],
+          [
+            152,
+            153
+          ],
+          [
+            155,
+            156
+          ],
+          [
+            155,
+            158
+          ],
+          [
+            160,
+            165
+          ],
+          [
+            165,
+            166
+          ],
+          [
+            165,
+            167
+          ],
+          [
+            222,
+            224
+          ],
+          [
+            222,
+            232
+          ],
+          [
+            224,
+            225
+          ],
+          [
+            224,
+            231
+          ]
+        ],
+        "missing_branches": [
+          [
+            81,
+            82
+          ],
+          [
+            85,
+            86
+          ],
+          [
+            89,
+            90
+          ],
+          [
+            95,
+            96
+          ],
+          [
+            101,
+            105
+          ],
+          [
+            105,
+            106
+          ],
+          [
+            105,
+            111
+          ],
+          [
+            111,
+            112
+          ],
+          [
+            111,
+            117
+          ],
+          [
+            117,
+            118
+          ],
+          [
+            117,
+            121
+          ],
+          [
+            121,
+            122
+          ],
+          [
+            121,
+            126
+          ],
+          [
+            143,
+            144
+          ],
+          [
+            160,
+            161
+          ]
+        ],
+        "functions": {
+          "builtin_analyzer_identities": {
+            "executed_lines": [
+              44
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 35,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "InventoryAdapter.identifier": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              59
+            ],
+            "start_line": 54,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "InventoryAdapter.analyze": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              68
+            ],
+            "start_line": 61,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "_generic_analyzer": {
+            "executed_lines": [
+              79,
+              80,
+              81,
+              85,
+              89,
+              95,
+              101,
+              102,
+              104
+            ],
+            "summary": {
+              "covered_lines": 9,
+              "num_statements": 31,
+              "percent_covered": 31.372549019607842,
+              "percent_covered_display": "31",
+              "missing_lines": 22,
+              "excluded_lines": 0,
+              "percent_statements_covered": 29.032258064516128,
+              "percent_statements_covered_display": "29",
+              "num_branches": 20,
+              "num_partial_branches": 5,
+              "covered_branches": 7,
+              "missing_branches": 13,
+              "percent_branches_covered": 35.0,
+              "percent_branches_covered_display": "35"
+            },
+            "missing_lines": [
+              82,
+              84,
+              86,
+              88,
+              90,
+              94,
+              96,
+              100,
+              105,
+              106,
+              110,
+              111,
+              112,
+              116,
+              117,
+              118,
+              120,
+              121,
+              122,
+              124,
+              126,
+              128
+            ],
+            "excluded_lines": [],
+            "start_line": 71,
+            "executed_branches": [
+              [
+                79,
+                80
+              ],
+              [
+                79,
+                81
+              ],
+              [
+                81,
+                85
+              ],
+              [
+                85,
+                89
+              ],
+              [
+                89,
+                95
+              ],
+              [
+                95,
+                101
+              ],
+              [
+                101,
+                102
+              ]
+            ],
+            "missing_branches": [
+              [
+                81,
+                82
+              ],
+              [
+                85,
+                86
+              ],
+              [
+                89,
+                90
+              ],
+              [
+                95,
+                96
+              ],
+              [
+                101,
+                105
+              ],
+              [
+                105,
+                106
+              ],
+              [
+                105,
+                111
+              ],
+              [
+                111,
+                112
+              ],
+              [
+                111,
+                117
+              ],
+              [
+                117,
+                118
+              ],
+              [
+                117,
+                121
+              ],
+              [
+                121,
+                122
+              ],
+              [
+                121,
+                126
+              ]
+            ]
+          },
+          "normalized_analyzer_ids": {
+            "executed_lines": [
+              143,
+              145,
+              146,
+              147,
+              148,
+              149,
+              151,
+              152,
+              153,
+              154,
+              155,
+              156,
+              158,
+              159,
+              160,
+              165,
+              166,
+              167
+            ],
+            "summary": {
+              "covered_lines": 18,
+              "num_statements": 20,
+              "percent_covered": 88.23529411764706,
+              "percent_covered_display": "88",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 90.0,
+              "percent_statements_covered_display": "90",
+              "num_branches": 14,
+              "num_partial_branches": 2,
+              "covered_branches": 12,
+              "missing_branches": 2,
+              "percent_branches_covered": 85.71428571428571,
+              "percent_branches_covered_display": "86"
+            },
+            "missing_lines": [
+              144,
+              161
+            ],
+            "excluded_lines": [],
+            "start_line": 131,
+            "executed_branches": [
+              [
+                143,
+                145
+              ],
+              [
+                148,
+                149
+              ],
+              [
+                148,
+                151
+              ],
+              [
+                151,
+                152
+              ],
+              [
+                151,
+                154
+              ],
+              [
+                152,
+                151
+              ],
+              [
+                152,
+                153
+              ],
+              [
+                155,
+                156
+              ],
+              [
+                155,
+                158
+              ],
+              [
+                160,
+                165
+              ],
+              [
+                165,
+                166
+              ],
+              [
+                165,
+                167
+              ]
+            ],
+            "missing_branches": [
+              [
+                143,
+                144
+              ],
+              [
+                160,
+                161
+              ]
+            ]
+          },
+          "InventoryRegistry.select": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              187
+            ],
+            "start_line": 178,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "InstalledInventoryRegistry.select": {
+            "executed_lines": [
+              206
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 198,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "select_analyzers": {
+            "executed_lines": [
+              219,
+              220,
+              222,
+              224,
+              225,
+              229,
+              231,
+              232
+            ],
+            "summary": {
+              "covered_lines": 8,
+              "num_statements": 8,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 4,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 209,
+            "executed_branches": [
+              [
+                222,
+                224
+              ],
+              [
+                222,
+                232
+              ],
+              [
+                224,
+                225
+              ],
+              [
+                224,
+                231
+              ]
+            ],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              7,
+              9,
+              11,
+              12,
+              13,
+              14,
+              19,
+              35,
+              50,
+              53,
+              54,
+              61,
+              71,
+              131,
+              170,
+              178,
+              190,
+              198,
+              209
+            ],
+            "summary": {
+              "covered_lines": 19,
+              "num_statements": 19,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 7,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              16,
+              17,
+              60,
+              69,
+              70,
+              188,
+              189
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "InventoryAdapter": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 2,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              59,
+              68
+            ],
+            "start_line": 50,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "InventoryRegistry": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 1,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              187
+            ],
+            "start_line": 170,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "InstalledInventoryRegistry": {
+            "executed_lines": [
+              206
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 190,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              7,
+              9,
+              11,
+              12,
+              13,
+              14,
+              19,
+              35,
+              44,
+              50,
+              53,
+              54,
+              61,
+              71,
+              79,
+              80,
+              81,
+              85,
+              89,
+              95,
+              101,
+              102,
+              104,
+              131,
+              143,
+              145,
+              146,
+              147,
+              148,
+              149,
+              151,
+              152,
+              153,
+              154,
+              155,
+              156,
+              158,
+              159,
+              160,
+              165,
+              166,
+              167,
+              170,
+              178,
+              190,
+              198,
+              209,
+              219,
+              220,
+              222,
+              224,
+              225,
+              229,
+              231,
+              232
+            ],
+            "summary": {
+              "covered_lines": 55,
+              "num_statements": 79,
+              "percent_covered": 66.66666666666667,
+              "percent_covered_display": "67",
+              "missing_lines": 24,
+              "excluded_lines": 7,
+              "percent_statements_covered": 69.62025316455696,
+              "percent_statements_covered_display": "70",
+              "num_branches": 38,
+              "num_partial_branches": 7,
+              "covered_branches": 23,
+              "missing_branches": 15,
+              "percent_branches_covered": 60.526315789473685,
+              "percent_branches_covered_display": "61"
+            },
+            "missing_lines": [
+              82,
+              84,
+              86,
+              88,
+              90,
+              94,
+              96,
+              100,
+              105,
+              106,
+              110,
+              111,
+              112,
+              116,
+              117,
+              118,
+              120,
+              121,
+              122,
+              124,
+              126,
+              128,
+              144,
+              161
+            ],
+            "excluded_lines": [
+              16,
+              17,
+              60,
+              69,
+              70,
+              188,
+              189
+            ],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                79,
+                80
+              ],
+              [
+                79,
+                81
+              ],
+              [
+                81,
+                85
+              ],
+              [
+                85,
+                89
+              ],
+              [
+                89,
+                95
+              ],
+              [
+                95,
+                101
+              ],
+              [
+                101,
+                102
+              ],
+              [
+                143,
+                145
+              ],
+              [
+                148,
+                149
+              ],
+              [
+                148,
+                151
+              ],
+              [
+                151,
+                152
+              ],
+              [
+                151,
+                154
+              ],
+              [
+                152,
+                151
+              ],
+              [
+                152,
+                153
+              ],
+              [
+                155,
+                156
+              ],
+              [
+                155,
+                158
+              ],
+              [
+                160,
+                165
+              ],
+              [
+                165,
+                166
+              ],
+              [
+                165,
+                167
+              ],
+              [
+                222,
+                224
+              ],
+              [
+                222,
+                232
+              ],
+              [
+                224,
+                225
+              ],
+              [
+                224,
+                231
+              ]
+            ],
+            "missing_branches": [
+              [
+                81,
+                82
+              ],
+              [
+                85,
+                86
+              ],
+              [
+                89,
+                90
+              ],
+              [
+                95,
+                96
+              ],
+              [
+                101,
+                105
+              ],
+              [
+                105,
+                106
+              ],
+              [
+                105,
+                111
+              ],
+              [
+                111,
+                112
+              ],
+              [
+                111,
+                117
+              ],
+              [
+                117,
+                118
+              ],
+              [
+                117,
+                121
+              ],
+              [
+                121,
+                122
+              ],
+              [
+                121,
+                126
+              ],
+              [
+                143,
+                144
+              ],
+              [
+                160,
+                161
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "totals": {
+      "covered_lines": 109,
+      "num_statements": 150,
+      "percent_covered": 69.90291262135922,
+      "percent_covered_display": "70",
+      "missing_lines": 41,
+      "excluded_lines": 39,
+      "percent_statements_covered": 72.66666666666667,
+      "percent_statements_covered_display": "73",
+      "num_branches": 56,
+      "num_partial_branches": 7,
+      "covered_branches": 35,
+      "missing_branches": 21,
+      "percent_branches_covered": 62.5,
+      "percent_branches_covered_display": "62"
+    }
+  }
+}

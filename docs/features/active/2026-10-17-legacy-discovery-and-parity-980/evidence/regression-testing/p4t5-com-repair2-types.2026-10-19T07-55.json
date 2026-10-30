@@ -1,0 +1,48 @@
+{
+  "stage": "3",
+  "label": "p4t5-com-repair2-types",
+  "started": "2026-10-19T07:55:27.280060+00:00",
+  "finished": "2026-10-19T07:55:29.461472+00:00",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+  "exit_code": 0,
+  "duration_seconds": 2.181,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "physical_lines": 229
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "physical_lines": 367
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+      "physical_lines": 429
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "physical_lines": 229
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "physical_lines": 367
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+      "physical_lines": 429
+    }
+  },
+  "output": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\n\n",
+  "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "scope": "P4-T5 COM subset only"
+}

@@ -1,0 +1,250 @@
+{
+  "bounded_confirmation": null,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-candidate-binding.2026-10-19T09-23.json",
+    "sha256": "b63df42849acff02e68362a466e63c15e71300c85fcd0396352a3f032b3f72b8"
+  },
+  "checked_candidate_commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-coverage-ranges.2026-10-19T09-23.json",
+    "sha256": "666a90d83b96f32916a13ae8466734f420269aef001936a935b0e4d14fb769f7"
+  },
+  "executed_harnesses": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-executed-harnesses.2026-10-19T09-23.json",
+    "sha256": "e846e37ab2d37df51704916d1e5421b27f43b457a3bf1537115d5a8472aa6225"
+  },
+  "limitations": [
+    "Only a finite WPF declaration dialect and bounded lexical test contexts are supported.",
+    "Code-behind, handler and test relevance remain inferred with null targets; binding, execution and behavioral coverage are unresolved.",
+    "XML anchors preserve accepted parser precision, including multiline/bare-CR limitations.",
+    "Dispatch and successful publication of these adapters remain P4-T9. The native proof verifies expected current closed-registry refusal.",
+    "Native Windows Python/Git only; no installed coding-agent host, non-Windows, UI or test execution proof.",
+    "Independent task/AC acceptance remains executor-owned."
+  ],
+  "native_result": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-native-result.2026-10-19T09-23.json",
+    "sha256": "c19ba38546358e9102996323092dbe483e41d4e7b57f9128f73ed68fc105e2b7"
+  },
+  "ordered_receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-format-092021.2026-10-19T09-20.md",
+        "sha256": "4204dfebdae29f3ab33866ce06b08f04adcacbb87cb1112dfd86afe392f3a9db"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-format-092021.2026-10-19T09-20.json",
+      "seconds": 0.324573,
+      "sha256": "9ac5efa45bc1abb237db19ee972c0fd04cdbfd8880e22df0f5919b33afa3eb53",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-lint-092021.2026-10-19T09-20.md",
+        "sha256": "890f6b2808bd0df0dc155f24992b4ffc3d847811f3c63c40ca4580231e5f8cb4"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-lint-092021.2026-10-19T09-20.json",
+      "seconds": 0.100954,
+      "sha256": "29fac241d5ef27e97c741f88f7f5703f7a7ee6cd6af02704421b2f92f591d044",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-types-092033.2026-10-19T09-20.md",
+        "sha256": "9d9d8a54a99124f1ec5a37ad581e835fd43da99d833a4107f53d11846ea6e894"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-types-092033.2026-10-19T09-20.json",
+      "seconds": 11.881453,
+      "sha256": "4cade3ebfc01c04e10186a87a1c0a7f49262de17591ea4ce2e1ab7a6095d888b",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-architecture-092033.2026-10-19T09-20.md",
+        "sha256": "f2abbbbd0aeb79a97a7da96ea9ce8c064cd1cd572ee73adc82574bb84a7b25c9"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-architecture-092033.2026-10-19T09-20.json",
+      "seconds": 0.126355,
+      "sha256": "6ac4ff9f7c8acf8ce13254e73076efe6b19f9df68e577939c94e60f4a9f0366c",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-ui-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-tests-ui-reverse-092116.2026-10-19T09-21.md",
+        "sha256": "d9f5b73c90350eda95018fa9d7609c2bd15ed8a02da4a884dc44e604664fc5ab"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-tests-ui-reverse-092116.2026-10-19T09-21.json",
+      "seconds": 42.666647,
+      "sha256": "0fc14966cd7e37f8df3b335d4e743180999e90c81b7535a1039765bc4b463741",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-references-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-tests-references-reverse-092331.2026-10-19T09-23.md",
+        "sha256": "5ca83dd4a99770210e6203b0d4e371fb63b8260b3b312498797501c1f8b5c56f"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-tests-references-reverse-092331.2026-10-19T09-23.json",
+      "seconds": 135.07586,
+      "sha256": "6027f0ad419d8e131809685b8614fbb64643f3d72ce0bf5a38169af857176aae",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-contracts-092332.2026-10-19T09-23.md",
+        "sha256": "3bcf13ac5c8da7308a4a6f28b1395d7da9523a9bb4c41e7265eb073b83e8549f"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-contracts-092332.2026-10-19T09-23.json",
+      "seconds": 1.576429,
+      "sha256": "75a3af80f397a7b577656d1c48f03d6cd25d338f40a2b51910dc66fef2d69372",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "native",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-native-092336.2026-10-19T09-23.md",
+        "sha256": "a1831a37e11369d629983d39761fd10ff4e5a6e08dcc62cca809331cff377878"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-native-092336.2026-10-19T09-23.json",
+      "seconds": 3.641654,
+      "sha256": "6809681ada3c0c969d94f5f8233a4cb737d14f3cbf2c0815d6551e5070b94215",
+      "stage": 7
+    }
+  ],
+  "ordered_stages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-ordered-stages.2026-10-19T09-23.json",
+    "sha256": "86b73eb5196b06179bf44dc7bb3eef74f8ad239a28c978e1a3dbb3faf314818f"
+  },
+  "preserved_predecessors": 55,
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-review.2026-10-19T09-18.json",
+    "sha256": "38d033308542311e956507ff3af5e5a8489938f24aa2b4a25a434eb0c5ffbe1e"
+  },
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t6-shared-baseline.2026-10-19T08-29.json",
+    "sha256": "bdf686a47676d9599c1bf2172068118caa8f0b092b9e37287108028d51b62ed4"
+  },
+  "source_files": [
+    {
+      "commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+      "commit_sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "filtered_git_blob": "ceb0c3aa49fff07a66dca9cab9a3ffd7ce65dcca",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py: eol: lf",
+      "index_sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "lines": 458,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "stream_relation": "identical",
+      "working_git_blob": "ceb0c3aa49fff07a66dca9cab9a3ffd7ce65dcca"
+    },
+    {
+      "commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+      "commit_sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "filtered_git_blob": "37708f7405a4ca953698cd3fc9533f475bd1af34",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_ui_callbacks.py: text: auto\ntests/discovery_runtime/analyzer/test_ui_callbacks.py: eol: lf",
+      "index_sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "lines": 417,
+      "path": "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "stream_relation": "identical",
+      "working_git_blob": "37708f7405a4ca953698cd3fc9533f475bd1af34"
+    },
+    {
+      "commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+      "commit_sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "filtered_git_blob": "a41e90b5324fbe25187ea032bae2553d9dece1a4",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py: text: auto\ntests/discovery_runtime/analyzer/test_ui_callback_limits.py: eol: lf",
+      "index_sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "lines": 241,
+      "path": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "stream_relation": "identical",
+      "working_git_blob": "a41e90b5324fbe25187ea032bae2553d9dece1a4"
+    },
+    {
+      "commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+      "commit_sha256": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+      "filtered_git_blob": "79b1440d9991bd4237ee034e95ce501e693101e9",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py: eol: lf",
+      "index_sha256": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+      "lines": 481,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "sha256": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+      "stream_relation": "identical",
+      "working_git_blob": "79b1440d9991bd4237ee034e95ce501e693101e9"
+    },
+    {
+      "commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+      "commit_sha256": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+      "filtered_git_blob": "52cc97d4f4439edbe8db06b41d42b0cbd273e110",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py: eol: lf",
+      "index_sha256": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+      "lines": 121,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+      "sha256": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+      "stream_relation": "identical",
+      "working_git_blob": "52cc97d4f4439edbe8db06b41d42b0cbd273e110"
+    },
+    {
+      "commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+      "commit_sha256": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+      "filtered_git_blob": "64c83a63eeaf200ba9d8f953b45d2f74ea1bf45e",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_test_references.py: text: auto\ntests/discovery_runtime/analyzer/test_test_references.py: eol: lf",
+      "index_sha256": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+      "lines": 486,
+      "path": "tests/discovery_runtime/analyzer/test_test_references.py",
+      "sha256": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+      "stream_relation": "identical",
+      "working_git_blob": "64c83a63eeaf200ba9d8f953b45d2f74ea1bf45e"
+    },
+    {
+      "commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+      "commit_sha256": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+      "filtered_git_blob": "9f66c7f31f4d7e283ce033c38b6c600d5e3a9520",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_test_reference_syntax.py: text: auto\ntests/discovery_runtime/analyzer/test_test_reference_syntax.py: eol: lf",
+      "index_sha256": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+      "lines": 311,
+      "path": "tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+      "sha256": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+      "stream_relation": "identical",
+      "working_git_blob": "9f66c7f31f4d7e283ce033c38b6c600d5e3a9520"
+    }
+  ],
+  "state": "EXECUTOR_ACCEPTANCE_PENDING",
+  "subset_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-ui-freeze.2026-10-19T08-52.json",
+      "sha256": "7d990c2859f1b2b4968ae6dee52193b54c55791636bf988a0ba91d5f9f282eb9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-test-reference-freeze.2026-10-19T09-07.json",
+      "sha256": "463f2dcb604a4290825909da78096ebaecdd1a9fbe25ec020343a1f8a582bdc1"
+    }
+  ],
+  "task": "P4-T6",
+  "test_cases": {
+    "contracts": 209,
+    "native_assertions": 13,
+    "references": 138,
+    "total": 245,
+    "ui": 107
+  },
+  "timestamp": "2026-10-19T09-23",
+  "toolchain_deltas": {
+    "new_lint_findings": 0,
+    "new_test_failures": 0,
+    "new_type_diagnostics": 0
+  }
+}

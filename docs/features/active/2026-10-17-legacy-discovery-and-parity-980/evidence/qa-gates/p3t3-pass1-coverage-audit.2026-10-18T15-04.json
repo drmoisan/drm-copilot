@@ -1,0 +1,357 @@
+{
+  "written_at_utc": "2026-10-18T15:04:54.020643+00:00",
+  "label": "pass1",
+  "diagnostic_only": false,
+  "historical_union": null,
+  "metrics": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": {
+      "covered_lines": 102,
+      "lines": 102,
+      "line_percent": 100.0,
+      "covered_branches": 30,
+      "branches": 30,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": {
+      "covered_lines": 162,
+      "lines": 162,
+      "line_percent": 100.0,
+      "covered_branches": 58,
+      "branches": 58,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": {
+      "covered_lines": 123,
+      "lines": 123,
+      "line_percent": 100.0,
+      "covered_branches": 48,
+      "branches": 48,
+      "branch_percent": 100.0
+    }
+  },
+  "callable_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": [
+      {
+        "name": "RegistryLocation",
+        "start": 24,
+        "end": 76,
+        "covered": 25,
+        "statements": 25,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "NativeRegistry",
+        "start": 79,
+        "end": 179,
+        "covered": 67,
+        "statements": 67,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "for_host",
+        "start": 37,
+        "end": 76,
+        "covered": 20,
+        "statements": 20,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 87,
+        "end": 99,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_directory",
+        "start": 102,
+        "end": 123,
+        "covered": 17,
+        "statements": 17,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_identity",
+        "start": 125,
+        "end": 134,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read",
+        "start": 136,
+        "end": 147,
+        "covered": 11,
+        "statements": 11,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "guard",
+        "start": 150,
+        "end": 164,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "write",
+        "start": 166,
+        "end": 179,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": [
+      {
+        "name": "RegistryIO",
+        "start": 49,
+        "end": 60,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ActivationStore",
+        "start": 63,
+        "end": 453,
+        "covered": 146,
+        "statements": 146,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read",
+        "start": 53,
+        "end": 56,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "write",
+        "start": 58,
+        "end": 60,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 72,
+        "end": 96,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "local",
+        "start": 99,
+        "end": 135,
+        "covered": 10,
+        "statements": 10,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_optional",
+        "start": 137,
+        "end": 142,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_record",
+        "start": 144,
+        "end": 153,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "select",
+        "start": 155,
+        "end": 209,
+        "covered": 21,
+        "statements": 21,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_policy",
+        "start": 211,
+        "end": 216,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_parents",
+        "start": 218,
+        "end": 247,
+        "covered": 17,
+        "statements": 17,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_require_inputs",
+        "start": 249,
+        "end": 272,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "configure",
+        "start": 274,
+        "end": 453,
+        "covered": 74,
+        "statements": 74,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": [
+      {
+        "name": "ConfigurationError",
+        "start": 32,
+        "end": 48,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "locator_bytes",
+        "start": 51,
+        "end": 65,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ActivationRecord",
+        "start": 69,
+        "end": 166,
+        "covered": 41,
+        "statements": 41,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ConfigurationSelection",
+        "start": 170,
+        "end": 177,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "select_configuration",
+        "start": 180,
+        "end": 273,
+        "covered": 32,
+        "statements": 32,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ConfigurationRequest",
+        "start": 277,
+        "end": 298,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ConfigurationResult",
+        "start": 302,
+        "end": 310,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 35,
+        "end": 48,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 86,
+        "end": 114,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "active",
+        "start": 117,
+        "end": 119,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "encode",
+        "start": 121,
+        "end": 123,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "decode",
+        "start": 126,
+        "end": 166,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 285,
+        "end": 298,
+        "covered": 8,
+        "statements": 8,
+        "percent": 100.0,
+        "missing": []
+      }
+    ]
+  },
+  "minimum_callable": 100.0,
+  "findings": []
+}

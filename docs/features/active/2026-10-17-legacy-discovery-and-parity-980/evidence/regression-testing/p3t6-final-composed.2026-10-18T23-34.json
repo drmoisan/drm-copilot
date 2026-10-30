@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "name": "actual export prospective graph",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "export dry run has no writes or invalidation",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "export creates exact bytes with manifest last",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "source original bytes preserved",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "new-destination import complete graph with staging retained",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "import dry run preserves directories bytes and authority",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "partial failure is explicit and manifest remains absent",
+      "passed": true,
+      "details": [
+        "created",
+        "conflict"
+      ]
+    },
+    {
+      "name": "partial import recovery preserves existing member and creates missing files",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "staged input and unrelated profile bytes preserved",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "identical repeated import performs no publication",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "staged byte change invalidates a previously valid import plan",
+      "passed": true,
+      "details": [
+        "Finding(code='MUTATION_FAILED', message='MUTATION_STALE: Complete input state changed; reload', next_action='Reload all inputs, inspect partial/uncertain paths, and revalidate before retrying.', severity='error', artifact_path=None, pointer='', related_ids=(), related_paths=())"
+      ]
+    }
+  ],
+  "failure": null,
+  "elapsed_seconds": 123.40642499999376,
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+    "tests/discovery_runtime/test_snapshot_export.py": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+    "tests/discovery_runtime/test_snapshot_import.py": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+    "tests/discovery_runtime/test_snapshot_export.py": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+    "tests/discovery_runtime/test_snapshot_import.py": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699"
+  },
+  "stable": true
+}

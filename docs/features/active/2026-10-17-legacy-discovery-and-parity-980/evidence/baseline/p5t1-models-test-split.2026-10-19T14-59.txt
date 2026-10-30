@@ -1,0 +1,22 @@
+"""Bind the approved P5-T1 test split before its first file creation."""
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path.cwd()
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+baseline = feature / 'evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json'
+target = Path('tests/discovery_runtime/test_report_models.py')
+assert not target.exists(), 'Approved split must be absent before creation'
+stamp = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+prefix = feature / ('evidence/baseline/p5t1-models-test-split.' + stamp)
+snapshot = Path(str(prefix) + '.txt')
+snapshot.write_bytes(Path(__file__).read_bytes())
+payload = {'task': 'P5-T1', 'timestamp_utc': datetime.now(timezone.utc).isoformat(),
+    'absent': target.as_posix(), 'scope': 'Direct pure report model tests only',
+    'baseline': {'path': baseline.as_posix(), 'sha256': hashlib.sha256(baseline.read_bytes()).hexdigest()},
+    'harness': {'path': snapshot.as_posix(), 'sha256': hashlib.sha256(snapshot.read_bytes()).hexdigest()}}
+Path(str(prefix)+'.json').write_text(json.dumps(payload, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+Path(str(prefix)+'.md').write_text('# P5-T1 approved model test split\n\nTimestamp: '+stamp+'\n\nConfirmed absent before creation: `'+target.as_posix()+'`.\n\nThe shared baseline remains authoritative; this supplement adds no production scope.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'path': str(prefix)+'.json', 'sha256':hashlib.sha256(Path(str(prefix)+'.json').read_bytes()).hexdigest()}))

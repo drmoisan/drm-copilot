@@ -1,0 +1,288 @@
+{
+  "Timestamp": "2026-10-21T11:17:12.333221+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "route": "atomic_execution_p6t1_all_wip_20261021T110700",
+  "status": "READY_FOR_ALL_WIP_COMMIT",
+  "current_head": "b80a454c41c5b33ae14b0f3fec47aeaae87182c4",
+  "branch": "feature/legacy-discovery-and-parity-980",
+  "purpose": "User-requested preservation of all untracked feature evidence and preparation. WIP save only, not task, feature or final-test acceptance.",
+  "inventory": {
+    "original_untracked_paths": 156,
+    "original_total_bytes": 5474085,
+    "direct_original_paths": 151,
+    "excluded_recoverable_originals": 5,
+    "snapshot_added_paths": 3,
+    "tracked_modifications_at_inventory": 0,
+    "categories": {
+      "baseline": 2,
+      "other": 17,
+      "qa-gates": 109,
+      "regression-testing": 28
+    },
+    "classification": "All original untracked paths are canonical issue-980 feature evidence. Earlier P5 records remain historical; P6/P7/P8 preparation remains preparation. Failed, interrupted and partial runs retain original outcomes. No source, package, cache or unknown foreign file is added."
+  },
+  "existing_committed_original_recovery": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+    "working_sha256": "6e432439ab962443f732d3c2fb2d46ab364ff0dbf0ca9cfe42cbe4e0f46173b3",
+    "git_lf_sha256": "6e432439ab962443f732d3c2fb2d46ab364ff0dbf0ca9cfe42cbe4e0f46173b3",
+    "expected_git_blob": "5acc2dd54407cdb6748248ccbcb54e1cc2439ef6",
+    "bytes": 340141,
+    "git_lf_bytes": 340141
+  },
+  "excluded_originals": [
+    {
+      "original": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-build.2026-10-20T17-19.json",
+        "working_sha256": "7932978f306ea64ba0e125e82165cdc4b1c641b9a3075d2c548c8912dc2bc6a4",
+        "git_lf_sha256": "7932978f306ea64ba0e125e82165cdc4b1c641b9a3075d2c548c8912dc2bc6a4",
+        "expected_git_blob": "67bfe59babc8560ea03561d649fae33a8115fe59",
+        "bytes": 75169,
+        "git_lf_bytes": 75169
+      },
+      "recovery_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "member_selector": {
+        "array": "originals_and_readable_views",
+        "original_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-build.2026-10-20T17-19.json",
+        "field": "original_gzip_base64"
+      },
+      "reason": "Host-locator original remains unchanged locally; exact bytes and normalized readable view are already committed in this lossless archive."
+    },
+    {
+      "original": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-check.2026-10-20T17-19.json",
+        "working_sha256": "e1a131324730d6166397419c1e9421a45ac175c196268a82e24e728807f43dfc",
+        "git_lf_sha256": "e1a131324730d6166397419c1e9421a45ac175c196268a82e24e728807f43dfc",
+        "expected_git_blob": "910928049c474177b9868403a1ce7d300cc303bd",
+        "bytes": 74942,
+        "git_lf_bytes": 74942
+      },
+      "recovery_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "member_selector": {
+        "array": "originals_and_readable_views",
+        "original_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-check.2026-10-20T17-19.json",
+        "field": "original_gzip_base64"
+      },
+      "reason": "Host-locator original remains unchanged locally; exact bytes and normalized readable view are already committed in this lossless archive."
+    },
+    {
+      "original": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-install.2026-10-20T17-19.json",
+        "working_sha256": "52533c42adc3662365c8172d38c047f8f1488e0131a4115a42c5ce6c3d8345bc",
+        "git_lf_sha256": "52533c42adc3662365c8172d38c047f8f1488e0131a4115a42c5ce6c3d8345bc",
+        "expected_git_blob": "863cf6253b801d89bb3d6f8f026d63b71099049b",
+        "bytes": 65566,
+        "git_lf_bytes": 65566
+      },
+      "recovery_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "member_selector": {
+        "array": "originals_and_readable_views",
+        "original_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-install.2026-10-20T17-19.json",
+        "field": "original_gzip_base64"
+      },
+      "reason": "Host-locator original remains unchanged locally; exact bytes and normalized readable view are already committed in this lossless archive."
+    },
+    {
+      "original": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-handoff.2026-10-20T17-19.json",
+        "working_sha256": "22d43501f691643b8a7c831bf9b3e1a5a4c7b309e35c21f305b562b261fe2bf9",
+        "git_lf_sha256": "22d43501f691643b8a7c831bf9b3e1a5a4c7b309e35c21f305b562b261fe2bf9",
+        "expected_git_blob": "b9b82592e208e80ffd6083759e3bf3eb7c5bc861",
+        "bytes": 36015,
+        "git_lf_bytes": 36015
+      },
+      "recovery_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "member_selector": {
+        "array": "originals_and_readable_views",
+        "original_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-handoff.2026-10-20T17-19.json",
+        "field": "original_gzip_base64"
+      },
+      "reason": "Host-locator original remains unchanged locally; exact bytes and normalized readable view are already committed in this lossless archive."
+    },
+    {
+      "original": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-raw-archive.2026-10-20T17-19.json",
+        "working_sha256": "9a9be59202c2ac74d33cb500812c51eb721ccb78db627a1532021191395652ee",
+        "git_lf_sha256": "9a9be59202c2ac74d33cb500812c51eb721ccb78db627a1532021191395652ee",
+        "expected_git_blob": "db120f648b97b9b3647760fad8bfed683b6267df",
+        "bytes": 11108,
+        "git_lf_bytes": 11108
+      },
+      "recovery_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "member_selector": {
+        "array": "originals_and_readable_views",
+        "original_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-raw-archive.2026-10-20T17-19.json",
+        "field": "original_gzip_base64"
+      },
+      "reason": "Host-locator original remains unchanged locally; exact bytes and normalized readable view are already committed in this lossless archive."
+    }
+  ],
+  "line_ending_qualification": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-all-wip-line-ending-originals.2026-10-21T11-17.json",
+      "working_sha256": "b991b7237af251d992343a7d66c4ed7f6f99301111b530b8ba662b2e5d015210",
+      "git_lf_sha256": "b991b7237af251d992343a7d66c4ed7f6f99301111b530b8ba662b2e5d015210",
+      "expected_git_blob": "4fe6a16e4657f57aef81529b3f01ef9a0eed6478",
+      "bytes": 23991,
+      "git_lf_bytes": 23991
+    },
+    "original_paths": [
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gate-interface-handoff.2026-10-20T15-56.json",
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gate-preparation.2026-10-20T15-55.json",
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gate-profile-qualification.2026-10-20T15-57.json",
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gate-shared-isolation-qualification.2026-10-20T15-59.json"
+    ],
+    "working_files_rewritten": false,
+    "git_normalization": "Four CRLF-to-LF text representations only; exact originals round-trip from the new archive."
+  },
+  "bounded_presentation_scan": {
+    "utf8_valid": true,
+    "json_documents_parsed": 110,
+    "trailing_whitespace_or_blank_EOF_defects": 0,
+    "obvious_private_key_or_access_token_pattern_matches": 0,
+    "synthetic_path_qualification": "Seven records contain exact negative-test node parameter C:/Work/CON. This is authored synthetic input, not a host locator; records and case identities remain unchanged.",
+    "unsafe_or_uncertain_unclassified_records": 0,
+    "scope": "Ordinary path/encoding/whitespace/token-pattern preservation checks; no renewed behavior/source review or exhaustive historical reference audit."
+  },
+  "active_run_snapshot": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-wip-progress.2026-10-21T11-12.json",
+      "working_sha256": "05be18c1a076947ce9ce1842d5441be74e2c9075bc8073f2f69e9e90f7f2dbcb",
+      "git_lf_sha256": "05be18c1a076947ce9ce1842d5441be74e2c9075bc8073f2f69e9e90f7f2dbcb",
+      "expected_git_blob": "66a1d9f99141527917fba2916379f4aed14e43d0",
+      "bytes": 4410,
+      "git_lf_bytes": 4410
+    },
+    "raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-wip-progress-raw.2026-10-21T11-12.json",
+      "working_sha256": "1fee663431857857cbb113bea2b7e22c3ea2493d6b2f15489c8a1d017a7f2df6",
+      "git_lf_sha256": "1fee663431857857cbb113bea2b7e22c3ea2493d6b2f15489c8a1d017a7f2df6",
+      "expected_git_blob": "cfcc04c9ea178322a384929074a17e65e367d591",
+      "bytes": 11058,
+      "git_lf_bytes": 11058
+    },
+    "owner_closure": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-wip-staging.2026-10-21T11-12.json",
+      "working_sha256": "ed04041516296666af8f0a181b73ed6ee8f47db0fad283abc94d34d5ca3111e3",
+      "git_lf_sha256": "ed04041516296666af8f0a181b73ed6ee8f47db0fad283abc94d34d5ca3111e3",
+      "expected_git_blob": "18e2201a7e17ea9a62e80e0624bf81894ec6fce6",
+      "bytes": 4198,
+      "git_lf_bytes": 4198
+    },
+    "status": "ACTIVE_WIP_NOT_ACCEPTED",
+    "observed_status_counts": {
+      "ERROR": 0,
+      "FAILED": 0,
+      "PASSED": 281,
+      "SKIPPED": 0
+    },
+    "expected_nodes": 329,
+    "remaining_nodes": 48,
+    "last_progress_elapsed_seconds": 2344.796,
+    "snapshot_qualification": "Exact available bytes captured once from each existing live output stream; cross-stream reads are sequential, not an atomic process snapshot. Later output is excluded and will be retained separately. Raw CR/LF and incomplete final lines are preserved exactly; this authored receipt is UTF-8 with LF and one terminal newline.",
+    "verified_raw_member_count": 4,
+    "stdout_completed_PASS_records": 281,
+    "completed_static_stages": [
+      {
+        "elapsed_seconds": 0.608318,
+        "receipt": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-black.2026-10-21T10-32.json",
+          "sha256": "3929f423e4d07bca146524f1edbb0c9d142b3337a7183c71cecbcc143c1a24bc"
+        },
+        "stage": "black",
+        "status": "PASS"
+      },
+      {
+        "elapsed_seconds": 0.207833,
+        "receipt": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-ruff.2026-10-21T10-32.json",
+          "sha256": "d31d9747aa08c4e35ad6efd025ef55f159f30903f27d1a3ddf5e85e18b70d8c6"
+        },
+        "stage": "ruff",
+        "status": "PASS"
+      },
+      {
+        "elapsed_seconds": 14.231142,
+        "receipt": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-pyright.2026-10-21T10-33.json",
+          "sha256": "1a0ab02d31ee832f0878ac6d3460430b8518a10570983aad1a90893cd5b7e8c4"
+        },
+        "stage": "pyright",
+        "status": "PASS"
+      },
+      {
+        "elapsed_seconds": 1.611533,
+        "receipt": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-static.2026-10-21T10-33.json",
+          "sha256": "0adf27b24a0b792becc6a6b3e4fad1750182496f070cbfa6d361b9d621f5e62a"
+        },
+        "stage": "static",
+        "status": "PASS"
+      }
+    ],
+    "owner_effective_binding_check": {
+      "all_match": true,
+      "completed_utc": "2026-10-21T11:12:18.635867+00:00",
+      "count": 241,
+      "scope": "Existing effective candidate source/test/package/harness closure only; no new inventory."
+    },
+    "pending": {
+      "coverage_json_and_named_body_zero_loss": "pending",
+      "independent_task_acceptance": "pending",
+      "package_contracts": {
+        "executed": 0,
+        "expected": 4,
+        "status": "pending"
+      },
+      "remaining_test_nodes": 48
+    },
+    "live_streams_included": false
+  },
+  "local_state_exclusions": [
+    {
+      "path": "artifacts/orchestration/orchestrator-state.json",
+      "reason": "Ignored mutable checkpoint remains durable locally and coordinator-owned; never force-added."
+    },
+    {
+      "path": ".venv/",
+      "reason": "Ignored dependency environment; not feature evidence."
+    },
+    {
+      "path": ".pytest_cache/",
+      "reason": "Ignored test cache; unchanged and excluded."
+    },
+    {
+      "path": ".coverage and dist/",
+      "reason": "Ignored cache/build output classes; no root files existed at inventory."
+    },
+    {
+      "path": "SCRATCH",
+      "reason": "External per-worker scripts, mutable run streams, coverage databases and installed/build caches remain local. Only immutable snapshots and canonical lossless archives are included."
+    }
+  ],
+  "counts_unchanged": {
+    "tasks_accepted": 46,
+    "tasks_total": 84,
+    "acceptance_criteria_accepted": 23,
+    "acceptance_criteria_total": 66
+  },
+  "unfinished": [
+    "P6-T1 final 329-case run, coverage/zero-regression, four contracts and independent acceptance",
+    "P6-T2 and P6-T3",
+    "P7-P11",
+    "Delivery, pull request and CI"
+  ],
+  "pull_request": "No PR exists per coordinator live query; this preservation task creates none.",
+  "publisher_diagnostic": "Two shell text write attempts were rejected before execution by PROMOTION_MCP_ONLY_BLOCKED despite containing no GitHub operation. The scratch file was then authored using the file-edit tool and invoked by path. No rejected attempt changed evidence, sources or behavior.",
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-all-wip-staging-union.2026-10-21T11-17.json",
+  "mutations": "Only the new receipt/Markdown, exact-original line-ending archive and staging manifest are authored. No original evidence, source/test/package/checkpoint/index or Git mutations; no behavior execution.",
+  "task_acceptance": false,
+  "feature_acceptance": false,
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

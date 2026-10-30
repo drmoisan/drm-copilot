@@ -1,0 +1,175 @@
+{
+  "Timestamp": "2026-10-20T15-25",
+  "label": "repair2",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "scripts/dev_tools/discovery_build_identity.py": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "aa5d9a9c4bd934d2909193b1cab9084901c954fbed0993bc41f2dbd423bf4be0",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "scripts/dev_tools/discovery_build_identity.py": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "aa5d9a9c4bd934d2909193b1cab9084901c954fbed0993bc41f2dbd423bf4be0",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "format",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9351711999916006,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-format.stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-format.stderr.bin",
+          "sha256": "84b9efe87539186dc93860b3f3a897d1a12d9d88af87ec1dd653ef7f7d1eab58",
+          "readable": "All done! \u2728 \ud83c\udf70 \u2728\r\n7 files would be left unchanged.\r\n"
+        }
+      }
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.12598670000443235,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-lint.stdout.bin",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+          "readable": "All checks passed!\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-lint.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "types",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.5279688999871723,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-types.stdout.bin",
+          "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+          "readable": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-types.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "reproductions",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_uses_approved_parser_when_tomllib_is_unavailable",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed"
+      ],
+      "exit_code": 1,
+      "seconds": 1.1076185000129044,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-reproductions.stdout.bin",
+          "sha256": "98c342922871bdb2df9b565438cf808ecb4368aac22e483683edcc200fabda68",
+          "readable": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- WORKSPACE\\.venv\\Scripts\\python.exe\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 8 items\r\n\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[installed] PASSED [ 12%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[source] PASSED [ 25%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_uses_approved_parser_when_tomllib_is_unavailable PASSED [ 37%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[enumerate] FAILED [ 50%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[read] FAILED [ 62%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[source] FAILED [ 75%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[enumerate] PASSED [ 87%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[read] PASSED [100%]\r\n\r\n================================== FAILURES ===================================\r\n______ test_reparse_rejection_does_not_require_new_path_apis[enumerate] _______\r\n\r\noperation = 'enumerate', mem_fs_path = WindowsPath('/__pytest_mem__/3')\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412AEAF10>\r\nmemory_build_metadata = {'\\\\__pytest_mem__\\\\3': (16384, 1024)}\r\n\r\n    @pytest.mark.parametrize(\"operation\", (\"enumerate\", \"read\", \"source\"))\r\n    def test_reparse_rejection_does_not_require_new_path_apis(\r\n        operation: str,\r\n        mem_fs_path: Path,\r\n        monkeypatch: pytest.MonkeyPatch,\r\n        memory_build_metadata: dict[str, tuple[int, int]],\r\n    ) -> None:\r\n        \"\"\"operation (str), memory metadata and MonkeyPatch model older Path APIs.\r\n    \r\n        Return None; assert Windows reparse rejection despite absent junction/symlink\r\n        convenience methods. Only local memory/import attributes change temporarily.\r\n        \"\"\"\r\n        memory_build_metadata[str(mem_fs_path)] = (stat.S_IFDIR, 0x400)\r\n    \r\n        def root(anchor: str) -> Path:\r\n            \"\"\"Return fixed memory root for anchor (str), without I/O or mutations.\"\"\"\r\n            return mem_fs_path\r\n    \r\n        monkeypatch.setattr(runtime_identity, \"files\", root)\r\n        with monkeypatch.context() as older:\r\n            older.delattr(Path, \"is_junction\", raising=False)\r\n>           older.delattr(Path, \"is_symlink\", raising=False)\r\nE           AttributeError: type object 'Path' has no attribute 'is_symlink'\r\n\r\ntests\\scripts\\dev_tools\\test_discovery_build_identity.py:146: AttributeError\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\noperation = 'enumerate', mem_fs_path = WindowsPath('/__pytest_mem__/3')\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412AEAF10>\r\nmemory_build_metadata = {'\\\\__pytest_mem__\\\\3': (16384, 1024)}\r\n\r\n    @pytest.mark.parametrize(\"operation\", (\"enumerate\", \"read\", \"source\"))\r\n    def test_reparse_rejection_does_not_require_new_path_apis(\r\n        operation: str,\r\n        mem_fs_path: Path,\r\n        monkeypatch: pytest.MonkeyPatch,\r\n        memory_build_metadata: dict[str, tuple[int, int]],\r\n    ) -> None:\r\n        \"\"\"operation (str), memory metadata and MonkeyPatch model older Path APIs.\r\n    \r\n        Return None; assert Windows reparse rejection despite absent junction/symlink\r\n        convenience methods. Only local memory/import attributes change temporarily.\r\n        \"\"\"\r\n        memory_build_metadata[str(mem_fs_path)] = (stat.S_IFDIR, 0x400)\r\n    \r\n        def root(anchor: str) -> Path:\r\n            \"\"\"Return fixed memory root for anchor (str), without I/O or mutations.\"\"\"\r\n            return mem_fs_path\r\n    \r\n        monkeypatch.setattr(runtime_identity, \"files\", root)\r\n>       with monkeypatch.context() as older:\r\n             ^^^^^^^^^^^^^^^^^^^^^\r\n\r\ntests\\scripts\\dev_tools\\test_discovery_build_identity.py:144: \r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n..\\..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\contextlib.py:162: in __exit__\r\n    self.gen.throw(value)\r\n.venv\\Lib\\site-packages\\_pytest\\monkeypatch.py:163: in context\r\n    m.undo()\r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n\r\nself = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412AEB020>\r\n\r\n    def undo(self) -> None:\r\n        \"\"\"Undo previous changes.\r\n    \r\n        This call consumes the undo stack. Calling it a second time has no\r\n        effect unless you do more monkeypatching after the undo call.\r\n    \r\n        There is generally no need to call `undo()`, since it is\r\n        called automatically during tear-down.\r\n    \r\n        .. note::\r\n            The same `monkeypatch` fixture is used across a\r\n            single test function invocation. If `monkeypatch` is used both by\r\n            the test function itself and one of the test fixtures,\r\n            calling `undo()` will undo all of the changes made in\r\n            both functions.\r\n    \r\n            Prefer to use :meth:`context() <pytest.MonkeyPatch.context>` instead.\r\n        \"\"\"\r\n        for obj, name, value in reversed(self._setattr):\r\n            if value is not notset:\r\n                setattr(obj, name, value)\r\n            else:\r\n>               delattr(obj, name)\r\nE               AttributeError: type object 'Path' has no attribute 'is_symlink'\r\n\r\n.venv\\Lib\\site-packages\\_pytest\\monkeypatch.py:416: AttributeError\r\n_________ test_reparse_rejection_does_not_require_new_path_apis[read] _________\r\n\r\noperation = 'read', mem_fs_path = WindowsPath('/__pytest_mem__/4')\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412B3E350>\r\nmemory_build_metadata = {'\\\\__pytest_mem__\\\\4': (16384, 1024)}\r\n\r\n    @pytest.mark.parametrize(\"operation\", (\"enumerate\", \"read\", \"source\"))\r\n    def test_reparse_rejection_does_not_require_new_path_apis(\r\n        operation: str,\r\n        mem_fs_path: Path,\r\n        monkeypatch: pytest.MonkeyPatch,\r\n        memory_build_metadata: dict[str, tuple[int, int]],\r\n    ) -> None:\r\n        \"\"\"operation (str), memory metadata and MonkeyPatch model older Path APIs.\r\n    \r\n        Return None; assert Windows reparse rejection despite absent junction/symlink\r\n        convenience methods. Only local memory/import attributes change temporarily.\r\n        \"\"\"\r\n        memory_build_metadata[str(mem_fs_path)] = (stat.S_IFDIR, 0x400)\r\n    \r\n        def root(anchor: str) -> Path:\r\n            \"\"\"Return fixed memory root for anchor (str), without I/O or mutations.\"\"\"\r\n            return mem_fs_path\r\n    \r\n        monkeypatch.setattr(runtime_identity, \"files\", root)\r\n        with monkeypatch.context() as older:\r\n>           older.delattr(Path, \"is_junction\", raising=False)\r\nE           AttributeError: type object 'Path' has no attribute 'is_junction'\r\n\r\ntests\\scripts\\dev_tools\\test_discovery_build_identity.py:145: AttributeError\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\noperation = 'read', mem_fs_path = WindowsPath('/__pytest_mem__/4')\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412B3E350>\r\nmemory_build_metadata = {'\\\\__pytest_mem__\\\\4': (16384, 1024)}\r\n\r\n    @pytest.mark.parametrize(\"operation\", (\"enumerate\", \"read\", \"source\"))\r\n    def test_reparse_rejection_does_not_require_new_path_apis(\r\n        operation: str,\r\n        mem_fs_path: Path,\r\n        monkeypatch: pytest.MonkeyPatch,\r\n        memory_build_metadata: dict[str, tuple[int, int]],\r\n    ) -> None:\r\n        \"\"\"operation (str), memory metadata and MonkeyPatch model older Path APIs.\r\n    \r\n        Return None; assert Windows reparse rejection despite absent junction/symlink\r\n        convenience methods. Only local memory/import attributes change temporarily.\r\n        \"\"\"\r\n        memory_build_metadata[str(mem_fs_path)] = (stat.S_IFDIR, 0x400)\r\n    \r\n        def root(anchor: str) -> Path:\r\n            \"\"\"Return fixed memory root for anchor (str), without I/O or mutations.\"\"\"\r\n            return mem_fs_path\r\n    \r\n        monkeypatch.setattr(runtime_identity, \"files\", root)\r\n>       with monkeypatch.context() as older:\r\n             ^^^^^^^^^^^^^^^^^^^^^\r\n\r\ntests\\scripts\\dev_tools\\test_discovery_build_identity.py:144: \r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n..\\..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\contextlib.py:162: in __exit__\r\n    self.gen.throw(value)\r\n.venv\\Lib\\site-packages\\_pytest\\monkeypatch.py:163: in context\r\n    m.undo()\r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n\r\nself = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412B3E250>\r\n\r\n    def undo(self) -> None:\r\n        \"\"\"Undo previous changes.\r\n    \r\n        This call consumes the undo stack. Calling it a second time has no\r\n        effect unless you do more monkeypatching after the undo call.\r\n    \r\n        There is generally no need to call `undo()`, since it is\r\n        called automatically during tear-down.\r\n    \r\n        .. note::\r\n            The same `monkeypatch` fixture is used across a\r\n            single test function invocation. If `monkeypatch` is used both by\r\n            the test function itself and one of the test fixtures,\r\n            calling `undo()` will undo all of the changes made in\r\n            both functions.\r\n    \r\n            Prefer to use :meth:`context() <pytest.MonkeyPatch.context>` instead.\r\n        \"\"\"\r\n        for obj, name, value in reversed(self._setattr):\r\n            if value is not notset:\r\n                setattr(obj, name, value)\r\n            else:\r\n>               delattr(obj, name)\r\nE               AttributeError: type object 'Path' has no attribute 'is_junction'\r\n\r\n.venv\\Lib\\site-packages\\_pytest\\monkeypatch.py:416: AttributeError\r\n________ test_reparse_rejection_does_not_require_new_path_apis[source] ________\r\n\r\noperation = 'source', mem_fs_path = WindowsPath('/__pytest_mem__/5')\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412B645F0>\r\nmemory_build_metadata = {'\\\\__pytest_mem__\\\\5': (16384, 1024)}\r\n\r\n    @pytest.mark.parametrize(\"operation\", (\"enumerate\", \"read\", \"source\"))\r\n    def test_reparse_rejection_does_not_require_new_path_apis(\r\n        operation: str,\r\n        mem_fs_path: Path,\r\n        monkeypatch: pytest.MonkeyPatch,\r\n        memory_build_metadata: dict[str, tuple[int, int]],\r\n    ) -> None:\r\n        \"\"\"operation (str), memory metadata and MonkeyPatch model older Path APIs.\r\n    \r\n        Return None; assert Windows reparse rejection despite absent junction/symlink\r\n        convenience methods. Only local memory/import attributes change temporarily.\r\n        \"\"\"\r\n        memory_build_metadata[str(mem_fs_path)] = (stat.S_IFDIR, 0x400)\r\n    \r\n        def root(anchor: str) -> Path:\r\n            \"\"\"Return fixed memory root for anchor (str), without I/O or mutations.\"\"\"\r\n            return mem_fs_path\r\n    \r\n        monkeypatch.setattr(runtime_identity, \"files\", root)\r\n        with monkeypatch.context() as older:\r\n>           older.delattr(Path, \"is_junction\", raising=False)\r\nE           AttributeError: type object 'Path' has no attribute 'is_junction'\r\n\r\ntests\\scripts\\dev_tools\\test_discovery_build_identity.py:145: AttributeError\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\noperation = 'source', mem_fs_path = WindowsPath('/__pytest_mem__/5')\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412B645F0>\r\nmemory_build_metadata = {'\\\\__pytest_mem__\\\\5': (16384, 1024)}\r\n\r\n    @pytest.mark.parametrize(\"operation\", (\"enumerate\", \"read\", \"source\"))\r\n    def test_reparse_rejection_does_not_require_new_path_apis(\r\n        operation: str,\r\n        mem_fs_path: Path,\r\n        monkeypatch: pytest.MonkeyPatch,\r\n        memory_build_metadata: dict[str, tuple[int, int]],\r\n    ) -> None:\r\n        \"\"\"operation (str), memory metadata and MonkeyPatch model older Path APIs.\r\n    \r\n        Return None; assert Windows reparse rejection despite absent junction/symlink\r\n        convenience methods. Only local memory/import attributes change temporarily.\r\n        \"\"\"\r\n        memory_build_metadata[str(mem_fs_path)] = (stat.S_IFDIR, 0x400)\r\n    \r\n        def root(anchor: str) -> Path:\r\n            \"\"\"Return fixed memory root for anchor (str), without I/O or mutations.\"\"\"\r\n            return mem_fs_path\r\n    \r\n        monkeypatch.setattr(runtime_identity, \"files\", root)\r\n>       with monkeypatch.context() as older:\r\n             ^^^^^^^^^^^^^^^^^^^^^\r\n\r\ntests\\scripts\\dev_tools\\test_discovery_build_identity.py:144: \r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n..\\..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\contextlib.py:162: in __exit__\r\n    self.gen.throw(value)\r\n.venv\\Lib\\site-packages\\_pytest\\monkeypatch.py:163: in context\r\n    m.undo()\r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n\r\nself = <_pytest.monkeypatch.MonkeyPatch object at 0x0000025412B64140>\r\n\r\n    def undo(self) -> None:\r\n        \"\"\"Undo previous changes.\r\n    \r\n        This call consumes the undo stack. Calling it a second time has no\r\n        effect unless you do more monkeypatching after the undo call.\r\n    \r\n        There is generally no need to call `undo()`, since it is\r\n        called automatically during tear-down.\r\n    \r\n        .. note::\r\n            The same `monkeypatch` fixture is used across a\r\n            single test function invocation. If `monkeypatch` is used both by\r\n            the test function itself and one of the test fixtures,\r\n            calling `undo()` will undo all of the changes made in\r\n            both functions.\r\n    \r\n            Prefer to use :meth:`context() <pytest.MonkeyPatch.context>` instead.\r\n        \"\"\"\r\n        for obj, name, value in reversed(self._setattr):\r\n            if value is not notset:\r\n                setattr(obj, name, value)\r\n            else:\r\n>               delattr(obj, name)\r\nE               AttributeError: type object 'Path' has no attribute 'is_junction'\r\n\r\n.venv\\Lib\\site-packages\\_pytest\\monkeypatch.py:416: AttributeError\r\n=========================== short test summary info ===========================\r\nFAILED tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[enumerate] - AttributeError: type object 'Path' has no attribute 'is_symlink'\r\nFAILED tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[read] - AttributeError: type object 'Path' has no attribute 'is_junction'\r\nFAILED tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[source] - AttributeError: type object 'Path' has no attribute 'is_junction'\r\n========================= 3 failed, 5 passed in 0.52s =========================\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair2-20261020T152548-reproductions.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    }
+  ],
+  "coverage": null,
+  "harness_sha256": "143a7a124671f9b3c69f2840d432f3f5171758c80ccf1b12ea1f64d7a3307cac",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "failed-retained"
+}

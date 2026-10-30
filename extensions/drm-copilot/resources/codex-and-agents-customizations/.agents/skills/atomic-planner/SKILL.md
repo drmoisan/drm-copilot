@@ -36,6 +36,13 @@ Each task must be:
 - independently verifiable,
 - free of placeholder text.
 
+In a workspace with an active discovery activation, the planner launch itself is admitted
+only after the native planning gate verifies the receipt named by the profile's
+`completion_gates.planning_prerequisite`. A plan cites the current acceptance
+specifications as its criteria and keeps implementation test passes as separate,
+executor-verified tasks: a ready criterion is never recorded as a passed test (see
+`docs/engineering/legacy-discovery-and-parity/enforcement.md`).
+
 ## Scratch Location
 
 Concurrent child runs in one session share one session scratchpad, so every plan places its scratch files in a directory unique to the child.

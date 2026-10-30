@@ -1,0 +1,63 @@
+{
+  "assertions": [
+    "Actual capture_workspace/load_snapshot retains exactly the materialized profile, scope, inventory, ledger and checksummed confirmation evidence.",
+    "The complete configured confirmed-no-scope fixture validates structurally using the actual trusted catalog.",
+    "Public build_coverage_report keeps a justified no-scope result distinct from an unconfigured or uninventoried graph.",
+    "Empty supported populations expose zero named counts and null zero-denominator percentages, including repaired runtime fields and units.",
+    "Public generated document equals report_projection for the same kind, identifier and mode.",
+    "to_dict, parsed to_json, and the exact embedded JSON of to_markdown agree field for field.",
+    "Repeated generation over identical captured inputs is byte-deterministic.",
+    "Generation and validation preserve the immutable snapshot digest and retained input bytes.",
+    "A pre-existing generated report in a separately prepared fixture does not change the semantic report input digest or coverage counts.",
+    "A changed authored input alters semantic identity or yields its actual validation finding; prior report success cannot be retained.",
+    "An authored report with forged counts is rejected by recomputation with REPORT_RESULT rather than accepted as authority.",
+    "A configured uninventoried fixture keeps discovery failure and actionable blockers rather than reporting completion.",
+    "Malformed authored scope bytes yield unavailable coverage populations and retain original structural findings.",
+    "All fixture/source/Git bytes and status remain unchanged during the read-only operation interval; no report publication or mutation commit is attempted."
+  ],
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+    "sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe"
+  },
+  "count": 14,
+  "execution": "Run only after released stages 1-6 pass; no implementation or unit test changes.",
+  "harnesses": {
+    "issue-980-p5t1-final-native-gate.py": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-gate-harness.2026-10-20T04-27.txt",
+      "sha256": "83db60a56d4de225b9eb355db3c58e3463328c45b63a14ca0c367edac9e5dae3"
+    },
+    "issue-980-p5t1-final-native-ready.py": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-ready-harness.2026-10-20T04-27.txt",
+      "sha256": "7028ec704738bdc05817941e3390f13c8c6c1699148f0995f98084742e568be6"
+    },
+    "issue-980-p5t1-final-native.py": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-harness.2026-10-20T04-27.txt",
+      "sha256": "9beba975e4c69c71ca5f7d7f77da692d09db65844294333462d2b8e5f611febd"
+    }
+  },
+  "limitations": [
+    "No publication, native coding-agent host or non-Windows claim.",
+    "Setup report generation is separately timed and is not a unit-suite rerun."
+  ],
+  "node_reconstruction_correction": {
+    "candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+      "sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe"
+    },
+    "correction": "Replace two prior unqualified node IDs with four executed mode-qualified IDs; final population remains 138.",
+    "observed_exit_code": 1,
+    "observed_failure": "AssertionError at assert len(new_nodes) == 138 before candidate/harness evidence or suites were emitted.",
+    "original_scratch_harness": "SCRATCH/issue-980-p5t1-final-bind-before-node-correction.py",
+    "original_sha256": "cb594bd65d245f71368acc83ca050bc34b4531b7b13c8062aa13676aecfcf2fb"
+  },
+  "preconditions": [
+    "Real synthetic Git fixture commit outside the workspace.",
+    "Complete no-scope fixture from the accepted helper and actual configured revision.",
+    "All variant materialization precedes the measured read-only interval.",
+    "Actual capture_workspace/load_snapshot, trusted catalog, LocalGitReader and filesystem read primitives.",
+    "Report filenames use the loader's exact coverage-report.json/.md convention."
+  ],
+  "stage": 7,
+  "timeout_seconds": 600,
+  "timestamp": "2026-10-20T04-27"
+}

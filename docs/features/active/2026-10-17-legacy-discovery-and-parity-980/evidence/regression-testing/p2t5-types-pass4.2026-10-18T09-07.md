@@ -1,0 +1,19 @@
+# p2t5-types-pass4
+
+Timestamp: 2026-10-18T09-07
+Command: poetry run pyright
+EXIT_CODE: 0
+Output Summary: 0 errors, 0 warnings, 0 informations; WARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).; Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+
+Working directory: .
+Started: 2026-10-18T09:07:29.140541+00:00
+Duration seconds: 7.979
+Phase: P2-T5 scoped decisions and supersession; focused task verification.
+
+## Captured output
+
+```text
+0 errors, 0 warnings, 0 informations
+WARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+```

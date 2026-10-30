@@ -1,0 +1,424 @@
+{
+  "Timestamp": "2026-10-20T16-23",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-repair-handoff.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Finite gateway repair: 98 affected cases; repaired-candidate order isolation and task acceptance remain pending.",
+  "status": "CHECKED_WIP_PENDING_INDEPENDENT_CONFIRMATION_AND_FINAL_ISOLATION",
+  "plan": "plan.2026-10-17T22-38.md",
+  "task": "P6-T1 gateway/doctor finite GW1/GW2/GW3/GP1 repair",
+  "baseline": {
+    "path": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+    "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1",
+    "qualification": "Owned paths were absent; predecessor per-file coverage is not applicable. No baseline replay."
+  },
+  "review": {
+    "path": "evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.json",
+    "sha256": "8b091fecd4f8fd0f2a832705577f3310671d4a26f6664cf18378b191143c9d5c"
+  },
+  "original_fail_before_archive": {
+    "path": "evidence/qa-gates/p6t1-executor-gateway-probe.2026-10-20T15-52.json",
+    "sha256": "6dd9f01571209147eda24121bf55c7160ce4cf26bf35b16edd70919a2883f199"
+  },
+  "original_checked_candidate": {
+    "path": "evidence/regression-testing/p6t1-gateway-freeze.2026-10-20T15-35.json",
+    "sha256": "939ef244f98bbd91ad6f9cfb4e679c2c08784a7e25ca90cb726d4ff21ff22184"
+  },
+  "approved_split_and_absence": "evidence/other/p6t1-gateway-repair-preparation.2026-10-20T15-58.json",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "70317b21203fb11dd640fa2036b8b13521516f8ce8c8f7412b4d177e2b9207db",
+      "physical_lines": 354
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "15d1ffba846eb418b8046cad1d2455c725167da2985f4c7e80f6fb44185564e1",
+      "physical_lines": 386
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "sha256": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+      "physical_lines": 288
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "sha256": "7cb784279aac1e0d0aa6f7b6f38e7a0e50df1a3eb010e064851fe5ea361135fd",
+      "physical_lines": 452
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+      "physical_lines": 494
+    },
+    {
+      "path": "tests/discovery_runtime/test_doctor.py",
+      "sha256": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+      "physical_lines": 414
+    },
+    {
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "sha256": "54399f29e71f00b20fac8b9c4036126c91bced0c12e8c1239dac5792fa72e6b7",
+      "physical_lines": 318
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+      "physical_lines": 304
+    }
+  ],
+  "proofs_in_execution_order": [
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair7-black.2026-10-20T16-19.raw.json",
+      "sha256": "27cb1c812529372ac167072502fb6c26382d8d0360e4e58226eec1f36896c996",
+      "command": ".venv/Scripts/python.exe -m black --check packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py tests/discovery_runtime/gateway_test_support.py tests/discovery_runtime/test_gateway_boundaries.py",
+      "exit_code": 0,
+      "passed": null
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair7-ruff.2026-10-20T16-19.raw.json",
+      "sha256": "5584b2e1e83f8e1ecc87a1b15f50d7748e14a875f0da44d8d7df38201fd1c447",
+      "command": ".venv/Scripts/python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py tests/discovery_runtime/gateway_test_support.py tests/discovery_runtime/test_gateway_boundaries.py",
+      "exit_code": 0,
+      "passed": null
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair7-types.2026-10-20T16-20.raw.json",
+      "sha256": "89add53248f865df507f3c8147439bb5647dd573e1db19ff0677093c8703ce0d",
+      "command": ".venv/Scripts/python.exe -m pyright packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py tests/discovery_runtime/gateway_test_support.py tests/discovery_runtime/test_gateway_boundaries.py",
+      "exit_code": 0,
+      "passed": null
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.raw.json",
+      "sha256": "40da3cbd370a5933020f20e2092a0c9a588681182f0607ffcb6cf5b0febd9aca",
+      "command": ".venv/Scripts/python.exe SCRATCH\\issue-980-p6t1-gateway-repair-probe.py",
+      "exit_code": 0,
+      "passed": null
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair7-prechecks.2026-10-20T16-20.raw.json",
+      "sha256": "0dc9abf4d60e94670d3dc1f9daeee306c5fd6526bc1bac3d1b026dffd3358337",
+      "command": ".venv/Scripts/python.exe -m pytest -o addopts= tests/discovery_runtime/test_gateway_boundaries.py",
+      "exit_code": 0,
+      "passed": 12
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair7-tests.2026-10-20T16-22.raw.json",
+      "sha256": "9fd82c5b6586aaca2a9a33147399e5cf3cf9b1f6193f746a24dadccb59792a34",
+      "command": ".venv/Scripts/python.exe -m pytest -o addopts= tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py tests/discovery_runtime/test_gateway_boundaries.py --cov=drm_copilot_discovery.gateway --cov=drm_copilot_discovery.gateway_local --cov=drm_copilot_discovery.doctor --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\issue-980-p6t1-gateway-repair7-coverage.json",
+      "exit_code": 0,
+      "passed": 98
+    }
+  ],
+  "input_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "70317b21203fb11dd640fa2036b8b13521516f8ce8c8f7412b4d177e2b9207db",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "15d1ffba846eb418b8046cad1d2455c725167da2985f4c7e80f6fb44185564e1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+    "tests/discovery_runtime/test_gateway.py": "7cb784279aac1e0d0aa6f7b6f38e7a0e50df1a3eb010e064851fe5ea361135fd",
+    "tests/discovery_runtime/test_gateway_local.py": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+    "tests/discovery_runtime/test_doctor.py": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+    "tests/discovery_runtime/gateway_test_support.py": "54399f29e71f00b20fac8b9c4036126c91bced0c12e8c1239dac5792fa72e6b7",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3"
+  },
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": {
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "summary": {
+        "covered_lines": 112,
+        "num_statements": 112,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 28,
+        "num_partial_branches": 0,
+        "covered_branches": 28,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_regions": {
+        "functions:_DoctorCapture.__init__": {
+          "statements": 8,
+          "covered": 8,
+          "line_percent": 100.0
+        },
+        "functions:_DoctorCapture.path": {
+          "statements": 9,
+          "covered": 9,
+          "line_percent": 100.0
+        },
+        "functions:_DoctorCapture.metadata": {
+          "statements": 2,
+          "covered": 2,
+          "line_percent": 100.0
+        },
+        "functions:_DoctorCapture.candidates": {
+          "statements": 11,
+          "covered": 11,
+          "line_percent": 100.0
+        },
+        "functions:_DoctorCapture._bounded_read": {
+          "statements": 4,
+          "covered": 4,
+          "line_percent": 100.0
+        },
+        "functions:_DoctorCapture.read": {
+          "statements": 14,
+          "covered": 14,
+          "line_percent": 100.0
+        },
+        "functions:_DoctorCapture.observe": {
+          "statements": 4,
+          "covered": 4,
+          "line_percent": 100.0
+        },
+        "functions:_DoctorCapture.verify": {
+          "statements": 2,
+          "covered": 2,
+          "line_percent": 100.0
+        },
+        "functions:inspect_doctor": {
+          "statements": 36,
+          "covered": 36,
+          "line_percent": 100.0
+        },
+        "classes:_DoctorCapture": {
+          "statements": 54,
+          "covered": 54,
+          "line_percent": 100.0
+        }
+      },
+      "minimum_named_body_line_percent": 100.0,
+      "historical_covered_line_loss": [],
+      "uncovered_new_or_changed_statements": [],
+      "comparison": "Exact equal-line mapping to the historical reviewed candidate; all changed executable lines checked."
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": {
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "summary": {
+        "covered_lines": 117,
+        "num_statements": 117,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 12,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 28,
+        "num_partial_branches": 0,
+        "covered_branches": 28,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_regions": {
+        "functions:_execute": {
+          "statements": 2,
+          "covered": 2,
+          "line_percent": 100.0
+        },
+        "functions:_failure": {
+          "statements": 8,
+          "covered": 8,
+          "line_percent": 100.0
+        },
+        "functions:_emit": {
+          "statements": 25,
+          "covered": 25,
+          "line_percent": 100.0
+        },
+        "functions:_read_request": {
+          "statements": 10,
+          "covered": 10,
+          "line_percent": 100.0
+        },
+        "functions:run_gateway": {
+          "statements": 28,
+          "covered": 28,
+          "line_percent": 100.0
+        },
+        "functions:main": {
+          "statements": 22,
+          "covered": 22,
+          "line_percent": 100.0
+        }
+      },
+      "minimum_named_body_line_percent": 100.0,
+      "historical_covered_line_loss": [],
+      "uncovered_new_or_changed_statements": [],
+      "comparison": "Exact equal-line mapping to the historical reviewed candidate; all changed executable lines checked."
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "line_percent": 99.2,
+      "branch_percent": 97.36842105263158,
+      "summary": {
+        "covered_lines": 124,
+        "num_statements": 125,
+        "percent_covered": 98.77300613496932,
+        "percent_covered_display": "99",
+        "missing_lines": 1,
+        "excluded_lines": 5,
+        "percent_statements_covered": 99.2,
+        "percent_statements_covered_display": "99",
+        "num_branches": 38,
+        "num_partial_branches": 1,
+        "covered_branches": 37,
+        "missing_branches": 1,
+        "percent_branches_covered": 97.36842105263158,
+        "percent_branches_covered_display": "97"
+      },
+      "named_regions": {
+        "functions:LocalServiceIO.__init__": {
+          "statements": 5,
+          "covered": 5,
+          "line_percent": 100.0
+        },
+        "functions:LocalServiceIO.activation": {
+          "statements": 1,
+          "covered": 1,
+          "line_percent": 100.0
+        },
+        "functions:LocalServiceIO.initialization": {
+          "statements": 1,
+          "covered": 1,
+          "line_percent": 100.0
+        },
+        "functions:LocalServiceIO.runtime_identity": {
+          "statements": 1,
+          "covered": 1,
+          "line_percent": 100.0
+        },
+        "functions:LocalServiceIO.authorize": {
+          "statements": 14,
+          "covered": 13,
+          "line_percent": 92.85714285714286
+        },
+        "functions:LocalServiceIO.writer": {
+          "statements": 3,
+          "covered": 3,
+          "line_percent": 100.0
+        },
+        "functions:LocalServiceIO._recapture": {
+          "statements": 12,
+          "covered": 12,
+          "line_percent": 100.0
+        },
+        "functions:_repository_selection": {
+          "statements": 9,
+          "covered": 9,
+          "line_percent": 100.0
+        },
+        "functions:run_local_git": {
+          "statements": 30,
+          "covered": 30,
+          "line_percent": 100.0
+        },
+        "functions:run_local_git.expire": {
+          "statements": 6,
+          "covered": 6,
+          "line_percent": 100.0
+        },
+        "functions:installed_local_io": {
+          "statements": 9,
+          "covered": 9,
+          "line_percent": 100.0
+        },
+        "classes:LocalServiceIO": {
+          "statements": 37,
+          "covered": 36,
+          "line_percent": 97.29729729729729
+        }
+      },
+      "minimum_named_body_line_percent": 92.85714285714286,
+      "historical_covered_line_loss": [],
+      "uncovered_new_or_changed_statements": [],
+      "comparison": "Exact equal-line mapping to the historical reviewed candidate; all changed executable lines checked."
+    }
+  },
+  "original_test_preservation": {
+    "tests/discovery_runtime/test_gateway.py": {
+      "same_test_function_names": true,
+      "same_assertions_and_parametrization": true,
+      "test_functions": 12,
+      "assertion_statements": 34
+    },
+    "tests/discovery_runtime/test_gateway_local.py": {
+      "same_test_function_names": true,
+      "same_assertions_and_parametrization": true,
+      "test_functions": 12,
+      "assertion_statements": 32
+    },
+    "tests/discovery_runtime/test_doctor.py": {
+      "same_test_function_names": true,
+      "same_assertions_and_parametrization": true,
+      "test_functions": 11,
+      "assertion_statements": 46
+    }
+  },
+  "repair_archive": {
+    "path": "evidence/regression-testing/p6t1-gateway-repair-archive.2026-10-20T16-23.json",
+    "sha256": "9a74510a5c7223b8a2b26776d88c6df722ded75e6452522810f7119a1e427154"
+  },
+  "changes": {
+    "GW1": "The final serializer/emission boundary converts unexpected failures to fixed stderr/exit 3 without replacement or retried JSON.",
+    "GW2": "A finite cancellation timer starts before bounded output_limit+1 reading and remains active through process completion; timeout/overflow reaps the fixed child.",
+    "GW3": "Doctor charges candidate/selected path text, hashing, sorting, comparison and retained manifest projection before the associated work.",
+    "GP1": "The finite typed parameter/return/error/effect contracts and eight doctor-test intent comments are consolidated; original tests retain all assertions and parametrization."
+  },
+  "scoped_deltas": {
+    "format": "No changes in final Black check",
+    "lint": "Zero findings",
+    "types": "Zero errors, warnings or information diagnostics",
+    "tests": "98 passed; zero failures; 86 original plus 12 boundary cases",
+    "named_body_coverage": "At least 90% for each named executable function/class",
+    "changed_statement_coverage": "No mapped historical covered-line loss; no uncovered newly changed statement",
+    "repository_coverage": "Pending coordinator-wide gate"
+  },
+  "remaining_gates": [
+    "Independent confirmation of finite GW1/GW2/GW3/GP1 corrections.",
+    "Repaired-candidate order isolation deferred by coordinator to one combined core/gateway reversed-module run with coverage after native proof.",
+    "Historical original 86-case forward and 86-case reverse receipts remain historical only.",
+    "Installed package manifest generation, installed process proof, integrated core behavior and task acceptance remain coordinator-owned.",
+    "In-memory transport tests inject service execution and runtime identity; they do not claim installed build verification.",
+    "P6 local provider rejects host markers, native invocation and prepare/finalize; it issues no native grant or receipt.",
+    "P6 empty-authority invalidation is not native revocation; P8 must wire actual revocation before native authority issuance or acceptance.",
+    "P6-T2 CLI registration and P6-T3 compatibility migration remain separate."
+  ],
+  "retained_failures": [
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair2-ruff.2026-10-20T16-11.raw.json",
+      "sha256": "719c82a000d20d4c5b6c00d7a3bc71e05a007071c2ec8eff865a5e1a6831608f"
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair3-types.2026-10-20T16-13.raw.json",
+      "sha256": "58547e7e983e0cff39b5cf7596c5a29aeed89549228a07d8960ee6a6fbc110e5"
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair4-black.2026-10-20T16-14.raw.json",
+      "sha256": "81f773b872bd52e0b00de0b26876514595749053b92b0f1622a30d13de9ecc5e"
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair5-prechecks.2026-10-20T16-14.raw.json",
+      "sha256": "1b1968b1f57a228d73075fddd98e3c251021a4c2a034aef95dc7ebd01d73953c"
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-repair6-prechecks.2026-10-20T16-19.raw.json",
+      "sha256": "5e71a218a37c512336f05ccdc50d35ec8b580cf27c310b11650506dd3fcf2b1e"
+    }
+  ],
+  "failures": []
+}

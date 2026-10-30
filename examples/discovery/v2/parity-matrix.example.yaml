@@ -1,0 +1,46 @@
+$schema: urn:drm-copilot:discovery:2.0.0:parity-matrix
+schema_version: 2.0.0
+artifact_kind: parity-matrix
+id: parity-alpha
+source_repositories:
+  - {id: synthetic-source, revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
+target_repositories:
+  - {id: synthetic-target, revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb}
+entries:
+  - id: parity-feature-alpha-client-alpha
+    feature_id: feature-alpha
+    source_contract_ref:
+      artifact_kind: feature-contract
+      repository_id: synthetic-source
+      revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      artifact_path: feature-contracts/feature-alpha.yaml
+      artifact_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      feature_id: feature-alpha
+      schema_version: 2.0.0
+    client_id: client-alpha
+    target_repository:
+      id: synthetic-target
+      revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    target_implementation_refs: []
+    parity_state: missing
+    dimensions:
+      observable_outputs:
+        applicability: applicable
+        verification: not-run
+        rationale: null
+        evidence_refs: []
+        product_decision_refs: []
+    online:
+      applicability: applicable
+      verification: not-run
+      rationale: null
+      evidence_refs: []
+      product_decision_refs: []
+    evidence_refs: []
+    intentional_deviation_refs: []
+    retirement_decision_ref: null
+    blockers: [Target implementation is not yet available.]
+    validation_status: null
+    missing_reason: No target implementation has been linked.
+    extensions: {}
+extensions: {}

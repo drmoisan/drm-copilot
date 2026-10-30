@@ -1,0 +1,63 @@
+"""Move the approved cohesive projection without changing legacy helper bodies."""
+from pathlib import Path
+
+root = Path.cwd()
+report = root / "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py"
+text = report.read_text(encoding="utf-8")
+start = text.index("def _reference(")
+end = text.index("def parity_summary(")
+projection = text[start:end]
+imports = '''"""Aggregate parity counts from retained outcomes and authoritative source scope."""
+
+from __future__ import annotations
+
+from collections import Counter
+from typing import TYPE_CHECKING, cast
+
+from drm_copilot_discovery.coverage_population import CoveragePopulation, record_identity
+from drm_copilot_discovery.models import JsonObject
+from drm_copilot_discovery.report_models import ReportBudget, bounded_object, ratio
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.claim_rules import ClaimValidation
+    from drm_copilot_discovery.coverage_population import Identity
+    from drm_copilot_discovery.decision_rules import DecisionValidation
+    from drm_copilot_discovery.dimension_rules import DimensionValidation, FeatureObligation
+    from drm_copilot_discovery.evidence_rules import EvidenceValidation
+    from drm_copilot_discovery.findings import Finding
+    from drm_copilot_discovery.parity_models import ParityDimensionOutcome, ParityEntryOutcome, ParityValidation
+    from drm_copilot_discovery.references import ArtifactRecord, ReferenceIndex
+    from drm_copilot_discovery.snapshot import DiscoverySnapshot
+
+STATES = ("unassessed", "full", "partial", "missing", "conflicting", "intentionally-changed", "retired")
+
+
+'''
+# The internal projection receives the fixed unavailable view without importing its caller.
+projection = projection.replace(
+    "def project(self) -> JsonObject:",
+    "def project(self, unavailable: JsonObject) -> JsonObject:",
+).replace("return unavailable_parity_summary()", "return unavailable")
+projection = projection.replace(
+    "Return a bounded summary of distinct features, obligations and rows.",
+    "Return a bounded summary, using unavailable (JsonObject) when scope is absent.",
+)
+helper = report.with_name("parity_metrics.py")
+helper.write_text(imports + projection.rstrip() + "\n", encoding="utf-8", newline="\n")
+text = text[:start] + text[end:]
+text = text.replace("from collections import Counter\n", "")
+text = text.replace(
+    "from drm_copilot_discovery.coverage_population import CoveragePopulation, record_identity\n",
+    "from drm_copilot_discovery.parity_metrics import _ParityProjection\n",
+)
+text = text.replace("    ratio,\n", "")
+text = text.replace("    from drm_copilot_discovery.coverage_population import Identity\n", "")
+text = text.replace("DimensionValidation, FeatureObligation", "DimensionValidation")
+text = text.replace("ParityDimensionOutcome, ParityEntryOutcome, ParityValidation", "ParityValidation")
+text = text.replace("ArtifactRecord, ReferenceIndex", "ReferenceIndex")
+text = text.replace(
+    'STATES = ("unassessed", "full", "partial", "missing", "conflicting", "intentionally-changed", "retired")\n\n\n',
+    "",
+)
+text = text.replace("parity, findings).project()", "parity, findings).project(unavailable_parity_summary())")
+report.write_text(text, encoding="utf-8", newline="\n")

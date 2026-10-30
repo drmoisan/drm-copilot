@@ -1,0 +1,135 @@
+{
+  "task": "P1-T3",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 15,
+  "schemas": [
+    "common",
+    "domain-profile",
+    "scope"
+  ],
+  "fixtures": [
+    {
+      "kind": "domain-profile",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "completion_gates",
+            "require_confirmed_scope"
+          ],
+          "message": "'true' is not of type 'boolean'"
+        }
+      ]
+    },
+    {
+      "kind": "scope",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "repository",
+            "revision"
+          ],
+          "message": "None is not of type 'string'"
+        }
+      ]
+    }
+  ],
+  "invalid_line_terminator_cases_rejected": 35,
+  "packaged_resources": 10,
+  "unchanged_prior_paths": 38,
+  "line_counts": {
+    "examples/discovery/v2/domain-profile.example.yaml": 96,
+    "examples/discovery/v2/scope.example.yaml": 27,
+    "packages/discovery-runtime/resource-manifest.json": 19,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": 56,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json": 177,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json": 181,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json": 78,
+    "schemas/discovery/v2/common.schema.json": 177,
+    "schemas/discovery/v2/domain-profile.schema.json": 181,
+    "schemas/discovery/v2/scope.schema.json": 78,
+    "tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml": 50,
+    "tests/fixtures/discovery_schemas/v2/scope.invalid.yaml": 20,
+    "tests/schemas/discovery/test_v2_common_schemas.py": 176,
+    "tests/schemas/discovery/test_v2_profile_schemas.py": 388,
+    "tests/schemas/discovery/v2_schema_test_support.py": 88
+  },
+  "paths": [
+    {
+      "path": "examples/discovery/v2/domain-profile.example.yaml",
+      "git_blob": "dea10bc619ce4a9df71b878d0c81ca85ab2a4184",
+      "sha256": "36c0d5a133a817ca2586471a797d50d662fe7dc57139ffbbf30a76a08f22c76f"
+    },
+    {
+      "path": "examples/discovery/v2/scope.example.yaml",
+      "git_blob": "6395ea1440b279a4e8fcf3ec6ac5a1fd778e3b39",
+      "sha256": "ec3de1ce762749ca8921bd57f74c21d18612eb1b0a3a6057a5ae701b99608a3a"
+    },
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "git_blob": "46b9d7607aa3ce568d8fb5c8c78b1bf0fde0a647",
+      "sha256": "63ddacae7632f36d1dd5470975d98f16833b81d24bea129f4a84b05ecab4ef7f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "git_blob": "48628322e075d8c1277d55d8e52f1db0bb14147b",
+      "sha256": "85d41cc8162d3d9f567bca002341df72936889ceeea08a9ec0c1e258f478bbb4"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "git_blob": "a466a9c7da1cd7def4fc07cc04725ff0dee8a17c",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "git_blob": "56c3535b742a0aa9defced7f62690ba65f1cb0e6",
+      "sha256": "3cd06d2d722eaabf0ddb87f0c224012a196d71e29429345cfdfb336cadbb4e2a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "git_blob": "d44afb26ea438e3cd16282c469723b05facc9746",
+      "sha256": "2da599b62c18e1ca326f61d915ec93f4480b99877bf075608c988b38a47e6713"
+    },
+    {
+      "path": "schemas/discovery/v2/common.schema.json",
+      "git_blob": "a466a9c7da1cd7def4fc07cc04725ff0dee8a17c",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe"
+    },
+    {
+      "path": "schemas/discovery/v2/domain-profile.schema.json",
+      "git_blob": "56c3535b742a0aa9defced7f62690ba65f1cb0e6",
+      "sha256": "3cd06d2d722eaabf0ddb87f0c224012a196d71e29429345cfdfb336cadbb4e2a"
+    },
+    {
+      "path": "schemas/discovery/v2/scope.schema.json",
+      "git_blob": "d44afb26ea438e3cd16282c469723b05facc9746",
+      "sha256": "2da599b62c18e1ca326f61d915ec93f4480b99877bf075608c988b38a47e6713"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "git_blob": "75ffcbd9ebfd929813bd2ad6b87d8e42d2a13334",
+      "sha256": "8dca86761d9b8a54864be8ef969849cf61213bba91aa16b265424317188c1cfd"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "git_blob": "245f85674aaf5afb27c39919c2155d0145618a63",
+      "sha256": "874977ed8e8524c4324bea52da49d1ecae3c00550481a76a3cd6cf61a802b927"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_common_schemas.py",
+      "git_blob": "6d5644b652878523d2c36c085c607bd65005311d",
+      "sha256": "40973502115319680b0b18348275cba897ef23b9c8eb6fa02bd8f4e27564e446"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_profile_schemas.py",
+      "git_blob": "b2cf2d76c1743c05b888b71edd892b58a9bb8b52",
+      "sha256": "832f948c577dfce16d2749eaa702ba78bf9b93b29545afd3a9b8b6a7deeae118"
+    },
+    {
+      "path": "tests/schemas/discovery/v2_schema_test_support.py",
+      "git_blob": "f5885ec291f0f41112f2ac5936880e79fd0efdd1",
+      "sha256": "43e7e9b85d00cd3ef105c34c210938ca40f002aa494d9ff2592f1acfcb3a097c"
+    }
+  ]
+}

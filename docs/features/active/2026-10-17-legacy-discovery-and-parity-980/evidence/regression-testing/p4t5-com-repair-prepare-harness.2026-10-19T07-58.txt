@@ -1,0 +1,66 @@
+"""Bind the exact retained tests and bounded COM context repair before gates."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+absence = max((feature / "evidence/baseline").glob("p4t5-com-syntax-split-absence.*.json"))
+binding = json.loads(absence.read_bytes())
+preserved = scratch / binding["preserved_directory"].removeprefix("SCRATCH/")
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+    "tests/discovery_runtime/analyzer/test_com_interop.py",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py",
+]
+records = []
+for name in paths:
+    path = repo / name
+    content = path.read_bytes()
+    text = content.decode()
+    tree = ast.parse(text)
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.AsyncFor, ast.While))]
+    lines = text.splitlines()
+    assert all(ast.get_docstring(node) for node in definitions), name
+    assert all(lines[node.lineno - 2].strip().startswith("#") for node in loops), name
+    assert len(lines) <= 500, name
+    retained = []
+    if name.startswith("tests/"):
+        original = ast.parse((preserved / path.name).read_text())
+        current = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+        for node in original.body:
+            if isinstance(node, ast.FunctionDef):
+                assert ast.dump(node) == ast.dump(current[node.name]), node.name
+                retained.append(node.name)
+    records.append({"path": name, "sha256": hashlib.sha256(content).hexdigest(), "physical_lines": len(lines),
+                    "definitions_with_docstrings": len(definitions), "loops_with_intent_comments": len(loops),
+                    "retained_test_definitions": retained})
+old_gate = (scratch / "issue-980-p4t5-com-gate.py").read_bytes()
+gate = old_gate.decode().replace('    "tests/discovery_runtime/analyzer/test_com_interop.py",',
+    '    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",\n    "tests/discovery_runtime/analyzer/test_com_interop.py",')
+gate = gate.replace("issue-980-p4t5-com-coverage", "issue-980-p4t5-com-repair-coverage")
+new_gate = scratch / "issue-980-p4t5-com-repair-gate.py"
+assert not new_gate.exists()
+new_gate.write_bytes(gate.encode())
+prefix = feature / ("evidence/regression-testing/p4t5-com-repair-preparation." + stamp)
+document = {"timestamp": stamp, "command": "poetry run python SCRATCH/issue-980-p4t5-com-repair-prepare.py",
+            "exit_code": 0, "scope_absence": absence.relative_to(repo).as_posix(), "source_and_structure": records,
+            "retained_original_cases": 111, "new_regression_and_control_cases": 26, "test_assertion_removals": 0,
+            "new_gate": {"path": "SCRATCH/" + new_gate.name, "sha256": hashlib.sha256(new_gate.read_bytes()).hexdigest()},
+            "baseline_replayed": False, "no_other_implementation_paths_changed": True}
+Path(str(prefix) + ".json").write_bytes((json.dumps(document, indent=2) + "\n").encode())
+Path(str(prefix) + ".md").write_bytes(("# P4-T5 COM bounded repair preparation\n\nTimestamp: " + stamp +
+    "\nCommand: " + document["command"] + "\nEXIT_CODE: 0\nOutput Summary: Original test definitions/decorators/assertions are AST-identical; all four files pass bounded structure checks.\n\n"
+    "The approved pure syntax split implements the complete R1 context correction and R3 intent-comment repair. "
+    "Delimiter pairing, bracket continuation propagation and the main candidate pass are linear in the token count; each candidate's body/arrow check is constant work. "
+    "All original 111 cases remain represented by unchanged test ASTs; 26 direct/adapter cases cover the retained negatives and genuine controls. "
+    "The paired JSON binds exact preparation bytes, retained definitions, docstring/loop checks and the new four-file gate wrapper. "
+    "These structural checks do not substitute for the pending ordered focused sequence.\n").encode())
+print(prefix.relative_to(repo).as_posix())
+print(json.dumps(records, indent=2))

@@ -1,0 +1,68 @@
+{
+  "stage": "types",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:29:52.976399+00:00",
+  "finished": "2026-10-19T10:29:54.983960+00:00",
+  "duration_seconds": 2.008,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "physical_lines": 465
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "physical_lines": 465
+    }
+  },
+  "shared_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    }
+  },
+  "shared_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    }
+  },
+  "streams": {
+    "stdout": {
+      "path": "SCRATCH/p4t7-dotnet-repair3-types.102954983960.stdout.bin",
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "bytes": 194,
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "path": "SCRATCH/p4t7-dotnet-repair3-types.102954983960.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "presentation": ""
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-repair-gates.py",
+    "sha256": "bfe522f495eef5b0e53bd5d147c5e6b35edc3d039ebc900bfe5d04b0d08ea277"
+  },
+  "review": "p4t7-executor-format-review.2026-10-19T10-23.json FR2",
+  "scope": "Only .NET parser/test repair; predecessor proof reused"
+}

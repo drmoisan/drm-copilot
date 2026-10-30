@@ -1,0 +1,56 @@
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "drm-copilot-discovery"
+version = "2.0.0"
+description = "Local, domain-neutral legacy discovery and parity artifact tooling."
+authors = ["Dan Moisan"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "drm_copilot_discovery", from = "src" }]
+include = [
+    "src/drm_copilot_discovery/py.typed",
+    { path = "src/drm_copilot_discovery/_build_manifest.json", format = ["sdist", "wheel"] },
+]
+
+[tool.poetry.scripts]
+"dev.discovery.init" = "drm_copilot_discovery.cli:main_init"
+"dev.discovery.configure" = "drm_copilot_discovery.cli:main_configure"
+"dev.discovery.profile" = "drm_copilot_discovery.cli:main_profile"
+"dev.discovery.inventory" = "drm_copilot_discovery.cli:main_inventory"
+"dev.discovery.dotnet" = "drm_copilot_discovery.cli:main_dotnet"
+"dev.discovery.vsto" = "drm_copilot_discovery.cli:main_vsto"
+"dev.discovery.new-contract" = "drm_copilot_discovery.cli:main_new_contract"
+"dev.discovery.new-scenario" = "drm_copilot_discovery.cli:main_new_scenario"
+"dev.discovery.update-artifact" = "drm_copilot_discovery.cli:main_update_artifact"
+"dev.discovery.link-evidence" = "drm_copilot_discovery.cli:main_link_evidence"
+"dev.discovery.validate-profile" = "drm_copilot_discovery.cli:main_validate_profile"
+"dev.discovery.validate-feature-contract" = "drm_copilot_discovery.cli:main_validate_feature_contract"
+"dev.discovery.validate-coverage-ledger" = "drm_copilot_discovery.cli:main_validate_coverage_ledger"
+"dev.discovery.validate-runtime-scenario" = "drm_copilot_discovery.cli:main_validate_runtime_scenario"
+"dev.discovery.validate-parity-matrix" = "drm_copilot_discovery.cli:main_validate_parity_matrix"
+"dev.discovery.validate-unspecified-behavior" = "drm_copilot_discovery.cli:main_validate_unspecified_behavior"
+"dev.discovery.validate-product-decision" = "drm_copilot_discovery.cli:main_validate_product_decision"
+"dev.discovery.validate-evidence-reference" = "drm_copilot_discovery.cli:main_validate_evidence_reference"
+"dev.discovery.validate-decisions" = "drm_copilot_discovery.cli:main_validate_decisions"
+"dev.discovery.validate-all" = "drm_copilot_discovery.cli:main_validate_all"
+"dev.discovery.validate" = "drm_copilot_discovery.cli:main_validate"
+"dev.discovery.coverage-report" = "drm_copilot_discovery.cli:main_coverage_report"
+"dev.discovery.parity-report" = "drm_copilot_discovery.cli:main_parity_report"
+"dev.discovery.completion-report" = "drm_copilot_discovery.cli:main_completion_report"
+"dev.discovery.generate-acceptance" = "drm_copilot_discovery.cli:main_generate_acceptance"
+"dev.discovery.generate-acceptance-scenarios" = "drm_copilot_discovery.cli:main_generate_acceptance_scenarios"
+"dev.discovery.snapshot-export" = "drm_copilot_discovery.cli:main_snapshot_export"
+"dev.discovery.snapshot-import" = "drm_copilot_discovery.cli:main_snapshot_import"
+"dev.discovery.import-inventory" = "drm_copilot_discovery.cli:main_import_inventory"
+"dev.discovery.migrate" = "drm_copilot_discovery.cli:main_migrate"
+"dev.discovery.doctor" = "drm_copilot_discovery.cli:main_doctor"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+PyYAML = ">=6.0"
+jsonschema = "^4.25.1"
+referencing = ">=0.37,<0.38"
+lxml = ">=5.3.0"

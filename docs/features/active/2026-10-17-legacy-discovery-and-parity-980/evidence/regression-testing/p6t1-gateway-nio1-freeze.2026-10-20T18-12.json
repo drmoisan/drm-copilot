@@ -1,0 +1,1034 @@
+{
+  "Timestamp": "2026-10-20T18-12",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-nio1-freeze.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Two production files and one test file frozen; loop2 statics and 57 new plus 32 retained cases pass; four executable-body gates pass without loss.",
+  "status": "CHECKED_NIO1_REPAIR_PENDING_FINAL_INDEPENDENT_RECONCILIATION",
+  "route": "gateway_doctor_p6t1_native_root_identity_repair_20261020",
+  "public_signature": "workspace_identity(path: str) -> PurePath",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "bytes": 20052,
+      "old_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "lines": 497
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+      "bytes": 17604,
+      "old_sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+      "lines": 403
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+      "bytes": 17390,
+      "old_sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+      "lines": 425
+    }
+  ],
+  "ordered_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-black.2026-10-20T18-02.raw.json",
+      "sha256": "1ce0de8489ef8e79b908c4cc0272ddc7c987da7ff43ab5f2748205c404f85d04",
+      "bytes": 9180,
+      "command": ".venv/Scripts/python.exe -m black --check packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py tests/discovery_runtime/test_gateway_boundaries.py",
+      "exit_code": 0,
+      "passed": 0,
+      "elapsed_seconds": 0.600669
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-ruff.2026-10-20T18-02.raw.json",
+      "sha256": "8b1a0c559bdcfa4967e80a8a6b1d291e8a3dafd14aeda9a432344859712615d7",
+      "bytes": 9122,
+      "command": ".venv/Scripts/python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py tests/discovery_runtime/test_gateway_boundaries.py",
+      "exit_code": 0,
+      "passed": 0,
+      "elapsed_seconds": 0.116918
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-types.2026-10-20T18-02.raw.json",
+      "sha256": "bec8cc9fa62b06bc2be0e8afc02bf3c39dbfc50c38914324e5fa5a734403aa04",
+      "bytes": 9342,
+      "command": ".venv/Scripts/python.exe -m pyright packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py tests/discovery_runtime/test_gateway_boundaries.py",
+      "exit_code": 0,
+      "passed": 0,
+      "elapsed_seconds": 1.103599
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-new.2026-10-20T18-05.raw.json",
+      "sha256": "c63977d93051b065e0d980ccc92762cd25e0cf38106c8641a5e0ad70473df41a",
+      "bytes": 33314,
+      "command": ".venv/Scripts/python.exe -m pytest -o addopts= -vv tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_accepts_equivalent_spelling tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots tests/discovery_runtime/test_gateway_boundaries.py::test_workspace_identity_rejects_an_invalid_trusted_root --cov=drm_copilot_discovery.path_policy --cov=drm_copilot_discovery.gateway_local --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p6t1-gateway-nio1-new-coverage.json",
+      "exit_code": 0,
+      "passed": 57,
+      "elapsed_seconds": 111.789755
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-retained.2026-10-20T18-06.raw.json",
+      "sha256": "404aac457ef7352f18a226abd3c60add1821930b26a557960eda6271148eba56",
+      "bytes": 24706,
+      "command": ".venv/Scripts/python.exe -m pytest -o addopts= -vv tests/discovery_runtime/test_gateway_local.py::test_local_ports_share_exact_readers_and_guard tests/discovery_runtime/test_gateway_local.py::test_missing_identity_never_fabricates_runtime tests/discovery_runtime/test_gateway_local.py::test_host_principal_is_never_converted_to_local_user tests/discovery_runtime/test_gateway_local.py::test_request_markers_cannot_expand_local_authority tests/discovery_runtime/test_gateway_local.py::test_cross_workspace_baseline_and_writer_are_rejected tests/discovery_runtime/test_gateway_local.py::test_writer_recaptures_real_memory_state_and_invalidates tests/discovery_runtime/test_gateway_local.py::test_read_selection_is_exact_and_profile_scoped tests/discovery_runtime/test_gateway_local.py::test_inventory_writer_preserves_exact_pinned_selection tests/discovery_runtime/test_gateway_local.py::test_extra_pins_require_the_bound_repository_reader tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape tests/discovery_runtime/test_path_policy.py::test_read_scope_cannot_expand_by_prefix_or_case tests/discovery_runtime/test_path_resolution.py::test_resolve_inputs_and_outputs_independently_of_host --cov=drm_copilot_discovery.path_policy --cov=drm_copilot_discovery.gateway_local --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p6t1-gateway-nio1-retained-coverage.json",
+      "exit_code": 0,
+      "passed": 32,
+      "elapsed_seconds": 33.28972
+    }
+  ],
+  "proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-proof.2026-10-20T18-10.json",
+    "sha256": "e045acce696bc66fd7df51c83eefdeb3d03cb552272a283943893a59d0ae23ba",
+    "bytes": 128460
+  },
+  "source_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-root-identity-source-confirmation.2026-10-20T18-09.json",
+    "sha256": "2807702edfb6d7c620e3ef5883ca182d77e9d8e375d88fb4dbea9665e3db7671",
+    "bytes": 4726
+  },
+  "test_ids": {
+    "new": {
+      "count": 57,
+      "member": "proof.new_node_ids"
+    },
+    "retained": {
+      "count": 32,
+      "member": "proof.retained_node_ids"
+    },
+    "distinct": 89
+  },
+  "body_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:workspace_identity": {
+      "body_range": [
+        122,
+        127
+      ],
+      "definition_line": 116,
+      "body_ast_sha256": "c9a627a66709da4f35a1bf2d9347ac70f9437a0f3b3390930dd3900fc407b47d",
+      "fresh": {
+        "covered_lines": 4,
+        "statements": 4,
+        "line_percent": 100.0,
+        "covered_branches": 2,
+        "branches": 2,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "historical_changed_body": null,
+      "executed_body_lines": [
+        122,
+        123,
+        124,
+        127
+      ],
+      "all_executable_body_lines": [
+        122,
+        123,
+        124,
+        127
+      ],
+      "declarations_docstrings_excluded": true
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO._matches_workspace": {
+      "body_range": [
+        105,
+        110
+      ],
+      "definition_line": 99,
+      "body_ast_sha256": "90b86fa1710cb3a57501aa18afc65cac64881e5f2c15303411de06bce8d559f1",
+      "fresh": {
+        "covered_lines": 4,
+        "statements": 4,
+        "line_percent": 100.0,
+        "covered_branches": 0,
+        "branches": 0,
+        "branch_percent": 100,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "historical_changed_body": null,
+      "executed_body_lines": [
+        105,
+        106,
+        109,
+        110
+      ],
+      "all_executable_body_lines": [
+        105,
+        106,
+        109,
+        110
+      ],
+      "declarations_docstrings_excluded": true
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO.authorize": {
+      "body_range": [
+        128,
+        161
+      ],
+      "definition_line": 112,
+      "body_ast_sha256": "18ee131a4ace64487af13284c1a2eaf6458a49ba05f56a8f46d83750f4ca9156",
+      "fresh": {
+        "covered_lines": 13,
+        "statements": 14,
+        "line_percent": 92.85714285714286,
+        "covered_branches": 7,
+        "branches": 8,
+        "branch_percent": 87.5,
+        "missing_lines": [
+          145
+        ],
+        "missing_branches": [
+          [
+            144,
+            145
+          ]
+        ]
+      },
+      "historical_changed_body": {
+        "covered_lines": 13,
+        "statements": 14,
+        "line_percent": 92.85714285714286,
+        "covered_branches": 7,
+        "branches": 8,
+        "branch_percent": 87.5,
+        "missing_lines": [
+          130
+        ],
+        "missing_branches": [
+          [
+            129,
+            130
+          ]
+        ]
+      },
+      "executed_body_lines": [
+        128,
+        139,
+        140,
+        142,
+        143,
+        144,
+        146,
+        151,
+        153,
+        154,
+        155,
+        160,
+        161
+      ],
+      "all_executable_body_lines": [
+        128,
+        139,
+        140,
+        142,
+        143,
+        144,
+        145,
+        146,
+        151,
+        153,
+        154,
+        155,
+        160,
+        161
+      ],
+      "declarations_docstrings_excluded": true
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO.writer": {
+      "body_range": [
+        178,
+        189
+      ],
+      "definition_line": 163,
+      "body_ast_sha256": "2d0a33fabb539e4adc35221cec5cb7af1e053fa7e0742be75acf3ea8e1594562",
+      "fresh": {
+        "covered_lines": 3,
+        "statements": 3,
+        "line_percent": 100.0,
+        "covered_branches": 2,
+        "branches": 2,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "historical_changed_body": {
+        "covered_lines": 3,
+        "statements": 3,
+        "line_percent": 100.0,
+        "covered_branches": 2,
+        "branches": 2,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "executed_body_lines": [
+        178,
+        184,
+        185
+      ],
+      "all_executable_body_lines": [
+        178,
+        184,
+        185
+      ],
+      "declarations_docstrings_excluded": true
+    }
+  },
+  "file_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "fresh_89_cases": {
+        "covered_lines": 134,
+        "statements": 161,
+        "line_percent": 83.22981366459628,
+        "covered_branches": 61,
+        "branches": 86,
+        "branch_percent": 70.93023255813954,
+        "missing_lines": [
+          178,
+          229,
+          235,
+          247,
+          257,
+          258,
+          264,
+          268,
+          274,
+          281,
+          288,
+          302,
+          321,
+          336,
+          343,
+          350,
+          366,
+          392,
+          400,
+          409,
+          441,
+          451,
+          458,
+          467,
+          474,
+          487,
+          492
+        ],
+        "missing_branches": [
+          [
+            177,
+            178
+          ],
+          [
+            226,
+            229
+          ],
+          [
+            234,
+            235
+          ],
+          [
+            245,
+            247
+          ],
+          [
+            263,
+            264
+          ],
+          [
+            267,
+            268
+          ],
+          [
+            273,
+            274
+          ],
+          [
+            280,
+            281
+          ],
+          [
+            287,
+            288
+          ],
+          [
+            301,
+            302
+          ],
+          [
+            320,
+            321
+          ],
+          [
+            332,
+            336
+          ],
+          [
+            342,
+            343
+          ],
+          [
+            349,
+            350
+          ],
+          [
+            365,
+            366
+          ],
+          [
+            391,
+            392
+          ],
+          [
+            399,
+            400
+          ],
+          [
+            408,
+            409
+          ],
+          [
+            440,
+            441
+          ],
+          [
+            450,
+            451
+          ],
+          [
+            456,
+            458
+          ],
+          [
+            466,
+            467
+          ],
+          [
+            473,
+            474
+          ],
+          [
+            486,
+            487
+          ],
+          [
+            491,
+            492
+          ]
+        ]
+      },
+      "historical_accepted": {
+        "covered_lines": 156,
+        "statements": 156,
+        "line_percent": 100.0,
+        "covered_branches": 84,
+        "branches": 84,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "qualified_fresh_plus_unchanged_history": {
+        "covered_lines": 161,
+        "statements": 161,
+        "line_percent": 100.0,
+        "covered_branches": 86,
+        "branches": 86,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "retained_only_lines": [
+        178,
+        229,
+        235,
+        247,
+        257,
+        258,
+        264,
+        268,
+        274,
+        281,
+        288,
+        302,
+        321,
+        336,
+        343,
+        350,
+        366,
+        392,
+        400,
+        409,
+        441,
+        451,
+        458,
+        467,
+        474,
+        487,
+        492
+      ],
+      "retained_only_branches": [
+        [
+          177,
+          178
+        ],
+        [
+          226,
+          229
+        ],
+        [
+          234,
+          235
+        ],
+        [
+          245,
+          247
+        ],
+        [
+          263,
+          264
+        ],
+        [
+          267,
+          268
+        ],
+        [
+          273,
+          274
+        ],
+        [
+          280,
+          281
+        ],
+        [
+          287,
+          288
+        ],
+        [
+          301,
+          302
+        ],
+        [
+          320,
+          321
+        ],
+        [
+          332,
+          336
+        ],
+        [
+          342,
+          343
+        ],
+        [
+          349,
+          350
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          391,
+          392
+        ],
+        [
+          399,
+          400
+        ],
+        [
+          408,
+          409
+        ],
+        [
+          440,
+          441
+        ],
+        [
+          450,
+          451
+        ],
+        [
+          456,
+          458
+        ],
+        [
+          466,
+          467
+        ],
+        [
+          473,
+          474
+        ],
+        [
+          486,
+          487
+        ],
+        [
+          491,
+          492
+        ]
+      ],
+      "qualification": "Composed evidence coverage, not a new full-file test run. Historical facts apply only through the exact unchanged-body/range mapping."
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "fresh_89_cases": {
+        "covered_lines": 85,
+        "statements": 131,
+        "line_percent": 64.8854961832061,
+        "covered_branches": 19,
+        "branches": 38,
+        "branch_percent": 50.0,
+        "missing_lines": [
+          145,
+          269,
+          270,
+          278,
+          280,
+          285,
+          293,
+          301,
+          303,
+          311,
+          312,
+          313,
+          314,
+          315,
+          316,
+          318,
+          319,
+          321,
+          322,
+          323,
+          324,
+          325,
+          326,
+          327,
+          328,
+          329,
+          330,
+          332,
+          333,
+          334,
+          335,
+          336,
+          337,
+          338,
+          339,
+          340,
+          341,
+          375,
+          376,
+          377,
+          378,
+          379,
+          380,
+          385,
+          392,
+          398
+        ],
+        "missing_branches": [
+          [
+            144,
+            145
+          ],
+          [
+            270,
+            278
+          ],
+          [
+            270,
+            280
+          ],
+          [
+            313,
+            -303
+          ],
+          [
+            313,
+            314
+          ],
+          [
+            323,
+            324
+          ],
+          [
+            323,
+            325
+          ],
+          [
+            326,
+            327
+          ],
+          [
+            326,
+            328
+          ],
+          [
+            334,
+            335
+          ],
+          [
+            334,
+            337
+          ],
+          [
+            337,
+            338
+          ],
+          [
+            337,
+            339
+          ],
+          [
+            339,
+            340
+          ],
+          [
+            339,
+            341
+          ],
+          [
+            376,
+            377
+          ],
+          [
+            376,
+            378
+          ],
+          [
+            378,
+            379
+          ],
+          [
+            378,
+            380
+          ]
+        ]
+      },
+      "historical_accepted": {
+        "covered_lines": 124,
+        "statements": 125,
+        "line_percent": 99.2,
+        "covered_branches": 37,
+        "branches": 38,
+        "branch_percent": 97.36842105263158,
+        "missing_lines": [
+          130
+        ],
+        "missing_branches": [
+          [
+            129,
+            130
+          ]
+        ]
+      },
+      "qualified_fresh_plus_unchanged_history": {
+        "covered_lines": 130,
+        "statements": 131,
+        "line_percent": 99.23664122137404,
+        "covered_branches": 37,
+        "branches": 38,
+        "branch_percent": 97.36842105263158,
+        "missing_lines": [
+          145
+        ],
+        "missing_branches": [
+          [
+            144,
+            145
+          ]
+        ]
+      },
+      "retained_only_lines": [
+        269,
+        270,
+        278,
+        280,
+        285,
+        293,
+        301,
+        303,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        318,
+        319,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        385,
+        392,
+        398
+      ],
+      "retained_only_branches": [
+        [
+          270,
+          278
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          313,
+          -303
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          323,
+          325
+        ],
+        [
+          326,
+          327
+        ],
+        [
+          326,
+          328
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          334,
+          337
+        ],
+        [
+          337,
+          338
+        ],
+        [
+          337,
+          339
+        ],
+        [
+          339,
+          340
+        ],
+        [
+          339,
+          341
+        ],
+        [
+          376,
+          377
+        ],
+        [
+          376,
+          378
+        ],
+        [
+          378,
+          379
+        ],
+        [
+          378,
+          380
+        ]
+      ],
+      "qualification": "Composed evidence coverage, not a new full-file test run. Historical facts apply only through the exact unchanged-body/range mapping."
+    }
+  },
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-nio1-inputs.2026-10-20T17-59.json",
+    "sha256": "be93a812aad06fe57ba345d498b19b9ae28a401328e23d0aa3cbd2aa97d3c515",
+    "bytes": 26554
+  },
+  "baseline_qualification": "Pre-edit archive binds the existing shared baseline and accepted coverage; no new baseline behavior.",
+  "preserved_failures": [
+    "Retained NR1 format failure remains a separate harness defect.",
+    "Retained 17:43 init-dry SERVICE_IO remains the truthful pre-repair production failure.",
+    "Loop1 Pyright test-only nonexistent public attribute diagnostic is retained and corrected before loop2.",
+    "Analysis1 evidence-helper zero-body diagnostic is retained with exact script bytes; analysis2 represents the unchanged docstring-only callback without inventing executable coverage."
+  ],
+  "no_additional_tests_or_replay": true,
+  "package_rebuild_window_released": true,
+  "generated_manifest_not_a_proof_input": true,
+  "final_native_and_combined_acceptance": "Pending coordinator-owned rebuilt package and bounded native/final proof.",
+  "staging_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "bytes": 20052
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+      "bytes": 17604
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+      "bytes": 17390
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-nio1-inputs.2026-10-20T17-59.json",
+      "sha256": "be93a812aad06fe57ba345d498b19b9ae28a401328e23d0aa3cbd2aa97d3c515",
+      "bytes": 26554
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-analysis1.2026-10-20T18-10.md",
+      "sha256": "c60088edc32dc06e4a885b40ee0e8f720a730b5569fbc6f8c7732092cef6e840",
+      "bytes": 614
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-analysis1.2026-10-20T18-10.raw.json",
+      "sha256": "6b95f8e0d679d26e33fddf48b39cb2ea110c15ebffbaaa83fe97f657267ca6e6",
+      "bytes": 9476
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-analysis2.2026-10-20T18-10.md",
+      "sha256": "daa99bbe87bb7d5179fbcaf34594665e681b6df01094d02e5c0d62ec4b0a596f",
+      "bytes": 1168
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-analysis2.2026-10-20T18-10.raw.json",
+      "sha256": "c95eadc2f21862c5ab93176e10ea303bb9b8bd269042ff4069a2771b6ad5fc80",
+      "bytes": 10044
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-format1.2026-10-20T18-01.md",
+      "sha256": "664489ff60ad96729340ec0661cc862d8283d456542ff8afe5dcc1c7e0ed06f6",
+      "bytes": 576
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-format1.2026-10-20T18-01.raw.json",
+      "sha256": "189ac8fed1e92beafc60bc969b6c3c62dfffb0a7b80915b49423a75c496ab42e",
+      "bytes": 9371
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop1-black.2026-10-20T18-01.md",
+      "sha256": "e9093607b67355dcdcff33d44e78f53f7071f26069ed3750af6807e4903d61cb",
+      "bytes": 431
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop1-black.2026-10-20T18-01.raw.json",
+      "sha256": "7e2271ebdbdbd347b15f4ffa0191cc55d556f17fc81fce92f059acad61b09f71",
+      "bytes": 9180
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop1-ruff.2026-10-20T18-01.md",
+      "sha256": "86add38738b4b965e61f121628cf60981946f7df717a983f2d0d4ebbfa15b4b9",
+      "bytes": 390
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop1-ruff.2026-10-20T18-01.raw.json",
+      "sha256": "d9a1a163a1127c9133ac88563648fb2c10c7227e8b5567cf19c09029eb4fc3e7",
+      "bytes": 9121
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop1-types.2026-10-20T18-02.md",
+      "sha256": "731debe0704cf1b546ddffb903f4c9ecff6f8063199f07e1a52b324d092a52aa",
+      "bytes": 977
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop1-types.2026-10-20T18-02.raw.json",
+      "sha256": "cb011e1d22a8772d061b4d8a917f66390b68f90c08ef198b93386038e14e4556",
+      "bytes": 10086
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-black.2026-10-20T18-02.md",
+      "sha256": "2a1cbed817c77582278f2ce7ba933cb627ab1aa2e9ce0e7fb592d7f95a085e52",
+      "bytes": 431
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-black.2026-10-20T18-02.raw.json",
+      "sha256": "1ce0de8489ef8e79b908c4cc0272ddc7c987da7ff43ab5f2748205c404f85d04",
+      "bytes": 9180
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-new.2026-10-20T18-05.md",
+      "sha256": "5550b578ddbcae21afc87a7699461963efe9002968a02c7d3088c866157f48fb",
+      "bytes": 10177
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-new.2026-10-20T18-05.raw.json",
+      "sha256": "c63977d93051b065e0d980ccc92762cd25e0cf38106c8641a5e0ad70473df41a",
+      "bytes": 33314
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-retained.2026-10-20T18-06.md",
+      "sha256": "f79844b3508d6f4f0ae3638bde121e591049d607eb3fa57311a67d75d9c0f7fc",
+      "bytes": 7076
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-retained.2026-10-20T18-06.raw.json",
+      "sha256": "404aac457ef7352f18a226abd3c60add1821930b26a557960eda6271148eba56",
+      "bytes": 24706
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-ruff.2026-10-20T18-02.md",
+      "sha256": "1579db288c8c68cf472bfd06e8b58d01a242aa9a4e87ad554048774d1605c983",
+      "bytes": 390
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-ruff.2026-10-20T18-02.raw.json",
+      "sha256": "8b1a0c559bdcfa4967e80a8a6b1d291e8a3dafd14aeda9a432344859712615d7",
+      "bytes": 9122
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-types.2026-10-20T18-02.md",
+      "sha256": "73b159322a2b133f2b820375c57cb489781bd8726d5b9085ba8870bb01a3ac1c",
+      "bytes": 560
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-types.2026-10-20T18-02.raw.json",
+      "sha256": "bec8cc9fa62b06bc2be0e8afc02bf3c39dbfc50c38914324e5fa5a734403aa04",
+      "bytes": 9342
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-proof.2026-10-20T18-10.json",
+      "sha256": "e045acce696bc66fd7df51c83eefdeb3d03cb552272a283943893a59d0ae23ba",
+      "bytes": 128460
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-nio1-freeze.2026-10-20T18-12.md",
+      "sha256": "bec948c58400d7d6abfc0a1b29d4d9626487ed07a03e2d2d68d83adda446ae51",
+      "bytes": 2156
+    }
+  ],
+  "staging_manifest_self_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-nio1-freeze.2026-10-20T18-12.json",
+  "staging_manifest_self_included": false,
+  "staging_rule": "Stage exactly the listed bindings plus this manifest. Its hash is returned externally; no index mutation performed.",
+  "readable_whitespace_check": "All scoped Markdown is UTF-8 LF without CR or trailing SP/TAB; raw bytes remain archived.",
+  "closure_script": {
+    "name": "SCRATCH/issue-980-p6t1-gateway-nio1-freeze.py",
+    "sha256": "ef99deefc475e7a9b5ec2d5582e0b8f8ab75c5bfa4578ac4da7015d0012b5bec",
+    "bytes": 7326,
+    "gzip_base64": "H4sIAAAAAAAC/61Z/U/bSBr+3X/FyLrqkm7sEGgpBfVOLKW70XUBAXu3J4rMxJ4ks3Vs78yYkHL87/e8Mx7HAdrtSVdpN4n9zvv98bxDGIZn9SSXes44m8pCGsHkYlEbPskFOxmfjticF1k5nbKlNPOyNsyUdTqXxYz9JA0rFVN1YeRCMK61MDoOwzCQi6pUhk24Fruv/K/ZF1n573Ou57mc+J+/67Lw35UIpqpcsIwbYfk2z/3vAaP/fymLhq7ihlh5sjP8DAJVlmbAdKq4SefsnX0ap8us1x/Y770kmcpcJEk/rrgShQmmgptaCdDSWTZkYVametg81kOeGnkrhttb27vRaCsavYlyMePpKsqkTstboVYR/BSBmzSr6O3eVhiIW5mJIiWenjvY+qdhUEHSNCH9QdESg+QPHs1grR5Wu2Zkvy75KipkOYrsmdhrsb11OdrDl5gc2DAEL/oV5yXPdG8tI1aCZ8lkBb69fj9QECiWfy5d3Im0NqWKyC0RURkyUJe1SkWUlsVUqgU3EhI3tdp622gVZGLKJrLIkDM9ktffDxj+Kb6E5CequXcC7irYfUivw31PlXMKQmLKHmnTj7lOqlLLO4TVHvP/Qj3n2693cbBJtNg96EFmP56Lu0zOhDaUDaEVC8pcFPb1QxAgoBVF7eo6mCLBC05Zh8pYMFkw69Gr0DkgWfCqgl06vI6JAPo745AuNc/BwxveZBXxciZSuSBfHeGV1/iavXtnRV2FBcLjn9oTVq0YAkWR9e5fvnRHYUKZZ0lrsTvceXQNilwW1sg1Z/fk+qFvTXxkHD6MSI1AUJz6OqmLFI1gJrLwer+r/yP7nAAbtev+c1a1FtkcWzs55xORkwq9cJLz9HMIrVU9ndKnWVXQFV+guH0uDIf6Wdg4u0niQtyZXu+5VA778SwvJ71p+LSi8rKstqN7K/8hfhkjB1zi9n0qpqXKHlXV03rquMSduAqPfxtfJken74+d/VsMDaJ9KYuqNgmlp9hwrmVkle5EeqN64IC0XCzADAH17I6aJxRscSdNkpaZwPutzcJoyqMiTTOf9A0LiDQJWl2dGyQGiUG9VaBLNCiKTHfEPX5DeaQNnwnbUCisGCmmjYXzfvjymYb2Mn5JnqYUsGFEBnQYufjKqWsAGvkg78iXYbyA+q1p32ol3VwNP6mQFUhUSKEzFBD6qUSsBVfpvKcm4RX7ZK5/6P393afiP3/pI9+oKwwcdypfMnRRQZ6fSHFRLnt+KMW1SfuxNmpKT3rhi39HLxbRi+zyxc/Ri1/CfrDInmu6Sszgeo02GlEcEOwQj5/L16kS4ouI760WD+QHsKQRg8F7CZH2+T5r3gdNYuyzm4uj88PLo5+HUuta0ISKvsq8Wt0EbfYiiYLT2iBd2UUNZmq174CB7UeU0RWXFD04WQMQZELhKcQbmbpMtn7ee8swKmFZSu6PFmJRqhVD+hhV5vqAuYZqSckDOIR5iQn/RRRxEFzOBasIqKTsZlmqz7ri6L5+HNnC2IdM1WfR39gZRi1N+Ru2VFREwCiiJuUMuLS1hjgqCWX4RJd5DdyD2Y00idlpIVhepmjfFSyRKUywIChvOCjxRw0NB6ysaO6BLuUVjffM4g5rwhIwgOTid8z+hfItl5pliiDErydHzCuO9p+KCsaCpbzlKEfDdI6mMEyBnQJdiTyn9nvAzk4vxr9B9AKdTzN6G2lRaEkDsWksv6Nla4Cu9LNlwXguQabhvQuKlJuiGJhw4gohZr1Xb98wOweQ3k0aJNZw93ZrB8/BOrCdwRNMyrrIgHLA2FJtv+7H7KRkJVyjfBRRzXSINa6GCj9SUx+wc5SwVfdspeRsbmzaUDnaNhwzivPrN2jlyzY1LMmATcs8L5fIrMmK7WwHaHK2TBivAUsJdKFQUfvQgdjbEvMcHFsQzSRF6+1eRP7zJruhF3jXzsEXpOQFe4wUG1lrorLIETGDtJlQvmSSz4pSU5rbrAUxAWjJ8xb6RXORU/59EaqMJmW26h5yEpmfZgdoRWzKAUtho5jzW1kqaAt4HSy5puJJOYqLnPkBvWLOHDQjoO5YWxiK1smkZq+Grxj11Ke1MvDvAoAXoGOMn5ZowEY7w5E72fj1i7A5wHaGO46hTWznmia6DNKRDkFewqmwYSG4pmpoFYrZe5HmXFmY6LoBgWv4Ealt61zcpXntbLOVboGsGzZI9loRREcHcXFr7dToPGAqEBW7CvwBOCSnEpLXQQxaanAUd8BM6w7QKE7GcORquSAwSTo6EbpbMGy0Oxriv8AWjOtou8O9XTZRvCAvHmyWEDy5NRztjNiafufNcGevpY/ZGI1QBzR/uE34aZ3nEa0ldqsSVhn0yGiJ0DXBJt3ciG485SzyvRMTDO0AxeJzPTJl5N13eHE5VGQ3A2gFTXMok9PpYO0lOzqtuk0ZVnmtUXBtmrLxexczWQQ3Ps+H7dJw39k4aFo+3DSaogcKwjO2xTnR3e2BkvbmvrOV+NPsgy1aZ3VAOVGkEp2t8YUrWtpNbQGmJVIGB+C4v2rm2FG6okGht99KqFrYJYLsUatBgLT/THZjAItCuBQd0CZMbb1cTKzJEhOiedMsvYhg+rkqJYyhZdkpw7HEFlBD6mYoujJpGIMPJrGcUl8EBVZpTYGF1tpnvAWFyCRpdNCxJCqXhR20k1rmmC12nDArJUet4RWfkRuMdYGbmY2P44D2ceueBnjEGAVFL7ybhH3gIlIDMh2Uct9jW+K9RRYjskCRvbA202iPUFoHmXl02nD17/y+QMD+W6sB624dFkhcP+IQA82TgA3syzZwIvZ9kfU6SkFFw9VMmP8XunIbrE6VrICNLcp8dH2wgTfdaRDdW3+u8VhI4ASfANVHLXYP/ydERovPeqNokX24Cc2I7eWypHzK6tSmJWnqKhrw1I1l22Rcnhy4ydvgtW9XPnVfN44PEIhaPZlADu3Zke5vizAUdBw2upKQmvaI8Ojn46N/HL9PCEgm58dnh+Pz5Oz45P345Kfkw/jk8GMyPnl/TE+OTy5BcHR6cjT+OD68HJ+eeG4K/GnHCX3jxVBBtSTkxMRVeUK5146+xFVlQhcVo63tLc/IActEy1lhr2mI53eDzNY2SmKKM33SUu6AcOIW0H3nGy+Qqh3P2txueyatXc3VQrc7dmg7LbK59XCbm7QL2r3dkekzBU4z+Pb6DVgCbU+EIrvcBRLdABSobXvq4Zkdcb1jd3ntbD/Dy1P+CUMP/nFw721DEVLWJH720D2Pu3+g1p8l6+xKNumum9O2Bp+e3nzsiekykmbxms6t4M3QfEKXNGgi9QEIz5SIsA8YP2dtSNxK0KJRPeeEfDwTW04O43fwkEV6VGEtmcd7baVg86B5BS8QIqQbSGhw1bo1PPc1eXI+oqaINGENZTsUeQuQsL4ooBCASDHFkuClbHIavdl/tWMRbJRhM7s4Pv/n+Og4GZ+2DMlSo4ALgVRoN4r86tdpNk6HDQkfLYL2gH+NpAv0I/IbIYJmt3sWXNtB1yhJ/gQqVPZ2Cm6D6aLZHboiDzG+V1rqEfsuJN6VYGdlA6ts33eQ6ACiHU9qiDY8hXm0Ua5RrTMQMDCndaxthrK4pV6CPFnn9holNwb4RCzKhGeZdCtmYnfiBN0NwnNOff5S1cJniwMxSYMQEocQEg8PNolbOJJ4OILKRR0krgvZqtg8YdGQ76iIQOKBUeJSm9N1NhWIsC2KfQ260Lbn0BaF0S6SeOf4Dh3kci2lMy8AY2ctJnBjtAMSHtG1BqGsXD/FCYcIvuP2+Cts0LTsbgJWH3iuxSNiVefW+AtSzCUOQk95QVdglKQeEtl5atGhF0A7gLZ31E0K1oq8RchHwRv5ynYKQs53a5iJLKaCx7LUDkJgENsml3NAKje1LEAlvQ7z3N/U/MLVZ+SFxdq/Xn6I9tjHD21uHp3brV2hgCmGF2fDy8MfD+w1mdsJmnW1aX5r6SlGPEo+cdVC82Jdh9TIu0gnZD88BlD2dj3405v7NQb71gV+h6rDk/7ylLg/RtEgtV/iye6rBt/S65i2P8KIHRYDtqA7vHdb/X6cCUvacMX4enCgukmu78TUPXuHnNWLSvccsBvY6Bbm3XYfrgk/FWH/Keyu0FJM9+x96E53YIFTpD9YZ0PnpQfpz14Gb1RUYkd94vZx+k0l4J27UXpfYeawi7vXplzoov79R38DeLoEPDx0HNIP/gvZX1qNnhwAAA=="
+  }
+}

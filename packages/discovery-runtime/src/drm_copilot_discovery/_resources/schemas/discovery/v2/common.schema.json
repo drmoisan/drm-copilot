@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:common",
+  "title": "Discovery v2 shared definitions",
+  "description": "Offline shared vocabulary. This document supplies definitions, not an alternative artifact schema or an authority grant.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "identifier": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$(?![\\s\\S])"},
+    "text": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "revision": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$(?![\\s\\S])"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "relative-path": {
+      "type": "string", "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/\\\\:\\x00-\\x1f\\u2028\\u2029*?<>|]+(?:/[^/\\\\:\\x00-\\x1f\\u2028\\u2029*?<>|]+)*$(?![\\s\\S])",
+      "description": "Workspace-relative POSIX spelling. Resolution, reserved names, case aliases and symlinks require the shared path policy."
+    },
+    "path-or-glob": {
+      "type": "string", "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/\\\\:\\x00-\\x1f\\u2028\\u2029<>|]+(?:/[^/\\\\:\\x00-\\x1f\\u2028\\u2029<>|]+)*$(?![\\s\\S])"
+    },
+    "identifiers": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "paths": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/relative-path"}},
+    "artifact-kind": {
+      "enum": ["domain-profile", "scope", "feature-contract", "coverage-ledger", "runtime-characterization-scenario", "parity-matrix", "unspecified-behavior", "product-decision", "evidence-reference", "inventory-snapshot", "acceptance-specification", "source-snapshot-manifest", "implementation-record", "unspecified-behavior-collection", "product-decision-collection", "extension-result-manifest"]
+    },
+    "artifact-reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact_kind", "id"],
+      "properties": {
+        "artifact_kind": {"$ref": "#/$defs/artifact-kind"},
+        "id": {"$ref": "#/$defs/identifier"},
+        "repository": {"$ref": "#/$defs/identifier"},
+        "revision": {"$ref": "#/$defs/revision"},
+        "path": {"$ref": "#/$defs/relative-path"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "dependentRequired": {
+        "repository": ["revision", "path", "sha256"],
+        "revision": ["repository", "path", "sha256"],
+        "path": ["repository", "revision", "sha256"],
+        "sha256": ["repository", "revision", "path"]
+      }
+    },
+    "immutable-artifact-reference": {
+      "allOf": [{"$ref": "#/$defs/artifact-reference"}],
+      "required": ["repository", "revision", "path", "sha256"]
+    },
+    "references": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/artifact-reference"}},
+    "evidence-reference": {
+      "allOf": [{"$ref": "#/$defs/artifact-reference"}],
+      "properties": {"artifact_kind": {"const": "evidence-reference"}}
+    },
+    "evidence-references": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/evidence-reference"}},
+    "feature-reference": {
+      "allOf": [{"$ref": "#/$defs/artifact-reference"}],
+      "properties": {"artifact_kind": {"const": "feature-contract"}}
+    },
+    "feature-references": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/feature-reference"}},
+    "decision-reference": {
+      "allOf": [{"$ref": "#/$defs/artifact-reference"}],
+      "properties": {"artifact_kind": {"const": "product-decision"}}
+    },
+    "decision-references": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/decision-reference"}},
+    "unresolved-references": {
+      "type": "array", "uniqueItems": true,
+      "items": {
+        "allOf": [{"$ref": "#/$defs/artifact-reference"}],
+        "properties": {"artifact_kind": {"const": "unspecified-behavior"}}
+      }
+    },
+    "inventory-references": {
+      "type": "array", "uniqueItems": true,
+      "items": {
+        "allOf": [{"$ref": "#/$defs/artifact-reference"}],
+        "properties": {"artifact_kind": {"const": "inventory-snapshot"}}
+      }
+    },
+    "repository-reference": {
+      "type": "object", "additionalProperties": false, "required": ["id", "revision"],
+      "properties": {"id": {"$ref": "#/$defs/identifier"}, "revision": {"$ref": "#/$defs/revision"}}
+    },
+    "draft-repository-reference": {
+      "type": "object", "additionalProperties": false, "required": ["id", "revision"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "revision": {"anyOf": [{"$ref": "#/$defs/revision"}, {"type": "null"}]}
+      }
+    },
+    "lifecycle": {"enum": ["draft", "reviewed", "superseded"]},
+    "observation-state": {"enum": ["verified", "inferred", "unknown", "contradictory", "intentionally-unspecified"]},
+    "confidence": {"enum": ["high", "medium", "low", "unknown"]},
+    "product-decision-state": {"enum": ["not-required", "proposed", "approved", "rejected", "superseded"]},
+    "target-relevance": {"enum": ["required", "optional", "retired", "undecided"]},
+    "inspection-status": {"enum": ["uninspected", "inspected", "blocked"]},
+    "coverage-disposition": {"enum": ["unassigned", "feature-linked", "supporting", "excluded", "blocked"]},
+    "runtime-result": {"enum": ["not-run", "observed", "passed", "failed", "blocked", "not-applicable"]},
+    "repeatability": {"enum": ["not-assessed", "repeatable", "variable", "environment-dependent"]},
+    "parity-state": {"enum": ["unassessed", "full", "partial", "missing", "conflicting", "intentionally-changed", "retired"]},
+    "applicability": {"enum": ["applicable", "not-applicable", "unspecified"]},
+    "dimension-verification": {"enum": ["not-run", "passed", "failed", "blocked", "not-applicable"]},
+    "unspecified-behavior-state": {"enum": ["open", "under-review", "resolved", "intentionally-unspecified"]},
+    "acceptance-readiness": {"enum": ["ready", "pending", "superseded"]},
+    "validation-outcome": {"enum": ["pass", "fail"]},
+    "evidence-type": {"enum": ["source", "test", "documentation", "runtime", "observation", "decision", "inventory"]},
+    "dimension-id": {
+      "enum": ["trigger", "preconditions", "inputs", "state_transitions", "observable_outputs", "side_effects", "ordering", "timing", "cancellation", "failure", "online", "offline", "mobile", "alternate_clients", "environment_constraints", "security_permissions"]
+    },
+    "dimensions": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/dimension-id"}},
+    "dimension-applicability": {
+      "type": "object", "additionalProperties": false, "required": ["applicability", "rationale"],
+      "properties": {
+        "applicability": {"$ref": "#/$defs/applicability"},
+        "rationale": {"anyOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]}
+      },
+      "if": {"properties": {"applicability": {"const": "not-applicable"}}, "required": ["applicability"]},
+      "then": {"properties": {"rationale": {"$ref": "#/$defs/text"}}}
+    },
+    "behavior-dimension": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observation_state", "statement", "evidence_refs", "unresolved_behavior_refs", "confidence"],
+      "properties": {
+        "observation_state": {"$ref": "#/$defs/observation-state"},
+        "statement": {"anyOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]},
+        "evidence_refs": {"$ref": "#/$defs/evidence-references"},
+        "unresolved_behavior_refs": {"$ref": "#/$defs/unresolved-references"},
+        "confidence": {"$ref": "#/$defs/confidence"},
+        "product_decision_refs": {"$ref": "#/$defs/decision-references"},
+        "applicability": {"$ref": "#/$defs/applicability"},
+        "rationale": {"anyOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"observation_state": {"enum": ["unknown", "contradictory"]}}, "required": ["observation_state"]},
+          "then": {"properties": {"statement": {"type": "null"}, "unresolved_behavior_refs": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"observation_state": {"const": "verified"}}, "required": ["observation_state"]},
+          "then": {"properties": {"statement": {"$ref": "#/$defs/text"}, "evidence_refs": {"minItems": 1}, "unresolved_behavior_refs": {"maxItems": 0}}}
+        },
+        {
+          "if": {"properties": {"observation_state": {"const": "inferred"}}, "required": ["observation_state"]},
+          "then": {"properties": {"statement": {"$ref": "#/$defs/text"}}}
+        },
+        {
+          "if": {"properties": {"observation_state": {"const": "intentionally-unspecified"}}, "required": ["observation_state"]},
+          "then": {
+            "required": ["product_decision_refs", "rationale"],
+            "properties": {"product_decision_refs": {"minItems": 1}, "rationale": {"$ref": "#/$defs/text"}}
+          }
+        },
+        {
+          "if": {"properties": {"applicability": {"const": "not-applicable"}}, "required": ["applicability"]},
+          "then": {"required": ["rationale"], "properties": {"rationale": {"$ref": "#/$defs/text"}}}
+        }
+      ]
+    },
+    "exclusion": {
+      "type": "object", "additionalProperties": false, "required": ["path_or_glob", "rationale"],
+      "properties": {"path_or_glob": {"$ref": "#/$defs/path-or-glob"}, "rationale": {"$ref": "#/$defs/text"}}
+    },
+    "exclusions": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/exclusion"}},
+    "extensions": {
+      "type": "object", "additionalProperties": false,
+      "patternProperties": {"^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$(?![\\s\\S])": {"$ref": "#/$defs/json-value"}},
+      "description": "Namespaced data only; never merged into core IDs, claims, gates, references or dimensions."
+    },
+    "json-value": {
+      "anyOf": [
+        {"type": ["string", "number", "boolean", "null"]},
+        {"type": "array", "items": {"$ref": "#/$defs/json-value"}},
+        {"type": "object", "additionalProperties": {"$ref": "#/$defs/json-value"}}
+      ]
+    }
+  }
+}

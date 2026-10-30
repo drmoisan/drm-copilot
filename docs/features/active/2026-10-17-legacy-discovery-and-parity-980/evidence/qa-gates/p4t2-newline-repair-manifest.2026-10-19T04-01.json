@@ -1,0 +1,284 @@
+{
+  "changes": [
+    {
+      "after_sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+      "before_sha256": "0c07b53cb291e44523035862d0f596a92c0fd728b3513b5c61e9b3c2ad07776f",
+      "original_path": "SCRATCH/repair-before/solution_input.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py"
+    },
+    {
+      "after_sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+      "before_sha256": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+      "original_path": "SCRATCH/repair-before/test_solution_input.py",
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py"
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-coverage.2026-10-19T04-00.json",
+    "totals": {
+      "covered_branches": 34,
+      "covered_lines": 63,
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 34,
+      "num_partial_branches": 0,
+      "num_statements": 63,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  },
+  "files": [
+    {
+      "disposition": "new",
+      "lines": 252,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "working_sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0"
+    },
+    {
+      "disposition": "new",
+      "lines": 144,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "working_sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde"
+    },
+    {
+      "disposition": "new",
+      "lines": 462,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "working_sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af"
+    },
+    {
+      "disposition": "new",
+      "lines": 259,
+      "path": "tests/discovery_runtime/analyzer/test_xml_input.py",
+      "working_sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+    },
+    {
+      "disposition": "new",
+      "lines": 248,
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py",
+      "working_sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632"
+    },
+    {
+      "disposition": "new",
+      "lines": 472,
+      "path": "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "working_sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8"
+    },
+    {
+      "disposition": "new",
+      "lines": 16,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Application.csproj",
+      "working_sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c"
+    },
+    {
+      "disposition": "new",
+      "lines": 10,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props",
+      "working_sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e"
+    },
+    {
+      "disposition": "new",
+      "lines": 6,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets",
+      "working_sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9"
+    },
+    {
+      "disposition": "new",
+      "lines": 7,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj",
+      "working_sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda"
+    },
+    {
+      "disposition": "new",
+      "lines": 7,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln",
+      "working_sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6"
+    },
+    {
+      "disposition": "new",
+      "lines": 6,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx",
+      "working_sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+    }
+  ],
+  "final_gates": "Not started; requires bounded review confirmation and parent tracked-path staging.",
+  "limitations": [
+    "Declaration extraction only; no MSBuild, SDK, imports, globs, target activation or dependency evaluation.",
+    "Relationships retain null target component IDs; paths are inert descriptive strings.",
+    "XML anchors use actual parser-reported element lines, not complete lexical spans.",
+    "XML outside empty or legacy MSBuild namespace fails closed; .slnx uses literal Solution/Folder/Project declarations.",
+    "Public dotnet registry selection remains P4-T9; direct adapter tests and composed inventory emission are implemented here.",
+    "UTF-8 and BOM-marked UTF-16/32 solution text are supported; other encodings fail closed."
+  ],
+  "prior_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json",
+    "sha256": "87d64d6d9201a91a07e432a464731e0b3affaf9f83fdf6a89c164f9725ea67a7"
+  },
+  "proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.json",
+      "sha256": "9cdabb52e5692f580b48cce0967cc506859f00ad899daf969dd11a60de8b81e1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.json",
+      "sha256": "49b65ac3e667d56db2d0c73da0f14e2374ac7bbcfb191c073c0f56d3049ae3a8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.json",
+      "sha256": "b8f826ae09b39ceb132e301ab2f4dfb1a1927fafcf80f7ea5604984f26a42817"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.json",
+      "sha256": "ba89f683fac644ac43da5fd4a6bd3edc29fb01f207b5ab2560504bdb21d324fe"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-coverage.2026-10-19T04-00.json",
+      "sha256": "bfa02beb43c44a2405bab5e57d960105bd16a0e2a6f1f621ae9cb9894287791e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-diff.2026-10-19T04-01.md",
+      "sha256": "5062a45bbb3b96cbd31d8ac55fdbe4f83a03f621492d7f000ecdc545d5f69f73"
+    }
+  ],
+  "retained_predecessor_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+    }
+  ],
+  "routing_receipt": "inventory_analyzers_p4t2_newline_repair",
+  "scope_note": "CRLF/CR/LF records preserve all other Unicode characters as literal text. No loader, XML adapter, project adapter, registry, policy or predecessor changes.",
+  "state": "FROZEN_READY_FOR_BOUNDED_R1_CONFIRMATION",
+  "task": "P4-T2",
+  "test_preservation": {
+    "all_original_test_helpers_and_assertions_ast_equal": true,
+    "complete_candidate_expected_cases": 198,
+    "matrix": "8 Unicode separators x 3 physical newline encodings x 2 distinct behaviors",
+    "new_solution_cases": 48,
+    "new_test_functions": [
+      "test_unicode_comment_separators_preserve_physical_anchor",
+      "test_unicode_separators_in_quoted_path_remain_literal"
+    ],
+    "old_solution_cases": 46,
+    "retained_test_functions": [
+      "test_byte_and_declaration_budgets_fail_closed",
+      "test_foreign_parent_expression_and_wildcard_paths_stay_inert",
+      "test_invalid_limits_cannot_disable_bounding",
+      "test_literal_path_round_trip",
+      "test_malformed_solution_does_not_return_partial_entries",
+      "test_retained_byte_contract_and_frozen_result_are_enforced",
+      "test_sections_are_retained_as_uninterpreted_surrounding_text",
+      "test_solution_bytes_preserve_literal_fields_and_duplicate_anchors",
+      "test_solution_entry_invariants",
+      "test_unknown_bytes_are_not_decoded_by_machine_locale"
+    ],
+    "solution_total": 94
+  },
+  "timestamp": "2026-10-19T04-01",
+  "unchanged_candidate_paths": 10
+}

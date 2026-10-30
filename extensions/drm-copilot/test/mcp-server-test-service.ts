@@ -40,7 +40,19 @@ export type MockService = jest.Mocked<RepoAutomationService> & {
   transitionPreparedOrchestration?: jest.MockedFunction<
     NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
   >;
+  consumeDiscoveryToolAuthorization?: jest.MockedFunction<
+    NonNullable<RepoAutomationService["consumeDiscoveryToolAuthorization"]>
+  >;
+  consumeDiscoveryRootGrant?: jest.MockedFunction<
+    NonNullable<RepoAutomationService["consumeDiscoveryRootGrant"]>
+  >;
+  discoveryCapabilitySentinel?: jest.MockedFunction<
+    NonNullable<RepoAutomationService["discoveryCapabilitySentinel"]>
+  >;
 };
+
+/** Root grant reference the mock seam hands to every controlled root call. */
+export const MOCK_ROOT_GRANT_REF = "grant-0123456789abcdef0123";
 
 /** Create a fully mocked MCP service while retaining optional handoff seams. */
 export function createMockService(): MockService {
@@ -77,6 +89,29 @@ export function createMockService(): MockService {
     runDiscoveryVstoAnalyzer: jest.fn(),
     runDiscoveryScenarioGeneration: jest.fn(),
     runDiscoveryReport: jest.fn(),
+    configureDiscoveryWorkspace: jest.fn(),
+    createDiscoveryArtifact: jest.fn(),
+    updateDiscoveryArtifact: jest.fn(),
+    linkDiscoveryEvidence: jest.fn(),
+    transferDiscoverySnapshot: jest.fn(),
+    importDiscoveryInventory: jest.fn(),
+    migrateDiscoveryArtifacts: jest.fn(),
+    runDiscoveryDoctor: jest.fn(),
+    readDiscoverySource: jest.fn(),
+    prepareDiscoveryAgent: jest.fn(),
+    finalizeDiscoveryAgent: jest.fn(),
+    consumeDiscoveryToolAuthorization:
+      jest.fn<
+        NonNullable<RepoAutomationService["consumeDiscoveryToolAuthorization"]>
+      >(),
+    // A controlled root call consumes a root grant; the mock issues one by default.
+    consumeDiscoveryRootGrant: jest
+      .fn<NonNullable<RepoAutomationService["consumeDiscoveryRootGrant"]>>()
+      .mockReturnValue(MOCK_ROOT_GRANT_REF),
+    discoveryCapabilitySentinel:
+      jest.fn<
+        NonNullable<RepoAutomationService["discoveryCapabilitySentinel"]>
+      >(),
   };
 }
 

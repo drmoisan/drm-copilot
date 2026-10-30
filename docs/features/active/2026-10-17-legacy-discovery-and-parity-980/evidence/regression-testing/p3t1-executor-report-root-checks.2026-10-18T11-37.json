@@ -1,0 +1,113 @@
+{
+  "proof": {
+    "task": "P3-T1",
+    "scope": "Authorized prerequisite correction only",
+    "status": "VERIFIED",
+    "timestamp_utc": "2026-10-18T11:37:11.822311+00:00",
+    "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+    "paths": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+        "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+        "git_blob": "4d6960a8975d91df8dea3c11ec39a74438073ce7"
+      },
+      {
+        "path": "tests/discovery_runtime/test_validation_modes.py",
+        "sha256": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed",
+        "git_blob": "2b9ada06226170a88f70b5c468b93a7122e9b603"
+      }
+    ],
+    "production_delta": "Only the three report-root normalization/filter replacements; reversing them restores accepted P2-T9 SHA256.",
+    "focused_tests": 38,
+    "reversed_affected_tests": 5,
+    "coverage_lines": "51/51",
+    "coverage_branches": "22/22",
+    "baseline_lines": "51/51",
+    "baseline_branches": "22/22",
+    "unit_coverage": [
+      {
+        "name": "input_problem",
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "validate_inputs",
+        "covered_lines": 32,
+        "statements": 32
+      },
+      {
+        "name": "report_input_digest",
+        "covered_lines": 7,
+        "statements": 7
+      }
+    ],
+    "unchanged_prior_paths": 209,
+    "unchanged_frozen_paths": 24,
+    "independent_cases": [
+      {
+        "name": "Actual reports directory creation preserves semantic report digest",
+        "passed": true
+      },
+      {
+        "name": "Actual reports directory creation remains bound by complete snapshot digest",
+        "passed": true
+      },
+      {
+        "name": "Missing path exclusion is exact for docs/migration/discovery/reports",
+        "passed": true
+      },
+      {
+        "name": "Missing path exclusion is exact for docs/migration/discovery/reports/later.json",
+        "passed": true
+      },
+      {
+        "name": "Missing path exclusion is exact for docs/migration/discovery/reports-neighbor",
+        "passed": true
+      },
+      {
+        "name": "Missing path exclusion is exact for src/unreadable.cs",
+        "passed": true
+      },
+      {
+        "name": "Captured bytes exclusion is exact for docs/migration/discovery/reports/coverage-report.md",
+        "passed": true
+      },
+      {
+        "name": "Captured bytes exclusion is exact for docs/migration/discovery/reports-neighbor/view.md",
+        "passed": true
+      },
+      {
+        "name": "Captured bytes exclusion is exact for src/current.cs",
+        "passed": true
+      },
+      {
+        "name": "Valid paired JSON and Markdown report is a permitted artifact mutation",
+        "passed": true,
+        "writes": [
+          "docs/migration/discovery/reports/coverage-report.json",
+          "docs/migration/discovery/reports/coverage-report.md"
+        ]
+      }
+    ],
+    "source_hash": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+    "line_counts": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": 179,
+      "tests/discovery_runtime/test_validation_modes.py": 355
+    },
+    "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-report-root-metrics.2026-10-18T11-33.json",
+    "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-report-root-coverage.2026-10-18T11-33.json",
+    "gate_receipts": [
+      "p3t1-report-root-pass1-format.2026-10-18T11-29.md",
+      "p3t1-report-root-pass1-lint.2026-10-18T11-29.md",
+      "p3t1-report-root-pass1-types.2026-10-18T11-29.md",
+      "p3t1-report-root-pass1-tests.2026-10-18T11-32.md",
+      "p3t1-report-root-isolation.2026-10-18T11-32.md"
+    ],
+    "task_checked": false,
+    "limitations": [
+      "Current mutation modules remain under correction; the retained first-report integration binds its recorded mutation hashes.",
+      "No P3-T1 task acceptance, native provider smoke, final QA or new AC is claimed."
+    ]
+  },
+  "findings": []
+}

@@ -1,0 +1,609 @@
+{
+  "batches": [
+    {
+      "batch": "scope",
+      "module_order": [
+        "tests/discovery_runtime/test_coverage_scope.py::test_malformed_inventory_rows_do_not_crash_or_shift_selection",
+        "tests/discovery_runtime/test_coverage_scope.py::test_current_configuration_is_checked_only_against_its_own_profile",
+        "tests/discovery_runtime/test_coverage_scope.py::test_excluded_selected_scan_input_requires_scope_rationale",
+        "tests/discovery_runtime/test_coverage_scope.py::test_skipped_paths_require_explicit_inventory_exclusion_accounting",
+        "tests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting"
+      ],
+      "nodes": [
+        "tests/discovery_runtime/test_coverage_scope.py::test_malformed_inventory_rows_do_not_crash_or_shift_selection",
+        "tests/discovery_runtime/test_coverage_scope.py::test_current_configuration_is_checked_only_against_its_own_profile[False]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_current_configuration_is_checked_only_against_its_own_profile[True]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_excluded_selected_scan_input_requires_scope_rationale",
+        "tests/discovery_runtime/test_coverage_scope.py::test_skipped_paths_require_explicit_inventory_exclusion_accounting[Generated files.]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_skipped_paths_require_explicit_inventory_exclusion_accounting[]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[None-True]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[src/component.cs-True]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[src/new.cs-True]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[src2/other.cs-False]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[missing-COVERAGE_INPUTS]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[extra-COVERAGE_INPUTS]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[changed-hash-COVERAGE_INPUTS]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[duplicate-COVERAGE_FILES]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[unsorted-COVERAGE_FILES]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[unreadable-COVERAGE_SCAN]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[excluded-COVERAGE_SCAN]"
+      ],
+      "raw_coverage": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-coverage.raw.json"
+    },
+    {
+      "batch": "graph",
+      "module_order": [
+        "tests/discovery_runtime/test_coverage_report_contract.py",
+        "tests/discovery_runtime/test_coverage_report.py"
+      ],
+      "nodes": [
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_renders_exact_fields_and_null_empty_percentages",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_never_promotes_missing_or_invalid_graphs[draft]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_never_promotes_missing_or_invalid_graphs[uninventoried]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_public_report_never_promotes_missing_or_invalid_graphs[invalid]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_outputs_do_not_change_input_digest_or_semantic_counts",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_arbitrary_objects_cannot_supply_graph_authority[None]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_arbitrary_objects_cannot_supply_graph_authority[value1]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_arbitrary_objects_cannot_supply_graph_authority[value2]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_aggregate_preflight_limits_nonascii_input_before_validation",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_preflight_excludes_large_report_output_but_not_authored_artifacts",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[empty-ledger]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[absent]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[missing-scope]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_unknown_population_is_unavailable_instead_of_zero_components[ambiguous]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_selector_work_is_reserved_before_the_accepted_scope_query[16-False]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_selector_work_is_reserved_before_the_accepted_scope_query[128-False]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_selector_work_is_reserved_before_the_accepted_scope_query[1024-True]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_loaded_report_views_do_not_replace_authored_documentation_accounting[reports-]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_loaded_report_views_do_not_replace_authored_documentation_accounting[generated/views-nested/]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/coverage-report.md-documentation-False]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/nested/coverage-report.md-documentation-False]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports-other/coverage-report.md-documentation-True]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/Reports/coverage-report.md-documentation-True]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/coverage-report.md-documentation-True]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/coverage-report.md-source-True]",
+        "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/coverage-report.md-test-True]",
+        "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[inspected-supporting-0-1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[inspected-unassigned-0-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[blocked-blocked-1-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[blocked-supporting-1-1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_inspection_disposition_and_blocked_identity_counts_are_independent[uninspected-unassigned-0-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_missing_and_duplicate_ledger_rows_remain_in_selected_denominator[rows0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_missing_and_duplicate_ledger_rows_remain_in_selected_denominator[rows1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_only_valid_exclusions_leave_the_eligible_denominator[True]",
+        "tests/discovery_runtime/test_coverage_report.py::test_only_valid_exclusions_leave_the_eligible_denominator[False]",
+        "tests/discovery_runtime/test_coverage_report.py::test_unselected_inventory_and_multiple_feature_links_have_named_units",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[observed-1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[passed-1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[failed-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[not-run-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[blocked-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_support_counts_source_scenarios_not_runs[absent-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[missing]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[checksum]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[stale]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[uri-only]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[environment]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[claim]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[truncation]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[passed-without-proof]",
+        "tests/discovery_runtime/test_coverage_report.py::test_runtime_proof_failures_cannot_inflate_verified_numerators[target-owned]",
+        "tests/discovery_runtime/test_coverage_report.py::test_required_feature_count_is_distinct_from_client_obligations",
+        "tests/discovery_runtime/test_coverage_report.py::test_confidence_never_substitutes_for_verified_claim_or_evidence[inferred-high-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_confidence_never_substitutes_for_verified_claim_or_evidence[verified-low-1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_confidence_never_substitutes_for_verified_claim_or_evidence[unknown-high-0]",
+        "tests/discovery_runtime/test_coverage_report.py::test_unresolved_questions_are_counted_independently[open-1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_unresolved_questions_are_counted_independently[under-review-1]",
+        "tests/discovery_runtime/test_coverage_report.py::test_unresolved_questions_are_counted_independently[resolved-0]"
+      ],
+      "raw_coverage": "SCRATCH/issue-980-p5t1-repaired-final-050607-graph-coverage.raw.json"
+    },
+    {
+      "batch": "callers",
+      "module_order": [
+        "tests/discovery_runtime/test_mutation_plan.py",
+        "tests/discovery_runtime/test_agent_output.py",
+        "tests/discovery_runtime/test_validation_modes.py"
+      ],
+      "nodes": [
+        "tests/discovery_runtime/test_mutation_plan.py::test_planner_projects_complete_valid_graph_and_preserves_originals",
+        "tests/discovery_runtime/test_mutation_plan.py::test_plan_permutation_and_repeatability_property",
+        "tests/discovery_runtime/test_mutation_plan.py::test_invalid_proposals_never_change_valid_existing_bytes[content]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_invalid_proposals_never_change_valid_existing_bytes[kind]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_invalid_proposals_never_change_valid_existing_bytes[id]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_invalid_proposals_never_change_valid_existing_bytes[digest]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_invalid_proposals_never_change_valid_existing_bytes[grant]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_invalid_proposals_never_change_valid_existing_bytes[duplicate]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_invalid_proposals_never_change_valid_existing_bytes[missing]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_unchanged_bytes_are_explicit_skips",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_output_uses_exact_accepted_validator[legacy-parity-analyst]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_output_uses_exact_accepted_validator[runtime-characterization-analyst]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_output_uses_exact_accepted_validator[requirements-reconciler]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_mismatches_and_unrequested_changes_are_rejected[role]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_mismatches_and_unrequested_changes_are_rejected[workspace]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_mismatches_and_unrequested_changes_are_rejected[baseline]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_mismatches_and_unrequested_changes_are_rejected[manifest]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_role_mismatches_and_unrequested_changes_are_rejected[unrequested]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_unsafe_or_misclassified_paths_fail_before_write[src/changed.py]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_unsafe_or_misclassified_paths_fail_before_write[config/discovery.json]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_unsafe_or_misclassified_paths_fail_before_write[../escape]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_unsafe_or_misclassified_paths_fail_before_write[docs/migration/discovery/reports/arbitrary.json]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_parser_findings_are_retained_in_graph_rejection",
+        "tests/discovery_runtime/test_mutation_plan.py::test_change_rejects_malformed_original_digests[short]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_change_rejects_malformed_original_digests[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_change_rejects_malformed_original_digests[gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_values_reject_mutability_and_metadata_ambiguity",
+        "tests/discovery_runtime/test_mutation_plan.py::test_bounded_empty_and_oversized_changes_fail",
+        "tests/discovery_runtime/test_mutation_plan.py::test_directory_enumeration_permutations_preserve_capture",
+        "tests/discovery_runtime/test_mutation_plan.py::test_opaque_grants_cannot_create_structured_records[evidence-payload]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_opaque_grants_cannot_create_structured_records[acceptance-view]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_report_view_requires_exact_structured_peer[False]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_report_view_requires_exact_structured_peer[True]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_projection_replays_only_captured_git_objects[none]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_projection_replays_only_captured_git_objects[missing]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_projection_replays_only_captured_git_objects[oversized]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_projection_refuses_uncaptured_profile_bytes",
+        "tests/discovery_runtime/test_mutation_plan.py::test_capture_rejects_metadata_changes_during_loading",
+        "tests/discovery_runtime/test_mutation_plan.py::test_coverage_report_mutations_reject_forged_projection_fields[coverage]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_coverage_report_mutations_reject_forged_projection_fields[discovery_result]",
+        "tests/discovery_runtime/test_mutation_plan.py::test_coverage_report_mutations_reject_forged_projection_fields[completion_findings]",
+        "tests/discovery_runtime/test_agent_output.py::test_all_four_roles_validate_only_their_exact_supplied_outputs[legacy-parity-analyst]",
+        "tests/discovery_runtime/test_agent_output.py::test_all_four_roles_validate_only_their_exact_supplied_outputs[runtime-characterization-analyst]",
+        "tests/discovery_runtime/test_agent_output.py::test_all_four_roles_validate_only_their_exact_supplied_outputs[requirements-reconciler]",
+        "tests/discovery_runtime/test_agent_output.py::test_all_four_roles_validate_only_their_exact_supplied_outputs[migration-coverage-reviewer]",
+        "tests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[discovery-complete-completion-report]",
+        "tests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[discovery-complete-coverage-report]",
+        "tests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[parity-complete-completion-report]",
+        "tests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[parity-complete-coverage-report]",
+        "tests/discovery_runtime/test_agent_output.py::test_unrelated_stable_report_does_not_break_incremental_outputs",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[role]",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[invocation]",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[workspace]",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[checksum]",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[profile]",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[stored]",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[malformed]",
+        "tests/discovery_runtime/test_agent_output.py::test_manifest_cannot_override_independent_invocation_bindings[unknown-role]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[missing]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[kind]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[id]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[format]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[path]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[precondition]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[duplicate]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[manifest-omitted]",
+        "tests/discovery_runtime/test_agent_output.py::test_exact_required_output_rows_cannot_be_broadened_or_substituted[forbidden]",
+        "tests/discovery_runtime/test_agent_output.py::test_ungranted_captured_input_changes_fail_output_validation[addition]",
+        "tests/discovery_runtime/test_agent_output.py::test_ungranted_captured_input_changes_fail_output_validation[deletion]",
+        "tests/discovery_runtime/test_agent_output.py::test_ungranted_captured_input_changes_fail_output_validation[bytes]",
+        "tests/discovery_runtime/test_agent_output.py::test_ungranted_captured_input_changes_fail_output_validation[category]",
+        "tests/discovery_runtime/test_agent_output.py::test_role_context_cannot_be_reused_as_root_mode_authority[structural]",
+        "tests/discovery_runtime/test_agent_output.py::test_role_context_cannot_be_reused_as_root_mode_authority[discovery-complete]",
+        "tests/discovery_runtime/test_agent_output.py::test_role_context_cannot_be_reused_as_root_mode_authority[parity-complete]",
+        "tests/discovery_runtime/test_agent_output.py::test_role_context_cannot_be_reused_as_root_mode_authority[planning]",
+        "tests/discovery_runtime/test_agent_output.py::test_role_output_needs_context_and_reviewer_needs_exact_review_mode",
+        "tests/discovery_runtime/test_agent_output.py::test_selected_proposals_and_protected_approval_history[proposed-proposed-True-None]",
+        "tests/discovery_runtime/test_agent_output.py::test_selected_proposals_and_protected_approval_history[approved-approved-True-None]",
+        "tests/discovery_runtime/test_agent_output.py::test_selected_proposals_and_protected_approval_history[proposed-proposed-False-OUTPUT_UNSELECTED]",
+        "tests/discovery_runtime/test_agent_output.py::test_selected_proposals_and_protected_approval_history[proposed-approved-True-OUTPUT_APPROVAL]",
+        "tests/discovery_runtime/test_agent_output.py::test_selected_proposals_and_protected_approval_history[approved-proposed-True-OUTPUT_APPROVAL]",
+        "tests/discovery_runtime/test_agent_output.py::test_selected_proposals_and_protected_approval_history[approved-None-True-OUTPUT_APPROVAL]",
+        "tests/discovery_runtime/test_agent_output.py::test_selected_proposals_and_protected_approval_history[None-approved-True-OUTPUT_APPROVAL]",
+        "tests/discovery_runtime/test_agent_output.py::test_opaque_payload_must_be_nonempty_and_exactly_granted[False]",
+        "tests/discovery_runtime/test_agent_output.py::test_opaque_payload_must_be_nonempty_and_exactly_granted[True]",
+        "tests/discovery_runtime/test_agent_output.py::test_digest_ignores_own_checksum_but_preserves_output_order",
+        "tests/discovery_runtime/test_validation_modes.py::test_initialized_draft_is_structural_success_but_not_completion[discovery-complete]",
+        "tests/discovery_runtime/test_validation_modes.py::test_initialized_draft_is_structural_success_but_not_completion[parity-complete]",
+        "tests/discovery_runtime/test_validation_modes.py::test_initialized_draft_is_structural_success_but_not_completion[planning]",
+        "tests/discovery_runtime/test_validation_modes.py::test_confirmed_empty_scope_can_complete_without_synthetic_features[structural]",
+        "tests/discovery_runtime/test_validation_modes.py::test_confirmed_empty_scope_can_complete_without_synthetic_features[discovery-complete]",
+        "tests/discovery_runtime/test_validation_modes.py::test_confirmed_empty_scope_can_complete_without_synthetic_features[parity-complete]",
+        "tests/discovery_runtime/test_validation_modes.py::test_confirmed_empty_scope_can_complete_without_synthetic_features[planning]",
+        "tests/discovery_runtime/test_validation_modes.py::test_planning_obeys_explicit_profile_prerequisite[none-True]",
+        "tests/discovery_runtime/test_validation_modes.py::test_planning_obeys_explicit_profile_prerequisite[discovery-complete-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_planning_obeys_explicit_profile_prerequisite[parity-complete-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_absent_snapshot_fails_closed_in_every_mode[structural]",
+        "tests/discovery_runtime/test_validation_modes.py::test_absent_snapshot_fails_closed_in_every_mode[agent-output]",
+        "tests/discovery_runtime/test_validation_modes.py::test_absent_snapshot_fails_closed_in_every_mode[discovery-complete]",
+        "tests/discovery_runtime/test_validation_modes.py::test_absent_snapshot_fails_closed_in_every_mode[parity-complete]",
+        "tests/discovery_runtime/test_validation_modes.py::test_absent_snapshot_fails_closed_in_every_mode[planning]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[missing-profile]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[malformed-profile]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[profile-mismatch]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[missing-descriptor]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[parsed-mismatch]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[v1]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[wrong-kind]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[bad-unreferenced]",
+        "tests/discovery_runtime/test_validation_modes.py::test_all_retained_inputs_are_checked_before_graph_success[pins]",
+        "tests/discovery_runtime/test_validation_modes.py::test_loader_findings_are_preserved_and_deterministically_sorted",
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[completion-report-initialized-root]",
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[completion-report-absent-root]",
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[completion-report-absent-report]",
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[coverage-report-initialized-root]",
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[coverage-report-absent-root]",
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[coverage-report-absent-report]",
+        "tests/discovery_runtime/test_validation_modes.py::test_authored_report_contract_cannot_replace_recomputation[id]",
+        "tests/discovery_runtime/test_validation_modes.py::test_authored_report_contract_cannot_replace_recomputation[mode]",
+        "tests/discovery_runtime/test_validation_modes.py::test_authored_report_contract_cannot_replace_recomputation[extra]",
+        "tests/discovery_runtime/test_validation_modes.py::test_authored_report_contract_cannot_replace_recomputation[agent-output]",
+        "tests/discovery_runtime/test_validation_modes.py::test_authored_report_contract_cannot_replace_recomputation[coverage]",
+        "tests/discovery_runtime/test_validation_modes.py::test_authored_report_contract_cannot_replace_recomputation[discovery_result]",
+        "tests/discovery_runtime/test_validation_modes.py::test_authored_report_contract_cannot_replace_recomputation[completion_findings]",
+        "tests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly",
+        "tests/discovery_runtime/test_validation_modes.py::test_semantic_digest_tracks_changed_source_bytes",
+        "tests/discovery_runtime/test_validation_modes.py::test_semantic_digest_preserves_non_output_missing_inputs[src/missing.cs]",
+        "tests/discovery_runtime/test_validation_modes.py::test_semantic_digest_preserves_non_output_missing_inputs[docs/migration/discovery/reports-neighbor/input.json]",
+        "tests/discovery_runtime/test_validation_modes.py::test_composed_warning_findings_are_bounded_and_truncation_blocks[1-True]",
+        "tests/discovery_runtime/test_validation_modes.py::test_composed_warning_findings_are_bounded_and_truncation_blocks[120-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[missing-profile]",
+        "tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[loader]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-True]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-True]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-True]"
+      ],
+      "raw_coverage": "SCRATCH/issue-980-p5t1-repaired-final-050607-callers-coverage.raw.json"
+    }
+  ],
+  "binding_sha256": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "contract_nodes": [
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage"
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-combined-coverage.2026-10-20T05-24.json",
+    "sha256": "f1dceba57a661ed4e03244bbc7c897ae07d837bc1dbab22d4bc6597f749934b3"
+  },
+  "finished_at": "2026-10-20T05:24:18.634909+00:00",
+  "native": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-native-result.2026-10-20T05-07.json",
+    "sha256": "f286598e898d7a33b01d16eaa5acc8dfe6a695075ddf1fc9f0270e32c6f3e274"
+  },
+  "native_pending": false,
+  "ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-coverage-ranges.2026-10-20T05-24.json",
+    "sha256": "cc6ae237414828e3f1430e4796172b1f65554c9ccb734fee826d808ecfe5feb4"
+  },
+  "raw_files": [
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-format.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 58,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-format.stderr",
+      "sha256": "d0f4682f5d925920449708eabf2a12cf5e871ad1a03807d46c36dde14a185bb8"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-format.progress.json",
+      "sha256": "f8082c0f990dafb563c952a9d309ec170ae204ed45e92eabb30b9ec33e3b8df3"
+    },
+    {
+      "bytes": 19,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-lint.stdout",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-lint.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 216,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-lint.progress.json",
+      "sha256": "23370b9dc68a95bd0d3cb878c735fd81f82f7ec375f367149318735ce205c093"
+    },
+    {
+      "bytes": 194,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-types.stdout",
+      "sha256": "3307f698d88973f65006330f0737c9aec078e957a38c212bb8cf681e476f83bd"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-types.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-types.progress.json",
+      "sha256": "8d9cf1f483f2aab4ea0d7cf569d8aa1d980030952d08f761643661abd0e0df99"
+    },
+    {
+      "bytes": 1515,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-architecture.stdout",
+      "sha256": "3de3ebcd058a48a2a8b75a7f752dc1b75d9439858fe4272ccd16579c0e59d98e"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-architecture.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 224,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-architecture.progress.json",
+      "sha256": "55d1078364d0b362b6288386ae505dce65e4292122db2344e6541087d7812a04"
+    },
+    {
+      "bytes": 1843,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-native-precheck.stdout",
+      "sha256": "aa4248f2edda7ed80109617cf045d3429e51b27d07a4b8a7b12feb6c6f66e77f"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-native-precheck.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 229,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-native-precheck.progress.json",
+      "sha256": "7b2d04e91dec0bf8e02d18b5f178b2a0003375dcc68848c900b06809c828db35"
+    },
+    {
+      "bytes": 52246,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-native-result.json",
+      "sha256": "f286598e898d7a33b01d16eaa5acc8dfe6a695075ddf1fc9f0270e32c6f3e274"
+    },
+    {
+      "bytes": 3885,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-reverse.stdout",
+      "sha256": "8a158b1b5bfd6f92ea4301c01b45dd922a6288fc26a5784c9a20094831988bd3"
+    },
+    {
+      "bytes": 1133,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-reverse.stderr",
+      "sha256": "4386b4349ea3972b727ea7f7a934c50a18326f01c928ba1bcc4435860e9fcc63"
+    },
+    {
+      "bytes": 381,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-reverse.progress.json",
+      "sha256": "48a475e086ee05db939b83c0b60b3dc8daf0281587621aec30fb752add58a3cc"
+    },
+    {
+      "bytes": 69632,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope.coverage",
+      "sha256": "40b442699e47a87fdd132a46b85c48b79d94f0d84db25a9d1e882fde2a5f81b1"
+    },
+    {
+      "bytes": 12910,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-coverage.raw.json",
+      "sha256": "7d59df9027c694e1df0c7cc2552f0791c38da4278ffc9ed16af25571055f3abd"
+    },
+    {
+      "bytes": 10682,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-graph-reverse.stdout",
+      "sha256": "2fbb708639ce258a469fe3449bdb503f1c75d468748f6d9a02dddea577154bef"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-graph-reverse.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 364,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-graph-reverse.progress.json",
+      "sha256": "c625669fb8deaba65f613d9143c0f4b7215b7f3d3d3e1c68ea4eb6c96c5ac856"
+    },
+    {
+      "bytes": 94208,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-graph.coverage",
+      "sha256": "da3f89250f150f8b9e96de954f35a76be101d8335348351da01d3c5ae42bc78d"
+    },
+    {
+      "bytes": 43556,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-graph-coverage.raw.json",
+      "sha256": "be1ec0b1f0e4635cfd0520934792e8283c340368f746f5afc483a72a124271d1"
+    },
+    {
+      "bytes": 21009,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-callers-reverse.stdout",
+      "sha256": "2bc3fa73aea1f4d6219648107c700e2a8e721f68fbf9c2f320a242e8b5888f84"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-callers-reverse.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 393,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-callers-reverse.progress.json",
+      "sha256": "3aded83144a1458e85886706ae79d0aa7c60ae70fc1b9a21da32b046ce24ff90"
+    },
+    {
+      "bytes": 90112,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-callers.coverage",
+      "sha256": "68570f2a5cd58359b1cca62cf5102c8ba1200e869df454fe3677331e23c0022d"
+    },
+    {
+      "bytes": 43595,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-callers-coverage.raw.json",
+      "sha256": "c2b0fda86e8a8c8e497ccc9acd00a2e7f8e50b6a96b627b150a19e5313481509"
+    },
+    {
+      "bytes": 401,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-combine.stdout",
+      "sha256": "b14206b273e92c91f4d2e45a210ad6e5ba822afc0c673f08d17a0bd6436a5a29"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-combine.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 228,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-combine.progress.json",
+      "sha256": "bf968610a2c29dedc5599319718a7f8a7e41244a810c3567aac4dad0995e2112"
+    },
+    {
+      "bytes": 157,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-json.stdout",
+      "sha256": "b4b82ea9218fd06bad6b86b0dba542f9e0cd333e8a9348e8feacad0a0764a91d"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-json.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 225,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-json.progress.json",
+      "sha256": "b45dfb501dfe26b4e85768a142c3f0a087fbe22c73970388813488c7597916b7"
+    },
+    {
+      "bytes": 80,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-check.stdout",
+      "sha256": "37bd3060ce217538db6bf42b8d4a7dc2142b9eff31cbb1cadf74488558468f89"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 227,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-check.progress.json",
+      "sha256": "22caa98f5eb2eb705a627c469779bc31dcc0374c9e4b79d369233cbf48957b68"
+    },
+    {
+      "bytes": 106496,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-combined.coverage",
+      "sha256": "c8a42aaf92d522fd07e4a2ebf5b30720bcf6baee9a02ba77409862192665e64a"
+    },
+    {
+      "bytes": 43457,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-combined-coverage.raw.json",
+      "sha256": "36b8404a5706e3eeaaeaee6564d5570f6202e5dc68797d93e13cd034298a9889"
+    },
+    {
+      "bytes": 40794,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-coverage-check.json",
+      "sha256": "b0ea54ea1df5530e7711bd74138af9aeafb4ffd6b855e474187d56d24dd4f154"
+    },
+    {
+      "bytes": 1015,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-contracts.stdout",
+      "sha256": "9cdccb66650989ebc9682265fe34882165b9b2ce93366d085d18e67e8bb91d4e"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-contracts.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 362,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-contracts.progress.json",
+      "sha256": "c7f06e058b8ffd8e23787f7e070dc0b2f10f503b8c09328e17c833fde836dbd2"
+    }
+  ],
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-format-050607.2026-10-20T05-06.json",
+      "seconds": 1.009,
+      "sha256": "9390f6b83ac6bc7ca8ccc18fd8e07f49bda00540ca9307a10cb6b1347fa18d0c",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-lint-050607.2026-10-20T05-06.json",
+      "seconds": 1.008,
+      "sha256": "2e25f8d4af7aa6e9965c82e959412f307465bd757105f471cd42760dfa9659b6",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-types-050607.2026-10-20T05-06.json",
+      "seconds": 14.036,
+      "sha256": "42fcceff3a4624f09b6f1bd6b16c4fc1ec38dccacaa560e5755a764b311817f3",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-architecture-050607.2026-10-20T05-06.json",
+      "seconds": 1.01,
+      "sha256": "60b79d61d9ce47b845378767dddb75c8e8c77fe808208ba33fa90244d7f78ece",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "native-precheck",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-native-precheck-050607.2026-10-20T05-07.json",
+      "seconds": 36.087,
+      "sha256": "2bcb45d78aee7218f0bc58b45af6325b5da8c849a63fbdccad9f9b0a4eaa5878",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "scope-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-scope-reverse-050607.2026-10-20T05-07.json",
+      "seconds": 3.015,
+      "sha256": "132fd60410f4cdccfe9fd10ed74a513a2780b4e17d817f3cc7a7d3eb834a2866",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "graph-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-graph-reverse-050607.2026-10-20T05-08.json",
+      "seconds": 106.245,
+      "sha256": "4c60fc561e4074055583569afef4f4d1ce971c8f67dff8dc25317a6089a065dd",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "callers-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-callers-reverse-050607.2026-10-20T05-24.json",
+      "seconds": 924.051,
+      "sha256": "ac99c6b415a0cb9ef67776e9ba2ee65680dc2d0c71f0e364e3c21ed885e03057",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-combine",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-coverage-combine-050607.2026-10-20T05-24.json",
+      "seconds": 1.01,
+      "sha256": "9d8658aaa1656ba3eb88acbe536d5a3753a45481f502a5b9d424269f9cfaab07",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-json",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-coverage-json-050607.2026-10-20T05-24.json",
+      "seconds": 1.01,
+      "sha256": "5f521d4d6ed9f8051f9ce9adddd627031114c07c823a747992606f8832f20686",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-check",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-coverage-check-050607.2026-10-20T05-24.json",
+      "seconds": 1.011,
+      "sha256": "78c9a04c1b280eba04c20a25042a35cdf37bf52a0b70e369ed8a551d9f420196",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-contracts-050607.2026-10-20T05-24.json",
+      "seconds": 1.011,
+      "sha256": "6a2f0bcbedf04aca6a6ed2bf4c09a479ca6b23e15c78f55ba5e0b503556e3713",
+      "stage": 7
+    }
+  ],
+  "retained_helper_cases": 114,
+  "started_at": "2026-10-20T05:06:07.585578+00:00",
+  "task": "P5-T1",
+  "unit_count": 213
+}

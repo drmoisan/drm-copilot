@@ -1,0 +1,20 @@
+# Invalid host observation: the decision is neither allow nor deny, the code is
+# not an upper-case token, and the sentinel grant carries a tool without its
+# input digest, expiry and state.
+$schema: urn:drm-copilot:discovery:2.0.0:host-observation
+schema_version: 2.0.0
+artifact_kind: host-observation
+id: observation-0123456789abcdef0123
+observation_ref: observation-0123456789abcdef0123
+host: codex
+session_id: session-alpha
+agent_id: null
+agent_type: null
+parent_agent_id: root
+tool_name: mcp__drm-copilot__discovery_capability_sentinel
+tool_use_id_present: false
+decision: maybe
+code: sentinel
+handler_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+observed_at: "2026-01-01T00:00:00Z"
+tool: discovery_capability_sentinel

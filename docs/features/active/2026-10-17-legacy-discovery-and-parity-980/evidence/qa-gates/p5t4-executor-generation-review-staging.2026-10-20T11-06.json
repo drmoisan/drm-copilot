@@ -1,0 +1,85 @@
+{
+  "task": "P5-T4",
+  "status": "IMMUTABLE_REVIEW_EVIDENCE_ONLY",
+  "published_at_utc": "2026-10-20T11:06:50.338130+00:00",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-probe-harness.2026-10-20T11-06.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-probe.2026-10-20T11-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-raw.2026-10-20T11-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review.2026-10-20T11-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review.2026-10-20T11-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-staging.2026-10-20T11-06.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-probe-harness.2026-10-20T11-06.txt",
+      "sha256": "57c5c8f398f18fd1dcef0077b60be00cd9c5527f17e04d16fc1c209ee60d2b76",
+      "bytes": 5774,
+      "git_lf_sha256": "57c5c8f398f18fd1dcef0077b60be00cd9c5527f17e04d16fc1c209ee60d2b76"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-probe.2026-10-20T11-06.json",
+      "sha256": "f55c4f27a4952e83d7126e5e5f556bcb3cb2cd5b39682912c6feb73a1b1a3ef5",
+      "bytes": 2425,
+      "git_lf_sha256": "f55c4f27a4952e83d7126e5e5f556bcb3cb2cd5b39682912c6feb73a1b1a3ef5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-raw.2026-10-20T11-06.json",
+      "sha256": "1e0ae92a6da437b2c9f684b852a0efdc80d87625e0491ad639529d853de31456",
+      "bytes": 42908,
+      "git_lf_sha256": "1e0ae92a6da437b2c9f684b852a0efdc80d87625e0491ad639529d853de31456"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review.2026-10-20T11-06.json",
+      "sha256": "fb4bc7b50176135884fdaf99149716eed9f656ffc3958b098c65bf5355b518fd",
+      "bytes": 19004,
+      "git_lf_sha256": "fb4bc7b50176135884fdaf99149716eed9f656ffc3958b098c65bf5355b518fd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review.2026-10-20T11-06.md",
+      "sha256": "c0ed9e9d98a0d6cd6d60a53b57ad277ab1b608ca6d5a8f5344bd2cf9d2c1ba9a",
+      "bytes": 2126,
+      "git_lf_sha256": "c0ed9e9d98a0d6cd6d60a53b57ad277ab1b608ca6d5a8f5344bd2cf9d2c1ba9a"
+    }
+  ],
+  "self_binding": "This manifest is included by path; caller records its exact SHA-256 after publication.",
+  "retained_references": {
+    "contract": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+      "sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51",
+      "bytes": 13811,
+      "git_lf_sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51"
+    },
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+      "sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3",
+      "bytes": 6948,
+      "git_lf_sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3"
+    },
+    "accepted_model_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json",
+      "sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea",
+      "bytes": 11394,
+      "git_lf_sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea"
+    },
+    "static_binding": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-focused8-pyright.2026-10-20T10-51.json",
+      "sha256": "ec90114b8e842782ffa9f6a818d2966557bf38f5291d038c64968053050766d0",
+      "bytes": 5430,
+      "git_lf_sha256": "ec90114b8e842782ffa9f6a818d2966557bf38f5291d038c64968053050766d0"
+    },
+    "stopped_behavior": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-focused8-tests.2026-10-20T10-55.json",
+      "sha256": "5f1a90831ec9d8d24fb3a48b6caeffa8837790972e4cecf495c874ad97808de7",
+      "bytes": 17221,
+      "git_lf_sha256": "5f1a90831ec9d8d24fb3a48b6caeffa8837790972e4cecf495c874ad97808de7"
+    },
+    "behavior_raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-focused8-tests-raw.2026-10-20T10-55.json",
+      "sha256": "f6d397398b954131eee183d4023d5c18a8afc10f2aefc605e2758225a9883df0",
+      "bytes": 6327,
+      "git_lf_sha256": "f6d397398b954131eee183d4023d5c18a8afc10f2aefc605e2758225a9883df0"
+    }
+  },
+  "excluded": "All owner implementation/test/staging evidence and unrelated preparation; no checkoffs."
+}

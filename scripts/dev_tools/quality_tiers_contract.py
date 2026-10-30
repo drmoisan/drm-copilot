@@ -16,11 +16,12 @@ Failure codes produced here:
     QT008 discovered project without an entry.
 
 Discovery rules (applied after the excluded roots are removed):
-    R1 the folder of every ``package.json`` or ``*.csproj``.
+    R1 the folder of every ``package.json``, ``pyproject.toml``, or ``*.csproj``.
     R2 the folder of every ``*.psd1`` with a same-stem sibling ``*.psm1``.
     R3 every ``scripts/<name>`` folder directly holding a code file.
     R4 every ``.claude/lib/<name>`` folder holding any file.
-    R5 ``.claude/hooks`` and ``.codex/hooks`` when they hold any file.
+    R5 ``.claude/hooks``, ``.codex/hooks`` and ``.github/hooks`` when they hold any
+       file.
 """
 
 from __future__ import annotations
@@ -50,7 +51,7 @@ class DiscoveryRules:
 
     excluded_prefixes: tuple[str, ...]
     excluded_segment: str
-    manifest_file_name: str
+    manifest_file_names: tuple[str, ...]
     project_file_suffix: str
     module_manifest_suffix: str
     module_script_suffix: str
@@ -68,14 +69,14 @@ DISCOVERY_RULES = DiscoveryRules(
         "node_modules/",
     ),
     excluded_segment="node_modules",
-    manifest_file_name="package.json",
+    manifest_file_names=("package.json", "pyproject.toml"),
     project_file_suffix=".csproj",
     module_manifest_suffix=".psd1",
     module_script_suffix=".psm1",
     script_root="scripts",
     script_suffixes=(".py", ".ps1", ".psm1", ".sh"),
     library_root=".claude/lib",
-    hook_roots=(".claude/hooks", ".codex/hooks"),
+    hook_roots=(".claude/hooks", ".codex/hooks", ".github/hooks"),
 )
 """The single constant holding every discovery root and exclusion."""
 
@@ -322,7 +323,8 @@ def _discover_from_path(path: str, tracked: frozenset[str]) -> set[str]:
     found: set[str] = set()
     name = posixpath.basename(path)
     parts = path.split("/")
-    if name == rules.manifest_file_name or name.endswith(rules.project_file_suffix):
+    # Each tracked language manifest establishes its containing project once.
+    if name in rules.manifest_file_names or name.endswith(rules.project_file_suffix):
         found.add(_folder_of(path))
     if name.endswith(rules.module_manifest_suffix):
         stem = path[: -len(rules.module_manifest_suffix)]

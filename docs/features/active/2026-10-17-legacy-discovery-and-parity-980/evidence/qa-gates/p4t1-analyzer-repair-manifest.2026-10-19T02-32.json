@@ -1,0 +1,1184 @@
+{
+  "accepted_head": "a94c44fa31e66d830d01203ee9cc068fce2deef1",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-analyzer-coverage.2026-10-19T01-42.json",
+    "sha256": "71fc8b1a54e6483f05b3e7f5cdf23ac2c73bd4ab84784e333bcfe116d29579b5",
+    "totals": {
+      "covered_branches": 30,
+      "covered_lines": 180,
+      "excluded_lines": 32,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 30,
+      "num_partial_branches": 0,
+      "num_statements": 180,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  },
+  "corrected_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+    "tests/discovery_runtime/analyzer/test_input_capture.py",
+    "tests/discovery_runtime/analyzer/test_pipeline.py"
+  ],
+  "correction_baseline": "34278a5db7fed0653886c46e599304691628a4b9",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-coverage-run-022728.2026-10-19T02-27.json",
+    "scope": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+    "sha256": "b06af31b1359309688899ad3410bf6774261fb67a0f34f604720a816455377dc",
+    "totals": {
+      "covered_branches": 46,
+      "covered_lines": 112,
+      "excluded_lines": 7,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 46,
+      "num_partial_branches": 0,
+      "num_statements": 112,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  },
+  "documentation_equivalence": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-repair-documentation-proof.2026-10-19T02-32.json",
+    "sha256": "1e69d08ab146c667a558089c135c05a528b6a72bb8b1983b6f9c3edee221c386"
+  },
+  "files": [
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "physical_lines": 1,
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "units": []
+    },
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 14,
+        "covered_lines": 50,
+        "excluded_lines": 4,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 14,
+        "num_partial_branches": 0,
+        "num_statements": 50,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "physical_lines": 228,
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "units": [
+        {
+          "covered_lines": 9,
+          "disposition": "relocated",
+          "end_line": 74,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+          "line": 46,
+          "missing_lines": [],
+          "name": "compute_schema_ref",
+          "statement_count": 9
+        },
+        {
+          "covered_lines": 4,
+          "disposition": "relocated",
+          "end_line": 92,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+          "line": 77,
+          "missing_lines": [],
+          "name": "serialize_record",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 7,
+          "disposition": "new",
+          "end_line": 108,
+          "legacy_path": null,
+          "line": 95,
+          "missing_lines": [],
+          "name": "_ordered",
+          "statement_count": 7
+        },
+        {
+          "covered_lines": 19,
+          "disposition": "new",
+          "end_line": 228,
+          "legacy_path": null,
+          "line": 111,
+          "missing_lines": [],
+          "name": "inventory_result",
+          "statement_count": 19
+        }
+      ]
+    },
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 2,
+        "covered_lines": 22,
+        "excluded_lines": 2,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 22,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "physical_lines": 142,
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "units": [
+        {
+          "covered_lines": 2,
+          "disposition": "new",
+          "end_line": 25,
+          "legacy_path": null,
+          "line": 18,
+          "missing_lines": [],
+          "name": "row",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "new",
+          "end_line": 35,
+          "legacy_path": null,
+          "line": 28,
+          "missing_lines": [],
+          "name": "stable_id",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "new",
+          "end_line": 44,
+          "legacy_path": null,
+          "line": 38,
+          "missing_lines": [],
+          "name": "tool",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 4,
+          "disposition": "new",
+          "end_line": 65,
+          "legacy_path": null,
+          "line": 47,
+          "missing_lines": [],
+          "name": "source_reference",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "new",
+          "end_line": 82,
+          "legacy_path": null,
+          "line": 68,
+          "missing_lines": [],
+          "name": "pinned_matches",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 3,
+          "disposition": "new",
+          "end_line": 109,
+          "legacy_path": null,
+          "line": 85,
+          "missing_lines": [],
+          "name": "diagnostic",
+          "statement_count": 3
+        },
+        {
+          "covered_lines": 3,
+          "disposition": "new",
+          "end_line": 142,
+          "legacy_path": null,
+          "line": 112,
+          "missing_lines": [],
+          "name": "seed_component",
+          "statement_count": 3
+        }
+      ]
+    },
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 46,
+        "covered_lines": 112,
+        "excluded_lines": 7,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 46,
+        "num_partial_branches": 0,
+        "num_statements": 112,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "physical_lines": 311,
+      "prior_candidate_sha256": "5f26c523a410f0a3b4e39bd79382d3e6df04b7dfc54d00df2939576da3faaeed",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "units": [
+        {
+          "covered_lines": 8,
+          "disposition": "new",
+          "end_line": 56,
+          "line": 31,
+          "missing_lines": [],
+          "name": "exclusion_rules",
+          "statement_count": 8
+        },
+        {
+          "covered_lines": 7,
+          "disposition": "new",
+          "end_line": 82,
+          "line": 59,
+          "missing_lines": [],
+          "name": "exclusion_reason",
+          "statement_count": 7
+        },
+        {
+          "covered_lines": 4,
+          "disposition": "new",
+          "end_line": 98,
+          "line": 85,
+          "missing_lines": [],
+          "name": "_category",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 14,
+          "disposition": "new",
+          "end_line": 134,
+          "line": 101,
+          "missing_lines": [],
+          "name": "capture_snapshot",
+          "statement_count": 14
+        },
+        {
+          "covered_lines": 50,
+          "disposition": "new",
+          "end_line": 256,
+          "line": 137,
+          "missing_lines": [],
+          "name": "capture_inputs",
+          "statement_count": 50
+        },
+        {
+          "covered_lines": 5,
+          "disposition": "new",
+          "end_line": 172,
+          "line": 162,
+          "missing_lines": [],
+          "name": "capture_inputs.bounded_read",
+          "statement_count": 5
+        },
+        {
+          "covered_lines": 18,
+          "disposition": "new",
+          "end_line": 311,
+          "line": 259,
+          "missing_lines": [],
+          "name": "pin_inventory_sources",
+          "statement_count": 18
+        }
+      ]
+    },
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 22,
+        "covered_lines": 80,
+        "excluded_lines": 5,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 22,
+        "num_partial_branches": 0,
+        "num_statements": 80,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "physical_lines": 328,
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "units": [
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 87,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 82,
+          "missing_lines": [],
+          "name": "AnalyzerError",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 8,
+          "disposition": "relocated",
+          "end_line": 116,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 90,
+          "missing_lines": [],
+          "name": "filter_paths",
+          "statement_count": 8
+        },
+        {
+          "covered_lines": 6,
+          "disposition": "relocated",
+          "end_line": 139,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 119,
+          "missing_lines": [],
+          "name": "classify_unit",
+          "statement_count": 6
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "relocated",
+          "end_line": 150,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 142,
+          "missing_lines": [],
+          "name": "classify_paths",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 3,
+          "disposition": "relocated",
+          "end_line": 156,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 153,
+          "missing_lines": [],
+          "name": "_slug",
+          "statement_count": 3
+        },
+        {
+          "covered_lines": 31,
+          "disposition": "changed-existing",
+          "end_line": 260,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 159,
+          "missing_lines": [],
+          "name": "InventoryAnalyzer",
+          "statement_count": 31
+        },
+        {
+          "covered_lines": 4,
+          "disposition": "relocated",
+          "end_line": 186,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 171,
+          "missing_lines": [],
+          "name": "InventoryAnalyzer.__init__",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 4,
+          "disposition": "relocated",
+          "end_line": 192,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 188,
+          "missing_lines": [],
+          "name": "InventoryAnalyzer._require_ctx",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 7,
+          "disposition": "relocated",
+          "end_line": 216,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 194,
+          "missing_lines": [],
+          "name": "InventoryAnalyzer.parse",
+          "statement_count": 7
+        },
+        {
+          "covered_lines": 4,
+          "disposition": "relocated",
+          "end_line": 222,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 218,
+          "missing_lines": [],
+          "name": "InventoryAnalyzer.classify",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 8,
+          "disposition": "relocated",
+          "end_line": 247,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 224,
+          "missing_lines": [],
+          "name": "InventoryAnalyzer.map",
+          "statement_count": 8
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "changed-existing",
+          "end_line": 260,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+          "line": 249,
+          "missing_lines": [],
+          "name": "InventoryAnalyzer.emit",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 19,
+          "disposition": "new",
+          "end_line": 328,
+          "legacy_path": null,
+          "line": 263,
+          "missing_lines": [],
+          "name": "RepositoryAnalyzer",
+          "statement_count": 19
+        },
+        {
+          "covered_lines": 17,
+          "disposition": "new",
+          "end_line": 328,
+          "legacy_path": null,
+          "line": 272,
+          "missing_lines": [],
+          "name": "RepositoryAnalyzer.analyze",
+          "statement_count": 17
+        }
+      ]
+    },
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 24,
+        "covered_lines": 109,
+        "excluded_lines": 4,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 24,
+        "num_partial_branches": 0,
+        "num_statements": 109,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "physical_lines": 293,
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "units": [
+        {
+          "covered_lines": 4,
+          "disposition": "relocated",
+          "end_line": 38,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 28,
+          "missing_lines": [],
+          "name": "UnitType",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 7,
+          "disposition": "relocated",
+          "end_line": 60,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 42,
+          "missing_lines": [],
+          "name": "AnalyzerContext",
+          "statement_count": 7
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "relocated",
+          "end_line": 71,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 64,
+          "missing_lines": [],
+          "name": "ParseResult",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 3,
+          "disposition": "relocated",
+          "end_line": 84,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 75,
+          "missing_lines": [],
+          "name": "ClassifiedUnit",
+          "statement_count": 3
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "relocated",
+          "end_line": 95,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 88,
+          "missing_lines": [],
+          "name": "ClassifyResult",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 20,
+          "disposition": "relocated",
+          "end_line": 155,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 99,
+          "missing_lines": [],
+          "name": "EvidenceRecord",
+          "statement_count": 20
+        },
+        {
+          "covered_lines": 10,
+          "disposition": "relocated",
+          "end_line": 155,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 127,
+          "missing_lines": [],
+          "name": "EvidenceRecord.to_json_dict",
+          "statement_count": 10
+        },
+        {
+          "covered_lines": 3,
+          "disposition": "relocated",
+          "end_line": 168,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/models.py",
+          "line": 159,
+          "missing_lines": [],
+          "name": "AnalyzerRunResult",
+          "statement_count": 3
+        },
+        {
+          "covered_lines": 16,
+          "disposition": "new",
+          "end_line": 211,
+          "legacy_path": null,
+          "line": 172,
+          "missing_lines": [],
+          "name": "InventoryInput",
+          "statement_count": 16
+        },
+        {
+          "covered_lines": 10,
+          "disposition": "new",
+          "end_line": 211,
+          "legacy_path": null,
+          "line": 186,
+          "missing_lines": [],
+          "name": "InventoryInput.__post_init__",
+          "statement_count": 10
+        },
+        {
+          "covered_lines": 19,
+          "disposition": "new",
+          "end_line": 252,
+          "legacy_path": null,
+          "line": 215,
+          "missing_lines": [],
+          "name": "InventoryCapture",
+          "statement_count": 19
+        },
+        {
+          "covered_lines": 14,
+          "disposition": "new",
+          "end_line": 252,
+          "legacy_path": null,
+          "line": 229,
+          "missing_lines": [],
+          "name": "InventoryCapture.__post_init__",
+          "statement_count": 14
+        },
+        {
+          "covered_lines": 11,
+          "disposition": "new",
+          "end_line": 280,
+          "legacy_path": null,
+          "line": 256,
+          "missing_lines": [],
+          "name": "Analysis",
+          "statement_count": 11
+        },
+        {
+          "covered_lines": 6,
+          "disposition": "new",
+          "end_line": 280,
+          "legacy_path": null,
+          "line": 268,
+          "missing_lines": [],
+          "name": "Analysis.__post_init__",
+          "statement_count": 6
+        },
+        {
+          "covered_lines": 4,
+          "disposition": "new",
+          "end_line": 293,
+          "legacy_path": null,
+          "line": 284,
+          "missing_lines": [],
+          "name": "InventoryResult",
+          "statement_count": 4
+        }
+      ]
+    },
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 10,
+        "covered_lines": 60,
+        "excluded_lines": 28,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 10,
+        "num_partial_branches": 0,
+        "num_statements": 60,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "physical_lines": 270,
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "units": [
+        {
+          "covered_lines": 6,
+          "disposition": "relocated",
+          "end_line": 74,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 48,
+          "missing_lines": [],
+          "name": "AnalyzerFileSystem",
+          "statement_count": 6
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 58,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 56,
+          "missing_lines": [],
+          "name": "AnalyzerFileSystem.exists",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 62,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 60,
+          "missing_lines": [],
+          "name": "AnalyzerFileSystem.is_dir",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 66,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 64,
+          "missing_lines": [],
+          "name": "AnalyzerFileSystem.walk_files",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 70,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 68,
+          "missing_lines": [],
+          "name": "AnalyzerFileSystem.read_bytes",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 74,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 72,
+          "missing_lines": [],
+          "name": "AnalyzerFileSystem.write_text",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 6,
+          "disposition": "relocated",
+          "end_line": 103,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 77,
+          "missing_lines": [],
+          "name": "Analyzer",
+          "statement_count": 6
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 89,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 87,
+          "missing_lines": [],
+          "name": "Analyzer.parse",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 93,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 91,
+          "missing_lines": [],
+          "name": "Analyzer.classify",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 97,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 95,
+          "missing_lines": [],
+          "name": "Analyzer.map",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "relocated",
+          "end_line": 103,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 99,
+          "missing_lines": [],
+          "name": "Analyzer.emit",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 19,
+          "disposition": "changed-existing",
+          "end_line": 144,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 106,
+          "missing_lines": [],
+          "name": "RealAnalyzerFileSystem",
+          "statement_count": 19
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "relocated",
+          "end_line": 111,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 109,
+          "missing_lines": [],
+          "name": "RealAnalyzerFileSystem.exists",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "relocated",
+          "end_line": 115,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 113,
+          "missing_lines": [],
+          "name": "RealAnalyzerFileSystem.is_dir",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 10,
+          "disposition": "relocated",
+          "end_line": 130,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 117,
+          "missing_lines": [],
+          "name": "RealAnalyzerFileSystem.walk_files",
+          "statement_count": 10
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "relocated",
+          "end_line": 134,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 132,
+          "missing_lines": [],
+          "name": "RealAnalyzerFileSystem.read_bytes",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 2,
+          "disposition": "changed-existing",
+          "end_line": 144,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 136,
+          "missing_lines": [],
+          "name": "RealAnalyzerFileSystem.write_text",
+          "statement_count": 2
+        },
+        {
+          "covered_lines": 5,
+          "disposition": "changed-existing",
+          "end_line": 173,
+          "legacy_path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+          "line": 147,
+          "missing_lines": [],
+          "name": "run_analyzer",
+          "statement_count": 5
+        },
+        {
+          "covered_lines": 5,
+          "disposition": "new",
+          "end_line": 207,
+          "legacy_path": null,
+          "line": 176,
+          "missing_lines": [],
+          "name": "run_inventory",
+          "statement_count": 5
+        },
+        {
+          "covered_lines": 15,
+          "disposition": "new",
+          "end_line": 270,
+          "legacy_path": null,
+          "line": 210,
+          "missing_lines": [],
+          "name": "plan_inventory",
+          "statement_count": 15
+        }
+      ]
+    },
+    {
+      "category": "canonical-production",
+      "changed_from_accepted": true,
+      "coverage": {
+        "covered_branches": 2,
+        "covered_lines": 14,
+        "excluded_lines": 8,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 14,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "physical_lines": 57,
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "units": [
+        {
+          "covered_lines": 4,
+          "disposition": "new",
+          "end_line": 36,
+          "legacy_path": null,
+          "line": 18,
+          "missing_lines": [],
+          "name": "InventoryAdapter",
+          "statement_count": 4
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "new",
+          "end_line": 27,
+          "legacy_path": null,
+          "line": 22,
+          "missing_lines": [],
+          "name": "InventoryAdapter.identifier",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 1,
+          "disposition": "new",
+          "end_line": 36,
+          "legacy_path": null,
+          "line": 29,
+          "missing_lines": [],
+          "name": "InventoryAdapter.analyze",
+          "statement_count": 1
+        },
+        {
+          "covered_lines": 7,
+          "disposition": "new",
+          "end_line": 57,
+          "legacy_path": null,
+          "line": 39,
+          "missing_lines": [],
+          "name": "select_analyzers",
+          "statement_count": 7
+        }
+      ]
+    },
+    {
+      "category": "compatibility-adapter",
+      "changed_from_accepted": true,
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "physical_lines": 8,
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9"
+    },
+    {
+      "category": "compatibility-adapter",
+      "changed_from_accepted": true,
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "physical_lines": 20,
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3"
+    },
+    {
+      "category": "compatibility-adapter",
+      "changed_from_accepted": true,
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "physical_lines": 26,
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9"
+    },
+    {
+      "category": "compatibility-adapter",
+      "changed_from_accepted": true,
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "physical_lines": 14,
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "physical_lines": 451,
+      "prior_candidate_sha256": "2a6214a07abf504f2cebdea3b8cf8e2ce4e5304ca3412ecd2446af9e1e21e2d2",
+      "sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "physical_lines": 353,
+      "prior_candidate_sha256": "a765771497c22cb420e9d4698642e5c8f8eea7d428bba292f682786a984d1eba",
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "physical_lines": 201,
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "physical_lines": 342,
+      "sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "physical_lines": 205,
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "physical_lines": 90,
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "physical_lines": 422,
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "physical_lines": 213,
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "physical_lines": 226,
+      "sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "physical_lines": 129,
+      "sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": false,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "physical_lines": 144,
+      "sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "physical_lines": 145,
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "physical_lines": 210,
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732"
+    },
+    {
+      "category": "test",
+      "changed_from_accepted": true,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "physical_lines": 486,
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+    }
+  ],
+  "final_gates": "pending-consolidated-review",
+  "focused_nodes": [
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_capture_prunes_outputs_and_dependencies_before_descent[/workspace]",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_capture_prunes_outputs_and_dependencies_before_descent[C:/workspace]",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_failed_oversized_and_missing_inputs_never_receive_fabricated_hashes",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_entry_and_depth_limits_fail_closed[limits0]",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_entry_and_depth_limits_fail_closed[limits1]",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_entry_and_depth_limits_fail_closed[limits2]",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_aggregate_bytes_and_changed_inputs_fail_without_partial_success",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_path_aliases_and_links_are_rejected_without_dereference",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_snapshot_capture_retains_exclusions_without_inventing_payload_inputs",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_pin_capture_preserves_existing_objects_and_refuses_missing_or_foreign_pins[False]",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_pin_capture_preserves_existing_objects_and_refuses_missing_or_foreign_pins[True]",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_branching_frontier_is_bounded_before_descendant_reads",
+    "tests/discovery_runtime/analyzer/test_input_capture.py::test_overlapping_roots_share_one_discovered_entry_budget",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding"
+  ],
+  "freeze": "candidate-source-and-tests",
+  "prior_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-candidate-manifest.2026-10-19T02-14.json",
+    "sha256": "52093ffebba8542dd1f8ac99e31910bb17b97125588cfafa5a399323085abe86"
+  },
+  "receipts": {
+    "format": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-focused-format-run-021215.2026-10-19T02-12.md",
+      "sha256": "0b5fe2d0839f4aa08722be1aace63522eb2a72036ed65b14662b3d8c8129e726"
+    },
+    "lint": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-focused-lint-run-021216.2026-10-19T02-12.md",
+      "sha256": "96935a7f1c5773543163c8123b40a3e465bb9e6f24d37922ad5e5b2735836dc1"
+    },
+    "tests": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-focused-tests-run-021431.2026-10-19T02-14.md",
+      "sha256": "10741b648991856762e7b2b820cbf005f18085dfbbb511fbea0eaf9bee10d262"
+    },
+    "types": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-focused-types-run-021217.2026-10-19T02-12.md",
+      "sha256": "92c40b3c507c535e84eaca1f010e4dc93c8cb6e0b49202853bace0058056993c"
+    }
+  },
+  "repair_receipts": {
+    "collected-nodes": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-collected-nodes-run-023258.2026-10-19T02-32.json",
+      "sha256": "d9f803cd9b33e14973f5566fcafc25b098d10f0a8c74f38647f3793ced6770df"
+    },
+    "format": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-format-run-022726.2026-10-19T02-27.json",
+      "sha256": "2034b5834627ee82fa547f11bdcd1ae53bebf15a0dfd247c7ae741e26d67a67c"
+    },
+    "lint": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-lint-run-022726.2026-10-19T02-27.json",
+      "sha256": "651872f4d160411b75e02175779ec3d97bd929aa67bcfe3abe2dcc2d5c9e89bb"
+    },
+    "tests": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-tests-run-023133.2026-10-19T02-31.json",
+      "sha256": "af72eeaf8ee093c2bb7acd18d28b6b91428c76650f4ccecee6e9cdadb834c6a0"
+    },
+    "types": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-types-run-022728.2026-10-19T02-27.json",
+      "sha256": "194e8bd0b01f3bf6efa1ccebf21ee31de437c1d2965ae7527ddccfd65ae748ce"
+    }
+  },
+  "retained_review": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-executor-analyzer-review.2026-10-19T02-23.json",
+  "task": "P4-T1",
+  "timestamp": "2026-10-19T02:32:58.472020+00:00",
+  "unchanged_coverage_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-focused-coverage-run-021217.2026-10-19T02-12.json",
+    "sha256": "6b4bf6fe7c428bbeee62b24ee6c948a3c6f0adf1e5c040620ed7ae605a34661e",
+    "totals": {
+      "covered_branches": 112,
+      "covered_lines": 436,
+      "excluded_lines": 58,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 112,
+      "num_partial_branches": 0,
+      "num_statements": 436,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  }
+}

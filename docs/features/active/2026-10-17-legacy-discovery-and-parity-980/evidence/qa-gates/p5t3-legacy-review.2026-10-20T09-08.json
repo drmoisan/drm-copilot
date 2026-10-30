@@ -1,0 +1,108 @@
+{
+  "Timestamp": "2026-10-20T09-08",
+  "Command": "Bounded legacy adapter source/diff and retained receipt reconciliation; no behavioral replay",
+  "EXIT_CODE": 0,
+  "status": "LEGACY_ADAPTER_REVIEW_CLEAR_DEPENDENCY_PENDING",
+  "findings": [],
+  "task": "P5-T3",
+  "task_accepted": false,
+  "independent_commit_ready": false,
+  "authority": {
+    "route": "rendering_review_p5t3_legacy_20261020",
+    "phase": "S5_P5T3_legacy_review",
+    "agent_id": "01a1587f-5823-7210-9d39-169420f2da62",
+    "profile": "atomic-executor-c3-elevated",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_attestation_key": "17a9c35c5720e245acb9e7e26ea514e403ed5aae4ba44629f4ea7a2e7c577065",
+    "qualification": "Existing native worker launch authority remains valid under fresh matching persisted resume route; not a new SubagentStart."
+  },
+  "rendering_prerequisite": "d8cdc87f8b70ef7311eb907966b13bbdbc48d89d",
+  "review": [
+    "Historical main signature and callable exports retained. Required named coverage/parity input flags, optional output flag, argv=None and success output routing preserved.",
+    "Both injected/default validators run before parsing/building/writing. ArtifactValidationError diagnostics retain coverage-then-parity order. Unexpected validator/read/write exceptions propagate unchanged.",
+    "Accepted runtime parsers reject explicit v2 and malformed/duplicate/nonfinite input despite injected acceptance. Runtime helper ValueError becomes a fixed stderr diagnostic and exit1 before output.",
+    "Counts/present flags and deterministic output retained; unsupported readiness claims replaced by explicit legacy-artifact-compatibility-only label. No v2 planning or host authority added.",
+    "All seven original logical tests retained with one rename and explicit compatibility assertion changes. Counts, output path, suppression and exit assertions retained. Other changes are docstrings, typing and equivalent fake-read simplification. Four I/O controls byte-identical.",
+    "New cases:12 malformed/v2 cases across two inputs; ordered default-validator diagnostics; argv=None; three missing-argument cases; three boundary exception-identity cases. In-memory collaborators only.",
+    "Full annotations, intent comments and contract docstrings. No new dependency or suppression. Source155 lines; tests382 lines."
+  ],
+  "proof": {
+    "freeze": "evidence/regression-testing/p5t3-legacy-freeze.2026-10-20T08-55.json",
+    "freeze_sha256": "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92",
+    "owner_staging": "evidence/regression-testing/p5t3-legacy-staging.2026-10-20T08-55.json",
+    "owner_staging_sha256": "6286d9f599b9a32c2b86a0cf6500beec3dff0e21cf7cdf8aa7420faeb8a77678",
+    "gates": "evidence/regression-testing/p5t3-legacy3-gates.2026-10-20T08-54.json",
+    "gate_order": [
+      "Black",
+      "Ruff",
+      "Pyright",
+      "Pytest"
+    ],
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "baseline_cases": 11,
+    "passed_cases": 31,
+    "replayed_cases": 0,
+    "raw_streams_verified": 26,
+    "qualified_raw_policy": "All original binary hashes and UTF-8 decoded/readable mappings verified; only documented workspace/scratch prefix normalization. Initial lint/type failures retained unchanged.",
+    "bindings": "All10 owner staging paths and7 frozen dependency hashes verified; final receipt before/after equal."
+  },
+  "coverage": {
+    "baseline_statements": "47/51",
+    "current_statements": "53/53",
+    "baseline_branches": "6/6",
+    "current_branches": "6/6",
+    "callable_bodies": {
+      "_default_coverage_ledger_validator": "2/2",
+      "_default_parity_matrix_validator": "2/2",
+      "parse_args": "5/5",
+      "main": "30/30"
+    },
+    "excluded_lines": [
+      32,
+      33,
+      154,
+      155
+    ],
+    "qualification": "Qualified coverage.py body counts exclude declarations included in freeze AST interval counts. Existing TYPE_CHECKING and __main__ exclusions match baseline convention; no new exclusions. Measured53/53 does not claim execution of excluded __main__ wiring. Removed pure helper bodies require producer proof; CLI coverage alone does not establish their no-regression gate.",
+    "repository_wide_claim": false
+  },
+  "dependency": {
+    "status": "UNCOMMITTED_REVIEW_AND_FULL_PLANNER_PROOF_PENDING",
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+    "working_sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "expected_git_blob": "e81ad97e993fe9057c9c1ea83b42d33700c5faeb",
+    "owner": "atomic_execution independently reviews producer; no duplicate review",
+    "commit_condition": "Only combine adapter union after producer and full planner proof pass, with the reviewed dependency-complete producer union."
+  },
+  "unchanged_controls": [
+    "tests/scripts/dev_tools/discovery/test_io.py",
+    "scripts/dev_tools/discovery/io.py",
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py"
+  ],
+  "reviewer_diagnostics": [
+    {
+      "signal": "PROMOTION_MCP_ONLY_BLOCKED",
+      "detail": "Repository PreToolUse hook rejected a local evidence-writing Python command as direct GitHub issue creation. Command contained no GitHub operation and wrote no files. Saved same authorized local evidence via file-edit tool; no hook bypass."
+    }
+  ],
+  "checklist": {
+    "phase": 5,
+    "accepted_tasks": "43/84",
+    "accepted_AC": "17/66",
+    "checkoffs_changed": false,
+    "next": [
+      "P5-T3",
+      "P5-T4",
+      "P5-T5",
+      "P6-T1",
+      "P6-T2"
+    ]
+  }
+}

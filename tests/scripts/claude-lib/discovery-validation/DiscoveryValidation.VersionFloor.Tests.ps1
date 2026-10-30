@@ -116,6 +116,16 @@ Describe 'DiscoveryValidation destination version floor' {
             $errors[0] | Should -Match '#475'
         }
 
+        It 'fails closed from the compatibility validation entry on an unsupported host' {
+            # Act
+            $result = Invoke-DiscoveryArtifactValidation -ValidatorArgs @('evidence-reference', 'docs/evidence.json') `
+                -PowerShellVersion ([version]'7.3.0')
+
+            # Assert
+            $result.ExitCode | Should -Be 1
+            $result.Output | Should -Match 'PowerShell 7\.4'
+        }
+
         It 'fails closed from the dispatch entry point on an unsupported host' {
             # Act
             $errors = Get-DiscoveryArtifactValidationError -ArtifactType 'evidence-reference' `
@@ -139,15 +149,18 @@ Describe 'DiscoveryValidation destination version floor' {
     }
 
     Context 'no silent degradation' {
-        It 'never returns a passing result on an unsupported host' {
-            # The same conforming document passes above the floor and fails below it.
+        It 'never returns a passing result on an unsupported host, and never a pass above it either (issue #980)' {
+            # Above the floor the retired validator directs to the authoritative service; below it the
+            # floor message wins. Neither host ever receives exit code 0 from this module.
             $supported = Get-DiscoveryArtifactValidationError -ArtifactType 'evidence-reference' `
                 -Text (Get-ValidEvidenceReferenceJson) -PowerShellVersion ([version]'7.4.0')
             $unsupported = Get-DiscoveryArtifactValidationError -ArtifactType 'evidence-reference' `
                 -Text (Get-ValidEvidenceReferenceJson) -PowerShellVersion ([version]'7.3.0')
 
             # Assert
-            (ConvertTo-DiscoveryValidationResult -ValidationError $supported).ExitCode | Should -Be 0
+            $supported[0] | Should -BeLike 'DISCOVERY_VALIDATION_REQUIRED:*'
+            (ConvertTo-DiscoveryValidationResult -ValidationError $supported).ExitCode | Should -Be 1
+            $unsupported[0] | Should -Match 'PowerShell 7\.4'
             (ConvertTo-DiscoveryValidationResult -ValidationError $unsupported).ExitCode | Should -Be 1
         }
 

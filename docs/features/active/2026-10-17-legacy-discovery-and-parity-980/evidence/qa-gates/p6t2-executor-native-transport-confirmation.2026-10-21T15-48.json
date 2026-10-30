@@ -1,0 +1,127 @@
+{
+  "Timestamp": "2026-10-21T15:48:04.924970+00:00",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "route": "atomic_execution_p6t2_package_native_20261021T154000",
+  "status": "READY_FOR_BOUNDED_NATIVE_HARNESS_TRANSPORT_CORRECTION",
+  "current_head": "ce51f57d8afe9f43c73127fc39854eeca6d22325",
+  "bindings": {
+    "help_diagnosis": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-help-byte-diagnosis.2026-10-21T15-41.json",
+      "working_sha256": "e210ac0913f97bdcd254b2321645435f9b334938fc2e7d4156e8caf2fd81c508",
+      "git_lf_sha256": "7d4404e7e803678bf70754228f97d8f9435469128ecb47917acae24ff435be78",
+      "expected_git_blob": "cba0c68f065c6b124c5bf7a87c94a705306bfdd6",
+      "bytes": 6459,
+      "git_lf_bytes": 6343
+    },
+    "original_native": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+      "working_sha256": "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108",
+      "git_lf_sha256": "9596ff31957ff898fb86042de4de2fbe2b2728a193073bfad9ee09d4fd9e6775",
+      "expected_git_blob": "fb7d69490418d8380b09e9bc3c86f6624703f659",
+      "bytes": 16043,
+      "git_lf_bytes": 15858
+    },
+    "original_raw": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+      "working_sha256": "34900a9a4dcd074497a38770bfa57ee550c229b4a05afb56bb8e0234464617bc",
+      "git_lf_sha256": "98f5918b16220de6362c01629d8afb820ae7b27cefb4cad2745ec7825ef1575d",
+      "expected_git_blob": "2e83b4796d32bca4e2a46fe7f3f0bc29bbb02eb1",
+      "bytes": 265367,
+      "git_lf_bytes": 265281
+    },
+    "native_preparation": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-installed-cli-preparation.2026-10-21T15-08.json",
+      "working_sha256": "55c70ec7b4f9cb5b6a2e4bf3cc33de3880c90e7e7ed70b27aa646a004915e683",
+      "git_lf_sha256": "f1ac1cf2464c8132b93965d967725057b57013d52b4f64ac0531341ad27eee4b",
+      "expected_git_blob": "023c3ee03a65e0c5fe4adde71fb48bab5c60b68c",
+      "bytes": 15412,
+      "git_lf_bytes": 15182
+    },
+    "accepted_interface": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-cli-preparation-delta.2026-10-20T15-11.md",
+      "working_sha256": "52fa180d56688577e3ac0f4acfbe7b811375c69f4487e0c1b5a9e744cf18a923",
+      "git_lf_sha256": "52fa180d56688577e3ac0f4acfbe7b811375c69f4487e0c1b5a9e744cf18a923",
+      "expected_git_blob": "b1dd867ee8998c993a71e0c9b8a93129fc709669",
+      "bytes": 16389,
+      "git_lf_bytes": 16389
+    },
+    "cli_source": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "working_sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0",
+      "git_lf_sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0",
+      "expected_git_blob": "b6c7f335314b2ad9ccde07d8558578f95981623f",
+      "bytes": 16081,
+      "git_lf_bytes": 16081
+    }
+  },
+  "classification": "The captured help call succeeded with exit 0 and exact fixed text transported as two CRLF-delimited lines. The original controller failed its stricter LF-only assertion. This is a native harness transport expectation mismatch; no production defect is established.",
+  "observed": {
+    "actual_console_calls": 1,
+    "actual_exit_code": 0,
+    "stdout_bytes": 146,
+    "logical_expected_bytes": 144,
+    "cr_offsets": [
+      39,
+      144
+    ],
+    "stderr_bytes": 0,
+    "controller_member": "SCRATCH\\issue-980-p6t2-console-native-once.py",
+    "controller_sha256": "462f33a658b29e9ed962ad95c9052246efb135472e33c61031ad2b21ec8fbac9",
+    "stdout_member": "SCRATCH\\issue-980-p6t2-native-cli-20261021T153823\\alias-help.stdout.bin",
+    "stdout_sha256": "a6663a788df52baca6c17b152431bec480939a7053e65aaa9cb1909439bcab2a",
+    "remaining_calls": [
+      "invalid-authority-option",
+      "doctor",
+      "completion-preview"
+    ]
+  },
+  "contract_scope": [
+    "Accepted CLI interface requires fixed help/exit 0 and one deterministic validated DiscoveryResult JSON plus one newline. DiscoveryResult.to_json returns a canonical LF str; cli._emit writes that str through TextIO, and cli._main supplies sys.stdout/sys.stderr unchanged. These are logical serialization contracts, not an explicit binary console-stream LF requirement.",
+    "The native preparation explicitly added LF-only raw help/JSON expectations. Preserve this stricter historical preparation and the failed assertion, and qualify the controller correction rather than rewriting either record.",
+    "The specification's LF UTF-8 wording in the analyzer-output paragraph remains unchanged. No normalization of serialized artifact content, JSON values, source bytes, package bytes, or stored raw streams is authorized."
+  ],
+  "finite_controller_delta": [
+    {
+      "line": 125,
+      "scope": "alias-help",
+      "change": "Compare the original UTF-8 stdout bytes against exactly the fixed two-line LF encoding or its all-CRLF transport encoding. Reject other text, bare CR, mixed delimiters, extra lines and extra whitespace."
+    },
+    {
+      "line": 128,
+      "scope": "all three remaining JSON calls",
+      "change": "Require exactly one final LF or CRLF delimiter and no raw CR or LF in the preceding JSON payload. Keep strict_json on the complete original raw stdout bytes, followed by the unchanged installed schema and semantic checks. Do not replace or normalize JSON bytes before parsing."
+    },
+    {
+      "line": 122,
+      "scope": "invalid-authority-option and completion-preview",
+      "change": "Accept exactly the fixed notice encoded with its one final LF or CRLF. Help and doctor must still have exactly empty stderr; reject all other diagnostic bytes."
+    }
+  ],
+  "unchanged_assertions": [
+    "bounded time/stream limits",
+    "actual process exit matches expected and typed result exit",
+    "strict duplicate/nonfinite JSON rejection and installed closed-schema validation",
+    "operation/mode/result version and findings",
+    "original diagnostic and fixed slash anchor",
+    "redaction and absence of host authority",
+    "installed origins/interpreter/environment",
+    "current package runtime identity",
+    "paired planned report contents/status and validation result",
+    "every fixture byte and membership unchanged",
+    "package and launcher bytes unchanged"
+  ],
+  "continuation": "The coordinator accepted this finite correction. The native owner may reevaluate all help assertions against the retained captured bytes/origins without another help invocation, then perform only the three previously unrun calls. The original lazy-service assertion followed the failed LF predicate, so its offline reevaluation must be recorded separately from checks actually reached by the original controller.",
+  "limitations": "No JSON-producing native call has yet run. CRLF for those calls is a related controller assumption identified from code, not an observed result. No source change, native replay, new test execution, or task acceptance is recorded here. Final 167-case proof remains disabled/pending.",
+  "counts_unchanged": {
+    "tasks": "47/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

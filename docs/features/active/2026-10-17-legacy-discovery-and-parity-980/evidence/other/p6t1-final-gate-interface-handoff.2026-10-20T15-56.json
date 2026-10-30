@@ -1,0 +1,363 @@
+{
+  "Timestamp": "2026-10-20T15-56",
+  "status": "PREPARATION_READY_PENDING_FINAL_SOURCE_FREEZE",
+  "route": "build_review_p6t1_final_preparation_20261020 / S5_P6T1_final_gate_preparation",
+  "reviewer": "01a159d5-e3e2-7c71-a150-0e37df63cf23",
+  "Command": "Read retained P6 release/interface/composition records and accepted P5/P1 packaging/native evidence; enumerate exact test paths; Get-FileHash on immutable inputs only",
+  "EXIT_CODE": 0,
+  "Output Summary": "Finite 30-operation authority, seven exact final caller modules, four generated-package contract selectors and fixed gateway entry confirmed. Preparation only: no behavioral execution, collection, install/build or moving-source binding.",
+  "task_baseline": "2c69b559bbd5dfe1f97c23947bd5d25d607e0303",
+  "accepted_shared_build_checkpoint": "2f63b6eaed7f80c392aba68c17b21ee8c9228804",
+  "checkpoint_provenance": "Coordinator-reported pushed checkpoint; no Git inspection performed.",
+  "input_bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "af8e7eac89a20d084d954a9fdc3bd6d2296a97f2b5f1af2c2cfc06b5aff69b85"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-release-preparation.2026-10-20T13-26.json",
+      "sha256": "9b3fdf7cbdabed00de84c1ebe61c81814ad9e17b9475fc4e9a7e75b150dbe19d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+      "sha256": "afa9611038e4981c166eb4b712d86277cd2b23c45900d4a82f4c305995c2c575"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-shared-declarations.2026-10-20T14-25.json",
+      "sha256": "414aece69a6ca96be7c193423b47ba04a9d2042525f3000174b1308a19307fb7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-split.2026-10-20T14-46.json",
+      "sha256": "273b7b3c49bbfd86bed2622c670027cf3d6ff5f6ff57b5301552b4b6ae1b1032"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-build-repair-confirmation.2026-10-20T15-31.json",
+      "sha256": "d623b2cfbe78f43a4b46f6ac411e6e057cd844fc2f34a67b2140d61477d32d22"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-repair-confirmation.2026-10-20T15-35.json",
+      "sha256": "120b295e58c869bec8a20225548b3cd03bfec511351e02d5b4f07248ce80d2b8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t2-wheel-build.2026-10-18T04-51.md",
+      "sha256": "da22b75e90fb734e5e8b629639614ee33cc305b0b8c98074cf5bc9fd7a26c245"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t2-wheel-install.2026-10-18T04-52.md",
+      "sha256": "6c0613fba4de843f96ce10b3d268bf1ba002ab30a4dc890f74d6254e2b3dd70c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t2-installed-smoke.2026-10-18T04-52.md",
+      "sha256": "cb68203ae2088baf9a78ef5d70e720c1c3241ac38e398ee7b16de134b4da5a49"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-fixture.2026-10-20T08-50.json",
+      "sha256": "dbea7cc24664797d6d3f0949c98af6b623ad2dfc5142dd48c15eae86891c8355"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-native-corrected-harness.2026-10-20T09-46.txt",
+      "sha256": "0997873d2633af4bfc819adafe7422ecb7141a19254f66fcbe121fed6e91a6d3"
+    }
+  ],
+  "public_scope": {
+    "operations": [
+      "init",
+      "configure",
+      "profile",
+      "inventory",
+      "new-contract",
+      "new-scenario",
+      "update-artifact",
+      "link-evidence",
+      "validate-profile",
+      "validate-feature-contract",
+      "validate-coverage-ledger",
+      "validate-runtime-scenario",
+      "validate-parity-matrix",
+      "validate-unspecified-behavior",
+      "validate-product-decision",
+      "validate-evidence-reference",
+      "validate-decisions",
+      "validate-all",
+      "coverage-report",
+      "parity-report",
+      "completion-report",
+      "generate-acceptance",
+      "snapshot-export",
+      "snapshot-import",
+      "import-inventory",
+      "migrate",
+      "doctor",
+      "read-source",
+      "prepare-agent",
+      "finalize-agent"
+    ],
+    "implemented": 28,
+    "typed_unavailable": [
+      "prepare-agent",
+      "finalize-agent"
+    ],
+    "rule": "Use the exact operation inputs/modes in the bound 14:30 composition record and accepted request schema. No aliases, request-selected module/executable, or invented operation.",
+    "deferred": "P6-T2 owns cli/cli_arguments/cli_commands and console registration; P6-T3 owns legacy adapter conversion. Do not exercise or add those surfaces as P6-T1 proof."
+  },
+  "ownership": {
+    "coordinator": "Close core CR1/CR2/CT1 and gateway review; assemble exact frozen runtime/schema/test union and release one serialized packaging window. Own acceptance and checkpoints.",
+    "core": "Owner confirmed six modules service/operations/service_inspection/service_reports/service_mutations/service_bootstrap and three core test modules; final exact nodes and coverage follow clean repair freeze.",
+    "gateway": "Own gateway/gateway_local/doctor; test modules test_gateway/test_gateway_local/test_doctor plus approved test-only test_gateway_boundaries and gateway_test_support split. Native interface now confirmed; bind final source/harness at release.",
+    "packaging": "Single designated owner refreshes resources, then build identity, wheel, and isolated installation after all packaged source bytes freeze.",
+    "native": "Adapt retained P5 fixture/capture/grants and P1 isolated import mechanics in an issue-specific SCRATCH runner; bind harness and fixture bytes before execution."
+  },
+  "prerequisites": [
+    "Final core and gateway repair freezes, independent confirmations, ordered static results and exact collected nodes are required. Do not bind their current moving bytes.",
+    "Materialize a dedicated SCRATCH/issue-980-p6t1-installed-composition.py runner from the specified checks. No runnable runner is claimed to exist by this artifact. The executor must syntax-check and hash it before release.",
+    "Resolve SCRATCH to the session issue-980 directory; use fresh run-specific dist/install/fixture/output subdirectories. Never overwrite predecessor evidence or install into the main environment.",
+    "Obtain current immutable P5 fixture descriptor or reconstruct an isolated copy from retained bytes; its original source revision is 00367d1c6b0af4630878401524aae631b36bcd0a. Recheck expected fixture hashes before reuse; later publication may have changed only derived outputs.",
+    "Gateway owner confirmed interface and additional boundary tests; final approved source/test freeze remains required. The future native runner must be materialized and syntax/hash checked before release."
+  ],
+  "sequence": [
+    {
+      "order": 1,
+      "owner": "coordinator/core/gateway",
+      "action": "Freeze and run format, lint and type checks over the final nine core/gateway production modules, seven test modules and shared test-only gateway support helper; enforce file sizes and direct new-callable coverage using final owner proofs. Reuse stable independently accepted shared/build/analyzer/selection subsets at exact hashes."
+    },
+    {
+      "order": 2,
+      "owner": "packaging alone",
+      "action": "One serialized window: stage canonical resource closure, generate installed-content manifest only after all source/resource bytes are frozen, then build the wheel. The existing builder performs this sequence.",
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "scripts.dev_tools.build_discovery_runtime",
+        "--output",
+        "SCRATCH/issue-980-p6t1-dist-RUN"
+      ],
+      "followup_argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "scripts.dev_tools.build_discovery_runtime",
+        "--check"
+      ],
+      "gate": "Record resource-manifest, build-manifest, policy, wheel and source hashes separately. No concurrent resource writer. Any subsequent packaged-source mutation invalidates this window and requires an explicitly re-released replacement, never silent identity reuse."
+    },
+    {
+      "order": 3,
+      "owner": "packaging alone",
+      "action": "Install only the resulting wheel into a fresh isolated target; existing approved dependencies remain available from the repository environment.",
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pip",
+        "install",
+        "--no-index",
+        "--no-deps",
+        "--target",
+        "SCRATCH/issue-980-p6t1-installed-RUN",
+        "SCRATCH/issue-980-p6t1-dist-RUN/drm_copilot_discovery-2.0.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "order": 4,
+      "owner": "native executor",
+      "action": "Run the actual installed service/gateway composition before expensive caller tests. Runner must not import tests or checkout code; materialized fixture bytes are data.",
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-I",
+        "-S",
+        "SCRATCH/issue-980-p6t1-installed-composition.py",
+        "--installation",
+        "SCRATCH/issue-980-p6t1-installed-RUN",
+        "--dependencies",
+        ".venv/Lib/site-packages",
+        "--wheel",
+        "SCRATCH/issue-980-p6t1-dist-RUN/drm_copilot_discovery-2.0.0-py3-none-any.whl",
+        "--release",
+        "SCRATCH/issue-980-p6t1-native-release-RUN.json",
+        "--output",
+        "SCRATCH/issue-980-p6t1-native-result-RUN.json"
+      ],
+      "gate": "Runner resolves explicit paths before changing to an unrelated SCRATCH cwd; installation precedes approved dependency path in sys.path, editable .pth startup is disabled, and source checkout paths are absent. Verify every loaded drm_copilot_discovery module lies under installation. Use exact gateway interface supplied by its owner."
+    },
+    {
+      "order": 5,
+      "owner": "core/gateway final QA",
+      "action": "Run exact finite caller and packaging-contract selectors after native composition passes. Serialize exact case IDs and outcomes; do not substitute a passing count for all-operation coverage.",
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/discovery_runtime/test_service.py",
+        "tests/discovery_runtime/test_service_publication.py",
+        "tests/discovery_runtime/test_service_boundaries.py",
+        "tests/discovery_runtime/test_gateway.py",
+        "tests/discovery_runtime/test_gateway_local.py",
+        "tests/discovery_runtime/test_doctor.py",
+        "tests/discovery_runtime/test_gateway_boundaries.py",
+        "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure",
+        "--cov=drm_copilot_discovery.service",
+        "--cov=drm_copilot_discovery.operations",
+        "--cov=drm_copilot_discovery.service_inspection",
+        "--cov=drm_copilot_discovery.service_reports",
+        "--cov=drm_copilot_discovery.service_mutations",
+        "--cov=drm_copilot_discovery.service_bootstrap",
+        "--cov=drm_copilot_discovery.gateway",
+        "--cov=drm_copilot_discovery.gateway_local",
+        "--cov=drm_copilot_discovery.doctor",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:SCRATCH/issue-980-p6t1-final-coverage-RUN.json"
+      ]
+    },
+    {
+      "order": 6,
+      "owner": "core/gateway final QA",
+      "action": "Run the same finite population in reversed file/selector order in one process; preserve exact collected IDs. No fresh coverage reset of accepted stable subsets.",
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+        "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+        "tests/discovery_runtime/test_gateway_boundaries.py",
+        "tests/discovery_runtime/test_doctor.py",
+        "tests/discovery_runtime/test_gateway_local.py",
+        "tests/discovery_runtime/test_gateway.py",
+        "tests/discovery_runtime/test_service_boundaries.py",
+        "tests/discovery_runtime/test_service_publication.py",
+        "tests/discovery_runtime/test_service.py"
+      ]
+    },
+    {
+      "order": 7,
+      "owner": "coordinator",
+      "action": "Reconcile native/caller/schema results, all 30 operation rows, final source hashes and retained subset coverage against original task baseline; retain failures and raw diagnostics. Publish canonical QA evidence and only then assess P6-T1/AC checkoff. No claim that this preparation completes the task."
+    }
+  ],
+  "native_checks": [
+    {
+      "case": "installed-identity",
+      "expected": "Actual installed load_build_identity succeeds; catalog/resource validation matches canonical resource stage; build/policy digests equal release. Build digest is installed content, wheel digest is archive identity; neither attests interpreter or native host."
+    },
+    {
+      "case": "init-and-profile",
+      "expected": "Use separate fresh scratch workspace for init dry-run then actual local-user initialization with explicit system/repository identity and production_roots, followed by profile/validate-profile. Dry-run tree unchanged; real output statuses/hashes agree with disk and typed result. Keep accepted P5 fixture intact."
+    },
+    {
+      "case": "inventory",
+      "expected": "Against the preserved nonempty Git fixture, use analyzer_ids=[repository], write=false and explicit profile. Result binds actual pinned source revision and capture, with no authored writes. Do not repeat predecessor analyzer/inventory matrix."
+    },
+    {
+      "case": "report-boundary",
+      "expected": "Use actual completion-report or parity-report in parity-complete mode on the fixture whose required target evidence is absent. Dry-run write=true returns planned exact JSON/Markdown; selected gate remains exit1. Then one guarded local-user paired publication and repeat verifies real hashes, statuses and idempotence. Use current fixture capture and grants; stale/wrong grants remain memory proof unless a native failure is revealed."
+    },
+    {
+      "case": "doctor",
+      "expected": "Read-only actual installed version/resource/profile status and explicit native capability unavailable. Do not require success code contrary to the approved doctor contract; freeze its independently stated expected result before running."
+    },
+    {
+      "case": "gateway-and-exits",
+      "expected": "Process-isolated installed gateway consumes exactly one bounded JSON document and writes one schema-valid result. Include valid local-user operation (exit0), known failing report gate (exit1), malformed/unknown operation (exit2), and unavailable host/identity (exit3). Process code equals result exit_code; no extra stdout or source/raw error text."
+    },
+    {
+      "case": "host-refusal",
+      "expected": "Use schema-valid opaque invocation reference in a host-required mode; absent protected provider returns typed exit3 with no local-user fallback or authored mutation. A literal token or request field is never a grant."
+    },
+    {
+      "case": "identity-failure",
+      "expected": "In a disposable installation copy only, absent or altered build manifest produces unavailable/corrupt exit3 without zero/resource-only digest fallback. Preserve the original installed target and release bytes; use a fresh interpreter for each failure control."
+    }
+  ],
+  "memory_acceptance": {
+    "all_operations": "Every implemented row must execute real validators and memory snapshots/planners through service.execute; prepare/finalize assert unavailable. Retain immutable operation-to-node mapping from final core collection.",
+    "mandatory_boundaries": [
+      "success/blocking/invocation/runtime exits 0/1/2/3 and result consistency",
+      "unsupported request rejected before dispatch",
+      "dependency/I/O failures with fixed redacted output",
+      "interrupted publication retains actual partial effects and exit3",
+      "local-user authorization versus refused host invocation",
+      "exact selectors, real captured manifest, bounded output and deterministic findings/artifact status"
+    ],
+    "unit_isolation": "No temporary files, network or subprocess in unit tests. Native integration uses explicit SCRATCH outputs and is recorded separately."
+  },
+  "retained_proofs": {
+    "build": "Repair confirmation 15:31: statics, eight controls, 152/152 normal and reverse, 551/551 statements, 234/234 branches. Preserve original failure/probe and fixture-setup diagnostics.",
+    "shared": "Repair confirmation 15:35: 145 shared cases and 29 schema cases; preserve exact accepted dependency hashes and callable coverage qualification.",
+    "selectors": "Use accepted analyzer and acceptance-selector receipts from coordinator checkpoint without rerunning predecessor suites for context.",
+    "invalidations": "Rerun only directly affected proof if an accepted dependency changes after its freeze. New caller composition and generated-package contracts remain fresh gates."
+  },
+  "python_floor": "Only Python 3.13 is locally discovered. Missing tomllib and newer Path APIs were simulated; no actual 3.10/3.11 execution claimed. Hand off exact frozen runtime/helper and seven final callers plus eight compatibility controls to CI Python3.10/3.11 matrix after push; preserve minimum >=3.10 and do not install interpreters during this preparation.",
+  "population_note": "Seven exact test modules plus four exact contract selectors are finite. Final parameter node count remains unset until freeze/collection. No broad runtime or predecessor suite glob.",
+  "ac_status": "P6-T1 remains in progress. P6-T2/P6-T3 remain deferred.",
+  "supersedes": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gate-preparation.2026-10-20T15-55.json",
+    "sha256": "d841abe87a558fd5ce499c01ae299064bc966cbfbfd7b0350a14b664129cccde",
+    "reason": "Gateway owner confirmed fixed interface and approved additional boundary-test module after initial preparation was written."
+  },
+  "gateway_interface": {
+    "provenance": "Direct gateway_doctor interface-only confirmation; no moving source inspection or hashes.",
+    "fixed_argv": [
+      "python",
+      "-m",
+      "drm_copilot_discovery.gateway",
+      "--workspace-root",
+      "<absolute canonical scratch workspace>",
+      "--principal",
+      "local-user",
+      "--repository-id",
+      "<fixture repository id>",
+      "--author-id",
+      "p6t1-native"
+    ],
+    "main": "main(argv: Sequence[str] | None = None, *, stdin: BinaryIO | None = None, stdout: TextIO | None = None, stderr: TextIO | None = None) -> int",
+    "factory": "gateway_local.installed_local_io(root: str, repository: RepositoryReader | None, principal: str, author_id: str) -> LocalServiceIO",
+    "composition": "Factory uses real ActivationStore.local and fixed installed build identity, shares the optional LocalGitReader with service, and explicitly rejects host principal. One binary JSON stdin document, JSON stdout/fixed stderr; SystemExit(main()) preserves process/result code.",
+    "isolated_invocation": "The -I -S SCRATCH bootstrap adds only the isolated installation and approved dependency path, sets sys.argv to the fixed module argv and calls runpy.run_module(\"drm_copilot_discovery.gateway\", run_name=\"__main__\"). Do not use ordinary -m from repository cwd or editable installation as installed-package proof."
+  },
+  "finite_population": {
+    "core_tests": [
+      "tests/discovery_runtime/test_service.py",
+      "tests/discovery_runtime/test_service_publication.py",
+      "tests/discovery_runtime/test_service_boundaries.py"
+    ],
+    "gateway_tests": [
+      "tests/discovery_runtime/test_gateway.py",
+      "tests/discovery_runtime/test_gateway_local.py",
+      "tests/discovery_runtime/test_doctor.py",
+      "tests/discovery_runtime/test_gateway_boundaries.py"
+    ],
+    "contract_selectors": [
+      "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+    ],
+    "test_only_support": "tests/discovery_runtime/gateway_test_support.py",
+    "final_node_count": "Unset until final owner collection; no guessed count."
+  }
+}

@@ -71,3 +71,35 @@ def test_normalize_selected_paths_rejects_paths_outside_source_root() -> None:
 
     with pytest.raises(ValueError, match="escapes the declared source root"):
         normalize_selected_paths(fixture_root, [Path("..") / "outside.md"])
+
+
+def test_discover_source_artifacts_includes_published_github_hooks_only() -> None:
+    """Discover `.github/hooks` resources without admitting unrelated paths."""
+
+    fixture_root = _fixture_root("native_surfaces")
+
+    discovered_paths = discover_source_artifacts(
+        fixture_root,
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert [path.as_posix() for path in discovered_paths] == [
+        ".github/copilot-instructions.md",
+        ".github/hooks/README.md",
+        ".github/hooks/discovery-pre-tool.ps1",
+        ".github/hooks/discovery.json",
+    ]
+
+
+def test_discover_source_artifacts_includes_claude_helper_library() -> None:
+    """Discover `.claude/lib` helper resources for the Claude ecosystem."""
+
+    fixture_root = _fixture_root("native_surfaces")
+
+    discovered_paths = discover_source_artifacts(fixture_root, SourceEcosystem.CLAUDE)
+
+    assert [path.as_posix() for path in discovered_paths] == [
+        ".claude/lib/bash/parallel-common.sh",
+        ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
+        "CLAUDE.md",
+    ]

@@ -1,0 +1,595 @@
+{
+  "Timestamp": "2026-10-20T13-36",
+  "Command": "poetry run python SCRATCH/issue-980-p5t5-trace-coverage.py",
+  "EXIT_CODE": 0,
+  "task": "P5-T5",
+  "status": "REAL_SINGLE_CALLABLE_COVERAGE_GAP",
+  "authority": "atomic_execution_p5t5_coverage_reconciliation_20261020",
+  "candidate_commit": "8cfac33dc648ee7ec314cfb2efea169e6b2cd9a2",
+  "candidate_source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457"
+  },
+  "finding": {
+    "id": "RC2",
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "function": "_trace",
+    "line": 179,
+    "rule": "New class/callable statement coverage must meet 90%; a function declaration is module execution, not execution of its body.",
+    "retained_and_final_named_body": {
+      "statements": "8/9",
+      "percent": 88.88888888888889,
+      "branches": "3/4"
+    },
+    "retained_ast_range": {
+      "statements": "9/10",
+      "percent": 90.0,
+      "extra_executed_declaration": 157
+    },
+    "missing_statement": "raise ReportLimitError() when output.budget.bytes_left < 1",
+    "missing_branch": [
+      178,
+      179
+    ],
+    "attribution": "There is no lambda or nested function in this range. coverage.py's named body correctly excludes declaration line 157.",
+    "minimal_repair": "Add one deterministic test-only exhausted-byte guard control using a valid retained specification and the actual AcceptanceTextOutput/ReportBudget. Exercise render_acceptance with that local output budget fully spent before trace construction, assert ReportLimitError before serialization and no returned partial bundle. No production edit or threshold change is indicated.",
+    "expected_additional_proof": "Execute line 179 and branch 178->179 on unchanged production. With the retained positive proof, _trace becomes 9/9 body statements and 4/4 branches."
+  },
+  "fixed_population": {
+    "ranges": 17,
+    "below_floor": [
+      "_trace"
+    ],
+    "other_ranges_pass": 16,
+    "lost_named_lines_or_arcs": []
+  },
+  "named_body_table": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderedFile",
+      "family": "classes",
+      "retained_ast_covered": 14,
+      "retained_ast_total": 14,
+      "named_covered": 10,
+      "named_total": 10,
+      "named_covered_branches": 4,
+      "named_total_branches": 4,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderedFile.__post_init__",
+      "family": "functions",
+      "retained_ast_covered": 11,
+      "retained_ast_total": 11,
+      "named_covered": 10,
+      "named_total": 10,
+      "named_covered_branches": 4,
+      "named_total_branches": 4,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_paths",
+      "family": "functions",
+      "retained_ast_covered": 15,
+      "retained_ast_total": 15,
+      "named_covered": 14,
+      "named_total": 14,
+      "named_covered_branches": 8,
+      "named_total_branches": 8,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderBundle",
+      "family": "classes",
+      "retained_ast_covered": 19,
+      "retained_ast_total": 19,
+      "named_covered": 16,
+      "named_total": 16,
+      "named_covered_branches": 8,
+      "named_total_branches": 8,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderBundle.__post_init__",
+      "family": "functions",
+      "retained_ast_covered": 17,
+      "retained_ast_total": 17,
+      "named_covered": 16,
+      "named_total": 16,
+      "named_covered_branches": 8,
+      "named_total_branches": 8,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_fields",
+      "family": "functions",
+      "retained_ast_covered": 23,
+      "retained_ast_total": 23,
+      "named_covered": 22,
+      "named_total": 22,
+      "named_covered_branches": 12,
+      "named_total_branches": 12,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_trace",
+      "family": "functions",
+      "retained_ast_covered": 9,
+      "retained_ast_total": 10,
+      "named_covered": 8,
+      "named_total": 9,
+      "named_covered_branches": 3,
+      "named_total_branches": 4,
+      "named_missing_lines": [
+        179
+      ],
+      "named_missing_branches": [
+        [
+          178,
+          179
+        ]
+      ],
+      "meets_90_percent": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_feature",
+      "family": "functions",
+      "retained_ast_covered": 21,
+      "retained_ast_total": 21,
+      "named_covered": 20,
+      "named_total": 20,
+      "named_covered_branches": 12,
+      "named_total_branches": 12,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "render_acceptance",
+      "family": "functions",
+      "retained_ast_covered": 30,
+      "retained_ast_total": 31,
+      "named_covered": 29,
+      "named_total": 30,
+      "named_covered_branches": 9,
+      "named_total_branches": 10,
+      "named_missing_lines": [
+        257
+      ],
+      "named_missing_branches": [
+        [
+          256,
+          257
+        ]
+      ],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "utf8_path_size",
+      "family": "functions",
+      "retained_ast_covered": 14,
+      "retained_ast_total": 14,
+      "named_covered": 13,
+      "named_total": 13,
+      "named_covered_branches": 10,
+      "named_total_branches": 10,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "_plain",
+      "family": "functions",
+      "retained_ast_covered": 8,
+      "retained_ast_total": 8,
+      "named_covered": 7,
+      "named_total": 7,
+      "named_covered_branches": 4,
+      "named_total_branches": 4,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput",
+      "family": "classes",
+      "retained_ast_covered": 62,
+      "retained_ast_total": 66,
+      "named_covered": 56,
+      "named_total": 60,
+      "named_covered_branches": 32,
+      "named_total_branches": 36,
+      "named_missing_lines": [
+        107,
+        135,
+        139,
+        144
+      ],
+      "named_missing_branches": [
+        [
+          106,
+          107
+        ],
+        [
+          134,
+          135
+        ],
+        [
+          138,
+          139
+        ],
+        [
+          141,
+          144
+        ]
+      ],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.__init__",
+      "family": "functions",
+      "retained_ast_covered": 3,
+      "retained_ast_total": 3,
+      "named_covered": 2,
+      "named_total": 2,
+      "named_covered_branches": 0,
+      "named_total_branches": 0,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.fixed",
+      "family": "functions",
+      "retained_ast_covered": 4,
+      "retained_ast_total": 4,
+      "named_covered": 3,
+      "named_total": 3,
+      "named_covered_branches": 0,
+      "named_total_branches": 0,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.measure",
+      "family": "functions",
+      "retained_ast_covered": 46,
+      "retained_ast_total": 50,
+      "named_covered": 45,
+      "named_total": 49,
+      "named_covered_branches": 32,
+      "named_total_branches": 36,
+      "named_missing_lines": [
+        107,
+        135,
+        139,
+        144
+      ],
+      "named_missing_branches": [
+        [
+          106,
+          107
+        ],
+        [
+          134,
+          135
+        ],
+        [
+          138,
+          139
+        ],
+        [
+          141,
+          144
+        ]
+      ],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.json",
+      "family": "functions",
+      "retained_ast_covered": 5,
+      "retained_ast_total": 5,
+      "named_covered": 4,
+      "named_total": 4,
+      "named_covered_branches": 0,
+      "named_total_branches": 0,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.block",
+      "family": "functions",
+      "retained_ast_covered": 3,
+      "retained_ast_total": 3,
+      "named_covered": 2,
+      "named_total": 2,
+      "named_covered_branches": 0,
+      "named_total_branches": 0,
+      "named_missing_lines": [],
+      "named_missing_branches": [],
+      "meets_90_percent": true
+    }
+  ],
+  "trace_exact_populations": {
+    "retained_renderer77": {
+      "named_summary": {
+        "covered_lines": 8,
+        "num_statements": 9,
+        "percent_covered": 84.61538461538461,
+        "percent_covered_display": "85",
+        "missing_lines": 1,
+        "excluded_lines": 0,
+        "percent_statements_covered": 88.88888888888889,
+        "percent_statements_covered_display": "89",
+        "num_branches": 4,
+        "num_partial_branches": 1,
+        "covered_branches": 3,
+        "missing_branches": 1,
+        "percent_branches_covered": 75.0,
+        "percent_branches_covered_display": "75"
+      },
+      "named_executed": [
+        164,
+        165,
+        175,
+        176,
+        177,
+        178,
+        180,
+        185
+      ],
+      "named_missing": [
+        179
+      ],
+      "named_executed_branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          177
+        ],
+        [
+          178,
+          180
+        ]
+      ],
+      "named_missing_branches": [
+        [
+          178,
+          179
+        ]
+      ],
+      "ast_range_executed": [
+        157,
+        164,
+        165,
+        175,
+        176,
+        177,
+        178,
+        180,
+        185
+      ],
+      "ast_range_missing": [
+        179
+      ],
+      "ast_range_executed_branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          177
+        ],
+        [
+          178,
+          180
+        ]
+      ],
+      "ast_range_missing_branches": [
+        [
+          178,
+          179
+        ]
+      ]
+    },
+    "final_reversed118": {
+      "named_summary": {
+        "covered_lines": 8,
+        "num_statements": 9,
+        "percent_covered": 84.61538461538461,
+        "percent_covered_display": "85",
+        "missing_lines": 1,
+        "excluded_lines": 0,
+        "percent_statements_covered": 88.88888888888889,
+        "percent_statements_covered_display": "89",
+        "num_branches": 4,
+        "num_partial_branches": 1,
+        "covered_branches": 3,
+        "missing_branches": 1,
+        "percent_branches_covered": 75.0,
+        "percent_branches_covered_display": "75"
+      },
+      "named_executed": [
+        164,
+        165,
+        175,
+        176,
+        177,
+        178,
+        180,
+        185
+      ],
+      "named_missing": [
+        179
+      ],
+      "named_executed_branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          177
+        ],
+        [
+          178,
+          180
+        ]
+      ],
+      "named_missing_branches": [
+        [
+          178,
+          179
+        ]
+      ],
+      "ast_range_executed": [
+        157,
+        164,
+        165,
+        175,
+        176,
+        177,
+        178,
+        180,
+        185
+      ],
+      "ast_range_missing": [
+        179
+      ],
+      "ast_range_executed_branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          177
+        ],
+        [
+          178,
+          180
+        ]
+      ],
+      "ast_range_missing_branches": [
+        [
+          178,
+          179
+        ]
+      ]
+    }
+  },
+  "execution_disposition": {
+    "tests": "118 reversed tests passed; no test failed or was replayed during diagnosis.",
+    "failed_subprocess": "Coverage proof reader exited 1 on its named-callable assertion. The assertion correctly detects an unmet coverage unit gate; it is not an attribution-only false positive.",
+    "contracts": "Four prepared contracts had not run when the proof reader stopped.",
+    "restart": "No suite restart was performed or inferred merely from a reader failure. The coordinator owns the bounded test repair and subsequent ordered validation scope."
+  },
+  "proof": {
+    "failure": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-proof-132232.2026-10-20T13-24.json",
+      "sha256": "9a52235bf55cdc203334331cd51a4b2de14476b4e17f32f01b341381ed56dc31",
+      "bytes": 1680
+    },
+    "failure_raw": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-proof-132232-raw.2026-10-20T13-24.json",
+      "sha256": "f59ce5048d48ad7390cee41ffad18d5537eae20da90f913f2f243043a3fdae71"
+    },
+    "passed_tests": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-rendering-132232.2026-10-20T13-24.json",
+      "sha256": "284879b8b54352d8335df9486bdfabdd5e0957d70a8823ea1ce6b2b44cdbad19",
+      "bytes": 30704
+    },
+    "retained_audit": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-repair-audit.2026-10-20T13-01.json",
+      "sha256": "ebe73fc77b859bf6304bb804407f05f0ee411862aff407eaff2c1afd12d7945f",
+      "bytes": 20166
+    },
+    "retained_raw": {
+      "archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze-originals.2026-10-20T13-07.json",
+      "member": "<SCRATCH>/p5t5-renderer-repair2-coverage.json",
+      "sha256": "9a3285ddbcf80872dc8d6b0b5df5e9a0070a40d9fe20bb1ff8913213b9e5cb4a",
+      "bytes": 66562
+    },
+    "final_raw": {
+      "path": "SCRATCH/p5t5-final-132232-combined-coverage.json",
+      "sha256": "71e3867b3d287a8bc3b6296653add7524fce81600fbd92a1521847eec38e2fb2",
+      "bytes": 40733
+    }
+  },
+  "qualification": "The prior 9/10 AST-range observation remains accurate as a range statistic. It does not establish the named-body 90% floor. Earlier source/repair findings and the passing test receipts are unchanged; final task acceptance remains pending.",
+  "reader_diagnostics": [
+    "Exploratory PowerShell ConvertFrom-Json rejected coverage.py's empty-name module region; subsequent property access was null. The successful Python reader uses exact decoded JSON and normalized observed separators.",
+    "An initial fixed-range reader compared complete named dictionaries and stopped on the first class. The corrected reader compares the documented executable line/arc populations and counts; no raw counter or owner evidence was changed."
+  ],
+  "exact_raw_payloads": {
+    "initial_trace_reader": {
+      "encoding": "gzip-base64",
+      "sha256": "51a02d565176b6754dc650e7eae9f2de9c8ec18b005939b22157c9446299856d",
+      "bytes": 3035,
+      "data": "H4sIAAAAAAAC/5VWTW/jNhC961cQPEmoJdnO5mONTYFFgmwPbZEm2ZNjCLQ0ttlIlEpSSbyL/PcOKVGWHDtofTAkcjjz3syboSild8AyUop8S/QGyIoLlhMmMiJBMy4gI4mWLAWSls8g2RpIVVZ1zjQvhYoopR4vqlJqwpR2j0um4OyTe1v/4JV73jC1yfnSvf6tSuGtZFmQimmzQdqNW3z1vBtyaZ98mpWpilfAdC1BxSzV/Bni6Xh6Fk7G4eQ8zGHN0m2YcWVhbkNkEFZMcr0NP1+MaeD9hb5uSEwoPPMMRArxPyxcMw2Ket/e7UlYYyCFHEO00FysqXfv0CTJiueQJEGEEUBo7+77nx3Sq1n8XYFU8TUTf5RcMRF/raprpln8e5myPH6Aooq5UjUYZGF1qk/D9QbkExcI8xYd0YqlT5hpFe/4yFpoXkCsZBpnskjSsuJ5qZPOIm59RNWWep6XwYqoDfMlewlmHsEf1rOWwlUgws3p6ZndjzbwmnGMp/2gPZqXLPNNTYaHTb0is6d8y9ZaRBIVlCy3mCg/cA4U5JBqyHwnm9ZRwXS6wXQizfkzWZWSPI3IM+Gi09ecmuwquoi4hgJdEr4iTxikylGGPn18pCNCYxpEIDL1whHGbbCwzpnCzGuSg/BdnIBcXpJJn4PbmY8XiNXqPTE8EJGpI6rAlsRuhJOT6fRkGqZlsTS9EDqQkckEbU7jwY6tzdvOJ6ajlHzdj/Gti4DSyUCCDFcS4AeEzlJFTtjT8cPkJByft9FQanKLLmyQgd9gTr/cX919fbj67dd46Bzzxric7iFfeGWeJVh8dGf6M8oAOVZG837TvdHy7JNZzMC3cec0Qw3TBVLqpbn1YrPcmlkh0IWdIUaBB0wa7TUg+tnrycudCjyBENBIwKv2hVWMMHLBcWPaT0GjxNtWhtqYYQuXGZb4ktZ6FV7QIIiWZba1KnA/FBVXXCjNsN99MbIOb2qRmsF2DavAEhCRYAUY6LQZg7Sj7xtgUY6yEOWI2BfMedIsWLb+5PR8RCYXnwNvNzORys83z9DI2RLyETFpNYR8n7qRm7jqnZ+j1jEVwYj4tJGVBKyjgmwyucA9uxa0vbVq0WMI4xQbqV3Acswd/qZTJBNrMLnPWbHMGM50LrSaEYXDFwvRy3OzY9LV40u+YEHs3x7tpg1lqo66ZtY1+9A1w9486n2XyrnN4MJktCstNfXKElUXBZNbOuuSgqpr1xajfWt4hbRGcANzt2iDqwOnChzi5mLoH2rXjp7pnC6xAukGbQ6G7HaPRj3s4N1m/zwKPLF17/NthOA3etmnHBw8veM9OLxHPfgwch++kcs+gB2BDzEccfM+Da2XN9e8PREd7LqF6d++0fvmW3g4Letcd/KjqqwldtiM/KRmKOPDLd5U7bCb2WE4mFXuynxrwFGcd4mN03dB27ke/+dbaTSYc23qBih2F9QQCKJtpvfMDvdjZn287hqykLEEG/www+fB7RQxlVSl4q++iVBAsQRpmP2/K+sQrXfM3LWxx8Qt75CjiCxknP9S49NgmFNE4tZ248cd7n3/otHubeS9ef59d73bcdtxwE9TthaYBNWwCaIX/DiFNqfNzZfVRaX8RlUjHJD4KaovpwH5hdBHYb937HWMd2IlcXJ+eCjw/gUPOB362wsAAA=="
+    },
+    "initial_range_reader": {
+      "encoding": "gzip-base64",
+      "sha256": "f52601dc0d8b7c9a474134a42d706a41dff12ca9099f3f77c9a3825f0a18015e",
+      "bytes": 4451,
+      "data": "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"
+    },
+    "completed_reader": {
+      "encoding": "gzip-base64",
+      "sha256": "c116a34681246c507138b9b633031fec64289ae5eb1c036347cbc0494e9c5006",
+      "bytes": 4808,
+      "data": "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"
+    },
+    "publication": {
+      "encoding": "gzip-base64",
+      "sha256": "3c533a0780127bb728b92d6261d42df16185471f9f019aa819617011f42d50c2",
+      "bytes": 7794,
+      "data": "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"
+    }
+  },
+  "open_probes": [],
+  "source_or_test_mutations": [],
+  "behavioral_runs": 0,
+  "next_five": [
+    "P5-T5",
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1"
+  ]
+}

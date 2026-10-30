@@ -1,0 +1,105 @@
+{
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T05:03:36.284941+00:00",
+  "status": "PRESERVED_BEFORE_MUTATION",
+  "candidate_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "snapshot": "SCRATCH/repair-before/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "snapshot": "SCRATCH/repair-before/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "sha256": "fab11585ff2b24a083dc3fc13d29cb7a847c1efea73235ccd2806b099dfe7209",
+      "snapshot": "SCRATCH/repair-before/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "snapshot": "SCRATCH/repair-before/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "snapshot": "SCRATCH/repair-before/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "snapshot": "SCRATCH/repair-before/scripts/dev_tools/discovery/analyzer/source_text.py"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+      "snapshot": "SCRATCH/repair-before/scripts/dev_tools/discovery/analyzer/dotnet_inventory.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "snapshot": "SCRATCH/repair-before/tests/discovery_runtime/analyzer/test_source_masking.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "snapshot": "SCRATCH/repair-before/tests/discovery_runtime/analyzer/test_csharp_tokens.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "snapshot": "SCRATCH/repair-before/tests/discovery_runtime/analyzer/test_csharp_declarations.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "snapshot": "SCRATCH/repair-before/tests/discovery_runtime/analyzer/test_event_subscriptions.py"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "snapshot": "SCRATCH/repair-before/tests/scripts/dev_tools/discovery/analyzer/test_source_text.py"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "snapshot": "SCRATCH/repair-before/tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py"
+    }
+  ],
+  "retained_proofs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-candidate-freeze.2026-10-19T04-46.json",
+      "sha256": "a078045ecbba053eb113419bd50d9e14767a616c4f8f90626c31993bb1daff32",
+      "snapshot": "SCRATCH/repair-before/p4t3-candidate-freeze.2026-10-19T04-46.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-review.2026-10-19T05-00.json",
+      "sha256": "53b9c90086d370d4de177fc9edc8d69326134efd0ca6ea9074b220d8d18b2150",
+      "snapshot": "SCRATCH/repair-before/p4t3-executor-candidate-review.2026-10-19T05-00.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-review.2026-10-19T05-00.md",
+      "sha256": "26f9d71da999a31d35922ef0d21e25bee2f126c8f165fcd2c3cdfdb30c5955e4",
+      "snapshot": "SCRATCH/repair-before/p4t3-executor-candidate-review.2026-10-19T05-00.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-probes.2026-10-19T04-51.json",
+      "sha256": "5cbf1766c668e57aa55a8ed0528c672f3f872686cae54cd63e6b10986305a41a",
+      "snapshot": "SCRATCH/repair-before/p4t3-executor-candidate-probes.2026-10-19T04-51.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-probes-harness.2026-10-19T05-00.txt",
+      "sha256": "648f9f23112c29b2c5c1dfab1f7d97363c2d754736cc2e008100e25239d284cc",
+      "snapshot": "SCRATCH/repair-before/p4t3-executor-candidate-probes-harness.2026-10-19T05-00.txt"
+    }
+  ],
+  "authorized_repair": [
+    "R1",
+    "R2",
+    "R3"
+  ],
+  "new_test_path": "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py"
+}

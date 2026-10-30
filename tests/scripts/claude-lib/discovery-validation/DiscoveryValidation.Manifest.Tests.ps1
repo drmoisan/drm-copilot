@@ -26,30 +26,62 @@ BeforeAll {
     $manifestPath = Join-Path $repoRoot 'extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json'
     $script:Manifest = Get-Content -Path $manifestPath -Raw | ConvertFrom-Json
     $script:ExpectedPaths = @(
-        '.claude/lib/discovery-validation/DiscoveryValidation.psm1'
+        '.claude/lib/discovery-validation/DiscoveryValidation.psm1',
+        '.claude/lib/discovery-validation/DiscoveryAuthority.psd1',
+        '.claude/lib/discovery-validation/DiscoveryAuthority.psm1',
+        '.claude/lib/discovery-validation/DiscoveryAuthorization.psm1',
+        '.claude/lib/discovery-validation/DiscoveryEncoding.psm1',
+        '.claude/lib/discovery-validation/DiscoveryManifest.psm1',
+        '.claude/lib/discovery-validation/DiscoveryPayload.psm1',
+        '.claude/lib/discovery-validation/DiscoveryToolRouting.psm1',
+        '.claude/lib/discovery-validation/DiscoveryRootGrant.psm1',
+        '.claude/lib/discovery-validation/DiscoveryObservation.psm1',
+        '.claude/lib/discovery-validation/DiscoveryStart.psm1',
+        '.claude/lib/discovery-validation/DiscoveryStartRecord.psm1',
+        '.claude/lib/discovery-validation/DiscoveryStop.psm1',
+        '.claude/lib/discovery-validation/DiscoveryPlanning.psm1',
+        '.claude/lib/discovery-validation/DiscoveryCapability.psm1'
     )
+    # The Codex bundle publishes the same helpers under .codex/lib through the shared
+    # resource directory (issue #980, P8-T9 mapping); the compatibility module stays Claude-only.
+    $script:CodexPublishedNames = @(
+        'DiscoveryAuthority.psd1',
+        'DiscoveryAuthority.psm1',
+        'DiscoveryAuthorization.psm1',
+        'DiscoveryEncoding.psm1',
+        'DiscoveryManifest.psm1',
+        'DiscoveryPayload.psm1',
+        'DiscoveryToolRouting.psm1',
+        'DiscoveryRootGrant.psm1',
+        'DiscoveryObservation.psm1',
+        'DiscoveryStart.psm1',
+        'DiscoveryStartRecord.psm1',
+        'DiscoveryStop.psm1',
+        'DiscoveryPlanning.psm1',
+        'DiscoveryCapability.psm1'
+    )
+    $codexManifestPath = Join-Path $repoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
+    $script:CodexManifest = Get-Content -Path $codexManifestPath -Raw | ConvertFrom-Json
 }
 
 Describe 'DiscoveryValidation core.json manifest membership' {
-    It 'lists the DiscoveryValidation module path in core.json paths' {
+    It 'lists every discovery-validation helper path in core.json paths exactly once' {
         # Arrange: the manifest paths array.
         $paths = @($script:Manifest.paths)
 
-        # Act / Assert: the module path is a member of the manifest paths.
-        $paths | Should -Contain $script:ExpectedPaths[0]
-    }
-
-    It 'lists the DiscoveryValidation module path exactly once' {
-        # Assert: the module path is not duplicated in the manifest paths.
-        $occurrences = @($script:Manifest.paths | Where-Object { $_ -eq $script:ExpectedPaths[0] }).Count
-        $occurrences | Should -Be 1
+        # Act / Assert: each helper path is a member of the manifest paths, once.
+        foreach ($expected in $script:ExpectedPaths) {
+            $paths | Should -Contain $expected
+            @($paths | Where-Object { $_ -eq $expected }).Count | Should -Be 1 -Because "$expected must be registered once"
+        }
     }
 
     It 'registers every on-disk discovery-validation module so none is unregistered' {
-        # Arrange: enumerate the actual module files under the repo lib folder.
+        # Arrange: enumerate the actual module and manifest files under the repo lib folder.
         $libFolder = Join-Path $script:RepoRoot '.claude/lib/discovery-validation'
-        $onDisk = @(Get-ChildItem -Path $libFolder -Filter '*.psm1' -File |
-                ForEach-Object { ".claude/lib/discovery-validation/$($_.Name)" })
+        $onDisk = @(Get-ChildItem -Path $libFolder -File |
+                Where-Object { $_.Extension -in @('.psm1', '.psd1') } |
+                    ForEach-Object { ".claude/lib/discovery-validation/$($_.Name)" })
 
         # Act / Assert: the expected-path list covers every on-disk module.
         foreach ($actual in $onDisk) {
@@ -70,6 +102,23 @@ Describe 'DiscoveryValidation bundle mirror byte identity' {
             $repoHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $repoFile).Hash
             $bundleHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $bundleFile).Hash
             $bundleHash | Should -Be $repoHash -Because "$relative must be mirrored byte-identically"
+        }
+    }
+}
+
+Describe 'Codex bundle helper publication' {
+    It 'stores each shared helper byte-identically under the Codex resource directory and lists its .codex/lib destination in core.json' {
+        # Arrange: the P8-T9 directory mapping publishes resources/lib/discovery-validation/<name>
+        # to .codex/lib/discovery-validation/<name>.
+        $codexPaths = @($script:CodexManifest.paths)
+        foreach ($name in $script:CodexPublishedNames) {
+            $repoFile = Join-Path $script:RepoRoot ".claude/lib/discovery-validation/$name"
+            $resourceFile = Join-Path $script:RepoRoot "extensions/drm-copilot/resources/lib/discovery-validation/$name"
+
+            # Act / Assert
+            Test-Path -LiteralPath $resourceFile | Should -BeTrue -Because "$name must be stored as a Codex helper resource"
+            (Get-FileHash -Algorithm SHA256 -LiteralPath $resourceFile).Hash | Should -Be (Get-FileHash -Algorithm SHA256 -LiteralPath $repoFile).Hash
+            $codexPaths | Should -Contain ".codex/lib/discovery-validation/$name"
         }
     }
 }

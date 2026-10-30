@@ -1,0 +1,3456 @@
+{
+  "Timestamp": "2026-10-21T16-37",
+  "Command": "poetry run python SCRATCH\\issue-980-analyzer-tests.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "tests exit 0",
+  "started": "2026-10-21T16:37:01.979044+00:00",
+  "finished": "2026-10-21T16:37:33.168997+00:00",
+  "duration_seconds": 31.19013120001182,
+  "source_before": {
+    "scripts/dev_tools/discovery/analyzer/__init__.py": {
+      "sha256": "3905cd4b6c8f7498267d1b1789fdc0802341d56b54ec0b6ebde833ac404b1e45",
+      "physical_lines": 31
+    },
+    "scripts/dev_tools/discovery/analyzer/__main__.py": {
+      "sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7",
+      "physical_lines": 12
+    },
+    "scripts/dev_tools/discovery/analyzer/cli.py": {
+      "sha256": "8ef3a6bb2422af14f88c39f16a167bf04393fd5976a822b7e3da0b84b0fb0dee",
+      "physical_lines": 88
+    },
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": {
+      "sha256": "835bfb91eb9d04a2a2541a1cb55404608187734f47dcf829b90ae7b2a487ca51",
+      "physical_lines": 50
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py": {
+      "sha256": "120d7696a04d1e0a86b2de74f29f47fa39cab212196d84d7fa9f73582f593cc7",
+      "physical_lines": 202
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": {
+      "sha256": "00a1ff1417324c0f443be57caa3877c3c82e95040670614b1d3f611fa8b4610c",
+      "physical_lines": 184
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": {
+      "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+      "physical_lines": 467
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "physical_lines": 405
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "physical_lines": 241
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py": {
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "physical_lines": 145
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": {
+      "sha256": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3",
+      "physical_lines": 174
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/analyzer/__init__.py": {
+      "sha256": "3905cd4b6c8f7498267d1b1789fdc0802341d56b54ec0b6ebde833ac404b1e45",
+      "physical_lines": 31
+    },
+    "scripts/dev_tools/discovery/analyzer/__main__.py": {
+      "sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7",
+      "physical_lines": 12
+    },
+    "scripts/dev_tools/discovery/analyzer/cli.py": {
+      "sha256": "8ef3a6bb2422af14f88c39f16a167bf04393fd5976a822b7e3da0b84b0fb0dee",
+      "physical_lines": 88
+    },
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": {
+      "sha256": "835bfb91eb9d04a2a2541a1cb55404608187734f47dcf829b90ae7b2a487ca51",
+      "physical_lines": 50
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py": {
+      "sha256": "120d7696a04d1e0a86b2de74f29f47fa39cab212196d84d7fa9f73582f593cc7",
+      "physical_lines": 202
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": {
+      "sha256": "00a1ff1417324c0f443be57caa3877c3c82e95040670614b1d3f611fa8b4610c",
+      "physical_lines": 184
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": {
+      "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+      "physical_lines": 467
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "physical_lines": 405
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "physical_lines": 241
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py": {
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "physical_lines": 145
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": {
+      "sha256": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3",
+      "physical_lines": 174
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "62ac516387a4a6e0e0a301a230f8bb55d9315bf254ce47a0cd2ca839c8272a5e",
+      "raw_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgIFsxMDAlXQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSB0ZXN0cyBjb3ZlcmFnZSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fX19fX18gY292ZXJhZ2U6IHBsYXRmb3JtIHdpbjMyLCBweXRob24gMy4xMy4xMi1maW5hbC0wIF9fX19fX19fX19fX19fXw0KDQpDb3ZlcmFnZSBKU09OIHdyaXR0ZW4gdG8gZmlsZSBDOlxVc2Vyc1xEQU5NT0l+MVxBcHBEYXRhXExvY2FsXFRlbXBcaXNzdWUtOTgwLXA2dDMtYW5hbHl6ZXJzXGNvdmVyYWdlLmpzb24NCjYwIHBhc3NlZCwgNDcgZGVzZWxlY3RlZCBpbiAyOC45OXMNCg==",
+      "presentation": "............................................................             [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nCoverage JSON written to file SCRATCH\\coverage.json\r\n60 passed, 47 deselected in 28.99s\r\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ],
+  "nodes.json": {
+    "nodes": [
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-2]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-3]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-2]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-3]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-2]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-3]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_module_entry_point_imports_cli_main",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[clock]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[fs]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[schema_path]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv0-0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv1-2]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv2-2]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv3-2]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv4-2]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[False]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[True]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_precharges_process_copy",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_dotnet-dotnet-dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_vsto-vsto-office-vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_dotnet-dotnet-dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_vsto-vsto-office-vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_dotnet-dotnet-dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_vsto-vsto-office-vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_dotnet-dotnet-dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_vsto-vsto-office-vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_dotnet]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_vsto]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_reexports_public_surface",
+      "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_unknown_attribute_raises_attribute_error",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[stack_cli.py]"
+    ],
+    "reports": [
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.002368899993598461
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000430900021456182
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003915000124834478
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006543999770656228
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00037299998803064227
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003205999964848161
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007150999736040831
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002906000008806586
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003236000193282962
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006605999660678208
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00027759996009990573
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[None-3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00023770000552758574
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005571999936364591
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000341300037689507
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00024309998843818903
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005954999942332506
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002574000391177833
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00026189995696768165
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006238999776542187
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002503000432625413
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022849999368190765
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007940999930724502
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00029880000511184335
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv1-3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002899000537581742
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006119000026956201
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002604000037536025
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002297000028192997
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007624000427313149
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003043999895453453
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00034030003007501364
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008385000401176512
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00048589997459203005
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003179000341333449
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006329999887384474
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00027469999622553587
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_canonical_inventory_forwards_exact_arguments_and_exit[argv2-3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003624000237323344
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_module_entry_point_imports_cli_main",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005986000178381801
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_module_entry_point_imports_cli_main",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0030203000060282648
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_module_entry_point_imports_cli_main",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0005329999839887023
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[clock]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0018307000282220542
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[clock]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0007082999800331891
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[clock]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00046770001063123345
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[fs]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0013483999646268785
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[fs]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004979000077582896
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[fs]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004102999810129404
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[schema_path]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0009843999869190156
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[schema_path]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005261999904178083
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_unsupported_seams_refuse_before_callbacks_or_installed_entry[schema_path]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00037100003100931644
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv0-0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007813000120222569
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv0-0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005732999998144805
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv0-0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0006525999633595347
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv1-2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0010535000474192202
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv1-2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.8993836999870837
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv1-2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004602000117301941
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv2-2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008662000182084739
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv2-2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.3930490000057034
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv2-2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0006384000298567116
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv3-2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007600999670103192
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv3-2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.0303832999779843
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv3-2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004039999912492931
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv4-2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007919999770820141
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv4-2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.974476200004574
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_help_usage_and_ambiguous_legacy_arguments_never_access_providers[argv4-2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00044169998727738857
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[False]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008445000275969505
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[False]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0012168000102974474
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[False]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00023070001043379307
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[True]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004893000004813075
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[True]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.001055500004440546
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_preserves_pure_public_carriers[True]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022029998945072293
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_precharges_process_copy",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004409999819472432
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_precharges_process_copy",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004820000031031668
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py::test_parse_args_precharges_process_copy",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002270000404678285
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_dotnet-dotnet-dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006733000045642257
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_dotnet-dotnet-dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008812999585643411
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_dotnet-dotnet-dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00025020004250109196
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_vsto-vsto-office-vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006647999980486929
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_vsto-vsto-office-vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008824999677017331
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[None-main_vsto-vsto-office-vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00026020000223070383
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_dotnet-dotnet-dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000666900014039129
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_dotnet-dotnet-dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000840499997138977
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_dotnet-dotnet-dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00024349999148398638
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_vsto-vsto-office-vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006682999664917588
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_vsto-vsto-office-vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008270999533124268
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv1-main_vsto-vsto-office-vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00024480000138282776
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_dotnet-dotnet-dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006616999744437635
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_dotnet-dotnet-dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000833099998999387
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_dotnet-dotnet-dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00023990002227947116
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_vsto-vsto-office-vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006466000340878963
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_vsto-vsto-office-vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008350000134669244
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv2-main_vsto-vsto-office-vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00024419999681413174
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_dotnet-dotnet-dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006480000447481871
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_dotnet-dotnet-dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008584000170230865
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_dotnet-dotnet-dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00024449999909847975
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_vsto-vsto-office-vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006555000436492264
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_vsto-vsto-office-vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008357999613508582
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_fixed_stack_route_retains_explicit_selector_and_publication_flags[argv3-main_vsto-vsto-office-vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00024289998691529036
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005291000124998391
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002209999947808683
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022980000358074903
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005143999587744474
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002136999974027276
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[1-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022260000696405768
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005390000296756625
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002218999434262514
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002638999721966684
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005413999897427857
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00021770002786070108
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[2-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00023040000814944506
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005206999485380948
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00020629999926313758
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022609997540712357
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005215000128373504
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00020319997565820813
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_installed_failure_survives_without_fabricating_success[3-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022109999554231763
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006338999955914915
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002711999695748091
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002644999767653644
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006240000366233289
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00025099999038502574
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[clock-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00026110000908374786
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006169999833218753
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00024999998277053237
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00026080000679939985
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006217000191099942
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00025400001322850585
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[fs-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00030770001467317343
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006277999491430819
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002462000120431185
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002635999699123204
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006243999814614654
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002550000208429992
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_unsupported_stack_seams_refuse_without_access[schema_path-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00026460003573447466
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007126000127755105
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003686999552883208
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002806999837048352
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006912999670021236
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003226000117138028
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv0-0-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002685000072233379
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006922000320628285
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.940010899968911
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0005805999971926212
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0013515999889932573
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 3.091013199998997
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv1-2-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0006336999940685928
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0013455000007525086
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 3.676812899997458
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0005598000134341419
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0011674999841488898
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.364386099972762
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv2-2-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000631699978839606
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0011855000047944486
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 2.1160385999828577
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00039850000757724047
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008808000129647553
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.9545147999888286
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv3-2-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00040580000495538116
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_dotnet]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008186999475583434
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_dotnet]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.9172442000126466
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_dotnet]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00040220003575086594
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_vsto]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008368000271730125
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_vsto]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.9164565000100993
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs[argv4-2-main_vsto]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00039980001747608185
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_reexports_public_surface",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005005999701097608
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_reexports_public_surface",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00028500001644715667
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_reexports_public_surface",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002319000195711851
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_unknown_attribute_raises_attribute_error",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004661999992094934
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_unknown_attribute_raises_attribute_error",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00026950001483783126
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_unknown_attribute_raises_attribute_error",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021879997802898288
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005103999865241349
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00035550002939999104
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022200000239536166
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004873000434599817
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003896999987773597
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00023580004926770926
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000519900000654161
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00035209994530305266
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022759998682886362
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[stack_cli.py]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004924999666400254
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[stack_cli.py]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003834000090137124
+      },
+      {
+        "nodeid": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[stack_cli.py]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002442999975755811
+      }
+    ],
+    "args": [
+      "-ra",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_reexports_public_surface",
+      "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py::test_package_unknown_attribute_raises_attribute_error",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding",
+      "-q",
+      "-o",
+      "addopts=-ra",
+      "--cov=scripts.dev_tools.discovery.analyzer.cli",
+      "--cov=scripts.dev_tools.discovery.analyzer.stack_cli",
+      "--cov=scripts.dev_tools.discovery.analyzer",
+      "--cov-branch",
+      "--cov-report=json:SCRATCH\\coverage.json"
+    ]
+  },
+  "coverage.json": {
+    "meta": {
+      "format": 3,
+      "version": "7.13.2",
+      "timestamp": "2026-10-21T12:37:32.918875",
+      "branch_coverage": true,
+      "show_contexts": false
+    },
+    "files": {
+      "scripts\\dev_tools\\discovery\\analyzer\\__init__.py": {
+        "executed_lines": [
+          3,
+          5,
+          12,
+          15,
+          23,
+          24,
+          26,
+          27,
+          28,
+          30,
+          31
+        ],
+        "summary": {
+          "covered_lines": 11,
+          "num_statements": 11,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 3,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [
+          7,
+          8,
+          10
+        ],
+        "executed_branches": [
+          [
+            23,
+            24
+          ],
+          [
+            23,
+            27
+          ],
+          [
+            27,
+            28
+          ],
+          [
+            27,
+            31
+          ]
+        ],
+        "missing_branches": [],
+        "functions": {
+          "__getattr__": {
+            "executed_lines": [
+              23,
+              24,
+              26,
+              27,
+              28,
+              30,
+              31
+            ],
+            "summary": {
+              "covered_lines": 7,
+              "num_statements": 7,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 4,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 15,
+            "executed_branches": [
+              [
+                23,
+                24
+              ],
+              [
+                23,
+                27
+              ],
+              [
+                27,
+                28
+              ],
+              [
+                27,
+                31
+              ]
+            ],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              12,
+              15
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 3,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              7,
+              8,
+              10
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              12,
+              15,
+              23,
+              24,
+              26,
+              27,
+              28,
+              30,
+              31
+            ],
+            "summary": {
+              "covered_lines": 11,
+              "num_statements": 11,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 3,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 4,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              7,
+              8,
+              10
+            ],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                23,
+                24
+              ],
+              [
+                23,
+                27
+              ],
+              [
+                27,
+                28
+              ],
+              [
+                27,
+                31
+              ]
+            ],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\__main__.py": {
+        "executed_lines": [
+          7,
+          9
+        ],
+        "summary": {
+          "covered_lines": 2,
+          "num_statements": 2,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 2,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [
+          11,
+          12
+        ],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "": {
+            "executed_lines": [
+              7,
+              9
+            ],
+            "summary": {
+              "covered_lines": 2,
+              "num_statements": 2,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 2,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              11,
+              12
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [
+              7,
+              9
+            ],
+            "summary": {
+              "covered_lines": 2,
+              "num_statements": 2,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 2,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              11,
+              12
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\cli.py": {
+        "executed_lines": [
+          3,
+          5,
+          6,
+          8,
+          9,
+          19,
+          27,
+          29,
+          30,
+          31,
+          34,
+          37,
+          55,
+          56,
+          63,
+          65,
+          67,
+          70,
+          86
+        ],
+        "summary": {
+          "covered_lines": 19,
+          "num_statements": 19,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 5,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [
+          11,
+          12,
+          13,
+          15,
+          16
+        ],
+        "executed_branches": [
+          [
+            30,
+            31
+          ],
+          [
+            30,
+            34
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            55,
+            65
+          ]
+        ],
+        "missing_branches": [],
+        "functions": {
+          "parse_args": {
+            "executed_lines": [
+              27,
+              29,
+              30,
+              31,
+              34
+            ],
+            "summary": {
+              "covered_lines": 5,
+              "num_statements": 5,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 19,
+            "executed_branches": [
+              [
+                30,
+                31
+              ],
+              [
+                30,
+                34
+              ]
+            ],
+            "missing_branches": []
+          },
+          "forward_analyzer": {
+            "executed_lines": [
+              55,
+              56,
+              63,
+              65,
+              67
+            ],
+            "summary": {
+              "covered_lines": 5,
+              "num_statements": 5,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 37,
+            "executed_branches": [
+              [
+                55,
+                56
+              ],
+              [
+                55,
+                65
+              ]
+            ],
+            "missing_branches": []
+          },
+          "main": {
+            "executed_lines": [
+              86
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 70,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              6,
+              8,
+              9,
+              19,
+              37,
+              70
+            ],
+            "summary": {
+              "covered_lines": 8,
+              "num_statements": 8,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 5,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              11,
+              12,
+              13,
+              15,
+              16
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              6,
+              8,
+              9,
+              19,
+              27,
+              29,
+              30,
+              31,
+              34,
+              37,
+              55,
+              56,
+              63,
+              65,
+              67,
+              70,
+              86
+            ],
+            "summary": {
+              "covered_lines": 19,
+              "num_statements": 19,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 5,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 4,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              11,
+              12,
+              13,
+              15,
+              16
+            ],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                30,
+                31
+              ],
+              [
+                30,
+                34
+              ],
+              [
+                55,
+                56
+              ],
+              [
+                55,
+                65
+              ]
+            ],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\dotnet_inventory.py": {
+        "executed_lines": [],
+        "summary": {
+          "covered_lines": 0,
+          "num_statements": 2,
+          "percent_covered": 0.0,
+          "percent_covered_display": "0",
+          "missing_lines": 2,
+          "excluded_lines": 0,
+          "percent_statements_covered": 0.0,
+          "percent_statements_covered_display": "0",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [
+          7,
+          10
+        ],
+        "excluded_lines": [],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              7,
+              10
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              7,
+              10
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\emitter.py": {
+        "executed_lines": [],
+        "summary": {
+          "covered_lines": 0,
+          "num_statements": 2,
+          "percent_covered": 0.0,
+          "percent_covered_display": "0",
+          "missing_lines": 2,
+          "excluded_lines": 0,
+          "percent_statements_covered": 0.0,
+          "percent_statements_covered_display": "0",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [
+          3,
+          6
+        ],
+        "excluded_lines": [],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              3,
+              6
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              3,
+              6
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\inventory.py": {
+        "executed_lines": [],
+        "summary": {
+          "covered_lines": 0,
+          "num_statements": 6,
+          "percent_covered": 0.0,
+          "percent_covered_display": "0",
+          "missing_lines": 6,
+          "excluded_lines": 0,
+          "percent_statements_covered": 0.0,
+          "percent_statements_covered_display": "0",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [
+          3,
+          6,
+          9,
+          12,
+          15,
+          18
+        ],
+        "excluded_lines": [],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 6,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 6,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              3,
+              6,
+              9,
+              12,
+              15,
+              18
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 6,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 6,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              3,
+              6,
+              9,
+              12,
+              15,
+              18
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\models.py": {
+        "executed_lines": [
+          3,
+          6,
+          9,
+          12,
+          15,
+          18,
+          21,
+          24
+        ],
+        "summary": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "": {
+            "executed_lines": [
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24
+            ],
+            "summary": {
+              "covered_lines": 8,
+              "num_statements": 8,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24
+            ],
+            "summary": {
+              "covered_lines": 8,
+              "num_statements": 8,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\pipeline.py": {
+        "executed_lines": [
+          3,
+          6,
+          9,
+          12
+        ],
+        "summary": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "": {
+            "executed_lines": [
+              3,
+              6,
+              9,
+              12
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [
+              3,
+              6,
+              9,
+              12
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\source_text.py": {
+        "executed_lines": [],
+        "summary": {
+          "covered_lines": 0,
+          "num_statements": 8,
+          "percent_covered": 0.0,
+          "percent_covered_display": "0",
+          "missing_lines": 8,
+          "excluded_lines": 0,
+          "percent_statements_covered": 0.0,
+          "percent_statements_covered_display": "0",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [
+          3,
+          6,
+          9,
+          12,
+          15,
+          18,
+          21,
+          24
+        ],
+        "excluded_lines": [],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 8,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 8,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 8,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 8,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24
+            ],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\stack_cli.py": {
+        "executed_lines": [
+          3,
+          5,
+          7,
+          16,
+          31,
+          34,
+          50
+        ],
+        "summary": {
+          "covered_lines": 7,
+          "num_statements": 7,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 4,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [
+          9,
+          10,
+          11,
+          13
+        ],
+        "executed_branches": [],
+        "missing_branches": [],
+        "functions": {
+          "main_dotnet": {
+            "executed_lines": [
+              31
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 16,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "main_vsto": {
+            "executed_lines": [
+              50
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 34,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              7,
+              16,
+              34
+            ],
+            "summary": {
+              "covered_lines": 5,
+              "num_statements": 5,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 4,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              9,
+              10,
+              11,
+              13
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              7,
+              16,
+              31,
+              34,
+              50
+            ],
+            "summary": {
+              "covered_lines": 7,
+              "num_statements": 7,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 4,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              9,
+              10,
+              11,
+              13
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\vsto_office.py": {
+        "executed_lines": [],
+        "summary": {
+          "covered_lines": 0,
+          "num_statements": 52,
+          "percent_covered": 0.0,
+          "percent_covered_display": "0",
+          "missing_lines": 52,
+          "excluded_lines": 5,
+          "percent_statements_covered": 0.0,
+          "percent_statements_covered_display": "0",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 8,
+          "percent_branches_covered": 0.0,
+          "percent_branches_covered_display": "0"
+        },
+        "missing_lines": [
+          8,
+          10,
+          12,
+          13,
+          14,
+          15,
+          30,
+          37,
+          45,
+          46,
+          49,
+          50,
+          51,
+          55,
+          58,
+          76,
+          77,
+          81,
+          90,
+          110,
+          111,
+          115,
+          126,
+          146,
+          147,
+          151,
+          162,
+          172,
+          173,
+          175,
+          184,
+          185,
+          187,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          205,
+          207,
+          212,
+          213,
+          215,
+          220,
+          221,
+          223,
+          229,
+          230,
+          232,
+          240,
+          241
+        ],
+        "excluded_lines": [
+          17,
+          18,
+          20,
+          27,
+          28
+        ],
+        "executed_branches": [],
+        "missing_branches": [
+          [
+            45,
+            46
+          ],
+          [
+            45,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            50,
+            55
+          ],
+          [
+            196,
+            197
+          ],
+          [
+            196,
+            198
+          ],
+          [
+            198,
+            199
+          ],
+          [
+            198,
+            200
+          ]
+        ],
+        "functions": {
+          "_require_consent": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 6,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 6,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 4,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              45,
+              46,
+              49,
+              50,
+              51,
+              55
+            ],
+            "excluded_lines": [],
+            "start_line": 37,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                45,
+                46
+              ],
+              [
+                45,
+                49
+              ],
+              [
+                50,
+                51
+              ],
+              [
+                50,
+                55
+              ]
+            ]
+          },
+          "classify_csharp": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 3,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 3,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              76,
+              77,
+              81
+            ],
+            "excluded_lines": [],
+            "start_line": 58,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "classify_xml": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 3,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 3,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              110,
+              111,
+              115
+            ],
+            "excluded_lines": [],
+            "start_line": 90,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "classify_project": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 3,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 3,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              146,
+              147,
+              151
+            ],
+            "excluded_lines": [],
+            "start_line": 126,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "VstoOfficeAnalyzer.__init__": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              184,
+              185
+            ],
+            "excluded_lines": [],
+            "start_line": 175,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "VstoOfficeAnalyzer.analyze": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 7,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 7,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 4,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              205
+            ],
+            "excluded_lines": [],
+            "start_line": 187,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                196,
+                197
+              ],
+              [
+                196,
+                198
+              ],
+              [
+                198,
+                199
+              ],
+              [
+                198,
+                200
+              ]
+            ]
+          },
+          "VstoOfficeAnalyzer.parse": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              212,
+              213
+            ],
+            "excluded_lines": [],
+            "start_line": 207,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "VstoOfficeAnalyzer.classify": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              220,
+              221
+            ],
+            "excluded_lines": [],
+            "start_line": 215,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "VstoOfficeAnalyzer.map": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              229,
+              230
+            ],
+            "excluded_lines": [],
+            "start_line": 223,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "VstoOfficeAnalyzer.emit": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 2,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 2,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              240,
+              241
+            ],
+            "excluded_lines": [],
+            "start_line": 232,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 20,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 20,
+              "excluded_lines": 5,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              8,
+              10,
+              12,
+              13,
+              14,
+              15,
+              30,
+              37,
+              58,
+              90,
+              126,
+              162,
+              172,
+              173,
+              175,
+              187,
+              207,
+              215,
+              223,
+              232
+            ],
+            "excluded_lines": [
+              17,
+              18,
+              20,
+              27,
+              28
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "VstoOfficeAnalyzer": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 17,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 17,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 4,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              184,
+              185,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              205,
+              212,
+              213,
+              220,
+              221,
+              229,
+              230,
+              240,
+              241
+            ],
+            "excluded_lines": [],
+            "start_line": 162,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                196,
+                197
+              ],
+              [
+                196,
+                198
+              ],
+              [
+                198,
+                199
+              ],
+              [
+                198,
+                200
+              ]
+            ]
+          },
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 35,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 35,
+              "excluded_lines": 5,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 4,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              8,
+              10,
+              12,
+              13,
+              14,
+              15,
+              30,
+              37,
+              45,
+              46,
+              49,
+              50,
+              51,
+              55,
+              58,
+              76,
+              77,
+              81,
+              90,
+              110,
+              111,
+              115,
+              126,
+              146,
+              147,
+              151,
+              162,
+              172,
+              173,
+              175,
+              187,
+              207,
+              215,
+              223,
+              232
+            ],
+            "excluded_lines": [
+              17,
+              18,
+              20,
+              27,
+              28
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                45,
+                46
+              ],
+              [
+                45,
+                49
+              ],
+              [
+                50,
+                51
+              ],
+              [
+                50,
+                55
+              ]
+            ]
+          }
+        }
+      },
+      "scripts\\dev_tools\\discovery\\analyzer\\vsto_patterns.py": {
+        "executed_lines": [],
+        "summary": {
+          "covered_lines": 0,
+          "num_statements": 8,
+          "percent_covered": 0.0,
+          "percent_covered_display": "0",
+          "missing_lines": 8,
+          "excluded_lines": 2,
+          "percent_statements_covered": 0.0,
+          "percent_statements_covered_display": "0",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 2,
+          "percent_branches_covered": 0.0,
+          "percent_branches_covered_display": "0"
+        },
+        "missing_lines": [
+          7,
+          9,
+          29,
+          47,
+          54,
+          55,
+          56,
+          58
+        ],
+        "excluded_lines": [
+          11,
+          12
+        ],
+        "executed_branches": [],
+        "missing_branches": [
+          [
+            54,
+            55
+          ],
+          [
+            54,
+            56
+          ]
+        ],
+        "functions": {
+          "__getattr__": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 4,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 4,
+              "excluded_lines": 0,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 2,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              54,
+              55,
+              56,
+              58
+            ],
+            "excluded_lines": [],
+            "start_line": 47,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                54,
+                55
+              ],
+              [
+                54,
+                56
+              ]
+            ]
+          },
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 4,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 4,
+              "excluded_lines": 2,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [
+              7,
+              9,
+              29,
+              47
+            ],
+            "excluded_lines": [
+              11,
+              12
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 8,
+              "percent_covered": 0.0,
+              "percent_covered_display": "0",
+              "missing_lines": 8,
+              "excluded_lines": 2,
+              "percent_statements_covered": 0.0,
+              "percent_statements_covered_display": "0",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 2,
+              "percent_branches_covered": 0.0,
+              "percent_branches_covered_display": "0"
+            },
+            "missing_lines": [
+              7,
+              9,
+              29,
+              47,
+              54,
+              55,
+              56,
+              58
+            ],
+            "excluded_lines": [
+              11,
+              12
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": [
+              [
+                54,
+                55
+              ],
+              [
+                54,
+                56
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "totals": {
+      "covered_lines": 51,
+      "num_statements": 129,
+      "percent_covered": 40.136054421768705,
+      "percent_covered_display": "40",
+      "missing_lines": 78,
+      "excluded_lines": 21,
+      "percent_statements_covered": 39.53488372093023,
+      "percent_statements_covered_display": "40",
+      "num_branches": 18,
+      "num_partial_branches": 0,
+      "covered_branches": 8,
+      "missing_branches": 10,
+      "percent_branches_covered": 44.44444444444444,
+      "percent_branches_covered_display": "44"
+    }
+  }
+}

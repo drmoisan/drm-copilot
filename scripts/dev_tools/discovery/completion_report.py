@@ -1,29 +1,27 @@
-"""Completion report CLI: aggregate readiness across discovery artifacts.
+"""Route explicit legacy files separately from installed workspace completion.
 
-Purpose:
-    Implement the `dev.discovery.completion-report` Poetry console-script:
-    read and validate both a Coverage Ledger and a Parity Matrix artifact,
-    then render a deterministic aggregate-readiness report over them.
-
-Constraints:
-    Per `spec.md` "Constraints & Risks" ("Completion-report scope risk"),
-    the v1 scope of this aggregation is restricted to the Coverage Ledger
-    and Parity Matrix artifact categories only (this feature's declared
-    `depends_on`). `build_completion_summary` performs no validation itself;
-    validation of both inputs already occurred in `main` before this
-    function is called, so `"readiness"` reflects that both artifacts were
-    successfully validated, not any entry-count threshold.
+The historical flags, callable exports and injected validators remain supported.
+The resulting counts describe legacy artifacts only and confer no v2 completion,
+planning or host-gate authority. This module owns argument and I/O routing.
 """
 
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from scripts.dev_tools.discovery import rendering
+from drm_copilot_discovery.cli import run_installed_cli
+from drm_copilot_discovery.completion_report import (
+    build_completion_summary as build_completion_summary,
+)
+from drm_copilot_discovery.completion_report import (
+    render_completion_report as render_completion_report,
+)
+from drm_copilot_discovery.parity_report import parse_parity_matrix
+from drm_copilot_discovery.report_models import parse_coverage_ledger
+
 from scripts.dev_tools.discovery.io import (
     ArtifactValidationError,
     ArtifactValidator,
@@ -31,95 +29,17 @@ from scripts.dev_tools.discovery.io import (
     validate_or_raise,
     write_report,
 )
+from scripts.dev_tools.validate_discovery_artifacts import report_arguments
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
 
-def build_completion_summary(
-    coverage_artifact: dict[str, Any], parity_artifact: dict[str, Any]
-) -> dict[str, Any]:
-    """Aggregate readiness across a Coverage Ledger and a Parity Matrix.
-
-    Purpose:
-        Produce a pure aggregation summary over the two v1-scoped discovery
-        artifact categories. This function performs no validation; callers
-        must have already validated both artifacts (via `main`'s
-        validate-then-aggregate ordering) before calling this function, so
-        `"readiness"` can unconditionally report `"ready"` here.
-
-    Args:
-        coverage_artifact (dict[str, Any]): Parsed Coverage Ledger document.
-        parity_artifact (dict[str, Any]): Parsed Parity Matrix document.
-
-    Returns:
-        dict[str, Any]: A summary dict with one entry per artifact category
-        (`"coverage_ledger"`, `"parity_matrix"`), each
-        `{"present": True, "entry_count": <int>}`, plus a top-level
-        `"readiness"` field equal to `"ready"`.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-    return {
-        "coverage_ledger": {
-            "present": True,
-            "entry_count": len(coverage_artifact.get("entries", [])),
-        },
-        "parity_matrix": {
-            "present": True,
-            "entry_count": len(parity_artifact.get("entries", [])),
-        },
-        "readiness": "ready",
-    }
-
-
-def render_completion_report(summary: dict[str, Any]) -> str:
-    """Render an aggregate-readiness summary into report text.
-
-    Args:
-        summary (dict[str, Any]): Summary dict, as produced by
-            `build_completion_summary`.
-
-    Returns:
-        str: Deterministic, pretty-printed JSON report text.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-    return rendering.render_pretty_json(summary)
-
-
 def _default_coverage_ledger_validator(text: str) -> list[str]:
-    """Bind and invoke the real upstream Coverage Ledger validator.
+    """Validate text (str) through the lazy upstream coverage validator.
 
-    Purpose:
-        Provide the default coverage-input `ArtifactValidator` used by
-        `main` when no test-injected validator is supplied, mirroring
-        `coverage_report.py`'s `_default_coverage_ledger_validator`. The
-        upstream import is performed lazily, inside this function body, so
-        importing this module never hard-fails if the upstream validator
-        module is unavailable, and so unit tests (which always inject fake
-        validators for both inputs) never trigger this import path.
-
-    Args:
-        text (str): Raw Coverage Ledger artifact text to validate.
-
-    Returns:
-        list[str]: Empty list when `text` conforms to the Coverage Ledger
-        schema; otherwise one or more human-readable error strings.
-
-    Raises:
-        None beyond what the upstream validator itself may raise.
-
-    Side Effects:
-        May read a local or cached schema file via the upstream validator.
+    Returns list[str] errors, empty on success; upstream exceptions propagate.
+    The upstream validator may read a schema. Lazy import preserves injection.
     """
     from scripts.dev_tools.validate_discovery_schema_artifacts import (
         validate_coverage_ledger_text,
@@ -129,27 +49,10 @@ def _default_coverage_ledger_validator(text: str) -> list[str]:
 
 
 def _default_parity_matrix_validator(text: str) -> list[str]:
-    """Bind and invoke the real upstream Parity Matrix validator.
+    """Validate text (str) through the lazy upstream parity validator.
 
-    Purpose:
-        Provide the default parity-input `ArtifactValidator` used by `main`
-        when no test-injected validator is supplied, mirroring
-        `parity_report.py`'s `_default_parity_matrix_validator`. The
-        upstream import is performed lazily, inside this function body, for
-        the same reason as `_default_coverage_ledger_validator` above.
-
-    Args:
-        text (str): Raw Parity Matrix artifact text to validate.
-
-    Returns:
-        list[str]: Empty list when `text` conforms to the Parity Matrix
-        schema; otherwise one or more human-readable error strings.
-
-    Raises:
-        None beyond what the upstream validator itself may raise.
-
-    Side Effects:
-        May read a local or cached schema file via the upstream validator.
+    Returns list[str] errors, empty on success; upstream exceptions propagate.
+    The upstream validator may read a schema. Lazy import preserves injection.
     """
     from scripts.dev_tools.validate_discovery_schema_artifacts import (
         validate_parity_matrix_text,
@@ -159,43 +62,22 @@ def _default_parity_matrix_validator(text: str) -> list[str]:
 
 
 def parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
-    """Parse command-line arguments for the completion-report CLI.
+    """Parse argv (Sequence[str] or None) into the historical named paths.
 
-    Purpose:
-        Use explicit `--coverage-input`/`--parity-input` flags (rather than
-        a repeated generic `--input`) so the CLI can dispatch each artifact
-        to the correct validator without depending on an unverified
-        type-indicating field inside the not-yet-defined schema, per
-        `spec.md` "Completion-report CLI flag naming deviation".
-
-    Args:
-        argv (Sequence[str] | None): Argument list; `None` defers to
-            `argparse`'s own `sys.argv[1:]` default.
-
-    Returns:
-        argparse.Namespace: Parsed arguments with `coverage_input`,
-        `parity_input`, and `output`.
+    Returns argparse.Namespace; None reads sys.argv. Raises SystemExit for help
+    or invalid arguments, with argparse output to stdout/stderr. No file I/O.
     """
     parser = argparse.ArgumentParser(
-        description=(
-            "Render an aggregate-readiness report from a Coverage Ledger and "
-            "a Parity Matrix artifact"
-        )
+        description="Render a legacy coverage and parity compatibility summary"
     )
     parser.add_argument(
-        "--coverage-input",
-        required=True,
-        help="Path to the Coverage Ledger artifact JSON file",
+        "--coverage-input", required=True, help="Path to the Coverage Ledger JSON file"
     )
     parser.add_argument(
-        "--parity-input",
-        required=True,
-        help="Path to the Parity Matrix artifact JSON file",
+        "--parity-input", required=True, help="Path to the Parity Matrix JSON file"
     )
     parser.add_argument(
-        "--output",
-        default=None,
-        help="Path to write the rendered report; omit to write to stdout",
+        "--output", default=None, help="Report destination; omit to write to stdout"
     )
     return parser.parse_args(list(argv) if argv is not None else None)
 
@@ -206,58 +88,83 @@ def main(
     coverage_validator: ArtifactValidator | None = None,
     parity_validator: ArtifactValidator | None = None,
 ) -> int:
-    """Entry point for the `dev.discovery.completion-report` CLI.
+    """Forward workspace flags or render two explicitly selected legacy artifacts.
 
     Args:
-        argv (Sequence[str] | None): Argument list; defaults to
-            `sys.argv[1:]` via `parse_args`.
-        coverage_validator (ArtifactValidator | None): Optional injected
-            validator for the Coverage Ledger input, used by tests in place
-            of the real lazily-imported `_default_coverage_ledger_validator`.
-        parity_validator (ArtifactValidator | None): Optional injected
-            validator for the Parity Matrix input, used by tests in place
-            of the real lazily-imported `_default_parity_matrix_validator`.
+        argv (Sequence[str] | None): CLI arguments; None reads sys.argv.
+        coverage_validator (ArtifactValidator | None): Coverage checker, or lazy
+            upstream default on the legacy route. Canonical calls refuse any
+            injection; legacy helpers still enforce version and resource limits.
+        parity_validator (ArtifactValidator | None): Parity checker, or lazy
+            upstream default, subject to the same bounded helper authority.
 
     Returns:
-        int: `0` on success; `1` when either validator reports errors.
+        int: Installed exit for workspace calls; legacy 0/1 for render/rejection,
+            or 2 for mixed routes, invalid argv or canonical validator injection.
 
     Raises:
-        None. `ArtifactValidationError` is caught internally.
+        OSError: Input/output boundary failures propagate unchanged.
+        SystemExit: argparse rejects arguments or handles help.
+        Exception: Unexpected injected validator failures propagate unchanged.
 
     Side Effects:
-        Reads both input artifacts from disk, writes the rendered report to
-        disk or stdout, and may print validation errors to stderr.
+        Reads both inputs and writes one compatibility report to disk or stdout.
+        Validator diagnostics go to stderr; helper failures use a fixed message.
+        The legacy route grants no v2 authority. Canonical effects belong solely
+        to the installed service, including controlled report publication.
     """
-    args = parse_args(argv)
+    try:
+        arguments, legacy = report_arguments(
+            argv, input_flags=("--coverage-input", "--parity-input")
+        )
+    except ValueError:
+        print(
+            "Use separate legacy file or canonical workspace report arguments",
+            file=sys.stderr,
+        )
+        return 2
+    # Neither explicitly supplied validator may be ignored by canonical execution.
+    if not legacy:
+        if coverage_validator is not None or parity_validator is not None:
+            print("Injected validators require the legacy file route", file=sys.stderr)
+            return 2
+        return run_installed_cli("completion-report", arguments)
+    args = parse_args(arguments)
     active_coverage_validator = coverage_validator or _default_coverage_ledger_validator
     active_parity_validator = parity_validator or _default_parity_matrix_validator
-
     coverage_text = read_artifact_text(Path(args.coverage_input))
     parity_text = read_artifact_text(Path(args.parity_input))
 
-    # Validate both inputs before any aggregation or rendering occurs;
-    # collect errors from both so a caller sees every problem in one run
-    # rather than fixing one artifact at a time across repeated invocations.
-    all_errors: list[str] = []
+    # Collect both validator outcomes before any parsing, building or publication.
+    errors: list[str] = []
     try:
         validate_or_raise(coverage_text, active_coverage_validator)
     except ArtifactValidationError as exc:
-        all_errors.extend(exc.errors)
+        errors.extend(exc.errors)
     try:
         validate_or_raise(parity_text, active_parity_validator)
     except ArtifactValidationError as exc:
-        all_errors.extend(exc.errors)
-
-    if all_errors:
-        for error in all_errors:
+        errors.extend(exc.errors)
+    if errors:
+        # Preserve every upstream diagnostic in its original validator order.
+        for error in errors:
             print(error, file=sys.stderr)
         return 1
 
-    coverage_artifact = json.loads(coverage_text)
-    parity_artifact = json.loads(parity_text)
-    summary = build_completion_summary(coverage_artifact, parity_artifact)
-    report_text = render_completion_report(summary)
+    # Strict parsing and runtime builders retain authority with injected validators.
+    try:
+        coverage = parse_coverage_ledger(coverage_text)
+        parity = parse_parity_matrix(parity_text)
+        summary = build_completion_summary(coverage, parity)
+        report_text = render_completion_report(summary)
+    except ValueError:
+        print(
+            "Artifacts cannot be rendered as a legacy completion report",
+            file=sys.stderr,
+        )
+        return 1
 
+    # Keep the historical destination seam; v2 reports use controlled mutation APIs.
     if args.output:
         write_report(Path(args.output), report_text)
     else:

@@ -1,0 +1,183 @@
+{
+  "issue": 980,
+  "Timestamp": "2026-10-21T14:59:29.648035+00:00",
+  "Command": ".venv/Scripts/python.exe -B SCRATCH/issue-980-p6t2-builder-work-probe.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "One reproduced prospective-work defect; no other bounded parser finding or open probe.",
+  "status": "CHANGES_REQUIRED",
+  "scope": "Frozen two parser modules and their two tests; composition remains separately owned.",
+  "source_head": "cb34737468e0bdb94056c51ee61c2a29ee3728b0",
+  "candidate_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "working_sha256": "bbfa527472baf410a0c20c838703271e3ed3c1542ea2c983eacd2447d4a3b99b",
+      "git_lf_sha256": "bbfa527472baf410a0c20c838703271e3ed3c1542ea2c983eacd2447d4a3b99b",
+      "expected_git_blob": "1ba45c4a276728bd939cd4ffeee31b07804e8cbe",
+      "bytes": 14341,
+      "git_lf_bytes": 14341
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "working_sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "git_lf_sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "expected_git_blob": "ade15e157e3e74881b247f5ba6d78138efa67a6d",
+      "bytes": 8474,
+      "git_lf_bytes": 8474
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_commands.py",
+      "working_sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9",
+      "git_lf_sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9",
+      "expected_git_blob": "2b72744a80fb9b3acaa596a2a4e3f5af4d559043",
+      "bytes": 12322,
+      "git_lf_bytes": 12322
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_errors.py",
+      "working_sha256": "d463475db4e878305828e39a73af611037753d453c8a76fa9701e70c227882d2",
+      "git_lf_sha256": "d463475db4e878305828e39a73af611037753d453c8a76fa9701e70c227882d2",
+      "expected_git_blob": "7919572df770ab7f92ff0db434f664f3e7615435",
+      "bytes": 11210,
+      "git_lf_bytes": 11210
+    }
+  ],
+  "immutable_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t2-cli-baseline-interface.2026-10-21T14-37.json",
+      "working_sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465",
+      "git_lf_sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465",
+      "expected_git_blob": "894ba05bfe2f3eedba2a73ba0580cb330e92f9f2",
+      "bytes": 29386,
+      "git_lf_bytes": 29386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-freeze.2026-10-21T14-53.json",
+      "working_sha256": "a353cd2254884b61223bf21dfa4b05fb6e5c77236c1fe036fd8838c27e9ba4ed",
+      "git_lf_sha256": "a353cd2254884b61223bf21dfa4b05fb6e5c77236c1fe036fd8838c27e9ba4ed",
+      "expected_git_blob": "c1b5ca47e97d7d44a0d5fe930c1fa97356283dc8",
+      "bytes": 32781,
+      "git_lf_bytes": 32781
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-staging.2026-10-21T14-53.json",
+      "working_sha256": "56773c0a3af6255c2bbad10d00915f2a6c99c8733b5457fcda7b6c59bf87942e",
+      "git_lf_sha256": "56773c0a3af6255c2bbad10d00915f2a6c99c8733b5457fcda7b6c59bf87942e",
+      "expected_git_blob": "5badf67d4d4ea9aff61a81e6d08bdc09decb2c53",
+      "bytes": 5920,
+      "git_lf_bytes": 5920
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass3-tests.2026-10-21T14-52.json",
+      "working_sha256": "691496d593309f201b8428a6fd157510e757fc359852b7db0aacf01435aaa304",
+      "git_lf_sha256": "691496d593309f201b8428a6fd157510e757fc359852b7db0aacf01435aaa304",
+      "expected_git_blob": "0b7f08ac86fb1bfdf4ae5e9f64594f4f219c287c",
+      "bytes": 153875,
+      "git_lf_bytes": 153875
+    }
+  ],
+  "findings": [
+    {
+      "id": "PA1",
+      "priority": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "line": 345,
+      "callable": "build_cli_request",
+      "title": "Reserve direct-carrier character work before measuring the invocation.",
+      "source_basis": "CliInvocation construction checks shape, but build_cli_request invokes ReportBudget.check on the entire direct request before any work reservation. ReportBudget.check measures strings without debiting the separate work counter. Later reservations therefore reject only after the unreserved scan.",
+      "reproduction": "At artifact_records=2, work capacity is 128. Direct immutable doctor requests with retained root lengths 64 and 1024 measure 147 and 1107 characters respectively before the first work call. Both subsequently raise ReportLimitError; no provider or service runs.",
+      "impact": "The public builder performs character work beyond its supplied work ceiling before refusal. This is a bounded-resource ordering defect, not schema authority bypass, filesystem execution or a demonstrated normal console-path failure.",
+      "minimal_repair": "Within cli_arguments.py, reserve bounded structural and character work for direct invocation fields before their Unicode/byte scan, copying, typed reconstruction or serialization. Keep the canonical-root substitution, deterministic IDs, schema ownership and fixed error contract unchanged; do not change accepted ReportBudget/service implementations.",
+      "required_controls": [
+        "A direct carrier with a long retained root and insufficient work must refuse before its character scan, copy or encoder/hash invocation; use deterministic counts.",
+        "Apply the same refusal check to a long non-root direct field so the complete public-carrier contract is covered, not only the replaced root.",
+        "Retain an adequate-capacity positive direct-builder control and exact request identity/schema assertions; preserve all existing 106 node identities/assertions."
+      ]
+    }
+  ],
+  "reviewed_clear": [
+    "All 31 command names, 27 canonical operations and four aliases match the frozen preparation; fixed selectors, option applicability and service-owned combination validation are retained.",
+    "Canonical root is supplied to the builder before request-ID generation; host references are null and no provider/module dispatch occurs in either parser module.",
+    "Normal argv parsing reserves sequence count and token-character work before token scans/retention; exact-string validation, Unicode byte accounting and duplicate rejection are present.",
+    "Safe fixed errors/help, immutable request carriers and the scoped intent contracts are adequate apart from PA1 ordering; all four files remain within 500 physical lines."
+  ],
+  "existing_proof_qualification": "The owner frozen run passed 106/106 after the single new-scenario positive fixture gained required --input proposal.json. Owner reports both modules and all 12 named BODY ranges at 100% (203/203 statements, 66/66 branches). This existing result remains preserved; it does not prove PA1 pre-reservation ordering. No suite was replayed by this reviewer.",
+  "original_fixture_failure": "Retained by owner freeze/archive. Missing required input_path was a positive-test setup error, with no inferred production defect.",
+  "probe": {
+    "observations": [
+      {
+        "supplied_root_characters": 64,
+        "expanded_work_capacity": 128,
+        "outcome": "ReportLimitError",
+        "supplied_root_scan": {
+          "event": "text",
+          "characters": 64,
+          "is_supplied_root": true,
+          "work_left": 128
+        },
+        "work_reservations_before_supplied_root_scan": [],
+        "characters_measured_before_first_work_reservation": 147
+      },
+      {
+        "supplied_root_characters": 1024,
+        "expanded_work_capacity": 128,
+        "outcome": "ReportLimitError",
+        "supplied_root_scan": {
+          "event": "text",
+          "characters": 1024,
+          "is_supplied_root": true,
+          "work_left": 128
+        },
+        "work_reservations_before_supplied_root_scan": [],
+        "characters_measured_before_first_work_reservation": 1107
+      }
+    ],
+    "archive_entries": {
+      "probe.py": {
+        "encoding": "gzip-base64",
+        "sha256": "e85d9d46d7efcd6c79c3faef319d86e6f04d4cc940a47b3e65449709379cac94",
+        "bytes": 2999,
+        "data": "H4sIAAAAAAAC/7VW32/jNgx+918h9MX2kLqJk1x+AHnZYQM6HNbDXotAkCW60dW2PElumx36vx8lO4596XXDAcuLI4n8SH4kRV1dXd1lBvQTEHsAkmv1D1Tk46dbkjWyEKBDQ2oN1xqcELNSVcRwVpFnaQ+qseT25o7USluTXF1dBbJ0/8mBmUMhs9Pyi1FVgNAlqZl1B6Q7+IzL9qCppLVgbFIq/ng6Rml+CFoBoUvKVS0LZamQhqsn0MeEF5Iy/dCUUFlzUvtYyNvqSXHv7aQNhDpJDX83aGOCwNoAHSm/Z6VUAooe/g+M5i77AhyBPjugT7KU7wNocJp0jPOX3/y1EQ9gg8AxY8iO3Ic144/sAcxNr3+tm8rKEm6M5jdvWrgZxZLUx3ASkNPv5xG5KktWCQ+4DzLIlQb08atzdnvKcmIOLF1+iFwyI3cSY7xM0OyICY3iODnAi5Bo3kYxQQRfBERW/mteA2awtCwpJAq0JpInVjRel+wcI1mWs2W6WqzSjOWL2ZRNeTrl6/l6NZ2nqxnMQcz5bLlIgaV8s54D4yJdLFZiwebZZpMNyXj7F+bT9ZrP55vFOp2vpqnIxTxf83yVrflinYuMz9bLzXTDNulstYINY6tlni9Xm9ksTfM5Y44eZhw5b9RWFArFrdLhhETxBCN19bIb1A5GeqJBGlkZyyoOkQOcjKs5DpSWD7JiBbXwggXYL5+VfkTrw6JKWpHRlhMLsJmbwvpq2wcuIwVUD21O7j8sJmQ2TRf7refMNHVdSBAoG+qQ/NKJ+jPZu4WnIzejrtN2516JbFMXEEWPcJycUWVOcMNlOXSeGaxUoFopGxLsFCC+EOI+e85XD+D3nb+Oo6SzlpRQZqBNjBy7jjMSOT9SKXZ/qqpDablHf4fsM21lzrjFC4IrLcwubYXhyV8rnia3FpATrrBzQHj6IwNF3jkTb3svW7WE1TVUIvoa+nW4JaHTwRoI+YFpNIeu4i4SGrUIeCINPXHT0rA9hWp60n5YzJ5CWkDu1JxrSb/xeuZQg210RUZ1NArkIlSH0kn4rf8Sqrc8GBou7C5NIFDAA01+0uULh7ykm0jtyEhUW3LDyp/09A8zGE/e1XCGBhpuOQje6uN2lIuLSRPJwRwaF/guvHkO+7ug/cQjNJyueP+C7zxPABJ3Jv6FQ23Jb/7jOpAZAlorvf0Bhj3WEHmJOKG0YiVQ6kV9n7Q9XLlSkJWAF99p/h+2knp2nQYVXmaaWUTxSY9d8+JZglRFl4Ubt8F0V825QkZS9PtOwKsFaYeXGqdORzjlDEmT9ugkPE1Jf17hQDXnfgi7cFGy+4dgY4Pu7YLHbQj3p9j3A4zvK9fQdijRN4HuHTuOrBNLLfC2R+5Yuu9aY9/fdaPuGDpw5oSWwEyj0WTnQi61sfRCG1unKSNvZUDo/i2/3kzxv2S49323u/Q83scD31vFnmDsYZajM//Xm+H0ItkRbyaotaxs5J6biWjK2mC9SWMaVxCb9RSLodYqc6uwbrJC8suOdY/dmklBeiKv/WTFsQAI/tA9JcLWMiK1fxDae4Ab/usueZxMjomuA1rjTxJhqNLUESjxKuCsKJzUtMPFRxlaoW18rvrw7HeGo/B14pNVWRxOcfANe+moo7cLAAA="
+      },
+      "stdout.bin": {
+        "encoding": "gzip-base64",
+        "sha256": "9193f2b587c98f5ace6ae20f5324bc25d3a86e627de80aad47b1bb8dfe3fc075",
+        "bytes": 34330,
+        "data": "H4sIAAAAAAAC/+1cQXPbKBS+d6b/QeNzukGABOp9b3vaa6ejQQhlNbUtFcnZdjr97yvZSRynTaiTYPD28yWOhXjf++C9B5b5vr19kySLdhg2ZvE+KSS52H7Q266aP1j0m2rZ6qTatMu61Mu2tObzxgxj0lvTq7ZO9D/KKj0a++7fzn5KOlsb266vFrt+KtN0du7o2/zv3LHSn9SVGS7rdtDdtbFf39nNemxX5nKw+rK2q1J3fbvsxvKuxeVsV9mrzcqsx+GP/usMrKoalVHBBa1Uw1OiiKZESyYFYVSkhpma6TTj1CiqC8mM0jXlXNRcsaooqh3AlyDS3Wql1vUtoIZIqRkruKRMEFo3NWukbkQlNZdNXelUZgUpVEFTIUyhlMiaJhNFmlLaMKUWM57vO9pUMxEK1o5kTavBDFOnH3YYb8ibLgybvl+2pi5tN+G5m7Fz25xf3DUzX/oJ2dRsnsmlVpOP7TijTKnct+o24+TDNjj+Nn1nx7/aVTv+aW1nFxePmBy0Wu+Hc2fsehqWuZPRfBn3N85uPIJvG6flQcdTg9FuzP0mW+xL04w73LdXvu+hbVtYMxh7rca2Ww/lLkrLn2L+8HF/5x5ZuTJq2Nip7c29TWuHsXzY9YyBi3sMz07fG6KDYXqalofEiMNrP2GmUcvBHLZ6hJz79DwbUB4bIA6Gzo2hlMSGqMAkco0ZjQ5RfJHvRvSgjnkGlJ2aoR8q42HXN6tqU89d56fj4eVzN6WvCghlHWUdZR1lHWX9DMp6dBTFXNbl41ZzTuaXL8s5ecI0K6YX9eY0d5hmNATfk2XJvY00E7nLNvG3eHT4zXMeiHFa5L4sc8cMp9Lfaj1zDDblMhDhxF9cp9TBOJHephl9OqfIItQMl4W/uHY6zYKNtZwGOxDhwl9cuwgX0l8OJy63szwQ4bm/ZMadpkko01kRaJUiM+4vlzmiOmN5qEWK5MEmuM+VQu4y7S+jcEc2o8Fq5lRdAm0+5LHfXb6e08TfNtOx2ZtMkzBOiyL3ZllQh+ks0EhPCxRvTjOH01LQUHx73OA6+Ba5t8giLsvBNvU+bTsse1waUcIdtmWgoiXYkVHt/anXFpR43UdxPEpUL/8W3AeqLEqqWJSoouSKxggqzvEjoOpUT1l9gMqjrDWY6eddAKPMn2mUqAQWMEhVvwNTcWaqNEj8HbPvFSk9t4z0jB+wnGD76QHVK8xpD6iyKKliUaKKkisaI6g4x4+AqpNtPz2AyqOsNZjp510Ao8yfaZSoBBYwSFW/A1NxZqo0SPwd8+iT5b963O/27cfdm1scvyS8kBIaufTCAcIzFV9ICdQXcAgRDOGYZoJjmidCFOG8ptBfgP4CCjsKOwo7CjsKO/QXoL8A/QXoLwQ4qgH9BegvQH8hgf4C9Begv3A84dBfgP4C9BegvwD9BegvHOk09BegvwD9BegvQH/Bx28iob+A44vQX0igvwD9hQT6CzjUDP0F5E/oL0B/AfoLyFTQX4D+wv/7UBf0F6C/AP0FUAX9BegvQH8B+gvQX0Cqgv4C9Bee9WO4XDxbgGH+s5MMWPS2u25rY8vOlrPZVptSq+VyuHuSvhjbVbu+KtUwXd9qEdz6/vbN1NN/0Zwg2BqGAAA="
+      },
+      "stderr.bin": {
+        "encoding": "gzip-base64",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "data": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+      }
+    },
+    "provider_or_service_calls": 0,
+    "timing_assertions": false,
+    "execution_history": "Initial setup used artifact_records=1 and the existing record guard rejected before the selected text, causing the observation lookup to raise StopIteration. Corrected only that probe policy to 2, sufficient for the root and inputs objects. The same two-case successful probe was captured once more verbatim for lossless evidence; no new scenario or owner test replay.",
+    "original_diagnostic": {
+      "exit_code": 1,
+      "exception": "StopIteration",
+      "expression": "next(index for index, row in enumerate(events) if row.get('is_supplied_root'))"
+    }
+  },
+  "open_probes": [],
+  "additional_source_findings": [],
+  "documentation_only_residue": [],
+  "repair_authorization": "Coordinator-owned; this receipt does not authorize edits.",
+  "task_accepted": false,
+  "task_counts": {
+    "accepted": 47,
+    "total": 84
+  },
+  "ac_counts": {
+    "accepted": 23,
+    "total": 66
+  },
+  "next_five_tasks": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

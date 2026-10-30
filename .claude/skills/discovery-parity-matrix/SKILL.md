@@ -1,63 +1,46 @@
 ---
 name: discovery-parity-matrix
-description: 'Produce or refresh the parity matrix in the discovery workflow. Use when building the parity matrix from feature contracts and runtime characterization evidence and routing parity reasoning to the parity role. Fifth stage, after runtime characterization and before behavior reconciliation.'
+description: 'Dispatch parity reconciliation to the canonical Requirements Reconciler workflow. Use when invoking the existing discovery parity-matrix alias.'
 ---
 
-# Discovery Parity Matrix
-
-Runs the parity stage of the discovery and parity-definition workflow. It
-produces or refreshes the parity matrix by comparing the feature contracts
-against the runtime characterization scenarios, so the workflow can measure how
-closely the modern target reproduces the legacy behavior. All domain specificity
-is read from the domain profile at runtime.
+# Discovery Parity Matrix Alias
 
 ## When to Use This Skill
 
-- Feature contracts and runtime characterization scenarios both exist.
-- You need a current parity matrix before reconciling unspecified behavior.
+Use this compatibility name only to dispatch to its canonical workflow.
 
-## Prerequisites
+## Inputs
 
-- `discovery-coverage-ledger` and `discovery-runtime-characterization` have
-  completed.
-- The domain profile is loaded and valid.
+| Input | Required contract |
+| --- | --- |
+| inputs | Required inputs of the linked canonical workflow, forwarded unchanged. |
 
-## Workflow
+Forward all other supplied canonical inputs to the selected target. These
+alias selectors are not service-request fields. A fixed mapping requires no
+additional selector; it does not add fields to `prepare-agent`.
 
-1. **Consume upstream artifacts.** Read the feature contracts (schema
-   `schemas/discovery/v1/feature-contract.schema.json`) and the runtime
-   characterization scenarios (schema
-   `schemas/discovery/v1/runtime-characterization-scenario.schema.json`).
+## Dispatch
 
-2. **Produce or refresh the parity matrix.** Build the parity matrix conforming
-   to the schema `schemas/discovery/v1/parity-matrix.schema.json`, mapping each
-   feature contract to its characterized behavior and its current parity state.
-   When the matrix already exists, refresh it in place from the latest upstream
-   artifacts.
+| Selector | Canonical skill |
+| --- | --- |
+| fixed | reconcile-parity-matrix |
 
-3. **Route parity reasoning.** Hand the matrix to the parity role for reasoning
-   about gaps and states (see `## Worker Routing`).
+Dispatch directly to `reconcile-parity-matrix`, whose logical role is `requirements-reconciler`. Do not route parity ownership to Legacy Parity Analyst or bypass the canonical root preparation.
 
-## Worker Routing
+This alias has no independent output or write authority. Do not duplicate
+business validation, call tools independently, create a receipt, change a model
+or auto-launch a role. Use only the linked canonical workflow's lifecycle and
+exact grants; no alias chain or filesystem fallback is permitted.
 
-- Worker: `legacy-parity-analyst`
+## Stop and result
 
-The parity role reasons about each parity-matrix entry, classifying parity state
-and flagging gaps for behavior reconciliation.
+Return the selected canonical workflow's explicit result and references without
+changing failed, blocked, pending or incremental outcomes into completion.
+An unknown selector fails with no fallback. Missing configuration or native
+capability is handled by the canonical workflow, including initialization's
+explicit root bootstrap exception. The alias cannot bypass prepare/finalize or
+native start/stop requirements.
 
-## Validation
+## References
 
-- Validate the parity matrix with `dev.discovery.validate-parity-matrix`.
-- An empty error list is a pass. On any error, follow the direction in
-  `discovery-validate-artifacts`.
-
-## Referenced Skills
-
-- `discovery-workflow` — stage order and the canonical Referenced Contracts
-  registry.
-- `discovery-validate-artifacts` — pass/fail semantics and error routing.
-
-## Notes
-
-- Parity gaps flagged here are the primary input to
-  `discovery-behavior-reconciliation`.
+- [reconcile-parity-matrix](../reconcile-parity-matrix/SKILL.md)

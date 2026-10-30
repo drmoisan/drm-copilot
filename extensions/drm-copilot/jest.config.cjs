@@ -1,3 +1,9 @@
+// Issue #980: the discovery host modules keep their per-file thresholds in a
+// sibling JSON map (gated at 90% lines / 75% branches) so that this file stays
+// below the 700-line advisory tier of the tiered file-size policy; the map is
+// merged below and carries no `global` key.
+const discoveryCoverageThresholds = require("./jest.discovery-coverage.json");
+
 /** @type {import('jest').Config} */
 module.exports = {
   testEnvironment: "node",
@@ -23,6 +29,7 @@ module.exports = {
   // unrelated legacy coverage. Zero-branch definition modules report 100% branch
   // by convention and therefore satisfy the branch gate.
   coverageThreshold: {
+    ...discoveryCoverageThresholds,
     // Issue #574: the three pr-context modules changed by the collect-pr-context
     // path-identity and freshness fix. The map carried no entry for any
     // src/lib/pr-context/ file before this change.
@@ -93,6 +100,11 @@ module.exports = {
     },
     "./src/lib/validate/orchestrator-state-core.ts": {
       lines: 85,
+      branches: 75,
+    },
+    // Issue #980: the fixed discovery-routing helper beside the topology resolver.
+    "./src/lib/validate/codex-discovery-routing.ts": {
+      lines: 90,
       branches: 75,
     },
     "./src/lib/validate/orchestrator-state-blocked-reason.ts": {
@@ -231,26 +243,9 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
-    "./src/repo-automation-execute-discovery.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/mcp-tool-inputs-discovery.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/mcp-handlers/discovery-handlers.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/mcp-discovery-tool-definitions.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/discovery-command-registration.ts": {
-      lines: 85,
-      branches: 75,
-    },
+    // The discovery host-module entries (execute adapters, MCP inputs/handlers/
+    // definitions, command registration, result and runtime transport) live in
+    // jest.discovery-coverage.json and are merged at the top of this map.
     "./src/mcp-tools.ts": {
       lines: 85,
       branches: 75,
@@ -490,6 +485,49 @@ module.exports = {
       branches: 75,
     },
     "./src/mcp-repo-automation-tool-definitions-handoff.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #980, remediation cycle 1 (P15-T20): the ten production files that
+    // were measured but carried no per-file entry. Per-file entries only; the
+    // map has no `global` key.
+    "./src/lib/codex-native-converter/classifier-claude.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/classifier.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/inventory.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/mapping.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/pipeline-render.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/rewrites-rules.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/rewrites.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/codex-topology-resolver.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestrator-state-codex-model-routing.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/repo-automation-tool-names.ts": {
       lines: 85,
       branches: 75,
     },

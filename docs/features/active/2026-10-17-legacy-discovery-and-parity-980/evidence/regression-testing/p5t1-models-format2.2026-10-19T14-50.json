@@ -1,0 +1,39 @@
+{
+  "command": [
+    "poetry",
+    "run",
+    "black",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py"
+  ],
+  "duration_seconds": 1.507,
+  "exit_code": 0,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-format2-harness.2026-10-19T14-50.txt",
+    "sha256": "fc532a34c151e723d7b676caa54fdf17a408d2b4b953c084c4aa61dbfc1d041c"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "tests/discovery_runtime/test_agent_output.py": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371",
+    "tests/discovery_runtime/test_mutation_plan.py": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+    "tests/discovery_runtime/test_validation_modes.py": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "dde31340749ed3d5220b54c157c62bab9a80e77dc9d5f0c304dfb9b7796e9436",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "tests/discovery_runtime/test_agent_output.py": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371",
+    "tests/discovery_runtime/test_mutation_plan.py": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+    "tests/discovery_runtime/test_validation_modes.py": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed"
+  },
+  "started_at": "2026-10-19T14:50:24.672426+00:00",
+  "stderr": {
+    "base64": "cmVmb3JtYXR0ZWQgcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxyZXBvcnRfbW9kZWxzLnB5DQoNCkFsbCBkb25lISDinKgg8J+NsCDinKgNCjEgZmlsZSByZWZvcm1hdHRlZC4NCg==",
+    "sha256": "60a0e0c8f7070af1c7aba7797561c75bb6add26e850e888dd4dd7db15d8bb847"
+  },
+  "stdout": {
+    "base64": "",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-19T14:50:26.181782+00:00"
+}

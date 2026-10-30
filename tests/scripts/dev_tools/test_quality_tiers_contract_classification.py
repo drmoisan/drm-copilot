@@ -33,6 +33,7 @@ SPEC_TIER_ASSIGNMENTS: tuple[tuple[str, str], ...] = (
     ("scripts/powershell", "T4"),
     (".claude/hooks", "T3"),
     (".codex/hooks", "T3"),
+    (".github/hooks", "T3"),
     (".claude/lib/bash", "T3"),
     (".claude/lib/blast-radius", "T3"),
     (".claude/lib/ci-gate", "T3"),
@@ -48,7 +49,7 @@ SPEC_TIER_ASSIGNMENTS: tuple[tuple[str, str], ...] = (
     (".claude/lib/requirements", "T3"),
     (".claude/lib/worktree-resolution", "T3"),
 )
-"""The 24 rows of the spec "Tier assignments" table, in table order."""
+"""The 25 rows of the spec "Tier assignments" table, in table order."""
 
 
 def test_find_classification_errors_valid_manifest_returns_no_errors() -> None:
@@ -182,7 +183,7 @@ def test_committed_quality_tiers_yml_matches_live_tree() -> None:
 
 
 def test_committed_quality_tiers_yml_assigns_spec_tiers() -> None:
-    """Every spec tier-table row is present with its tier, and no entry is T1 or T2."""
+    """Preserve existing tiers and permit only the approved discovery T2 package."""
     # Arrange
     text = (REPO_ROOT / "quality-tiers.yml").read_text(encoding="utf-8")
 
@@ -192,8 +193,11 @@ def test_committed_quality_tiers_yml_assigns_spec_tiers() -> None:
     # Assert
     assert manifest is not None
     assigned = {entry.path: entry.tier for entry in manifest.entries}
-    assert len(SPEC_TIER_ASSIGNMENTS) == 24
+    assert len(SPEC_TIER_ASSIGNMENTS) == 25
     for path, tier in SPEC_TIER_ASSIGNMENTS:
         assert assigned.get(path) == tier, f"{path}: expected {tier}"
     elevated = sorted(path for path, tier in assigned.items() if tier in {"T1", "T2"})
-    assert elevated == [], f"unexpected T1/T2 entries: {elevated}"
+    assert assigned["packages/discovery-runtime"] == "T2"
+    assert elevated == [
+        "packages/discovery-runtime"
+    ], f"unexpected T1/T2 entries: {elevated}"

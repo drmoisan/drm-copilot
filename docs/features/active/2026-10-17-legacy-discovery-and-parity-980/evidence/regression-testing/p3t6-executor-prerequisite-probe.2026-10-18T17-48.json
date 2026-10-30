@@ -1,0 +1,205 @@
+{
+  "timestamp": "2026-10-18T17:47:48.949124+00:00",
+  "task": "P3-T6 prerequisite review only",
+  "acceptance_baseline": "27753e5f8b9a6cd1d85b9d1d28d2999800af209a",
+  "elapsed_seconds": 17.529,
+  "checks": [
+    {
+      "name": "frozen_production_hashes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "complete_member_bytes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "missing_member",
+      "passed": true,
+      "detail": "Transport requires its exact complete declared file set"
+    },
+    {
+      "name": "extra_member",
+      "passed": true,
+      "detail": "Transport requires its exact complete declared file set"
+    },
+    {
+      "name": "changed_member_bytes",
+      "passed": true,
+      "detail": "Transport member identity, size or checksum differs"
+    },
+    {
+      "name": "wrong_member_id",
+      "passed": true,
+      "detail": "Transport member identity, size or checksum differs"
+    },
+    {
+      "name": "forged_route",
+      "passed": true,
+      "detail": "Transport route differs from its original manifest"
+    },
+    {
+      "name": "wrong_manifest_digest",
+      "passed": true,
+      "detail": "Transport manifest checksum differs"
+    },
+    {
+      "name": "unsupported_version",
+      "passed": true,
+      "detail": "Transport manifest is malformed or uses an unsupported schema"
+    },
+    {
+      "name": "mutable_pin",
+      "passed": true,
+      "detail": "Transport manifest is malformed or uses an unsupported schema"
+    },
+    {
+      "name": "wrong_counts",
+      "passed": true,
+      "detail": "Transport member counts differ"
+    },
+    {
+      "name": "verification_flags_not_digest_authority",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "export_metadata_still_bound",
+      "passed": true,
+      "detail": "Transport manifest checksum differs"
+    },
+    {
+      "name": "wrong_root_denied",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local_evidence_projection_before_export",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary_grant_stays_closed",
+      "passed": true,
+      "detail": "PATH_WRITE_DENIED: 'docs/migration/discovery/source-snapshots/export-alpha/docs/migration/discovery/feature-contracts/alpha.json': Use the artifact kind's exact configured file or child location."
+    },
+    {
+      "name": "exact_transport_grant",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "root_route_rejects_specialist",
+      "passed": true,
+      "detail": "MUTATION_TRANSPORT: Transport is a root-only operation"
+    },
+    {
+      "name": "incomplete_set",
+      "passed": true,
+      "detail": "MUTATION_TRANSPORT: Require the exact complete transport grants and members"
+    },
+    {
+      "name": "extra_grant",
+      "passed": true,
+      "detail": "MUTATION_TRANSPORT: Require the exact complete transport grants and members"
+    },
+    {
+      "name": "real_complete_planner_positive",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "manifest_published_last",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all_write_contexts_bound",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all_physical_inputs_retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all_export_members_retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "proven_replicas_resolve_once",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local_evidence_projection_after_export",
+      "passed": false,
+      "detail": {
+        "code": "EVIDENCE_TARGET",
+        "message": "EVIDENCE_TARGET: Select one captured local artifact"
+      }
+    },
+    {
+      "name": "unbound_replicas_remain_duplicates",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "changed_raw_replicas_remain_duplicates",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "real_capture_agrees_with_projection",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary_same_byte_duplicate_still_rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "bound_bytes_unchanged",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "passed": 31,
+  "failed": 1,
+  "before_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "16c94114fbfef4143d0b4628dd6e94b4ab1feeb4b415dcb93d7b3bd00f385262",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "cc81447dfcb9fe5cb462a3239db45662a7ee87e95db7c9571d53ee244d7404ac",
+    "tests/discovery_runtime/test_snapshot_export.py": "f9dbd5bb484575018c1dea8f24055c6d18089fda590b646cef48e027ee058f99",
+    "tests/discovery_runtime/test_snapshot_import.py": "549068c4963c4c3575f7ead4473c46028f0efa00a8589f905ef665e4e8b8673b",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2"
+  },
+  "after_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "16c94114fbfef4143d0b4628dd6e94b4ab1feeb4b415dcb93d7b3bd00f385262",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "cc81447dfcb9fe5cb462a3239db45662a7ee87e95db7c9571d53ee244d7404ac",
+    "tests/discovery_runtime/test_snapshot_export.py": "f9dbd5bb484575018c1dea8f24055c6d18089fda590b646cef48e027ee058f99",
+    "tests/discovery_runtime/test_snapshot_import.py": "549068c4963c4c3575f7ead4473c46028f0efa00a8589f905ef665e4e8b8673b",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2"
+  },
+  "details": {
+    "replica_aliases": {
+      "docs/migration/discovery/feature-contracts/alpha.json": "docs/migration/discovery/source-snapshots/export-alpha/docs/migration/discovery/feature-contracts/alpha.json",
+      "docs/migration/discovery/unspecified-behaviors.yaml": "docs/migration/discovery/source-snapshots/export-alpha/docs/migration/discovery/unspecified-behaviors.yaml"
+    }
+  },
+  "limits": "Memory-only behavior; one actual planner projection, no commit or task acceptance.",
+  "publication_timestamp": "2026-10-18 17:48:36 UTC"
+}

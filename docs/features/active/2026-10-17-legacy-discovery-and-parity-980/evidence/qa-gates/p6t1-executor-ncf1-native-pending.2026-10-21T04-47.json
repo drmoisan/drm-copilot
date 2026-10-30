@@ -1,0 +1,56 @@
+{
+  "Timestamp": "2026-10-21T04-47",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -B SCRATCH/issue-980-ncf1-native-pending-union.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "The verified 52-path repair union is retained and extended only with the new native suffix failure, this addendum and the final union.",
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "head": "bb249a0751b8e74d2e42a1e6ee1b4fca2dcf2e17",
+  "prior_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf1-ready.2026-10-21T04-44.json",
+    "sha256": "b7b8dd36febde64cf878625a2f7b9d83a17cc87e4169c0d2074c2da17e0bd16e",
+    "bytes": 5958,
+    "git_lf_sha256": "b7b8dd36febde64cf878625a2f7b9d83a17cc87e4169c0d2074c2da17e0bd16e"
+  },
+  "prior_union": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf1-staging.2026-10-21T04-44.json",
+    "sha256": "bb29a4098eed8aaa17918d73c55cd737107f4a164d959c70aa22bd719a5315cf",
+    "bytes": 26634,
+    "git_lf_sha256": "bb29a4098eed8aaa17918d73c55cd737107f4a164d959c70aa22bd719a5315cf"
+  },
+  "native_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf1-suffix.2026-10-21T04-44.json",
+    "sha256": "76d6df6cd6d221bbb089e2d8e8224674bc008a4c0a1aac044d9cd5e0c2be4666",
+    "bytes": 26120,
+    "git_lf_sha256": "76d6df6cd6d221bbb089e2d8e8224674bc008a4c0a1aac044d9cd5e0c2be4666"
+  },
+  "native_raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf1-suffix-raw.2026-10-21T04-44.json",
+    "sha256": "ec0bacc50a3c0e23c9e91e2dff8d04552a6b9200f87de430ddd2d252a2139c08",
+    "bytes": 47442,
+    "git_lf_sha256": "ec0bacc50a3c0e23c9e91e2dff8d04552a6b9200f87de430ddd2d252a2139c08"
+  },
+  "native_result": {
+    "fresh_installed_identity": "PASS, 1.313 seconds",
+    "configure_dry": "SERVICE_FAILURE, exit 3, null runtime/manifest, 1.011 seconds",
+    "remaining_calls_unexecuted": 14,
+    "cause": "UNPROVEN; separate bounded diagnosis required",
+    "inputs_fixtures_package": "Owner reports unchanged; no reviewer replay"
+  },
+  "disposition": "The exact 26-case repair proof, two fresh BODY units, retained unchanged bodies and package verification remain valid. This is recoverable checked WIP, not successful native configure or task acceptance. Historical init retains its original package identity and the existing carry qualification.",
+  "native_acceptance": "PENDING",
+  "task_accepted": false,
+  "reviewer_execution": "Verified only the two new artifact hashes and extended the immutable manifest; no source review, probe, suite, runtime/native/build, source/test/package/fixture/state, checkpoint, Git or index mutation.",
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ],
+  "final_staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf1-preservation-staging.2026-10-21T04-47.json"
+}

@@ -1,0 +1,31 @@
+"""Verify source modules retain package and read-only boundaries."""
+import ast
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path.cwd()
+for name in ("source_read_models", "source_reads"):
+    path = root / "packages/discovery-runtime/src/drm_copilot_discovery" / (name + ".py")
+    text = path.read_text("utf-8")
+    tree = ast.parse(text)
+    imports = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            imports.append(node.module)
+        elif isinstance(node, ast.Import):
+            imports.extend(alias.name for alias in node.names)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            assert node.func.id not in {"open", "exec", "eval"}, (name, node.lineno)
+    assert not any(value.startswith(("scripts", "subprocess", "socket", "requests", "http", "urllib", "os", "pathlib")) for value in imports), name
+    assert not any(isinstance(node, ast.ImportFrom) and any(alias.name in {"LocalGitReader", "WriteGrant", "InvocationContext"} for alias in node.names) for node in ast.walk(tree)), name
+    assert len(text.splitlines()) <= 500, name
+    if name in {"source_read_models", "source_reads"}:
+        assert not any(value.endswith(("init_io", "mutation_filesystem")) for value in imports), name
+    print("PASS source package/read-only boundary: " + name)
+for name in ("test_source_reads", "test_source_read_limits", "test_source_read_snapshot_scope"):
+    text = (root / "tests/discovery_runtime" / (name + ".py")).read_text("utf-8")
+    assert len(text.splitlines()) <= 500, name
+    assert not any(token in text for token in ("tmp_path", "tmpdir", "TemporaryDirectory", "NamedTemporaryFile", "tempfile")), name
+    print("PASS in-memory test boundary: " + name)
+sys.exit(subprocess.call([sys.executable, "-m", "pytest", "-o", "addopts=-ra", "tests/discovery_runtime/test_package_contract.py", "-k", "canonical_modules_do_not_import_repository_tooling", "-q"]))

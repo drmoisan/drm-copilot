@@ -1,0 +1,41 @@
+{
+  "result_version": "2.0.0",
+  "operation": "validate-all",
+  "mode": "discovery-complete",
+  "ok": false,
+  "exit_code": 1,
+  "findings": [
+    {
+      "code": "COMPLETION_PROFILE",
+      "severity": "error",
+      "artifact_path": "docs/migration/discovery/domain-profile.yaml",
+      "pointer": "/profile_state",
+      "related_ids": [],
+      "related_paths": [],
+      "message": "The profile is still a draft, so discovery cannot be complete.",
+      "next_action": "Complete the profile, activate the workspace and re-run validation."
+    }
+  ],
+  "artifacts": [],
+  "summary": {
+    "message": "Discovery completion failed.",
+    "counts": [{"name": "findings", "value": 1}],
+    "validation_result": "fail",
+    "receipt_ref": null,
+    "invocation_ref": null
+  },
+  "input_manifest": {
+    "entries": [],
+    "missing_paths": [],
+    "source_repositories": [],
+    "target_repositories": [],
+    "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "runtime": {
+    "package_version": "2.0.0",
+    "schema_version": "2.0.0",
+    "build_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "policy_version": 2,
+    "policy_sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "Timestamp": "2026-10-20T10-34",
+  "Command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py tests/discovery_runtime/test_acceptance_properties.py",
+  "EXIT_CODE": 1,
+  "duration_seconds": 1.208820600004401,
+  "started": "2026-10-20T10:34:45.614000+00:00",
+  "finished": "2026-10-20T10:34:46.821939+00:00",
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "sha256": "d3a6c6bced0beee363b1748e5f25971baf68b44b76f9d3c803c89d480d084efe",
+      "physical_lines": 469
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "sha256": "d3a6c6bced0beee363b1748e5f25971baf68b44b76f9d3c803c89d480d084efe",
+      "physical_lines": 469
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "5488b37f290962c34be74397956d38b29f3b3432e7f78d0c4b270295d4902deb",
+      "raw_bytes": 3130,
+      "raw_base64": "STAwMSBbKl0gSW1wb3J0IGJsb2NrIGlzIHVuLXNvcnRlZCBvciB1bi1mb3JtYXR0ZWQKICAtLT4gdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9hY2NlcHRhbmNlX3Byb3BlcnRpZXMucHk6MzoxCiAgIHwKIDEgfCAgICIiIkV4ZXJjaXNlIGltbXV0YWJsZSBhY2NlcHRhbmNlIGlkZW50aXRpZXMsIGJvdW5kZWQgdmFsdWVzIGFuZCBleGFjdCB0YWcgcG9saWN5LiIiIgogMiB8CiAzIHwgLyBmcm9tIF9fZnV0dXJlX18gaW1wb3J0IGFubm90YXRpb25zCiA0IHwgfAogNSB8IHwgaW1wb3J0IGpzb24KIDYgfCB8IGZyb20gZGF0YWNsYXNzZXMgaW1wb3J0IEZyb3plbkluc3RhbmNlRXJyb3IsIHJlcGxhY2UKIDcgfCB8IGZyb20gaGFzaGxpYiBpbXBvcnQgc2hhMjU2CiA4IHwgfCBmcm9tIGl0ZXJ0b29scyBpbXBvcnQgcGVybXV0YXRpb25zCiA5IHwgfCBmcm9tIHR5cGluZyBpbXBvcnQgY2FzdAoxMCB8IHwKMTEgfCB8IGltcG9ydCBweXRlc3QKMTIgfCB8CjEzIHwgfCBmcm9tIGRybV9jb3BpbG90X2Rpc2NvdmVyeS5hY2NlcHRhbmNlX21vZGVscyBpbXBvcnQgKAoxNCB8IHwgICAgIEFjY2VwdGFuY2VHZW5lcmF0aW9uLAoxNSB8IHwgICAgIEFjY2VwdGFuY2VJZGVudGl0eSwKMTYgfCB8ICAgICBBY2NlcHRhbmNlU3BlY2lmaWNhdGlvbiwKMTcgfCB8ICAgICBhY2NlcHRhbmNlX3RhZ3MsCjE4IHwgfCApCjE5IHwgfCBmcm9tIGRybV9jb3BpbG90X2Rpc2NvdmVyeS5maW5kaW5ncyBpbXBvcnQgRmluZGluZywgU2V2ZXJpdHkKMjAgfCB8IGZyb20gZHJtX2NvcGlsb3RfZGlzY292ZXJ5Lm1vZGVscyBpbXBvcnQgSnNvbk9iamVjdCwgUGFyc2VMaW1pdHMsIGNhbm9uaWNhbF9qc29uCjIxIHwgfCBmcm9tIGRybV9jb3BpbG90X2Rpc2NvdmVyeS5yZXBvcnRfbW9kZWxzIGltcG9ydCBSZXBvcnRMaW1pdEVycm9yLCBib3VuZGVkX29iamVjdAoyMiB8IHwgZnJvbSBkcm1fY29waWxvdF9kaXNjb3ZlcnkucmVwb3NpdG9yeV9yZWFkZXIgaW1wb3J0IFJlcG9zaXRvcnlJZGVudGl0eQogICB8IHxfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXgogICB8CmhlbHA6IE9yZ2FuaXplIGltcG9ydHMKCkIwMDggRG8gbm90IHBlcmZvcm0gZnVuY3Rpb24gY2FsbCBgUGFyc2VMaW1pdHNgIGluIGFyZ3VtZW50IGRlZmF1bHRzOyBpbnN0ZWFkLCBwZXJmb3JtIHRoZSBjYWxsIHdpdGhpbiB0aGUgZnVuY3Rpb24sIG9yIHJlYWQgdGhlIGRlZmF1bHQgZnJvbSBhIG1vZHVsZS1sZXZlbCBzaW5nbGV0b24gdmFyaWFibGUKICAtLT4gdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9hY2NlcHRhbmNlX3Byb3BlcnRpZXMucHk6NTA6MjcKICAgfAo0OCB8ICAgICByZWFkaW5lc3M6IHN0ciA9ICJyZWFkeSIsCjQ5IHwgICAgIHJlcG9zaXRvcnk6IFJlcG9zaXRvcnlJZGVudGl0eSB8IE5vbmUgPSBOb25lLAo1MCB8ICAgICBsaW1pdHM6IFBhcnNlTGltaXRzID0gUGFyc2VMaW1pdHMoKSwKICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl5eXl5eXl5eXl4KNTEgfCApIC0+IEFjY2VwdGFuY2VTcGVjaWZpY2F0aW9uOgo1MiB8ICAgICAiIiJCdWlsZCBtb2RlbCBkYXRhIGZyb20ga2V5L3RleHQvcmVhZGluZXNzL293bmVyL2xpbWl0czsgcmV0dXJuIHNwZWNpZmljYXRpb24uCiAgIHwKCkIwMTAgWypdIERvIG5vdCBjYWxsIGBzZXRhdHRyYCB3aXRoIGEgY29uc3RhbnQgYXR0cmlidXRlIHZhbHVlLiBJdCBpcyBub3QgYW55IHNhZmVyIHRoYW4gbm9ybWFsIHByb3BlcnR5IGFjY2Vzcy4KICAgLS0+IHRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3RfYWNjZXB0YW5jZV9wcm9wZXJ0aWVzLnB5OjI1Njo5CiAgICB8CjI1NCB8ICAgICBhc3NlcnQgInJlcG9zaXRvcnkiIG5vdCBpbiBwbGFpbgoyNTUgfCAgICAgd2l0aCBweXRlc3QucmFpc2VzKEZyb3plbkluc3RhbmNlRXJyb3IpOgoyNTYgfCAgICAgICAgIHNldGF0dHIoaXRlbSwgImRvY3VtZW50Iiwgb3RoZXIuZG9jdW1lbnQpCiAgICB8ICAgICAgICAgXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl4KICAgIHwKaGVscDogUmVwbGFjZSBgc2V0YXR0cmAgd2l0aCBhc3NpZ25tZW50CgpFNTAxIExpbmUgdG9vIGxvbmcgKDg5ID4gODgpCiAgIC0tPiB0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVx0ZXN0X2FjY2VwdGFuY2VfcHJvcGVydGllcy5weTozODc6ODkKICAgIHwKMzg1IHwgQHB5dGVzdC5tYXJrLnBhcmFtZXRyaXplKCJzZXZlcml0eSIsIFsiZXJyb3IiLCAid2FybmluZyIsICJpbmZvIl0pCjM4NiB8IGRlZiB0ZXN0X2ZpbmRpbmdzX3ByZXNlcnZlX2Jsb2NraW5nX2F1dGhvcml0eShzZXZlcml0eTogc3RyKSAtPiBOb25lOgozODcgfCAgICAgIiIiVXNlIHNldmVyaXR5IChzdHIpIHRvIGRpc3Rpbmd1aXNoIGJsb2NraW5nIGRpYWdub3N0aWNzIGZyb20gaW5mb3JtYXRpb25hbCBkYXRhLiIiIgogICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgozODggfCAgICAgZmluZGluZyA9IEZpbmRpbmcoCjM4OSB8ICAgICAgICAgY29kZT0iRElBR05PU1RJQyIsCiAgICB8CgpFNTAxIExpbmUgdG9vIGxvbmcgKDkyID4gODgpCiAgIC0tPiB0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVx0ZXN0X2FjY2VwdGFuY2VfcHJvcGVydGllcy5weTozOTU6ODkKICAgIHwKMzkzIHwgICAgICkKMzk0IHwgICAgIGl0ZW0gPSBzcGVjaWZpY2F0aW9uKCkKMzk1IHwgICAgICMgT25seSBlcnJvciBkaWFnbm9zdGljcyByZXZva2UgcmVhZHkgbWVtYmVyc2hpcDsgaW5mb3JtYXRpb25hbCBmaW5kaW5ncyByZW1haW4gdmlzaWJsZS4KICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl4KMzk2IHwgICAgIGlmIHNldmVyaXR5ID09ICJlcnJvciI6CjM5NyB8ICAgICAgICAgd2l0aCBweXRlc3QucmFpc2VzKFZhbHVlRXJyb3IsIG1hdGNoPSJCbG9ja2luZyIpOgogICAgfAoKRm91bmQgNSBlcnJvcnMuClsqXSAyIGZpeGFibGUgd2l0aCB0aGUgYC0tZml4YCBvcHRpb24uCg==",
+      "presentation": "I001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\test_acceptance_properties.py:3:1\n   |\n 1 |   \"\"\"Exercise immutable acceptance identities, bounded values and exact tag policy.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | import json\n 6 | | from dataclasses import FrozenInstanceError, replace\n 7 | | from hashlib import sha256\n 8 | | from itertools import permutations\n 9 | | from typing import cast\n10 | |\n11 | | import pytest\n12 | |\n13 | | from drm_copilot_discovery.acceptance_models import (\n14 | |     AcceptanceGeneration,\n15 | |     AcceptanceIdentity,\n16 | |     AcceptanceSpecification,\n17 | |     acceptance_tags,\n18 | | )\n19 | | from drm_copilot_discovery.findings import Finding, Severity\n20 | | from drm_copilot_discovery.models import JsonObject, ParseLimits, canonical_json\n21 | | from drm_copilot_discovery.report_models import ReportLimitError, bounded_object\n22 | | from drm_copilot_discovery.repository_reader import RepositoryIdentity\n   | |______________________________________________________________________^\n   |\nhelp: Organize imports\n\nB008 Do not perform function call `ParseLimits` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable\n  --> tests\\discovery_runtime\\test_acceptance_properties.py:50:27\n   |\n48 |     readiness: str = \"ready\",\n49 |     repository: RepositoryIdentity | None = None,\n50 |     limits: ParseLimits = ParseLimits(),\n   |                           ^^^^^^^^^^^^^\n51 | ) -> AcceptanceSpecification:\n52 |     \"\"\"Build model data from key/text/readiness/owner/limits; return specification.\n   |\n\nB010 [*] Do not call `setattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\test_acceptance_properties.py:256:9\n    |\n254 |     assert \"repository\" not in plain\n255 |     with pytest.raises(FrozenInstanceError):\n256 |         setattr(item, \"document\", other.document)\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\nhelp: Replace `setattr` with assignment\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_acceptance_properties.py:387:89\n    |\n385 | @pytest.mark.parametrize(\"severity\", [\"error\", \"warning\", \"info\"])\n386 | def test_findings_preserve_blocking_authority(severity: str) -> None:\n387 |     \"\"\"Use severity (str) to distinguish blocking diagnostics from informational data.\"\"\"\n    |                                                                                         ^\n388 |     finding = Finding(\n389 |         code=\"DIAGNOSTIC\",\n    |\n\nE501 Line too long (92 > 88)\n   --> tests\\discovery_runtime\\test_acceptance_properties.py:395:89\n    |\n393 |     )\n394 |     item = specification()\n395 |     # Only error diagnostics revoke ready membership; informational findings remain visible.\n    |                                                                                         ^^^^\n396 |     if severity == \"error\":\n397 |         with pytest.raises(ValueError, match=\"Blocking\"):\n    |\n\nFound 5 errors.\n[*] 2 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "SCRATCH=owned external temporary harness directory",
+    "WORKSPACE=current repository checkout"
+  ],
+  "raw_stream_rule": "base64 decodes to exact captured child bytes; presentation replaces only explicit host path aliases"
+}

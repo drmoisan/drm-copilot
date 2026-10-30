@@ -1,0 +1,57 @@
+"""Record approved absence then relocate cohesive aggregate-limit tests unchanged."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+root = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence")
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+target = Path("tests/discovery_runtime/analyzer/test_dependency_projection_limits.py")
+assert not target.exists()
+baseline = root / "baseline/p4t7-shared-baseline.2026-10-19T09-44.json"
+record = {"timestamp": stamp, "path": target.as_posix(), "exists_before_creation": False,
+          "approval": "Parent approval at2026-10-19T10:07:46Z; exclusive integration test split",
+          "shared_baseline": {"path": baseline.as_posix(), "sha256": hashlib.sha256(baseline.read_bytes()).hexdigest()},
+          "command": "poetry run python SCRATCH/issue-980-p4t7-integration-test-split.py", "exit_code": 0}
+path = root / f"baseline/p4t7-integration-test-split.{stamp}.json"
+assert not path.exists()
+path.write_bytes((json.dumps(record, indent=2) + "\n").encode())
+source = Path("tests/discovery_runtime/analyzer/test_dependencies.py")
+text = source.read_text("utf-8")
+lines = text.splitlines(keepends=True)
+names = {"test_all_diagnostics_and_error_fallbacks_share_output_limits",
+         "test_impossible_error_envelope_raises_instead_of_emitting_over_budget",
+         "test_complete_output_budget_precedes_projection", "test_independent_aggregate_resource_limits",
+         "test_parser_contract_violations_cannot_escape", "test_invalid_public_capture_and_internal_reservations"}
+selected = [node for node in ast.parse(text).body if isinstance(node, ast.FunctionDef) and node.name in names]
+assert len(selected) == len(names)
+body = []
+for node in selected:
+    start = min([node.lineno] + [decorator.lineno for decorator in node.decorator_list]) - 1
+    body.append("".join(lines[start:node.end_lineno]).strip())
+    lines[start:node.end_lineno] = ["" for _ in range(node.end_lineno - start)]
+header = '''"""Enforce aggregate dependency projection limits without filesystem or process use."""
+from __future__ import annotations
+
+from dataclasses import replace
+from typing import TYPE_CHECKING, cast
+
+import pytest
+from drm_copilot_discovery.analyzer import dependencies
+from drm_copilot_discovery.analyzer.dependencies import DependencyAnalyzer
+from drm_copilot_discovery.analyzer.dependency_inputs import DependencyAnchor, DependencyInputError, DependencyLimits, DependencyResult
+from drm_copilot_discovery.analyzer.models import InventoryCapture, InventoryInput
+from drm_copilot_discovery.models import canonical_json
+from tests.discovery_runtime.analyzer.test_dependencies import codes, configured, item, stub
+from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.catalog import SchemaCatalog
+
+
+'''
+target.write_bytes((header + "\n\n\n".join(body) + "\n").encode())
+source.write_bytes(("".join(lines).rstrip() + "\n").encode())
+print(path.as_posix())
+print("relocated", len(selected), "top-level tests with their assertions/decorators unchanged")

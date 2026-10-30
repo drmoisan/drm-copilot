@@ -1,0 +1,166 @@
+"""Confirm only the authorized R1-R3 repair and retained exact proof."""
+import hashlib
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from unittest.mock import patch
+
+import drm_copilot_discovery.analyzer.csharp_declarations as declarations
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError, tokenize_csharp
+
+QA = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+WORKER = Path(sys.argv[1])
+SCRATCH = Path(__file__).parent
+
+
+def load(path):
+    return json.loads(Path(path).read_text(encoding='utf-8-sig'))
+
+
+def digest(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def ref(path):
+    return {'path': Path(path).as_posix(), 'sha256': digest(path)}
+
+
+fpath = QA / 'p4t3-repair-freeze.2026-10-19T05-08.json'
+assert digest(fpath) == 'f805ef676ce36fab5c65f26a66144f4cbb0c0b4643819da1e8b14c395e773c71'
+freeze = load(fpath)
+original_path = QA / 'p4t3-candidate-freeze.2026-10-19T04-46.json'
+original = load(original_path)
+original_hashes = {row['path']: row['sha256'] for row in original['files']}
+repaired_hashes = {row['path']: row['sha256'] for row in freeze['files']}
+changed = [path for path in original_hashes if repaired_hashes[path] != original_hashes[path]]
+added = sorted(set(repaired_hashes) - set(original_hashes))
+assert changed == ['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py']
+assert added == ['tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py']
+for row in freeze['files']:
+    assert digest(row['path']) == row['sha256'], row['path']
+    assert digest(WORKER / row['frozen_copy'].removeprefix('SCRATCH/')) == row['sha256']
+    assert row['lines'] == len(Path(row['path']).read_bytes().splitlines()) <= 500
+for row in freeze['preserved_files'] + freeze['proofs']:
+    assert digest(row['path']) == row['sha256'], row['path']
+preserved = load(QA / 'p4t3-repair-original-bindings.2026-10-19T05-03.json')
+for row in preserved['candidate_files'] + preserved['retained_proofs']:
+    assert digest(WORKER / row['snapshot'].removeprefix('SCRATCH/')) == row['sha256']
+
+binding_path = QA / 'p4t3-repair-binding.2026-10-19T05-06.json'
+binding = load(binding_path)
+receipts = []
+for row in binding['receipts']:
+    assert digest(row['path']) == row['sha256']
+    receipt = load(row['path'])
+    assert receipt['exit_code'] == 0
+    assert receipt['source_before'] == receipt['source_after'] == binding['sources']
+    for path, expected in receipt['source_after'].items():
+        assert digest(path) == expected
+    for value in receipt['raw'].values():
+        assert digest(WORKER / value['path'].removeprefix('SCRATCH/')) == value['sha256']
+    receipts.append({'path': row['path'], 'sha256': row['sha256'], 'command': receipt['command'], 'exit_code': 0, 'started_at': receipt['started_at'], 'finished_at': receipt['finished_at'], 'seconds': receipt['seconds'], 'stdout': receipt['stdout'], 'stderr': receipt['stderr'], 'raw_binding_verified': True})
+assert all(left['finished_at'] <= right['started_at'] for left, right in zip(receipts, receipts[1:]))
+assert digest(binding['coverage']['path']) == binding['coverage']['sha256']
+coverage = load(binding['coverage']['path'])
+units = []
+for path, details in coverage['files'].items():
+    assert details['summary']['missing_lines'] == details['summary']['missing_branches'] == 0
+    for category in ['functions', 'classes']:
+        for name, data in details[category].items():
+            if name and data['summary']['num_statements']:
+                assert data['summary']['percent_covered'] == 100
+                units.append({'path': path.replace('\\', '/'), 'kind': category, 'name': name, 'summary': data['summary']})
+collection = freeze['collection']
+assert collection['exit_code'] == 0 and len(collection['nodes']) == len(set(collection['nodes'])) == 137
+new_nodes = [node for node in collection['nodes'] if node.startswith(added[0] + '::')]
+assert len(new_nodes) == 26
+for value in collection['raw'].values():
+    assert digest(WORKER / value['path'].removeprefix('SCRATCH/')) == value['sha256']
+
+prior_probe_path = QA / 'p4t3-executor-candidate-probes.2026-10-19T04-51.json'
+prior = load(prior_probe_path)
+context_results = []
+for case in prior['context_cases']:
+    values = declarations.declaration_candidates('src/example.cs', case['input'])
+    projected = [{'kind': value.detection_kind, 'symbol': value.symbol, 'symbol_kind': value.symbol_kind, 'line': value.line, 'extra': dict(value.extra)} for value in values]
+    unexpected = case['unexpected_declaration']
+    assert not any(value['kind'] == unexpected['kind'] and value['symbol'] == unexpected['symbol'] for value in projected)
+    assert any(value['kind'] == 'type' and value['symbol'] == 'C' for value in projected)
+    context_results.append({'case': case['case'], 'input_sha256': case['input_sha256'], 'observed': projected, 'original_false_declaration_absent': True, 'actual_class_preserved': True})
+
+
+class CountedTokens(tuple):
+    def __new__(cls, values):
+        value = super().__new__(cls, values)
+        value.accesses = 0
+        return value
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            self.accesses += 1
+        return super().__getitem__(key)
+
+
+work_results = []
+for case in prior['bounded_work_cases']:
+    size = case['repetitions']
+    source = 'class T<' * size + 'int' + '>' * size if case['shape'] == 'generic' else 'event Action ' * size + ';'
+    assert hashlib.sha256(source.encode()).hexdigest() == case['input_sha256']
+    tokens = CountedTokens(tokenize_csharp(source))
+    error_code = None
+    returned = False
+    with patch.object(declarations, 'tokenize_csharp', return_value=tokens):
+        try:
+            declarations.declaration_candidates('src/work.cs', source, include_members=False)
+            returned = True
+        except SourceScanError as error:
+            error_code = error.code
+    assert error_code == 'source-work-limit' and not returned
+    work_results.append({'shape': case['shape'], 'repetitions': size, 'input_sha256': case['input_sha256'], 'tokens': len(tokens), 'before_token_index_accesses': case['token_index_accesses'], 'after_token_index_accesses': tokens.accesses, 'error_code': error_code, 'partial_result_returned': returned})
+
+assert repaired_hashes == {path: digest(path) for path in repaired_hashes}
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+snapshot = QA / f'p4t3-executor-repair-confirmation-harness.{stamp}.txt'
+snapshot.write_bytes(Path(__file__).read_bytes())
+output = {
+    'task': 'P4-T3', 'timestamp': now.isoformat(), 'status': 'READY_FOR_CHECKED_WIP_AND_FINAL_GATES',
+    'command': 'poetry run python SCRATCH/issue-980-p4t3-repair-confirm.py SCRATCH/worker', 'exit_code': 0,
+    'authority': {'receipt': 'atomic_execution_p4t3_repair_confirmation', 'phase': 'S5_P4T3_repair_confirmation', 'profile': 'atomic-executor-c4', 'model': 'gpt-6-astra', 'effort': 'max', 'profile_sha256': 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9', 'native_authority': 'Unchanged native attestation and exact current profile/receipt verified; no fallback.'},
+    'freeze': ref(fpath), 'original_review': ref(QA / 'p4t3-executor-candidate-review.2026-10-19T05-00.json'), 'original_probes': ref(prior_probe_path), 'binding': ref(binding_path), 'delta': ref(QA / 'p4t3-repair-delta.2026-10-19T05-08.md'), 'original_preservation': ref(QA / 'p4t3-repair-original-bindings.2026-10-19T05-03.json'),
+    'files': [{k: v for k, v in row.items() if k != 'units'} for row in freeze['files']], 'changed_existing_paths': changed, 'added_paths': added, 'unchanged_original_paths': freeze['unchanged_reviewed_paths'], 'preserved_original_copies': len(preserved['candidate_files']), 'preserved_prior_proof_copies': len(preserved['retained_proofs']), 'preserved_callers_fixtures': len(freeze['preserved_files']),
+    'closed_findings': [{'id': 'P4-T3-R1', 'confirmation': 'The original foreach reproduction emits no type in; actual class/member declarations remain. Context/name-continuation guards are confined to contextual record interpretation.'}, {'id': 'P4-T3-R2', 'confirmation': 'The original anonymous delegate body emits no delegate Work. Early exclusions for *, { and ( stop body/signature entry; named/generic delegate regressions pass.'}, {'id': 'P4-T3-R3', 'confirmation': 'One _ScanWork instance per declaration scan charges generic, namespace, event/delegate, reverse-name and member-prefix traversals. Original six adversarial inputs now fail with source-work-limit before returning partial results; retained v2 tests assert empty component/finding/relationship arrays even after an earlier valid declaration.'}],
+    'remaining_findings': [], 'independent_reproduction_count': 8, 'context_reproductions': context_results, 'work_reproductions': work_results,
+    'focused_receipts': receipts, 'test_counts': {'retained': 111, 'new': 26, 'total': 137}, 'collection_qualification': 'Collection-only metadata is separately verified; original three test modules/parameterizations remain byte-identical. No test body was rerun by this verifier.', 'new_test_nodes': new_nodes,
+    'raw_coverage': binding['coverage'], 'coverage_totals': coverage['totals'], 'coverage_units': units,
+    'policy_confirmation': 'Only the reviewed 51-line declaration delta and new 117-line isolated regression module were reviewed. Production module401 lines, all files<=500. New helper/test contracts and intent comments present. Shared private counter changes no I/O or public payload authority. Existing unit tests unchanged, no temporary filesystem/process use introduced.',
+    'reuse_rationale': 'The complete 05-00 candidate review, nine AST qualifications, tokenizer58/masking108/caller83 proof and all accepted predecessor proof remain applicable to their exact unchanged bytes. This confirmation does not repeat the full candidate review or any broad behavioral suite.',
+    'index_qualification': 'Freeze lists actual working and index hashes separately. Untracked/substantively changed files are not claimed index-equal. The existing source_text compatibility adapter retains its exact CRLF-to-LF qualification. Final index/commit bindings belong to parent staging and final acceptance.',
+    'harness': ref(snapshot), 'next_step': 'Parent may commit the checked corrected candidate and release the single final ordered gate sequence. P4-T3 and AC checkoffs remain pending.', 'mutations': 'Verification artifacts only; no production/tests/checkpoint/plan/AC/Git edits.',
+}
+target = QA / f'p4t3-executor-repair-confirmation.{stamp}.json'
+target.write_text(json.dumps(output, indent=2, ensure_ascii=True) + '\n', encoding='utf-8', newline='\n')
+summary = f'''# P4-T3 bounded R1-R3 repair confirmation
+
+Timestamp: {stamp}
+Command: poetry run python SCRATCH/issue-980-p4t3-repair-confirm.py SCRATCH/worker
+EXIT_CODE: 0
+Output Summary: READY_FOR_CHECKED_WIP_AND_FINAL_GATES. All three retained findings are closed by the bounded repair; task acceptance remains pending.
+
+The reviewed change is confined to `csharp_declarations.py` (401 lines) and the approved new `test_csharp_declaration_regressions.py` (117 lines). All twelve other candidate paths and twelve caller/fixture paths retain their original hashes. All fourteen current hashes match the 05-08 freeze. Thirteen pre-repair source copies and five original review/probe copies were verified independently.
+
+- **R1:** The exact original contextual-record/foreach input no longer produces a type named `in`; the actual class and member remain.
+- **R2:** The exact original parameterless anonymous-delegate input no longer produces a delegate named `Work`. Early anonymous/pointer exclusions preserve named/generic delegates through focused regressions.
+- **R3:** The shared `max(32, 4 * token_count)` counter bounds aggregate generic, namespace, event/delegate, callable-name and member-prefix traversal. All six retained adversarial inputs now return `source-work-limit` without a partial scanner result. The focused v2 tests additionally verify empty components/findings/relationships after a failed file, including an earlier valid declaration.
+
+The verifier ran only the eight retained reproductions. The worker's bound Black, Ruff, targeted Pyright and 137-case loop (111 retained plus 26 new cases) passed; raw receipt hashes and unchanged executing bytes were verified. Declaration coverage is 174/174 statements and 98/98 branches; all three scanner/projection modules total 358/358 statements and 162/162 branches. All measured class/callable ranges in that proof are 100%. Existing test module bytes and collection-only metadata establish the retained/new population.
+
+The complete [candidate review](p4t3-executor-candidate-review.2026-10-19T05-00.md) remains the review of unchanged scope. Tokenizer, masking, caller and accepted predecessor evidence is reused without broad test or review replay. Working/index hashes remain separately qualified; this receipt does not claim all files are staged or committed. Exact proof references, reproduction measurements and raw evidence bindings are in the paired JSON.
+
+No production/test/checkpoint/plan/AC/Git change was made. Parent may commit the checked corrected candidate, then release the final ordered gates. No P4-T3 or AC checkoff is authorized by this intermediate result.
+
+Current phase: P4-T3 checked WIP/final gates pending. Accepted: 34/84 tasks, 13/66 ACs. Upcoming tasks: P4-T3, P4-T4, P4-T5, P4-T6, P4-T7.
+'''
+target.with_suffix('.md').write_text(summary, encoding='utf-8', newline='\n')
+print(json.dumps({'status': output['status'], 'json': ref(target), 'markdown': ref(target.with_suffix('.md')), 'harness': ref(snapshot), 'work_reproductions': work_results, 'measured_ranges': len(units)}, ensure_ascii=True))

@@ -1,0 +1,215 @@
+"""Bind inert P5-T3 runner preparation without importing or executing task code."""
+
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+REGRESSION = FEATURE / "evidence/regression-testing"
+PROFILE_SHA = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+ROUTE = "inventory_analyzers_p5t3_final_prepare_20261020"
+
+
+def sha(raw):
+    """Return the exact byte identity of a preserved stream."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def bound(path, expected):
+    """Read one immutable receipt only after its exact digest matches."""
+    raw = path.read_bytes()
+    assert sha(raw) == expected, path
+    return json.loads(raw), {"path": path.as_posix(), "sha256": expected}
+
+
+def save(path, value):
+    """Create a new authored UTF-8 LF receipt without replacing prior evidence."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8", newline="\n")
+
+
+def inert_hygiene(raw, name):
+    """Check only script syntax, explicit text decoding, size and readable bytes."""
+    tree = ast.parse(raw)
+    assert len(raw.splitlines()) <= 500, name
+    assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), name
+    assert not re.search(rb"[ \t]+\r?$", raw, re.M), name
+    # Binary readers preserve original bytes; text readers must declare their encoding.
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        function = ast.unparse(node.func)
+        keywords = {item.arg: item.value for item in node.keywords}
+        if function.endswith((".read_text", ".write_text")):
+            assert "encoding" in keywords, (name, function, node.lineno)
+        if function.endswith(".open") or function == "open":
+            mode = keywords.get("mode", node.args[0] if function.endswith(".open") and node.args else None)
+            if function == "open":
+                mode = keywords.get("mode", node.args[1] if len(node.args) > 1 else None)
+            binary = isinstance(mode, ast.Constant) and isinstance(mode.value, str) and "b" in mode.value
+            assert binary or "encoding" in keywords, (name, function, node.lineno)
+    return {"physical_lines": len(raw.splitlines()), "syntax_only": True,
+            "explicit_text_encoding_or_binary_reads": True, "lf_utf8": True}
+
+
+def main():
+    """Preserve known proof and list the missing final release bindings explicitly."""
+    profile = Path(".codex/agents/python-typed-engineer-c4.toml").read_bytes()
+    assert sha(profile) == PROFILE_SHA
+    checkpoint = Path("artifacts/orchestration/orchestrator-state.json").read_text(encoding="utf-8")
+    assert ROUTE in checkpoint
+    native, native_ref = bound(QA / "p5t3-native-preparation.2026-10-20T08-50.json",
+                              "4d467c845b14d6f593516de66e17819e4df106062d65df2df11658550cc7c0ef")
+    producer, producer_ref = bound(REGRESSION / "p5t3-producer-freeze.2026-10-20T09-15.json",
+                                  "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991")
+    pure, pure_ref = bound(REGRESSION / "p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+                          "235e7b873529c5ea0e7cb211ac6dc129077e10b881759ac99131388e131a6719")
+    legacy, legacy_ref = bound(REGRESSION / "p5t3-legacy-freeze.2026-10-20T08-55.json",
+                              "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92")
+    rendering, rendering_ref = bound(REGRESSION / "p5t3-rendering-freeze.2026-10-20T08-45.json",
+                                    "d1ba1c6b9b0692dcdfa910c2f2b69b8c96ad509d0b6e4c5bb63415db864032f2")
+    mechanical, mechanical_ref = bound(REGRESSION / "p5t3-mechanical-freeze.2026-10-20T08-52.json",
+                                      "f7e3551b96c3b0095527a58a12da3ffb65cdc10490b7c5afecd2ac77171ee6c4")
+    prior, prior_ref = bound(QA / "p5t2-final-preparation.2026-10-20T07-04.json",
+                            "5a541fe2225c24bf4772d107d352a142cd0718de25da2b5f66450472b6619357")
+    assert legacy["cases"] == 31 and rendering["cases"] == 105 and mechanical["test_count"] == 8
+    pure_nodes = re.findall(r"^(tests/.+?) PASSED(?:\s|$)", pure["stdout"], re.M)
+    assert len(pure_nodes) == len(set(pure_nodes)) == 35
+    producer_nodes = [node for proof in producer["proof"] for node in proof["nodes"]]
+    assert len(producer_nodes) == len(set(producer_nodes)) == 54
+    assert producer_nodes[:35] == pure_nodes
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    harnesses = []
+    # These files are parsed as inert text, never imported or run as final gates.
+    for name in ("final_gates.py", "final_static.py", "final_coverage.py", "prepare_final.py"):
+        path = SCRATCH / name
+        raw = path.read_bytes()
+        checks = inert_hygiene(raw, name)
+        snapshot = QA / ("p5t3-final-preparation-" + path.stem.replace("_", "-") + "-harness." + stamp + ".txt")
+        assert not snapshot.exists(), snapshot
+        snapshot.write_bytes(raw)
+        harnesses.append({"runtime_path": "SCRATCH/" + name, "path": snapshot.as_posix(),
+                          "sha256": sha(raw), **checks})
+    native_snapshot = QA / "p5t3-native-composition-harness.2026-10-20T08-50.txt"
+    native_raw = native_snapshot.read_bytes()
+    assert sha(native_raw) == "b3d6e78f5f7af0c9d10cb9f6f6f91c16f0fbc754e44e3a0c41abcda65206c1f3"
+    native_hygiene = inert_hygiene(native_raw, native_snapshot.name)
+    contracts = prior["contracts"]
+    assert len(contracts) == len(set(contracts)) == 4
+    payload = {
+        "task": "P5-T3", "Timestamp": stamp, "state": "PREPARATION_READY_FINAL_RELEASE_PENDING",
+        "execution_released": False, "route": ROUTE, "profile_sha256": PROFILE_SHA,
+        "scope": "Four temporary final runner scripts and this compact canonical preparation evidence only.",
+        "production_test_mutations": False, "fixture_mutations": False, "behavioral_commands_executed": [],
+        "retained_references": {"producer54": producer_ref, "producer_pure35": pure_ref,
+                                "legacy31": legacy_ref, "rendering105": rendering_ref,
+                                "mechanical8": mechanical_ref, "native": native_ref,
+                                "prior_runner": prior_ref},
+        "accepted_prerequisite_commit": "d8cdc87f8b70ef7311eb907966b13bbdbc48d89d",
+        "executed_frozen_nodes": {"producer": producer_nodes},
+        "announced_population_not_a_collected_or_passed_claim": {
+            "producer_pure": 35, "producer_planning": 19, "legacy": 31,
+            "semantic_completion": 19, "affected_existing_caller": 1, "nominal_union": 105,
+        },
+        "population_policy": "Only final owner-frozen exact nodes may authorize execution. Legacy nonverbose proof establishes 31 passes but has no exact node list; do not infer parameter IDs. No standalone rendering105 or mechanical8 replay.",
+        "semantic_pending": "Initial20 reported17 passes and3 fixture failures. Test-only correction and one necessary coverage-report fallthrough control are pending parent confirmation/final freeze; no successful20/21-case claim.",
+        "harnesses": harnesses, "native_hygiene": native_hygiene,
+        "script_changes_from_accepted_runner": [
+            "P5-T3 task/evidence labels and the exact retained native harness.",
+            "Observed GetLongPathNameW/GetShortPathNameW root normalization; originals retained in raw base64.",
+            "Native static-success release is written only after the four actual static stages pass.",
+            "Exact batch-order completeness and bounded alias suffix validation.",
+            "Optional prior source_path/source_name for moved unchanged AST coverage bodies.",
+            "Explicit retained-only prerequisite modules may reuse accepted bound body proof without a duplicate batch.",
+        ],
+        "ordered_commands": [
+            "python -m black --check <frozen task source/test paths>",
+            "python -m ruff check <same paths>",
+            "python -m pyright",
+            "python SCRATCH/final_static.py <released exact candidate>",
+            "python NATIVE_SCRATCH/issue-980-p5t3-native-composition.py <preserved descriptor> <new result> --release <static-success release>",
+            "python -m pytest -v -o addopts= -p no:cacheprovider <reversed producer54 exact nodes> <six measured modules> --cov-branch",
+            "python -m pytest -v -o addopts= -p no:cacheprovider <reversed legacy31 exact nodes> <same measured modules> --cov-branch",
+            "python -m pytest -v -o addopts= -p no:cacheprovider <reversed final semantic/affected caller nodes> <same measured modules> --cov-branch",
+            "python -m coverage combine --keep <separate databases>; coverage json; final_coverage.py",
+            "python -m pytest -v -o addopts= -p no:cacheprovider --no-cov <four retained applicable contracts>",
+        ],
+        "coverage_targets": [
+            "drm_copilot_discovery.completion_report", "drm_copilot_discovery.validation",
+            "drm_copilot_discovery.validation_operation", "drm_copilot_discovery.report_models",
+            "drm_copilot_discovery.report_rendering", "scripts.dev_tools.discovery.completion_report",
+        ],
+        "coverage_policy": {
+            "current": "Exact raw module/class/callable coverage, plus zero lost lines/arcs from final focused proofs on identical bytes.",
+            "retained": "Accepted prerequisite bodies require immutable source hashes, bound raw coverage, executable-AST equality and old/new line/branch-origin maps. Never add retained counts to raw JSON.",
+            "thresholds": "At least90% statements per module/class/callable and75% touched-module branches, with unchanged qualifications explicit and all critical changed behavior proved.",
+            "limits": "Task-scoped verification only; not repository-wide remeasurement or feature acceptance.",
+        },
+        "contracts": contracts,
+        "provisional_timeouts_seconds": {"format": 300, "lint": 300, "types": 300, "static": 300,
+                                        "native": 660, "producer": 660, "legacy": 180,
+                                        "semantic": 660, "contracts": 180},
+        "timeout_basis": "Native performs two guarded publications versus the accepted151.326s one-publication fixture. Producer pure35 took29.391s and planning19 took132.548s; legacy31 took0.799s. Initial semantic20 took142.07s with3 fixture failures; confirm final semantic timing before release.",
+        "progress": "Immediate stage start/completion and20-second child elapsed/PID/completed-node/last-node updates; stop and preserve raw streams on the first failure or byte drift.",
+        "native": {
+            "harness_path": "NATIVE_SCRATCH/issue-980-p5t3-native-composition.py",
+            "harness_sha256": sha(native_raw), "fixture": native["fixture"],
+            "fixture_receipt": "NATIVE_SCRATCH/issue-980-p5t3-native-fixture.2026-10-20T08-50.json",
+            "expected_contract": native["expected_contract"], "execution_released": False,
+            "mutation_scope": "Only exact granted completion-report.json and completion-report.md within the preserved fixture after explicit release.",
+        },
+        "raw_readable_policy": "Read source/text as UTF-8 or bytes. Raw output/SQLite/coverage JSON are exact bytes, including CRLF and absent final newline. Authored receipts/readable views are portable LF UTF-8 with no trailing spaces or blank lines.",
+        "pending_release_bindings": [
+            "Complete closed independent candidate review, checked commit/push and explicit parent execution authorization.",
+            "Final semantic/actual-caller successful nodes and any authorized new control; exact complete source/test/dependency hashes and per-unit coverage.",
+            "Exact legacy31 node identities or an explicitly authorized collection-only binding step.",
+            "Owner-qualified moved unchanged body references and final current coverage baselines.",
+            "Disjoint final node union, exact task file scope, harness hashes and owner-confirmed independent native expectations.",
+            "Finite final deadlines informed by the actual owner-focused timings.",
+        ],
+        "limitations": [
+            "No final gate, task unit test, native publication or fixture mutation executed during preparation.",
+            "Native fixture can prove actual Windows/Git composition only; no installed coding-agent-host hooks or non-Windows claim.",
+            "No successor, CLI-delivery or feature-completion acceptance is implied.",
+        ],
+    }
+    canonical = QA / ("p5t3-final-preparation." + stamp + ".json")
+    save(canonical, payload)
+    readable = (
+        f"# P5-T3 final gate preparation\n\nTimestamp: {stamp}\n"
+        "Command: `python SCRATCH/prepare_final.py` (inert syntax and evidence binding only)\n"
+        "EXIT_CODE: 0\n"
+        "Output Summary: PREPARATION_READY; final execution remains held.\n\n"
+        "The prepared order is Black, Ruff, whole-repository Pyright, exact static checks, "
+        "native completion capture/derive/guarded creation and replacement/recapture, "
+        "separate reversed producer, legacy and semantic caller batches, coverage reconciliation, "
+        "then four applicable contracts.\n\n"
+        "The producer freeze supplies exactly 54 successful node identities. Legacy has 31 passes "
+        "but needs an exact node list. The initial 20 semantic/caller cases had three fixture failures; "
+        "its correction and one proposed additional control remain pending final freeze. "
+        "Accepted rendering 105 and mechanical eight proofs remain separate.\n\n"
+        "No production/test file, native fixture or Git/checkpoint state was changed. "
+        "Final owner freezes, independent review, checked candidate and explicit release are still required.\n"
+    )
+    canonical.with_suffix(".md").write_text(readable, encoding="utf-8", newline="\n")
+    # Authored readable receipts have stricter newline rules than preserved raw streams.
+    for path in (canonical, canonical.with_suffix(".md")):
+        raw = path.read_bytes()
+        assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), path
+        assert not re.search(rb"[ \t]+\r?$", raw, re.M), path
+        assert not re.search(rb"[A-Za-z]:[\\/]", raw), path
+    print(json.dumps({"state": payload["state"], "path": canonical.as_posix(),
+                      "sha256": sha(canonical.read_bytes()), "harness_count": len(harnesses),
+                      "execution_released": False}))
+
+
+if __name__ == "__main__":
+    main()

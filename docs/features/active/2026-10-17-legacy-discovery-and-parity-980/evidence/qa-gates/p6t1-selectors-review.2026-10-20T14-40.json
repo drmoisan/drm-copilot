@@ -1,0 +1,157 @@
+{
+  "Timestamp": "2026-10-20T14-40",
+  "Command": "Bounded independent selector source/evidence review and one counted returned-identifier probe",
+  "EXIT_CODE": 0,
+  "status": "CHANGES_REQUIRED_ONE_CONSOLIDATED_FINDING",
+  "task": "P6-T1",
+  "task_acceptance": false,
+  "authority": {
+    "agent_id": "01a1587f-5823-7210-9d39-169420f2da62",
+    "agent_type": "atomic-executor-c3-elevated",
+    "actual_model": "gpt-6-astra",
+    "actual_reasoning_effort": "high",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true,
+    "delegation_id": "rendering_review_p6t1_selectors_20261020",
+    "phase": "S5_P6T1_analyzer_selector_review",
+    "qualification": "Current persisted review route and existing native SubagentStart authority verified for this resumed reviewer."
+  },
+  "scope": {
+    "accepted_head": "2c69b559bbd5dfe1f97c23947bd5d25d607e0303",
+    "sources": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": "6011d12a78e19e848a607ccc7b16acd7b110123ea902de1bef674fe55ad50190",
+      "tests/discovery_runtime/analyzer/test_inventory_selection.py": "6b0ecfab9f0ac1ab2843fa826c864d0a9214a035bb6fb74871afecc21319b839"
+    },
+    "freeze": "evidence/regression-testing/p6t1-selectors-freeze.2026-10-20T14-31.json",
+    "freeze_sha256": "a5709cb2c1389d622d14c10f9ed45f8551178c3d5b99015eeca548e56708a487",
+    "owner_staging": "evidence/regression-testing/p6t1-selectors-staging.2026-10-20T14-31.json",
+    "owner_staging_sha256": "799797df30d88e880c8eb7f459d9f27653ebbd7b9c51918291d4951f05a42766"
+  },
+  "findings": [
+    {
+      "id": "P6T1-SELECTOR-01",
+      "priority": "P2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "start_line": 216,
+      "end_line": 219,
+      "title": "Validate returned identifier types before comparing the injected selection",
+      "observation": "actual_ids is compared directly with expected_ids. A str subclass containing 'dotnet' can override __eq__ to return True for 'repository'; the exact-ID guard accepts it and the adapter analyze callback executes.",
+      "impact": "The new returned-identity consistency check does not enforce its advertised exact fixed IDs and invokes collaborator-defined equality before rejecting malformed identifiers. This is a trusted-DI contract failure, not a claim that request JSON can select arbitrary code or that publication grants are bypassed.",
+      "correction": "After reading each identifier once, reject non-exact str values and out-of-range fixed-ID lengths before equality. Retain exact ordered tuple comparison against normalized expected_ids and fail with the existing ValueError before any analyze callback.",
+      "focused_regression": "Count equality and analysis with a wrong-text str subclass/non-string sentinel; require zero custom equality calls and zero analyze calls on rejection. Cover oversized plain identifier without changing valid one-read/one-analysis behavior."
+    }
+  ],
+  "source_checks": {
+    "fixed_requests": "Nonempty tuple of at most 12 exact strings, each at most 19 characters, unique/known/enabled and consented before optional imports or injected select callback.",
+    "compatibility": "None retains configured-all behavior. Transient selection does not mutate profile/digest. Explicit selection is normalized and passed through installed dispatch.",
+    "publication": "plan_inventory accepts the explicit selector but no registry callback; recomputes via installed registry and rejects divergent contents/selectors with INVENTORY_INPUTS.",
+    "policies": "All three files below 500 lines; changed callable intent contracts present; tests use isolated in-memory collaborators and counted observations. No additional source/policy findings."
+  },
+  "reconciliation": {
+    "ordered_receipts": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-pass1-format.2026-10-20T14-24.json",
+        "sha256": "1a25d1a6b8e3d4e760fbb84949a857b55e13de1fb58ea84bb521e9107d3804ff",
+        "started": "2026-10-20T14:24:17.253648+00:00",
+        "finished": "2026-10-20T14:24:19.293054+00:00",
+        "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py tests/discovery_runtime/analyzer/test_inventory_selection.py"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-pass1-lint.2026-10-20T14-24.json",
+        "sha256": "0067ee99fb74184d6b2e0553323980c8b8cbfcb154a8b02a635062545a5babf9",
+        "started": "2026-10-20T14:24:19.297417+00:00",
+        "finished": "2026-10-20T14:24:20.525875+00:00",
+        "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py tests/discovery_runtime/analyzer/test_inventory_selection.py"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-pass1-types.2026-10-20T14-24.json",
+        "sha256": "1806b650e9df495becab8d93fee18737ebe0fc13067a74296ffdd231e969197a",
+        "started": "2026-10-20T14:24:20.532528+00:00",
+        "finished": "2026-10-20T14:24:22.876151+00:00",
+        "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py tests/discovery_runtime/analyzer/test_inventory_selection.py"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-pass1-tests.2026-10-20T14-29.json",
+        "sha256": "36e5fb341adc51ccdedbb19903d81244379905fefef04b05c4cea25a56408a6f",
+        "started": "2026-10-20T14:24:22.882518+00:00",
+        "finished": "2026-10-20T14:29:57.467402+00:00",
+        "command": "poetry run python SCRATCH\\issue-980-p6t1-selectors-tests.py"
+      }
+    ],
+    "archive_payloads": 5,
+    "raw_readable_streams": 12,
+    "nodes": 71,
+    "reports": 213,
+    "named_ast_bindings": 31,
+    "coverage": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+        "raw_statements": [
+          50,
+          67
+        ],
+        "raw_branches": [
+          8,
+          14
+        ],
+        "retained_missing_statements": 17,
+        "retained_missing_branches": 6,
+        "qualified_statements": 67,
+        "qualified_branches": 14
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+        "raw_statements": [
+          80,
+          80
+        ],
+        "raw_branches": [
+          38,
+          38
+        ],
+        "retained_missing_statements": 0,
+        "retained_missing_branches": 0,
+        "qualified_statements": 80,
+        "qualified_branches": 38
+      }
+    ],
+    "existing_tests_unchanged": true,
+    "resource_window": "Owner-held pre/post qualification matches baseline and accepted Git resources; current equality is deliberately not asserted.",
+    "static_import_closure_modules": 82,
+    "non_owned_uncommitted_dependencies": [],
+    "scope": "Read-only import-path/hash reconciliation; no predecessor semantic review or execution. Mutable packaged service-result resources remain separately time-qualified."
+  },
+  "probe": {
+    "purpose": "Isolate the exact new returned-ID guard; normalized_analyzer_ids and emitter replaced with fixed sentinels, so this is not a full inventory/catalog/publication test.",
+    "source": "import json\nfrom types import SimpleNamespace\nfrom unittest.mock import patch\nfrom drm_copilot_discovery.analyzer.pipeline import run_inventory\ncounts = {'equality': 0, 'analysis': 0}\nclass Mislabelled(str):\n    def __eq__(self, other):\n        counts['equality'] += 1\n        return True\nclass Adapter:\n    identifier = Mislabelled('dotnet')\n    def analyze(self, capture):\n        counts['analysis'] += 1\n        return 'analysis'\nclass Registry:\n    def select(self, profile, *, analyzer_ids=None):\n        return (Adapter(),)\nwith patch('drm_copilot_discovery.analyzer.registry.normalized_analyzer_ids', return_value=('repository',)), patch('drm_copilot_discovery.analyzer.emitter.inventory_result', return_value='reached-emitter'):\n    result = run_inventory(SimpleNamespace(profile=object()), timestamp='unused', author_or_agent=None, catalog=None, analyzer_registry=Registry())\nprint(json.dumps({'boundary': 'run_inventory returned-ID validation only; selector normalization and emitter replaced by fixed sentinels', 'requested': ['repository'], 'returned_identifier_text': str(Adapter.identifier), 'returned_identifier_exact_str': type(Adapter.identifier) is str, 'result': result, 'counts': counts}))\n",
+    "process_exit_code": 0,
+    "captured_tool_output": "{\"boundary\": \"run_inventory returned-ID validation only; selector normalization and emitter replaced by fixed sentinels\", \"requested\": [\"repository\"], \"returned_identifier_text\": \"dotnet\", \"returned_identifier_exact_str\": false, \"result\": \"reached-emitter\", \"counts\": {\"equality\": 1, \"analysis\": 1}}\r\n",
+    "observed": {
+      "boundary": "run_inventory returned-ID validation only; selector normalization and emitter replaced by fixed sentinels",
+      "requested": [
+        "repository"
+      ],
+      "returned_identifier_text": "dotnet",
+      "returned_identifier_exact_str": false,
+      "result": "reached-emitter",
+      "counts": {
+        "equality": 1,
+        "analysis": 1
+      }
+    },
+    "expected": "Reject the malformed identifier with ValueError before custom equality or analysis.",
+    "qualification": "One deterministic counted boundary probe. No timing assertion, tempfile, network, unit subprocess, 71-case rerun or parser sweep."
+  },
+  "coverage_qualification": "Raw pipeline remains 50/67 statements and 8/14 branches. Exactly 17 missing statements and 6 arcs map to unchanged named accepted AST bodies, yielding qualified 67/67 and 14/14. Registry raw 80/80 and 38/38. Changed selection/publication ranges use current execution. Raw reports were not augmented.",
+  "resource_qualification": "Separate owner-held resource-window receipt binds baseline/pre-post resource hashes for the historical 14:24-14:29 run. Catalog was not directly in the runner hash map. No assertion that independently edited result-schema resources still equal that historical window.",
+  "effects": {
+    "source_test_edits": false,
+    "git_checkpoint_plan_ac_mutation": false,
+    "delegation": false,
+    "whole_task_acceptance": false
+  },
+  "next": "Coordinator releases the single consolidated correction; owner retains original proof, repairs the guard/test, runs the required ordered scoped restart and rebinds changed receipts. This review does not authorize a checked commit yet."
+}

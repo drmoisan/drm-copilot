@@ -1,0 +1,854 @@
+{
+  "timestamp": "2026-10-21T16-40",
+  "status": "ADAPTER75_PASS_PENDING_INDEPENDENT_REVIEW",
+  "task_acceptance": false,
+  "owned": [
+    {
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+      "bytes": 12464,
+      "physical_lines": 346
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+      "bytes": 12917,
+      "physical_lines": 338
+    }
+  ],
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-acceptance-retained-baseline.2026-10-21T16-31.json",
+    "sha256": "e7d74aa99ab9fbf0447587085f83aeff4e9d1de39ac86980cdb8c4dd3c0a47c8",
+    "bytes": 30093,
+    "physical_lines": 451
+  },
+  "ordered_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-format.2026-10-21T16-37.json",
+      "sha256": "5b3d353dd10de45dfa221b5092d75bc94a1fdd861992d027460b084f0af78b73",
+      "bytes": 2369,
+      "physical_lines": 39
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-lint.2026-10-21T16-37.json",
+      "sha256": "d335391c44bfe1587ed3926ae187e4c16719d1f2bbcb56c41ed2a59e945b712c",
+      "bytes": 2311,
+      "physical_lines": 39
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-types.2026-10-21T16-37.json",
+      "sha256": "01532eb3d1559914fe8197bf808beadb48010d2739e79e450bcef7b546b64bea",
+      "bytes": 2516,
+      "physical_lines": 40
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-tests.2026-10-21T16-37.json",
+      "sha256": "ae8ec53e04e3e57529f05721e019f0f48fd40f6bb89e3f4ed5fa7f14d9b1e89c",
+      "bytes": 15021,
+      "physical_lines": 44
+    }
+  ],
+  "dependencies": {
+    "scripts/dev_tools/generate_acceptance_scenarios.py": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5"
+  },
+  "passed": 75,
+  "nodes": [
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_schema_path_refuses_checkout_authority[None-False]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_schema_path_refuses_checkout_authority[None-True]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_schema_path_refuses_checkout_authority[v1-False]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_schema_path_refuses_checkout_authority[v1-True]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_schema_path_refuses_checkout_authority[2.0.0-False]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_schema_path_refuses_checkout_authority[2.0.0-True]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_schema_self_reference_never_fabricates_fallback",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_keyword_only_parameters",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document0-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document0-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document0-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document1-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document1-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document1-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document2-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document2-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document2-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document3-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document3-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document3-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document4-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document4-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document4-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document5-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document5-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document5-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document6-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document6-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document6-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document7-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document7-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document7-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document8-project_feature_contract]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document8-project_parity_matrix]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_placeholder_projections_refuse_without_mutation[document8-project_runtime_characterization]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_assembly_cannot_turn_historical_carriers_into_readiness[False]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_assembly_cannot_turn_historical_carriers_into_readiness[True]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_build_document_refuses_without_schema_or_output[document0]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_build_document_refuses_without_schema_or_output[document1]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_build_document_refuses_without_schema_or_output[document2]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_carriers_remain_frozen[value0-title]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_carriers_remain_frozen[value1-feature_ref]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_carriers_remain_frozen[value2-rows]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_carriers_remain_frozen[value3-feature_ref]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_carriers_remain_frozen[value4-scenarios]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_identifier_remains_deterministic[None-None]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_identifier_remains_deterministic[P-None]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_identifier_remains_deterministic[None-C]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_historical_identifier_remains_deterministic[P-C]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_digest_preserves_key_order_independence_and_content_sensitivity",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_formatter_preserves_exact_unicode_order_and_single_lf",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_serialization_errors_remain_explicit",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_collect_input_paths_sorted",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_compatibility_values_remain_domain_neutral",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_parse_args_defaults_and_flags",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_argument_inspection_uses_process_arguments",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[None-0]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[None-1]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[None-2]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[None-3]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv1-0]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv1-1]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv1-2]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv1-3]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv2-0]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv2-1]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv2-2]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_main_forwards_exact_command_arguments_and_exit[argv2-3]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_generation_arguments_fail_without_effects[argv0]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_generation_arguments_fail_without_effects[argv1]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_generation_arguments_fail_without_effects[argv2]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_generation_arguments_fail_without_effects[argv3]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_generation_arguments_fail_without_effects[argv4]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_generation_arguments_fail_without_effects[argv5]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_legacy_generation_arguments_fail_without_effects[argv6]"
+  ],
+  "pytest_seconds": 17.53,
+  "harness_test_seconds": 18.761484999966342,
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-coverage.2026-10-21T16-37.json",
+    "sha256": "974f28b168cc8cdfcf2c00aba4d2eec520784482fbaf7d0831eeae40f74850e3",
+    "bytes": 14053,
+    "physical_lines": 1
+  },
+  "coverage_summary": {
+    "covered_lines": 75,
+    "num_statements": 75,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 4,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 0,
+    "num_partial_branches": 0,
+    "covered_branches": 0,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "body_units": [
+    {
+      "name": "GenerationError",
+      "kind": "ClassDef",
+      "start": 34,
+      "end": 39,
+      "body_executable_lines": [],
+      "body_missing_lines": [],
+      "body_line_percent": null,
+      "qualification": "No executable body"
+    },
+    {
+      "name": "resolve_discovery_schema",
+      "kind": "FunctionDef",
+      "start": 42,
+      "end": 58,
+      "body_executable_lines": [
+        58
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "resolve_schema_self_ref",
+      "kind": "FunctionDef",
+      "start": 61,
+      "end": 73,
+      "body_executable_lines": [
+        73
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "FeatureContractProjection",
+      "kind": "ClassDef",
+      "start": 77,
+      "end": 89,
+      "body_executable_lines": [
+        84,
+        85,
+        86,
+        87,
+        88,
+        89
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "ParityRow",
+      "kind": "ClassDef",
+      "start": 93,
+      "end": 103,
+      "body_executable_lines": [
+        100,
+        101,
+        102,
+        103
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "ParityMatrixProjection",
+      "kind": "ClassDef",
+      "start": 107,
+      "end": 114,
+      "body_executable_lines": [
+        114
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "CharacterizationScenario",
+      "kind": "ClassDef",
+      "start": 118,
+      "end": 129,
+      "body_executable_lines": [
+        125,
+        126,
+        127,
+        128,
+        129
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "RuntimeCharacterizationProjection",
+      "kind": "ClassDef",
+      "start": 133,
+      "end": 140,
+      "body_executable_lines": [
+        140
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "project_feature_contract",
+      "kind": "FunctionDef",
+      "start": 143,
+      "end": 155,
+      "body_executable_lines": [
+        155
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "project_parity_matrix",
+      "kind": "FunctionDef",
+      "start": 158,
+      "end": 170,
+      "body_executable_lines": [
+        170
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "project_runtime_characterization",
+      "kind": "FunctionDef",
+      "start": 173,
+      "end": 187,
+      "body_executable_lines": [
+        187
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "derive_scenario_id",
+      "kind": "FunctionDef",
+      "start": 190,
+      "end": 206,
+      "body_executable_lines": [
+        204,
+        205,
+        206
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "assemble_scenarios",
+      "kind": "FunctionDef",
+      "start": 209,
+      "end": 227,
+      "body_executable_lines": [
+        227
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "compute_source_digest",
+      "kind": "FunctionDef",
+      "start": 230,
+      "end": 253,
+      "body_executable_lines": [
+        249,
+        253
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "build_document",
+      "kind": "FunctionDef",
+      "start": 256,
+      "end": 277,
+      "body_executable_lines": [
+        277
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "format_document",
+      "kind": "FunctionDef",
+      "start": 280,
+      "end": 292,
+      "body_executable_lines": [
+        292
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "collect_input_paths",
+      "kind": "FunctionDef",
+      "start": 295,
+      "end": 306,
+      "body_executable_lines": [
+        306
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "parse_args",
+      "kind": "FunctionDef",
+      "start": 309,
+      "end": 328,
+      "body_executable_lines": [
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    },
+    {
+      "name": "main",
+      "kind": "FunctionDef",
+      "start": 331,
+      "end": 342,
+      "body_executable_lines": [
+        342
+      ],
+      "body_missing_lines": [],
+      "body_line_percent": 100,
+      "qualification": "Coverage intersection excludes docstring and declaration/decorator lines"
+    }
+  ],
+  "retained_body_no_loss": [
+    {
+      "name": "derive_scenario_id",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "compute_source_digest",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "format_document",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "collect_input_paths",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "FeatureContractProjection",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "ParityRow",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "ParityMatrixProjection",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "CharacterizationScenario",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    },
+    {
+      "name": "RuntimeCharacterizationProjection",
+      "executable_body_ast_identical": true,
+      "old_covered_body_loss": 0
+    }
+  ],
+  "legacy_assertion_dispositions": [
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_raises_naming_convention_when_tree_absent",
+      "replacement_tests": [
+        "test_schema_path_refuses_checkout_authority",
+        "test_schema_self_reference_never_fabricates_fallback"
+      ],
+      "contract_reason": "Existing/absent checkout schemas and fabricated fallback cannot supply installed authority; both now refuse with migration guidance."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_keyword_only_parameters",
+      "replacement_tests": [
+        "test_seam_keyword_only_parameters"
+      ],
+      "contract_reason": "Retained keyword-only public schema signature without a new suppression."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_downstream_calls_resolver",
+      "replacement_tests": [
+        "test_schema_path_refuses_checkout_authority",
+        "test_schema_self_reference_never_fabricates_fallback"
+      ],
+      "contract_reason": "Existing/absent checkout schemas and fabricated fallback cannot supply installed authority; both now refuse with migration guidance."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_falls_back_to_convention_when_absent",
+      "replacement_tests": [
+        "test_schema_path_refuses_checkout_authority",
+        "test_schema_self_reference_never_fabricates_fallback"
+      ],
+      "contract_reason": "Existing/absent checkout schemas and fabricated fallback cannot supply installed authority; both now refuse with migration guidance."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_returns_path_when_schema_present",
+      "replacement_tests": [
+        "test_schema_path_refuses_checkout_authority",
+        "test_schema_self_reference_never_fabricates_fallback"
+      ],
+      "contract_reason": "Existing/absent checkout schemas and fabricated fallback cannot supply installed authority; both now refuse with migration guidance."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_feature_contract_positive",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_parity_matrix_positive",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_runtime_characterization_positive",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_non_list_string_field_ignored",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document0-must be an array]",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document1-must be an object]",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document2-must be an array]",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document3-must be an object]",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_adapters_ignore_unknown_fields",
+      "replacement_tests": [
+        "test_placeholder_projections_refuse_without_mutation"
+      ],
+      "contract_reason": "All former positive/malformed/unknown-field placeholder shapes refuse before interpretation; no second parser or engine survives."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_maps_given_when_then",
+      "replacement_tests": [
+        "test_assembly_cannot_turn_historical_carriers_into_readiness",
+        "test_build_document_refuses_without_schema_or_output"
+      ],
+      "contract_reason": "Placeholder Cartesian expansion, top-level schema and null-reference fallbacks are removed by the settled contract; real v2 projection remains in its unchanged companion."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_derives_stable_id",
+      "replacement_tests": [
+        "test_historical_identifier_remains_deterministic",
+        "test_build_document_refuses_without_schema_or_output"
+      ],
+      "contract_reason": "Historical hash remains identical and nonauthoritative; generation refuses unsupported context."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_top_level_fields",
+      "replacement_tests": [
+        "test_assembly_cannot_turn_historical_carriers_into_readiness",
+        "test_build_document_refuses_without_schema_or_output"
+      ],
+      "contract_reason": "Placeholder Cartesian expansion, top-level schema and null-reference fallbacks are removed by the settled contract; real v2 projection remains in its unchanged companion."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_null_refs_when_none_match",
+      "replacement_tests": [
+        "test_assembly_cannot_turn_historical_carriers_into_readiness",
+        "test_build_document_refuses_without_schema_or_output"
+      ],
+      "contract_reason": "Placeholder Cartesian expansion, top-level schema and null-reference fallbacks are removed by the settled contract; real v2 projection remains in its unchanged companion."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_byte_identical_repeat",
+      "replacement_tests": [
+        "test_formatter_preserves_exact_unicode_order_and_single_lf"
+      ],
+      "contract_reason": "Safe deterministic serialization and single-LF behavior retained without generation authority."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_invariant_to_input_ordering",
+      "replacement_tests": [
+        "test_cli_collect_input_paths_sorted",
+        "test_digest_preserves_key_order_independence_and_content_sensitivity",
+        "test_build_document_refuses_without_schema_or_output"
+      ],
+      "contract_reason": "Safe ordering remains; unsupported scenario combination ordering is replaced by refusal and accepted v2 generator coverage."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_source_digest_stable",
+      "replacement_tests": [
+        "test_digest_preserves_key_order_independence_and_content_sensitivity"
+      ],
+      "contract_reason": "Unchanged raw digest body remains deterministic, role-sensitive and content-sensitive."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_domain_neutrality_module_source_and_output_fields",
+      "replacement_tests": [
+        "test_compatibility_values_remain_domain_neutral"
+      ],
+      "contract_reason": "Value neutrality retained; source neutrality checked in this freeze rather than runtime test filesystem reads. No fake output is generated."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_file-not found]",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_non_object_root-root must be an object]",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_parse_error-invalid JSON]",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_field-feature_ref]",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_parse_args_defaults_and_flags",
+      "replacement_tests": [
+        "test_cli_parse_args_defaults_and_flags"
+      ],
+      "contract_reason": "Original legitimate public values/order assertions retained. parse_args is inspection-only."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_collect_input_paths_sorted",
+      "replacement_tests": [
+        "test_cli_collect_input_paths_sorted"
+      ],
+      "contract_reason": "Original legitimate public values/order assertions retained. parse_args is inspection-only."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_writes_output",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_stdout",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_matches",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_mismatch",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_requires_output",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    },
+    {
+      "old_node": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_target_absent",
+      "replacement_tests": [
+        "test_legacy_generation_arguments_fail_without_effects",
+        "test_main_forwards_exact_command_arguments_and_exit"
+      ],
+      "contract_reason": "Canonical main forwards exact arguments/exits. Unsupported old input/output/check shapes are typed failures before effects; --check is never dry-run or readiness."
+    }
+  ],
+  "removed_private_engine_functions": [
+    "_generate_from_args",
+    "_load_json_document",
+    "_require_str",
+    "_run_check",
+    "_scenario_sort_key",
+    "_string_tuple"
+  ],
+  "unchanged_real_v2_projection": {
+    "path": "tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+    "sha256": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+    "bytes": 8948,
+    "physical_lines": 222
+  },
+  "semantic_qualification": "Legacy placeholder engine/schema fallback/checking removed by explicit P6-T3 contract; every retained safe body AST-identical and100%covered. New/refusal/forwarding bodies100%covered. No old186-line denominator claim after removing unsupported behavior. Seven accepted actual-v2 cases remain unchanged and were not replayed.",
+  "retained_diagnostics": "Initial Black formatting edits, E501, format-check restart and harness stdout cp1252 UnicodeEncodeError are preserved; UTF-8 harness correction changed no product behavior. Read-only evidence inspection required ConvertFrom-Json -AsHashtable for an empty coverage function key. Initial proof assembly assumed POSIX coverage keys and raised KeyError; corrected Windows path-key lookup without changing raw coverage or product bytes.",
+  "limitations": "Scoped adapter proof only; current installed-entry dependency frozen. No package generation, native effects or whole-task acceptance; central integration and independent review remain coordinator-owned.",
+  "evidence_bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-format.2026-10-21T16-36.json",
+      "sha256": "2a8d755647b6217625732a935b069e67c1a91f0ad881554844fc03c278b7c4b6",
+      "bytes": 2448,
+      "physical_lines": 38
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-raw-archive.2026-10-21T16-36.json",
+      "sha256": "5f051aaa88dbb68f18bf8da6cbe8ae5807dd23c9d1c80aff9a98fcd25d405d29",
+      "bytes": 3046,
+      "physical_lines": 16
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-format.2026-10-21T16-37.json",
+      "sha256": "fbd8fa4b9d9da5a47e5187dc193cb81b4b729f105aef19de1d3f004978acb4e5",
+      "bytes": 2346,
+      "physical_lines": 38
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-lint.2026-10-21T16-37.json",
+      "sha256": "030f196b19daf253fe210eff8b966f127e4eb43bf643b18c4df538d9adddb0f5",
+      "bytes": 2784,
+      "physical_lines": 40
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-raw-archive.2026-10-21T16-37.json",
+      "sha256": "76ea6d227332c3d14a00d0f10da07879ae36a6ec04bf46c9f0c5c74bbb6cd742",
+      "bytes": 3635,
+      "physical_lines": 26
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-format.2026-10-21T16-37.json",
+      "sha256": "7b7543b4bf3ba697b9948da9726bec83bcb3c07feeaa3ed914a60fc00192e0af",
+      "bytes": 2448,
+      "physical_lines": 38
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-lint.2026-10-21T16-37.json",
+      "sha256": "415db0e489f53876b0fb3f7eed6a4985b72f34c63039baedb5b6f73b0bd37c7e",
+      "bytes": 2324,
+      "physical_lines": 40
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-raw-archive.2026-10-21T16-37.json",
+      "sha256": "6ea746204d8c338e91a379d443e83720902f9f1cafeefd02e97a76d3d32e7682",
+      "bytes": 3447,
+      "physical_lines": 26
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-format.2026-10-21T16-37.json",
+      "sha256": "f9ae807d3f5f9c8657c8eafe0e6961e986c0ead3a890109838ac04200e1c0ee5",
+      "bytes": 2493,
+      "physical_lines": 39
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-raw-archive.2026-10-21T16-37.json",
+      "sha256": "e805d9464b934baee6f7398a075e7af4b9f1f6e8d5395b65417ea85737d77969",
+      "bytes": 3082,
+      "physical_lines": 16
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-coverage.2026-10-21T16-37.json",
+      "sha256": "974f28b168cc8cdfcf2c00aba4d2eec520784482fbaf7d0831eeae40f74850e3",
+      "bytes": 14053,
+      "physical_lines": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-format.2026-10-21T16-37.json",
+      "sha256": "5b3d353dd10de45dfa221b5092d75bc94a1fdd861992d027460b084f0af78b73",
+      "bytes": 2369,
+      "physical_lines": 39
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-lint.2026-10-21T16-37.json",
+      "sha256": "d335391c44bfe1587ed3926ae187e4c16719d1f2bbcb56c41ed2a59e945b712c",
+      "bytes": 2311,
+      "physical_lines": 39
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-raw-archive.2026-10-21T16-37.json",
+      "sha256": "78b4f3d45867ff516d224b07cdcfd700095f8aa4a966746c3c05275cf1ac1414",
+      "bytes": 6248,
+      "physical_lines": 46
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-tests.2026-10-21T16-37.json",
+      "sha256": "ae8ec53e04e3e57529f05721e019f0f48fd40f6bb89e3f4ed5fa7f14d9b1e89c",
+      "bytes": 15021,
+      "physical_lines": 44
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-types.2026-10-21T16-37.json",
+      "sha256": "01532eb3d1559914fe8197bf808beadb48010d2739e79e450bcef7b546b64bea",
+      "bytes": 2516,
+      "physical_lines": 40
+    }
+  ],
+  "stage_paths": [
+    "scripts/dev_tools/generate_acceptance_scenarios.py",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-acceptance-retained-baseline.2026-10-21T16-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-format.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-raw-archive.2026-10-21T16-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-lint.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-lint.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-coverage.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-format.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-lint.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-raw-archive.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-tests.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-types.2026-10-21T16-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-freeze.2026-10-21T16-40.json"
+  ]
+}

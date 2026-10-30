@@ -1,0 +1,68 @@
+{
+  "Timestamp": "2026-10-21T12-07",
+  "Command": ".venv/Scripts/python.exe -m ruff check tests/discovery_runtime/test_service_report_guards.py",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "ruff",
+    "check",
+    "tests/discovery_runtime/test_service_report_guards.py"
+  ],
+  "EXIT_CODE": 1,
+  "elapsed_seconds": 0.130018,
+  "input_hashes_before": {
+    "tests/discovery_runtime/test_service_report_guards.py": "89c00f0ce7b837d4e97df3e697cfce33c1587db9519a2ea43503f7ad4f011d28",
+    "tests/discovery_runtime/test_service.py": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+    "tests/discovery_runtime/test_service_boundaries.py": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+    "tests/discovery_runtime/initialization_test_support.py": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+  },
+  "input_hashes_after": {
+    "tests/discovery_runtime/test_service_report_guards.py": "89c00f0ce7b837d4e97df3e697cfce33c1587db9519a2ea43503f7ad4f011d28",
+    "tests/discovery_runtime/test_service.py": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+    "tests/discovery_runtime/test_service_boundaries.py": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+    "tests/discovery_runtime/initialization_test_support.py": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [],
+  "streams": {
+    "stdout": {
+      "base64": "VEMwMDEgTW92ZSBhcHBsaWNhdGlvbiBpbXBvcnQgYHRlc3RzLmRpc2NvdmVyeV9ydW50aW1lLnRlc3Rfc2VydmljZS5NZW1vcnlTZXJ2aWNlYCBpbnRvIGEgdHlwZS1jaGVja2luZyBibG9jawogIC0tPiB0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVx0ZXN0X3NlcnZpY2VfcmVwb3J0X2d1YXJkcy5weToyMTo1MAogICB8CjE5IHwgZnJvbSBkcm1fY29waWxvdF9kaXNjb3Zlcnkuc2VydmljZV9yZXBvcnRzIGltcG9ydCBwcm9qZWN0LCByZXBvcnRfZmluZGluZ3MKMjAgfAoyMSB8IGZyb20gdGVzdHMuZGlzY292ZXJ5X3J1bnRpbWUudGVzdF9zZXJ2aWNlIGltcG9ydCBNZW1vcnlTZXJ2aWNlCiAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl5eXl5eXl5eXl4KMjIgfCBmcm9tIHRlc3RzLmRpc2NvdmVyeV9ydW50aW1lLnRlc3Rfc2VydmljZSBpbXBvcnQgKAoyMyB8ICAgICBpbml0aWFsaXphdGlvbl9jYXRhbG9nIGFzIGluaXRpYWxpemF0aW9uX2NhdGFsb2csCiAgIHwKaGVscDogTW92ZSBpbnRvIHR5cGUtY2hlY2tpbmcgYmxvY2sKCkIwMDggRG8gbm90IHBlcmZvcm0gZnVuY3Rpb24gY2FsbCBgSnNvbk9iamVjdGAgaW4gYXJndW1lbnQgZGVmYXVsdHM7IGluc3RlYWQsIHBlcmZvcm0gdGhlIGNhbGwgd2l0aGluIHRoZSBmdW5jdGlvbiwgb3IgcmVhZCB0aGUgZGVmYXVsdCBmcm9tIGEgbW9kdWxlLWxldmVsIHNpbmdsZXRvbiB2YXJpYWJsZQogIC0tPiB0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVx0ZXN0X3NlcnZpY2VfcmVwb3J0X2d1YXJkcy5weTo0NToyNgogICB8CjQzIHwgICAgICosCjQ0IHwgICAgIG9wZXJhdGlvbjogT3BlcmF0aW9uID0gImNvdmVyYWdlLXJlcG9ydCIsCjQ1IHwgICAgIGlucHV0czogSnNvbk9iamVjdCA9IEpzb25PYmplY3QoKCkpLAogICB8ICAgICAgICAgICAgICAgICAgICAgICAgICBeXl5eXl5eXl5eXl5eXgo0NiB8ICAgICB3cml0ZTogYm9vbCA9IEZhbHNlLAo0NyB8ICkgLT4gT3BlcmF0aW9uQ29udGV4dDoKICAgfAoKRm91bmQgMiBlcnJvcnMuCk5vIGZpeGVzIGF2YWlsYWJsZSAoMSBoaWRkZW4gZml4IGNhbiBiZSBlbmFibGVkIHdpdGggdGhlIGAtLXVuc2FmZS1maXhlc2Agb3B0aW9uKS4K",
+      "sha256": "4721dd411edff9868e34eac7a4aca06b549c3a63a1897b2b8ca422141e6c9544",
+      "bytes": 1122
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

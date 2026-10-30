@@ -1,0 +1,173 @@
+{
+  "Timestamp": "2026-10-20T17:38:18.106672+00:00",
+  "Command": "Read-only retained-request diagnosis; .venv/Scripts/python.exe -B SCRATCH/issue-980-p6t1-native-request-diagnosis.py",
+  "EXIT_CODE": 0,
+  "task": "P6-T1",
+  "status": "HARNESS_CORRECTION_REQUIRED",
+  "route": "atomic_execution_p6t1_native_request_diagnosis_20261020",
+  "phase": "S5_P6T1_native_request_diagnosis",
+  "head_at_finding": "c2d7926c02a19ad02689f0111b353807221b8d36",
+  "retained_native_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native.2026-10-20T17-26.json",
+    "sha256": "ee16910a59bec165773fd6f6e02227f772049207d0c39f0408d20269dfd981a8",
+    "bytes": 24102
+  },
+  "retained_native_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-raw.2026-10-20T17-26.json",
+    "sha256": "c9e40a8b293c93d54ca5e5b5f175a8e9c4bff7f07dd92faba99e3bcf7c9f520e",
+    "bytes": 45235
+  },
+  "frozen_request_boundary_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "bytes": 17125
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "bytes": 16674
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "bytes": 10018
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "bytes": 11635
+    },
+    {
+      "path": "schemas/discovery/v2/service-request.schema.json",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "bytes": 11635
+    }
+  ],
+  "finding": {
+    "id": "NR1",
+    "classification": "Native fixture/harness request-construction error",
+    "location": "SCRATCH/issue-980-p6t1-installed-composition.py:193-200",
+    "harness_binding": {
+      "entry": "issue-980-p6t1-installed-composition.py",
+      "sha256": "b6509b8beca210ad9fa0f1ef3f680ca141231eaba0f94167bf2ed04469eabfdc",
+      "request_definition_lines": [
+        193,
+        200
+      ]
+    },
+    "cause": "The common request constructor hard-codes format='both' for every operation. The fixed service operation matrix requires format='json' for non-report operations, including init.",
+    "rule": "service_request_rules.py:265-266; _REPORTS consists of validate-all, coverage-report, parity-report and completion-report.",
+    "actual_request": {
+      "sha256": "88c020ebf307551f20b646637561334bb62e55119eab6fe8d4648abe1611f7a9",
+      "bytes": 748
+    },
+    "original_diagnosis": {
+      "label": "retained-init-dry-exact-bytes",
+      "sha256": "88c020ebf307551f20b646637561334bb62e55119eab6fe8d4648abe1611f7a9",
+      "bytes": 748,
+      "json_ok": true,
+      "schema_ok": true,
+      "schema_findings": [],
+      "combination_error": "This operation requires JSON representation",
+      "service_parser_accepted": false,
+      "service_findings": [
+        {
+          "code": "SERVICE_REQUEST",
+          "pointer": "/"
+        }
+      ]
+    },
+    "single_field_control": {
+      "label": "diagnostic-copy-init-dry-format-json-only",
+      "sha256": "19491e9a74a29da30f419c27e0cac1ad0579de317ac150dd351993196e357288",
+      "bytes": 748,
+      "json_ok": true,
+      "schema_ok": true,
+      "schema_findings": [],
+      "combination_error": null,
+      "service_parser_accepted": true,
+      "operation": "init",
+      "format": "json"
+    },
+    "impact": "Installed identity passed, then the first init-dry request was correctly rejected before operation execution. Remaining 16 child invocations did not run.",
+    "result_classification": "The original native command/assertion failure is real. SERVICE_REQUEST/exit 2 is the expected production rejection of this invalid operation/format combination; it is not a proof-reader attribution error."
+  },
+  "planned_request_reconciliation": {
+    "object_request_shapes": 16,
+    "valid_nonreport_shapes_requiring_json": 12,
+    "paired_completion_report_shapes_preserving_both": [
+      "report-dry",
+      "report-publish",
+      "report-repeat"
+    ],
+    "unknown_operation_still_rejected": true,
+    "malformed_control_still_rejected": true,
+    "additional_shape_findings": 0,
+    "qualification": "In-memory copies only. Parser acceptance does not establish local/host authority, runtime identity, mutation success, publication or any downstream expected result."
+  },
+  "minimal_repair": [
+    "Add a representation parameter to the existing request() helper, defaulting to 'json', and use that parameter for the format field.",
+    "Pass format='both' explicitly at the three existing completion-report calls: report-dry, report-publish and report-repeat.",
+    "Keep all payload inputs, roots, selected modes, dry_run/write values, expected exit assertions and publication/negative assertions unchanged.",
+    "Preserve the original failed harness, request, outputs and receipt. Bind any corrected harness separately before coordinator-authorized continuation."
+  ],
+  "production_changes_required": false,
+  "schema_changes_required": false,
+  "package_rebuild_required_by_this_finding": false,
+  "retained_native_observations": {
+    "installed_identity": {
+      "passed": true,
+      "seconds": 1.3139833000022918
+    },
+    "init_dry": {
+      "expected_exit": 0,
+      "actual_exit": 2,
+      "seconds": 1.5148394999559969
+    },
+    "later_child_invocations_unexecuted": 16,
+    "source_input_count": 211,
+    "fixture_file_count": 48,
+    "init_seed_file_count": 36,
+    "original_p5_fixture_file_count": 50,
+    "qualification": "Unchanged source/fixture/effect observations are retained from the original receipt; this diagnosis does not recapture them."
+  },
+  "pure_diagnostic_evidence": {
+    "script": {
+      "path": "SCRATCH/issue-980-p6t1-native-request-diagnosis.py",
+      "encoding": "gzip-base64",
+      "sha256": "7e88bd86e77b615baa72e538941df4aa71bbf1b1b852b9b5f99e1e0bc112598a",
+      "bytes": 9599,
+      "data": "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"
+    },
+    "result": {
+      "path": "SCRATCH/issue-980-p6t1-native-request-diagnosis.result.json",
+      "encoding": "gzip-base64",
+      "sha256": "900765731350643b11427213087407676c2ce637596dc0c18bf272e4145b0ec7",
+      "bytes": 21101,
+      "data": "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"
+    }
+  },
+  "diagnosis_effects": {
+    "service_calls": 0,
+    "native_replays": 0,
+    "fixture_writes": 0,
+    "source_test_harness_assertion_changes": 0
+  },
+  "open_probes": [],
+  "task_accepted": false,
+  "final_207_plus_4_release": "Remains disabled; coordinator owns subsequent execution and release.",
+  "counts": {
+    "accepted_tasks": 46,
+    "total_tasks": 84,
+    "accepted_source_acs": 23,
+    "total_source_acs": 66
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

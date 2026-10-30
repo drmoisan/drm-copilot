@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:acceptance-specification",
+  "title": "Discovery v2 acceptance specification",
+  "description": "Structured test specification with immutable source and decision traceability. Readiness is never an implementation test pass.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "scenario_id", "kind", "feature_id", "criterion_id", "client_id", "platform_id", "mode_id", "readiness", "given", "when", "then", "pending_reasons", "expectation_basis", "source_contract_refs", "evidence_refs", "product_decision_refs", "tags", "source_content_sha256", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:acceptance-specification"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "acceptance-specification"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "scenario_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "kind": {"enum": ["legacy-characterization", "target-acceptance"]},
+    "feature_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "criterion_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "client_id": {"$ref": "#/$defs/nullable-identifier"},
+    "platform_id": {"$ref": "#/$defs/nullable-identifier"},
+    "mode_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "readiness": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/acceptance-readiness"},
+    "given": {"$ref": "#/$defs/statements"},
+    "when": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+    "then": {"anyOf": [{"$ref": "#/$defs/statements", "minItems": 1}, {"type": "null"}]},
+    "pending_reasons": {"$ref": "#/$defs/statements"},
+    "expectation_basis": {"enum": ["verified-source", "approved-decision", "unresolved"]},
+    "source_contract_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:parity-matrix#/$defs/source-contract-reference"}},
+    "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+    "product_decision_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-references"},
+    "tags": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^@[a-z][a-z0-9_.-]*$(?![\\s\\S])"}},
+    "source_content_sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "implementation_test_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:inventory-snapshot#/$defs/source"}},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"kind": {"const": "target-acceptance"}}, "required": ["kind"]},
+      "then": {"properties": {"client_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"}, "platform_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"}}}
+    },
+    {
+      "if": {"properties": {"kind": {"const": "legacy-characterization"}}, "required": ["kind"]},
+      "then": {"properties": {"expectation_basis": {"enum": ["verified-source", "unresolved"]}, "product_decision_refs": {"maxItems": 0}}}
+    },
+    {
+      "if": {"properties": {"readiness": {"const": "ready"}}, "required": ["readiness"]},
+      "then": {"properties": {"when": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, "then": {"$ref": "#/$defs/statements", "minItems": 1}, "pending_reasons": {"maxItems": 0}, "expectation_basis": {"enum": ["verified-source", "approved-decision"]}}}
+    },
+    {
+      "if": {"properties": {"readiness": {"const": "pending"}}, "required": ["readiness"]},
+      "then": {"properties": {"then": {"type": "null"}, "pending_reasons": {"minItems": 1}, "expectation_basis": {"const": "unresolved"}}}
+    },
+    {
+      "if": {"properties": {"expectation_basis": {"const": "verified-source"}}, "required": ["expectation_basis"]},
+      "then": {"properties": {"evidence_refs": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"expectation_basis": {"const": "approved-decision"}}, "required": ["expectation_basis"]},
+      "then": {"properties": {"product_decision_refs": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "nullable-identifier": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"}, {"type": "null"}]},
+    "statements": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}
+  }
+}

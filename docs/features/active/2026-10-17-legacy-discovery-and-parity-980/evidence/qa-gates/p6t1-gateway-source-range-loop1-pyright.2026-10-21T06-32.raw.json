@@ -1,0 +1,39 @@
+{
+  "Timestamp": "2026-10-21T06-32",
+  "Command": ".venv/Scripts/python.exe -m pyright tests/discovery_runtime/test_service_boundaries.py",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "pyright",
+    "tests/discovery_runtime/test_service_boundaries.py"
+  ],
+  "EXIT_CODE": 0,
+  "elapsed_seconds": 0.972678,
+  "input_hashes_before": {
+    "tests/discovery_runtime/test_service_boundaries.py": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea"
+  },
+  "input_hashes_after": {
+    "tests/discovery_runtime/test_service_boundaries.py": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [],
+  "streams": {
+    "stdout": {
+      "base64": "MCBlcnJvcnMsIDAgd2FybmluZ3MsIDAgaW5mb3JtYXRpb25zCldBUk5JTkc6IHRoZXJlIGlzIGEgbmV3IHB5cmlnaHQgdmVyc2lvbiBhdmFpbGFibGUgKHYxLjEuNDA5IC0+IHYxLjEuNDE0KS4NClBsZWFzZSBpbnN0YWxsIHRoZSBuZXcgdmVyc2lvbiBvciBzZXQgUFlSSUdIVF9QWVRIT05fRk9SQ0VfVkVSU0lPTiB0byBgbGF0ZXN0YA0KDQo=",
+      "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "bytes": 194
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "acceptance": false,
+  "baseline": "evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json",
+  "current_tests_status": "Production remains frozen; approved positive disposition assertions are being added to existing parameter cases, without a larger node population.",
+  "helper_proof": "evidence/regression-testing/p5t2-helper-freeze.2026-10-20T06-00.json",
+  "original_conflict_control": "evidence/regression-testing/p5t2-graph-conflict-original.2026-10-20T06-35.json",
+  "passing_cases": 36,
+  "passing_focused_receipt": "evidence/regression-testing/p5t2-graph-focused11-tests.2026-10-20T06-39.json",
+  "sources": [
+    {
+      "bytes": 7219,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "physical_lines": 173,
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036"
+    },
+    {
+      "bytes": 17837,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "physical_lines": 399,
+      "sha256": "cd96d559f5562fef7ac6db69af3f1dbe0632e6ad6c3ec0955ce233401a74556d"
+    },
+    {
+      "bytes": 14576,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "physical_lines": 346,
+      "sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903"
+    }
+  ],
+  "status": "source-only-frozen-for-review",
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:41:27.693774+00:00"
+}

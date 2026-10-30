@@ -1,0 +1,102 @@
+{
+  "issue": 980,
+  "task": "P6-T3",
+  "timestamp": "2026-10-21T16:46:28.892971+00:00",
+  "status": "READY_FOR_CHECKED_SUBSET_NOT_STAGED",
+  "paths": [
+    {
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-acceptance-retained-baseline.2026-10-21T16-31.json",
+      "sha256": "e7d74aa99ab9fbf0447587085f83aeff4e9d1de39ac86980cdb8c4dd3c0a47c8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-format.2026-10-21T16-36.json",
+      "sha256": "2a8d755647b6217625732a935b069e67c1a91f0ad881554844fc03c278b7c4b6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate-raw-archive.2026-10-21T16-36.json",
+      "sha256": "5f051aaa88dbb68f18bf8da6cbe8ae5807dd23c9d1c80aff9a98fcd25d405d29"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-format.2026-10-21T16-37.json",
+      "sha256": "fbd8fa4b9d9da5a47e5187dc193cb81b4b729f105aef19de1d3f004978acb4e5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-lint.2026-10-21T16-37.json",
+      "sha256": "030f196b19daf253fe210eff8b966f127e4eb43bf643b18c4df538d9adddb0f5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate2-raw-archive.2026-10-21T16-37.json",
+      "sha256": "76ea6d227332c3d14a00d0f10da07879ae36a6ec04bf46c9f0c5c74bbb6cd742"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-format.2026-10-21T16-37.json",
+      "sha256": "7b7543b4bf3ba697b9948da9726bec83bcb3c07feeaa3ed914a60fc00192e0af"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-lint.2026-10-21T16-37.json",
+      "sha256": "415db0e489f53876b0fb3f7eed6a4985b72f34c63039baedb5b6f73b0bd37c7e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-consolidate3-raw-archive.2026-10-21T16-37.json",
+      "sha256": "6ea746204d8c338e91a379d443e83720902f9f1cafeefd02e97a76d3d32e7682"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-format.2026-10-21T16-37.json",
+      "sha256": "f9ae807d3f5f9c8657c8eafe0e6961e986c0ead3a890109838ac04200e1c0ee5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass1-raw-archive.2026-10-21T16-37.json",
+      "sha256": "e805d9464b934baee6f7398a075e7af4b9f1f6e8d5395b65417ea85737d77969"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-coverage.2026-10-21T16-37.json",
+      "sha256": "974f28b168cc8cdfcf2c00aba4d2eec520784482fbaf7d0831eeae40f74850e3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-format.2026-10-21T16-37.json",
+      "sha256": "5b3d353dd10de45dfa221b5092d75bc94a1fdd861992d027460b084f0af78b73"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-lint.2026-10-21T16-37.json",
+      "sha256": "d335391c44bfe1587ed3926ae187e4c16719d1f2bbcb56c41ed2a59e945b712c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-raw-archive.2026-10-21T16-37.json",
+      "sha256": "78b4f3d45867ff516d224b07cdcfd700095f8aa4a966746c3c05275cf1ac1414"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-tests.2026-10-21T16-37.json",
+      "sha256": "ae8ec53e04e3e57529f05721e019f0f48fd40f6bb89e3f4ed5fa7f14d9b1e89c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-types.2026-10-21T16-37.json",
+      "sha256": "01532eb3d1559914fe8197bf808beadb48010d2739e79e450bcef7b546b64bea"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-freeze.2026-10-21T16-40.json",
+      "sha256": "84c4a317730f5ee6467bef1fdf1ba1d3c5d1eb9f98ccf5342e13f853e445b946"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-proof-archive.2026-10-21T16-40.json",
+      "sha256": "94ad8a4f420e5e3dc3825d25c3cffa08667ec30b53f58c5f3384988a6ac7867b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-independent-review.2026-10-21T16-46.json",
+      "sha256": "a91a66211fa902771f2fae398a07de40eef33d65c28add7ca4b45e65391eb879"
+    }
+  ],
+  "manifest_self": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-checked-staging-union.2026-10-21T16-46.json",
+  "path_count_including_manifest": 23,
+  "self_binding": "Coordinator binds the exact manifest SHA supplied in this handoff; no recursive self-digest.",
+  "dependency_closure": "Requires runtime cli.py c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3 committed with or before this subset. That entry is independently reviewed; its implementation is not re-reviewed here.",
+  "exclusions": "No runtime entry source, other compatibility slices, package files, live final gates, checkpoint or unrelated preparation artifacts included.",
+  "task_acceptance": false
+}

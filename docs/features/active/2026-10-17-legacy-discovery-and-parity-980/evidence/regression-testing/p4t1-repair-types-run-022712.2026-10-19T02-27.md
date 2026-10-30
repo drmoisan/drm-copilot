@@ -1,0 +1,42 @@
+Timestamp: 2026-10-19T02:27:12.356400+00:00
+Command: poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py tests/discovery_runtime/analyzer/test_input_capture.py tests/discovery_runtime/analyzer/test_pipeline.py
+EXIT_CODE: 1
+Output Summary:
+
+```text
+WORKSPACE\tests\discovery_runtime\analyzer\test_pipeline.py
+  WORKSPACE\tests\discovery_runtime\analyzer\test_pipeline.py:116:19 - error: Argument of type "str" cannot be assigned to parameter "key" of type "ArtifactKey" in function "__getitem__"
+    Type "str" is not assignable to type "ArtifactKey"
+      "str" is not assignable to type "Literal['root']"
+      "str" is not assignable to type "Literal['profile']"
+      "str" is not assignable to type "Literal['scope']"
+      "str" is not assignable to type "Literal['coverage_ledger']"
+      "str" is not assignable to type "Literal['unspecified_behaviors']"
+      "str" is not assignable to type "Literal['product_decisions']"
+      "str" is not assignable to type "Literal['parity_matrix']" (reportArgumentType)
+  WORKSPACE\tests\discovery_runtime\analyzer\test_pipeline.py:180:23 - error: Argument of type "str" cannot be assigned to parameter "key" of type "ArtifactKey" in function "__getitem__"
+    Type "str" is not assignable to type "ArtifactKey"
+      "str" is not assignable to type "Literal['root']"
+      "str" is not assignable to type "Literal['profile']"
+      "str" is not assignable to type "Literal['scope']"
+      "str" is not assignable to type "Literal['coverage_ledger']"
+      "str" is not assignable to type "Literal['unspecified_behaviors']"
+      "str" is not assignable to type "Literal['product_decisions']"
+      "str" is not assignable to type "Literal['parity_matrix']" (reportArgumentType)
+2 errors, 0 warnings, 0 informations
+WARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+
+
+```
+
+Elapsed seconds: 1.064459
+Source and test bytes unchanged: True
+
+```json
+{
+  "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+  "tests/discovery_runtime/analyzer/test_input_capture.py": "6b479acd2afb810e727106c1dbff79497f7113067c425a449bb089a33c5ea033",
+  "tests/discovery_runtime/analyzer/test_pipeline.py": "61d700debf2a45d69bca57a2d8888191880a5d2d178b800d406c63d2e6316de1"
+}
+```

@@ -1,0 +1,87 @@
+{
+  "findings": [],
+  "current_head": "172313a2adf7c353aaf08910c3a11deaf7aad976",
+  "timestamp": "2026-10-20T17:28:13.003686+00:00",
+  "original_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-build.2026-10-20T17-19.json",
+      "sha256": "7932978f306ea64ba0e125e82165cdc4b1c641b9a3075d2c548c8912dc2bc6a4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-check.2026-10-20T17-19.json",
+      "sha256": "e1a131324730d6166397419c1e9421a45ac175c196268a82e24e728807f43dfc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-install.2026-10-20T17-19.json",
+      "sha256": "52533c42adc3662365c8172d38c047f8f1488e0131a4115a42c5ce6c3d8345bc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-handoff.2026-10-20T17-19.json",
+      "sha256": "22d43501f691643b8a7c831bf9b3e1a5a4c7b309e35c21f305b562b261fe2bf9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-raw-archive.2026-10-20T17-19.json",
+      "sha256": "9a9be59202c2ac74d33cb500812c51eb721ccb78db627a1532021191395652ee"
+    }
+  ],
+  "source_count": 211,
+  "payload_count": 168,
+  "raw_archive_members": 7,
+  "changed_from_original": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py"
+  ],
+  "identity": {
+    "build_sha256": "c05c22a870a0ae74431ee32f84a89bfddda39230310265dbb0b563e44290978a",
+    "policy_sha256": "87ccd267f082c61d8b60f7f23d38468e3ecbe66b190a51b0229b7a101ba8f07b",
+    "resource_manifest_sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "wheel_sha256": "48db453865dd62ba42a69593c4ddbd541707a8a0cdec770c36e91606f6da3871",
+    "package_version": "2.0.0",
+    "schema_version": "2.0.0"
+  },
+  "staging_files": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json"
+  ],
+  "status": "READY_FOR_CHECKED_COMMIT",
+  "scope": "Generated package identity and retained packaging receipt reconstruction only",
+  "authority": {
+    "delegation_id": "rendering_review_p6t1_package_identity_confirmation_20261020",
+    "phase": "S5_P6T1_package_identity_confirmation",
+    "profile": "atomic-executor-c3-elevated",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_attestation_sha256": "f4016ebdabcd36d1e5aac5c6dde6e1ebdb558bec770792f5c188710d8c621bf5",
+    "qualification": "Persisted resume route and existing native SubagentStart authority verified; no new launch is claimed."
+  },
+  "inputs": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "sha256": "c05c22a870a0ae74431ee32f84a89bfddda39230310265dbb0b563e44290978a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "sha256": "6e432439ab962443f732d3c2fb2d46ab364ff0dbf0ca9cfe42cbe4e0f46173b3"
+    }
+  ],
+  "verification": {
+    "method": "Read-only explicit UTF-8, gzip/base64 decoding, SHA-256, JSON comparison and ZIP member reads; no runtime execution or build/test replay.",
+    "receipt_reconstruction": "All five embedded original receipts match declared length/SHA and retained original bytes. Recursive locator normalization reproduces every readable view exactly.",
+    "raw_streams": "All seven archived members match length/SHA and retained disk bytes; build/check/install readable stdout/stderr reproduce by locator substitution with original CRLF preserved.",
+    "ordered_packaging": "Retained build, --check, isolated --no-index --no-deps install exits are zero, in that order; durations 4.040, 2.391 and 3.211 seconds.",
+    "source_binding": "All 211 before/after maps equal the handoff and current bytes. Against the retained failed build, only the previously confirmed dependency_inputs.py import substitution differs.",
+    "identity": "Canonical manifest bytes and policy projection independently reconstructed. Resource manifest digest and wheel digest match; all 168 listed file sizes/digests match source, wheel and installation; the separately generated build manifest also matches all three.",
+    "scope_limit": "Byte identity and retained packaging results only. Installed composition, native execution, actual Python 3.10/3.11 execution and whole P6-T1 acceptance remain separate."
+  },
+  "prior_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-package-import-confirmation.2026-10-20T17-15.json",
+    "sha256": "388964cdbb4bf763bc411185ae04d045bada3f9b2a729b66cdb4a5044945e169"
+  },
+  "staging_qualification": "Only the two requested paths and this review's metadata belong in this checkpoint. Original locator-bearing audit receipts remain unstaged; their exact bytes are embedded in the readable bundle.",
+  "task_acceptance": "P6-T1 remains unchecked.",
+  "upcoming_tasks": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

@@ -1,0 +1,3440 @@
+{
+  "Timestamp": "2026-10-20T10-35",
+  "Command": "poetry run python SCRATCH\\tests.py",
+  "EXIT_CODE": 1,
+  "duration_seconds": 2.3429127000272274,
+  "started": "2026-10-20T10:35:25.671141+00:00",
+  "finished": "2026-10-20T10:35:28.012926+00:00",
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "sha256": "26735c9911483103887c28a99fd05f10d240bd701e1ae0140f5b51f67da59bde",
+      "physical_lines": 470
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "sha256": "26735c9911483103887c28a99fd05f10d240bd701e1ae0140f5b51f67da59bde",
+      "physical_lines": 470
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "33e7e9b3b18d0620caeaf6cefad36f7bae07115e0d9a674d745cf0e8622b2733",
+      "raw_bytes": 2980,
+      "raw_base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi5GLiAgIFsxMDAlXQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSBGQUlMVVJFUyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fX19fXyB0ZXN0X2FnZ3JlZ2F0ZV9saW1pdHNfcmVqZWN0X2JlZm9yZV91bmJvdW5kZWRfd29yayBfX19fX19fX19fX19fXw0KDQptb25rZXlwYXRjaCA9IDxfcHl0ZXN0Lm1vbmtleXBhdGNoLk1vbmtleVBhdGNoIG9iamVjdCBhdCAweDAwMDAwMUVCMzJCMzY3QjA+DQoNCiAgICBkZWYgdGVzdF9hZ2dyZWdhdGVfbGltaXRzX3JlamVjdF9iZWZvcmVfdW5ib3VuZGVkX3dvcmsoDQogICAgICAgIG1vbmtleXBhdGNoOiBweXRlc3QuTW9ua2V5UGF0Y2gsDQogICAgKSAtPiBOb25lOg0KICAgICAgICAiIiJDb3VudCBrZXkgdmlzaXRzIHdpdGggbW9ua2V5cGF0Y2g7IHJlamVjdCBvdmVyc2l6ZWQgcG9wdWxhdGlvbnMgYmVmb3JlIHZpc2l0cy4iIiINCiAgICAgICAgaXRlbSA9IHNwZWNpZmljYXRpb24oKQ0KICAgICAgICBjYWxsczogbGlzdFtOb25lXSA9IFtdDQogICAgICAgIG9yaWdpbmFsID0gQWNjZXB0YW5jZUlkZW50aXR5LmtleQ0KICAgIA0KICAgICAgICBkZWYgb2JzZXJ2ZShzZWxmOiBBY2NlcHRhbmNlSWRlbnRpdHksICosIGxpbWl0czogUGFyc2VMaW1pdHMpIC0+IEpzb25PYmplY3Q6DQogICAgICAgICAgICAiIiJDb3VudCBvbmUgYm91bmRlZCBrZXkgcmVxdWVzdCwgdGhlbiByZXR1cm4gb3JpZ2luYWw7IHByb3BhZ2F0ZSBlcnJvcnMuIiIiDQogICAgICAgICAgICBjYWxscy5hcHBlbmQoTm9uZSkNCiAgICAgICAgICAgIHJldHVybiBvcmlnaW5hbChzZWxmLCBsaW1pdHM9bGltaXRzKQ0KICAgIA0KICAgICAgICBtb25rZXlwYXRjaC5zZXRhdHRyKEFjY2VwdGFuY2VJZGVudGl0eSwgImtleSIsIG9ic2VydmUpDQogICAgICAgIHdpdGggcHl0ZXN0LnJhaXNlcyhSZXBvcnRMaW1pdEVycm9yKToNCiAgICAgICAgICAgIEFjY2VwdGFuY2VHZW5lcmF0aW9uKA0KICAgICAgICAgICAgICAgIHNwZWNpZmljYXRpb25zPShpdGVtLCkgKiAzLA0KICAgICAgICAgICAgICAgIHJlYWR5PSgpLA0KICAgICAgICAgICAgICAgIGZpbmRpbmdzPSgpLA0KICAgICAgICAgICAgICAgIGxpbWl0cz1QYXJzZUxpbWl0cyhhcnRpZmFjdF9yZWNvcmRzPTIpLA0KICAgICAgICAgICAgKQ0KICAgICAgICBhc3NlcnQgY2FsbHMgPT0gW10NCiAgICAgICAgd2l0aCBweXRlc3QucmFpc2VzKFJlcG9ydExpbWl0RXJyb3IpOg0KICAgICAgICAgICAgQWNjZXB0YW5jZUdlbmVyYXRpb24oDQogICAgICAgICAgICAgICAgc3BlY2lmaWNhdGlvbnM9KGl0ZW0sKSwNCiAgICAgICAgICAgICAgICByZWFkeT0oKSwNCiAgICAgICAgICAgICAgICBmaW5kaW5ncz0oKSwNCiAgICAgICAgICAgICAgICBsaW1pdHM9UGFyc2VMaW1pdHMoZG9jdW1lbnRfYnl0ZXM9NTAwKSwNCiAgICAgICAgICAgICkNCiAgICAgICAgd2FybmluZyA9IEZpbmRpbmcoDQogICAgICAgICAgICBjb2RlPSJSRVZJRVciLCBtZXNzYWdlPSJSZXZpZXcuIiwgbmV4dF9hY3Rpb249Ikluc3BlY3QuIiwgc2V2ZXJpdHk9Indhcm5pbmciDQogICAgICAgICkNCj4gICAgICAgd2l0aCBweXRlc3QucmFpc2VzKFJlcG9ydExpbWl0RXJyb3IpOg0KICAgICAgICAgICAgIF5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl4NCkUgICAgICAgRmFpbGVkOiBESUQgTk9UIFJBSVNFIDxjbGFzcyAnZHJtX2NvcGlsb3RfZGlzY292ZXJ5LnJlcG9ydF9tb2RlbHMuUmVwb3J0TGltaXRFcnJvcic+DQoNCnRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3RfYWNjZXB0YW5jZV9wcm9wZXJ0aWVzLnB5OjQ1NjogRmFpbGVkDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09IHRlc3RzIGNvdmVyYWdlID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQpfX19fX19fX19fX19fXyBjb3ZlcmFnZTogcGxhdGZvcm0gd2luMzIsIHB5dGhvbiAzLjEzLjEyLWZpbmFsLTAgX19fX19fX19fX19fX19fDQoNCk5hbWUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTdG10cyAgIE1pc3MgQnJhbmNoIEJyUGFydCAgQ292ZXIgICBNaXNzaW5nDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxhY2NlcHRhbmNlX21vZGVscy5weSAgICAgMTgwICAgICAgMCAgICAgODIgICAgICAwICAgMTAwJQ0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NClRPVEFMICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDE4MCAgICAgIDAgICAgIDgyICAgICAgMCAgIDEwMCUNCkNvdmVyYWdlIEpTT04gd3JpdHRlbiB0byBmaWxlIEM6XFVzZXJzXERhbk1vaXNhblxBcHBEYXRhXExvY2FsXFRlbXBcaXNzdWUtOTgwLXA1dDQtbW9kZWxzXGNvdmVyYWdlLmpzb24NCj09PT09PT09PT09PT09PT09PT09PT09PT09PSBzaG9ydCB0ZXN0IHN1bW1hcnkgaW5mbyA9PT09PT09PT09PT09PT09PT09PT09PT09PT0NCkZBSUxFRCB0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2FjY2VwdGFuY2VfcHJvcGVydGllcy5weTo6dGVzdF9hZ2dyZWdhdGVfbGltaXRzX3JlamVjdF9iZWZvcmVfdW5ib3VuZGVkX3dvcmsNCjEgZmFpbGVkLCA2OSBwYXNzZWQgaW4gMC40NnMNCg==",
+      "presentation": "....................................................................F.   [100%]\r\n================================== FAILURES ===================================\r\n_____________ test_aggregate_limits_reject_before_unbounded_work ______________\r\n\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EB32B367B0>\r\n\r\n    def test_aggregate_limits_reject_before_unbounded_work(\r\n        monkeypatch: pytest.MonkeyPatch,\r\n    ) -> None:\r\n        \"\"\"Count key visits with monkeypatch; reject oversized populations before visits.\"\"\"\r\n        item = specification()\r\n        calls: list[None] = []\r\n        original = AcceptanceIdentity.key\r\n    \r\n        def observe(self: AcceptanceIdentity, *, limits: ParseLimits) -> JsonObject:\r\n            \"\"\"Count one bounded key request, then return original; propagate errors.\"\"\"\r\n            calls.append(None)\r\n            return original(self, limits=limits)\r\n    \r\n        monkeypatch.setattr(AcceptanceIdentity, \"key\", observe)\r\n        with pytest.raises(ReportLimitError):\r\n            AcceptanceGeneration(\r\n                specifications=(item,) * 3,\r\n                ready=(),\r\n                findings=(),\r\n                limits=ParseLimits(artifact_records=2),\r\n            )\r\n        assert calls == []\r\n        with pytest.raises(ReportLimitError):\r\n            AcceptanceGeneration(\r\n                specifications=(item,),\r\n                ready=(),\r\n                findings=(),\r\n                limits=ParseLimits(document_bytes=500),\r\n            )\r\n        warning = Finding(\r\n            code=\"REVIEW\", message=\"Review.\", next_action=\"Inspect.\", severity=\"warning\"\r\n        )\r\n>       with pytest.raises(ReportLimitError):\r\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nE       Failed: DID NOT RAISE <class 'drm_copilot_discovery.report_models.ReportLimitError'>\r\n\r\ntests\\discovery_runtime\\test_acceptance_properties.py:456: Failed\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                        Stmts   Miss Branch BrPart  Cover   Missing\r\n-----------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\acceptance_models.py     180      0     82      0   100%\r\n-----------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                         180      0     82      0   100%\r\nCoverage JSON written to file SCRATCH\\coverage.json\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/test_acceptance_properties.py::test_aggregate_limits_reject_before_unbounded_work\r\n1 failed, 69 passed in 0.46s\r\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "SCRATCH=owned external temporary harness directory",
+    "WORKSPACE=current repository checkout"
+  ],
+  "raw_stream_rule": "base64 decodes to exact captured child bytes; presentation replaces only explicit host path aliases",
+  "nodes.json": {
+    "args": [
+      "-ra",
+      "tests/discovery_runtime/test_acceptance_properties.py",
+      "-q",
+      "-o",
+      "addopts=-ra",
+      "--cov=drm_copilot_discovery.acceptance_models",
+      "--cov-branch",
+      "--cov-report=term-missing",
+      "--cov-report=json:C:\\Users\\DanMoisan\\AppData\\Local\\Temp\\issue-980-p5t4-models\\coverage.json"
+    ],
+    "nodes": [
+      "tests/discovery_runtime/test_acceptance_properties.py::test_canonical_identity_bytes_and_full_digest_are_fixed",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes0]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes1]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes2]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes3]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes4]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes5]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes6]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes7]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes8]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes9]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[Upper]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1start]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[bad space]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a..b]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a-]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a/b]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\xe9]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\ud800]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[None]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes0]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes1]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes2]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes3]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes4]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes5]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes6]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_identity_byte_boundary_and_limits_type",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[online-False-expected0]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-False-expected1]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[mobile-False-expected2]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[custom-True-expected3]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-True-expected4]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_tags_omit_null_coordinates_and_reject_invalid_inputs",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[Expected.]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[\\xe9\\U0001f600\\n\\t\\\\\"]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[A changed statement.]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_revisions_and_nonidentity_metadata_leave_scenario_id_unchanged",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[feature_id-other]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[id-other]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[scenario_id-other]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[artifact_kind-other]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[schema_version-1.0.0]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[repository]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[identity]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[document]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[limits]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_owner_and_unicode_encoded_budget",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_permutations_and_exact_duplicates_have_identical_results",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[content]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[owner]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[absent]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[content]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[owner]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[pending]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[duplicate]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[invalid]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[error]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[warning]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[info]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value0]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[ready-value1]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value2]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value3]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value4]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[limits-value5]",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_aggregate_limits_reject_before_unbounded_work",
+      "tests/discovery_runtime/test_acceptance_properties.py::test_hash_collision_is_rejected"
+    ],
+    "reports": [
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_canonical_identity_bytes_and_full_digest_are_fixed",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0007448999967891723
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_canonical_identity_bytes_and_full_digest_are_fixed",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0012197000032756478
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_canonical_identity_bytes_and_full_digest_are_fixed",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020119998953305185
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003039000148419291
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006920000014360994
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001247999898623675
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002770999853964895
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006363000138662755
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011590000940486789
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002615999837871641
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006525000208057463
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011369999265298247
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002623999898787588
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006355000077746809
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011819999781437218
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes4]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025370001094415784
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes4]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006441999867092818
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes4]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011260001338087022
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes5]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025049998657777905
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes5]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006346000009216368
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes5]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001126999850384891
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes6]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025389998336322606
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes6]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006241000082809478
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes6]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011160000576637685
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes7]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025690000620670617
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes7]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000689799984684214
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes7]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011480000102892518
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes8]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002580000145826489
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes8]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006846000032965094
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes8]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011389999417588115
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes9]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025270000332966447
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes9]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006346000009216368
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes9]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011340001947246492
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002519999979995191
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005774000019300729
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00016250001499429345
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[Upper]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002677999727893621
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[Upper]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002909999748226255
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[Upper]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001109000004362315
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1start]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002610999799799174
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1start]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00030220000189729035
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1start]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010939998901449144
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[bad space]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025030001415871084
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[bad space]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002809999859891832
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[bad space]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010949998977594078
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a..b]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00024729999131523073
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a..b]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002905000001192093
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a..b]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010939998901449144
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a-]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00024659998598508537
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a-]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003029999788850546
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a-]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001227000029757619
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a/b]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025030001415871084
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a/b]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00028670000028796494
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a/b]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010740000288933516
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\xe9]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002463999844621867
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\xe9]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002820999943651259
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\xe9]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010919998749159276
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\ud800]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00024500000290572643
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\ud800]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00024130000383593142
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\ud800]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010840001050382853
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002476999943610281
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00027340001543052495
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010629999451339245
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[None]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00024399999529123306
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[None]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002730000123847276
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[None]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010730000212788582
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00024500000290572643
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002815999905578792
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010699999984353781
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00024309998843818903
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002725000085774809
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010810000821948051
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000544899987289682
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003384999872650951
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001247999898623675
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00027520000003278255
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004898000042885542
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013420000323094428
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes4]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00027879999834112823
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes4]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003252000024076551
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes4]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010999999358318746
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes5]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002530000056140125
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes5]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00029250001534819603
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes5]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011130000348202884
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes6]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002410000015515834
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes6]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00029510000604204834
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes6]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010590002057142556
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_identity_byte_boundary_and_limits_type",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00019599997904151678
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_identity_byte_boundary_and_limits_type",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0015199999907054007
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_identity_byte_boundary_and_limits_type",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010899998596869409
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[online-False-expected0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0025236000074073672
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[online-False-expected0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0006614000012632459
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[online-False-expected0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013499998021870852
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-False-expected1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00037029999657534063
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-False-expected1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005795999895781279
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-False-expected1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012589999823831022
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[mobile-False-expected2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003448000061325729
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[mobile-False-expected2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005568999913521111
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[mobile-False-expected2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012210002751089633
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[custom-True-expected3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003623999946285039
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[custom-True-expected3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005653999978676438
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[custom-True-expected3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013770000077784061
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-True-expected4]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00034389999927952886
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-True-expected4]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005852000031154603
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-True-expected4]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013760000001639128
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_tags_omit_null_coordinates_and_reject_invalid_inputs",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00021440000273287296
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_tags_omit_null_coordinates_and_reject_invalid_inputs",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004754000110551715
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_tags_omit_null_coordinates_and_reject_invalid_inputs",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00010649999603629112
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[Expected.]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00025019998429343104
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[Expected.]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.003967299999203533
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[Expected.]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001330000231973827
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[\\xe9\\U0001f600\\n\\t\\\\\"]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00027730001602321863
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[\\xe9\\U0001f600\\n\\t\\\\\"]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.003722300025401637
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[\\xe9\\U0001f600\\n\\t\\\\\"]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013219998800195754
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[A changed statement.]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002970999921672046
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[A changed statement.]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.003634499997133389
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[A changed statement.]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001230000052601099
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_revisions_and_nonidentity_metadata_leave_scenario_id_unchanged",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002345999819226563
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_revisions_and_nonidentity_metadata_leave_scenario_id_unchanged",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0030827999871689826
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_revisions_and_nonidentity_metadata_leave_scenario_id_unchanged",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013520001084543765
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[feature_id-other]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00034509997931309044
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[feature_id-other]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.002595900004962459
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[feature_id-other]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013259999104775488
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[id-other]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003226999833714217
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[id-other]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0024370999890379608
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[id-other]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012389998300932348
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[scenario_id-other]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00031820000731386244
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[scenario_id-other]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.002431000000797212
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[scenario_id-other]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001247999898623675
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[artifact_kind-other]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003099000023212284
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[artifact_kind-other]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00264019999303855
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[artifact_kind-other]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001469000126235187
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[schema_version-1.0.0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003350999904796481
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[schema_version-1.0.0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.002514099993277341
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[schema_version-1.0.0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012389998300932348
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[repository]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002592999953776598
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[repository]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.001676399988355115
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[repository]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00015239999629557133
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[identity]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00033260000054724514
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[identity]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0014890999882481992
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[identity]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012079998850822449
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[document]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002651000104378909
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[document]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0014658999862149358
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[document]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012240000069141388
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[limits]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00027120002778247
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[limits]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0015112999826669693
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[limits]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000152299995534122
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_owner_and_unicode_encoded_budget",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002589999930933118
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_owner_and_unicode_encoded_budget",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.004312099976232275
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_owner_and_unicode_encoded_budget",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00015119998715817928
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_permutations_and_exact_duplicates_have_identical_results",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002702999918255955
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_permutations_and_exact_duplicates_have_identical_results",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.043259300000499934
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_permutations_and_exact_duplicates_have_identical_results",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00015810001059435308
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[content]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004610000178217888
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[content]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.005354599998099729
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[content]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00014059999375604093
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[owner]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00038690000656060874
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[owner]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.004236400010995567
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[owner]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001280000142287463
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[absent]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00028940002084709704
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[absent]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.007266100001288578
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[absent]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00015200002235360444
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[content]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00030449999030679464
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[content]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.006844699993962422
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[content]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012889999197795987
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[owner]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00029510000604204834
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[owner]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.006923699984326959
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[owner]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013749999925494194
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[pending]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00029070000164210796
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[pending]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.006732700014254078
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[pending]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012909999350085855
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[duplicate]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002887000155169517
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[duplicate]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.007357200025580823
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[duplicate]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013959998614154756
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[invalid]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002893999917432666
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[invalid]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00642419999348931
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[invalid]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000135600013891235
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[error]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00028160001966170967
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[error]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.003802499995799735
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[error]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012689997674897313
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[warning]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004188999882899225
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[warning]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0038263000024016947
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[warning]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00013530001160688698
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[info]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002964999875985086
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[info]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0035998999956063926
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[info]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012589999823831022
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003302000113762915
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00017929999739862978
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001204000145662576
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[ready-value1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003133999998681247
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[ready-value1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00016240001423284411
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[ready-value1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011780002387240529
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00029689999064430594
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00015499998698942363
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001196000084746629
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00029360002372413874
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00015629999688826501
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011749999248422682
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value4]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00029159997939132154
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value4]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00015669999993406236
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value4]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011330001871101558
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[limits-value5]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0002992999798152596
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[limits-value5]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000149200001033023
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[limits-value5]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00011419999646022916
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_aggregate_limits_reject_before_unbounded_work",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00019910000264644623
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_aggregate_limits_reject_before_unbounded_work",
+        "when": "call",
+        "outcome": "failed",
+        "duration": 0.0025310000055469573
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_aggregate_limits_reject_before_unbounded_work",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00018430000636726618
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_hash_collision_is_rejected",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00027189997490495443
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_hash_collision_is_rejected",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0033258000039495528
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_acceptance_properties.py::test_hash_collision_is_rejected",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00012769998284056783
+      }
+    ],
+    "exit_code": 1
+  },
+  "coverage.json": {
+    "meta": {
+      "format": 3,
+      "version": "7.13.2",
+      "timestamp": "2026-10-20T06:35:27.862425",
+      "branch_coverage": true,
+      "show_contexts": false
+    },
+    "files": {
+      "packages\\discovery-runtime\\src\\drm_copilot_discovery\\acceptance_models.py": {
+        "executed_lines": [
+          8,
+          10,
+          11,
+          12,
+          14,
+          15,
+          22,
+          23,
+          25,
+          28,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          41,
+          42,
+          43,
+          44,
+          45,
+          47,
+          48,
+          49,
+          52,
+          53,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          81,
+          87,
+          89,
+          96,
+          97,
+          107,
+          108,
+          112,
+          114,
+          115,
+          116,
+          117,
+          118,
+          120,
+          126,
+          128,
+          129,
+          130,
+          131,
+          132,
+          136,
+          138,
+          139,
+          140,
+          142,
+          148,
+          151,
+          164,
+          165,
+          168,
+          169,
+          176,
+          177,
+          178,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          203,
+          204,
+          219,
+          220,
+          221,
+          222,
+          224,
+          230,
+          231,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          249,
+          250,
+          251,
+          253,
+          254,
+          255,
+          256,
+          260,
+          261,
+          263,
+          269,
+          270,
+          272,
+          278,
+          279,
+          282,
+          288,
+          300,
+          306,
+          307,
+          308,
+          309,
+          312,
+          313,
+          328,
+          329,
+          330,
+          331,
+          333,
+          340,
+          342,
+          346,
+          347,
+          348,
+          352,
+          353,
+          354,
+          355,
+          357,
+          358,
+          359,
+          362,
+          363,
+          364,
+          365,
+          366,
+          367,
+          368,
+          371,
+          374,
+          375,
+          376,
+          377,
+          378,
+          380,
+          381,
+          382,
+          383,
+          384,
+          385,
+          386,
+          387,
+          394,
+          397,
+          399,
+          400,
+          401,
+          402,
+          403,
+          404,
+          405,
+          406,
+          407,
+          409,
+          413,
+          416
+        ],
+        "summary": {
+          "covered_lines": 180,
+          "num_statements": 180,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 82,
+          "num_partial_branches": 0,
+          "covered_branches": 82,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [],
+        "executed_branches": [
+          [
+            34,
+            35
+          ],
+          [
+            34,
+            36
+          ],
+          [
+            37,
+            38
+          ],
+          [
+            37,
+            39
+          ],
+          [
+            41,
+            42
+          ],
+          [
+            41,
+            48
+          ],
+          [
+            42,
+            43
+          ],
+          [
+            42,
+            44
+          ],
+          [
+            44,
+            45
+          ],
+          [
+            44,
+            47
+          ],
+          [
+            48,
+            -28
+          ],
+          [
+            48,
+            49
+          ],
+          [
+            108,
+            112
+          ],
+          [
+            108,
+            114
+          ],
+          [
+            114,
+            115
+          ],
+          [
+            114,
+            117
+          ],
+          [
+            115,
+            116
+          ],
+          [
+            115,
+            120
+          ],
+          [
+            117,
+            118
+          ],
+          [
+            117,
+            120
+          ],
+          [
+            120,
+            126
+          ],
+          [
+            120,
+            128
+          ],
+          [
+            128,
+            129
+          ],
+          [
+            128,
+            131
+          ],
+          [
+            129,
+            128
+          ],
+          [
+            129,
+            130
+          ],
+          [
+            131,
+            132
+          ],
+          [
+            131,
+            140
+          ],
+          [
+            132,
+            136
+          ],
+          [
+            132,
+            138
+          ],
+          [
+            138,
+            139
+          ],
+          [
+            138,
+            140
+          ],
+          [
+            164,
+            165
+          ],
+          [
+            164,
+            168
+          ],
+          [
+            180,
+            181
+          ],
+          [
+            180,
+            184
+          ],
+          [
+            181,
+            180
+          ],
+          [
+            181,
+            182
+          ],
+          [
+            184,
+            185
+          ],
+          [
+            184,
+            187
+          ],
+          [
+            187,
+            188
+          ],
+          [
+            187,
+            190
+          ],
+          [
+            193,
+            194
+          ],
+          [
+            193,
+            195
+          ],
+          [
+            195,
+            196
+          ],
+          [
+            195,
+            197
+          ],
+          [
+            231,
+            236
+          ],
+          [
+            231,
+            237
+          ],
+          [
+            249,
+            250
+          ],
+          [
+            249,
+            253
+          ],
+          [
+            250,
+            249
+          ],
+          [
+            250,
+            251
+          ],
+          [
+            253,
+            254
+          ],
+          [
+            253,
+            256
+          ],
+          [
+            254,
+            253
+          ],
+          [
+            254,
+            255
+          ],
+          [
+            256,
+            260
+          ],
+          [
+            256,
+            261
+          ],
+          [
+            342,
+            346
+          ],
+          [
+            342,
+            347
+          ],
+          [
+            348,
+            352
+          ],
+          [
+            348,
+            353
+          ],
+          [
+            357,
+            358
+          ],
+          [
+            357,
+            378
+          ],
+          [
+            358,
+            359
+          ],
+          [
+            358,
+            362
+          ],
+          [
+            368,
+            371
+          ],
+          [
+            368,
+            374
+          ],
+          [
+            374,
+            375
+          ],
+          [
+            374,
+            376
+          ],
+          [
+            380,
+            381
+          ],
+          [
+            380,
+            399
+          ],
+          [
+            381,
+            382
+          ],
+          [
+            381,
+            383
+          ],
+          [
+            387,
+            394
+          ],
+          [
+            387,
+            397
+          ],
+          [
+            399,
+            400
+          ],
+          [
+            399,
+            407
+          ],
+          [
+            400,
+            401
+          ],
+          [
+            400,
+            402
+          ],
+          [
+            405,
+            399
+          ],
+          [
+            405,
+            406
+          ]
+        ],
+        "missing_branches": [],
+        "functions": {
+          "_identifier": {
+            "executed_lines": [
+              34,
+              35,
+              36,
+              37,
+              38,
+              39,
+              41,
+              42,
+              43,
+              44,
+              45,
+              47,
+              48,
+              49
+            ],
+            "summary": {
+              "covered_lines": 14,
+              "num_statements": 14,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 12,
+              "num_partial_branches": 0,
+              "covered_branches": 12,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 28,
+            "executed_branches": [
+              [
+                34,
+                35
+              ],
+              [
+                34,
+                36
+              ],
+              [
+                37,
+                38
+              ],
+              [
+                37,
+                39
+              ],
+              [
+                41,
+                42
+              ],
+              [
+                41,
+                48
+              ],
+              [
+                42,
+                43
+              ],
+              [
+                42,
+                44
+              ],
+              [
+                44,
+                45
+              ],
+              [
+                44,
+                47
+              ],
+              [
+                48,
+                -28
+              ],
+              [
+                48,
+                49
+              ]
+            ],
+            "missing_branches": []
+          },
+          "AcceptanceIdentity.__post_init__": {
+            "executed_lines": [
+              87
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 81,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "AcceptanceIdentity.key": {
+            "executed_lines": [
+              96,
+              97,
+              107,
+              108,
+              112,
+              114,
+              115,
+              116,
+              117,
+              118,
+              120,
+              126,
+              128,
+              129,
+              130,
+              131,
+              132,
+              136,
+              138,
+              139,
+              140
+            ],
+            "summary": {
+              "covered_lines": 21,
+              "num_statements": 21,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 20,
+              "num_partial_branches": 0,
+              "covered_branches": 20,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 89,
+            "executed_branches": [
+              [
+                108,
+                112
+              ],
+              [
+                108,
+                114
+              ],
+              [
+                114,
+                115
+              ],
+              [
+                114,
+                117
+              ],
+              [
+                115,
+                116
+              ],
+              [
+                115,
+                120
+              ],
+              [
+                117,
+                118
+              ],
+              [
+                117,
+                120
+              ],
+              [
+                120,
+                126
+              ],
+              [
+                120,
+                128
+              ],
+              [
+                128,
+                129
+              ],
+              [
+                128,
+                131
+              ],
+              [
+                129,
+                128
+              ],
+              [
+                129,
+                130
+              ],
+              [
+                131,
+                132
+              ],
+              [
+                131,
+                140
+              ],
+              [
+                132,
+                136
+              ],
+              [
+                132,
+                138
+              ],
+              [
+                138,
+                139
+              ],
+              [
+                138,
+                140
+              ]
+            ],
+            "missing_branches": []
+          },
+          "AcceptanceIdentity.scenario_id": {
+            "executed_lines": [
+              148
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 142,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "acceptance_tags": {
+            "executed_lines": [
+              164,
+              165,
+              168,
+              169,
+              176,
+              177,
+              178,
+              180,
+              181,
+              182,
+              183,
+              184,
+              185,
+              186,
+              187,
+              188,
+              189,
+              190,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200
+            ],
+            "summary": {
+              "covered_lines": 27,
+              "num_statements": 27,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 14,
+              "num_partial_branches": 0,
+              "covered_branches": 14,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 151,
+            "executed_branches": [
+              [
+                164,
+                165
+              ],
+              [
+                164,
+                168
+              ],
+              [
+                180,
+                181
+              ],
+              [
+                180,
+                184
+              ],
+              [
+                181,
+                180
+              ],
+              [
+                181,
+                182
+              ],
+              [
+                184,
+                185
+              ],
+              [
+                184,
+                187
+              ],
+              [
+                187,
+                188
+              ],
+              [
+                187,
+                190
+              ],
+              [
+                193,
+                194
+              ],
+              [
+                193,
+                195
+              ],
+              [
+                195,
+                196
+              ],
+              [
+                195,
+                197
+              ]
+            ],
+            "missing_branches": []
+          },
+          "AcceptanceSpecification.__post_init__": {
+            "executed_lines": [
+              230,
+              231,
+              236,
+              237,
+              238,
+              239,
+              240,
+              241,
+              242,
+              249,
+              250,
+              251,
+              253,
+              254,
+              255,
+              256,
+              260,
+              261
+            ],
+            "summary": {
+              "covered_lines": 18,
+              "num_statements": 18,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 12,
+              "num_partial_branches": 0,
+              "covered_branches": 12,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 224,
+            "executed_branches": [
+              [
+                231,
+                236
+              ],
+              [
+                231,
+                237
+              ],
+              [
+                249,
+                250
+              ],
+              [
+                249,
+                253
+              ],
+              [
+                250,
+                249
+              ],
+              [
+                250,
+                251
+              ],
+              [
+                253,
+                254
+              ],
+              [
+                253,
+                256
+              ],
+              [
+                254,
+                253
+              ],
+              [
+                254,
+                255
+              ],
+              [
+                256,
+                260
+              ],
+              [
+                256,
+                261
+              ]
+            ],
+            "missing_branches": []
+          },
+          "AcceptanceSpecification.to_dict": {
+            "executed_lines": [
+              269,
+              270
+            ],
+            "summary": {
+              "covered_lines": 2,
+              "num_statements": 2,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 263,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "AcceptanceSpecification.to_json": {
+            "executed_lines": [
+              278,
+              279
+            ],
+            "summary": {
+              "covered_lines": 2,
+              "num_statements": 2,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 272,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "_finding_fields": {
+            "executed_lines": [
+              288
+            ],
+            "summary": {
+              "covered_lines": 1,
+              "num_statements": 1,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 282,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "_encoded": {
+            "executed_lines": [
+              306,
+              307,
+              308,
+              309
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 300,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "AcceptanceGeneration.__post_init__": {
+            "executed_lines": [
+              340,
+              342,
+              346,
+              347,
+              348,
+              352,
+              353,
+              354,
+              355,
+              357,
+              358,
+              359,
+              362,
+              363,
+              364,
+              365,
+              366,
+              367,
+              368,
+              371,
+              374,
+              375,
+              376,
+              377,
+              378,
+              380,
+              381,
+              382,
+              383,
+              384,
+              385,
+              386,
+              387,
+              394,
+              397,
+              399,
+              400,
+              401,
+              402,
+              403,
+              404,
+              405,
+              406,
+              407,
+              409,
+              413,
+              416
+            ],
+            "summary": {
+              "covered_lines": 47,
+              "num_statements": 47,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 24,
+              "num_partial_branches": 0,
+              "covered_branches": 24,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 333,
+            "executed_branches": [
+              [
+                342,
+                346
+              ],
+              [
+                342,
+                347
+              ],
+              [
+                348,
+                352
+              ],
+              [
+                348,
+                353
+              ],
+              [
+                357,
+                358
+              ],
+              [
+                357,
+                378
+              ],
+              [
+                358,
+                359
+              ],
+              [
+                358,
+                362
+              ],
+              [
+                368,
+                371
+              ],
+              [
+                368,
+                374
+              ],
+              [
+                374,
+                375
+              ],
+              [
+                374,
+                376
+              ],
+              [
+                380,
+                381
+              ],
+              [
+                380,
+                399
+              ],
+              [
+                381,
+                382
+              ],
+              [
+                381,
+                383
+              ],
+              [
+                387,
+                394
+              ],
+              [
+                387,
+                397
+              ],
+              [
+                399,
+                400
+              ],
+              [
+                399,
+                407
+              ],
+              [
+                400,
+                401
+              ],
+              [
+                400,
+                402
+              ],
+              [
+                405,
+                399
+              ],
+              [
+                405,
+                406
+              ]
+            ],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              8,
+              10,
+              11,
+              12,
+              14,
+              15,
+              22,
+              23,
+              25,
+              28,
+              52,
+              53,
+              72,
+              73,
+              74,
+              75,
+              76,
+              77,
+              78,
+              79,
+              81,
+              89,
+              142,
+              151,
+              203,
+              204,
+              219,
+              220,
+              221,
+              222,
+              224,
+              263,
+              272,
+              282,
+              300,
+              312,
+              313,
+              328,
+              329,
+              330,
+              331,
+              333
+            ],
+            "summary": {
+              "covered_lines": 42,
+              "num_statements": 42,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "AcceptanceIdentity": {
+            "executed_lines": [
+              87,
+              96,
+              97,
+              107,
+              108,
+              112,
+              114,
+              115,
+              116,
+              117,
+              118,
+              120,
+              126,
+              128,
+              129,
+              130,
+              131,
+              132,
+              136,
+              138,
+              139,
+              140,
+              148
+            ],
+            "summary": {
+              "covered_lines": 23,
+              "num_statements": 23,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 20,
+              "num_partial_branches": 0,
+              "covered_branches": 20,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 53,
+            "executed_branches": [
+              [
+                108,
+                112
+              ],
+              [
+                108,
+                114
+              ],
+              [
+                114,
+                115
+              ],
+              [
+                114,
+                117
+              ],
+              [
+                115,
+                116
+              ],
+              [
+                115,
+                120
+              ],
+              [
+                117,
+                118
+              ],
+              [
+                117,
+                120
+              ],
+              [
+                120,
+                126
+              ],
+              [
+                120,
+                128
+              ],
+              [
+                128,
+                129
+              ],
+              [
+                128,
+                131
+              ],
+              [
+                129,
+                128
+              ],
+              [
+                129,
+                130
+              ],
+              [
+                131,
+                132
+              ],
+              [
+                131,
+                140
+              ],
+              [
+                132,
+                136
+              ],
+              [
+                132,
+                138
+              ],
+              [
+                138,
+                139
+              ],
+              [
+                138,
+                140
+              ]
+            ],
+            "missing_branches": []
+          },
+          "AcceptanceSpecification": {
+            "executed_lines": [
+              230,
+              231,
+              236,
+              237,
+              238,
+              239,
+              240,
+              241,
+              242,
+              249,
+              250,
+              251,
+              253,
+              254,
+              255,
+              256,
+              260,
+              261,
+              269,
+              270,
+              278,
+              279
+            ],
+            "summary": {
+              "covered_lines": 22,
+              "num_statements": 22,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 12,
+              "num_partial_branches": 0,
+              "covered_branches": 12,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 204,
+            "executed_branches": [
+              [
+                231,
+                236
+              ],
+              [
+                231,
+                237
+              ],
+              [
+                249,
+                250
+              ],
+              [
+                249,
+                253
+              ],
+              [
+                250,
+                249
+              ],
+              [
+                250,
+                251
+              ],
+              [
+                253,
+                254
+              ],
+              [
+                253,
+                256
+              ],
+              [
+                254,
+                253
+              ],
+              [
+                254,
+                255
+              ],
+              [
+                256,
+                260
+              ],
+              [
+                256,
+                261
+              ]
+            ],
+            "missing_branches": []
+          },
+          "AcceptanceGeneration": {
+            "executed_lines": [
+              340,
+              342,
+              346,
+              347,
+              348,
+              352,
+              353,
+              354,
+              355,
+              357,
+              358,
+              359,
+              362,
+              363,
+              364,
+              365,
+              366,
+              367,
+              368,
+              371,
+              374,
+              375,
+              376,
+              377,
+              378,
+              380,
+              381,
+              382,
+              383,
+              384,
+              385,
+              386,
+              387,
+              394,
+              397,
+              399,
+              400,
+              401,
+              402,
+              403,
+              404,
+              405,
+              406,
+              407,
+              409,
+              413,
+              416
+            ],
+            "summary": {
+              "covered_lines": 47,
+              "num_statements": 47,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 24,
+              "num_partial_branches": 0,
+              "covered_branches": 24,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 313,
+            "executed_branches": [
+              [
+                342,
+                346
+              ],
+              [
+                342,
+                347
+              ],
+              [
+                348,
+                352
+              ],
+              [
+                348,
+                353
+              ],
+              [
+                357,
+                358
+              ],
+              [
+                357,
+                378
+              ],
+              [
+                358,
+                359
+              ],
+              [
+                358,
+                362
+              ],
+              [
+                368,
+                371
+              ],
+              [
+                368,
+                374
+              ],
+              [
+                374,
+                375
+              ],
+              [
+                374,
+                376
+              ],
+              [
+                380,
+                381
+              ],
+              [
+                380,
+                399
+              ],
+              [
+                381,
+                382
+              ],
+              [
+                381,
+                383
+              ],
+              [
+                387,
+                394
+              ],
+              [
+                387,
+                397
+              ],
+              [
+                399,
+                400
+              ],
+              [
+                399,
+                407
+              ],
+              [
+                400,
+                401
+              ],
+              [
+                400,
+                402
+              ],
+              [
+                405,
+                399
+              ],
+              [
+                405,
+                406
+              ]
+            ],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              8,
+              10,
+              11,
+              12,
+              14,
+              15,
+              22,
+              23,
+              25,
+              28,
+              34,
+              35,
+              36,
+              37,
+              38,
+              39,
+              41,
+              42,
+              43,
+              44,
+              45,
+              47,
+              48,
+              49,
+              52,
+              53,
+              72,
+              73,
+              74,
+              75,
+              76,
+              77,
+              78,
+              79,
+              81,
+              89,
+              142,
+              151,
+              164,
+              165,
+              168,
+              169,
+              176,
+              177,
+              178,
+              180,
+              181,
+              182,
+              183,
+              184,
+              185,
+              186,
+              187,
+              188,
+              189,
+              190,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              203,
+              204,
+              219,
+              220,
+              221,
+              222,
+              224,
+              263,
+              272,
+              282,
+              288,
+              300,
+              306,
+              307,
+              308,
+              309,
+              312,
+              313,
+              328,
+              329,
+              330,
+              331,
+              333
+            ],
+            "summary": {
+              "covered_lines": 88,
+              "num_statements": 88,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 26,
+              "num_partial_branches": 0,
+              "covered_branches": 26,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                34,
+                35
+              ],
+              [
+                34,
+                36
+              ],
+              [
+                37,
+                38
+              ],
+              [
+                37,
+                39
+              ],
+              [
+                41,
+                42
+              ],
+              [
+                41,
+                48
+              ],
+              [
+                42,
+                43
+              ],
+              [
+                42,
+                44
+              ],
+              [
+                44,
+                45
+              ],
+              [
+                44,
+                47
+              ],
+              [
+                48,
+                -28
+              ],
+              [
+                48,
+                49
+              ],
+              [
+                164,
+                165
+              ],
+              [
+                164,
+                168
+              ],
+              [
+                180,
+                181
+              ],
+              [
+                180,
+                184
+              ],
+              [
+                181,
+                180
+              ],
+              [
+                181,
+                182
+              ],
+              [
+                184,
+                185
+              ],
+              [
+                184,
+                187
+              ],
+              [
+                187,
+                188
+              ],
+              [
+                187,
+                190
+              ],
+              [
+                193,
+                194
+              ],
+              [
+                193,
+                195
+              ],
+              [
+                195,
+                196
+              ],
+              [
+                195,
+                197
+              ]
+            ],
+            "missing_branches": []
+          }
+        }
+      }
+    },
+    "totals": {
+      "covered_lines": 180,
+      "num_statements": 180,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 82,
+      "num_partial_branches": 0,
+      "covered_branches": 82,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    }
+  }
+}

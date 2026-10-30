@@ -1,0 +1,37 @@
+{
+  "batch": "corrected",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-corrected-coverage.2026-10-19T07-22.json",
+    "raw_path": "SCRATCH/p4t5-access-corrected-coverage.raw.json",
+    "raw_sha256": "3550df88fd9e7087bd640716e4bd53a114801a9390eaa3245b8aa578f24c3fa2",
+    "sha256": "39848684d1a12edd699bd422af54986dd8e7a1f88d3d14fab7efa2771721c800"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-format-072033.2026-10-19T07-20.json",
+      "sha256": "e9c0e83f232b74dd3660169f7a4db7418b18b3258f5d8741be72fa6adc2860dc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-lint-072033.2026-10-19T07-20.json",
+      "sha256": "f86489c317954220692933b30159702d710afb1f2c5fa578a5780ecede731221"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-types-072034.2026-10-19T07-20.json",
+      "sha256": "c9ba0ce215871dc925da54dbeecb580a0e7bbd3495816342d41aa4faf62c8e59"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-corrected-tests-072207.2026-10-19T07-22.json",
+      "sha256": "38dee8685485121d0fac1d48ea45a5aa63de523210fc5be68a19ea915619236b"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0df91febc3db341422c7116e475abaa41432aeb7a1798fd2309f805f203c0e2a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "6027feab1c95f812cbf81dbce0ac9460609bc39db9836d71cc26bc9f09967cc7",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-22"
+}

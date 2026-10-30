@@ -1,0 +1,113 @@
+{
+  "checkoffs": [],
+  "checks": {
+    "archive_entries_verified": 9,
+    "changed_predicate_executed_lines": [
+      249
+    ],
+    "focused_tests": 9,
+    "held_bindings_verified": 47,
+    "ordered_gates": [
+      {
+        "duration_seconds": 1.767,
+        "exit_code": 0,
+        "receipt": {
+          "bytes": 3983,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format.2026-10-20T04-53.json",
+          "sha256": "cec401b950923257b444e1e618395678bbe7e399483084ac8096690a7de64068"
+        },
+        "stage": "format"
+      },
+      {
+        "duration_seconds": 1.172,
+        "exit_code": 0,
+        "receipt": {
+          "bytes": 3926,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint.2026-10-20T04-53.json",
+          "sha256": "308193a1f71d82ef10c179aedea11986121594ebaa55bc3247d013db9626d338"
+        },
+        "stage": "lint"
+      },
+      {
+        "duration_seconds": 2.86,
+        "exit_code": 0,
+        "receipt": {
+          "bytes": 4148,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types.2026-10-20T04-53.json",
+          "sha256": "266f76e44249693758c461b6f7af2871a8e0c01f690a481702e66bdb411322df"
+        },
+        "stage": "types"
+      },
+      {
+        "duration_seconds": 73.564,
+        "exit_code": 0,
+        "receipt": {
+          "bytes": 8625,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests.2026-10-20T04-55.json",
+          "sha256": "d8b9ab637bbdba9f14d20a9fc0a9e6c3f2582ff26ada61e1b3d1b5d8059d2157"
+        },
+        "stage": "tests"
+      }
+    ],
+    "owner_bindings_verified": 44,
+    "retained_test_definitions": 8
+  },
+  "conclusion": "Only documentation within the configured, case-sensitive report-root boundary is removed from expected scan inputs. Authored documentation elsewhere and source/test inputs remain required. No loader, digest, renderer, grant or path-policy change; no new unbounded traversal.",
+  "execution_payload": {
+    "bytes": 40837,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-output-scope-payload.2026-10-20T05-02.json",
+    "sha256": "c4a1d15f4f6b39e80efa34ecea3180a584eac4c3ba7e2447a80a4b845310308a"
+  },
+  "findings": [],
+  "freeze": {
+    "bytes": 7785,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze.2026-10-20T04-59.json",
+    "sha256": "19d4d84bd0410c896328f35b7e19b1205c1f6deec376e111213993a8b480f386"
+  },
+  "head": "f5a37bc6d237668174069d8e7c8a0f057d685bbf",
+  "held_closure": {
+    "bytes": 18626,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-held-staging-closure.2026-10-20T04-45.json",
+    "sha256": "5f9696b30aa4c064440299a1a69cd038cce6946f4aec7617595372647eb6eb19"
+  },
+  "native_authority": "Reread: routing, launch authority and provenance true; exact C4 Astra/max profile.",
+  "open_probes": [],
+  "owner_closure": {
+    "bytes": 18800,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-staging.2026-10-20T04-59.json",
+    "sha256": "77350562131287c6e410600f1d6ebaaa4522f4127c5bdaba6761b7ec94d1a68b"
+  },
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "proof_qualifications": [
+    "Original native failure was report inequality, not digest inequality; assertions 1-8 passed, 9 failed, 10-14 were unexecuted.",
+    "Held stages 1-6 remain historical f5a37bc6 proof. The unchanged helper/legacy 114-case evidence remains reusable.",
+    "Focused coverage is 90/142 statements and 32/78 branches, not full-module acceptance. Final changed-function/no-loss coverage remains pending.",
+    "Boundary3 retained seven passes and two raw-report test-helper failures; the same nine cases passed through the public result after a test-only correction.",
+    "Owner binder failures and exact originals remain archived. The verifier's preliminary PowerShell object reader rejected coverage.py's empty property name; Python json and PowerShell -AsHashtable read the same valid bytes without modification.",
+    "The first verifier script required raw/readable coverage JSON equality and stopped before writes. The owner freezer explicitly normalizes only file-key separators; applying that exact mapping yields equality. The original verifier script and observed AssertionError transcription are preserved in the payload.",
+    "Readable evidence and exact archived execution bytes retain separate identities; no historical source, failure or raw stream was rewritten.",
+    "The unchanged 14-assertion native harness will precede long affected tests after fresh static gates; this checkpoint does not assert final P5-T1 success."
+  ],
+  "retained_review": {
+    "bytes": 21200,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-consolidated-candidate-review.2026-10-20T04-12.json",
+    "sha256": "bff0d6838743044beec6af16f10b28670383e4f8aa134f510a197c4f4330ea43"
+  },
+  "route": "atomic_execution_p5t1_output_scope_confirmation_20261020",
+  "source_test": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": {
+      "bytes": 16758,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "sha256": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02"
+    },
+    "tests/discovery_runtime/test_coverage_report_contract.py": {
+      "bytes": 14736,
+      "path": "tests/discovery_runtime/test_coverage_report_contract.py",
+      "sha256": "31d1a668bf3b5d1f7254da11c7ff4b8158bafb5c4cc9c070f84810fbc3a6a0a7"
+    }
+  },
+  "status": "REPAIR_CONFIRMED_READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "task": "P5-T1",
+  "task_accepted": false,
+  "timestamp_utc": "2026-10-20T05:02:58.367256+00:00"
+}

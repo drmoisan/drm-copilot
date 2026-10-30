@@ -1,0 +1,129 @@
+{
+  "Timestamp": "2026-10-20T12-26",
+  "status": "EXACT_OWNED_SUBSET_ONLY_NO_GIT_MUTATION",
+  "paths": [
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "001e8869e6657fc4405b22c01a9026de3a990afffbfd4560a718aecf33f2ebfe",
+      "bytes": 17036,
+      "physical_lines": 488
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+      "sha256": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+      "bytes": 8948,
+      "physical_lines": 222
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-consolidate-consolidate.2026-10-20T12-14.json",
+      "sha256": "096c7d2a69b7b0a5ded9c662a50b7e4b2e78e08bbc3c1b656c2ea3fa7755fed4",
+      "bytes": 8223,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass1-format.2026-10-20T12-14.json",
+      "sha256": "bfe4c83e7fd60fa436f44f298b4d42f47308c46cf1ea34e744e2a8889bce79b2",
+      "bytes": 8012,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass1-lint.2026-10-20T12-14.json",
+      "sha256": "7873b41968b3df90b815eaf67952c1d33c76e61c6d9f71f15e717d536e921f24",
+      "bytes": 7884,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass1-types.2026-10-20T12-14.json",
+      "sha256": "cfd4a9a8e05ee8bdd827abd23f28e1a9aacda725ce258a5ea28c0ca9f1b15221",
+      "bytes": 13869,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass2-format.2026-10-20T12-15.json",
+      "sha256": "be27504cb135a6807c3730c14ff2ac2158431b2c3500a6eb7332d8f36439d2e6",
+      "bytes": 8013,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass2-lint.2026-10-20T12-15.json",
+      "sha256": "38f6041fdbc33e5d4af941ad3b382a3b94bb8bce9f2b212ca41fd1d73e73d6c4",
+      "bytes": 7885,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass2-tests.2026-10-20T12-15.json",
+      "sha256": "c4db02a38cb94d5fbd10d8cd83e74435ddfaf7bab4087c7cc96d9bcff0b6ad19",
+      "bytes": 76917,
+      "physical_lines": 2010
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass2-types.2026-10-20T12-15.json",
+      "sha256": "671af744d87bbe7cdc613ce1de9340476ada0ce999795f228f327a0da68978db",
+      "bytes": 8295,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-format.2026-10-20T12-16.json",
+      "sha256": "1d07795c89fad49fa8a04d3313b2163726a0190b33c945d48c514c071c471c9e",
+      "bytes": 8013,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-lint.2026-10-20T12-16.json",
+      "sha256": "3513226bdd41e94a3cd8d45fcd496e2fad4ffa66cb10eacb0066314d6e90f5f6",
+      "bytes": 7883,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-tests.2026-10-20T12-17.json",
+      "sha256": "d1f5d19af0798957e6b2ff8b2daf806980079a73a28b915815066c313df94594",
+      "bytes": 200108,
+      "physical_lines": 7831
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-types.2026-10-20T12-16.json",
+      "sha256": "2b341bb82bbd7196c68a9670af9e8a7e55a54eb347e40aaf41516cea9af59315",
+      "bytes": 8296,
+      "physical_lines": 175
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-lossless-archive.2026-10-20T12-26.json",
+      "sha256": "1113787e18add8d1a39a3508a54226cb991e74a72180da856a0233c4c89cbec3",
+      "bytes": 20989,
+      "physical_lines": 87
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-freeze.2026-10-20T12-26.json",
+      "sha256": "14859545b59822b63c51717c65d0db755c9abf704d234827228cbc8ac4cceff4",
+      "bytes": 63951,
+      "physical_lines": 1610
+    }
+  ],
+  "required_external_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+      "sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475",
+      "bytes": 29911,
+      "physical_lines": 597
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline-originals.2026-10-20T12-11.json",
+      "sha256": "1588e9bc3b66c73d204a392b37e3ba79bbd4eae3332b1e89b99071289e0818e3",
+      "bytes": 12582,
+      "physical_lines": 21
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-handoff.2026-10-20T11-46.json",
+      "sha256": "3cd8f6080ee99f629d17831d2f2fce41ecb5794153abcdc764573fc2c6ad3bb9",
+      "bytes": 31512,
+      "physical_lines": 455
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-final-acceptance.2026-10-20T11-57.json",
+      "sha256": "e454e73f509ca24c0f6e6ebb784be9c9c95166740ce9d6e45d5105c257ce1ad6",
+      "bytes": 9032,
+      "physical_lines": 198
+    }
+  ],
+  "excluded": "Concurrent renderer work, P6 production adaptation, plans, checkpoint and acceptance checkoffs."
+}

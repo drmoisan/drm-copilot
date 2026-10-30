@@ -1,0 +1,54 @@
+{
+  "stage": 5,
+  "label": "p3t7-pass2-unit",
+  "started": "2026-10-19T00:08:29.413106+00:00",
+  "finished": "2026-10-19T00:10:25.482200+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p3t7-tests.py forward --cov=drm_copilot_discovery.migration_models --cov=drm_copilot_discovery.migration_conversion --cov=drm_copilot_discovery.migration_v1 --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p3t7-final-coverage.json",
+  "exit_code": 0,
+  "duration_seconds": 116.069,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "physical_lines": 300
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "physical_lines": 273
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "physical_lines": 356
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+      "physical_lines": 489
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+      "physical_lines": 440
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "physical_lines": 300
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "physical_lines": 273
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "physical_lines": 356
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+      "physical_lines": 489
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+      "physical_lines": 440
+    }
+  },
+  "output": "........................................................................ [ 96%]\n...                                                                      [100%]\n=============================== tests coverage ================================\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\n\nName                                                                           Stmts   Miss Branch BrPart  Cover   Missing\n--------------------------------------------------------------------------------------------------------------------------\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\migration_conversion.py      76      0     26      0   100%\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\migration_models.py          96      0     22      0   100%\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\migration_v1.py             131      0     46      0   100%\n--------------------------------------------------------------------------------------------------------------------------\nTOTAL                                                                            303      0     94      0   100%\nCoverage JSON written to file SCRATCH/issue-980-p3t7-final-coverage.json\n75 passed in 114.34s (0:01:54)\n"
+}

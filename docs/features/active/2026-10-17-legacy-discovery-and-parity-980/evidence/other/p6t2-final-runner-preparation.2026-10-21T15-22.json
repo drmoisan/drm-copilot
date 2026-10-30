@@ -1,0 +1,85 @@
+{
+  "Command": "Metadata-only adaptation of accepted final runner and coverage output labels; immutable node extraction, no collection or gates",
+  "EXIT_CODE": 0,
+  "Output Summary": "Prepared disabled167-case reversed4-module process plus4 retained contracts; production/test/package state unchanged.",
+  "Timestamp": "2026-10-21T15-22",
+  "accepted_coverage_reader": {
+    "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+    "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+  },
+  "accepted_predecessor": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-handoff.2026-10-21T14-16.json",
+    "sha256": "6392124516a47c4055103501907effab17abaad2ffcd52832a1d4a50fb5425f9"
+  },
+  "accepted_runner": {
+    "runtime_path": "SCRATCH/p6t1_final_guard_gates.py",
+    "sha256": "eb9213887e8f29898288531073fd32d509f3f523795aa517625496986c0e29ef"
+  },
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t2-cli-baseline-interface.2026-10-21T14-37.json",
+    "sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465"
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-candidate-disabled.2026-10-21T15-22.json",
+    "sha256": "279ce5f9a236c058a37a2098e5db7aa54841d382dc61a84bc0860f41cb780af4"
+  },
+  "coverage_reader_delta": "Only two output filename prefixes change toP6T2; measurement, named BODY, thresholds, mappings and no-loss predicates are unchanged.",
+  "executed_checks": "Syntax parsing of the two prepared scratch scripts only; no static quality gate, collection, test, service, native, build or package operation.",
+  "execution_released": false,
+  "pending": [
+    "Repaired composition58-node PASS and exact final source/test/dependency and BODY freeze independently confirmed.",
+    "All scoped checker qualifications reconciled against the frozen exact changed-unit scope; no whole-file or native-read exemption inferred.",
+    "Designated owner regenerates and verifies new package identity and installed CLI console metadata.",
+    "Native owner confirms installed CLI native-first composition on that exact package.",
+    "Coordinator publishes explicit checked-candidate execution release."
+  ],
+  "physical_lines": {
+    "issue-980-p6t2-final-coverage.py": 234,
+    "issue-980-p6t2-final-gates.py": 266
+  },
+  "prepared_harnesses": {
+    "issue-980-p6t2-final-coverage.py": {
+      "runtime_path": "SCRATCH/issue-980-p6t2-final-coverage.py",
+      "sha256": "4d75a6812aad7d0aed01ea13ef605dac6d6eb7dc729f98000d3d53e345b0c8a8"
+    },
+    "issue-980-p6t2-final-gates.py": {
+      "runtime_path": "SCRATCH/issue-980-p6t2-final-gates.py",
+      "sha256": "96b99e694bbfece90463bee35d3846d6c5e85b124330bc0567067096cf895459"
+    },
+    "p6t1_final_nio1_static.py": {
+      "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+      "sha256": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9"
+    }
+  },
+  "runner_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-preparation-originals.2026-10-21T15-22.json",
+    "sha256": "5858ea3ccda7491ad4da42b63b42dfbbb78722e93aecd8d6415a7376ca195b83"
+  },
+  "runner_delta": "Task/output labels; exact167 identity extraction from existing109/58 receipts replaces historical294+76 assertions;1200-second bound; explicit PASS/FAIL/ERROR/SKIP counts derived from existing20-second output parsing. Process, cleanup, ordering, archives and normalization bodies are reused.",
+  "selection": {
+    "count": 167,
+    "forward_module_count": 4,
+    "node_sources": [
+      {
+        "count": 109,
+        "kind": "parser",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-tests.2026-10-21T15-05.json",
+        "sha256": "776f0bddaa7d3ed2393f02a3f9d01cf2e41fea2e54004119fe34aa6a0307497e"
+      },
+      {
+        "count": 58,
+        "kind": "composition",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150621-tests.2026-10-21T15-13.json",
+        "sha256": "4f0360f7ac78e9ad4e74c11f99e725dddd4fdbc103e1885bf0b26ce650912da2"
+      }
+    ],
+    "reverse_sha256": "f6eab247f6b677042658ba813497cc594b33e70a6f7669c07c6e91d0d77b9827",
+    "unique": 167
+  },
+  "source_or_test_changes": false,
+  "static_reader": {
+    "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+    "sha256": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9"
+  },
+  "task": "P6-T2"
+}

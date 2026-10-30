@@ -1,0 +1,87 @@
+"""Record owned P4-T9 focused gates without replaying other owners' proof."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+repo, scratch = Path.cwd(), Path(__file__).parent
+evidence = repo / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing'
+label, stage = sys.argv[1:]
+owned = [
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py',
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py',
+    'tests/discovery_runtime/test_extension_results.py',
+    'tests/discovery_runtime/test_extension_inventory_merge.py',
+    'tests/discovery_runtime/test_extension_validation_limits.py',
+]
+borrowed = [
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py',
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py',
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py',
+]
+python = str(repo / '.venv/Scripts/python.exe')
+commands = {
+    'format': [python, '-m', 'black', *owned],
+    'black': [python, '-m', 'black', '--check', *owned],
+    'ruff': [python, '-m', 'ruff', 'check', *owned],
+    'pyright': [python, '-m', 'pyright', *owned],
+    'precheck': [python, '-m', 'pytest', '-o', 'addopts=',
+        owned[-1] + '::test_capture_index_count_is_bounded_before_projection',
+        owned[-1] + '::test_integer_budget_never_renders_before_reservation',
+        '-v', '--tb=short'],
+    'pytest': [python, '-m', 'pytest', '-o', 'addopts=', *owned[2:], '-v', '--tb=short',
+        '--cov=drm_copilot_discovery.extension_results', '--cov=drm_copilot_discovery.extension_validation',
+        '--cov-branch', '--cov-report=term-missing', '--cov-report=json:' + str(scratch / (label + '-coverage.json'))],
+}
+
+
+def bindings(paths):
+    return {path: {'sha256': hashlib.sha256((repo / path).read_bytes()).hexdigest(),
+                   'physical_lines': len((repo / path).read_bytes().splitlines())} for path in paths}
+
+
+def sanitize(value):
+    for path, replacement in ((scratch, 'SCRATCH'), (repo, '.')):
+        for spelling in (str(path), path.as_posix()):
+            value = re.sub(re.escape(spelling), lambda match: replacement, value, flags=re.I)
+    return value
+
+
+before, dependencies = bindings(owned), bindings(borrowed)
+command = commands[stage]
+start = datetime.datetime.now(datetime.timezone.utc)
+timer = time.monotonic()
+result = subprocess.run(command, cwd=repo, env=dict(os.environ, PYTHONIOENCODING='utf-8',
+    COVERAGE_FILE=str(scratch / (label + '.coverage'))), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+duration = round(time.monotonic() - timer, 3)
+finish = datetime.datetime.now(datetime.timezone.utc)
+stamp = finish.strftime('%Y-%m-%dT%H-%M')
+streams = {}
+for name, raw in (('stdout', result.stdout), ('stderr', result.stderr)):
+    filename = label + '-' + stage + '-' + finish.strftime('%H%M%S') + '.' + name + '.bin'
+    (scratch / filename).write_bytes(raw)
+    streams[name] = {'scratch_identifier': 'SCRATCH/' + filename, 'raw_sha256': hashlib.sha256(raw).hexdigest(),
+                     'raw_bytes': len(raw), 'presentation': sanitize(raw.decode('utf-8', errors='replace'))}
+record = {'stage': stage, 'started': start.isoformat(), 'finished': finish.isoformat(),
+          'command': sanitize(subprocess.list2cmdline(command)), 'exit_code': result.returncode,
+          'duration_seconds': duration, 'source_before': before, 'source_after': bindings(owned),
+          'borrowed_before': dependencies, 'borrowed_after': bindings(borrowed), 'streams': streams,
+          'accepted_baseline': 'c64b35435d1c1597830d8dd03e661d7944192065'}
+prefix = evidence / (label + '-' + stage + '.' + stamp)
+json_path, md_path = Path(str(prefix) + '.json'), Path(str(prefix) + '.md')
+assert not json_path.exists() and not md_path.exists()
+json_path.write_bytes((json.dumps(record, indent=2) + '\n').encode())
+output = '\n'.join(streams[name]['presentation'] for name in ('stdout', 'stderr'))
+rendered = '\n'.join(line.rstrip() for line in output.splitlines()).rstrip()
+md_path.write_bytes((f'# {label} {stage}\n\nTimestamp: {stamp}\n\nCommand: {record["command"]}\n\nEXIT_CODE: {result.returncode}\n\n'
+                    f'Output Summary: Scoped {stage}; elapsed {duration} seconds. Exact stream hashes/lengths bind the path-sanitized presentation.\n\n```text\n{rendered}\n```\n').encode())
+sys.stdout.reconfigure(encoding='utf-8')
+print(output)
+print(json_path.relative_to(repo).as_posix())
+assert record['borrowed_before'] == record['borrowed_after'], 'Borrowed source changed during focused gate'
+sys.exit(result.returncode)

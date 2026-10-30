@@ -1,0 +1,609 @@
+{
+  "task": "P2-T4",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "independent_boundary_cases": [
+    {
+      "name": "verified feature uses exact pinned source proof",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "confidence does not supply or promote observation state",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "unknown dimension links same-feature open question",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "contradictory dimension links same-feature open question",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "wrong question dimension cannot satisfy uncertainty",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "CLAIM_UNRESOLVED",
+            "/failure"
+          ],
+          [
+            "CLAIM_UNRESOLVED",
+            "/timing"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "verified dimension cannot omit open backlink",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "CLAIM_UNRESOLVED",
+            "/timing"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "first unknown-expectation observation remains observed",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "known expectation supports passed run",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "summary and run known expectations must agree",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_SUMMARY",
+            "/runs"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "summary and run status must agree",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_SUMMARY",
+            "/runs"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "summary and run environment must agree",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_SUMMARY",
+            "/runs"
+          ],
+          [
+            "RUNTIME_EVIDENCE",
+            "/runs/0"
+          ],
+          [
+            "RUNTIME_CAPTURE",
+            "/runs/0/post_state_capture"
+          ],
+          [
+            "RUNTIME_CAPTURE",
+            "/runs/0/pre_state_capture"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "summary and run pre-state must agree",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_SUMMARY",
+            "/runs"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "summary and run post-state must agree",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_SUMMARY",
+            "/runs"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "failed-to-passed history remains valid",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "first observation-to-known comparison history remains valid",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "source bytes cannot prove runtime execution",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_EVIDENCE",
+            ""
+          ]
+        ]
+      }
+    },
+    {
+      "name": "replaced pre-state capture cannot prove execution",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_CAPTURE",
+            "/pre_state_capture"
+          ],
+          [
+            "RUNTIME_CAPTURE",
+            "/runs/0/pre_state_capture"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "honest not-run plan remains valid",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "honest blocked plan remains valid",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "honest not-applicable plan remains valid",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "feature-wide omitted open question blocks verified summary",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "CLAIM_UNRESOLVED",
+            ""
+          ]
+        ]
+      }
+    },
+    {
+      "name": "valid source proof cannot mask mislabeled runtime proof",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "CLAIM_RUNTIME_EVIDENCE",
+            "/runtime_evidence_refs"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "wholly unknown contract cannot establish known source expectation",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_EXPECTATION",
+            "/expected_result_basis"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "unrelated known trigger cannot establish unknown planned expectation",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_EXPECTATION",
+            "/expected_result_basis"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "known criterion with observed proof establishes source basis",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "decision-only criterion evidence cannot establish legacy source expectation",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_EXPECTATION",
+            "/expected_result_basis"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "current pass alone cannot establish prior-runtime basis",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_EXPECTATION",
+            "/expected_result_basis"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "separate supported observation establishes prior-runtime basis",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "prior-runtime support is independent of array ordering",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "foreign environment observation cannot establish current prior basis",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_EXPECTATION",
+            "/expected_result_basis"
+          ],
+          [
+            "RUNTIME_EVIDENCE",
+            "/runs/1"
+          ],
+          [
+            "RUNTIME_CAPTURE",
+            "/runs/1/post_state_capture"
+          ],
+          [
+            "RUNTIME_CAPTURE",
+            "/runs/1/pre_state_capture"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "intentional uncertainty depends on scoped declared approval",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": []
+      }
+    },
+    {
+      "name": "proposed decision cannot justify intentional uncertainty",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "CLAIM_DECISION",
+            "/timing"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "wrong-dimension approval cannot justify intentional uncertainty",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "CLAIM_DECISION",
+            "/timing"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "missing runtime payload cannot prove a passed result",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "findings": [
+          [
+            "RUNTIME_EVIDENCE",
+            ""
+          ],
+          [
+            "RUNTIME_EVIDENCE",
+            "/runs/0"
+          ]
+        ]
+      }
+    }
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p2t4.py",
+  "probe_scope": "Schema-valid captured-memory claim graphs; scoped declared approval is a dependency, not proof of full decision authority. Prior-runtime support makes no chronological-order claim.",
+  "probe_production_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py": "9ed14bdc675a7b68653d9c65831235d432c88dcb97308e29c394bdc73b2f6df8"
+  },
+  "owned_paths": 4,
+  "unchanged_prior_paths": 182,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "coverage_lines": "217/220",
+  "coverage_branch_arcs": "125/132",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py": [
+      {
+        "name": "_objects",
+        "line": 33,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "ClaimValidation",
+        "line": 44,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "ClaimContext",
+        "line": 54,
+        "covered_lines": 100,
+        "statements": 101
+      },
+      {
+        "name": "validate_claims",
+        "line": 317,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "__init__",
+        "line": 61,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "add",
+        "line": 74,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "links",
+        "line": 82,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "targets",
+        "line": 94,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "proof",
+        "line": 105,
+        "covered_lines": 11,
+        "statements": 11
+      },
+      {
+        "name": "questions",
+        "line": 132,
+        "covered_lines": 11,
+        "statements": 11
+      },
+      {
+        "name": "decision",
+        "line": 152,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "observation",
+        "line": 185,
+        "covered_lines": 21,
+        "statements": 21
+      },
+      {
+        "name": "feature",
+        "line": 258,
+        "covered_lines": 27,
+        "statements": 28
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py": [
+      {
+        "name": "has_text",
+        "line": 16,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "environment_identity",
+        "line": 21,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "_capture_state",
+        "line": 39,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "_execution",
+        "line": 45,
+        "covered_lines": 20,
+        "statements": 20
+      },
+      {
+        "name": "_source_basis",
+        "line": 98,
+        "covered_lines": 20,
+        "statements": 22
+      },
+      {
+        "name": "_basis",
+        "line": 142,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "validate_runtime_claim",
+        "line": 186,
+        "covered_lines": 19,
+        "statements": 19
+      }
+    ]
+  },
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py": 341,
+    "packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py": 237,
+    "tests/discovery_runtime/test_observation_claims.py": 379,
+    "tests/discovery_runtime/test_runtime_claims.py": 484
+  },
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-coverage.2026-10-18T08-54.json",
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-coverage-metrics.2026-10-18T08-54.json",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "git_blob": "8da49f40331e9ba045901a3faec28b50db8065be",
+      "sha256": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "git_blob": "280d4d877416873632c55a152b1d5e1f28c07635",
+      "sha256": "9ed14bdc675a7b68653d9c65831235d432c88dcb97308e29c394bdc73b2f6df8"
+    },
+    {
+      "path": "tests/discovery_runtime/test_observation_claims.py",
+      "git_blob": "612973240060b57ac6ec2bfe9b5ad1a080f89f0b",
+      "sha256": "4a0ff68836c604ae4a5b54d375c7005c916ede2fc4b6d155bd8bda761c604893"
+    },
+    {
+      "path": "tests/discovery_runtime/test_runtime_claims.py",
+      "git_blob": "6046f3b8ac64099061d994bdd1f097563af5e61f",
+      "sha256": "8185e1cb3c4d206d9e45cc9ab30c041412ef784c9bd93f6355a400af760d18e8"
+    }
+  ],
+  "command_exit_code": 0,
+  "review_corrections": [
+    "P2T4-R1: omitted feature-wide unresolved backlinks block verified summaries.",
+    "P2T4-R2: source evidence cannot satisfy runtime-designated references.",
+    "P2T4-R3: declared source expectations need relevant known behavior or supported criteria.",
+    "P2T4-R4: prior-runtime basis needs a separate evidenced observation in the same environment."
+  ],
+  "carry_forward": "Scenario/run status and known-expectation contradictions verified; mixed valid histories remain supported without a chronological-order claim."
+}

@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-10-19T10-38",
+  "recorded_utc": "2026-10-19T10:38:03.451352+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-integration-resume.py",
+  "exit_code": 0,
+  "paused_drafts_preserved": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "073f4d390cb41aaf2b55c2451bdbceab706d5353137df1e735d90502a83c7115",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/dependencies.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "fef3fbfb7d32a25f6b7067cc4802574ce85f87b30244f5613e83059eb9ed6123",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/test_dependencies.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "3e9486a2f0ab8857ec5ebcc7593359af20d95ac89727f94363048f848268bb9d",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/test_dependency_projection_limits.py"
+    }
+  ],
+  "route": "workspace_operations_p4t7_integration_resume",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "native_authority": "routing_valid, launch_authority_valid and provenance_valid reread true",
+  "checked_wip": "42c2c4d2ba23128914c6f6afad20010c439d61bc",
+  "shared_freeze": "evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json",
+  "shared_sha256": "de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749",
+  "predecessor_baseline": "evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+  "qualification": "No code mutation or predecessor suite replay; only the three preserved integration drafts are now released."
+}

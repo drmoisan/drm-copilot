@@ -1,0 +1,6 @@
+{
+  "tool": "run_poshqc_analyze",
+  "ok": true,
+  "workspace_root": ".",
+  "limitation": "Invocation receipt only: the MCP result exposes neither process exit nor output. Actual results are recorded separately."
+}

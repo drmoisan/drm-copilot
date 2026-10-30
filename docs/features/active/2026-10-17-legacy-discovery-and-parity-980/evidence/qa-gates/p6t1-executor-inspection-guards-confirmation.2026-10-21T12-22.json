@@ -1,0 +1,235 @@
+{
+  "Timestamp": "2026-10-21T12:22:43.320265+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "current_head": "a3631bddd73c0e2beb1d72093decc06d01ceda40",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-freeze.2026-10-21T12-15.json",
+    "working_sha256": "57062d43acaed919d7589d9a56248b93c022c5ed074c24202e9f3a859ba80deb",
+    "git_lf_sha256": "57062d43acaed919d7589d9a56248b93c022c5ed074c24202e9f3a859ba80deb",
+    "expected_git_blob": "a5ef15b50c9eab9a2c15827140987ee68b41c920",
+    "bytes": 9713,
+    "git_lf_bytes": 9713
+  },
+  "owned_test": {
+    "path": "tests/discovery_runtime/test_service_inspection_guards.py",
+    "working_sha256": "79da7a7479dbeea9ae5ff1a00ad91baca8af99752972d9d32219c38b4ea5dcbf",
+    "git_lf_sha256": "79da7a7479dbeea9ae5ff1a00ad91baca8af99752972d9d32219c38b4ea5dcbf",
+    "expected_git_blob": "6f2d4961c1614557753444cb70f2f4f6ac6e2abb",
+    "bytes": 15318,
+    "git_lf_bytes": 15318
+  },
+  "review": {
+    "controls": "IG1-IG9",
+    "functional_findings": [],
+    "intent_and_types_clear": true,
+    "physical_lines": 364,
+    "scope": "Only frozen nine inspection guards and their three measured body scopes; accepted callers not re-reviewed.",
+    "assertions": [
+      "Exact selected profile bytes/digest and unchanged activation/files.",
+      "Unsupported profile version and original malformed-v2 findings refuse without artifacts.",
+      "ProfileError identity preserved before analysis; empty inventory inputs correct the constructor fixture.",
+      "Inventory preview is reconstructed canonically with exact analyzer selection/grant; corrupted preview refuses a second write.",
+      "Captured source freshness, prospective byte limit and invalid direct-helper inputs refuse before forbidden reads/writes.",
+      "Wrong-family inspection refuses before graph assessment."
+    ],
+    "isolation": "Memory-only collaborators, function-scoped monkeypatch; no temporary files or external processes."
+  },
+  "ordered_gates": [
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-format.2026-10-21T12-11.json",
+        "sha256": "eae376db6cd7cb3bab47f56927b1be93a346a39f984bc4c2c05b546b8531c6c3"
+      },
+      "started": "2026-10-21T12:11:35.107986+00:00",
+      "finished": "2026-10-21T12:11:37.045331+00:00",
+      "duration_seconds": 1.9374399000080302,
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-lint.2026-10-21T12-11.json",
+        "sha256": "16f7588d93f3f14bc42f0f5cba9fb5c5733e03b1ad984be9c025c9c0bd481b8c"
+      },
+      "started": "2026-10-21T12:11:37.052403+00:00",
+      "finished": "2026-10-21T12:11:38.283037+00:00",
+      "duration_seconds": 1.230722300009802,
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-types.2026-10-21T12-11.json",
+        "sha256": "c7f4003f502980837f31e1bb66432859a40f978ac345669bba4a178e89222141"
+      },
+      "started": "2026-10-21T12:11:38.292827+00:00",
+      "finished": "2026-10-21T12:11:40.889906+00:00",
+      "duration_seconds": 2.597189599997364,
+      "exit_code": 0
+    },
+    {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-tests.2026-10-21T12-15.json",
+        "sha256": "976e1f64a23f19986ce05de488fd2e75d5bf4e3da866a199ebbbca64a98b41e4"
+      },
+      "started": "2026-10-21T12:11:40.904075+00:00",
+      "finished": "2026-10-21T12:15:04.330679+00:00",
+      "duration_seconds": 203.42669940000633,
+      "exit_code": 0
+    }
+  ],
+  "exact_nodes": [
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig1_default_profile_uses_trusted_selection_and_exact_bytes",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig2_unsupported_profile_version_refuses_artifacts",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig3_malformed_v2_preserves_original_profile_findings",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig4_selector_profile_error_survives_before_analysis",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig5_inventory_write_reconstructs_exact_selection_and_grants",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig6_changed_physical_source_refuses_captured_page",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig7_captured_source_bound_refuses_before_physical_read",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig8_invalid_direct_source_request_refuses_before_read",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig9_other_operation_family_refuses_before_assessment"
+  ],
+  "counts": {
+    "passed": 9,
+    "failed": 0,
+    "errors": 0
+  },
+  "historical_failure": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-tests.2026-10-21T12-10.json",
+      "sha256": "6a4c4b6c8190a3f6c5ad0b5dac422e0740136db4fe66866e333a521228ed0710"
+    },
+    "passed": 8,
+    "failed": 1,
+    "cause": "IG4 retained read-source-only inputs when constructing inventory request. Fixed by empty JsonObject inputs and matching direct context inputs. No production defect.",
+    "preserved": true
+  },
+  "body_preflight": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-inspection-guards-body-preflight.2026-10-21T12-19.json",
+    "working_sha256": "d833e5ccb1bb2d0d422dfb07f1bd9b35459b261d1060176d458648d153963633",
+    "git_lf_sha256": "d833e5ccb1bb2d0d422dfb07f1bd9b35459b261d1060176d458648d153963633",
+    "expected_git_blob": "2aa6d53cc3a00fdb136cda7e215ea76023e55b84",
+    "bytes": 14140,
+    "git_lf_bytes": 14140
+  },
+  "verified_raw_coordinate_union": [
+    {
+      "name": "_profile",
+      "statements": 27,
+      "covered_statements": 27,
+      "branches": 8,
+      "covered_branches": 8,
+      "missing_lines": [],
+      "missing_branches": []
+    },
+    {
+      "name": "_inventory",
+      "statements": 23,
+      "covered_statements": 22,
+      "branches": 4,
+      "covered_branches": 3,
+      "missing_lines": [
+        113
+      ],
+      "missing_branches": [
+        [
+          112,
+          113
+        ]
+      ]
+    },
+    {
+      "name": "_source.read",
+      "statements": 4,
+      "covered_statements": 4,
+      "branches": 2,
+      "covered_branches": 2,
+      "missing_lines": [],
+      "missing_branches": []
+    },
+    {
+      "name": "MODULE",
+      "statements": 114,
+      "covered_statements": 113,
+      "branches": 30,
+      "covered_branches": 29,
+      "missing_lines": [
+        113
+      ],
+      "missing_branches": [
+        [
+          112,
+          113
+        ]
+      ]
+    }
+  ],
+  "coverage_qualification": "Retained329 and focused9 raw coordinates remain separate. Union is diagnostic only, not final isolation. Remaining line113/arc112->113 is retained as missing and included in denominators; no waiver or augmented counters.",
+  "presentation_qualification": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-inspection-guards-receipt-originals.2026-10-21T12-22.json",
+      "working_sha256": "e8ece20b98a2e6111f17f34baf903b7f7c1caca8533cc7b8c0f53471340d6d7f",
+      "git_lf_sha256": "e8ece20b98a2e6111f17f34baf903b7f7c1caca8533cc7b8c0f53471340d6d7f",
+      "expected_git_blob": "a9f36f8dca1ad38f0c1cb3a1fc40a8465b9bab29",
+      "bytes": 23467,
+      "git_lf_bytes": 23467
+    },
+    "excluded_originals": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-tests.2026-10-21T12-10.json",
+        "working_sha256": "6a4c4b6c8190a3f6c5ad0b5dac422e0740136db4fe66866e333a521228ed0710",
+        "git_lf_sha256": "6a4c4b6c8190a3f6c5ad0b5dac422e0740136db4fe66866e333a521228ed0710",
+        "expected_git_blob": "4983e286bbbcdb8519551f509515c9ec68480da0",
+        "bytes": 50879,
+        "git_lf_bytes": 50879
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-tests.2026-10-21T12-15.json",
+        "working_sha256": "976e1f64a23f19986ce05de488fd2e75d5bf4e3da866a199ebbbca64a98b41e4",
+        "git_lf_sha256": "976e1f64a23f19986ce05de488fd2e75d5bf4e3da866a199ebbbca64a98b41e4",
+        "expected_git_blob": "dda7edf0cf036e2e44b30371c5a9514f325cd172",
+        "bytes": 40691,
+        "git_lf_bytes": 40691
+      }
+    ],
+    "portable_views": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-tests.2026-10-21T12-10.readable.json",
+        "working_sha256": "e5bc71d7569189ee1bf9e0e8ed4abb5e6e7d4330af244d90594c6a32789d38c0",
+        "git_lf_sha256": "e5bc71d7569189ee1bf9e0e8ed4abb5e6e7d4330af244d90594c6a32789d38c0",
+        "expected_git_blob": "7c5fe358d16c5b7a39cb203050fb425bd0ca6d4b",
+        "bytes": 51440,
+        "git_lf_bytes": 51440
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-tests.2026-10-21T12-15.readable.json",
+        "working_sha256": "db0876ec09e27fe85d7f14cffad16eecfdddeeb901f91dfa112919dd1396b55a",
+        "git_lf_sha256": "db0876ec09e27fe85d7f14cffad16eecfdddeeb901f91dfa112919dd1396b55a",
+        "expected_git_blob": "deb345879cf4797c50b3b4e30f239b6cc3d0b7a0",
+        "bytes": 41252,
+        "git_lf_bytes": 41252
+      }
+    ],
+    "lossless_reconstruction_verified": true,
+    "chronology": "Owner ordered_receipts is filename-sorted; immutable started/finished timestamps prove format, lint, types, tests sequence."
+  },
+  "reader_diagnostic": "PowerShell object conversion rejected coverage.py empty-string named scope; established UTF-8 json.loads reader handled the same immutable receipt. No evidence/source/behavior change.",
+  "staging_union": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-inspection-guards-staging-union.2026-10-21T12-22.json",
+  "task_acceptance": false,
+  "pending": [
+    "Other three independently reviewed guard subsets",
+    "Final combined reversed population and coverage floors",
+    "Four contract checks and P6-T1 acceptance"
+  ],
+  "counts_unchanged": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

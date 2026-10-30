@@ -1,0 +1,2873 @@
+{
+  "files": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": {
+      "classes": {
+        "": {
+          "excluded_lines": [
+            30,
+            31,
+            32,
+            36,
+            37,
+            38
+          ],
+          "executed_branches": [
+            [
+              484,
+              485
+            ],
+            [
+              484,
+              489
+            ],
+            [
+              486,
+              487
+            ],
+            [
+              486,
+              489
+            ],
+            [
+              487,
+              488
+            ],
+            [
+              487,
+              489
+            ]
+          ],
+          "executed_lines": [
+            3,
+            5,
+            6,
+            7,
+            8,
+            10,
+            11,
+            12,
+            17,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            41,
+            50,
+            62,
+            65,
+            66,
+            69,
+            70,
+            73,
+            76,
+            87,
+            92,
+            116,
+            155,
+            180,
+            272,
+            388,
+            441,
+            455,
+            456,
+            459,
+            464,
+            475,
+            478,
+            479,
+            484,
+            485,
+            486,
+            487,
+            488,
+            489
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 1,
+          "summary": {
+            "covered_branches": 6,
+            "covered_lines": 45,
+            "excluded_lines": 6,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "num_statements": 45,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "AcceptanceValidation": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 66,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 0,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_AcceptanceRules": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              97,
+              98
+            ],
+            [
+              97,
+              114
+            ],
+            [
+              101,
+              97
+            ],
+            [
+              101,
+              113
+            ],
+            [
+              120,
+              121
+            ],
+            [
+              120,
+              127
+            ],
+            [
+              127,
+              131
+            ],
+            [
+              127,
+              132
+            ],
+            [
+              138,
+              139
+            ],
+            [
+              138,
+              153
+            ],
+            [
+              146,
+              138
+            ],
+            [
+              146,
+              147
+            ],
+            [
+              159,
+              160
+            ],
+            [
+              159,
+              164
+            ],
+            [
+              168,
+              170
+            ],
+            [
+              183,
+              184
+            ],
+            [
+              183,
+              185
+            ],
+            [
+              192,
+              195
+            ],
+            [
+              192,
+              200
+            ],
+            [
+              206,
+              207
+            ],
+            [
+              206,
+              212
+            ],
+            [
+              213,
+              219
+            ],
+            [
+              213,
+              224
+            ],
+            [
+              224,
+              231
+            ],
+            [
+              224,
+              236
+            ],
+            [
+              237,
+              240
+            ],
+            [
+              237,
+              245
+            ],
+            [
+              245,
+              246
+            ],
+            [
+              245,
+              251
+            ],
+            [
+              251,
+              257
+            ],
+            [
+              251,
+              262
+            ],
+            [
+              262,
+              270
+            ],
+            [
+              277,
+              278
+            ],
+            [
+              277,
+              279
+            ],
+            [
+              279,
+              286
+            ],
+            [
+              279,
+              287
+            ],
+            [
+              294,
+              295
+            ],
+            [
+              294,
+              306
+            ],
+            [
+              295,
+              299
+            ],
+            [
+              306,
+              307
+            ],
+            [
+              306,
+              314
+            ],
+            [
+              332,
+              333
+            ],
+            [
+              332,
+              379
+            ],
+            [
+              334,
+              335
+            ],
+            [
+              334,
+              341
+            ],
+            [
+              351,
+              332
+            ],
+            [
+              351,
+              354
+            ],
+            [
+              354,
+              357
+            ],
+            [
+              354,
+              358
+            ],
+            [
+              365,
+              366
+            ],
+            [
+              365,
+              367
+            ],
+            [
+              368,
+              351
+            ],
+            [
+              368,
+              378
+            ],
+            [
+              379,
+              -272
+            ],
+            [
+              379,
+              380
+            ],
+            [
+              398,
+              399
+            ],
+            [
+              398,
+              410
+            ],
+            [
+              399,
+              398
+            ],
+            [
+              399,
+              404
+            ],
+            [
+              410,
+              411
+            ],
+            [
+              410,
+              412
+            ],
+            [
+              425,
+              426
+            ],
+            [
+              425,
+              431
+            ],
+            [
+              426,
+              425
+            ],
+            [
+              426,
+              427
+            ],
+            [
+              431,
+              -388
+            ],
+            [
+              431,
+              432
+            ]
+          ],
+          "executed_lines": [
+            84,
+            85,
+            89,
+            90,
+            96,
+            97,
+            98,
+            101,
+            113,
+            114,
+            120,
+            121,
+            127,
+            131,
+            132,
+            133,
+            136,
+            137,
+            138,
+            139,
+            146,
+            147,
+            153,
+            157,
+            158,
+            159,
+            160,
+            164,
+            168,
+            170,
+            174,
+            182,
+            183,
+            184,
+            185,
+            186,
+            192,
+            195,
+            200,
+            201,
+            206,
+            207,
+            212,
+            213,
+            219,
+            224,
+            231,
+            236,
+            237,
+            240,
+            245,
+            246,
+            251,
+            257,
+            262,
+            270,
+            276,
+            277,
+            278,
+            279,
+            286,
+            287,
+            294,
+            295,
+            299,
+            306,
+            307,
+            313,
+            314,
+            325,
+            326,
+            327,
+            332,
+            333,
+            334,
+            335,
+            341,
+            346,
+            351,
+            354,
+            357,
+            358,
+            365,
+            366,
+            367,
+            368,
+            378,
+            379,
+            380,
+            390,
+            395,
+            398,
+            399,
+            404,
+            410,
+            411,
+            412,
+            418,
+            425,
+            426,
+            427,
+            430,
+            431,
+            432
+          ],
+          "missing_branches": [
+            [
+              168,
+              169
+            ],
+            [
+              262,
+              265
+            ],
+            [
+              295,
+              294
+            ]
+          ],
+          "missing_lines": [
+            169,
+            265
+          ],
+          "start_line": 73,
+          "summary": {
+            "covered_branches": 67,
+            "covered_lines": 104,
+            "excluded_lines": 0,
+            "missing_branches": 3,
+            "missing_lines": 2,
+            "num_branches": 70,
+            "num_partial_branches": 3,
+            "num_statements": 106,
+            "percent_branches_covered": 95.71428571428571,
+            "percent_branches_covered_display": "96",
+            "percent_covered": 97.1590909090909,
+            "percent_covered_display": "97",
+            "percent_statements_covered": 98.11320754716981,
+            "percent_statements_covered_display": "98"
+          }
+        }
+      },
+      "excluded_lines": [
+        30,
+        31,
+        32,
+        36,
+        37,
+        38
+      ],
+      "executed_branches": [
+        [
+          97,
+          98
+        ],
+        [
+          97,
+          114
+        ],
+        [
+          101,
+          97
+        ],
+        [
+          101,
+          113
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          127
+        ],
+        [
+          127,
+          131
+        ],
+        [
+          127,
+          132
+        ],
+        [
+          138,
+          139
+        ],
+        [
+          138,
+          153
+        ],
+        [
+          146,
+          138
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          159,
+          160
+        ],
+        [
+          159,
+          164
+        ],
+        [
+          168,
+          170
+        ],
+        [
+          183,
+          184
+        ],
+        [
+          183,
+          185
+        ],
+        [
+          192,
+          195
+        ],
+        [
+          192,
+          200
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          212
+        ],
+        [
+          213,
+          219
+        ],
+        [
+          213,
+          224
+        ],
+        [
+          224,
+          231
+        ],
+        [
+          224,
+          236
+        ],
+        [
+          237,
+          240
+        ],
+        [
+          237,
+          245
+        ],
+        [
+          245,
+          246
+        ],
+        [
+          245,
+          251
+        ],
+        [
+          251,
+          257
+        ],
+        [
+          251,
+          262
+        ],
+        [
+          262,
+          270
+        ],
+        [
+          277,
+          278
+        ],
+        [
+          277,
+          279
+        ],
+        [
+          279,
+          286
+        ],
+        [
+          279,
+          287
+        ],
+        [
+          294,
+          295
+        ],
+        [
+          294,
+          306
+        ],
+        [
+          295,
+          299
+        ],
+        [
+          306,
+          307
+        ],
+        [
+          306,
+          314
+        ],
+        [
+          332,
+          333
+        ],
+        [
+          332,
+          379
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          334,
+          341
+        ],
+        [
+          351,
+          332
+        ],
+        [
+          351,
+          354
+        ],
+        [
+          354,
+          357
+        ],
+        [
+          354,
+          358
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          365,
+          367
+        ],
+        [
+          368,
+          351
+        ],
+        [
+          368,
+          378
+        ],
+        [
+          379,
+          -272
+        ],
+        [
+          379,
+          380
+        ],
+        [
+          398,
+          399
+        ],
+        [
+          398,
+          410
+        ],
+        [
+          399,
+          398
+        ],
+        [
+          399,
+          404
+        ],
+        [
+          410,
+          411
+        ],
+        [
+          410,
+          412
+        ],
+        [
+          425,
+          426
+        ],
+        [
+          425,
+          431
+        ],
+        [
+          426,
+          425
+        ],
+        [
+          426,
+          427
+        ],
+        [
+          431,
+          -388
+        ],
+        [
+          431,
+          432
+        ],
+        [
+          484,
+          485
+        ],
+        [
+          484,
+          489
+        ],
+        [
+          486,
+          487
+        ],
+        [
+          486,
+          489
+        ],
+        [
+          487,
+          488
+        ],
+        [
+          487,
+          489
+        ]
+      ],
+      "executed_lines": [
+        3,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        17,
+        18,
+        24,
+        25,
+        26,
+        27,
+        28,
+        41,
+        50,
+        62,
+        65,
+        66,
+        69,
+        70,
+        73,
+        76,
+        84,
+        85,
+        87,
+        89,
+        90,
+        92,
+        96,
+        97,
+        98,
+        101,
+        113,
+        114,
+        116,
+        120,
+        121,
+        127,
+        131,
+        132,
+        133,
+        136,
+        137,
+        138,
+        139,
+        146,
+        147,
+        153,
+        155,
+        157,
+        158,
+        159,
+        160,
+        164,
+        168,
+        170,
+        174,
+        180,
+        182,
+        183,
+        184,
+        185,
+        186,
+        192,
+        195,
+        200,
+        201,
+        206,
+        207,
+        212,
+        213,
+        219,
+        224,
+        231,
+        236,
+        237,
+        240,
+        245,
+        246,
+        251,
+        257,
+        262,
+        270,
+        272,
+        276,
+        277,
+        278,
+        279,
+        286,
+        287,
+        294,
+        295,
+        299,
+        306,
+        307,
+        313,
+        314,
+        325,
+        326,
+        327,
+        332,
+        333,
+        334,
+        335,
+        341,
+        346,
+        351,
+        354,
+        357,
+        358,
+        365,
+        366,
+        367,
+        368,
+        378,
+        379,
+        380,
+        388,
+        390,
+        395,
+        398,
+        399,
+        404,
+        410,
+        411,
+        412,
+        418,
+        425,
+        426,
+        427,
+        430,
+        431,
+        432,
+        441,
+        455,
+        456,
+        459,
+        464,
+        475,
+        478,
+        479,
+        484,
+        485,
+        486,
+        487,
+        488,
+        489
+      ],
+      "functions": {
+        "": {
+          "excluded_lines": [
+            30,
+            31,
+            32,
+            36,
+            37,
+            38
+          ],
+          "executed_branches": [],
+          "executed_lines": [
+            3,
+            5,
+            6,
+            7,
+            8,
+            10,
+            11,
+            12,
+            17,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            41,
+            65,
+            66,
+            69,
+            70,
+            73,
+            76,
+            87,
+            92,
+            116,
+            155,
+            180,
+            272,
+            388,
+            441
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 1,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 30,
+            "excluded_lines": 6,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 30,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_AcceptanceRules.__init__": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            84,
+            85
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 76,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 2,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 2,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_AcceptanceRules.criteria": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              120,
+              121
+            ],
+            [
+              120,
+              127
+            ],
+            [
+              127,
+              131
+            ],
+            [
+              127,
+              132
+            ],
+            [
+              138,
+              139
+            ],
+            [
+              138,
+              153
+            ],
+            [
+              146,
+              138
+            ],
+            [
+              146,
+              147
+            ]
+          ],
+          "executed_lines": [
+            120,
+            121,
+            127,
+            131,
+            132,
+            133,
+            136,
+            137,
+            138,
+            139,
+            146,
+            147,
+            153
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 116,
+          "summary": {
+            "covered_branches": 8,
+            "covered_lines": 13,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "num_statements": 13,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_AcceptanceRules.empty_scope": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              398,
+              399
+            ],
+            [
+              398,
+              410
+            ],
+            [
+              399,
+              398
+            ],
+            [
+              399,
+              404
+            ],
+            [
+              410,
+              411
+            ],
+            [
+              410,
+              412
+            ],
+            [
+              425,
+              426
+            ],
+            [
+              425,
+              431
+            ],
+            [
+              426,
+              425
+            ],
+            [
+              426,
+              427
+            ],
+            [
+              431,
+              -388
+            ],
+            [
+              431,
+              432
+            ]
+          ],
+          "executed_lines": [
+            390,
+            395,
+            398,
+            399,
+            404,
+            410,
+            411,
+            412,
+            418,
+            425,
+            426,
+            427,
+            430,
+            431,
+            432
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 388,
+          "summary": {
+            "covered_branches": 12,
+            "covered_lines": 15,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 12,
+            "num_partial_branches": 0,
+            "num_statements": 15,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_AcceptanceRules.identity": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              159,
+              160
+            ],
+            [
+              159,
+              164
+            ],
+            [
+              168,
+              170
+            ]
+          ],
+          "executed_lines": [
+            157,
+            158,
+            159,
+            160,
+            164,
+            168,
+            170,
+            174
+          ],
+          "missing_branches": [
+            [
+              168,
+              169
+            ]
+          ],
+          "missing_lines": [
+            169
+          ],
+          "start_line": 155,
+          "summary": {
+            "covered_branches": 3,
+            "covered_lines": 8,
+            "excluded_lines": 0,
+            "missing_branches": 1,
+            "missing_lines": 1,
+            "num_branches": 4,
+            "num_partial_branches": 1,
+            "num_statements": 9,
+            "percent_branches_covered": 75.0,
+            "percent_branches_covered_display": "75",
+            "percent_covered": 84.61538461538461,
+            "percent_covered_display": "85",
+            "percent_statements_covered": 88.88888888888889,
+            "percent_statements_covered_display": "89"
+          }
+        },
+        "_AcceptanceRules.proof": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              97,
+              98
+            ],
+            [
+              97,
+              114
+            ],
+            [
+              101,
+              97
+            ],
+            [
+              101,
+              113
+            ]
+          ],
+          "executed_lines": [
+            96,
+            97,
+            98,
+            101,
+            113,
+            114
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 92,
+          "summary": {
+            "covered_branches": 4,
+            "covered_lines": 6,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "num_statements": 6,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_AcceptanceRules.record": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              183,
+              184
+            ],
+            [
+              183,
+              185
+            ],
+            [
+              192,
+              195
+            ],
+            [
+              192,
+              200
+            ],
+            [
+              206,
+              207
+            ],
+            [
+              206,
+              212
+            ],
+            [
+              213,
+              219
+            ],
+            [
+              213,
+              224
+            ],
+            [
+              224,
+              231
+            ],
+            [
+              224,
+              236
+            ],
+            [
+              237,
+              240
+            ],
+            [
+              237,
+              245
+            ],
+            [
+              245,
+              246
+            ],
+            [
+              245,
+              251
+            ],
+            [
+              251,
+              257
+            ],
+            [
+              251,
+              262
+            ],
+            [
+              262,
+              270
+            ]
+          ],
+          "executed_lines": [
+            182,
+            183,
+            184,
+            185,
+            186,
+            192,
+            195,
+            200,
+            201,
+            206,
+            207,
+            212,
+            213,
+            219,
+            224,
+            231,
+            236,
+            237,
+            240,
+            245,
+            246,
+            251,
+            257,
+            262,
+            270
+          ],
+          "missing_branches": [
+            [
+              262,
+              265
+            ]
+          ],
+          "missing_lines": [
+            265
+          ],
+          "start_line": 180,
+          "summary": {
+            "covered_branches": 17,
+            "covered_lines": 25,
+            "excluded_lines": 0,
+            "missing_branches": 1,
+            "missing_lines": 1,
+            "num_branches": 18,
+            "num_partial_branches": 1,
+            "num_statements": 26,
+            "percent_branches_covered": 94.44444444444444,
+            "percent_branches_covered_display": "94",
+            "percent_covered": 95.45454545454545,
+            "percent_covered_display": "95",
+            "percent_statements_covered": 96.15384615384616,
+            "percent_statements_covered_display": "96"
+          }
+        },
+        "_AcceptanceRules.reject": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            89,
+            90
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 87,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 2,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 2,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_AcceptanceRules.required": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              277,
+              278
+            ],
+            [
+              277,
+              279
+            ],
+            [
+              279,
+              286
+            ],
+            [
+              279,
+              287
+            ],
+            [
+              294,
+              295
+            ],
+            [
+              294,
+              306
+            ],
+            [
+              295,
+              299
+            ],
+            [
+              306,
+              307
+            ],
+            [
+              306,
+              314
+            ],
+            [
+              332,
+              333
+            ],
+            [
+              332,
+              379
+            ],
+            [
+              334,
+              335
+            ],
+            [
+              334,
+              341
+            ],
+            [
+              351,
+              332
+            ],
+            [
+              351,
+              354
+            ],
+            [
+              354,
+              357
+            ],
+            [
+              354,
+              358
+            ],
+            [
+              365,
+              366
+            ],
+            [
+              365,
+              367
+            ],
+            [
+              368,
+              351
+            ],
+            [
+              368,
+              378
+            ],
+            [
+              379,
+              -272
+            ],
+            [
+              379,
+              380
+            ]
+          ],
+          "executed_lines": [
+            276,
+            277,
+            278,
+            279,
+            286,
+            287,
+            294,
+            295,
+            299,
+            306,
+            307,
+            313,
+            314,
+            325,
+            326,
+            327,
+            332,
+            333,
+            334,
+            335,
+            341,
+            346,
+            351,
+            354,
+            357,
+            358,
+            365,
+            366,
+            367,
+            368,
+            378,
+            379,
+            380
+          ],
+          "missing_branches": [
+            [
+              295,
+              294
+            ]
+          ],
+          "missing_lines": [],
+          "start_line": 272,
+          "summary": {
+            "covered_branches": 23,
+            "covered_lines": 33,
+            "excluded_lines": 0,
+            "missing_branches": 1,
+            "missing_lines": 0,
+            "num_branches": 24,
+            "num_partial_branches": 1,
+            "num_statements": 33,
+            "percent_branches_covered": 95.83333333333333,
+            "percent_branches_covered_display": "96",
+            "percent_covered": 98.24561403508773,
+            "percent_covered_display": "98",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "acceptance_source_digest": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            50,
+            62
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 41,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 2,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 2,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "validate_acceptance": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              484,
+              485
+            ],
+            [
+              484,
+              489
+            ],
+            [
+              486,
+              487
+            ],
+            [
+              486,
+              489
+            ],
+            [
+              487,
+              488
+            ],
+            [
+              487,
+              489
+            ]
+          ],
+          "executed_lines": [
+            455,
+            456,
+            459,
+            464,
+            475,
+            478,
+            479,
+            484,
+            485,
+            486,
+            487,
+            488,
+            489
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 441,
+          "summary": {
+            "covered_branches": 6,
+            "covered_lines": 13,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "num_statements": 13,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        }
+      },
+      "missing_branches": [
+        [
+          168,
+          169
+        ],
+        [
+          262,
+          265
+        ],
+        [
+          295,
+          294
+        ]
+      ],
+      "missing_lines": [
+        169,
+        265
+      ],
+      "summary": {
+        "covered_branches": 73,
+        "covered_lines": 149,
+        "excluded_lines": 6,
+        "missing_branches": 3,
+        "missing_lines": 2,
+        "num_branches": 76,
+        "num_partial_branches": 3,
+        "num_statements": 151,
+        "percent_branches_covered": 96.05263157894737,
+        "percent_branches_covered_display": "96",
+        "percent_covered": 97.79735682819383,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 98.67549668874172,
+        "percent_statements_covered_display": "99"
+      }
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py": {
+      "classes": {
+        "": {
+          "excluded_lines": [
+            17,
+            18,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "executed_branches": [],
+          "executed_lines": [
+            3,
+            5,
+            6,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            29,
+            38,
+            49,
+            57,
+            58,
+            65,
+            72,
+            84,
+            85,
+            92,
+            93,
+            94,
+            95,
+            96,
+            99,
+            100,
+            103,
+            104,
+            107,
+            110,
+            125,
+            154,
+            246,
+            277,
+            290,
+            291,
+            294,
+            299,
+            302,
+            303,
+            309
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 1,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 42,
+            "excluded_lines": 7,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 42,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "DimensionValidation": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 100,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 0,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "FeatureObligation": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 85,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 0,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_DimensionRules": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              134,
+              135
+            ],
+            [
+              134,
+              152
+            ],
+            [
+              136,
+              137
+            ],
+            [
+              136,
+              138
+            ],
+            [
+              139,
+              143
+            ],
+            [
+              145,
+              134
+            ],
+            [
+              145,
+              146
+            ],
+            [
+              171,
+              172
+            ],
+            [
+              171,
+              244
+            ],
+            [
+              173,
+              174
+            ],
+            [
+              173,
+              175
+            ],
+            [
+              175,
+              176
+            ],
+            [
+              175,
+              184
+            ],
+            [
+              176,
+              177
+            ],
+            [
+              176,
+              183
+            ],
+            [
+              184,
+              187
+            ],
+            [
+              184,
+              193
+            ],
+            [
+              194,
+              195
+            ],
+            [
+              194,
+              201
+            ],
+            [
+              201,
+              202
+            ],
+            [
+              201,
+              224
+            ],
+            [
+              215,
+              216
+            ],
+            [
+              215,
+              218
+            ],
+            [
+              224,
+              225
+            ],
+            [
+              224,
+              231
+            ],
+            [
+              231,
+              171
+            ],
+            [
+              231,
+              238
+            ],
+            [
+              249,
+              250
+            ],
+            [
+              249,
+              256
+            ],
+            [
+              266,
+              267
+            ],
+            [
+              266,
+              274
+            ]
+          ],
+          "executed_lines": [
+            119,
+            120,
+            121,
+            129,
+            133,
+            134,
+            135,
+            136,
+            137,
+            138,
+            139,
+            143,
+            144,
+            145,
+            146,
+            152,
+            161,
+            166,
+            170,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            183,
+            184,
+            187,
+            193,
+            194,
+            195,
+            196,
+            201,
+            202,
+            215,
+            216,
+            218,
+            224,
+            225,
+            231,
+            238,
+            244,
+            248,
+            249,
+            250,
+            256,
+            257,
+            262,
+            265,
+            266,
+            267,
+            270,
+            271,
+            274
+          ],
+          "missing_branches": [
+            [
+              139,
+              142
+            ]
+          ],
+          "missing_lines": [
+            142
+          ],
+          "start_line": 107,
+          "summary": {
+            "covered_branches": 31,
+            "covered_lines": 55,
+            "excluded_lines": 0,
+            "missing_branches": 1,
+            "missing_lines": 1,
+            "num_branches": 32,
+            "num_partial_branches": 1,
+            "num_statements": 56,
+            "percent_branches_covered": 96.875,
+            "percent_branches_covered_display": "97",
+            "percent_covered": 97.72727272727273,
+            "percent_covered_display": "98",
+            "percent_statements_covered": 98.21428571428571,
+            "percent_statements_covered_display": "98"
+          }
+        }
+      },
+      "excluded_lines": [
+        17,
+        18,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "executed_branches": [
+        [
+          134,
+          135
+        ],
+        [
+          134,
+          152
+        ],
+        [
+          136,
+          137
+        ],
+        [
+          136,
+          138
+        ],
+        [
+          139,
+          143
+        ],
+        [
+          145,
+          134
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          171,
+          172
+        ],
+        [
+          171,
+          244
+        ],
+        [
+          173,
+          174
+        ],
+        [
+          173,
+          175
+        ],
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          184
+        ],
+        [
+          176,
+          177
+        ],
+        [
+          176,
+          183
+        ],
+        [
+          184,
+          187
+        ],
+        [
+          184,
+          193
+        ],
+        [
+          194,
+          195
+        ],
+        [
+          194,
+          201
+        ],
+        [
+          201,
+          202
+        ],
+        [
+          201,
+          224
+        ],
+        [
+          215,
+          216
+        ],
+        [
+          215,
+          218
+        ],
+        [
+          224,
+          225
+        ],
+        [
+          224,
+          231
+        ],
+        [
+          231,
+          171
+        ],
+        [
+          231,
+          238
+        ],
+        [
+          249,
+          250
+        ],
+        [
+          249,
+          256
+        ],
+        [
+          266,
+          267
+        ],
+        [
+          266,
+          274
+        ]
+      ],
+      "executed_lines": [
+        3,
+        5,
+        6,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        29,
+        38,
+        49,
+        57,
+        58,
+        65,
+        72,
+        84,
+        85,
+        92,
+        93,
+        94,
+        95,
+        96,
+        99,
+        100,
+        103,
+        104,
+        107,
+        110,
+        119,
+        120,
+        121,
+        125,
+        129,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        143,
+        144,
+        145,
+        146,
+        152,
+        154,
+        161,
+        166,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        183,
+        184,
+        187,
+        193,
+        194,
+        195,
+        196,
+        201,
+        202,
+        215,
+        216,
+        218,
+        224,
+        225,
+        231,
+        238,
+        244,
+        246,
+        248,
+        249,
+        250,
+        256,
+        257,
+        262,
+        265,
+        266,
+        267,
+        270,
+        271,
+        274,
+        277,
+        290,
+        291,
+        294,
+        299,
+        302,
+        303,
+        309
+      ],
+      "functions": {
+        "": {
+          "excluded_lines": [
+            17,
+            18,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "executed_branches": [],
+          "executed_lines": [
+            3,
+            5,
+            6,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            29,
+            49,
+            65,
+            84,
+            85,
+            92,
+            93,
+            94,
+            95,
+            96,
+            99,
+            100,
+            103,
+            104,
+            107,
+            110,
+            125,
+            154,
+            246,
+            277
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 1,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 31,
+            "excluded_lines": 7,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 31,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_DimensionRules.__init__": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            119,
+            120,
+            121
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 110,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 3,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 3,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_DimensionRules.classification": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              171,
+              172
+            ],
+            [
+              171,
+              244
+            ],
+            [
+              173,
+              174
+            ],
+            [
+              173,
+              175
+            ],
+            [
+              175,
+              176
+            ],
+            [
+              175,
+              184
+            ],
+            [
+              176,
+              177
+            ],
+            [
+              176,
+              183
+            ],
+            [
+              184,
+              187
+            ],
+            [
+              184,
+              193
+            ],
+            [
+              194,
+              195
+            ],
+            [
+              194,
+              201
+            ],
+            [
+              201,
+              202
+            ],
+            [
+              201,
+              224
+            ],
+            [
+              215,
+              216
+            ],
+            [
+              215,
+              218
+            ],
+            [
+              224,
+              225
+            ],
+            [
+              224,
+              231
+            ],
+            [
+              231,
+              171
+            ],
+            [
+              231,
+              238
+            ]
+          ],
+          "executed_lines": [
+            161,
+            166,
+            170,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            183,
+            184,
+            187,
+            193,
+            194,
+            195,
+            196,
+            201,
+            202,
+            215,
+            216,
+            218,
+            224,
+            225,
+            231,
+            238,
+            244
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 154,
+          "summary": {
+            "covered_branches": 20,
+            "covered_lines": 27,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 20,
+            "num_partial_branches": 0,
+            "num_statements": 27,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_DimensionRules.feature": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              249,
+              250
+            ],
+            [
+              249,
+              256
+            ],
+            [
+              266,
+              267
+            ],
+            [
+              266,
+              274
+            ]
+          ],
+          "executed_lines": [
+            248,
+            249,
+            250,
+            256,
+            257,
+            262,
+            265,
+            266,
+            267,
+            270,
+            271,
+            274
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 246,
+          "summary": {
+            "covered_branches": 4,
+            "covered_lines": 12,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "num_statements": 12,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "_DimensionRules.scope_requirements": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              134,
+              135
+            ],
+            [
+              134,
+              152
+            ],
+            [
+              136,
+              137
+            ],
+            [
+              136,
+              138
+            ],
+            [
+              139,
+              143
+            ],
+            [
+              145,
+              134
+            ],
+            [
+              145,
+              146
+            ]
+          ],
+          "executed_lines": [
+            129,
+            133,
+            134,
+            135,
+            136,
+            137,
+            138,
+            139,
+            143,
+            144,
+            145,
+            146,
+            152
+          ],
+          "missing_branches": [
+            [
+              139,
+              142
+            ]
+          ],
+          "missing_lines": [
+            142
+          ],
+          "start_line": 125,
+          "summary": {
+            "covered_branches": 7,
+            "covered_lines": 13,
+            "excluded_lines": 0,
+            "missing_branches": 1,
+            "missing_lines": 1,
+            "num_branches": 8,
+            "num_partial_branches": 1,
+            "num_statements": 14,
+            "percent_branches_covered": 87.5,
+            "percent_branches_covered_display": "88",
+            "percent_covered": 90.9090909090909,
+            "percent_covered_display": "91",
+            "percent_statements_covered": 92.85714285714286,
+            "percent_statements_covered_display": "93"
+          }
+        },
+        "covering_decisions": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            57,
+            58
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 49,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 2,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 2,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "criterion_applies": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            72
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 65,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 1,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 1,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "decision_scope": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            38
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 29,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 1,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 1,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "validate_dimensions": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            290,
+            291,
+            294,
+            299,
+            302,
+            303,
+            309
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 277,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 7,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 7,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        }
+      },
+      "missing_branches": [
+        [
+          139,
+          142
+        ]
+      ],
+      "missing_lines": [
+        142
+      ],
+      "summary": {
+        "covered_branches": 31,
+        "covered_lines": 97,
+        "excluded_lines": 7,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 32,
+        "num_partial_branches": 1,
+        "num_statements": 98,
+        "percent_branches_covered": 96.875,
+        "percent_branches_covered_display": "97",
+        "percent_covered": 98.46153846153847,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 98.9795918367347,
+        "percent_statements_covered_display": "99"
+      }
+    }
+  },
+  "meta": {
+    "branch_coverage": true,
+    "format": 3,
+    "show_contexts": false,
+    "timestamp": "2026-10-18T05:58:06.576135",
+    "version": "7.13.2"
+  },
+  "totals": {
+    "covered_branches": 104,
+    "covered_lines": 246,
+    "excluded_lines": 13,
+    "missing_branches": 4,
+    "missing_lines": 3,
+    "num_branches": 108,
+    "num_partial_branches": 4,
+    "num_statements": 249,
+    "percent_branches_covered": 96.29629629629629,
+    "percent_branches_covered_display": "96",
+    "percent_covered": 98.03921568627452,
+    "percent_covered_display": "98",
+    "percent_statements_covered": 98.79518072289157,
+    "percent_statements_covered_display": "99"
+  }
+}

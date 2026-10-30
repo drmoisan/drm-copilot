@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0.0",
+  "description": "Shared synthetic vectors for the host-principal completion path. tests/discovery_runtime/test_public_host_workflow.py drives the Python authority over a synthetic protected partition and asserts every transition and refusal listed here; extensions/drm-copilot/test/discovery-host-workflow.test.ts drives prepare, one-use consumption and finalization over memory stores and asserts the host-side transitions and refusals. Neither suite reads a file outside the committed tree, launches a process or uses the network.",
+  "identity": {
+    "host": "codex",
+    "session_id": "session-alpha",
+    "agent_id": "agent-alpha",
+    "role": "legacy-parity-analyst",
+    "invocation_id": "invocation-alpha"
+  },
+  "skill_id": "extract-feature-contract",
+  "selected_ids": ["feature-alpha"],
+  "selected_paths": ["application"],
+  "authorizations": {
+    "read-source": {
+      "tool": "read_discovery_source",
+      "authorization_ref": "protected-read-000000000002"
+    },
+    "new-contract": {
+      "tool": "create_discovery_artifact",
+      "authorization_ref": "protected-create-00000000004"
+    },
+    "update-artifact": {
+      "tool": "update_discovery_artifact",
+      "authorization_ref": "protected-update-00000000005"
+    },
+    "finalize-agent": {
+      "tool": "finalize_discovery_agent",
+      "authorization_ref": "protected-final-00000000003"
+    },
+    "unconsumed": {
+      "tool": "read_discovery_source",
+      "authorization_ref": "protected-unconsumed-0000006"
+    }
+  },
+  "python_transitions": [
+    { "name": "prepare-agent", "principal": "local-user", "mode": "structural", "exit_code": 0 },
+    { "name": "read-source", "principal": "host", "mode": "agent-output", "exit_code": 0 },
+    { "name": "new-contract", "principal": "host", "mode": "agent-output", "exit_code": 0 },
+    { "name": "update-artifact", "principal": "host", "mode": "agent-output", "exit_code": 0 },
+    { "name": "finalize-agent", "principal": "host", "mode": "agent-output", "exit_code": 0 }
+  ],
+  "python_refusals": [
+    { "name": "unconsumed-authorization", "code": "SERVICE_AUTHORITY", "exit_code": 3 },
+    { "name": "baseline-drift", "code": "SERVICE_BASELINE", "exit_code": 3 },
+    { "name": "replayed-authorization", "code": "SERVICE_AUTHORITY", "exit_code": 3 }
+  ],
+  "host_transitions": [
+    { "name": "prepare", "protected_files": 5 },
+    { "name": "consume", "state": "consumed" },
+    { "name": "finalize", "validation_result": "pass", "output_valid": true, "planning_authorized": true }
+  ],
+  "host_refusals": [
+    { "name": "authorization-replay", "code": "AUTHORIZATION_CONSUMED" },
+    { "name": "finalize-replay", "code": "FINALIZATION_INVOCATION_STATE" },
+    { "name": "stale-receipt", "code": "FINALIZATION_RECEIPT_STALE" }
+  ],
+  "finalize_result": {
+    "operation": "finalize-agent",
+    "mode": "agent-output",
+    "ok": true,
+    "exit_code": 0,
+    "summary": {
+      "message": "Operation passed.",
+      "validation_result": "pass",
+      "receipt_ref": null
+    },
+    "artifact_status": {
+      "new_output": "created",
+      "existing_output": "updated"
+    }
+  }
+}

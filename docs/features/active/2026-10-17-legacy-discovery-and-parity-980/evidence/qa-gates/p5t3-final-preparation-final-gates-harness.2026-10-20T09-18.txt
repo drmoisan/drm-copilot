@@ -1,0 +1,292 @@
+"""Run only a released, byte-bound P5-T3 candidate in the approved gate order."""
+
+import base64
+import ctypes
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import threading
+import time
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+NATIVE_SCRATCH = Path(os.environ["TEMP"]) / "codex-legacy-discovery" / "issue-980"
+QA = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates"
+MANIFEST_PATH = Path(sys.argv[1]).resolve()
+MANIFEST = json.loads(MANIFEST_PATH.read_bytes())
+if MANIFEST.get("execution_released") is not True or MANIFEST.get("task") != "P5-T3":
+    raise SystemExit("Final candidate execution has not been released")
+STARTED = datetime.datetime.now(datetime.timezone.utc)
+RUN_ID = STARTED.strftime("%H%M%S")
+RECEIPTS, BATCHES, RAW_FILES = [], [], []
+
+
+def sha(data):
+    """Return the exact byte digest used in every receipt."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def observed_aliases():
+    """Reuse observed long/short Windows root spellings for portable readable views."""
+    result = []
+    # Windows may emit the short TEMP spelling even when the command used a long path.
+    for path, label in ((ROOT, "WORKSPACE"), (SCRATCH, "SCRATCH"),
+                        (NATIVE_SCRATCH, "NATIVE_SCRATCH")):
+        spellings = {str(path), path.as_posix()}
+        for name in ("GetLongPathNameW", "GetShortPathNameW"):
+            buffer = ctypes.create_unicode_buffer(32768)
+            size = getattr(ctypes.windll.kernel32, name)(str(path), buffer, len(buffer))
+            if not 0 < size < len(buffer):
+                raise ValueError("Operational root alias could not be observed")
+            spellings.update((buffer.value, buffer.value.replace("\\", "/")))
+        result.extend((spelling, label) for spelling in sorted(spellings))
+    return sorted(result, key=lambda pair: len(pair[0]), reverse=True)
+
+
+ALIASES = observed_aliases()
+
+
+def portable(text):
+    """Replace only observed root spellings; retain the originals in raw archives."""
+    # Longer roots must be replaced before a possible containing root.
+    for spelling, label in ALIASES:
+        text = re.sub(re.escape(spelling), lambda match: label, text, flags=re.I)
+    return text
+
+
+def path_of(value):
+    """Resolve only explicit operational aliases or a repository-relative path."""
+    for prefix, root in (("SCRATCH/", SCRATCH), ("NATIVE_SCRATCH/", NATIVE_SCRATCH), ("WORKSPACE/", ROOT)):
+        if value.startswith(prefix):
+            suffix = Path(value.removeprefix(prefix))
+            if suffix.is_absolute() or ".." in suffix.parts:
+                raise ValueError("Manifest aliases must remain within their stated root")
+            return root / suffix
+    path = Path(value)
+    if path.is_absolute() or ".." in path.parts:
+        raise ValueError("Manifest paths must use a bounded operational alias")
+    return ROOT / path
+
+
+def write(path, value):
+    """Create one LF UTF-8 JSON receipt without replacing earlier evidence."""
+    if path.exists():
+        raise ValueError("Evidence already exists: " + portable(str(path)))
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+def bindings():
+    """Capture actual bound streams and list changes without losing diagnostics."""
+    actual, changed = {}, []
+    # Missing files are explicit binding failures rather than silently omitted rows.
+    for path, expected in MANIFEST["bindings"].items():
+        target = ROOT / path
+        actual[path] = sha(target.read_bytes()) if target.is_file() else None
+        if actual[path] != expected:
+            changed.append(path)
+    for name, record in MANIFEST["harnesses"].items():
+        target = path_of(record["runtime_path"])
+        digest = sha(target.read_bytes()) if target.is_file() else None
+        actual["harness:" + name] = digest
+        if digest != record["sha256"]:
+            changed.append("harness:" + name)
+    return {"sha256": sha(json.dumps(actual, sort_keys=True).encode()), "changed": changed}
+
+
+def run(stage, label, arguments, *, module=True, timeout=300, environment=None):
+    """Run one bounded command and preserve exact streams before enforcing failure."""
+    before = bindings()
+    if before["changed"]:
+        raise RuntimeError("Candidate changed before " + label + ": " + repr(before["changed"]))
+    started = datetime.datetime.now(datetime.timezone.utc)
+    clock = time.monotonic()
+    command = [sys.executable, "-u", *(["-m"] if module else []), *map(str, arguments)]
+    env = dict(os.environ)
+    env.update(PYTHONIOENCODING="utf-8", PYTHONUNBUFFERED="1", PYTHONDONTWRITEBYTECODE="1")
+    env.update(environment or {})
+    stem = f"p5t3-final-{label}-{RUN_ID}"
+    stdout_path, stderr_path = SCRATCH / (stem + ".stdout"), SCRATCH / (stem + ".stderr")
+    progress_path = SCRATCH / (stem + ".progress.json")
+    progress = {"stage": stage, "label": label, "status": "running", "completed": 0,
+                "last_node": None, "started_at": started.isoformat(), "timeout_seconds": timeout}
+    print(json.dumps({"stage_started": dict(progress)}), flush=True)
+    lock = threading.Lock()
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, bufsize=0)
+    progress["pid"] = process.pid
+
+    def consume(stream, destination, node_stream):
+        """Retain original output bytes and only observe completed verbose nodes."""
+        with destination.open("wb") as target:
+            # Incremental reads permit live progress without altering the raw stream.
+            for line in iter(stream.readline, b""):
+                target.write(line)
+                target.flush()
+                if node_stream:
+                    match = re.match(r"^(tests/.+?) (PASSED|FAILED|ERROR|SKIPPED)(?:\s|$)",
+                                     line.decode("utf-8", errors="replace"))
+                    if match:
+                        with lock:
+                            progress["completed"] += 1
+                            progress["last_node"], progress["last_status"] = match.groups()
+            stream.close()
+
+    threads = [threading.Thread(target=consume, args=(process.stdout, stdout_path, True)),
+               threading.Thread(target=consume, args=(process.stderr, stderr_path, False))]
+    for thread in threads:
+        thread.start()
+    timed_out, last_notice = False, 0.0
+    # Each child has a finite wall-clock bound and reports progress every 20 seconds.
+    while process.poll() is None:
+        elapsed = time.monotonic() - clock
+        with lock:
+            progress["elapsed_seconds"] = round(elapsed, 3)
+            temporary = progress_path.with_suffix(".pending")
+            temporary.write_text(json.dumps(progress) + "\n", encoding="utf-8", newline="\n")
+            temporary.replace(progress_path)
+            if elapsed - last_notice >= 20:
+                print(json.dumps({"progress": dict(progress)}), flush=True)
+                last_notice = elapsed
+        if elapsed >= timeout:
+            timed_out = True
+            process.kill()
+            break
+        time.sleep(1)
+    process.wait()
+    for thread in threads:
+        thread.join()
+    after = bindings()
+    finished = datetime.datetime.now(datetime.timezone.utc)
+    progress.update(status="timeout" if timed_out else "finished", exit_code=process.returncode,
+                    elapsed_seconds=round(time.monotonic() - clock, 3))
+    progress_path.write_text(json.dumps(progress) + "\n", encoding="utf-8", newline="\n")
+    stdout, stderr = stdout_path.read_bytes(), stderr_path.read_bytes()
+    raw_entries = []
+    if not RECEIPTS:
+        aliases = json.dumps(ALIASES, ensure_ascii=True).encode("utf-8")
+        raw_entries.append({"path": "OBSERVED_PATH_ALIASES", "sha256": sha(aliases),
+                            "bytes": len(aliases), "base64": base64.b64encode(aliases).decode("ascii")})
+    # Each stage archives raw bytes immediately, including failed or changed-byte runs.
+    for path in (stdout_path, stderr_path, progress_path):
+        data = path.read_bytes()
+        raw_entries.append({"path": "SCRATCH/" + path.name, "sha256": sha(data),
+                            "bytes": len(data), "base64": base64.b64encode(data).decode("ascii")})
+    stamp = finished.strftime("%Y-%m-%dT%H-%M")
+    archive = QA / (stem + "-raw." + stamp + ".json")
+    write(archive, {"qualification": "Exact raw streams; base64 retains original path and newline bytes.",
+                    "entries": raw_entries})
+    payload = {"stage": stage, "label": label, "timestamp": stamp, "started_at": started.isoformat(),
+               "finished_at": finished.isoformat(), "seconds": progress["elapsed_seconds"],
+               "command": portable(subprocess.list2cmdline(command)), "exit_code": process.returncode,
+               "timed_out": timed_out, "timeout_seconds": timeout, "completed_nodes": progress["completed"],
+               "candidate": portable(str(MANIFEST_PATH)), "candidate_sha256": sha(MANIFEST_PATH.read_bytes()),
+               "binding_before": before, "binding_after": after,
+               "stdout": portable(stdout.decode("utf-8", errors="replace")).replace("\r\n", "\n").replace("\r", "\n"),
+               "stderr": portable(stderr.decode("utf-8", errors="replace")).replace("\r\n", "\n").replace("\r", "\n"),
+               "raw_archive": {"path": archive.relative_to(ROOT).as_posix(), "sha256": sha(archive.read_bytes())}}
+    receipt = QA / (stem + "." + stamp + ".json")
+    write(receipt, payload)
+    readable = (f"# P5-T3 final {label}\n\nTimestamp: {stamp}\nCommand: `{payload['command']}`\n"
+                f"EXIT_CODE: {process.returncode}\nOutput Summary: Stage {stage}; {payload['seconds']} seconds; "
+                f"{progress['completed']} completed nodes; timeout={timed_out}; changed bindings={len(after['changed'])}.\n\n"
+                f"```text\n{payload['stdout']}{payload['stderr']}\n```\n")
+    receipt.with_suffix(".md").write_text("\n".join(line.rstrip() for line in readable.splitlines()).rstrip() + "\n",
+                                          encoding="utf-8", newline="\n")
+    RECEIPTS.append({"stage": stage, "label": label, "path": receipt.relative_to(ROOT).as_posix(),
+                     "sha256": sha(receipt.read_bytes()), "exit_code": process.returncode, "seconds": payload["seconds"]})
+    RAW_FILES.extend({key: value for key, value in record.items() if key != "base64"} for record in raw_entries)
+    print(json.dumps(RECEIPTS[-1]), flush=True)
+    if timed_out or process.returncode or after["changed"]:
+        raise SystemExit(process.returncode or 1)
+    return payload
+
+
+def passed_nodes(payload):
+    """Return the ordered passed-node identities, preserving escaped parameter IDs."""
+    return re.findall(r"^(tests/.+?) PASSED(?:\s|$)", payload["stdout"], re.M)
+
+
+def main():
+    """Execute the fixed sequence only after every release and identity prerequisite."""
+    if bindings()["changed"] or not MANIFEST["final_review_closed"]:
+        raise ValueError("Candidate binding or independent review is incomplete")
+    node_groups = MANIFEST["nodes"]
+    flat = [node for nodes in node_groups.values() for node in nodes]
+    if len(flat) != len(set(flat)) or len(flat) != MANIFEST["node_count"]:
+        raise ValueError("Final node population is not exact and disjoint")
+    if set(MANIFEST["batch_order"]) != set(node_groups) or len(MANIFEST["batch_order"]) != len(node_groups):
+        raise ValueError("Every approved batch must execute exactly once")
+    if not all(nodes for nodes in node_groups.values()):
+        raise ValueError("A released behavioral batch must have frozen node identities")
+    # Exact files are frozen by the owners; no autofix is permitted in the final loop.
+    run(1, "format", ["black", "--check", *MANIFEST["files"]])
+    run(2, "lint", ["ruff", "check", *MANIFEST["files"]])
+    run(3, "types", ["pyright"], timeout=MANIFEST["timeouts"]["types"])
+    run(4, "static", [SCRATCH / "final_static.py", MANIFEST_PATH], module=False)
+    native = MANIFEST["native"]
+    if native.get("execution_released") is not True or native.get("expected_contract_confirmed") is not True:
+        raise ValueError("Native execution release is absent")
+    # Static success is recorded only after the four preceding stages actually pass.
+    native_release = {
+        "task": "P5-T3", "execution_released": True, "ordered_static_passed": True,
+        "independent_review_closed": True, "source_bindings": MANIFEST["bindings"],
+        "fixture_receipt_sha256": native["fixture_receipt_sha256"],
+        "harness_sha256": native["harness_sha256"], "static_receipts": list(RECEIPTS),
+        "candidate_sha256": sha(MANIFEST_PATH.read_bytes()),
+    }
+    write(path_of(native["release_path"]), native_release)
+    run(5, "native", [path_of(native["harness_path"]), path_of(native["fixture_receipt"]), path_of(native["result_path"]),
+                       "--release", path_of(native["release_path"])], module=False,
+        timeout=MANIFEST["timeouts"]["native"],
+        environment={"PYTHONPATH": os.pathsep.join((str(ROOT), str(ROOT / "packages/discovery-runtime/src")))})
+    native_result = json.loads(path_of(native["result_path"]).read_bytes())
+    if native_result["state"] != "native-composition-passed" or not all(item["passed"] for item in native_result["checks"]):
+        raise AssertionError("Native composition result is incomplete")
+    databases = []
+    # Separate fresh processes reverse every node within each approved disjoint batch.
+    for label in MANIFEST["batch_order"]:
+        nodes = list(reversed(node_groups[label]))
+        database = SCRATCH / f"p5t3-final-{RUN_ID}-{label}.coverage"
+        coverage_path = SCRATCH / f"p5t3-final-{RUN_ID}-{label}-coverage.json"
+        payload = run(6, label, ["pytest", "-v", "-o", "addopts=", "-p", "no:cacheprovider", *nodes,
+                      *["--cov=" + target for target in MANIFEST["coverage_targets"]], "--cov-branch",
+                      "--cov-report=term-missing", "--cov-report=json:" + str(coverage_path)],
+                      timeout=MANIFEST["timeouts"][label], environment={"COVERAGE_FILE": str(database)})
+        observed = passed_nodes(payload)
+        if observed != nodes:
+            raise AssertionError((label, "Executed nodes or order differ from the frozen population"))
+        databases.append(database)
+        BATCHES.append({"label": label, "nodes": observed, "coverage": "SCRATCH/" + coverage_path.name,
+                        "coverage_sha256": sha(coverage_path.read_bytes())})
+    combined = SCRATCH / f"p5t3-final-{RUN_ID}-combined.coverage"
+    combined_json = SCRATCH / f"p5t3-final-{RUN_ID}-combined-coverage.json"
+    environment = {"COVERAGE_FILE": str(combined)}
+    run(6, "coverage-combine", ["coverage", "combine", "--keep", *databases], environment=environment)
+    run(6, "coverage-json", ["coverage", "json", "-o", combined_json], environment=environment)
+    coverage_result = SCRATCH / f"p5t3-final-{RUN_ID}-coverage-result.json"
+    run(6, "coverage-proof", [SCRATCH / "final_coverage.py", MANIFEST_PATH, combined_json, coverage_result], module=False)
+    contracts = run(7, "contracts", ["pytest", "-v", "-o", "addopts=", "-p", "no:cacheprovider",
+                                    "--no-cov", *MANIFEST["contracts"]], timeout=MANIFEST["timeouts"]["contracts"])
+    if passed_nodes(contracts) != MANIFEST["contracts"]:
+        raise AssertionError("Contract population or order differs from release")
+    finished = datetime.datetime.now(datetime.timezone.utc)
+    result = {"task": "P5-T3", "status": "FINAL_GATES_PASSED_ACCEPTANCE_PENDING",
+              "timestamp": finished.strftime("%Y-%m-%dT%H-%M"), "started_at": STARTED.isoformat(),
+              "finished_at": finished.isoformat(), "candidate_sha256": sha(MANIFEST_PATH.read_bytes()),
+              "receipts": RECEIPTS, "batches": BATCHES, "node_count": len(flat),
+              "contracts": MANIFEST["contracts"], "native": native_result,
+              "coverage": json.loads(coverage_result.read_bytes()), "bindings": bindings(),
+              "retained_proof": MANIFEST["retained_proof"], "raw_files": RAW_FILES,
+              "limitations": MANIFEST["limitations"]}
+    path = QA / ("p5t3-final-handoff." + result["timestamp"] + ".json")
+    write(path, result)
+    print(json.dumps({"handoff": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes())}), flush=True)
+
+
+if __name__ == "__main__":
+    main()

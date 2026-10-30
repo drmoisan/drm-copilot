@@ -1,0 +1,19 @@
+{
+  "command": "poetry run python SCRATCH/issue-980-p5t1-final-bind.py",
+  "decode_verified": true,
+  "exit_code": 1,
+  "observed_combined_output": "Traceback (most recent call last):\n  File \"SCRATCH\\issue-980-p5t1-final-bind.py\", line 68, in <module>\n    assert len(new_nodes) == 138\n           ^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+  "observed_output": "H4sIAAAAAAAC/22OwWoCQRBE7/sVjScFJ0QkYZUYkKgnc9PboLSzndCkt2eYHjX791kk4MU61aEer3YZA50w/MCwjVYgUyAtEFAEBK2M5hXAhoVg8DH3e6NsfoX6GdlQ/TKlFRb029gDfkdt8iE29OuEvjF0rmEL8UK582x2Jjern+/NpZcycV+sKO7E2jylbjAGYSV4rcfACm9tbM5C7/0FALReXkBIh0rXo/YeG8FiAZNpfRv85/Ao1fJGc9R1zjFXf2FzHdr3AAAA",
+  "observed_output_bytes": 247,
+  "observed_output_encoding": "base64(gzip(UTF-8 transcription of tool response))",
+  "observed_output_sha256": "161511186bc446456abc14a886621b0ade758ac83e47be2f22add9966e3a29b4",
+  "original_harness": {
+    "identifier": "SCRATCH/issue-980-p5t1-final-bind-before-node-correction.py",
+    "sha256": "cb594bd65d245f71368acc83ca050bc34b4531b7b13c8062aa13676aecfcf2fb"
+  },
+  "qualification": "This preparation attempt did not capture process stdout/stderr independently. The exact displayed traceback is retained as a UTF-8 transcription; no claim is made about original process stream bytes. No final suites or canonical candidate snapshots had run.",
+  "reported_elapsed_seconds": 1.3631,
+  "resolution": "The bound 136-node original population contained two old single-mode IDs. Those IDs were replaced by four executed mode-qualified IDs, yielding the approved 138 callers. No test was added, removed or rerun for this correction.",
+  "timestamp": "2026-10-20T04-29",
+  "timing_source": "tool result"
+}

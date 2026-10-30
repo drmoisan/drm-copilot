@@ -152,3 +152,85 @@ def _test_claude_fixture_review_maps_rules_to_shared_skills() -> None:
 globals()[
     "test_claude_fixture_review_run_maps_rules_to_shared_skills_without_failing"
 ] = _test_claude_fixture_review_maps_rules_to_shared_skills
+
+
+def test_native_surfaces_fixture_publishes_github_hooks_through_approved_mappings() -> (
+    None
+):
+    """Deliver GitHub hook surfaces natively while unrelated paths stay unsupported."""
+
+    recording_fs = RecordingFileSystem()
+    result = run_review_mode(
+        RunOptions(
+            mode="review",
+            source_root=_fixture_root("native_surfaces"),
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            selected_paths=(),
+            destination_root=None,
+            artifact_root=Path("virtual/end-to-end/native-surfaces"),
+        ),
+        fs=recording_fs,
+    )
+
+    targets = {
+        record.source_path: record.target_path for record in result.mapping_records
+    }
+
+    assert targets[".github/hooks/discovery-pre-tool.ps1"] == (
+        ".codex/hooks/discovery-pre-tool.ps1"
+    )
+    assert targets[".github/hooks/discovery.json"] == ".codex/config.toml"
+    assert targets[".github/hooks/README.md"] is None
+    # Workflows are not an inventoried surface, so no record exists for them.
+    assert ".github/workflows/ci.yml" not in targets
+    assert not any(
+        finding.code == "unsupported-ecosystem"
+        and finding.source_path == ".github/hooks/README.md"
+        for finding in result.validation_findings
+    )
+    hook_output = next(
+        content
+        for path, content in recording_fs.files.items()
+        if path.endswith("proposed-tree/.codex/hooks/discovery-pre-tool.ps1")
+    )
+    assert hook_output.startswith("# Converted hook\n")
+    assert ".codex/lib/discovery-validation/DiscoveryValidation.psm1" in hook_output
+
+
+def test_native_surfaces_fixture_publishes_claude_helpers_verbatim() -> None:
+    """Emit shared PowerShell helpers verbatim under `.codex/lib` after rewrites."""
+
+    recording_fs = RecordingFileSystem()
+    result = run_review_mode(
+        RunOptions(
+            mode="review",
+            source_root=_fixture_root("native_surfaces"),
+            source_ecosystem=SourceEcosystem.CLAUDE,
+            selected_paths=(),
+            destination_root=None,
+            artifact_root=Path("virtual/end-to-end/native-surfaces"),
+        ),
+        fs=recording_fs,
+    )
+
+    targets = {
+        record.source_path: record.target_path for record in result.mapping_records
+    }
+    helper_source = ".claude/lib/discovery-validation/DiscoveryValidation.psm1"
+    helper_output = next(
+        content
+        for path, content in recording_fs.files.items()
+        if path.endswith(
+            "proposed-tree/.codex/lib/discovery-validation/DiscoveryValidation.psm1"
+        )
+    )
+
+    assert (
+        targets[helper_source]
+        == ".codex/lib/discovery-validation/DiscoveryValidation.psm1"
+    )
+    assert targets[".claude/lib/bash/parallel-common.sh"] is None
+    assert not helper_output.startswith("# Converted hook")
+    assert "function Test-FixtureDiscoveryAuthority" in helper_output
+    assert "imported from .codex/lib/discovery-validation/" in helper_output
+    assert ".claude/lib/" not in helper_output

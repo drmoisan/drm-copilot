@@ -70,6 +70,18 @@ Describe 'Codex validate-codex-subagent-routing coverage (issue #786)' {
         It 'allows a matching attestation' {
             Invoke-CodexSubagentStopDecision -PayloadRaw '{"agent_type":"pr-author","agent_id":"a","model":"m1"}' -AttestationRaw '{"agent_type":"pr-author","agent_id":"a","routing_valid":true,"actual_model":"m1"}' | Should -BeNullOrEmpty
         }
+
+        It 'gates discovery specialist <AgentType> on a discovery-invocation start attestation (issue #980)' -ForEach @(
+            @{ AgentType = 'legacy-parity-analyst' }, @{ AgentType = 'requirements-reconciler-c3-elevated' }
+        ) {
+            Test-CodexStopGatedAgent -AgentType $AgentType | Should -BeTrue
+            Test-CodexStopDiscoveryAgent -AgentType $AgentType | Should -BeTrue
+            Test-CodexStopDiscoveryAgent -AgentType 'pr-author' | Should -BeFalse
+            $payload = "{`"agent_type`":`"$AgentType`",`"agent_id`":`"a`",`"model`":`"m1`"}"
+            (Invoke-CodexSubagentStopDecision -PayloadRaw $payload -AttestationRaw '').reason | Should -Match 'MODEL_ROUTING_ATTESTATION_BLOCKED: no SubagentStart'
+            (Invoke-CodexSubagentStopDecision -PayloadRaw $payload -AttestationRaw "{`"agent_type`":`"$AgentType`",`"agent_id`":`"a`",`"routing_valid`":true,`"actual_model`":`"m1`"}").reason | Should -Match 'DISCOVERY_START_ATTESTATION_BLOCKED'
+            Invoke-CodexSubagentStopDecision -PayloadRaw $payload -AttestationRaw "{`"agent_type`":`"$AgentType`",`"agent_id`":`"a`",`"routing_valid`":true,`"actual_model`":`"m1`",`"receipt_kind`":`"discovery-invocation`"}" | Should -BeNullOrEmpty
+        }
     }
 
     Context 'Find-CodexStopAttestationRaw' {

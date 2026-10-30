@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:tool-authorization",
+  "title": "Discovery v2 one-use native tool authorization",
+  "description": "Only a protected native PreToolUse event can issue this record. Correlation IDs, shape-valid workspace copies and supplied hashes are never authorization. Consumers must recompute exact identity/input bindings, expiry and one-use state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "artifact_kind",
+    "id",
+    "authorization_ref",
+    "request_id",
+    "workspace",
+    "identity",
+    "tool",
+    "operation",
+    "input_sha256",
+    "invocation_ref",
+    "start_attestation_ref",
+    "capability_ref",
+    "issued_at",
+    "expires_at",
+    "state",
+    "consumed_at",
+    "writer"
+  ],
+  "properties": {
+    "$schema": {"const":"urn:drm-copilot:discovery:2.0.0:tool-authorization"},
+    "schema_version": {"const":"2.0.0"},
+    "artifact_kind": {"const":"tool-authorization"},
+    "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "authorization_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "request_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "workspace": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-binding"},
+    "identity": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/native-identity"},
+    "tool": {
+      "enum": [
+        "read_discovery_source",
+        "run_discovery_repo_inventory",
+        "run_discovery_dotnet_analyzer",
+        "run_discovery_vsto_analyzer",
+        "create_discovery_artifact",
+        "update_discovery_artifact",
+        "link_discovery_evidence",
+        "run_discovery_scenario_generation",
+        "run_discovery_report",
+        "validate_discovery_artifacts",
+        "finalize_discovery_agent",
+        "discovery_capability_sentinel"
+      ]
+    },
+    "operation": {
+      "enum": [
+        "profile",
+        "inventory",
+        "new-contract",
+        "new-scenario",
+        "update-artifact",
+        "link-evidence",
+        "validate-profile",
+        "validate-feature-contract",
+        "validate-coverage-ledger",
+        "validate-runtime-scenario",
+        "validate-parity-matrix",
+        "validate-unspecified-behavior",
+        "validate-product-decision",
+        "validate-evidence-reference",
+        "validate-decisions",
+        "validate-all",
+        "coverage-report",
+        "parity-report",
+        "completion-report",
+        "generate-acceptance",
+        "read-source",
+        "finalize-agent",
+        "sentinel"
+      ]
+    },
+    "input_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "invocation_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "start_attestation_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "capability_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "issued_at": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "expires_at": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "state": {"enum":["issued","consumed","revoked"]},
+    "consumed_at": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},{"type":"null"}]},
+    "writer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind","host","event_id","handler_sha256"],
+      "properties": {
+        "kind": {"const":"native-pretooluse"},
+        "host": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+        "event_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "handler_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}
+      }
+    }
+  },
+  "allOf": [
+    {"if":{"properties":{"state":{"const":"consumed"}},"required":["state"]},"then":{"properties":{"consumed_at":{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"}}}},
+    {"if":{"properties":{"state":{"const":"issued"}},"required":["state"]},"then":{"properties":{"consumed_at":{"type":"null"}}}}
+  ]
+}

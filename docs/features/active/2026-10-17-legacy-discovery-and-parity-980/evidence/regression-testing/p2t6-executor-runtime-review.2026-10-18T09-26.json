@@ -1,0 +1,18 @@
+{
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py": "c28af237ba20d505a4c10d2dcf68e2265d7705ee1efaf6f9b4529a666bccfd9c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce"
+  },
+  "results": [
+    {
+      "name": "same-source observed runtime supports source coverage",
+      "coverage": [],
+      "upstream": []
+    },
+    {
+      "name": "target runtime cannot satisfy source required characterization",
+      "coverage": [],
+      "upstream": []
+    }
+  ]
+}

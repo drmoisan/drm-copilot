@@ -1,0 +1,34 @@
+{
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_xml_input.py tests/discovery_runtime/analyzer/test_solution_input.py",
+  "duration_seconds": 1.169,
+  "exit_code": 1,
+  "finished_at": "2026-10-19T03:35:52.007693+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-parser-lint-033552.2026-10-19T03-35.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-parser-lint-033552.2026-10-19T03-35.stdout.txt",
+    "sha256": "a12cac4808392efd50284f049ea6536c7cebee01a6753cdaed1da9814ed82e3d"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f430f4807f5f22e8435c0e36f99f0b435cdeb1156b171672f19d78eefbd2b445",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6d8fc1e4625fb38d8bd260863be52480e8dd82eabde6633c472411062169a4d6"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f430f4807f5f22e8435c0e36f99f0b435cdeb1156b171672f19d78eefbd2b445",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6d8fc1e4625fb38d8bd260863be52480e8dd82eabde6633c472411062169a4d6"
+  },
+  "stage": "parser-lint",
+  "started_at": "2026-10-19T03:35:50.839781+00:00",
+  "stderr": "",
+  "stdout": "I001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_solution_input.py:3:1\n   |\n 1 |   \"\"\"Test solution-text declarations using bounded in-memory byte sequences.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from dataclasses import FrozenInstanceError, replace\n 6 | | from typing import cast\n 7 | |\n 8 | | import pytest\n 9 | | from drm_copilot_discovery.analyzer.solution_input import (\n10 | |     SolutionEntry,\n11 | |     SolutionInputError,\n12 | |     parse_solution,\n13 | | )\n14 | | from hypothesis import given, strategies as st\n   | |______________________________________________^\n15 |\n16 |   HEADER = \"Microsoft Visual Studio Solution File, Format Version 12.00\\n\"\n   |\nhelp: Organize imports\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_solution_input.py:121:89\n    |\n119 |     text = solution().replace(\n120 |         \"EndProject\",\n121 |         \"ProjectSection(Unresolved) = preProject\\n X = Y\\nEndProjectSection\\nEndProject\",\n    |                                                                                         ^\n122 |     )\n123 |     assert len(parse((text + \"Global\\nEndGlobal\\n\").encode())) == 1\n    |\n\nB010 [*] Do not call `setattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_solution_input.py:171:9\n    |\n169 |     entry = parse(solution().encode())[0]\n170 |     with pytest.raises(FrozenInstanceError):\n171 |         setattr(entry, \"path\", \"other\")\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\nhelp: Replace `setattr` with assignment\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_xml_input.py:3:1\n   |\n 1 |   \"\"\"Exercise secure XML byte parsing with immutable, isolated in-memory inputs.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from dataclasses import FrozenInstanceError, replace\n 6 | | from types import SimpleNamespace\n 7 | | from typing import cast\n 8 | |\n 9 | | import pytest\n10 | | from drm_copilot_discovery.analyzer import xml_input\n11 | | from drm_copilot_discovery.analyzer.xml_input import XmlInputError, XmlNode, parse_xml\n12 | | from hypothesis import given, strategies as st\n   | |______________________________________________^\n   |\nhelp: Organize imports\n\nE501 Line too long (124 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_xml_input.py:33:89\n   |\n31 |     Returns None; assertions fail on changes. Only in-memory byte parsing occurs.\n32 |     \"\"\"\n33 |     content = '<Project xmlns=\"urn:synthetic\" Z=\"2\" A=\"1\">\\r\\n <Name>\u00c9tat &amp; \u03a9</Name>\\r\\n <Empty/>\\r\\n</Project>'.encode(\n   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n34 |         encoding\n35 |     )\n   |\n\nE501 Line too long (115 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_xml_input.py:56:89\n   |\n54 |     Returns None; AssertionError signals a mismatch. No arguments, I/O or mutation.\n55 |     \"\"\"\n56 |     content = b'<?synthetic instruction?>\\n<Project>\\n<!-- comment -->\\n <Reference\\n Include=\"A\"\\n />\\n</Project>'\n   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n57 |     nodes = parse(content)\n58 |     assert len(nodes) == 2 and nodes[1].tag == \"Reference\"\n   |\n\nB010 [*] Do not call `setattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_xml_input.py:232:9\n    |\n230 |     node = XmlNode(tag=\"Child\", attributes=(), text=\"\", line=2, parent=0)\n231 |     with pytest.raises(FrozenInstanceError):\n232 |         setattr(node, \"line\", 9)\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n233 |     assert node.line == 2 and node.parent == 0\n    |\nhelp: Replace `setattr` with assignment\n\nFound 7 errors.\n[*] 4 fixable with the `--fix` option.\n",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-35"
+}

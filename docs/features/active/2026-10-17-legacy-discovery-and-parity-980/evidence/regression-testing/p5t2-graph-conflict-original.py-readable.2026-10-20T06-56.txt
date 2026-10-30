@@ -1,0 +1,396 @@
+"""Aggregate parity counts from retained outcomes and authoritative source scope."""
+
+from __future__ import annotations
+
+from collections import Counter
+from typing import TYPE_CHECKING, cast
+
+from drm_copilot_discovery.coverage_population import (
+    CoveragePopulation,
+    record_identity,
+)
+from drm_copilot_discovery.models import JsonObject
+from drm_copilot_discovery.report_models import ReportBudget, bounded_object, ratio
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.claim_rules import ClaimValidation
+    from drm_copilot_discovery.coverage_population import Identity
+    from drm_copilot_discovery.decision_rules import DecisionValidation
+    from drm_copilot_discovery.dimension_rules import (
+        DimensionValidation,
+        FeatureObligation,
+    )
+    from drm_copilot_discovery.evidence_rules import EvidenceValidation
+    from drm_copilot_discovery.findings import Finding
+    from drm_copilot_discovery.parity_models import (
+        ParityDimensionOutcome,
+        ParityEntryOutcome,
+        ParityValidation,
+    )
+    from drm_copilot_discovery.references import ArtifactRecord, ReferenceIndex
+    from drm_copilot_discovery.snapshot import DiscoverySnapshot
+
+STATES = (
+    "unassessed",
+    "full",
+    "partial",
+    "missing",
+    "conflicting",
+    "intentionally-changed",
+    "retired",
+)
+
+
+def _reference(record: ArtifactRecord) -> dict[str, object]:
+    """Return the fixed identity of record (ArtifactRecord), without I/O.
+
+    Retains captured physical location and repository pin; never resolves or
+    authenticates a reference. Caller reserves the resulting output before use.
+    """
+    return {
+        "repository": record.repository,
+        "revision": record.artifact.repository.revision,
+        "id": record.id,
+        "path": record.artifact.path,
+        "pointer": record.pointer,
+    }
+
+
+class ParityProjection:
+    """Aggregate retained rule outcomes over authoritative source scope.
+
+    Construct with the composer's typed assessments, then project once. Work
+    units count row/axis visits; output bytes/nodes are separately reserved before
+    retention. Only private containers change. No I/O, reassessment or approval.
+    """
+
+    def __init__(
+        self,
+        snapshot: DiscoverySnapshot,
+        index: ReferenceIndex,
+        evidence: EvidenceValidation,
+        claims: ClaimValidation,
+        decisions: DecisionValidation,
+        dimensions: DimensionValidation,
+        parity: ParityValidation,
+        findings: tuple[Finding, ...],
+    ) -> None:
+        """Initialize local state from captured assessments; return None without I/O.
+
+        snapshot (DiscoverySnapshot), index (ReferenceIndex), evidence
+        (EvidenceValidation) and claims (ClaimValidation) define source scope.
+        decisions (DecisionValidation), dimensions (DimensionValidation) and parity
+        (ParityValidation) retain eligibility and outcomes. findings
+        (tuple[Finding]) carries complete diagnostics. ReportLimitError rejects
+        excess indexing. Caller-created assessments grant no authority.
+        """
+        self.population = CoveragePopulation(
+            snapshot, index, evidence, claims, findings
+        )
+        self.decisions, self.dimensions, self.parity = decisions, dimensions, parity
+        self.output = ReportBudget(snapshot.profile.limits.parse_limits())
+        self.by_obligation: dict[
+            tuple[Identity, str | None], list[ParityEntryOutcome]
+        ] = {}
+
+    def entries(self) -> tuple[dict[str, object], list[dict[str, object]]]:
+        """Return authored totals/invalid locations and explicit blocker records.
+
+        Retained booleans define eligibility independently of truncated findings.
+        Raises ReportLimitError before excess traversal/retention; no I/O occurs.
+        """
+        states, valid_states = dict.fromkeys(STATES, 0), dict.fromkeys(STATES, 0)
+        invalid: list[dict[str, object]] = []
+        blockers: list[dict[str, object]] = []
+        rows: dict[tuple[str, str], JsonObject] = {}
+        budget = self.population.budget
+        budget.work(len(self.population.index.records) + len(self.parity.entries))
+        # Index authored rows once so every outcome has constant-time blocker lookup.
+        for record in self.population.index.records:
+            values = (
+                record.document.get("entries")
+                if record.kind == "parity-matrix"
+                else None
+            )
+            if not isinstance(values, tuple):
+                continue
+            budget.work(len(values))
+            # Physical record/pointer identity never merges same-named foreign rows.
+            for position, row in enumerate(values):
+                if isinstance(row, JsonObject):
+                    rows[(record.artifact.path, f"/entries/{position}")] = row
+        valid = complete = unresolved_source = unresolved_target = duplicates = 0
+        # Authored states survive invalid references, but cannot enter verified counts.
+        for item in self.parity.entries:
+            if item.authored_state in states:
+                states[item.authored_state] += 1
+                valid_states[item.authored_state] += item.valid
+            valid += item.valid
+            complete += item.complete
+            unresolved_source += item.source is None
+            unresolved_target += item.target is None
+            duplicates += item.duplicate
+            if item.source is not None:
+                key = (
+                    record_identity(
+                        item.source, str(item.source.document.get("feature_id"))
+                    ),
+                    item.client_id,
+                )
+                self.by_obligation.setdefault(key, []).append(item)
+            location = {**_reference(item.matrix), "pointer": item.pointer}
+            if not item.valid:
+                self.output.check(location)
+                invalid.append(location)
+            row = rows.get((item.matrix.artifact.path, item.pointer))
+            authored = row.get("blockers") if row is not None else None
+            if isinstance(authored, tuple):
+                budget.work(len(authored))
+                # Preserve every authored blocker with its exact row location.
+                for text in authored:
+                    value = {**location, "blocker": text}
+                    self.output.check(value)
+                    blockers.append(value)
+        return {
+            "total": len(self.parity.entries),
+            "valid": valid,
+            "invalid": len(self.parity.entries) - valid,
+            "complete": complete,
+            "unresolved_source": unresolved_source,
+            "unresolved_target": unresolved_target,
+            "duplicate_rows": duplicates,
+            "state_counts": states,
+            "valid_state_counts": valid_states,
+            "invalid_entries": invalid,
+        }, blockers
+
+    def axes(
+        self,
+        obligation: FeatureObligation,
+        entry: ParityEntryOutcome | None,
+    ) -> list[dict[str, object]]:
+        """Return dimension rows for obligation and its unique entry, if present.
+
+        Parameters are FeatureObligation/ParityEntryOutcome|None. Optional fixed
+        axes never become passes. Custom modes use retained aggregate coordinate
+        proof. Retired completion is disposition, not execution. Resource excess
+        raises ReportLimitError; all mutation is private.
+        """
+        requirements = obligation.requirements
+        self.population.budget.work(
+            len(requirements.dimensions)
+            + len(requirements.modes)
+            + len(requirements.platforms)
+            + (len(entry.dimensions) if entry else 0)
+        )
+        required = set(requirements.dimensions) | set(requirements.modes)
+        if "mobile" in requirements.platforms:
+            required.add("mobile")
+        values: dict[str, list[ParityDimensionOutcome]] = {}
+        # Direct/nested representations form one axis with combined validity.
+        for dimension in entry.dimensions if entry else ():
+            values.setdefault(dimension.name, []).append(dimension)
+        names = required | values.keys() | {"online", "offline", "mobile"}
+        self.population.budget.work(len(names))
+        result: list[dict[str, object]] = []
+        # Stable names make client output independent of authored map insertion order.
+        for name in sorted(names):
+            parts = values.get(name, [])
+            self.population.budget.work(3 * len(parts))
+            # All authored representations must agree before a single value is reported.
+            applicability = {part.applicability for part in parts}
+            verification = {part.verification for part in parts}
+            needed = obligation.required and name in required
+            eligible = entry is not None and entry.valid and not entry.duplicate
+            retired = (
+                entry is not None
+                and eligible
+                and entry.authored_state == "retired"
+                and entry.complete
+            )
+            custom = name in requirements.modes and name not in {
+                "online",
+                "offline",
+                "mobile",
+            }
+            # Explicit classifications precede required custom-coordinate proof;
+            # otherwise absence distinguishes unknown requirements from optional axes.
+            if parts:
+                applicable = (
+                    (next(iter(applicability)) or "unspecified")
+                    if len(applicability) == 1
+                    else "conflicting"
+                )
+                verified = (
+                    eligible
+                    and applicability == {"applicable"}
+                    and verification == {"passed"}
+                    and all(part.valid and part.proof_valid is True for part in parts)
+                )
+                disposed = (
+                    eligible
+                    and applicability == {"not-applicable"}
+                    and all(part.valid and part.disposition_valid for part in parts)
+                )
+            elif custom:
+                applicable = "applicable"
+                verified = (
+                    entry is not None and eligible and entry.verification_valid is True
+                )
+                disposed = False
+            else:
+                applicable = "unspecified" if name in required else "not-required"
+                verified = disposed = False
+            row: dict[str, object] = {
+                "name": name,
+                "required": int(needed),
+                "applicable": int(applicable == "applicable"),
+                "not_required": int(applicable == "not-required"),
+                "unspecified": int(applicable == "unspecified"),
+                "conflicting": int(applicable == "conflicting"),
+                "not_applicable": int(applicable == "not-applicable"),
+                "disposed": int(disposed),
+                "retired": int(retired),
+                "verified": int(verified and not retired),
+                "required_verified": int(needed and verified and not retired),
+                "required_pending": int(
+                    needed and not (verified or disposed or retired)
+                ),
+            }
+            self.output.check(row)
+            result.append(row)
+        return result
+
+    def project(self, unavailable: JsonObject) -> JsonObject:
+        """Return bounded metrics or unavailable (JsonObject) for absent scope.
+
+        Unavailable source scope produces null metrics, not inferred completion.
+        Raises ReportLimitError on work/output excess without partial results.
+        Uses retained assessments only, with no external effects or reassessment.
+        """
+        self.population.collect()
+        if not self.population.available:
+            return unavailable
+        entries, blockers = self.entries()
+        required: set[Identity] = set()
+        incomplete: set[Identity] = set()
+        obligations: dict[tuple[Identity, str | None], FeatureObligation] = {}
+        self.population.budget.work(len(self.dimensions.obligations))
+        # Distinct source identities and configured clients define the denominator.
+        for item in self.dimensions.obligations:
+            key = record_identity(
+                item.feature, str(item.feature.document.get("feature_id"))
+            )
+            if key in self.population.features:
+                obligations[(key, item.client_id)] = item
+        clients: dict[str | None, dict[str, Counter[str]]] = {}
+        totals = Counter[str]()
+        self.population.budget.work(len(obligations))
+        # Missing rows remain obligations; duplicates cannot select a proof.
+        for (identity, client), obligation in obligations.items():
+            matches = self.by_obligation.get((identity, client), [])
+            entry = matches[0] if len(matches) == 1 else None
+            completed = (
+                entry is not None
+                and entry.valid
+                and entry.complete
+                and not entry.duplicate
+            )
+            totals["total"] += 1
+            totals["required"] += obligation.required
+            totals["completed_required"] += obligation.required and completed
+            totals["missing"] += not matches
+            totals["conflicting"] += len(matches) > 1
+            if obligation.required:
+                required.add(identity)
+                if not completed:
+                    incomplete.add(identity)
+            axes = clients.setdefault(client, {})
+            # Aggregate each feature/client/axis once, retaining optional status counts.
+            for row in self.axes(obligation, entry):
+                counts = axes.setdefault(str(row["name"]), Counter[str]())
+                counts["obligations"] += 1
+                # Fixed integer fields are counts, never coercions of authored state.
+                for name, count in row.items():
+                    if name != "name":
+                        counts[name] += cast("int", count)
+        client_rows: list[dict[str, object]] = []
+        self.population.budget.work(len(clients))
+        # Sort only stable identifiers; null denotes missing client context explicitly.
+        for client, axes in sorted(clients.items(), key=lambda pair: pair[0] or ""):
+            self.population.budget.work(len(axes))
+            # Each nested object is already bounded before this final detached copy.
+            value: dict[str, object] = {
+                "client_id": client,
+                "dimensions": {
+                    name: {
+                        **dict(counts),
+                        "verification": ratio(
+                            counts["required_verified"],
+                            counts["required"],
+                            unit="required feature/client/dimension obligations",
+                        ),
+                    }
+                    for name, counts in sorted(axes.items())
+                },
+            }
+            self.output.check(value)
+            client_rows.append(value)
+        approved: set[tuple[str, str]] = set()
+        self.population.budget.work(
+            len(self.decisions.approved) + len(self.population.index.records)
+        )
+        # Physical identity prevents same-ID records from borrowing approval.
+        for item in self.decisions.approved:
+            approved.add((item.record.artifact.path, item.record.pointer))
+        unresolved: list[dict[str, object]] = []
+        # Rejected/superseded proposals remain history, not current blockers.
+        for record in self.population.index.records:
+            status = record.document.get("status")
+            if record.kind == "product-decision" and (
+                status in {"proposed", "blocked"}
+                or status == "approved"
+                and (record.artifact.path, record.pointer) not in approved
+            ):
+                value = {**_reference(record), "status": status}
+                self.output.check(value)
+                unresolved.append(value)
+        # Fixed counters include zero values even when the confirmed scope is empty.
+        obligation_counts = {
+            name: totals[name]
+            for name in (
+                "total",
+                "required",
+                "completed_required",
+                "missing",
+                "conflicting",
+            )
+        }
+        return bounded_object(
+            {
+                "population_state": "available",
+                "source_features": {
+                    "total": len(self.population.features),
+                    "required": len(required),
+                    "completed_required": len(required - incomplete),
+                },
+                "feature_client_obligations": obligation_counts,
+                "entries": entries,
+                "clients": client_rows,
+                "blockers": blockers,
+                "unresolved_decisions": unresolved,
+                "metrics": {
+                    "feature_completion": ratio(
+                        len(required - incomplete),
+                        len(required),
+                        unit="required source-feature identities",
+                    ),
+                    "client_completion": ratio(
+                        totals["completed_required"],
+                        totals["required"],
+                        unit="required feature/client obligations",
+                    ),
+                },
+            },
+            limits=self.population.snapshot.profile.limits.parse_limits(),
+        )

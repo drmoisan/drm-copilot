@@ -1,0 +1,107 @@
+"""Bind the independent native stage without running it or changing the candidate."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+scratch = Path(__file__).resolve().parent
+qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+candidate_path = Path(sys.argv[1])
+candidate = json.loads(candidate_path.read_bytes())
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def sha(data):
+    """Hash exact supplied bytes."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def bind(path):
+    """Return a portable exact-byte binding."""
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+native = scratch / "issue-980-p5t1-final-native.py"
+native_bytes = native.read_bytes()
+ast.parse(native_bytes)
+assert b"\r" not in native_bytes and native_bytes.endswith(b"\n") and not native_bytes.endswith(b"\n\n")
+assert sum(isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "check"
+           for node in ast.walk(ast.parse(native_bytes))) == 14
+for path, expected in candidate["bindings"].items():
+    assert sha(Path(path).read_bytes()) == expected, path
+runner = (scratch / "issue-980-p5t1-final-gates.py").read_text(encoding="utf-8")
+prefix = runner.split("\nbinding()\ncode = ", 1)[0]
+assert prefix != runner
+native_hash = sha(native_bytes)
+tail = '''
+binding()
+assert sha((scratch / "issue-980-p5t1-final-native.py").read_bytes()) == NATIVE_HASH
+stage_summary_path = Path(sys.argv[2])
+stage_summary = json.loads(stage_summary_path.read_bytes())
+assert stage_summary["candidate_sha256"] == sha(manifest_path.read_bytes())
+assert stage_summary["unit_count"] == 187 and len(stage_summary["contract_nodes"]) == 4
+assert all(item["exit_code"] == 0 for item in stage_summary["receipts"])
+native_result_path = scratch / ("issue-980-p5t1-final-" + run_id + "-native-result.raw.json")
+record = run(7, "native", [scratch / "issue-980-p5t1-final-native.py", native_result_path],
+    module=False, timeout=manifest["timeout_seconds"]["native"])
+native_result = json.loads(native_result_path.read_bytes())
+assert native_result["passed"] == len(native_result["checks"]) == 14
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+result_path = qa / ("p5t1-final-native-result." + stamp + ".json")
+write(result_path, native_result)
+raw_files.append({"path": "SCRATCH/" + native_result_path.name, "sha256": sha(native_result_path.read_bytes()),
+                  "bytes": native_result_path.stat().st_size})
+summary_path = qa / ("p5t1-final-stage7." + stamp + ".json")
+write(summary_path, {"candidate": manifest_path.as_posix(), "candidate_sha256": sha(manifest_path.read_bytes()),
+    "stages1_6": {"path": stage_summary_path.as_posix(), "sha256": sha(stage_summary_path.read_bytes())},
+    "receipts": receipts, "result": {"path": result_path.as_posix(), "sha256": sha(result_path.read_bytes())},
+    "raw_files": raw_files, "binding_sha256": binding(), "native_harness_sha256": NATIVE_HASH})
+print(json.dumps({"stage7": summary_path.as_posix(), "passed": 14, "seconds": record["seconds"]}), flush=True)
+'''.replace("NATIVE_HASH", repr(native_hash))
+wrapper = scratch / "issue-980-p5t1-final-native-gate.py"
+assert not wrapper.exists()
+wrapper.write_text(prefix + "\n" + tail.strip() + "\n", encoding="utf-8", newline="\n")
+ast.parse(wrapper.read_bytes())
+harnesses = {}
+for path in (native, wrapper, Path(__file__)):
+    data = path.read_bytes()
+    assert b"\r" not in data and data.endswith(b"\n") and not data.endswith(b"\n\n")
+    destination = qa / (path.stem.removeprefix("issue-980-") + "-harness." + stamp + ".txt")
+    assert not destination.exists()
+    destination.write_bytes(data)
+    harnesses[path.name] = bind(destination)
+result = {"timestamp": stamp, "candidate": bind(candidate_path), "harnesses": harnesses,
+    "stage": 7, "assertions": candidate["native_assertions"], "count": 14, "timeout_seconds": 600,
+    "execution": "Run only after released stages 1-6 pass; no implementation or unit test changes.",
+    "preconditions": ["Real synthetic Git fixture commit outside the workspace.",
+        "Complete no-scope fixture from the accepted helper and actual configured revision.",
+        "All variant materialization precedes the measured read-only interval.",
+        "Actual capture_workspace/load_snapshot, trusted catalog, LocalGitReader and filesystem read primitives.",
+        "Report filenames use the loader's exact coverage-report.json/.md convention."],
+    "limitations": ["No publication, native coding-agent host or non-Windows claim.",
+        "Setup report generation is separately timed and is not a unit-suite rerun."],
+    "node_reconstruction_correction": {
+        "original_scratch_harness": "SCRATCH/issue-980-p5t1-final-bind-before-node-correction.py",
+        "original_sha256": sha((scratch / "issue-980-p5t1-final-bind-before-node-correction.py").read_bytes()),
+        "observed_exit_code": 1,
+        "observed_failure": "AssertionError at assert len(new_nodes) == 138 before candidate/harness evidence or suites were emitted.",
+        "correction": "Replace two prior unqualified node IDs with four executed mode-qualified IDs; final population remains 138.",
+        "candidate": bind(candidate_path)}}
+path = qa / ("p5t1-final-native-readiness." + stamp + ".json")
+assert not path.exists()
+path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+markdown = f"""# P5-T1 final native readiness
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-p5t1-final-native-ready.py <candidate>`
+EXIT_CODE: 0
+Output Summary: Fourteen assertions and exact native harnesses are bound; no behavioral suite or native composition ran during preparation.
+
+The candidate and 187-case population are unchanged. Six synthetic fixture variants use actual capture/loading during stage 7. Setup writes precede the measured read-only interval. Publication and installed-host verification are outside this proof.
+
+The first candidate-binding attempt stopped before suites at a node-count assertion. Two old review-node IDs required replacement by four executed mode-qualified IDs. The corrected manifest retains 138 callers; the original harness is retained for the final lossless archive.
+"""
+path.with_suffix(".md").write_text(markdown.rstrip() + "\n", encoding="utf-8", newline="\n")
+print(json.dumps({"readiness": bind(path), "assertions": 14, "harnesses": harnesses}, indent=2))

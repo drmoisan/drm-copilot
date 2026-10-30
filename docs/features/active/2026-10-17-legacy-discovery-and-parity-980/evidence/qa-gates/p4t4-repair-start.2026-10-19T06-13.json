@@ -1,0 +1,73 @@
+{
+  "original_candidate_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "preserved_path": "SCRATCH/original-reviewed/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "sha256": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "preserved_path": "SCRATCH/original-reviewed/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "sha256": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py",
+      "preserved_path": "SCRATCH/original-reviewed/tests/discovery_runtime/analyzer/test_configuration.py",
+      "sha256": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "preserved_path": "SCRATCH/original-reviewed/tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "sha256": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/application.config.txt",
+      "preserved_path": "SCRATCH/original-reviewed/tests/fixtures/discovery_analyzers/configuration/application.config.txt",
+      "sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/config.json.txt",
+      "preserved_path": "SCRATCH/original-reviewed/tests/fixtures/discovery_analyzers/configuration/config.json.txt",
+      "sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt",
+      "preserved_path": "SCRATCH/original-reviewed/tests/fixtures/discovery_analyzers/configuration/settings.ini.txt",
+      "sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt",
+      "preserved_path": "SCRATCH/original-reviewed/tests/fixtures/discovery_analyzers/configuration/settings.settings.txt",
+      "sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+    }
+  ],
+  "predecessor_proof": "Reuse unchanged baseline/freeze manifests; no predecessor suite rerun.",
+  "preserved_cases": 61,
+  "recorded_at": "2026-10-19T06:13:03.558045+00:00",
+  "repair_scope": [
+    "R1 prospective parser text/address and cross-file projected-output bounds",
+    "R2 one linear ConfigParser option grammar used at both matching sites",
+    "R3 immediate intent comments"
+  ],
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-review.2026-10-19T06-10.json",
+    "sha256": "eff5e903958412fc4fdf09b305481dd9788d905d8e2c4867969736a4d6b79990"
+  },
+  "routing": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p4t4_bounded_repair",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T4_bounded_repair",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-13"
+}

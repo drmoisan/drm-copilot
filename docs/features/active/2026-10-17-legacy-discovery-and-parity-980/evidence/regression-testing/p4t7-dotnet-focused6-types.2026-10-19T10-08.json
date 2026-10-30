@@ -1,0 +1,49 @@
+{
+  "stage": "types",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:08:10.316090+00:00",
+  "finished": "2026-10-19T10:08:12.240270+00:00",
+  "duration_seconds": 1.925,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+      "physical_lines": 332
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce",
+      "physical_lines": 408
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+      "physical_lines": 332
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce",
+      "physical_lines": 408
+    }
+  },
+  "shared_before": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+  "shared_after": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused6-types.100812240270.stdout.bin",
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_bytes": 194,
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused6-types.100812240270.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "aa3c72bdee8f69ec25f861fd8692ba76a074449790599bf3bbe6a221c6e4c47a"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}

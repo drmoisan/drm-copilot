@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-10-19T09-08",
+  "started_utc": "2026-10-19T09:08:04.424711+00:00",
+  "finished_utc": "2026-10-19T09:08:06.299129+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t6-ui-output-probe.py",
+  "exit_code": 0,
+  "manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-ui-freeze.2026-10-19T08-52.json",
+    "sha256": "7d990c2859f1b2b4968ae6dee52193b54c55791636bf988a0ba91d5f9f282eb9"
+  },
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "physical_lines": 458,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "physical_lines": 417,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_ui_callbacks.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_ui_callbacks.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "physical_lines": 241,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_ui_callback_limits.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_ui_callback_limits.py: eol: lf"
+      ]
+    }
+  ],
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-ui-output-probe-harness.2026-10-19T09-08.txt",
+    "sha256": "743d77af868cd4117fabc055e9a0b6cbe0e1dd4a7aaf6472808ec182c388fb94"
+  },
+  "cases": [
+    {
+      "case": "ascii",
+      "path_characters": 526,
+      "source_sha256": "581dc04a80500573458ba911ac522139a3f46c5b1a1cf06e8d5430a0923c9065",
+      "code_sha256": "fa36318b64783be510566a1b15a019b0d2d163a1cc7a98f30395d1a0ec21f4fe",
+      "reserved_bytes": 698648,
+      "canonical_utf8_bytes": 89842,
+      "ascii_escaped_compact_bytes": 89841,
+      "finding_count": 21,
+      "relationship_count": 21,
+      "canonical_bound_satisfied": true
+    },
+    {
+      "case": "bmp",
+      "path_characters": 526,
+      "source_sha256": "581dc04a80500573458ba911ac522139a3f46c5b1a1cf06e8d5430a0923c9065",
+      "code_sha256": "fa36318b64783be510566a1b15a019b0d2d163a1cc7a98f30395d1a0ec21f4fe",
+      "reserved_bytes": 698648,
+      "canonical_utf8_bytes": 123122,
+      "ascii_escaped_compact_bytes": 256241,
+      "finding_count": 21,
+      "relationship_count": 21,
+      "canonical_bound_satisfied": true
+    },
+    {
+      "case": "astral",
+      "path_characters": 526,
+      "source_sha256": "581dc04a80500573458ba911ac522139a3f46c5b1a1cf06e8d5430a0923c9065",
+      "code_sha256": "fa36318b64783be510566a1b15a019b0d2d163a1cc7a98f30395d1a0ec21f4fe",
+      "reserved_bytes": 698648,
+      "canonical_utf8_bytes": 189682,
+      "ascii_escaped_compact_bytes": 455921,
+      "finding_count": 21,
+      "relationship_count": 21,
+      "canonical_bound_satisfied": true
+    }
+  ],
+  "limitations": "Checks only this concrete UI projection reservation concern. Canonical UTF-8 is the authoritative serializer; ASCII-escaped length is diagnostic. No worker suite or predecessor review rerun."
+}

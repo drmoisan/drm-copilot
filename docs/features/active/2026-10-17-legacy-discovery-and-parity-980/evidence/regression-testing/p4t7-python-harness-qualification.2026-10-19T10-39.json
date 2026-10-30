@@ -1,0 +1,82 @@
+{
+  "status": "QUALIFIED_EXACT_RAW_EXECUTED_HARNESSES_ONLY",
+  "timestamp": "2026-10-19T10-39",
+  "command": "poetry run python SCRATCH/issue-980-python-harness-qualification.py",
+  "exit_code": 0,
+  "authority": {
+    "route": "source_inspection_p4t7_harness_qualification",
+    "profile_sha256": "6a4be9ed26fba66f7a437895b20c0b4f2d1534d1a6098c39c9fc796aa64bf363",
+    "native_routing_launch_provenance_verified": true
+  },
+  "allowable_evidence_only_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-gate-harness.2026-10-19T10-12.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-gate-harness.2026-10-19T10-32.txt"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-gate-harness.2026-10-19T10-12.txt",
+      "working_sha256": "a06974ab2ca23fd0c1e39f2c6695c83e63b9e4ecb8b39a0a9d788c181645d0f7",
+      "working_bytes": 3503,
+      "executed_payload": "SCRATCH/issue-980-p4t7-python-gate.py",
+      "executed_sha256": "a06974ab2ca23fd0c1e39f2c6695c83e63b9e4ecb8b39a0a9d788c181645d0f7",
+      "raw_payload_equals_working": true,
+      "frozen_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-freeze.2026-10-19T10-12.json",
+      "frozen_receipt_sha256": "1ec6826e8b621ff41bf5a38eb959a179541bf802e3cacd740bfff6915a08259a",
+      "frozen_artifact_hash_matches": true,
+      "gate_receipts": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-format.2026-10-19T10-11.json",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-lint.2026-10-19T10-11.json",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-types.2026-10-19T10-11.json",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-unit.2026-10-19T10-11.json"
+      ],
+      "index_blob": "e596bde7cc546d813ce54a85825bffd80d292783",
+      "index_mode": "100644",
+      "index_stage": "0",
+      "index_sha256": "5d5bdd2d499cacc5d9c6cbebc00dc2766e8cf6382d016e2da96949baadcebf01",
+      "index_bytes": 3500,
+      "transformation": "Replace every CRLF byte pair with LF; preserve all other bytes including terminal blank padding.",
+      "crlf_pairs_replaced": 3,
+      "index_equals_exact_transformation": true,
+      "terminal_blank_lines_preserved": 3,
+      "trailing_space_or_tab_lines": [],
+      "classification": "Captured executable payload; exact raw working bytes and normalized index representation are both bound."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-gate-harness.2026-10-19T10-32.txt",
+      "working_sha256": "21787e73aba9cc3169a31d2e6025a75493c3a8d72be08438fba550065c7460b7",
+      "working_bytes": 3612,
+      "executed_payload": "SCRATCH/issue-980-p4t7-python-repair-gate.py",
+      "executed_sha256": "21787e73aba9cc3169a31d2e6025a75493c3a8d72be08438fba550065c7460b7",
+      "raw_payload_equals_working": true,
+      "frozen_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-freeze.2026-10-19T10-32.json",
+      "frozen_receipt_sha256": "f1dcbc459210449e2a4bc938f26d391b04921725175e0e89885b3305a8309ec7",
+      "frozen_artifact_hash_matches": true,
+      "gate_receipts": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-format.2026-10-19T10-31.json",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-lint.2026-10-19T10-31.json",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-types.2026-10-19T10-31.json",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-unit.2026-10-19T10-31.json"
+      ],
+      "index_blob": "52e9bb815d9ae1d3668b0bd0ae3ca148efab2b58",
+      "index_mode": "100644",
+      "index_stage": "0",
+      "index_sha256": "2fd2a80d8bbf614be43762b7cf6e22c7930cd8886b9607dca6516b1c0c6f0f6c",
+      "index_bytes": 3608,
+      "transformation": "Replace every CRLF byte pair with LF; preserve all other bytes including terminal blank padding.",
+      "crlf_pairs_replaced": 4,
+      "index_equals_exact_transformation": true,
+      "terminal_blank_lines_preserved": 4,
+      "trailing_space_or_tab_lines": [],
+      "classification": "Captured executable payload; exact raw working bytes and normalized index representation are both bound."
+    }
+  ],
+  "initial_diagnostic": {
+    "command": "git diff --cached --check -- docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-gate-harness.2026-10-19T10-12.txt docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-gate-harness.2026-10-19T10-32.txt",
+    "exit_code": 2,
+    "stdout": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-gate-harness.2026-10-19T10-12.txt:61: new blank line at EOF.\ndocs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-gate-harness.2026-10-19T10-32.txt:61: new blank line at EOF.\n",
+    "stdout_sha256": "231c016852671a630613d8942e233d3a8794b9c5ddb28a3fdce65307357095e5",
+    "stderr": "",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "qualification": "Only the two exact line61 terminal-blank diagnostics are allowed. No additional authored trailing-space/tab issue exists. Raw harnesses, source/tests, original evidence and index remain unchanged. No tests rerun or predecessor manifests recaptured."
+}

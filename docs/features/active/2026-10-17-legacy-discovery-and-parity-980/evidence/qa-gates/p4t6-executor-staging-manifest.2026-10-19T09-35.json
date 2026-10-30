@@ -1,0 +1,89 @@
+{
+  "task": "P4-T6",
+  "scope": "Verifier-owned untracked evidence and the single plan checkoff; worker evidence remains indexed by its handoff.",
+  "staging_performed": false,
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-acceptance-harness.2026-10-19T09-35.txt",
+      "working_sha256": "ae131d8bff9276ed59ea136ad4151971acfc52fa5d8f4f6bc2ded8cc5a2fd8a9",
+      "expected_lf_blob_sha256": "ae131d8bff9276ed59ea136ad4151971acfc52fa5d8f4f6bc2ded8cc5a2fd8a9",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-binding-harness.2026-10-19T09-15.txt",
+      "working_sha256": "38f7f86ab3238b3d279cc27151b047b5244e03ece8988ace7e7758ebb313f306",
+      "expected_lf_blob_sha256": "38f7f86ab3238b3d279cc27151b047b5244e03ece8988ace7e7758ebb313f306",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-binding.2026-10-19T09-15.json",
+      "working_sha256": "f2580ca269f112a97bb21344f9d5185cf58c7b34d90836f20793067e55ab7af4",
+      "expected_lf_blob_sha256": "f2580ca269f112a97bb21344f9d5185cf58c7b34d90836f20793067e55ab7af4",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-review.2026-10-19T09-18.json",
+      "working_sha256": "38d033308542311e956507ff3af5e5a8489938f24aa2b4a25a434eb0c5ffbe1e",
+      "expected_lf_blob_sha256": "38d033308542311e956507ff3af5e5a8489938f24aa2b4a25a434eb0c5ffbe1e",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-review.2026-10-19T09-18.md",
+      "working_sha256": "59beaa98c3893b179b4a2e71d15277bf209c3af87f00b55f03007628ffebd6e6",
+      "expected_lf_blob_sha256": "59beaa98c3893b179b4a2e71d15277bf209c3af87f00b55f03007628ffebd6e6",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-final-acceptance.2026-10-19T09-35.json",
+      "working_sha256": "ee119c0427b6b920e987dd0abe8b2c8e6ccec555accd3527b1e543f31f3a054c",
+      "expected_lf_blob_sha256": "ee119c0427b6b920e987dd0abe8b2c8e6ccec555accd3527b1e543f31f3a054c",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-final-acceptance.2026-10-19T09-35.md",
+      "working_sha256": "af78264489fa0bf7ee2917711e07b8dc4fe123ccf63024514ce72a924b9b6724",
+      "expected_lf_blob_sha256": "af78264489fa0bf7ee2917711e07b8dc4fe123ccf63024514ce72a924b9b6724",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-final-reconciliation-harness.2026-10-19T09-31.txt",
+      "working_sha256": "0646931504aff486f32333a2371fa53c848ae0a3b8d391e6d13671a4df50f96f",
+      "expected_lf_blob_sha256": "0646931504aff486f32333a2371fa53c848ae0a3b8d391e6d13671a4df50f96f",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-final-reconciliation.2026-10-19T09-31.json",
+      "working_sha256": "008c7d099c6ee963ac6e800639dc34961b76f73f172e832a763f3b658d2661ff",
+      "expected_lf_blob_sha256": "008c7d099c6ee963ac6e800639dc34961b76f73f172e832a763f3b658d2661ff",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-review-publication-harness.2026-10-19T09-18.txt",
+      "working_sha256": "0bb8e02980169452c4195628d7d6b6bd6a7693c1ef45f0c598d252495b1606c4",
+      "expected_lf_blob_sha256": "0bb8e02980169452c4195628d7d6b6bd6a7693c1ef45f0c598d252495b1606c4",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-ui-output-probe-harness.2026-10-19T09-08.txt",
+      "working_sha256": "743d77af868cd4117fabc055e9a0b6cbe0e1dd4a7aaf6472808ec182c388fb94",
+      "expected_lf_blob_sha256": "743d77af868cd4117fabc055e9a0b6cbe0e1dd4a7aaf6472808ec182c388fb94",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-ui-output-probe.2026-10-19T09-08.json",
+      "working_sha256": "2a2fffad7c227a76b2dca2a8e265fca719f421d64e4e376cbd9fe7b6d2e53b9f",
+      "expected_lf_blob_sha256": "2a2fffad7c227a76b2dca2a8e265fca719f421d64e4e376cbd9fe7b6d2e53b9f",
+      "crlf_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "2578a9e5b7ceb61df8fd6b43ad624d744d1536b4760f3f5448d50f951dae1750",
+      "expected_lf_blob_sha256": "7a5ce5270c9a9b8be70f4178cee22089c10dead84382420729c2913f45522a62",
+      "crlf_count": 559
+    }
+  ],
+  "manifest_self_excluded": true,
+  "normalization": "Evidence is UTF-8 LF. The plan working bytes retain CRLF; expected_lf_blob_sha256 qualifies Git text=auto/eol=lf publication and is not raw identity.",
+  "timestamp": "2026-10-19T09-35",
+  "published_utc": "2026-10-19T09:35:49.670599+00:00"
+}

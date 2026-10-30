@@ -1,0 +1,64 @@
+"""Bind the explicit P4-T7 final execution release to unchanged reviewed streams."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+root, scratch = Path.cwd(), Path(__file__).parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+def save(path, value):
+    assert not path.exists(), path
+    path.write_bytes((json.dumps(value, indent=2) + '\n').encode())
+
+
+preparation_path = qa / 'p4t7-final-preparation.2026-10-19T11-00.json'
+assert sha(preparation_path.read_bytes()) == '9ed734c49b60f1c1bff863af66c6ddef61ada1b7d4062824bef2a3c73334a76e'
+preparation = json.loads(preparation_path.read_bytes())
+source = scratch / preparation['candidate_manifest']['path'].removeprefix('SCRATCH/')
+assert sha(source.read_bytes()) == preparation['candidate_manifest']['sha256']
+candidate = json.loads(source.read_bytes())
+assert candidate['execution_released'] is False
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip() == 'b63840c3b00736a33ec14169b63a8ea68aa827f1'
+assert sha(Path('.codex/agents/python-typed-engineer-c4.toml').read_bytes()) == '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+for entry in candidate['files']:
+    assert sha(Path(entry['path']).read_bytes()) == entry['sha256']
+for entry in preparation['prepared_harnesses']:
+    assert sha((scratch / entry['path'].removeprefix('SCRATCH/')).read_bytes()) == entry['sha256']
+review_path = qa / 'p4t7-executor-integration-review.2026-10-19T11-03.json'
+assert sha(review_path.read_bytes()) == '0dfeef26d6d6c334df9489a57226a62610ef27c3c4617b81be2c813547c045a1'
+review = json.loads(review_path.read_bytes())
+assert review['status'] == 'INTEGRATION_REVIEW_PASS_READY_FOR_FINAL_GATES'
+assert not review['findings'] and not review['open_probes']
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+candidate.update(preparation_only=False, execution_released=True,
+    coordinator_release_receipt='workspace_operations_p4t7_final_gates / S5_P4T7_final_gates',
+    review=ref(review_path), preparation=ref(preparation_path), released_at=stamp,
+    committed_candidate='b63840c3b00736a33ec14169b63a8ea68aa827f1')
+candidate_path = scratch / ('issue-980-p4t7-final-candidate.released.' + stamp + '.json')
+save(candidate_path, candidate)
+harness_path = qa / ('p4t7-final-release-harness.' + stamp + '.txt')
+assert not harness_path.exists()
+harness_path.write_bytes(Path(__file__).read_bytes())
+record = {'timestamp': stamp, 'command': 'poetry run python SCRATCH/issue-980-p4t7-final-release.py', 'exit_code': 0,
+    'state': 'RELEASED_READY_TO_EXECUTE', 'authority': candidate['coordinator_release_receipt'],
+    'profile_sha256': '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6',
+    'native_authority': {'routing_valid': True, 'launch_authority_valid': True, 'provenance_valid': True},
+    'preparation': ref(preparation_path), 'review': ref(review_path), 'source_files': candidate['files'],
+    'prepared_harnesses': preparation['prepared_harnesses'],
+    'candidate': {'path': 'SCRATCH/' + candidate_path.name, 'sha256': sha(candidate_path.read_bytes())},
+    'release_harness': ref(harness_path), 'source_test_mutation': False, 'git_mutation': False, 'gate_execution': False}
+path = qa / ('p4t7-final-execution-release.' + stamp + '.json')
+save(path, record)
+path.with_suffix('.md').write_bytes((f'# P4-T7 final execution release\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: explicit coordinator release, current C4/native authority and immutable review bind all 14 committed source/test streams and three prepared harnesses. No gate ran during this binding.\n\nThe separate scratch manifest enables the exact prepared final sequence. Earlier preparation, review and subset evidence remains unchanged. No product/test, Git, checkpoint, plan or acceptance-criteria mutation occurred.\n').encode())
+print(json.dumps({'release': ref(path), 'candidate': record['candidate']}, indent=2))

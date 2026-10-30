@@ -1,0 +1,60 @@
+{
+  "Timestamp": "2026-10-20T08-55",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-baseline-coverage.2026-10-20T08-40.json",
+      "physical_lines": 1,
+      "sha256": "05d501ca0026aa8177936f9b8d9855c3028e62d3a4c3ed0aac912d637588e7d2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-baseline-gates.2026-10-20T08-40.json",
+      "physical_lines": 134,
+      "sha256": "e035c5a9202349bd5d9be23014d3f4d3fb0ec358bdb0347fc6ec9e0962a4dcc8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-legacy-gate-harness.2026-10-20T08-55.txt",
+      "physical_lines": 78,
+      "sha256": "f36ddd4ef2566965f9c013042a090a5c06b3ac5ba1e4fb7768c542a4379c9a9c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy-freeze.2026-10-20T08-55.json",
+      "physical_lines": 147,
+      "sha256": "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy1-gates.2026-10-20T08-53.json",
+      "physical_lines": 100,
+      "sha256": "8053b55f1e43975257242f74101bcc85202b719d743fc9fb62e4280db5623821"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy2-gates.2026-10-20T08-53.json",
+      "physical_lines": 125,
+      "sha256": "11aee283b5a6ba7363cb48dc45a2b7fa76b898286b5dd7df50f6bd984c10a36a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy3-coverage.2026-10-20T08-54.json",
+      "physical_lines": 1,
+      "sha256": "0cedafa020e30782e8914cd0e979c0d884b0f60e28f01eae6210609671d0bece"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy3-gates.2026-10-20T08-54.json",
+      "physical_lines": 157,
+      "sha256": "ed909900e4997c21092e174296ee526db2c07c643442128851f499c787b90283"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/completion_report.py",
+      "physical_lines": 155,
+      "sha256": "cccb1a4787c664a015c78db3354f5673823c182a7f28162ce578aa73db1240a6"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_completion_report.py",
+      "physical_lines": 382,
+      "sha256": "60e6557aa4508e3714c6a93833d186875d0108fbfa188c21585484cf9523dc25"
+    }
+  ],
+  "rendering_slice": "Already frozen separately; do not include in this legacy-only list.",
+  "status": "legacy-only-staging-list",
+  "unchanged_not_staged": [
+    "tests/scripts/dev_tools/discovery/test_io.py"
+  ]
+}

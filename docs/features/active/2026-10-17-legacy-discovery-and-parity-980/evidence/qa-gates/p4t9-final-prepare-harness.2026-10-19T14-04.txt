@@ -1,0 +1,151 @@
+"""Bind existing proofs and scratch harnesses; this preparation runs no quality gate."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import tomllib
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+evidence = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence')
+qa = evidence / 'qa-gates'
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+
+
+def load(relative):
+    """Read one immutable feature evidence file."""
+    return json.loads((evidence / relative).read_bytes())
+
+
+def ref(path):
+    """Bind exact working bytes without claiming Git-normalized equality."""
+    path = Path(path)
+    return {'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def write(path, value):
+    """Create a new LF-only readable JSON artifact."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+
+
+registry_path = evidence / 'regression-testing/p4t9-registry-freeze.2026-10-19T13-00.json'
+shared_path = evidence / 'regression-testing/p4t9-shared-inputs-freeze.2026-10-19T13-40.json'
+core_path = evidence / 'regression-testing/p4t9-core-freeze.2026-10-19T13-45.json'
+registry, shared, core = [json.loads(path.read_bytes()) for path in (registry_path, shared_path, core_path)]
+baseline_path = evidence / 'baseline/p4t9-shared-baseline.2026-10-19T12-41.json'
+baseline = json.loads(baseline_path.read_bytes())
+files = {path: registry['bindings'][path]['sha256'] for path in registry['owned_paths']}
+files.update({item['path']: item['sha256'] for item in shared['source_bindings']})
+files.update({path: item['sha256'] for path, item in core['source'].items()})
+assert len(files) == 15 and all(ref(path)['sha256'] == digest for path, digest in files.items())
+nodes = {'registry': registry['nodes'], 'shared': shared['test_node_order'], 'core': core['forward_nodes']}
+counts = {batch: len(items) for batch, items in nodes.items()}
+assert counts == {'registry': 77, 'shared': 133, 'core': 144}
+assert len({item for items in nodes.values() for item in items}) == 354
+modules = {batch: list(dict.fromkeys(item.split('::')[0] for item in items)) for batch, items in nodes.items()}
+previous = load('qa-gates/p4t8-final-candidate-binding.2026-10-19T12-25.json')
+original_owned = {path for paths in baseline['ownership'].values() for path in paths}
+retained = {item['path']: item['sha256'] for key in ('files', 'fixtures', 'preserved_files')
+            for item in previous[key] if item['path'] not in original_owned}
+assert all(ref(path)['sha256'] == digest for path, digest in retained.items())
+contracts = [
+    'tests/schemas/discovery/test_v2_inventory_schemas.py',
+    'tests/scripts/dev_tools/test_quality_tiers_contract.py',
+    'tests/scripts/dev_tools/test_quality_tiers_contract_classification.py',
+    'tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python',
+    'tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage',
+    'tests/scripts/dev_tools/discovery/test_domain_neutrality.py::test_domain_neutrality_templates_contain_no_disallowed_tokens',
+]
+bindings = dict(retained)
+bindings.update(files)
+# Bind actual caller and contract modules without adding unneeded test populations.
+for path in {item for values in modules.values() for item in values} | {item.split('::')[0] for item in contracts}:
+    bindings[path] = ref(path)['sha256']
+for path in [Path('pyproject.toml'), Path('examples/discovery/v2/domain-profile.example.yaml'), *sorted(Path('schemas/discovery/v2').rglob('*.json'))]:
+    bindings[path.as_posix()] = ref(path)['sha256']
+profile_path = Path('.codex/agents/python-typed-engineer-c4.toml')
+assert ref(profile_path)['sha256'] == '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+state = json.loads(Path('artifacts/orchestration/orchestrator-state.json').read_bytes())
+
+
+def routes(value):
+    """Find the existing exact routed authority without writing checkpoint state."""
+    if isinstance(value, dict):
+        if value.get('delegation_id') == 'workspace_operations_p4t9_final_gates':
+            yield value
+        for item in value.values():
+            yield from routes(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from routes(item)
+
+
+authority = next(routes(state))
+assert authority['profile_sha256'] == ref(profile_path)['sha256']
+head = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode().strip()
+assert head == 'feb2ed1a349d861122e04d2d487fac3183cf5c30'
+coverage_config = scratch / 'issue-980-p4t9-final-registry-coverage.ini'
+rules = tomllib.loads(Path('pyproject.toml').read_text('utf-8'))['tool']['coverage']
+config = '[run]\nbranch = True\n[report]\ninclude =\n    */analyzer/registry.py\n    */analyzer/__init__.py\n'
+# Preserve the existing exclusion and partial-branch rules in the focused package report.
+for name in ('exclude_lines', 'partial_also'):
+    config += name + ' =\n' + ''.join('    ' + value + '\n' for value in rules['report'][name])
+assert not coverage_config.exists()
+coverage_config.write_text(config, encoding='utf-8', newline='\n')
+harness_paths = [scratch / ('issue-980-p4t9-final-' + name + '.py') for name in ('prepare', 'gates', 'architecture', 'native')]
+harnesses, snapshots = {}, []
+for path in [*harness_paths, coverage_config]:
+    raw = path.read_bytes()
+    assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n'), path.name
+    assert all(line.rstrip() == line for line in raw.splitlines()), path.name
+    if path.suffix == '.py':
+        ast.parse(raw)
+    harnesses[path.name] = hashlib.sha256(raw).hexdigest()
+    copy = qa / (path.stem.replace('issue-980-', '') + '-harness.' + stamp + '.txt')
+    assert not copy.exists()
+    copy.write_bytes(raw)
+    snapshots.append(ref(copy))
+reviews = [qa / name for name in (
+    'p4t9-executor-registry-review.2026-10-19T13-08.json',
+    'p4t9-executor-shared-core-review.2026-10-19T13-31.json',
+    'p4t9-executor-shared-repair-confirmation.2026-10-19T13-43.json',
+    'p4t9-executor-core-repair-confirmation.2026-10-19T13-52.json')]
+R = 'packages/discovery-runtime/src/drm_copilot_discovery/'
+manifest = {'task': 'P4-T9', 'timestamp': stamp, 'written_at': now.isoformat(),
+    'preparation_only': True, 'execution_released': True, 'released_stages': [1, 2, 3, 4, 5, 6],
+    'native_execution_released': False, 'coordinator_release_receipt': authority,
+    'head_at_preparation': head, 'accepted_baseline': 'c64b35435d1c1597830d8dd03e661d7944192065',
+    'baseline': ref(baseline_path), 'subset_manifests': [ref(path) for path in (registry_path, shared_path, core_path)],
+    'review_references': [ref(path) for path in reviews], 'files': [{'path': path, 'sha256': digest} for path, digest in sorted(files.items())],
+    'bindings': [{'path': path, 'sha256': digest} for path, digest in sorted(bindings.items())],
+    'retained_predecessor_reference': ref(evidence / 'qa-gates/p4t8-final-candidate-binding.2026-10-19T12-25.json'),
+    'retained_predecessor_count': len(retained), 'expected_test_counts': counts, 'prior_node_order': nodes,
+    'forward_test_module_order': modules, 'contract_selection': contracts, 'contract_expected_count': 177,
+    'production_paths': {'registry': [R + 'analyzer/__init__.py', R + 'analyzer/registry.py'],
+        'shared': [R + 'analyzer/emitter.py', R + 'extension_inputs.py'],
+        'core': [R + 'extension_results.py', R + 'extension_validation.py']},
+    'coverage_targets': {'registry': ['drm_copilot_discovery.analyzer'],
+        'shared': ['drm_copilot_discovery.analyzer.emitter', 'drm_copilot_discovery.extension_inputs'],
+        'core': ['drm_copilot_discovery.extension_results', 'drm_copilot_discovery.extension_validation']},
+    'harnesses': harnesses, 'harness_snapshots': snapshots,
+    'native_assertion_count': 20, 'native_preconditions': ['Windows native non-following reader and local Git',
+        'Synthetic source/test/docs bytes committed before profile/artifact setup',
+        'The same configured profile/manifest paths before and after transport generation',
+        'Actual capture_workspace/load_snapshot followed by retained Git pin capture',
+        'Read-only checkpoint after setup; all subsequent source/artifact/Git bytes unchanged'],
+    'qualifications': ['354 unique cases; shared batch already contains actual pipeline and legacy emitter callers.',
+        'Registry historical proof used an earlier emitter; final composition binds the corrected committed shared emitter.',
+        'Existing documentation-only repair and unchanged helper AST qualifications remain in immutable reviews; no current measured callable is exempted.',
+        'Registry package measurement reports only its two task-owned files; four other modules are measured in their own batches.',
+        'Baseline whole-repository coverage remains retained; final scope must not lose any accepted module/class/callable or changed-line coverage.',
+        'Stage 7 requires a separate readiness release and uses only actual local capture/data merge, never publication.',
+        'Raw harness bytes are exact LF snapshots; command streams will retain separate raw hashes and a final lossless archive.']}
+candidate = qa / ('p4t9-final-preparation.' + stamp + '.json')
+write(candidate, manifest)
+markdown = f'# P4-T9 final preparation\n\nTimestamp: {stamp}\nCommand: `.venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-prepare.py`\nEXIT_CODE: 0\nOutput Summary: Bound 15 owned files, six measured modules, 354 unique affected cases and 177 contracts. Preparation ran no quality gate.\n\nThe released sequence is Black, Ruff, whole-repository Pyright, architecture/size/isolation, three isolated reversed-module batches, and the selected contracts. Stage 7 remains held pending its native fixture readiness release; its draft has 20 assertions. The adjacent JSON records exact selections, prior nodes, hashes, commands through the bound runner, baseline and completed review references.\n\nAll source/test bytes remain unchanged. Working-byte hashes are distinct from Git normalization. Exact harness snapshots have LF line endings and one terminal newline.\n'
+candidate.with_suffix('.md').write_text(markdown, encoding='utf-8', newline='\n')
+print(json.dumps({'candidate': ref(candidate), 'files': len(files), 'bindings': len(bindings),
+                  'retained': len(retained), 'counts': counts, 'contracts': 177, 'harnesses': snapshots}, indent=2))

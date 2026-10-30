@@ -1,0 +1,149 @@
+{
+  "behavioral_execution": false,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-capture-candidate-released.2026-10-21T10-28.json",
+    "sha256": "d38bb70d5623f5e2f9a267e631fb5ca35103e313e8dc8c9d52ec41fd5afa3de0"
+  },
+  "checked_files": [
+    {
+      "definitions": 6,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "physical_lines": 334
+    },
+    {
+      "definitions": 20,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "physical_lines": 500
+    },
+    {
+      "definitions": 5,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+      "physical_lines": 278
+    },
+    {
+      "definitions": 4,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "physical_lines": 217
+    },
+    {
+      "definitions": 4,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "physical_lines": 246
+    },
+    {
+      "definitions": 7,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "physical_lines": 354
+    },
+    {
+      "definitions": 8,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "physical_lines": 354
+    },
+    {
+      "definitions": 16,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "physical_lines": 431
+    },
+    {
+      "definitions": 10,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "physical_lines": 288
+    },
+    {
+      "definitions": 24,
+      "path": "tests/discovery_runtime/test_service.py",
+      "physical_lines": 495
+    },
+    {
+      "definitions": 19,
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "physical_lines": 497
+    },
+    {
+      "definitions": 27,
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "physical_lines": 500
+    },
+    {
+      "definitions": 26,
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "physical_lines": 453
+    },
+    {
+      "definitions": 21,
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "physical_lines": 494
+    },
+    {
+      "definitions": 17,
+      "path": "tests/discovery_runtime/test_doctor.py",
+      "physical_lines": 414
+    },
+    {
+      "definitions": 19,
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "physical_lines": 425
+    },
+    {
+      "definitions": 22,
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "physical_lines": 319
+    },
+    {
+      "definitions": 13,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "physical_lines": 497
+    },
+    {
+      "definitions": 18,
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "physical_lines": 410
+    },
+    {
+      "definitions": 12,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "physical_lines": 287
+    },
+    {
+      "definitions": 19,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "physical_lines": 500
+    },
+    {
+      "definitions": 5,
+      "path": "tests/discovery_runtime/test_service_migration.py",
+      "physical_lines": 168
+    },
+    {
+      "definitions": 11,
+      "path": "tests/discovery_runtime/test_migration_capture.py",
+      "physical_lines": 480
+    },
+    {
+      "definitions": 8,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "physical_lines": 326
+    }
+  ],
+  "findings": [
+    {
+      "line": 54,
+      "loop_ast_sha256": "0746e740d1f54654fd57cffe37c846025972b4938e0916191d5343b227cbd076",
+      "loop_line": "    for file in plan.mutation.prospective.manifest.files:",
+      "path": "tests/discovery_runtime/test_migration_capture.py",
+      "predicate": "immediately_preceding_loop_intent",
+      "prior_line": "        io.disk.store.metadata.add(path, kind=\"directory\")",
+      "retained_body": null,
+      "source_sha256": "4cb44991947a5fc4083a7aabedcfc19778d51eb88878d52d481bc7008e302b4f",
+      "symbol": "migration_capture_case"
+    }
+  ],
+  "not_final_gate": true,
+  "reader_sha256": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9",
+  "retained_body_checks": 48,
+  "script_sha256": "2dfe7401608f68fa29944867f799b3e13c3f806cf5bbaa5afb52df2a1c829deb",
+  "source_test_reader_changes": false,
+  "status": "SCOPED_STATIC_DIAGNOSTIC_COMPLETE",
+  "task": "P6-T1"
+}

@@ -1,0 +1,270 @@
+"""Reconcile retained final proof; never execute task tests or modify source."""
+import ast
+import base64
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+import traceback
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+QA = FEATURE / 'evidence/qa-gates'
+PLAN = FEATURE / 'plan.2026-10-17T22-38.md'
+PROFILE = 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+ROUTE = 'atomic_execution_p4t7_final_acceptance'
+WORKER = Path(sys.argv[1])
+COMMAND = 'poetry run python SCRATCH/issue-980-p4t7-final-reconcile.py WORKER_SCRATCH'
+STARTED = dt.datetime.now(dt.timezone.utc)
+
+
+def digest(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def load(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def bound(reference):
+    path = Path(reference['path'])
+    data = path.read_bytes()
+    assert digest(data) == reference['sha256'], str(path)
+    return data
+
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': digest(path.read_bytes())}
+
+
+def portable(text):
+    for path, label in ((ROOT, 'WORKSPACE'), (WORKER, 'WORKER_SCRATCH'), (Path(__file__).parent, 'SCRATCH')):
+        for form in (str(path), path.as_posix()):
+            text = re.sub(re.escape(form), lambda _: label, text, flags=re.I)
+    return text
+
+
+def worker_portable(text):
+    for path, label in ((ROOT, 'WORKSPACE'), (WORKER, 'SCRATCH')):
+        for form in (str(path), path.as_posix()):
+            text = re.sub(re.escape(form), lambda _: label, text, flags=re.I)
+    return text
+
+
+def write(stem, suffix, content):
+    # Obtain each publication filename from the clock immediately before writing.
+    stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    path = QA / (stem + '.' + stamp + suffix)
+    assert not path.exists(), str(path)
+    path.write_bytes(content)
+    return path
+
+
+def encoded(value):
+    return (json.dumps(value, indent=2, sort_keys=True) + '\n').encode()
+
+
+def route_records(value):
+    if isinstance(value, dict):
+        if value.get('delegation_id') == ROUTE:
+            yield value
+        for child in value.values():
+            yield from route_records(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from route_records(child)
+
+
+def authority():
+    routes = list(route_records(load('artifacts/orchestration/orchestrator-state.json')))
+    assert len(routes) == 1
+    route = routes[0]
+    assert route['profile_sha256'] == PROFILE == digest(Path(route['profile_path']).read_bytes())
+    assert (route['deployment_agent'], route['model'], route['model_reasoning_effort']) == ('atomic-executor-c4', 'gpt-6-astra', 'max')
+    attestation = Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json'
+    native = load(attestation)
+    assert native['profile_sha256'] == PROFILE
+    assert (native['actual_model'], native['actual_reasoning_effort']) == ('gpt-6-astra', 'max')
+    assert all(native[k] is True for k in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+    return {'receipt': ROUTE, 'profile_sha256': PROFILE, 'native_routing_launch_provenance': True}
+
+
+def reconcile():
+    auth = authority()
+    hpath = QA / 'p4t7-final-handoff.2026-10-19T11-09.json'
+    assert digest(hpath.read_bytes()) == '0bb22689574e3acdc8eaba593593c2bbaa23640637ba4e9cb3223219514726f8'
+    handoff = load(hpath)
+    staging_path = QA / 'p4t7-final-staging.2026-10-19T11-10.json'
+    assert digest(staging_path.read_bytes()) == 'de47bfecbb0826d2976f51ee080e247b6ae208bde2998d2e7670fcc4aae9dbcf'
+    closure = load(staging_path)
+    assert len(closure['stage_paths']) == len(set(closure['stage_paths'])) == 69
+    for entry in closure['files']:
+        bound(entry)
+    assert closure['preparation_correction_included']
+    candidate = json.loads(bound(handoff['candidate']))
+    ordered = json.loads(bound(handoff['ordered_stages']))
+    coverage = json.loads(bound(handoff['coverage_ranges']))
+    harnesses = json.loads(bound(handoff['executed_harnesses']))
+    native = json.loads(bound(handoff['native_result']))
+    baseline = json.loads(bound(handoff['shared_baseline']))
+    assert len(baseline['preserved_files']) == 62
+    for entry in baseline['preserved_files']:
+        bound(entry)
+    expected = {entry['path']: entry['sha256'] for entry in handoff['source_files']}
+    assert len(expected) == 14 and expected == ordered['source_hashes']
+    assert expected == {entry['path']: entry['sha256'] for entry in candidate['files']}
+    for entry in handoff['source_files']:
+        content = bound(entry)
+        index = subprocess.check_output(['git', 'show', ':' + entry['path']])
+        commit = subprocess.check_output(['git', 'show', handoff['checked_candidate_commit'] + ':' + entry['path']])
+        assert content == index == commit
+        assert digest(index) == entry['index_sha256'] == entry['commit_sha256']
+        assert entry['stream_relation'] == 'identical' and len(content.splitlines()) <= 500
+        attributes = subprocess.check_output(['git', 'check-attr', 'text', 'eol', '--', entry['path']]).decode().strip()
+        assert attributes == entry['git_attributes']
+    retained = []
+    for name, checksum in (
+        ('p4t7-executor-shared-node-confirmation.2026-10-19T10-32.json', '89fa8d3c97da9343e8b83d855ce6d8dc8ca28f758b6e7ef2489ddbd0de7beac0'),
+        ('p4t7-executor-format-confirmation.2026-10-19T10-36.json', '226d6b3885d34e6bfe53dcda7f98c3f48318704a3dbfb6230d7257f4027b7208'),
+        ('p4t7-executor-integration-review.2026-10-19T11-03.json', '0dfeef26d6d6c334df9489a57226a62610ef27c3c4617b81be2c813547c045a1'),
+    ):
+        reference = {'path': (QA / name).as_posix(), 'sha256': checksum}
+        bound(reference)
+        retained.append(reference)
+    snapshots = {}
+    for entry in harnesses['snapshots']:
+        raw = base64.b64decode(entry['executed_content_base64'], validate=True)
+        assert digest(raw) == entry['executed_sha256']
+        assert bound(entry['readable_lf_companion']) == raw.replace(b'\r\n', b'\n')
+        snapshots[entry['executed_path']] = entry['executed_sha256']
+    assert all(snapshots[k] == v for k, v in ordered['harness_hashes'].items())
+    labels = ['format', 'lint', 'types', 'architecture'] + ['tests-' + b + '-reverse' for b in candidate['expected_test_counts']] + ['contracts', 'native']
+    assert [r['label'] for r in ordered['receipts']] == labels
+    previous = dt.datetime.fromisoformat(ordered['started_at'])
+    receipts = {}
+    for entry in handoff['ordered_receipts']:
+        record = json.loads(bound(entry))
+        bound(entry['markdown'])
+        assert record['exit_code'] == entry['exit_code'] == 0
+        assert record['source_before'] == record['source_after'] == expected
+        assert record['harness_hashes'] == ordered['harness_hashes']
+        started, finished = map(dt.datetime.fromisoformat, (record['started_at'], record['finished_at']))
+        assert previous <= started <= finished
+        previous = finished
+        for key in ('stdout', 'stderr'):
+            raw_ref = record['raw_' + key]
+            raw = (WORKER / raw_ref['path'].removeprefix('SCRATCH/')).read_bytes()
+            assert digest(raw) == raw_ref['sha256']
+            assert worker_portable(raw.decode('utf-8', errors='replace')) == record[key]
+        receipts[record['label']] = record
+    assert len(receipts) == 11 and previous <= dt.datetime.fromisoformat(ordered['finished_at'])
+    assert re.search(r'215 passed', receipts['contracts']['stdout'])
+    assert receipts['types']['command'] == 'poetry run python -m pyright'
+    nodes = []
+    module_data = {}
+    for batch, detail in zip(ordered['coverage_batches'], coverage['coverage_batches'], strict=True):
+        name = batch['batch']
+        record = receipts['tests-' + name + '-reverse']
+        actual_nodes = re.findall(r'^(tests/.*?) PASSED(?:\s|$)', record['stdout'], flags=re.M)
+        assert actual_nodes == batch['test_nodes']
+        assert len(actual_nodes) == len(set(actual_nodes)) == candidate['expected_test_counts'][name]
+        assert set(actual_nodes) == set(candidate['prior_node_order'][name])
+        assert list(dict.fromkeys(n.split('::')[0] for n in actual_nodes)) == batch['test_module_order']
+        nodes.extend(actual_nodes)
+        original = bound(detail['canonical_original'])
+        assert digest(original) == batch['raw_coverage']['sha256']
+        assert original == (WORKER / batch['raw_coverage']['path'].removeprefix('SCRATCH/')).read_bytes()
+        raw = json.loads(original)
+        normalized = json.loads(bound({'path': batch['coverage_path'], 'sha256': batch['coverage_sha256']}))
+        raw['files'] = {worker_portable(k).replace('\\', '/'): v for k, v in raw['files'].items()}
+        assert raw == normalized and normalized['totals'] == detail['totals']
+        for path, data in normalized['files'].items():
+            assert path not in module_data
+            module_data[path] = data
+            assert data['summary'] == coverage['module_summaries'][path]
+    assert nodes == ordered['test_nodes'] and len(nodes) == len(set(nodes)) == 557
+    totals = {k: sum(d['summary'][k] for d in module_data.values()) for k in ('num_statements', 'covered_lines', 'num_branches', 'covered_branches')}
+    assert totals == {'num_statements': 824, 'covered_lines': 824, 'num_branches': 414, 'covered_branches': 414}
+    ranges = []
+    for path, data in module_data.items():
+        def collect(body, prefix=''):
+            for node in body:
+                if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                    family = 'classes' if isinstance(node, ast.ClassDef) else 'functions'
+                    name = prefix + node.name
+                    summary = data[family][name]['summary']
+                    assert summary['missing_lines'] == summary['missing_branches'] == 0
+                    ranges.append({'path': path, 'name': name, 'kind': type(node).__name__, 'start': node.lineno, 'end': node.end_lineno, 'summary': summary})
+                    collect(node.body, name + '.')
+        collect(ast.parse(Path(path).read_bytes()).body)
+    key = lambda row: (row['path'], row['name'])
+    assert len(ranges) == 63 and sorted(ranges, key=key) == sorted(coverage['unit_ranges'], key=key)
+    assert len(native['checks']) == 16 and native['source_tree_unchanged'] and native['git_status_unchanged']
+    assert native['publication'] == 'refused-unregistered-adapter'
+    assert digest((WORKER / ordered['raw_native']['path'].removeprefix('SCRATCH/')).read_bytes()) == ordered['raw_native']['sha256'] == handoff['native_result']['sha256']
+    ac = []
+    for name in ('spec.md', 'user-story.md'):
+        path = FEATURE / name
+        section = path.read_text('utf-8').split('## Acceptance Criteria', 1)[1].split('\n## ', 1)[0]
+        boxes = re.findall(r'^- \[([ x])\]', section, re.M)
+        assert len(boxes) == 66 and boxes.count('x') == 13
+        ac.append(ref(path))
+    plan_text = PLAN.read_text('utf-8')
+    tasks = re.findall(r'^- \[([ x])\] \[P\d+-T\d+\]', plan_text, re.M)
+    assert len(tasks) == 84 and tasks.count('x') == 38
+    assert '- [ ] [P4-T7] Inventory local declared dependencies.' in plan_text
+    return {'status': 'PASS', 'task': 'P4-T7', 'authority': auth, 'handoff': ref(hpath), 'worker_staging': ref(staging_path), 'candidate_commit': handoff['checked_candidate_commit'], 'retained_reviews': retained, 'receipt_count': len(receipts), 'test_cases': handoff['test_cases'], 'coverage_totals': totals, 'measured_ranges': 63, 'source_working_index_commit_streams': 14, 'preserved_predecessor_working_streams': 62, 'harness_snapshots': len(snapshots), 'plan_before': ref(PLAN), 'ac_sources_unchanged': ac, 'ac_count': {'checked': 13, 'total': 66}, 'findings': [], 'open_checks': [], 'behavioral_runs': 0, 'limitations': handoff['limitations'][:-1], 'normalization': 'Exact current working/index/committed sources are identical. Decoded raw harnesses match LF-readable companions after CRLF-to-LF only. Raw stdout/stderr match sanitized receipt text; original coverage bytes are preserved and their only structured presentation change is file-path normalization.', 'reuse': 'Complete shared/Node, Python/NET and central integration reviews reused; no implementation review, suite or probe replay. AC-33 through AC-36 retain later optional-adapter/registry/integration scope and stay unchecked.'}
+
+
+def publish_reconciliation():
+    result = reconcile()
+    result.update(timestamp=dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M'), started_at=STARTED.isoformat(), finished_at=dt.datetime.now(dt.timezone.utc).isoformat(), command=COMMAND, exit_code=0)
+    proof = write('p4t7-executor-final-reconciliation', '.json', encoded(result))
+    harness = write('p4t7-executor-final-reconciliation-harness', '.txt', Path(__file__).read_bytes())
+    markdown = f"# P4-T7 final reconciliation\n\nTimestamp: {result['timestamp']}\nCommand: {COMMAND}\nEXIT_CODE: 0\nOutput Summary: PASS; 557 task cases, 215 affected contracts, 16 native assertions; 824/824 statements, 414/414 branches, 63 fully covered measured ranges. No tests or probes replayed.\n\nThe 11 ordered receipts, raw streams, exact harness snapshots and test-node populations match the frozen handoff. Fourteen working/index/committed source and test streams and 62 predecessor working streams remain unchanged. Prior reviews and failure qualifications remain authoritative. Task checkoff is a separate authorized file edit; source ACs remain 13/66.\n\nRegistry/publication is deferred to P4-T9; installed-host and non-Windows proof remain outstanding. Finite declared syntax does not prove installed state or evaluated resolution. See `{proof.name}` for exact bindings and normalization qualifications.\n"
+    md = write('p4t7-executor-final-reconciliation', '.md', markdown.encode())
+    print(json.dumps({'status': 'PASS', 'proof': ref(proof), 'markdown': ref(md), 'harness': ref(harness)}))
+
+
+def finalize(proof_path):
+    proof = load(proof_path)
+    assert proof['status'] == 'PASS' and proof['open_checks'] == []
+    current = PLAN.read_bytes()
+    original = current.replace(b'- [x] [P4-T7] Inventory local declared dependencies.', b'- [ ] [P4-T7] Inventory local declared dependencies.', 1)
+    assert digest(original) == proof['plan_before']['sha256']
+    assert current != original
+    for entry in proof['ac_sources_unchanged']:
+        bound(entry)
+    stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    result = {'status': 'TASK_STATUS: PASS', 'task': 'P4-T7', 'timestamp': stamp, 'command': COMMAND + ' --finalize RECONCILIATION_JSON', 'exit_code': 0, 'reconciliation': ref(proof_path), 'handoff': proof['handoff'], 'plan': ref(PLAN), 'tasks': {'checked': 39, 'total': 84}, 'acceptance_criteria': {'checked': 13, 'total': 66, 'newly_checked': []}, 'scope': 'Only P4-T7 was checked off. Source/test/checkpoint/Git bytes were not edited.', 'limitations': proof['limitations'], 'next_five': ['P4-T8', 'P4-T9', 'P5-T1', 'P5-T2', 'P5-T3']}
+    acceptance = write('p4t7-executor-final-acceptance', '.json', encoded(result))
+    text = f"# P4-T7 acceptance\n\nTimestamp: {stamp}\nCommand: {result['command']}\nEXIT_CODE: 0\nOutput Summary: TASK_STATUS: PASS; P4-T7 checked off; plan 39/84, authoritative ACs unchanged at 13/66.\n\nThe reconciled final loop passed 557 unit cases, 215 affected contracts and 16 native Windows/Git assertions. Six modules cover 824/824 statements and 414/414 branches; all 63 measured class/callable ranges meet their thresholds. The exact frozen candidate, raw evidence, retained reviews and limitations are bound by `{proof_path.name}`. No suite, probe or source review was repeated.\n\nP4-T7 provides finite source-linked declared dependency syntax. Installed state, effective resolution, evaluated graph/conditions and package execution remain unverified. Registry/publication remains P4-T9; installed-agent-host and non-Windows proof remain outstanding. AC-33 through AC-36 retain broader later analyzer responsibilities, so no source AC was checked off. Whole-repository coverage was not remeasured by this task.\n\nNext five: P4-T8, P4-T9, P5-T1, P5-T2, P5-T3.\n"
+    markdown = write('p4t7-executor-final-acceptance', '.md', text.encode())
+    proof_stem = proof_path.stem.removeprefix('p4t7-executor-final-reconciliation.')
+    paths = [proof_path, proof_path.with_suffix('.md'), QA / ('p4t7-executor-final-reconciliation-harness.' + proof_stem + '.txt'), acceptance, markdown, PLAN]
+    for path in paths[:-1]:
+        content = path.read_bytes()
+        assert b'\r' not in content and content.endswith(b'\n') and not content.endswith(b'\n\n')
+        assert all(line.rstrip() == line for line in content.decode().splitlines())
+    staging_stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    staging = QA / ('p4t7-executor-final-staging.' + staging_stamp + '.json')
+    document = {'task': 'P4-T7', 'timestamp': staging_stamp, 'status': 'ACCEPTED', 'files': [ref(p) for p in paths], 'stage_paths': [p.as_posix() for p in paths + [staging]], 'worker_evidence_closure': proof['worker_staging'], 'checkoff': 'P4-T7 only; 39/84 tasks and unchanged 13/66 AC', 'source_test_checkpoint_git_mutations': False}
+    assert not staging.exists()
+    staging.write_bytes(encoded(document))
+    print(json.dumps({'status': 'TASK_STATUS: PASS', 'task': 'P4-T7', 'acceptance': ref(acceptance), 'markdown': ref(markdown), 'staging': ref(staging), 'plan': ref(PLAN), 'tasks': '39/84', 'ac': '13/66'}))
+
+
+try:
+    if len(sys.argv) > 2 and sys.argv[2] == '--finalize':
+        finalize(Path(sys.argv[3]))
+    else:
+        publish_reconciliation()
+except Exception:
+    diagnostic = {'status': 'CHECKER_FAILURE', 'timestamp': dt.datetime.now(dt.timezone.utc).isoformat(), 'command': COMMAND, 'diagnostic': portable(traceback.format_exc()), 'behavioral_runs': 0}
+    failure = write('p4t7-executor-final-checker-diagnostic', '.json', encoded(diagnostic))
+    harness = write('p4t7-executor-final-checker-failed-harness', '.txt', Path(__file__).read_bytes())
+    print(json.dumps({'failure': ref(failure), 'harness': ref(harness), 'diagnostic': diagnostic['diagnostic']}))
+    raise SystemExit(1)

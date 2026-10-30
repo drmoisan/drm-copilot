@@ -1,0 +1,202 @@
+{
+  "Timestamp": "2026-10-20T16-16",
+  "Command": "poetry run python -B SCRATCH/issue-980-p6t1-prepare-native.py; compile helper bytes only, no execution",
+  "EXIT_CODE": 0,
+  "Output Summary": "Two helpers syntax-checked only; no production imports, native operations, build or installation.",
+  "status": "NATIVE_RUNNER_PREPARED_NOT_EXECUTED",
+  "route": "build_review_p6t1_native_runner_preparation_20261020 / S5_P6T1_native_runner_preparation",
+  "task": "P6-T1",
+  "syntax_elapsed_seconds": 0.0056164999841712415,
+  "helpers": [
+    {
+      "path": "SCRATCH/issue-980-p6t1-installed-composition.py",
+      "sha256": "7877d11ac67f78dfe99909de6ef3fb98e0cafe25a65de0902e02d34023fd035d",
+      "bytes": 21240,
+      "lines": 369,
+      "source_gzip_base64": "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"
+    },
+    {
+      "path": "SCRATCH/issue-980-p6t1-installed-bootstrap.py",
+      "sha256": "b449ac94935d03421be08ea03a4f8977dbbd1fed49e4359b78104c7b826c6ccc",
+      "bytes": 3663,
+      "lines": 73,
+      "source_gzip_base64": "H4sIAAAAAAAC/5VXO4/jNhDu/SsIN5IQW7hLkccCKlJcgjTBAQnSXBYEVxrZzFGkQlJeG4f975mhSFmyvS8VtkXOfJznN/R6vf5dH8xXYEarE/N7YFI7L5SChrXyiJ874eFRnJjQDbPghdQMDmBPTBnR4L4dtJcdAli5k7pcr9cr2fXGeibsrhfWwaq1pmON8KJWwjlwLAm4RtY+if/rjE6/xy8lH8rBSzUC9MLvcSUpf8bXJI429Kf04k5utVo10LIOjc2LuxXDJ1hiWTVZVf5id0MH2n8OO3kxEytF03AR9/Nsu41BEV4anW0wDv8N0kJT/WUHeFGxgR50A7qW4N6l2Ftj2ndpiDpaV++NrMFVeSbxZC/9CRezmMeseA/mo7FfXS9q2KI5/p0OSPS6F2phkTK1UNsBFcimvXGeDMJkiUH5ar79IriF3jjpjT1tZXPbLBR3mO4IEL4IwsVEzzOKYlRNOW2X842itOCMOkDuvMVSncHPE7vQn2+8oB/yu1AMK2eNaGY7SpZwlM6j8dhnTJtQ5WWrBBmM8pjb5npHG45BgrEB6LFCOmB/CzXAJ2uNzbNf8bh9NIY6fALTZku6GCcPtsfGx+ZJUY65oYMaoz1/tCjJH04eatMAOkVuTiLUt1/uPtzj+hcMQ74I8IbR0iJm95Om840ZPEakNrqVu8FCjjKmkXpXZYNvtz9h6jU8Kqmhyv7RM7tQFax9t2q0/0N4gSPUA8WiYn8YPTrk7ekcTkxOyNzYeayq2LnjzlL0jAxoO16bXirjeSNdbYhGy4dBqoYnvcRuRK58ufVWwBqJVpndAimuvRWCanCw9ZmpA0ha5Z3QsgXnqe9m6wv0yaHqli+xutOTAJPw1UkX8i2WOgLhEMJplGTOVi9jHwp/bmceVENdbibtKv1YnpSCWS3ieGEOUZ3PaX6VzdD1Lv+WxamY3cUhlyfPi82Vccsnm9zgmAvZSuy3O6ZA59eOvg7m6j104goq+oHtWwdOdcVTcfYJlINlDF0PNcZgOZbLVuqG01ae3a6jaeYswGZ9Rc0fGJBQyvEKMaPApR62G/FbkE8YBdIfJpbY5ADcmyW73CiEKwb8Ld5vRkTxoJDzHEPecZiyxZi4cINoBtv/QLz2iv846q5n6bOpC5wySXOSDgDziRonRlx4HuvGrAyq50XsyYAuBr83dhTJ+h/8x60OQc3uF+DhqlXiJ+9MMyjIX3WdZLXokGY5pxsZ5zGQcKyh9+zPk/PQfTpKuhAyoKyc8xYJOayW4QWrQLqQFk2tPG1saFQVoXbZx6CP5Ympm/H1WF80rr+RQXfn8ht9KTlvpQLOny3BGf8QAtJHUCQaonIY33Ako0Muv6lKRYyaOKCE9e5R4uG3I5gVYSDv8Mrt0cwRGlOTbMTI0lQqnubjaGotLGHqFZJYNkGMwSsVi5FIUHgSje70OoEdhJLUwg/GqDyijiZj0MeoEsO+3KCv0Nc83gRGcY5HlQfqYTdP0HhRGi8jHo4XjBz1kADjL4wl2sGn/zu4E3zavM2oDBPOySjUS9cchEwXqLi6vKK9FTpe3BYYce2J6pxmSfV9wb5jdHXZsMurTbG64Mzg2LIQYmf9/ONqHJB+sDos4p8n1OKhZzkPt5qpcUeIkUTPfZuPf7SK1f/ECp6GTw4AAA=="
+    }
+  ],
+  "release_template": {
+    "path": "SCRATCH/issue-980-p6t1-native-release-template.json",
+    "sha256": "278e1160ebffb4d0c09a41a186b740e7689ba2364854e1ec2eda8d3465a9dca1",
+    "state": "Non-executable until coordinator fills final exact bindings and releases."
+  },
+  "inputs": [
+    {
+      "path": "evidence/other/p6t1-final-gate-interface-handoff.2026-10-20T15-56.json",
+      "sha256": "9abf96d494f336ca7717219a2afb0fd15c13c634e68247a2d081fecd1142c242"
+    },
+    {
+      "path": "evidence/other/p6t1-final-gate-profile-qualification.2026-10-20T15-57.json",
+      "sha256": "06d937830267ba4881cccc55af7e00b557810329dab943bb7491cbe727e3040d"
+    },
+    {
+      "path": "evidence/qa-gates/p5t3-native-fixture.2026-10-20T08-50.json",
+      "sha256": "dbea7cc24664797d6d3f0949c98af6b623ad2dfc5142dd48c15eae86891c8355"
+    },
+    {
+      "path": "evidence/qa-gates/p5t3-final-native-corrected-harness.2026-10-20T09-46.txt",
+      "sha256": "0997873d2633af4bfc819adafe7422ecb7141a19254f66fcbe121fed6e91a6d3"
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-shared-reverse-binding.2026-10-20T16-04.json",
+      "sha256": "ee103f4bb408ffd73e7fc51c27b3f8d3526a0e783dad4a590a798a7120289b86"
+    }
+  ],
+  "argv": [
+    "poetry",
+    "run",
+    "python",
+    "-I",
+    "-S",
+    "-B",
+    "SCRATCH/issue-980-p6t1-installed-composition.py",
+    "--installation",
+    "SCRATCH/FINAL-INSTALLATION",
+    "--dependencies",
+    "WORKSPACE/.venv/Lib/site-packages",
+    "--wheel",
+    "SCRATCH/FINAL-WHEEL.whl",
+    "--release",
+    "SCRATCH/FINAL-NATIVE-RELEASE.json",
+    "--output",
+    "SCRATCH/FRESH-NATIVE-RESULT.json"
+  ],
+  "finite_children": [
+    [
+      "installed-identity",
+      0,
+      "Fresh isolated child verifies build identity, every resource and offline catalog."
+    ],
+    [
+      "init-dry",
+      0,
+      "Fresh Git/source fixture, draft=true, planned artifacts and identical tree."
+    ],
+    [
+      "init-real",
+      0,
+      "Created artifact digests match disk; actual profile_state remains draft."
+    ],
+    [
+      "configure-dry",
+      0,
+      "Retained independently configured P5 profile; no tree changes."
+    ],
+    [
+      "configure-real",
+      0,
+      "Explicit activate/input_path through actual gateway and protected local activation."
+    ],
+    [
+      "profile",
+      0,
+      "Actual selected profile, verified runtime and schema-valid envelope."
+    ],
+    [
+      "validate-profile",
+      0,
+      "Real configured profile validation."
+    ],
+    [
+      "inventory",
+      0,
+      "Explicit repository analyzer only; canonical preview hashes, exact source pin, no writes."
+    ],
+    [
+      "report-dry",
+      1,
+      "Parity-complete completion report; exact pair planned/skipped; tree unchanged."
+    ],
+    [
+      "report-publish",
+      1,
+      "Truthful failing selected gate; pair paths/digests on disk and JSON/Markdown projection equality."
+    ],
+    [
+      "report-repeat",
+      1,
+      "Same failing gate and two skipped outputs with identical workspace."
+    ],
+    [
+      "doctor",
+      0,
+      "Read-only warning DISCOVERY_ENFORCEMENT_UNAVAILABLE; no receipt/deployment/invocation authority."
+    ],
+    [
+      "malformed",
+      2,
+      "One malformed stdin document; exact safe stderr and valid failure envelope."
+    ],
+    [
+      "unknown-operation",
+      2,
+      "Unknown operation rejected as invocation failure."
+    ],
+    [
+      "opaque-reference-refusal",
+      3,
+      "Local-user agent-output request cannot turn opaque input into host authority."
+    ],
+    [
+      "host-refusal",
+      3,
+      "Outer host principal rejected; no runtime/manifest/artifacts or fallback."
+    ],
+    [
+      "identity-missing",
+      3,
+      "Disposable installation copy only, absent manifest: RUNTIME_UNAVAILABLE, null runtime."
+    ],
+    [
+      "identity-corrupt",
+      3,
+      "Separate disposable copy, invalid manifest: RUNTIME_CORRUPT, null runtime."
+    ]
+  ],
+  "import_isolation": "Both controller and children use -I -S with only explicit installation then approved dependency path added. Child fixed runpy module spec and every loaded runtime origin must lie under installation; no test/checkout import or .pth startup. Controller origins are also checked.",
+  "bounds": "18 finite serial child processes, each 90-second watchdog with 15-second progress; 16MiB limit for each stream. Windows timeout/overflow kills the exact child PID tree, other platforms kill child. Each raw stream retained in SCRATCH; receipt includes lossless gzip-base64, SHA256, actual exit and elapsed time. Safe UTF-8 readable projection is separate from raw bytes.",
+  "fixtures": "Copy exact frozen P5 bytes into fresh bounded SCRATCH fixture; do not alter preserved source. Separate init seed uses only its .git/src/.gitattributes bytes. P5 configured profile must already validate with repository analyzer enabled; configure activation is explicit. No invented configured state or source revision.",
+  "assertion_bindings": "Independent release supplies exact P5 source revision/report semantic input digest, complete fixture file hashes, full final source freeze, verified runtime identity and generated manifest/wheel hashes. Report publications are compared to actual disk digests and one JSON/Markdown projection, not accepted by process count alone.",
+  "prerequisites": [
+    "Final core/gateway repair confirmation and ordered statics; no moving source hashes were captured here.",
+    "Build specialist alone performs one separately released resource -> identity -> wheel -> isolated install window.",
+    "Coordinator supplies exact wheel/build/resource/runtime/source bindings and copies template to a fresh release with execution_released true.",
+    "Resolve retained P5 fixture from preserved exact descriptor bytes (or reconstruct those exact bytes); provide fixture_files and absolute operational fixture_root. No predecessor fixture run required.",
+    "Configured P5 profile includes repository analyzer; validate expected source revision/report digest and exact profile bytes before release.",
+    "Native runner must be executed before expensive final caller gate; syntax acceptance here is not behavioral verification."
+  ],
+  "final_gate_qualification": {
+    "supersedes": "15:56 handoff sequence steps 5 and 6 requiring separate fresh forward and reverse combined batches.",
+    "required_sequence": "After native passes: one clean format -> lint -> type -> combined reversed-module test sequence with exact changed core/gateway coverage and four package contract selectors. No additional full forward batch solely to repeat accepted focused populations.",
+    "reverse_population": [
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+      "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+      "tests/discovery_runtime/test_gateway_boundaries.py",
+      "tests/discovery_runtime/test_doctor.py",
+      "tests/discovery_runtime/test_gateway_local.py",
+      "tests/discovery_runtime/test_gateway.py",
+      "tests/discovery_runtime/test_service_boundaries.py",
+      "tests/discovery_runtime/test_service_publication.py",
+      "tests/discovery_runtime/test_service.py"
+    ],
+    "coverage": "Retain all final collected nodes and measure nine actual changed core/gateway modules, branch coverage and required per-callable thresholds; no exclusions or threshold relaxation. Reuse unchanged shared/build/analyzer/selector proof by exact dependencies, including shared145 reverse at16:04.",
+    "ownership": "Coordinator owns exact final source/test union, static argv and test release; this artifact does not bind moving files."
+  },
+  "limitations": [
+    "Only syntax was checked. No actual installed package or native behavior is claimed.",
+    "Only Python3.13 is locally discovered; actual3.10/3.11 floor execution remains CI handoff.",
+    "No P8 native host authority, P6-T2 CLI registration or P6-T3 legacy adapter claim.",
+    "Thirty-operation matrix/interrupted publication remains real in-memory task proof; native suite is deliberately finite."
+  ],
+  "ac_status": "P6-T1 in progress; no acceptance/checkpoint/source changes."
+}

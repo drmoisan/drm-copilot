@@ -1,0 +1,609 @@
+{
+  "files": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "classes": {
+        "": {
+          "excluded_lines": [
+            15,
+            16
+          ],
+          "executed_branches": [
+            [
+              45,
+              46
+            ],
+            [
+              45,
+              48
+            ],
+            [
+              51,
+              52
+            ],
+            [
+              51,
+              58
+            ],
+            [
+              68,
+              69
+            ],
+            [
+              68,
+              70
+            ],
+            [
+              70,
+              71
+            ],
+            [
+              70,
+              79
+            ],
+            [
+              81,
+              82
+            ],
+            [
+              81,
+              95
+            ],
+            [
+              82,
+              81
+            ],
+            [
+              82,
+              87
+            ],
+            [
+              95,
+              96
+            ],
+            [
+              95,
+              129
+            ],
+            [
+              98,
+              99
+            ],
+            [
+              98,
+              107
+            ],
+            [
+              118,
+              119
+            ],
+            [
+              118,
+              120
+            ],
+            [
+              120,
+              95
+            ],
+            [
+              120,
+              121
+            ],
+            [
+              129,
+              136
+            ],
+            [
+              129,
+              141
+            ]
+          ],
+          "executed_lines": [
+            3,
+            5,
+            6,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            18,
+            31,
+            33,
+            41,
+            43,
+            45,
+            46,
+            48,
+            49,
+            50,
+            51,
+            52,
+            58,
+            68,
+            69,
+            70,
+            71,
+            79,
+            81,
+            82,
+            87,
+            95,
+            96,
+            98,
+            99,
+            105,
+            107,
+            116,
+            118,
+            119,
+            120,
+            121,
+            129,
+            136,
+            141,
+            144,
+            151,
+            156,
+            158,
+            164,
+            174,
+            179
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 1,
+          "summary": {
+            "covered_branches": 22,
+            "covered_lines": 51,
+            "excluded_lines": 2,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 22,
+            "num_partial_branches": 0,
+            "num_statements": 51,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        }
+      },
+      "excluded_lines": [
+        15,
+        16
+      ],
+      "executed_branches": [
+        [
+          45,
+          46
+        ],
+        [
+          45,
+          48
+        ],
+        [
+          51,
+          52
+        ],
+        [
+          51,
+          58
+        ],
+        [
+          68,
+          69
+        ],
+        [
+          68,
+          70
+        ],
+        [
+          70,
+          71
+        ],
+        [
+          70,
+          79
+        ],
+        [
+          81,
+          82
+        ],
+        [
+          81,
+          95
+        ],
+        [
+          82,
+          81
+        ],
+        [
+          82,
+          87
+        ],
+        [
+          95,
+          96
+        ],
+        [
+          95,
+          129
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          98,
+          107
+        ],
+        [
+          118,
+          119
+        ],
+        [
+          118,
+          120
+        ],
+        [
+          120,
+          95
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          129,
+          136
+        ],
+        [
+          129,
+          141
+        ]
+      ],
+      "executed_lines": [
+        3,
+        5,
+        6,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        18,
+        31,
+        33,
+        41,
+        43,
+        45,
+        46,
+        48,
+        49,
+        50,
+        51,
+        52,
+        58,
+        68,
+        69,
+        70,
+        71,
+        79,
+        81,
+        82,
+        87,
+        95,
+        96,
+        98,
+        99,
+        105,
+        107,
+        116,
+        118,
+        119,
+        120,
+        121,
+        129,
+        136,
+        141,
+        144,
+        151,
+        156,
+        158,
+        164,
+        174,
+        179
+      ],
+      "functions": {
+        "": {
+          "excluded_lines": [
+            15,
+            16
+          ],
+          "executed_branches": [],
+          "executed_lines": [
+            3,
+            5,
+            6,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            18,
+            31,
+            41,
+            144
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 1,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 13,
+            "excluded_lines": 2,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 13,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "input_problem": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            33
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 31,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 1,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 1,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "report_input_digest": {
+          "excluded_lines": [],
+          "executed_branches": [],
+          "executed_lines": [
+            151,
+            156,
+            158,
+            164,
+            174,
+            179
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 144,
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 6,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 6,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        "validate_inputs": {
+          "excluded_lines": [],
+          "executed_branches": [
+            [
+              45,
+              46
+            ],
+            [
+              45,
+              48
+            ],
+            [
+              51,
+              52
+            ],
+            [
+              51,
+              58
+            ],
+            [
+              68,
+              69
+            ],
+            [
+              68,
+              70
+            ],
+            [
+              70,
+              71
+            ],
+            [
+              70,
+              79
+            ],
+            [
+              81,
+              82
+            ],
+            [
+              81,
+              95
+            ],
+            [
+              82,
+              81
+            ],
+            [
+              82,
+              87
+            ],
+            [
+              95,
+              96
+            ],
+            [
+              95,
+              129
+            ],
+            [
+              98,
+              99
+            ],
+            [
+              98,
+              107
+            ],
+            [
+              118,
+              119
+            ],
+            [
+              118,
+              120
+            ],
+            [
+              120,
+              95
+            ],
+            [
+              120,
+              121
+            ],
+            [
+              129,
+              136
+            ],
+            [
+              129,
+              141
+            ]
+          ],
+          "executed_lines": [
+            43,
+            45,
+            46,
+            48,
+            49,
+            50,
+            51,
+            52,
+            58,
+            68,
+            69,
+            70,
+            71,
+            79,
+            81,
+            82,
+            87,
+            95,
+            96,
+            98,
+            99,
+            105,
+            107,
+            116,
+            118,
+            119,
+            120,
+            121,
+            129,
+            136,
+            141
+          ],
+          "missing_branches": [],
+          "missing_lines": [],
+          "start_line": 41,
+          "summary": {
+            "covered_branches": 22,
+            "covered_lines": 31,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 22,
+            "num_partial_branches": 0,
+            "num_statements": 31,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        }
+      },
+      "missing_branches": [],
+      "missing_lines": [],
+      "summary": {
+        "covered_branches": 22,
+        "covered_lines": 51,
+        "excluded_lines": 2,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 22,
+        "num_partial_branches": 0,
+        "num_statements": 51,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    }
+  },
+  "meta": {
+    "branch_coverage": true,
+    "format": 3,
+    "show_contexts": false,
+    "timestamp": "2026-10-18T07:32:24.698715",
+    "version": "7.13.2"
+  },
+  "totals": {
+    "covered_branches": 22,
+    "covered_lines": 51,
+    "excluded_lines": 2,
+    "missing_branches": 0,
+    "missing_lines": 0,
+    "num_branches": 22,
+    "num_partial_branches": 0,
+    "num_statements": 51,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100",
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100"
+  }
+}

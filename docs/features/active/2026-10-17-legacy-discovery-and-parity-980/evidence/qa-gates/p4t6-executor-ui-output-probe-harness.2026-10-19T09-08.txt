@@ -1,0 +1,67 @@
+"""Measure only the frozen UI projection's variable-text reservation concern."""
+from __future__ import annotations
+
+from dataclasses import replace
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.ui_callbacks import UiCallbackAnalyzer
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.models import canonical_json, to_plain_value
+from tests.discovery_runtime.analyzer.test_dotnet_projects import capture
+from tests.discovery_runtime.analyzer.test_repository import inventory_profile
+from tests.discovery_runtime.analyzer.test_ui_callbacks import markup
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+MANIFEST = FEATURE / "evidence/regression-testing/p4t6-ui-freeze.2026-10-19T08-52.json"
+EXPECTED = "7d990c2859f1b2b4968ae6dee52193b54c55791636bf988a0ba91d5f9f282eb9"
+
+
+def sha(raw: bytes) -> str:
+    """Return SHA-256 of exact bytes without normalization or I/O."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+started = datetime.now(timezone.utc)
+manifest_bytes = MANIFEST.read_bytes()
+assert sha(manifest_bytes) == EXPECTED
+manifest = json.loads(manifest_bytes)
+bindings = manifest["source_files"]
+# Bind only the frozen UI scope; the other candidate remains mutable elsewhere.
+for item in bindings:
+    assert sha(Path(item["path"]).read_bytes()) == item["sha256"]
+catalog = load_catalog()
+cases = []
+# Long ASCII class/handler names and escaping-heavy paths stress repeated provenance.
+for label, segment in (("ascii", "a" * 512), ("bmp", "\u00e9" * 512), ("astral", "\U0001f680" * 512)):
+    path = "src/" + segment + "/view.xaml"
+    class_name = "V" * 512
+    handler = "H" * 128
+    xml = markup(f'<Button Click="{handler}"/>' * 20, class_name=class_name)
+    code = f"class {class_name} {{ void {handler}() {{}} }}".encode()
+    inputs = capture(catalog, ((path, xml), (path + ".cs", code)))
+    cost = 8192 + 12 * (len(path) + len(inputs.profile.repository.id) + len(inputs.profile.repository.revision or ""))
+    reserved = (4 + 2 * 21) * cost
+    inputs = replace(inputs, profile=inventory_profile(catalog, limits={"document_bytes": reserved}))
+    result = UiCallbackAnalyzer().analyze(inputs)
+    value = row(components=result.components, findings=result.findings, relationships=result.relationships, diagnostics=result.diagnostics)
+    canonical_length = len(canonical_json(value))
+    ascii_length = len(json.dumps(to_plain_value(value), ensure_ascii=True, separators=(",", ":")).encode())
+    passed = len(result.findings) == 21 and len(result.relationships) == 21 and canonical_length <= reserved
+    cases.append({"case": label, "path_characters": len(path), "source_sha256": sha(xml), "code_sha256": sha(code), "reserved_bytes": reserved, "canonical_utf8_bytes": canonical_length, "ascii_escaped_compact_bytes": ascii_length, "finding_count": len(result.findings), "relationship_count": len(result.relationships), "canonical_bound_satisfied": passed})
+# Reconfirm frozen source bytes after the in-memory calls.
+for item in bindings:
+    assert sha(Path(item["path"]).read_bytes()) == item["sha256"]
+finished = datetime.now(timezone.utc)
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+harness = QA / f"p4t6-executor-ui-output-probe-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+output = QA / f"p4t6-executor-ui-output-probe.{stamp}.json"
+value = {"timestamp": stamp, "started_utc": started.isoformat(), "finished_utc": finished.isoformat(), "command": "poetry run python SCRATCH/issue-980-p4t6-ui-output-probe.py", "exit_code": 0, "manifest": {"path": MANIFEST.as_posix(), "sha256": EXPECTED}, "source_files": bindings, "harness": {"path": harness.as_posix(), "sha256": sha(harness.read_bytes())}, "cases": cases, "limitations": "Checks only this concrete UI projection reservation concern. Canonical UTF-8 is the authoritative serializer; ASCII-escaped length is diagnostic. No worker suite or predecessor review rerun."}
+output.write_bytes((json.dumps(value, indent=2, ensure_ascii=True) + "\n").encode())
+print(json.dumps({"evidence": output.as_posix(), "cases": cases}))

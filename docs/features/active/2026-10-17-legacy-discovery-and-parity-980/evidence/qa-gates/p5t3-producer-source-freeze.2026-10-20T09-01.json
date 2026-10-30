@@ -1,0 +1,78 @@
+{
+  "Timestamp": "2026-10-20T09-01",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json",
+    "sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d"
+  },
+  "borrowed_before_after": {
+    "bytes": 9585,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+    "sha256": "235e7b873529c5ea0e7cb211ac6dc129077e10b881759ac99131388e131a6719"
+  },
+  "limits": [
+    "Builder/planner successful composition not yet executed; planning-only population is 19 declared cases, not a collected/result claim.",
+    "Pending semantic completion dispatch is owned separately. The full producer module is not accepted at partial 72/95 statement and 18/24 branch coverage.",
+    "Source/tests contain no runtime filesystem, subprocess, network or native-grant creation; in-memory mutation proof remains pending.",
+    "Working bytes archived exactly; Git index normalization must be separately bound by the coordinator."
+  ],
+  "lossless_archive": {
+    "bytes": 46825,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-archive.2026-10-20T09-01.json",
+    "sha256": "40be07f7d204d6c2ca99410deecf4c3d1d887d523e52294dd1d35150fb42b8a0"
+  },
+  "pure_cases_passed": 35,
+  "pure_current_coverage": {
+    "covered_branches": 18,
+    "covered_lines": 72,
+    "excluded_lines": 4,
+    "missing_branches": 6,
+    "missing_lines": 23,
+    "num_branches": 24,
+    "num_partial_branches": 0,
+    "num_statements": 95,
+    "percent_branches_covered": 75.0,
+    "percent_branches_covered_display": "75",
+    "percent_covered": 75.63025210084034,
+    "percent_covered_display": "76",
+    "percent_statements_covered": 75.78947368421052,
+    "percent_statements_covered_display": "76"
+  },
+  "scope": [
+    {
+      "bytes": 11322,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+      "physical_lines": 261,
+      "sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69"
+    },
+    {
+      "bytes": 15649,
+      "path": "tests/discovery_runtime/test_completion_report.py",
+      "physical_lines": 389,
+      "sha256": "0403687ca7be3c7606ca734d0c28e80b05646da067b6d5e90b2c5309cc1df962"
+    },
+    {
+      "bytes": 15345,
+      "path": "tests/discovery_runtime/test_completion_planning.py",
+      "physical_lines": 360,
+      "sha256": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214"
+    }
+  ],
+  "state": "SOURCE_READY_PARTIAL_FOCUSED_PROOF",
+  "task": "P5-T3",
+  "test_documentation_qualification": [
+    {
+      "current_sha256": "0403687ca7be3c7606ca734d0c28e80b05646da067b6d5e90b2c5309cc1df962",
+      "executable_ast_identical": true,
+      "old_sha256": "90be5a38f5d22cc951aec043cfa510faba2744bccbf80723cd19bcf0ffb9e33a",
+      "path": "tests/discovery_runtime/test_completion_report.py",
+      "qualification": "Test docstrings/comments only; executable AST, decorators, parametrizations and assertions identical."
+    },
+    {
+      "current_sha256": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214",
+      "executable_ast_identical": true,
+      "old_sha256": "f5c9b527fe262fd4b1dabc962e77825a3d897ac4dc99d3fd2485f876550badba",
+      "path": "tests/discovery_runtime/test_completion_planning.py",
+      "qualification": "Test docstrings/comments only; executable AST, decorators, parametrizations and assertions identical."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+$schema: urn:drm-copilot:discovery:2.0.0:inventory-snapshot
+schema_version: 2.0.0
+artifact_kind: inventory-snapshot
+id: inventory-alpha
+repository: synthetic-source
+revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+tool: {id: discovery, version: 2.0.0}
+analyzers:
+  - {id: repository, version: 2.0.0}
+scan_configuration_sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+files:
+  - path: src/Processor.cs
+    status: inspected
+    sha256: null
+    size: 64
+    rationale: null
+    diagnostic_ids: []
+components: []
+findings: []
+relationships: []
+diagnostics: []
+exclusions: []
+capture:
+  timestamp: "2026-01-01T00:00:00Z"
+  author_or_agent: {kind: tool, id: discovery}
+extensions: {}

@@ -1,0 +1,145 @@
+# P4-T8 shared baseline pytest
+
+Timestamp: 2026-10-19T11-23
+Command: .\.venv\Scripts\python.exe -m pytest -o addopts= tests/discovery_runtime/analyzer/test_registry.py tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py tests/scripts/dev_tools/discovery/test_domain_neutrality.py -v --tb=short --cov=scripts.dev_tools.discovery.analyzer.vsto_office --cov=scripts.dev_tools.discovery.analyzer.vsto_patterns --cov=scripts.dev_tools.discovery.analyzer.stack_cli --cov=drm_copilot_discovery.analyzer.registry --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\issue-980-p4t8-shared-baseline-coverage.json
+EXIT_CODE: 0
+Output Summary: affected unchanged legacy pytest; 10.837 seconds. Raw streams retained separately; presentation paths sanitized.
+
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: .
+configfile: pyproject.toml
+plugins: anyio-4.12.1, cov-7.0.0
+collecting ... collected 114 items
+
+tests/discovery_runtime/analyzer/test_registry.py::test_registry_loads_only_explicit_core_adapters PASSED [  0%]
+tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_unavailable_selections_without_fallback[enabled0] PASSED [  1%]
+tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_unavailable_selections_without_fallback[enabled1] PASSED [  2%]
+tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_unavailable_selections_without_fallback[enabled2] PASSED [  3%]
+tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[bad-None-None] PASSED [  4%]
+tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[inspected-None-None] PASSED [  5%]
+tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[inspected-Not allowed-file2] PASSED [  6%]
+tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[excluded-None-None] PASSED [  7%]
+tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[unreadable- -None] PASSED [  7%]
+tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[excluded-Excluded-file5] PASSED [  8%]
+tests/discovery_runtime/analyzer/test_registry.py::test_models_reject_untyped_rows_profile_inputs_and_collisions PASSED [  9%]
+tests/discovery_runtime/analyzer/test_registry.py::test_draft_and_input_count_limits_fail_closed PASSED [ 10%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_customui_uri_and_root[<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui">-http://schemas.microsoft.com/office/2006/01/customui] PASSED [ 11%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_customui_uri_and_root[<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui">-http://schemas.microsoft.com/office/2009/07/customui] PASSED [ 12%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[public class R : IRibbonExtensibility {-IRibbonExtensibility] PASSED [ 13%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[public class R : Microsoft.Office.Core.IRibbonExtensibility {-IRibbonExtensibility] PASSED [ 14%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[public string GetCustomUI(string id) {-GetCustomUI] PASSED [ 14%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[class D : Microsoft.Office.Tools.Ribbon.RibbonBase {-Microsoft.Office.Tools.Ribbon] PASSED [ 15%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_cs_comment_ribbon_trap_ignored_but_xml_unstripped PASSED [ 16%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_fixtures PASSED [ 17%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[ComImport]-ComImport] PASSED [ 18%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[ComVisible(true)]-ComVisible] PASSED [ 19%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]-InterfaceType] PASSED [ 20%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[DispId(1)]-DispId] PASSED [ 21%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_guid_attribute_captures_com_guid PASSED [ 21%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_marshal_member_captured_into_symbol PASSED [ 22%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_progid_activation PASSED [ 23%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_interop_using_captures_target_as_data[using Microsoft.Office.Interop.Excel;-Excel] PASSED [ 24%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_interop_using_captures_target_as_data[using static Microsoft.Office.Interop.Excel.XlDirection;-Excel] PASSED [ 25%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_interop_using_captures_target_as_data[using GenericApp = Microsoft.Office.Interop.Word;-Word] PASSED [ 26%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_string_literal_attribute_trap_rejected PASSED [ 27%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_project_com_references[<COMReference Include="GenericLib">-GenericLib] PASSED [ 28%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_project_com_references[<EmbedInteropTypes>true</EmbedInteropTypes>-EmbedInteropTypes] PASSED [ 28%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_project_com_references[<Reference Include="Microsoft.Office.Interop.Word">-Microsoft.Office.Interop.Word] PASSED [ 29%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_fixtures PASSED [ 30%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_routing_by_extension PASSED [ 31%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_classify_rejects_plain_parse_result PASSED [ 32%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_parse_unreachable_root_raises_analyzer_error PASSED [ 33%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_include_exclude_routing[include0-exclude0-expected0] PASSED [ 34%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_include_exclude_routing[include1-exclude1-expected1] PASSED [ 35%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_include_exclude_routing[include2-exclude2-expected2] PASSED [ 35%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestEndToEndEmission::test_emits_schema_valid_instances PASSED [ 36%]
+tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestEndToEndEmission::test_byte_identical_on_rerun PASSED [ 37%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_success_keeps_default_run_read_only[main_dotnet] PASSED [ 38%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_success_keeps_default_run_read_only[main_vsto] PASSED [ 39%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_json_summary[main_dotnet] PASSED [ 40%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_json_summary[main_vsto] PASSED [ 41%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_output_dir_override[main_dotnet] PASSED [ 42%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_output_dir_override[main_vsto] PASSED [ 42%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_malformed_profile_exits_one[main_dotnet] PASSED [ 43%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_malformed_profile_exits_one[main_vsto] PASSED [ 44%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_unreachable_root_exits_one[main_dotnet] PASSED [ 45%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_unreachable_root_exits_one[main_vsto] PASSED [ 46%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_usage_error_exits_two[main_dotnet] PASSED [ 47%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_usage_error_exits_two[main_vsto] PASSED [ 48%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_stack_modules_present PASSED [ 49%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[csharp_declarations.py] PASSED [ 50%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[csharp_tokens.py] PASSED [ 50%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[dotnet_inventory.py0] PASSED [ 51%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[event_subscriptions.py] PASSED [ 52%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[source_text.py0] PASSED [ 53%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[dotnet_inventory.py1] PASSED [ 54%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[source_text.py1] PASSED [ 55%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[stack_cli.py] PASSED [ 56%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[vsto_office.py] PASSED [ 57%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[vsto_patterns.py] PASSED [ 57%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[com_interop.cs.txt] PASSED [ 58%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[csharp_declarations.cs.txt] PASSED [ 59%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[csharp_events.cs.txt] PASSED [ 60%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[project_com_reference.xmlproj.txt] PASSED [ 61%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[ribbon_customui.xml.txt] PASSED [ 62%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[vsto_ribbon.cs.txt] PASSED [ 63%]
+tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_permitted_stack_literals_do_not_trip_the_ban PASSED [ 64%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_production_modules_exist PASSED [ 64%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py0] PASSED [ 65%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[api_access.py] PASSED [ 66%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[api_syntax.py] PASSED [ 67%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[com_interop.py] PASSED [ 68%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[com_syntax.py] PASSED [ 69%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[configuration.py] PASSED [ 70%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[configuration_input.py] PASSED [ 71%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[csharp_declarations.py] PASSED [ 71%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[csharp_tokens.py] PASSED [ 72%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependencies.py] PASSED [ 73%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_dotnet.py] PASSED [ 74%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_inputs.py] PASSED [ 75%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_node.py] PASSED [ 76%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_python.py] PASSED [ 77%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_values.py] PASSED [ 78%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dotnet_projects.py] PASSED [ 78%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[emitter.py0] PASSED [ 79%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[event_subscriptions.py] PASSED [ 80%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[filesystem_access.py] PASSED [ 81%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[findings.py] PASSED [ 82%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[input_capture.py] PASSED [ 83%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[inventory.py0] PASSED [ 84%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[models.py0] PASSED [ 85%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[pipeline.py0] PASSED [ 85%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[registry.py] PASSED [ 86%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[registry_access.py] PASSED [ 87%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[solution_input.py] PASSED [ 88%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[test_reference_syntax.py] PASSED [ 89%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[test_references.py] PASSED [ 90%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[ui_callbacks.py] PASSED [ 91%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[xml_input.py] PASSED [ 92%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1] PASSED [ 92%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py] PASSED [ 93%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py] PASSED [ 94%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[emitter.py1] PASSED [ 95%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[inventory.py1] PASSED [ 96%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[models.py1] PASSED [ 97%]
+tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[pipeline.py1] PASSED [ 98%]
+tests/scripts/dev_tools/discovery/test_domain_neutrality.py::test_domain_neutrality_templates_contain_no_disallowed_tokens PASSED [ 99%]
+tests/scripts/dev_tools/discovery/test_domain_neutrality.py::test_rendered_v2_drafts_use_only_caller_identity_and_empty_knowledge PASSED [100%]
+
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.13.12-final-0 _______________
+
+Name                                                                        Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------------------------------------------
+packages\discovery-runtime\src\drm_copilot_discovery\analyzer\registry.py      14      0      2      0   100%
+scripts\dev_tools\discovery\analyzer\stack_cli.py                              52      3      2      0    94%   75, 80-81
+scripts\dev_tools\discovery\analyzer\vsto_office.py                           134     11     60      4    91%   156->158, 305, 339, 414, 444-451
+scripts\dev_tools\discovery\analyzer\vsto_patterns.py                          16      0      0      0   100%
+-----------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                         216     14     64      4    93%
+Coverage JSON written to file SCRATCH\issue-980-p4t8-shared-baseline-coverage.json
+============================ 114 passed in 10.16s =============================
+```

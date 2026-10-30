@@ -1,212 +1,184 @@
-"""CLI tests for the stack-analyzer console entry points.
-
-Exercises ``main_dotnet`` and ``main_vsto`` over an in-memory consumer tree and a
-patched profile loader (patched at its import location in ``stack_cli`` per the
-python.md rule). No temporary files are created; the injected clock is pinned.
-"""
+"""Verify fixed stack forwarding and fail-closed legacy seams without source access."""
 
 from __future__ import annotations
 
+import builtins
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
+from drm_copilot_discovery import cli as installed
+from drm_copilot_discovery.cli_arguments import CliInvocation, parse_cli_arguments
+from drm_copilot_discovery.models import JsonObject, ParseLimits
 
 from scripts.dev_tools.discovery.analyzer import stack_cli
-from scripts.dev_tools.discovery.analyzer.pipeline import RealAnalyzerFileSystem
-from scripts.dev_tools.discovery.domain_profile_models import (
-    ArtifactsConfig,
-    DomainProfile,
-    DomainProfileError,
-    LegacySourceConfig,
-    TargetConfig,
-    TechnologyStackConfig,
-)
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from pathlib import Path
+    from types import ModuleType
+    from typing import NoReturn
 
-    # Both console entry points share this callable shape.
+    from drm_copilot_discovery.analyzer.pipeline import AnalyzerFileSystem
+
     EntryPoint = Callable[..., int]
 
-_CLOCK = "2026-07-18T12:34:56Z"
-_SOURCE = "namespace Foo;\npublic class Bar : IRibbonExtensibility {}\n"
+
+@pytest.mark.parametrize(
+    "entry,command,selected",
+    [
+        (stack_cli.main_dotnet, "dotnet", "dotnet"),
+        (stack_cli.main_vsto, "vsto", "office-vsto"),
+    ],
+)
+@pytest.mark.parametrize("argv", [None, (), ("--dry-run",), ("--write",)])
+def test_fixed_stack_route_retains_explicit_selector_and_publication_flags(
+    monkeypatch: pytest.MonkeyPatch,
+    entry: EntryPoint,
+    command: str,
+    selected: str,
+    argv: Sequence[str] | None,
+) -> None:
+    """Forward one fixed alias without implementing selection or publication.
+
+    monkeypatch (pytest.MonkeyPatch) replaces installed execution; entry
+    (EntryPoint), command/selected (str), argv (Sequence[str] | None) choose a
+    canonical request. Return None after exact identity/read-only/flag checks.
+    Only local records change; no source, registry or optional module is accessed.
+    """
+    seen: list[JsonObject] = []
+
+    def forward(name: str, arguments: Sequence[str] | None = None) -> int:
+        """Check name (str)/arguments (Sequence[str] | None); return synthetic exit 0.
+
+        Parse only the immutable request; local records change, never providers.
+        Assertions diagnose mismatched forwarding rather than grant consent.
+        """
+        assert name == command and arguments is argv
+        parsed = parse_cli_arguments(name, arguments or (), limits=ParseLimits())
+        assert isinstance(parsed, CliInvocation)
+        seen.append(parsed.request)
+        return 0
+
+    monkeypatch.setattr(installed, "run_installed_cli", forward)
+    assert entry(argv) == 0 and len(seen) == 1
+    inputs = seen[0]["inputs"]
+    assert isinstance(inputs, JsonObject) and inputs["analyzer_ids"] == (selected,)
+    assert seen[0]["write"] is (argv == ("--write",))
+    assert seen[0]["dry_run"] is (argv == ("--dry-run",))
 
 
-def _clock() -> str:
-    """Return a pinned ISO-8601 timestamp for deterministic emission."""
-    return _CLOCK
+@pytest.mark.parametrize("entry", [stack_cli.main_dotnet, stack_cli.main_vsto])
+@pytest.mark.parametrize("code", [1, 2, 3])
+def test_installed_failure_survives_without_fabricating_success(
+    monkeypatch: pytest.MonkeyPatch, entry: EntryPoint, code: int
+) -> None:
+    """Preserve installed code (int) through entry (EntryPoint), without fallback.
+
+    monkeypatch (pytest.MonkeyPatch) isolates execution. Return None after one
+    forwarding call; no legacy profile/pipeline/clock or external I/O is used.
+    """
+    calls: list[str] = []
+
+    def forward(command: str, argv: Sequence[str] | None = None) -> int:
+        """Record command (str), ignore argv (Sequence[str] | None); return code int.
+
+        Only the test-local call list changes; no provider effects or errors.
+        """
+        calls.append(command)
+        return code
+
+    monkeypatch.setattr(installed, "run_installed_cli", forward)
+    assert entry(()) == code and len(calls) == 1
 
 
-def _profile(source_root: Path, out_root: Path) -> DomainProfile:
-    """Build a valid domain profile pointing at the given in-memory roots."""
-    return DomainProfile(
-        profile_version=1,
-        legacy_source=LegacySourceConfig(root=str(source_root)),
-        target=TargetConfig(root=str(source_root / "target")),
-        technology_stack=TechnologyStackConfig(legacy=("csharp", "vsto")),
-        artifacts=ArtifactsConfig(root=str(out_root)),
+@pytest.mark.parametrize("entry", [stack_cli.main_dotnet, stack_cli.main_vsto])
+@pytest.mark.parametrize("seam", ["clock", "fs", "schema_path"])
+def test_unsupported_stack_seams_refuse_without_access(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    entry: EntryPoint,
+    seam: str,
+) -> None:
+    """Refuse seam (str) before entry (EntryPoint) can reach any installed provider.
+
+    monkeypatch (pytest.MonkeyPatch) traps execution; capsys (CaptureFixture[str])
+    captures fixed refusal. Return None; no callback, profile or filesystem access.
+    """
+
+    def forbidden(*args: object, **kwargs: object) -> NoReturn:
+        """Reject args/kwargs (object) with AssertionError; no return or effects."""
+        raise AssertionError("Unsupported seam was evaluated")
+
+    monkeypatch.setattr(installed, "run_installed_cli", forbidden)
+    code = entry(
+        ("--repository-id", "repository"),
+        clock=forbidden if seam == "clock" else None,
+        fs=cast("AnalyzerFileSystem", forbidden) if seam == "fs" else None,
+        schema_path=cast("Path", forbidden) if seam == "schema_path" else None,
     )
-
-
-def _build_source(source_root: Path) -> None:
-    """Populate an in-memory consumer source tree with one C# file."""
-    source_root.mkdir(parents=True, exist_ok=True)
-    (source_root / "a.cs").write_text(_SOURCE, encoding="utf-8")
-
-
-def _patch_loader(monkeypatch: pytest.MonkeyPatch, profile: DomainProfile) -> None:
-    """Patch the profile loader at its import location in ``stack_cli``."""
-
-    def _fake_loader(path: Path) -> DomainProfile:
-        """Return the prebuilt profile regardless of the requested path."""
-        del path
-        return profile
-
-    monkeypatch.setattr(stack_cli, "load_domain_profile", _fake_loader)
+    output = capsys.readouterr()
+    assert code == 2 and output.out == ""
+    assert "Migrate" in output.err and "No files were read or written" in output.err
 
 
 @pytest.mark.parametrize("entry", [stack_cli.main_dotnet, stack_cli.main_vsto])
-class TestSuccessPaths:
-    """Success-path behavior shared by both entry points."""
+@pytest.mark.parametrize(
+    "argv,code",
+    [
+        (("--help",), 0),
+        (("--nonexistent-flag",), 2),
+        (("missing.yaml",), 2),
+        (("--output-dir", "ignored"), 2),
+        (("--analyzer", "repository"), 2),
+    ],
+)
+def test_optional_cli_preserves_help_usage_and_refuses_ambiguous_inputs(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    entry: EntryPoint,
+    argv: tuple[str, ...],
+    code: int,
+) -> None:
+    """Use actual installed parsing before any optional import/provider work.
 
-    def test_success_writes_instances(
-        self, entry: EntryPoint, mem_fs_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """A valid run exits 0 and writes at least one instance."""
-        # Arrange
-        source_root = mem_fs_path / "consumer"
-        out_root = mem_fs_path / "out"
-        _build_source(source_root)
-        _patch_loader(monkeypatch, _profile(source_root, out_root))
+    monkeypatch (pytest.MonkeyPatch) restores traps; capsys (CaptureFixture[str])
+    captures streams. entry (EntryPoint), argv (tuple[str, ...]), code (int) select
+    the case. Return None after refusal/help checks; local records/streams only.
+    """
+    imports: list[str] = []
+    original = builtins.__import__
 
-        # Act
-        code = entry(
-            ["discovery-profile.yaml"],
-            clock=_clock,
-            fs=RealAnalyzerFileSystem(),
-            schema_path=mem_fs_path / "schemas" / "s.json",
-        )
+    def tracked(
+        name: str,
+        globals: dict[str, object] | None = None,
+        locals: dict[str, object] | None = None,
+        fromlist: Sequence[str] = (),
+        level: int = 0,
+    ) -> ModuleType:
+        """Trap optional name (str); otherwise preserve the original import contract.
 
-        # Assert
-        assert code == 0
-        written = list(out_root.iterdir())
-        assert written
-        assert all(p.name.endswith(".json") for p in written)
+        globals/locals (dict[str, object] | None), fromlist (Sequence[str]), level
+        (int) are forwarded unchanged. Return ModuleType or original error;
+        optional imports raise AssertionError. Only local counters may change.
+        """
+        if ".optional" in name:
+            imports.append(name)
+            raise AssertionError("Optional implementation imported before selection")
+        return original(name, globals, locals, fromlist, level)
 
-    def test_json_summary(
-        self,
-        entry: EntryPoint,
-        mem_fs_path: Path,
-        monkeypatch: pytest.MonkeyPatch,
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        """The ``--json`` flag prints a machine-readable run summary."""
-        # Arrange
-        source_root = mem_fs_path / "consumer"
-        out_root = mem_fs_path / "out"
-        _build_source(source_root)
-        _patch_loader(monkeypatch, _profile(source_root, out_root))
+    def forbidden(selected: str) -> NoReturn:
+        """Reject selected (str) workspace with AssertionError; no I/O or return."""
+        raise AssertionError("Invalid/help argv reached a provider")
 
-        # Act
-        code = entry(
-            ["discovery-profile.yaml", "--json"],
-            clock=_clock,
-            fs=RealAnalyzerFileSystem(),
-            schema_path=mem_fs_path / "schemas" / "s.json",
-        )
-        summary = json.loads(capsys.readouterr().out)
-
-        # Assert
-        assert code == 0
-        assert summary["record_count"] == len(summary["written_paths"])
-        assert summary["record_count"] >= 1
-
-    def test_output_dir_override(
-        self, entry: EntryPoint, mem_fs_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """The ``--output-dir`` flag overrides the profile artifacts root."""
-        # Arrange
-        source_root = mem_fs_path / "consumer"
-        profile_out = mem_fs_path / "profile_out"
-        override_out = mem_fs_path / "override_out"
-        _build_source(source_root)
-        _patch_loader(monkeypatch, _profile(source_root, profile_out))
-
-        # Act
-        code = entry(
-            ["discovery-profile.yaml", "--output-dir", str(override_out)],
-            clock=_clock,
-            fs=RealAnalyzerFileSystem(),
-            schema_path=mem_fs_path / "schemas" / "s.json",
-        )
-
-        # Assert: instances land under the override root, not the profile root.
-        assert code == 0
-        assert list(override_out.iterdir())
-        assert not profile_out.exists()
-
-
-@pytest.mark.parametrize("entry", [stack_cli.main_dotnet, stack_cli.main_vsto])
-class TestErrorPaths:
-    """Error-path and usage-error behavior shared by both entry points."""
-
-    def test_malformed_profile_exits_one(
-        self,
-        entry: EntryPoint,
-        mem_fs_path: Path,
-        monkeypatch: pytest.MonkeyPatch,
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        """A malformed profile exits 1 with a specific error on stderr."""
-
-        # Arrange: the loader raises DomainProfileError for a malformed profile.
-        def _raise(path: Path) -> DomainProfile:
-            del path
-            raise DomainProfileError("profile is malformed: missing legacy_source")
-
-        monkeypatch.setattr(stack_cli, "load_domain_profile", _raise)
-
-        # Act
-        code = entry(
-            ["discovery-profile.yaml"],
-            clock=_clock,
-            fs=RealAnalyzerFileSystem(),
-            schema_path=mem_fs_path / "schemas" / "s.json",
-        )
-
-        # Assert
-        assert code == 1
-        assert "malformed" in capsys.readouterr().err
-
-    def test_unreachable_root_exits_one(
-        self,
-        entry: EntryPoint,
-        mem_fs_path: Path,
-        monkeypatch: pytest.MonkeyPatch,
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        """An unreachable legacy_source.root exits 1 naming the path."""
-        # Arrange: the profile points at a source root that does not exist.
-        missing_root = mem_fs_path / "missing"
-        _patch_loader(monkeypatch, _profile(missing_root, mem_fs_path / "out"))
-
-        # Act
-        code = entry(
-            ["discovery-profile.yaml"],
-            clock=_clock,
-            fs=RealAnalyzerFileSystem(),
-            schema_path=mem_fs_path / "schemas" / "s.json",
-        )
-
-        # Assert
-        assert code == 1
-        assert "missing" in capsys.readouterr().err
-
-    def test_usage_error_exits_two(self, entry: EntryPoint) -> None:
-        """An argparse usage error exits 2 via SystemExit."""
-        # Act / Assert
-        with pytest.raises(SystemExit) as exc_info:
-            entry(["--nonexistent-flag"])
-        assert exc_info.value.code == 2
+    monkeypatch.setattr(installed, "_resolve_workspace", forbidden)
+    # Restore import interception before pytest formats any assertion or failure.
+    with monkeypatch.context() as scoped:
+        scoped.setattr(builtins, "__import__", tracked)
+        result = entry(argv)
+    output = capsys.readouterr()
+    assert result == code and not imports
+    if code:
+        assert json.loads(output.out)["exit_code"] == code and output.err
+    else:
+        assert "dev.discovery." in output.out and not output.err
