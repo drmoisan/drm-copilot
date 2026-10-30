@@ -4,82 +4,93 @@
 - Owner: drmoisan
 - Status: Draft
 - Last Updated: 2026-10-30
-- Parent: #1019 (epic `documentation-estate-tooling`, wave 0, epic child 900002)
+- Parent: #1019 (epic `documentation-estate-tooling`, child 1021, wave 1, band C3; depends on 1020)
 - Work Mode: full-feature
-- Spec: `spec.md` (authoritative for the schema, finding codes, report shape, and rules)
+- Spec: `spec.md` (authoritative for the modules, schema, front-matter subset, finding codes, `check` contract and base configuration)
+- Revision: the Python package design of the earlier version is withdrawn; this story describes the PowerShell design under `.claude/lib/docs/` (new planning cycle under owner decision D1).
 
 ## Story Statement
 
-- As a consumer-repository maintainer, I want to install `drm-copilot-docs-check` and run
-  `dev.docs.check` over my documentation pages, so that missing metadata, broken links or anchors,
-  Diataxis mode drift, and orphan pages are reported deterministically and fail my build.
-- As a consumer-repository maintainer, I want a domain-neutral base PyMarkdown and Vale
-  configuration with a vocabulary file that I own, so that I can adopt Markdown quality checks
-  without inheriting another organization's terms.
-- As the maintainer of the downstream reference generator (epic sibling 900006), I want a precise,
-  fixed page-metadata schema and finding-code catalog, so that every page the generator emits
-  passes the checker with zero findings.
+- As a consumer-repository maintainer, I want to run
+  `Invoke-DocsCommand.ps1 -Command check` with PowerShell 7.4 over the documentation roots declared
+  in my docs profile, so that missing or malformed page metadata, broken links or anchors, Diataxis
+  mode drift and orphan pages are reported deterministically and fail my build, without installing
+  Python or Node.js.
+- As a consumer-repository maintainer, I want optional, domain-neutral markdownlint and Vale
+  configuration that `init` can write for me, with a vocabulary file I own, so that I can adopt
+  Markdown linting without inheriting another organization's terms or a required linter runtime.
+- As the maintainer of the reference generator (1024), I want a fixed page-metadata schema, a
+  documented front-matter subset and a pure checking function, so that every page the generator
+  emits passes the checker with zero findings in a Pester integration test.
+- As the maintainer of the MCP tools (900007) and the consumer CI workflow (1034), I want a stable
+  exit-code contract and a `-Json` envelope that validates against the envelope schema, so that my
+  wrappers parse results without reimplementing any rule.
 
 ## Problem / Why
 
-A destination repository that adopts the documentation-estate tooling has no framework-provided
-way to check the structural quality of its documentation pages. Pages can lack ownership and
-review metadata, carry broken relative links or missing heading anchors, drift from their declared
-Diataxis mode, or become orphans that no other page links to. One consumer repository built a
-bespoke checker for these conditions; the framework needs a domain-neutral, consumer-installable
-equivalent. No Markdown QC configuration (PyMarkdown or Vale) exists on `main`, so the framework
-also has no base configuration a consumer can adopt.
+A destination repository that adopts the documentation-estate tooling has no framework-provided way
+to check the structural quality of its documentation pages. Pages can lack ownership and review
+metadata, carry broken relative links or missing heading anchors, drift from their declared
+Diataxis mode, or become orphans that no entry page reaches. One consumer repository built a
+bespoke checker for these conditions; the framework needs a domain-neutral equivalent that is
+delivered by the existing Claude push-down and needs only PowerShell in the destination repository.
+No Markdown QC configuration exists on `main`, so the framework also has no base configuration a
+consumer can adopt.
 
 ## Personas & Scenarios
 
 - Persona: consumer-repository maintainer
-  - Maintains a repository that adopts the documentation-estate tooling and owns its `docs/` tree.
-  - Cares about pages that carry an owner and review date, links that resolve, and pages that are
-    reachable from an entry page.
-  - Constraints: installs Python packages as a wheel into the repository's own interpreter; does
-    not have this repository's Poetry environment; must keep product vocabulary in a file the
-    consumer controls.
-  - Goals: a single command with a stable exit code for CI and a stable JSON report for tooling.
-    Frustrations: bespoke checkers that drift, nondeterministic output, and base styles that embed
+  - Owns a repository that receives the `.claude/lib/docs/` push-down and keeps a docs profile at
+    `docs/documentation-estate/docs-profile.json`.
+  - Cares about pages that carry an owner, a review date, declared audiences and a Diataxis mode,
+    links that resolve, and pages reachable from a root entry page.
+  - Constraints: PowerShell 7.4 is available; Python and Node.js may not be; product vocabulary must
+    stay in a file the consumer controls.
+  - Goals: one command with a stable exit code for CI and a stable JSON envelope for tooling.
+    Frustrations: bespoke checkers that drift, nondeterministic output, and styles that embed
     another organization's terms.
-- Persona: downstream reference-generator maintainer (epic sibling 900006)
-  - Emits reference pages with front matter (`diataxis_mode: reference`, `surface_refs`) and
-    generated-block markers.
-  - Cares about a schema and rule set that do not change under the generator.
-  - Constraints: must not emit headings that begin with `How to` or `Step <n>`.
-  - Goal: an integration test in which every generated page passes the checker with zero findings.
+- Persona: reference-generator maintainer (1024)
+  - Emits reference pages with JSON-valued front matter (`diataxis_mode: "reference"`,
+    `surface_refs`) and generated-block markers.
+  - Constraints: must not emit headings that begin `how to ` or match `^step\s+[0-9]+\b`; audience
+    identifiers must match `^[a-z0-9][a-z0-9-]*$` and be declared in the profile.
+  - Goal: an integration test in which every generated page passes with zero findings.
+- Persona: MCP and CI maintainer (900007, 1034)
+  - Invokes `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command check -Json`.
+  - Goal: parse `exit_code`, `findings` and `result` from a schema-validated envelope; add no logic.
 - Scenario: consumer CI run
-  - The maintainer installs the wheel and runs `dev.docs.check --root docs --format json` in CI.
-  - A page lacks `last_reviewed` and links to a removed heading. The command prints
-    `FRONT_MATTER_FIELD_MISSING` and `LINK_ANCHOR_MISSING` findings naming the page, sorted by the
-    documented key, and exits `1`.
-  - The maintainer adds the field and fixes the link; the next run prints no findings and exits `0`.
+  - CI runs `-Command check -Json`. One page lacks `last_reviewed` and links to a removed heading on
+    another page. The envelope lists `DOCS_PAGE_FIELD_MISSING` and `DOCS_PAGE_LINK_ANCHOR_MISSING`,
+    each with the page path as `artifact_path`, in the documented order, and the exit code is `1`.
+  - The maintainer adds the field and fixes the link; the next run reports no findings and exits `0`.
 - Scenario: consumer adopts the base configuration
-  - The maintainer copies `extensions/drm-copilot/resources/templates/docs-quality/` into the
-    repository by hand, following the package README, adds product terms to
-    `styles/config/vocabularies/Project/accept.txt`, and runs
-    `pymarkdown --config .pymarkdown.json scan docs` and `vale docs`.
+  - The maintainer runs `-Command init` to review the planned writes, then `-Command init -Write`.
+    `.markdownlint.json`, `.vale.ini`, the `DocsBase` Vale style and an empty
+    `.vale/styles/config/vocabularies/Project/accept.txt` are written; the maintainer adds product
+    terms to `accept.txt`. Running markdownlint or Vale stays optional; `check` remains the gate.
 - Scenario: generator integration
-  - The generator renders reference pages whose front matter conforms to
-    `schemas/docs/v1/page-metadata.schema.json`, with generated-block markers and no instructional
-    headings, and runs the checker over them; it reports zero findings.
+  - The 1024 integration test renders reference pages plus an entry page that links them and calls
+    `Get-DocsPageCheckFinding` on the in-memory page map; it reports zero findings.
 
 ## Acceptance Criteria
 
-- [ ] Missing or malformed front-matter fields, a broken relative link, a missing heading anchor, a Diataxis mode mismatch and an orphan page each produce a distinct finding code naming the file.
-- [ ] `dev.docs.check` exits 0 on a clean page set and non-zero when any finding is present; JSON output ordering is deterministic.
-- [ ] No consumer vocabulary or repository name ships in the base Vale style; vocabulary is a consumer-owned file.
-- [ ] The package imports nothing from `drm_copilot_docs` (independent installability).
-- [ ] Line coverage >= 85% and branch coverage >= 75% for `drm_copilot_docs_check`.
-- [ ] A test fixture page set containing a page with `diataxis_mode: reference`, schema-conforming front matter, `<!-- docs:generated:start id=... -->` and `<!-- docs:generated:end id=... -->` markers, and no heading beginning `How to` or `Step <n>`, reachable from an entry page, produces zero findings and exit code 0.
-- [ ] `packages/docs-page-check/README.md` documents wheel installation, the finding codes, the Diataxis heading prefixes, and manual adoption of `extensions/drm-copilot/resources/templates/docs-quality/`, including that PyMarkdown requires `--config .pymarkdown.json`.
+- [ ] Missing or malformed front-matter fields, a broken relative link, a missing heading anchor, a Diataxis mode mismatch and an orphan page each produce a distinct `DOCS_PAGE_*` finding code whose `artifact_path` names the failing page (`tests/scripts/claude-lib/docs/DocsPageCheck.Tests.ps1`).
+- [ ] `Invoke-DocsCommand.ps1 -Command check` exits 0 on a clean page set and 1 when any finding is present; `-Json` output is byte-identical across repeated runs and across a reversed page-listing order (`DocsPageCheck.Tests.ps1`).
+- [ ] The `-Command check -Json` stdout document validates against `schemas/docs/v1/docs-command-envelope.schema.json` (`DocsPageCheck.Tests.ps1`).
+- [ ] Generated-block markers, other HTML comments and fenced code produce no link, anchor or Diataxis-step finding, and a fixture page set in the 1024 output shape, linked from its root entry page, produces zero findings and exit code 0 (`DocsPageCheck.Tests.ps1`).
+- [ ] `schemas/docs/v1/page-metadata.schema.json` defines the fields `owner`, `last_reviewed`, `audience`, `diataxis_mode` and `surface_refs` (plus optional `title` and `extensions`) with an `audience` item pattern of `^[a-z0-9][a-z0-9-]*$`, and its runtime copy under `.claude/lib/docs/schemas/v1/` is byte-identical (`DocsPageMetadataSchema.Tests.ps1`).
+- [ ] The page-check modules import nothing from the ledger, analyzer-implementation or reference modules, proven by the static import-closure test `tests/scripts/claude-lib/docs/DocsPageImportIsolation.Tests.ps1` with a positive control.
+- [ ] No consumer vocabulary or repository name ships in the base configuration under `.claude/lib/docs/templates/page-check/`; the Vale vocabulary file ships empty and is consumer-owned; `-Command init -Write` writes each base-configuration file with the bytes of its template (`DocsPageTemplates.Tests.ps1`, `DocsNeutrality.Tests.ps1`).
+- [ ] Every new or edited file under `.claude/lib/docs/` is listed in the Claude `pack-manifests/core.json` and its push-down copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/` is byte-identical (`Docs.Manifest.Tests.ps1`).
+- [ ] No Python or TypeScript file is added or modified by the feature diff.
+- [ ] Pester line coverage is at least 85% for each new `DocsPage*.psm1` module, recorded under `<FEATURE>/evidence/coverage/`, and the required check `poshqc / PowerShell QC` (Pester shards on `windows-latest`, with coverage) passes on the pull request head (CI-dependent).
 
 ## Non-Goals
 
-- No push-down command copies `resources/templates/docs-quality/` into a consumer repository in
-  this feature; adoption is manual per the package README, and automated delivery is left to a
-  later epic child.
-- Mechanical judgment of prose correctness.
-- Running PyMarkdown or Vale in this repository.
-- A published distribution channel for the wheel.
-- Enforcement of the surface element-identifier grammar in `surface_refs`.
+- Mechanical judgment of prose correctness (epic non-goal).
+- A required Markdown linter: markdownlint and Vale are optional; no Node.js or Python linter is
+  installed or run (D4).
+- Running markdownlint or Vale on this repository's own documentation (epic A3, issue #5).
+- Comparison of `last_reviewed` with the current date.
+- Validation of generated-block marker balance or identifiers (owned by 1024).
+- MCP wrappers (900007) and the consumer CI workflow (1034).

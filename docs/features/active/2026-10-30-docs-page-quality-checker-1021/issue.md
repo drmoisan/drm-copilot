@@ -22,6 +22,8 @@ also has no base configuration a consumer can adopt.
 
 ## Proposed Behavior
 
+> Note (2026-10-30): the Python package design described in this section is withdrawn under the epic's refined implementation-language rule. `spec.md` in this folder (PowerShell design under `.claude/lib/docs/`) is authoritative.
+
 Ship a separate, independently installable Python package `packages/docs-page-check` (import name
 `drm_copilot_docs_check`) that imports nothing from `drm_copilot_docs`. It provides:
 
