@@ -322,7 +322,7 @@ Resolver module (`.claude/lib/worktree-resolution/HookTargetWorktree.psm1`):
 - [x] The resolver performs no file, environment, or clock read: a test asserts (by AST inspection) that the module contains no file-reading, environment-reading, or clock cmdlet or .NET call outside the default invoker body, and that the default invoker body runs `git -C <SessionRoot> worktree list --porcelain` with no timeout and returns an empty string on non-zero exit, without spawning git.
 
 Codex twin (`.codex/hooks/hook-target-worktree.ps1`):
-- [ ] `.codex/hooks/hook-target-worktree.ps1` exists as a functions-only file whose function names and each function's `Extent.Text` equal those of `HookTargetWorktree.psm1`, verified by `tests/scripts/codex-hooks/hook-target-worktree.Tests.ps1`, which also runs resolver behavior rows on the Linux hook-suite job.
+- [x] `.codex/hooks/hook-target-worktree.ps1` exists as a functions-only file whose function names and each function's `Extent.Text` equal those of `HookTargetWorktree.psm1`, verified by `tests/scripts/codex-hooks/hook-target-worktree.Tests.ps1`, which also runs resolver behavior rows on the Linux hook-suite job.
 - [x] `hook-target-worktree.ps1` is added to `$script:SharedModuleNames` in `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, and that suite passes (parse, line limit, bundle byte identity, core-manifest membership).
 
 Claude batch-budget hooks:
@@ -338,7 +338,7 @@ Claude batch-budget hooks:
 
 Codex batch-budget hooks:
 - [x] Both `.codex/hooks/enforce-python-batch-budget.ps1` and `.codex/hooks/enforce-powershell-batch-budget.ps1` dot-source `hook-target-worktree.ps1` through a guarded `try`/`Add-HookDependencyFailure` statement, and the auto-discovered row in `hook-dependency-failure.Codex.Tests.ps1` passes.
-- [ ] `tests/scripts/codex-hooks/codex-batch-budget.TargetWorktree.Tests.ps1` passes for both Codex hooks with rows for: item checkpoint uncapped; item worktree without checkpoint capped; independent per-worktree counters with worktree-keyed state under the session root `.codex/state/`; root-level `artifacts/` paths not counted; a session-root file with the unchanged state-file name; a path outside every registered worktree counted as today (no containment added); and an `apply_patch` move whose `source_path` and `file_path` resolve to different worktrees, each evaluated against its own root.
+- [x] `tests/scripts/codex-hooks/codex-batch-budget.TargetWorktree.Tests.ps1` passes for both Codex hooks with rows for: item checkpoint uncapped; item worktree without checkpoint capped; independent per-worktree counters with worktree-keyed state under the session root `.codex/state/`; root-level `artifacts/` paths not counted; a session-root file with the unchanged state-file name; a path outside every registered worktree counted as today (no containment added); and an `apply_patch` move whose `source_path` and `file_path` resolve to different worktrees, each evaluated against its own root.
 
 Existing suites and unchanged files:
 - [x] The existing suites pass without edits: `enforce-python-batch-budget.Tests.ps1`, `enforce-powershell-batch-budget.Tests.ps1`, `enforce-python-batch-budget-routing.Tests.ps1`, `enforce-powershell-batch-budget-routing.Tests.ps1`, `enforce-batch-budget.RouteImportFailure.Tests.ps1` (under `tests/scripts/claude-hooks/`), and `codex-batch-budget-hooks.Tests.ps1`, `codex-python-batch-budget-routing.Tests.ps1`, `codex-powershell-batch-budget-routing.Tests.ps1`, `codex-batch-budget.RouteImportFailure.Tests.ps1`, `codex-batch-budget-route-parity.Tests.ps1` (under `tests/scripts/codex-hooks/`), plus `PreToolUseSchema.Contract.Tests.ps1`.
@@ -360,7 +360,7 @@ Non-functional gates:
 - [x] No enforcement hook invokes Python: `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes.
 - [x] Line coverage for `HookTargetWorktree.psm1` and `hook-target-worktree.ps1`, read from `artifacts/pester/powershell-coverage.xml`, meets the repository line threshold, and changed hook lines do not regress coverage.
 - [x] File-size limits hold: the Codex hooks and the Codex twin stay within the limit pinned by `legacy-codex-hook-contracts.Tests.ps1`, and no edited or created file reaches the 801-line hard block.
-- [ ] The full toolchain loop (format, lint, type-check skip for PowerShell, architecture, Pester, contract, integration) completes in one clean pass, and the isolation checks (seeded shuffled file-order run with the brief's required seed count and a fresh single-process run over `tests/scripts`) pass.
+- [x] The full toolchain loop (format, lint, type-check skip for PowerShell, architecture, Pester, contract, integration) completes in one clean pass, and the isolation checks (seeded shuffled file-order run with the brief's required seed count and a fresh single-process run over `tests/scripts`) pass.
 - [x] Evidence artifacts are written under `<FEATURE>/evidence/<kind>/` with write-time UTC stamps, no absolute paths, and pass/fail counts taken from `artifacts/pester/pester-junit.xml`.
 
 ## Risks & Mitigations
