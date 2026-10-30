@@ -40,6 +40,25 @@ Differences from the provisional table in the research file:
 These rows are still pre-clearance upstream text; the plan keeps the option names in one
 declarative table per tool so a later rename is a one-line change.
 
+### F1a - Resolutions of the feature-document open issues (orchestrator, 2026-10-30T23-40)
+
+- Multi-value form: the revised 1020 spec `#### Dispatch table` defines `multi` as "repeatable", and
+  exit 2 covers a "repeated non-`multi` option". A multi option is therefore passed as one
+  `-<Name> <value>` pair per array element, in array order (for example `-Path a.md -Path b.md`).
+- `check -Path`: the 1021 PowerShell addendum (`-Path <relative path>` (repeatable), finding
+  `DOCS_PAGE_PATH_UNMATCHED`) takes relative paths, not globs; a path matching no page is a finding
+  (exit 1), not a usage error.
+- `update-ledger -Limit`: the 1023 PowerShell addendum `### 5.2 update-ledger` permits `-Limit` only
+  for `set-disposition` and `remove-entry`, as an alternative to `-Element` (`-Element` xor
+  `-Limit`). Grammar: docs `identifier` with the `diagnostic-` prefix. `-Limit` with a
+  `-Disposition` other than `deferred` is exit 2 in PowerShell. Every operation requires
+  `-ActorKind` (`human`, `agent`, `tool`) and `-ActorId`. Per-operation table (required / optional):
+  `set-disposition` (`Element` xor `Limit`, `Disposition` / `Page` multi with optional `#anchor`,
+  `Rationale`, `Owner`, `Target`); `remove-entry` (`Element` xor `Limit` / none); `pin` (`Element`,
+  one `Page` without anchor / `Claim`); `unpin` (`Element`, one `Page` without anchor / none);
+  `set-dimension` (`Element`, one `Page` without anchor, `Dimension`, `State` / `Rationale`);
+  `sync-refs` (none / none). Dry run is the default; `-Write` commits.
+
 ## F2 - Envelope schema text
 
 The revised 1020 spec on `feature/docs-profile-and-artifact-schemas-1020`, section
