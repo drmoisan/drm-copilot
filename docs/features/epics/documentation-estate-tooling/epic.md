@@ -48,8 +48,8 @@ features:
   - issue_num: 900010
     feature_folder: documentation-estate-template-and-onboarding
     depends_on: [1034, 900009]
-  - issue_num: 900011
-    feature_folder: docs-surface-analyzer-python-native
+  - issue_num: 1031
+    feature_folder: 2026-10-30-docs-surface-analyzer-python-native-1031
     depends_on: [1022]
 ---
 
@@ -130,7 +130,7 @@ Consequences applied in this document:
   text scanner remains the always-available baseline and keeps its documented precision limit,
   recorded as `deferred` with an owner in the coverage ledger. The Python-native analyzer (Python
   `ast`, written in Python, listed in the python pack manifest, tested under the Python gates) is
-  in the first release as new child 900011, depending on 1022. C# and TypeScript native analyzers
+  in the first release as new child 1031, depending on 1022. C# and TypeScript native analyzers
   are later, optional children; 900004 stays the baseline TypeScript/.NET scanner. The inventory
   snapshot and the ledger record the analysis method (`native` or `scanner`) per element.
 - **D4 - Linting.** Optional by default: configuration data only; no required Node or Python
@@ -147,7 +147,7 @@ Consequences applied in this document:
 1020 was cleared before these decisions. Its schemas and contracts gain: an `analysis_method`
 field (`native` | `scanner`) on inventory elements and ledger entries; the declaration-lines
 digest rule; `schemas/docs/v1/docs-command-envelope.schema.json` for the `-Json` envelope; and a
-900011 anchor in `DocsAnalyzerRegistry.psm1`. 1020 is re-planned once for this requirements change
+1031 anchor in `DocsAnalyzerRegistry.psm1`. 1020 is re-planned once for this requirements change
 (a new cycle under D1).
 
 Consequences for other children: 1022 and 900004 record `analysis_method: scanner` and the
@@ -216,6 +216,17 @@ provisional defaults.
 - **Q8 - PowerShell floor (from 1020).** Provisional default: require PowerShell 7.4 (Draft
   2020-12 `Test-Json`) and fail closed below it.
 - **Q9 - Tier (from 1020).** Provisional default: `.claude/lib/docs` is T3.
+- **Q11 - Python-invocation guard (from 1031).** `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`
+  forbids Python invocation from `.claude/lib` with an empty allowlist. Provisional default: one
+  explicit allowlist entry for `DocsAnalyzerPythonNative.psm1`, citing D3, in a form the guard
+  detects (whether that form supports a timeout is open).
+- **Q12 - Packaging strips Python (from 1031).** `.vscodeignore` (`**/*.py`) and
+  `packages/mcp-server/prepack.cjs` remove all Python from the VSIX and npm package. Provisional
+  default: a narrow carve-out for `.claude/lib/docs/python/**`, with the pinning test updated.
+- **Q13 - Host-dependent inventory (from 1031).** Provisional default: `-AnalysisMethod
+  auto|native|scanner`, default `auto`; `native` fails closed when unavailable.
+- **Q14 - Full-tree push-down ships the Python helper everywhere (from 1031).** Provisional
+  default: accept and document; only the python pack manifest lists it.
 - **Q10 - `init` writes into consumer `.github/workflows/` and root dotfiles (from 1020).**
   Provisional default: only with `-Write`, never overwriting an existing file without `-Force`.
 
@@ -233,7 +244,7 @@ provisional defaults.
 | 2 | 1034 | docs-enforcement-and-ci | C3 | Consumer workflow template, surface-delta helper, opt-in integration-PR gate hook, feature-review check. |
 | 4 | 900009 | docs-authoring-workflow | C4 | Four documentation roles, eight skills, page templates, mirrored to all surfaces. |
 | 5 | 900010 | documentation-estate-template-and-onboarding | C3 | `documentation-estate` epic template, onboarding docs, end-to-end Pester fixture test. |
-| 2 | 900011 | docs-surface-analyzer-python-native | C3 | Python-native (`ast`) analyzer for Python surfaces, shipped in the python pack, with scanner fallback (D3). |
+| 2 | 1031 | docs-surface-analyzer-python-native | C3 | Python-native (`ast`) analyzer for Python surfaces, shipped in the python pack, with scanner fallback (D3). |
 
 ## Non-Goals
 
@@ -245,7 +256,7 @@ provisional defaults.
 - A docs-site build (A2).
 - Markdown QC adoption for this repository's own documentation (issue #5, A3).
 - Changes to the Python discovery runtime. A defect found there is filed separately.
-- New Python code other than the D3 Python-native analyzer (900011), and TypeScript outside MCP
+- New Python code other than the D3 Python-native analyzer (1031), and TypeScript outside MCP
   tools and extension commands. C# and TypeScript native analyzers (later, optional children). Existing
   repository Python tooling (for example the mirror generators `scripts/dev_tools/agentic_sync.py`
   and `scripts/dev_tools/generate_codex_agent_variants.py`, or the plan validator) may still be
@@ -326,6 +337,21 @@ provisional defaults.
 - Every new `.claude/lib/docs/` file is listed in the Claude `pack-manifests/core.json` and
   mirrored byte-identically. `.claude/lib/docs` is T3 in `quality-tiers.yml`.
 - Execution runs in the item worktree under an exempt-route checkpoint (batch budget).
+
+### Native-analyzer contracts from the preparation of 1031 (binding)
+
+- The Python helper emits raw facts only (kind, path, declaration, line span); PowerShell computes
+  every identifier and declaration-lines digest with the shared 1020/1022 functions, so the
+  identity rule has one implementation.
+- Native analysis covers only `.py` files for `python-cli`, `python-http`, `python-public-api` and
+  `python-architecture`; Python floor 3.10; interpreter run as `-I -B -X utf8`, UTF-8 JSON in,
+  ASCII-escaped JSON out. The helper lives under `.claude/lib/docs/python/`.
+- Preconditions 1020/1022 must provide: the 1031 registry anchor (own provider table, because the
+  registry rejects duplicate identifiers), `analysis_method`, the declaration-lines digest function
+  and per-kind line-range rules, a shared fixture path, a process member on the command context,
+  and an `information` severity in `New-DocsDiagnostic`.
+- Conflict to resolve in 1020: its planned manifest test (every file under `.claude/lib/docs/` is
+  listed in core) must exclude `.claude/lib/docs/python/`, which only the python pack lists.
 
 ### Command contract decisions from the first preparation of 1023 (language-independent)
 
@@ -651,14 +677,14 @@ Acceptance criteria:
 - The onboarding guide documents every subcommand and MCP tool with an example and states the
   destination-repository prerequisite (PowerShell 7).
 
-### 900011 - docs-surface-analyzer-python-native (wave 2, C3)
+### 1031 - docs-surface-analyzer-python-native (wave 2, C3)
 
 Band rationale: a bounded Python `ast` analyzer behind an existing contract; the precision and
 classification rules come from 1022, and the new work is the cross-language handoff (PowerShell
 inventory to a pack-shipped Python helper) and pack packaging. Owner-approved exception D3.
 
 Scope split with 1022 (planner decision): 1022 is the PowerShell text scanner for Python and
-configuration surfaces and is always available. 900011 adds a native analyzer for the Python
+configuration surfaces and is always available. 1031 adds a native analyzer for the Python
 surfaces only (`python-cli`, `python-http`, `python-public-api`, `python-architecture`); the
 `config-files` analyzer stays scanner-only. When the python pack is installed and a Python
 interpreter is available, `inventory` runs the native analyzer for those four identifiers and
@@ -676,7 +702,7 @@ Files (create):
 
 Files (edit): `extensions/drm-copilot/resources/claude-customizations/pack-manifests/python.json`
 (and the Codex pack manifest if the python pack carries libs there), `DocsAnalyzerRegistry.psm1`
-(append under the 900011 anchor), `pack-manifests/core.json` for the PowerShell adapter.
+(append under the 1031 anchor), `pack-manifests/core.json` for the PowerShell adapter.
 
 Acceptance criteria:
 - For the 1022 Python fixture, the native analyzer emits the same element identifiers as the
@@ -701,9 +727,9 @@ Acceptance criteria:
 - 1034 depends on the checker and the receipt only.
 - 900009 depends on the MCP tools its roles are restricted to.
 - 900010 composes everything and depends on the authoring workflow and enforcement.
-- 900011 depends on 1022 (analyzer identifiers, element kinds, fixtures and the fallback target)
+- 1031 depends on 1022 (analyzer identifiers, element kinds, fixtures and the fallback target)
   and transitively on 1020; it lands in wave 2, the earliest wave its dependencies allow. No
-  feature depends on 900011, because the scanner keeps every downstream feature working without it.
+  feature depends on 1031, because the scanner keeps every downstream feature working without it.
 
 ## Planned Waves
 
@@ -711,7 +737,7 @@ Computed with `scripts/dev_tools/epic_wave_computation.py`:
 
 - Wave 0: 1020
 - Wave 1: 1021, 1022, 900004, 1023
-- Wave 2: 1024, 1034, 900011
+- Wave 2: 1024, 1034, 1031
 - Wave 3: 900007
 - Wave 4: 900009
 - Wave 5: 900010
