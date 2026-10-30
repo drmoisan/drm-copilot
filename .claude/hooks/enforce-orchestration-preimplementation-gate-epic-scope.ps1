@@ -168,6 +168,14 @@ function Get-OrchestrationGateCommandOperandPath {
         wrapper payload). Each -C value in any git global-option position and each absolute
         operand is returned, distinct and in first-seen order. Relative operands, a -C on a
         git segment invoking neither add nor commit, and Indeterminate matches are ignored.
+        For a match whose record is not argument-injected, a subcommand-aware walk (issue
+        #1010, F2) also reads the tokens after the subcommand with a per-subcommand option
+        model, compared case-sensitively: a value option consumes the next token unless its
+        value is inline (--name=value) or attached (-mvalue); a standalone flag consumes
+        itself; '--' makes every later token an operand; a redirection and its target are
+        skipped; any other dash token, such as the cluster -am, stops the walk. Its literal
+        absolute tokens are returned, and a token the walk reads as an option value is not
+        returned as an operand.
     .PARAMETER Command
         The full command line.
     .OUTPUTS
@@ -177,12 +185,43 @@ function Get-OrchestrationGateCommandOperandPath {
     [OutputType([string[]])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Command)
 
+    $valueOptions = @{
+        commit = @('-m', '--message', '-F', '--file', '--author', '--date', '-C', '--reuse-message', '-c', '--reedit-message', '-t', '--template', '--fixup', '--squash', '--trailer', '--pathspec-from-file')
+        add    = @('--pathspec-from-file', '--chmod')
+    }
+    $flagOptions = @{
+        commit = @('-a', '--all', '--amend', '--no-edit', '--no-verify', '-n', '-s', '--signoff', '-q', '--quiet', '-v', '--verbose', '--allow-empty', '-o', '--only', '-i', '--include', '--pathspec-file-nul')
+        add    = @('-A', '--all', '-u', '--update', '-f', '--force', '-N', '--intent-to-add', '-n', '--dry-run', '-v', '--verbose', '--pathspec-file-nul')
+    }
+    $absolutePattern = '^([A-Za-z]:[\\/]|/)'
     $paths = [System.Collections.Generic.List[string]]::new()
     foreach ($subcommand in @('add', 'commit')) {
         foreach ($match in @(Get-CommandLineInvocation -CommandText $Command -CommandWord 'git' -SubcommandPath @($subcommand))) {
             if ($match.Status -ne 'Structural') { continue }
+            $walked = [System.Collections.Generic.List[string]]::new()
+            $optionValues = [System.Collections.Generic.List[string]]::new()
+            $tokens = if ($match.Segment.ArgumentInjected) { [string[]]@() } else { [string[]]@($match.Segment.Tokens) }
+            $afterSeparator = $false
+            for ($index = [int]$match.OperandIndex; $index -lt $tokens.Count; $index++) {
+                $token = $tokens[$index]
+                if (-not $afterSeparator -and $token -match '^(<|>|\d*>|&>)') {
+                    if ($token -match '^(\d*[<>]{1,2}&?|&>{1,2})$') { $index++ }
+                    continue
+                }
+                if ($afterSeparator -or -not $token.StartsWith('-')) { $walked.Add($token); continue }
+                if ($token -ceq '--') { $afterSeparator = $true; continue }
+                $name = if ($token.IndexOf('=') -gt 0) { $token.Substring(0, $token.IndexOf('=')) } else { $token }
+                if ($valueOptions[$subcommand] -ccontains $name) {
+                    if ($name -ceq $token -and $index + 1 -lt $tokens.Count) { $index++; $optionValues.Add($tokens[$index]) }
+                    continue
+                }
+                if ($token -match '^-[^-].' -and $valueOptions[$subcommand] -ccontains $token.Substring(0, 2)) { continue }
+                if ($flagOptions[$subcommand] -ccontains $token) { continue }
+                break
+            }
             $candidates = @(@($match.GlobalOptions) | Where-Object { $_.Name -ceq '-C' -and $_.Value } | ForEach-Object { [string]$_.Value })
-            $candidates += @(@($match.Operands) | Where-Object { $_ -match '^([A-Za-z]:[\\/]|/)' })
+            $candidates += @(@($match.Operands) | Where-Object { $_ -match $absolutePattern -and $optionValues -cnotcontains $_ })
+            $candidates += @($walked | Where-Object { $_ -match $absolutePattern -and (Test-CommandLineTokenLiteral -Token $_) })
             foreach ($candidate in $candidates) {
                 if ($paths -notcontains $candidate) { $paths.Add($candidate) }
             }

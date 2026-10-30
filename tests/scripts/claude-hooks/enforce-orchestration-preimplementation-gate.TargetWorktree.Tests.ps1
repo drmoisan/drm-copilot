@@ -147,6 +147,67 @@ Describe 'Claude gate target-worktree building blocks (issue #1010)' {
         $text | Should -BeExactly ''
         $script:OrchestrationGateWorktreeListFailed | Should -BeTrue
     }
+
+    It 'B10 collects an absolute pathspec after the value-taking commit option <Label>' -ForEach @(
+        # Label differs from Option only where two options differ by case alone, so the row names stay unique when case-folded.
+        @{ Label = '-m msg'; Option = '-m msg' }
+        @{ Label = '--message msg'; Option = '--message msg' }
+        @{ Label = '--message=msg'; Option = '--message=msg' }
+        @{ Label = '-mmsg'; Option = '-mmsg' }
+        @{ Label = '-F msg.txt'; Option = '-F msg.txt' }
+        @{ Label = '--file msg.txt'; Option = '--file msg.txt' }
+        @{ Label = '--author Sample'; Option = '--author Sample' }
+        @{ Label = '--author=Sample'; Option = '--author=Sample' }
+        @{ Label = '--date now'; Option = '--date now' }
+        @{ Label = '-C HEAD (reuse-message)'; Option = '-C HEAD' }
+        @{ Label = '-c HEAD (reedit-message)'; Option = '-c HEAD' }
+    ) {
+        # Act
+        $paths = @(Get-OrchestrationGateCommandOperandPath -Command "git commit $Option $($script:ItemRoot)/scripts/Sample.ps1")
+
+        # Assert
+        $paths | Should -Be @("$($script:ItemRoot)/scripts/Sample.ps1")
+    }
+
+    It 'B11 collects an absolute pathspec after git add --pathspec-from-file `<value`>' {
+        # Act
+        $paths = @(Get-OrchestrationGateCommandOperandPath -Command "git add --pathspec-from-file stage-list.txt $($script:ItemRoot)/scripts/Sample.ps1")
+
+        # Assert
+        $paths | Should -Be @("$($script:ItemRoot)/scripts/Sample.ps1")
+    }
+
+    It 'B12 does not collect the absolute value of a value-taking option' {
+        # Act
+        $paths = @(Get-OrchestrationGateCommandOperandPath -Command "git commit -F $($script:ItemRoot)/msg.txt")
+
+        # Assert
+        $paths.Count | Should -Be 0
+    }
+
+    It 'B13 stops collection at an unmodeled option' {
+        # Act
+        $paths = @(Get-OrchestrationGateCommandOperandPath -Command "git commit --unmodeled-sample value $($script:ItemRoot)/scripts/Sample.ps1")
+
+        # Assert
+        $paths.Count | Should -Be 0
+    }
+
+    It 'B14 collects an absolute pathspec after a standalone flag and after --' {
+        # Act
+        $paths = @(Get-OrchestrationGateCommandOperandPath -Command "git commit -a --no-verify -m msg -- $($script:ItemRoot)/scripts/Sample.ps1")
+
+        # Assert
+        $paths | Should -Be @("$($script:ItemRoot)/scripts/Sample.ps1")
+    }
+
+    It 'B15 skips a redirection and its target and collects the absolute pathspec after them' {
+        # Act
+        $paths = @(Get-OrchestrationGateCommandOperandPath -Command "git commit -m msg 2> $($script:OtherRoot)/err.txt $($script:ItemRoot)/scripts/Sample.ps1")
+
+        # Assert
+        $paths | Should -Be @("$($script:ItemRoot)/scripts/Sample.ps1")
+    }
 }
 
 Describe 'Claude gate target-worktree decisions (issue #1010)' {
@@ -346,5 +407,17 @@ Describe 'Claude gate target-worktree decisions (issue #1010)' {
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         Should -Invoke Get-OrchestrationGateWorktreeList -Times 1 -Exactly
         Should -Invoke Get-CheckpointContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:SessionCheckpoint }
+    }
+
+    It 'T15 admits git commit -m msg `<abs file`> against a ready item checkpoint, reading the item checkpoint' {
+        # Arrange (the session-root checkpoint is empty, so only the item checkpoint can admit)
+        Set-TargetFixture -ItemBody $script:ReadyItem
+
+        # Act
+        $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw (ConvertTo-ToolPayload -Tool 'Bash' -Command "git commit -m msg $($script:ItemRoot)/scripts/Sample.ps1")
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        Should -Invoke Get-CheckpointContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:ItemCheckpoint }
     }
 }
