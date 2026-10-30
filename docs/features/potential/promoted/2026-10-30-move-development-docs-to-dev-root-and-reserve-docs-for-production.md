@@ -77,7 +77,7 @@ docs/
 - Dot-folder risk: Node glob libraries and ripgrep skip dot folders by default; Python and PowerShell do not.
 - Agent permission rules cannot read config, so write scopes become generated or checked literals; a missed scope fails mid-run.
 - Enforcement hooks do not invoke Python.
-- Design decisions Q12 to Q16 and Q17 below were put to the owner and are not yet answered. Their recommended answers are written down here as the working defaults and must be confirmed during the spec.
+- Decisions D-12 to D-17 were confirmed by the owner on 2026-10-30.
 
 ## Decisions
 
@@ -95,7 +95,7 @@ Settled by the owner:
 - **D-10** `docs/` keeps only production documentation, starting with a short README.
 - **D-11** Delivered as one feature with three phases, run after the current batch merges.
 
-Recommended and awaiting owner confirmation (working defaults):
+Confirmed by the owner on 2026-10-30:
 
 - **D-12** `.dev/**` is added to `config/ci-docs-only-paths.json`.
 - **D-13** Every Node-glob and ripgrep consumer gets explicit dot handling plus a test.
