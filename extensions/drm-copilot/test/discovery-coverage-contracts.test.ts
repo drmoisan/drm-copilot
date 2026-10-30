@@ -1,8 +1,9 @@
 /**
  * Coverage-threshold contract for the discovery host modules (issue #980).
  *
- * `jest.config.cjs` sits at the 500-line limit, so the discovery per-file
- * thresholds live in `jest.discovery-coverage.json` and are merged into the
+ * Under the tiered file-size policy `jest.config.cjs` must stay below the
+ * 700-line advisory tier, so the discovery per-file thresholds live in
+ * `jest.discovery-coverage.json` and are merged into the
  * `coverageThreshold` map. These tests pin that every discovery production
  * module has its own entry at the 90% line / 75% branch floor, that the merge
  * reaches the Jest configuration, that no `global` key exists, and that each

@@ -1,6 +1,7 @@
 // Issue #980: the discovery host modules keep their per-file thresholds in a
-// sibling JSON map (gated at 90% lines / 75% branches) because this file sits
-// at the 500-line limit; the map is merged below and carries no `global` key.
+// sibling JSON map (gated at 90% lines / 75% branches) so that this file stays
+// below the 700-line advisory tier of the tiered file-size policy; the map is
+// merged below and carries no `global` key.
 const discoveryCoverageThresholds = require("./jest.discovery-coverage.json");
 
 /** @type {import('jest').Config} */
@@ -484,6 +485,49 @@ module.exports = {
       branches: 75,
     },
     "./src/mcp-repo-automation-tool-definitions-handoff.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #980, remediation cycle 1 (P15-T20): the ten production files that
+    // were measured but carried no per-file entry. Per-file entries only; the
+    // map has no `global` key.
+    "./src/lib/codex-native-converter/classifier-claude.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/classifier.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/inventory.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/mapping.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/pipeline-render.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/rewrites-rules.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/rewrites.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/codex-topology-resolver.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestrator-state-codex-model-routing.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/repo-automation-tool-names.ts": {
       lines: 85,
       branches: 75,
     },

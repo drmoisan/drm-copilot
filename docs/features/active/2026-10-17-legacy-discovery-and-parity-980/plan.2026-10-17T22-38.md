@@ -918,7 +918,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Run the module; prove the assertion can fail with SCRATCH/issue-980-p15-isolation-probe.py (a copy of the test that mutates the live contents before the comparison), recorded in FEATURE/evidence/regression-testing/p15-isolation-assertion.<timestamp>.md, then discard the probe.
   - Acceptance: The test passes on the tree and the probe run fails on the `after == before` assertion; the file stays at or below 500 logical lines.
 
-- [ ] [P15-T20] Gate the ten unthresholded TypeScript files (extensions/drm-copilot/jest.config.cjs).
+- [x] [P15-T20] Gate the ten unthresholded TypeScript files (extensions/drm-copilot/jest.config.cjs).
   - Files and behavior: Add `coverageThreshold` entries with `lines: 85` and `branches: 75` for ./src/lib/codex-native-converter/{classifier-claude,classifier,inventory,mapping,pipeline-render,rewrites-rules,rewrites}.ts, ./src/lib/validate/{codex-topology-resolver,orchestrator-state-codex-model-routing}.ts and ./src/repo-automation-tool-names.ts to the map in extensions/drm-copilot/jest.config.cjs under one comment naming this cycle; update the header comment of ET/discovery-coverage-contracts.test.ts from the 500-line limit to the tiered policy wording.
   - Tests and proof: `node run-jest.cjs --coverage` in extensions/drm-copilot passes with every threshold met (read from the run output); record the logical line count of jest.config.cjs in FEATURE/evidence/other/p15-jest-thresholds.<timestamp>.md.
   - Acceptance: The coverage run exits 0 with no threshold failure; jest.config.cjs is below 700 logical lines and the count is recorded; no existing entry is lowered.
