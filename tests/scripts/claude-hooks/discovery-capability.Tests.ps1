@@ -53,8 +53,8 @@ Describe 'discovery-capability-probe.ps1 (Claude Code)' {
         $observation['controls']['trusted_attribution'] | Should -BeTrue
         $observation['controls']['forbidden_tools_denied'] | Should -BeTrue
         $observation['probe']['result'] | Should -Be 'denied'
-        $observation['probe']['sentinel_id'] | Should -Be 'observation-tool-alpha'
-        $observation['probe']['evidence_ref'] | Should -Be 'observation-shell-alpha'
+        $observation['probe']['sentinel_id'] | Should -Be $script:GateSentinelToolRef
+        $observation['probe']['evidence_ref'] | Should -Be $script:GateSentinelShellRef
         $observation['runtime']['build_sha256'] | Should -Match '^[0-9a-f]{64}$'
     }
 
@@ -80,7 +80,7 @@ Describe 'discovery-capability-probe.ps1 (Claude Code)' {
         @{ Name = 'an observation without agent_id'; Seed = @{ Tool = @{ agent_id = $null; agent_type = $null } }; Control = 'trusted_attribution'; Text = 'carries no sentinel agent identity' }
         @{ Name = 'a stale observation'; Seed = @{ Tool = @{ observed_at = '2026-10-22T10:00:00Z' } }; Control = 'trusted_attribution'; Text = 'is stale' }
         @{ Name = 'a handler-hash mismatch'; Seed = @{ Tool = @{ handler_sha256 = ('f' * 64) } }; Control = 'trusted_attribution'; Text = 'hash differs' }
-        @{ Name = 'an unconsumed sentinel grant'; Seed = @{ Tool = @{ state = 'issued' } }; Control = 'trusted_attribution'; Text = 'was not consumed' }
+        @{ Name = 'an unconsumed sentinel grant'; Seed = @{ NoLatch = $true }; Control = 'trusted_attribution'; Text = 'was not consumed' }
     ) {
         $observation = Invoke-Probe -Store (Add-GateSentinelObservation -Store (Get-GateStore) @Seed)
         $observation['status'] | Should -Be 'unsupported' -Because $Name

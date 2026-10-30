@@ -14,6 +14,13 @@
 
 Set-StrictMode -Version Latest
 
+# The sentinel helper builds its records through the gate's own modules; importing without -Force is a no-op
+# in a suite that already imported them and makes them visible in a suite that imported only the probe module.
+$script:GateLibrary = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/discovery-validation").Path
+foreach ($gateModule in @('DiscoveryEncoding', 'DiscoveryAuthority', 'DiscoveryPayload', 'DiscoveryToolRouting', 'DiscoveryObservation')) {
+    Import-Module (Join-Path $script:GateLibrary "$gateModule.psm1")
+}
+
 $script:GateWorkspaceRoot = 'C:/Users/Example/Repos/Workspace'
 $script:GateWorkspaceSha256 = '77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6'
 $script:GateProfilePath = 'docs/migration/discovery/domain-profile.yaml'
@@ -173,18 +180,61 @@ function Get-GateEnvelope {
 $script:GateRepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
 # The registered PreToolUse handler of each host; the gate records the hash of its own bytes and the probe hashes the same file.
 $script:GateToolHandlers = @{ 'claude-code' = '.claude/hooks/enforce-discovery-artifact-gate.ps1'; 'codex' = '.codex/hooks/enforce-discovery-artifact-gate.ps1'; 'github-copilot' = '.github/hooks/discovery-pre-tool.ps1' }
+# The shared sentinel consumption fixture: the gate envelopes, the records the gate builds from them and the exact consumer latch.
+$script:GateSentinelFixture = Get-Content -LiteralPath (Join-Path $script:GateRepoRoot 'tests/fixtures/discovery_host/sentinel-consumption.json') -Raw | ConvertFrom-Json -Depth 12
+# The references the gate derives from the fixture tool-call identifiers; the probe suites assert these instead of hand-chosen names.
+$script:GateSentinelToolRef = [string]$script:GateSentinelFixture.records.tool.observation_ref
+$script:GateSentinelShellRef = [string]$script:GateSentinelFixture.records.shell.observation_ref
+
+function Get-GateSentinelRecord {
+    <#
+    .SYNOPSIS
+        Builds one fixture observation exactly as the gate does for HostName.
+    .DESCRIPTION
+        The fixture envelope is re-emitted in HostName's key spelling with the fixture
+        identity fields, then normalized, attributed, routed and recorded through the
+        gate's own modules with the fixture clock, nonce and TTL and the given handler hash.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory = $true)][string]$HostName,
+        [Parameter(Mandatory = $true)][pscustomobject]$Envelope,
+        [Parameter(Mandatory = $true)][string]$HandlerSha256
+    )
+
+    $fixture = $script:GateSentinelFixture
+    $toolInput = [ordered]@{}
+    foreach ($property in $Envelope.tool_input.PSObject.Properties) { $toolInput[$property.Name] = $property.Value }
+    $json = Get-GateEnvelope -HostName $HostName -ToolName $Envelope.tool_name -ToolInput $toolInput -SessionId $Envelope.session_id -Cwd $Envelope.cwd `
+        -AgentId $Envelope.agent_id -AgentType $Envelope.agent_type -ToolUseId $Envelope.tool_use_id
+    $normalized = ConvertFrom-DiscoveryHostPayloadText -HostName $HostName -Text $json
+    $principal = Get-DiscoveryTrustedPrincipal -Normalized $normalized
+    $tool = Resolve-DiscoveryToolName -ToolName $normalized.ToolName
+    # The gate allows the sentinel tool with a grant digest and denies the sentinel shell command; the fixture holds one of each.
+    $isSentinelTool = ($tool.Family -eq 'mcp-discovery' -and $tool.Name -ceq 'discovery_capability_sentinel')
+    $digest = $(if ($isSentinelTool) { Get-DiscoveryInputDigest -Tool 'discovery_capability_sentinel' -Operation 'sentinel' -Inputs $normalized.ToolInput } else { $null })
+    return ConvertTo-DiscoveryHostObservationRecord -Normalized $normalized -Principal $principal -ToolName ([string]$normalized.ToolName) `
+        -Decision $(if ($isSentinelTool) { 'allow' } else { 'deny' }) -Code $(if ($isSentinelTool) { 'SENTINEL' } else { 'SHELL' }) `
+        -HandlerSha256 $HandlerSha256 -Now ([datetime]$fixture.gate_now).ToUniversalTime() -Nonce ([string]$fixture.nonce) `
+        -SentinelInputSha256 $digest -TtlSeconds ([int]$fixture.ttl_seconds)
+}
 
 function Add-GateSentinelObservation {
     <#
     .SYNOPSIS
-        Seeds session-alpha's sentinel observation pair into Store and returns the store.
+        Seeds session-alpha's sentinel observation pair from the shared consumption fixture into Store and returns the store.
     .DESCRIPTION
         The pair is what the native PreToolUse gate records while the capability sentinel
-        agent runs: the consumed sentinel tool call (observation-tool-alpha, with the
-        one-use grant fields) and the denied sentinel shell command (observation-shell-alpha),
-        both attributed to agent-sentinel and carrying the hash of the repository's registered
-        tool handler for HostName. Tool overrides fields of the tool observation; NoTool and
-        NoShell omit a record. Records are placed directly in Files, so Writes is unchanged.
+        agent runs. Both records are built from the fixture envelopes through the gate's own
+        normalizer, principal, tool routing and record builder (Get-GateSentinelRecord) with
+        the hash of the repository's registered tool handler for HostName, so their references
+        are the ones the gate derives from the fixture tool-call identifiers
+        ($script:GateSentinelToolRef and $script:GateSentinelShellRef). The consumer's effect is
+        the fixture latch text placed verbatim at the tool record path plus `.consumed`; NoLatch
+        omits it, and a caller that overrides observation_ref passes NoLatch. Tool overrides
+        fields of the tool record after it is built; NoTool and NoShell omit a record. Records
+        are placed directly in Files, so Writes is unchanged.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -193,26 +243,23 @@ function Add-GateSentinelObservation {
         [Parameter(Mandatory = $false)][string]$HostName = 'claude-code',
         [Parameter(Mandatory = $false)][hashtable]$Tool = @{},
         [Parameter(Mandatory = $false)][switch]$NoTool,
-        [Parameter(Mandatory = $false)][switch]$NoShell
+        [Parameter(Mandatory = $false)][switch]$NoShell,
+        [Parameter(Mandatory = $false)][switch]$NoLatch
     )
 
+    $fixture = $script:GateSentinelFixture
     $directory = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/observations"
     $handlerSha256 = Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:GateRepoRoot $script:GateToolHandlers[$HostName])))
-    $common = [ordered]@{
-        '$schema' = 'urn:drm-copilot:discovery:2.0.0:host-observation'; schema_version = '2.0.0'; artifact_kind = 'host-observation'; host = $HostName; session_id = 'session-alpha'
-        agent_id = 'agent-sentinel'; agent_type = 'discovery-capability-sentinel'; parent_agent_id = 'root'; tool_use_id_present = $true; handler_sha256 = $handlerSha256; observed_at = '2026-10-22T11:59:00Z'
-    }
     if (-not $NoTool) {
-        $record = [ordered]@{} + $common
-        $record['id'] = 'observation-tool-alpha'; $record['observation_ref'] = 'observation-tool-alpha'; $record['tool_name'] = 'mcp__drm-copilot__discovery_capability_sentinel'
-        $record['decision'] = 'allow'; $record['code'] = 'SENTINEL'; $record['tool'] = 'discovery_capability_sentinel'; $record['input_sha256'] = ('d' * 64); $record['expires_at'] = '2026-10-22T12:04:00Z'; $record['state'] = 'consumed'
+        $record = Get-GateSentinelRecord -HostName $HostName -Envelope $fixture.envelopes.tool -HandlerSha256 $handlerSha256
         foreach ($key in $Tool.Keys) { $record[$key] = $Tool[$key] }
-        $Store.Files["$directory/observation-tool-alpha.json"] = ($record | ConvertTo-Json -Depth 4)
+        $path = "$directory/$($record['observation_ref']).json"
+        $Store.Files[$path] = (($record | ConvertTo-Json -Depth 8) + "`n")
+        if (-not $NoLatch) { $Store.Files["$path.consumed"] = [string]$fixture.latch.text }
     }
     if (-not $NoShell) {
-        $record = [ordered]@{} + $common
-        $record['id'] = 'observation-shell-alpha'; $record['observation_ref'] = 'observation-shell-alpha'; $record['tool_name'] = 'Bash'; $record['decision'] = 'deny'; $record['code'] = 'SHELL'
-        $Store.Files["$directory/observation-shell-alpha.json"] = ($record | ConvertTo-Json -Depth 4)
+        $record = Get-GateSentinelRecord -HostName $HostName -Envelope $fixture.envelopes.shell -HandlerSha256 $handlerSha256
+        $Store.Files["$directory/$($record['observation_ref']).json"] = (($record | ConvertTo-Json -Depth 8) + "`n")
     }
     return $Store
 }

@@ -130,7 +130,7 @@ Describe 'observation evidence' {
         @{ HostName = 'codex'; Name = 'a Codex-shaped observation without agent_id'; Seed = @{ Tool = @{ agent_id = $null; agent_type = $null } }; Control = 'trusted_attribution'; Text = 'carries no sentinel agent identity' }
         @{ HostName = 'claude-code'; Name = 'a stale observation'; Seed = @{ Tool = @{ observed_at = '2026-10-22T10:00:00Z' } }; Control = 'trusted_attribution'; Text = 'is stale' }
         @{ HostName = 'github-copilot'; Name = 'a handler-hash mismatch'; Seed = @{ Tool = @{ handler_sha256 = ('f' * 64) } }; Control = 'trusted_attribution'; Text = 'hash differs' }
-        @{ HostName = 'claude-code'; Name = 'an unconsumed sentinel grant'; Seed = @{ Tool = @{ state = 'issued' } }; Control = 'trusted_attribution'; Text = 'was not consumed' }
+        @{ HostName = 'claude-code'; Name = 'an unconsumed sentinel grant'; Seed = @{ NoLatch = $true }; Control = 'trusted_attribution'; Text = 'was not consumed' }
         @{ HostName = 'claude-code'; Name = 'a shell deny from another agent'; Seed = @{ NoShell = $true }; Control = 'forbidden_tools_denied'; Text = 'no SHELL deny observation' }
     ) {
         $store = Add-GateSentinelObservation -Store (Get-GateStore -HostName $HostName) -HostName $HostName @Seed
@@ -143,13 +143,37 @@ Describe 'observation evidence' {
     }
 
     It 'accepts a later valid observation when an earlier sentinel observation is rejected' {
-        $store = Add-GateSentinelObservation -Store (Get-GateStore) -Tool @{ observation_ref = 'observation-tool-beta'; id = 'observation-tool-beta'; state = 'issued' }
+        # The rejected record is an unconsumed grant under another reference; the fixture pair beside its latch is accepted.
+        $store = Add-GateSentinelObservation -Store (Get-GateStore) -Tool @{ observation_ref = 'observation-tool-beta'; id = 'observation-tool-beta' } -NoLatch
         $store = Add-GateSentinelObservation -Store $store -NoShell
         $evidence = Get-DiscoveryObservationEvidence -Observations (Get-DiscoverySessionObservation -Location $script:GateLocation -SessionId 'session-alpha' -Store $store) `
             -ToolHandlerSha256 (Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:RepoRoot $script:GateToolHandlers['claude-code'])))) -Now $script:GateNow -TtlSeconds 3600
         $evidence.TrustedAttribution | Should -BeTrue
-        $evidence.SentinelRef | Should -Be 'observation-tool-alpha'
-        @($evidence.Deficiencies).Count | Should -Be 0
+        $evidence.ForbiddenDenied | Should -BeTrue
+        $evidence.SentinelRef | Should -Be $script:GateSentinelToolRef
+        # Both records now exist in the store, so the rejected one yields exactly its documented deficiency.
+        @($evidence.Deficiencies).Count | Should -Be 1
+        $evidence.Deficiencies[0].Message | Should -BeLike 'sentinel observation observation-tool-beta was not consumed*latch absent*'
+    }
+
+    It 'rejects a record rewritten as consumed without the consumer latch' {
+        $store = Add-GateSentinelObservation -Store (Get-GateStore) -Tool @{ state = 'consumed' } -NoLatch
+        $observation = Get-Observation -Store $store
+        $observation['status'] | Should -Be 'unsupported'
+        $observation['controls']['trusted_attribution'] | Should -BeFalse
+        Get-FindingText -Observation $observation | Should -BeLike '*was not consumed by the sentinel tool (state consumed, latch absent)*'
+    }
+
+    It 'rejects a latch naming another observation and treats an unparseable latch as absent' {
+        $latchPath = "$(Get-DiscoveryObservationDirectory -Location $script:GateLocation -SessionId 'session-alpha')/$($script:GateSentinelToolRef).json.consumed"
+        $foreign = Add-GateSentinelObservation -Store (Get-GateStore) -NoLatch
+        $foreign.Files[$latchPath] = '{"consumed_at":"2026-10-22T12:00:00.000Z","observation_ref":"observation-tool-beta"}' + "`n"
+        $observation = Get-Observation -Store $foreign
+        $observation['controls']['trusted_attribution'] | Should -BeFalse
+        Get-FindingText -Observation $observation | Should -BeLike '*was not consumed by the sentinel tool (state issued, latch names another observation)*'
+        $broken = Add-GateSentinelObservation -Store (Get-GateStore) -NoLatch
+        $broken.Files[$latchPath] = '{not json'
+        Get-FindingText -Observation (Get-Observation -Store $broken) | Should -BeLike '*(state issued, latch absent)*'
     }
 
     It 'skips unreadable and foreign observation entries and treats an unlistable directory as empty' {
@@ -179,8 +203,8 @@ Describe 'capability observation' {
         foreach ($handler in $observation['handlers']) { $handler['sha256'] | Should -Be (Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path $script:RepoRoot $handler['path'])))) }
         @($observation['controls'].Values | Where-Object { -not $_ }).Count | Should -Be 0
         $observation['probe']['result'] | Should -Be 'denied'
-        $observation['probe']['sentinel_id'] | Should -Be 'observation-tool-alpha'
-        $observation['probe']['evidence_ref'] | Should -Be 'observation-shell-alpha'
+        $observation['probe']['sentinel_id'] | Should -Be $script:GateSentinelToolRef
+        $observation['probe']['evidence_ref'] | Should -Be $script:GateSentinelShellRef
         $observation['workspace']['profile_sha256'] | Should -Be $script:GateProfileSha256
         $observation['expires_at'] | Should -Be '2026-10-22T13:00:00Z'
         @($observation.Keys | Sort-Object) -join ',' | Should -Be '$schema,artifact_kind,attestation_ref,configuration_sha256,controls,expires_at,findings,handlers,host,id,observed_at,probe,runtime,schema_version,session_id,status,workspace'

@@ -9,9 +9,13 @@
     confirms that the start, tool and stop handlers are registered for the four
     discovery agent names and the controlled tools, hashes the configuration and
     every handler, and reads the host observations the native PreToolUse gate
-    recorded while the discovery-capability-sentinel agent ran: a consumed sentinel
-    tool call that carried the agent identity, and the denied sentinel shell command
-    from the same agent. The result is a `capability-attestation`-shaped document
+    recorded while the discovery-capability-sentinel agent ran: a sentinel tool call
+    that carried the agent identity and was consumed by the sentinel MCP tool, and
+    the denied sentinel shell command from the same agent. Consumption is the
+    exclusive `<record>.json.consumed` latch the MCP server writes beside the
+    observation and never a rewrite of the record: the gate writes the record once
+    with state `issued`, and the probe accepts it only when the latch beside it names
+    the same observation_ref. The result is a `capability-attestation`-shaped document
     whose status is derived, never supplied: `supported` requires every control,
     every handler and observation evidence for attribution and the denied sentinel.
     No in-process decision, caller Boolean or repository text can substitute for
@@ -96,13 +100,42 @@ function ConvertTo-DiscoveryObservationInstant {
     return $null
 }
 
+function Get-DiscoveryConsumedLatch {
+    <#
+    .SYNOPSIS
+        Reads the exclusive `.consumed` latch beside a one-use record through the ReadText seam.
+    .DESCRIPTION
+        The MCP server consumes a sentinel grant by creating `<record>.json.consumed`
+        with a JSON object naming the record's observation_ref; the record itself is
+        never rewritten. Returns the parsed latch as a hashtable, or $null when the
+        latch is absent, unreadable or not a JSON object.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)][hashtable]$Store,
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+
+    try {
+        $text = Invoke-DiscoveryStoreSeam -Seam $Store.ReadText -Arguments @($Path)
+        $latch = $(if ($null -ne $text) { ConvertFrom-Json -InputObject $text -AsHashtable -Depth 4 } else { $null })
+    } catch { $latch = $null }
+    if ($latch -is [hashtable]) { return $latch }
+    return $null
+}
+
 function Get-DiscoverySessionObservation {
     <#
     .SYNOPSIS
-        Reads every parseable host-observation record of the session from the protected store.
+        Reads every parseable host-observation record of the session from the protected store, with its consumer latch.
     .DESCRIPTION
         Entries that cannot be read or parsed are skipped; an absent directory yields
-        an empty list. Records are returned as hashtables keyed by the schema names.
+        an empty list. Records are returned as hashtables keyed by the schema names
+        plus the reader-side entry `consumed_latch`: the sibling `<name>.consumed`
+        the sentinel MCP tool writes when it consumes the grant, read by path through
+        the same ReadText seam, as a hashtable when it parses as a JSON object and
+        otherwise $null.
     #>
     [CmdletBinding()]
     [OutputType([object[]])]
@@ -122,7 +155,11 @@ function Get-DiscoverySessionObservation {
             $text = Invoke-DiscoveryStoreSeam -Seam $Store.ReadText -Arguments @("$directory/$name")
             $record = $(if ($null -ne $text) { ConvertFrom-Json -InputObject $text -AsHashtable -Depth 8 } else { $null })
         } catch { $record = $null }
-        if ($record -is [hashtable] -and [string]$record['artifact_kind'] -eq 'host-observation') { $records.Add($record) }
+        if ($record -is [hashtable] -and [string]$record['artifact_kind'] -eq 'host-observation') {
+            # The latch is the consumption marker; it is attached here so the evidence derivation never touches the store.
+            $record['consumed_latch'] = Get-DiscoveryConsumedLatch -Store $Store -Path "$directory/$name.consumed"
+            $records.Add($record)
+        }
     }
     return $records.ToArray()
 }
@@ -132,11 +169,16 @@ function Get-DiscoveryObservationEvidence {
     .SYNOPSIS
         Derives trusted_attribution and forbidden_tools_denied from the session's host observations.
     .DESCRIPTION
-        trusted_attribution holds only for a consumed sentinel-tool observation that
-        carries a non-empty agent_id, the sentinel agent type, the hash of the
-        registered tool handler and an observed_at within TtlSeconds of Now.
-        forbidden_tools_denied holds only for a SHELL deny observation from the same
-        agent_id. Every rejected or missing observation yields one deficiency message.
+        trusted_attribution holds only for a sentinel-tool observation that carries a
+        non-empty agent_id, the sentinel agent type, state `issued` beside a consumer
+        latch (`consumed_latch`, the parsed `<record>.json.consumed` the sentinel MCP
+        tool writes) whose observation_ref equals the record's, the hash of the
+        registered tool handler and an observed_at within TtlSeconds of Now. A record
+        rewritten as `consumed`, a missing latch or a latch naming another observation
+        is reported as not consumed, because the record is never rewritten and only
+        the latch beside it proves consumption. forbidden_tools_denied holds only for
+        a SHELL deny observation from the same agent_id. Every rejected or missing
+        observation yields one deficiency message.
     .OUTPUTS
         [pscustomobject] TrustedAttribution, ForbiddenDenied, Deficiencies, SentinelRef, ShellRef.
     #>
@@ -158,8 +200,11 @@ function Get-DiscoveryObservationEvidence {
         $reference = [string]$candidate['observation_ref']
         $observedAt = ConvertTo-DiscoveryObservationInstant -Value $candidate['observed_at']
         $problem = $null
+        # Consumption is proved by the latch alone: present and naming this record, or absent, or naming another record.
+        $latch = $candidate['consumed_latch']
+        $latchState = $(if ($latch -isnot [hashtable]) { 'absent' } elseif ([string]$latch['observation_ref'] -ceq $reference) { 'present' } else { 'names another observation' })
         if ([string]::IsNullOrWhiteSpace([string]$candidate['agent_id']) -or [string]$candidate['agent_type'] -cne 'discovery-capability-sentinel') { $problem = 'carries no sentinel agent identity' }
-        elseif ([string]$candidate['state'] -cne 'consumed') { $problem = "was not consumed by the sentinel tool (state $([string]$candidate['state']))" }
+        elseif ([string]$candidate['state'] -cne 'issued' -or $latchState -ne 'present') { $problem = "was not consumed by the sentinel tool (state $([string]$candidate['state']), latch $latchState)" }
         elseif ([string]::IsNullOrEmpty($ToolHandlerSha256) -or [string]$candidate['handler_sha256'] -cne $ToolHandlerSha256) { $problem = 'was recorded by a tool handler whose hash differs from the registered handler' }
         elseif ($null -eq $observedAt -or ($Now.ToUniversalTime() - $observedAt).TotalSeconds -gt $TtlSeconds -or $observedAt -gt $Now.ToUniversalTime()) { $problem = 'is stale' }
         if ($null -eq $problem) { if ($null -eq $accepted) { $accepted = $candidate } }
