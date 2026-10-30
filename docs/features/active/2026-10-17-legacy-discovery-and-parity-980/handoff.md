@@ -69,11 +69,18 @@ reports, `snapshot-export`, `snapshot-import`), and each attempt needs its own p
 invocation (one prepared invocation admits one start; a second prepare for the same
 specialist in one session makes the start ambiguous and is denied).
 
-## Delivery status (executor handoff, P16-T11)
+## Delivery status (executor handoff, P18-T8)
 
-Every plan task is checked with canonical proof (`evidence/qa-gates/p16-handoff-validation.*.md`,
-lexicographically greatest): all 156 tasks of Phases 0 to 16, including the 34 tasks of
-remediation cycle 1. The final gates ran on the remediated tree in Phase 16:
+Every plan task is checked with canonical proof (`evidence/qa-gates/p18-handoff-validation.*.md`,
+lexicographically greatest, following `p16-handoff-validation.*.md`): all 171 tasks of Phases 0
+to 18, including the 34 tasks of remediation cycle 1 and the 15 tasks of remediation cycle 2.
+The cycle-2 gates for the touched languages ran on the final tree in Phase 18:
+`evidence/qa-gates/p18-python-*.2026-10-30T12-32.md`, `p18-typescript-*.2026-10-30T12-25.md`,
+`p18-powershell-*.2026-10-30T12-41.md`, `p18-coverage-comparison.2026-10-30T12-43.md`,
+`p18-mirror-and-publication-contracts.2026-10-30T12-43.md`, `p18-file-size.2026-10-30T12-43.md`,
+`p18-evidence-locations.2026-10-30T12-44.md`, `acceptance-criteria-status.2026-10-30T12-46.md`
+and `self-review.2026-10-30T12-49.md` (0 FAIL rows); `completion-report.md` lists them. The
+cycle-1 record below is retained for the gates this cycle does not repeat. The final gates ran on the remediated tree in Phase 16:
 `evidence/qa-gates/p16-python-*.2026-10-30T00-42.md`, `p16-typescript-*.2026-10-30T01-40.md`,
 `p16-powershell-*.2026-10-30T01-29.md`, `p16-coverage-comparison.2026-10-30T01-41.md`,
 `evidence/regression-testing/p16-isolation.2026-10-30T01-45.md`,
