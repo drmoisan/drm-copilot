@@ -1,6 +1,6 @@
 ---
 parallel: "bugs-1001-1002-1003-1006"
-mode: "closed"
+mode: "open"
 max_concurrency: 4
 created_at: "2026-10-30T14:31:56Z"
 items:
