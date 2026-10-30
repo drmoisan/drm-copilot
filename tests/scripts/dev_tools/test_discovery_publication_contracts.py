@@ -94,12 +94,17 @@ SHARED_HELPERS: tuple[str, ...] = (
     "DiscoveryCapability.psm1",
     "DiscoveryEncoding.psm1",
     "DiscoveryManifest.psm1",
+    "DiscoveryObservation.psm1",
     "DiscoveryPayload.psm1",
     "DiscoveryPlanning.psm1",
+    "DiscoveryRootGrant.psm1",
     "DiscoveryStart.psm1",
     "DiscoveryStartRecord.psm1",
     "DiscoveryStop.psm1",
+    "DiscoveryToolRouting.psm1",
 )
+# The compatibility module is published to the Claude bundle only; the Codex
+# shared library carries exactly SHARED_HELPERS.
 CLAUDE_ONLY_HELPERS: tuple[str, ...] = ("DiscoveryValidation.psm1",)
 # Published hook files that no host configuration registers directly.
 UNREGISTERED_HOOK_FILES: frozenset[str] = frozenset(
