@@ -2,8 +2,8 @@
 
 - Issue: #980
 - Owner: drmoisan
-- Status: Remediation cycle 1 implemented and verified on `feature/legacy-discovery-and-parity-980`: identity comes from the host hook payload only, unbound controlled calls fail closed and the capability probe derives support from recorded host observations (Phases 15 and 16); 65 of 66 criteria checked after the P16-T9 re-reconciliation; independent re-review (AC-64) and exact-head CI pending (see `completion-report.md`)
-- Last Updated: 2026-10-30T01-58
+- Status: Remediation cycle 2 implemented on `feature/legacy-discovery-and-parity-980`: the capability probe proves sentinel consumption from the exclusive `.consumed` latch the sentinel tool writes beside the observation record, which is never rewritten (Phase 17, closing Blocker R5 of the 2026-10-30T10-19 review; the root-grant Minor and the shell-observation Nit are deferred to follow-up issues #1007 and #1008 by user decision); Phase 18 re-runs the gates for the touched languages; 65 of 66 criteria checked; independent re-review (AC-64) and exact-head CI pending (see `completion-report.md`)
+- Last Updated: 2026-10-30T12-13
 
 ## Story Statement
 

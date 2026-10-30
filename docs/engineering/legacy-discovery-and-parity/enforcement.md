@@ -71,6 +71,9 @@ The store at the platform state root holds, per workspace:
   and `agent_type` may be null), whether a tool-call identifier was present, the decision
   and its code, and the handler hash. The sentinel tool observation also carries the one-use
   sentinel grant fields (tool, input digest, validity window, state) the MCP server consumes.
+  The sentinel tool records its consumption as the exclusive `.consumed` latch beside the
+  record (a JSON object naming the `observation_ref` and `consumed_at`) and never rewrites the
+  record, whose `state` stays `issued`; the capability probe proves consumption from that latch.
 - `root-grants/<grant_ref>.json` and its `.consumed` latch: one short-lived, one-use
   `root-grant` per root call (`prepare_discovery_agent`, `run_discovery_doctor` and a
   controlled tool called with no `agent_id` on the payload), bound to the tool, the derived
@@ -191,8 +194,11 @@ The probe assumes nothing about what a host places in its hook payloads. A
 `discovery_capability_sentinel` MCP tool and runs one harmless forbidden shell command. The
 tool gate handles both calls as it handles any PreToolUse and records each as a
 `host-observation` under the session's `observations/` partition. The sentinel tool consumes
-its one-use sentinel grant and reports whether the host attributed the call to the sentinel
-agent; it grants nothing and never fails the call. `discovery-capability-probe.ps1` then
+its one-use sentinel grant by writing the exclusive `.consumed` latch beside the observation
+and reports whether the host attributed the call to the sentinel agent; the observation record
+itself is never rewritten, the probe proves consumption from that latch (present and naming the
+same `observation_ref`), and the tool grants nothing and never fails the call.
+`discovery-capability-probe.ps1` then
 reads the registration and handler hashes and derives the status from the observations:
 `supported` requires an attributed sentinel tool observation and an attributed denial of the
 forbidden command, each recorded by the current handler hash inside the attestation window;

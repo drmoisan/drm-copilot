@@ -88,6 +88,17 @@ per-host observation (orchestrator-driven, instructions in
 `discovery-host-observations.2026-10-30T01-47.md`) and exact-head CI on the pull request the
 orchestrator opens. No open blocker remains from the executor's side.
 
+Remediation cycle 2 (Phases 17 and 18) answers the 2026-10-30T10-19 re-review. Its Blocker R5
+is closed: the sentinel tool consumes its grant by writing the exclusive `.consumed` latch beside
+the observation record, the record is never rewritten, and the capability probe proves
+consumption from that latch (shared fixture P17-T2, fail-before run P17-T3, probe correction
+P17-T4, cross-runtime smoke over a real filesystem store P17-T5, mirrors P17-T6). Two open items
+are deferred to follow-up issues by user decision and are not preconditions of the cycle exit
+gate: #1007 (the root-grant Minor: strict decode of every `root-grants/` entry and no pruning)
+and #1008 (the shell-observation Nit: the `SHELL` deny observation is matched by `agent_id`
+only); the record is `evidence/other/p17-deferred-findings.*.md` (lexicographically greatest).
+The Phase 18 gates for the touched languages are recorded by P18-T8.
+
 ## Publication prerequisites
 
 1. The feature branch has passed review, the full QA pass and the orchestration completion
@@ -164,6 +175,10 @@ The framework cannot and does not answer these; they are discovered in each repo
 - target implementation and verification work, including offline and mobile dimensions
   once the profile declares them applicable;
 - repository-specific characterization tooling for manual or automated runtime capability.
+
+Two repository follow-ups are open in this repository rather than resolved locally, deferred by
+user decision in remediation cycle 2: #1007 (root-grant pruning and tolerant decode of
+neighbouring entries) and #1008 (handler-hash and TTL checks on the `SHELL` deny observation).
 
 ## Reference
 
