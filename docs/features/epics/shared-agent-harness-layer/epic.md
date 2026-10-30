@@ -21,12 +21,12 @@ features:
   - issue_num: 1025
     feature_folder: harness-survey-gold-standard-contracts-parity-matrix
     depends_on: []
-  - issue_num: null
-    feature_folder: move-development-docs-to-dev-root-and-reserve-docs-for-production
+  - issue_num: 1035
+    feature_folder: 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035
     depends_on: []
   - issue_num: null
     feature_folder: shared-source-generators-skills-rules-mcp-agents
-    depends_on: [harness-survey-gold-standard-contracts-parity-matrix, move-development-docs-to-dev-root-and-reserve-docs-for-production]
+    depends_on: [1025, 1035]
   - issue_num: null
     feature_folder: push-down-consolidation-and-ecosystem-packs
     depends_on: [shared-source-generators-skills-rules-mcp-agents]
@@ -38,7 +38,7 @@ features:
     depends_on: [push-down-consolidation-and-ecosystem-packs, hook-parity-across-claude-codex-copilot]
   - issue_num: 1016
     feature_folder: dev-docs-root-migration-and-feature-folder-rename
-    depends_on: [move-development-docs-to-dev-root-and-reserve-docs-for-production, retire-github-skills-and-thin-copilot-layer]
+    depends_on: [1035, retire-github-skills-and-thin-copilot-layer]
 ---
 
 # Epic: Shared Agent-Harness Layer Across Claude Code, Codex and GitHub Copilot
@@ -65,7 +65,7 @@ and are not re-opened here.
 | Child | Feature (hint) | Issue | Wave | Band |
 | --- | --- | --- | --- | --- |
 | 1 Survey, gold-standard contracts, parity matrix, Copilot and Codex experiments | harness-survey-gold-standard-contracts-parity-matrix | #1025 | 0 | C4 |
-| 2 #1016 Phase 1: resolver, configured root, folder-name parser, folder creation by issue number | move-development-docs-to-dev-root-and-reserve-docs-for-production | new child issue referencing #1016 | 0 | C3 |
+| 2 #1016 Phase 1: resolver, configured root, folder-name parser, folder creation by issue number | 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035 | #1035 (references #1016, does not close it) | 0 | C3 |
 | 3 Generators and shared-source pipeline (skills, rules, MCP, agents; all with --check) | shared-source-generators-skills-rules-mcp-agents | new | 1 | C3 |
 | 4 Push-down consolidation and per-ecosystem pack selection | push-down-consolidation-and-ecosystem-packs | new | 2 | C3 |
 | 5 Hook parity | hook-parity-across-claude-codex-copilot | new | 2 | C3 |
@@ -83,6 +83,21 @@ the move completes. Child 2 (Phase 1) receives a new child issue that references
 issue, spec, checkpoint and pull request carry no `Closes`/`Fixes`/`Resolves` line for #1016.
 #1016 is not promoted a second time. Child 2 carries the full #1016 design (D-1 to D-22) in its
 spec with Phases 2 and 3 marked as delivered by child 7; child 7's spec cites it.
+
+Re-key record (2026-10-30). Child 2 was prepared under #1016 before decision E1 arrived. At
+fan-in the epic planner: promoted the new child issue #1035 through
+`mcp__drm-copilot__potential_to_issue` (potential entry
+`2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser.md`); moved the folder
+`2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016` to
+`2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035` with `git mv`; rewrote the
+identity text only (issue.md header and a re-key note, the spec and user-story issue lines, the
+plan title, issue line, branch label `feature/dev-docs-root-resolver-phase1-1035`, `<FEATURE>`
+path, SCRATCH namespace and re-baseline comment issue number); and added
+`evidence/other/preflight-result.2026-10-30T22-51.md`. No plan task or acceptance condition
+changed, and the plan re-validated. No document in the folder carries a Closes, Fixes or Resolves
+line for #1016. Historical research and preflight-fix records keep the old path as written. The
+pushed branch `feature/dev-docs-root-resolver-phase1-1016` holds the pre-re-key preparation and
+is superseded by the integration branch.
 
 ## Scope
 
