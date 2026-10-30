@@ -945,7 +945,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: As P14-T6; the tests record carries the pytest summary line, the wall-clock seconds and the JSON totals.
   - Acceptance: One clean pass; repository line coverage at least 85% and branch coverage at least 75%; the threshold gate exits 0; the retained JSON report exists.
 
-- [ ] [P16-T2] Run both TypeScript loops and retain the coverage reports (FEATURE/evidence/qa-gates/).
+- [x] [P16-T2] Run both TypeScript loops and retain the coverage reports (FEATURE/evidence/qa-gates/).
   - Files and behavior: As P14-T7 with p16-typescript-{root,extension}-{format,lint,types,tests,architecture,build}.<timestamp>.md; run each coverage command with `--coverageReporters=lcov --coverageReporters=json-summary --coverageReporters=text-summary` (the extension configuration lists `lcov` and `text-summary` only, so the summary file is not written without the flag), then copy `coverage/lcov.info` and `coverage/coverage-summary.json` of the root and of extensions/drm-copilot to FEATURE/evidence/qa-gates/p16-typescript-{root,extension}-lcov.<timestamp>.info and p16-typescript-{root,extension}-coverage-summary.<timestamp>.json, and leave the canonical `lcov.info` files in place.
   - Tests and proof: Complete coverage-enabled populations with every per-file threshold including those of P15-T20; type checks, architecture checks and both builds; figures from the run output.
   - Acceptance: One clean cycle; the four retained reports exist and the tests records cite them; every per-file threshold is met without blanket mocks.
