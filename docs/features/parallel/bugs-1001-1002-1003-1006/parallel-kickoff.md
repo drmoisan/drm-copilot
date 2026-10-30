@@ -1,6 +1,6 @@
 # Parallel Kickoff: bugs-1001-1002-1003-1006
 
-Planned by parallel-planner on 2026-10-30T16:37:00Z. All items are prepared: promoted, active folders created,
+Planned by parallel-planner on 2026-10-30T16:51:13Z. All items are prepared: promoted, active folders created,
 research complete, spec and user-story written, atomic plans approved, preflight ALL CLEAR, blast
 radii declared and V1/V2-clear. Planning state:
 artifacts/orchestration/parallel-planner-state.json (run branch: parallel/bugs-1001-1002-1003-1006-plan).
@@ -14,7 +14,7 @@ docs/features/parallel/bugs-1001-1002-1003-1006/parallel.md on the plan-home bra
 resumes at atomic execution from its committed plan-path on its own pushed feature branch rather
 than re-planning, and each item opens its own pull request against main.
 
-Execution notes: the cohort order is the owner-directed priority order (resolver family 1009, 1010, 1011 first; 1006 before 1013; 1013 last). It is a valid coloring of the derived conflict edges; a recolor of unstarted items would reapply the derived order. Items 1010, 1011 and 1013 carry Phase 0 dependency gates: 1010 requires the 1009 resolver module on origin/main; 1011 requires the 1009 resolver and the 1010 gate change; 1013 requires the 1006 scheduling-rule change. Item 1013 has a plan revision in progress (contract weight); resume it from the head of its branch at execution time. Items 1006, 1009, 1010 and 1013 exceed the three-file direct-mode batch budget and must execute on the large route.
+Execution notes: the cohort order is the owner-directed priority order (resolver family 1009, 1010, 1011 first; 1006 before 1013; 1013 last). It is a valid coloring of the 33 derived conflict edges (re-derived 2026-10-30T16:51Z, unchanged; no radius narrowed, no edge added); the Welsh-Powell output over the same edges is [[1001],[1006],[1009],[1010],[1012],[1013],[1002,1003,1011]], and a recolor of unstarted items would reapply that derived order. Items 1010, 1011 and 1013 carry Phase 0 dependency gates: 1010 requires the 1009 resolver module on origin/main; 1011 requires the 1009 resolver and the 1010 gate change; 1013 requires the 1006 scheduling-rule change. Item 1013 has a plan revision in progress (contract weight); resume it from the head of its branch at execution time; its plan-path is unchanged and its plan-hash below records the pre-revision blob. Items 1006, 1009, 1010 and 1013 exceed the three-file direct-mode batch budget and must execute on the large route.
 
 ## Item Summary
 
@@ -32,7 +32,7 @@ Execution notes: the cohort order is the owner-directed priority order (resolver
 
 ## Integrity
 
-planning_commit: 0aab0619231ef96d31001b16d950e4b84c5d4910
+planning_commit: 2e45517f491f9c34365a9f9d6a0f00656a931929
 
 | plan-path | plan-hash |
 | --- | --- |
