@@ -3,9 +3,9 @@
 - **Issue:** #1013
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T13-28
+- **Last Updated:** 2026-10-30T16-00
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3 (owner decision 2026-10-30: `conflict_tolerance.weights.contract`, see D-7)
 - **Work Mode:** full-feature (acceptance criteria are tracked in this file and in `user-story.md`)
 - **Branch:** `feature/parallel-scheduling-integration-cost-1013`
 - **Research:** `research/research.2026-10-30T13-28.md` in this feature folder (authoritative for design decisions, symbols, and the complete file list)
@@ -22,7 +22,7 @@ The parallel run should balance the speed gained by running items concurrently a
 - Hard classes (`shared_surface_overlap`, `contract_dependency`) serialize at every tolerance, even when the two items would be cheaper to deliver as one.
 - Nothing combines two items whose overlap is heavy enough that one worktree, one PR, and one CI cycle would cost less than any merge.
 
-This feature adds a default-tolerance regression pin, an aggregate per-item cost cap applied inside the existing scheduling entry point, telemetry-only recording of observed merge-conflict resolution time, and planning-time issue combination governed by a new `conflict_tolerance.combination_threshold_percent` member.
+This feature adds a default-tolerance regression pin, an aggregate per-item cost cap applied inside the existing scheduling entry point, telemetry-only recording of observed merge-conflict resolution time, planning-time issue combination governed by a new `conflict_tolerance.combination_threshold_percent` member, and a new required cost weight `conflict_tolerance.weights.contract` that is summed once per shared contract identifier, so a pair that shares only a contract has a nonzero cost and can qualify for combination.
 
 ## Context
 
@@ -47,6 +47,7 @@ In scope:
 - Benefit currency: unchanged (band durations).
 - Issue combination: a new pure library in Python (authority) and PowerShell (runtime port, re-exported by the facade), the `parallel-plan` / `parallel-planner` procedure, `parallel-orchestrate` kickoff and remediation text, `parallel-add` report-only text, and `pr-author` / `orchestrate` wording for multi-issue autoclose.
 - `combination_threshold_percent`: an optional `conflict_tolerance` member validated in Python and PowerShell, committed explicitly in both truth tables.
+- Contract weight (D-7): a required `conflict_tolerance.weights.contract` name validated exactly like `same_file`, `possible_overlap`, `append_only`, and `module` in Python and PowerShell; a contract term added to `pair_cost` and `Get-BlastRadiusPairCost`; the committed value in both truth tables; every existing fixture and test config that carries `conflict_tolerance.weights` updated to carry the new name; the rule text (Integration-cost scheduling: Configuration and Cost sections) in `.claude/rules/parallel-orchestration.md` and its bundle copy.
 - Correction of the stale "three token shapes" sentence in `.claude/skills/parallel-plan/SKILL.md` to the post-#1006 count read from the merged rule (research decision D14).
 - Bundle copies, the `core.json` pack manifest, and the tests and fixtures in the Complete File List.
 
@@ -58,9 +59,9 @@ Non-goals and explicit boundaries:
   - `items[].combined_issue_nums` (manifest, planner checkpoint, orchestrator checkpoint);
   - a top-level `combinations` list (planner checkpoint).
 - No validator module is edited in Python (`validate_parallel_orchestrator_state.py`, `validate_parallel_planner_state.py`, `parallel_manifest_contract.py`), TypeScript (`extensions/drm-copilot/src/lib/validate/parallel-*`), or bash (`parallel-manifest-validate.sh`, `parallel-items-validate.sh`, `validate-parallel-manifest.sh`).
-- No change to `decide_pair`, `Get-BlastRadiusPairDecision`, `conflicts`, `HARD_REASON_KINDS`, `pair_cost`, or `pair_benefit`.
+- No change to `decide_pair`, `Get-BlastRadiusPairDecision`, `conflicts`, `HARD_REASON_KINDS`, or `pair_benefit`. `pair_cost` and `Get-BlastRadiusPairCost` change only by the D-7 contract term; their path-pair and module terms are unchanged. `contract_dependency` remains a hard reason kind.
 - No change to drift detection (`scripts/dev_tools/_parallel_drift_scheduling.py`); it stays pairwise.
-- No automatic tuning: nothing reads `observed_resolution`, and no weight changes.
+- No automatic tuning: nothing reads `observed_resolution`, and no existing weight value changes (the new `contract` weight is added once, by the owner decision, not by telemetry).
 - No change to `.claude/hooks/enforce-model-routing-receipt.ps1`; it already accepts several issue numbers.
 - No TypeScript or bash port of the reader, the cap, or the combination library.
 - No umbrella GitHub issue; combined issues stay separate on GitHub.
@@ -158,7 +159,7 @@ Rules:
 4. Qualifies when `cost * 100 >= benefit * combination_threshold_percent`, where benefit is the shorter item's band duration (the existing pair benefit).
 5. Components (research decision D6): qualifying pairs are grouped into connected components with union-find. Each component of two or more items becomes one combination with `members` ascending, `primary = min(members)`, `pairs` sorted by `(a, b)`, and `estimated_savings` equal to the sum of the qualifying pair costs in cost units (research decision D11). No size cap. Combination runs once, before cohort seeding, and is not repeated on combined radii.
 
-Contract-only pairs (research decision D5): `pair_cost` is unchanged and contracts add no cost, so a contract-only pair does not combine unless the threshold is 0. The rule text documents this; such a pair still serializes as a hard `contract_dependency` edge.
+Contract-only pairs (owner decision 2026-10-30, superseding research decision D5): a pair that shares only contracts has cost `weights.contract` times the number of shared contract identifiers (D-7), so it is a candidate under rule 3 and qualifies under rule 4 when that cost meets the threshold. At the committed values (`contract` 8, `combination_threshold_percent` 400, `C1` 1, `C2` 2) a pair sharing one contract qualifies when the shorter item is C1 or C2 (`8*100 >= 2*400`). A contract-only pair that does not qualify still serializes as a hard `contract_dependency` edge.
 
 Planner procedure (research decisions D9 and D10): a new `## Issue Combination` section in `.claude/skills/parallel-plan/SKILL.md`, after `## Complexity Assessment` and before `## Cohort Seeding`:
 
@@ -211,6 +212,28 @@ Cross-runtime parity:
 
 The top-level key partition enumerates top-level keys only, so the nested member does not affect `DECLARED_TOP_LEVEL_KEYS` or its tests.
 
+### D-7 Contract weight (owner decision 2026-10-30)
+
+Configuration:
+
+- `WEIGHT_NAMES` in `_blast_radius_scheduling.py` and `$script:WeightName` in `BlastRadiusScheduling.psm1` gain `contract` as a fifth name, appended after `module`.
+- Validation is identical to the other four weights: the name is required and exact (`_read_int_map` / `_require_names`, `Get-RequiredIntegerMap` / `Assert-ExactMemberName`), the value is a non-boolean integer of at least 1 (`_require_int(..., minimum=1)` / `Get-RequiredInteger`), and every failure is fail-fast with an error naming `config["conflict_tolerance"]["weights"]["contract"]` (or the `weights` label for a missing or unknown name). Booleans are rejected. Python and PowerShell accept and reject the same cases.
+- `STRICT_CONFLICT_TOLERANCE` and the PowerShell strict hashtable carry `contract: 1` through their existing all-names construction; `test_absent_key_reads_as_strict` and `'reads an absent key as strict'` pass unchanged.
+- Both committed truth tables carry `"contract": 8` as the last member of `weights`, with `conflict_tolerance` byte-equal across both copies (Class 1). The value 8 equals `same_file`, so one shared contract is weighted like one same-file overlap. This value is an orchestrator assumption recorded for owner review; the owner decision fixes the name, the minimum, and the summation, not the committed value.
+- TypeScript: the push-down derivers carry `conflict_tolerance` verbatim and the overlay composers merge it recursively; there is no TypeScript reader or validator of `conflict_tolerance` (`extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` carries it as an opaque value). Parity is proven by `SOURCE_BLAST_RADIUS` in `config-carriage.test-helpers.ts`, by every TypeScript test that literally restates the committed `weights` map (for example `blast-radius-derive-tolerance-keys.test.ts`), and by an overlay corpus fixture `tests/fixtures/blast_radius_overlay/conflict-tolerance-contract-weight.json` that both composers compose to the same expected text, proving a destination can override the weight.
+
+Cost:
+
+- `pair_cost` and `Get-BlastRadiusPairCost` add `weights.contract` times the number of shared contract identifiers, where the shared contract identifiers are exactly the set the relation intersects to report `contract_dependency` (the intersection of the two radii's `contracts`, after any filtering #1006 applies to that relation). Each identifier counts once, whatever the number of times it appears in either radius.
+- The path-pair and module terms are unchanged, so the cost of any pair that shares no contract is unchanged.
+- `contract_dependency` stays in `HARD_REASON_KINDS` and `decide_pair` is unchanged: a pair that shares a contract is an edge at every tolerance. The contract term therefore changes the recorded `cost` of such edges and their combination eligibility, and it does not change any edge set. The aggregate cap reads tolerated overlaps only; because a pair sharing a contract is never tolerated, no tolerated overlap carries a contract term, and every cap output over pairs without shared contracts is unchanged.
+
+Invariant (stated in the rule text and pinned by tests): at `tolerance_percent` 0 the edge set is identical to strict scheduling (every detected conflict is an edge) for any `contract` weight; and at any tolerance the edge set produced with the contract term equals the edge set produced without it. Only the `cost` field of edges whose pair shares a contract differs.
+
+Existing tests and fixtures that pin a `cost` value for a pair sharing a contract, or that construct a `conflict_tolerance.weights` map, are updated in the task that introduces the term; each is named with its disposition in the plan.
+
+Rule text: `.claude/rules/parallel-orchestration.md` and its bundle copy, Integration-cost scheduling `Configuration` (the `weights` member list, the `contract` minimum, and the committed value) and `Cost` (the contract term, once per shared contract identifier; `contract_dependency` remains hard; the tolerance-0 identity), byte-identical across both copies.
+
 ## Interfaces and Error Texts
 
 | Symbol | Runtime | Module | Signature or shape |
@@ -223,6 +246,10 @@ The top-level key partition enumerates top-level keys only, so the nested member
 | `COMBINATION_THRESHOLD_DEFAULT` | Python | `scripts/dev_tools/_blast_radius_scheduling.py` | `400` |
 | `ConflictTolerance.combination_threshold_percent` | Python | `scripts/dev_tools/_blast_radius_scheduling.py` | `int`, default `400` |
 | `combination_threshold_percent` hashtable key | PowerShell | `.claude/lib/blast-radius/BlastRadiusScheduling.psm1` | `int`, default `400` |
+| `WEIGHT_NAMES` | Python | `scripts/dev_tools/_blast_radius_scheduling.py` | gains `"contract"` after `"module"` |
+| `$script:WeightName` | PowerShell | `.claude/lib/blast-radius/BlastRadiusScheduling.psm1` | gains `'contract'` after `'module'` |
+| `pair_cost` | Python | `scripts/dev_tools/_blast_radius_scheduling.py` | unchanged signature; adds `weights["contract"] * len(shared contract identifiers)` |
+| `Get-BlastRadiusPairCost` | PowerShell | `.claude/lib/blast-radius/BlastRadiusScheduling.psm1` | unchanged parameters; adds the same contract term |
 
 A combination record carries `members` (ascending issue numbers), `primary` (minimum member), `pairs` (sorted by `(a, b)`, each with cost and benefit), and `estimated_savings` (sum of qualifying pair costs, cost units).
 
@@ -233,11 +260,11 @@ Prompt and record lines:
 - `parallel-add` report text: `qualifies for combination; not combined (combination applies at planning time only)`
 - P6 report reason: a qualifying pair is reported as not combined because applying the combinations would leave fewer than two items.
 
-Error texts: a malformed `combination_threshold_percent` raises in the reader and names the key with the existing label style `config["conflict_tolerance"]["combination_threshold_percent"]` — `TypeError` (non-integer or boolean) or `ValueError` (below 0) in Python, and a terminating error carrying the same label in PowerShell. An unknown sibling member continues to raise the existing unknown-name error from `_require_names` / `Assert-ExactMemberName`. The cap and combination functions are total over valid input and do not raise.
+Error texts: a malformed `combination_threshold_percent` raises in the reader and names the key with the existing label style `config["conflict_tolerance"]["combination_threshold_percent"]` — `TypeError` (non-integer or boolean) or `ValueError` (below 0) in Python, and a terminating error carrying the same label in PowerShell. An unknown sibling member continues to raise the existing unknown-name error from `_require_names` / `Assert-ExactMemberName`. A missing `weights.contract` name raises the existing missing-name error naming `config["conflict_tolerance"]["weights"]`; a non-integer or boolean `contract` value raises `TypeError`, and a value below 1 raises `ValueError`, each naming `config["conflict_tolerance"]["weights"]["contract"]`; PowerShell raises a terminating error carrying the same label. The cap and combination functions are total over valid input and do not raise.
 
 ## Complete File List
 
-Every file this feature writes, exactly as recommended by the research. (new) marks a new file; `[#1006]` marks a file also written by #1006. Feature-folder documents and evidence files are excluded.
+Every file this feature writes: entries 1 to 54 as recommended by the research, and entries 55 to 75 added by the D-7 contract weight. (new) marks a new file; `[#1006]` marks a file also written by #1006. Feature-folder documents and evidence files are excluded.
 
 Production, configuration, and documentation:
 
@@ -299,7 +326,33 @@ Tests and fixtures:
 53. `tests/fixtures/blast_radius_overlay/conflict-tolerance-combination-threshold.json` (new)
 54. `tests/fixtures/parallel_manifest_bash/manifest_valid_combined_item.json` (new)
 
-Files deliberately not written: `scripts/dev_tools/compute_blast_radius.py`; `scripts/dev_tools/_parallel_drift_scheduling.py`; every parallel validator module in Python, TypeScript, and bash; `.claude/hooks/enforce-model-routing-receipt.ps1`; the `.agents/` and `.github/` copies of `pr-author` and `orchestrate`; the six execution-environment brief copies; `.claude/agents/epic-orchestrator.md`; `.claude/skills/epic-orchestrate/SKILL.md`; `quality-tiers.yml`.
+Added by the D-7 contract weight (revision 0.3). Each file below constructs or restates a `conflict_tolerance.weights` map or pins a pair `cost`, as found by a repository search for `possible_overlap` on the pre-#1006 base; the plan re-derives this set after the #1006 rebase, names each file with its disposition (updated, with the reason, or unchanged because unaffected), and adds any further match.
+
+55. `tests/fixtures/blast_radius_overlay/conflict-tolerance-contract-weight.json` (new)
+56. `tests/scripts/dev_tools/test_blast_radius_contract_weight.py` (new)
+57. `tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.ContractWeight.Tests.ps1` (new)
+58. `tests/fixtures/blast_radius/combination/combination-contract-only.json` (new)
+59. `tests/fixtures/blast_radius/write-intent/write-intent-shared-surface-read-citation.json`
+60. `tests/fixtures/blast_radius/scheduling/scheduling-soft-pair-tolerated.json`
+61. `tests/fixtures/blast_radius/scheduling/scheduling-452-shared-surface-hard.json`
+62. `tests/fixtures/blast_radius/scheduling/scheduling-452-negative-controls.json`
+63. `tests/fixtures/blast_radius/scheduling/scheduling-452-directory-prefix-weighted.json`
+64. `tests/fixtures/blast_radius/historical-runs/followups-2026-09-27.json`
+65. `tests/fixtures/blast_radius/historical-runs/epic-655-followups.json`
+66. `tests/fixtures/blast_radius/historical-runs/backlog-2026-09-26.json`
+67. `tests/fixtures/parallel_drift/tolerated-overlap-under-conflict-tolerance.json`
+68. `tests/scripts/dev_tools/test_blast_radius_scheduling.py`
+69. `tests/scripts/dev_tools/test_blast_radius_scheduling_properties.py`
+70. `tests/scripts/dev_tools/test_blast_radius_historical_runs.py`
+71. `tests/scripts/dev_tools/test_parallel_drift_scheduling.py`
+72. `tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.Tests.ps1`
+73. `tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.PairCost.Tests.ps1`
+74. `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1`
+75. `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-tolerance-keys.test.ts`
+
+Files 1, 4, 8, 13, 14, 15, 16, 39, and 45 above also carry D-7 edits.
+
+Files deliberately not written: `scripts/dev_tools/compute_blast_radius.py`; `scripts/dev_tools/_parallel_drift_scheduling.py` (its fixture and test file, entries 67 and 71, may change only to carry the `contract` weight name); `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` (it carries `conflict_tolerance` verbatim); every parallel validator module in Python, TypeScript, and bash; `.claude/hooks/enforce-model-routing-receipt.ps1`; the `.agents/` and `.github/` copies of `pr-author` and `orchestrate`; the six execution-environment brief copies; `.claude/agents/epic-orchestrator.md`; `.claude/skills/epic-orchestrate/SKILL.md`; `quality-tiers.yml`.
 
 ## Test Strategy
 
@@ -332,7 +385,7 @@ Execution route: the distinct non-test PowerShell production files (sources plus
 
 ## Acceptance Criteria
 
-Issue acceptance criteria map: issue AC 1 to AC-01; issue AC 2 to AC-02, AC-03, AC-04, AC-05; issue AC 3 to AC-06, AC-07; issue AC 4 to AC-10, AC-11, AC-12, AC-13, AC-14; issue AC 5 to AC-15; issue AC 6 to AC-16; issue AC 7 to AC-08, AC-09; issue AC 8 to AC-17; issue AC 9 to AC-18, AC-19.
+Issue acceptance criteria map: issue AC 1 to AC-01; issue AC 2 to AC-02, AC-03, AC-04, AC-05; issue AC 3 to AC-06, AC-07; issue AC 4 to AC-10, AC-11, AC-12, AC-13, AC-14; issue AC 5 to AC-15; issue AC 6 to AC-16; issue AC 7 to AC-08, AC-09; issue AC 8 to AC-17; issue AC 9 to AC-18, AC-19; issue AC 10 (contract weight, added 2026-10-30) to AC-26, AC-27, AC-28, AC-29.
 
 Default tolerance:
 
@@ -348,16 +401,16 @@ Aggregate cost cap:
 Telemetry:
 
 - [ ] AC-06 Telemetry recorded: `.claude/rules/parallel-orchestration.md` declares `tolerated_overlaps[].observed_resolution` as tolerated-not-validated with the D-3 shape and non-exclusive attribution; `.claude/skills/parallel-orchestrate/SKILL.md` defines the writes in `## Per-Item Merge-Conflict Handling` and `## Per-Item Merge to Main (Merge-on-Green)` and prescribes `## Tolerated Overlaps` in `## Documentation Maintenance Boundaries`; `docs/features/templates/parallel/parallel-status.md` contains `## Tolerated Overlaps` with the D-3 columns; `test_seam_status_template_realises_projections_prescribed_by_skill` passes; `test_validate_parallel_state_tolerated_edge_fields.py` and `parallel-state-tolerated-edge-fields.test.ts` accept a checkpoint carrying `observed_resolution` with zero errors.
-- [ ] AC-07 No automatic tuning: a test in `test_parallel_issue_combination_contracts.py` asserts that no file under `scripts/`, `.claude/lib/`, or `extensions/drm-copilot/resources/claude-customizations/.claude/lib/` contains the token `observed_resolution`, and that `config_conflict_tolerance` and `Get-ConfigConflictTolerance` read only the config mapping; no weight value in either committed truth table changes.
+- [ ] AC-07 No automatic tuning: a test in `test_parallel_issue_combination_contracts.py` asserts that no file under `scripts/`, `.claude/lib/`, or `extensions/drm-copilot/resources/claude-customizations/.claude/lib/` contains the token `observed_resolution`, and that `config_conflict_tolerance` and `Get-ConfigConflictTolerance` read only the config mapping; no existing weight value (`same_file`, `possible_overlap`, `append_only`, `module`) in either committed truth table changes.
 
 Combination threshold:
 
 - [ ] AC-08 Threshold validation: `config_conflict_tolerance` and `Get-ConfigConflictTolerance` accept `combination_threshold_percent` as an optional non-boolean integer of at least 0, default it to 400 when absent, and reject negative, float, string, and boolean values with an error naming `config["conflict_tolerance"]["combination_threshold_percent"]`, while an unknown sibling name is still rejected; identical cases pass in `test_blast_radius_combination_threshold.py` and `BlastRadiusCombination.Tests.ps1`; a Pester row reads `COMBINATION_THRESHOLD_DEFAULT` from `_blast_radius_scheduling.py` and asserts it equals the PowerShell default; `test_absent_key_reads_as_strict` and `'reads an absent key as strict'` pass unchanged.
-- [ ] AC-09 Committed value and destination override: both committed truth tables carry `"combination_threshold_percent": 400` as the last `conflict_tolerance` member, with `conflict_tolerance` byte-equal across both committed copies (`test_class_one_keys_are_equal_across_both_committed_copies` passes); `COMMITTED_CONFLICT_TOLERANCE`, `test_committed_conflict_tolerance_reads_cleanly`, and `SOURCE_BLAST_RADIUS` reflect the member; `conflict-tolerance-combination-threshold.json` is composed to the same expected text by both the TypeScript and Python overlay composers, proving a destination can change the value.
+- [ ] AC-09 Committed value and destination override: both committed truth tables carry `"combination_threshold_percent": 400` as the last `conflict_tolerance` member and `"contract": 8` as the last `weights` member, with `conflict_tolerance` byte-equal across both committed copies (`test_class_one_keys_are_equal_across_both_committed_copies` passes); `COMMITTED_CONFLICT_TOLERANCE`, `test_committed_conflict_tolerance_reads_cleanly`, and `SOURCE_BLAST_RADIUS` reflect the member; `conflict-tolerance-combination-threshold.json` is composed to the same expected text by both the TypeScript and Python overlay composers, proving a destination can change the value.
 
 Issue combination:
 
-- [ ] AC-10 Combination library: `find_combinations` and `Get-BlastRadiusCombination` implement D-5 rules 1 to 5 (disabled when the key is absent or `tolerance_percent` is 0; candidates by full `reasons` containing `contract_dependency` or `has_same_file_overlap`; qualification `cost * 100 >= benefit * combination_threshold_percent`; union-find components with ascending `members`, `primary = min(members)`, sorted `pairs`, and `estimated_savings` equal to the sum of qualifying pair costs); `combination-threshold-boundary.json` (one below, at, one above), `combination-candidate-classes.json` (contract, same file, append-only same file not a candidate, glob overlap not a candidate), and `combination-component-chain.json` are asserted to identical results by `test_blast_radius_combination.py` and `BlastRadiusCombination.Tests.ps1`.
+- [ ] AC-10 Combination library: `find_combinations` and `Get-BlastRadiusCombination` implement D-5 rules 1 to 5 (disabled when the key is absent or `tolerance_percent` is 0; candidates by full `reasons` containing `contract_dependency` or `has_same_file_overlap`; qualification `cost * 100 >= benefit * combination_threshold_percent`; union-find components with ascending `members`, `primary = min(members)`, sorted `pairs`, and `estimated_savings` equal to the sum of qualifying pair costs); `combination-threshold-boundary.json` (one below, at, one above), `combination-candidate-classes.json` (contract, same file, append-only same file not a candidate, glob overlap not a candidate), `combination-component-chain.json`, and `combination-contract-only.json` (AC-28) are asserted to identical results by `test_blast_radius_combination.py` and `BlastRadiusCombination.Tests.ps1`.
 - [ ] AC-11 Planner procedure: `.claude/skills/parallel-plan/SKILL.md` contains `## Issue Combination` between `## Complexity Assessment` and `## Cohort Seeding`, stating no operator approval, the P6 skip with its report reason, the re-plan delegation on the primary branch with the `Combined issues:` line, the path import of each other member's feature folder, the fresh `## Complexity Assessment` of the combined item, removal of non-primary members from `items[]`, `combined_issue_nums`, the `combinations` list, and capped scheduling over the post-combination item set; `.claude/agents/parallel-planner.md` states the same duties; asserted by `test_parallel_issue_combination_contracts.py`, and `test_parallel_planner_surface_contracts.py` and `test_parallel_complexity_routing_contracts.py` pass unchanged.
 - [ ] AC-12 One branch, one PR, both issues closed: `.claude/skills/parallel-orchestrate/SKILL.md` places `Combined issues: #A #B` after kickoff element 3 for a combined item, and `test_parallel_orchestrate_kickoff_keeps_five_elements` and `test_parallel_orchestrator_surface_contracts.py` pass unchanged; `.claude/skills/pr-author/SKILL.md` names each issue on `Author-asserted autoclose issues: #NNN [#NNN ...]`; `.claude/skills/orchestrate/SKILL.md` lists every `Combined issues:` number on that line, keeps the literal `Author-asserted autoclose issues: #<issue-num>`, and states in `## Issue Number Consistency` that `Combined issues:` numbers are permitted cross-references; new allow rows in `enforce-model-routing-receipt.AuthorAsserted.Tests.ps1` show a line naming two issue numbers allowed with the checkpoint number in the first position and in the second position; the rule text states that no umbrella issue is created.
 - [ ] AC-13 Prompt-shape safety: `test_parallel_issue_combination_contracts.py` asserts that the `Combined issues:` and `Author-asserted autoclose issues:` example lines in the edited skills do not match `HOOK_ISSUE_NUMBER_PATTERN` and that no combination line carries a `docs/features/active/` path; `test_parallel_issue_adoption_skill_contracts.py` and `pr-author-issue-link-contract.Tests.ps1` pass unchanged.
@@ -375,16 +428,25 @@ Cross-cutting:
 
 - [ ] AC-20 Token-shape sentence corrected: the stale "three token shapes" sentence in `.claude/skills/parallel-plan/SKILL.md` and its bundle copy states the shape count read from the merged `.claude/rules/parallel-orchestration.md` token-shape rejection paragraph, asserted by `test_parallel_issue_combination_contracts.py`.
 - [ ] AC-21 Dependency gate: before implementation, each #1006 observable under Dependency on #1006 holds on `origin/main` and `git merge-base --is-ancestor origin/main HEAD` exits 0; the result is recorded under `evidence/` in this feature folder.
-- [ ] AC-22 Scope boundaries held: the diff against the merge base does not modify `decide_pair`, `Get-BlastRadiusPairDecision`, `conflicts`, `HARD_REASON_KINDS`, `pair_cost`, `pair_benefit`, the `conflict_edges[].reason` enum, any parallel validator module, `_parallel_drift_scheduling.py`, `.claude/hooks/enforce-model-routing-receipt.ps1`, or any file listed under Files deliberately not written; the diff touches only files in the Complete File List and feature-folder documents and evidence.
-- [ ] AC-23 Fail-before evidence: the new tests in `test_blast_radius_aggregate.py`, `test_blast_radius_combination.py`, and `test_blast_radius_combination_threshold.py` were run against the pre-change code and failed, and the run is recorded under `evidence/regression-testing/` in this feature folder.
+- [ ] AC-22 Scope boundaries held: the diff against the merge base does not modify `decide_pair`, `Get-BlastRadiusPairDecision`, `conflicts`, `HARD_REASON_KINDS`, `pair_benefit`, or `pair_cost` and `Get-BlastRadiusPairCost` beyond the D-7 contract term, the `conflict_edges[].reason` enum, any parallel validator module, `_parallel_drift_scheduling.py`, `.claude/hooks/enforce-model-routing-receipt.ps1`, or any file listed under Files deliberately not written; the diff touches only files in the Complete File List and feature-folder documents and evidence.
+- [ ] AC-23 Fail-before evidence: the new tests in `test_blast_radius_aggregate.py`, `test_blast_radius_combination.py`, `test_blast_radius_combination_threshold.py`, and `test_blast_radius_contract_weight.py` were run against the pre-change code and failed, and the run is recorded under `evidence/regression-testing/` in this feature folder.
 - [ ] AC-24 Coverage: every changed or new production file meets the line and branch coverage thresholds of `.claude/rules/general-unit-test.md` (line only for PowerShell), measured per file as described in the execution-environment brief; no production file is excluded from measurement; coverage on changed lines does not regress.
 - [ ] AC-25 Toolchain, file size, and isolation: the seven-stage toolchain loop passes in a single pass for Python, PowerShell, and TypeScript; every new file is at or below 500 lines and every edited code file is below 700 lines; the test-isolation checks in the execution-environment brief pass and are recorded under `evidence/regression-testing/` in this feature folder.
+
+Contract weight (owner decision 2026-10-30, D-7):
+
+- [ ] AC-26 Contract weight validation: `config_conflict_tolerance` and `Get-ConfigConflictTolerance` require `conflict_tolerance.weights.contract` exactly like `same_file`, `possible_overlap`, `append_only`, and `module`: a missing `contract` name and an unknown weight name are rejected with an error naming `config["conflict_tolerance"]["weights"]`; a boolean, float, or string value is rejected with `TypeError` (PowerShell: terminating error) and a value of 0 or below with `ValueError`, each naming `config["conflict_tolerance"]["weights"]["contract"]`; an integer of 1 or more is accepted; identical accept and reject cases pass in `test_blast_radius_contract_weight.py` and `BlastRadiusScheduling.ContractWeight.Tests.ps1`; `STRICT_CONFLICT_TOLERANCE` and the PowerShell strict hashtable carry `contract` 1, and `test_absent_key_reads_as_strict` and `'reads an absent key as strict'` pass unchanged; `SOURCE_BLAST_RADIUS` and every TypeScript test that restates the committed `weights` map carry `"contract": 8`, and `conflict-tolerance-contract-weight.json` is composed to the same expected text by both the TypeScript and Python overlay composers.
+- [ ] AC-27 Cost summed once per shared contract identifier: `pair_cost` and `Get-BlastRadiusPairCost` return the unchanged path-pair and module terms plus `weights.contract` times the number of distinct contract identifiers in the intersection the relation uses to report `contract_dependency`; asserted in both runtimes with identical results for a pair sharing zero, one, and two contract identifiers and for an identifier repeated within one radius (counted once); the cost of every pair that shares no contract is unchanged, and existing tests that pin a cost for a contract-sharing pair are updated with the reason recorded in the plan.
+- [ ] AC-28 Contract-only pair eligibility: a pair whose only overlap is shared contracts has cost `weights.contract * n` (not 0), is a combination candidate, and qualifies when `cost * 100 >= benefit * combination_threshold_percent`; `combination-contract-only.json` pins one contract-only pair that qualifies at the committed values and one that does not (shorter item band above the boundary), with identical results from `find_combinations` and `Get-BlastRadiusCombination`; the spec statement that contract-only pairs cannot combine is removed, and `.claude/rules/parallel-orchestration.md` (Integration-cost scheduling: Configuration and Cost) and its bundle copy state the `contract` weight, its minimum of 1, its committed value, its once-per-identifier summation, and that `contract_dependency` remains a hard edge class.
+- [ ] AC-29 Tolerance-0 strict identity with the contract term: at `tolerance_percent` 0 the edge set from `schedule_conflict_edges` and `Get-BlastRadiusConflictEdge` equals the detected conflict set for every `contract` weight in a tested range including 1 and the committed value; at every tested tolerance the edge set with the contract term equals the edge set with `contract` contributing 0 (only edge `cost` fields differ); asserted by a property test in `test_blast_radius_contract_weight.py` and an equivalent Pester Context in `BlastRadiusScheduling.ContractWeight.Tests.ps1`; the AC-04 strict-identity pins pass; the rule text states the invariant.
 
 ## Risks and Mitigations
 
 - Loss of set-level monotonicity (D3): documented in the rule text and pinned by the AC-05 properties.
 - Aggressive combination at committed weights: two C1 items sharing one non-append-only file give `8*100 >= 1*400`, and two C2 items give `800 >= 800`. The threshold is destination-tunable; the behavior is documented in the rule text.
-- Contract-only pairs never combine at the default threshold (cost 0, D5): documented; they continue to serialize as hard edges.
+- Contract-only pairs now combine at the committed values when the shorter item is C1 or C2 (D-7). The committed `contract` value 8 is an orchestrator assumption; a destination tunes it through `config/blast-radius.local.json`.
+- Required `contract` weight name breaks any config that carries `weights` without it, including destination overlays that restate the full `weights` map: the overlay composers merge recursively, so an overlay that sets individual weights keeps the published `contract`; an overlay that is invalid after the merge fails fast with the key named. Every in-repository fixture carrying `weights` is updated in the same task (entries 59 to 75).
+- Pinned cost values for contract-sharing edges change (historical-run and scheduling fixtures): each change is named with its reason in the plan; edge sets are pinned unchanged (AC-29).
 - Unbounded combined item and larger review (R4): accepted trade, documented.
 - Mirror drift across bundle copies and the Class 1 `conflict_tolerance` value: copy bundle files in one task with recorded SHA-256 pairs, edit both truth tables in one task, and run the AC-18 contract tests.
 - File size: logic goes into the four new modules; line counts are recorded before and after.

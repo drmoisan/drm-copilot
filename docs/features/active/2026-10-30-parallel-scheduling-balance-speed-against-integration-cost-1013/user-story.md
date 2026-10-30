@@ -3,7 +3,7 @@
 - Issue: #1013
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-30T13-28
+- Last Updated: 2026-10-30T16-00 (owner decision 2026-10-30: contract weight; US-18, US-19)
 - Work Mode: full-feature (acceptance criteria are tracked in this file and in `spec.md`)
 - Spec: `spec.md` in this feature folder (AC IDs referenced below are the spec's `AC-NN` identifiers)
 
@@ -80,6 +80,7 @@ As a parallel-run operator, I want qualifying pairs combined into one item at pl
 Acceptance Criteria:
 
 - [ ] US-04 A pair meeting the combination threshold, with candidates limited to `contract_dependency` or same-file overlap, is combined by the library with deterministic members, primary, pairs, and estimated savings (spec AC-10).
+- [ ] US-18 A pair that shares only contracts has a nonzero cost (`conflict_tolerance.weights.contract` summed once per shared contract identifier) and is combined when that cost meets the threshold; `contract_dependency` remains a hard edge class, and at `tolerance_percent` 0 the edge set stays identical to strict scheduling (spec AC-27, AC-28, AC-29).
 - [ ] US-05 The planner combines without operator approval, re-plans on the primary branch, assigns the combined item a band from a fresh complexity assessment, and records `combined_issue_nums` and the `combinations` list (spec AC-11, AC-14).
 - [ ] US-06 The combined item runs as one child with one branch and one PR whose autoclose line names every member issue; no umbrella issue is created (spec AC-12, AC-13).
 - [ ] US-07 A combined item that fails review or CI remediates as one unit and never splits back into separate PRs (spec AC-16).
@@ -104,6 +105,7 @@ Acceptance Criteria:
 - [ ] US-12 A destination with no overlay receives `tolerance_percent` 100 and `combination_threshold_percent` 400 from the published truth table (spec AC-01).
 - [ ] US-13 `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other members, and its accept, reject, and default behavior is equal across Python and PowerShell (spec AC-08).
 - [ ] US-14 The committed value is equal in both truth tables, and a destination overlay value is composed identically by the TypeScript and Python composers (spec AC-09).
+- [ ] US-19 `conflict_tolerance.weights.contract` is a required integer of at least 1, validated like the other weights with fail-fast errors naming the key and booleans rejected, equal across Python and PowerShell, carried by the TypeScript push-down and overlay surfaces, and committed byte-equal in both truth tables; a destination overlay can change it (spec AC-09, AC-26).
 
 ### Story 5 — Delivered consistently to destinations (destination maintainer)
 
@@ -128,6 +130,7 @@ Issue acceptance criteria, restated from `issue.md`, with their story and spec t
 - [ ] `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other keys, and equal across Python, PowerShell, and TypeScript where ported (US-13, US-14; spec AC-08, AC-09).
 - [ ] The plan report lists each combination and its estimated savings (US-08; spec AC-17).
 - [ ] Mirrored and bundled copies, pack manifest, and contract tests pass (US-15; spec AC-18, AC-19).
+- [ ] A pair that shares only a contract has a nonzero cost from `conflict_tolerance.weights.contract` (summed once per shared contract identifier, validated like the other weights) and can qualify for combination; at `tolerance_percent` 0 the edge set equals strict scheduling (US-18, US-19; spec AC-26 to AC-29).
 
 ## Non-Goals
 
