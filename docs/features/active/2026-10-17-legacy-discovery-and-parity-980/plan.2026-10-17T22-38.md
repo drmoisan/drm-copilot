@@ -955,7 +955,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: Analyzer findings from a direct run with the repository settings file; counts from the JUnit copy; coverage from the XML copy; shard completeness; the Linux hook-suite shape over CPTEST and XPTEST.
   - Acceptance: No failure, no missing shard, line coverage at least 85% read from the evidence copy, and the canonical artifacts/pester/powershell-coverage.xml total equals the evidence copy's total.
 
-- [ ] [P16-T4] Verify coverage for every changed file of the branch (FEATURE/evidence/qa-gates/).
+- [x] [P16-T4] Verify coverage for every changed file of the branch (FEATURE/evidence/qa-gates/).
   - Files and behavior: Write FEATURE/evidence/qa-gates/p16-coverage-comparison.<timestamp>.md from the P16-T1 JSON, the P16-T2 summaries, the P16-T3 XML and the P0 baselines, over every production Python, TypeScript and PowerShell file listed by `git diff --name-only --diff-filter=AM` from the merge base of origin/main and HEAD to HEAD, with `git status --porcelain` recorded empty beside it.
   - Tests and proof: Per file: baseline (or `new`), final and delta for lines and, for Python and TypeScript, branches; new files at least 90% lines; every file at least 85% lines and 75% branches; no regression on changed lines; the ten P15-T20 files and every Phase 15 module listed by name.
   - Acceptance: Every listed file has numeric measurements meeting the floors; a missing measurement fails the gate; no exclusion and no threshold change.
