@@ -17,7 +17,7 @@ Most professional repos keep work-tracking state in the issue tracker, and keep 
 
 ## Proposed Behavior
 
-Delivered as ONE feature with three phases, merged as one change set (owner decision: a single feature, not an epic and not three sequenced items).
+Delivered as ONE feature with three phases, merged as one change set (owner decision). Update 2026-10-30: this feature is now incorporated into epic #1018 (shared agent-harness layer). It is split by its own phases: Phase 1 (resolver and configured root, default unchanged) is child 2 of the epic and runs early so later children use the resolver; Phases 2 and 3 (migration command, the move to `.dev` and the default flip) are child 7, the last child, after the other epic work has merged. The epic takes priority over this item as a standalone feature.
 
 **Target layout** (the `features` level is dropped):
 
