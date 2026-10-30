@@ -24,8 +24,8 @@ features:
   - issue_num: 1021
     feature_folder: 2026-10-30-docs-page-quality-checker-1021
     depends_on: [1020]
-  - issue_num: 900003
-    feature_folder: docs-surface-analyzers-python-config
+  - issue_num: 1022
+    feature_folder: 2026-10-30-docs-surface-analyzers-python-config-1022
     depends_on: [1020]
   - issue_num: 900004
     feature_folder: docs-surface-analyzers-typescript-dotnet
@@ -38,7 +38,7 @@ features:
     depends_on: [1020, 1021]
   - issue_num: 900007
     feature_folder: docs-mcp-tools
-    depends_on: [1021, 900003, 1023, 900006]
+    depends_on: [1021, 1022, 1023, 900006]
   - issue_num: 900008
     feature_folder: docs-enforcement-and-ci
     depends_on: [1021, 1023]
@@ -97,7 +97,7 @@ Consequences applied in this document:
   `packages/docs-page-check` as `drm_copilot_docs_check`, `dev.docs.*` Poetry console commands, a
   Python wheel build script) and the interim TypeScript runtime design (`extensions/drm-copilot/src/docs/`
   and a `drm-copilot-docs` npm bin), which ran pushed-down logic in TypeScript.
-- Children 1020, 1021, 900003, 1023 and 900006 were prepared, or were being prepared, against a
+- Children 1020, 1021, 1022, 1023 and 900006 were prepared, or were being prepared, against a
   withdrawn design. Each is re-prepared with one planner revision against this document.
 - Every child plan carries an artifact classification table: each new or edited file, its class
   (`pushed-down helper/lib`, `hook`, `skill`, `agent`, `MCP tool`, `extension command`,
@@ -119,7 +119,7 @@ Consequences applied in this document:
 
 None of the following has been approved by the owner. Each is a provisional default.
 
-- **A1 - Analyzer scope.** Python/configuration analyzers (900003) and TypeScript/.NET analyzers
+- **A1 - Analyzer scope.** Python/configuration analyzers (1022) and TypeScript/.NET analyzers
   (900004) are both in the epic as separate features, both implemented as PowerShell lexical
   scanners. No other feature depends on 900004, so it may land later; stacks outside the built-in
   set enter through the discovery extension-result manifest format.
@@ -173,7 +173,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 |---|---|---|---|---|
 | 0 | 1020 | docs-profile-and-artifact-schemas | C3 | Docs profile, versioned schemas, surface element model, analyzer registry, `Invoke-DocsCommand.ps1` entry and push-down registration. |
 | 1 | 1021 | docs-page-quality-checker | C3 | PowerShell page checker (front matter, links/anchors, Diataxis mode, orphans) with base linter and Vale configuration data. |
-| 1 | 900003 | docs-surface-analyzers-python-config | C4 | PowerShell lexical analyzers for Python CLI, HTTP route, public API, configuration and architecture surfaces; `inventory` subcommand. |
+| 1 | 1022 | docs-surface-analyzers-python-config | C4 | PowerShell lexical analyzers for Python CLI, HTTP route, public API, configuration and architecture surfaces; `inventory` subcommand. |
 | 1 | 900004 | docs-surface-analyzers-typescript-dotnet | C4 | PowerShell lexical analyzers for TypeScript CLI/route/export and .NET route/config/public-type surfaces; extension-manifest import. |
 | 1 | 1023 | docs-coverage-ledger-and-receipt | C4 | PowerShell coverage ledger, parity matrix, evidence pins and staleness, `docs-complete` receipt. |
 | 2 | 900006 | docs-reference-generator | C3 | PowerShell deterministic reference-page renderer with marker-delimited generated blocks. |
@@ -208,7 +208,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 - Tests: Pester under `tests/scripts/claude-lib/docs/<Module>.Tests.ps1`, following
   `tests/scripts/claude-lib/mermaid/`; hook tests under `tests/scripts/claude-hooks/`; MCP tests
   under `extensions/drm-copilot/test/`.
-- Subcommands and owners: `init`, `validate-profile` (1020); `check` (1021); `inventory` (900003;
+- Subcommands and owners: `init`, `validate-profile` (1020); `check` (1021); `inventory` (1022;
   900004 adds analyzers only); `coverage`, `update-ledger`, `validate` (1023);
   `generate-reference` (900006); `surface-delta` (900008). Each owner adds its own command module
   and one dispatch-table row.
@@ -263,8 +263,23 @@ None of the following has been approved by the owner. Each is a provisional defa
 - `docs-complete` fails when the snapshot revision is null (`DOCS_SNAPSHOT_UNPINNED`). Owner
   question Q5.
 - Open: whether the element digest covers the whole file or the declaration's source lines
-  (research recommends declaration lines; 900003 decides with 1023), and whether the JSON envelope
+  (research recommends declaration lines; 1022 decides with 1023), and whether the JSON envelope
   gets a schema.
+
+### Analyzer decisions from the first preparation of 1022 (language-independent)
+
+- Analyzer identifiers: `python-cli`, `python-http`, `python-public-api`, `config-files`,
+  `python-architecture`. 900004 uses distinct identifiers.
+- Ownership: console-script tables (`[project.scripts]`, `[tool.poetry.scripts]`,
+  `[project.gui-scripts]`) belong to `python-cli`; `config-files` owns `[tool.*]` keys, `.env`
+  keys, JSON Schema `properties` and YAML keys.
+- Size bound: 1 MiB per input file; a larger input is a diagnostic.
+- Only template environment files are read (`.env.example`, `.sample`, `.template`, `.dist`);
+  other environment files are neither read nor hashed and produce one informational diagnostic.
+- Registry and dispatch-table form: 1020 writes `DocsAnalyzerRegistry.psm1` and the
+  `Invoke-DocsCommand.ps1` dispatch table with one entry per line and the closing delimiter on its
+  own line, so later children append without changing an existing line. Contract tests that
+  enumerate registered analyzers or subcommands assert membership, not set equality.
 
 ### Reuse
 
@@ -283,8 +298,8 @@ None of the following has been approved by the owner. Each is a provisional defa
 ### Cross-feature conflict surface
 
 Children create disjoint new modules. Shared, append-only edit points:
-`.claude/lib/docs/Invoke-DocsCommand.ps1` dispatch table (1020, 1021, 900003, 1023, 900006,
-900008), `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (900003, 900004), any push-down manifest or
+`.claude/lib/docs/Invoke-DocsCommand.ps1` dispatch table (1020, 1021, 1022, 1023, 900006,
+900008), `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (1022, 900004), any push-down manifest or
 parity list that enumerates mirrored files (every child that adds a module), and
 `quality-tiers.yml` if applicable. Append-only conflicts are resolved inside the child's
 remediation loop.
@@ -352,7 +367,7 @@ Acceptance criteria:
 - No consumer vocabulary or repository name ships in the base configuration.
 - Pester line coverage >= 85%.
 
-### 900003 - docs-surface-analyzers-python-config (wave 1, C4)
+### 1022 - docs-surface-analyzers-python-config (wave 1, C4)
 
 Band rationale: lexical extraction of Python and configuration surfaces in PowerShell without a
 Python parser (Q2); ambiguity in what counts as public surface; research-heavy.
@@ -396,7 +411,7 @@ Acceptance criteria:
 - Each analyzer emits the expected elements for in-memory TypeScript and C# fixtures.
 - An extension-result manifest whose captured-input digest does not match is rejected with a
   diagnostic; a matching manifest is merged as inert data.
-- Determinism and bounded-input diagnostics as in 900003.
+- Determinism and bounded-input diagnostics as in 1022.
 - Pester line coverage >= 85%.
 
 ### 1023 - docs-coverage-ledger-and-receipt (wave 1, C4)
@@ -556,7 +571,7 @@ Acceptance criteria:
 Computed with `scripts/dev_tools/epic_wave_computation.py`:
 
 - Wave 0: 1020
-- Wave 1: 1021, 900003, 900004, 1023
+- Wave 1: 1021, 1022, 900004, 1023
 - Wave 2: 900006, 900008
 - Wave 3: 900007
 - Wave 4: 900009
