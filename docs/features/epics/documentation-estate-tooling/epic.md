@@ -2,7 +2,7 @@
 epic: documentation-estate-tooling
 integration_branch: epic/documentation-estate-tooling-integration
 created_at: 2026-10-30T20:10:00Z
-# PLANNING STATE. issue_num values below are placeholders (900001-900010) until each child's
+# PLANNING STATE. issue_num values of the form 9000NN are placeholders until each child's
 # promotion receipt is back-filled; depends_on uses issue_num values. The final resolved manifest
 # replaces every placeholder before the kickoff artifact is written.
 intent:
@@ -17,24 +17,24 @@ intent:
     - Analyzers are read-only, lexical, bounded and deterministic; no analyzer executes, compiles or installs consumer code.
     - Line coverage >= 85% and branch coverage >= 75% on every new Python and TypeScript module; files stay within the 500/700/800 line tiers.
 features:
-  - issue_num: 900001
-    feature_folder: docs-profile-and-artifact-schemas
+  - issue_num: 1020
+    feature_folder: 2026-10-30-docs-profile-and-artifact-schemas-1020
     depends_on: []
   - issue_num: 900002
     feature_folder: docs-page-quality-checker
     depends_on: []
   - issue_num: 900003
     feature_folder: docs-surface-analyzers-python-config
-    depends_on: [900001]
+    depends_on: [1020]
   - issue_num: 900004
     feature_folder: docs-surface-analyzers-typescript-dotnet
-    depends_on: [900001]
+    depends_on: [1020]
   - issue_num: 900005
     feature_folder: docs-coverage-ledger-and-receipt
-    depends_on: [900001]
+    depends_on: [1020]
   - issue_num: 900006
     feature_folder: docs-reference-generator
-    depends_on: [900001, 900002]
+    depends_on: [1020, 900002]
   - issue_num: 900007
     feature_folder: docs-mcp-tools
     depends_on: [900002, 900003, 900005, 900006]
@@ -102,7 +102,7 @@ None of the following has been approved by the owner. Each is a provisional defa
 
 | Wave | issue_num | Feature | Band | Purpose |
 |---|---|---|---|---|
-| 0 | 900001 | docs-profile-and-artifact-schemas | C3 | Docs profile, versioned schemas, surface element model, analyzer contract, `drm_copilot_docs` package skeleton. |
+| 0 | 1020 | docs-profile-and-artifact-schemas | C3 | Docs profile, versioned schemas, surface element model, analyzer contract, `drm_copilot_docs` package skeleton. |
 | 0 | 900002 | docs-page-quality-checker | C3 | Consumer-installable page checker (front matter, links/anchors, Diataxis mode, orphans) with base PyMarkdown and Vale configuration. |
 | 1 | 900003 | docs-surface-analyzers-python-config | C4 | Python CLI, HTTP route, public API, configuration and architecture analyzers; `dev.docs.inventory`. |
 | 1 | 900004 | docs-surface-analyzers-typescript-dotnet | C4 | TypeScript CLI/route/export and .NET route/config/public-type analyzers; extension-manifest import. |
@@ -133,7 +133,7 @@ None of the following has been approved by the owner. Each is a provisional defa
   (`drm_copilot_docs_check`).
 - Schemas: `schemas/docs/v1/<name>.schema.json`; examples: `examples/docs/v1/`.
 - Console commands (one module per command family, so children edit disjoint modules):
-  `dev.docs.init`, `dev.docs.validate-profile` (900001); `dev.docs.check` (900002);
+  `dev.docs.init`, `dev.docs.validate-profile` (1020); `dev.docs.check` (900002);
   `dev.docs.inventory` (900003, 900004 adds analyzers only); `dev.docs.coverage`,
   `dev.docs.update-ledger`, `dev.docs.validate` (900005); `dev.docs.generate-reference` (900006);
   `dev.docs.surface-delta` (900008).
@@ -149,6 +149,23 @@ None of the following has been approved by the owner. Each is a provisional defa
 - Page front matter fields: `owner`, `last_reviewed`, `audience`, `diataxis_mode`, `surface_refs`.
 - Generated-block markers: `<!-- docs:generated:start id=<element-id> -->` and
   `<!-- docs:generated:end id=<element-id> -->`.
+
+### Decisions recorded during preparation of 1020 (binding on later children)
+
+- A seventh schema file, `schemas/docs/v1/common.schema.json` (definitions only, `$id`
+  `urn:drm-copilot:docs:1.0.0:common`), holds shared definitions; the six artifact schema names
+  are unchanged. Evidence pins are stored as one collection document.
+- Diataxis mode values are exactly `tutorial`, `how-to`, `reference`, `explanation` (shared by
+  1020 and 900002).
+- Schema tests live under `tests/schemas/docs/`.
+- `quality-tiers.yml` exists at the repository root; each new package is classified there
+  (`packages/docs-runtime` is T2), which also updates the tier classification test.
+- Property tests use deterministic `itertools` enumerations; `hypothesis` is not an approved
+  dependency.
+- Distribution follows the discovery runtime's wheel pattern: a build script stages schema copies
+  under the package's `_resources` and writes a wheel; consumers install the discovery and docs
+  wheels. This resolves the installation risk below for `drm_copilot_docs`.
+- The neutrality test configures consumer identifiers only as SHA-256 digests, never as text.
 
 ### Reuse of the merged discovery runtime
 
@@ -167,9 +184,10 @@ confirms the exact symbols it consumes.
 ### Cross-feature conflict surface
 
 Children edit disjoint new modules. The shared files that more than one child edits, all
-append-only: root `pyproject.toml` `[tool.poetry.scripts]` and path dependencies (900001, 900002,
-900003, 900005, 900006, 900008), `poetry.lock` (900001, 900002),
-`packages/docs-runtime/src/drm_copilot_docs/analyzer_contract.py` registry table (900003, 900004).
+append-only: root `pyproject.toml` `[tool.poetry.scripts]` and path dependencies (1020, 900002,
+900003, 900005, 900006, 900008), `poetry.lock` (1020, 900002),
+`packages/docs-runtime/src/drm_copilot_docs/analyzer_contract.py` registry table (900003, 900004),
+`quality-tiers.yml` and its tier classification test (1020, 900002).
 Append-only conflicts are resolved inside the child's remediation loop.
 
 ## Child Feature Specifications
@@ -180,7 +198,7 @@ temporary files, so pure cores take in-memory path-to-content mappings and I/O s
 modules. Each child's research may refine file names; it may not change the naming contract above
 without an epic-level update.
 
-### 900001 - docs-profile-and-artifact-schemas (wave 0, C3)
+### 1020 - docs-profile-and-artifact-schemas (wave 0, C3)
 
 Band rationale: defines the contracts every other child consumes (schemas, element model,
 analyzer protocol); cross-module invariant work, not research-heavy.
@@ -203,7 +221,7 @@ Files (create):
 - `examples/docs/v1/docs-profile.example.json` and one example per schema
 - `tests/docs_runtime/test_profile.py`, `test_profile_properties.py`, `test_surface_models.py`,
   `test_analyzer_contract.py`, `test_cli.py`, `test_neutrality.py`
-- `tests/schemas/docs_schemas/test_docs_schemas_v1.py`
+- `tests/schemas/docs/ (schema tests)`
 
 Files (edit): `pyproject.toml` (path dependency, two scripts), `poetry.lock`; package registration
 wherever the discovery runtime is registered for bundling (research confirms the mechanism).
@@ -448,7 +466,7 @@ Acceptance criteria:
 
 ## Decomposition Rationale
 
-- Contracts first: 900001 fixes the schemas, element model and analyzer protocol so the four
+- Contracts first: 1020 fixes the schemas, element model and analyzer protocol so the four
   wave-1 features build in parallel against stable contracts.
 - 900002 is independent (separate package) and runs in wave 0.
 - 900006 depends on 900002 because generated pages must satisfy the page-metadata schema and
@@ -463,7 +481,7 @@ Acceptance criteria:
 
 ## Planned Waves
 
-- Wave 0: 900001, 900002
+- Wave 0: 1020, 900002
 - Wave 1: 900003, 900004, 900005, 900006
 - Wave 2: 900007, 900008
 - Wave 3: 900009
@@ -475,6 +493,6 @@ Execution concurrency cap (`max_parallel_features`): 3, set by the coordinator's
 
 - Append-only conflicts in `pyproject.toml` and `analyzer_contract.py` across wave-1 children.
 - Consumer installation path for the Python packages (how a destination repository runs
-  `dev.docs.*` without this repository's Poetry environment) is unresolved; 900001 research must
+  `dev.docs.*` without this repository's Poetry environment) is unresolved; 1020 research must
   establish it, following the discovery runtime's distribution mechanism.
 - Lexical analyzers cannot see dynamic registration; such elements surface as diagnostics.
