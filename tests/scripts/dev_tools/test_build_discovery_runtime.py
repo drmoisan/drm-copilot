@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import json
+import sys
 from itertools import permutations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-import tomllib
 from drm_copilot_discovery import cli
+
+# tomllib is stdlib only from Python 3.11; the supported floor 3.10 uses tomli.
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 from scripts.dev_tools import build_discovery_runtime as build
 
