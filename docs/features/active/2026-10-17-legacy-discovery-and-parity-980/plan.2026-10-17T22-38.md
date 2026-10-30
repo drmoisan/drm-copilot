@@ -985,7 +985,7 @@ Scratch helpers in this phase live under SCRATCH with names that start with `iss
   - Tests and proof: The status artifact lists every criterion with its cited evidence; no criterion is checked from executor prose alone.
   - Acceptance: The four re-evaluated criteria each cite Phase 15 or 16 evidence or are unchecked; AC-64 is unchecked; the deliverable set is unchanged.
 
-- [ ] [P16-T10] Rewrite the complete checklist self-review on the remediated tree (FEATURE/evidence/qa-gates/).
+- [x] [P16-T10] Rewrite the complete checklist self-review on the remediated tree (FEATURE/evidence/qa-gates/).
   - Files and behavior: Walk docs/features/templates/policy_audit/{policy-audit.yyyy-MM-ddTHH-mm,code-review.yyyy-MM-ddTHH-mm,feature-audit.yyyy-MM-ddTHH-mm}.md against the branch diff from the merge base of origin/main and HEAD; write FEATURE/evidence/qa-gates/self-review.<timestamp>.md with one PASS, FAIL or justified N/A row per checklist item and one row per review finding (R1 through R4 of the remediation inputs, the Major, each Minor and the catalog cache) naming its closing task and evidence. The sweep also covers this plan's Phase 15 and 16 text and the four cycle documents for wording that violates the rule it enforces.
   - Tests and proof: A FAIL row is fixed, the affected loop among P16-T1 through P16-T3 and every later dependent Phase 16 task are repeated, and the self-review is rewritten before this task completes.
   - Acceptance: Zero FAIL rows and no unverified blocking row; every review finding row cites existing evidence.
