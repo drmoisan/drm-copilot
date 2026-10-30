@@ -166,6 +166,16 @@ None of the following has been approved by the owner. Each is a provisional defa
   (preinstalled on GitHub-hosted runners). Provisional default: accept.
 - **Q5 - Unpinned snapshot.** `docs-complete` fails when the inventory snapshot carries no
   revision. Provisional default: fail closed.
+- **Q6 - Runtime schema location (from 1020).** Provisional default: canonical `schemas/docs/v1/`
+  plus a parity-tested copy under `.claude/lib/docs/schemas/v1/`.
+- **Q7 - Codex reach (from 1020).** Provisional default: the docs lib ships in the Claude bundle
+  only; a `.codex/lib/docs/` mirror would need a TypeScript change and an in-place edit of existing
+  Python.
+- **Q8 - PowerShell floor (from 1020).** Provisional default: require PowerShell 7.4 (Draft
+  2020-12 `Test-Json`) and fail closed below it.
+- **Q9 - Tier (from 1020).** Provisional default: `.claude/lib/docs` is T3.
+- **Q10 - `init` writes into consumer `.github/workflows/` and root dotfiles (from 1020).**
+  Provisional default: only with `-Write`, never overwriting an existing file without `-Force`.
 
 ## Scope
 
@@ -243,6 +253,35 @@ None of the following has been approved by the owner. Each is a provisional defa
   budget otherwise denies the fourth production file.
 - `quality-tiers.yml` exists at the repository root; new code areas are classified there if its
   schema covers `.claude/lib` directories (research confirms).
+
+### PowerShell contracts from the re-preparation of 1020 (binding; authoritative text in 1020 spec.md `## Decisions Later Children Must Honor`)
+
+- `Invoke-DocsCommand.ps1` dispatch table and `DocsAnalyzerRegistry.psm1` carry one anchor comment
+  per later owner; each child adds rows under its own anchor only, with literal module joins.
+  Dispatch uses `[scriptblock]`-typed parameters declared in the same file, because the existing
+  test `enforcement-hooks-no-python-invocation.Tests.ps1` rejects `&` calls through a variable,
+  member or expression in `.claude/lib`.
+- Exit code 2 carries finding `DOCS_CLI_ARGUMENTS`, exit code 3 carries `DOCS_CLI_RUNTIME`. `-Json`
+  prints canonical JSON `{command, exit_code, findings, ok, result}`; the envelope has no schema
+  file.
+- Pure functions take strings and hashtables; all file and clock access goes through one command
+  context built by `Invoke-DocsCommand.ps1`, whose only write function is `Write-DocsFileText`.
+- Element identifiers are `<kind>-<sha256>` over canonical JSON of `{declaration, kind, path}` plus
+  a line feed, using `ConvertTo-DiscoveryCanonicalJson`. JSON is parsed with System.Text.Json into
+  ordinal hashtables with duplicate-key detection.
+- Schemas: `schemas/docs/v1/` is canonical; a parity-tested runtime copy ships under
+  `.claude/lib/docs/schemas/v1/`. `DocsSchema.psm1` inlines the docs-common `$defs` in memory,
+  because `Test-Json` rejects external `$ref` by default (Q1 resolved). `format: date-time` is not
+  enforced, so timestamps use a `pattern`. Field-level messages come from
+  `Get-DocsSchemaStructuralFinding`; schema constraints that must name a failing field stay within
+  its keyword subset.
+- The consumer profile is JSON at `docs/documentation-estate/docs-profile.json`; YAML is rejected.
+- Consumer configuration and the 900008 workflow template are written by
+  `Invoke-DocsCommand.ps1 -Command init` from templates under `.claude/lib/docs/templates/`; 1021
+  and 900008 each add one template row.
+- Every new `.claude/lib/docs/` file is listed in the Claude `pack-manifests/core.json` and
+  mirrored byte-identically. `.claude/lib/docs` is T3 in `quality-tiers.yml`.
+- Execution runs in the item worktree under an exempt-route checkpoint (batch budget).
 
 ### Command contract decisions from the first preparation of 1023 (language-independent)
 
