@@ -72,7 +72,7 @@ An executor plan cannot contain an owner stop. The work is therefore delivered a
 
 - The orchestrator presents the dry-run report and the owner questions (OQ-1 to OQ-13) to the owner.
 - The orchestrator writes the owner's answers to `<FEATURE>/evidence/other/folder-rename-decisions.<UTC>.json` using the schema in "Decision File".
-- The stage B plan is authored only after the decision file exists. Owner answers that change stage B scope (OQ-3, OQ-4, OQ-5, OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11) are recorded in `global_decisions` and become stage B tasks or exclusions; they are not decided by either plan.
+- The stage B plan is authored during preparation with explicitly authorized branches for each owner answer, and its Phase 1 maps the decision file's answers onto those branches; an answer that maps to no branch, or an answer listed under "Orchestrator Rulings (preparation)" as re-entering planning, halts stage B for one plan revision. Owner answers that change stage B scope (OQ-3, OQ-4, OQ-5, OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11) are recorded in `global_decisions` and become stage B tasks or exclusions; they are not decided by either plan.
 
 ### Stage B — post-decision plan (Phase 3: move, rename, flip, updates)
 
@@ -80,13 +80,13 @@ An executor plan cannot contain an owner stop. The work is therefore delivered a
 2. Apply the migration with the decision file (moves, renames, reference rewrites, link recomputation, `docs/README.md`), committed as one commit or as moves-then-rewrites according to `global_decisions.commit_split` (OQ-12).
 3. Update the orchestrator checkpoint (`artifacts/orchestration/orchestrator-state.json`) to the post-move feature path in the same step as the self-move; the feature folder becomes `.dev/active/1016-move-development-docs-to-dev-root-and-reserve-docs-for-production` unless the decision file states otherwise. Later evidence is written only under the new `<FEATURE>` path.
 4. Flip `development_docs_root` to `.dev` in `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` together (the parity test forbids flipping one copy).
-5. Add `.dev` to `path_roots` in `config/blast-radius.json` and its bundle copy under `extensions/drm-copilot/resources/claude-customizations/config/`.
+5. Add `.dev` to `path_roots` in the self-hosted `config/blast-radius.json` and to `PINNED_SELF_HOSTED_PATH_ROOTS`. The bundle copy under `extensions/drm-copilot/resources/claude-customizations/config/` keeps its empty Class 2 `path_roots` (ruling R1).
 6. Change the relative link depth in the feature plan template in both copies (`.dev/templates/feature/plan.yyyy-MM-ddTHH-mm.md` after the move, and `extensions/drm-copilot/resources/feature-templates/feature/plan.yyyy-MM-ddTHH-mm.md`) so `.github/instructions/...` links resolve from `.dev/active/<folder>/` (OQ-11 records the effect on unmigrated destinations).
 7. Update the epic manifest `feature_folder` value for child 2 in `.dev/epics/shared-agent-harness-layer/epic.md` to the renamed folder basename.
 8. Create `docs/README.md` (the tool does this in apply mode) and confirm `docs/` contains nothing else.
 9. Update tests and prose in the sources. Where epic child 3 has made a surface generated, edit the generator source and re-run the generator with `--check`; do not edit generated outputs. The exact source set is determined by the Phase 0 gate after children 3 to 6 merge.
 10. Re-baseline `PINNED_FROZEN_SURFACE_HASHES` with a dated comment for each pinned file whose text changes, and update `KICKOFF_IDENTITY_FRAGMENTS` in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` in the same change as any prose rewrite of the pinned surface.
-11. Apply the stage B tasks implied by `global_decisions` (for example discovery runtime packaging for OQ-4, FileSizePolicy segment for OQ-10, allow-list entries for OQ-8, fallback removal for OQ-6).
+11. Apply the stage B tasks implied by `global_decisions` (for example discovery runtime packaging for OQ-4, FileSizePolicy segment for OQ-10, allow-list entries for OQ-8). An OQ-6 answer that removes the fallback, or an OQ-9 answer that requests an extension command, re-enters planning (ruling R2).
 12. Run the full seven-stage toolchain for TypeScript, Python and PowerShell with the key at `.dev`, plus the mirror and contract tests in "Contract Tests".
 
 ## Design Rule for Unresolved Owner Questions
@@ -154,7 +154,7 @@ Versioned subfolders (`v1/`, `v2/`) and nested layouts (`audit-*/`, `evidence/**
 
 The rewrite never changes:
 
-- Historical JSON fixtures under `tests/fixtures/` (D-15) and the historical-run fixtures under `tests/fixtures/blast_radius/historical-runs/`.
+- Historical JSON fixtures under `tests/fixtures/` (D-15) and the historical-run fixtures under `tests/fixtures/blast_radius/historical-runs/`. In this repository the stage B decision file excludes all of `tests/fixtures/**`, including non-JSON fixtures (ruling R3).
 - Text that records the old-to-new mapping itself: the promoted record, this feature's spec, user story, research and plans, and child 2's spec, research and plan. A prefix rewrite of these would corrupt the mapping.
 - Fallback-support surfaces that must keep the `docs/features` form during the fallback release: child 2's resolver and matcher modules and their tests, the `docs/` entries of `config/ci-docs-only-paths.json`, and every `Write(`/`Edit(` permission literal (the D-16 checker requires both root forms). An occurrence inside a `Write(` or `Edit(` literal is protected by rule; the remaining surfaces are listed as path globs.
 - The decision file and the dry-run reports.
@@ -339,6 +339,16 @@ Overlap files (research section 11), re-checked by the Phase 0 gate:
 
 Run in stage B with the key at `.dev` (research section 9): the tests listed in the execution-environment brief `## Contract Tests That Pin Mirrored Files` (resource contracts, pack-manifest completeness and dependency closure, `scripts/dev_tools/generate_codex_agent_variants.py --check`, `test_codex_agent_wrapper_contracts.py`, `test_codex_handoff_contract_parity.py`, `test_claude_rules_frontmatter.py`, `parallel_orchestrator_surface_expectations.py` consumers, `test_quality_checks_workflow_contracts.py`, `test_push_down_issue_824_follow_ups.py`, `test_typescript_toolchain_instruction_contracts.py`, `claude-architecture-doc.Tests.ps1`, `hook-dependency-guard-completeness.Tests.ps1`), plus `test_execution_environment_brief_contracts.py`, `test_orchestration_routing_config_parity.py`, child 2's write-scope checker suite under `extensions/drm-copilot/test/lib/development-docs/`, the literal-containment `test_*contract*.py` tests that carry `docs/features` fragments (including `test_parallel_planner_surface_contracts.py`, `test_parallel_kickoff_contract.py`, `test_epic_kickoff_contract.py`), and every generator `--check` that child 3 delivers.
 
+## Orchestrator Rulings (preparation)
+
+The orchestrator recorded these rulings on 2026-10-31 after the stage B preflight. They correct spec facts and fix the planning protocol; none of them answers an owner question.
+
+- **R1 (blast-radius bundle copy).** `path_roots` in `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` is a Class 2 bundled key that `test_class_two_bundled_path_roots_are_empty` and the Pester case "declares an empty bundled path_roots list" pin to an empty list. Stage B adds `.dev` only to the self-hosted `config/blast-radius.json` and to `PINNED_SELF_HOSTED_PATH_ROOTS`.
+- **R2 (answers that re-enter planning).** An OQ-6 answer that removes the fallback conflicts with the D-15 criterion that frozen fixtures pass through the fallback, and an OQ-9 answer that requests an extension command needs design that stage A does not contain. Either answer halts stage B at its owner-answer mapping task, and the stage B plan receives one revision for it. This halt is an accepted branch, not a plan gap.
+- **R3 (fixtures).** The stage B decision file lists `tests/fixtures/**` in `rewrite_exclusions`, so non-JSON fixtures that record past runs are frozen together with the D-15 JSON fixtures.
+- **R4 (post-apply verification).** The post-apply idempotence check runs the tool in dry-run mode, which never applies the apply-mode refusals. It uses a decision file derived mechanically in `SCRATCH` from the approved file: `decisions` empty, and `rewrite_exclusions` mapped through the mapping table and the approved rename map. It asserts zero moves, zero renames and zero rewrite candidates outside the excluded files.
+- **R5 (execution split).** Stage B pauses for the orchestrator's checkpoint path update after the self-move. Epic execution therefore delegates stage B as two executor runs: the phases up to and including the apply and checkpoint handoff, then the remaining phases.
+
 ## Owner Questions
 
 Recorded as questions only. None is decided by this spec.
@@ -393,7 +403,7 @@ Recorded as questions only. None is decided by this spec.
 - [ ] Every folder renamed under `.dev/active`, `.dev/completed` and `.dev/archive` matches either the mechanical rule or its decision-file entry, every `keep` folder retains its name, and potential records, epics, parallel runs and research keep their names; a mechanical comparison of the post-apply folder list with the dry-run plan and decision file is stored under `<FEATURE>/evidence/other/`.
 - [ ] A second dry run after apply reports an empty plan (no moves, renames or rewrites), stored under `<FEATURE>/evidence/other/`.
 - [ ] `development_docs_root` is `.dev` in `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`, and `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py` passes.
-- [ ] `config/blast-radius.json` and its bundle copy list `.dev` in `path_roots`, and the blast-radius tests pass.
+- [ ] The self-hosted `config/blast-radius.json` lists `.dev` in `path_roots` and `PINNED_SELF_HOSTED_PATH_ROOTS` matches it; the bundle copy keeps its empty Class 2 `path_roots` (ruling R1); and the blast-radius tests pass.
 - [ ] Both feature plan template copies link to `.github/instructions/` with the depth that resolves from `.dev/active/<folder>/`, and a link check over a plan created from the template after the flip finds no broken link.
 - [ ] The epic manifest `feature_folder` for child 2 names the renamed folder, and the epic manifest validation passes.
 - [ ] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned file whose text changed, `KICKOFF_IDENTITY_FRAGMENTS` matches the rewritten pinned text, and the parallel-orchestrator surface tests and `test_parallel_planner_surface_contracts.py` pass.
