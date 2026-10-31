@@ -74,9 +74,6 @@ PORTABLE_SHARED_SURFACES = frozenset(
         "package-lock.json",
         # Separator-free. The Python analogue of the entry above.
         "poetry.lock",
-        # Separator-free. The repo-root tier map every repository using this
-        # runtime is required to carry by .claude/rules/quality-tiers.md.
-        "quality-tiers.yml",
     }
 )
 
