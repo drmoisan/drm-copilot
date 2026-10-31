@@ -33,7 +33,7 @@ const TARGET = `${DEST}/config/blast-radius.json`;
 /** The committed integration-cost scheduling policy (block B2 of the plan). */
 const CONFLICT_TOLERANCE = {
   tolerance_percent: 100,
-  weights: { same_file: 8, possible_overlap: 2, append_only: 1, module: 2 },
+  weights: { same_file: 8, possible_overlap: 2, append_only: 1, module: 2, contract: 8 },
   band_durations: { C1: 1, C2: 2, C3: 4, C4: 8 },
   default_band: "C1",
   append_only_paths: [

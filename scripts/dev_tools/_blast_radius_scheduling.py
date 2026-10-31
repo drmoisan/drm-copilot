@@ -79,7 +79,7 @@ _MEMBER_NAMES: tuple[str, ...] = tuple(
     "tolerance_percent weights band_durations default_band append_only_paths".split()
 )
 WEIGHT_NAMES: tuple[str, ...] = tuple(
-    "same_file possible_overlap append_only module".split()
+    "same_file possible_overlap append_only module contract".split()
 )
 BAND_NAMES: tuple[str, ...] = ("C1", "C2", "C3", "C4")
 
@@ -271,8 +271,11 @@ def pair_cost(
         tolerance (ConflictTolerance): Weights and append-only patterns.
 
     Returns:
-        int: Summed path-pair weights plus the module weight times the number of
-        shared modules. Mergeable paths contribute 0.
+        int: Summed path-pair weights, plus the module weight times the number
+        of shared modules, plus the contract weight times the number of
+        distinct shared contract identifiers (the set the relation intersects
+        for ``contract_dependency``, each identifier counted once). Mergeable
+        paths contribute 0.
     """
     mergeable = config_mergeable_paths(config)
     paths_a = exclude_mergeable_paths(radius_a.paths, mergeable)
@@ -287,7 +290,12 @@ def pair_cost(
         if _entries_overlap(entry_a, entry_b)
     )
     shared_modules = set(radius_a.modules) & set(radius_b.modules)
-    return cost + tolerance.weights["module"] * len(shared_modules)
+    shared_contracts = set(radius_a.contracts) & set(radius_b.contracts)
+    return (
+        cost
+        + tolerance.weights["module"] * len(shared_modules)
+        + tolerance.weights["contract"] * len(shared_contracts)
+    )
 
 
 def pair_benefit(

@@ -46,7 +46,7 @@ $script:ToleranceLabel = 'config["conflict_tolerance"]'
 # Member names of the key and of its two nested maps. Each must be carried
 # exactly, so a misspelled name fails fast instead of reading as absent.
 $script:MemberName = @('tolerance_percent', 'weights', 'band_durations', 'default_band', 'append_only_paths')
-$script:WeightName = @('same_file', 'possible_overlap', 'append_only', 'module')
+$script:WeightName = @('same_file', 'possible_overlap', 'append_only', 'module', 'contract')
 $script:BandName = @('C1', 'C2', 'C3', 'C4')
 
 # Reason kinds that make a conflict an edge at every tolerance: a shared surface
@@ -221,7 +221,10 @@ function Get-BlastRadiusPairCost {
     .DESCRIPTION
         Port of pair_cost. Sums the weight of every overlapping path pair left
         after the mergeable exclusion, then adds the module weight times the
-        number of shared modules. Mergeable paths therefore contribute 0.
+        number of shared modules and the contract weight times the number of
+        distinct shared contract identifiers (the ordinal intersection the
+        relation reads for contract_dependency, each identifier counted once).
+        Mergeable paths therefore contribute 0.
 
     .PARAMETER RadiusA
         First radius record.
@@ -269,7 +272,10 @@ function Get-BlastRadiusPairCost {
         $cost += Get-PathPairWeight -EntryA $pair['EntryA'] -EntryB $pair['EntryB'] -Tolerance $Tolerance
     }
     $sharedModule = @(@($left['modules']) | Where-Object { @($right['modules']) -ccontains $_ })
-    return $cost + ([long]$Tolerance['weights']['module'] * $sharedModule.Count)
+    # Distinct shared contract identifiers, compared ordinally like the relation.
+    $sharedContract = [System.Collections.Generic.HashSet[string]]::new([string[]]@($left['contracts']), [StringComparer]::Ordinal)
+    $sharedContract.IntersectWith([string[]]@($right['contracts']))
+    return $cost + ([long]$Tolerance['weights']['module'] * $sharedModule.Count) + ([long]$Tolerance['weights']['contract'] * $sharedContract.Count)
 }
 
 function Get-BlastRadiusPairBenefit {
