@@ -1,64 +1,347 @@
 # push-down-consolidation-and-ecosystem-packs - Plan
 
 - **Issue:** #1029
-- **Parent (optional):** none
+- **Parent (optional):** epic #1018, child 4 (integration branch `epic/shared-agent-harness-layer-integration`)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-30T18-37
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
+- **Work Mode:** full-feature (AC sources: `spec.md` `## Acceptance Criteria` and `user-story.md` `## Acceptance Criteria`)
+- **Requirements sources (folder-relative):** `spec.md`, `user-story.md`, `issue.md`, `research/research.2026-10-30T23-07.md`; epic manifest `docs/features/epics/shared-agent-harness-layer/epic.md`.
 
 ## Required References
 
 - General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../../.github/instructions/general-code-change.instructions.md)
 - General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../../.github/instructions/general-unit-test.instructions.md)
-- (Add language-specific policies as needed, e.g. `python-code-change.instructions.md`)
+- TypeScript: `.github/instructions/typescript-code-change.instructions.md`, `.github/instructions/typescript-unit-test.instructions.md`
+- Python (existing Python tests edited in place only): `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`
+- Execution environment (tool routes, launchers, batch budget, CI shape, isolation checks): `.claude/skills/execution-environment/SKILL.md`. This plan does not restate tool routes; each task names the outcome and the evidence.
 
 **All work must comply with these policies; do not duplicate their content here.**
 
+## Conventions Used in This Plan
+
+- `<FEATURE>` is `docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029`. Every evidence artifact is written under `<FEATURE>/evidence/<kind>/` as `<name>.<timestamp>.md`, where the timestamp is the UTC write time; a consumer selects the lexicographically greatest `<name>.*.md`. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`, and records no absolute path or host name.
+- `SCRATCH` resolves to `<session scratchpad>/issue-1029/`; every scratch file and launcher this plan needs lives under `SCRATCH`, and artifacts record the token `SCRATCH`, never a host path.
+- `PD` is `extensions/drm-copilot/src/lib/push-down/`; `PDT` is `extensions/drm-copilot/test/lib/push-down/`; `RES` is `extensions/drm-copilot/resources/`.
+- `BASE` is the merge base of `origin/epic/shared-agent-harness-layer-integration` and `HEAD`, recomputed when used. `MAIN_BASE` is the merge base of `origin/main` and `HEAD`. No scope comparison uses a fixed commit.
+- Coverage entries are `{ lines: 85, branches: 75 }` in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`. Per-file figures are read from `extensions/drm-copilot/coverage/lcov.info` (`LF`/`LH`, `BRF`/`BRH`).
+- Physical line counts use the method in the brief's `## Preflight Defect Classes the Validator Cannot See`, never `Measure-Object -Line`.
+- A Phase 0 gate that fails writes its record with `Result: BLOCKED`, stops execution, and returns `BLOCKED at <task id>` for re-planning. The executor does not improvise around a failed gate. No task outside Phase 0 is an owner stop.
+
+## Language Classification
+
+Owner LANGUAGE RULE (verbatim): "Avoid new Python (existing Python is tolerated: reuse, call or extend in place only). The language depends on where the new code runs: (1) anything pushed down to destination repos, meaning skills, skill helpers, hooks and libs, must be PowerShell or bash, never TypeScript and never Python; (2) TypeScript is ONLY for MCP commands (tools in the MCP server package) and extension commands." Owner exception E2: a language-native analyzer is allowed when it analyzes that same language and ships only with that language's pack; PowerShell remains the baseline.
+
+| Planned artifact | Runs where | Language | Rule clause |
+| --- | --- | --- | --- |
+| New pipeline modules in `PD`: `push-down-destination-manifest.ts`, `push-down-plan-comparator.ts`, `push-down-report.ts`, `push-down-write-if-changed.ts`, `push-down-layer.ts`, `push-down-pack-resolver.ts`, `push-down-shared-layer.ts`, `push-down-pipeline.ts`, `push-down-apply.ts`, `push-down-ecosystem-registry.ts`, `push-down-harness.ts` | MCP server process (bundled into `@danmoisan/drm-copilot-mcp`) and VS Code extension host; never copied to a destination (`packages/mcp-server/prepack.cjs` copies `resources/` only) | TypeScript | Clause (2), MCP-command code; O-1 default |
+| Edited push-down modules in `PD` (`copilot-customizations-engine.ts`, `copilot-customizations.ts`, `codex-agents-customizations.ts`, `claude-customizations.ts`, `push-down-service-call.ts`) | same | TypeScript (existing, edited) | Clause (2) |
+| MCP wrapper changes: `mcp-push-down-schema-properties.ts`, `mcp-tool-inputs-push-down.ts`, `mcp-tool-inputs.ts`, `mcp-tools.ts`, `repo-automation-service-contract.ts`, `repo-automation-service.ts`, `repo-automation-service-push-down.ts` | MCP server | TypeScript | Clause (2), MCP commands |
+| Extension command changes: new `extensions/drm-copilot/src/push-down-command-support.ts`, edited `repo-automation-command-registration-admin.ts` | VS Code extension host | TypeScript | Clause (2), extension commands |
+| New Jest tests and helper under `extensions/drm-copilot/test/` | CI and local test runs | TypeScript | Tests of clause (2) code; no new Python |
+| Pack manifests: new `RES/codex-and-agents-customizations/pack-manifests/shared.json`, new `RES/customizations/pack-manifests/{core,python,powershell,typescript,csharp}.json`, edited Claude and Codex manifests | bundled data | JSON | Data; neither clause restricts data |
+| Destination `.push-down-manifest.json` | written into destinations | JSON | Data; clause (1) covers skills, skill helpers, hooks and libs only |
+| `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` | CI | existing Python, edited in place | "extend in place only"; spec O-12 names this behavior change |
+| `scripts/dev_tools/push_down_*.py` ports | repository tests only | existing Python, unchanged | "reuse, call"; O-6 |
+| Execution-environment brief (six copies), README, CHANGELOG | documentation | Markdown | Not code |
+| Destination-side edit check (hook or skill helper) | none | none | Not created (spec Out of scope) |
+| Language-native analyzer | none | none | E2 not applicable |
+
+No new `.py` file is added anywhere, tests included. No TypeScript or Python file is added under `.claude`, `.codex`, `.agents`, `.github`, `config` or their bundle copies. No new PowerShell module directory is added, so `quality-tiers.yml` needs no entry (QT008 not triggered); `extensions/drm-copilot` stays T3. No artifact falls outside the rule, so no new owner question is raised.
+
+## Design Summary
+
+- **Layers.** A layer (`PushDownLayer` in `push-down-layer.ts`) describes one payload source: layer name (`shared`, `claude`, `codex`, `copilot`), source root, root folders, root-file pairs `[destination path, resources-relative source path]`, the composed file system (enumeration filters, variant reads, destination-write decorators over a `WriteIfChangedFileSystem`), the rewrite function, merged paths, merged deliveries (path plus pure merge function, no source file), an owning-pack lookup, the selection record and the artifact directory.
+- **Builders.** `claude-customizations.ts` exports `buildClaudeLayer`, `codex-agents-customizations.ts` exports `buildCodexLayer`, `copilot-customizations.ts` exports `buildCopilotLayer`; each contains the composition its `pushDownCustomizations` performs today, and each module's `pushDownCustomizations` becomes a layer-level adapter that calls `runPushDownPipeline` with its single layer and returns the existing summary type. `push-down-shared-layer.ts` exports `buildSharedLayer`.
+- **Pipeline.** `runPushDownPipeline` (`push-down-pipeline.ts`) validates the destination, reads `.push-down-exclusions` and `.push-down-manifest.json`, enumerates layers in order (a path claimed by an earlier layer is skipped by later layers), wraps each layer with `ExclusionFilterFileSystem`, classifies each payload path with the comparator, adds `merge`, `excluded` and `orphaned` entries, and builds the report before any write. With `dryRun` it returns without writing. Otherwise `applyPushDownPlan` (`push-down-apply.ts`) writes `create`, `update` and opted-in `unmanaged-conflict` files, runs merged paths and merged deliveries through the write-if-changed base, writes the manifest only when its text changed, and writes the summary artifact with the per-file `action`.
+- **Entry point.** `pushDownHarness` (`push-down-harness.ts`) takes `extensionRoot`, `destinationRoot`, the `ecosystems` map (ecosystem name to selection), `dryRun`, `overwriteUnmanaged`, `clock`, optional `listEntries`, and the file system; it reads the destination manifest, applies the O-5 selection reuse, builds the shared layer then each selected layer through `push-down-ecosystem-registry.ts`, and runs the pipeline. The three service calls in `push-down-service-call.ts` call `pushDownHarness` with exactly one ecosystem each.
+- **Pinned declarations.** `ROOT_FOLDERS`, `MERGED_RELATIVE_PATHS`, `ROUTING_MERGE_RELATIVE_PATH`, `DESTINATION_WRITE_DECORATORS`, `EXCLUDED_RELATIVE_PATHS` in `claude-customizations.ts`, `VIRTUAL_RESOURCE_PAIRS`, `VIRTUAL_RESOURCE_DIRECTORIES` and `ROOT_FOLDERS` in `codex-agents-customizations.ts`, and the declarations read by `TS_DERIVE_CORE`, `TS_FILESYSTEM_ADAPTER` and `TS_OVERLAY` keep their names and literal values (O-6 default). No new `export const` whose name matches the merged-path pattern of `test_push_down_claude_parity.py` is added to `claude-customizations.ts`.
+
+## Planning Decisions (within the spec; not owner stops)
+
+- D1. The shared-layer manifest is `RES/codex-and-agents-customizations/pack-manifests/shared.json` (`name` `shared`). Shared-layer files record `pack` `core`, matching the spec's report example. Existing Codex `core.json` entries for shared skills are kept (no partition), so the Codex generator `--check` and the Codex closure model are unaffected; in a harness run the shared layer claims those paths first.
+- D2. Shared configuration (`config/orchestration-routing.json`, `config/orchestration-handoff-registry.json`, `config/orchestration-handoff.schema.json`) is derived from the `config/` entries of `VIRTUAL_RESOURCE_PAIRS`; the shared layer merges `config/orchestration-routing.json` through `RoutingMergeFileSystem`, which gives the Codex wrapper the merge (consolidation side effect).
+- D3. `orphaned` covers manifest entries whose `layer` is one of the run's layers (shared plus the selected ecosystem) and that have no payload counterpart. Entries of an ecosystem that the run did not select are neither reported nor changed; under the O-2 default no wrapper deselects another ecosystem.
+- D4. `destination_status` in the summary keeps its present meaning (`created` when the destination file was absent before the run, `overwritten` when it was present) and `created_count`/`overwritten_count` count those classes over payload-backed entries; the new `action` field states what the run did. `PushDownFileResult.action` is optional so existing typed fixtures compile unchanged.
+- D5. With `packs` omitted and no recorded selection, the full ecosystem tree is published and the recorded `packs` lists every pack the ecosystem's `packs` input accepts plus `core`, with the C# entry in that input's form for the effective variant (Claude `csharp-modern`/`csharp-legacy`, Codex `csharp` plus `csharp_variant`, Copilot `csharp`). With complete manifests (enforced by `PDT/push-down-bundle-manifest-completeness.test.ts`, P5-T1) a reused selection publishes the same files.
+- D6. `payload_version` is read from `<extensionRoot>/package.json` through the injected file system; when absent or unparseable it is `0.0.0`.
+- D7. Extension commands gain the Copilot pack QuickPick and a push-down-conflict warning; the optional extension dry-run step is not added (dry run is available through the MCP wrappers).
+- D8. Pack-assignment rule (mechanical, for an unlisted bundle path): take the agent file stem, skill folder name, rule or instruction stem, or prompt stem; when it equals `python`, `powershell` or `typescript` or starts with one of them followed by `-`, the path goes to that pack; when it is or starts with `csharp`, it goes to `csharp-modern.json` and `csharp-legacy.json` (Claude, Codex) or `csharp.json` (Copilot); otherwise to `core.json`. A path in the Phase 0 shared-layer set goes to `shared.json` only. Existing entries are not moved.
+
+## Citation Inventory (re-checked at P0-T3)
+
+- `PD/copilot-customizations-engine.ts`: `pushDownCustomizations`, `PushDownFileResult`, `PushDownSummary`, `enumerateSourceFiles`, `validateDestination`, `writeSummaryArtifact`, `renderPushDownSummary`, `stringifySorted`, `COPILOT_ROOT_FOLDERS`.
+- `PD/copilot-customizations.ts`: `pushDownCustomizations`, `PushDownCustomizationsOptions`. `PD/reference-rewrites.ts`: `rewriteTextReferences`.
+- `PD/codex-agents-customizations.ts`: `pushDownCustomizations`, `ROOT_FOLDERS`, `VIRTUAL_RESOURCE_PAIRS`, `VIRTUAL_RESOURCE_DIRECTORIES`, `VIRTUAL_ROOT_FOLDERS`, `RoutingConfigFileSystem`, `CodexFilteringFileSystem`, `ARTIFACT_DIRECTORY`.
+- `PD/claude-customizations.ts`: `pushDownCustomizations`, `ROOT_FOLDERS`, `EXCLUDED_RELATIVE_PATHS`, `DESTINATION_WRITE_DECORATORS`, `MERGED_RELATIVE_PATHS`, `ROUTING_MERGE_RELATIVE_PATH`, `resolvePublishedPaths`, `deliverDestinationGitignore`, `ClaudePushDownSummary`.
+- `PD/claude-pack-selection.ts`: `loadPackManifests`, `computePublishedPaths`, `assertSingleCsharpToolchain`. `PD/codex-pack-selection.ts`: `resolveManifestPackNames`, `loadPackManifests`, `MANIFEST_PACK_NAMES`.
+- `PD/claude-exclusion-filter.ts`: `ExclusionFilterFileSystem`, `readExclusionManifest`, `buildExclusionReport`, `renderExclusionLines`, `appendExclusionsToArtifact`, `EXCLUSION_CONFLICT_LINE_PREFIX`. `PD/claude-exclusion-manifest.ts`: `EXCLUSION_MANIFEST_RELATIVE_PATH`, `assertManifestPathIsRootLevel`, `matchesExclusionEntry`.
+- `PD/claude-routing-merge.ts`: `RoutingMergeFileSystem`. `PD/claude-gitignore-merge.ts`: `mergeClaudeGitignore`, `CLAUDE_GITIGNORE_RELATIVE_PATH`. `PD/claude-filesystem-adapter.ts`: `LOCAL_RUNTIME_RELATIVE_DIRECTORIES`. `PD/filesystem-adapter.ts`: `PushDownFileSystem`, `RealPushDownFileSystem`, `toPosixPath`.
+- `PD/push-down-service-call.ts`: `pushDownClaudeCustomizationsServiceCall`, `pushDownCodexAndAgentsCustomizationsServiceCall`, `pushDownCopilotCustomizationsServiceCall`, `PushDownServiceCallResult`, `PushDownServiceCallInput`.
+- `extensions/drm-copilot/src/repo-automation-service-contract.ts`: `RepoAutomationExecutionResult`, `RepoAutomationService`, `PushDownClaudeCustomizationsInput`, `PushDownCodexAndAgentsCustomizationsInput`. `extensions/drm-copilot/src/repo-automation-service.ts`: method `pushDownCopilotCustomizations`. `extensions/drm-copilot/src/repo-automation-service-push-down.ts`: `runPushDownCopilotCustomizations`, `runPushDownCodexAndAgentsCustomizations`, `runPushDownClaudeCustomizations`.
+- `extensions/drm-copilot/src/mcp-push-down-schema-properties.ts`: `claudePushDownSelectionProperties`, `codexPushDownSelectionProperties`, `copilotPushDownSelectionProperties`. `extensions/drm-copilot/src/mcp-tool-inputs-push-down.ts`: `resolvePushDownClaudeCustomizationsToolInput`, `resolvePushDownCodexAndAgentsCustomizationsToolInput`. `extensions/drm-copilot/src/mcp-tool-inputs.ts`: `resolvePushDownCopilotCustomizationsToolInput`. `extensions/drm-copilot/src/mcp-tools.ts`: `toMcpToolResult`, `RepoAutomationMcpToolResult`, `dispatchRepoAutomationTool`. `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts`: `REPO_AUTOMATION_TOOL_DEFINITIONS`. `extensions/drm-copilot/src/mcp-tool-definitions.ts`: `toolDefinitions`.
+- `extensions/drm-copilot/src/repo-automation-command-registration-admin.ts`: `registerPushDownCopilotCustomizationsCommand`, `registerPushDownCodexAndAgentsCustomizationsCommand`, `registerPushDownClaudeCustomizationsCommand`.
+- Tests: `PDT/copilot-customizations-engine.test.ts` (`pushDownCustomizations (engine)`), `PDT/codex-agents-customizations.test.ts` (`classifies created vs overwritten files`), `extensions/drm-copilot/test/mcp-repo-automation-tool-definitions.test.ts` (`keeps Copilot push-down schemas workspace-root-only`), `PDT/push-down-service-call.test.ts`, `PDT/real-bundle-filesystem.test-helpers.ts` (`ReadThroughPushDownFileSystem`), `PDT/push-down.test-helpers.ts` (`buildInMemoryFileSystem`, `InMemoryPushDownFileSystem`), `tests/scripts/dev_tools/test_push_down_claude_parity.py` (`test_merged_relative_paths_match_typescript`), `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` (`PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS`, `PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS`), `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` (`test_brief_copies_are_byte_identical`).
+- Brief heading `## Contract Tests That Pin Mirrored Files` in the six execution-environment copies; README headings `## Push Down Codex and Agents Customizations`; CHANGELOG heading `## [Unreleased]`.
+
+## Contract Test Set
+
+Python (`tests/scripts/dev_tools/`): `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_codex_core_manifest_closure.py`, `test_push_down_issue_824_follow_ups.py`, `test_push_down_tier_rule_adoption_gate.py`, `test_codex_agent_wrapper_contracts.py`, `test_codex_handoff_contract_parity.py`, `test_claude_rules_frontmatter.py`, `test_quality_checks_workflow_contracts.py`, `test_typescript_toolchain_instruction_contracts.py`, `test_execution_environment_brief_contracts.py`, `test_discovery_publication_contracts.py`, `test_generate_codex_agent_variants.py`, `test_push_down_codex_and_agents_customizations.py`, and the static parity tests `test_push_down_claude_parity.py`, `test_push_down_claude_overlay_parity.py`, `test_push_down_claude_exclusion_parity.py`, `test_push_down_claude_gitignore_parity.py`, `test_skill_bundle_contract_repo.py`. Pester: the eleven `tests/scripts/claude-lib/*/*.Manifest.Tests.ps1` suites. Not run because nothing they pin is edited: `parallel_orchestrator_surface_expectations.py` (support module), `claude-architecture-doc.Tests.ps1`, `hook-dependency-guard-completeness.Tests.ps1`.
+
+## Existing Test Dispositions
+
+Rules applied to the case list recorded at P0-T6 (each case gets a comment naming its rule):
+
+- R1 (O-4): a case that seeds a destination file at a payload path with text different from the payload, with no `.push-down-manifest.json`, and asserts the payload text at that path after the run (or the path in `writtenPaths`) passes `overwriteUnmanaged: true`.
+- R2 (manifest write): a case that asserts the complete set or count of destination files or written paths after an apply run includes `.push-down-manifest.json`.
+- R3 (shared layer): a case that drives a service call or `RepoAutomationService` push-down over an in-memory bundle seeds the shared manifest through the new helper, because a missing manifest fails the run (spec Behavior 13).
+- R4 (adopt): a case that seeds a destination file identical to the payload and asserts it in `writtenPaths` expects no write.
+
+| Test | Disposition |
+| --- | --- |
+| `PDT/copilot-customizations-engine.test.ts` `pushDownCustomizations (engine)` cases | Updated: import retargeted to `pushDownCustomizations` in `copilot-customizations.ts` (identical options); assertions unchanged, including `classifies created vs overwritten and enumerates in root then path order` (D4). Other describes unchanged. |
+| `PDT/codex-agents-customizations.test.ts` `classifies created vs overwritten files` | Unchanged (D4: status is presence-based). Other cases: R1/R2/R4 per inventory. |
+| `PDT/copilot-customizations.test.ts` `renderPushDownSummary` cases | Unchanged (`action` optional and absent in fixtures). Other cases: R1/R2/R4. |
+| `PDT/claude-customizations.test.ts`, `PDT/claude-config-carriage.test.ts`, `PDT/claude-gitignore-delivery.test.ts`, `PDT/claude-exclusion-filter.test.ts`, `PDT/codex-bundle-publish.integration.test.ts` | R1/R2/R4 per inventory; exclusion behaviors and artifact assertions unchanged (exclusions appended only when `.push-down-exclusions` exists). |
+| `PDT/push-down-service-call.test.ts`, `extensions/drm-copilot/test/repo-automation-service.push-down-claude.test.ts`, `extensions/drm-copilot/test/repo-automation-service.push-down-codex.test.ts`, `extensions/drm-copilot/test/extension.push-down-claude-customizations.test.ts` | R3, plus R1/R2/R4 per inventory. |
+| `extensions/drm-copilot/test/mcp-repo-automation-tool-definitions.test.ts` `keeps Copilot push-down schemas workspace-root-only` | Updated and renamed: expected keys become `dry_run`, `overwrite_unmanaged`, `packs`, `workspace_root`; reason: spec `### MCP Wrapper Input Additions`. Other cases unchanged (`toMatchObject`). |
+| `extensions/drm-copilot/test/mcp-tools.push-down-claude.test.ts`, `mcp-tool-inputs.push-down-codex.test.ts`, `repo-automation-command-registration-admin.test.ts`, `mcp-server.test.ts`, `push-down-claude-handler.test.ts`, `extension.workflow-commands.test.ts` | Unchanged: new fields are spread only when present; tool names and Claude/Codex command flows unchanged. |
+| Unit tests of decorators and loaders (`claude-pack-selection`, `codex-pack-selection`, `claude-routing-merge-parity`, `claude-blast-radius-*`, `blast-radius-derive*`, `claude-filesystem-adapter`, `claude-exclusion-manifest`, `claude-exclusion-parity`, `claude-gitignore-merge*`, `reference-rewrites`, `filesystem-adapter`, `claude-pack-manifest-completeness`) | Unchanged: the units are not modified. |
+| `test_push_down_codex_and_agents_pack_manifest_completeness.py` | Updated in place (O-12): closed exceptions removed, scope note updated. |
+| `test_push_down_claude_pack_manifest_completeness.py` | Unchanged: its exception set is already empty. |
+| Static parity tests (five), other Python contract tests, Python port tests, Pester `*.Manifest.Tests.ps1` | Unchanged (O-6; manifest location and shape unchanged, entries only added). |
+
 ## Implementation Plan (Atomic Tasks)
 
-> **Instructions for this section:**
-> - Break work into **Phases** (broad buckets) and **Atomic Tasks** (binary, 5-30 min units).
-> - Use `- [ ] [P#-T#]` for every task.
-> - Start every task with a **strong verb** (Implement, Create, Update, Verify).
-> - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
-> - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
-> - Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
-> - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
-> - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+### Phase 0 — Gates, Policy Reads, and Baselines (no repository edits)
 
-### Phase 0: Compliance & Context
-- [ ] [P0-T1] Confirm alignment with repo policies by reading `.github/instructions/general-code-change.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, and `.github/instructions/python-unit-test.instructions.md` before touching code
-  - Acceptance: Development log contains policy review timestamp prior to Phase 1 commits
+- [ ] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.claude/rules/powershell.md`, `.claude/rules/tonality.md`, `.claude/skills/execution-environment/SKILL.md`, then the requirements sources listed in the header.
+  - Acceptance: `<FEATURE>/evidence/baseline/phase0-instructions-read.<timestamp>.md` exists with `Timestamp:`, `Policy Order:` and the list of files read.
+- [ ] [P0-T2] Gate (a), execution precondition: read the item list from `docs/features/parallel/bugs-1001-1002-1003-1006/parallel.md` on branch `parallel/bugs-1001-1002-1003-1006-plan` and confirm with `gh` that every listed item's pull request is merged into `main` and that `origin/main` contains each merge. Until this gate passes, no task edits any file in research section 8 or any other repository file.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/phase0-parallel-run-gate.<timestamp>.md` lists each item, its PR number and merged state, and `Result: PASS`; any unmerged item gives `Result: BLOCKED` and execution stops.
+- [ ] [P0-T3] Gate (b), tree re-check: confirm every file this plan edits and every entry of `## Citation Inventory` exists at `MAIN_BASE` and at `HEAD`, with the symbol, heading or test name present in that file; re-read `DESTINATION_WRITE_DECORATORS` (changed by item 1006) and confirm it is still the fold registry consumed by `pushDownCustomizations` in `claude-customizations.ts`, and that the five static parity tests still read the declarations listed in `## Design Summary`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/phase0-tree-recheck.<timestamp>.md` has one row per citation with `present`/`moved`/`absent` and `Result: PASS`; any moved, renamed or reshaped citation gives `Result: BLOCKED` and execution stops for re-planning.
+- [ ] [P0-T4] Gate (c), upstream re-check (owner decision E3): confirm with `gh` that the branches `feature/harness-survey-gold-standard-contracts-parity-matrix-1025` (#1025) and `feature/shared-source-generators-skills-rules-mcp-agents-1028` (#1028) are merged into `epic/shared-agent-harness-layer-integration` and that the integration branch is an ancestor of `HEAD`; then verify each assumption in spec `## Upstream Dependencies and Phase 0 Gate`: `config/harness-parity-matrix.json` and `config/harness-parity-matrix.schema.json` exist, the schema `$id` is `https://drm-copilot.dev/schemas/harness-parity-matrix/1.0.0/schema.json` and `schema_version` major is `1`, entries carry `ecosystem`, `kind`, `name`, `disposition`, `target_paths`, `generated_from`; the shared set (entries with `kind` `skill`, `ecosystem` `codex`, `disposition` `shared`) each has `.agents/skills/<name>/references/standard.md` with a byte-identical copy under `RES/codex-and-agents-customizations/.agents/skills/<name>/references/`; child 3's generated paths and bundle copies (skill mirror, rules, `.mcp.json` and its bundle location, `.codex/config.toml` `[mcp_servers]`, agents, `CLAUDE.md` bundle copy if any) exist as stated; no file in a shared skill's bundle folder ends in `.ps1`, `.psm1`, `.py` or `.ts`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/phase0-upstream-recheck.<timestamp>.md` records `Result: PASS`, the resolved shared-layer file set (every file under each shared skill's bundle folder, plus `AGENTS.md` and the three shared config paths), the resources-relative source paths of `CLAUDE.md` and `.mcp.json` (or `absent`), and the list, per bundle, of child 3 generated files that no pack manifest lists. Any mismatch or unmerged child gives `Result: BLOCKED`; one plan revision is accepted.
+- [ ] [P0-T5] Gate (d), owner answers: read spec `## Open Owner Questions`, the epic manifest's `## Shared Design`, and the body and comments of issues #1029 and #1018, and record for each of Q1 and O-1 through O-12 whether the owner answered and with what text.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/phase0-owner-answers.<timestamp>.md` has thirteen rows (`answered`/`default applies`) and `Result: PASS`; a non-default answer that changes a task, file set or assertion of this plan gives `Result: BLOCKED` and execution stops for re-planning.
+- [ ] [P0-T6] Record the existing-test disposition inventory: search `extensions/drm-copilot/test/` for callers of each ecosystem `pushDownCustomizations`, the three service calls, `RepoAutomationService` push-down methods and `writtenPaths`, and list every case matching rule R1, R2, R3 or R4 of `## Existing Test Dispositions` by file and test name.
+  - Acceptance: `<FEATURE>/evidence/other/test-disposition-inventory.<timestamp>.md` lists each matching case with its rule; files named in the dispositions table with no matching case are listed as `no case`.
+- [ ] [P0-T7] Capture the TypeScript format baseline with Prettier in check mode over `src/**/*.ts`, `test/**/*.ts`, `*.json` and `*.cjs` in `extensions/drm-copilot/` (no write mode in Phase 0).
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-ts-format.<timestamp>.md` records the exit code and, on success, the literal `All matched files use Prettier code style!`.
+- [ ] [P0-T8] Capture the ESLint baseline (`npm run lint` in `extensions/drm-copilot/`).
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-ts-lint.<timestamp>.md` records exit code and error/warning counts.
+- [ ] [P0-T9] Capture the type-check baseline (`npm run typecheck` in `extensions/drm-copilot/`).
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-ts-typecheck.<timestamp>.md` records exit code and error count.
+- [ ] [P0-T10] Capture the Jest coverage baseline (`npm run test:coverage` in `extensions/drm-copilot/`).
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-ts-jest-coverage.<timestamp>.md` records pass/fail counts and numeric line and branch coverage from `coverage/lcov.info` for every existing file this plan edits under `extensions/drm-copilot/src/`.
+- [ ] [P0-T11] Capture the Python baseline of `## Contract Test Set` (Python files) with pytest.
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-python-contract-tests.<timestamp>.md` records pass/fail counts per module.
+- [ ] [P0-T12] Capture Black `--check`, Ruff check and Pyright baselines for `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`.
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-python-static.<timestamp>.md` records each exit code and summary line (`would be left unchanged`, `All checks passed!`, Pyright error count).
+- [ ] [P0-T13] Capture the Pester baseline of the eleven `tests/scripts/claude-lib/*/*.Manifest.Tests.ps1` suites through the branch-current PoshQC route in the brief, reading counts from the JUnit file.
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-pester-manifest-suites.<timestamp>.md` records passed/failed/total from `artifacts/pester/pester-junit.xml`.
+- [ ] [P0-T14] Capture the Codex generator baseline: `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check`.
+  - Acceptance: `<FEATURE>/evidence/baseline/baseline-codex-generator-check.<timestamp>.md` records exit code and output summary.
 
-### Phase 1: <Phase Name>
-- [ ] [P1-T1] <Atomic task with strong verb>
-- [ ] [P1-T2] <Atomic task>
-  - Preconditions: <optional>
-  - Acceptance: <optional>
+### Phase 1 — Destination Manifest, Comparator, Report, Write Guard
 
-### Phase 2: <Phase Name>
-- [ ] [P2-T1] <Atomic task>
-- [ ] [P2-T2] <Atomic task>
+- [ ] [P1-T1] Create `PD/push-down-destination-manifest.ts`: constants `DESTINATION_MANIFEST_RELATIVE_PATH` (`.push-down-manifest.json`) and `DESTINATION_MANIFEST_SCHEMA_VERSION` (`1.0.0`); types `DestinationManifest`, `DestinationManifestEntry`, `EcosystemSelectionRecord`; `DestinationManifestError` (carries the offending field); `hashPayloadText` (lowercase hex SHA-256 via `node:crypto` of the CRLF/CR-to-LF normalized text); `parseDestinationManifest` (rejects invalid JSON, a non-semver or unknown-major `schema_version`, a missing required field, a `layer` outside `shared`/`claude`/`codex`/`copilot`, a non-64-hex `sha256`, and a path with a leading `/`, a drive letter, a UNC prefix or a `..` segment); `readDestinationManifest(fs, destinationRoot)` (undefined when absent); `renderDestinationManifest` (`stringifySorted` with indent 2 plus a trailing LF). The module imports no ecosystem module (the root-level assertion is made in the registry, P3-T7).
+  - Acceptance: the file exists, compiles, and is at most 800 physical lines.
+- [ ] [P1-T2] Create `PDT/push-down-destination-manifest.test.ts` with Arrange-Act-Assert cases for each rejection above (each asserting `DestinationManifestError` and its field), a valid round trip, sorted keys and trailing LF, a rendered manifest containing no timestamp field and no absolute path, and `hashPayloadText` equality for CRLF and LF variants of the same text.
+  - Acceptance: the file's tests pass in a Jest run of that file.
+- [ ] [P1-T3] Create `PD/push-down-plan-comparator.ts`: `PushDownAction` union (`create`, `update`, `unchanged`, `converged`, `adopt`, `conflict`, `unmanaged-conflict`, `deleted-locally`, `merge`, `excluded`, `orphaned`) and pure `classifyPayloadFile({ destinationHash, manifestHash, payloadHash, overwriteUnmanaged })` returning `{ action, write, recordHash, reason }` exactly per spec `### Decision Table`, where `recordHash` is the payload hash for `create`/`update`/`adopt`/`converged` and for an overwritten `unmanaged-conflict`, and the previous entry is kept otherwise. Reasons are fixed strings exported as `PUSH_DOWN_ACTION_REASONS`.
+  - Acceptance: the file exists, compiles, and contains no I/O import.
+- [ ] [P1-T4] Create `PDT/push-down-plan-comparator.test.ts` with one test per decision-table row (eight rows) asserting `action` and `write`, plus the `overwriteUnmanaged: true` variant of the `unmanaged-conflict` row asserting `write` true, and a `conflict` case asserting the previous manifest hash is kept.
+  - Acceptance: ten or more named tests pass, and each row of spec `### Decision Table` maps to a test name containing its action.
+- [ ] [P1-T5] Create `PD/push-down-report.ts`: types `PushDownReport` (`mode`, `ecosystems`, `files`, `counts`) and `PushDownReportFile` (`path`, `layer`, `pack`, `action`, `reason`); pure `buildPushDownReport(mode, ecosystems, entries)` sorting `files` by `path` (code-point order) with a `counts` key per occurring action; constant `PUSH_DOWN_CONFLICT_LINE_PREFIX` with value `push-down conflict:`; pure `renderPushDownConflictLines(report)` returning `<prefix> <action>: <path>` for each `conflict`, `unmanaged-conflict` and `deleted-locally` entry in path order.
+  - Acceptance: the file exists and compiles; `PUSH_DOWN_CONFLICT_LINE_PREFIX` does not start with `EXCLUSION_CONFLICT_LINE_PREFIX` and the reverse also holds.
+- [ ] [P1-T6] Create `PDT/push-down-report.test.ts`: sorting, counts per action, absence of a count key for an action that does not occur, conflict-line rendering, prefix distinctness against `EXCLUSION_CONFLICT_LINE_PREFIX`, and a report with no absolute path.
+  - Acceptance: the file's tests pass.
+- [ ] [P1-T7] Create `PD/push-down-write-if-changed.ts`: `WriteIfChangedFileSystem` wraps a `PushDownFileSystem`; `writeTextFile` reads the current file when present and skips the inner write when the LF-normalized texts are equal; `writtenRelativeCount` and `skippedWrites` record what happened; all other methods delegate.
+  - Acceptance: the file exists and compiles.
+- [ ] [P1-T8] Create `PDT/push-down-write-if-changed.test.ts`: absent target written, identical target skipped, CRLF-identical target skipped, differing target written, delegation of the other methods.
+  - Acceptance: the file's tests pass.
+- [ ] [P1-T9] Add `coverageThreshold` entries for the four Phase 1 modules to `extensions/drm-copilot/jest.config.cjs` (file in the parallel-run blast radius; editable after P0-T2).
+  - Acceptance: the map has entries keyed `./src/lib/push-down/push-down-destination-manifest.ts`, `./src/lib/push-down/push-down-plan-comparator.ts`, `./src/lib/push-down/push-down-report.ts` and `./src/lib/push-down/push-down-write-if-changed.ts`, each `{ lines: 85, branches: 75 }`.
+- [ ] [P1-T10] Run Jest with coverage over the four Phase 1 test files.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/phase1-jest.<timestamp>.md` records all tests passing and per-file line and branch coverage meeting the entries.
+
+### Phase 2 — Layer Model, Pack Resolution, Shared Layer, Pipeline Core
+
+- [ ] [P2-T1] Create `PD/push-down-layer.ts`: `LayerName` and `EcosystemName` types, `ECOSYSTEM_NAMES` (`claude`, `codex`, `copilot`), `isEcosystemName`, `PushDownLayer`, `MergedDelivery`, `RootFilePair`, `EcosystemSelectionInput` (`packs`, `csharpVariant`, `memoryMode`), and `LAYER_ROOT_FILES`: shared `["AGENTS.md", "codex-and-agents-customizations/AGENTS.md"]`, copilot `[".github/copilot-instructions.md", "customizations/.github/copilot-instructions.md"]`, claude the `CLAUDE.md` and `.mcp.json` pairs whose sources P0-T4 recorded (an `absent` source contributes no pair).
+  - Acceptance: the file exists, compiles, and imports no ecosystem module.
+- [ ] [P2-T2] Create `PD/push-down-pack-resolver.ts`: `resolveLayerPublishedPaths(ecosystem, selection, bundleRoot, fs)` delegating to Claude `resolvePublishedPaths` for Claude, to `resolveManifestPackNames` plus Codex `loadPackManifests`/`computePublishedPaths` for Codex, and to Claude `loadPackManifests`/`computePublishedPaths` over `RES/customizations/pack-manifests` for Copilot; `loadSharedLayerPaths(manifestDir, fs)` returning the `shared` manifest's `paths` (missing or malformed manifest throws `ManifestError` before any write); `buildPackOwnerLookup(manifests)` (path to owning pack, `core` preferred, `core` for unscoped); `PublishedPathFilterFileSystem` (enumeration filter by a path set, `null` passes all).
+  - Acceptance: the file exists and compiles; Claude and Codex loader modules are not modified.
+- [ ] [P2-T3] Create `PDT/push-down-pack-resolver.test.ts`: per-ecosystem resolution with in-memory manifests, Copilot unknown pack failing, both C# variants failing for Claude and Codex, missing and malformed shared manifest failing, owner lookup, filter pass-through for `null`.
+  - Acceptance: the file's tests pass.
+- [ ] [P2-T4] Create `RES/codex-and-agents-customizations/pack-manifests/shared.json` with `name` `shared`, `label` `Shared layer`, and `paths` equal to the shared-layer file set recorded at P0-T4 (sorted).
+  - Acceptance: the file parses as a manifest; its `paths` equal the recorded set exactly.
+- [ ] [P2-T5] Add the `export` keyword to the class `RoutingConfigFileSystem` in `PD/codex-agents-customizations.ts` (no other change to that file in this task), then create `PD/push-down-shared-layer.ts`: `SHARED_LAYER_MANIFEST_NAME`, `SHARED_CONFIG_RELATIVE_PATHS` derived from the `config/` destinations of `VIRTUAL_RESOURCE_PAIRS`, and `buildSharedLayer({ extensionRoot, destinationRoot, fs })` composing `PublishedPathFilterFileSystem` (shared paths) over `RoutingConfigFileSystem` for the Codex bundle, root folders `.agents` and `config`, the `AGENTS.md` root pair, passthrough rewrite, merged path `config/orchestration-routing.json` written through `RoutingMergeFileSystem` over `WriteIfChangedFileSystem`, and `pack` `core` for every file (D1).
+  - Acceptance: both files compile; `codex-agents-customizations.test.ts` still passes.
+- [ ] [P2-T6] Create `PDT/push-down-shared-layer.test.ts`: in-memory shared layer enumerates exactly the shared manifest paths plus `AGENTS.md` and the three config paths; routing is a merged path; and a real-tree case asserting the `paths` of `shared.json` equal the set derived from `config/harness-parity-matrix.json` (shared skills' bundle files plus the four fixed paths), read through the real file system without writing.
+  - Acceptance: the file's tests pass.
+- [ ] [P2-T7] Create `PD/push-down-pipeline.ts`: `runPushDownPipeline(input)` with `PushDownPipelineInput` (`layers`, `destinationRoot`, `repoRoot`, `rawFs`, `dryRun`, `overwriteUnmanaged`, `payloadVersion`, `artifactRoot`, `artifactDirectory`, `clock`, optional pre-read `destinationManifest`) performing, in order and before any write: `validateDestination`, `readExclusionManifest`, destination-manifest read, per-layer `ExclusionFilterFileSystem` wrap, enumeration (`enumerateSourceFiles` plus root pairs filtered by the layer's published set; first layer to claim a path keeps it), payload text via the layer rewrite, classification (`merge` for merged paths and merged deliveries, `excluded` from skip records, comparator otherwise), `orphaned` per D3, and `buildPushDownReport`; returns `PushDownPipelineResult` (`report`, `summary`, `exclusions`, `warnings`, `manifestWritten`). With `dryRun` it returns the plan, no summary artifact and no write.
+  - Acceptance: the file exists, compiles, and is at most 800 physical lines; it imports no ecosystem module.
+- [ ] [P2-T8] Create `PD/push-down-apply.ts`: `applyPushDownPlan(plan, input)` writing `create`, `update` and opted-in `unmanaged-conflict` files through the layer file system (parent ensured), running merged paths and merged deliveries through the write-if-changed base, building the next manifest per spec entry-maintenance rules (selection entries of unselected ecosystems kept), writing it through `WriteIfChangedFileSystem` over `rawFs`, writing the summary artifact with `writeSummaryArtifact` and `action` per file, and appending exclusions with `appendExclusionsToArtifact` only when `.push-down-exclusions` exists; warnings are the exclusion lines followed by `renderPushDownConflictLines`.
+  - Acceptance: the file exists, compiles, and is at most 800 physical lines.
+- [ ] [P2-T9] Edit `PD/copilot-customizations-engine.ts`: add optional `action` (type `PushDownAction`) to `PushDownFileResult` and render `action` in `renderPushDownSummary` only when present.
+  - Acceptance: `PDT/copilot-customizations.test.ts` `renderPushDownSummary` cases pass unchanged.
+- [ ] [P2-T10] Create `PDT/push-down-pipeline.test.ts` over in-memory layers: plan built before the first write (a recording file system asserts zero writes until classification completes), dry run leaves every destination file byte-identical and writes no manifest and no artifact, each failure-before-write case (missing pack manifest, malformed pack manifest, both C# variants, malformed `.push-down-exclusions`, invalid-JSON, unknown-major and missing-field `.push-down-manifest.json`, missing destination, destination equal to source) asserting the specific error and an empty write log and empty ensured-directory log, first-layer claim, `excluded` and `orphaned` entries, and D3 scope.
+  - Acceptance: the file's tests pass.
+- [ ] [P2-T11] Create `PDT/push-down-apply.test.ts`: writes only for `create`, `update` and opted-in `unmanaged-conflict`; `conflict` keeps file and previous hash and emits a warning line; manifest written as sorted-key LF JSON with no timestamp or absolute path and not rewritten when unchanged; merged path not written when merged text is unchanged; summary carries `action` and presence-based `destination_status`; exclusions appended only with `.push-down-exclusions`; orphaned file not deleted.
+  - Acceptance: the file's tests pass.
+- [ ] [P2-T12] Add `coverageThreshold` entries for `push-down-layer.ts`, `push-down-pack-resolver.ts`, `push-down-shared-layer.ts`, `push-down-pipeline.ts` and `push-down-apply.ts` to `extensions/drm-copilot/jest.config.cjs`.
+  - Acceptance: five new keys under `./src/lib/push-down/`, each `{ lines: 85, branches: 75 }`.
+- [ ] [P2-T13] Run Jest with coverage over the Phase 1 and Phase 2 test files.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/phase2-jest.<timestamp>.md` records all tests passing and every new file meeting its entry.
+
+### Phase 3 — Ecosystem Layers, Registry, Harness
+
+- [ ] [P3-T1] Edit `PD/claude-customizations.ts`: add `buildClaudeLayer(options)` holding the existing composition (pack resolution, decorator fold now over `WriteIfChangedFileSystem`, `ExcludingFileSystem`), merged paths `MERGED_RELATIVE_PATHS`, the `.gitignore` merged delivery using `mergeClaudeGitignore`, `LAYER_ROOT_FILES` claude pairs, and a selection record; rewrite `pushDownCustomizations` as a layer-level adapter over `runPushDownPipeline` returning `ClaudePushDownSummary`; remove `deliverDestinationGitignore` and the exclusion wiring now owned by the pipeline. Pinned declarations are unchanged and no export matching the merged-path pattern is added.
+  - Acceptance: `test_push_down_claude_parity.py`, `test_skill_bundle_contract_repo.py` and `test_push_down_claude_gitignore_parity.py` pass unmodified; the file's physical line count does not exceed its count at `MAIN_BASE`.
+- [ ] [P3-T2] Edit `PD/codex-agents-customizations.ts`: add `buildCodexLayer(options)` with the existing `CodexFilteringFileSystem`/`RoutingConfigFileSystem` composition over `WriteIfChangedFileSystem`, published roots, passthrough rewrite and selection record; rewrite `pushDownCustomizations` as a layer-level adapter over `runPushDownPipeline`. `ROOT_FOLDERS`, `VIRTUAL_RESOURCE_PAIRS` and `VIRTUAL_RESOURCE_DIRECTORIES` are unchanged.
+  - Acceptance: the file compiles and is at most 800 physical lines.
+- [ ] [P3-T3] Edit `PD/copilot-customizations.ts`: add optional `packs` and `bundleRoot` to `PushDownCustomizationsOptions`; add `buildCopilotLayer(options)` with `COPILOT_ROOT_FOLDERS`, the copilot root pair, `PublishedPathFilterFileSystem` from the Copilot pack resolution, `rewriteTextReferences` default and selection record; rewrite `pushDownCustomizations` as a layer-level adapter over `runPushDownPipeline`.
+  - Acceptance: the file compiles; `COPILOT_ROOT_FOLDERS` is unchanged.
+- [ ] [P3-T4] Update `PDT/copilot-customizations-engine.test.ts` per `## Existing Test Dispositions`: the `pushDownCustomizations (engine)` cases import `pushDownCustomizations` from `copilot-customizations.ts` instead of the engine.
+  - Acceptance: the file's tests pass with the assertion lines unchanged apart from the import.
+- [ ] [P3-T5] Remove the engine `pushDownCustomizations` function and its copy loop from `PD/copilot-customizations-engine.ts` (enumeration, validation, artifact and serialization helpers stay); no module imports it any more.
+  - Acceptance: the engine no longer exports `pushDownCustomizations`; `npm run typecheck` reports no error; the file's physical line count is below its `MAIN_BASE` count.
+- [ ] [P3-T6] Create `RES/customizations/pack-manifests/core.json`, `python.json`, `powershell.json`, `typescript.json` and `csharp.json` listing every file under the five `.github` sub-roots of `RES/customizations/` plus `.github/copilot-instructions.md`, assigned by rule D8.
+  - Acceptance: each file parses as a manifest with `name` equal to its stem; the union of their `paths` equals the bundle's file set under those roots.
+- [ ] [P3-T7] Create `PD/push-down-ecosystem-registry.ts`: `ECOSYSTEM_LAYER_BUILDERS` mapping `claude`, `codex`, `copilot` to `buildClaudeLayer`, `buildCodexLayer`, `buildCopilotLayer` with each bundle's resources-relative directory and artifact directory, and a module-load call of `assertManifestPathIsRootLevel(DESTINATION_MANIFEST_RELATIVE_PATH, …)` over the union of every layer's root folders and root-file destinations.
+  - Acceptance: the file compiles; no pipeline, manifest, comparator, report or apply module imports it (no import cycle).
+- [ ] [P3-T8] Create `PD/push-down-harness.ts`: `pushDownHarness(input)` reading the destination manifest once, resolving each selected ecosystem's selection (explicit `packs` wins; omitted `packs` reuses the recorded selection for that ecosystem; otherwise full tree with the D5 record), building the shared layer then the selected layers in `ECOSYSTEM_NAMES` order, and running the pipeline; `resolvePayloadVersion(fs, extensionRoot)` per D6; `PushDownHarnessResult` carries the pipeline result.
+  - Acceptance: the file compiles and is at most 800 physical lines.
+- [ ] [P3-T9] Create `PDT/push-down-pipeline.test-helpers.ts`: `seedSharedLayerManifest(files, extensionRoot, paths)` and minimal three-bundle seed builders over `buildInMemoryFileSystem`, building CRLF content in code (no committed CRLF fixture).
+  - Acceptance: the helper compiles under `npm run typecheck`.
+- [ ] [P3-T10] Create `PDT/push-down-harness.test.ts`: one ecosystem selected per call yields layers `shared` plus that ecosystem only; O-5 reuse of recorded `packs` and full-tree default with D5 record; selection entries of unselected ecosystems kept; `payload_version` from a seeded `package.json` and the `0.0.0` fallback; identical `files` and `counts` between a dry run and the following apply on identical inputs.
+  - Acceptance: the file's tests pass.
+- [ ] [P3-T11] Create `PDT/push-down-ecosystem-registry.test.ts`: each registry entry builds a layer whose name, root folders and artifact directory match the ecosystem module's declarations, and the destination manifest path is accepted as root-level.
+  - Acceptance: the file's tests pass.
+- [ ] [P3-T12] Apply rules R1, R2 and R4 to every case listed in the P0-T6 inventory for the layer-level test files (`claude-customizations.test.ts`, `codex-agents-customizations.test.ts`, `copilot-customizations.test.ts`, `claude-config-carriage.test.ts`, `claude-gitignore-delivery.test.ts`, `claude-exclusion-filter.test.ts`, `codex-bundle-publish.integration.test.ts` under `PDT`), each change carrying a comment naming its rule.
+  - Acceptance: every inventory case for these files is changed as its rule states and no other case is changed; these files pass.
+- [ ] [P3-T13] Add `coverageThreshold` entries for `push-down-ecosystem-registry.ts` and `push-down-harness.ts`.
+  - Acceptance: two new keys, each `{ lines: 85, branches: 75 }`.
+- [ ] [P3-T14] Run Jest with coverage over `PDT`.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/phase3-jest.<timestamp>.md` records all `PDT` tests passing and every gated push-down file meeting its entry.
+
+### Phase 4 — Service Calls, MCP Wrappers, Extension Commands
+
+- [ ] [P4-T1] Edit `PD/push-down-service-call.ts`: the three service calls call `pushDownHarness` with exactly one ecosystem key; inputs gain `dryRun`, `overwriteUnmanaged` and (Copilot) `packs`; `PushDownServiceCallResult` gains optional `pushDownReport`; apply results keep the existing `summary` strings and a one-element `artifacts`; dry-run results carry the summary `Dry run: planned bundled <Copilot|Codex and agents|Claude Code> customizations; no file was written.` and an empty `artifacts`; `warnings` holds exclusion lines then conflict lines, present only when non-empty, each also sent to `log`.
+  - Acceptance: the file compiles and contains no enumeration, planning or write loop.
+- [ ] [P4-T2] Update `PDT/push-down-service-call.test.ts` per R3/R1/R2/R4 and add cases: each service call's `pushDownReport.ecosystems` has exactly one key, its own ecosystem, and every report file's `layer` is `shared` or that ecosystem (behavioral proof of delegation to the one pipeline; no module mock), a dry run returns `pushDownReport.mode` `dry-run` and empty `artifacts`, Copilot `packs` reaches the harness, and conflict lines reach `warnings` and `log`.
+  - Acceptance: the file's tests pass.
+- [ ] [P4-T3] Edit `extensions/drm-copilot/src/repo-automation-service-contract.ts` and `extensions/drm-copilot/src/repo-automation-service.ts`: add `pushDownReport` to `RepoAutomationExecutionResult`, add `dryRun`/`overwriteUnmanaged` to both existing push-down inputs, add `PushDownCopilotCustomizationsInput` (`packs`, `dryRun`, `overwriteUnmanaged`) used by `pushDownCopilotCustomizations` and re-exported from the service module.
+  - Acceptance: `npm run typecheck` reports no error in these files.
+- [ ] [P4-T4] Edit `extensions/drm-copilot/src/repo-automation-service-push-down.ts`: forward the new fields only when present; `runPushDownCopilotCustomizations` takes the Copilot input.
+  - Acceptance: the file compiles; `repo-automation-service.ts` passes the input object.
+- [ ] [P4-T5] Edit `extensions/drm-copilot/src/mcp-push-down-schema-properties.ts`: add optional boolean `dry_run` and `overwrite_unmanaged` to all three exported selection-property objects and optional `packs` (string array) to `copilotPushDownSelectionProperties`; existing property objects are unchanged.
+  - Acceptance: both `REPO_AUTOMATION_TOOL_DEFINITIONS` and `toolDefinitions` expose the new properties with no edit to either definition file.
+- [ ] [P4-T6] Edit `extensions/drm-copilot/src/mcp-tool-inputs-push-down.ts` and `extensions/drm-copilot/src/mcp-tool-inputs.ts`: parse `dry_run` and `overwrite_unmanaged` (boolean, error `Field 'dry_run' must be a boolean when provided.` and the same form for `overwrite_unmanaged`), spread only when present; move `resolvePushDownCopilotCustomizationsToolInput` into the push-down module with `packs` parsing and re-export it from `mcp-tool-inputs.ts`.
+  - Acceptance: both files compile; `mcp-tool-inputs.ts` physical line count is below the `MAIN_BASE` count.
+- [ ] [P4-T7] Edit `extensions/drm-copilot/src/mcp-tools.ts`: `RepoAutomationMcpToolResult` gains optional `push_down_report`; `toMcpToolResult` maps `pushDownReport` to it only when present.
+  - Acceptance: the file compiles; no other mapping changes.
+- [ ] [P4-T8] Update `extensions/drm-copilot/test/mcp-repo-automation-tool-definitions.test.ts` (`keeps Copilot push-down schemas workspace-root-only` per the dispositions table) and apply R3/R1/R2/R4 to `repo-automation-service.push-down-claude.test.ts`, `repo-automation-service.push-down-codex.test.ts` and `extension.push-down-claude-customizations.test.ts` inventory cases.
+  - Acceptance: these four files pass.
+- [ ] [P4-T9] Create `extensions/drm-copilot/test/push-down-wrapper-compatibility.test.ts`: a real `RepoAutomationService` over an in-memory file system with seeded bundles; for each of the three tools, `dispatchRepoAutomationTool` with only `workspace_root` returns exactly the keys `ok`, `tool`, `workspace_root`, `summary`, `artifacts` (one element) and `push_down_report`, with no `warnings`; tool names equal the pre-change names; existing schema properties deep-equal frozen copies of their pre-change objects; each wrapper's run writes only shared-layer paths, paths under its own layer roots or root-file destinations, its merged-delivery paths, `.push-down-manifest.json` and its artifact directory.
+  - Acceptance: the file's tests pass.
+- [ ] [P4-T10] Create `extensions/drm-copilot/test/mcp-tool-inputs.push-down-planning.test.ts`: `dry_run` and `overwrite_unmanaged` parsing and rejection for all three resolvers, Copilot `packs` parsing, and omission when absent.
+  - Acceptance: the file's tests pass.
+- [ ] [P4-T11] Create `extensions/drm-copilot/src/push-down-command-support.ts`: `COPILOT_PUSH_DOWN_PACK_ITEMS` (Python, PowerShell, TypeScript, C# mapped to `python`, `powershell`, `typescript`, `csharp`) and `countPushDownConflictLines(warnings)` counting lines starting with `PUSH_DOWN_CONFLICT_LINE_PREFIX`.
+  - Acceptance: the file compiles.
+- [ ] [P4-T12] Edit `extensions/drm-copilot/src/repo-automation-command-registration-admin.ts`: `registerPushDownCopilotCustomizationsCommand` shows a pre-picked multi-select QuickPick of `COPILOT_PUSH_DOWN_PACK_ITEMS` (cancel aborts) and passes `packs`; all three commands show `Push-down conflicts: <n>. See the drm-copilot output channel for the affected paths.` when `countPushDownConflictLines` is above zero; the existing exclusion-conflict message is unchanged.
+  - Acceptance: the file compiles and stays at most 500 physical lines.
+- [ ] [P4-T13] Create `extensions/drm-copilot/test/push-down-command-support.test.ts` and `extensions/drm-copilot/test/repo-automation-command-registration-admin.push-down.test.ts`: item mapping, conflict counting, Copilot QuickPick forwarding and cancellation, and the conflict warning for each command.
+  - Acceptance: both files pass.
+- [ ] [P4-T14] Add `coverageThreshold` entry `./src/push-down-command-support.ts` `{ lines: 85, branches: 75 }`, then run Jest with coverage over the Phase 4 test files and `PDT`.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/phase4-jest.<timestamp>.md` records all tests passing and every gated file meeting its entry.
+
+### Phase 5 — Real-Bundle Integration and Manifest Completeness
+
+- [ ] [P5-T1] Create `PDT/push-down-bundle-manifest-completeness.test.ts` reading the real tree read-only: every file under each bundle's published roots and every root-file source is listed by that bundle's manifests or by `shared.json`, except paths in `EXCLUDED_RELATIVE_PATHS` or under `LOCAL_RUNTIME_RELATIVE_DIRECTORIES`, each exception carrying a stated reason; an enumeration floor fails if fewer files than a non-zero minimum are found. Run it once and record the missing paths.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/phase5-completeness-first-run.<timestamp>.md` lists the missing paths per bundle (possibly none).
+- [ ] [P5-T2] Add every missing Claude-bundle path from the P5-T1 record and the P0-T4 child 3 list to `RES/claude-customizations/pack-manifests/*.json` by rule D8 (including `CLAUDE.md` and `.mcp.json` when bundled), and every missing Copilot path to `RES/customizations/pack-manifests/*.json`.
+  - Acceptance: the Claude and Copilot cases of the completeness test pass.
+- [ ] [P5-T3] Add every missing Codex-bundle path (including every entry of `PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS` and `PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS` and the child 3 list) to `RES/codex-and-agents-customizations/pack-manifests/*.json` by rule D8; for each dependency the closure test then reports, add its target to the reporting pack.
+  - Acceptance: the Codex case of the completeness test, `test_push_down_pack_manifest_dependency_closure.py` and `test_codex_core_manifest_closure.py` pass; the Codex generator `--check` exits 0.
+- [ ] [P5-T4] Edit `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` in place: empty `PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS` and `PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS`, and update the module scope note to state the gaps were closed by issue #1029.
+  - Acceptance: `test_bundled_codex_files_are_listed_in_some_pack_manifest` and `test_no_bundled_codex_file_is_absent_from_disk_and_exception_list` pass.
+- [ ] [P5-T5] Create `PDT/push-down-harness.integration.test.ts` using `ReadThroughPushDownFileSystem` rooted at the extension directory and an in-memory `/dest`: a data-driven case per ecosystem asserting every shared-layer file is written and every written path, apart from `.push-down-manifest.json`, the run's artifact directory and the ecosystem's merged-delivery paths, is in the shared set or under that ecosystem's layer roots or root-file destinations, with no path under another ecosystem's roots (no Codex-only `.agents/skills` path for Claude or Copilot); per-wrapper `packs` publishing core plus selected packs with C# rules unchanged; a second apply writing nothing outside `artifacts/` and reporting only `unchanged`, `merge` or `excluded`; a local edit kept, reported `conflict` in report and warnings with its manifest hash unchanged; a pre-populated destination with no manifest giving `create`/`adopt`/`unmanaged-conflict` and overwrite with `overwriteUnmanaged`; a CRLF copy of an unchanged file classified `unchanged`; Codex merging `config/orchestration-routing.json` with a destination-local route preserved; `.push-down-exclusions` honored for all three; an orphaned entry reported and not deleted.
+  - Acceptance: the file's tests pass.
+- [ ] [P5-T6] Run the Jest push-down suite (`PDT`) and the Pester `*.Manifest.Tests.ps1` suites after the manifest edits.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/phase5-jest.<timestamp>.md` records all `PDT` tests passing, including both new real-tree tests, and Pester counts from the JUnit file with zero failures.
+
+### Phase 6 — Documentation and Brief
+
+- [ ] [P6-T1] Update `extensions/drm-copilot/README.md`: the push-down input list (all three tools: `dry_run`, `overwrite_unmanaged`; Copilot `packs`), the shared layer, `.push-down-manifest.json`, the no-overwrite rule, and `push_down_report`.
+  - Acceptance: the README input list names `dry_run` and `overwrite_unmanaged` for each push-down tool.
+- [ ] [P6-T2] Add an entry under `## [Unreleased]` in `extensions/drm-copilot/CHANGELOG.md` describing the consolidated pipeline, the new optional inputs, the O-4 behavior change (differing files without a manifest are reported, not overwritten) and the Codex routing merge.
+  - Acceptance: the `## [Unreleased]` section names `overwrite_unmanaged`.
+- [ ] [P6-T3] Add one bullet to `## Contract Tests That Pin Mirrored Files` naming `extensions/drm-copilot/test/lib/push-down/push-down-bundle-manifest-completeness.test.ts` (every bundled file under a published root is listed by a layer manifest) in all six execution-environment copies (`.claude/skills/`, `.agents/skills/`, `.github/skills/` and the three bundle copies under `RES`); where P0-T4 recorded a copy as generated by child 3's skill generator, produce that copy with the generator.
+  - Acceptance: `test_brief_copies_are_byte_identical`, `test_brief_has_no_g11_or_g12_findings` and `test_brief_has_no_consuming_names` pass, and the resource-contract tests pass.
+
+### Phase 7 — Final QA Loop, Isolation, Scope Checks, Self-Review
+
+Restart from P7-T1 whenever a step fails or changes a file.
+
+- [ ] [P7-T1] Run Prettier in check mode over the `extensions/drm-copilot/` format scope; if it fails, apply Prettier in write mode and restart at P7-T1.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-ts-format.<timestamp>.md` records exit 0 and the literal `All matched files use Prettier code style!`.
+- [ ] [P7-T2] Run `npm run lint` in `extensions/drm-copilot/`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-ts-lint.<timestamp>.md` records exit 0 and zero errors.
+- [ ] [P7-T3] Run `npm run typecheck` in `extensions/drm-copilot/`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-ts-typecheck.<timestamp>.md` records exit 0.
+- [ ] [P7-T4] Run `npm run test:coverage` in `extensions/drm-copilot/`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-ts-jest-coverage.<timestamp>.md` records all suites passing, no threshold failure, and per-file line and branch figures for every new and edited file under `src/`.
+- [ ] [P7-T5] Write the coverage comparison from the P0-T10 and P7-T4 records.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/coverage-delta.<timestamp>.md` lists baseline, post-change and new/changed-code coverage per file; every new file is at or above 85 percent line and 75 percent branch; no edited file decreases; Python and PowerShell rows read `not applicable: no production file changed`.
+- [ ] [P7-T6] Run the seeded shuffled Jest isolation check in `extensions/drm-copilot/` with seed `20261030`.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/jest-seeded-shuffle.<timestamp>.md` records the seed and all tests passing.
+- [ ] [P7-T7] Run Black `--check`, Ruff check and Pyright on `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-python-static.<timestamp>.md` records `would be left unchanged`, `All checks passed!` and zero Pyright errors.
+- [ ] [P7-T8] Run the Python `## Contract Test Set` with pytest.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-python-contract-tests.<timestamp>.md` records zero failures per module.
+- [ ] [P7-T9] Run the changed Python module `test_push_down_codex_and_agents_pack_manifest_completeness.py` in reversed test order in one process.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/python-reversed-order.<timestamp>.md` records the order used and all tests passing.
+- [ ] [P7-T10] Run the eleven Pester `*.Manifest.Tests.ps1` suites and `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` through the branch-current route; read counts from the JUnit file.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-pester-suites.<timestamp>.md` records zero failures.
+- [ ] [P7-T11] Run the eleven Manifest suites in seeded shuffled file order in one process with seeds `11`, `22` and `33`.
+  - Acceptance: `<FEATURE>/evidence/regression-testing/pester-shuffled.<timestamp>.md` records each seed, its file order and zero failures.
+- [ ] [P7-T12] Run the Codex generator `--check`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-codex-generator-check.<timestamp>.md` records exit 0.
+- [ ] [P7-T13] Measure physical lines of every file the branch adds or changes under `extensions/drm-copilot/src`, `extensions/drm-copilot/test` and `tests/scripts` (from `git diff --name-status BASE HEAD` plus `git status --porcelain`).
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-file-size.<timestamp>.md` lists each file and count; none exceeds 800; files above 500 carry a reason; `claude-customizations.ts` is not above its `MAIN_BASE` count.
+- [ ] [P7-T14] Check scope from `git diff --name-status BASE HEAD` plus `git status --porcelain`: no added path ends in `.py`; no added `.ts` or `.py` path is under `.claude/`, `.codex/`, `.agents/`, `.github/`, `config/` or `RES`; no `scripts/dev_tools/push_down_*.py` path, no path under `.claude/hooks`, `.codex/hooks` or `.github/hooks`, and none of the five static parity tests appears; plain `grep` for the token `enumerateSourceFiles` in `PD/push-down-service-call.ts`, `PD/claude-customizations.ts`, `PD/codex-agents-customizations.ts` and `PD/copilot-customizations.ts` finds zero matches.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-scope-check.<timestamp>.md` records each check as PASS with the listed paths.
+- [ ] [P7-T15] Search the new and edited test files under `extensions/drm-copilot/test/` with plain `grep` for the tokens `mkdtemp`, `tmpdir` and `writeFileSync`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-test-temp-file-check.<timestamp>.md` records zero matches.
+- [ ] [P7-T16] Self-review: walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the diff from `BASE`, and map every spec and user-story acceptance criterion to its test and evidence.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` has one PASS, FAIL or N/A row per checklist item and no FAIL row; a FAIL is fixed and the loop re-run from P7-T1 before the file is rewritten.
 
 ## Pre-Mortem
 
-<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
-- Review checklists:
-- Coverage:
-- Mirror parity:
-- File size:
-- Test isolation:
-- CI-only behavior:
-- Evidence:
+- Review checklists: a reviewer could find a changed wrapper default, an edited test without a stated reason, or a spec AC with no test. Prevention: `## Existing Test Dispositions` with rules R1 to R4 and the P0-T6 inventory, the wrapper-compatibility test (P4-T9), and the self-review walk of all three templates with an AC-to-test map (P7-T16).
+- Coverage: a new module without its own entry would be ungated because `jest.config.cjs` has no `global` key, and tests that mock the comparator would overstate coverage. Prevention: entries for all twelve new production files (P1-T9, P2-T12, P3-T13, P4-T14); comparator, report, manifest and pipeline code exercised with in-memory fakes and no module mocks, so every asserted per-file floor measures real execution; coverage delta in P7-T5. Python and PowerShell production code is unchanged, so their coverage delta is not applicable.
+- Mirror parity: new manifests, added entries and the brief bullet could break resource-contract, completeness, closure or brief-parity tests. Prevention: the brief update is task P6-T3 (all six byte-identical copies, the brief's contract-test list gains the new Jest completeness test); the full `## Contract Test Set` runs at P0-T11 and P7-T8; the generator `--check` at P5-T3 and P7-T12; shared paths are added to `shared.json` without moving Codex `core.json` entries (D1).
+- File size: `claude-customizations.ts` sits near the 500 guidance tier and several MCP files are between 420 and 490 lines. Prevention: new logic only in new modules; `claude-customizations.ts` and `mcp-tool-inputs.ts` must not grow (P3-T1, P4-T6); the admin file stays at most 500 (P4-T12); every changed file is measured at P7-T13 and gated by `FileSizePolicy.RepoGate.Tests.ps1` at P7-T10.
+- Test isolation: shared in-memory destinations or module-level state could leak under shuffled order. Prevention: a fresh fake per test, no module-level mutable state in pipeline modules, and the isolation runs: seeded shuffled Jest with seed `20261030` recorded (P7-T6), reversed-order run of the changed Python module (P7-T9), and seeded shuffled file-order Pester runs of the Manifest suites with seeds `11`, `22`, `33` recorded (P7-T11), whose input manifests change.
+- CI-only behavior: drive-letter fixture roots fail on Linux, committed CRLF fixtures become LF under `eol=lf`, and real-tree tests can read gitignored state. Prevention: POSIX in-memory roots (`/dest`, `/ext`), CRLF built in test code (P3-T7), real-tree tests read only tracked bundle and config files, and Jest runs on both `ubuntu-latest` and `windows-latest` in `drm-copilot-extension-tests`; no CI job, required context, tool route or batch-budget rule changes.
+- Evidence: counts taken from PoshQC MCP summaries or evidence with absolute paths would fail review. Prevention: Pester counts read from `artifacts/pester/pester-junit.xml`, every artifact under `<FEATURE>/evidence/<kind>/` with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`, scratch paths recorded as `SCRATCH`, and Phase 0 gate records written before any edit.
+
+## Size Justification
+
+The plan has more than 40 tasks because it carries four mandatory execution-time gates, baselines for three languages, twelve new production modules each with its own test and coverage entry, edits across five push-down modules and seven MCP or service files, two data-manifest sets, a real-bundle integration suite, a full-bundle completeness test, a six-copy brief update, and a final QA loop for TypeScript, Python and Pester. Splitting it would separate the pipeline from the wrappers that must delegate to it, which the spec requires to land together.
 
 ## Test Plan
 
-- Unit: ...
-- Integration: ...
-- Manual/CLI: ...
-- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
+- Unit: comparator rows, manifest parse/render/hash, report, write guard, pack resolver, shared layer, pipeline planning and failures, apply, harness selection, registry, MCP input parsing, command support.
+- Integration: `PDT/push-down-harness.integration.test.ts` (real bundle, in-memory destination); `PDT/push-down-bundle-manifest-completeness.test.ts` (real tree, read-only); `extensions/drm-copilot/test/push-down-wrapper-compatibility.test.ts`.
+- Contract: `## Contract Test Set`, Pester Manifest suites, Codex generator `--check`.
+- Coverage evidence: baseline `<FEATURE>/evidence/baseline/baseline-ts-jest-coverage.<timestamp>.md`; post-change `<FEATURE>/evidence/qa-gates/final-ts-jest-coverage.<timestamp>.md`; comparison `<FEATURE>/evidence/qa-gates/coverage-delta.<timestamp>.md`.
 
 ## Open Questions / Notes
 
-- ...
+- Owner questions Q1 and O-1 to O-12 proceed on the spec defaults unless P0-T5 records a non-default answer, which stops execution for one plan revision.
+- Spec Behavior 4 says one loader replaces the duplicated load logic; the Claude and Codex loaders stay because their tests pin their error messages, and the pipeline reaches all loaders through `resolveLayerPublishedPaths` (P2-T2).
