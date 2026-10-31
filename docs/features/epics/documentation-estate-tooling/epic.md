@@ -352,6 +352,23 @@ provisional defaults.
   (`285786ec4`) is kept; the duplicate set remains unpushed on the relaunch worktree branch and was
   not deleted.
 
+### Enforcement notes from the two preparations of 1034
+
+- The pushed preparation (`20e9aa408`, `PREFLIGHT: ALL CLEAR`) is kept. A concurrent relaunch
+  produced a second preparation that halted (`validator_failed`) and stays unpushed on its own
+  worktree branch.
+- The halted preparation found a PowerShell module-visibility defect: a hook that imports only
+  `DocsCompleteGate.psm1` cannot call functions that module merely imports from a sibling (for
+  example `DocsSchema.psm1`). The kept plan's hook calls only the `DocsCompleteGate.psm1` predicates,
+  which use sibling helpers inside their own module scope, so the defect does not appear to apply.
+  Execution of 1034 must still confirm that every function the hook calls is exported by a module
+  the hook imports.
+- Contracts: `surface-delta` options `-Base`, `-BaseSnapshot`, `-BaseLedger`, `-Profile`; finding
+  `DOCS_SURFACE_DELTA_UNLEDGERED`; gate opt-in `completion_gates.integration_pr_gate.enabled`
+  (default false), receipt at `artifact_paths.validation_receipt`, deny prefix
+  `DOCS_COMPLETE_GATE_BLOCKED:`. 1023 must persist `revision`, `mode`, `repository`,
+  `validation_result` and `id` in the receipt.
+
 ### Native-analyzer contracts from the preparation of 1031 (binding)
 
 - The Python helper emits raw facts only (kind, path, declaration, line span); PowerShell computes
