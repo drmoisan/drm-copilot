@@ -350,6 +350,10 @@ The orchestrator recorded these rulings on 2026-10-31 after the stage B prefligh
 - **R6 (scope-diff base).** This child merges into the integration branch, so the no-new-Python and language-scope diffs are anchored on the merge base of `origin/epic/shared-agent-harness-layer-integration` and `HEAD`, not on `origin/main`. Commits from other children are therefore not counted against this child.
 - **R5 (execution split).** Stage B pauses for the orchestrator's checkpoint path update after the self-move. Epic execution therefore delegates stage B as two executor runs: the phases up to and including the apply and checkpoint handoff, then the remaining phases.
 
+## Owner Decisions (preparation)
+
+- **H2 (moves-then-rewrites halt, owner decision 2026-10-31, option (b)).** When the decision file sets `global_decisions.commit_split` to `moves-then-rewrites` (OQ-12), the second apply-mode call, after the moves are committed, refuses its own decision file: the fresh `source_digest` differs from the approved one, and the `decisions` sources (the former `docs/features/...` paths) are no longer reported folders. This refusal is not worked around. Stage B stops at that point with a message that tells the user to re-run the dry run against the post-move tree and approve a new decision file, and the halt is recorded as an accepted branch in the same manner as ruling R2. Stage A is not reopened, and the refusal rules under `### Refusal rules` are unchanged. The `single` commit split is unaffected.
+
 ## Owner Questions
 
 Recorded as questions only. None is decided by this spec.
