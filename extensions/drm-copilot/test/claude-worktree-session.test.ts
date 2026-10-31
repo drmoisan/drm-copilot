@@ -8,6 +8,7 @@ import {
   deriveWorktreeGroupDirectory,
   formatWorktreeTimestamp,
   quoteForPwsh,
+  VENV_ACTIVATE_COMMAND,
 } from "../src/claude-worktree-session";
 
 describe("formatWorktreeTimestamp", () => {
@@ -213,7 +214,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.setLocation).toBe(
-      "Set-Location '/parent/auth-wt/2026-04-20T09-59'",
+      "Set-Location '/parent/auth-wt/2026-04-20T09-59' -ErrorAction Stop",
     );
   });
 
@@ -226,7 +227,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.ensureParentDirectory).toBe(
-      "New-Item -ItemType Directory -Force -Path '/parent/auth-wt' | Out-Null",
+      "New-Item -ItemType Directory -Force -Path '/parent/auth-wt' -ErrorAction Stop | Out-Null",
     );
   });
 
@@ -248,7 +249,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.ensureParentDirectory).toBe(
-      `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(group)} | Out-Null`,
+      `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(group)} -ErrorAction Stop | Out-Null`,
     );
     expect(worktreePath.startsWith(`${group}/`)).toBe(true);
   });
@@ -293,6 +294,18 @@ describe("buildWorktreeSessionCommands", () => {
       "No virtual environment activation script found under ./.venv",
     );
     expect(commands.activate).toContain("& $venvActivate");
+  });
+
+  it("exports VENV_ACTIVATE_COMMAND as the activate value when usePoetry is true", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      usePoetry: true,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.activate).toBe(VENV_ACTIVATE_COMMAND);
   });
 
   it("emits a claude command without a trailing objective when objective is undefined", () => {
@@ -362,7 +375,7 @@ describe("buildWorktreeSessionCommands", () => {
       "git -C '/parent dir/o''connor' worktree add '/parent dir/o''connor-wt' -b 'feature/o''connor'",
     );
     expect(commands.setLocation).toBe(
-      "Set-Location '/parent dir/o''connor-wt'",
+      "Set-Location '/parent dir/o''connor-wt' -ErrorAction Stop",
     );
   });
 
