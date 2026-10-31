@@ -13,10 +13,12 @@
     resolver behind it reads real git state, so driving it directly would make these tests
     depend on whichever worktrees exist on the machine running them.
 
-    Issue #1011: TR-01 to TR-09 run the real Resolve-PrAuthorWorktreeTarget body with the shared
+    Issue #1011: TR-01 to TR-12 run the real Resolve-PrAuthorWorktreeTarget body with the shared
     resolver Resolve-HookTargetWorktree, the identity resolver Resolve-WorktreeItemTarget, and the
     current-branch reader Get-PrAuthorCurrentBranch mocked, so no row starts git. Resolver results
-    are built in test scope with the six properties of the shared resolver's result.
+    are built in test scope with the six properties of the shared resolver's result. The two
+    filesystem checks, Test-WorktreeResolutionRootMarker and Find-WorktreeResolutionRoot, are
+    mocked in the context BeforeEach, so no row reads the disk.
 
     Issue #673: both expected reason codes come from the worktree-resolution accessors rather
     than from a literal, and every synthetic root is composed at run time from the path root
@@ -148,6 +150,8 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         BeforeEach {
             Mock -CommandName Resolve-WorktreeItemTarget -MockWith { $script:IdentityNoTarget }
             Mock -CommandName Get-PrAuthorCurrentBranch -MockWith { $null }
+            Mock -CommandName Test-WorktreeResolutionRootMarker -MockWith { $true }
+            Mock -CommandName Find-WorktreeResolutionRoot -ModuleName WorktreeItemResolution -MockWith { $null }
         }
 
         It 'TR-01 invokes Resolve-HookTargetWorktree once for a --head command' {
@@ -253,6 +257,48 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly -ParameterFilter {
                 $CommandBranch -eq 'feature/item-701' -and -not $FilePath -and -not $CommandOperandPath -and [string]::IsNullOrEmpty($DelegationPrompt)
             }
+        }
+
+        It 'TR-10 maps a CommandOperand root that encloses the session path to SessionRoot' {
+            $result = Get-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            $sessionPath = "$($script:ItemRoot)/hooks"
+            $enclosingRoot = ConvertTo-WorktreeResolutionNormalizedPath -Path $script:ItemRoot
+            Mock -CommandName Find-WorktreeResolutionRoot -ModuleName WorktreeItemResolution -MockWith { $enclosingRoot }.GetNewClosure()
+
+            $target = ConvertFrom-PrAuthorHookTargetResult -Result $result -CommandText $script:HeadCommand -SessionRoot $sessionPath
+
+            $target.Status | Should -Be 'SessionRoot' -Because 'the resolved root is the worktree the session path sits inside'
+            $target.WorktreeRoot | Should -Be $script:ItemRoot
+            $target.Signal | Should -Be 'Branch'
+        }
+
+        It 'TR-11 lets the identity resolver decide when the command also carries a canonical issue line' {
+            $command = "$($script:HeadCommand)`nCanonical issue number for this feature is 701."
+            $hookResult = Get-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            $identityResult = New-WorktreeResolutionTargetResult -Status Ambiguous -SessionRoot $script:SessionRootPath -Detail 'branch and issue disagree.'
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $hookResult }.GetNewClosure()
+            Mock -CommandName Resolve-WorktreeItemTarget -MockWith { $identityResult }.GetNewClosure()
+
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText $command
+
+            $target.Status | Should -Be 'Ambiguous' -Because 'the branch/issue agreement check of the identity resolver decides'
+            $target.ReasonCode | Should -Be $script:AmbiguityCode
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 0 -Exactly
+            Should -Invoke -CommandName Resolve-WorktreeItemTarget -Times 1 -Exactly
+        }
+
+        It 'TR-12 yields no selection for a resolved root whose directory is gone' {
+            $hookResult = Get-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $hookResult }.GetNewClosure()
+            Mock -CommandName Test-WorktreeResolutionRootMarker -MockWith { $false }
+
+            $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $hookResult -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
+
+            $mapped | Should -BeNullOrEmpty -Because 'a root without a worktree marker is not a live worktree'
+            $target.Status | Should -Be 'NoTarget'
+            $target.ReasonCode | Should -Be $script:NoTargetCode
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
         }
     }
 }
