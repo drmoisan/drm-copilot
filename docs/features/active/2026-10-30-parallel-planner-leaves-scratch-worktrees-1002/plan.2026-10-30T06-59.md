@@ -91,9 +91,9 @@ This plan edits no `.claude/rules/` file, no `.github/instructions/` file, and n
 
 ### Phase 4 — Agent Fix
 
-- [ ] [P4-T1] Edit `.claude/agents/parallel-planner.md` `## Delegation Model`: append the closing pointer paragraph per Design Decision 5. Acceptance: `test_agent_delegation_model_points_to_no_worktree_prohibition` passes.
-- [ ] [P4-T2] Edit `.claude/agents/parallel-planner.md` `## Completion Requirements`: append item `8.` per Design Decision 5; items 1 through 7 and `tools:` are unchanged. Acceptance: `test_agent_completion_requirements_new_item_requires_no_worktree_and_pushed_plan_branch`, the `agent` case of `test_every_git_worktree_add_occurrence_is_inside_prohibition_sentence`, `test_parallel_planner_agent_requires_routing_record`, and `test_parallel_planner_surface_contracts.py` pass.
-- [ ] [P4-T3] Copy `.claude/agents/parallel-planner.md` byte-identically to `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`. Acceptance: the `agent` case of `test_bundled_copies_are_byte_identical_to_canonical` passes.
+- [x] [P4-T1] Edit `.claude/agents/parallel-planner.md` `## Delegation Model`: append the closing pointer paragraph per Design Decision 5. Acceptance: `test_agent_delegation_model_points_to_no_worktree_prohibition` passes.
+- [x] [P4-T2] Edit `.claude/agents/parallel-planner.md` `## Completion Requirements`: append item `8.` per Design Decision 5; items 1 through 7 and `tools:` are unchanged. Acceptance: `test_agent_completion_requirements_new_item_requires_no_worktree_and_pushed_plan_branch`, the `agent` case of `test_every_git_worktree_add_occurrence_is_inside_prohibition_sentence`, `test_parallel_planner_agent_requires_routing_record`, and `test_parallel_planner_surface_contracts.py` pass.
+- [x] [P4-T3] Copy `.claude/agents/parallel-planner.md` byte-identically to `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`. Acceptance: the `agent` case of `test_bundled_copies_are_byte_identical_to_canonical` passes.
 
 ### Phase 5 — Final QA Loop and Self-Review
 
