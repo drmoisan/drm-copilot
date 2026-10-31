@@ -341,8 +341,10 @@ provisional defaults.
 ### Generator contracts from the PowerShell preparation of 1024 (binding)
 
 - `generate-reference [-Profile] [-Snapshot] [-OutputDirectory] [-Write] [-Json]`; dry run is the
-  default and performs no write. Exit 1 means error findings and nothing written; exit 3 covers a
-  write conflict or failure. `result` is `{mode, pages, summary, unrendered}`. Output is
+  default and performs no write. Exit 1 means error findings and nothing written, including a write
+  conflict (`REFERENCE_WRITE_CONFLICT`, with a full `result`); exit 3 covers a write failure or
+  `DOCS_CLI_RUNTIME`. `result` is `{mode, output_directory, pages, summary, unrendered}` (corrected
+  2026-10-31 from the 1024 spec, as reported by 1036). Output is
   byte-identical regardless of the clock.
 - Anchor labels in 1020's dispatch table still carry placeholder numbers (for example
   `900006: generate-reference`); children locate their anchor by subcommand token. Owner question
