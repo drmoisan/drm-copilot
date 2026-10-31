@@ -3,7 +3,7 @@
 - **Issue:** #1029
 - **Parent (optional):** epic #1018, child 4 (integration branch `epic/shared-agent-harness-layer-integration`)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-31T00-45
+- **Last Updated:** 2026-10-31T00-40
 - **Status:** Draft
 - **Version:** 1.1
 - **Work Mode:** full-feature (AC sources: `spec.md` `## Acceptance Criteria` and `user-story.md` `## Acceptance Criteria`)
@@ -315,8 +315,8 @@ Restart from P7-T1 whenever a step fails or changes a file.
   - Acceptance: `<FEATURE>/evidence/qa-gates/final-file-size.<timestamp>.md` lists each file and count; none exceeds 800; files above 500 carry a reason; `claude-customizations.ts` is not above its `MAIN_BASE` count.
 - [ ] [P7-T14] Check scope from `git diff --name-status BASE HEAD` plus `git status --porcelain`: no added path ends in `.py`; no added `.ts` or `.py` path is under `.claude/`, `.codex/`, `.agents/`, `.github/`, `config/` or `RES`; no `scripts/dev_tools/push_down_*.py` path, no path under `.claude/hooks`, `.codex/hooks` or `.github/hooks`, and none of the five static parity tests appears; plain `grep` for the token `enumerateSourceFiles` in `PD/push-down-service-call.ts`, `PD/claude-customizations.ts`, `PD/codex-agents-customizations.ts` and `PD/copilot-customizations.ts` finds zero matches.
   - Acceptance: `<FEATURE>/evidence/qa-gates/final-scope-check.<timestamp>.md` records each check as PASS with the listed paths.
-- [ ] [P7-T15] Search the new and edited test files under `extensions/drm-copilot/test/` with plain `grep` for the tokens `mkdtemp`, `tmpdir` and `writeFileSync`.
-  - Acceptance: `<FEATURE>/evidence/qa-gates/final-test-temp-file-check.<timestamp>.md` records zero matches.
+- [ ] [P7-T15] Search, with plain `grep` for the tokens `mkdtemp`, `tmpdir` and `writeFileSync`, the new test files under `extensions/drm-copilot/test/` (untracked or added, from `git status --porcelain` plus `git diff --name-status BASE HEAD`) in full, and the lines the branch adds to edited test files under that directory (the `+` lines of `git diff BASE -- extensions/drm-copilot/test`). Pre-existing lines are out of scope: `extension.push-down-claude-customizations.test.ts`, edited at P4-T8, already holds an in-memory `fsMock.writeFileSync` mock that creates no file.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-test-temp-file-check.<timestamp>.md` records the searched files and zero matches.
 - [ ] [P7-T16] Self-review: walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the diff from `BASE`, and map every spec and user-story acceptance criterion to its test and evidence.
   - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` has one PASS, FAIL or N/A row per checklist item and no FAIL row; a FAIL is fixed and the loop re-run from P7-T1 before the file is rewritten.
 
