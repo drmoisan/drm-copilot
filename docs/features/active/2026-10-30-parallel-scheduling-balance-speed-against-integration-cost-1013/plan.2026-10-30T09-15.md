@@ -161,11 +161,11 @@ P2-T1 to P2-T7 land as one sequence: `contract` becomes a required weight name i
 
 ### Phase 6 — Validator Acceptance and Manifest Parity
 
-- [ ] [P6-T1] Extend `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`: an orchestrator checkpoint whose `tolerated_overlaps[0]` carries an `observed_resolution` object in the D-3 shape; an orchestrator checkpoint whose item carries `combined_issue_nums`; a planner checkpoint whose item carries `combined_issue_nums` and whose top level carries a `combinations` list. Each validates with zero errors (planner under the plain and ready gates). `test_out_of_enum_reason_is_still_rejected` is unchanged.
-- [ ] [P6-T2] Extend `extensions/drm-copilot/test/lib/validate/parallel-state-tolerated-edge-fields.test.ts` with the same three checkpoint shapes, each validating with zero errors under the TypeScript validators (planner under the plain and ready gates).
-- [ ] [P6-T3] Create `tests/fixtures/parallel_manifest_bash/manifest_valid_combined_item.json` (LF): a valid two-item manifest in the shape of `manifest_valid_two_items.json` where one item carries `combined_issue_nums` as a block sequence, with `expected_errors` empty.
+- [x] [P6-T1] Extend `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`: an orchestrator checkpoint whose `tolerated_overlaps[0]` carries an `observed_resolution` object in the D-3 shape; an orchestrator checkpoint whose item carries `combined_issue_nums`; a planner checkpoint whose item carries `combined_issue_nums` and whose top level carries a `combinations` list. Each validates with zero errors (planner under the plain and ready gates). `test_out_of_enum_reason_is_still_rejected` is unchanged.
+- [x] [P6-T2] Extend `extensions/drm-copilot/test/lib/validate/parallel-state-tolerated-edge-fields.test.ts` with the same three checkpoint shapes, each validating with zero errors under the TypeScript validators (planner under the plain and ready gates).
+- [x] [P6-T3] Create `tests/fixtures/parallel_manifest_bash/manifest_valid_combined_item.json` (LF): a valid two-item manifest in the shape of `manifest_valid_two_items.json` where one item carries `combined_issue_nums` as a block sequence, with `expected_errors` empty.
   - Acceptance: `tests/scripts/dev_tools/test_parallel_manifest_bash_parity.py` passes with the new fixture discovered; `tests/shell/parallel_manifest_parity.bats` discovers it in `shell-coverage / Shell Coverage (Bats + kcov)`.
-- [ ] [P6-T4] Run `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`, `extensions/drm-copilot/test/lib/validate/parallel-state-tolerated-edge-fields.test.ts`, and `tests/scripts/dev_tools/test_parallel_manifest_bash_parity.py`.
+- [x] [P6-T4] Run `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`, `extensions/drm-copilot/test/lib/validate/parallel-state-tolerated-edge-fields.test.ts`, and `tests/scripts/dev_tools/test_parallel_manifest_bash_parity.py`.
   - Evidence: `FEATURE/evidence/regression-testing/validator-acceptance.<timestamp>.md`.
   - Acceptance: zero failures; no validator module is in the branch diff.
 
