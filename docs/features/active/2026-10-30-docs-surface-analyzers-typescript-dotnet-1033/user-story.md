@@ -3,7 +3,7 @@
 - Issue: #1033
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-30T23-10
+- Last Updated: 2026-10-31 (owner decision P3 reconciliation, aligned with `spec.md` version 0.4)
 - Authoritative specification: `spec.md` in this folder
 
 ## Story Statement
@@ -114,24 +114,26 @@ children and are out of scope here.
 - [ ] An input above the 1 MiB size bound, an undecodable input, or a construct the scanner cannot classify yields a diagnostic, not a partial or guessed result; a lexical error in one file does not remove other files' elements (`DocsScannerContract.Tests.ps1`, run by `poshqc / PowerShell QC`).
 - [ ] Every element from the built-in scanners records `analysis_method: scanner` and a declaration-lines digest that ignores edits outside the declaration's lines and line-ending conversions (`DocsScannerContract.Tests.ps1`, run by `poshqc / PowerShell QC`).
 - [ ] No configuration value appears in analyzer output as text; only keys and shapes are emitted, including for imported `config-key` findings, and each `config-key` element's `source_sha256` is 1020's declaration-lines digest of the raw key line (OQ-4 superseded by 1020 D5; see `spec.md` `## Owner Questions`) (`DocsAnalyzerDotnetConfig.Tests.ps1`, `DocsAnalyzerExtensionImport.Tests.ps1`, run by `poshqc / PowerShell QC`).
-- [ ] The analyzer identifiers `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config`, `dotnet-public-api` and `extension-import` are distinct from 1022's identifiers and are registered under the 900004 anchor of `DocsAnalyzerRegistry.psm1` only; 1020's registry suite asserts membership rather than an empty registry (`DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1`, `DocsAnalyzerRegistry.Tests.ps1`, run by `poshqc / PowerShell QC`).
-- [ ] The scanner precision limit is documented in the specification's `## Scanner Precision Limit` for the coverage ledger's deferred entry, is returned by `Get-DocsScannerPrecisionLimit`, and every listed code is emitted by a fixture (`DocsScannerCommon.Tests.ps1`, `DocsScannerContract.Tests.ps1`, run by `poshqc / PowerShell QC`).
+- [ ] The analyzer identifiers `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config`, `dotnet-public-api` and `extension-import` are distinct from 1022's identifiers and are registered under the `# --- 1033: TypeScript and .NET analyzers ---` anchor of `DocsAnalyzerRegistry.psm1` only; the registry suites assert membership only (the anchor and the scanner table exist and each row is found by `Id` and `AnalysisMethod`), never a row count, and 1020's suite is edited only if it still contains a row-count assertion (`DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1`, `DocsAnalyzerRegistry.Tests.ps1`, run by `poshqc / PowerShell QC`).
+- [ ] The scanner precision limit is documented in the specification's `## Scanner Precision Limit` with one element kind per row for the coverage ledger's deferred entry, is returned by `Get-DocsScannerPrecisionLimit`, and every listed code is emitted by a fixture as a non-blocking `warning` with a non-null `path` whose `extensions` carries the `docs.precision-limit` marker with that row's `element_kind`, while diagnostics for other conditions carry no marker (`DocsScannerCommon.Tests.ps1`, `DocsScannerContract.Tests.ps1`, run by `poshqc / PowerShell QC`).
 - [ ] The push-down copy of every new or edited `.claude/lib/docs/` file is byte-identical to its source and listed in the Claude `core.json` (`Docs.Manifest.Tests.ps1`, run by `poshqc / PowerShell QC`, and the existing push-down contract tests passing unmodified).
 - [ ] No new Python or TypeScript file is added, and the plan carries the artifact classification table.
-- [ ] Pester line coverage is at least 85% for each new module, and no test creates a temporary file.
+- [ ] Pester line coverage is at least 85% for each new module, no test creates a temporary file, and no test starts a process, waits on a real timer or resolves an executable on PATH (every input is built in memory).
 - [ ] (CI-dependent) The required check `poshqc / PowerShell QC` (Windows shards, coverage) passes on the pull request head.
 
 ## Owner Questions
 
-Carried from `spec.md` `## Owner Questions` with their provisional defaults (none decided): OQ-1
+Carried from `spec.md` `## Owner Questions`. OQ-2 and OQ-5 are resolved; the others keep their
+provisional defaults: OQ-1
 analysis method of imported elements (default: manifest extensions key `docs.analysis-method`,
-`scanner` when absent), OQ-2 ledger representation of the precision limit (default: a ledger section
-keyed by `(analyzer_id, code)`, decided by 1023), OQ-3 JavaScript sources (default: out of scope),
+`scanner` when absent), OQ-2 ledger representation of the precision limit (resolved by 1023 and
+owner decision P3: one `deferred` entry per `(analyzer_id, code, path)`, keyed from the diagnostic
+marked with `docs.precision-limit` and its `element_kind`), OQ-3 JavaScript sources (default: out of scope),
 OQ-4 digest of a configuration key line (the masking default is superseded by 1020 v0.4 D5, under
 which the digest is set only by `New-DocsSurfaceElement -SourceText` and recomputed by
 `Invoke-DocsAnalyzer`; the raw key line is hashed and the question is re-raised to the coordinator as
-a 1020 contract question), OQ-5 anchor numbering (default: the `900004` placeholder text stays as
-committed).
+a 1020 contract question), OQ-5 anchor numbering (resolved by 1020 v0.6 and owner decision P1: the
+anchor is `# --- 1033: TypeScript and .NET analyzers ---`; placeholder anchors are rejected).
 
 ## Non-Goals
 

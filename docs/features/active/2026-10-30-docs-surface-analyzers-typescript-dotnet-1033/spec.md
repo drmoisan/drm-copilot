@@ -1,14 +1,21 @@
 # docs-surface-analyzers-typescript-dotnet — Spec
 
 - **Issue:** #1033
-- **Parent (optional):** #1019 (epic documentation-estate-tooling, manifest placeholder 900004, wave 1, band C4)
+- **Parent (optional):** #1019 (epic documentation-estate-tooling, child 1033, wave 1, band C4)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-31
 - **Status:** Draft
-- **Version:** 0.3 (preflight alignment with 1020 v0.4: digest path, `AnalysisMethod` rows, optional `-Selection` keys, empty-file behavior)
+- **Version:** 0.4 (owner decision P3: reconciliation with 1023 and 1020 v0.6)
+- **Revision note (P3, 2026-10-31):** owner decision P3 authorizes one reconciliation revision.
+  Precision-limit diagnostics now carry the 1023 `docs.precision-limit` marker with an
+  `element_kind` (row C5 resolved in favor of 1023; C9 and OQ-2 resolved by 1023);
+  `extension-finding-skipped` is no longer a precision limit; the registry anchor is
+  `# --- 1033: TypeScript and .NET analyzers ---` (C6 and OQ-5 resolved by 1020 P1); registry suites
+  assert membership only; the no-process, no-timer test rule is stated. Version 0.3 aligned with
+  1020 v0.4 (digest path, `AnalysisMethod` rows, optional `-Selection` keys, empty-file behavior).
 - **Work Mode:** full-feature
 - **Research (primary design source):** `docs/features/active/2026-10-30-docs-surface-analyzers-typescript-dotnet-1033/research/2026-10-30T22-45-docs-surface-analyzers-typescript-dotnet-research.md`
-- **Binding upstream contracts:** epic `docs/features/epics/documentation-estate-tooling/epic.md` (sections `## Owner Directive: Implementation Language (2026-10-30, refined)`, `## Owner Decisions`, `### Amendment of 1020 required by D3 and D5`, `### PowerShell contracts from the re-preparation of 1020`, `### Command contract decisions from the first preparation of 1023`, `### Analyzer decisions from the first preparation of 1022`, `### 900004 - docs-surface-analyzers-typescript-dotnet`) and 1020 `spec.md` version 0.4 `## Decisions Later Children Must Honor`, `### \`DocsSurface.psm1\`` and `### \`DocsAnalyzerRegistry.psm1\``.
+- **Binding upstream contracts:** epic `docs/features/epics/documentation-estate-tooling/epic.md` (sections `## Owner Directive: Implementation Language (2026-10-30, refined)`, `## Owner Decisions`, `### Amendment of 1020 required by D3 and D5`, `### PowerShell contracts from the re-preparation of 1020`, `### Command contract decisions from the first preparation of 1023`, `### Analyzer decisions from the first preparation of 1022`, `### Ledger contracts from the PowerShell preparation of 1023 (binding)`, `### 1033 - docs-surface-analyzers-typescript-dotnet`), 1020 `spec.md` version 0.6 `## Decisions Later Children Must Honor`, `### \`DocsSurface.psm1\`` and `### \`DocsAnalyzerRegistry.psm1\``, and 1023 `spec.md` `### Scanner precision limits (D3)` and `### #1022 and #1033 (PowerShell scanners) for precision-limit diagnostics`.
 
 ## Overview
 
@@ -57,16 +64,17 @@ subcommand through 1020's registry.
   `Invoke-DocsAnalyzerExtensionImport`. The rename is a refinement of a module name, which the epic
   permits research to make; the naming contract `Docs<Area>.psm1` is preserved.
   `DocsScannerCommon.psm1` is an additional refinement module under the same contract.
-- Register the seven analyzers as rows directly under the `# --- 900004: TypeScript and .NET
-  analyzers ---` anchor of `DocsAnalyzerRegistry.psm1` (anchor text as committed by 1020; see C6 and
-  OQ-5), and nowhere else. The identifiers are distinct from 1022's `python-cli`, `python-http`,
+- Register the seven analyzers as rows directly under the `# --- 1033: TypeScript and .NET
+  analyzers ---` anchor of the scanner table `$script:DocsAnalyzerRow` in `DocsAnalyzerRegistry.psm1`
+  (anchor text as committed by 1020 v0.6; see C6 and OQ-5), and nowhere else. The identifiers are distinct from 1022's `python-cli`, `python-http`,
   `python-public-api`, `config-files` and `python-architecture`.
 - Every element carries the analysis method field defined by the 1020 amendment (C1) with value
   `scanner` for the six built-in scanners, and a digest over the declaration's source lines, not the
   whole file (D5; C2). Imported elements follow OQ-1.
 - A construct the scanner cannot classify is reported as a non-blocking diagnostic with a fixed code
   and is never guessed. The set of such codes is the scanner precision limit (`## Scanner Precision
-  Limit`); the coverage ledger records it as a `deferred` entry with an owner (C9, OQ-2).
+  Limit`); each such diagnostic carries the `docs.precision-limit` marker with its `element_kind`,
+  and the coverage ledger (1023) records it as a `deferred` entry with an owner (C5, C9, OQ-2).
 - An input above the size bound, an undecodable input, a lexical error or a token, depth or key
   bound overflow yields a blocking diagnostic and no element from that file; other files still
   produce elements.
@@ -152,10 +160,11 @@ no module of this feature imports `.claude/lib/discovery-validation/` directly.
 | `Join-DocsRouteTemplate` | `-Prefix <string> -Template <string>` | Joined template beginning with `/`, single `/` between segments, case kept |
 | `New-DocsScannerDiagnosticSet` | none | Empty ordinal aggregation map |
 | `Add-DocsScannerDiagnostic` | `-Set <hashtable> -Code <string> -Path <string> -Line <int> [-Blocking <bool>]` | Updates count and first line for `(code, path)` |
-| `ConvertTo-DocsScannerDiagnostic` | `-Set <hashtable> -AnalyzerId <string>` | `New-DocsDiagnostic` records sorted by `id` |
+| `ConvertTo-DocsScannerDiagnostic` | `-Set <hashtable> -AnalyzerId <string>` | Diagnostic records sorted by `id`: a `(AnalyzerId, code)` pair that is a row of `Get-DocsScannerPrecisionLimit` is built with `New-DocsScannerPrecisionLimitDiagnostic` and that row's `element_kind`; every other code is built with `New-DocsDiagnostic` and carries no `docs.precision-limit` key |
+| `New-DocsScannerPrecisionLimitDiagnostic` | `-AnalyzerId <string> -Code <string> -Path <string> -Message <string> -ElementKind <string>` | The record of `New-DocsDiagnostic -Code -Path -Message -AnalyzerId -Severity warning` with `extensions['docs.precision-limit']` set to the ordered map `@{ element_kind = <ElementKind> }` (the `extensions` member is created as an empty ordered map first when the record has none or it is `$null`; any other `extensions` key is kept). Throws for a `$null` or empty `-Path` and for an `-ElementKind` that is not a docs element kind. 1020's `New-DocsDiagnostic` has no extensions parameter, so the marker is set on the returned record; no 1020 file is edited (C5) |
 | `Get-DocsScannerDeclarationText` | `-Text <string> -LineRange <int[]>` | Normalized declaration text per `### Declaration-lines span and digest`; created and exported only when 1020 does not provide `ConvertTo-DocsDeclarationText` (C2; 1020 v0.4 provides it) |
 | `Get-DocsDeclarationSha256` | `-Text <string> -LineRange <int[]>` | Lowercase hex digest; created and exported only when 1020 does not provide a function of the same contract (C2; 1020 v0.4 provides it in `DocsSurface.psm1`) |
-| `Get-DocsScannerPrecisionLimit` | none | One ordered row per `(analyzer_id, code)` of `## Scanner Precision Limit`: `analyzer_id`, `code`, `construct`, `consequence` |
+| `Get-DocsScannerPrecisionLimit` | none | One ordered row per `(analyzer_id, code)` of `## Scanner Precision Limit`: `analyzer_id`, `code`, `element_kind`, `construct`, `consequence` |
 
 ### `DocsTypeScriptTokens.psm1` (pure)
 
@@ -227,8 +236,9 @@ Common analyzer rules:
 
 ### Registry rows (edit of `DocsAnalyzerRegistry.psm1`)
 
-One row per line, inserted directly under the `# --- 900004: TypeScript and .NET analyzers ---`
-anchor, in the 1020 v0.4 row form `[pscustomobject]@{ Id; Version; AnalysisMethod; ElementKinds;
+One row per line, inserted directly under the `# --- 1033: TypeScript and .NET analyzers ---`
+anchor of the scanner table `$script:DocsAnalyzerRow` (1020 v0.6; any `# --- 900NNN:` anchor is
+rejected), in the 1020 row form `[pscustomobject]@{ Id; Version; AnalysisMethod; ElementKinds;
 Module; Function }` with `Version = '1.0.0'`, `AnalysisMethod = 'scanner'` (the field name and value
 as committed by 1020; C6) and `Module = (Join-Path -Path $PSScriptRoot -ChildPath '<leaf>')`.
 Registry uniqueness is on (`Id`, `AnalysisMethod`), and `Invoke-DocsAnalyzer` rejects output whose
@@ -374,45 +384,81 @@ non-blocking `csharp-conditional-compilation`.
 ## Scanner Precision Limit
 
 This section is normative. Each row is a construct class that the scanner reports instead of
-classifying. Every code is a lowercase identifier, emitted as a non-blocking `warning` at most once
-per `(analyzer_id, code, path)`, with the occurrence count and first line in the message.
-`Get-DocsScannerPrecisionLimit` returns exactly these rows. The coverage ledger records this
-precision limit as a `deferred` entry with an owner; the ledger representation is decided by 1023
-(C9, OQ-2). Closing a row is the purpose of the later, optional native TypeScript or C# analyzer.
+classifying. Every code is a lowercase identifier, emitted at most once per
+`(analyzer_id, code, path)`, with the occurrence count and first line in the message.
+`Get-DocsScannerPrecisionLimit` returns exactly these rows.
 
-| Analyzer id | Diagnostic code | Construct | Why it is not classified | Consequence |
-|---|---|---|---|---|
-| `typescript-cli` | `cli-dynamic-registration` | Non-literal or template-with-substitution command or option names, registration in a loop body, spread arguments, computed object keys | The name exists only at run time; a lexical scanner cannot evaluate expressions | No element |
-| `typescript-cli` | `cli-unbound-registration` | `.addCommand` or `.command` on a receiver that is not tracked in the file | Receiver identity needs data-flow or cross-module type information | No element |
-| `typescript-cli` | `cli-command-module-unresolved` | yargs `.command(require(...))`, `.command(importedModule)`, `.commandDir(...)` | The command definition lives in another module or directory loaded at run time | No element |
-| `typescript-http` | `http-dynamic-route` | Regex or non-literal path, non-literal method or url | The template exists only at run time | No element |
-| `typescript-http` | `http-prefix-dynamic` | Mount or plugin prefix that is not a literal | The prefix exists only at run time | Element with a `<dynamic>` segment and `prefix_resolved: false` |
-| `typescript-http` | `http-mount-unresolved` | `use` with an untracked router, plugin from a package import | Resolution needs module resolution outside the captured relative set | Routes of the mounted router keep their own template (`mounted: false`) or are absent when the router is not captured |
-| `typescript-exports` | `ts-reexport-unresolved` | `export *` from a package, an unresolvable relative specifier, a cycle, depth above 16 | Needs package resolution or unbounded expansion | Re-exported names absent; other exports kept |
-| `typescript-exports` | `ts-export-pattern-unsupported` | Exported destructuring with defaults, rest or nested patterns | Binding names need pattern evaluation beyond simple identifiers | No element for the pattern |
-| `typescript-exports` | `ts-export-assignment` | `export =` | The exported shape is the assigned expression | Element `default` with `export_form: assignment` |
-| `typescript-exports` | `ts-ambient-module` | `declare module 'x' { ... }`, `declare global` | Ambient declarations describe another module's surface | No element |
-| `typescript-exports` | `ts-commonjs-export` | `module.exports`, `exports.x` in a TypeScript file | Run-time assignment, not a declaration | No element |
-| `dotnet-http` | `http-dynamic-route` | `[Route(Constants.X)]`, `nameof(...)`, interpolated templates with holes, non-literal minimal-API template or method list | Constant folding and interpolation need semantic analysis | No element |
-| `dotnet-http` | `http-prefix-dynamic` | `MapGroup` with a non-literal prefix | The prefix exists only at run time | Element with a `<dynamic>` segment and `prefix_resolved: false` |
-| `dotnet-http` | `http-receiver-unresolved` | `Map*` on a method parameter (`IEndpointRouteBuilder` or `RouteGroupBuilder` extension method) | The caller's group prefix needs call-graph analysis | Element without prefix, `prefix_resolved: false` |
-| `dotnet-http` | `http-route-token-unresolved` | `[area]` without a literal `[Area]` | The token value is not in the file | No element |
-| `dotnet-http` | `http-endpoint-kind-unsupported` | `MapHub<T>`, `MapGrpcService<T>`, `MapHealthChecks`, `MapFallback`, `MapRazorPages` | The endpoint set is generated by the framework | No element |
-| `dotnet-http` | `dotnet-route-inherited-unresolved` | Verb attribute in a class with no route whose base is not `Controller` or `ControllerBase` | The prefix is inherited from a base class in another file | No element |
-| `dotnet-http` | `dotnet-conventional-routing-unresolved` | `MapControllerRoute`, `MapDefaultControllerRoute` | Conventional routes are computed from controller discovery at run time | No element |
-| `dotnet-http` | `csharp-conditional-compilation` | File containing `#if` | Branches are not evaluated; both are scanned | Elements from both branches; duplicates reported as `duplicate-declaration` |
-| `dotnet-public-api` | `csharp-declaration-unrecognized` | Declaration the scanner cannot delimit | Unsupported syntax or unbalanced braces | No element for that declaration |
-| `dotnet-public-api` | `csharp-conditional-compilation` | File containing `#if` | Branches are not evaluated; both are scanned | Elements from both branches; duplicates reported as `duplicate-declaration` |
-| `extension-import` | `extension-finding-skipped` | A finding of a kind that is not a docs element kind, without `source.symbol` or `source.line_range`, or a `cli-option` without `parent_symbol`; components and relationships | No docs element can be built without a kind, declaration and line range | Finding not imported; one diagnostic per manifest with counts per reason |
+Emission contract (1023 `### #1022 and #1033 (PowerShell scanners) for precision-limit
+diagnostics`, owner decision P3; C5). Every diagnostic whose `(analyzer_id, code)` is a row of the
+table below is built by `New-DocsScannerPrecisionLimitDiagnostic` and:
+
+- has `analyzer_id` equal to the registered scanner identifier (registry row `AnalysisMethod`
+  `scanner`) and `path` equal to the relative path of the input file, never `$null`;
+- carries `extensions` containing the key `docs.precision-limit` with the value
+  `{"element_kind": "<element kind>"}`, where the kind is the row's `Element kind` column: the
+  element kind the scanner would have emitted had it classified the construct;
+- has severity `warning` (blocking `false`). A precision-limit diagnostic reports a construct the
+  scanner left unclassified, which the ledger must record as a `deferred` entry, so it uses the
+  non-blocking severity above `information`, which 1020 reserves for non-blocking notices; both are
+  permitted by 1020's `New-DocsDiagnostic` contract.
+
+Diagnostics for every other condition, including oversize and undecodable inputs and every code in
+the list of codes that are not precision limits below, carry no `docs.precision-limit` key.
+
+Ledger representation (C9, OQ-2, resolved by 1023 `### Scanner precision limits (D3)`): 1023 reads
+only marked diagnostics and records one `deferred` ledger entry per `(analyzer_id, code, path)`,
+keyed from the marked diagnostic: its element id is `Get-DocsElementId` over the marker's
+`element_kind`, the diagnostic `path` and the diagnostic `id` as the declaration, and the entry's
+`kind` is the marker's `element_kind`. Because the diagnostic `id` is derived from
+`(analyzer_id, code, path)`, one entry covers every occurrence of that code in that file. Closing a
+row is the purpose of the later, optional native TypeScript or C# analyzer.
+
+Element-kind rule: each row has exactly one element kind, fixed per `(analyzer_id, code)`, so the
+marker and the ledger entry are deterministic. For an analyzer with one element kind, that kind is
+used. For `typescript-cli`, `cli-dynamic-registration` covers both command and option names and is
+assigned `cli-command`, because an option is declared on a command and the per-file entry stands
+for the unclassified command surface of that file; the other two `typescript-cli` rows concern
+command definitions only.
+
+| Analyzer id | Diagnostic code | Element kind | Construct | Why it is not classified | Consequence |
+|---|---|---|---|---|---|
+| `typescript-cli` | `cli-dynamic-registration` | `cli-command` | Non-literal or template-with-substitution command or option names, registration in a loop body, spread arguments, computed object keys | The name exists only at run time; a lexical scanner cannot evaluate expressions | No element |
+| `typescript-cli` | `cli-unbound-registration` | `cli-command` | `.addCommand` or `.command` on a receiver that is not tracked in the file | Receiver identity needs data-flow or cross-module type information | No element |
+| `typescript-cli` | `cli-command-module-unresolved` | `cli-command` | yargs `.command(require(...))`, `.command(importedModule)`, `.commandDir(...)` | The command definition lives in another module or directory loaded at run time | No element |
+| `typescript-http` | `http-dynamic-route` | `http-route` | Regex or non-literal path, non-literal method or url | The template exists only at run time | No element |
+| `typescript-http` | `http-prefix-dynamic` | `http-route` | Mount or plugin prefix that is not a literal | The prefix exists only at run time | Element with a `<dynamic>` segment and `prefix_resolved: false` |
+| `typescript-http` | `http-mount-unresolved` | `http-route` | `use` with an untracked router, plugin from a package import | Resolution needs module resolution outside the captured relative set | Routes of the mounted router keep their own template (`mounted: false`) or are absent when the router is not captured |
+| `typescript-exports` | `ts-reexport-unresolved` | `public-symbol` | `export *` from a package, an unresolvable relative specifier, a cycle, depth above 16 | Needs package resolution or unbounded expansion | Re-exported names absent; other exports kept |
+| `typescript-exports` | `ts-export-pattern-unsupported` | `public-symbol` | Exported destructuring with defaults, rest or nested patterns | Binding names need pattern evaluation beyond simple identifiers | No element for the pattern |
+| `typescript-exports` | `ts-export-assignment` | `public-symbol` | `export =` | The exported shape is the assigned expression | Element `default` with `export_form: assignment` |
+| `typescript-exports` | `ts-ambient-module` | `public-symbol` | `declare module 'x' { ... }`, `declare global` | Ambient declarations describe another module's surface | No element |
+| `typescript-exports` | `ts-commonjs-export` | `public-symbol` | `module.exports`, `exports.x` in a TypeScript file | Run-time assignment, not a declaration | No element |
+| `dotnet-http` | `http-dynamic-route` | `http-route` | `[Route(Constants.X)]`, `nameof(...)`, interpolated templates with holes, non-literal minimal-API template or method list | Constant folding and interpolation need semantic analysis | No element |
+| `dotnet-http` | `http-prefix-dynamic` | `http-route` | `MapGroup` with a non-literal prefix | The prefix exists only at run time | Element with a `<dynamic>` segment and `prefix_resolved: false` |
+| `dotnet-http` | `http-receiver-unresolved` | `http-route` | `Map*` on a method parameter (`IEndpointRouteBuilder` or `RouteGroupBuilder` extension method) | The caller's group prefix needs call-graph analysis | Element without prefix, `prefix_resolved: false` |
+| `dotnet-http` | `http-route-token-unresolved` | `http-route` | `[area]` without a literal `[Area]` | The token value is not in the file | No element |
+| `dotnet-http` | `http-endpoint-kind-unsupported` | `http-route` | `MapHub<T>`, `MapGrpcService<T>`, `MapHealthChecks`, `MapFallback`, `MapRazorPages` | The endpoint set is generated by the framework | No element |
+| `dotnet-http` | `dotnet-route-inherited-unresolved` | `http-route` | Verb attribute in a class with no route whose base is not `Controller` or `ControllerBase` | The prefix is inherited from a base class in another file | No element |
+| `dotnet-http` | `dotnet-conventional-routing-unresolved` | `http-route` | `MapControllerRoute`, `MapDefaultControllerRoute` | Conventional routes are computed from controller discovery at run time | No element |
+| `dotnet-http` | `csharp-conditional-compilation` | `http-route` | File containing `#if` | Branches are not evaluated; both are scanned | Elements from both branches; duplicates reported as `duplicate-declaration` |
+| `dotnet-public-api` | `csharp-declaration-unrecognized` | `public-symbol` | Declaration the scanner cannot delimit | Unsupported syntax or unbalanced braces | No element for that declaration |
+| `dotnet-public-api` | `csharp-conditional-compilation` | `public-symbol` | File containing `#if` | Branches are not evaluated; both are scanned | Elements from both branches; duplicates reported as `duplicate-declaration` |
 
 Limits without a diagnostic code: JavaScript files are not selected (OQ-3); a UTF-16 source is
 undecodable under strict UTF-8 and yields blocking `input-undecodable`; `dotnet-config` has no
 precision-limit row because it parses the complete JSON document.
 
-Codes that are not precision limits (blocking unless stated): `input-over-bound`,
-`input-undecodable`, `ts-lexical-invalid`, `csharp-lexical-invalid`, `token-limit`, `json-invalid`,
-`input-key-limit`, the extension rejection codes below, and the non-blocking `declaration-invalid`,
-`duplicate-declaration`, `extension-repository-unverified` and `extension-revision-unverified`.
+`extension-finding-skipped` is not a precision limit (P3). The skipped finding was produced by an
+external adapter, not by the docs scanner, and its kind is by definition either not a docs element
+kind or lacks the declaration or line range a docs element needs, so no deterministic
+`element_kind` exists. It stays a non-blocking diagnostic (`warning`) without the marker and is
+listed below.
+
+Codes that are not precision limits (blocking unless stated; none carries the
+`docs.precision-limit` key): `input-over-bound`, `input-undecodable`, `ts-lexical-invalid`,
+`csharp-lexical-invalid`, `token-limit`, `json-invalid`, `input-key-limit`, the extension rejection
+codes below, and the non-blocking `declaration-invalid`, `duplicate-declaration`,
+`extension-finding-skipped`, `extension-repository-unverified` and `extension-revision-unverified`.
 
 ## Extension-Result Manifest Import
 
@@ -505,12 +551,11 @@ Merge as inert data (step 8, after every check passes):
   import of the analyzer does not re-enter the registry module in a way that breaks either module.
 - Shared append-only edit points with 1022 and 900011: `DocsAnalyzerRegistry.psm1`, its mirror, and
   `core.json`; conflicts are resolved in this feature's remediation loop.
-- Existing tests changed by this feature: 1020's `DocsAnalyzerRegistry.Tests.ps1` asserts that the
-  committed registry has no rows, which fails once any row is appended. Per the epic
-  (`### Analyzer decisions from the first preparation of 1022`: contract tests assert membership,
-  not set equality), this feature updates it to assert anchor presence and that
-  `Test-DocsAnalyzerRegistration` returns no finding (disposition: updated), unless 1020's amendment
-  already made that change (C6).
+- Existing tests changed by this feature: none expected. 1020 v0.6 (owner decision P1) made its
+  `DocsAnalyzerRegistry.Tests.ps1` a membership suite with no row-count assertion, so this feature
+  does not edit it. Only if the suite as merged still contains a row-count or empty-registry
+  assertion does this feature replace that assertion with anchor presence plus membership
+  (disposition: updated, recorded in the plan) (C6).
 - Test isolation: suites remove every imported `Docs*` and `DiscoveryEncoding` module in `AfterAll`.
 - CI-only behavior: `.gitattributes` converts committed CRLF to LF, so CRLF and BOM fixtures are
   built in code.
@@ -537,12 +582,12 @@ and documentation rows). "Avoid new Python" applies to every row.
 | `.claude/lib/docs/DocsAnalyzerDotnetConfig.psm1` | pushed-down helper/lib | PowerShell | R1 |
 | `.claude/lib/docs/DocsAnalyzerDotnetApi.psm1` | pushed-down helper/lib | PowerShell | R1 |
 | `.claude/lib/docs/DocsAnalyzerExtensionImport.psm1` | pushed-down helper/lib | PowerShell | R1 |
-| `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (edit: rows under the 900004 anchor) | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (edit: rows under the 1033 anchor) | pushed-down helper/lib | PowerShell | R1 |
 | `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/<each file above>` (create, or edit for the registry mirror) | pushed-down helper/lib (mirror) | PowerShell | R1 |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit: append each new `.claude/lib/docs/` file) | schema/config/data | JSON | D |
 | `tests/scripts/claude-lib/docs/DocsScannerCommon.Tests.ps1`, `DocsTypeScriptTokens.Tests.ps1`, `DocsTypeScriptJsx.Tests.ps1` (conditional), `DocsCSharpTokens.Tests.ps1`, `DocsAnalyzerTypeScriptCli.Tests.ps1`, `DocsAnalyzerTypeScriptHttp.Tests.ps1`, `DocsAnalyzerTypeScriptExports.Tests.ps1`, `DocsAnalyzerDotnetHttp.Tests.ps1`, `DocsAnalyzerDotnetConfig.Tests.ps1`, `DocsAnalyzerDotnetApi.Tests.ps1`, `DocsAnalyzerExtensionImport.Tests.ps1`, `DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1`, `DocsScannerContract.Tests.ps1` | test | PowerShell (Pester) | D |
 | `tests/scripts/claude-lib/docs/Docs.ScannerTestSupport.psm1` (in-memory captured-input and manifest builders) | test | PowerShell (Pester support) | D |
-| `tests/scripts/claude-lib/docs/DocsAnalyzerRegistry.Tests.ps1` (edit: empty-registry assertion becomes anchor presence plus membership; only if 1020's amendment has not made the change) | test | PowerShell (Pester) | D |
+| `tests/scripts/claude-lib/docs/DocsAnalyzerRegistry.Tests.ps1` (conditional edit: only if the merged suite still contains a row-count or empty-registry assertion, which 1020 v0.6 removes; that assertion becomes anchor presence plus membership) | test | PowerShell (Pester) | D |
 | `docs/features/active/2026-10-30-docs-surface-analyzers-typescript-dotnet-1033/**` (spec, user story, plan, research, evidence) | documentation | Markdown | D |
 
 No MCP tool, extension command, hook, skill, agent, schema file, Python file or TypeScript file is
@@ -563,11 +608,11 @@ feature's scope.
 | C2 | Declaration-lines digest (D5): storage field and byte rule | `source_sha256` is redefined as the digest over the `line_range` lines (file digest stays in snapshot `inputs[].sha256`); `line_range` non-null for every scanner element; byte rule as in `### Declaration-lines span and digest`; the functions live in 1020 `DocsSurface.psm1` (1020 v0.4: `ConvertTo-DocsDeclarationText` and `Get-DocsDeclarationSha256 -Text -LineRange`), else `DocsScannerCommon.psm1` creates `Get-DocsScannerDeclarationText` and `Get-DocsDeclarationSha256` with the same contract; the digest is set only through `New-DocsSurfaceElement -SourceText` |
 | C3 | Shape of `-Selection` | The profile `surface_selection` hashtable plus `repository_id`, `revision` and `registered_analyzer_ids`, requested from the 1022 inventory through a coordinator item (plan `## Open Questions / Notes`); 1022 step 7 defines no key today, so the plan records each key as PRESENT or ABSENT and every key is optional on this feature's side (`## Inputs / Outputs`) |
 | C4 | `New-DocsCapturedInput`: `-MaxBytes` default, BOM handling, codes and `analyzer_id` for oversize and undecodable inputs | Default 1048576 supplied by the inventory; one leading U+FEFF stripped before decoding; codes `input-over-bound` and `input-undecodable`; analyzers re-emit under their own identifier |
-| C5 | `New-DocsDiagnostic` produces only `error` (blocking) or `warning`, with no extensions parameter | Precision-limit diagnostics are non-blocking `warning`; identification by `(analyzer_id, code)`; no extension marker |
-| C6 | Registry: anchor literal (`900004` placeholder versus issue number 1033); the row method field (1020 v0.4: `AnalysisMethod`, value `scanner`); 1020's "registry has no rows" criterion; the `DocsAnalyzer*.psm1` leaf rule | Keep the anchor text as committed by 1020; every row carries `AnalysisMethod = 'scanner'` under the field name 1020 commits; update `DocsAnalyzerRegistry.Tests.ps1` to anchor presence plus membership if 1020 has not; use `DocsAnalyzerExtensionImport.psm1` |
+| C5 | Precision-limit marker: 1020 v0.6 `New-DocsDiagnostic` takes `-Severity error\|warning\|information` and has no extensions parameter; 1023 requires the `docs.precision-limit` marker | Resolved in favor of 1023 (owner decision P3): every precision-limit diagnostic carries `extensions` with the key `docs.precision-limit` and value `{"element_kind": "<element kind>"}` (the row's `Element kind` in `## Scanner Precision Limit`), `path` never `$null`, severity `warning` (blocking `false`); `New-DocsScannerPrecisionLimitDiagnostic` in `DocsScannerCommon.psm1` builds the record with `New-DocsDiagnostic` and sets the marker on its `extensions` member, so no 1020 file is edited; diagnostics for other conditions carry no such key |
+| C6 | Registry: anchor literal; the row method field (1020: `AnalysisMethod`, value `scanner`); 1020's registry suite; the `DocsAnalyzer*.psm1` leaf rule | Resolved by 1020 v0.6 (owner decision P1): the anchor is `# --- 1033: TypeScript and .NET analyzers ---` in `$script:DocsAnalyzerRow`, and any `# --- 900NNN:` anchor is rejected; every row carries `AnalysisMethod = 'scanner'`; registry suites assert membership only (anchor and scanner table exist, rows found by `Id` and `AnalysisMethod` in `Get-DocsAnalyzerRegistration`), never a row count or exclusivity count of the committed table; 1020's suite is edited only if it still contains a row-count assertion; use `DocsAnalyzerExtensionImport.psm1` |
 | C7 | `diagnostic.code` grammar in docs common (1020 lists `code` without a type) | Discovery identifier grammar; this feature's codes use lowercase words joined by `-` |
 | C8 | Inventory merge precedence for an imported element colliding with a built-in element (1022 `DocsInventory.psm1`) | Built-in wins; imported element dropped with a non-blocking diagnostic |
-| C9 | Ledger representation of the scanner precision limit as `deferred` with an owner (1023, possibly the 1020 ledger schema) | Decided by 1023; this feature guarantees stable codes, `## Scanner Precision Limit` and `Get-DocsScannerPrecisionLimit` |
+| C9 | Ledger representation of the scanner precision limit as `deferred` with an owner (1023) | Resolved by 1023 `### Scanner precision limits (D3)`: one `deferred` entry per `(analyzer_id, code, path)`, keyed from the marked diagnostic (element id over the marker's `element_kind`, the diagnostic `path` and the diagnostic `id`); this feature guarantees stable codes, the marker (C5), `## Scanner Precision Limit` and `Get-DocsScannerPrecisionLimit` |
 | C10 | Cross-child consistency with the re-prepared 1022: config key quoting and `[]` array segments, `<dynamic>` prefix rendering, shared codes `declaration-invalid`, `duplicate-declaration`, `input-over-bound`, `input-undecodable` | The strings in this specification; agreed in the epic `### Analyzer decisions` section |
 
 The JSON envelope schema of D5 does not affect this feature, which adds no subcommand.
@@ -583,10 +628,16 @@ The JSON envelope schema of D5 does not affect this feature, which adds no subco
   Codes are stable: changing, adding or removing one increments the analyzer's registration
   `Version`. The shared codes `input-over-bound`, `input-undecodable`, `declaration-invalid` and
   `duplicate-declaration` keep one meaning across analyzers.
-- Precision-limit keys are `(analyzer_id, code)` pairs. `Get-DocsScannerPrecisionLimit` is the
-  machine-readable source and `## Scanner Precision Limit` is the normative text; 1023 keys its
-  `deferred` record on these pairs (C9). Precision-limit diagnostics are non-blocking and emitted at
-  most once per `(analyzer_id, code, path)`.
+- Precision-limit rows are `(analyzer_id, code)` pairs, each with one fixed `element_kind`.
+  `Get-DocsScannerPrecisionLimit` is the machine-readable source and `## Scanner Precision Limit` is
+  the normative text. Precision-limit diagnostics are non-blocking `warning` diagnostics, emitted at
+  most once per `(analyzer_id, code, path)` with a non-null `path`, and carry `extensions` with the
+  key `docs.precision-limit` and value `{"element_kind": "<element kind>"}` (C5, owner decision
+  P3); no other diagnostic carries that key. 1023 records one `deferred` entry per
+  `(analyzer_id, code, path)` keyed from the marked diagnostic (C9). A later native TypeScript or C#
+  analyzer emits elements, not marked diagnostics, for the constructs it classifies.
+- Registry rows of this feature live under `# --- 1033: TypeScript and .NET analyzers ---`; a suite
+  asserts membership only, never a row count of the committed registry tables.
 - Declaration forms per kind and the declaration-lines byte rule in `## Recognition Rules` apply to
   every TypeScript and .NET analyzer, scanner or native.
 - Extension-result manifests are imported only through `extension-import`: every declared digest is
@@ -599,8 +650,9 @@ The JSON envelope schema of D5 does not affect this feature, which adds no subco
 
 ## Owner Questions
 
-None of these is decided. Each provisional default is used by the plan until the owner answers; an
-answer may change the affected criteria through a specification revision.
+OQ-2 and OQ-5 are resolved (owner decisions P3 and P1). The others are not decided; each
+provisional default is used by the plan until the owner answers, and an answer may change the
+affected criteria through a specification revision.
 
 1. **OQ-1 - Analysis method of imported elements.** D3 allows `native` or `scanner`, but an element
    imported from an extension-result manifest was produced by neither the docs scanner nor a docs
@@ -612,8 +664,10 @@ answer may change the affected criteria through a specification revision.
    identifier, and an unclassified construct has no element. Should 1023 record the precision limit
    as a ledger section keyed by `(analyzer_id, diagnostic code)`, should the ledger schema accept a
    diagnostic identifier, or should the precision limit be recorded only in documentation with no
-   ledger entry? Provisional default: a ledger section keyed by `(analyzer_id, code)`, decided by
-   1023 (C9).
+   ledger entry? Status: resolved by 1023 and owner decision P3. 1023 `### Scanner precision limits
+   (D3)` records one `deferred` entry per `(analyzer_id, code, path)` in the existing ledger entry
+   shape, keyed from the diagnostic marked with `docs.precision-limit` and its `element_kind` (C5,
+   C9).
 3. **OQ-3 - JavaScript sources.** Express, Fastify, Commander and yargs code is often plain
    JavaScript (`*.js`, `*.mjs`, `*.cjs`, `*.jsx`), which the same tokenizer can read. Should
    JavaScript inputs be selected in this feature? Provisional default: out of scope, listed as a
@@ -628,12 +682,11 @@ answer may change the affected criteria through a specification revision.
    over the raw captured text; this feature hashes the raw key line and re-raises the question to
    the coordinator as a 1020 contract question (a masked-text rule would have to live in 1020's
    `ConvertTo-DocsDeclarationText`). Provisional default in effect: the raw line.
-5. **OQ-5 - Anchor numbering.** 1020 commits the registry anchor `# --- 900004: TypeScript and .NET
-   analyzers ---` with a manifest placeholder, while this feature is issue #1033. Should 1020's
-   amendment renumber anchors to issue numbers, or do the placeholders stay as committed text?
-   1020 v0.4 `## Decisions Later Children Must Honor` states that a child whose placeholder number
-   changed on promotion "edits only its own anchor comment, in the same change that inserts its
-   rows". Provisional default: the placeholder text stays as committed (C6) until the owner answers.
+5. **OQ-5 - Anchor numbering.** Should registry anchors carry manifest placeholder numbers or
+   issue numbers? Status: resolved by 1020 v0.6 (owner decision P1): every anchor carries the real
+   issue number, any `# --- 900NNN:` anchor is rejected, and this feature's anchor is
+   `# --- 1033: TypeScript and .NET analyzers ---` as committed by 1020 (C6). The earlier default
+   of keeping the placeholder text is superseded.
 
 ## Non-Goals
 
@@ -654,7 +707,8 @@ answer may change the affected criteria through a specification revision.
 
 - Phase order (recommended): confirm the merged 1020 amendment and re-prepared 1022 contracts and
   record C1-C10 outcomes; `DocsScannerCommon.psm1`; the two tokenizers; the six scanners; the
-  importer; registry rows and the registry-test update; mirrors and `core.json` entries in the same
+  importer; registry rows and the registry membership suite (plus the conditional 1020 suite edit,
+  C6); mirrors and `core.json` entries in the same
   task as each module; cross-cutting contract suite; coverage, isolation and contract-test evidence.
 - Fixtures are single-quoted here-strings inside the suites, converted to captured inputs with 1020's
   `New-DocsCapturedInput` over in-memory bytes; CRLF, BOM and oversize variants are built in code.
@@ -673,6 +727,8 @@ asserted.
 
 All Pester suites named below live under `tests/scripts/claude-lib/docs/` and run in CI in the
 required check `poshqc / PowerShell QC` (Windows shards with coverage). Fixtures are in memory.
+No test starts a process, waits on a real timer or resolves an executable on PATH; every input is
+built in memory.
 
 - [ ] `DocsTypeScriptTokens.Tests.ps1` and `DocsCSharpTokens.Tests.ps1` assert token kinds, decoded `Value`, `Dynamic`, `Line` and `Depth` for each lexical state (escapes, template substitution nesting, regex versus division, JSX text with an apostrophe, verbatim, interpolated and raw strings, directive lines, BOM and hashbang), and assert that a lexical error and a token or depth overflow each yield one blocking diagnostic (`ts-lexical-invalid`, `csharp-lexical-invalid`, `token-limit`) (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsAnalyzerTypeScriptCli.Tests.ps1`: in-memory Commander and yargs fixtures yield the expected `cli-command` and `cli-option` elements, asserting declaration (for example `tool serve` and `tool serve --port`), `parent_id`, `name`, properties (`short`, `required`, `positional`, `name_source`) and `line_range`, including multi-line chained calls and yargs builder functions (CI: `poshqc / PowerShell QC`).
@@ -681,15 +737,15 @@ required check `poshqc / PowerShell QC` (Windows shards with coverage). Fixtures
 - [ ] `DocsAnalyzerDotnetHttp.Tests.ps1`: in-memory C# fixtures yield the expected `http-route` elements for attribute routing (class prefix, `[controller]`, `[action]`, literal `[area]`, `/` and `~/` overrides, multiple verbs, `AcceptVerbs`) and minimal APIs (`MapGet` through `MapPatch`, `MapMethods`, `Map` as `ANY`, nested `MapGroup` prefixes) (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsAnalyzerDotnetConfig.Tests.ps1`: an in-memory `appsettings.json` and `appsettings.Development.json` with comments and trailing commas yield one `config-key` per member path with the quoted-segment and `[]` declaration rule, `value_type`, `configuration_path` and `environment`; every configuration value in the fixture is a distinctive string that occurs nowhere in the canonical JSON of the analyzer output (keys only, no values) (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsAnalyzerDotnetApi.Tests.ps1`: in-memory C# fixtures yield the expected `public-symbol` elements for public types (file-scoped and block namespaces, nested types, generics, a `partial` type split across two in-memory paths) and members (overloaded methods with distinct declarations, constructors, indexers, operators, enum members, positional record parameters), and yield no element for `internal`, `private`, `private protected`, `file` and explicit interface implementations (CI: `poshqc / PowerShell QC`).
-- [ ] `DocsAnalyzerExtensionImport.Tests.ps1`: a valid manifest built in memory (its `manifest_sha256` computed in the test with `ConvertTo-DocsCanonicalJson` and `Get-DocsSha256Hex`) is merged as inert data: each mappable finding becomes an element with `analyzer_id` `extension-import`, a recomputed `element_id`, a declaration-lines digest computed from the captured text, `adapter_id`, `adapter_version`, `classification`, `confidence` and `finding_id` copied unchanged, and only `value_type` copied for `config-key`; unmappable findings yield one non-blocking `extension-finding-skipped` (CI: `poshqc / PowerShell QC`).
+- [ ] `DocsAnalyzerExtensionImport.Tests.ps1`: a valid manifest built in memory (its `manifest_sha256` computed in the test with `ConvertTo-DocsCanonicalJson` and `Get-DocsSha256Hex`) is merged as inert data: each mappable finding becomes an element with `analyzer_id` `extension-import`, a recomputed `element_id`, a declaration-lines digest computed from the captured text, `adapter_id`, `adapter_version`, `classification`, `confidence` and `finding_id` copied unchanged, and only `value_type` copied for `config-key`; unmappable findings yield one non-blocking `extension-finding-skipped` whose `extensions` has no `docs.precision-limit` key (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsAnalyzerExtensionImport.Tests.ps1`: a manifest whose `source_inputs[]` `sha256` does not match the captured input is rejected with exactly one blocking `extension-input-digest-mismatch` diagnostic and contributes no element; one mutation per validation step yields that step's code (`extension-manifest-invalid`, `extension-manifest-digest-mismatch`, `extension-repository-mismatch`, `extension-adapter-invalid`, `extension-input-not-captured`, `extension-result-digest-mismatch`, `extension-result-invalid`, `extension-finding-source-mismatch`) and no element; a valid manifest validated with a `-Selection` that carries neither `repository_id` nor `revision` is accepted with exactly the two non-blocking diagnostics `extension-repository-unverified` and `extension-revision-unverified` (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsScannerContract.Tests.ps1`: for each of the seven analyzers, two runs over identical captured inputs, and runs over input orders shuffled with a seeded `[System.Random]` (seed printed on failure), produce byte-identical canonical JSON of `@{ Elements; Diagnostics }` (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsScannerContract.Tests.ps1`: for each analyzer, a selected captured input with `text` `$null` because it exceeds the 1 MiB bound yields one blocking `input-over-bound` diagnostic under that analyzer's identifier and no element from that path, an undecodable input yields `input-undecodable`, and a lexical error in one file does not remove the elements of another file (CI: `poshqc / PowerShell QC`).
-- [ ] `DocsScannerContract.Tests.ps1`: every `(analyzer_id, code)` row returned by `Get-DocsScannerPrecisionLimit` is emitted by at least one in-memory fixture as a non-blocking diagnostic with the consequence stated in `## Scanner Precision Limit` (no element, or an element with a `<dynamic>` segment and `prefix_resolved: false`), at most once per `(analyzer_id, code, path)`, with a message containing the occurrence count and first line and no fixture source text; every non-blocking code emitted by the fixtures that is not listed under the codes that are not precision limits is a row of the table (CI: `poshqc / PowerShell QC`).
+- [ ] `DocsScannerContract.Tests.ps1`: every `(analyzer_id, code)` row returned by `Get-DocsScannerPrecisionLimit` is emitted by at least one in-memory fixture as a non-blocking `warning` diagnostic with the consequence stated in `## Scanner Precision Limit` (no element, or an element with a `<dynamic>` segment and `prefix_resolved: false`), at most once per `(analyzer_id, code, path)`, with a non-null `path`, with `extensions` containing the key `docs.precision-limit` whose value is exactly `{"element_kind": <the row's element_kind>}`, and with a message containing the occurrence count and first line and no fixture source text; every diagnostic emitted by the fixtures whose code is listed under the codes that are not precision limits (including `input-over-bound`, `input-undecodable` and `extension-finding-skipped`) has no `docs.precision-limit` key; every non-blocking code emitted by the fixtures that is not listed under the codes that are not precision limits is a row of the table (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsScannerContract.Tests.ps1`: every element produced by the six built-in scanners records `analysis_method` `scanner` and a declaration-lines digest with a non-null `line_range`; editing a line outside `line_range` leaves the digest unchanged, editing a line inside changes it, and an LF and a CRLF variant built in code yield equal digests; every element passes `ConvertFrom-DocsSurfaceElement`; and for each of the six built-in scanners, 1020 `Invoke-DocsAnalyzer` with an in-memory registration row (`AnalysisMethod` `scanner`) and the `-ImportModule` seam returns the scanner's elements with no rejection finding (CI: `poshqc / PowerShell QC`).
-- [ ] `DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1`: `Get-DocsAnalyzerRegistration` contains rows with identifiers `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config`, `dotnet-public-api` and `extension-import`, each with `AnalysisMethod` `scanner` and the module leaves and functions of `### Registry rows`; none equals `python-cli`, `python-http`, `python-public-api`, `config-files` or `python-architecture`; `Test-DocsAnalyzerRegistration` returns no finding; and in the registry source text every row with these identifiers lies between the `900004` anchor line and the next anchor line or the closing delimiter, and no other row lies there (CI: `poshqc / PowerShell QC`).
-- [ ] `DocsAnalyzerRegistry.Tests.ps1` (1020's suite) asserts anchor presence and registry validity by membership rather than an empty row set, and passes with the appended rows (CI: `poshqc / PowerShell QC`).
-- [ ] `## Scanner Precision Limit` in this specification lists one row per `(analyzer_id, code)` with the construct and why it is not classified, states that the coverage ledger records it as a `deferred` entry with an owner, and `DocsScannerCommon.Tests.ps1` asserts that `Get-DocsScannerPrecisionLimit` returns rows with exactly the keys `analyzer_id`, `code`, `construct` and `consequence`, ordered by `analyzer_id` then `code`, whose `analyzer_id` values are registered identifiers (CI: `poshqc / PowerShell QC`).
+- [ ] `DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1` asserts membership only: the registry source text contains the anchor line `# --- 1033: TypeScript and .NET analyzers ---` inside the scanner table `$script:DocsAnalyzerRow`, and contains no `# --- 900NNN:` anchor; `Get-DocsAnalyzerRegistration` contains a row found by `Id` and `AnalysisMethod` `scanner` for each of `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config`, `dotnet-public-api` and `extension-import`, with the module leaves and functions of `### Registry rows`; none of these identifiers equals `python-cli`, `python-http`, `python-public-api`, `config-files` or `python-architecture`; `Test-DocsAnalyzerRegistration` returns no finding; and each of these seven rows appears in the source text after the 1033 anchor line and before the next anchor line or the end of the scanner table. The suite asserts no row count and no exclusivity of the committed tables (CI: `poshqc / PowerShell QC`).
+- [ ] `DocsAnalyzerRegistry.Tests.ps1` (1020's suite): 1020 v0.6 already makes it a membership suite, so this feature leaves it unmodified and it passes with the appended rows; only if the merged suite still contains a row-count or empty-registry assertion does this feature replace that assertion with anchor presence plus membership, and the plan records the edit (CI: `poshqc / PowerShell QC`).
+- [ ] `## Scanner Precision Limit` in this specification lists one row per `(analyzer_id, code)` with the element kind, the construct and why it is not classified, states that the coverage ledger records it as a `deferred` entry with an owner, and `DocsScannerCommon.Tests.ps1` asserts that `Get-DocsScannerPrecisionLimit` returns rows with exactly the keys `analyzer_id`, `code`, `element_kind`, `construct` and `consequence`, ordered by `analyzer_id` then `code`, whose `analyzer_id` values are registered identifiers and whose `element_kind` values are docs element kinds listed in that row's registered `ElementKinds`; and that `New-DocsScannerPrecisionLimitDiagnostic` returns a `warning` record with `blocking` `false` whose `extensions['docs.precision-limit']` equals `{"element_kind": <ElementKind>}`, keeps any other `extensions` key, and throws for a `$null` or empty `-Path` and for an `-ElementKind` that is not a docs element kind (CI: `poshqc / PowerShell QC`).
 - [ ] The push-down copy of every new or edited file under `.claude/lib/docs/` is byte-identical to its source and listed exactly once in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: 1020's `tests/scripts/claude-lib/docs/Docs.Manifest.Tests.ps1` passes (CI: `poshqc / PowerShell QC`), and the existing contract tests `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass unmodified (CI: `quality-checks7 / Code Quality & Tests`).
 - [ ] Every new module passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` and 1020's `DocsNeutrality.Tests.ps1` unmodified, and no production file under `.claude/lib/docs/` created by this feature exceeds 500 logical lines (CI: `poshqc / PowerShell QC`).
 - [ ] No Python or TypeScript file is added or modified: `git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`, and the plan carries the artifact classification table of `## Artifact Classification`.
