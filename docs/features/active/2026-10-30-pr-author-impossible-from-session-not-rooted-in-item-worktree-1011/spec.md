@@ -6,6 +6,7 @@
 - **Last Updated:** 2026-10-30
 - **Status:** Draft
 - **Version:** 0.2
+- **Amendment note (2026-10-30):** The last acceptance criterion and the execution-environment brief out-of-scope bullet were amended because sibling #1009 merged brief text that names #1011 as a pending resolver adopter, and the brief's maintenance rule requires the brief to be updated in the same change.
 - **Work Mode:** full-bug (acceptance criteria source: this file only)
 - **Research:** `docs/features/active/2026-10-30-pr-author-impossible-from-session-not-rooted-in-item-worktree-1011/research/research.2026-10-30T12-20.md`
 
@@ -67,7 +68,7 @@ Research findings (summary):
   - Creating or modifying `.claude/lib/worktree-resolution/HookTargetWorktree.psm1` or its pack-manifest entry (owned by #1009).
   - The preimplementation-gate change that permits the receipt write into the item worktree (owned by #1010).
   - Worktree-isolation behavior and checkpoint schemas.
-  - The execution-environment brief and its copies: no fact in the brief changes (research Question 7).
+  - The execution-environment brief and its copies, except the single `## Hook Execution Context` statement about which gates adopt `Resolve-HookTargetWorktree`, which is updated in every copy to record that the PR authoring gate (#1011) has adopted it (see the last acceptance criterion).
 - Explicitly excluded systems, integrations, or datasets: GitHub API behavior of `gh pr create`; the Claude Code permission-rule matcher.
 
 ## Root Cause Analysis
@@ -229,7 +230,7 @@ Seeded from issue:
 - [ ] PowerShell line coverage of `.claude/hooks/enforce-pr-author-command-allowlist.ps1` and `.claude/hooks/enforce-pr-author-skill-helpers.ps1`, read from `artifacts/pester/powershell-coverage.xml`, is at least 85% for each file with no regression on changed lines, recorded under `<FEATURE>/evidence/qa-gates/`.
 - [ ] Invoke-Formatter reports no changes and PSScriptAnalyzer with the repository settings reports zero findings for both edited hook files and all new or edited Pester files.
 - [ ] The touched Pester suites pass in seeded shuffled single-process order under multiple seeds, and the full `tests/scripts` Pester run passes; results recorded under `<FEATURE>/evidence/regression-testing/`.
-- [ ] No file under `.codex/`, `.agents/`, `.github/agents/`, `.claude/lib/worktree-resolution/`, or any pack manifest is modified by this item, and no execution-environment brief copy is modified.
+- [ ] No file under `.codex/`, `.agents/`, `.github/agents/`, `.claude/lib/worktree-resolution/`, or any pack manifest is modified by this item, and the only execution-environment brief change is the `## Hook Execution Context` statement about which gates adopt `Resolve-HookTargetWorktree`, updated to state that the PR authoring gate (#1011) has adopted it, applied byte-identically to every execution-environment brief copy, namely (`.claude/skills/execution-environment/SKILL.md`, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md`), with `.agents/skills/execution-environment/SKILL.md` and `.github/skills/execution-environment/SKILL.md` being the only files under `.agents/` and `.github/` that change.
 
 ## Risks & Mitigations
 
