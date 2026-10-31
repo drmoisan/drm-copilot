@@ -24,21 +24,21 @@ features:
   - issue_num: 1035
     feature_folder: 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035
     depends_on: []
-  - issue_num: null
-    feature_folder: shared-source-generators-skills-rules-mcp-agents
+  - issue_num: 1028
+    feature_folder: 2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028
     depends_on: [1025, 1035]
-  - issue_num: null
+  - issue_num: 1029
     feature_folder: push-down-consolidation-and-ecosystem-packs
-    depends_on: [shared-source-generators-skills-rules-mcp-agents]
-  - issue_num: null
+    depends_on: [1028]
+  - issue_num: 1030
     feature_folder: hook-parity-across-claude-codex-copilot
-    depends_on: [shared-source-generators-skills-rules-mcp-agents]
-  - issue_num: null
+    depends_on: [1028]
+  - issue_num: 1032
     feature_folder: retire-github-skills-and-thin-copilot-layer
-    depends_on: [push-down-consolidation-and-ecosystem-packs, hook-parity-across-claude-codex-copilot]
+    depends_on: [1029, 1030]
   - issue_num: 1016
     feature_folder: dev-docs-root-migration-and-feature-folder-rename
-    depends_on: [1035, retire-github-skills-and-thin-copilot-layer]
+    depends_on: [1035, 1032]
 ---
 
 # Epic: Shared Agent-Harness Layer Across Claude Code, Codex and GitHub Copilot
