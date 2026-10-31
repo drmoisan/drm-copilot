@@ -25,6 +25,15 @@ this operation may disturb. Read that section before applying anything here.
   tracks its `parallel_slug`.
 - `$ARGUMENTS` names exactly one item key — an integer `items[].issue_num`. Item keys are integers
   throughout this surface; there is no string key.
+- The run-existence check is evaluated first. When no checkpoint tracks the run's `parallel_slug`,
+  stop without changing state and emit the rejection signal defined in
+  `## Mutation Rejection Signal (issue #1012)` of `.claude/rules/parallel-orchestration.md`: when
+  the run's slug is known, put the line `parallel_slug: <slug>` before the signal, and end the
+  final output with the literal line `PARALLEL_MUTATION_REJECTED: run_not_started` as its last
+  line, with no formatting and no trailing text.
+- An argument that is not exactly one integer key is rejected only after the run-existence check,
+  while the run's checkpoint exists; that rejection emits no rejection signal and validates against
+  that checkpoint.
 
 ## Re-Derive Durable State Before Applying Anything
 
@@ -54,6 +63,12 @@ Implement this table exactly, one branch per row:
 
 An item already `withdrawn` or `blocked` is not a live removal target and is rejected as an unknown
 item.
+
+On a rejected row, put the line `parallel_slug: <slug>` before the signal and end the final output
+with one literal signal line as its last line, with no formatting and no trailing text, per
+`## Mutation Rejection Signal (issue #1012)`: `PARALLEL_MUTATION_REJECTED: items_in_flight` for an
+`in_flight` item without `--disposition`, and `PARALLEL_MUTATION_REJECTED: unknown_item` for an
+unknown, `withdrawn`, or `blocked` item. The `merged` rejection emits no rejection signal.
 
 ## No Default Disposition
 

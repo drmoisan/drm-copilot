@@ -8,7 +8,6 @@
     "package-lock.json",
     "extensions/drm-copilot/package-lock.json",
     "packages/mcp-server/package-lock.json",
-    "quality-tiers.yml",
     "config/blast-radius.json",
     "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
   ],
@@ -45,7 +44,8 @@
     "default_band": "C1",
     "append_only_paths": [
       "**/CHANGELOG.md",
-      "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+      "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+      "quality-tiers.yml"
     ]
   },
   "write_intent_extraction": true,

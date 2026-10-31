@@ -231,8 +231,9 @@ Describe 'Get-PathTokenKind' {
     Context 'Configured separator-free root surfaces' {
         # Mirrors the Python matrix in
         # tests/scripts/dev_tools/test_blast_radius_extraction.py for Gap 1
-        # (issue #452). The three tokens are the separator-free entries of the
-        # committed shared_surfaces list.
+        # (issue #452). The three tokens are the issue #452 set, supplied inline;
+        # since issue #1006 the committed shared_surfaces list carries two of
+        # them, and quality-tiers.yml is an append-only path there instead.
         BeforeAll {
             $script:RootSurface = @('package-lock.json', 'poetry.lock', 'quality-tiers.yml')
         }

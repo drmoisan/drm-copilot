@@ -74,7 +74,12 @@ COMMITTED_CONFLICT_TOLERANCE: dict[str, object] = {
     "weights": {"same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2},
     "band_durations": {"C1": 1, "C2": 2, "C3": 4, "C4": 8},
     "default_band": "C1",
-    "append_only_paths": ["**/CHANGELOG.md", PACK_MANIFEST_REGISTRY],
+    # quality-tiers.yml is an append-only registry since issue #1006.
+    "append_only_paths": [
+        "**/CHANGELOG.md",
+        PACK_MANIFEST_REGISTRY,
+        "quality-tiers.yml",
+    ],
 }
 
 
@@ -102,6 +107,7 @@ def test_committed_conflict_tolerance_reads_cleanly(label: str, path: Path) -> N
     assert tolerance.append_only_paths == (
         "**/CHANGELOG.md",
         PACK_MANIFEST_REGISTRY,
+        "quality-tiers.yml",
     ), label
 
 

@@ -459,6 +459,7 @@ Export-ModuleMember -Function `
     Test-PlaceholderMarker, `
     Test-MultipleFeatureFolderSpan, `
     Test-FileShapedComponent, `
+    Test-GenericContractToken, `
     Get-PathTokenKind, `
     Get-PathFromLine, `
     Get-PlanPaths

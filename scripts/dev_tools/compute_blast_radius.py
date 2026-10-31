@@ -64,6 +64,7 @@ from scripts.dev_tools._blast_radius_scheduling import (
     pair_cost,
     schedule_conflict_edges,
 )
+from scripts.dev_tools._blast_radius_token_shapes import is_generic_contract_token
 from scripts.dev_tools._blast_radius_validation import (
     RadiusFinding,
     config_mandate_reads,
@@ -357,7 +358,8 @@ def normalize_declared_radius(
 
     Returns:
         BlastRadius: A new radius carrying the surviving paths, contracts
-        re-filtered by the ASCII-letter rule, modules and shared surfaces
+        re-filtered by the ASCII-letter rule and the generic sheet-tab rule of
+        ``is_generic_contract_token`` (issue #1006), modules and shared surfaces
         re-resolved from the surviving paths, and ``source`` and ``computed_at``
         preserved unchanged.
 
@@ -399,10 +401,13 @@ def normalize_declared_radius(
         )
     paths = exclude_mandate_reads(accepted, config_mandate_reads(config))
 
+    # Keep a recorded contract only when it carries an ASCII letter and is not a
+    # default spreadsheet sheet-tab name (issue #1006).
     contracts = tuple(
         identifier
         for identifier in radius.contracts
         if CONTRACT_LETTER_RE.search(identifier) is not None
+        and not is_generic_contract_token(identifier)
     )
 
     return BlastRadius(

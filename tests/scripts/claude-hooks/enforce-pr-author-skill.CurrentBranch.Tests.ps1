@@ -16,7 +16,10 @@
     reach the fallback mocks Get-PrAuthorCurrentBranch and Resolve-WorktreeItemTarget inside the
     row; the resolver mock uses a ParameterFilter on $Text to separate the command-text call from
     the 'branch: <name>' re-resolution. No sibling function is mocked at file level, so the CB-16
-    row runs whether or not the sibling file is loaded.
+    row runs whether or not the sibling file is loaded. The shared resolver
+    Resolve-HookTargetWorktree (issue #1011) is mocked at file level to the not-derivable result,
+    which maps to no selection, so the --head rows start no git process and keep exercising the
+    identity path.
 
 .NOTES
     Synthetic roots use the /synthetic-worktrees/... form. No row creates a file, changes the
@@ -42,6 +45,9 @@ BeforeAll {
     . (Join-Path $PSScriptRoot 'WorktreeResolutionFixture.Helpers.ps1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/HookTargetWorktree.psm1')
+    $script:SharedNoSelection = [pscustomobject]@{ WorktreeRoot = $null; Source = 'CommandOperand'; Ambiguous = $false; ReasonCode = (Get-WorktreeResolutionNoTargetReasonCode); Detail = 'shared resolver not exercised by this suite'; Candidates = [string[]] @() }
+    Mock Resolve-HookTargetWorktree { $script:SharedNoSelection }
 
     $script:NoTargetCode = Get-WorktreeResolutionNoTargetReasonCode
     $script:EditCommand = 'gh pr edit 5 --body-file artifacts/pr_body_5.md'

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
@@ -157,10 +157,19 @@ def test_derive_excludes_mandate_read_citations_from_every_level() -> None:
 
 
 def test_derive_without_the_mandate_reads_key_includes_the_citations() -> None:
-    """Removing the key restores the pre-change derivation output exactly."""
-    # Arrange: the committed table with only the new key removed.
+    """Removing the key restores the pre-change derivation output exactly.
+
+    The separator-free surface ``quality-tiers.yml`` is supplied explicitly in
+    ``shared_surfaces``, because the committed table no longer lists it there
+    (issue #1006); without that entry the classifier would not accept the bare
+    citation as a root surface at all.
+    """
+    # Arrange: the committed table with the mandate-read key removed and the
+    # tier map restored as a separator-free shared surface.
     config = committed_config()
     config.pop("mandate_reads")
+    committed_surfaces = cast("list[str]", config["shared_surfaces"])
+    config["shared_surfaces"] = [*committed_surfaces, "quality-tiers.yml"]
 
     # Act
     radius = derive(config)
