@@ -235,6 +235,8 @@ Total number of shards.
 Optional path that receives the shard manifest JSON.
 .PARAMETER WriteShardFileList
 Seam that writes the manifest JSON; receives the path and the JSON text.
+.PARAMETER ReadWeightsText
+Optional seam passed to Get-PoshQCShardTestFileWeight that returns the weights-file text for RootPath, or $null (issue #1048).
 #>
 function Select-PoshQCShardTestFile {
     [CmdletBinding()]
@@ -245,11 +247,17 @@ function Select-PoshQCShardTestFile {
         [Parameter(Mandatory)][int] $ShardIndex,
         [Parameter(Mandatory)][int] $ShardCount,
         [string] $ShardFileListPath,
-        [Parameter(Mandatory)][scriptblock] $WriteShardFileList
+        [Parameter(Mandatory)][scriptblock] $WriteShardFileList,
+        [scriptblock] $ReadWeightsText
     )
 
     $paths = [string[]] @($TestFile | ForEach-Object { if ($_ -is [string]) { $_ } else { $_.FullName } })
-    $weights = [long[]] @(Get-PoshQCShardTestFileWeight -TestFile $TestFile)
+    # Issue #1048: the root lets the weight lookup read config/poshqc-shard-weights.json; a supplied reader replaces the default one.
+    $weightArguments = @{ TestFile = $TestFile; RootPath = $RootPath }
+    if ($PSBoundParameters.ContainsKey('ReadWeightsText')) {
+        $weightArguments['ReadWeightsText'] = $ReadWeightsText
+    }
+    $weights = [long[]] @(Get-PoshQCShardTestFileWeight @weightArguments)
     $manifest = New-PoshQCShardManifest -RootPath $RootPath -TestFile $paths -ShardIndex $ShardIndex -ShardCount $ShardCount -Weight $weights
     if (@($manifest.selected).Count -eq 0) {
         throw "Shard $ShardIndex of $ShardCount selects no test file; $($paths.Count) test files cannot fill $ShardCount shards. Lower the shard count."
@@ -262,24 +270,113 @@ function Select-PoshQCShardTestFile {
 
 <#
 .SYNOPSIS
-Returns the shard weight of each enumerated test file (issue #953, CR-19).
+Parses and validates the text of config/poshqc-shard-weights.json (issue #1048).
 .DESCRIPTION
-A FileInfo item weighs the UTF-8 byte count of its text after every CRLF pair is replaced by LF, so a checkout
-with CRLF line endings computes the same weights, and therefore the same shard assignment, as a checkout with
-LF line endings. Another object weighs its Length property when it has one; a plain path string, or an object
-without a Length property, weighs 1. Returns one weight per item, in input order.
+The document must be a JSON object with version 1, unit 'ms', and a non-empty files map whose keys are
+repository-relative forward-slash paths (no backslash, no leading slash, no colon) and whose values are
+non-negative integers. Throws a message that names poshqc-shard-weights.json otherwise. Returns a dictionary
+of milliseconds keyed by path, compared case-insensitively.
+.PARAMETER Json
+The text of the weights file.
+#>
+function ConvertFrom-PoshQCShardWeightJson {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Generic.Dictionary[string, long]])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Json
+    )
+
+    $name = 'config/poshqc-shard-weights.json'
+    try {
+        $document = $Json | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        throw "$name is not valid JSON: $($_.Exception.Message)"
+    }
+    if ($null -eq $document -or $document -isnot [System.Management.Automation.PSCustomObject]) {
+        throw "$name must hold a JSON object."
+    }
+    $isInteger = { param($Value) $Value -is [int] -or $Value -is [long] }
+    $version = $document.PSObject.Properties['version']
+    if ($null -eq $version -or -not (& $isInteger $version.Value) -or $version.Value -ne 1) {
+        throw "$name must declare version 1."
+    }
+    $unit = $document.PSObject.Properties['unit']
+    if ($null -eq $unit -or [string] $unit.Value -cne 'ms') {
+        throw "$name must declare unit 'ms'."
+    }
+    $files = $document.PSObject.Properties['files']
+    if ($null -eq $files -or $files.Value -isnot [System.Management.Automation.PSCustomObject] -or @($files.Value.PSObject.Properties).Count -eq 0) {
+        throw "$name must list at least one file in a 'files' object."
+    }
+
+    $weights = New-Object 'System.Collections.Generic.Dictionary[string,long]' ([System.StringComparer]::OrdinalIgnoreCase)
+    # Validate each entry: a repository-relative forward-slash key and a non-negative integer of milliseconds.
+    foreach ($entry in $files.Value.PSObject.Properties) {
+        if ([string]::IsNullOrWhiteSpace($entry.Name) -or $entry.Name.Contains('\') -or $entry.Name.StartsWith('/') -or $entry.Name.Contains(':')) {
+            throw "$name lists '$($entry.Name)', which is not a repository-relative forward-slash path."
+        }
+        if (-not (& $isInteger $entry.Value) -or $entry.Value -lt 0) {
+            throw "$name gives '$($entry.Name)' the weight '$($entry.Value)'; weights must be non-negative integers."
+        }
+        $weights[$entry.Name] = [long] $entry.Value
+    }
+    , $weights
+}
+
+<#
+.SYNOPSIS
+Returns the shard weight of each enumerated test file (issue #953, CR-19; measured weights issue #1048).
+.DESCRIPTION
+When RootPath is supplied and ReadWeightsText returns text, the text is parsed with
+ConvertFrom-PoshQCShardWeightJson and each test file weighs the milliseconds listed for its repository-relative
+forward-slash path; a file without an entry weighs the median of all listed values, so bytes and milliseconds
+are never mixed. Otherwise the size path runs: a FileInfo item weighs the UTF-8 byte count of its text after
+every CRLF pair is replaced by LF, so a checkout with CRLF line endings computes the same weights, and therefore
+the same shard assignment, as a checkout with LF line endings. Another object weighs its Length property when it
+has one; a plain path string, or an object without a Length property, weighs 1. Returns one weight per item, in
+input order.
 .PARAMETER TestFile
 Enumerated test files: FileInfo items, objects with FullName (and optionally Length), or path strings.
 .PARAMETER ReadTestFileText
 Seam that returns the text of a test file from its full path. Defaults to [System.IO.File]::ReadAllText.
+.PARAMETER RootPath
+Optional workspace root. Without it the size path runs.
+.PARAMETER ReadWeightsText
+Seam that receives RootPath and returns the text of RootPath/config/poshqc-shard-weights.json, or $null when the
+file does not exist. Defaults to Test-Path and Get-Content -Raw.
 #>
 function Get-PoshQCShardTestFileWeight {
     [CmdletBinding()]
     [OutputType([long[]])]
     param(
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]] $TestFile,
-        [scriptblock] $ReadTestFileText = { param([string] $Path) [System.IO.File]::ReadAllText($Path) }
+        [scriptblock] $ReadTestFileText = { param([string] $Path) [System.IO.File]::ReadAllText($Path) },
+        [string] $RootPath,
+        [scriptblock] $ReadWeightsText = {
+            param([string] $Root)
+            $weightsPath = Join-Path (Join-Path $Root 'config') 'poshqc-shard-weights.json'
+            if (Test-Path -LiteralPath $weightsPath) { Get-Content -Raw -LiteralPath $weightsPath } else { $null }
+        }
     )
+
+    $weightsText = if ($RootPath) { & $ReadWeightsText $RootPath } else { $null }
+    if ($null -ne $weightsText) {
+        $measured = ConvertFrom-PoshQCShardWeightJson -Json ([string] $weightsText)
+        [long[]] $listed = @($measured.Values)
+        [System.Array]::Sort($listed)
+        $middle = [int] [math]::Floor($listed.Count / 2)
+        $median = if ($listed.Count % 2 -eq 1) { $listed[$middle] } else { [long] [math]::Floor(($listed[$middle - 1] + $listed[$middle]) / 2) }
+        $prefix = ($RootPath -replace '\\', '/').TrimEnd('/') + '/'
+        # Look up each file by its root-relative forward-slash path; an unlisted file weighs the median.
+        $measuredWeights = New-Object 'System.Collections.Generic.List[long]'
+        foreach ($item in $TestFile) {
+            $path = $(if ($item -is [string]) { $item } else { [string] $item.FullName }) -replace '\\', '/'
+            $relative = if ($path.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) { $path.Substring($prefix.Length) } else { $path }
+            $weight = [long] 0
+            if ($measured.TryGetValue($relative, [ref] $weight)) { $measuredWeights.Add($weight) } else { $measuredWeights.Add($median) }
+        }
+        return [long[]] $measuredWeights.ToArray()
+    }
 
     $weights = New-Object 'System.Collections.Generic.List[long]'
     foreach ($item in $TestFile) {
