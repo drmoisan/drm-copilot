@@ -441,6 +441,19 @@ Cross-child reconciliation found during 1021's preflight (to be resolved before 
 - Conflict to resolve in 1020: its planned manifest test (every file under `.claude/lib/docs/` is
   listed in core) must exclude `.claude/lib/docs/python/`, which only the python pack lists.
 
+Outcome of 1031's preparation (2026-10-31, `PREFLIGHT: ALL CLEAR`), with three items for
+acknowledgement before execution:
+- 1031 edits two 1022 surfaces (the `inventory` dispatch row option and
+  `.claude/lib/docs/DocsInventory.psm1`, to implement `-AnalysisMethod auto|native|scanner`), a
+  departure from the own-anchor-only rule. Accepted by the epic planner as the Q13 default
+  implementation; 1022 and 1031 execute in wave order (1022 first), and 1031's [P0-T3] stops if
+  1022 adds its own inventory seam.
+- The Python-invocation guard gains a detection class `SeamInterpreterTarget` and one allowlist
+  entry for `Invoke-DocsPythonNativeInterpreter` (Q11 default).
+- 1031's report lists the `architecture-component` digest as unresolved between 1020 and 1022.
+  1022's prepared contract settles it (whole normalized file, `line_range: null`, through 1020's
+  `New-DocsSurfaceElement`); 1031's [P0-T3] recomputation verifies it at execution.
+
 ### Command contract decisions from the first preparation of 1023 (language-independent)
 
 - Exit codes: 0 pass, 1 findings, 2 usage or input error, 3 internal or I/O error (extends the
