@@ -125,7 +125,13 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
     ],
     conflict_tolerance: {
       tolerance_percent: 100,
-      weights: { same_file: 8, possible_overlap: 2, append_only: 1, module: 2, contract: 8 },
+      weights: {
+        same_file: 8,
+        possible_overlap: 2,
+        append_only: 1,
+        module: 2,
+        contract: 8,
+      },
       band_durations: { C1: 1, C2: 2, C3: 4, C4: 8 },
       default_band: "C1",
       append_only_paths: [

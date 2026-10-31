@@ -141,7 +141,9 @@ def uncapped(
                 )
             elif d.conflict:
                 tolerated.append(
-                    ToleratedOverlap(first.key, second.key, d.reasons, d.cost, d.benefit)
+                    ToleratedOverlap(
+                        first.key, second.key, d.reasons, d.cost, d.benefit
+                    )
                 )
     return SchedulingResult(edges=tuple(edges), tolerated_overlaps=tuple(tolerated))
 

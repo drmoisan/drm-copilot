@@ -71,7 +71,7 @@ def case_config(
     fixture: Mapping[str, object], case: Mapping[str, object]
 ) -> dict[str, object]:
     """Copy a fixture's truth table and apply the case's tolerance override."""
-    config = cast("dict[str, object]", copy.deepcopy(dict(fixture["config"])))
+    config = copy.deepcopy(dict(cast("Mapping[str, object]", fixture["config"])))
     if case.get("conflict_tolerance_absent") is True:
         del config["conflict_tolerance"]
     elif "tolerance_percent" in case:
@@ -92,7 +92,9 @@ def case_items(case: Mapping[str, object]) -> list[SchedulingItem]:
     ]
 
 
-def make_radius(paths: Sequence[str] = (), contracts: Sequence[str] = ()) -> BlastRadius:
+def make_radius(
+    paths: Sequence[str] = (), contracts: Sequence[str] = ()
+) -> BlastRadius:
     """Build a declared radius with only paths and contracts set."""
     return BlastRadius(
         paths=paths,
@@ -106,10 +108,8 @@ def make_radius(paths: Sequence[str] = (), contracts: Sequence[str] = ()) -> Bla
 
 def base_config(*, mergeable: Sequence[str] = ()) -> dict[str, object]:
     """Return the candidate-classes truth table with optional mergeable paths."""
-    config = cast(
-        "dict[str, object]",
-        copy.deepcopy(dict(load_fixture("combination-candidate-classes")["config"])),
-    )
+    fixture = load_fixture("combination-candidate-classes")
+    config = copy.deepcopy(dict(cast("Mapping[str, object]", fixture["config"])))
     config["mergeable_paths"] = list(mergeable)
     return config
 
@@ -124,9 +124,9 @@ def test_find_combinations_matches_fixture(
     result = find_combinations(case_items(case), case_config(fixture, case))
 
     assert [pair.to_dict() for pair in result.pairs] == case["expected_pairs"], name
-    assert [
-        combination.to_dict() for combination in result.combinations
-    ] == case["expected_combinations"], name
+    assert [combination.to_dict() for combination in result.combinations] == case[
+        "expected_combinations"
+    ], name
 
 
 @pytest.mark.parametrize(("name", "fixture", "case"), CASES, ids=CASE_IDS)
@@ -208,12 +208,30 @@ def test_find_combinations_does_not_mutate_its_inputs() -> None:
     ("label", "paths_a", "paths_b", "mergeable", "expected"),
     [
         ("equal concrete entries", ["src/x.py"], ["src/x.py"], (), True),
-        ("append-only equal entries", ["docs/CHANGELOG.md"], ["docs/CHANGELOG.md"], (), False),
+        (
+            "append-only equal entries",
+            ["docs/CHANGELOG.md"],
+            ["docs/CHANGELOG.md"],
+            (),
+            False,
+        ),
         ("glob against concrete", ["src/**"], ["src/x.py"], (), False),
         ("equal globs", ["src/**"], ["src/**"], (), False),
-        ("mergeable equal entries", ["pkg/app.csproj"], ["pkg/app.csproj"], ("**/*.csproj",), False),
+        (
+            "mergeable equal entries",
+            ["pkg/app.csproj"],
+            ["pkg/app.csproj"],
+            ("**/*.csproj",),
+            False,
+        ),
         ("disjoint entries", ["src/x.py"], ["src/y.py"], (), False),
-        ("one same file among others", ["a.py", "docs/CHANGELOG.md"], ["a.py", "docs/CHANGELOG.md"], (), True),
+        (
+            "one same file among others",
+            ["a.py", "docs/CHANGELOG.md"],
+            ["a.py", "docs/CHANGELOG.md"],
+            (),
+            True,
+        ),
     ],
 )
 def test_has_same_file_overlap(

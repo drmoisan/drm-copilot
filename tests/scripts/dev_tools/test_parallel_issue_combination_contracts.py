@@ -40,7 +40,7 @@ STATUS_TEMPLATE = Path("docs/features/templates/parallel/parallel-status.md")
 SCHEDULING_SUBSECTION = "### Integration-cost scheduling (issue #722)"
 SCHEDULING_SOURCE = Path("scripts/dev_tools/_blast_radius_scheduling.py")
 SCHEDULING_MODULE = Path(".claude/lib/blast-radius/BlastRadiusScheduling.psm1")
-TELEMETRY_TOKEN = "observed_resolution"
+TELEMETRY_FIELD = "observed_resolution"
 NO_TUNING_ROOTS: tuple[Path, ...] = (
     Path("scripts"),
     Path(".claude/lib"),
@@ -249,7 +249,10 @@ def test_completion_reports_list_each_combination() -> None:
     for label, text in (("skill", skill), ("agent", agent)):
         assert_contains_all(
             text,
-            ("members, primary, qualifying pairs with cost and benefit", "`estimated_savings`"),
+            (
+                "members, primary, qualifying pairs with cost and benefit",
+                "`estimated_savings`",
+            ),
             label,
         )
         assert "not-combined" in text or "not combined" in text, label
@@ -363,7 +366,7 @@ def test_no_runtime_script_reads_the_telemetry() -> None:
     readers = [
         path.relative_to(REPO_ROOT).as_posix()
         for path in files
-        if TELEMETRY_TOKEN in path.read_text(encoding="utf-8", errors="replace")
+        if TELEMETRY_FIELD in path.read_text(encoding="utf-8", errors="replace")
     ]
 
     assert files, "no runtime script was scanned"
@@ -376,7 +379,8 @@ def test_python_reader_reads_only_the_config_mapping() -> None:
     function = next(
         node
         for node in tree.body
-        if isinstance(node, ast.FunctionDef) and node.name == "config_conflict_tolerance"
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "config_conflict_tolerance"
     )
     calls = {
         ast.unparse(node.func)
@@ -398,5 +402,5 @@ def test_powershell_reader_reads_only_the_config_mapping() -> None:
     parameters = re.findall(r"\[object\]\s+\$(\w+)", body)
 
     assert parameters == ["Config"], parameters
-    for token in ("Get-Content", "ReadAllText", "$env:", TELEMETRY_TOKEN):
+    for token in ("Get-Content", "ReadAllText", "$env:", TELEMETRY_FIELD):
         assert token not in body, token

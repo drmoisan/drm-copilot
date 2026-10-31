@@ -146,9 +146,7 @@ def test_reader_rejects_an_unknown_extra_weight_name() -> None:
         config_conflict_tolerance(make_config(weights=weights))
 
 
-@pytest.mark.parametrize(
-    "value", [True, 8.0, "8"], ids=["boolean", "float", "string"]
-)
+@pytest.mark.parametrize("value", [True, 8.0, "8"], ids=["boolean", "float", "string"])
 def test_reader_rejects_a_non_integer_contract_weight(value: object) -> None:
     """A boolean, float, or string contract weight raises TypeError."""
     with pytest.raises(TypeError, match=CONTRACT_LABEL):
@@ -218,10 +216,16 @@ def test_same_file_pair_sharing_one_identifier_costs_both_terms() -> None:
 
 NO_SHARED_CONTRACT_PAIRS: tuple[tuple[BlastRadius, BlastRadius], ...] = (
     (make_radius(paths=["src/x.py"]), make_radius(paths=["src/x.py"])),
-    (make_radius(paths=["src/**"], modules=["core"]), make_radius(paths=["src/a.py"], modules=["core"])),
+    (
+        make_radius(paths=["src/**"], modules=["core"]),
+        make_radius(paths=["src/a.py"], modules=["core"]),
+    ),
     (make_radius(paths=["CHANGELOG.md"]), make_radius(paths=["CHANGELOG.md"])),
     (make_radius(contracts=["ParseLedger"]), make_radius(contracts=["FormatInvoice"])),
-    (make_radius(shared_surfaces=["poetry.lock"]), make_radius(shared_surfaces=["poetry.lock"])),
+    (
+        make_radius(shared_surfaces=["poetry.lock"]),
+        make_radius(shared_surfaces=["poetry.lock"]),
+    ),
 )
 
 
@@ -257,9 +261,13 @@ def test_contract_only_pair_stays_a_hard_edge_at_any_tolerance() -> None:
 INVARIANT_RADII: tuple[BlastRadius, ...] = (
     make_radius(paths=["src/app.py"], modules=["core"], contracts=["ParseLedger"]),
     make_radius(paths=["src/app.py"], contracts=["FormatInvoice", "ParseLedger"]),
-    make_radius(paths=["src/**"], modules=["core"], contracts=["FormatInvoice", "ParseLedger"]),
+    make_radius(
+        paths=["src/**"], modules=["core"], contracts=["FormatInvoice", "ParseLedger"]
+    ),
     make_radius(paths=["CHANGELOG.md"], shared_surfaces=["poetry.lock"]),
-    make_radius(modules=["core"], shared_surfaces=["poetry.lock"], contracts=["FormatInvoice"]),
+    make_radius(
+        modules=["core"], shared_surfaces=["poetry.lock"], contracts=["FormatInvoice"]
+    ),
     make_radius(paths=["docs/guide.md", "CHANGELOG.md"], modules=["docs"]),
 )
 INVARIANT_BANDS: tuple[tuple[str | None, ...], ...] = (
@@ -275,9 +283,7 @@ def invariant_items(bands: Sequence[str | None]) -> list[SchedulingItem]:
     """Pair every invariant radius template with one band vector."""
     return [
         SchedulingItem(key=index + 1, radius=radius, band=band)
-        for index, (radius, band) in enumerate(
-            zip(INVARIANT_RADII, bands, strict=True)
-        )
+        for index, (radius, band) in enumerate(zip(INVARIANT_RADII, bands, strict=True))
     ]
 
 
@@ -352,9 +358,7 @@ def test_invariant_contract_term_changes_only_edge_costs(
 
 def test_invariant_domain_carries_shared_contracts() -> None:
     """The invariant domain includes pairs sharing zero, one, and two contracts."""
-    counts = {
-        shared_count(a, b) for a, b in itertools.combinations(INVARIANT_RADII, 2)
-    }
+    counts = {shared_count(a, b) for a, b in itertools.combinations(INVARIANT_RADII, 2)}
 
     assert {0, 1, 2} <= counts
 

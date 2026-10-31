@@ -224,7 +224,10 @@ describe("issue #722: tolerated scheduling fields", () => {
     // Arrange
     const state = buildValidPlannerState();
     state["items"] = [
-      { ...buildPlannerItem(444, "parallel-schema-validators"), combined_issue_nums: [990] },
+      {
+        ...buildPlannerItem(444, "parallel-schema-validators"),
+        combined_issue_nums: [990],
+      },
       buildPlannerItem(445, "parallel-cohort-scheduler"),
     ];
     state["combinations"] = [{ ...COMBINATION }];

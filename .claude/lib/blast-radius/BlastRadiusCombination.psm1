@@ -101,6 +101,24 @@ function Get-CombinationOrderedItem {
     return @(@($record) | Where-Object { $null -ne $_ } | Sort-Object -Property { $_['key'] })
 }
 
+# Return the union-find root of Key, registering Key as its own root when new.
+# Parent is the component's working map, owned by Get-CombinationComponent.
+function Get-UnionFindRoot {
+    [CmdletBinding()]
+    [OutputType([long])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable] $Parent,
+        [Parameter(Mandatory = $true)]
+        [long] $Key
+    )
+
+    if (-not $Parent.ContainsKey($Key)) { $Parent[$Key] = $Key }
+    $root = $Key
+    while ($Parent[$root] -ne $root) { $root = $Parent[$root] }
+    return $root
+}
+
 # Group qualifying pairs into connected components with union-find.
 function Get-CombinationComponent {
     [CmdletBinding()]
@@ -112,15 +130,9 @@ function Get-CombinationComponent {
     )
 
     $parent = @{}
-    $findRoot = {
-        param([long] $Key)
-        if (-not $parent.ContainsKey($Key)) { $parent[$Key] = $Key }
-        while ($parent[$Key] -ne $Key) { $Key = $parent[$Key] }
-        return $Key
-    }
     foreach ($entry in $Pair) {
-        $rootA = & $findRoot $entry['a']
-        $rootB = & $findRoot $entry['b']
+        $rootA = Get-UnionFindRoot -Parent $parent -Key $entry['a']
+        $rootB = Get-UnionFindRoot -Parent $parent -Key $entry['b']
         if ($rootA -ne $rootB) {
             $parent[[System.Math]::Max($rootA, $rootB)] = [System.Math]::Min($rootA, $rootB)
         }
@@ -128,7 +140,7 @@ function Get-CombinationComponent {
 
     $grouped = @{}
     foreach ($entry in $Pair) {
-        $root = & $findRoot $entry['a']
+        $root = Get-UnionFindRoot -Parent $parent -Key $entry['a']
         if (-not $grouped.ContainsKey($root)) { $grouped[$root] = [System.Collections.Generic.List[object]]::new() }
         $grouped[$root].Add($entry)
     }
@@ -199,8 +211,10 @@ function Get-BlastRadiusCombination {
             $decision = Get-BlastRadiusPairDecision -RadiusA $a['radius'] -RadiusB $b['radius'] -Config $Config -BandA $a['band'] -BandB $b['band'] -Relation $Relation
             if (-not $decision['conflict']) { continue }
             # The full reasons are read, because contract_dependency is never first.
-            $isCandidate = (@($decision['reasons']) -ccontains $script:ContractDependency) -or
-                (Test-SameFileOverlap -RadiusA $a['radius'] -RadiusB $b['radius'] -Config $Config -Tolerance $tolerance)
+            $isCandidate = @($decision['reasons']) -ccontains $script:ContractDependency
+            if (-not $isCandidate) {
+                $isCandidate = Test-SameFileOverlap -RadiusA $a['radius'] -RadiusB $b['radius'] -Config $Config -Tolerance $tolerance
+            }
             if ($isCandidate -and ($decision['cost'] * $script:Percent -ge $decision['benefit'] * $threshold)) {
                 $qualifying.Add([ordered]@{ a = $a['key']; b = $b['key']; cost = [long]$decision['cost']; benefit = [long]$decision['benefit'] })
             }

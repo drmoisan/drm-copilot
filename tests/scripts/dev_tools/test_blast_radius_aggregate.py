@@ -78,7 +78,7 @@ def case_config(
     fixture: Mapping[str, object], *, tolerance_percent: int | None = None
 ) -> dict[str, object]:
     """Copy a fixture's truth table, optionally overriding tolerance_percent."""
-    config = cast("dict[str, object]", copy.deepcopy(dict(fixture["config"])))
+    config = copy.deepcopy(dict(cast("Mapping[str, object]", fixture["config"])))
     if tolerance_percent is not None:
         member = cast("dict[str, object]", config["conflict_tolerance"])
         member["tolerance_percent"] = tolerance_percent
@@ -199,9 +199,9 @@ def test_schedule_conflict_edges_applies_the_cap(
     result = schedule_conflict_edges(case_items(case), case_config(fixture))
 
     assert [edge.to_dict() for edge in result.edges] == case["expected_edges"], name
-    assert [
-        overlap.to_dict() for overlap in result.tolerated_overlaps
-    ] == case["expected_tolerated"], name
+    assert [overlap.to_dict() for overlap in result.tolerated_overlaps] == case[
+        "expected_tolerated"
+    ], name
 
 
 @pytest.mark.parametrize(("name", "fixture", "case"), CASES, ids=CASE_IDS)
