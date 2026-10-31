@@ -38,6 +38,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusAggregate.psm1') -Force -ErrorAction Stop
 
 # Truth-table key and the label every reader error carries.
 $script:ToleranceKey = 'conflict_tolerance'
@@ -48,6 +49,12 @@ $script:ToleranceLabel = 'config["conflict_tolerance"]'
 $script:MemberName = @('tolerance_percent', 'weights', 'band_durations', 'default_band', 'append_only_paths')
 $script:WeightName = @('same_file', 'possible_overlap', 'append_only', 'module', 'contract')
 $script:BandName = @('C1', 'C2', 'C3', 'C4')
+
+# The one optional member (issue #1013): the issue-combination threshold, read
+# as this default when absent. Pinned to COMBINATION_THRESHOLD_DEFAULT in the
+# Python reference by a Pester parity row.
+$script:CombinationThresholdName = 'combination_threshold_percent'
+$script:CombinationThresholdDefault = 400
 
 # Reason kinds that make a conflict an edge at every tolerance: a shared surface
 # or a contract dependency cannot be reconciled by a merge step.
@@ -140,15 +147,18 @@ function Get-ConfigConflictTolerance {
     .DESCRIPTION
         Port of config_conflict_tolerance. An absent or null key returns the
         strict semantics: tolerance 0, every weight 1, every band duration 1,
-        default_band C1, and no append-only paths.
+        default_band C1, no append-only paths, and the default combination
+        threshold. combination_threshold_percent is optional: when present it
+        must be an integer of at least 0, and when absent it reads as 400.
 
     .PARAMETER Config
         Parsed config/blast-radius.json.
 
     .OUTPUTS
         System.Collections.Hashtable. Keys tolerance_percent, weights,
-        band_durations, default_band, and append_only_paths. Every error message
-        names the conflict_tolerance key.
+        band_durations, default_band, append_only_paths, and
+        combination_threshold_percent. Every error message names the
+        conflict_tolerance key.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -165,22 +175,32 @@ function Get-ConfigConflictTolerance {
         foreach ($entry in $script:WeightName) { $unit[$entry] = [long]1 }
         $band = @{}
         foreach ($entry in $script:BandName) { $band[$entry] = [long]1 }
-        return @{ tolerance_percent = [long]0; weights = $unit; band_durations = $band; default_band = $script:BandName[0]; append_only_paths = [string[]]@() }
+        return @{ tolerance_percent = [long]0; weights = $unit; band_durations = $band; default_band = $script:BandName[0]; append_only_paths = [string[]]@(); combination_threshold_percent = [long]$script:CombinationThresholdDefault }
     }
 
     $member = Get-RequiredMapping -Value $value -FieldName $script:ToleranceLabel
-    Assert-ExactMemberName -Mapping $member -Name $script:MemberName -FieldName $script:ToleranceLabel
+    # The optional member joins the exact name set only when it is present, so
+    # every other unknown name is still rejected.
+    $hasThreshold = $member.ContainsKey($script:CombinationThresholdName)
+    $names = if ($hasThreshold) { @($script:MemberName) + $script:CombinationThresholdName } else { $script:MemberName }
+    Assert-ExactMemberName -Mapping $member -Name $names -FieldName $script:ToleranceLabel
     $defaultBand = $member['default_band']
     if ($defaultBand -isnot [string] -or $script:BandName -cnotcontains $defaultBand) {
         throw "$script:ToleranceLabel[""default_band""] must be one of $($script:BandName -join ', ')."
     }
 
+    $threshold = [long]$script:CombinationThresholdDefault
+    if ($hasThreshold) {
+        $threshold = Get-RequiredInteger -Value $member[$script:CombinationThresholdName] -FieldName "$script:ToleranceLabel[""$script:CombinationThresholdName""]" -Minimum 0
+    }
+
     return @{
-        tolerance_percent = Get-RequiredInteger -Value $member['tolerance_percent'] -FieldName "$script:ToleranceLabel[""tolerance_percent""]" -Minimum 0
-        weights           = Get-RequiredIntegerMap -Value $member['weights'] -Name $script:WeightName -Member 'weights'
-        band_durations    = Get-RequiredIntegerMap -Value $member['band_durations'] -Name $script:BandName -Member 'band_durations'
-        default_band      = [string]$defaultBand
-        append_only_paths = [string[]]@(Get-RequiredStringList -Value $member['append_only_paths'] -FieldName "$script:ToleranceLabel[""append_only_paths""]")
+        tolerance_percent             = Get-RequiredInteger -Value $member['tolerance_percent'] -FieldName "$script:ToleranceLabel[""tolerance_percent""]" -Minimum 0
+        weights                       = Get-RequiredIntegerMap -Value $member['weights'] -Name $script:WeightName -Member 'weights'
+        band_durations                = Get-RequiredIntegerMap -Value $member['band_durations'] -Name $script:BandName -Member 'band_durations'
+        default_band                  = [string]$defaultBand
+        append_only_paths             = [string[]]@(Get-RequiredStringList -Value $member['append_only_paths'] -FieldName "$script:ToleranceLabel[""append_only_paths""]")
+        combination_threshold_percent = $threshold
     }
 }
 
@@ -429,7 +449,9 @@ function Get-BlastRadiusConflictEdge {
         Port of schedule_conflict_edges. Visits every unordered pair once in
         ascending key order. A pair whose decision is an edge is recorded as an
         edge; a conflict within tolerance is recorded as a tolerated overlap; a
-        pair that does not conflict appears in neither list.
+        pair that does not conflict appears in neither list. The aggregate cap
+        of BlastRadiusAggregate.psm1 (issue #1013) then promotes tolerated
+        overlaps until every item is within its cap.
 
     .PARAMETER Item
         The run's items: records carrying key (an integer issue number), radius,
@@ -460,7 +482,7 @@ function Get-BlastRadiusConflictEdge {
     )
 
     if ($null -eq $Relation) { throw $script:RelationRequired }
-    [void](Get-ConfigConflictTolerance -Config $Config)
+    $tolerance = Get-ConfigConflictTolerance -Config $Config
     $ordered = @(Get-OrderedSchedulingItem -Item $Item)
 
     $edge = [System.Collections.Generic.List[object]]::new()
@@ -478,7 +500,26 @@ function Get-BlastRadiusConflictEdge {
         }
     }
 
-    return @{ edges = @($edge.ToArray()); tolerated_overlaps = @($tolerated.ToArray()) }
+    # Aggregate cap post-pass (issue #1013, D-2): promote each cap-selected
+    # tolerated overlap to a non-hard edge carrying its first reason, then
+    # re-sort both lists by (a, b). At tolerance 0 nothing is tolerated.
+    $band = @{}
+    foreach ($entry in $ordered) { $band[$entry['key']] = $entry['band'] }
+    $promoted = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($pair in @(Get-AggregateCappedPair -ToleratedOverlap @($tolerated.ToArray()) -Band $band -Tolerance $tolerance)) {
+        [void]$promoted.Add(('{0}-{1}' -f $pair['a'], $pair['b']))
+    }
+    $kept = [System.Collections.Generic.List[object]]::new()
+    foreach ($overlap in $tolerated) {
+        if ($promoted.Contains(('{0}-{1}' -f $overlap['a'], $overlap['b']))) {
+            $edge.Add([ordered]@{ a = $overlap['a']; b = $overlap['b']; reason = @($overlap['reasons'])[0]; hard = $false; cost = $overlap['cost']; benefit = $overlap['benefit'] })
+        } else {
+            $kept.Add($overlap)
+        }
+    }
+    $sortedEdge = @($edge.ToArray() | Sort-Object -Property { $_['a'] }, { $_['b'] })
+
+    return @{ edges = $sortedEdge; tolerated_overlaps = @($kept.ToArray()) }
 }
 
 Export-ModuleMember -Function `
