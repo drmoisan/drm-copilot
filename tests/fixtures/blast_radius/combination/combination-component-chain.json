@@ -1,0 +1,69 @@
+{
+  "description": "Issue #1013 D-5 rules 1 and 5: a chain of three items forms one component, and combination is disabled at tolerance 0 and when the conflict_tolerance key is absent.",
+  "notes": "Every item is C1 (benefit 1, qualifying cost 4 at combination_threshold_percent 400). Item 1 and item 2 share src/a.py (same_file 8) and item 2 and item 3 share src/b.py (same_file 8); items 1 and 3 share nothing. Case chain (tolerance_percent 100): both pairs qualify (800 >= 400) and union-find joins them into one component: members [1,2,3], primary 1, pairs (1,2) and (2,3), estimated_savings 8+8 = 16. Case tolerance-zero (tolerance_percent 0): rule 1 disables combination, so pairs and combinations are empty. Case absent-key (conflict_tolerance removed): rule 1 disables combination, so pairs and combinations are empty.",
+  "tags": ["#1013"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2, "contract": 8 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["**/CHANGELOG.md"],
+      "combination_threshold_percent": 400
+    },
+    "modules": {},
+    "over_breadth_fraction": 0.25
+  },
+  "cases": [
+    {
+      "name": "chain",
+      "items": [
+        { "key": 1, "band": "C1", "radius": { "paths": ["src/a.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 2, "band": "C1", "radius": { "paths": ["src/a.py", "src/b.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 3, "band": "C1", "radius": { "paths": ["src/b.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } }
+      ],
+      "expected_pairs": [
+        { "a": 1, "b": 2, "cost": 8, "benefit": 1 },
+        { "a": 2, "b": 3, "cost": 8, "benefit": 1 }
+      ],
+      "expected_combinations": [
+        {
+          "members": [1, 2, 3],
+          "primary": 1,
+          "pairs": [
+            { "a": 1, "b": 2, "cost": 8, "benefit": 1 },
+            { "a": 2, "b": 3, "cost": 8, "benefit": 1 }
+          ],
+          "estimated_savings": 16
+        }
+      ]
+    },
+    {
+      "name": "tolerance-zero",
+      "tolerance_percent": 0,
+      "items": [
+        { "key": 1, "band": "C1", "radius": { "paths": ["src/a.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 2, "band": "C1", "radius": { "paths": ["src/a.py", "src/b.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 3, "band": "C1", "radius": { "paths": ["src/b.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } }
+      ],
+      "expected_pairs": [],
+      "expected_combinations": []
+    },
+    {
+      "name": "absent-key",
+      "conflict_tolerance_absent": true,
+      "items": [
+        { "key": 1, "band": "C1", "radius": { "paths": ["src/a.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 2, "band": "C1", "radius": { "paths": ["src/a.py", "src/b.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 3, "band": "C1", "radius": { "paths": ["src/b.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } }
+      ],
+      "expected_pairs": [],
+      "expected_combinations": []
+    }
+  ]
+}

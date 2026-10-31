@@ -211,6 +211,13 @@ pull request with a `gh` command. There are also no upstream-context citation li
 `depends_on` field, so no item cites another item's output. Ordering exists only as blast-radius
 overlap expressed by the cohort table.
 
+A combined item (issue #1013), whose entry carries `combined_issue_nums`, receives the
+`Combined issues: #A #B` line after kickoff element 3, as the skill's
+`## Parallel-Mode Kickoff Parameter` section defines, so its child names every member on its
+author-asserted autoclose line and its one pull request closes every member issue. A combined item
+remediates as one unit: one child, one `remediation_loop`, and one pull request. It never splits
+back into separate pull requests, and it is merged, blocked, or removed as a whole.
+
 ## Cohort Scheduling
 
 You consume the `cohorts[]` table that `parallel-planner` seeded. You never compute a cohort
@@ -268,6 +275,13 @@ for the three .NET verification commands are scoped to that step and to no other
 only reason those commands appear in your allowlist at all. That step's one optional item field is
 `mergeable_conflicts_resolved`, declared in the rule file and appended to an item after a
 parent-side resolution.
+
+You also write the tolerated-not-validated telemetry object
+`tolerated_overlaps[].observed_resolution` (issue #1013), declared in the rule file: the detection
+fields when the later-merging item of a tolerated pair hits a merge conflict, and the resolution
+fields at that item's confirmed merge, per the skill's `## Per-Item Merge-Conflict Handling` and
+`## Per-Item Merge to Main (Merge-on-Green)` sections. Nothing reads it, and no weight changes
+from it.
 
 ## Documentation Maintenance
 

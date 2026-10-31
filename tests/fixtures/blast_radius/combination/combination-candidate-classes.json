@@ -1,0 +1,45 @@
+{
+  "description": "Issue #1013 D-5 rule 3 candidate classes: a contract dependency with a path overlap and a same-file pair are candidates; an append-only same file and a glob overlap are not, even when their cost meets the threshold.",
+  "notes": "combination_threshold_percent 400; every item is C1 (duration 1), so each pair has benefit 1 and the qualifying cost is 4. Pair (1,2): src/lib/** against src/lib/parse.py is a glob overlap (possible_overlap 2) and both carry contract ParseLedger (contract 8): cost 10, candidate through contract_dependency, 1000 >= 400, qualifies. Pair (3,4): src/same.py in both (same_file 8): cost 8, candidate through a same-file overlap, qualifies. Pair (5,6): docs/CHANGELOG.md in both matches **/CHANGELOG.md (append_only 1) plus modules m5a and m5b (2*2 = 4): cost 5 >= 4, but the only equal concrete entry is append-only, so it is not a candidate. Pair (7,8): tools/** against tools/run.py (possible_overlap 2) plus modules m7a and m7b (4): cost 6 >= 4, but a glob overlap is not a same-file overlap and no contract is shared, so it is not a candidate. Combinations: [1,2] (primary 1, savings 10) and [3,4] (primary 3, savings 8).",
+  "tags": ["#1013"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2, "contract": 8 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["**/CHANGELOG.md"],
+      "combination_threshold_percent": 400
+    },
+    "modules": {},
+    "over_breadth_fraction": 0.25
+  },
+  "cases": [
+    {
+      "name": "candidate-classes",
+      "items": [
+        { "key": 1, "band": "C1", "radius": { "paths": ["src/lib/**"], "modules": [], "shared_surfaces": [], "contracts": ["ParseLedger"], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 2, "band": "C1", "radius": { "paths": ["src/lib/parse.py"], "modules": [], "shared_surfaces": [], "contracts": ["ParseLedger"], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 3, "band": "C1", "radius": { "paths": ["src/same.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 4, "band": "C1", "radius": { "paths": ["src/same.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 5, "band": "C1", "radius": { "paths": ["docs/CHANGELOG.md"], "modules": ["m5a", "m5b"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 6, "band": "C1", "radius": { "paths": ["docs/CHANGELOG.md"], "modules": ["m5a", "m5b"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 7, "band": "C1", "radius": { "paths": ["tools/**"], "modules": ["m7a", "m7b"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 8, "band": "C1", "radius": { "paths": ["tools/run.py"], "modules": ["m7a", "m7b"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } }
+      ],
+      "expected_pairs": [
+        { "a": 1, "b": 2, "cost": 10, "benefit": 1 },
+        { "a": 3, "b": 4, "cost": 8, "benefit": 1 }
+      ],
+      "expected_combinations": [
+        { "members": [1, 2], "primary": 1, "pairs": [{ "a": 1, "b": 2, "cost": 10, "benefit": 1 }], "estimated_savings": 10 },
+        { "members": [3, 4], "primary": 3, "pairs": [{ "a": 3, "b": 4, "cost": 8, "benefit": 1 }], "estimated_savings": 8 }
+      ]
+    }
+  ]
+}

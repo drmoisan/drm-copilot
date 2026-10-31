@@ -61,7 +61,7 @@ BeforeAll {
     function Get-CommittedToleranceMember {
         return @{
             tolerance_percent = 100
-            weights           = @{ same_file = 8; possible_overlap = 2; append_only = 1; module = 2 }
+            weights           = @{ same_file = 8; possible_overlap = 2; append_only = 1; module = 2; contract = 8 }
             band_durations    = @{ C1 = 1; C2 = 2; C3 = 4; C4 = 8 }
             default_band      = 'C1'
             append_only_paths = @('**/CHANGELOG.md')
@@ -169,7 +169,7 @@ Describe 'BlastRadiusScheduling' {
             $decision = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = 1000000 }) -Relation $script:ConflictRelation
             $decision['hard'] | Should -BeTrue
             $decision['edge'] | Should -BeTrue
-            $decision['cost'] | Should -Be 0 -Because 'a contract dependency carries no cost term'
+            $decision['cost'] | Should -Be 8 -Because 'a contract dependency carries the contract weight per shared identifier'
             $decision['reason'] | Should -BeExactly 'contract_dependency'
         }
 

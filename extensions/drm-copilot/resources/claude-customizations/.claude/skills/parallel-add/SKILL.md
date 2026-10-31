@@ -117,7 +117,14 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    unstarted subset only: an in-flight conflict is precisely what the admission decision turns on.
    A tolerated overlap is not an edge: the two items run in the same or adjacent cohorts without a
    barrier, and the later-merging item merges `origin/main` under the existing per-item
-   merge-conflict handling and re-passes CI before it merges.
+   merge-conflict handling and re-passes CI before it merges. The entry point applies the aggregate
+   cost cap (issue #1013) inside the same call, so the edges this step records are capped edges.
+   After the edges are computed, call Get-BlastRadiusCombination from the same facade over the
+   candidate plus the unstarted items, with the same `-Config` and `-Relation`, and report each
+   qualifying pair that involves the candidate with the text
+   `qualifies for combination; not combined (combination applies at planning time only)`. This
+   step never combines items: it adds no checkpoint field and makes no `mutations[]` change for a
+   qualifying pair.
 
 4. **Decide admission.** Call the bundled entry point, which needs no Python interpreter:
 

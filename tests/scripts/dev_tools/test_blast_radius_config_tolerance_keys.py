@@ -71,7 +71,13 @@ PINNED_SELF_HOSTED_PATH_ROOTS: tuple[str, ...] = tuple(
 # The committed conflict_tolerance value (spec: required configuration keys).
 COMMITTED_CONFLICT_TOLERANCE: dict[str, object] = {
     "tolerance_percent": 100,
-    "weights": {"same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2},
+    "weights": {
+        "same_file": 8,
+        "possible_overlap": 2,
+        "append_only": 1,
+        "module": 2,
+        "contract": 8,
+    },
     "band_durations": {"C1": 1, "C2": 2, "C3": 4, "C4": 8},
     "default_band": "C1",
     # quality-tiers.yml is an append-only registry since issue #1006.
@@ -80,6 +86,7 @@ COMMITTED_CONFLICT_TOLERANCE: dict[str, object] = {
         PACK_MANIFEST_REGISTRY,
         "quality-tiers.yml",
     ],
+    "combination_threshold_percent": 400,
 }
 
 
@@ -109,6 +116,7 @@ def test_committed_conflict_tolerance_reads_cleanly(label: str, path: Path) -> N
         PACK_MANIFEST_REGISTRY,
         "quality-tiers.yml",
     ), label
+    assert tolerance.combination_threshold_percent == 400, label
 
 
 @pytest.mark.parametrize(("label", "path"), COPIES, ids=COPY_IDS)
