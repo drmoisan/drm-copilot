@@ -666,6 +666,31 @@
 			"type": "shell"
 		},
 		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"& { Import-Module '${workspaceFolder}/scripts/powershell/PoshQC'; exit (Invoke-PoshQCParallelTest -Root '${workspaceFolder}').ExitCode }"
+			],
+			"command": "pwsh",
+			"detail": "Runs the Pester suite as concurrent shard processes and merges the JUnit and coverage output.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "PoshQC: 4 test (Pester, parallel)",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
 			"dependsOn": [
 				"TS: 4 Jest: unit tests with coverage",
 				"QC: 4 Pytest: run tests with coverage",

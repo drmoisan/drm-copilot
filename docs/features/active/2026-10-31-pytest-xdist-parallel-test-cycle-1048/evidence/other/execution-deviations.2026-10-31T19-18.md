@@ -11,6 +11,7 @@ Four deviations were needed to satisfy the plan's own acceptance conditions or r
 - Plan text: "`poetry run python -m scripts.dev_tools.validate_json` exits 0".
 - Observation: the command exits 1 on 3700 findings in pre-existing repository JSON files under `docs/` and `scripts/`. `.vscode/tasks.json` is outside the governed globs and is JSONC, so the command never reads it.
 - Substitute verification: a JSONC parse of `.vscode/tasks.json` plus a label check. Recorded in `validate-json-tasks.2026-10-31T18-16.md`.
+- P6-T3 repeat: after the `PoshQC: 4 test (Pester, parallel)` task was added, `validate_json` again exited 1 with the same 3700 findings, none naming a `.vscode` path. The JSONC parse succeeds (55 tasks), and both `PoshQC: 4 test (Pester)` (unchanged) and `PoshQC: 4 test (Pester, parallel)` are present.
 
 ## D2: P5-T2, the PR09 default-seam case
 

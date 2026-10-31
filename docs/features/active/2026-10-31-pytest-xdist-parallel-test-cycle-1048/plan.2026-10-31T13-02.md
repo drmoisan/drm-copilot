@@ -108,13 +108,13 @@
 
 ### Phase 6 — Bundled Mirrors, Parity Test, VS Code Task, and README
 
-- [ ] [P6-T1] Copy `PoshQC.Parallel.psm1`, `PoshQC.Shard.psm1`, `PoshQC.Testing.psm1`, `PoshQC.psm1`, and `PoshQC.psd1` from `scripts/powershell/PoshQC/` byte-for-byte to `extensions/drm-copilot/resources/powershell/PoshQC/`.
+- [x] [P6-T1] Copy `PoshQC.Parallel.psm1`, `PoshQC.Shard.psm1`, `PoshQC.Testing.psm1`, `PoshQC.psm1`, and `PoshQC.psd1` from `scripts/powershell/PoshQC/` byte-for-byte to `extensions/drm-copilot/resources/powershell/PoshQC/`.
   - Acceptance: each pair has an equal SHA-256 hash, recorded in `FEATURE/evidence/other/poshqc-mirror-hashes.<timestamp>.md`.
-- [ ] [P6-T2] Add `scripts/powershell/PoshQC/PoshQC.Parallel.psm1` and `scripts/powershell/PoshQC/README.md` to `POSHQC_PARITY_PATHS` in `tests/scripts/dev_tools/test_poshqc_bundled_parity.py`.
+- [x] [P6-T2] Add `scripts/powershell/PoshQC/PoshQC.Parallel.psm1` and `scripts/powershell/PoshQC/README.md` to `POSHQC_PARITY_PATHS` in `tests/scripts/dev_tools/test_poshqc_bundled_parity.py`.
   - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` passes `test_poshqc_bundled_module_files_match_repo_root_sources` after P6-T4.
-- [ ] [P6-T3] Add the task `PoshQC: 4 test (Pester, parallel)` to `.vscode/tasks.json`, running `pwsh` with `& { Import-Module '${workspaceFolder}/scripts/powershell/PoshQC'; exit (Invoke-PoshQCParallelTest -Root '${workspaceFolder}').ExitCode }`, in the file's existing style; `PoshQC: 4 test (Pester)` stays unchanged.
+- [x] [P6-T3] Add the task `PoshQC: 4 test (Pester, parallel)` to `.vscode/tasks.json`, running `pwsh` with `& { Import-Module '${workspaceFolder}/scripts/powershell/PoshQC'; exit (Invoke-PoshQCParallelTest -Root '${workspaceFolder}').ExitCode }`, in the file's existing style; `PoshQC: 4 test (Pester)` stays unchanged.
   - Acceptance: `poetry run python -m scripts.dev_tools.validate_json` exits 0; both labels are present.
-- [ ] [P6-T4] Update `scripts/powershell/PoshQC/README.md` (runner and worker default, the output-path parameters, the merged JUnit root `time` as the longest shard wall-clock, the weights file format with median fallback and size fallback, and the `Export-PoshQCShardWeight` regeneration command from CI JUnit artifacts), replace the sentence that weights test files by UTF-8 size in bytes with the weights-first rule, and copy the file byte-for-byte to `extensions/drm-copilot/resources/powershell/PoshQC/README.md`.
+- [x] [P6-T4] Update `scripts/powershell/PoshQC/README.md` (runner and worker default, the output-path parameters, the merged JUnit root `time` as the longest shard wall-clock, the weights file format with median fallback and size fallback, and the `Export-PoshQCShardWeight` regeneration command from CI JUnit artifacts), replace the sentence that weights test files by UTF-8 size in bytes with the weights-first rule, and copy the file byte-for-byte to `extensions/drm-copilot/resources/powershell/PoshQC/README.md`.
   - Acceptance: the README contains `Invoke-PoshQCParallelTest`, `-TestResultPath`, `-CoverageOutputPath`, `poshqc-shard-weights.json`, and `Export-PoshQCShardWeight`; the parity test passes.
 
 ### Phase 7 — Weights File, Concurrent-Run Comparison, Pester Isolation, and Diagnosis

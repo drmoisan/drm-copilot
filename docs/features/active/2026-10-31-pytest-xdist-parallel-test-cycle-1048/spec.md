@@ -142,7 +142,7 @@ Owner decisions that bind this spec are recorded in `owner-decisions.md` in this
 - [ ] Pester suites pass as concurrent shards and under seeded shuffled file-order runs with at least three seeds (each seed and file order recorded), and every leaker and victim found is fixed without ordering workarounds.
 - [ ] The merged coverage and completeness checks in `_poshqc.yml` continue to pass, and a green workflow run on the branch head is recorded.
 - [ ] Every changed or new PoshQC file has a bundled copy under `extensions/drm-copilot/resources/powershell/PoshQC/`, the new path is in `POSHQC_PARITY_PATHS`, and `test_poshqc_bundled_parity.py` and the PoshQC and workflow Pester tests pass.
-- [ ] `scripts/powershell/PoshQC/README.md` documents the runner, the output-path parameters, the JUnit root `time` semantics, and weights regeneration.
+- [x] `scripts/powershell/PoshQC/README.md` documents the runner, the output-path parameters, the JUnit root `time` semantics, and weights regeneration.
 
 ### Documentation and constraints
 
