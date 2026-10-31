@@ -1,6 +1,6 @@
 # Expect-Fail Regression Run (before any planner-surface change)
 
-Timestamp: 2026-10-31T13-20
+Timestamp: 2026-10-31T12-53
 Command: poetry run pytest -p no:cacheprovider --no-cov -rfp --tb=line -q tests/scripts/dev_tools/test_parallel_planner_no_scratch_worktree_contracts.py
 EXIT_CODE: 1
 ExpectedExitCode: 1

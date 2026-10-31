@@ -1,6 +1,6 @@
 # Wording Constraint Inventory
 
-Timestamp: 2026-10-31T13-05
+Timestamp: 2026-10-31T12-51
 Source: current text of the six test modules under tests/scripts/dev_tools/ named in plan task P1-T1, plus test_claude_rules_frontmatter.py (spec-section citation scan). Every test function below was located by search in the current tree.
 
 | Fragment | Presence | Asserting test | Scope read |

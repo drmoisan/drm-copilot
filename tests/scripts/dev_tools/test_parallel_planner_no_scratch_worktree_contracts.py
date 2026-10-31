@@ -2,7 +2,7 @@
 
 The skill and agent are Markdown, so the contract is text fragments read from
 committed files, collapsed for whitespace. No test writes a file or reads
-``artifacts/`` state.
+gitignored state.
 """
 
 from __future__ import annotations
@@ -173,9 +173,12 @@ def test_agent_delegation_model_points_to_no_worktree_prohibition() -> None:
     )
 
 
-def test_agent_completion_requirements_new_item_requires_no_worktree_and_pushed_plan_branch() -> (
-    None
-):
+# fmt: off
+# The plan-mandated test name is longer than the line limit; Black would join the
+# backslash continuation, so formatting is off for this one function.
+def \
+test_agent_completion_requirements_new_item_requires_no_worktree_and_pushed_plan_branch(
+) -> None:
     """The final Completion Requirements item requires no worktree and a push."""
     # Arrange
     agent_text = read_repo_text(AGENT_RELATIVE)
@@ -195,6 +198,7 @@ def test_agent_completion_requirements_new_item_requires_no_worktree_and_pushed_
     assert_contains_all(tail, fragments, "Completion Requirements item 8")
     collapsed = collapse_whitespace(section)
     assert_contains_all(collapsed, ("(P10)", "model_routing_receipt"), "item 2")
+# fmt: on
 
 
 def test_skill_contains_no_pinned_word_and_no_forbidden_fragments() -> None:
@@ -221,9 +225,11 @@ def test_skill_contains_no_pinned_word_and_no_forbidden_fragments() -> None:
     assert not present, f"skill contains forbidden fragments: {present}"
 
 
-def test_edited_sections_exclude_preparation_fan_out_item_intake_and_kickoff_artifact_changes() -> (
-    None
-):
+# fmt: off
+# Plan-mandated test name; see the note on the item 8 test above.
+def \
+test_edited_sections_exclude_preparation_fan_out_item_intake_and_kickoff_artifact_changes(
+) -> None:
     """The three untouched sections still carry their required fragments."""
     # Arrange
     skill_text = read_repo_text(SKILL_RELATIVE)
@@ -263,6 +269,7 @@ def test_edited_sections_exclude_preparation_fan_out_item_intake_and_kickoff_art
         ),
         "Kickoff Artifact",
     )
+# fmt: on
 
 
 @pytest.mark.parametrize(
