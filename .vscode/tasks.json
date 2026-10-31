@@ -411,6 +411,56 @@
 			"args": [
 				"run",
 				"pytest",
+				"-n",
+				"auto"
+			],
+			"command": "poetry",
+			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests (parallel)",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"pytest",
+				"-n",
+				"auto",
+				"--cov-branch",
+				"--cov-report=term-missing",
+				"--cov-report=lcov:artifacts/python/lcov.info",
+				"--cov"
+			],
+			"command": "poetry",
+			"detail": "Runs the pytest suite in pytest-xdist workers with branch coverage and the lcov report.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests with coverage (parallel)",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"pytest",
 				"--cov=src/lexile_corpus_tuner",
 				"--cov=scripts/dev_tools",
 				"--cov-report=term-missing",
