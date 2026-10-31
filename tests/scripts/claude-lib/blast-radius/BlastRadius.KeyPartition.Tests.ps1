@@ -176,8 +176,8 @@ Describe 'Committed blast-radius truth table cross-copy key partition' {
             # overlay composers, so each is disjoint from every declared
             # truth-table key and absent from both committed copies. Mirrors
             # OVERLAY_DIRECTIVE_KEYS in blast_radius_parity_test_support.py.
-            $script:OverlayDirectiveKey = @('shared_surfaces_demote')
-            foreach ($key in $script:OverlayDirectiveKey) {
+            $overlayDirectiveKey = @('shared_surfaces_demote')
+            foreach ($key in $overlayDirectiveKey) {
                 $declaredTopLevelKey | Should -Not -Contain $key
                 @($unionKey) | Should -Not -Contain $key
             }
