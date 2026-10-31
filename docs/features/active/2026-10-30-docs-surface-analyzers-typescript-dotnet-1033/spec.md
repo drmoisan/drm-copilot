@@ -3,12 +3,12 @@
 - **Issue:** #1033
 - **Parent (optional):** #1019 (epic documentation-estate-tooling, manifest placeholder 900004, wave 1, band C4)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T23-10
+- **Last Updated:** 2026-10-31
 - **Status:** Draft
-- **Version:** 0.2 (first full specification; replaces the promoted template text)
+- **Version:** 0.3 (preflight alignment with 1020 v0.4: digest path, `AnalysisMethod` rows, optional `-Selection` keys, empty-file behavior)
 - **Work Mode:** full-feature
 - **Research (primary design source):** `docs/features/active/2026-10-30-docs-surface-analyzers-typescript-dotnet-1033/research/2026-10-30T22-45-docs-surface-analyzers-typescript-dotnet-research.md`
-- **Binding upstream contracts:** epic `docs/features/epics/documentation-estate-tooling/epic.md` (sections `## Owner Directive: Implementation Language (2026-10-30, refined)`, `## Owner Decisions`, `### Amendment of 1020 required by D3 and D5`, `### PowerShell contracts from the re-preparation of 1020`, `### Command contract decisions from the first preparation of 1023`, `### Analyzer decisions from the first preparation of 1022`, `### 900004 - docs-surface-analyzers-typescript-dotnet`) and 1020 `spec.md` version 0.3 `## Decisions Later Children Must Honor`.
+- **Binding upstream contracts:** epic `docs/features/epics/documentation-estate-tooling/epic.md` (sections `## Owner Directive: Implementation Language (2026-10-30, refined)`, `## Owner Decisions`, `### Amendment of 1020 required by D3 and D5`, `### PowerShell contracts from the re-preparation of 1020`, `### Command contract decisions from the first preparation of 1023`, `### Analyzer decisions from the first preparation of 1022`, `### 900004 - docs-surface-analyzers-typescript-dotnet`) and 1020 `spec.md` version 0.4 `## Decisions Later Children Must Honor`, `### \`DocsSurface.psm1\`` and `### \`DocsAnalyzerRegistry.psm1\``.
 
 ## Overview
 
@@ -86,7 +86,12 @@ subcommand through 1020's registry.
     input. Analyzers never decode bytes.
   - `-Selection <object>`: a hashtable (shape C3) whose keys this feature reads are
     `source_roots` (POSIX relative paths), `repository_id` (identifier), `revision` (40 or 64
-    lowercase hex, or `$null`) and, optionally, `registered_analyzer_ids` (string array).
+    lowercase hex, or `$null`) and `registered_analyzer_ids` (string array). Every key is optional,
+    because 1020 types `-Selection` as `<object>` without a shape and the 1022 inventory (step 7 of
+    its `### Inventory command and snapshot builder`) defines no key: an absent or empty
+    `source_roots` gives repository-relative module paths; an absent `repository_id` or `revision`
+    yields the non-blocking unverified diagnostic of `## Extension-Result Manifest Import` step 3;
+    an absent `registered_analyzer_ids` triggers the in-function registry import.
 - Outputs: `@{ Elements = @(...); Diagnostics = @(...) }` per the 1020 analyzer contract.
   - Elements are built with `New-DocsSurfaceElement`, carry `analyzer_id` equal to the registration
     `Id`, a non-null `line_range`, the analysis method (C1) and the declaration-lines digest (C2),
@@ -148,8 +153,8 @@ no module of this feature imports `.claude/lib/discovery-validation/` directly.
 | `New-DocsScannerDiagnosticSet` | none | Empty ordinal aggregation map |
 | `Add-DocsScannerDiagnostic` | `-Set <hashtable> -Code <string> -Path <string> -Line <int> [-Blocking <bool>]` | Updates count and first line for `(code, path)` |
 | `ConvertTo-DocsScannerDiagnostic` | `-Set <hashtable> -AnalyzerId <string>` | `New-DocsDiagnostic` records sorted by `id` |
-| `Get-DocsScannerDeclarationText` | `-Text <string> -LineRange <int[]>` | Normalized declaration text per `### Declaration-lines digest` |
-| `Get-DocsDeclarationSha256` | `-Text <string> -LineRange <int[]>` | Lowercase hex digest; exported only when 1020 does not provide a function of the same contract (C2) |
+| `Get-DocsScannerDeclarationText` | `-Text <string> -LineRange <int[]>` | Normalized declaration text per `### Declaration-lines span and digest`; created and exported only when 1020 does not provide `ConvertTo-DocsDeclarationText` (C2; 1020 v0.4 provides it) |
+| `Get-DocsDeclarationSha256` | `-Text <string> -LineRange <int[]>` | Lowercase hex digest; created and exported only when 1020 does not provide a function of the same contract (C2; 1020 v0.4 provides it in `DocsSurface.psm1`) |
 | `Get-DocsScannerPrecisionLimit` | none | One ordered row per `(analyzer_id, code)` of `## Scanner Precision Limit`: `analyzer_id`, `code`, `construct`, `consequence` |
 
 ### `DocsTypeScriptTokens.psm1` (pure)
@@ -223,18 +228,21 @@ Common analyzer rules:
 ### Registry rows (edit of `DocsAnalyzerRegistry.psm1`)
 
 One row per line, inserted directly under the `# --- 900004: TypeScript and .NET analyzers ---`
-anchor, in the 1020 row form with `Version = '1.0.0'` and `Module = (Join-Path -Path $PSScriptRoot
--ChildPath '<leaf>')`:
+anchor, in the 1020 v0.4 row form `[pscustomobject]@{ Id; Version; AnalysisMethod; ElementKinds;
+Module; Function }` with `Version = '1.0.0'`, `AnalysisMethod = 'scanner'` (the field name and value
+as committed by 1020; C6) and `Module = (Join-Path -Path $PSScriptRoot -ChildPath '<leaf>')`.
+Registry uniqueness is on (`Id`, `AnalysisMethod`), and `Invoke-DocsAnalyzer` rejects output whose
+`analysis_method` differs from the row's `AnalysisMethod`:
 
-| `Id` | `ElementKinds` | `Module` leaf | `Function` |
-|---|---|---|---|
-| `typescript-cli` | `cli-command`, `cli-option` | `DocsAnalyzerTypeScriptCli.psm1` | `Invoke-DocsAnalyzerTypeScriptCli` |
-| `typescript-http` | `http-route` | `DocsAnalyzerTypeScriptHttp.psm1` | `Invoke-DocsAnalyzerTypeScriptHttp` |
-| `typescript-exports` | `public-symbol` | `DocsAnalyzerTypeScriptExports.psm1` | `Invoke-DocsAnalyzerTypeScriptExports` |
-| `dotnet-http` | `http-route` | `DocsAnalyzerDotnetHttp.psm1` | `Invoke-DocsAnalyzerDotnetHttp` |
-| `dotnet-config` | `config-key` | `DocsAnalyzerDotnetConfig.psm1` | `Invoke-DocsAnalyzerDotnetConfig` |
-| `dotnet-public-api` | `public-symbol` | `DocsAnalyzerDotnetApi.psm1` | `Invoke-DocsAnalyzerDotnetApi` |
-| `extension-import` | `cli-command`, `cli-option`, `http-route`, `config-key`, `public-symbol`, `architecture-component` | `DocsAnalyzerExtensionImport.psm1` | `Invoke-DocsAnalyzerExtensionImport` |
+| `Id` | `AnalysisMethod` | `ElementKinds` | `Module` leaf | `Function` |
+|---|---|---|---|---|
+| `typescript-cli` | `scanner` | `cli-command`, `cli-option` | `DocsAnalyzerTypeScriptCli.psm1` | `Invoke-DocsAnalyzerTypeScriptCli` |
+| `typescript-http` | `scanner` | `http-route` | `DocsAnalyzerTypeScriptHttp.psm1` | `Invoke-DocsAnalyzerTypeScriptHttp` |
+| `typescript-exports` | `scanner` | `public-symbol` | `DocsAnalyzerTypeScriptExports.psm1` | `Invoke-DocsAnalyzerTypeScriptExports` |
+| `dotnet-http` | `scanner` | `http-route` | `DocsAnalyzerDotnetHttp.psm1` | `Invoke-DocsAnalyzerDotnetHttp` |
+| `dotnet-config` | `scanner` | `config-key` | `DocsAnalyzerDotnetConfig.psm1` | `Invoke-DocsAnalyzerDotnetConfig` |
+| `dotnet-public-api` | `scanner` | `public-symbol` | `DocsAnalyzerDotnetApi.psm1` | `Invoke-DocsAnalyzerDotnetApi` |
+| `extension-import` | `scanner` | `cli-command`, `cli-option`, `http-route`, `config-key`, `public-symbol`, `architecture-component` | `DocsAnalyzerExtensionImport.psm1` | `Invoke-DocsAnalyzerExtensionImport` |
 
 No existing line of the registry changes; no row is added under any other anchor.
 
@@ -265,16 +273,19 @@ Element `name`: the last command word (`cli-command`), the long option or positi
 | TypeScript interfaces, type aliases, enums | Whole construct through its closing `}` or `;` |
 | C# types | First attribute or modifier line through the line of the body-opening `{` |
 | C# members | First attribute or modifier line through the line of the body-opening `{`, `=>`, or terminating `;` |
-| Configuration keys | The key's line (digest text per OQ-4) |
+| Configuration keys | The key's line, start and end equal (raw line text; OQ-4 superseded, see below) |
 | Imported findings | The finding's `source.line_range` |
 
-Declaration-lines digest byte rule (C2): take the decoded text of physical lines `start..end`
-(lines split on CRLF, CR or LF), remove each line terminator, join with LF, append one LF, encode as
-UTF-8 and hash with `Get-DocsSha256Hex`. A line-ending conversion therefore does not change a
-digest; an edit outside `line_range` does not change it; an edit inside does. For `config-key`, the
-provisional default of OQ-4 applies: every JSON value literal on the key's line (a string that is not
-a member name, a number, `true`, `false`, `null`) is replaced by its `value_type` name before hashing,
-so no configuration value contributes to the digest.
+Declaration-lines digest byte rule (C2): 1020 v0.4 `#### Declaration-lines digest (D5)` (one
+leading U+FEFF removed; CRLF then CR normalized to LF; one trailing LF removed; lines `start..end`
+selected, each followed by one LF; UTF-8 without BOM; `Get-DocsSha256Hex`). A line-ending conversion
+therefore does not change a digest; an edit outside `line_range` does not change it; an edit inside
+does. The digest is produced only by `New-DocsSurfaceElement -SourceText <captured text> -LineRange`;
+an analyzer never computes, masks or supplies it, because `Invoke-DocsAnalyzer` recomputes it with
+`Get-DocsDeclarationSha256` over the captured text and rejects a differing digest. For `config-key`
+the digest therefore covers the raw key line, including its value literal; the OQ-4 masking default
+is superseded by this rule and the concern is re-raised to the coordinator as a 1020 contract
+question (`## Owner Questions`, OQ-4).
 
 ### `typescript-cli` (Commander and yargs)
 
@@ -336,9 +347,10 @@ non-blocking `csharp-conditional-compilation`.
   `array`, `string`, `number`, `boolean`, `null`), `configuration_path` (colon form, for example
   `Logging:LogLevel:Default`) and `environment` (the middle segment of `appsettings.<name>.json`, when
   present). Keys of objects inside arrays are unioned under `[]`. No value is read into output.
-- Diagnostics: invalid JSON or a non-object root: `json-invalid`, blocking, no element. A duplicate
-  member at one path: `duplicate-declaration`, the element keeps the first line. More than 10000 keys:
-  `input-key-limit`, blocking, no element.
+- Diagnostics: invalid JSON or a non-object root: `json-invalid`, blocking, no element. An empty or
+  whitespace-only selected `appsettings*.json` is invalid JSON and yields exactly one blocking
+  `json-invalid` and no element. A duplicate member at one path: `duplicate-declaration`, the
+  element keeps the first line. More than 10000 keys: `input-key-limit`, blocking, no element.
 
 ### `dotnet-public-api`
 
@@ -400,7 +412,7 @@ precision-limit row because it parses the complete JSON document.
 Codes that are not precision limits (blocking unless stated): `input-over-bound`,
 `input-undecodable`, `ts-lexical-invalid`, `csharp-lexical-invalid`, `token-limit`, `json-invalid`,
 `input-key-limit`, the extension rejection codes below, and the non-blocking `declaration-invalid`,
-`duplicate-declaration` and `extension-revision-unverified`.
+`duplicate-declaration`, `extension-repository-unverified` and `extension-revision-unverified`.
 
 ## Extension-Result Manifest Import
 
@@ -416,7 +428,7 @@ whose `path` is the manifest path, and the manifest contributes no element:
 |---|---|---|
 | 1 | Closed key set and constants (`$schema`, `schema_version` `2.0.0`, `artifact_kind`), field shapes, manifest `id` unique across selected manifests | `extension-manifest-invalid` |
 | 2 | `manifest_sha256` equals `Get-DocsSha256Hex` of `ConvertTo-DocsCanonicalJson` of the manifest without its root `manifest_sha256` member (a canonical-JSON failure, such as a fractional number, is reported under step 1's code) | `extension-manifest-digest-mismatch` |
-| 3 | `repository.id` equals `Selection.repository_id`; when `Selection.revision` is non-null, `repository.revision` equals it (when it is null, non-blocking `extension-revision-unverified` and the check continues) | `extension-repository-mismatch` |
+| 3 | When `Selection.repository_id` is present and non-null, `repository.id` equals it (when it is absent or null, non-blocking `extension-repository-unverified` and the check continues); when `Selection.revision` is present and non-null, `repository.revision` equals it (when it is absent or null, non-blocking `extension-revision-unverified` and the check continues). A `-Selection` carrying neither key, which is what the 1022 inventory passes today (C3), therefore accepts a valid manifest with the two unverified diagnostics | `extension-repository-mismatch` |
 | 4 | `adapter.id` is not a registered docs analyzer identifier and is unique across selected manifests | `extension-adapter-invalid` |
 | 5a | Every `source_inputs[].path` is a captured input | `extension-input-not-captured` |
 | 5b | Every `source_inputs[]` `sha256` and `size` equal the captured input's | `extension-input-digest-mismatch` |
@@ -458,8 +470,10 @@ Merge as inert data (step 8, after every check passes):
   path; every hashtable whose keys reach output is enumerated through an ordinal key sort. Shuffling
   `-CapturedInput` produces identical output bytes.
 - No clock, random source, environment variable, file read or module-scope cache.
-- Configuration values never enter output: `dotnet-config` emits key paths and shapes only; the
-  `config-key` digest masks values (OQ-4); the importer copies only `value_type` for `config-key`.
+- Configuration values never enter output as text: `dotnet-config` emits key paths and shapes only;
+  the importer copies only `value_type` for `config-key`. The `config-key` digest is 1020's
+  declaration-lines digest of the raw key line (OQ-4 superseded by D5; `### Declaration-lines span
+  and digest`).
   Source string literals appear in output only where they are the declaration (route templates,
   option and command names).
 - Persistence: none. The inventory snapshot that contains these elements is written by 1022.
@@ -546,11 +560,11 @@ feature's scope.
 | ID | Dependency | Recommended default used by the plan |
 |---|---|---|
 | C1 | `analysis_method` on snapshot elements (D3 amendment of 1020): field name, enum and `New-DocsSurfaceElement` parameter | Required element field `analysis_method` with enum `native`, `scanner`, set through `-AnalysisMethod` |
-| C2 | Declaration-lines digest (D5): storage field and byte rule | `source_sha256` is redefined as the digest over the `line_range` lines (file digest stays in snapshot `inputs[].sha256`); `line_range` non-null for every scanner element; byte rule as in `### Declaration-lines span and digest`; the function lives in 1020 `DocsSurface.psm1` (for example `Get-DocsDeclarationSha256 -Text -LineRange`), else in `DocsScannerCommon.psm1` with the same contract |
-| C3 | Shape of `-Selection` | The profile `surface_selection` hashtable plus `repository_id`, `revision` and optional `registered_analyzer_ids`, built by the 1022 inventory |
+| C2 | Declaration-lines digest (D5): storage field and byte rule | `source_sha256` is redefined as the digest over the `line_range` lines (file digest stays in snapshot `inputs[].sha256`); `line_range` non-null for every scanner element; byte rule as in `### Declaration-lines span and digest`; the functions live in 1020 `DocsSurface.psm1` (1020 v0.4: `ConvertTo-DocsDeclarationText` and `Get-DocsDeclarationSha256 -Text -LineRange`), else `DocsScannerCommon.psm1` creates `Get-DocsScannerDeclarationText` and `Get-DocsDeclarationSha256` with the same contract; the digest is set only through `New-DocsSurfaceElement -SourceText` |
+| C3 | Shape of `-Selection` | The profile `surface_selection` hashtable plus `repository_id`, `revision` and `registered_analyzer_ids`, requested from the 1022 inventory through a coordinator item (plan `## Open Questions / Notes`); 1022 step 7 defines no key today, so the plan records each key as PRESENT or ABSENT and every key is optional on this feature's side (`## Inputs / Outputs`) |
 | C4 | `New-DocsCapturedInput`: `-MaxBytes` default, BOM handling, codes and `analyzer_id` for oversize and undecodable inputs | Default 1048576 supplied by the inventory; one leading U+FEFF stripped before decoding; codes `input-over-bound` and `input-undecodable`; analyzers re-emit under their own identifier |
 | C5 | `New-DocsDiagnostic` produces only `error` (blocking) or `warning`, with no extensions parameter | Precision-limit diagnostics are non-blocking `warning`; identification by `(analyzer_id, code)`; no extension marker |
-| C6 | Registry: anchor literal (`900004` placeholder versus issue number 1033); 1020's "registry has no rows" criterion; the `DocsAnalyzer*.psm1` leaf rule | Keep the anchor text as committed by 1020; update `DocsAnalyzerRegistry.Tests.ps1` to anchor presence plus membership if 1020 has not; use `DocsAnalyzerExtensionImport.psm1` |
+| C6 | Registry: anchor literal (`900004` placeholder versus issue number 1033); the row method field (1020 v0.4: `AnalysisMethod`, value `scanner`); 1020's "registry has no rows" criterion; the `DocsAnalyzer*.psm1` leaf rule | Keep the anchor text as committed by 1020; every row carries `AnalysisMethod = 'scanner'` under the field name 1020 commits; update `DocsAnalyzerRegistry.Tests.ps1` to anchor presence plus membership if 1020 has not; use `DocsAnalyzerExtensionImport.psm1` |
 | C7 | `diagnostic.code` grammar in docs common (1020 lists `code` without a type) | Discovery identifier grammar; this feature's codes use lowercase words joined by `-` |
 | C8 | Inventory merge precedence for an imported element colliding with a built-in element (1022 `DocsInventory.psm1`) | Built-in wins; imported element dropped with a non-blocking diagnostic |
 | C9 | Ledger representation of the scanner precision limit as `deferred` with an owner (1023, possibly the 1020 ledger schema) | Decided by 1023; this feature guarantees stable codes, `## Scanner Precision Limit` and `Get-DocsScannerPrecisionLimit` |
@@ -608,12 +622,18 @@ answer may change the affected criteria through a specification revision.
    declaration's lines, and the analyzer guarantee forbids value leakage. A digest over a raw
    `appsettings*.json` line includes the configuration value and allows a low-entropy value to be
    confirmed by hashing guesses. Should the `config-key` digest cover the line with values replaced
-   by their type names, the raw line, or only the key path and value type? Provisional default: the
-   line with values replaced by their type names.
+   by their type names, the raw line, or only the key path and value type? Status: the masking
+   default is superseded by 1020 v0.4 D5, under which `New-DocsSurfaceElement -SourceText` is the
+   only digest path and `Invoke-DocsAnalyzer` rejects a digest that differs from the recomputation
+   over the raw captured text; this feature hashes the raw key line and re-raises the question to
+   the coordinator as a 1020 contract question (a masked-text rule would have to live in 1020's
+   `ConvertTo-DocsDeclarationText`). Provisional default in effect: the raw line.
 5. **OQ-5 - Anchor numbering.** 1020 commits the registry anchor `# --- 900004: TypeScript and .NET
    analyzers ---` with a manifest placeholder, while this feature is issue #1033. Should 1020's
    amendment renumber anchors to issue numbers, or do the placeholders stay as committed text?
-   Provisional default: the placeholder text stays as committed (C6).
+   1020 v0.4 `## Decisions Later Children Must Honor` states that a child whose placeholder number
+   changed on promotion "edits only its own anchor comment, in the same change that inserts its
+   rows". Provisional default: the placeholder text stays as committed (C6) until the owner answers.
 
 ## Non-Goals
 
@@ -662,12 +682,12 @@ required check `poshqc / PowerShell QC` (Windows shards with coverage). Fixtures
 - [ ] `DocsAnalyzerDotnetConfig.Tests.ps1`: an in-memory `appsettings.json` and `appsettings.Development.json` with comments and trailing commas yield one `config-key` per member path with the quoted-segment and `[]` declaration rule, `value_type`, `configuration_path` and `environment`; every configuration value in the fixture is a distinctive string that occurs nowhere in the canonical JSON of the analyzer output (keys only, no values) (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsAnalyzerDotnetApi.Tests.ps1`: in-memory C# fixtures yield the expected `public-symbol` elements for public types (file-scoped and block namespaces, nested types, generics, a `partial` type split across two in-memory paths) and members (overloaded methods with distinct declarations, constructors, indexers, operators, enum members, positional record parameters), and yield no element for `internal`, `private`, `private protected`, `file` and explicit interface implementations (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsAnalyzerExtensionImport.Tests.ps1`: a valid manifest built in memory (its `manifest_sha256` computed in the test with `ConvertTo-DocsCanonicalJson` and `Get-DocsSha256Hex`) is merged as inert data: each mappable finding becomes an element with `analyzer_id` `extension-import`, a recomputed `element_id`, a declaration-lines digest computed from the captured text, `adapter_id`, `adapter_version`, `classification`, `confidence` and `finding_id` copied unchanged, and only `value_type` copied for `config-key`; unmappable findings yield one non-blocking `extension-finding-skipped` (CI: `poshqc / PowerShell QC`).
-- [ ] `DocsAnalyzerExtensionImport.Tests.ps1`: a manifest whose `source_inputs[]` `sha256` does not match the captured input is rejected with exactly one blocking `extension-input-digest-mismatch` diagnostic and contributes no element; one mutation per validation step yields that step's code (`extension-manifest-invalid`, `extension-manifest-digest-mismatch`, `extension-repository-mismatch`, `extension-adapter-invalid`, `extension-input-not-captured`, `extension-result-digest-mismatch`, `extension-result-invalid`, `extension-finding-source-mismatch`) and no element (CI: `poshqc / PowerShell QC`).
+- [ ] `DocsAnalyzerExtensionImport.Tests.ps1`: a manifest whose `source_inputs[]` `sha256` does not match the captured input is rejected with exactly one blocking `extension-input-digest-mismatch` diagnostic and contributes no element; one mutation per validation step yields that step's code (`extension-manifest-invalid`, `extension-manifest-digest-mismatch`, `extension-repository-mismatch`, `extension-adapter-invalid`, `extension-input-not-captured`, `extension-result-digest-mismatch`, `extension-result-invalid`, `extension-finding-source-mismatch`) and no element; a valid manifest validated with a `-Selection` that carries neither `repository_id` nor `revision` is accepted with exactly the two non-blocking diagnostics `extension-repository-unverified` and `extension-revision-unverified` (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsScannerContract.Tests.ps1`: for each of the seven analyzers, two runs over identical captured inputs, and runs over input orders shuffled with a seeded `[System.Random]` (seed printed on failure), produce byte-identical canonical JSON of `@{ Elements; Diagnostics }` (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsScannerContract.Tests.ps1`: for each analyzer, a selected captured input with `text` `$null` because it exceeds the 1 MiB bound yields one blocking `input-over-bound` diagnostic under that analyzer's identifier and no element from that path, an undecodable input yields `input-undecodable`, and a lexical error in one file does not remove the elements of another file (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsScannerContract.Tests.ps1`: every `(analyzer_id, code)` row returned by `Get-DocsScannerPrecisionLimit` is emitted by at least one in-memory fixture as a non-blocking diagnostic with the consequence stated in `## Scanner Precision Limit` (no element, or an element with a `<dynamic>` segment and `prefix_resolved: false`), at most once per `(analyzer_id, code, path)`, with a message containing the occurrence count and first line and no fixture source text; every non-blocking code emitted by the fixtures that is not listed under the codes that are not precision limits is a row of the table (CI: `poshqc / PowerShell QC`).
-- [ ] `DocsScannerContract.Tests.ps1`: every element produced by the six built-in scanners records `analysis_method` `scanner` and a declaration-lines digest with a non-null `line_range`; editing a line outside `line_range` leaves the digest unchanged, editing a line inside changes it, and an LF and a CRLF variant built in code yield equal digests; every element passes `ConvertFrom-DocsSurfaceElement` (CI: `poshqc / PowerShell QC`).
-- [ ] `DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1`: `Get-DocsAnalyzerRegistration` contains rows with identifiers `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config`, `dotnet-public-api` and `extension-import`, with the module leaves and functions of `### Registry rows`; none equals `python-cli`, `python-http`, `python-public-api`, `config-files` or `python-architecture`; `Test-DocsAnalyzerRegistration` returns no finding; and in the registry source text every row with these identifiers lies between the `900004` anchor line and the next anchor line or the closing delimiter, and no other row lies there (CI: `poshqc / PowerShell QC`).
+- [ ] `DocsScannerContract.Tests.ps1`: every element produced by the six built-in scanners records `analysis_method` `scanner` and a declaration-lines digest with a non-null `line_range`; editing a line outside `line_range` leaves the digest unchanged, editing a line inside changes it, and an LF and a CRLF variant built in code yield equal digests; every element passes `ConvertFrom-DocsSurfaceElement`; and for each of the six built-in scanners, 1020 `Invoke-DocsAnalyzer` with an in-memory registration row (`AnalysisMethod` `scanner`) and the `-ImportModule` seam returns the scanner's elements with no rejection finding (CI: `poshqc / PowerShell QC`).
+- [ ] `DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1`: `Get-DocsAnalyzerRegistration` contains rows with identifiers `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config`, `dotnet-public-api` and `extension-import`, each with `AnalysisMethod` `scanner` and the module leaves and functions of `### Registry rows`; none equals `python-cli`, `python-http`, `python-public-api`, `config-files` or `python-architecture`; `Test-DocsAnalyzerRegistration` returns no finding; and in the registry source text every row with these identifiers lies between the `900004` anchor line and the next anchor line or the closing delimiter, and no other row lies there (CI: `poshqc / PowerShell QC`).
 - [ ] `DocsAnalyzerRegistry.Tests.ps1` (1020's suite) asserts anchor presence and registry validity by membership rather than an empty row set, and passes with the appended rows (CI: `poshqc / PowerShell QC`).
 - [ ] `## Scanner Precision Limit` in this specification lists one row per `(analyzer_id, code)` with the construct and why it is not classified, states that the coverage ledger records it as a `deferred` entry with an owner, and `DocsScannerCommon.Tests.ps1` asserts that `Get-DocsScannerPrecisionLimit` returns rows with exactly the keys `analyzer_id`, `code`, `construct` and `consequence`, ordered by `analyzer_id` then `code`, whose `analyzer_id` values are registered identifiers (CI: `poshqc / PowerShell QC`).
 - [ ] The push-down copy of every new or edited file under `.claude/lib/docs/` is byte-identical to its source and listed exactly once in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: 1020's `tests/scripts/claude-lib/docs/Docs.Manifest.Tests.ps1` passes (CI: `poshqc / PowerShell QC`), and the existing contract tests `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass unmodified (CI: `quality-checks7 / Code Quality & Tests`).
