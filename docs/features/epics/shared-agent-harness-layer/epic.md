@@ -28,7 +28,7 @@ features:
     feature_folder: 2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028
     depends_on: [1025, 1035]
   - issue_num: 1029
-    feature_folder: push-down-consolidation-and-ecosystem-packs
+    feature_folder: 2026-10-30-push-down-consolidation-and-ecosystem-packs-1029
     depends_on: [1028]
   - issue_num: 1030
     feature_folder: hook-parity-across-claude-codex-copilot
