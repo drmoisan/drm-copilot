@@ -13,6 +13,7 @@ paths:
   - "scripts/dev_tools/validate_orchestration_artifacts.py"
   - "extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts"
   - ".claude/hooks/enforce-epic-merge-gate.ps1"
+  - ".claude/hooks/validate-orchestrator-output-rejection.ps1"
   - ".claude/agents/parallel-orchestrator.md"
   - ".claude/agents/parallel-planner.md"
   - ".claude/skills/parallel-*/SKILL.md"
@@ -212,6 +213,38 @@ All nine enums of the parallel surface are owned by the schema-and-validator fea
 The wave-4 features — F6 (mutation protocol), F7 (enforcement hooks), and F8 (drift detection) — CONSUME these member sets and NEVER extend them. A wave-4 feature that needs a new member must amend this rule file and the validators at spec review, not add the member at implementation time. This constraint exists because the wave-4 features are prepared concurrently and would otherwise add fields to the same files at the same time.
 
 Integration-cost scheduling (issue #722) adds no `conflict_edges[].reason` member; the four members above are unchanged. The scheduling data travels in tolerated-not-validated fields: an edge may carry the extra fields `hard`, `cost`, and `benefit`, and the planner and orchestrator checkpoints may carry a `tolerated_overlaps` list. No validator reads these fields, and the Python validators and the TypeScript validator port accept them with zero errors.
+
+## Mutation Rejection Signal (issue #1012)
+
+A parallel skill that rejects a mutation before any run checkpoint exists stops without writing state. Its final output then carries a rejection signal so that the completion stop hook `.claude/hooks/validate-orchestrator-output.ps1` can release the stop without demanding a checkpoint that the skill correctly did not write.
+
+**Line grammar.** The signal is the last non-blank line of the final output, after trailing whitespace (including a carriage return) is trimmed, and it matches `^PARALLEL_MUTATION_REJECTED: (?<code>[a-z_]+)$` case-sensitively: the uppercase prefix, a colon, exactly one space, and one code from the table below, with no Markdown formatting (no backticks, no bold), no leading text, and no trailing text. A token on an earlier line, inside prose, or in any other form is not a signal. Where the run's slug is known, the line `parallel_slug: <slug>` precedes the signal.
+
+**Closed code set.** The set is defined here and nowhere else:
+
+| Code | Meaning |
+| --- | --- |
+| `kickoff_artifact_missing` | `/parallel-run` found no committed kickoff artifact for the run and delegated nothing. |
+| `run_not_started` | The run is pending or not started, or no checkpoint tracks the named `parallel_slug`, so there is no running run to mutate. |
+| `items_in_flight` | The mutation is rejected because an item is in flight: a close while any item is in flight, or a removal of an in-flight item without `--disposition`. |
+| `unknown_item` | The removal target is not a live item: it is unknown, `withdrawn`, or `blocked`. |
+
+**Output signal, not a schema member.** The signal is an output signal, not a checkpoint field, and it is not one of the nine enums owned by `## Enum Ownership (F6/F7/F8 consume, never extend)`; that table and its count are unchanged. No validator reads the signal and no checkpoint records it.
+
+**Hook behavior.** The hook evaluates the signal only for `parallel-orchestrator-state` when the checkpoint resolution status is `NoTarget`:
+
+| Condition | Result |
+| --- | --- |
+| parallel, `NoTarget`, valid signal, no contradicting state in any live worktree | allow, regardless of `stop_hook_active` |
+| parallel, `NoTarget`, no signal or an invalid signal | block as before (repairable); the message gains a hint line naming the signal form and this section, and lists the allowed codes when the final line carries the prefix with an invalid code |
+| parallel, `NoTarget`, valid signal, and a live worktree holds parallel checkpoint text that is unparseable, has a non-object root, is off-route, lacks a `parallel_slug`, or records the slug the output names | block as before |
+| parallel, `Ambiguous` or `Rejected`, any signal | block as before |
+| parallel, resolved checkpoint, any signal | full validation as before |
+| `orchestrator-state` or `epic-orchestrator-state`, any signal | unchanged |
+
+A signal never relaxes validation when a checkpoint resolves, and a path that wrote state validates fully. The parser, the state-absence scan, and the decision live in `.claude/hooks/validate-orchestrator-output-rejection.ps1`, whose code array mirrors the table above and is pinned to it by a parity test.
+
+**Ownership.** The parallel skills consume these codes and never redefine them. Each mapped STOP path in `parallel-run`, `parallel-add`, `parallel-close`, and `parallel-remove` names only its own code and cites this section by heading; no skill restates the full set. A new code requires an amendment to this section, to the hook array, and to the parity test in the same change.
 
 ## F7 Seam
 
