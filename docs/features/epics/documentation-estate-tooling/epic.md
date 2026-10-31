@@ -2,9 +2,9 @@
 epic: documentation-estate-tooling
 integration_branch: epic/documentation-estate-tooling-integration
 created_at: 2026-10-30T20:10:00Z
-# PLANNING STATE. All issue_num values are real issues (placeholders back-filled 2026-10-30); each child
-# promotion receipt is back-filled; depends_on uses issue_num values. The final resolved manifest
-# replaces every placeholder before the kickoff artifact is written.
+# FINAL RESOLVED MANIFEST (2026-10-31). All issue_num values are real issues; every child
+# cleared preflight; depends_on uses issue_num values. Kickoff: epic-kickoff.md in this
+# folder.
 intent:
   epic_type: enabler
   business_outcome_hypothesis: A consumer repository can inventory its documentable surface, generate reference pages, author narrative pages through constrained roles, and prove documentation correspondence with a docs-complete receipt, without bespoke per-repository tooling, manual counting of drift, or a Python or Node.js runtime for the pushed-down helpers.
