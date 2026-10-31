@@ -256,6 +256,11 @@ carries exactly these five elements.
    The child needs it for its own operation, and F7's Layer 1 hook resolves the target item by
    scanning the prompt for exactly that path shape, so the path is emitted as a bare path token.
 3. The canonical issue number line, which is the item key.
+   For a combined item (issue #1013), element 3 is followed by the line `Combined issues: #A #B`,
+   naming every other member issue of the combination recorded in the item's
+   `combined_issue_nums`, and the prompt instructs the child to carry every member on its pr-author
+   line, `Author-asserted autoclose issues: #A #B`, so the one pull request closes every member
+   issue. The added line is part of element 3, not a further element.
 4. The item's committed `plan-path`, together with the resume instruction: resume at atomic
    execution from that plan rather than re-running promotion, research, or planning. The item's
    prepared feature folder and approved atomic plan are already committed and preflight-clear on the
@@ -483,6 +488,16 @@ unattended. When `main` uses a merge queue, the queue replaces that `gh pr updat
 step 3 enqueues each green pull request, the queue validates it against the latest `main`
 together with the entries ahead of it, and step 3's confirmation polling waits for the merge.
 
+**Resolution telemetry write (issue #1013).** When step 4 records `merge_status: merged` for an
+item that is the later-merging item of a tolerated pair (an entry of the checkpoint's
+`tolerated_overlaps` whose peer is already `merged` or `worktree_removed`), complete that entry's
+`observed_resolution` object in the same checkpoint write. When a conflict was detected for the
+pair, set `resolved_at` to the first `ci_green` confirmation that followed the detection,
+`resolution_minutes` to the whole minutes between `conflict_detected_at` and `resolved_at`, and
+`recorded_at`. When no conflict occurred, set `later_item`, `conflicted: false`,
+`conflict_detected_at` and `resolved_at` to null, `resolution_minutes: 0`, and `recorded_at`.
+Nothing reads `observed_resolution`; it is recorded for measurement only.
+
 ## Per-Item Merge-Conflict Handling
 
 Remediation is child-owned and parent-initiated. The conflict is always between one item's own
@@ -550,6 +565,19 @@ Boundary with F8: a merge conflict between two same-cohort items is evidence tha
 blast radius under-reported, and this feature records the child's blocked or remediated outcome
 only, leaving drift recording in `drift_events[]`, quiesce of admission, conflict recomputation
 against the observed radius, and requeue of the later-started item to F8.
+
+**Detection telemetry write (issue #1013).** When the item whose merge conflicted is the
+later-merging item of a tolerated pair whose peer is already `merged` or `worktree_removed`, set
+`later_item`, `conflicted: true`, and `conflict_detected_at` on that `tolerated_overlaps` entry's
+`observed_resolution` object, unless they are already set. Attribution is non-exclusive: the one
+conflict episode is recorded on every such tolerated pair. The resolution fields are written in
+`## Per-Item Merge to Main (Merge-on-Green)`.
+
+**Combined item remediation (issue #1013).** A combined item, whose checkpoint entry carries
+`combined_issue_nums`, remediates as one unit: one child, one `remediation_loop`, and one pull
+request. A combined item that fails review or CI is remediated within that one child and pull
+request, never splits back into separate pull requests, and is merged, blocked, or removed as a
+whole.
 
 ## Worktree Cleanup
 
@@ -657,6 +685,11 @@ commit message, the pull-request body, and an evidence artifact at
 `docs/features/parallel/<slug>/evidence/other/mergeable-conflicts.<yyyy-MM-ddTHH-mm>.md` carrying
 `Timestamp`, `Command`, `EXIT_CODE`, and the script's JSON output verbatim.
 
+The projection's `## Tolerated Overlaps` heading (issue #1013) renders `tolerated_overlaps[]`: one
+row per entry with `a`, `b`, `reasons`, `cost`, `benefit`, and, from the entry's
+`observed_resolution` object when present, `later_item`, `conflicted`, and `resolution_minutes`.
+An entry without `observed_resolution` renders those three cells empty.
+
 Regeneration boundaries — regenerate at each of the following, not only at final completion:
 
 - Run kickoff, seeding the initial projection from the manifest and the seeded cohorts.
@@ -666,6 +699,7 @@ Regeneration boundaries — regenerate at each of the following, not only at fin
 - Every append to `mutations[]`.
 - Every append to `drift_events[]`.
 - Every append to an item's `mergeable_conflicts_resolved`.
+- Every write of an `observed_resolution`.
 - Run completion in `closed` mode, or run close in `open` mode.
 
 Defining the `mutations[]` and `drift_events[]` appends as regeneration boundaries here means F6 and

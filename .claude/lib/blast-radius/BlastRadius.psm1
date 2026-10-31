@@ -73,6 +73,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.p
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusScheduling.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusWriteIntent.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusCombination.psm1') -Force -ErrorAction Stop
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
 # caller may pass either a bare folder name or an already-qualified path.
@@ -476,4 +477,5 @@ Export-ModuleMember -Function `
     Get-WriteIntentPlanPath, `
     Get-WriteIntentSpecContract, `
     Select-WriteIntentPathEntry, `
-    Get-PlanPathForConfig
+    Get-PlanPathForConfig, `
+    Get-BlastRadiusCombination

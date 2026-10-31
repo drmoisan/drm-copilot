@@ -513,12 +513,16 @@ narrowing. The only sanctioned mechanisms for relaxing contention are the config
 radius: editing a declared radius to suppress an edge remains prohibited.
 
 **Configuration.** `config/blast-radius.json` carries an optional `conflict_tolerance` object with
-tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only, and
-module, each an integer of at least 1), `band_durations` (C1 through C4, each an integer of at least
-1), `default_band` (one of C1 through C4), and append_only_paths (a list of exact entries and `**`
-globs). The reader fails fast with an error naming the key for any other shape; booleans are
-rejected wherever an integer is required. An absent key means strict scheduling, identical to
-tolerance_percent 0.
+tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only,
+module, and contract, each an integer of at least 1), `band_durations` (C1 through C4, each an
+integer of at least 1), `default_band` (one of C1 through C4), append_only_paths (a list of exact
+entries and `**` globs), and the optional `combination_threshold_percent` (integer, at least 0;
+default 400 when absent). The `contract` weight (issue #1013) is required and validated like the
+other weights; its committed value is 8, and a destination overrides it, like every other member,
+through `config/blast-radius.local.json`. `combination_threshold_percent` is committed as 400 and is
+overridden through the same overlay. The reader fails fast with an error naming the key for any other
+shape; booleans are rejected wherever an integer is required. An absent key means strict scheduling,
+identical to tolerance_percent 0.
 
 **Edge rule.** For each unordered pair of items:
 
@@ -532,7 +536,14 @@ tolerance_percent 0.
    possible_overlap weight for a glob or directory-prefix overlap, and the module weight times the
    number of shared modules. The append_only_paths check runs before the same_file check (append-only
    precedence), so an append-only file stays low cost even when both items name it. Mergeable paths
-   contribute 0 because they are excluded before enumeration.
+   contribute 0 because they are excluded before enumeration. Add the contract weight times the
+   number of distinct shared contract identifiers: the set the relation intersects to report
+   `contract_dependency`, each identifier counted once however often either radius lists it.
+   `contract_dependency` remains a hard class, so the contract term changes recorded edge costs and
+   combination eligibility and never an edge set. Invariant: at tolerance_percent 0 the edge set
+   equals strict scheduling for any `contract` weight, and at every tolerance the edge set with the
+   contract term equals the edge set without it; only the `cost` of edges whose pair shares a
+   contract differs.
 4. **Benefit** (integer, pairwise). The smaller of the two items' band durations; a missing band uses
    `default_band`. Running the pair concurrently saves at most one cohort step of the shorter item.
 5. **Rule.** The pair is an edge if and only if it conflicts and either it is hard or
@@ -544,8 +555,27 @@ least 1. A detected conflict that is not hard therefore has a cost of at least 1
 tolerance_percent 0 the inequality `cost * 100 > 0` always holds and the edge set equals the
 detected-conflict set exactly; cohort coloring of that set is identical to strict scheduling. At
 every tolerance an edge requires a conflict, so every edge implies a conflict and the edge set is
-always a subset of the detected-conflict set. Raising tolerance_percent never adds an edge, and the
-decision for (a, b) equals the decision for (b, a).
+always a subset of the detected-conflict set. Raising tolerance_percent never turns a pairwise
+decision into an edge, and the decision for (a, b) equals the decision for (b, a). Because the
+aggregate cap below can promote a tolerated overlap, this monotonicity holds for the pairwise
+decision only, not for the capped edge set.
+
+**Aggregate cap (issue #1013).** The pairwise rule judges each pair alone, so the single entry point
+in each runtime (`schedule_conflict_edges` through `select_capped_pairs` in
+`scripts/dev_tools/_blast_radius_aggregate.py`, and Get-BlastRadiusConflictEdge through
+Get-AggregateCappedPair in `.claude/lib/blast-radius/BlastRadiusAggregate.psm1`) applies a post-pass
+that planners and `parallel-add` cannot skip. For item `i`, `total(i)` is the summed cost of its
+remaining tolerated overlaps, and `i` is over its cap when
+`total(i) * 100 > band_duration(i) * tolerance_percent` (integers only; a missing band reads as
+`default_band`). While any item is over its cap, the smallest-key such item promotes the overlap with
+the minimum key (benefit ascending, cost descending, a ascending, b ascending) to an edge carrying
+`hard` false and the overlap's first reason, and the totals are recomputed. At tolerance_percent 0
+nothing is tolerated, so the pass is a no-op and strict identity holds. A single tolerated overlap
+never exceeds the cap, so the cap binds only for an item with two or more tolerated overlaps. The
+capped scheduling output has five pinned set-level properties: the capped edges are a superset of
+the pairwise edges and a subset of the detected conflicts; the output at tolerance 0 equals the
+uncapped output; every item is within its cap after the pass; the output is invariant to input
+order; and a second pass changes nothing.
 
 **Soft-overlap handling.** A detected, non-hard pair within tolerance is a tolerated overlap, not an
 edge. The planner records it in a tolerated_overlaps list on the planner checkpoint (and the
@@ -561,7 +591,39 @@ the checkpoint (`default_band` when absent), through the helper module
 yields an edge and the pair is not already a recorded edge. A tolerated pair whose observed overlap
 stays within tolerance halts neither item; one whose observed overlap exceeds tolerance, or becomes
 hard, is reported. An unevaluable peer radius still counts as an edge (fail closed). At
-tolerance_percent 0 the drift output equals strict drift output.
+tolerance_percent 0 the drift output equals strict drift output. Drift detection stays pairwise: it
+does not apply the aggregate cap, and a cap-promoted pair is a recorded edge, so drift never reports
+it as newly conflicting.
+
+**Telemetry (issue #1013).** Three fields are tolerated and not validated; no validator reads them:
+`tolerated_overlaps[].observed_resolution` on the orchestrator checkpoint, `items[].combined_issue_nums`
+on the planner and orchestrator checkpoints and the run manifest, and a top-level `combinations` list
+on the planner checkpoint. `observed_resolution` has the shape `later_item` (integer), `conflicted`
+(boolean), `conflict_detected_at` (timestamp or null), `resolved_at` (timestamp or null),
+`resolution_minutes` (integer), and `recorded_at` (timestamp). The parallel orchestrator writes it for
+the later-merging item of a tolerated pair. Attribution is non-exclusive: one conflict episode is
+attributed to every tolerated peer that merged before it. Nothing reads `observed_resolution`, and no
+weight changes automatically from it.
+
+**Issue combination (issue #1013).** At planning time only, `find_combinations` in
+`scripts/dev_tools/_blast_radius_combination.py` and Get-BlastRadiusCombination in
+`.claude/lib/blast-radius/BlastRadiusCombination.psm1` find pairs that are cheaper to deliver as one
+item. Combination is disabled when `conflict_tolerance` is absent or tolerance_percent is 0. A
+conflicting pair is a candidate when its full reasons contain `contract_dependency` or it has a
+same-file overlap (two equal concrete entries, after the mergeable exclusion, neither matching
+append_only_paths), and it qualifies when `cost * 100 >= benefit * combination_threshold_percent`.
+A contract-only pair is a candidate and qualifies when its contract-term cost meets the threshold;
+one that does not qualify still serializes as a hard `contract_dependency` edge. Qualifying pairs
+are grouped into connected components; each becomes one combination with ascending members, the
+smallest member as primary, its pairs sorted by `(a, b)`, and `estimated_savings` equal to the sum
+of its pair costs. There is no size cap on a combined item. The planner re-plans the primary
+member's branch to cover every member, removes the other members from `items[]`, and records
+`combined_issue_nums` and the `combinations` entry. No umbrella issue is created: the member issues
+stay separate on GitHub, and the one PR closes every member through its author-asserted autoclose
+line. A combined item remediates as one unit (one child, one `remediation_loop`, one PR) and never
+splits back into separate PRs. A larger combined PR to review and a shared remediation budget are an
+accepted trade; a destination tunes `combination_threshold_percent` to change how often items
+combine.
 
 ### Write-intent extraction (issue #722)
 
