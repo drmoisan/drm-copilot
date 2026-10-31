@@ -3,9 +3,9 @@
 - **Issue:** #1013
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T16-00
+- **Last Updated:** 2026-10-31
 - **Status:** Draft
-- **Version:** 0.4 (preflight 2026-10-30: the "unchanged" wording of AC-04, AC-08, AC-26, D-6, D-7, and `## Test Strategy` aligned with D-7; 0.3 owner decision 2026-10-30: `conflict_tolerance.weights.contract`, see D-7)
+- **Version:** 0.5 (staleness revision 2026-10-31: Complete File List entry 76 added for the post-#1006 overlay corpus file that restates the committed `weights` map; 0.4 preflight 2026-10-30: the "unchanged" wording of AC-04, AC-08, AC-26, D-6, D-7, and `## Test Strategy` aligned with D-7; 0.3 owner decision 2026-10-30: `conflict_tolerance.weights.contract`, see D-7)
 - **Work Mode:** full-feature (acceptance criteria are tracked in this file and in `user-story.md`)
 - **Branch:** `feature/parallel-scheduling-integration-cost-1013`
 - **Research:** `research/research.2026-10-30T13-28.md` in this feature folder (authoritative for design decisions, symbols, and the complete file list)
@@ -264,7 +264,7 @@ Error texts: a malformed `combination_threshold_percent` raises in the reader an
 
 ## Complete File List
 
-Every file this feature writes: entries 1 to 54 as recommended by the research, and entries 55 to 75 added by the D-7 contract weight. (new) marks a new file; `[#1006]` marks a file also written by #1006. Feature-folder documents and evidence files are excluded.
+Every file this feature writes: entries 1 to 54 as recommended by the research, and entries 55 to 76 added by the D-7 contract weight (entry 76 after the #1006 rebase). (new) marks a new file; `[#1006]` marks a file also written by #1006. Feature-folder documents and evidence files are excluded.
 
 Production, configuration, and documentation:
 
@@ -349,6 +349,7 @@ Added by the D-7 contract weight (revision 0.3). Each file below constructs or r
 73. `tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.PairCost.Tests.ps1`
 74. `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1`
 75. `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-tolerance-keys.test.ts`
+76. `tests/fixtures/blast_radius_overlay/shared-surfaces-demote-already-append-only.json` [#1006] (added by the post-rebase re-derivation: its `base_text` and `expected_text` restate the committed `weights` map; the overlay composers do not read it, so the edit keeps the fixture mirroring the committed table and changes no test outcome)
 
 Files 1, 4, 8, 13, 14, 15, 16, 39, and 45 above also carry D-7 edits.
 
@@ -447,7 +448,7 @@ Contract weight (owner decision 2026-10-30, D-7):
 - Loss of set-level monotonicity (D3): documented in the rule text and pinned by the AC-05 properties.
 - Aggressive combination at committed weights: two C1 items sharing one non-append-only file give `8*100 >= 1*400`, and two C2 items give `800 >= 800`. The threshold is destination-tunable; the behavior is documented in the rule text.
 - Contract-only pairs now combine at the committed values when the shorter item is C1 or C2 (D-7). The committed `contract` value 8 is an orchestrator assumption; a destination tunes it through `config/blast-radius.local.json`.
-- Required `contract` weight name breaks any config that carries `weights` without it, including destination overlays that restate the full `weights` map: the overlay composers merge recursively, so an overlay that sets individual weights keeps the published `contract`; an overlay that is invalid after the merge fails fast with the key named. Every in-repository fixture carrying `weights` is updated in the same task (entries 59 to 75).
+- Required `contract` weight name breaks any config that carries `weights` without it, including destination overlays that restate the full `weights` map: the overlay composers merge recursively, so an overlay that sets individual weights keeps the published `contract`; an overlay that is invalid after the merge fails fast with the key named. Every in-repository fixture carrying `weights` is updated in the same task (entries 59 to 76).
 - Pinned cost values for contract-sharing edges change (historical-run and scheduling fixtures): each change is named with its reason in the plan; edge sets are pinned unchanged (AC-29).
 - Unbounded combined item and larger review (R4): accepted trade, documented.
 - Mirror drift across bundle copies and the Class 1 `conflict_tolerance` value: copy bundle files in one task with recorded SHA-256 pairs, edit both truth tables in one task, and run the AC-18 contract tests.
