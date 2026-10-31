@@ -3,10 +3,10 @@
 - Issue: #1024
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-30
+- Last Updated: 2026-10-31
 - Parent: #1019 (epic `documentation-estate-tooling`, wave 2; depends on 1020 and 1021)
 - Work Mode: full-feature
-- Spec: `spec.md` version 0.3 (authoritative for the command contract, `-Json` result, finding codes, marker grammar, merge algorithm, page-plan rules, module design and property-test table). The spec supersedes the Python design named in `issue.md` `## Proposed Behavior`.
+- Spec: `spec.md` version 0.4, the reconciliation revision against the current 1021 and 1020 contracts under owner decision P2 (authoritative for the command contract, `-Json` result, finding codes, marker grammar, merge algorithm, page-plan rules, module design and property-test table). The spec supersedes the Python design named in `issue.md` `## Proposed Behavior`.
 
 ## Story Statement
 
@@ -57,7 +57,8 @@ destination repository.
   - Wraps the command as `generate_docs_reference`, launching
     `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command generate-reference -Json`
     and reading exactly one envelope from stdout.
-  - Cares that options, exit codes, finding codes and `result` keys are fixed and that the envelope
+  - Cares that options, exit codes, finding codes and `result` keys (exactly `mode`,
+    `output_directory`, `pages`, `summary`, `unrendered`) are fixed and that the envelope
     validates against `schemas/docs/v1/docs-command-envelope.schema.json`.
 - Scenario: first generation
   - The maintainer runs the command. The profile names `docs/reference` as the reference
@@ -89,7 +90,7 @@ Pester criteria run locally through `Invoke-PoshQCTest` and in CI under the requ
 - [ ] Prose outside generated markers is preserved across regeneration: a seeded property test on `Merge-DocsReferenceBlock` shows that lines outside blocks keep their relative order, prose segments stay byte-identical when the identifier set is unchanged, and a second merge changes nothing (`poshqc / PowerShell QC`).
 - [ ] A removed element's block is removed and reported: its identifier appears in `result.pages[].blocks.removed` and one `REFERENCE_BLOCK_REMOVED` info finding names it in `related_ids` (Pester, `poshqc / PowerShell QC`).
 - [ ] Every generated page passes the 1021 `check` subcommand with zero findings, for new pages and after regeneration over pages with author prose (Pester integration test with an in-memory context and an entry page linking each generated page; `poshqc / PowerShell QC`).
-- [ ] Emitted front matter validates against the committed `schemas/docs/v1/page-metadata.schema.json`, and valid existing `owner`, `audience`, `last_reviewed`, `title` and `extensions` values are preserved (Pester, `poshqc / PowerShell QC`).
+- [ ] Emitted front matter is `---`, one `<key>: <JSON value>` line per field, `---`, and validates against the 1021 page-metadata schema (`urn:drm-copilot:docs:1.0.0:page-metadata`) through 1021 `Test-DocsPageFrontMatter` with the composed schema set (through `Get-DocsPageComposedSchemaSet` when 1021 uses its own schema gate), with no `owner`, `audience`, `last_reviewed` or `surface_refs` pattern pinned by 1024, and valid existing `owner`, `audience`, `last_reviewed`, `title` and `extensions` values are preserved (Pester, `poshqc / PowerShell QC`).
 - [ ] `-Json` output for dry-run, write, exit-1, exit-2 and exit-3 runs validates against `schemas/docs/v1/docs-command-envelope.schema.json` and has the keys `command`, `exit_code`, `findings`, `ok`, `result` (Pester, `poshqc / PowerShell QC`).
 - [ ] Without `-Write` nothing is written and the planned changes are printed: the in-memory context records no write, the exit code is 0, text output shows each page line and diff hunks, and the `-Json` result has `mode` `dry-run` with status `planned` (Pester, `poshqc / PowerShell QC`).
 - [ ] With `-Write`, changed pages are written only through the command context's `WriteText` in ordinal path order, and an immediate second run writes nothing and reports action `none` for every page (Pester, `poshqc / PowerShell QC`).
@@ -98,7 +99,7 @@ Pester criteria run locally through `Invoke-PoshQCTest` and in CI under the requ
 - [ ] A marker anomaly (malformed, duplicate, unbalanced, mismatched, inside front matter) or an unclosed fence blocks only the affected page with the code listed in the spec's finding-code catalog (Pester, `poshqc / PowerShell QC`).
 - [ ] Each public pure function has a seeded property-style Pester test, explicitly including `Resolve-DocsReferenceOutputDirectory`, `Get-DocsReferenceCandidatePagePath`, `Format-DocsReferenceSourceLine`, `Split-DocsReferenceFrontMatter`, `ConvertFrom-DocsReferencePageText` and `Get-DocsReferenceReportLine`, with the seed in the test name (`poshqc / PowerShell QC`).
 - [ ] Generated pages are the fixed family pages `cli-reference.md`, `http-reference.md`, `config-reference.md` and `api-reference.md`; `architecture-component` elements are counted, not rendered; no index page is generated (Pester, `poshqc / PowerShell QC`).
-- [ ] No rendered heading begins with `How to` or `Step <n>`, and every marker is a standalone line with blank lines inside and outside the block (Pester, `poshqc / PowerShell QC`).
+- [ ] No rendered heading begins, case-insensitively, with `how to ` or `step <n>` (the headings 1021 reports on a reference page as `DOCS_PAGE_MODE_INSTRUCTION_HEADING`), and every marker is a standalone line with blank lines inside and outside the block (Pester, `poshqc / PowerShell QC`).
 - [ ] Each new `DocsReference*.psm1` module and the edited `Invoke-DocsCommand.ps1` are byte-identical to their push-down copies, each new module is listed in the Claude `core.json`, and the existing push-down contract tests pass unmodified.
 - [ ] No Python or TypeScript file is added or modified, and no new test creates a temporary file.
 - [ ] Pester line coverage is at least 85% for each new module under `.claude/lib/docs/`, with no production file excluded from measurement.

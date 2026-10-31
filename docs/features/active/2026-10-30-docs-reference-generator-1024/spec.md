@@ -3,9 +3,9 @@
 - **Issue:** #1024
 - **Parent (optional):** #1019 (epic `documentation-estate-tooling`, wave 2, complexity band C3; depends on 1020 and 1021)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30
+- **Last Updated:** 2026-10-31
 - **Status:** Draft
-- **Version:** 0.3
+- **Version:** 0.4
 - **Work Mode:** full-feature
 - **Research:** `research/2026-10-30T22-39-docs-reference-powershell-addendum-research.md` (authoritative for the PowerShell module design, public functions, property-test table, test strategy, artifact classification and owner questions adopted below). `research/research.2026-10-30T20-59.md` describes the withdrawn Python design and is superseded for every mechanism; its language-independent rules are carried forward only where this specification restates them.
 
@@ -20,17 +20,28 @@ through `Invoke-DocsCommand.ps1 -Command generate-reference`.
 `issue.md` `## Proposed Behavior` and its early-draft acceptance criteria still name the withdrawn
 Python design. This specification supersedes them; `issue.md` is not edited.
 
+Version 0.4 is the owner-authorized reconciliation revision (decision P2, 2026-10-31) against the
+current PowerShell contracts of 1021 and 1020 (including 1020's P1 cycle). It replaces the
+pre-PowerShell 1021 names (`DX-NO-INSTRUCTION`, `PAGE_ORPHANED`, root and entry-page `check`
+options) with 1021's `DOCS_PAGE_*` codes and options, removes the page-metadata pattern constants
+that 1024 pinned itself, validates existing front matter through 1021's validation route, and
+records the resolved coordination items. The generator design is otherwise unchanged.
+
 Binding sources, in precedence order:
 
-1. Owner decisions D1, D3, D4, D5 and the refined implementation-language directive (epic
-   `## Owner Directive: Implementation Language (2026-10-30, refined)`, `## Owner Decisions`).
+1. Owner decisions D1, D3, D4, D5, P1 and P2 and the refined implementation-language directive
+   (epic `## Owner Directive: Implementation Language (2026-10-30, refined)`, `## Owner Decisions`).
 2. D5 supersedes the epic sentence that the `-Json` envelope has no schema file: the envelope
    schema is `schemas/docs/v1/docs-command-envelope.schema.json` (planned by the 1020 amendment).
-3. Epic `### Generator decisions from the first preparation of 1024` and `### Naming contract`.
-4. The 1020 PowerShell contracts (epic `### PowerShell contracts from the re-preparation of 1020`
-   and 1020 spec `## Decisions Later Children Must Honor`).
-5. 1021 language-independent checker rules (page-metadata fields and patterns, Diataxis rules,
-   orphan rule, fence rule).
+3. Epic `### Generator contracts from the PowerShell preparation of 1024 (binding)`,
+   `### Generator decisions from the first preparation of 1024` and `### Naming contract`.
+4. The 1020 PowerShell contracts (epic `### PowerShell contracts from the re-preparation of 1020`,
+   `### 1020 amendment outcome (2026-10-31)` and 1020 spec `## Decisions Later Children Must
+   Honor`, including its P1 items).
+5. The 1021 PowerShell contracts (epic `### Page-check contracts from the PowerShell preparation of
+   1021 (binding)` and 1021 spec: finding-code catalog, `check` options, page-metadata schema
+   `urn:drm-copilot:docs:1.0.0:page-metadata`, front-matter subset, Diataxis and orphan rules,
+   fence rule, `## Decisions Later Children Must Honor`).
 
 ## Overview
 
@@ -53,7 +64,10 @@ framework-native and domain-neutral; no consumer identifier appears in framework
 `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command generate-reference` runs
 these stages:
 
-1. Read and compose the docs schema set (`Read-DocsSchemaSet`, `Get-DocsComposedSchemaSet`).
+1. Read and compose the docs schema set (`Read-DocsSchemaSet`, `Get-DocsComposedSchemaSet`). If
+   1020 does not compose `page-metadata` into that set and 1021 therefore uses its own schema gate,
+   the result is passed through 1021's `Get-DocsPageComposedSchemaSet`; that composed set is the
+   one given to every 1021 validation call (`Test-DocsPageFrontMatter`, `Get-DocsPageCheckFinding`).
 2. Read and validate the docs profile (`ConvertFrom-DocsProfileText`).
 3. Read and validate the surface inventory snapshot (`ConvertFrom-DocsReferenceSnapshotText`).
 4. Resolve the reference output directory and plan the family pages (`Get-DocsReferencePagePlan`).
@@ -84,10 +98,11 @@ blocker when one is absent. This specification does not re-design them.
 | `Get-DocsCommandTable`, `Test-DocsCommandTable`, `ConvertFrom-DocsCommandArgument`, `New-DocsCommandContext`, `Write-DocsFileText`, `Invoke-DocsCommandCli`; context members `ReadText`, `ReadBytes`, `TestFile`, `ListFile`, `WriteText`, `UtcNow` (`Invoke-DocsCommand.ps1`) | planned by 1020 | Entry, dispatch, argument parsing, I/O |
 | `schemas/docs/v1/docs-command-envelope.schema.json`; `analysis_method` and the declaration-lines digest on snapshot elements | planned by the 1020 amendment (D3, D5) | Envelope validation; fields read and ignored by the generator |
 | `tests/scripts/claude-lib/docs/Docs.TestSupport.psm1`, `Docs.Manifest.Tests.ps1`, the 1020 neutrality suite | planned by 1020 | Test support, manifest parity, neutrality |
-| Front-matter parse function and fence-aware line classifier (`DocsPageFrontMatter.psm1` or a shared page-scan module) | planned by 1021 (coordination item C6) | Parse existing front-matter values; skip fenced code identically to the checker |
-| `check` subcommand and its root and entry-page options | planned by 1021 (C7) | Integration test only; never called by production code |
-| `schemas/docs/v1/page-metadata.schema.json` and its runtime copy under `.claude/lib/docs/schemas/v1/` | planned by 1021 (C8) | Front-matter contract; read by tests only |
-| Diataxis rule `DX-NO-INSTRUCTION` (heading prefixes `how to `, `step <n>`), orphan rule `PAGE_ORPHANED` | 1021 (language-independent rules) | Constraints on emitted Markdown |
+| `ConvertFrom-DocsPageFrontMatter`, `Test-DocsPageFrontMatter -FrontMatter -PagePath -ComposedSchemaSet -RequiredField -AudienceId [-FieldLine]` (`DocsPageFrontMatter.psm1`); `Get-DocsPageComposedSchemaSet` (same module, only when 1021 falls back to its own schema gate) | planned by 1021 (C6) | Parse existing front-matter values; decide validity of existing values against the page-metadata schema |
+| `Get-DocsPageFenceLine`, `Test-DocsPageFenceClose`, `Get-DocsPageLineModel` (`DocsPageMarkdown.psm1`) | planned by 1021 (C6) | Skip fenced code identically to the checker |
+| `check` subcommand (options `-Profile` and repeatable `-Path` only) and `Get-DocsPageCheckFinding` (`DocsPageCheck.psm1`) | planned by 1021 (C7) | Integration test only; never called by production code |
+| `schemas/docs/v1/page-metadata.schema.json` (`$id` `urn:drm-copilot:docs:1.0.0:page-metadata`) and its runtime copy under `.claude/lib/docs/schemas/v1/` | planned by 1021 (C8) | Front-matter contract; source of every `owner`, `audience`, `last_reviewed` and `surface_refs` constraint; reached only through the composed schema set |
+| Diataxis rule `DOCS_PAGE_MODE_INSTRUCTION_HEADING` (heading text that, case-insensitively, starts with `how to ` or matches `^step\s+[0-9]+\b`), orphan rule `DOCS_PAGE_ORPHAN`, entry pages `<root>/README.md` else `<root>/index.md` | 1021 | Constraints on emitted Markdown |
 
 Existing code reused indirectly: `.claude/lib/discovery-validation/DiscoveryEncoding.psm1`
 (canonical JSON and SHA-256), reached only through 1020 `DocsJson.psm1`. The Mermaid fence helpers
@@ -140,25 +155,27 @@ There is no `-DryRun` option; dry run is the default.
 
 ### Dispatch row
 
-One line under the generate-reference anchor of the dispatch table in `Invoke-DocsCommand.ps1`
-(anchor text fixed by the amended 1020 spec; coordination item C1; the 1020 spec v0.3 text is
-`# --- 900006: generate-reference ---`, and the current manifest numbering is 1024):
+One line directly under the anchor `# --- 1024: generate-reference ---` of the dispatch table in
+`Invoke-DocsCommand.ps1` (fixed by the amended 1020 spec, which uses real issue numbers and rejects
+any `# --- 900NNN:` anchor; coordination item C1 resolved):
 
 ```powershell
 [pscustomobject]@{ Name = 'generate-reference'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReferenceWriter.psm1'); Function = 'Invoke-DocsGenerateReferenceCommand'; Option = @{ Profile = 'value'; Snapshot = 'value'; OutputDirectory = 'value'; Write = 'switch' } }
 ```
 
 No other row or anchor is edited. The row passes `Test-DocsCommandTable`. Both the source and the
-bundle copy of `Invoke-DocsCommand.ps1` carry the row.
+bundle copy of `Invoke-DocsCommand.ps1` carry the row. Tests assert membership (the anchor exists
+and the row is found by `Name` directly under it); no 1024 test asserts a row count of the
+committed dispatch table, following the 1020 P1 membership-assertion rule.
 
 ### Exit codes
 
 | Code | Condition | Findings | `result` |
 |---|---|---|---|
 | 0 | No `error` finding. Dry run computed the plan, or write mode completed every required write | `warning` and `info` findings only | Non-null |
-| 1 | At least one `error` finding during loading or planning (nothing written in either mode); `DOCS_PROFILE_MISSING`; `REFERENCE_SNAPSHOT_MISSING`; a write conflict (`REFERENCE_WRITE_CONFLICT`) | Ordered findings | `null` when the profile did not load; otherwise non-null |
+| 1 | At least one `error` finding during loading or planning (nothing written in either mode); `DOCS_PROFILE_MISSING`; `REFERENCE_SNAPSHOT_MISSING`; a write conflict (`REFERENCE_WRITE_CONFLICT`, with a full `result`) | Ordered findings | `null` when the profile did not load; otherwise non-null |
 | 2 | Usage or input error detected before any read | Only `DOCS_CLI_ARGUMENTS` | `null` |
-| 3 | Uncomposable schema set; a read failure other than absence or any unexpected exception (`DOCS_CLI_RUNTIME` at the entry boundary); an exception from `WriteText` (`REFERENCE_WRITE_FAILED`, OQ-3) | Exactly one finding | `null` |
+| 3 | Uncomposable schema set (including composition findings from `Get-DocsPageComposedSchemaSet` when 1021 uses its own schema gate); a read failure other than absence or any unexpected exception (`DOCS_CLI_RUNTIME` at the entry boundary); an exception from `WriteText` (`REFERENCE_WRITE_FAILED`, OQ-3) | Exactly one finding | `null` |
 
 Change from version 0.2: an absent profile or snapshot is exit 1 (the 1020 `validate-profile`
 convention) rather than exit 3; a write conflict is exit 1 with a full result.
@@ -167,8 +184,10 @@ convention) rather than exit 3; a write conflict is exit 1 with a full result.
 
 The envelope is the 1020 canonical JSON `{command, exit_code, findings, ok, result}` (sorted keys,
 compact, one trailing LF), with `command` equal to `generate-reference`. It validates against
-`schemas/docs/v1/docs-command-envelope.schema.json` (D5; composed through `Join-DocsSchemaText` when
-it references docs common, otherwise self-contained). `result`:
+`schemas/docs/v1/docs-command-envelope.schema.json` (D5) through `Test-DocsArtifactText
+-ArtifactKind 'docs-command-envelope'` (1020); the envelope schema does not constrain `result`.
+The `result` key set is exactly `{mode, output_directory, pages, summary, unrendered}` (epic
+`### Generator contracts from the PowerShell preparation of 1024 (binding)`). `result`:
 
 | Key | Content |
 |---|---|
@@ -197,7 +216,7 @@ dropped: the envelope carries the command name, and an exit-3 result is `null`.
 `Get-DocsReferenceReportLine` returns, in order: one `<action> <path> (+<added> ~<updated>
 -<removed>)` line per page in ordinal path order; in dry run, the diff lines of each changed page;
 one `note: <path> is new; link it from a documentation entry page so that the check command does
-not report PAGE_ORPHANED` line per created page; then one mode line (`dry run, nothing written`,
+not report DOCS_PAGE_ORPHAN` line per created page; then one mode line (`dry run, nothing written`,
 `wrote <n> page(s)`, or `nothing written`). 1020 `ConvertTo-DocsReportText` prints the finding lines
 before these and the `generate-reference: exit=<n> errors=<n> warnings=<n> infos=<n>` summary line
 after them.
@@ -256,7 +275,7 @@ including front matter, and appear in the message. `next_action` is a fixed sent
 | `REFERENCE_OUTPUT_OUTSIDE_ROOTS` | error | page | No `documentation_roots` entry covers the page path |
 | `REFERENCE_OWNER_UNRESOLVED` | error | page | No valid existing `owner` and no `page_owners` entry covers the path |
 | `REFERENCE_AUDIENCE_MISSING` | error | page | No valid existing `audience` and the covering root has empty `audience_ids` |
-| `REFERENCE_FRONT_MATTER_INVALID` | error | page | Existing front matter is unterminated, rejected by the 1021 parser (including a duplicate key or a non-mapping value), has a key outside the page-metadata properties, or has a value that violates the page-metadata constraint for its field |
+| `REFERENCE_FRONT_MATTER_INVALID` | error | page | Existing front matter is unterminated, rejected by 1021 `ConvertFrom-DocsPageFrontMatter` (including a duplicate key or a non-mapping value), or yields a finding from 1021 `Test-DocsPageFrontMatter` over the composed schema set (a key outside the page-metadata properties, or a value that violates the page-metadata constraint for its field); the message names the 1021 `DOCS_PAGE_*` code, and 1024 emits no `DOCS_PAGE_*` code itself |
 | `REFERENCE_MARKER_MALFORMED` | error | page | A line outside fenced code and outside an open block whose trimmed text starts with `<!-- docs:generated:` but is not an exact start or end marker (indentation, trailing text, identifier outside the element-id grammar) |
 | `REFERENCE_MARKER_DUPLICATE` | error | page | A start marker repeats an identifier already opened in the page |
 | `REFERENCE_MARKER_UNBALANCED` | error | page | An end marker without an open block, a start marker while a block is open, or a start marker never closed |
@@ -270,11 +289,11 @@ including front matter, and appear in the message. `next_action` is a fixed sent
 | `DOCS_CLI_ARGUMENTS` | error | invocation | Exit 2 (1020) |
 | `DOCS_CLI_RUNTIME` | error | runtime | Exit 3 at the entry boundary (1020) |
 
-`REFERENCE_AUDIENCE_INVALID` (version 0.2) is removed: the epic fixes one audience pattern,
-`^[a-z0-9][a-z0-9-]*$`, for profile audience identifiers and the page-metadata `audience` item, so
-the condition is unreachable on a schema-valid profile and would be untestable code. If
-coordination item C4 reports that the amended 1020 profile schema does not enforce the pattern, the
-code is reinstated through a specification revision.
+`REFERENCE_AUDIENCE_INVALID` (version 0.2) is removed: profile `audiences[].id`,
+`documentation_roots[].audience_ids` and the page-metadata `audience` items all use the docs common
+`audience-id` definition (1020 `## Decisions Later Children Must Honor`, audience coordination with
+1021), so the condition is unreachable on a schema-valid profile and would be untestable code. 1024
+does not restate the pattern.
 
 Error gating: global findings stop the run before the next stage (profile errors before the
 snapshot read; snapshot or repository errors before planning; output-directory errors before page
@@ -319,7 +338,8 @@ mode `reference` whose `path_or_glob` contains none of `*`, `?`, `[`; otherwise
   order; none gives `REFERENCE_OUTPUT_OUTSIDE_ROOTS`.
 - Audience: a valid existing `audience` is preserved; otherwise the ordinal-sorted `audience_ids`
   of the documentation root; empty gives `REFERENCE_AUDIENCE_MISSING`. Audience identifiers follow
-  `^[a-z0-9][a-z0-9-]*$`, the pattern 1020 and 1021 adopt in both schemas.
+  the docs common `audience-id` definition that the profile and page-metadata schemas share; 1024
+  pins no audience pattern.
 
 ### Element order within a page
 
@@ -372,9 +392,14 @@ mode `reference` whose `path_or_glob` contains none of `*`, `?`, `[`; otherwise
 
 - Existing front matter is recognized only when line 1 (after BOM removal and CRLF normalization)
   is exactly `---`; it ends at the next line that is exactly `---` or `...`
-  (`Split-DocsReferenceFrontMatter`). Field values are parsed by the 1021 front-matter parser, so
-  generator and checker read the block identically (C6). No YAML library is used (A8).
-- Rendered form (`ConvertTo-DocsReferenceFrontMatterText`): `---`, one `<key>: <JSON value>` line
+  (`Split-DocsReferenceFrontMatter`). Field values are parsed by 1021 `ConvertFrom-DocsPageFrontMatter`,
+  so generator and checker read the block identically (C6). No YAML library is used (A8).
+- Validity of an existing value is decided by 1021 `Test-DocsPageFrontMatter` over the composed
+  schema set of `## Behavior` stage 1 (passed through `Get-DocsPageComposedSchemaSet` when 1021 uses
+  its own schema gate), with an empty `-RequiredField` (the generator fills missing fields) and the
+  profile `audiences[].id` values as `-AudienceId`.
+- Rendered form (`ConvertTo-DocsReferenceFrontMatterText`, the 1021 front-matter format): `---`,
+  one `<key>: <JSON value>` line
   per field in the order `owner`, `last_reviewed`, `audience`, `diataxis_mode`, `surface_refs`,
   `title` (when present), `extensions` (when present), then `---`, LF-terminated. JSON values come
   from `ConvertTo-DocsCanonicalJson` without its trailing LF, with U+0085, U+2028 and U+2029
@@ -388,10 +413,10 @@ mode `reference` whose `path_or_glob` contains none of `*`, `?`, `[`; otherwise
   page.
 - Existing page without front matter: a rendered block and one blank line are inserted before the
   unchanged body. YAML comments inside an existing block are not preserved.
-- Pattern constants equal the page-metadata schema patterns (`owner` `^\S(.*\S)?$`,
-  `last_reviewed` `^[0-9]{4}-[0-9]{2}-[0-9]{2}$` plus calendar validity, audience item
-  `^[a-z0-9][a-z0-9-]*$`, `surface_refs` item `^\S+$`); a test pins them against the committed
-  schema file.
+- 1024 defines no pattern constant for `owner`, `audience`, `last_reviewed` or `surface_refs`.
+  Their constraints come only from 1021's page-metadata schema
+  (`urn:drm-copilot:docs:1.0.0:page-metadata`, fields through docs common `$defs`), reached through
+  the composed schema set; the `last_reviewed` calendar check is 1021's.
 
 ### Rendering rules
 
@@ -412,8 +437,10 @@ mode `reference` whose `path_or_glob` contains none of `*`, `?`, `[`; otherwise
 - Property `<property name>`: `<json value>` (one line per property, ordinal by name)
 ```
 
-- Every heading starts with a fixed English word followed by a code span, so no heading text
-  begins with `how to ` or matches `^step\s+[0-9]+\b` (1021 `DX-NO-INSTRUCTION`).
+- No generated heading text begins, case-insensitively, with `how to ` or matches
+  `^step\s+[0-9]+\b`, because 1021 reports such a heading on a `reference` page as
+  `DOCS_PAGE_MODE_INSTRUCTION_HEADING`. Every heading starts with a fixed English word followed by
+  a code span, which guarantees this for any declaration text.
 - Every consumer-derived string (declaration, name, path, property name, property value as
   canonical JSON) passes through `ConvertTo-DocsReferenceSingleLine` and then
   `ConvertTo-DocsReferenceCodeSpan`. No consumer text starts a line, so no rendered line can open an
@@ -450,7 +477,7 @@ from the writer to stay within the 500-line guidance.
 |---|---|---|---|
 | `DocsReferencePlan.psm1` | Snapshot conversion, path coverage, output directory, candidate paths, page plan, unrendered count | pure | `DocsJson.psm1`, `DocsFinding.psm1`, `DocsSchema.psm1`, `DocsSurface.psm1` |
 | `DocsReferenceRender.psm1` | Single-line and code-span escaping, source and property lines, block body per element kind | pure | `DocsJson.psm1` |
-| `DocsReferenceMarkers.psm1` | Marker lines, fence-aware body parse, block merge with edit records | pure | `DocsSurface.psm1`, `DocsFinding.psm1`, the 1021 module exporting the fence classifier |
+| `DocsReferenceMarkers.psm1` | Marker lines, fence-aware body parse, block merge with edit records | pure | `DocsSurface.psm1`, `DocsFinding.psm1`, `DocsPageMarkdown.psm1` (1021) |
 | `DocsReferenceFrontMatter.psm1` | Delimiter split, existing-page conversion, value resolution, canonical rendering | pure | `DocsJson.psm1`, `DocsFinding.psm1`, `DocsPageFrontMatter.psm1` (1021) |
 | `DocsReferenceWriter.psm1` | Pure composition, diff rendering, result and report lines; the `generate-reference` command function | mixed (I/O through the command context only) | the four modules above, `DocsFinding.psm1`, `DocsJson.psm1`, `DocsProfile.psm1`, `DocsSchema.psm1`, `DocsSurface.psm1` |
 
@@ -487,10 +514,10 @@ inputs are strings, arrays and dictionaries (hashtables) and are not mutated.
 | `ConvertFrom-DocsReferenceBody -Line -PagePath -LineOffset` | Markers | pure | Returns `@{ Segment; Finding }` (prose and block segments, marker and fence findings with page line numbers) |
 | `Merge-DocsReferenceBlock -Line -Desired -PagePath -LineOffset` | Markers | pure | Returns `@{ Line; Added; Updated; Unchanged; Removed; Edit; Finding }` per `### Merge algorithm` |
 | `Split-DocsReferenceFrontMatter -Text` | FrontMatter | pure | Returns `@{ HasFrontMatter; Terminated; FrontMatterLine; BodyLine; BodyLineOffset }` after BOM removal and CRLF normalization |
-| `ConvertFrom-DocsReferencePageText -Text -PagePath` | FrontMatter | pure | Returns `@{ Value; HasFrontMatter; BodyLine; BodyLineOffset; Finding }`; performs no read |
+| `ConvertFrom-DocsReferencePageText -Text -PagePath -ComposedSchemaSet -AudienceId` | FrontMatter | pure | Returns `@{ Value; HasFrontMatter; BodyLine; BodyLineOffset; Finding }`; validates existing values through 1021 `Test-DocsPageFrontMatter` with the given composed set; performs no read |
 | `Resolve-DocsReferenceFrontMatterValue -Existing -PagePlan -SurfaceRef -CapturedAt -IsNewPage` | FrontMatter | pure | Returns `@{ Value; Finding }` per `### Front-matter rules` |
 | `ConvertTo-DocsReferenceFrontMatterText -Value` | FrontMatter | pure | Canonical front-matter block |
-| `Get-DocsReferenceGeneration -Profile -Snapshot -Element -ExistingPage -OutputDirectory -ProfilePath` | Writer | pure | Composes plan, render, merge and front matter; `ExistingPage` maps each candidate path to `$null` or `@{ Text; Sha256 }`; returns `@{ Page; Unrendered; Finding }` |
+| `Get-DocsReferenceGeneration -Profile -Snapshot -Element -ExistingPage -OutputDirectory -ProfilePath -ComposedSchemaSet` | Writer | pure | Composes plan, render, merge and front matter; `ExistingPage` maps each candidate path to `$null` or `@{ Text; Sha256 }`; returns `@{ Page; Unrendered; Finding }` |
 | `Format-DocsReferenceDiff -PagePath -BeforeLine -AfterLine -Edit [-IsNewPage]` | Writer | pure | Hunk text or `''` |
 | `ConvertTo-DocsReferenceResult -Generation -Mode [-WriteStatus] [-OutputDirectory]` | Writer | pure | The ordered `result` object |
 | `Get-DocsReferenceReportLine -Result` | Writer | pure | Command-specific text lines |
@@ -674,8 +701,14 @@ question on language.
 - `Test-Json` behavior on the CI runner depends on its PowerShell release; tests assert finding
   codes and pointers, not `Test-Json` message text.
 - The write check-then-write sequence is not atomic (documented limit).
-- A consumer must link generated pages from an entry page; otherwise `check` reports
-  `PAGE_ORPHANED`.
+- A consumer must link generated pages from a documentation-root entry page (`<root>/README.md`,
+  else `<root>/index.md`); otherwise `check` reports `DOCS_PAGE_ORPHAN`.
+- Path-or-glob matching differs from 1021 `Test-DocsPagePathMatch` for `[!x]` negation (epic owner
+  question Q15, provisional default unchanged); this revision does not resolve it.
+- 1020 P1 contracts: 1024 adds no `init` template row (the repository-relative template `Source`
+  rule therefore has no 1024 instance), adds no analyzer registry row and asserts no row count of
+  any committed table (membership assertions only), and starts no process (it neither uses
+  `Context.InvokeProcess` nor calls `Invoke-DocsProcess`).
 
 ## Decisions Later Children Must Honor
 
@@ -683,8 +716,10 @@ question on language.
   .claude/lib/docs/Invoke-DocsCommand.ps1 -Command generate-reference -Json` with optional
   `-Profile`, `-Snapshot`, `-OutputDirectory` (and `-Write` only if OQ-1 allows it), with the
   workspace root as working directory; parses the envelope; adds no logic. Its Jest tests pin the
-  `result` key set of `### -Json envelope and result`. Exit 1 on a write conflict carries a full
-  result; exit 3 carries a null result.
+  `result` key set, exactly `{mode, output_directory, pages, summary, unrendered}`. Exit 1 means
+  error findings and nothing written, including `REFERENCE_WRITE_CONFLICT` with a full result
+  (pages written before a conflict are not rolled back; see `### Write semantics`); exit 2 carries only `DOCS_CLI_ARGUMENTS`; exit 3 (a write failure,
+  `REFERENCE_WRITE_FAILED`, or `DOCS_CLI_RUNTIME`) carries a null result.
 - **900008.** May detect page drift in CI by running the dry run with `-Json` and reading
   `result.summary.pages_changed`; no separate check mode exists. The feature-review
   surface-change check treats generated blocks as generator-owned.
@@ -693,9 +728,13 @@ question on language.
   and conforming `owner`, `audience` and `last_reviewed`, and contain no generated-block markers.
   Roles author prose only outside markers and never edit inside a generated block. The reconciler
   calls `generate-reference` (or the MCP tool) to refresh blocks. Consumer entry pages link each
-  generated page (orphan rule).
+  generated page (1021 orphan rule, `DOCS_PAGE_ORPHAN`).
 - **900010.** The end-to-end fixture drives `generate-reference -Write` through an in-memory
   context and runs `check` over the result.
+- **Any direct caller of 1021 validation.** A test or module that calls `Get-DocsPageCheckFinding`
+  or `Test-DocsPageFrontMatter` outside `check` passes the composed schema set; when 1021 uses its
+  own schema gate, that set is the `Get-DocsComposedSchemaSet` result passed through
+  `Get-DocsPageComposedSchemaSet`.
 - **1023.** The `path_or_glob` coverage rule of `### Path matching and precedence` is shared
   (OQ-2); generated pages list their element identifiers in `surface_refs`, which page bindings may
   reference.
@@ -703,23 +742,30 @@ question on language.
 Coordination confirmations requested from the concurrent 1020 and 1021 re-preparations (contract
 confirmations, routed by the coordinator; not language questions):
 
-- **C1 (1020).** The anchor line for generate-reference in the dispatch table (`900006` in 1020
-  spec v0.3; 1024 under the current manifest).
+- **C1 (1020, resolved).** The anchor is `# --- 1024: generate-reference ---`; anchors use real
+  issue numbers and any `# --- 900NNN:` anchor is rejected.
 - **C2 (1020).** `WriteText` mode `create` behavior on an existing target and whether it creates
   parent directories; `ReadBytes` availability; whether `ReadText` decodes strictly (invalid UTF-8).
-- **C3 (1020).** The envelope schema keeps `result` open (any JSON value); the function the
-  envelope test uses (`Test-Json` over a composed or self-contained schema).
-- **C4 (1020).** Whether the amended profile schema enforces `^[a-z0-9][a-z0-9-]*$` on audience
-  identifiers (this specification assumes it does and drops `REFERENCE_AUDIENCE_INVALID`).
-- **C5 (1020).** `analysis_method` and the declaration-lines digest on snapshot elements; the
+- **C3 (1020, resolved).** The envelope schema does not constrain `result`; envelope tests use
+  `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'`.
+- **C4 (1020, resolved).** Profile `audiences[].id`, `documentation_roots[].audience_ids` and the
+  page-metadata `audience` items use the docs common `audience-id` definition, so
+  `REFERENCE_AUDIENCE_INVALID` stays dropped.
+- **C5 (1020, resolved).** `analysis_method` and the declaration-lines digest on snapshot elements
+  (1020 `## Decisions Later Children Must Honor`); the
   generator ignores both, so a change of analysis method causes no page churn.
-- **C6 (1021).** Export a front-matter parse function and a fence-aware line classifier from
-  `DocsPageFrontMatter.psm1` or a shared page-scan module; the parser accepts `<key>: <JSON>` lines
-  (double-quoted strings with `\u` escapes, flow sequences of double-quoted strings).
-- **C7 (1021).** The `check` subcommand options for root and entry pages, and continuation of the
-  `DX-NO-INSTRUCTION` heading prefixes (`how to `, `step <n>`).
-- **C8 (1021).** `page-metadata` in `Get-DocsSchemaName` under the 1021 anchor and a byte-identical
-  runtime copy under `.claude/lib/docs/schemas/v1/`.
+- **C6 (1021, resolved by the 1021 spec).** 1021 exports `ConvertFrom-DocsPageFrontMatter` and
+  `Test-DocsPageFrontMatter` from `DocsPageFrontMatter.psm1` and the fence and line-model functions
+  from `DocsPageMarkdown.psm1`, and permits 1024 to import both modules. The JSON branch of the
+  1021 value forms accepts `<key>: <JSON value>` lines, including `\uXXXX` escapes.
+- **C7 (1021, resolved by the 1021 spec).** `check` has only `-Profile` and repeatable `-Path`;
+  there are no root or entry-page options. Entry pages are `<root>/README.md`, else
+  `<root>/index.md`. The instructional-heading rule is `DOCS_PAGE_MODE_INSTRUCTION_HEADING`
+  (`how to ` prefix, `^step\s+[0-9]+\b`, case-insensitive).
+- **C8 (1021).** `page-metadata` registered in `Get-DocsSchemaName` and `Get-DocsSchemaPath` under
+  the 1021 anchor with a byte-identical runtime copy under `.claude/lib/docs/schemas/v1/`. If 1020
+  does not compose it, 1021 uses its own schema gate and 1024 passes the composed set through
+  `Get-DocsPageComposedSchemaSet` (`## Behavior` stage 1).
 
 ## Open Questions
 
@@ -743,7 +789,8 @@ specification revision.
    `generate-reference` to return exit 1 with a full result for a write failure. Provisional
    default: (a).
 
-Pending dependencies (not owner questions): coordination items C1 to C8 above. Each consumed 1020
+Pending dependencies (not owner questions): coordination items C2 and C8 above (C1, C3, C4, C5,
+C6 and C7 are resolved by the current 1020 and 1021 specifications). Each consumed 1020
 and 1021 symbol is re-confirmed against merged code before use.
 
 ## Acceptance Criteria
@@ -755,9 +802,9 @@ All Pester criteria run locally through `Invoke-PoshQCTest` and in CI under the 
 - [ ] Rendering the same snapshot twice is byte-identical: for each seed in `11, 23, 47, 101, 211`, `Get-DocsReferenceGeneration` over a drawn profile and snapshot, run twice and run on a shuffled element order, yields identical page texts for every page; and two `-Json` command runs over the same in-memory inputs, plus one over a shuffled snapshot element order, produce identical written page texts and identical envelope bytes (Pester `DocsReferenceWriter.Properties.Tests.ps1` and `DocsReferenceIntegration.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] Prose outside generated markers is preserved across regeneration: for each seed, `Merge-DocsReferenceBlock` over drawn prose segments and drawn existing and desired block sets keeps every non-blank line outside generated blocks in its original relative order, keeps every prose segment byte-identical when the desired identifier set equals the existing one, returns identical lines with every block `unchanged` when applied a second time, and applying its `Edit` records to the input reproduces its output (Pester `DocsReferenceMarkers.Properties.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] A removed element's block is removed and reported: regenerating after one element leaves the snapshot removes that element's block, lists its identifier in `result.pages[].blocks.removed`, emits one `REFERENCE_BLOCK_REMOVED` finding with severity `info` whose `related_ids` contains that identifier, exits 0, and leaves every other page line unchanged (Pester `DocsReferenceIntegration.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
-- [ ] Every generated page passes the 1021 `check` subcommand with zero findings: after `generate-reference -Write` into an in-memory context and the addition of an entry page with conforming front matter linking each generated page, `Invoke-DocsCommandCli -Command check -Json` over the same context (with the root and entry options fixed by 1021, C7) exits 0 with an empty `findings` array; a second case inserts seeded prose around and between the blocks, regenerates, checks again, and also exits 0 with an empty `findings` array and the prose unchanged (Pester integration test `DocsReferenceIntegration.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
-- [ ] Emitted front matter conforms to `page-metadata.schema.json`: for every generated page, the front-matter block parsed with the 1021 parser and serialized with `ConvertTo-DocsJsonText` makes `Test-Json -Schema` against the committed `schemas/docs/v1/page-metadata.schema.json` return `True`; the 1024 pattern constants equal the schema patterns read from the same file; and valid existing `owner`, `audience`, `last_reviewed`, `title` and `extensions` values are preserved on regeneration (Pester `DocsReferenceIntegration.Tests.ps1` and `DocsReferenceFrontMatter.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
-- [ ] `-Json` output validates against `schemas/docs/v1/docs-command-envelope.schema.json`: the stdout of a dry run, a write run, an exit-1 run, an exit-2 run and an exit-3 run each make `Test-Json` return `True` against the envelope schema (composed through `Join-DocsSchemaText` when it references docs common, otherwise self-contained, per D5); the envelope keys are exactly `command`, `exit_code`, `findings`, `ok`, `result`; `command` is `generate-reference`; and on exit 0 the `result`, page and `summary` key sets equal those in `### -Json envelope and result` (Pester `DocsReferenceIntegration.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
+- [ ] Every generated page passes the 1021 `check` subcommand with zero findings: after `generate-reference -Write` into an in-memory context and the addition of an entry page with conforming front matter linking each generated page, `Invoke-DocsCommandCli -Command check -Json` over the same context (1021 `check` options are only `-Profile` and repeatable `-Path`; the entry page is the documentation root's `README.md`, C7) exits 0 with an empty `findings` array; a second case inserts seeded prose around and between the blocks, regenerates, checks again, and also exits 0 with an empty `findings` array and the prose unchanged (Pester integration test `DocsReferenceIntegration.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
+- [ ] Emitted front matter conforms to the 1021 page-metadata schema (`urn:drm-copilot:docs:1.0.0:page-metadata`): for every generated page, the block is `---`, one `<key>: <JSON value>` line per field, `---`; parsing it with 1021 `ConvertFrom-DocsPageFrontMatter` yields no finding; and 1021 `Test-DocsPageFrontMatter`, given the composed schema set built from the committed schema files (passed through `Get-DocsPageComposedSchemaSet` when 1021 uses its own schema gate), returns no finding; no 1024 module defines an `owner`, `audience`, `last_reviewed` or `surface_refs` pattern constant; and valid existing `owner`, `audience`, `last_reviewed`, `title` and `extensions` values are preserved on regeneration (Pester `DocsReferenceIntegration.Tests.ps1` and `DocsReferenceFrontMatter.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
+- [ ] `-Json` output validates against `schemas/docs/v1/docs-command-envelope.schema.json`: the stdout of a dry run, a write run, an exit-1 run, an exit-2 run and an exit-3 run each validate against the envelope schema through `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'` with no finding (1020, D5); the envelope keys are exactly `command`, `exit_code`, `findings`, `ok`, `result`; `command` is `generate-reference`; on exit 0 and on a write-conflict exit 1 the `result` key set is exactly `mode`, `output_directory`, `pages`, `summary`, `unrendered`; and the page and `summary` key sets equal those in `### -Json envelope and result` (Pester `DocsReferenceIntegration.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] Without `-Write` nothing is written and the planned changes are printed: the in-memory context's `WriteText` recording list stays empty, the exit code is 0, text output contains each `<action> <path> (+<added> ~<updated> -<removed>)` line and the hunk headers (`--- /dev/null` and `+++ b/<path>` for a new page) followed by the line `dry run, nothing written`, and the `-Json` result has `mode` `dry-run`, status `planned` and a non-null `diff` for each `create` and `update` page (Pester `DocsReferenceWriter.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] With `-Write`, pages are written only through `Context.WriteText` (the 1020 `Write-DocsFileText` in the real context): the recording list holds one entry per changed page in ordinal path order with mode `create` for new pages and `overwrite` for updated pages and statuses `created` or `updated`; an immediate second run records no write and reports action `none` and status `skipped` for every page (Pester `DocsReferenceWriter.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] A write conflict (an existing target on `create`, or a `ReadBytes` digest that differs from `sha256_before` on `update`) stops writing at that page with status `conflict`, gives later pages `not-attempted`, records no write for the conflicting page, and exits 1 with one `REFERENCE_WRITE_CONFLICT` finding and a non-null result; an exception thrown by `WriteText` exits 3 with `findings` holding only `REFERENCE_WRITE_FAILED` (its `related_paths` holding the failed path), `result` `null`, and one stderr line (Pester `DocsReferenceWriter.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
@@ -769,7 +816,7 @@ All Pester criteria run locally through `Invoke-PoshQCTest` and in CI under the 
 - [ ] Every generated block has standalone marker lines with a blank line after the start marker, a blank line before the end marker, and a blank line between the block and adjacent content; no rendered heading begins, case-insensitively, with `how to ` or matches `^step\s+[0-9]+\b`; and no rendered line other than a marker line begins with `<` (Pester `DocsReferenceRender.Tests.ps1` and `DocsReferenceWriter.Properties.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] Generated pages are deterministic and clock-free: every command test runs with an in-memory context whose `UtcNow` member throws, and passes; every written page is LF-only, ends with exactly one LF, has no trailing spaces on generated lines and no BOM; and changing every element's `analysis_method` (scanner to native) and digest leaves every page action `none` (Pester `DocsReferenceWriter.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] The module-boundary test passes: an AST scan of every new `DocsReference*.psm1` module finds no `CommandAst` named `Set-Content`, `Add-Content`, `Out-File`, `New-Item`, `Remove-Item`, `Copy-Item`, `Move-Item`, `Get-Content`, `Test-Path`, `Get-Date`, `Get-Random` or `Invoke-Expression`, no `[System.IO.File]` or `[System.IO.Directory]` type expression, no `$Context` reference outside `DocsReferenceWriter.psm1`, and no import of a `DocsLedger*`, `DocsAnalyzer*` or `DocsInventory*` module (Pester `DocsReferenceBoundary.Tests.ps1`, `poshqc / PowerShell QC` on `windows-latest`).
-- [ ] The `generate-reference` dispatch row is the only line added to the dispatch table, sits directly under the generate-reference anchor fixed by the amended 1020 spec (C1), names `DocsReferenceWriter.psm1` and `Invoke-DocsGenerateReferenceCommand` with options `Profile`, `Snapshot`, `OutputDirectory` (value) and `Write` (switch), and `Test-DocsCommandTable` returns no finding for the committed table (Pester, `poshqc / PowerShell QC` on `windows-latest`).
+- [ ] The `generate-reference` dispatch row is the only line added to the dispatch table, sits directly under the anchor `# --- 1024: generate-reference ---` (C1), names `DocsReferenceWriter.psm1` and `Invoke-DocsGenerateReferenceCommand` with options `Profile`, `Snapshot`, `OutputDirectory` (value) and `Write` (switch), and `Test-DocsCommandTable` returns no finding for the committed table (Pester, `poshqc / PowerShell QC` on `windows-latest`).
 - [ ] Push-down copies are byte-identical: each of `DocsReferencePlan.psm1`, `DocsReferenceRender.psm1`, `DocsReferenceMarkers.psm1`, `DocsReferenceFrontMatter.psm1`, `DocsReferenceWriter.psm1` and the edited `Invoke-DocsCommand.ps1` is SHA-256 identical to its copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`; each new module is listed exactly once in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`; 1020 `Docs.Manifest.Tests.ps1` passes (Pester, `poshqc / PowerShell QC` on `windows-latest`); and the existing push-down contract tests `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass without modification.
 - [ ] No Python or TypeScript file is added or modified: `git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`; and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
 - [ ] Tests create no temporary files: no file under `tests/scripts/claude-lib/docs/` added by this feature contains `TestDrive`, `New-TemporaryFile`, `GetTempFileName`, `GetTempPath`, `$env:TEMP`, `$env:TMP` or `Start-Process`; pure-function tests pass only strings, arrays and hashtables; and every command test uses an in-memory command context.
