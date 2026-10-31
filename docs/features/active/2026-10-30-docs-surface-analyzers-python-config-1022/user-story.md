@@ -3,7 +3,7 @@
 - Issue: #1022
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-30T22-55
+- Last Updated: 2026-10-31T05-10
 
 ## Revision Note
 
@@ -32,8 +32,8 @@ documentation drift must be counted by hand.
 
 Pushed-down helpers must be PowerShell or bash (epic owner directive), so the analyzers are lexical
 PowerShell scanners. They are the always-available baseline (D3); a Python-native analyzer
-delivered later by 900011 may replace them for Python surfaces when the python pack is installed,
-using the same identifiers and digests.
+delivered later by 1031 may replace them for Python surfaces when the python pack is installed,
+using the same identifiers and digests (both computed by the shared 1020 functions).
 
 ## Personas & Scenarios
 
@@ -100,9 +100,9 @@ using the same identifiers and digests.
 - Executing, importing or installing consumer code, or resolving surface that exists only at run
   time (plugin loading, settings-driven registration, `getattr`-based registration); such sites
   become diagnostics or are listed as undetectable in the precision limit.
-- The Python-native analyzer (900011), TypeScript and .NET analyzers (900004), the coverage ledger
-  (1023), reference page generation (1024), MCP tools (900007) and CI enforcement or surface deltas
-  (900008).
+- The Python-native analyzer (1031), TypeScript and .NET analyzers (1033), the coverage ledger
+  (1023), reference page generation (1024), MCP tools (1036) and CI enforcement or surface deltas
+  (1034).
 - External distribution dependencies and the import of an existing discovery inventory snapshot
   (deferred to the coordinator).
 - Class members as public symbols; module-to-module edges other than static `import` statements.
