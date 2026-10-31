@@ -401,19 +401,19 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'returns empty checkpoint content when the checkpoint file is absent' {
-            Push-Location -LiteralPath $script:CheckpointFreeDirectory
-            try {
-                Get-CheckpointContent | Should -Be ''
-            } finally {
-                Pop-Location
-            }
+            # Issue #1010: the seam takes a mandatory absolute Path; the file system is mocked.
+            Mock Test-Path { $false }
+            Mock Get-Content { 'unexpected-read' }
+
+            Get-CheckpointContent -Path '/synthetic-worktrees/w-item/artifacts/orchestration/orchestrator-state.json' | Should -Be ''
+            Should -Invoke Get-Content -Times 0 -Exactly
         }
 
         It 'returns the checkpoint file content when the checkpoint file is present' {
             Mock Test-Path { $true }
             Mock Get-Content { 'checkpoint-body' }
 
-            Get-CheckpointContent | Should -Be 'checkpoint-body'
+            Get-CheckpointContent -Path '/synthetic-worktrees/w-item/artifacts/orchestration/orchestrator-state.json' | Should -Be 'checkpoint-body'
         }
 
         It 'allows when no mapped tool_input is supplied' {
@@ -453,17 +453,20 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'reads the checkpoint from disk when no checkpoint text is supplied' {
-            Push-Location -LiteralPath $script:CheckpointFreeDirectory
-            try {
-                $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{"file_path":"scripts/a.ps1"}'
+            # Issue #1010: the read seam and the worktree-list wrapper are mocked, so no host
+            # checkpoint is read; the seam receives an absolute path beneath the target root.
+            Mock Get-CheckpointContent { '' }
+            Mock Get-OrchestrationGateWorktreeList { "worktree /synthetic-worktrees/w-item`n" }
 
-                $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            } finally {
-                Pop-Location
-            }
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{"file_path":"scripts/a.ps1"}'
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            Should -Invoke Get-CheckpointContent -Times 1 -Exactly -ParameterFilter { $Path -match '^([A-Za-z]:[\\/]|/)' }
         }
 
         It 'denies an apply_patch implementation through its own entrypoint' {
+            Mock Get-CheckpointContent { '' }
+            Mock Get-OrchestrationGateWorktreeList { "worktree /synthetic-worktrees/w-item`n" }
             $payload = ConvertTo-CodexPatchPayload -Patch "*** Begin Patch`n*** Add File: scripts/a.ps1`n+line`n*** End Patch"
 
             $result = Invoke-GateEntrypoint -PayloadRaw $payload
@@ -474,6 +477,8 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'denies a mapped Edit implementation through its own entrypoint' {
+            Mock Get-CheckpointContent { '' }
+            Mock Get-OrchestrationGateWorktreeList { "worktree /synthetic-worktrees/w-item`n" }
             $payload = ConvertTo-CodexPreToolPayload -ToolName 'Edit' -ToolInput @{ file_path = 'scripts/a.ps1'; old_string = 'a'; new_string = 'b' }
 
             $result = Invoke-GateEntrypoint -PayloadRaw $payload

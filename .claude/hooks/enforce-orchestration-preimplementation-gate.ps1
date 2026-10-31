@@ -239,7 +239,7 @@ function Test-OrchestrationReady {
     }
     $lifecycleReady = $false
     if ($Payload.PSObject.Properties.Name -contains 'lifecycle_ready') {
-        $lifecycleReady = [bool]$Payload.lifecycle_ready
+        $lifecycleReady = ($Payload.lifecycle_ready -is [bool]) -and $Payload.lifecycle_ready
     }
 
     if (-not $issueNum -or -not $featureFolder -or -not $routeId -or -not $lifecycleReady) {
