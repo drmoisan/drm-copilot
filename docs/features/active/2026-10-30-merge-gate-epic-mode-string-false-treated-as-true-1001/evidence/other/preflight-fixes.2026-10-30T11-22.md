@@ -1,0 +1,20 @@
+# Preflight Fixes
+
+Timestamp: 2026-10-30T11-22
+Plan: docs/features/active/2026-10-30-merge-gate-epic-mode-string-false-treated-as-true-1001/plan.2026-10-30T06-58.md
+Directive: PREFLIGHT VALIDATION ONLY (no task executed, no checkbox changed, no production or test file edited)
+
+## Fixes
+
+1. `## Terms` (`MERGE_BASE`) | anchored diff that cannot see uncommitted edits | The plan has no commit task, so the three-dot form `origin/main...HEAD` shows none of the executor's edits before a commit. The term now states that content comparisons use `git diff MERGE_BASE -- <paths>` (merge-base commit against the working tree) and that the [P6-T1] name listing pairs the three-dot form with `git status --porcelain --untracked-files=all`.
+2. `## Existing Test Dispositions` (`enforce-epic-merge-gate.ps1`) | missing disposition entries | Added `session-root-reads-850.Constraints.Tests.ps1` test `keeps every changed file within the line cap` (asserts at most 500 lines for the merge gate; kept by [P2-T2]) and `hook-command-parser.AcceptanceCases.Tests.ps1`, `hook-dependency-failure.Claude.Tests.ps1`, and `OrchestratorState.Tests.ps1` context `epic-merge-gate regression scenario`, all unchanged.
+3. `## Existing Test Dispositions` (`enforce-pr-author-skill.epic-base-branch.ps1`) | incomplete and inaccurate disposition | Added the contexts `end-to-end via Invoke-PrAuthorSkillDecision (sixth check wired into the receipt path)` and `issue #663 epic scope` of `enforce-pr-author-skill.epic-base-branch.Tests.ps1`. Recorded that `enforce-pr-author-skill.WorktreeResolution.Tests.ps1` does use an `epic_mode` fixture (`pr-author/item-own-epic-mode`, JSON `true`); the outcome is unchanged.
+4. `## Existing Test Dispositions` (`enforce-model-routing-receipt.ps1`) | missing disposition entry | Added `checkpoint-hygiene-skill-contract.Tests.ps1`, which dot-sources the hook for its gated-agent list; it is unchanged.
+5. [P0-T3] and [P4-T1] | formatter check without the repository settings | Both tasks now name `Invoke-Formatter -Settings scripts/powershell/PoshQC/settings/pssa.settings.psd1`, which is what the PoshQC format step passes. A preflight read-only check showed that without settings, `enforce-epic-merge-gate.ps1` and `enforce-pr-author-skill.epic-base-branch.ps1` report `would change` on the unedited tree, and with the settings all three hooks report `unchanged` and zero analyzer findings.
+6. [P0-T8] and [P4-T5] | `Measure-Object -Line` line-count class | Both tasks now count with `wc -l` or `@(Get-Content -LiteralPath <path>).Count`, not `Measure-Object -Line`.
+7. [P4-T5] | anchored diff that cannot see uncommitted edits | The `config/file-size-baseline.json` check changed from `git diff origin/main...HEAD` to `git diff MERGE_BASE --`, using the resolved merge-base commit.
+8. [P4-T6] | anchored diff that cannot see uncommitted edits | The deny-text inspection changed from `git diff origin/main...HEAD` to `git diff MERGE_BASE --`, using the resolved merge-base commit, and now requires the diff to be non-empty so the check cannot pass vacuously.
+9. [P6-T1] | directory-only token in the scope listing | `git status --porcelain` became `git status --porcelain --untracked-files=all`, so the untracked feature folder is listed file by file.
+10. [P6-T2] and `## Pre-Mortem` (Review checklists) | anchored diff that cannot see uncommitted edits | The self-review now walks `git diff MERGE_BASE` plus the untracked files from `git status --porcelain --untracked-files=all`, not `origin/main...HEAD` alone.
+11. [P2-T3] | literal count | "both `EPIC_BASE_BRANCH_MISMATCH` literals" became "none of the three `EPIC_BASE_BRANCH_MISMATCH` return literals". `Test-EpicBaseBranchOverride` returns three such literals.
+12. [P1-T1] row (c) | ambiguous fixture definition | "Otherwise green standalone checkpoint" now names `step9_status` `"passed"` and a lowercase 40-character hexadecimal `ci_gate.head_sha`, so every `Test-ChildCheckpointGreenCiRecorded` condition except the epic marker holds. Without `step9_status` `"passed"`, branch 1 would decline before the fix and the [P1-T4] fail-before expectation for this row could not hold.

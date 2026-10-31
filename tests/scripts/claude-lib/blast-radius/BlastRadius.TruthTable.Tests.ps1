@@ -292,11 +292,16 @@ Describe 'Committed blast-radius truth table shape' {
             }
         }
 
-        It 'lists quality-tiers.yml as both a shared surface and a mandate read' {
-            # Assert: the tier map is a genuine shared surface when an item really
-            # writes it, and a mandate read when an item merely cites it.
-            $script:CommittedConfig['shared_surfaces'] | Should -Contain 'quality-tiers.yml'
-            $script:CommittedConfig['mandate_reads'] | Should -Contain 'quality-tiers.yml'
+        It 'lists quality-tiers.yml as an append-only path and a mandate read, not a shared surface, in both copies' {
+            # Assert: the tier map is an append-only registry that contends on
+            # path_overlap at the append_only weight when an item writes it, and
+            # a mandate read when an item merely cites it; it is never a hard
+            # shared-surface edge (issue #1006).
+            foreach ($config in @($script:CommittedConfig, $script:BundledConfig)) {
+                $config['conflict_tolerance']['append_only_paths'] | Should -Contain 'quality-tiers.yml'
+                $config['mandate_reads'] | Should -Contain 'quality-tiers.yml'
+                $config['shared_surfaces'] | Should -Not -Contain 'quality-tiers.yml'
+            }
         }
     }
 

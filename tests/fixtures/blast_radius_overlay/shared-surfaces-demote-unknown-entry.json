@@ -1,0 +1,5 @@
+{
+  "base_text": "{\n  \"version\": 1,\n  \"shared_surfaces\": [\n    \"a.json\",\n    \"quality-tiers.yml\",\n    \"b.json\"\n  ],\n  \"conflict_tolerance\": {\n    \"tolerance_percent\": 100,\n    \"append_only_paths\": [\n      \"**/CHANGELOG.md\"\n    ]\n  }\n}\n",
+  "overlay_text": "{\"shared_surfaces_demote\": [\"no-such-surface.json\"]}\n",
+  "expected_error": "Blast-radius overlay config/blast-radius.local.json was not applied; config/blast-radius.json was not written: key \"shared_surfaces_demote\" names \"no-such-surface.json\", which is neither a shared surface nor an append-only path"
+}

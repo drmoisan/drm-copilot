@@ -1,0 +1,5 @@
+{
+  "base_text": "{\n  \"version\": 1,\n  \"shared_surfaces\": [\n    \"a.json\",\n    \"quality-tiers.yml\",\n    \"b.json\"\n  ],\n  \"conflict_tolerance\": {\n    \"tolerance_percent\": 100,\n    \"append_only_paths\": [\n      \"**/CHANGELOG.md\"\n    ]\n  }\n}\n",
+  "overlay_text": "{\"shared_surfaces_demote\": [\"quality-tiers.yml\"]}\n",
+  "expected_text": "{\n  \"version\": 1,\n  \"shared_surfaces\": [\n    \"a.json\",\n    \"b.json\"\n  ],\n  \"conflict_tolerance\": {\n    \"tolerance_percent\": 100,\n    \"append_only_paths\": [\n      \"**/CHANGELOG.md\",\n      \"quality-tiers.yml\"\n    ]\n  }\n}\n"
+}

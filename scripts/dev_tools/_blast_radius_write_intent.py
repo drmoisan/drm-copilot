@@ -41,8 +41,9 @@ Invariants, constraints, and side effects:
     rules only ever drop tokens the current classifier accepts; they never add a
     token. Returned collections are deduplicated and ordinally sorted. Every
     function is pure and mutates no input: no filesystem, subprocess, network,
-    or wall-clock access. This module imports the extraction and guard leaves
-    only, never the validation module, so no import cycle can form.
+    or wall-clock access. This module imports the extraction, guard, and
+    token-shape leaves only, never the validation module, so no import cycle
+    can form.
 """
 
 from __future__ import annotations
@@ -62,6 +63,7 @@ from scripts.dev_tools._blast_radius_extraction import (
     normalize_lines,
 )
 from scripts.dev_tools._blast_radius_guards import require_str_tuple
+from scripts.dev_tools._blast_radius_token_shapes import is_generic_contract_token
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
@@ -327,8 +329,10 @@ def extract_write_intent_contracts(spec_text: str) -> tuple[str, ...]:
         spec_text (str): Full feature ``spec.md`` document text.
 
     Returns:
-        tuple[str, ...]: Identifiers carrying an ASCII letter and no separator,
-        deduplicated and ordinally sorted.
+        tuple[str, ...]: Identifiers carrying an ASCII letter and no separator
+        that ``is_generic_contract_token`` does not recognize as a default
+        spreadsheet sheet-tab name (issue #1006), deduplicated and ordinally
+        sorted.
     """
     identifiers: set[str] = set()
     qualifying_depth: int | None = None
@@ -351,12 +355,14 @@ def extract_write_intent_contracts(spec_text: str) -> tuple[str, ...]:
             continue
 
         # Inside a qualifying section a single-word, wildcard-free token without
-        # a separator and with a letter is a contract identifier.
+        # a separator and with a letter is a contract identifier, unless it is
+        # a default spreadsheet sheet-tab name such as Sheet1 (issue #1006).
         for token in _single_word_tokens(line):
             if (
                 "/" not in token
                 and not _has_wildcard(token)
                 and CONTRACT_LETTER_RE.search(token) is not None
+                and not is_generic_contract_token(token)
             ):
                 identifiers.add(token)
 
