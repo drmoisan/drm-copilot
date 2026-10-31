@@ -320,7 +320,8 @@ function ConvertFrom-PoshQCShardWeightJson {
         }
         $weights[$entry.Name] = [long] $entry.Value
     }
-    , $weights
+    # A dictionary is not enumerated by the pipeline, so it is returned as one object.
+    $weights
 }
 
 <#

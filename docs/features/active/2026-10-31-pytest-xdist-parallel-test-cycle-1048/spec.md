@@ -129,11 +129,11 @@ Owner decisions that bind this spec are recorded in `owner-decisions.md` in this
 ### Part 2: Pester
 
 - [x] `Invoke-PoshQCTest` accepts `-TestResultPath` and `-CoverageOutputPath`, and unit tests show that omitting them leaves the settings-file paths unchanged.
-- [ ] `scripts/powershell/PoshQC/PoshQC.Parallel.psm1` exists, is registered in `PoshQC.psm1` and exported from `PoshQC.psd1`, and `Invoke-PoshQCParallelTest` starts one process per shard, waits for all, and merges results.
-- [ ] The worker count defaults to half the logical core count capped at 8 and is overridable by parameter, with unit tests for the default, the cap and the override.
-- [ ] `Merge-PoshQCJunitReport` produces one JUnit document with summed `tests`, `errors`, `failures`, `disabled`, root `time` equal to the longest shard wall-clock, and unit tests cover passing, failing and empty-shard inputs.
+- [x] `scripts/powershell/PoshQC/PoshQC.Parallel.psm1` exists, is registered in `PoshQC.psm1` and exported from `PoshQC.psd1`, and `Invoke-PoshQCParallelTest` starts one process per shard, waits for all, and merges results.
+- [x] The worker count defaults to half the logical core count capped at 8 and is overridable by parameter, with unit tests for the default, the cap and the override.
+- [x] `Merge-PoshQCJunitReport` produces one JUnit document with summed `tests`, `errors`, `failures`, `disabled`, root `time` equal to the longest shard wall-clock, and unit tests cover passing, failing and empty-shard inputs.
 - [ ] The merged coverage uses `Merge-PoshQCCoverageReport`, shard manifests pass `Test-PoshQCShardCompleteness`, and the merged `artifacts/pester/powershell-coverage.xml` is produced.
-- [ ] The runner exits non-zero when any shard fails or any merge or completeness step fails, exits zero otherwise, and never overwrites merged artifacts when a shard produced no output; unit tests cover each case.
+- [x] The runner exits non-zero when any shard fails or any merge or completeness step fails, exits zero otherwise, and never overwrites merged artifacts when a shard produced no output; unit tests cover each case.
 - [ ] A VS Code task runs `Invoke-PoshQCParallelTest`, the existing `PoshQC: 4 test (Pester)` task remains, and `tasks.json` passes governed-JSON validation.
 - [ ] A local concurrent run and a serial run on the same tree produce the same total test count and pass/fail outcome, with the comparison recorded in evidence.
 - [ ] `config/poshqc-shard-weights.json` is committed with millisecond weights derived from CI JUnit artifacts, `Get-PoshQCShardTestFileWeight` uses it with a median fallback for unlisted files, and the size-based path still works when the file is absent; tests cover all three cases and a malformed file.
