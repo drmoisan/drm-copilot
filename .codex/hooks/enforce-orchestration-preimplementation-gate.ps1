@@ -33,8 +33,6 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-e
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
-# The readiness checkpoint this gate reads and names in its block message.
-$script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
 # of these is orchestration bookkeeping, not implementation, so the gate must not
@@ -270,7 +268,7 @@ function Test-OrchestrationReady {
     }
     $lifecycleReady = $false
     if ($Payload.PSObject.Properties.Name -contains 'lifecycle_ready') {
-        $lifecycleReady = [bool]$Payload.lifecycle_ready
+        $lifecycleReady = ($Payload.lifecycle_ready -is [bool]) -and $Payload.lifecycle_ready
     }
 
     if (-not $issueNum -or -not $featureFolder -or -not $routeId -or -not $lifecycleReady) {
@@ -282,17 +280,6 @@ function Test-OrchestrationReady {
         $routeId -and
         $lifecycleReady
     )
-}
-
-function Get-CheckpointContent {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:CheckpointPath)) {
-        return ''
-    }
-    return Get-Content -Raw -LiteralPath $script:CheckpointPath
 }
 
 function Get-OrchestrationPreimplementationGateAllowDecision {
@@ -445,8 +432,12 @@ function Invoke-OrchestrationPreimplementationGateDecision {
             Get-OrchestrationModeDenyReason -Mode $mode -Failure $failure)
     }
 
+    # Truthiness fall-through is kept: an empty -CheckpointRaw resolves like an unbound one.
+    # The checkpoint is read beneath the worktree the call targets (issue #1010).
     if (-not $CheckpointRaw) {
-        $CheckpointRaw = Get-CheckpointContent
+        $read = Read-OrchestrationGateCheckpoint -Mode 'single-feature' -FilePath $filePath -Command $command
+        if (-not $read.Resolved) { return Get-OrchestrationPreimplementationGateBlockDecision -Reason $read.DenyReason }
+        $CheckpointRaw = $read.Raw
     }
     try {
         $checkpoint = ConvertFrom-CheckpointJson -Json $CheckpointRaw
