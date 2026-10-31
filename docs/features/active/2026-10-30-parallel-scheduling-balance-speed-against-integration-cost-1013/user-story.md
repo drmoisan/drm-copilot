@@ -81,7 +81,7 @@ Acceptance Criteria:
 
 - [x] US-04 A pair meeting the combination threshold, with candidates limited to `contract_dependency` or same-file overlap, is combined by the library with deterministic members, primary, pairs, and estimated savings (spec AC-10).
 - [x] US-18 A pair that shares only contracts has a nonzero cost (`conflict_tolerance.weights.contract` summed once per shared contract identifier) and is combined when that cost meets the threshold; `contract_dependency` remains a hard edge class, and at `tolerance_percent` 0 the edge set stays identical to strict scheduling (spec AC-27, AC-28, AC-29).
-- [ ] US-05 The planner combines without operator approval, re-plans on the primary branch, assigns the combined item a band from a fresh complexity assessment, and records `combined_issue_nums` and the `combinations` list (spec AC-11, AC-14).
+- [x] US-05 The planner combines without operator approval, re-plans on the primary branch, assigns the combined item a band from a fresh complexity assessment, and records `combined_issue_nums` and the `combinations` list (spec AC-11, AC-14).
 - [x] US-06 The combined item runs as one child with one branch and one PR whose autoclose line names every member issue; no umbrella issue is created (spec AC-12, AC-13).
 - [x] US-07 A combined item that fails review or CI remediates as one unit and never splits back into separate PRs (spec AC-16).
 - [x] US-08 The plan report lists each combination with its members, pairs, threshold, and estimated savings, and lists not-combined qualifying pairs with the reason (spec AC-17).
@@ -124,7 +124,7 @@ Issue acceptance criteria, restated from `issue.md`, with their story and spec t
 - [x] A destination with no overlay receives a nonzero default `tolerance_percent` from the published truth table (US-12; spec AC-01).
 - [x] An item whose tolerated overlaps exceed its aggregate cap has its cheapest pair converted to an edge; at `tolerance_percent` 0 the edge set equals strict scheduling (US-01, US-02, US-03; spec AC-02 to AC-05).
 - [x] Observed merge-resolution time per tolerated pair is recorded, and no weight changes automatically (US-10, US-11; spec AC-06, AC-07).
-- [ ] A pair meeting the combination threshold becomes one item with one branch and one PR closing both issues; its complexity band comes from a fresh assessment (US-04, US-05, US-06; spec AC-10 to AC-14).
+- [x] A pair meeting the combination threshold becomes one item with one branch and one PR closing both issues; its complexity band comes from a fresh assessment (US-04, US-05, US-06; spec AC-10 to AC-14).
 - [x] `parallel-add` reports a qualifying overlap with an unstarted item without combining it (US-09; spec AC-15).
 - [x] A combined item that fails review or CI remediates as one unit (US-07; spec AC-16).
 - [x] `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other keys, and equal across Python, PowerShell, and TypeScript where ported (US-13, US-14; spec AC-08, AC-09).
