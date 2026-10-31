@@ -41,6 +41,17 @@ Use the `drm-copilot: Sync AGENTS.md from Instructions` command (command ID: `dr
 
 Use the `drm-copilot: New Claude Worktree Session` command (command ID: `drmCopilotExtension.newClaudeWorktreeSession`) from the Command Palette to open an integrated PowerShell terminal that creates a new git worktree, navigates into it, optionally installs and activates the poetry environment when the workspace declares poetry, and then starts an interactive `claude` session. The command prompts for an optional objective to pass to `claude` as the initial prompt.
 
+How the session is delivered:
+
+- The setup steps and the `claude` launch run as one PowerShell script that is passed to the shell at process start through `-NoLogo -NoExit -EncodedCommand <base64>`. Nothing is typed into the terminal input stream, so the session does not depend on shell start-up timing and behaves the same in a local Windows terminal and in a Linux dev container.
+- The terminal is created with `hideFromUser` and then shown immediately. A hidden-at-creation terminal is skipped by the Python extension's automatic environment activation, so no activation text is injected into the session.
+- Setup is fail-fast: setup stops at the first failed step (a non-zero exit code from `git worktree add` or `poetry install`, or a terminating error such as a failed `New-Item` or `Set-Location`), a red failure message is written, and `claude` is not started. The terminal stays open at an interactive prompt.
+- Each step prints a `Write-Host` progress banner (for example `==> Adding git worktree`) before it runs, in place of a per-command echo.
+- When the workspace uses poetry, the virtual environment is activated from `.venv/Scripts/Activate.ps1` or `.venv/bin/Activate.ps1`, whichever exists in the new worktree.
+- The objective is embedded in the encoded script. An objective long enough to push the encoded argument past 30000 characters is rejected before the terminal is created.
+- Terminal shell-integration decorations (command markers) may be absent in these terminals, because the shell is started with an encoded command.
+- `drm-copilot: New Codex Worktree Session` (command ID: `drmCopilotExtension.newCodexWorktreeSession`) uses the same delivery, banners, fail-fast setup, and activation probe, with its trust and post-codex steps in place of the pre-`claude` step.
+
 ### Injecting a pre-`claude` script
 
 The command can run a local PowerShell script in the new worktree immediately before `claude` is started. This lets a repository carry its own pre-session setup (for example, copying machine-local configuration, seeding environment variables, or running a repo-specific bootstrap) in the local repository rather than centrally in the extension.
@@ -49,8 +60,9 @@ How it works:
 
 - The script path is read from the `drmCopilotExtension.newClaudeWorktreeSession.preClaudeScriptPath` configuration setting.
 - The default value is `.claude/hooks/pre-claude-session.ps1`, resolved relative to the new worktree root.
-- After the worktree is created, navigated into, and (when applicable) the poetry environment is installed and activated, the command runs the configured script if it exists in the worktree, then starts `claude`.
-- The script runs only when it exists: the command emits a runtime existence guard (`if (Test-Path -LiteralPath '<path>') { & '<path>' }`), so a missing script is not an error and the session proceeds directly to `claude`.
+- After the worktree is created, navigated into, and (when applicable) the poetry environment is installed and activated, the session script runs the configured script if it exists in the worktree, then starts `claude`.
+- The script runs only when it exists: the session script includes a runtime existence guard (`if (Test-Path -LiteralPath '<path>') { & '<path>' }`), so a missing script is not an error and the session proceeds directly to `claude`.
+- Non-terminating errors written by the script do not stop the session; a terminating error thrown by the script stops setup and `claude` is not started.
 
 To use the default convention, commit a PowerShell script to the repository at `.claude/hooks/pre-claude-session.ps1`. Because the script lives in the repository, it is present in the new worktree after `git worktree add` and runs automatically on the next worktree session.
 
@@ -65,7 +77,7 @@ To use a different path, set the configuration value in the repository's `.vscod
 Notes:
 
 - The path is resolved relative to the worktree root and is embedded with PowerShell single-quote escaping, so paths containing spaces or apostrophes are preserved literally.
-- Leaving the setting empty or whitespace-only suppresses the pre-`claude` step entirely; no additional command is sent.
+- Leaving the setting empty or whitespace-only suppresses the pre-`claude` step entirely; the session script contains no pre-`claude` step or banner.
 - The script runs in the worktree's PowerShell session before `claude` takes over the terminal.
 
 ## Remove Secondary Worktrees

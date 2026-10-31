@@ -254,8 +254,8 @@ Refinement: delivery is through `shellArgs` at process start, not `sendText`. Th
 - [ ] `extension.workflow-commands.test.ts` has no more than 800 logical lines, `extension.ts` has no more than 500 logical lines, and no other changed or new file exceeds 800 lines.
 - [x] The Claude handler tests are located in `claude-worktree-session-command.test.ts`, and the moved tests are no longer present in `extension.workflow-commands.test.ts`.
 - [x] A fail-before record shows that the no-`sendText` and `hideFromUser: true` handler test and the activation-probe builder test fail on the pre-change tree and pass after the change.
-- [ ] `extensions/drm-copilot/README.md` `## New Claude Worktree Session` describes single-script delivery, `hideFromUser`, fail-fast behavior, and per-step banners, and no longer says commands are sent individually.
-- [ ] `extensions/drm-copilot/CHANGELOG.md` has a `### Fixed` bullet under `## [Unreleased]` for issue #1003 that records the fail-fast behavior change; `package.json` version is unchanged.
+- [x] `extensions/drm-copilot/README.md` `## New Claude Worktree Session` describes single-script delivery, `hideFromUser`, fail-fast behavior, and per-step banners, and no longer says commands are sent individually.
+- [x] `extensions/drm-copilot/CHANGELOG.md` has a `### Fixed` bullet under `## [Unreleased]` for issue #1003 that records the fail-fast behavior change; `package.json` version is unchanged.
 - [ ] No file in `scripts/dev-tools/activate.ps1`, `scripts/dev-tools/DrmCopilotPromptSupport.ps1`, the `resources/templates` mirror, `.claude/rules/`, `.github/instructions/`, or the execution-environment brief is modified, and `quality-tiers.yml` is not created.
 - [ ] The full TypeScript toolchain (Prettier, ESLint, `tsc`, and Jest with coverage through `node run-jest.cjs`) passes in a single pass with no errors.
 
