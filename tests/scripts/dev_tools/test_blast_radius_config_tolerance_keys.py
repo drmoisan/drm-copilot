@@ -86,6 +86,7 @@ COMMITTED_CONFLICT_TOLERANCE: dict[str, object] = {
         PACK_MANIFEST_REGISTRY,
         "quality-tiers.yml",
     ],
+    "combination_threshold_percent": 400,
 }
 
 
@@ -115,6 +116,7 @@ def test_committed_conflict_tolerance_reads_cleanly(label: str, path: Path) -> N
         PACK_MANIFEST_REGISTRY,
         "quality-tiers.yml",
     ), label
+    assert tolerance.combination_threshold_percent == 400, label
 
 
 @pytest.mark.parametrize(("label", "path"), COPIES, ids=COPY_IDS)

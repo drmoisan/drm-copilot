@@ -133,6 +133,7 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
         "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
         "quality-tiers.yml",
       ],
+      combination_threshold_percent: 400,
     },
     write_intent_extraction: true,
     path_roots: [],
