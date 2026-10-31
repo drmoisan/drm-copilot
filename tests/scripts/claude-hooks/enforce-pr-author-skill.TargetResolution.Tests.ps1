@@ -13,6 +13,11 @@
     resolver behind it reads real git state, so driving it directly would make these tests
     depend on whichever worktrees exist on the machine running them.
 
+    Issue #1011: TR-01 to TR-09 run the real Resolve-PrAuthorWorktreeTarget body with the shared
+    resolver Resolve-HookTargetWorktree, the identity resolver Resolve-WorktreeItemTarget, and the
+    current-branch reader Get-PrAuthorCurrentBranch mocked, so no row starts git. Resolver results
+    are built in test scope with the six properties of the shared resolver's result.
+
     Issue #673: both expected reason codes come from the worktree-resolution accessors rather
     than from a literal, and every synthetic root is composed at run time from the path root
     of $PSScriptRoot, so no drive-letter path is written here.
@@ -123,6 +128,131 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
 
             $reason | Should -Not -BeNullOrEmpty
             $reason | Should -BeLike ("{0}*" -f (Get-WorktreeResolutionNoTargetReasonCode))
+        }
+    }
+
+    Context 'shared resolver consumption (issue #1011)' {
+        BeforeAll {
+            Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/HookTargetWorktree.psm1')).Path -ErrorAction Stop
+            $script:HeadCommand = 'gh pr create --head feature/item-701 --body-file artifacts/pr_body_701.md'
+            $script:FeatureFolderRoot = "$($script:SeamRoot)/docs/features/active/item-701"
+            $script:IdentityNoTarget = New-WorktreeResolutionTargetResult -Status NoTarget -SessionRoot $script:SessionRootPath -Detail 'identity resolution found no target.'
+
+            # Build a resolver result with the six RESOLVER_CONTRACT properties.
+            function New-HookTargetTestResult {
+                param($Root, [string] $Source, [bool] $Ambiguous = $false, $ReasonCode = $null)
+                [pscustomobject]@{ WorktreeRoot = $Root; Source = $Source; Ambiguous = $Ambiguous; ReasonCode = $ReasonCode; Detail = 'test resolver result'; Candidates = [string[]] @() }
+            }
+        }
+
+        BeforeEach {
+            Mock -CommandName Resolve-WorktreeItemTarget -MockWith { $script:IdentityNoTarget }
+            Mock -CommandName Get-PrAuthorCurrentBranch -MockWith { $null }
+        }
+
+        It 'TR-01 invokes Resolve-HookTargetWorktree once for a --head command' {
+            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
+
+            $null = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
+
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
+        }
+
+        It 'TR-02 maps a CommandOperand root equal to the session root to SessionRoot' {
+            $result = New-HookTargetTestResult -Root $script:SessionRootPath -Source 'CommandOperand'
+
+            $target = ConvertFrom-PrAuthorHookTargetResult -Result $result -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
+
+            $target.Status | Should -Be 'SessionRoot'
+            $target.WorktreeRoot | Should -Be $script:SessionRootPath
+            $target.Signal | Should -Be 'Branch'
+        }
+
+        It 'TR-03 maps a different CommandOperand root to OtherWorktree' {
+            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
+
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
+
+            $target.Status | Should -Be 'OtherWorktree'
+            $target.WorktreeRoot | Should -Be $script:ItemRoot
+            $target.ReasonCode | Should -BeNullOrEmpty
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
+        }
+
+        It 'TR-04 maps an ambiguous result to Ambiguous with the ambiguity code' {
+            $script:HookResult = New-HookTargetTestResult -Root $null -Source 'CommandOperand' -Ambiguous $true -ReasonCode $script:AmbiguityCode
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
+
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
+
+            $target.Status | Should -Be 'Ambiguous'
+            $target.ReasonCode | Should -Be $script:AmbiguityCode
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
+        }
+
+        It 'TR-05 maps a not-derivable result to NoTarget with the no-target code after the current-branch fallback' {
+            $script:HookResult = New-HookTargetTestResult -Root $null -Source 'CommandOperand' -ReasonCode $script:NoTargetCode
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
+
+            $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $script:HookResult -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
+
+            $mapped | Should -BeNullOrEmpty
+            $target.Status | Should -Be 'NoTarget'
+            $target.ReasonCode | Should -Be $script:NoTargetCode
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
+            Should -Invoke -CommandName Get-PrAuthorCurrentBranch -Times 0 -Exactly
+        }
+
+        It 'TR-06 does not select a worktree from the <Source> source' -ForEach @(
+            @{ Source = 'SessionRoot' }
+            @{ Source = 'DelegationIdentity' }
+        ) {
+            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source $Source
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
+
+            $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $script:HookResult -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
+
+            $mapped | Should -BeNullOrEmpty
+            $target.Status | Should -Be 'NoTarget'
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
+        }
+
+        It 'TR-07 does not select a worktree from a path-derived source (issue #673)' {
+            $script:HookResult = New-HookTargetTestResult -Root $script:FeatureFolderRoot -Source 'FilePath'
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
+
+            $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $script:HookResult -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
+
+            $mapped | Should -BeNullOrEmpty
+            $target.Status | Should -Be 'NoTarget'
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
+        }
+
+        It 'TR-08 never invokes the shared resolver for a command with no branch signal' {
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { throw 'the shared resolver must not run without a branch signal' }
+
+            $target = Resolve-PrAuthorWorktreeTarget -CommandText 'gh pr create --title x --body-file artifacts/pr_body_1.md'
+
+            $target.Status | Should -Be 'NoTarget'
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 0 -Exactly
+        }
+
+        It 'TR-09 passes the --head branch to the shared resolver only through -CommandBranch' {
+            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
+            $command = "gh pr create --head feature/item-701 --body-file $($script:FeatureFolderRoot)/artifacts/pr_body_701.md"
+
+            $null = Resolve-PrAuthorWorktreeTarget -CommandText $command
+
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly
+            Should -Invoke -CommandName Resolve-HookTargetWorktree -Times 1 -Exactly -ParameterFilter {
+                $CommandBranch -eq 'feature/item-701' -and -not $FilePath -and -not $CommandOperandPath -and [string]::IsNullOrEmpty($DelegationPrompt)
+            }
         }
     }
 }
