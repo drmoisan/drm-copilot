@@ -19,6 +19,10 @@
  *     - An entry that is already append-only and not shared is a no-op.
  *     - No partial `conflict_tolerance` is created and the input is not mutated.
  *
+ * The module also hosts {@link unionStrings}, the single order-preserving
+ * union used by both overlay modules; `claude-blast-radius-overlay.ts`
+ * imports it from here.
+ *
  * This module imports nothing from `claude-blast-radius-overlay.ts`, so no
  * import cycle exists; the caller turns a failure detail into its own error.
  */
@@ -60,6 +64,38 @@ function isStringList(value: unknown): value is string[] {
   return (
     Array.isArray(value) && value.every((item) => typeof item === "string")
   );
+}
+
+/**
+ * Return the ordered union of a base list and overlay strings.
+ *
+ * This is the single order-preserving union used by both overlay modules
+ * (`claude-blast-radius-overlay.ts` for string-list and nested-list keys, and
+ * this module for the demotion target list).
+ *
+ * @param base Base entries of any element type, kept in base order.
+ * @param overlay Overlay strings, each appended in overlay order unless it
+ *   equals a string member of the base or an earlier overlay string.
+ * @returns The composed list; neither input is mutated.
+ */
+export function unionStrings<T>(
+  base: ReadonlyArray<T>,
+  overlay: ReadonlyArray<string>,
+): (T | string)[] {
+  const composed: (T | string)[] = [...base];
+  const seen = new Set<string>();
+  for (const item of base) {
+    if (typeof item === "string") {
+      seen.add(item);
+    }
+  }
+  for (const item of overlay) {
+    if (!seen.has(item)) {
+      seen.add(item);
+      composed.push(item);
+    }
+  }
+  return composed;
 }
 
 /**
@@ -106,12 +142,7 @@ export function applySharedSurfaceDemotion(
   }
 
   const demoted = new Set(overlayValue);
-  const unioned: unknown[] = [...appendOnly];
-  for (const entry of overlayValue) {
-    if (!unioned.includes(entry)) {
-      unioned.push(entry);
-    }
-  }
+  const unioned = unionStrings<unknown>(appendOnly, overlayValue);
   const document: Record<string, unknown> = { ...composed };
   if (Array.isArray(sharedValue)) {
     document[SHARED_SURFACES_KEY] = shared.filter(

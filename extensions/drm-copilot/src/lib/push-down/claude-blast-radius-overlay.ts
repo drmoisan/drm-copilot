@@ -34,6 +34,7 @@ import {
 import {
   SHARED_SURFACES_DEMOTE_KEY,
   applySharedSurfaceDemotion,
+  unionStrings,
 } from "./claude-blast-radius-overlay-demote";
 
 /** Destination-relative path of the destination-owned overlay. */
@@ -130,28 +131,6 @@ function parseObject(text: string, path: string): JsonObject {
     );
   }
   return parsed;
-}
-
-/**
- * Return the ordered union of a base list and overlay strings.
- *
- * @param base Base entries, kept in base order.
- * @param overlay Overlay entries appended in overlay order when not present.
- * @returns The composed list.
- */
-function unionStrings(
-  base: ReadonlyArray<JsonValue>,
-  overlay: ReadonlyArray<string>,
-): JsonValue[] {
-  const composed: JsonValue[] = [...base];
-  const seen = new Set(base.filter((item) => typeof item === "string"));
-  for (const item of overlay) {
-    if (!seen.has(item)) {
-      seen.add(item);
-      composed.push(item);
-    }
-  }
-  return composed;
 }
 
 /**
