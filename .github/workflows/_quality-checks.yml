@@ -102,7 +102,7 @@ jobs:
       - name: Run tests with Pytest
         if: ${{ inputs.run-heavy }}
         run: |
-          poetry run pytest --cov --cov-branch \
+          poetry run pytest -n auto --cov --cov-branch \
             --cov-report=xml \
             --cov-report=json:artifacts/python/coverage.json \
             --cov-report=term-missing

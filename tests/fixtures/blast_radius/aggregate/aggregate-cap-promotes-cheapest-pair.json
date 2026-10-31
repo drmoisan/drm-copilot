@@ -1,0 +1,54 @@
+{
+  "description": "Issue #1013 D-2 aggregate cap: an item over its cap promotes its cheapest-to-serialize tolerated overlap, chosen by benefit ascending before cost descending.",
+  "notes": "tolerance_percent 100. Item 1 (C4, duration 8) shares modules mA and mB with item 2 (C3, duration 4): cost 2*2 = 4, benefit min(8, 4) = 4, 400 <= 400, tolerated. Item 1 shares modules mC, mD, and mE with item 3 (C4): cost 2*3 = 6, benefit 8, 600 <= 800, tolerated. Items 2 and 3 share nothing. Totals: item 1 = 4 + 6 = 10, 10*100 = 1000 > 8*100 = 800, over its cap; item 2 = 4, 400 <= 400; item 3 = 6, 600 <= 800. Round 1: item 1 is the smallest over-cap key; its overlaps (1,2) key (4, -4, 1, 2) and (1,3) key (8, -6, 1, 3); the minimum is (1,2) by benefit, although (1,3) costs more. Promote (1,2). Item 1 total = 6, 600 <= 800; no item is over its cap, so the pass stops. Promoted: (1,2). Edges: (1,2) module_overlap, hard false, cost 4, benefit 4. Tolerated: (1,3).",
+  "tags": ["#1013"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2, "contract": 8 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["**/CHANGELOG.md"]
+    },
+    "modules": {},
+    "over_breadth_fraction": 0.25
+  },
+  "cases": [
+    {
+      "name": "benefit-first",
+      "items": [
+        {
+          "key": 1,
+          "band": "C4",
+          "radius": { "paths": [], "modules": ["mA", "mB", "mC", "mD", "mE"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" }
+        },
+        {
+          "key": 2,
+          "band": "C3",
+          "radius": { "paths": [], "modules": ["mA", "mB"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" }
+        },
+        {
+          "key": 3,
+          "band": "C4",
+          "radius": { "paths": [], "modules": ["mC", "mD", "mE"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" }
+        }
+      ],
+      "pairwise_tolerated": [
+        { "a": 1, "b": 2, "reasons": ["module_overlap"], "cost": 4, "benefit": 4 },
+        { "a": 1, "b": 3, "reasons": ["module_overlap"], "cost": 6, "benefit": 8 }
+      ],
+      "expected_promoted": [[1, 2]],
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "module_overlap", "hard": false, "cost": 4, "benefit": 4 }
+      ],
+      "expected_tolerated": [
+        { "a": 1, "b": 3, "reasons": ["module_overlap"], "cost": 6, "benefit": 8 }
+      ]
+    }
+  ]
+}

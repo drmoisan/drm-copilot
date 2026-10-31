@@ -65,6 +65,10 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 - `Test-PoshQCShardTestCount`: throw unless the shard test counts sum to a discovery-pass test count.
 - `Merge-PoshQCCoverageReport`: merge the CoverageGutters XML texts of the shards at LINE granularity (no file I/O, no threshold).
 - `Get-PoshQCCoverageLineSummary`: return covered, missed, total, and percent from a report's LINE counter.
+- `Invoke-PoshQCParallelTest`: run the Pester suite as concurrent shard processes on one machine and merge the results (see Local concurrent runs below).
+- `Get-PoshQCParallelWorkerCount`: return the default worker count, half the logical processors, at least 1 and at most 8.
+- `Merge-PoshQCJunitReport`: merge the JUnit XML texts of the shards into one report (no file I/O).
+- `ConvertTo-PoshQCShardWeight` / `Export-PoshQCShardWeight`: build the measured shard-weights document from JUnit reports, and write it to a file.
 
 ## Configuration
 
@@ -81,10 +85,25 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
   - An empty population disables coverage for that invocation, logs `Code coverage disabled for this invocation`, and still runs the tests.
   - Each run logs `Code coverage population: source=<source>; files=<count>` before Pester starts.
 - Sharded runs (issue #953): `Invoke-PoshQCTest -ShardIndex <n> -ShardCount <N>` runs only shard n of N.
-  - Test files are weighted by the UTF-8 size in bytes of their text with CRLF line endings counted as LF, and assigned heaviest first to the shard with the least assigned weight (ties: fewer files, then the lower shard index; equal sizes are taken in ordinal path order), so runners whose checkouts differ only in line-ending conversion compute the same assignment.
+  - Test files are weighted by measured duration first (issue #1048): when `config/poshqc-shard-weights.json` exists at the workspace root, a listed file weighs its milliseconds and a file without an entry weighs the median of all listed values, so bytes and milliseconds are never mixed. Without the weights file, test files are weighted by the UTF-8 size in bytes of their text with CRLF line endings counted as LF, so runners whose checkouts differ only in line-ending conversion compute the same assignment. Files are assigned heaviest first to the shard with the least assigned weight (ties: fewer files, then the lower shard index; equal weights are taken in ordinal path order).
+  - Weights file format: `{"version": 1, "unit": "ms", "files": {"<repository-relative forward-slash path>": <non-negative integer milliseconds>}}`. A document with another `version`, another `unit`, an empty `files` map, a non-relative key, or a negative or non-integer value is rejected with an error that names `poshqc-shard-weights.json`. Entries for files that no longer exist are ignored. The file is committed, so every CI shard computes the same assignment; stale or missing entries affect wall-clock time only, because the completeness and test-count checks still guard that every file runs once.
+  - Regenerate the weights from the shard JUnit files of a full CI run, not from a local run (local durations differ from the runner's). `Export-PoshQCShardWeight` maps each JUnit `testsuite` name, an absolute path on the runner, to the path from its first `tests` or `scripts` segment, sums seconds per file, and writes integer milliseconds with sorted keys:
+
+    ```powershell
+    gh run download <run id> --pattern 'poshqc-test-results-shard-*' --dir <download dir>
+    Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1
+    Export-PoshQCShardWeight -JunitPath (Get-ChildItem -LiteralPath <download dir> -Recurse -Filter pester-junit.xml).FullName -OutputPath config/poshqc-shard-weights.json
+    ```
   - `-ShardFileListPath <path>` writes the shard manifest (`shardIndex`, `shardCount`, `all`, `selected`) as JSON through the `-WriteShardFileList` seam.
   - A shard that selects no test file (more shards than test files) stops with an error before Pester runs.
   - `Merge-PoshQCCoverageReport` merges the shard reports with `ci = max(ci)` per line and recomputes the LINE and INSTRUCTION counters, so the merged LINE figures are exact. It omits `class` and `method` elements and METHOD and CLASS counters, because those cannot be recomputed from line hits.
+- Output-path parameters (issue #1048): `Invoke-PoshQCTest -TestResultPath <path> -CoverageOutputPath <path>` replace the JUnit and coverage output paths of the settings file for one invocation; a relative path is resolved against `-Root`. When a parameter is omitted or blank, the settings value is used.
+- Local concurrent runs (issue #1048): `Invoke-PoshQCParallelTest -Root . [-WorkerCount <n>]` runs the suite as concurrent shard processes on one machine. Pester 5 has no in-process parallel mode, so each shard is a separate `pwsh` process; the VS Code task `PoshQC: 4 test (Pester, parallel)` runs it.
+  - The worker count defaults to half the logical processor count, at least 1 and at most 8 (`Get-PoshQCParallelWorkerCount`); `-WorkerCount` overrides it.
+  - Each shard runs `Invoke-PoshQCTest -ShardIndex <i> -ShardCount <N>` with its JUnit, coverage, and manifest files and its console log (`shard.log`, standard error in `shard.log.err`) under `artifacts/pester/parallel/shard-<i>/`.
+  - After every shard has exited, the runner checks the manifests with `Test-PoshQCShardCompleteness`, merges the JUnit reports with `Merge-PoshQCJunitReport` and the coverage reports with `Merge-PoshQCCoverageReport`, and writes `artifacts/pester/pester-junit.xml`, `artifacts/pester/powershell-coverage.xml`, and the `powershell-coverage.koverage.xml` copy.
+  - The merged JUnit root carries the summed `tests`, `errors`, `failures`, and `disabled` counts, every shard's `testsuite` elements with `id` renumbered from 0, and a root `time` equal to the longest shard's root `time`: the shards run at the same time, so the longest shard is the wall-clock time of the run, not the sum of test time.
+  - The runner returns an object with `ExitCode`, `WorkerCount`, `WallClockSeconds`, and per-shard exit codes and log paths. `ExitCode` is 0 only when every shard exited 0, wrote all three outputs, passed the completeness check, and merged; otherwise it is 1 and no merged artifact is written, so a partial result never replaces a full one. The runner never calls `exit`; the VS Code task exits with the returned `ExitCode`.
 
 ## Typical workflow
 

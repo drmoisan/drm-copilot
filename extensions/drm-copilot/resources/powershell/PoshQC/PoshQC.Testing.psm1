@@ -158,6 +158,12 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
 Optional path that receives the shard manifest (shardIndex, shardCount, all, selected) as JSON.
 .PARAMETER WriteShardFileList
 Injectable seam that writes the shard manifest JSON. Defaults to Set-Content.
+.PARAMETER TestResultPath
+Optional JUnit output path that replaces the settings TestResult.OutputPath for this invocation, so concurrent
+shards write distinct files (issue #1048). A relative path is resolved against Root. Omitted or blank keeps the settings value.
+.PARAMETER CoverageOutputPath
+Optional coverage output path that replaces the settings CodeCoverage.OutputPath for this invocation (issue #1048).
+A relative path is resolved against Root. Omitted or blank keeps the settings value.
 #>
 function Invoke-PoshQCTest {
     [CmdletBinding()]
@@ -171,6 +177,8 @@ function Invoke-PoshQCTest {
         [int] $ShardIndex = 0,
         [int] $ShardCount = 0,
         [string] $ShardFileListPath,
+        [string] $TestResultPath,
+        [string] $CoverageOutputPath,
         [scriptblock] $WriteShardFileList = { param([string] $Path, [string] $Json) Set-Content -LiteralPath $Path -Value $Json -Encoding utf8 },
         [scriptblock] $EnsureModule = {
             param([string] $Name, [string] $ErrorMessage, [string] $MinimumVersion, [string] $MaximumVersion)
@@ -325,6 +333,10 @@ function Invoke-PoshQCTest {
 
     $settings = & $LoadSettings $SettingsPath
     $config = & $BuildConfiguration $settings
+    # Issue #1048: per-invocation output paths, applied before EnsureResultPath and ExpandCoveragePaths so the
+    # relative-to-root resolution and directory creation also apply to them.
+    if (-not [string]::IsNullOrWhiteSpace($TestResultPath)) { $config.TestResult.OutputPath = $TestResultPath }
+    if (-not [string]::IsNullOrWhiteSpace($CoverageOutputPath) -and $config.CodeCoverage) { $config.CodeCoverage.OutputPath = $CoverageOutputPath }
     $config = & $ExpandRunPaths $config $Root $ExcludeDirs
     $config = & $EnsureResultPath $config $Root
     $config = & $ExpandCoveragePaths $config $Root

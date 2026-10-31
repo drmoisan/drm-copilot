@@ -105,6 +105,22 @@ An item whose radius fails V1 or V2 is re-planned through a follow-up preparatio
 carrying the findings as plan-revision instructions. It is never dropped, and never withdrawn on
 your own initiative; withdrawal is a caller decision made through F6's remove operation.
 
+**No planner worktrees.** The planner runs no `git worktree add` for any step. It authors
+`parallel/<slug>-plan` in its own session checkout and reads item text by ref, as the
+**No planner worktrees.** paragraph in the Artifact Home section of the `parallel-plan` skill
+specifies.
+
+**Issue combination (issue #1013).** After every item is prepared and banded, and before cohort
+seeding, run the `## Issue Combination` steps of the `parallel-plan` skill without operator approval:
+call Get-BlastRadiusCombination; when applying every combination would leave fewer than two items,
+apply none and report each qualifying pair as not combined with that reason; otherwise issue one
+follow-up preparation-mode delegation per combination on the primary item's pushed branch, carrying
+the unchanged preparation kickoff line followed by `Combined issues: #A #B`; read the combined plan
+by ref, re-derive the combined item's declared radius, and run a fresh complexity assessment;
+remove the non-primary members from `items[]`, record `combined_issue_nums` on the primary item and
+the combination in the `combinations` list; and only then run capped scheduling over the
+post-combination item set. Each combination re-plan delegation is a preparation child.
+
 ## Checkpoint Persistence
 
 Update `artifacts/orchestration/parallel-planner-state.json` after every completed step with:
@@ -140,7 +156,11 @@ Do not report completion until:
    `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: "parallel-kickoff"`.
 7. The final report lists, per item, the `plan-path:`, branch name, preflight status, and
    radius-validation result; plus the cohort table, the manifest path, both kickoff paths, and the
-   statement that execution has NOT started.
+   statement that execution has NOT started. It also lists each combination (issue #1013) with its
+   members, primary, qualifying pairs with cost and benefit, the threshold, and
+   `estimated_savings`, and each not-combined qualifying pair with the reason.
+8. The planner created no worktree: it runs no `git worktree add` for any step, and
+   `parallel/<slug>-plan` is checked out in its own session checkout and pushed.
 
 ## Upstream Library Invocation
 

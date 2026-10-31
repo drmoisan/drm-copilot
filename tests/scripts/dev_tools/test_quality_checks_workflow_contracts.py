@@ -25,6 +25,11 @@ MIN_LINE_FLOOR = "85"
 MIN_BRANCH_FLOOR = "75"
 CODECOV_ACTION = "codecov/codecov-action"
 RUN_HEAVY_GATE = "${{ inputs.run-heavy }}"
+XDIST_WORKER_FLAG = "-n"
+XDIST_WORKER_VALUES = ("auto", "4")
+XDIST_LONG_FLAG_PREFIXES = ("--numprocesses", "--dist")
+PYPROJECT_PATH = "pyproject.toml"
+PYTEST_INI_SECTION = "[tool.pytest.ini_options]"
 
 
 def read_repo_text(relative_path: str) -> str:
@@ -79,6 +84,53 @@ def run_tokens(step: dict[str, object]) -> tuple[str, ...]:
     run_value = step.get("run")
     assert isinstance(run_value, str), "step carries no string run value"
     return tuple(token for token in shlex.split(run_value) if token.strip())
+
+
+def extract_pytest_addopts(pyproject_text: str) -> str:
+    """Return the ``addopts`` value of the pytest section of a pyproject text.
+
+    The text is scanned line by line instead of parsed with ``tomllib``,
+    because the Python 3.10 matrix leg has no ``tomllib``. Only a single-line
+    quoted ``addopts`` string is recognized, which is the form the project
+    uses.
+
+    Args:
+        pyproject_text: Full text of a ``pyproject.toml`` document.
+
+    Returns:
+        The unquoted ``addopts`` string, or an empty string when the pytest
+        section carries no ``addopts`` key.
+    """
+    in_pytest_section = False
+    # Walk the lines, tracking whether the current table is the pytest section.
+    for line in pyproject_text.splitlines():
+        stripped = line.strip()
+        # A table header switches sections; only keys of the pytest table count.
+        if stripped.startswith("["):
+            in_pytest_section = stripped == PYTEST_INI_SECTION
+            continue
+        key, separator, value = stripped.partition("=")
+        if in_pytest_section and separator and key.strip() == "addopts":
+            return value.strip().strip("\"'")
+    return ""
+
+
+def xdist_flags_in(addopts: str) -> list[str]:
+    """Return every xdist worker or distribution token in an ``addopts`` value.
+
+    Args:
+        addopts: The ``addopts`` string to shell-split.
+
+    Returns:
+        The tokens equal to ``-n`` or starting with ``--numprocesses`` or
+        ``--dist``, in their original order; an empty list when there are none.
+    """
+    # Keep each token that would make every pytest invocation start xdist workers.
+    return [
+        token
+        for token in shlex.split(addopts)
+        if token == XDIST_WORKER_FLAG or token.startswith(XDIST_LONG_FLAG_PREFIXES)
+    ]
 
 
 def test_workflow_names_no_foreign_coverage_target() -> None:
@@ -161,3 +213,68 @@ def test_codecov_step_uses_the_declared_files_input() -> None:
 
     assert "files" in with_mapping
     assert "file" not in with_mapping
+
+
+def test_pytest_step_runs_xdist_workers() -> None:
+    """The CI pytest step must start xdist workers with a measured worker count.
+
+    Scenario: the pytest step's ``run`` value is shell-split. Expected outcome:
+    ``-n`` occurs exactly once and the token after it is ``auto`` or ``4``,
+    the two worker settings that issue #1048 measures on the CI runner.
+    """
+    # Arrange
+    tokens = run_tokens(step_named(PYTEST_STEP_NAME))
+
+    # Act
+    flag_count = tokens.count(XDIST_WORKER_FLAG)
+
+    # Assert
+    assert flag_count == 1, f"expected one -n token, found {flag_count}"
+    worker_value = tokens[tokens.index(XDIST_WORKER_FLAG) + 1]
+    assert (
+        worker_value in XDIST_WORKER_VALUES
+    ), f"expected a worker count in {XDIST_WORKER_VALUES}, found {worker_value!r}"
+
+
+def test_pyproject_addopts_carries_no_xdist_flag() -> None:
+    """The project ``addopts`` must not start xdist workers on every run.
+
+    Scenario: the committed ``pyproject.toml`` is read as text and its pytest
+    ``addopts`` value is shell-split. Expected outcome: no ``-n``,
+    ``--numprocesses``, or ``--dist`` token is present, because the VS Code
+    Test Explorer keys results to the wrong file when ``addopts`` carries
+    ``-n``.
+    """
+    # Arrange
+    addopts = extract_pytest_addopts(read_repo_text(PYPROJECT_PATH))
+
+    # Act
+    flags = xdist_flags_in(addopts)
+
+    # Assert
+    assert addopts != "", "the pytest section carries no addopts value"
+    assert flags == [], f"addopts must not carry xdist flags, found {flags}"
+
+
+def test_addopts_xdist_check_rejects_injected_flag() -> None:
+    """The ``addopts`` check must report an injected xdist flag.
+
+    Scenario: an in-memory pyproject text whose pytest ``addopts`` carries
+    ``-n auto`` and a ``--dist`` option, preceded by another table that has
+    its own ``addopts`` key, is fed to the same extraction helper. Expected
+    outcome: only the pytest table is read and both xdist tokens are
+    reported, so the check can fail.
+    """
+    # Arrange
+    pyproject_text = (
+        "[tool.other]\n"
+        'addopts = "-q"\n'
+        f"{PYTEST_INI_SECTION}\n"
+        'addopts = "-ra -n auto --dist=loadfile"\n'
+    )
+
+    # Act
+    flags = xdist_flags_in(extract_pytest_addopts(pyproject_text))
+
+    # Assert
+    assert flags == ["-n", "--dist=loadfile"]

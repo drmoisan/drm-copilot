@@ -49,7 +49,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 
 - Hooks for an isolated subagent run inside the subagent's worktree with that worktree's hook scripts, which are `main`'s copies. A hook change on a branch is not exercised by isolated subagents until it merges.
 - Hook behavior on a branch is therefore proven by Pester suites, not by a live subagent run. A live check of a branch hook needs a non-isolated delegation from the item worktree.
-- The batch-budget hooks evaluate the checkpoint of the target worktree that `Resolve-HookTargetWorktree` resolves for the edited file, so an edit made from a coordinating session into an item worktree is evaluated against the item worktree's checkpoint. The other gates that read `artifacts/orchestration/orchestrator-state.json` are unchanged and still use the root that holds the hook script until #1010 (preimplementation gate) and #1011 (PR authoring gate) adopt the resolver.
+- The batch-budget hooks evaluate the checkpoint of the target worktree that `Resolve-HookTargetWorktree` resolves for the edited file, so an edit made from a coordinating session into an item worktree is evaluated against the item worktree's checkpoint. The preimplementation gate (#1010) resolves the file path of a Write or Edit call and the `-C` values and absolute operands of `git add` and `git commit` through the same resolver, and denies when the worktree listing fails or names no worktree; its delegation checks still resolve by portable identity. The PR authoring gate (#1011) resolves the branch that a `gh pr create` or `gh pr edit` command names (`--head`, `--branch`, or a `branch:` label) through the same resolver when the command carries no canonical issue number line, and otherwise keeps its portable-identity and current-branch resolution. The other gates that read `artifacts/orchestration/orchestrator-state.json` are unchanged and still use the root that holds the hook script.
 - Enforcement hooks do not invoke Python; bash is preferred and PowerShell is acceptable (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`).
 
 ## MCP Surfaces Run the Installed Extension
@@ -133,7 +133,9 @@ These pass every validator rule and are found only by reading the plan against t
 - Diagnose before proposing sharding or parallel workers. First aggregate per-test and per-module time from the JUnit report that the full run already writes (`--junitxml`); a small fraction of tests usually holds most of the time. Then run the slowest test under a profiler (`python -m cProfile -o <file> -m pytest <node id>`) and read the profile with `pstats`.
 - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
 - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
-- Parallel shards reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
+- Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
+- pytest: pass `-n auto` (pytest-xdist) on the command line of the CI step `Run tests with Pytest` and of the parallel VS Code tasks, never in `addopts`, because the VS Code Test Explorer keys results to the wrong file when `addopts` carries it. `-n auto` counts physical cores, so a runner can start fewer workers than it has vCPUs; measure it against an explicit count such as `-n 4` before keeping it. pytest-cov combines the worker coverage into one report, and the serial `poetry run pytest` command remains the isolation reference.
+- Pester: Pester 5 has no in-process parallel mode, so parallel Pester runs are process-per-shard: `Invoke-PoshQCTest -ShardIndex -ShardCount` on the CI runners and `Invoke-PoshQCParallelTest` locally. Read the per-file `time` of the JUnit `testsuite` elements before changing the shard count or the weights in `config/poshqc-shard-weights.json`.
 - A candidate fix can be measured before the tree is edited by loading a pytest plugin module from `SCRATCH` with `-p <module>` and `PYTHONPATH`.
 
 ## Test Isolation Checks
@@ -143,5 +145,6 @@ These pass every validator rule and are found only by reading the plan against t
   - a seeded shuffled Jest run (`node run-jest.cjs --randomize --seed=<n>` in `extensions/drm-copilot/`) with the seed recorded;
   - a reversed-order run of the new or changed Python test modules in one process;
   - a seeded shuffled file-order run of the touched Pester suites in one process, with at least three seeds and each seed and its file order recorded;
-  - a fresh single-process Pester run over `tests/scripts`, which is the CI shape.
+  - a fresh single-process Pester run over `tests/scripts`, which is the CI shape;
+  - in addition to the serial runs, a concurrent-shard Pester run through `Invoke-PoshQCParallelTest` and a `pytest -n auto` run, both with zero failures.
 - An order dependence found by any run is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state. Every seed is then re-run.

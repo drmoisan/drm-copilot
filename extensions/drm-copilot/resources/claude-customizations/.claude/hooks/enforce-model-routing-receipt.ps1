@@ -45,7 +45,8 @@
     `epic_mode` is not true requires the prompt line
     `Author-asserted autoclose issues: #<issue-num>` at the start of a line. Its absence denies
     with the AUTHOR_ASSERTED_AUTOCLOSE_MISSING sub-code (Get-ModelRoutingAuthorAssertedReason).
-    The epic-scope path is not subject to this rule.
+    The epic-scope path is not subject to this rule. Only the JSON boolean true waives the line;
+    a string or number such as "true" or 1 does not (issue #1001).
 
 .NOTES
     Compatible with PowerShell 7+. Read-only presence-gating deterrent.
@@ -214,7 +215,9 @@ function Get-ModelRoutingAuthorAssertedReason {
         epic_mode property whose value is true (an epic child whose integration PR owns the
         closing keyword), or when a prompt line starts with 'Author-asserted autoclose issues:'
         and names '#<issue-num>' later on that line with no digit after the number. Property
-        presence is tested first because strict mode throws on a missing property.
+        presence is tested first because strict mode throws on a missing property. Only the
+        JSON boolean true waives the line: a string or number such as "true" or 1 does not
+        (issue #1001).
     .PARAMETER Checkpoint
         The resolved per-feature checkpoint object.
     .PARAMETER PromptText
@@ -231,7 +234,7 @@ function Get-ModelRoutingAuthorAssertedReason {
 
     $names = @($Checkpoint.PSObject.Properties.Name)
     $issue = if ($names -contains 'issue-num') { ConvertTo-WorktreeItemIssueNumber -Value $Checkpoint.'issue-num' } else { $null }
-    if ($null -eq $issue -or ($names -contains 'epic_mode' -and $Checkpoint.epic_mode -eq $true)) {
+    if ($null -eq $issue -or ($names -contains 'epic_mode' -and ($Checkpoint.epic_mode -is [bool]) -and $Checkpoint.epic_mode)) {
         return $null
     }
     $line = "Author-asserted autoclose issues: #$issue"
