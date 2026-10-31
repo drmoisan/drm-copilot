@@ -203,6 +203,22 @@ reference resolves.
 - Feature-folder names: `^\d{4}-\d{2}-\d{2}-` is the old date-first format; any other name starting
   with four digits and a dash is the new format; both are accepted until child 7 migrates.
 
+## Owner Decisions H1 to H3 (2026-10-31)
+
+- **H1.** Child 1 (#1025) receives one plan-A revision beyond the one-revision limit: a
+  `quality-tiers.yml` entry for `scripts/harness` (QT008), a deterministic parity-matrix `id`
+  encoding covering hook matchers with special characters, the `$schema` key and duplicate
+  registrations (children 3 to 6 consume it), and confirmation that the matrix schema accepts
+  `decision_status: provisional`.
+- **H2.** Child 7 (#1016) stage B takes option (b): the moves-then-rewrites case, where the
+  second apply call refuses its own decision file after the moves, is a documented halt branch that
+  stops with a clear message telling the user to re-run the dry run. Stage A is not reopened. One
+  more stage B revision is authorized for P2-T4, P1-T3/P1-T4 and P7-T1.
+- **H3.** Child 6 (#1032) owns retiring or redirecting
+  `scripts/dev-tools/sync-agents-from-instructions.ps1`; child 3 (#1028) owns redirecting the Codex
+  native converter to the new generators. Child 3's OQ-6 default is resolved accordingly, and both
+  plans receive the scope revision this requires.
+
 ## Execution Preconditions
 
 - Execution starts only after the parallel run `bugs-1001-1002-1003-1006` has merged to `main`.
