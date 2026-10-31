@@ -18,6 +18,14 @@ Composition rules (identical to TypeScript):
       names are emitted in ordinal order and the forbidden-glob guard applies.
     - Other keys in both: objects merge recursively, lists union, otherwise the
       overlay value wins. Overlay-only keys are appended in overlay order.
+    - ``shared_surfaces_demote`` (issue #1006) is a directive, not a document
+      key. After every other key is composed it is checked in this order: the
+      value is a list of strings; the composed document carries a
+      ``conflict_tolerance`` object with an ``append_only_paths`` list; every
+      entry is a composed shared surface or append-only path. Each entry is
+      then removed from ``shared_surfaces`` (remaining order kept) and unioned
+      into ``conflict_tolerance.append_only_paths``; an entry that is already
+      append-only is a no-op, and the key itself is not emitted.
     - Output is 2-space indented with one trailing newline.
 
 Invariants / Constraints:
@@ -50,6 +58,7 @@ __all__ = [
     "BLAST_RADIUS_OVERLAY_RELATIVE_PATH",
     "BLAST_RADIUS_RELATIVE_PATH",
     "FORBIDDEN_GLOBS",
+    "SHARED_SURFACES_DEMOTE_KEY",
     "BlastRadiusGuardError",
     "BlastRadiusOverlayError",
     "compose_blast_radius_overlay",
@@ -70,6 +79,13 @@ _STRING_LIST_KEYS = frozenset(
 )
 _MODULES_KEY = "modules"
 _VERSION_KEY = "version"
+
+# Overlay directive key naming shared surfaces to demote to append-only paths
+# (issue #1006), and the composed-document keys the demotion reads.
+SHARED_SURFACES_DEMOTE_KEY = "shared_surfaces_demote"
+_SHARED_SURFACES_KEY = "shared_surfaces"
+_CONFLICT_TOLERANCE_KEY = "conflict_tolerance"
+_APPEND_ONLY_PATHS_KEY = "append_only_paths"
 
 JsonObject = dict[str, object]
 
@@ -242,6 +258,75 @@ def _compose_key(key: str, base: object, overlay: object, overlay_path: str) -> 
     return _merge_values(base, overlay, key, overlay_path)
 
 
+def _apply_shared_surface_demotion(
+    composed: JsonObject, overlay_value: object, overlay_path: str
+) -> JsonObject:
+    """Demote the named shared surfaces to append-only paths (issue #1006).
+
+    Args:
+        composed (JsonObject): The document composed from the base and every
+            other overlay key. It is not mutated.
+        overlay_value (object): The overlay value of
+            ``SHARED_SURFACES_DEMOTE_KEY``.
+        overlay_path (str): Overlay path reported in an error.
+
+    Returns:
+        JsonObject: A new document in which each named entry is absent from
+        ``shared_surfaces`` (remaining order kept) and present in
+        ``conflict_tolerance.append_only_paths`` (base entries first).
+
+    Raises:
+        BlastRadiusOverlayError: When the value is not a list of strings, when
+            the composed document has no ``conflict_tolerance`` object with an
+            ``append_only_paths`` list, or when an entry is neither a composed
+            shared surface nor an append-only path. The checks run in that
+            order, so no partial ``conflict_tolerance`` is ever created.
+    """
+    demoted = _as_string_list(overlay_value)
+    if demoted is None:
+        raise BlastRadiusOverlayError(
+            overlay_path,
+            f'key "{SHARED_SURFACES_DEMOTE_KEY}" must be a list of strings',
+        )
+    tolerance = _as_object(composed.get(_CONFLICT_TOLERANCE_KEY))
+    append_only = tolerance.get(_APPEND_ONLY_PATHS_KEY) if tolerance else None
+    if tolerance is None or not isinstance(append_only, list):
+        raise BlastRadiusOverlayError(
+            overlay_path,
+            f'key "{SHARED_SURFACES_DEMOTE_KEY}" requires '
+            f"{_CONFLICT_TOLERANCE_KEY}.{_APPEND_ONLY_PATHS_KEY} in the composed document",
+        )
+    append_only_list = cast("list[object]", append_only)
+    shared_value = composed.get(_SHARED_SURFACES_KEY)
+    shared = (
+        cast("list[object]", shared_value) if isinstance(shared_value, list) else []
+    )
+
+    # Every named entry must already be known to the composed document, so a
+    # typo fails closed instead of silently demoting nothing.
+    for entry in demoted:
+        if entry not in shared and entry not in append_only_list:
+            raise BlastRadiusOverlayError(
+                overlay_path,
+                f'key "{SHARED_SURFACES_DEMOTE_KEY}" names "{entry}", which is '
+                "neither a shared surface nor an append-only path",
+            )
+
+    document: JsonObject = dict(composed)
+    # Only an existing shared-surface list is rewritten; an absent key stays
+    # absent so the output key set matches the composed document.
+    if isinstance(shared_value, list):
+        removed = set(demoted)
+        document[_SHARED_SURFACES_KEY] = [
+            item for item in shared if not (isinstance(item, str) and item in removed)
+        ]
+    document[_CONFLICT_TOLERANCE_KEY] = {
+        **tolerance,
+        _APPEND_ONLY_PATHS_KEY: _union_strings(append_only_list, demoted),
+    }
+    return document
+
+
 def compose_blast_radius_overlay(
     base_text: str, overlay_text: str | None, overlay_path: str
 ) -> str:
@@ -280,7 +365,13 @@ def compose_blast_radius_overlay(
             if key == _VERSION_KEY or key not in overlay
             else _compose_key(key, value, overlay[key], overlay_path)
         )
+    # Overlay-only keys are appended in overlay order; the demotion directive
+    # is consumed below instead of being emitted.
     for key, value in overlay.items():
-        if key not in composed:
+        if key != SHARED_SURFACES_DEMOTE_KEY and key not in composed:
             composed[key] = _compose_key(key, _ABSENT, value, overlay_path)
+    if SHARED_SURFACES_DEMOTE_KEY in overlay:
+        composed = _apply_shared_surface_demotion(
+            composed, overlay[SHARED_SURFACES_DEMOTE_KEY], overlay_path
+        )
     return json.dumps(composed, indent=2, ensure_ascii=False) + "\n"

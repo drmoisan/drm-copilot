@@ -162,6 +162,12 @@ DECLARED_TOP_LEVEL_KEYS = (
 )
 
 
+# Overlay directive keys (issue #1006). A destination overlay may carry these
+# keys, but the overlay composers consume them, so they never appear in a
+# composed or committed truth table and belong to no truth-table key class.
+OVERLAY_DIRECTIVE_KEYS = ("shared_surfaces_demote",)
+
+
 def config_key(config: Mapping[str, object], key: str) -> object:
     """Read one top-level key from a parsed truth table.
 
