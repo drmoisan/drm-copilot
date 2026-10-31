@@ -1,14 +1,14 @@
 # docs-mcp-tools - Plan
 
 - **Issue:** #1036
-- **Parent (optional):** #1019 (epic `documentation-estate-tooling`, child 900007, wave 3, band C3)
+- **Parent (optional):** #1019 (epic `documentation-estate-tooling`, child 1036, wave 3, band C3)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-30T18-58
 - **Status:** Ready for preflight
 - **Version:** 1.0
 - **Work Mode:** full-feature (acceptance criteria source: `spec.md` `## Acceptance Criteria` and `user-story.md` `## Acceptance Criteria`)
 - **Branch:** `feature/docs-mcp-tools-1036` (pull request targets `epic/documentation-estate-tooling-integration`)
-- **Inputs:** `issue.md`, `spec.md`, `user-story.md`, `research/research.2026-10-30T23-05.md`, `research/orchestrator-confirmations.2026-10-30T23-30.md` (binding: `## F1`, `### F1a`, `## F2`); epic `docs/features/epics/documentation-estate-tooling/epic.md` (`## Owner Directive: Implementation Language (2026-10-30, refined)`, `### Artifact classes for this epic`, `## Owner Decisions (2026-10-30, received through the coordinator)`, `### Amendment of 1020 required by D3 and D5`, `### 900007 - docs-mcp-tools (wave 3, C3)`)
+- **Inputs:** `issue.md`, `spec.md`, `user-story.md`, `research/research.2026-10-30T23-05.md`, `research/orchestrator-confirmations.2026-10-30T23-30.md` (binding: `## F1`, `### F1a`, `## F2`); epic `docs/features/epics/documentation-estate-tooling/epic.md` (`## Owner Directive: Implementation Language (2026-10-30, refined)`, `### Artifact classes for this epic`, `## Owner Decisions (2026-10-30, received through the coordinator)`, `### Amendment of 1020 required by D3 and D5`, `### 1036 - docs-mcp-tools (wave 3, C3)`)
 
 **Fail-closed evidence rule:** a missing baseline, QA, or coverage-comparison artifact makes the audit verdict BLOCKED or INCOMPLETE, never PASS.
 
