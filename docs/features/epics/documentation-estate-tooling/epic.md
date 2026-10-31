@@ -352,6 +352,28 @@ provisional defaults.
   (`285786ec4`) is kept; the duplicate set remains unpushed on the relaunch worktree branch and was
   not deleted.
 
+### Page-check contracts from the PowerShell preparation of 1021 (binding)
+
+- Page-metadata schema `urn:drm-copilot:docs:1.0.0:page-metadata` (fields `owner`,
+  `last_reviewed`, `audience`, `diataxis_mode`, `surface_refs`, `title`, `extensions`; no required
+  list); front matter is `---`, one `<key>: <JSON value>` line per field, `---`. The `DOCS_PAGE_*`
+  finding-code prefix is reserved to 1021. `check` result is `{page_count, profile_path, roots}`.
+- If 1020 does not compose `page-metadata` into its schema set, 1021 uses its own schema gate
+  (`Get-DocsPageComposedSchemaSet`); a direct caller of `Get-DocsPageCheckFinding` or
+  `Test-DocsPageFrontMatter` then passes the composed set through that function.
+- `init -Write` writes `.markdownlint.json`, `.vale.ini`, `.vale/styles/DocsBase/*.yml` and an
+  empty `accept.txt`, all or nothing.
+
+Cross-child reconciliation found during 1021's preflight (to be resolved before execution):
+- 1024's cleared spec and plan still use pre-PowerShell 1021 names (`DX-NO-INSTRUCTION`,
+  `PAGE_ORPHANED`, root and entry-page check options) and pin their own `owner` and `surface_refs`
+  patterns. 1024 needs one reconciliation revision against the 1021 contracts above.
+- Glob matching differs between 1021 and 1024 for `[!x]` negation (Q15).
+- 1020: the structural schema walk ignores `patternProperties` (false unknown-property finding on
+  non-empty `extensions`); an empty `accept.txt` may throw under strict mode if read with
+  `Get-Content -Raw`; `init` template rows use absolute `Source` paths while the context's
+  `ReadText` accepts relative paths only.
+
 ### Enforcement notes from the two preparations of 1034
 
 - The pushed preparation (`20e9aa408`, `PREFLIGHT: ALL CLEAR`) is kept. A concurrent relaunch
