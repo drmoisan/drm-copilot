@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-31
 - **Status:** Draft
-- **Version:** 0.5 (preflight revision of the D3 and D5 amendment: binding 1031 preconditions and real issue numbers)
+- **Version:** 0.6 (owner decision P1: thin process seam, `patternProperties` walk, empty-file read, relative template sources, registry membership assertions)
 - **Requirements source:** `docs/features/epics/documentation-estate-tooling/epic.md` on branch `origin/epic/documentation-estate-tooling-integration`
 - **Research (amendment design source):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T22-35-docs-profile-amendment-d3-d5-addendum-research.md`
 - **Research (primary design source):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T21-45-docs-profile-powershell-design-addendum-research.md`
@@ -61,6 +61,26 @@ the preparation of 1031 (binding)` adds preconditions for 1031. Changes:
 - The core pack manifest, its bundle mirror and `Docs.Manifest.Tests.ps1` cover every file under
   `.claude/lib/docs/` except the `.claude/lib/docs/python/` subtree, which only the python pack
   manifest lists (1031). 1020 creates no file under that subtree.
+
+Version 0.6 applies owner decision P1 (epic `## Owner Decisions`, P1-P4 of 2026-10-31, and
+`### 1020 amendment outcome (2026-10-31)`). Acceptance criteria keep their number and order;
+S2, S19 and S32 change wording. Changes:
+
+- `Invoke-DocsProcess` becomes a thin executable seam. Argument validation
+  (`ConvertTo-DocsProcessRequest`) and result shaping (`ConvertTo-DocsProcessResult`) are pure
+  functions over plain values, tested in memory. No test starts a process, waits on a real timer or
+  resolves an executable on PATH. The `InvokeProcess` member signature and the in-memory fake are
+  unchanged.
+- The structural walk handles `patternProperties`, so a non-empty `extensions` object yields no
+  false `DOCS_SCHEMA_PROPERTY_UNKNOWN` finding.
+- The context `ReadText` returns an empty string, never `$null`, for an empty file (for example the
+  empty consumer `accept.txt` template that 1021 adds); decoding goes through the pure
+  `ConvertFrom-DocsUtf8Bytes`.
+- `init` template rows use repository-relative `Source` paths (`.claude/lib/docs/templates/<file>`)
+  read through `Context.ReadText`; no template `Source` is absolute.
+- The registry suite asserts membership (each owner anchor and each provider table exists, and a
+  registered row is found by its `Id` and `AnalysisMethod`), never a row count of the committed
+  tables.
 
 ## Overview
 
@@ -160,7 +180,10 @@ No Python or TypeScript file is created or edited. No discovery runtime file, di
 - Every `$PSScriptRoot` use is the literal form `Join-Path -Path $PSScriptRoot -ChildPath
   '<literal>'`, so the existing recognized-form and dependency-closure tests
   (`tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`) see every sibling
-  module, command module, schema and template target.
+  module, command module and schema target. Init template `Source` values are the one exception:
+  they are repository-relative strings read through `Context.ReadText` (see
+  `### DocsProfileCommands.psm1`), and every template file is covered by `Docs.Manifest.Tests.ps1`
+  through the `core.json` listing of every file under `.claude/lib/docs/`.
 - Every function is an advanced function with `[CmdletBinding()]`; parameter names are PascalCase.
 - "Pure" means no filesystem, clock, process, environment or module-scope mutable state. Pure
   functions take in-memory strings and hashtables. No module keeps a schema or composition cache.
@@ -170,7 +193,7 @@ Import graph (literal joins):
 
 | File | Role | Imports |
 |---|---|---|
-| `DocsJson.psm1` | Parsing, deterministic serialization, canonical JSON, SHA-256 | `../discovery-validation/DiscoveryEncoding.psm1` |
+| `DocsJson.psm1` | Parsing, UTF-8 text decoding, deterministic serialization, canonical JSON, SHA-256 | `../discovery-validation/DiscoveryEncoding.psm1` |
 | `DocsFinding.psm1` | Finding model, ordering, bound, command result, envelope, text report | `DocsJson.psm1` |
 | `DocsSchema.psm1` | Schema table, schema reading, composition, artifact validation, structural walk, version floor | `DocsJson.psm1`, `DocsFinding.psm1` |
 | `DocsSurface.psm1` | Element kinds, path and revision grammar, stable and element identifiers, element and diagnostic records | `DocsJson.psm1`, `DocsFinding.psm1` |
@@ -195,6 +218,9 @@ import is closed under core.
   (compact, sorted keys, trailing LF).
 - `Get-DocsSha256Hex -Text <string>` and `Get-DocsBytesSha256Hex -Bytes <byte[]>` delegate to
   `Get-DiscoverySha256Hex` and `Get-DiscoveryBytesSha256Hex`; output is lowercase hex.
+- `ConvertFrom-DocsUtf8Bytes -Bytes <byte[]>` returns the UTF-8 text of the bytes with one leading
+  BOM removed. Zero bytes, and a BOM alone, return the empty string, never `$null`. The context
+  `ReadText` decodes through this function (P1).
 
 ### `DocsFinding.psm1` (pure)
 
@@ -324,7 +350,8 @@ pointer segment, or the property name for a missing or unknown property):
 | `type` (string or array of names) | Compare with the JSON type of the value (`integer` accepts `Int64`) | `DOCS_SCHEMA_TYPE_MISMATCH` |
 | `required` | Each absent name yields one finding at `<pointer>/<name>` | `DOCS_SCHEMA_REQUIRED_MISSING` |
 | `properties` | Walk each present member with its subschema | — |
-| `additionalProperties: false` | Each member not in `properties` yields one finding at its pointer | `DOCS_SCHEMA_PROPERTY_UNKNOWN` |
+| `patternProperties` | For each present member, walk the subschema of every pattern that matches the member name (`[regex]::IsMatch`, the pattern text unchanged) at the member's pointer | — |
+| `additionalProperties: false` | Each member that is neither in `properties` nor matched by a `patternProperties` pattern yields one finding at its pointer | `DOCS_SCHEMA_PROPERTY_UNKNOWN` |
 | `enum`, `const` | Value not allowed; message names the field and the allowed values | `DOCS_SCHEMA_VALUE_NOT_ALLOWED` |
 | `items` | Walk each element at `<pointer>/<index>` | — |
 | `minItems`, `maxItems` | Array length outside the bound | `DOCS_SCHEMA_ITEM_COUNT` |
@@ -336,6 +363,15 @@ Every other keyword (for example `pattern`, `uniqueItems`, `minimum`, `format`) 
 walk and enforced only by `Test-Json`. The walk is pure, has no cache and never mutates its inputs.
 A later child that adds a schema whose failures must name a field keeps those constraints within
 this subset or accepts a `DOCS_SCHEMA_INVALID` finding for them.
+
+`patternProperties` (P1): the docs common `extensions` definition, copied from discovery v2, is a
+closed object whose members are admitted only through `patternProperties`. Without this keyword the
+walk would report every member of a non-empty `extensions` object as unknown. With it, a member
+whose name matches the `extensions` pattern (for example `vendor.note`) yields no finding, and a
+member that matches no pattern (for example `note` or `Vendor`) yields
+`DOCS_SCHEMA_PROPERTY_UNKNOWN` at its pointer. Walk cases in `DocsSchema.Tests.ps1`: a non-empty
+`extensions` object with a matching key (no finding), a non-matching key (one finding), and a
+member that matches both a `properties` name and a pattern (both subschemas walked).
 
 ### `DocsSurface.psm1` (pure)
 
@@ -529,7 +565,7 @@ $script:DocsAnalyzerNativeRow = @(
   (`/diataxis_policy/directory_modes/<n>/mode`), `DOCS_ANALYZER_UNKNOWN`
   (`/surface_selection/analyzers/<n>`).
 - `New-DocsStarterProfile [-RepositoryId <string> = 'repository']` (pure) returns a profile that
-  passes `ConvertFrom-DocsProfileText` with the committed (empty) registry; it omits
+  passes `ConvertFrom-DocsProfileText` with the committed registry, whatever rows it holds; it omits
   `surface_selection.analyzers` and sets `completion_gates.integration_pr_gate.enabled` to `false`.
 
 ### `DocsProfileCommands.psm1`
@@ -539,11 +575,16 @@ $script:DocsAnalyzerNativeRow = @(
 - `Invoke-DocsValidateProfileCommand -Argument <IDictionary> -Context <object>`; option `Profile`
   (value).
 - `Get-DocsInitTemplate` (pure) returns the init template table: rows
-  `[pscustomobject]@{ Source = (Join-Path -Path $PSScriptRoot -ChildPath 'templates/<file>');
-  Destination = '<destination-relative path>' }` under the anchors
-  `# --- 1021: page-check configuration ---` and `# --- 1034: docs workflow ---`. 1020 commits the
-  mechanism and both anchors with no rows; the profile itself is generated by
-  `New-DocsStarterProfile`, not copied.
+  `[pscustomobject]@{ Source = '.claude/lib/docs/templates/<file>'; Destination =
+  '<destination-relative path>' }` under the anchors `# --- 1021: page-check configuration ---` and
+  `# --- 1034: docs workflow ---`. `Source` is a repository-relative POSIX path that passes
+  `Test-DocsRelativePath`; `init` reads it through `Context.ReadText`, which accepts relative paths
+  only. No `Source` is absolute and none is built with `$PSScriptRoot` (P1). The push-down places
+  the library at `.claude/lib/docs/` in every destination, so the same relative path resolves under
+  `RepositoryRoot` in this repository and in a destination. A template file may be empty (for
+  example the 1021 `accept.txt`); `ReadText` then returns the empty string and `init` writes an
+  empty file. 1020 commits the mechanism and both anchors with no rows; the profile itself is
+  generated by `New-DocsStarterProfile`, not copied.
 
 `init` behavior (consumer configuration delivery decision):
 
@@ -588,28 +629,66 @@ $script:DocsAnalyzerNativeRow = @(
   `Stderr` and calls `exit $outcome.ExitCode`.
 - Command context (`[pscustomobject]`, built for real only by `New-DocsCommandContext`):
   `RepositoryRoot`; `ReadText` (`param($RelativePath)`, throws an item-not-found error for an absent
-  file, strips a leading BOM); `ReadBytes`; `TestFile`; `ListFile` (`param($RelativeRoot)`, sorted
+  file, reads the bytes and decodes them through `ConvertFrom-DocsUtf8Bytes`, which strips a leading
+  BOM and returns the empty string for an empty file; `Get-Content` is not used, because
+  `Get-Content -Raw` returns `$null` for an empty file and a strict-mode caller then fails; the
+  in-memory context of `Docs.TestSupport.psm1` also returns the empty string for an empty entry);
+  `ReadBytes`; `TestFile`; `ListFile` (`param($RelativeRoot)`, sorted
   relative POSIX paths); `WriteText` (`param($RelativePath, $Text, $Mode)`, `Mode` `create` or
   `overwrite`, UTF-8 without BOM, LF); `UtcNow`; `InvokeProcess` (`param($FilePath, $ArgumentList,
   $StdinText, $TimeoutSeconds)`, 1031 precondition). Relative paths are checked with
   `Test-DocsRelativePath` before any context call.
-- Process member: the real `InvokeProcess` wraps the private function `Invoke-DocsProcess` of the
-  same file, which starts `FilePath` through `System.Diagnostics.ProcessStartInfo` with
-  `UseShellExecute` false, each `ArgumentList` item added as one argument (no shell and no command
-  string), standard input, output and error redirected as UTF-8, and the working directory equal to
-  `RepositoryRoot`. It writes `StdinText` to standard input and closes it, reads both output streams
-  asynchronously, and waits at most `TimeoutSeconds`. It returns `@{ ExitCode; Stdout; Stderr;
-  TimedOut }`: on exit, `ExitCode` is the process exit code and `TimedOut` is `$false`; on timeout
-  the process tree is killed, `ExitCode` is `$null` and `TimedOut` is `$true`. A `TimeoutSeconds`
-  that is not a positive number throws `DOCS_PROCESS_ARGUMENT_INVALID` before any process starts,
-  and a start failure (for example an executable that does not exist) throws
-  `DOCS_PROCESS_START_FAILED` naming `FilePath`. 1020 names no process target and no 1020 command
-  calls the member. A caller in `.claude/lib/docs/` never invokes it as `& $Context.InvokeProcess`;
-  it passes the member to a `[scriptblock]`-typed parameter declared in the calling file and invokes
-  that parameter, which `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`
-  accepts. If `Invoke-DocsCommand.ps1` approaches 500 lines, `Invoke-DocsProcess` moves to
-  `.claude/lib/docs/DocsProcess.psm1` with its own Pester suite, bundle copy, core entry and
-  classification row.
+- Process member (P1): the real `InvokeProcess` forwards its four arguments unchanged to the private
+  function `Invoke-DocsProcess` of the same file and returns its result. The member signature is
+  `param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds)` returning `@{ ExitCode; Stdout;
+  Stderr; TimedOut }`, unchanged from version 0.5. The behavior is split into two pure functions
+  and one thin executable seam:
+  - `ConvertTo-DocsProcessRequest -FilePath <object> -ArgumentList <object> -StdinText <object>
+    -TimeoutSeconds <object>` (pure) validates plain values and returns an ordered hashtable
+    `@{ FilePath; ArgumentList; StdinText; TimeoutMilliseconds }`: `FilePath` a non-blank string;
+    `ArgumentList` a string array (`$null` becomes the empty array; a `$null` item is invalid);
+    `StdinText` a string (`$null` becomes the empty string); `TimeoutSeconds` a positive finite
+    number, converted to whole milliseconds rounded up. Any other value throws
+    `DOCS_PROCESS_ARGUMENT_INVALID` naming the argument.
+  - `ConvertTo-DocsProcessResult -FilePath <string> -Started <bool> -Exited <bool> [-ExitCode
+    <object>] [-Stdout <string>] [-Stderr <string>] [-StartError <string>]` (pure) shapes the
+    result: `Started` `$false` throws `DOCS_PROCESS_START_FAILED` naming `FilePath` and including
+    `StartError`; `Exited` `$true` returns `ExitCode` as an integer and `TimedOut` `$false`;
+    `Exited` `$false` returns `ExitCode` `$null` and `TimedOut` `$true`. A `$null` `Stdout` or
+    `Stderr` becomes the empty string.
+  - `Invoke-DocsProcess -FilePath -ArgumentList -StdinText -TimeoutSeconds` is the seam. It calls
+    `ConvertTo-DocsProcessRequest` before any process starts, builds a
+    `System.Diagnostics.ProcessStartInfo` with `UseShellExecute` false, each `ArgumentList` item
+    added as one argument (no shell and no command string), standard input, output and error
+    redirected as UTF-8, and the working directory equal to `RepositoryRoot`; starts the process
+    (a start exception is caught and passed on as `Started` `$false` with its message as
+    `StartError`); writes `StdinText` to standard input and closes it; reads both output streams
+    asynchronously; waits at most `TimeoutMilliseconds`; kills the process tree when it has not
+    exited; and returns `ConvertTo-DocsProcessResult`. It holds no validation, defaulting or
+    result-shaping logic of its own, and its body stays at or below 20 executable lines.
+  - Tests: the two pure functions are tested in memory with plain values (`Invoke-DocsCommand.Tests.ps1`).
+    The member wiring is tested with `Invoke-DocsProcess` replaced by a Pester `Mock` whose
+    parameters match the production names (`.claude/rules/powershell.md` `### Mocking Rules`: mock
+    the wrapper, never the executable). No test starts a process, waits on a real timer or
+    resolves an executable on PATH (`.claude/rules/powershell.md` `### Deterministic Test
+    Requirements`; `.claude/hooks/check-powershell-test-purity.ps1`). The seam body is not
+    executed by any test.
+  - Hosting and coverage: the seam and the two pure functions are hosted in `Invoke-DocsCommand.ps1`.
+    A file holding only the seam would report near 0% line coverage, which the per-file 85% gate
+    forbids, so the seam is never placed in a file of its own. In `Invoke-DocsCommand.ps1` the
+    seam's at most 20 executable lines are the only lines this change leaves unexecuted; the pure
+    process functions and the other functions of the file are executed by the dot-sourced suite.
+    The per-file figure is confirmed in the coverage evidence of the per-file coverage criterion
+    (S25); a shortfall is closed by
+    reducing the seam or adding tests of the remaining functions, never by exclusion. If
+    `Invoke-DocsCommand.ps1` approaches 500 lines, the two pure functions move to
+    `.claude/lib/docs/DocsProcess.psm1` (fully executed by its own in-memory Pester suite, with a
+    bundle copy, core entry and classification row), and `Invoke-DocsProcess` stays in
+    `Invoke-DocsCommand.ps1`.
+  - 1020 names no process target and no 1020 command calls the member. A caller in
+    `.claude/lib/docs/` never invokes it as `& $Context.InvokeProcess`; it passes the member to a
+    `[scriptblock]`-typed parameter declared in the calling file and invokes that parameter, which
+    `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` accepts.
 
 #### Dispatch table
 
@@ -973,8 +1052,11 @@ schemas; it has its own example and its own acceptance criterion.
   own Pester suite, push-down copy and core entry. `DocsSurface.psm1` and
   `DocsAnalyzerRegistry.psm1` grow with this amendment; if `DocsSurface.psm1` approaches 500 lines,
   the digest functions move to `DocsDeclarationDigest.psm1` with the same obligations and a
-  classification row. The process member adds `Invoke-DocsProcess` to `Invoke-DocsCommand.ps1`; if
-  that file approaches 500 lines, the function moves to `DocsProcess.psm1` on the same terms.
+  classification row. The process member adds `Invoke-DocsProcess`, `ConvertTo-DocsProcessRequest`
+  and `ConvertTo-DocsProcessResult` to `Invoke-DocsCommand.ps1`; if that file approaches 500 lines,
+  the two pure functions move to `DocsProcess.psm1` on the same terms and the seam
+  `Invoke-DocsProcess` stays in `Invoke-DocsCommand.ps1` (see `### Entry script`, hosting and
+  coverage).
 - Test isolation: dot-sourcing the entry script imports `Docs*` and `DiscoveryEncoding` modules into
   the session; every suite removes them in `AfterAll`.
 - Shared append-only edit points: `Invoke-DocsCommand.ps1` dispatch table, `DocsAnalyzerRegistry.psm1`,
@@ -1059,8 +1141,9 @@ edited. Every artifact follows the language rule; OQ-1 and OQ-2 concern location
 not language. The D3 language exception (a language-native analyzer pushed down only with its
 language's pack) applies to 1031, not to 1020: 1020 creates no Python file. If the conditional
 split of `## Constraints & Risks` creates `.claude/lib/docs/DocsDeclarationDigest.psm1` or
-`.claude/lib/docs/DocsProcess.psm1`, each is a pushed-down helper/lib in PowerShell under R1, with a
-bundle copy and a `core.json` line.
+`.claude/lib/docs/DocsProcess.psm1` (pure process functions only; the seam stays in
+`Invoke-DocsCommand.ps1`), each is a pushed-down helper/lib in PowerShell under R1, with a bundle
+copy and a `core.json` line.
 
 ## Decisions Later Children Must Honor
 
@@ -1095,7 +1178,7 @@ bundle copy and a `core.json` line.
   five normalization steps of `#### Declaration-lines digest` byte for byte. Evidence pins copy the
   element digest, and 1023 compares digests as opaque values.
 - Use only literal `Join-Path -Path $PSScriptRoot -ChildPath '<literal>'` for sibling modules and
-  data; list every new `.claude/lib/docs/` file except the files of the `.claude/lib/docs/python/`
+  data, except init template `Source` values, which are repository-relative strings; list every new `.claude/lib/docs/` file except the files of the `.claude/lib/docs/python/`
   subtree (PowerShell and data) in Claude `core.json`, mirror it byte-identically, and keep
   `Docs.Manifest.Tests.ps1` green. The `.claude/lib/docs/python/` subtree is listed only in the
   python pack manifest (1031), and every assertion of `Docs.Manifest.Tests.ps1` excludes it.
@@ -1132,11 +1215,26 @@ bundle copy and a `core.json` line.
   `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` accepts it.
   1020 commits no process target; a child whose file names an interpreter follows the epic's
   allowlist decision for that guard (owner question Q11) in its own change. Unit tests use the
-  in-memory `InvokeProcess` fake of `Docs.TestSupport.psm1`, whose call log records each call.
+  in-memory `InvokeProcess` fake of `Docs.TestSupport.psm1`, whose call log records each call. No
+  child test starts a process, waits on a real timer or resolves an executable on PATH. A child
+  that needs its own process handling (for example 1031 parsing the helper's output) puts that
+  logic in pure functions over the `@{ ExitCode; Stdout; Stderr; TimedOut }` hashtable and tests
+  them with the fake; it adds no logic to `Invoke-DocsProcess`, which stays a thin seam with
+  validation in `ConvertTo-DocsProcessRequest` and shaping in `ConvertTo-DocsProcessResult` (P1).
 - Consumer configuration and workflow templates ship as data under `.claude/lib/docs/templates/` and
   are delivered by `init` through one `Get-DocsInitTemplate` row under the child's anchor (1021,
-  1034); no push-down root is added and no file goes under
-  `extensions/drm-copilot/resources/templates/`.
+  1034). The row form is `[pscustomobject]@{ Source = '.claude/lib/docs/templates/<file>';
+  Destination = '<destination-relative path>' }`: `Source` is repository-relative, passes
+  `Test-DocsRelativePath` and is read through `Context.ReadText`; it is never absolute and never
+  built with `$PSScriptRoot` (P1). An empty template (1021 `accept.txt`) is valid: `ReadText`
+  returns the empty string, and a child never reads a template with `Get-Content -Raw`. Each
+  template file is listed in `core.json` and mirrored. No push-down root is added and no file goes
+  under `extensions/drm-copilot/resources/templates/`.
+- Registry tests (P1): a child that adds rows asserts membership (its anchor exists, and its rows
+  are found by `Id` and `AnalysisMethod` in `Get-DocsAnalyzerRegistration`); no suite, in 1020 or
+  a child, asserts a row count of the committed registry tables.
+- Structural walk (P1): `patternProperties` is in the walk subset, so a child artifact with a
+  non-empty `extensions` object validates without a false unknown-property finding.
 - Element identifiers come from `Get-DocsElementId`; records are rebuilt with
   `ConvertFrom-DocsSurfaceElement`; pin and receipt identifiers use `Get-DocsStableId`; element
   digests use `Get-DocsDeclarationSha256`, other file digests use `Get-DocsBytesSha256Hex`, and all
@@ -1214,7 +1312,7 @@ eight PowerShell files and eight runtime schema copies).
 ## Acceptance Criteria
 
 - [ ] Every example under `examples/docs/v1/` validates against its schema, including the `docs-command-envelope` example against the envelope schema: `Test-Json` returns `True` and `Test-DocsArtifactText` returns no finding for each example (`tests/scripts/claude-lib/docs/DocsSchemaContract.Tests.ps1`).
-- [ ] For each artifact schema (`docs-profile`, `surface-inventory-snapshot`, `docs-coverage-ledger`, `docs-parity-matrix`, `docs-evidence-pin`, `docs-validation-receipt`), an in-memory copy of its example with one required field deleted, and a copy with an unknown element kind or disposition, each make `Test-Json` return `False` and make `Test-DocsArtifactText` return an `error` finding (`DOCS_SCHEMA_REQUIRED_MISSING`, `DOCS_SCHEMA_VALUE_NOT_ALLOWED` or `DOCS_SCHEMA_PROPERTY_UNKNOWN`) whose pointer locates the mutated field (`DocsSchemaContract.Tests.ps1`).
+- [ ] For each artifact schema (`docs-profile`, `surface-inventory-snapshot`, `docs-coverage-ledger`, `docs-parity-matrix`, `docs-evidence-pin`, `docs-validation-receipt`), an in-memory copy of its example with one required field deleted, and a copy with an unknown element kind or disposition, each make `Test-Json` return `False` and make `Test-DocsArtifactText` return an `error` finding (`DOCS_SCHEMA_REQUIRED_MISSING`, `DOCS_SCHEMA_VALUE_NOT_ALLOWED` or `DOCS_SCHEMA_PROPERTY_UNKNOWN`) whose pointer locates the mutated field; and an in-memory copy of its example whose root `extensions` object holds one member with a name matching the docs common `extensions` pattern (for example `vendor.note`) makes `Test-DocsArtifactText` return no finding, while a member named `note` yields `DOCS_SCHEMA_PROPERTY_UNKNOWN` at `/extensions/note` (`DocsSchemaContract.Tests.ps1`).
 - [ ] `Invoke-DocsCommand.ps1 -Command validate-profile -Profile examples/docs/v1/docs-profile.example.json` exits 0 with no `error` finding (`tests/scripts/claude-lib/docs/Invoke-DocsCommand.Tests.ps1` and `DocsProfileCommands.Tests.ps1`).
 - [ ] `-Command validate-profile` exits 1 for an invalid profile, and the finding names the failing field: a profile without `audiences` yields `DOCS_SCHEMA_REQUIRED_MISSING` at `/audiences` with a message containing `audiences`; a missing required field inside a nested `$ref` target yields a finding whose pointer and message name that field; an unknown element kind yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/surface_selection/element_kinds/<n>`; the field naming comes from `Get-DocsSchemaStructuralFinding`, not from `Test-Json` message text (`DocsProfileCommands.Tests.ps1`, `DocsSchema.Tests.ps1`).
 - [ ] `-Command validate-profile` exits 1 with `DOCS_JSON_DUPLICATE_KEY` for a profile containing a repeated member, with `DOCS_PROFILE_AUDIENCE_UNKNOWN` for an undeclared audience reference, and with `DOCS_PROFILE_MISSING` for an absent profile (`DocsProfile.Tests.ps1`, `DocsProfileCommands.Tests.ps1`).
@@ -1231,7 +1329,7 @@ eight PowerShell files and eight runtime schema copies).
 - [ ] Exit codes follow 0/1/2/3 for every 1020 subcommand: 0 for success and `-Help`; 1 for `error` findings; 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` `null` for a missing `-Command`, an unknown command, an unknown option, a missing value, a repeated non-`multi` option and a non-relative path; 3 with exactly one finding (`DOCS_RUNTIME_UNSUPPORTED` through the `-PowerShellVersion` seam set below 7.4, or `DOCS_CLI_RUNTIME` for an injected exception) and one stderr line (`Invoke-DocsCommand.Tests.ps1`).
 - [ ] With `-Json`, stdout is exactly one canonical JSON document whose keys are `command`, `exit_code`, `findings`, `ok` and `result`, `command` is the subcommand name when `-Command` names a dispatch-table row and `null` for a missing or unknown command, `ok` is `true` exactly when `exit_code` is 0, and two runs with identical inputs, arguments and clock produce identical bytes; without `-Json`, the last line is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>` (`Invoke-DocsCommand.Tests.ps1`, `DocsFinding.Tests.ps1`).
 - [ ] `Test-DocsCommandTable` returns no finding for the committed dispatch table; the table contains the `init` and `validate-profile` rows under the `# --- 1020: init, validate-profile ---` anchor followed by the anchors `# --- 1021: check ---`, `# --- 1022: inventory ---`, `# --- 1023: coverage, update-ledger, validate ---`, `# --- 1024: generate-reference ---` and `# --- 1034: surface-delta ---` in that order, with no anchor line carrying a placeholder number in the `900000` range; and `Test-DocsCommandTable` rejects a duplicate name, a reserved option name and a function outside `^Invoke-Docs[A-Za-z]+Command$` (`Invoke-DocsCommand.Tests.ps1`).
-- [ ] The committed analyzer registry has no rows: the scanner provider table `$script:DocsAnalyzerRow` is empty and carries the anchors `# --- 1022: Python and configuration analyzers ---` and `# --- 1033: TypeScript and .NET analyzers ---` in that order, the separate native provider table `$script:DocsAnalyzerNativeRow` is empty, follows the scanner table in the module text and carries the anchor `# --- 1031: Python-native analyzers ---`, and no anchor line carries a placeholder number in the `900000` range; `Get-DocsAnalyzerRegistration` returns the scanner rows followed by the native rows; `Test-DocsAnalyzerRegistration` validates rows from both tables (a defective row in either table yields `DOCS_ANALYZER_REGISTRATION_INVALID` with a pointer to its position in the concatenated registration, and a `scanner` row in the scanner table with a `native` row of the same `Id` in the native table is accepted); `Test-DocsAnalyzerRegistration` returns no finding for the committed registry and returns `DOCS_ANALYZER_REGISTRATION_INVALID` for a duplicate (`Id`, `AnalysisMethod`) pair and for a `Module` outside `.claude/lib/docs/`; `Select-DocsAnalyzerRegistration` reports `DOCS_ANALYZER_UNKNOWN` without invoking the `-ImportModule` seam; `Invoke-DocsAnalyzer` rejects fixture output whose kind is outside the registration (`tests/scripts/claude-lib/docs/DocsAnalyzerRegistry.Tests.ps1`).
+- [ ] The committed analyzer registry carries its owner anchors and provider tables, asserted by membership and never by row count: the module text contains the scanner provider table `$script:DocsAnalyzerRow` carrying the anchors `# --- 1022: Python and configuration analyzers ---` and `# --- 1033: TypeScript and .NET analyzers ---` in that order, and the separate native provider table `$script:DocsAnalyzerNativeRow`, which follows the scanner table in the module text and carries the anchor `# --- 1031: Python-native analyzers ---`; no anchor line carries a placeholder number in the `900000` range; a row passed in memory is found by its `Id` and `AnalysisMethod` in the output of `Get-DocsAnalyzerRegistration`; no assertion requires either committed table to be empty or to hold a given number of rows; `Get-DocsAnalyzerRegistration` returns the scanner rows followed by the native rows; `Test-DocsAnalyzerRegistration` validates rows from both tables (a defective row in either table yields `DOCS_ANALYZER_REGISTRATION_INVALID` with a pointer to its position in the concatenated registration, and a `scanner` row in the scanner table with a `native` row of the same `Id` in the native table is accepted); `Test-DocsAnalyzerRegistration` returns no finding for the committed registry and returns `DOCS_ANALYZER_REGISTRATION_INVALID` for a duplicate (`Id`, `AnalysisMethod`) pair and for a `Module` outside `.claude/lib/docs/`; `Select-DocsAnalyzerRegistration` reports `DOCS_ANALYZER_UNKNOWN` without invoking the `-ImportModule` seam; `Invoke-DocsAnalyzer` rejects fixture output whose kind is outside the registration (`tests/scripts/claude-lib/docs/DocsAnalyzerRegistry.Tests.ps1`).
 - [ ] Every new file under `.claude/lib/docs/` passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, and no production file under `.claude/lib/docs/` exceeds 500 logical lines.
 - [ ] `quality-tiers.yml` contains an entry with `path: ".claude/lib/docs"` and `tier: T3`; `python -m scripts.dev_tools.check_quality_tiers` exits 0 and `test_committed_quality_tiers_yml_matches_live_tree` and `test_committed_quality_tiers_yml_assigns_spec_tiers` pass unmodified.
 - [ ] No Python or TypeScript file is added or modified: `git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`; and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
@@ -1244,13 +1342,13 @@ eight PowerShell files and eight runtime schema copies).
 - [ ] Envelope schema (D5): `schemas/docs/v1/docs-command-envelope.schema.json` exists with `$id` `urn:drm-copilot:docs:1.0.0:docs-command-envelope`, its runtime copy under `.claude/lib/docs/schemas/v1/` and its bundle copy are byte-identical to it, and `core.json` lists `.claude/lib/docs/schemas/v1/docs-command-envelope.schema.json`; a Pester test validates the `Invoke-DocsCommand.ps1 -Json` output of each planned `-Json` scenario (exit 0 `validate-profile`, exit 1 invalid profile, each exit 2 case, each exit 3 case, and `-Help -Json`) against the envelope schema, asserting that `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'` returns no finding and that `Test-Json` with the composed envelope schema returns `True`, with `Test-Json` not mocked in that suite (`Invoke-DocsCommand.Tests.ps1`); and in-memory mutations of the envelope example are rejected: `ok` true with `exit_code` 1 yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/ok`, an extra key yields `DOCS_SCHEMA_PROPERTY_UNKNOWN`, `exit_code` 2 with two findings yields `DOCS_SCHEMA_ITEM_COUNT` at `/findings`, `exit_code` 0 with an `error` finding yields `DOCS_SCHEMA_VALUE_NOT_ALLOWED` at `/findings/0/severity`, and a missing `result` yields `DOCS_SCHEMA_REQUIRED_MISSING` at `/result` (`DocsSchemaContract.Tests.ps1`).
 - [ ] Audience identifiers: docs common defines `audience-id` with pattern `^[a-z0-9][a-z0-9-]*$(?![\s\S])` and `audience-ids`, and the profile schema references them for `audiences[].id` and `documentation_roots[].audience_ids` (`DocsSchemaContract.Tests.ps1`); profiles with audience identifiers `Readers`, `docs.v2`, `a_b`, `-x` and `readers` followed by a newline are each rejected by `ConvertFrom-DocsProfileText` (`Ok` false, at least one `error` finding), and profiles with `2nd-line` and `maintainers` are accepted (`DocsProfile.Tests.ps1`).
 - [ ] Diagnostic severity (1031 precondition): `New-DocsDiagnostic -Severity error` returns `severity` `error` with `blocking` `true`; `-Severity warning` returns `warning` with `blocking` `false`; `-Severity information` returns `information` with `blocking` `false`, also when `-Blocking` is omitted; `-Severity information -Blocking $true` throws `DOCS_IDENTITY_INPUT_INVALID` naming `Blocking`; an unknown severity (for example `info`) throws `DOCS_IDENTITY_INPUT_INVALID` naming `Severity`; without `-Severity`, `-Blocking $true` gives `error` and `-Blocking $false` gives `warning`; every returned diagnostic has exactly the key set of the docs common `diagnostic` definition, and its `severity` is a value of that definition's `severity` enum (`DocsSurface.Tests.ps1`).
-- [ ] Process member (1031 precondition): the context from `New-DocsCommandContext` exposes the `[scriptblock]` member `InvokeProcess`, and its member set equals that of the in-memory context of `tests/scripts/claude-lib/docs/Docs.TestSupport.psm1`; run against the current PowerShell executable (no Python), the real member returns the child's exit code, its standard output and its standard error separately, passes `StdinText` to the child's standard input, returns `TimedOut` `$true` and `ExitCode` `$null` for a child that outlives a one-second timeout, throws `DOCS_PROCESS_START_FAILED` for an executable that does not exist and `DOCS_PROCESS_ARGUMENT_INVALID` for a non-positive timeout; the in-memory fake records each call with its four arguments in its call log; and `enforcement-hooks-no-python-invocation.Tests.ps1` reports no finding for any `.claude/lib/docs/` file (`Invoke-DocsCommand.Tests.ps1`).
+- [ ] Process member (1031 precondition, P1 thin seam): the context from `New-DocsCommandContext` exposes the `[scriptblock]` member `InvokeProcess` with the parameters `FilePath`, `ArgumentList`, `StdinText` and `TimeoutSeconds`, and its member set equals that of the in-memory context of `tests/scripts/claude-lib/docs/Docs.TestSupport.psm1`; with `Invoke-DocsProcess` replaced by a Pester `Mock` whose parameter names match production, invoking the real member forwards the four arguments unchanged and returns the mock's `@{ ExitCode; Stdout; Stderr; TimedOut }` hashtable; the pure `ConvertTo-DocsProcessRequest` throws `DOCS_PROCESS_ARGUMENT_INVALID` naming the argument for a blank `FilePath`, a `$null` argument item, and a `TimeoutSeconds` of `0`, `-1`, `$null` or `'abc'`, and accepts `1` and `1.5` (1500 milliseconds); the pure `ConvertTo-DocsProcessResult`, given plain values, returns the exit code with standard output and standard error kept separate for an exited child, the empty string for a `$null` stream, `TimedOut` `$true` with `ExitCode` `$null` for a child that did not exit, and throws `DOCS_PROCESS_START_FAILED` naming `FilePath` for a child that did not start; the in-memory fake records each call with its four arguments in its call log; no file under `tests/scripts/claude-lib/docs/` contains `Start-Process`, `Start-Sleep`, `System.Diagnostics.Process`, `ProcessStartInfo` or `-CommandType Application`, so no test starts a process, waits on a real timer or resolves an executable on PATH; and `enforcement-hooks-no-python-invocation.Tests.ps1` reports no finding for any `.claude/lib/docs/` file (`Invoke-DocsCommand.Tests.ps1`).
 
 ## Definition of Done
 
 - [ ] Acceptance criteria documented and mapped to Pester suites or commands
 - [ ] Behavior matches acceptance criteria on PowerShell 7.4 or later and on the CI `windows-latest` runner
-- [ ] Edge cases covered by tests: empty file, invalid JSON, duplicate keys, excess depth, unknown analyzer identifier, duplicate audience identifiers, unknown audience reference, directory mode outside the policy, existing init target, digest range outside the text, empty source text, `architecture-component` without a range, `native` registry row without a `scanner` row, analyzer output with a mismatched method or digest, a defective row in the native provider table, each diagnostic severity with its blocking coupling, an unknown diagnostic severity, a severity that disagrees with an explicit `-Blocking`, a process that exits non-zero, writes to standard error, outlives its timeout or cannot start, and a non-positive process timeout
+- [ ] Edge cases covered by tests: empty file (including `ConvertFrom-DocsUtf8Bytes` returning the empty string, not `$null`, for zero bytes and for a BOM alone, and an in-memory `ReadText` of an empty entry), a non-empty `extensions` object, invalid JSON, duplicate keys, excess depth, unknown analyzer identifier, duplicate audience identifiers, unknown audience reference, directory mode outside the policy, existing init target, digest range outside the text, empty source text, `architecture-component` without a range, `native` registry row without a `scanner` row, analyzer output with a mismatched method or digest, a defective row in the native provider table, each diagnostic severity with its blocking coupling, an unknown diagnostic severity, a severity that disagrees with an explicit `-Blocking`, a process that exits non-zero, writes to standard error, outlives its timeout or cannot start, and a non-positive process timeout (each through the pure process functions with plain values, never a real process)
 - [ ] Docs suites pass in three seeded shuffled file-order runs in one process (each seed and order recorded) and in a fresh single-process run over `tests/scripts`, with evidence under `<FEATURE>/evidence/regression-testing/`
 - [ ] Toolchain pass completed (format, lint with PSScriptAnalyzer, architecture and contract tests, Pester) in a single clean pass
 - [ ] Forbidden-token scan with bracket-class patterns over every changed file reports no match
