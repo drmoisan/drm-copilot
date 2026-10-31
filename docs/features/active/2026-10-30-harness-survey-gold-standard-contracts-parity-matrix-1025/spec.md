@@ -3,9 +3,9 @@
 - **Issue:** #1025
 - **Parent (optional):** epic #1018 (shared agent-harness layer across Claude Code, Codex and GitHub Copilot), child 1
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T21-40
+- **Last Updated:** 2026-10-31 (owner-authorized revision H1)
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3 (H1: `quality-tiers.yml` classification of `scripts/harness`; identifier encoding and duplicate tie-break)
 - **Work Mode:** full-feature
 - **Primary research input:** `docs/features/active/2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025/research/research.2026-10-30T21-08.md`
 - **Epic manifest:** `docs/features/epics/shared-agent-harness-layer/epic.md`
@@ -76,10 +76,10 @@ These contracts are consumed by children 3 to 6. Changing any of them after this
 
 | Field | Type | Required | Rule |
 | --- | --- | --- | --- |
-| `id` | string | yes | `<ecosystem>:<kind>:<name>`; pattern `^(claude\|codex\|copilot\|cross-tool):[a-z-]+:[A-Za-z0-9._@/#:+-]+$`; the `<ecosystem>` and `<kind>` segments equal the entry's `ecosystem` and `kind`; unique across `features` (enforced by the completeness test, because JSON Schema cannot express uniqueness by property) |
+| `id` | string | yes | `<ecosystem>:<kind>:<encoded name>[~<encoded source_path>[~<nn>]]`, derived by the encoding and tie-break in `### Parity Matrix: Identifier Encoding`; the schema pattern is the one stated there, which admits only the unreserved characters `A-Z a-z 0-9 . _ -`, `%` followed by two uppercase hexadecimal digits, `/` between `hook-registration` name components, and `~` before a disambiguator; the `<ecosystem>` and `<kind>` segments equal the entry's `ecosystem` and `kind`; unique across `features` (enforced by the completeness test, because JSON Schema cannot express uniqueness by property) |
 | `ecosystem` | enum | yes | `claude`, `codex`, `copilot`, `cross-tool`. The ecosystem that owns the feature's current location. `cross-tool` is used only for `AGENTS.md`. Everything under `.agents/**` is `codex`. |
 | `kind` | enum | yes | see `### Parity Matrix: Feature Kinds and Inventory Rules` |
-| `name` | string | yes | `minLength: 1`; the bare feature name (skill folder name, agent file stem, `<Event>/<matcher>/<command-stem>` for a hook registration, key or table name for settings, permissions and MCP servers, frontmatter key for field kinds) |
+| `name` | string | yes | `minLength: 1`; the bare, unencoded feature name (skill folder name, agent file stem, `<Event>/<matcher>/<command-stem>` for a hook registration as defined in `### Parity Matrix: Identifier Encoding`, key or table name for settings, permissions and MCP servers, frontmatter key for field kinds). Two entries may share a `name` only when the tie-break gave them distinct `id` values; consumers that select by `name` also use `source_path`. |
 | `source_path` | string | yes | repository-relative POSIX path of the defining file; no leading `/`, no drive letter, no `..` segment |
 | `source_pointer` | string | no | location inside the file: a JSON pointer (for example `/permissions/deny`), a TOML table header (for example `[mcp_servers.drm-copilot]`) or a frontmatter key |
 | `disposition` | enum | yes | `shared`, `native`, `generated`, `dropped` (see `### Disposition Semantics`) |
@@ -101,6 +101,29 @@ Conditional rules, expressed in the schema with `if`/`then` under `allOf`:
 - `disposition == "generated"` requires `generated_from`.
 - `decision_status == "provisional"` requires `decision_ref`.
 - `generated_from` beginning with `pending-source:` requires `decision_status == "provisional"`.
+
+### Parity Matrix: Identifier Encoding
+
+The `id` of an entry is derived mechanically from its `ecosystem`, `kind`, name components and, for a duplicated identity, its `source_path`. The encoding is injective (two distinct inputs never yield the same `id`), round-trippable (decoding an `id` and re-encoding the result reproduces it), and produces ASCII only, so the ordinal sort of `features` does not depend on culture or locale. The inventory module is the only producer of `id` values; consumers compare `id` values as opaque strings.
+
+1. **Name components.** `name` is stored unencoded. For `kind` `hook-registration`, `name` is `<Event>/<matcher>/<command-stem>` and has three components:
+   - `<Event>`: the event key (for example `PreToolUse`, `SubagentStop`).
+   - `<matcher>`: the matcher string exactly as written in the source, with no trimming or normalization; the empty string when the registration has no matcher (for example the `.claude/settings.json` `SessionStart` registration, the `.codex/config.toml` `UserPromptSubmit` registration, and every `.github/hooks/*.json` registration).
+   - `<command-stem>`: the file name, without directory and extension, of the first `.ps1` or `.sh` script path in the command text (for `.github/hooks/*.json`, the `powershell` field), with surrounding quotes removed; the full command text when the command names no such script.
+
+   Every other `kind` has one name component, the whole `name`. The inventory module derives the `id` from the component list, never by splitting `name`, so a matcher that contains `/` is still encoded correctly.
+2. **Component encoding.** Each component is converted to UTF-8 bytes. A byte that is one of the unreserved characters `A`-`Z`, `a`-`z`, `0`-`9`, `.`, `_` and `-` is written as that character. Every other byte is written as `%` followed by its two-digit uppercase hexadecimal value. Examples: `|` is `%7C`, `*` is `%2A`, `^` is `%5E`, `$` is `%24`, `(` is `%28`, `)` is `%29`, `/` is `%2F`, `%` is `%25`, `:` is `%3A`, `~` is `%7E`, `"` is `%22` and a space is `%20`. The empty component encodes to the empty string.
+3. **Base id.** `<ecosystem>:<kind>:` followed by the encoded components joined with `/`. Examples: the Codex `PreToolUse` registration with matcher `^(apply_patch|Edit|Write)$` running `enforce-evidence-locations.ps1` has base id `codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-evidence-locations`; the Claude `SessionStart` registration with no matcher has base id `claude:hook-registration:SessionStart//persist-session-id`. Skill, agent, rule and instructions names use only unreserved characters, so their ids are unchanged by the encoding (for example `codex:skill:orchestrate`, `claude:instructions:CLAUDE.md`).
+4. **Duplicate tie-break.** The inventory groups features by base id. A group with one member uses the base id. In a group with two or more members, every member's id is `<base id>~<encoded source_path>`, where `source_path` is encoded with the component encoding (so `/` becomes `%2F`). When two or more members of one group share a `source_path`, each of those members carries a further `~<nn>`, where `<nn>` is the two-digit, one-based position of the member in document order within that file (`01`, `02`, ...); a group with more than 99 members in one file is an inventory error. No member of a group keeps the bare base id, so the ids in a group do not depend on enumeration order. Example: the `SubagentStop` registration with matcher `atomic-planner` running `validate-planner-output.ps1` is declared in `.claude/settings.json` and in the `.claude/agents/atomic-planner.md` frontmatter, and its two entries are `claude:hook-registration:SubagentStop/atomic-planner/validate-planner-output~.claude%2Fagents%2Fatomic-planner.md` and `claude:hook-registration:SubagentStop/atomic-planner/validate-planner-output~.claude%2Fsettings.json`, in that ordinal order. A change that adds a second registration of an existing identity renames the first entry's `id`; the completeness test then reports the old `id` as an orphan and the new ids as missing, and that change updates the matrix.
+5. **Pattern.** The schema pattern for `id` admits exactly the encoded alphabet:
+
+   ```text
+   ^(claude|codex|copilot|cross-tool):[a-z-]+:(?:[A-Za-z0-9._-]|%[0-9A-F]{2})+(?:/(?:[A-Za-z0-9._-]|%[0-9A-F]{2})*)*(?:~(?:[A-Za-z0-9._-]|%[0-9A-F]{2})+(?:~[0-9]{2})?)?$
+   ```
+
+6. **Decoding and canonical form.** Decoding splits the `id` after its second `:`, splits the remainder at `~` into the name part, the optional encoded `source_path` and the optional `<nn>`, splits the name part at `/`, and percent-decodes each part as UTF-8. The decoder rejects a lowercase hexadecimal digit, a `%` not followed by two hexadecimal digits, a percent-encoded unreserved character, and a byte sequence that is not valid UTF-8. Every accepted `id` is therefore the encoding of exactly one tuple, and re-encoding a decoded `id` reproduces it.
+7. **Ordering.** `features` is sorted by ordinal comparison of `id` (`[string]::CompareOrdinal`). All members of a duplicate group share the prefix `<base id>~`, so they sort contiguously, ordered by encoded `source_path` and then by `<nn>`.
+8. **The `$schema` key of `.claude/settings.json` is not inventoried.** It names the JSON Schema that an editor uses to validate the file and configures no behavior of Claude Code, so it has no function to keep in parity and no disposition to record. Every other top-level key of `.claude/settings.json` that is not `hooks` or `permissions` (for example `enabledPlugins`, `defaultPermissionMode`) remains a `setting` entry.
 
 ### Disposition Semantics
 
@@ -132,7 +155,7 @@ Conditional rules, expressed in the schema with `if`/`then` under `allOf`:
 | `prompt` | `copilot`, `codex` | file matching `.github/prompts/**/*.prompt.md` (including `drafts/`) or `.codex/prompts/*.md` |
 | `hook-registration` | `claude`, `codex`, `copilot` | (event, matcher, command) triple in `.claude/settings.json` `hooks`; `[[hooks.<Event>]]` entry in `.codex/config.toml`; registration in `.github/hooks/*.json`; `hooks:` entry in `.claude/agents/*.md` frontmatter |
 | `permission` | `claude`, `codex` | sub-key of `.claude/settings.json` `permissions` (`allow`, `deny`, `ask`, `defaultMode`, `additionalDirectories`); `[permissions.<profile>]` table in `.codex/config.toml` |
-| `setting` | `claude`, `codex` | other top-level key of `.claude/settings.json`; other top-level table or key of `.codex/config.toml` (for example `[features]`, `[agents]`) |
+| `setting` | `claude`, `codex` | other top-level key of `.claude/settings.json` except `$schema` (see `### Parity Matrix: Identifier Encoding`, item 8); other top-level table or key of `.codex/config.toml` (for example `[features]`, `[agents]`) |
 | `mcp-server` | `claude`, `codex` | server under `mcpServers` in `.mcp.json`; `[mcp_servers.<id>]` table in `.codex/config.toml` |
 
 Parsing rule: the repository has no TOML or YAML parser available to PowerShell without a new dependency, so frontmatter keys and TOML table headers are read with anchored regular expressions. JSON files are read with `ConvertFrom-Json`.
@@ -143,6 +166,7 @@ Parsing rule: the repository has no TOML or YAML parser available to PowerShell 
 - Implementation libraries and helper scripts that are not themselves registered features: `.claude/lib/**`, `.codex/scripts/**`, and hook scripts that no registration names. Their function is represented by the registrations that load them (working assumption under Q6).
 - Bundle copies under `extensions/drm-copilot/resources/**`.
 - README files: `.agents/README.md`, `.agents/skills/README.md`, `.github/skills/README.md`.
+- The top-level `$schema` key of `.claude/settings.json` (editor validation metadata, not a feature).
 - Non-`SKILL.md` supporting files inside a skill folder (`references/**`, `scripts/**`, example files), except `agents/openai.yaml`, which is kind `skill-metadata-file`.
 
 ### Default Dispositions (starting values, owner-approved through the approval artifact)
@@ -292,7 +316,8 @@ Field rules:
   - `.agents/skills/<name>/references/standard.md` and their bundle copies
   - `scripts/harness/*.psm1`, `tests/scripts/harness/*.Tests.ps1`
   - `<FEATURE>/survey/**`, `<FEATURE>/runbooks/**`, `<FEATURE>/evidence/**`
-- Config keys and defaults: none added to existing configuration files.
+  - one new `projects` entry in `quality-tiers.yml` classifying `scripts/harness` (see `### Tier classification of scripts/harness`)
+- Config keys and defaults: no key is added to any existing configuration file; the only edit to an existing configuration file is the `quality-tiers.yml` entry above.
 - Versioning: the matrix carries `schema_version` `1.0.0`. A breaking schema change in a later child bumps the major version and updates the schema `$id` and the data `$schema` together.
 
 ## API / CLI Surface
@@ -311,7 +336,7 @@ Children 3 to 6 that work in TypeScript read the JSON directly and do not depend
   1. Each inventoried feature has exactly one matrix entry, matched by `id`.
   2. Every entry has a `disposition` from the enum; an unknown value of any enum field (`ecosystem`, `kind`, `disposition`, `consumers` item, `decision_status`) fails.
   3. A `dropped` entry has a non-empty `reason` and a `decision_ref`.
-  4. `id` values are unique, consistent with `ecosystem` and `kind`, and sorted.
+  4. `id` values match the pattern in `### Parity Matrix: Identifier Encoding`, are unique, consistent with `ecosystem` and `kind`, and sorted ordinally.
   5. An entry whose feature is no longer inventoried (orphan) must be `dropped`; an orphan with any other disposition fails.
   6. The conditional rules of the schema hold (`target_paths`, `generated_from`, `decision_ref` when `provisional`).
   7. The matrix conforms to the schema: no unknown properties, required fields present, types and patterns respected.
@@ -332,7 +357,7 @@ Requirement: this child adds no new `.py` file. Existing Python tests (for examp
 | Aspect | Detail |
 | --- | --- |
 | Choice | PowerShell modules under `scripts/harness/`, Pester tests under `tests/scripts/harness/` mirroring the production paths |
-| CI | Runs in the required `poshqc / PowerShell QC` check, picked up through `config/poshqc-scan.json` (`scanFolders` includes `tests/scripts`); no workflow or configuration edit |
+| CI | Runs in the required `poshqc / PowerShell QC` check, picked up through `config/poshqc-scan.json` (`scanFolders` includes `tests/scripts`); no workflow edit and no PoshQC configuration edit. The new `scripts/harness` folder is a discovered project for the `tier-classification` step, so `quality-tiers.yml` gains one entry (`### Tier classification of scripts/harness`). |
 | Coverage | `scripts` is already a coverage root in `config/poshqc-coverage.json`; each new module needs at least 85% line coverage. Pester does not measure branch coverage, so no branch gate applies. |
 | Destination dependency | PowerShell 7 is already required by the enforcement hooks; no new runtime is introduced |
 | Alternatives rejected | Root TypeScript: not a required check and has no coverage gate without new configuration. Extension TypeScript: shipped product code, and `extensions/drm-copilot/jest.config.cjs` is excluded from this child's edit set. |
@@ -340,6 +365,18 @@ Requirement: this child adds no new `.py` file. Existing Python tests (for examp
 | Risk: `Test-Json -SchemaFile` | Draft 2020-12 support in `Test-Json -SchemaFile` requires PowerShell 7.4 or later. Whether the `windows-latest` runner provides 7.4 is unconfirmed. Fallback (required design, not conditional): the module implements every schema rule as structural validation in code, and that validation is the gate. The repository gate test also reads the schema file as data and asserts that its enums, required fields and conditional rules agree with the module's constants, so the two cannot drift. A supplemental `Test-Json -SchemaFile` assertion may run only when `$PSVersionTable.PSVersion` is 7.4 or later and is marked skipped otherwise; no gate depends on it. |
 | Risk: file size | The inventory module covers 13 kinds and may approach the 500-line guidance tier; it is split by kind family if it does, subject to the batch budget. |
 | Risk: Windows only | The PowerShell QC shards run on Windows. Paths are built with `Join-Path` and compared in forward-slash relative form; the exclusion list prevents local-only gitignored files from changing the result between a developer machine and CI. |
+
+### Tier classification of scripts/harness
+
+`quality-tiers.yml` exists at the repository root, so every discovered project must be classified. `scripts/dev_tools/quality_tiers_contract.py` discovers every `scripts/<name>` folder that directly holds a code file (rule R3, which counts `.psm1`), so `scripts/harness` becomes a project once its modules are tracked, and without an entry the `tier-classification` step of `_quality-checks.yml` fails with `QT008`, which fails all four required `quality-checks7 / Code Quality & Tests (<python-version>)` contexts.
+
+| Item | Value |
+| --- | --- |
+| Entry | `path: "scripts/harness"`, `tier: T4`, `rationale: "Repository-internal parity-matrix and contract checks run by the PowerShell QC gate; not published by push-down"` |
+| Placement | after the `scripts/ci` entry, the last entry of `projects` at planning |
+| Tier | T4 (Scaffolding) |
+| Reason | The modules are repository-internal dev tooling: a CI gate over repository configuration, comparable to `scripts/dev_tools` (T4) and `scripts/ci` (T4). They are not bundled under `extensions/drm-copilot/resources/**`, not listed in a pack manifest, and not invoked by any skill or hook, so they are not adapters shipped to consumers (T3). A defect in them can let a matrix inconsistency pass the gate but cannot lose data or change runtime behavior. T4 adds no tier-dependent gate; the uniform 85% line-coverage floor still applies to each module. A later child that publishes these modules re-classifies the entry. |
+| Asserting tests | `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py`: `test_committed_quality_tiers_yml_matches_live_tree` (passes because the `scripts/harness` folder exists when the entry is added) and `test_committed_quality_tiers_yml_assigns_spec_tiers` (passes because T4 is not an elevated tier and the 25 pinned rows are unchanged) |
 
 ### Execution precondition
 
@@ -404,7 +441,8 @@ Follows the stop (plan B):
 
 ## Implementation Strategy
 
-- Edit set (new files only):
+- Edit set (new files, plus one edit to the existing `quality-tiers.yml`):
+  - `quality-tiers.yml` (edit: the `scripts/harness` entry in `### Tier classification of scripts/harness`; no other line changes)
   - `config/harness-parity-matrix.json`, `config/harness-parity-matrix.schema.json`
   - `scripts/harness/HarnessInventory.psm1`, `scripts/harness/HarnessParityMatrix.psm1`, `scripts/harness/HarnessSkillContract.psm1`
   - `tests/scripts/harness/HarnessInventory.Tests.ps1`, `tests/scripts/harness/HarnessParityMatrix.Tests.ps1`, `tests/scripts/harness/HarnessSkillContract.Tests.ps1`, `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1`
@@ -444,10 +482,10 @@ Items for the orchestrator to confirm (not owner questions): the epic record's 8
 - [ ] **Matrix.** `config/harness-parity-matrix.json` exists, conforms to the schema, and gives every feature inventoried by `scripts/harness/HarnessInventory.psm1` exactly one entry and one disposition; verified by `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1`.
 - [ ] **Contracts.** For every matrix entry with `kind` `skill`, `ecosystem` `codex` and `disposition` `shared`, `.agents/skills/<name>/references/standard.md` exists and satisfies every rule in `### Contract Format`; verified by `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1` using `scripts/harness/HarnessSkillContract.psm1`.
 - [ ] **Bundle copies.** Each contract has a byte-identical copy under `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`; `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` and `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` pass, with results recorded in `<FEATURE>/evidence/qa-gates/`.
-- [ ] **Completeness unit tests: failure cases.** `tests/scripts/harness/HarnessParityMatrix.Tests.ps1` contains a passing test for each of these inputs producing a violation: an inventoried feature with no entry; an entry without `disposition`; an unknown value in `disposition`, `kind`, `ecosystem`, a `consumers` item and `decision_status`; `dropped` without `reason`; `dropped` with an empty `reason`; `dropped` without `decision_ref`; a duplicate `id`; an `id` inconsistent with `ecosystem` or `kind`; unsorted `features`; an orphan entry that is not `dropped`; `shared` or `generated` without `target_paths`; `generated` without `generated_from`; `provisional` without `decision_ref`; an unknown property.
+- [ ] **Completeness unit tests: failure cases.** `tests/scripts/harness/HarnessParityMatrix.Tests.ps1` contains a passing test for each of these inputs producing a violation: an inventoried feature with no entry; an entry without `disposition`; an unknown value in `disposition`, `kind`, `ecosystem`, a `consumers` item and `decision_status`; `dropped` without `reason`; `dropped` with an empty `reason`; `dropped` without `decision_ref`; a duplicate `id`; an `id` that does not match the pattern in `### Parity Matrix: Identifier Encoding` (for example one containing a raw `|`); an `id` inconsistent with `ecosystem` or `kind`; unsorted `features`; an orphan entry that is not `dropped`; `shared` or `generated` without `target_paths`; `generated` without `generated_from`; `provisional` without `decision_ref`; an unknown property.
 - [ ] **Completeness unit tests: pass case.** `tests/scripts/harness/HarnessParityMatrix.Tests.ps1` contains a passing test in which a valid in-memory matrix that covers every disposition produces no violation, and `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1` passes on the committed matrix.
 - [ ] **Contract unit tests.** `tests/scripts/harness/HarnessSkillContract.Tests.ps1` contains a passing test for each of: a missing contract for a required skill; a wrong H1; a missing, extra or reordered H2; an empty section; a gap or repeat in `OB-<n>` or `AC-<n>` numbering; an acceptance check citing a non-existent behavior; a behavior cited by no check; checkbox syntax; and a conforming contract producing no violation.
-- [ ] **Inventory unit tests.** `tests/scripts/harness/HarnessInventory.Tests.ps1` contains a passing test for each `kind` inventory rule and a test showing that every entry in the exclusion list is excluded, using injected in-memory file listings only.
+- [ ] **Inventory unit tests.** `tests/scripts/harness/HarnessInventory.Tests.ps1` contains a passing test for each `kind` inventory rule and a test showing that every entry in the exclusion list is excluded, using injected in-memory file listings only; it also contains passing tests for `### Parity Matrix: Identifier Encoding`: hook matchers containing `|`, `*`, `^`, `$` and parentheses, an empty matcher, the encode-decode round trip and the rejection of non-canonical ids, the `$schema` exclusion, the cross-source duplicate tie-break, the same-file duplicate tie-break, and ordinal ordering of encoded ids.
 - [ ] **Required CI check.** The `poshqc / PowerShell QC` check passes on the pull request head, including the tests under `tests/scripts/harness/` (CI-dependent; checked off at S9).
 - [ ] **Coverage.** Each of `scripts/harness/HarnessInventory.psm1`, `scripts/harness/HarnessParityMatrix.psm1` and `scripts/harness/HarnessSkillContract.psm1` has at least 85% line coverage, read from `artifacts/pester/powershell-coverage.xml` and recorded per file in `<FEATURE>/evidence/qa-gates/`.
 - [ ] **Schema validation fallback.** No gate depends on `Test-Json -SchemaFile`: the module's structural validation is the gate, and any `Test-Json -SchemaFile` assertion is skipped when the PowerShell version is below 7.4; verified by reading `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1` and its recorded run.
@@ -459,6 +497,7 @@ Items for the orchestrator to confirm (not owner questions): the epic record's 8
 - [ ] **No new Python.** The list of files added relative to the merge base (`git diff --name-only --diff-filter=A`) contains no file ending in `.py`, recorded in `<FEATURE>/evidence/qa-gates/`.
 - [ ] **File size.** No file added or changed by this child exceeds 800 lines; the repository file-size check passes and the result is recorded in `<FEATURE>/evidence/qa-gates/`.
 - [ ] **Excluded paths untouched.** The list of files changed relative to the merge base contains none of the paths in `### Excluded paths (must not be edited by this child)`, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [ ] **Tier classification.** `quality-tiers.yml` carries the `scripts/harness` entry in `### Tier classification of scripts/harness`; the tier-classification check (`scripts/dev_tools/check_quality_tiers.py`) reports no `QT` error with the modules tracked, and `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` passes, recorded in `<FEATURE>/evidence/qa-gates/`.
 
 ## Definition of Done
 

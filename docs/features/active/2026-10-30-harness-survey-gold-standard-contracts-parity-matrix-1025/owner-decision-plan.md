@@ -3,9 +3,9 @@
 - **Issue:** #1025
 - **Parent (optional):** epic #1018, child 1
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T17-06
+- **Last Updated:** 2026-10-31 (owner-authorized revision H1)
 - **Status:** Draft
-- **Version:** 1.0
+- **Version:** 1.1 (H1: identifier-based matching rule, language classification, consistency with plan A's tier check and new spec criterion)
 - **Work Mode:** full-feature
 - **Requirements sources:** `spec.md` (`## Acceptance Criteria`, `## Owner Stop`), `user-story.md`, `plan.2026-10-30T17-06.md` (plan A: `## Matrix Bootstrap Rules`, `## Owner Stop (Orchestrator-Owned, After Plan A)`, `## Acceptance Criteria Traceability`)
 - **Delegation:** the orchestrator delegates this plan only after plan A is complete and the owner stop's resume conditions R1 to R4 hold. Plan A remains the canonical plan path; this plan carries the post-decision work.
@@ -37,7 +37,7 @@
 ## Excluded Paths (must never be edited)
 
 - Every path in plan A `## Excluded Paths`.
-- `scripts/harness/**`, `tests/scripts/harness/**`, `config/harness-parity-matrix.schema.json`, `<FEATURE>/runbooks/**`, `<FEATURE>/survey/difference-approval.md` (owner-edited) and `plan.2026-10-30T17-06.md`. A defect found in a module, test or schema is a re-planning stop, not a plan B edit.
+- `quality-tiers.yml` (classified by plan A P4-T9), `scripts/harness/**`, `tests/scripts/harness/**`, `config/harness-parity-matrix.schema.json`, `<FEATURE>/runbooks/**`, `<FEATURE>/survey/difference-approval.md` (owner-edited) and `plan.2026-10-30T17-06.md`. A defect found in a module, test or schema is a re-planning stop, not a plan B edit.
 
 ## Language Choices
 
@@ -46,7 +46,22 @@
 | PowerShell 7 + Pester 5 (run only) | the four `tests/scripts/harness/*.Tests.ps1` suites and the three `scripts/harness/*.psm1` modules from plan A | No production PowerShell file is created or edited, so the batch budget is not consumed. | Module behavior is fixed by plan A's tests; P2-T3 re-runs them with coverage. |
 | JSON (edit) | `config/harness-parity-matrix.json` against the Draft 2020-12 schema from plan A | No new dependency. | Structural validation through `Get-HarnessParityMatrixViolation` and the repository gate. |
 | Throwaway PowerShell under `SCRATCH` | matrix update, reconciliation, bundle copy | None committed. | P2-T8 asserts no path outside the edit set and `BranchBaseline`. |
-| Existing Python, run only | the four test modules and the generator `--check` named in plan A `## Language Choices` | No new `.py` file (owner directive). | P2-T6 asserts zero added `.py` files against `MB`. |
+| Existing Python, run only | the five test modules, the generator `--check` and the tier-classification check named in plan A `## Language Choices` | No new `.py` file (owner directive). | P2-T6 asserts zero added `.py` files against `MB`. |
+
+## Language Classification
+
+Owner language rule (H1), as stated in plan A `## Language Classification`. Every artifact this plan creates, edits, deletes or runs:
+
+| Artifact | Language | Where it runs | Permitting clause |
+| --- | --- | --- | --- |
+| `config/harness-parity-matrix.json` (edit) | JSON data | repo-only; read by the Pester gate and by children 3 to 6 | data, no executable code |
+| `.agents/skills/<name>/references/standard.md` and bundle copies (create, revise, delete) | Markdown | bundle payload (no pack-manifest entry) | documentation, no executable code |
+| `<FEATURE>/survey/skill-survey.md`, `<FEATURE>/survey/batch-*.md`, `<FEATURE>/survey/single-ecosystem.md`, `<FEATURE>/evidence/**` | Markdown | repo-only | documentation |
+| `SCRATCH/issue-1025-matrix-decisions.ps1`, `SCRATCH/issue-1025-matrix-results.ps1`, `SCRATCH/issue-1025-copy-contracts.ps1`, `SCRATCH/issue-1025-diff-reconcile.ps1` | PowerShell 7 | session-only, never committed | PowerShell baseline; no new Python |
+| `scripts/harness/*.psm1` and `tests/scripts/harness/*.Tests.ps1` (run only) | PowerShell 7, Pester 5 | repo-only CI and local | PowerShell baseline (classified in plan A) |
+| Existing Python (five test modules, generator `--check`, tier check; run only) | Python (existing) | repo-only CI and local | existing Python tolerated: called, not edited |
+
+OWNER QUESTION: none. No artifact needs the E2 exception.
 
 ## Execution Preconditions (Orchestrator-Checked)
 
@@ -67,6 +82,7 @@ The executor runs Y1 to Y3 before checking any task. If any check fails, it chec
 
 Applied by P1-T2 and P1-T3 in this order; values not named stay as plan A wrote them.
 
+0. Identifiers: every `id` in these rules, in `Approval` `## Disposition Proposals` and `## Owner Overrides`, and in the scratch scripts is the encoded form of spec `### Parity Matrix: Identifier Encoding` (for example a hook registration declared in both `.claude/settings.json` and agent frontmatter appears as two ids ending `~.claude%2Fsettings.json` and `~.claude%2Fagents%2F<agent>.md`). A rule selects entries either by an exact `id` string copied from `config/harness-parity-matrix.json` or by the entry fields `ecosystem`, `kind` and `name` (written below as `<ecosystem>:<kind>:*`); it never decodes, re-encodes or re-derives an `id`, and it never matches on a substring of an `id` beyond the `<ecosystem>:<kind>:` prefix. An `Approval` row naming a feature id that is not an exact `id` in the matrix is counted as `UnmatchedApprovalIds`; a non-zero count stops P1-T2 for re-planning.
 1. Approved disposition: for an entry or skill listed in `Approval` `## Disposition Proposals` or `## Owner Overrides`, the owner's decision (an empty answer accepts the proposal); for every other entry, the plan A disposition (approved in bulk by `Approval-Status`).
 2. Single-ecosystem skill approved `shared`: Claude-only `claude:skill:<name>` gets `shared`, `target_paths` `[.agents/skills/<name>/SKILL.md]`, `owner_child` 3 (no contract, F2); Codex-only `codex:skill:<name>` gets `shared`, `target_paths` `[.claude/skills/<name>/SKILL.md]`, `owner_child` 3, and a contract in P1-T4. Approved `native`: unchanged. The `proposed:` note becomes `approved: <disposition>`.
 3. Override to `dropped`: `reason` from the override note, `decision_ref` `#1025:survey/difference-approval.md#owner-overrides`, `target_paths` and `generated_from` removed.
@@ -85,15 +101,15 @@ Applied by P1-T2 and P1-T3 in this order; values not named stay as plan A wrote 
   - Acceptance: `<FEATURE>/evidence/baseline/phase0b-resume.<timestamp>.md` records `blocked_reason: human_decision_required`, six requirements with five non-empty `runbook_path` values, `Approval-Status` `approved` or `approved-with-overrides`, disputed cases decided equal to disputed cases listed, eight question rows and five runbook rows, and ends `ResumeGate: PASS`.
 - [ ] [P0-T3] Capture the harness baseline: a branch-current run of the four `tests/scripts/harness` suites with coverage over `scripts/harness`.
   - Acceptance: `<FEATURE>/evidence/baseline/phase0b-pester-harness.<timestamp>.md` has `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:` with numeric passed and failed counts and the three per-file line-coverage values from `artifacts/pester/powershell-coverage.xml`.
-- [ ] [P0-T4] Capture the Python contract-test baseline: the four test modules and the generator `--check` named in plan A `## Language Choices`.
-  - Acceptance: `<FEATURE>/evidence/baseline/phase0b-python-contracts.<timestamp>.md` has the four command-step fields per command and numeric passed and failed counts.
+- [ ] [P0-T4] Capture the Python contract-test baseline: the five test modules, the generator `--check` and the tier-classification check named in plan A `## Language Choices`.
+  - Acceptance: `<FEATURE>/evidence/baseline/phase0b-python-contracts.<timestamp>.md` has the four command-step fields per command, numeric passed and failed counts, and for the tier check `EXIT_CODE: 0` with a line beginning `quality-tiers: OK (` and no line beginning `QT0`.
 
 ### Phase 1 — Apply Owner Decisions and Runbook Results
 
 - [ ] [P1-T1] Apply every disputed-case `Owner-Decision` and every Diff ID override in `Approval` to the batch records (class, port direction, rationale) and every single-ecosystem disposition decision to `<FEATURE>/survey/single-ecosystem.md` and the `Proposed disposition` column of `<FEATURE>/survey/skill-survey.md`, leaving Diff IDs unchanged; then re-write if absent and run `SCRATCH/issue-1025-diff-reconcile.ps1` with the plan A P7-T2 counts.
   - Acceptance: `<FEATURE>/evidence/other/owner-decisions-applied.<timestamp>.md` lists each decision with the record it changed, and the reconciliation output in it reads `Missing: 0`, `Duplicated: 0`, `Unknown: 0`, `InvalidClass: 0`, `SequenceGaps: 0`, `RecordsWithoutTable: 0` and `BrokenRecordLinks: 0`.
 - [ ] [P1-T2] Apply `## Decision Application Rules` rules 1 to 3 to `config/harness-parity-matrix.json` from `SCRATCH/issue-1025-matrix-decisions.ps1`, keeping `features` sorted by `id`.
-  - Acceptance: `<FEATURE>/evidence/other/matrix-dispositions-applied.<timestamp>.md` lists each changed `id` with old and new disposition, and `Get-HarnessParityMatrixViolation` against the live inventory records `Violations: 0`.
+  - Acceptance: `<FEATURE>/evidence/other/matrix-dispositions-applied.<timestamp>.md` lists each changed `id` with old and new disposition, records `UnmatchedApprovalIds: 0` (rule 0), and `Get-HarnessParityMatrixViolation` against the live inventory records `Violations: 0`.
 - [ ] [P1-T3] Apply rules 4 to 9 to `config/harness-parity-matrix.json` from `SCRATCH/issue-1025-matrix-results.ps1`.
   - Acceptance: `<FEATURE>/evidence/other/matrix-violations-post-decision.<timestamp>.md` records `Violations: 0` against the live inventory, the counts of `approved` and `provisional` entries, the count of `provisional` entries per reason (`deferred runbook`, `pending-source`), and `UnsettledWithoutReason: 0`.
 - [ ] [P1-T4] Create a contract for every Codex-only name approved `shared` (from its `.agents/skills/<name>/SKILL.md` and survey record), delete the contract of every `codex:skill` name moved off `shared`, and review the contract of every name that has a disputed-case decision or Diff ID override, revising it where the decision changes a stated objective or behavior. An empty set is recorded as `none`.
@@ -112,13 +128,13 @@ Applied by P1-T2 and P1-T3 in this order; values not named stay as plan A wrote 
 - [ ] [P2-T3] Run the four harness suites branch-current with coverage.
   - Acceptance: `<FEATURE>/evidence/qa-gates/final-pester-harness-b.<timestamp>.md` records 0 failed from `artifacts/pester/pester-junit.xml` and per-file line coverage of 85% or more for `scripts/harness/HarnessInventory.psm1`, `scripts/harness/HarnessParityMatrix.psm1` and `scripts/harness/HarnessSkillContract.psm1`, each not below its P0-T3 value.
 - [ ] [P2-T4] Run the Python contract set from P0-T4 again.
-  - Acceptance: `<FEATURE>/evidence/qa-gates/final-python-contracts-b.<timestamp>.md` records 0 failed and the generator `--check` exit 0.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/final-python-contracts-b.<timestamp>.md` records 0 failed, the generator `--check` exit 0, and the tier check `EXIT_CODE: 0` with no line beginning `QT0`.
 - [ ] [P2-T5] Run `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/file-size-b.<timestamp>.md` records 0 failed for the It block `reports zero ratchet violations against config/file-size-baseline.json`.
 - [ ] [P2-T6] List added files with `git diff --name-only --diff-filter=A MB` and the untracked set with `git status --porcelain`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/no-new-python-b.<timestamp>.md` records both outputs and `AddedPy: 0`.
 - [ ] [P2-T7] Check off in `<FEATURE>/spec.md` every acceptance criterion except `Required CI check`, and in `<FEATURE>/user-story.md` every criterion except the one beginning `The completeness gate fails on` (CI-dependent, checked off by the orchestrator at S9), citing plan A and plan B evidence; criteria already checked by plan A stay checked.
-  - Acceptance: `spec.md` has exactly 24 checked criteria and one unchecked (`Required CI check`); `user-story.md` has exactly 16 checked and one unchecked.
+  - Acceptance: `spec.md` has exactly 25 checked criteria and one unchecked (`Required CI check`); `user-story.md` has exactly 16 checked and one unchecked.
 - [ ] [P2-T8] List changed files with `git diff --name-only MB` and `git status --porcelain`, and compare each path with `## Edit Set`, `BranchBaseline` and `## Excluded Paths`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/excluded-paths-b.<timestamp>.md` records both outputs, `ExcludedTouched: 0` and `OutsideEditSet: 0`, where `OutsideEditSet` counts paths in neither `## Edit Set` nor `BranchBaseline`.
 - [ ] [P2-T9] Walk the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from `MB`, citing plan A and plan B evidence for each row.
@@ -141,6 +157,7 @@ Applied by P1-T2 and P1-T3 in this order; values not named stay as plan A wrote 
 | SPEC-AC-23 No new Python | P2-T6 | plan A P9-T9 |
 | SPEC-AC-24 File size | P2-T5 | plan A P9-T8 |
 | SPEC-AC-25 Excluded paths untouched | P2-T8 | plan A P9-T12 |
+| SPEC-AC-26 Tier classification | P0-T4, P2-T4 (re-run) | plan A P4-T9, P9-T7 (checked off by plan A) |
 | US-AC-CP Copilot entries approved or provisional with issue-keyed `decision_ref` (user-story) | P1-T3, P1-T6 | plan A Phase 5 |
 | SPEC-AC-15 Required CI check | — | orchestrator S9 on `poshqc / PowerShell QC` |
 
@@ -165,7 +182,7 @@ Applied by P1-T2 and P1-T3 in this order; values not named stay as plan A wrote 
 - Mirror parity: every created, revised or deleted contract is synchronized with its bundle copy and the resource-contract tests run (P1-T5); no pack manifest or `SKILL.md` is edited; no execution-environment brief fact changes, so no brief-update task is needed.
 - File size: plan B edits JSON and Markdown only, both exempt; P2-T5 confirms the repository gate still passes.
 - Test isolation: not applicable to new runs, because plan B adds and changes no test file and no production code; the seeded shuffled runs of plan A (P9-T6, seeds 1025, 2051 and 3077) cover the suites, and P2-T3 re-runs them against the edited matrix.
-- CI-only behavior: the repository gate reads the committed matrix and live tree only; R4 re-runs it after the `origin/main` sync, so an upstream inventory change stops before plan B rather than failing in CI.
+- CI-only behavior: the repository gate reads the committed matrix and live tree only; R4 re-runs it after the `origin/main` sync, so an upstream inventory change stops before plan B rather than failing in CI. Encoded ids are ASCII and sorted ordinally, so the re-sorted matrix is identical on every runner. The `tier-classification` step in the four `quality-checks7` contexts is re-run locally at P0-T4 and P2-T4 because an upstream project added during the sync would fail it in CI.
 - Evidence: every artifact is under `<FEATURE>/evidence/<kind>/` with a write-time UTC stamp and the four command-step fields where a command is recorded; plan B artifact names carry a `phase0b-` prefix or `-b` suffix where plan A wrote the same kind, so the latest-file rule never selects a plan A file for a plan B acceptance.
 
 ## Test Plan
