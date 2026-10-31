@@ -139,7 +139,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             $script:IdentityNoTarget = New-WorktreeResolutionTargetResult -Status NoTarget -SessionRoot $script:SessionRootPath -Detail 'identity resolution found no target.'
 
             # Build a resolver result with the six RESOLVER_CONTRACT properties.
-            function New-HookTargetTestResult {
+            function Get-HookTargetTestResult {
                 param($Root, [string] $Source, [bool] $Ambiguous = $false, $ReasonCode = $null)
                 [pscustomobject]@{ WorktreeRoot = $Root; Source = $Source; Ambiguous = $Ambiguous; ReasonCode = $ReasonCode; Detail = 'test resolver result'; Candidates = [string[]] @() }
             }
@@ -151,7 +151,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         }
 
         It 'TR-01 invokes Resolve-HookTargetWorktree once for a --head command' {
-            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            $script:HookResult = Get-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
             Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
 
             $null = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
@@ -160,7 +160,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         }
 
         It 'TR-02 maps a CommandOperand root equal to the session root to SessionRoot' {
-            $result = New-HookTargetTestResult -Root $script:SessionRootPath -Source 'CommandOperand'
+            $result = Get-HookTargetTestResult -Root $script:SessionRootPath -Source 'CommandOperand'
 
             $target = ConvertFrom-PrAuthorHookTargetResult -Result $result -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
 
@@ -170,7 +170,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         }
 
         It 'TR-03 maps a different CommandOperand root to OtherWorktree' {
-            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            $script:HookResult = Get-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
             Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
 
             $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
@@ -182,7 +182,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         }
 
         It 'TR-04 maps an ambiguous result to Ambiguous with the ambiguity code' {
-            $script:HookResult = New-HookTargetTestResult -Root $null -Source 'CommandOperand' -Ambiguous $true -ReasonCode $script:AmbiguityCode
+            $script:HookResult = Get-HookTargetTestResult -Root $null -Source 'CommandOperand' -Ambiguous $true -ReasonCode $script:AmbiguityCode
             Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
 
             $target = Resolve-PrAuthorWorktreeTarget -CommandText $script:HeadCommand
@@ -193,7 +193,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         }
 
         It 'TR-05 maps a not-derivable result to NoTarget with the no-target code after the current-branch fallback' {
-            $script:HookResult = New-HookTargetTestResult -Root $null -Source 'CommandOperand' -ReasonCode $script:NoTargetCode
+            $script:HookResult = Get-HookTargetTestResult -Root $null -Source 'CommandOperand' -ReasonCode $script:NoTargetCode
             Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
 
             $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $script:HookResult -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
@@ -210,7 +210,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             @{ Source = 'SessionRoot' }
             @{ Source = 'DelegationIdentity' }
         ) {
-            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source $Source
+            $script:HookResult = Get-HookTargetTestResult -Root $script:ItemRoot -Source $Source
             Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
 
             $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $script:HookResult -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
@@ -222,7 +222,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         }
 
         It 'TR-07 does not select a worktree from a path-derived source (issue #673)' {
-            $script:HookResult = New-HookTargetTestResult -Root $script:FeatureFolderRoot -Source 'FilePath'
+            $script:HookResult = Get-HookTargetTestResult -Root $script:FeatureFolderRoot -Source 'FilePath'
             Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
 
             $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $script:HookResult -CommandText $script:HeadCommand -SessionRoot $script:SessionRootPath
@@ -243,7 +243,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         }
 
         It 'TR-09 passes the --head branch to the shared resolver only through -CommandBranch' {
-            $script:HookResult = New-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
+            $script:HookResult = Get-HookTargetTestResult -Root $script:ItemRoot -Source 'CommandOperand'
             Mock -CommandName Resolve-HookTargetWorktree -MockWith { $script:HookResult }
             $command = "gh pr create --head feature/item-701 --body-file $($script:FeatureFolderRoot)/artifacts/pr_body_701.md"
 
