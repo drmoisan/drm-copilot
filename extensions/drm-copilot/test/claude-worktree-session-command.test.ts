@@ -35,7 +35,8 @@ interface CapturedTerminal {
   readonly sendText: jest.Mock;
 }
 
-const POETRY_PYPROJECT = '[tool.poetry]\nname = "drm-copilot"\nversion = "0.1.0"\n';
+const POETRY_PYPROJECT =
+  '[tool.poetry]\nname = "drm-copilot"\nversion = "0.1.0"\n';
 const CLAUDE_WITH_OBJECTIVE =
   "claude --dangerously-skip-permissions 'Refactor the auth module.'";
 

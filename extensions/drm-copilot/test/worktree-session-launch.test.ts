@@ -211,9 +211,9 @@ describe("worktree-session-launch Claude script", () => {
     const codexScript = buildCodexSessionScript(fullCodexCommands);
 
     // Assert
-    expect(claudeScript.startsWith("& {\n$setupSucceeded = $false\ntry {\n")).toBe(
-      true,
-    );
+    expect(
+      claudeScript.startsWith("& {\n$setupSucceeded = $false\ntry {\n"),
+    ).toBe(true);
     expectInOrder(claudeScript, [
       fullClaudeCommands.preClaude ?? "missing preClaude",
       "$setupSucceeded = $true",

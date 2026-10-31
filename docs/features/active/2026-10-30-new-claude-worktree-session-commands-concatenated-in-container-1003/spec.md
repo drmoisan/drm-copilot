@@ -247,17 +247,17 @@ Refinement: delivery is through `shellArgs` at process start, not `sendText`. Th
 - [x] Paths and objectives that contain spaces, double quotes, and apostrophes survive encoding and decode to correctly quoted script text.
 - [x] `TERMINAL_AUTO_ACTIVATION_GRACE_MS` and both `setTimeout` calls are removed from `extension.ts`, no handler test uses fake timers for the agent launch, and the output-channel log text no longer mentions a deferred send.
 - [x] The cancelled-prompt, missing-powershell-runtime, and unresolved-Codex-executable paths behave as before and still do not create a terminal.
-- [ ] `worktree-session-launch.ts`, `claude-worktree-session.ts`, and `codex-worktree-session.ts` contain no `vscode`, `node:fs`, or `node:child_process` imports.
-- [ ] `extensions/drm-copilot/jest.config.cjs` has `coverageThreshold` entries with lines 85 and branches 75 for `./src/worktree-session-launch.ts`, `./src/claude-worktree-session.ts`, and `./src/codex-worktree-session.ts`, and Jest with coverage meets them.
-- [ ] Coverage of the changed lines in `extension.ts` is not lower than the recorded baseline, with baseline and post-change figures recorded from `coverage/lcov.info`.
-- [ ] Test-suite results are stable: a seeded shuffled Jest run passes, and the new tests create no temporary files and do not branch on `process.platform` except through the existing Codex executable helper.
-- [ ] `extension.workflow-commands.test.ts` has no more than 800 logical lines, `extension.ts` has no more than 500 logical lines, and no other changed or new file exceeds 800 lines.
+- [x] `worktree-session-launch.ts`, `claude-worktree-session.ts`, and `codex-worktree-session.ts` contain no `vscode`, `node:fs`, or `node:child_process` imports.
+- [x] `extensions/drm-copilot/jest.config.cjs` has `coverageThreshold` entries with lines 85 and branches 75 for `./src/worktree-session-launch.ts`, `./src/claude-worktree-session.ts`, and `./src/codex-worktree-session.ts`, and Jest with coverage meets them.
+- [x] Coverage of the changed lines in `extension.ts` is not lower than the recorded baseline, with baseline and post-change figures recorded from `coverage/lcov.info`.
+- [x] Test-suite results are stable: a seeded shuffled Jest run passes, and the new tests create no temporary files and do not branch on `process.platform` except through the existing Codex executable helper.
+- [x] `extension.workflow-commands.test.ts` has no more than 800 logical lines, `extension.ts` has no more than 500 logical lines, and no other changed or new file exceeds 800 lines.
 - [x] The Claude handler tests are located in `claude-worktree-session-command.test.ts`, and the moved tests are no longer present in `extension.workflow-commands.test.ts`.
 - [x] A fail-before record shows that the no-`sendText` and `hideFromUser: true` handler test and the activation-probe builder test fail on the pre-change tree and pass after the change.
 - [x] `extensions/drm-copilot/README.md` `## New Claude Worktree Session` describes single-script delivery, `hideFromUser`, fail-fast behavior, and per-step banners, and no longer says commands are sent individually.
 - [x] `extensions/drm-copilot/CHANGELOG.md` has a `### Fixed` bullet under `## [Unreleased]` for issue #1003 that records the fail-fast behavior change; `package.json` version is unchanged.
-- [ ] No file in `scripts/dev-tools/activate.ps1`, `scripts/dev-tools/DrmCopilotPromptSupport.ps1`, the `resources/templates` mirror, `.claude/rules/`, `.github/instructions/`, or the execution-environment brief is modified, and `quality-tiers.yml` is not created.
-- [ ] The full TypeScript toolchain (Prettier, ESLint, `tsc`, and Jest with coverage through `node run-jest.cjs`) passes in a single pass with no errors.
+- [x] No file in `scripts/dev-tools/activate.ps1`, `scripts/dev-tools/DrmCopilotPromptSupport.ps1`, the `resources/templates` mirror, `.claude/rules/`, `.github/instructions/`, or the execution-environment brief is modified, and `quality-tiers.yml` is not created.
+- [x] The full TypeScript toolchain (Prettier, ESLint, `tsc`, and Jest with coverage through `node run-jest.cjs`) passes in a single pass with no errors.
 
 ## Risks & Mitigations
 - Technical or operational risks:
