@@ -340,8 +340,8 @@ Finding codes (all `DOCS_` prefixed except reused codes; severity in parentheses
 | `DOCS_MATRIX_EXISTS_INCONSISTENT` (error) | `parity_rules` | `exists` is `pass` but the page path is not in the page set. |
 | `DOCS_MATRIX_OWNER_INCONSISTENT` (error) | `parity_rules` | `owner_assigned` is `pass` but no `page_owners` entry matches (`fnmatch.fnmatchcase`). |
 | `DOCS_PIN_INCONSISTENT` (error) | `evidence_pins` | pin identity fields do not reproduce `element_id`, or `pin_id` differs from its derivation. |
-| `DOCS_PAGE_STALE` (warning in `matrix`; in `docs-complete` error when the stale-page count exceeds `max_stale_pages`, otherwise warning) | `staleness` | one finding per stale page; message names the page and each non-current element. |
-| `DOCS_PAGE_MISSING` (error, `docs-complete`) | `validation` | a bound page path is not in the page set. |
+| `DOCS_STALE_PAGE` (warning in `matrix`; in `docs-complete` error when the stale-page count exceeds `max_stale_pages`, otherwise warning) | `staleness` | one finding per stale page; message names the page and each non-current element. |
+| `DOCS_BOUND_PAGE_MISSING` (error, `docs-complete`) | `validation` | a bound page path is not in the page set. |
 | `DOCS_DEFERRED_NOT_ALLOWED` (error, `docs-complete`) | `validation` | a `deferred` entry while `allow_deferred` is false. |
 | `DOCS_PARITY_REQUIRED_DIMENSION` (error, `docs-complete`) | `validation` | a required dimension is `fail` or `not-assessed` for a documented binding (`pass` and `not-applicable` satisfy it). |
 | `DOCS_REVISION_MISMATCH` (error) | `validation` | snapshot `revision` is non-null and differs from `--revision`. |
