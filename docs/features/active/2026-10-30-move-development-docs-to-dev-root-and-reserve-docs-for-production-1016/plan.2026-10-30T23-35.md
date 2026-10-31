@@ -276,7 +276,7 @@ Restart from [P8-T1] whenever a step fails or changes a file; all Phase 8 artifa
   - Acceptance: `<FEATURE>/evidence/qa-gates/no-new-python.<timestamp>.md` records both outputs with zero `.py` additions.
 - [ ] [P8-T14] Record the decision completion table: for OQ-1 to OQ-13, the `BRANCH-OQ-` value (OQ-13, which has no `global_decisions` key: the `DECISIONS` `decisions` entry count), the implementing task or `no change`, and the named test or evidence artifact.
   - Acceptance: `<FEATURE>/evidence/qa-gates/stage-b-decision-completion.<timestamp>.md` has thirteen rows and none is blank.
-- [ ] [P8-T15] Walk the policy-audit, code-review and feature-audit templates under `.dev/templates/policy_audit/` (moved from `docs/features/templates/policy_audit/`) against `git diff BASE HEAD`.
+- [ ] [P8-T15] Walk the policy-audit, code-review and feature-audit templates under `.dev/templates/policy_audit/` (moved from `docs/features/templates/policy_audit/`) against `git diff BASE` (the merge base against the working tree, because run 2 commits nothing and its Phase 4 to 7 edits are uncommitted) together with the untracked files listed by `git status --porcelain`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` has one PASS, FAIL or N/A row per checklist item and no FAIL row; a FAIL row is fixed, the loop restarts at [P8-T1], and the self-review is rewritten.
 
 ## Pre-Mortem
