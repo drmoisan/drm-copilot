@@ -138,8 +138,8 @@ Owner decisions that bind this spec are recorded in `owner-decisions.md` in this
 - [x] A local concurrent run and a serial run on the same tree produce the same total test count and pass/fail outcome, with the comparison recorded in evidence.
 - [ ] `config/poshqc-shard-weights.json` is committed with millisecond weights derived from CI JUnit artifacts, `Get-PoshQCShardTestFileWeight` uses it with a median fallback for unlisted files, and the size-based path still works when the file is absent; tests cover all three cases and a malformed file.
 - [ ] The CI Pester shard durations before and after the weights change are recorded, and the spread between the longest and shortest shard is smaller than the baseline spread; if it is not, a recorded decision states whether a further shard is added (with the matrix, brief and `PoshQcWorkflow.Tests.ps1` updated together).
-- [ ] The slow-file profile of Pester test files at or above 10 s is recorded, with per-file durations and follow-up records for non-trivial fixes.
-- [ ] Pester suites pass as concurrent shards and under seeded shuffled file-order runs with at least three seeds (each seed and file order recorded), and every leaker and victim found is fixed without ordering workarounds.
+- [x] The slow-file profile of Pester test files at or above 10 s is recorded, with per-file durations and follow-up records for non-trivial fixes.
+- [x] Pester suites pass as concurrent shards and under seeded shuffled file-order runs with at least three seeds (each seed and file order recorded), and every leaker and victim found is fixed without ordering workarounds.
 - [ ] The merged coverage and completeness checks in `_poshqc.yml` continue to pass, and a green workflow run on the branch head is recorded.
 - [ ] Every changed or new PoshQC file has a bundled copy under `extensions/drm-copilot/resources/powershell/PoshQC/`, the new path is in `POSHQC_PARITY_PATHS`, and `test_poshqc_bundled_parity.py` and the PoshQC and workflow Pester tests pass.
 - [x] `scripts/powershell/PoshQC/README.md` documents the runner, the output-path parameters, the JUnit root `time` semantics, and weights regeneration.
@@ -149,7 +149,7 @@ Owner decisions that bind this spec are recorded in `owner-decisions.md` in this
 - [ ] `## Test Runtime` is updated in every copy of the execution-environment brief for both runners, retaining all pinned tokens, and `## Test Isolation Checks` gains the concurrent-run bullet; the mirror contract tests pass.
 - [ ] No new Python script is added, and the changed files include no Python enforcement-hook invocation.
 - [ ] The Linux hook-suite job is unchanged and its non-required status is recorded as an observation.
-- [ ] The explanation of the Pester test file count difference is recorded from the discovery count.
+- [x] The explanation of the Pester test file count difference is recorded from the discovery count.
 
 ## Definition of Done
 
