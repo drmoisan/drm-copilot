@@ -1,5 +1,6 @@
 """Tests for scripts.dev_tools.resolve_hard_lock_prompt."""
 
+import sys
 from io import StringIO
 from pathlib import Path, PurePosixPath
 from unittest.mock import MagicMock, patch
@@ -218,14 +219,10 @@ def test_copy_to_clipboard_with_pyperclip_success() -> None:
     mock_pyperclip = MagicMock()
     mock_pyperclip.copy = MagicMock()
 
+    # copy_to_clipboard imports pyperclip at call time, so patching sys.modules
+    # supplies the mock without reloading (and replacing) the module under test.
     with patch.dict("sys.modules", {"pyperclip": mock_pyperclip}):
-        # Force reimport to use the mock
-        # Reload to pick up the patched pyperclip
-        import importlib
-
         from scripts.dev_tools import resolve_hard_lock_prompt
-
-        importlib.reload(resolve_hard_lock_prompt)
 
         result = resolve_hard_lock_prompt.copy_to_clipboard("test text")
 
@@ -243,12 +240,7 @@ def test_copy_to_clipboard_pyperclip_failure_fallback() -> None:
         patch("shutil.which", return_value="/usr/bin/clip"),
         patch("subprocess.run") as mock_run,
     ):
-        # Force reimport
-        import importlib
-
         from scripts.dev_tools import resolve_hard_lock_prompt
-
-        importlib.reload(resolve_hard_lock_prompt)
 
         result = resolve_hard_lock_prompt.copy_to_clipboard("test text")
 
@@ -263,17 +255,36 @@ def test_copy_to_clipboard_no_mechanism() -> None:
         patch.dict("sys.modules", {"pyperclip": None}),
         patch("shutil.which", return_value=None),
     ):
-        import importlib
-
         from scripts.dev_tools import resolve_hard_lock_prompt
-
-        importlib.reload(resolve_hard_lock_prompt)
 
         # Capture stderr to avoid test noise
         with patch("sys.stderr", new_callable=StringIO):
             result = resolve_hard_lock_prompt.copy_to_clipboard("test text")
 
         assert result is False
+
+
+def test_clipboard_tests_leave_module_bindings_intact() -> None:
+    """The clipboard tests must not replace the module's function objects.
+
+    Scenario: the three clipboard tests run in this test's Act step, in the
+    same process as every later test. Expected outcome: the module object in
+    ``sys.modules`` still binds ``resolve_prompt`` and ``main`` to the objects
+    this file imported, so a later test sees the original module rather than
+    a reloaded copy built while ``pyperclip`` was patched.
+    """
+    # Arrange
+    module_name = "scripts.dev_tools.resolve_hard_lock_prompt"
+
+    # Act
+    test_copy_to_clipboard_with_pyperclip_success()
+    test_copy_to_clipboard_pyperclip_failure_fallback()
+    test_copy_to_clipboard_no_mechanism()
+
+    # Assert
+    module = sys.modules[module_name]
+    assert module.resolve_prompt is resolve_prompt, "resolve_prompt was rebound"
+    assert module.main is main, "main was rebound"
 
 
 def test_main_success(mem_fs_path: Path) -> None:

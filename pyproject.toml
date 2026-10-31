@@ -128,8 +128,9 @@ select = [
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra --cov-report=lcov:artifacts/python/lcov.info"
+addopts = "-ra --cov-report=lcov:artifacts/python/lcov.info --strict-markers --strict-config"
 testpaths = ["tests"]
+xfail_strict = true
 
 [tool.coverage.run]
 source = ["src", "scripts/dev_tools", "packages/discovery-runtime/src"]
