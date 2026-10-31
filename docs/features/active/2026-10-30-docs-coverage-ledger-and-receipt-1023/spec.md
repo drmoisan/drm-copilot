@@ -273,8 +273,8 @@ On exit 0, `findings` is empty; rule violations are reported by `validate`. `res
 |---|---|---|
 | `profile` | profile | `ConvertFrom-DocsProfileText` findings |
 | `ledger` | plus snapshot, ledger | schema validation; snapshot view; ledger rules including precision-limit rules; `DOCS_REVISION_MISMATCH` |
-| `matrix` | plus matrix, pin collection, page-path set | schema validation; matrix rules; pin consistency; `DOCS_PAGE_STALE` as `warning` |
-| `docs-complete` | as `matrix` | gate from `completion_gates.docs_complete`: `DOCS_SNAPSHOT_UNPINNED`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_PAGE_MISSING`, `DOCS_PAGE_STALE` severity per `max_stale_pages` |
+| `matrix` | plus matrix, pin collection, page-path set | schema validation; matrix rules; pin consistency; `DOCS_STALE_PAGE` as `warning` |
+| `docs-complete` | as `matrix` | gate from `completion_gates.docs_complete`: `DOCS_SNAPSHOT_UNPINNED`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_BOUND_PAGE_MISSING`, `DOCS_STALE_PAGE` severity per `max_stale_pages` |
 
 - `result` is the receipt on exit 0 and on exit 1 with a loaded profile; otherwise null.
 - `DOCS_REVISION_MISMATCH`: the snapshot revision is non-null and differs from `-Revision`.
@@ -361,8 +361,8 @@ false yields one `DOCS_DEFERRED_NOT_ALLOWED` per entry (risk R6).
 | `DOCS_MATRIX_LEDGER_REF` | warning | `Get-DocsMatrixFinding` | `ledger_ref.sha256` differs |
 | `DOCS_MATRIX_UNBOUND_ROW`, `DOCS_MATRIX_ROW_MISSING`, `DOCS_MATRIX_DUPLICATE_ROW`, `DOCS_MATRIX_PIN_UNKNOWN`, `DOCS_MATRIX_ACCURACY_UNPINNED`, `DOCS_MATRIX_EXISTS_INCONSISTENT`, `DOCS_MATRIX_OWNER_INCONSISTENT` | error | `Get-DocsMatrixFinding` | Row not bound by a documented entry; documented binding without row; duplicate row; unknown or foreign pin id; `accurate` `pass` without pin; `exists` `pass` for a page outside the page-path set; `owner_assigned` `pass` with no `Get-DocsPageOwner` match |
 | `DOCS_PIN_INCONSISTENT` | error | `Get-DocsPinFinding` | Pin identity fields do not reproduce `element_id`, `pin_id` differs from `Get-DocsPinId`, or duplicate `pin_id` |
-| `DOCS_PAGE_STALE` | warning in `matrix`; in `docs-complete` error when stale pages exceed `max_stale_pages`, otherwise warning | `Get-DocsStalenessFinding` | One per stale page; message names the page path and, per non-current pin, the declaration, element id and status |
-| `DOCS_PAGE_MISSING`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_SNAPSHOT_UNPINNED` | error | `Get-DocsCompletionGateFinding` | Bound page outside the page-path set; deferred entry with `allow_deferred` false; required dimension `fail` or `not-assessed`; null snapshot revision |
+| `DOCS_STALE_PAGE` | warning in `matrix`; in `docs-complete` error when stale pages exceed `max_stale_pages`, otherwise warning | `Get-DocsStalenessFinding` | One per stale page; message names the page path and, per non-current pin, the declaration, element id and status |
+| `DOCS_BOUND_PAGE_MISSING`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_SNAPSHOT_UNPINNED` | error | `Get-DocsCompletionGateFinding` | Bound page outside the page-path set; deferred entry with `allow_deferred` false; required dimension `fail` or `not-assessed`; null snapshot revision |
 | `DOCS_REVISION_MISMATCH` | error | `Invoke-DocsValidation` | Non-null snapshot revision differs from `-Revision` |
 | `DOCS_UPDATE_TARGET_INVALID` | error | `Invoke-DocsUpdateLedgerCommand` | Named entry, binding, pin, element or precision limit absent |
 | `DOCS_CLI_ARGUMENTS` | error (exit 2) | 1020 parser, `Test-DocsUpdateLedgerArgument`, `Test-DocsValidateArgument` | Usage error |
@@ -403,6 +403,8 @@ see `DocsLedgerCommands.psm1`.
   documents are created on first write. Framework code contains no consumer identifier.
 
 ## Contracts Later Children Must Honor
+
+- Finding codes (all children, including #1038 fixtures and guides): the stale-page code is `DOCS_STALE_PAGE` and the bound-page-outside-page-path-set code is `DOCS_BOUND_PAGE_MISSING`; earlier names for these two conditions under the page-check prefix reserved to 1021 are superseded.
 
 ### 900007 (docs-mcp-tools; TypeScript wrappers)
 
@@ -505,7 +507,7 @@ None is decided beyond its provisional default.
    precision-limit flag).
 3. **OQ-3 - `FINDINGS_LIMIT` severity (1020 contract).** 1020 `Get-DocsOrderedFinding` appends a
    `FINDINGS_LIMIT` finding with severity `error` when more than 100 findings exist. A passing
-   validation with more than 100 warnings (for example many `DOCS_PAGE_STALE` warnings under
+   validation with more than 100 warnings (for example many `DOCS_STALE_PAGE` warnings under
    `max_stale_pages`) would then place an `error` finding into a `pass` receipt and an exit-0
    envelope, both of which the 1020 schemas reject. 1023 handling: exit code and
    `validation_result` are computed from the unbounded set. Provisional default: 1020 gives
@@ -608,7 +610,7 @@ Unless stated otherwise, each Pester criterion is verified by the named suite un
 - [ ] The receipt `id` equals `Get-DocsStableId -Prefix 'docs-validation-receipt'` over `inputs`, `mode`, `repository`, `revision` and `validation_result`; a property test shows it is unchanged when only `issued_at`, `counts` or `findings` differ and changes when any of those five members differs (`DocsReceipt.Tests.ps1`).
 - [ ] The receipt `inputs` hold one `artifact-pin` per artifact read, with `sha256` equal to `Get-DocsBytesSha256Hex` of the raw bytes, sorted by `artifact_kind` then `path`, and no pin for an absent artifact (`DocsReceipt.Tests.ps1`).
 - [ ] `validate -Mode docs-complete` with a snapshot whose `revision` is null exits 1 with `DOCS_SNAPSHOT_UNPINNED`; with a non-null snapshot revision different from `-Revision` it reports `DOCS_REVISION_MISMATCH` (`DocsValidation.Tests.ps1`).
-- [ ] In `docs-complete`, a required parity dimension in state `fail` or `not-assessed` yields `DOCS_PARITY_REQUIRED_DIMENSION`, a bound page outside the page-path set yields `DOCS_PAGE_MISSING`, and `DOCS_PAGE_STALE` is `error` when the stale-page count exceeds `max_stale_pages` and `warning` otherwise; in `matrix` mode `DOCS_PAGE_STALE` is always `warning` (`DocsValidation.Tests.ps1`).
+- [ ] In `docs-complete`, a required parity dimension in state `fail` or `not-assessed` yields `DOCS_PARITY_REQUIRED_DIMENSION`, a bound page outside the page-path set yields `DOCS_BOUND_PAGE_MISSING`, and `DOCS_STALE_PAGE` is `error` when the stale-page count exceeds `max_stale_pages` and `warning` otherwise; in `matrix` mode `DOCS_STALE_PAGE` is always `warning` (`DocsValidation.Tests.ps1`).
 - [ ] `Get-DocsMatrixFinding` reports each of `DOCS_MATRIX_UNBOUND_ROW`, `DOCS_MATRIX_ROW_MISSING`, `DOCS_MATRIX_DUPLICATE_ROW`, `DOCS_MATRIX_PIN_UNKNOWN`, `DOCS_MATRIX_ACCURACY_UNPINNED`, `DOCS_MATRIX_EXISTS_INCONSISTENT`, `DOCS_MATRIX_OWNER_INCONSISTENT` and `DOCS_MATRIX_LEDGER_REF` for a fixture exhibiting its condition, and `Get-DocsPinFinding` reports `DOCS_PIN_INCONSISTENT` for a tampered pin identity, a wrong `pin_id` and a duplicate `pin_id` (`DocsParity.Tests.ps1`, `DocsEvidencePins.Tests.ps1`).
 - [ ] `Test-DocsPathOrGlobMatch` agrees with an enumerated table covering exact match, prefix plus `/`, `*` across `/`, `?`, `[...]`, `[!...]` and case difference (no match), and `Get-DocsPageOwner` returns the first matching `page_owners` entry and is unchanged when non-matching entries are appended (`DocsParity.Tests.ps1`).
 - [ ] `Measure-DocsParityScore` returns per dimension integer counts that sum to the row count and `score_basis_points` equal to `floor(10000 * pass / (pass + fail + not_assessed))` or null when that denominator is 0 (`DocsParity.Tests.ps1`).

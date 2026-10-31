@@ -257,7 +257,7 @@ No cycle: `DocsLedgerCommands` is the only importer of `DocsLedgerMutation`, and
 | `Merge-DocsEvidencePin -PinSet -Pin` and `Get-DocsPinSetWithoutPin -PinSet -ElementId [-PagePath]` | yes | Replace-or-insert by `pin_id`; removal; pins sorted by `pin_id`. |
 | `Get-DocsPinStatus -Pin -Element <IDictionary>` (DocsStaleness) | yes | `element-missing` when no current element has `element_id`; `digest-changed` when present and digests differ (ordinal string comparison); `current` otherwise. A revision difference never changes the status. |
 | `Get-DocsStalePage -PinSet -Element` (DocsStaleness) | yes | One record per page with at least one non-current pin: `{page_path, pins: [{pin_id, element_id, status}]}`, sorted by `page_path` then `pin_id`. |
-| `Get-DocsStalenessFinding -StalePage -Element -Severity <warning|error> [-ArtifactPath]` (DocsStaleness) | yes | One `DOCS_PAGE_STALE` per stale page; message names the page path and, per non-current pin, the declaration, element id and status; `related_paths` the page; `related_ids` the element and pin ids. |
+| `Get-DocsStalenessFinding -StalePage -Element -Severity <warning|error> [-ArtifactPath]` (DocsStaleness) | yes | One `DOCS_STALE_PAGE` per stale page; message names the page path and, per non-current pin, the declaration, element id and status; `related_paths` the page; `related_ids` the element and pin ids. |
 
 ### 4.5 `DocsReceipt.psm1`
 
@@ -277,7 +277,7 @@ No cycle: `DocsLedgerCommands` is the only importer of `DocsLedgerMutation`, and
 |---|---|---|
 | `Get-DocsValidationMode` | yes | `profile`, `ledger`, `matrix`, `docs-complete` (each includes the checks of the modes before it). |
 | `Get-DocsValidationInputKind -Mode` | yes | `profile`: profile; `ledger`: plus snapshot and ledger; `matrix` and `docs-complete`: plus matrix, pin collection and the page-path set. |
-| `Get-DocsCompletionGateFinding -Gate <IDictionary> -SnapshotView -Ledger -Matrix -StalePage -PagePath -SnapshotRevision` | yes | `DOCS_SNAPSHOT_UNPINNED`, `DOCS_DEFERRED_NOT_ALLOWED` (entries and precision-limit records), `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_PAGE_MISSING`, and the `DOCS_PAGE_STALE` severity rule. |
+| `Get-DocsCompletionGateFinding -Gate <IDictionary> -SnapshotView -Ledger -Matrix -StalePage -PagePath -SnapshotRevision` | yes | `DOCS_SNAPSHOT_UNPINNED`, `DOCS_DEFERRED_NOT_ALLOWED` (entries and precision-limit records), `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_BOUND_PAGE_MISSING`, and the `DOCS_STALE_PAGE` severity rule. |
 | `Invoke-DocsValidation -Mode -Revision -IssuedAt <string> -ProfileText -ProfilePath -Artifact <IDictionary> -PagePath <string[]> -ComposedSchemaSet <IDictionary> [-AnalyzerId <string[]>]` | yes, apart from `Test-Json` | `Artifact` maps an artifact kind to `@{ Path; Bytes }` or `$null` (absent). Returns `@{ Receipt; Findings; Ok }`; `Receipt` is `$null` only when the profile does not load. Every built receipt is validated with `Test-DocsArtifactText -ArtifactKind 'docs-validation-receipt'`; a failure throws `DOCS_RECEIPT_INVALID` (defect guard, exit 3). |
 
 ### 4.7 `DocsLedgerMutation.psm1` (single write boundary)
@@ -439,8 +439,8 @@ path, owner, target, recorded}]` (`recorded` false for an unrecorded limit), `st
 | `DOCS_MATRIX_LEDGER_REF` | warning | `Get-DocsMatrixFinding` | Ledger digest differs |
 | `DOCS_MATRIX_UNBOUND_ROW`, `DOCS_MATRIX_ROW_MISSING`, `DOCS_MATRIX_DUPLICATE_ROW`, `DOCS_MATRIX_PIN_UNKNOWN`, `DOCS_MATRIX_ACCURACY_UNPINNED`, `DOCS_MATRIX_EXISTS_INCONSISTENT`, `DOCS_MATRIX_OWNER_INCONSISTENT` | error | `Get-DocsMatrixFinding` | Carried from the Python design; owner check uses the section 3.3 rule |
 | `DOCS_PIN_INCONSISTENT` | error | `Get-DocsPinFinding` | Pin identity or `pin_id` derivation mismatch, duplicate `pin_id` |
-| `DOCS_PAGE_STALE` | warning in `matrix`; in `docs-complete` error when stale pages exceed `max_stale_pages`, else warning | `Get-DocsStalenessFinding` | One per stale page |
-| `DOCS_PAGE_MISSING`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_SNAPSHOT_UNPINNED` | error | `Get-DocsCompletionGateFinding` | docs-complete gate |
+| `DOCS_STALE_PAGE` | warning in `matrix`; in `docs-complete` error when stale pages exceed `max_stale_pages`, else warning | `Get-DocsStalenessFinding` | One per stale page |
+| `DOCS_BOUND_PAGE_MISSING`, `DOCS_DEFERRED_NOT_ALLOWED`, `DOCS_PARITY_REQUIRED_DIMENSION`, `DOCS_SNAPSHOT_UNPINNED` | error | `Get-DocsCompletionGateFinding` | docs-complete gate |
 | `DOCS_REVISION_MISMATCH` | error | `Invoke-DocsValidation` | Non-null snapshot revision differs from `-Revision` |
 | `DOCS_UPDATE_TARGET_INVALID` | error | `Invoke-DocsUpdateLedgerCommand` | Target entry, binding, pin, element or limit absent |
 | `DOCS_CLI_ARGUMENTS` | error (exit 2) | `Test-DocsUpdateLedgerArgument`, `Test-DocsValidateArgument`, 1020 parser | Usage error |
@@ -651,7 +651,7 @@ and its runtime copies (data, rule D), which is a cross-child decision for the o
   in the shapes proposed; 1023 cannot meet D3 without them. Mitigation: confirm before the 1023 plan
   is written (Items to Confirm).
 - R2: 1020 appends a `FINDINGS_LIMIT` finding with severity `error` when truncating. More than 100
-  warnings (for example many `DOCS_PAGE_STALE` warnings) would then put an `error` finding into a
+  warnings (for example many `DOCS_STALE_PAGE` warnings) would then put an `error` finding into a
   `pass` receipt, which the receipt schema rejects (defect guard, exit 3). Mitigation requested from
   1020: give `FINDINGS_LIMIT` the highest severity among the dropped findings; 1023 computes the exit
   code and `validation_result` from the unbounded set.
