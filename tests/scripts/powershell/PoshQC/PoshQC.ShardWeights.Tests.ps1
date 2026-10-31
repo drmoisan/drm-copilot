@@ -80,10 +80,13 @@ Describe 'Get-PoshQCShardTestFileWeight measured weights' {
     }
 
     It 'SW04-MALFORMED-FILE-THROWS rejects every malformed weights document with a message naming the file' {
-        # Arrange: invalid JSON, wrong version, wrong unit, an empty files map, and a negative value.
+        # Arrange: invalid JSON, a non-object document, wrong version, wrong unit, an empty files map, a
+        # non-relative key, and a negative value.
         $items = & $script:NewItems @('a.Tests.ps1')
         $malformed = @(
             '{ not json',
+            '[1, 2]',
+            (& $script:WeightsJson @{ '/abs/tests/a.Tests.ps1' = 1 }),
             (& $script:WeightsJson @{ 'tests/a.Tests.ps1' = 1 }).Replace('"version": 1', '"version": 2'),
             (& $script:WeightsJson @{ 'tests/a.Tests.ps1' = 1 }).Replace('"ms"', '"s"'),
             (& $script:WeightsJson @{}),

@@ -12,5 +12,5 @@ Output Summary:
 | `totals.percent_statements_covered` | 96.6940 (32144 / 33243) | 96.6940 (32144 / 33243) | 0.0000 percentage points |
 | `totals.percent_branches_covered` | 93.6298 (11685 / 12480) | 93.6378 (11686 / 12480) | +0.0080 percentage points |
 
-- Both differences are within 0.1 percentage point. The single additional covered branch is attributable to the test changes made after the baseline (P2-T1 and P2-T2 add a test and change three clipboard tests in `tests/scripts/dev_tools/test_resolve_hard_lock_prompt.py`), which exercise `copy_to_clipboard` without reloading the module; it is not a worker-merge artifact.
+- Both differences are within 0.1 percentage point. The single additional covered branch is run-to-run variance, not an effect of the test edits: the final `-n auto` coverage run (P10-T4, same code) measured 11685/12480 branches, equal to the serial baseline. Which branch varies was not identified.
 - Terminal TOTAL row under `-n auto`: 33243 statements, 1099 missed, 12480 branches, 550 partial, 96%.

@@ -160,25 +160,25 @@ These tasks need branch CI runs. The executor does not execute them and continue
 
 ### Phase 10 — Final QA Loop and Self-Review
 
-- [ ] [P10-T1] Run `poetry run black --check .` and record `FEATURE/evidence/qa-gates/black.<timestamp>.md`.
+- [x] [P10-T1] Run `poetry run black --check .` and record `FEATURE/evidence/qa-gates/black.<timestamp>.md`.
   - Acceptance: exit 0 and the summary records the printed line containing `would be left unchanged`; on a failure, run Black in write mode, restart from P10-T1.
-- [ ] [P10-T2] Run `poetry run ruff check .` and record `FEATURE/evidence/qa-gates/ruff.<timestamp>.md`.
+- [x] [P10-T2] Run `poetry run ruff check .` and record `FEATURE/evidence/qa-gates/ruff.<timestamp>.md`.
   - Acceptance: exit 0 and the summary records `All checks passed!`.
-- [ ] [P10-T3] Run `poetry run pyright` and record `FEATURE/evidence/qa-gates/pyright.<timestamp>.md`.
+- [x] [P10-T3] Run `poetry run pyright` and record `FEATURE/evidence/qa-gates/pyright.<timestamp>.md`.
   - Acceptance: exit 0 and the summary records `0 errors`.
-- [ ] [P10-T4] Run `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1048-final.json --cov` and the threshold checker over that report, and record `FEATURE/evidence/qa-gates/pytest-coverage.<timestamp>.md`.
+- [x] [P10-T4] Run `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1048-final.json --cov` and the threshold checker over that report, and record `FEATURE/evidence/qa-gates/pytest-coverage.<timestamp>.md`.
   - Acceptance: zero failures; checker exit 0; the summary records the totals line and branch percentages from the JSON report and their delta against P0-T2 (no regression).
-- [ ] [P10-T5] Run the PoshQC format check through `mcp__drm-copilot__run_poshqc_format` and confirm with `git status --porcelain` that no PowerShell file changed; record `FEATURE/evidence/qa-gates/poshqc-format.<timestamp>.md`.
+- [x] [P10-T5] Run the PoshQC format check through `mcp__drm-copilot__run_poshqc_format` and confirm with `git status --porcelain` that no PowerShell file changed; record `FEATURE/evidence/qa-gates/poshqc-format.<timestamp>.md`.
   - Acceptance: the porcelain output before and after the format call is identical; a changed file restarts the loop from P10-T1.
-- [ ] [P10-T6] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `scripts/powershell/PoshQC` and the new test files, and record `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
+- [x] [P10-T6] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `scripts/powershell/PoshQC` and the new test files, and record `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
   - Acceptance: zero findings, or no finding beyond the P0-T4 baseline in an unchanged file.
-- [ ] [P10-T7] Run the full Pester suite with coverage through `Invoke-PoshQCTest`, and record `FEATURE/evidence/qa-gates/pester-coverage.<timestamp>.md`.
+- [x] [P10-T7] Run the full Pester suite with coverage through `Invoke-PoshQCTest`, and record `FEATURE/evidence/qa-gates/pester-coverage.<timestamp>.md`.
   - Acceptance: zero failures read from `artifacts/pester/pester-junit.xml`; per-file line coverage read from `artifacts/pester/powershell-coverage.xml` is at least 85% for `PoshQC.Parallel.psm1`, `PoshQC.Shard.psm1`, and `PoshQC.Testing.psm1`, and not below the P0-T3 value for the latter two.
-- [ ] [P10-T8] Run the fresh single-process Pester run over `tests/scripts` (the CI shape) and record `FEATURE/evidence/regression-testing/pester-single-process.<timestamp>.md`.
+- [x] [P10-T8] Run the fresh single-process Pester run over `tests/scripts` (the CI shape) and record `FEATURE/evidence/regression-testing/pester-single-process.<timestamp>.md`.
   - Acceptance: zero failures read from the JUnit file.
-- [ ] [P10-T9] Verify the scope constraints against the merge base of `origin/main` and `HEAD`: `git diff --name-status <merge-base> HEAD` together with `git status --porcelain` shows no added `.py` file outside `tests/`, no changed file under `.claude/hooks/` or `.codex/hooks/`, no change to `.github/workflows/_poshqc.yml` unless the P9-T4 decision record adds a shard, and every changed file at or below 800 lines; record `FEATURE/evidence/qa-gates/scope-check.<timestamp>.md`.
+- [x] [P10-T9] Verify the scope constraints against the merge base of `origin/main` and `HEAD`: `git diff --name-status <merge-base> HEAD` together with `git status --porcelain` shows no added `.py` file outside `tests/`, no changed file under `.claude/hooks/` or `.codex/hooks/`, no change to `.github/workflows/_poshqc.yml` unless the P9-T4 decision record adds a shard, and every changed file at or below 800 lines; record `FEATURE/evidence/qa-gates/scope-check.<timestamp>.md`.
   - Acceptance: each of the four checks is recorded as PASS with the listed files.
-- [ ] [P10-T10] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item, marking Phase 9 rows as pending step 9.
+- [x] [P10-T10] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item, marking Phase 9 rows as pending step 9.
   - Acceptance: no FAIL row; a FAIL is fixed and the loop re-run from P10-T1 before the self-review is rewritten.
 
 ## Pre-Mortem

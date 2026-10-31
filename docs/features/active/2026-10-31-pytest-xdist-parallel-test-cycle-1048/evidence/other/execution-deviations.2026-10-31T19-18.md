@@ -4,7 +4,7 @@ Timestamp: 2026-10-31T19-18
 Command: record of micro-actions and policy-driven adjustments made during execution
 EXIT_CODE: 0
 Output Summary:
-Five deviations were needed to satisfy the plan's own acceptance conditions or repository policy. None adds a task or changes what a task asserts.
+Six deviations were needed to satisfy the plan's own acceptance conditions or repository policy. None adds a task or changes what a task asserts.
 
 ## D1: P1-T5 and P6-T3, governed-JSON validation
 
@@ -33,3 +33,8 @@ Five deviations were needed to satisfy the plan's own acceptance conditions or r
 ## D4: P4-T1, SW03 call scope
 
 - `Select-PoshQCShardTestFile` is not exported, so SW03 calls it inside `InModuleScope PoshQC`, like SW06. The case still passes before and after P4-T2, as the plan requires.
+
+## D6: P10-T7, Shard coverage below the P0-T3 value on the first final run
+
+- Observation: the first P10-T7 run reported `PoshQC.Shard.psm1` at 98.55% line coverage, below the P0-T3 value of 100%. Lines 296 and 316 were not executed: the non-object document branch and the non-relative key branch of `ConvertFrom-PoshQCShardWeightJson`.
+- Fix (in P10-T7, mechanically necessary to meet its acceptance): SW04 gained two malformed documents, `'[1, 2]'` and a weights map keyed by `/abs/tests/a.Tests.ps1`. No production code changed. The toolchain loop was restarted from P10-T1, and every earlier gate record carries a loop-restart note.

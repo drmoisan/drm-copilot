@@ -136,32 +136,32 @@ Owner decisions that bind this spec are recorded in `owner-decisions.md` in this
 - [x] The runner exits non-zero when any shard fails or any merge or completeness step fails, exits zero otherwise, and never overwrites merged artifacts when a shard produced no output; unit tests cover each case.
 - [ ] A VS Code task runs `Invoke-PoshQCParallelTest`, the existing `PoshQC: 4 test (Pester)` task remains, and `tasks.json` passes governed-JSON validation.
 - [x] A local concurrent run and a serial run on the same tree produce the same total test count and pass/fail outcome, with the comparison recorded in evidence.
-- [ ] `config/poshqc-shard-weights.json` is committed with millisecond weights derived from CI JUnit artifacts, `Get-PoshQCShardTestFileWeight` uses it with a median fallback for unlisted files, and the size-based path still works when the file is absent; tests cover all three cases and a malformed file.
+- [x] `config/poshqc-shard-weights.json` is committed with millisecond weights derived from CI JUnit artifacts, `Get-PoshQCShardTestFileWeight` uses it with a median fallback for unlisted files, and the size-based path still works when the file is absent; tests cover all three cases and a malformed file.
 - [ ] The CI Pester shard durations before and after the weights change are recorded, and the spread between the longest and shortest shard is smaller than the baseline spread; if it is not, a recorded decision states whether a further shard is added (with the matrix, brief and `PoshQcWorkflow.Tests.ps1` updated together).
 - [x] The slow-file profile of Pester test files at or above 10 s is recorded, with per-file durations and follow-up records for non-trivial fixes.
 - [x] Pester suites pass as concurrent shards and under seeded shuffled file-order runs with at least three seeds (each seed and file order recorded), and every leaker and victim found is fixed without ordering workarounds.
 - [ ] The merged coverage and completeness checks in `_poshqc.yml` continue to pass, and a green workflow run on the branch head is recorded.
-- [ ] Every changed or new PoshQC file has a bundled copy under `extensions/drm-copilot/resources/powershell/PoshQC/`, the new path is in `POSHQC_PARITY_PATHS`, and `test_poshqc_bundled_parity.py` and the PoshQC and workflow Pester tests pass.
+- [x] Every changed or new PoshQC file has a bundled copy under `extensions/drm-copilot/resources/powershell/PoshQC/`, the new path is in `POSHQC_PARITY_PATHS`, and `test_poshqc_bundled_parity.py` and the PoshQC and workflow Pester tests pass.
 - [x] `scripts/powershell/PoshQC/README.md` documents the runner, the output-path parameters, the JUnit root `time` semantics, and weights regeneration.
 
 ### Documentation and constraints
 
 - [x] `## Test Runtime` is updated in every copy of the execution-environment brief for both runners, retaining all pinned tokens, and `## Test Isolation Checks` gains the concurrent-run bullet; the mirror contract tests pass.
-- [ ] No new Python script is added, and the changed files include no Python enforcement-hook invocation.
+- [x] No new Python script is added, and the changed files include no Python enforcement-hook invocation.
 - [ ] The Linux hook-suite job is unchanged and its non-required status is recorded as an observation.
 - [x] The explanation of the Pester test file count difference is recorded from the discovery count.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
+- [x] Acceptance criteria documented and mapped to tests or demos
 - [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, brief, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (per-shard logs)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, brief, docs/features/active/... links)
+- [x] Telemetry/logging added or updated (per-shard logs)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
 - [x] Unit coverage areas: the Python suite serially and under `-n auto`; the workflow contract test; the shard assignment with measured weights; the result and coverage merge for concurrent shards.
 - [x] Integration scenarios: a full CI run with the changed steps comparing durations and coverage totals; a local concurrent Pester run compared with a serial run.
-- [ ] CLI/API examples
+- [x] CLI/API examples
