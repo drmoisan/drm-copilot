@@ -445,6 +445,8 @@ def test_brief_test_isolation_requires_seeded_pester_shuffle() -> None:
             "seeded shuffled file-order run of the touched Pester suites",
             "at least three seeds",
             "each seed and its file order recorded",
+            "concurrent-shard",
+            "pytest -n auto",
         ),
     )
 
@@ -470,6 +472,13 @@ def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> Non
             "wall-clock time only",
             "-p <module>",
             "PYTHONPATH",
+            "Parallel workers",
+            "-n auto",
+            "addopts",
+            "physical cores",
+            "Pester 5",
+            "Invoke-PoshQCParallelTest",
+            "testsuite",
         ),
     )
 

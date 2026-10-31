@@ -10,9 +10,12 @@
     in one of these forms, matched by token position:
 
       - git log ...            and git rev-parse ...        (no git global option)
+      - git worktree list --porcelain                       (exactly these four tokens, issue #1011)
       - gh pr create ...       and gh pr edit ...           (no gh global option)
       - gh pr view <N> --json closingIssuesReferences,body  (exactly these six tokens, issue #989)
       - sha256sum artifacts/pr_body_<N>.md                  (only as the whole command)
+      - sha256sum <item worktree>/artifacts/pr_body_<N>.md  (only as the whole command; an absolute
+                                                             forward-slash path, issue #1011)
       - date -u [+<format>]                                 (only as the whole command)
 
     Segments may be joined only by ';', '&&', '||', '|', or a newline. A record that is
@@ -42,7 +45,38 @@ $script:PrAuthorAllowlistWrapperWords = @(
     'sh', 'bash', 'zsh', 'dash', 'ksh', 'pwsh', 'powershell', 'eval', 'xargs',
     'env', 'timeout', 'time', 'command', 'nohup'
 )
-$script:PrAuthorAllowlistFormText = 'git log, git rev-parse, gh pr create, gh pr edit, gh pr view <N> --json closingIssuesReferences,body, sha256sum artifacts/pr_body_<N>.md, date -u [+<format>]'
+$script:PrAuthorAllowlistFormText = 'git log, git rev-parse, git worktree list --porcelain, gh pr create, gh pr edit, gh pr view <N> --json closingIssuesReferences,body, sha256sum artifacts/pr_body_<N>.md, sha256sum <item worktree>/artifacts/pr_body_<N>.md, date -u [+<format>]'
+
+function Test-PrAuthorAbsoluteBodyPathToken {
+    <#
+    .SYNOPSIS
+        Report whether a token is an absolute canonical body path beneath an item worktree (issue #1011).
+    .DESCRIPTION
+        The token must be rooted at '/' or at a drive letter followed by ':/', use forward slashes
+        only, hold at least one segment before 'artifacts', hold no empty, '.', or '..' segment,
+        and end in '/artifacts/pr_body_<digits>.md' with the exact case of the relative form.
+        Pure string logic: no process, file read, or module import.
+    .PARAMETER Value
+        The sha256sum argument token, quotes already stripped.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Value
+    )
+
+    if ($Value.Contains('\') -or $Value -cnotmatch '^(/|[A-Za-z]:/)(?<rest>.+)/artifacts/pr_body_\d+\.md$') {
+        return $false
+    }
+    foreach ($segment in $Matches['rest'].Split('/')) {
+        if ($segment -eq '' -or $segment -eq '.' -or $segment -eq '..') {
+            return $false
+        }
+    }
+    return $true
+}
 
 function Test-PrAuthorAllowlistForm {
     <#
@@ -67,7 +101,11 @@ function Test-PrAuthorAllowlistForm {
     }
     switch -CaseSensitive ($Token[0]) {
         'git' {
-            return ($Token.Count -ge 2 -and @('log', 'rev-parse') -ccontains $Token[1])
+            if ($Token.Count -ge 2 -and @('log', 'rev-parse') -ccontains $Token[1]) {
+                return $true
+            }
+            # The read-only worktree discovery form, matched exactly (issue #1011).
+            return ($Token.Count -eq 4 -and $Token[1] -ceq 'worktree' -and $Token[2] -ceq 'list' -and $Token[3] -ceq '--porcelain')
         }
         'gh' {
             if ($Token.Count -ge 3 -and $Token[1] -ceq 'pr' -and @('create', 'edit') -ccontains $Token[2]) {
@@ -78,7 +116,10 @@ function Test-PrAuthorAllowlistForm {
                 $Token[4] -ceq '--json' -and $Token[5] -ceq 'closingIssuesReferences,body')
         }
         'sha256sum' {
-            return ($IsWholeCommand -and $Token.Count -eq 2 -and $Token[1] -cmatch '^artifacts/pr_body_\d+\.md$')
+            if (-not $IsWholeCommand -or $Token.Count -ne 2) {
+                return $false
+            }
+            return ($Token[1] -cmatch '^artifacts/pr_body_\d+\.md$' -or (Test-PrAuthorAbsoluteBodyPathToken -Value $Token[1]))
         }
         'date' {
             if (-not $IsWholeCommand -or $Token.Count -lt 2 -or $Token[1] -cne '-u') {

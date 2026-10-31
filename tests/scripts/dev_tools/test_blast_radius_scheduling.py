@@ -57,7 +57,13 @@ FIXTURE_452_STEMS: tuple[str, ...] = SCHEDULING_STEMS[:3]
 # so every weight and band duration has its committed value.
 COMMITTED_TOLERANCE: dict[str, object] = {
     "tolerance_percent": 100,
-    "weights": {"same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2},
+    "weights": {
+        "same_file": 8,
+        "possible_overlap": 2,
+        "append_only": 1,
+        "module": 2,
+        "contract": 8,
+    },
     "band_durations": {"C1": 1, "C2": 2, "C3": 4, "C4": 8},
     "default_band": "C1",
     "append_only_paths": ["**/CHANGELOG.md"],
@@ -171,7 +177,9 @@ def test_contract_dependency_is_hard() -> None:
 
     assert decision.hard
     assert decision.edge
-    assert decision.cost == 0, "contract dependency carries no cost term"
+    assert (
+        decision.cost == 8
+    ), "contract dependency carries the contract weight per shared identifier"
     assert decision.reason == "contract_dependency"
 
 
@@ -292,7 +300,13 @@ def test_absent_key_reads_as_strict() -> None:
     assert tolerance == STRICT_CONFLICT_TOLERANCE
     assert tolerance == ConflictTolerance(
         tolerance_percent=0,
-        weights={"same_file": 1, "possible_overlap": 1, "append_only": 1, "module": 1},
+        weights={
+            "same_file": 1,
+            "possible_overlap": 1,
+            "append_only": 1,
+            "module": 1,
+            "contract": 1,
+        },
         band_durations={"C1": 1, "C2": 1, "C3": 1, "C4": 1},
         default_band="C1",
         append_only_paths=(),

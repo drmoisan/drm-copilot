@@ -145,3 +145,19 @@ an edit in one of two ways:
   derives the branch from that worktree's checkout.
 - When running outside the item worktree, append the shell comment `# branch: <branch>` to the
   command, and pass the absolute canonical body path beneath the item worktree.
+
+## Coordinator-Session Topology (issue #1011)
+
+When the process directory is not the item worktree (for example, when the orchestrator delegates
+from a coordinator session rooted in another checkout), a relative `artifacts/` path resolves to the
+wrong checkout. In that topology, use this procedure instead of the relative forms above:
+
+1. Run `git worktree list --porcelain` as a single command. Select the `worktree` entry whose `branch refs/heads/<branch>` line names the `--head` branch, and use that entry's absolute root, written with forward slashes, as `<item worktree>`. If zero or more than one entry matches, stop and report the result; do not choose a root.
+2. Confirm that the PR context summary already exists at `<item worktree>/artifacts/pr_context.summary.txt`. The orchestrator produces it; pr-author does not call `collect_pr_context`.
+3. Write the body to `<item worktree>/artifacts/pr_body_<N>.md` by absolute path.
+4. Run `sha256sum <item worktree>/artifacts/pr_body_<N>.md` as a single command and take the lowercase hexadecimal digest.
+5. Write the receipt to `<item worktree>/artifacts/pr_body_<N>.receipt.json` by absolute path. Keep `pr_body_path` and `context_summary_path` repo-relative (`artifacts/pr_body_<N>.md` and `artifacts/pr_context.summary.txt`), so no absolute path is recorded in the receipt. The receipt `created_at` must be strictly newer than the last-write time of the summary.
+6. Run `gh pr create --head <branch> --body-file <item worktree>/artifacts/pr_body_<N>.md`. The gate resolves the item worktree from `--head` and verifies the body and receipt beneath it; in this topology it denies a relative `--body-file` with `PR_BODY_PATH_NONCANONICAL`.
+
+In this topology pr-author is delegated without worktree isolation, because an isolated agent
+worktree refuses command text that names another worktree.

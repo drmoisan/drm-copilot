@@ -1,0 +1,52 @@
+{
+  "description": "Issue #1013 D-2 aggregate cap cascade: three promotion rounds, two of them on one item, and an item with no band read as default_band.",
+  "notes": "tolerance_percent 100. Item 1 (C4, duration 8) shares three modules with each of items 2, 3, and 4 (each C4): each pair costs 2*3 = 6 with benefit 8, 600 <= 800, tolerated. Item 5 has no band, so default_band C1 (duration 1) applies. Item 5 names docs/CHANGELOG.md with item 6 (C4) and notes/CHANGELOG.md with item 7 (C4); each path matches **/CHANGELOG.md, so each pair costs append_only 1 with benefit min(1, 8) = 1, 100 <= 100, tolerated. Totals: item 1 = 18, 1800 > 800; item 5 = 2, 200 > 100 (read as C4 it would be 200 <= 800 and nothing would be promoted for it); items 2, 3, 4 = 6 each and items 6, 7 = 1 each, all within their caps. Round 1: item 1; keys (8,-6,1,2), (8,-6,1,3), (8,-6,1,4); promote (1,2); item 1 total 12 > 8. Round 2: item 1; promote (1,3); item 1 total 6 <= 8. Round 3: item 5; keys (1,-1,5,6) and (1,-1,5,7); promote (5,6); item 5 total 1 <= 1. No item is over its cap. Promoted in order: (1,2), (1,3), (5,6). Edges sorted: (1,2), (1,3), (5,6). Tolerated: (1,4) and (5,7).",
+  "tags": ["#1013"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2, "contract": 8 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["**/CHANGELOG.md"]
+    },
+    "modules": {},
+    "over_breadth_fraction": 0.25
+  },
+  "cases": [
+    {
+      "name": "cascade",
+      "items": [
+        { "key": 1, "band": "C4", "radius": { "paths": [], "modules": ["a1", "a2", "a3", "b1", "b2", "b3", "c1", "c2", "c3"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 2, "band": "C4", "radius": { "paths": [], "modules": ["a1", "a2", "a3"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 3, "band": "C4", "radius": { "paths": [], "modules": ["b1", "b2", "b3"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 4, "band": "C4", "radius": { "paths": [], "modules": ["c1", "c2", "c3"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 5, "radius": { "paths": ["docs/CHANGELOG.md", "notes/CHANGELOG.md"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 6, "band": "C4", "radius": { "paths": ["docs/CHANGELOG.md"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 7, "band": "C4", "radius": { "paths": ["notes/CHANGELOG.md"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } }
+      ],
+      "pairwise_tolerated": [
+        { "a": 1, "b": 2, "reasons": ["module_overlap"], "cost": 6, "benefit": 8 },
+        { "a": 1, "b": 3, "reasons": ["module_overlap"], "cost": 6, "benefit": 8 },
+        { "a": 1, "b": 4, "reasons": ["module_overlap"], "cost": 6, "benefit": 8 },
+        { "a": 5, "b": 6, "reasons": ["path_overlap"], "cost": 1, "benefit": 1 },
+        { "a": 5, "b": 7, "reasons": ["path_overlap"], "cost": 1, "benefit": 1 }
+      ],
+      "expected_promoted": [[1, 2], [1, 3], [5, 6]],
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "module_overlap", "hard": false, "cost": 6, "benefit": 8 },
+        { "a": 1, "b": 3, "reason": "module_overlap", "hard": false, "cost": 6, "benefit": 8 },
+        { "a": 5, "b": 6, "reason": "path_overlap", "hard": false, "cost": 1, "benefit": 1 }
+      ],
+      "expected_tolerated": [
+        { "a": 1, "b": 4, "reasons": ["module_overlap"], "cost": 6, "benefit": 8 },
+        { "a": 5, "b": 7, "reasons": ["path_overlap"], "cost": 1, "benefit": 1 }
+      ]
+    }
+  ]
+}

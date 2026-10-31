@@ -1,6 +1,7 @@
 /**
- * Pure helpers for assembling the Claude worktree session command that runs
- * in a VS Code integrated terminal.
+ * Pure helpers for assembling the Claude worktree session commands. The
+ * launch module (`worktree-session-launch.ts`) composes them into one
+ * PowerShell script that the integrated terminal runs at process start.
  *
  * @remarks
  * This module must remain side-effect free and must not import vscode,
@@ -17,8 +18,8 @@
  */
 
 /**
- * Inputs required to build the PowerShell commands that the integrated
- * terminal sends through `Terminal.sendText`.
+ * Inputs required to build the PowerShell commands of a Claude worktree
+ * session.
  */
 export interface WorktreeSessionCommandInput {
   readonly repoRoot: string;
@@ -38,18 +39,17 @@ export interface WorktreeSessionCommandInput {
  * The ordered PowerShell commands that constitute a worktree session.
  *
  * @remarks
- * The handler must send these as separate `sendText` invocations so each
- * appears on its own PowerShell prompt and the user sees the output of
- * each step independently. The `poetryInstall` and `activate` commands are
- * present together when the workspace's `pyproject.toml` declares poetry,
- * and absent together when it does not (in which case there is no
- * environment to install or activate).
+ * The launch module emits these in field order as statements of one script,
+ * each preceded by a progress banner. The `poetryInstall` and `activate`
+ * commands are present together when the workspace's `pyproject.toml`
+ * declares poetry, and absent together when it does not (in which case there
+ * is no environment to install or activate).
  */
 export interface WorktreeSessionCommands {
   /**
    * Idempotent guard that creates the `<repoName>-wt` grouping directory before
-   * `git worktree add` runs. The handler must send this via its own
-   * `terminal.sendText` immediately before {@link WorktreeSessionCommands.git}.
+   * `git worktree add` runs. The launch module emits it immediately before
+   * {@link WorktreeSessionCommands.git}.
    */
   readonly ensureParentDirectory: string;
   readonly git: string;
@@ -178,19 +178,32 @@ export function quoteForPwsh(value: string): string {
 }
 
 /**
- * Builds the ordered PowerShell commands that the integrated terminal sends
- * to create the worktree, navigate into it, install dependencies via poetry
- * (when the workspace uses poetry), activate the resulting in-project venv,
- * and start an interactive Claude CLI session.
+ * PowerShell statement list that activates the worktree-local virtual
+ * environment from whichever layout exists at run time: `.venv/Scripts`
+ * (Windows) or `.venv/bin` (Linux and macOS).
+ *
+ * @remarks
+ * The layout is probed at run time because neither `process.platform` nor
+ * `vscode.env.remoteName` reliably identifies the shell's operating system
+ * (for example in a dev container). The statement throws when neither script
+ * exists. This is the single definition; the Codex builder imports it.
+ */
+export const VENV_ACTIVATE_COMMAND =
+  "$venvActivate = @('./.venv/Scripts/Activate.ps1', './.venv/bin/Activate.ps1') | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1; if ($null -eq $venvActivate) { throw 'No virtual environment activation script found under ./.venv' }; & $venvActivate";
+
+/**
+ * Builds the ordered PowerShell commands that create the worktree, navigate
+ * into it, install dependencies via poetry (when the workspace uses poetry),
+ * activate the resulting in-project venv, and start an interactive Claude CLI
+ * session.
  *
  * @param input The repository root, resolved worktree path, branch name,
  *              poetry flag, and optional objective.
  * @returns The ensureParentDirectory/git/setLocation/poetryInstall/activate/
- *          claude commands as separate strings. Each is intended to be sent via
- *          its own
- *          `Terminal.sendText` call so it appears on its own PowerShell
- *          prompt. The poetryInstall and activate commands are both present
- *          when `usePoetry` is true and both undefined otherwise.
+ *          preClaude/claude commands as separate strings, in the order the
+ *          launch module emits them. The poetryInstall and activate commands
+ *          are both present when `usePoetry` is true and both undefined
+ *          otherwise.
  */
 export function buildWorktreeSessionCommands(
   input: WorktreeSessionCommandInput,
@@ -202,25 +215,24 @@ export function buildWorktreeSessionCommands(
   // Derive the grouping directory directly from the nested worktree path so the
   // guard can never target a different directory than the one the worktree is
   // created under. `-Force` makes creation idempotent and creates any missing
-  // leading directories.
+  // leading directories. `-ErrorAction Stop` makes a failure terminating so
+  // the launch script's setup block stops at this step.
   const groupDirectory = deriveWorktreeGroupDirectory(input.worktreePath);
   const ensureParentDirectory = `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(
     groupDirectory,
-  )} | Out-Null`;
+  )} -ErrorAction Stop | Out-Null`;
 
   const trimmedObjective = input.objective?.trim() ?? "";
   const objectiveSuffix =
     trimmedObjective.length > 0 ? ` ${quoteForPwsh(trimmedObjective)}` : "";
 
   // The poetry-managed venv is created in the worktree under .venv after
-  // `poetry install`. We Set-Location into the worktree before this step so
-  // the relative './.venv/Scripts/Activate.ps1' resolves correctly.
+  // `poetry install`. Set-Location into the worktree runs before this step so
+  // the relative paths probed by VENV_ACTIVATE_COMMAND resolve correctly.
   const poetryInstall = input.usePoetry
     ? "poetry install --with dev"
     : undefined;
-  const activate = input.usePoetry
-    ? "& './.venv/Scripts/Activate.ps1'"
-    : undefined;
+  const activate = input.usePoetry ? VENV_ACTIVATE_COMMAND : undefined;
 
   // Guard the pre-`claude` script behind a runtime Test-Path so a missing
   // script at the configured path does not cause an error. The path is
@@ -239,7 +251,7 @@ export function buildWorktreeSessionCommands(
   return {
     ensureParentDirectory,
     git: `git -C ${quotedRepoRoot} worktree add ${quotedPath} -b ${quotedBranch}`,
-    setLocation: `Set-Location ${quotedPath}`,
+    setLocation: `Set-Location ${quotedPath} -ErrorAction Stop`,
     poetryInstall,
     activate,
     preClaude,

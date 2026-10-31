@@ -15,6 +15,7 @@ import {
   buildBlastRadius,
   buildPlannerRoutingFields,
   buildValidParallelState,
+  itemAt,
   validateState,
   type JsonRecord,
 } from "./parallel-state-test-support";
@@ -36,6 +37,24 @@ const TOLERATED_OVERLAP: JsonRecord = {
   reasons: ["path_overlap", "module_overlap"],
   cost: 1,
   benefit: 2,
+};
+
+/** The observed_resolution telemetry object (issue #1013, spec D-3). */
+const OBSERVED_RESOLUTION: JsonRecord = {
+  later_item: 445,
+  conflicted: true,
+  conflict_detected_at: "2026-10-30T12-00",
+  resolved_at: "2026-10-30T12-40",
+  resolution_minutes: 40,
+  recorded_at: "2026-10-30T12-41",
+};
+
+/** A combination record in the planner's combinations list (issue #1013, D-5). */
+const COMBINATION: JsonRecord = {
+  members: [444, 990],
+  primary: 444,
+  pairs: [{ a: 444, b: 990, cost: 16, benefit: 2 }],
+  estimated_savings: 16,
 };
 
 /**
@@ -165,6 +184,53 @@ describe("issue #722: tolerated scheduling fields", () => {
     // Arrange
     const state = buildValidPlannerState();
     state["tolerated_overlaps"] = [{ ...TOLERATED_OVERLAP }];
+
+    // Act
+    const plainErrors = validatePlanner(state, false);
+    const readyErrors = validatePlanner(state, true);
+
+    // Assert
+    expect(plainErrors).toEqual([]);
+    expect(readyErrors).toEqual([]);
+  });
+
+  it("accepts a tolerated overlap carrying observed_resolution (issue #1013)", () => {
+    // Arrange: the D-3 telemetry object on an orchestrator tolerated overlap.
+    const state = buildValidParallelState();
+    state["tolerated_overlaps"] = [
+      { ...TOLERATED_OVERLAP, observed_resolution: { ...OBSERVED_RESOLUTION } },
+    ];
+
+    // Act
+    const errors = validateState(state);
+
+    // Assert
+    expect(errors).toEqual([]);
+  });
+
+  it("accepts an orchestrator item carrying combined_issue_nums (issue #1013)", () => {
+    // Arrange
+    const state = buildValidParallelState();
+    itemAt(state, 0)["combined_issue_nums"] = [990];
+
+    // Act
+    const errors = validateState(state);
+
+    // Assert
+    expect(errors).toEqual([]);
+  });
+
+  it("accepts a planner combined item and a combinations list (issue #1013)", () => {
+    // Arrange
+    const state = buildValidPlannerState();
+    state["items"] = [
+      {
+        ...buildPlannerItem(444, "parallel-schema-validators"),
+        combined_issue_nums: [990],
+      },
+      buildPlannerItem(445, "parallel-cohort-scheduler"),
+    ];
+    state["combinations"] = [{ ...COMBINATION }];
 
     // Act
     const plainErrors = validatePlanner(state, false);

@@ -13,6 +13,7 @@ paths:
   - "scripts/dev_tools/validate_orchestration_artifacts.py"
   - "extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts"
   - ".claude/hooks/enforce-epic-merge-gate.ps1"
+  - ".claude/hooks/validate-orchestrator-output-rejection.ps1"
   - ".claude/agents/parallel-orchestrator.md"
   - ".claude/agents/parallel-planner.md"
   - ".claude/skills/parallel-*/SKILL.md"
@@ -213,6 +214,38 @@ The wave-4 features — F6 (mutation protocol), F7 (enforcement hooks), and F8 (
 
 Integration-cost scheduling (issue #722) adds no `conflict_edges[].reason` member; the four members above are unchanged. The scheduling data travels in tolerated-not-validated fields: an edge may carry the extra fields `hard`, `cost`, and `benefit`, and the planner and orchestrator checkpoints may carry a `tolerated_overlaps` list. No validator reads these fields, and the Python validators and the TypeScript validator port accept them with zero errors.
 
+## Mutation Rejection Signal (issue #1012)
+
+A parallel skill that rejects a mutation before any run checkpoint exists stops without writing state. Its final output then carries a rejection signal so that the completion stop hook `.claude/hooks/validate-orchestrator-output.ps1` can release the stop without demanding a checkpoint that the skill correctly did not write.
+
+**Line grammar.** The signal is the last non-blank line of the final output, after trailing whitespace (including a carriage return) is trimmed, and it matches `^PARALLEL_MUTATION_REJECTED: (?<code>[a-z_]+)$` case-sensitively: the uppercase prefix, a colon, exactly one space, and one code from the table below, with no Markdown formatting (no backticks, no bold), no leading text, and no trailing text. A token on an earlier line, inside prose, or in any other form is not a signal. Where the run's slug is known, the line `parallel_slug: <slug>` precedes the signal.
+
+**Closed code set.** The set is defined here and nowhere else:
+
+| Code | Meaning |
+| --- | --- |
+| `kickoff_artifact_missing` | `/parallel-run` found no committed kickoff artifact for the run and delegated nothing. |
+| `run_not_started` | The run is pending or not started, or no checkpoint tracks the named `parallel_slug`, so there is no running run to mutate. |
+| `items_in_flight` | The mutation is rejected because an item is in flight: a close while any item is in flight, or a removal of an in-flight item without `--disposition`. |
+| `unknown_item` | The removal target is not a live item: it is unknown, `withdrawn`, or `blocked`. |
+
+**Output signal, not a schema member.** The signal is an output signal, not a checkpoint field, and it is not one of the nine enums owned by `## Enum Ownership (F6/F7/F8 consume, never extend)`; that table and its count are unchanged. No validator reads the signal and no checkpoint records it.
+
+**Hook behavior.** The hook evaluates the signal only for `parallel-orchestrator-state` when the checkpoint resolution status is `NoTarget`:
+
+| Condition | Result |
+| --- | --- |
+| parallel, `NoTarget`, valid signal, no contradicting state in any live worktree | allow, regardless of `stop_hook_active` |
+| parallel, `NoTarget`, no signal or an invalid signal | block as before (repairable); the message gains a hint line naming the signal form and this section, and lists the allowed codes when the final line carries the prefix with an invalid code |
+| parallel, `NoTarget`, valid signal, and a live worktree holds parallel checkpoint text that is unparseable, has a non-object root, is off-route, lacks a `parallel_slug`, or records the slug the output names | block as before |
+| parallel, `Ambiguous` or `Rejected`, any signal | block as before |
+| parallel, resolved checkpoint, any signal | full validation as before |
+| `orchestrator-state` or `epic-orchestrator-state`, any signal | unchanged |
+
+A signal never relaxes validation when a checkpoint resolves, and a path that wrote state validates fully. The parser, the state-absence scan, and the decision live in `.claude/hooks/validate-orchestrator-output-rejection.ps1`, whose code array mirrors the table above and is pinned to it by a parity test.
+
+**Ownership.** The parallel skills consume these codes and never redefine them. Each mapped STOP path in `parallel-run`, `parallel-add`, `parallel-close`, and `parallel-remove` names only its own code and cites this section by heading; no skill restates the full set. A new code requires an amendment to this section, to the hook array, and to the parity test in the same change.
+
 ## F7 Seam
 
 The retrospective cohort-ordering invariant `PARALLEL_COHORT_BARRIER_VIOLATION` (design section 9, Layer 2) is F7's explicitly assigned addition to the orchestrator validator. It is NOT implemented here. The entry point of `scripts/dev_tools/validate_parallel_orchestrator_state.py` contains a clearly delimited, appendable helper-invocation block, marked with explicit begin and end comments that name F7 and the invariant token, so that F7's edit is one appended helper call with no reflow of existing code. The TypeScript core `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-core.ts` carries the matching comment-delimited seam. Existing helper calls sit outside the block.
@@ -255,19 +288,45 @@ Three constraints bound the mandate-read exclusion:
 1. **The planner remains obliged to enumerate a genuine write explicitly.** An exclusion describes
    the default reading relationship, not a permanent ban. When an item's plan will actually write an
    excluded path, the planner appends that exact path to the declared radius after normalization.
-2. **`quality-tiers.yml` stays a shared surface.** It is listed in both `shared_surfaces` and
-   `mandate_reads`: the first governs what happens when an item really writes it, the second governs
-   what happens when an item merely cites it.
+2. **`quality-tiers.yml` is an append-only registry and a mandate read (issue #1006).** Every item
+   that adds a module appends one entry to it, so both committed truth tables list it in
+   `conflict_tolerance.append_only_paths` and in `mandate_reads`, not in `shared_surfaces`. When an
+   item really writes it, the planner-appended or observed path contends on `path_overlap` at the
+   `append_only` weight and is never a hard edge; when an item merely cites it, the mandate-read
+   exclusion drops the citation. Separator-free token acceptance for it through the root-surface rule
+   (`config_root_surfaces`, `Get-ConfigRootSurface`) no longer applies, because that rule reads only
+   the separator-free entries of `shared_surfaces`; the planner append obligation in constraint 1 and
+   `detect_escaped_paths` in constraint 3 are the backstops.
 3. **`detect_escaped_paths` makes the read/write distinction exact at execution time.** The
    derivation heuristic reads intent from plan text and can be wrong in either direction; drift
    detection compares the declared radius against the paths a diff actually touched, so an item that
    wrote an excluded path is caught against observed evidence rather than against prose.
 
-The extractor additionally rejects four token shapes that were never write claims: a wildcard-free
+The extractor additionally rejects five token shapes that were never write claims: a wildcard-free
 token whose final component names a directory rather than a file, a `docs/features/` glob whose
 wildcard occupies or truncates the feature-folder segment, a contract token carrying no ASCII
-letter, and a token containing a placeholder or interpolation marker. `artifacts/` is not a known
-top-level segment, so a bare `artifacts/**` subtree claim no longer satisfies the shape rules.
+letter, a token containing a placeholder or interpolation marker, and a contract token that is a
+default spreadsheet sheet name (`Sheet` or `Chart` followed by ASCII digits, compared
+case-insensitively). `artifacts/` is not a known top-level segment, so a bare `artifacts/**`
+subtree claim no longer satisfies the shape rules.
+
+#### Generic contract-token rejection (issue #1006)
+
+A spreadsheet application names a new worksheet or chart sheet with a default stem followed by a
+number, so a spec that mentions `Sheet1` in an interface section names a worksheet, not an
+exported symbol, schema, or CLI identifier. Two unrelated items that both named `Sheet1` received a
+hard `contract_dependency` edge. The stems are a code constant, not a truth-table key:
+`GENERIC_CONTRACT_STEMS` in `scripts/dev_tools/_blast_radius_token_shapes.py` and
+`$script:GenericContractStem` in `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1`, pinned equal
+across Python and PowerShell by a Pester parity test that reads the Python source. Workbook and
+object names such as `Book1` and `Table1` are a different class and are not rejected. The predicate
+(`is_generic_contract_token`, `Test-GenericContractToken`) first requires an ASCII token, because a
+.NET case-insensitive match folds the Kelvin sign and the long s to ASCII letters while Python
+`re.ASCII` does not (the issue #903 precedent). It is applied at all six contract-filtering sites:
+`extract_contract_identifiers`, `extract_write_intent_contracts`, and `normalize_declared_radius` in
+Python, and `Get-ContractIdentifier`, `Get-WriteIntentSpecContract`, and
+`Get-NormalizedDeclaredRadius` in PowerShell, so a previously recorded `Sheet1` is dropped on
+recompute. TypeScript has no contract extractor, so no TypeScript parity applies.
 
 ### Mechanically-mergeable path class (issue #643)
 
@@ -454,12 +513,16 @@ narrowing. The only sanctioned mechanisms for relaxing contention are the config
 radius: editing a declared radius to suppress an edge remains prohibited.
 
 **Configuration.** `config/blast-radius.json` carries an optional `conflict_tolerance` object with
-tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only, and
-module, each an integer of at least 1), `band_durations` (C1 through C4, each an integer of at least
-1), `default_band` (one of C1 through C4), and append_only_paths (a list of exact entries and `**`
-globs). The reader fails fast with an error naming the key for any other shape; booleans are
-rejected wherever an integer is required. An absent key means strict scheduling, identical to
-tolerance_percent 0.
+tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only,
+module, and contract, each an integer of at least 1), `band_durations` (C1 through C4, each an
+integer of at least 1), `default_band` (one of C1 through C4), append_only_paths (a list of exact
+entries and `**` globs), and the optional `combination_threshold_percent` (integer, at least 0;
+default 400 when absent). The `contract` weight (issue #1013) is required and validated like the
+other weights; its committed value is 8, and a destination overrides it, like every other member,
+through `config/blast-radius.local.json`. `combination_threshold_percent` is committed as 400 and is
+overridden through the same overlay. The reader fails fast with an error naming the key for any other
+shape; booleans are rejected wherever an integer is required. An absent key means strict scheduling,
+identical to tolerance_percent 0.
 
 **Edge rule.** For each unordered pair of items:
 
@@ -473,7 +536,14 @@ tolerance_percent 0.
    possible_overlap weight for a glob or directory-prefix overlap, and the module weight times the
    number of shared modules. The append_only_paths check runs before the same_file check (append-only
    precedence), so an append-only file stays low cost even when both items name it. Mergeable paths
-   contribute 0 because they are excluded before enumeration.
+   contribute 0 because they are excluded before enumeration. Add the contract weight times the
+   number of distinct shared contract identifiers: the set the relation intersects to report
+   `contract_dependency`, each identifier counted once however often either radius lists it.
+   `contract_dependency` remains a hard class, so the contract term changes recorded edge costs and
+   combination eligibility and never an edge set. Invariant: at tolerance_percent 0 the edge set
+   equals strict scheduling for any `contract` weight, and at every tolerance the edge set with the
+   contract term equals the edge set without it; only the `cost` of edges whose pair shares a
+   contract differs.
 4. **Benefit** (integer, pairwise). The smaller of the two items' band durations; a missing band uses
    `default_band`. Running the pair concurrently saves at most one cohort step of the shorter item.
 5. **Rule.** The pair is an edge if and only if it conflicts and either it is hard or
@@ -485,8 +555,27 @@ least 1. A detected conflict that is not hard therefore has a cost of at least 1
 tolerance_percent 0 the inequality `cost * 100 > 0` always holds and the edge set equals the
 detected-conflict set exactly; cohort coloring of that set is identical to strict scheduling. At
 every tolerance an edge requires a conflict, so every edge implies a conflict and the edge set is
-always a subset of the detected-conflict set. Raising tolerance_percent never adds an edge, and the
-decision for (a, b) equals the decision for (b, a).
+always a subset of the detected-conflict set. Raising tolerance_percent never turns a pairwise
+decision into an edge, and the decision for (a, b) equals the decision for (b, a). Because the
+aggregate cap below can promote a tolerated overlap, this monotonicity holds for the pairwise
+decision only, not for the capped edge set.
+
+**Aggregate cap (issue #1013).** The pairwise rule judges each pair alone, so the single entry point
+in each runtime (`schedule_conflict_edges` through `select_capped_pairs` in
+`scripts/dev_tools/_blast_radius_aggregate.py`, and Get-BlastRadiusConflictEdge through
+Get-AggregateCappedPair in `.claude/lib/blast-radius/BlastRadiusAggregate.psm1`) applies a post-pass
+that planners and `parallel-add` cannot skip. For item `i`, `total(i)` is the summed cost of its
+remaining tolerated overlaps, and `i` is over its cap when
+`total(i) * 100 > band_duration(i) * tolerance_percent` (integers only; a missing band reads as
+`default_band`). While any item is over its cap, the smallest-key such item promotes the overlap with
+the minimum key (benefit ascending, cost descending, a ascending, b ascending) to an edge carrying
+`hard` false and the overlap's first reason, and the totals are recomputed. At tolerance_percent 0
+nothing is tolerated, so the pass is a no-op and strict identity holds. A single tolerated overlap
+never exceeds the cap, so the cap binds only for an item with two or more tolerated overlaps. The
+capped scheduling output has five pinned set-level properties: the capped edges are a superset of
+the pairwise edges and a subset of the detected conflicts; the output at tolerance 0 equals the
+uncapped output; every item is within its cap after the pass; the output is invariant to input
+order; and a second pass changes nothing.
 
 **Soft-overlap handling.** A detected, non-hard pair within tolerance is a tolerated overlap, not an
 edge. The planner records it in a tolerated_overlaps list on the planner checkpoint (and the
@@ -502,7 +591,39 @@ the checkpoint (`default_band` when absent), through the helper module
 yields an edge and the pair is not already a recorded edge. A tolerated pair whose observed overlap
 stays within tolerance halts neither item; one whose observed overlap exceeds tolerance, or becomes
 hard, is reported. An unevaluable peer radius still counts as an edge (fail closed). At
-tolerance_percent 0 the drift output equals strict drift output.
+tolerance_percent 0 the drift output equals strict drift output. Drift detection stays pairwise: it
+does not apply the aggregate cap, and a cap-promoted pair is a recorded edge, so drift never reports
+it as newly conflicting.
+
+**Telemetry (issue #1013).** Three fields are tolerated and not validated; no validator reads them:
+`tolerated_overlaps[].observed_resolution` on the orchestrator checkpoint, `items[].combined_issue_nums`
+on the planner and orchestrator checkpoints and the run manifest, and a top-level `combinations` list
+on the planner checkpoint. `observed_resolution` has the shape `later_item` (integer), `conflicted`
+(boolean), `conflict_detected_at` (timestamp or null), `resolved_at` (timestamp or null),
+`resolution_minutes` (integer), and `recorded_at` (timestamp). The parallel orchestrator writes it for
+the later-merging item of a tolerated pair. Attribution is non-exclusive: one conflict episode is
+attributed to every tolerated peer that merged before it. Nothing reads `observed_resolution`, and no
+weight changes automatically from it.
+
+**Issue combination (issue #1013).** At planning time only, `find_combinations` in
+`scripts/dev_tools/_blast_radius_combination.py` and Get-BlastRadiusCombination in
+`.claude/lib/blast-radius/BlastRadiusCombination.psm1` find pairs that are cheaper to deliver as one
+item. Combination is disabled when `conflict_tolerance` is absent or tolerance_percent is 0. A
+conflicting pair is a candidate when its full reasons contain `contract_dependency` or it has a
+same-file overlap (two equal concrete entries, after the mergeable exclusion, neither matching
+append_only_paths), and it qualifies when `cost * 100 >= benefit * combination_threshold_percent`.
+A contract-only pair is a candidate and qualifies when its contract-term cost meets the threshold;
+one that does not qualify still serializes as a hard `contract_dependency` edge. Qualifying pairs
+are grouped into connected components; each becomes one combination with ascending members, the
+smallest member as primary, its pairs sorted by `(a, b)`, and `estimated_savings` equal to the sum
+of its pair costs. There is no size cap on a combined item. The planner re-plans the primary
+member's branch to cover every member, removes the other members from `items[]`, and records
+`combined_issue_nums` and the `combinations` entry. No umbrella issue is created: the member issues
+stay separate on GitHub, and the one PR closes every member through its author-asserted autoclose
+line. A combined item remediates as one unit (one child, one `remediation_loop`, one PR) and never
+splits back into separate PRs. A larger combined PR to review and a shared remediation budget are an
+accepted trade; a destination tunes `combination_threshold_percent` to change how often items
+combine.
 
 ### Write-intent extraction (issue #722)
 
@@ -674,8 +795,19 @@ keys are appended after the base keys. An overlay `version` must equal the base 
 forbidden-glob guard (`**`, `docs/**`, `tests/**`) applies to the composed module map, including
 overlay-authored modules. A malformed overlay, a `version` mismatch, or a forbidden glob raises an
 error before any write, so `config/blast-radius.json` keeps its prior bytes. With no overlay
-present, the written file is byte-identical to the base document. The overlay cannot remove a
-shipped surface or a derived module.
+present, the written file is byte-identical to the base document. A destination demotes a shipped
+shared surface with the overlay directive `shared_surfaces_demote`, a list of strings (issue
+#1006). It is applied after all other keys are composed: each named entry is removed from
+`shared_surfaces`, with the order of the remaining entries preserved, and unioned into
+`conflict_tolerance.append_only_paths`, base entries first. The directive is consumed, not emitted,
+so the composed file stays within the truth-table key set. An entry that is already an append-only
+path and not a shared surface is accepted as a no-op, so composing a composed result again yields
+identical output. The directive fails closed, before any write, on a non-list value, a non-string
+member, a composed document without `conflict_tolerance.append_only_paths` (no partial
+`conflict_tolerance` is created), or an unknown entry that is neither a shared surface nor an
+append-only path. Demotion never touches `modules`, so the forbidden-glob guard is unchanged. A
+demoted entry that a `shared_surface_globs` pattern still matches stays shared through the glob; the
+bundled glob list is empty. The overlay still cannot remove a derived module.
 
 ## Enforcement
 

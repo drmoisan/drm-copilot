@@ -9,6 +9,9 @@
     so a suite near the line cap can satisfy the guard without spelling out each Import-Module and
     Mock pair. On the Claude surface a module seam is imported without -Force and mocked in its own
     module scope; every other seam, and every seam on the Codex surface, is mocked at script scope.
+    When the seam list contains Get-CheckpointContent and the gate's worktree-list wrapper
+    Get-OrchestrationGateWorktreeList is loaded, the wrapper is also mocked at script scope with
+    a listing that names only the session root (issue #1010).
 
     Invoke-EpicStateInterceptionProbe proves that a suite's baseline mock intercepts the read. It
     registers hostile in-memory payloads for the lower seams, calls the exported resolver by name,
@@ -53,6 +56,15 @@ function Register-EpicStateBaselineMock {
         } else {
             Mock -CommandName $name -MockWith { $null }
         }
+    }
+    # Issue #1010: the gate's single-feature read resolves its target from the worktree
+    # listing. A suite that requests the Get-CheckpointContent baseline also gets a
+    # script-scope mock of the listing wrapper (a gate function on both surfaces) naming
+    # only the session root, so no git process runs and an absolute target outside the
+    # session root keeps the session-root fallback.
+    if ($Seam -contains 'Get-CheckpointContent' -and (Get-Command -Name 'Get-OrchestrationGateWorktreeList' -ErrorAction SilentlyContinue)) {
+        $listing = 'worktree ' + ((Get-Location).Path -replace '\\', '/')
+        Mock -CommandName 'Get-OrchestrationGateWorktreeList' -MockWith { $listing }.GetNewClosure()
     }
 }
 

@@ -240,9 +240,11 @@ def test_classify_path_token_rejects_non_path_tokens(token: str) -> None:
     assert classify_path_token(token) is None
 
 
-# The three separator-free entries of the committed ``shared_surfaces`` list. Gap 1
+# The issue #452 set of separator-free root surfaces, supplied inline. Gap 1
 # (issue #452) made them unreachable from plan or spec text because the classifier
 # rejected any token without a separator before any other acceptance rule ran.
+# Since issue #1006 the committed ``shared_surfaces`` list carries two of the three
+# entries; ``quality-tiers.yml`` is an append-only path there instead.
 CONFIGURED_ROOT_SURFACES: tuple[str, ...] = (
     "package-lock.json",
     "poetry.lock",

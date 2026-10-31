@@ -17,6 +17,10 @@
  *       names are emitted in ordinal order and the forbidden-glob guard applies.
  *     - Other keys in both: objects merge recursively, lists union, otherwise
  *       the overlay value wins. Overlay-only keys are appended in overlay order.
+ *     - `shared_surfaces_demote` (issue #1006) is a directive, not a document
+ *       key: after every other key is composed, each named entry is moved from
+ *       `shared_surfaces` to `conflict_tolerance.append_only_paths`, and the
+ *       key itself is not emitted (`claude-blast-radius-overlay-demote.ts`).
  *     - Every error is raised before any write.
  */
 
@@ -27,6 +31,11 @@ import {
   BlastRadiusGuardError,
   FORBIDDEN_GLOBS,
 } from "./claude-blast-radius-derive-core";
+import {
+  SHARED_SURFACES_DEMOTE_KEY,
+  applySharedSurfaceDemotion,
+  unionStrings,
+} from "./claude-blast-radius-overlay-demote";
 
 /** Destination-relative path of the destination-owned overlay. */
 export const BLAST_RADIUS_OVERLAY_RELATIVE_PATH =
@@ -122,28 +131,6 @@ function parseObject(text: string, path: string): JsonObject {
     );
   }
   return parsed;
-}
-
-/**
- * Return the ordered union of a base list and overlay strings.
- *
- * @param base Base entries, kept in base order.
- * @param overlay Overlay entries appended in overlay order when not present.
- * @returns The composed list.
- */
-function unionStrings(
-  base: ReadonlyArray<JsonValue>,
-  overlay: ReadonlyArray<string>,
-): JsonValue[] {
-  const composed: JsonValue[] = [...base];
-  const seen = new Set(base.filter((item) => typeof item === "string"));
-  for (const item of overlay) {
-    if (!seen.has(item)) {
-      seen.add(item);
-      composed.push(item);
-    }
-  }
-  return composed;
 }
 
 /**
@@ -320,11 +307,21 @@ export function composeBlastRadiusOverlay(
         : composeKey(key, value, overlayValue, overlayPath);
   }
   for (const [key, value] of Object.entries(overlay)) {
-    if (!(key in composed)) {
+    if (key !== SHARED_SURFACES_DEMOTE_KEY && !(key in composed)) {
       composed[key] = composeKey(key, undefined, value, overlayPath);
     }
   }
-  return `${JSON.stringify(composed, null, 2)}\n`;
+  if (!(SHARED_SURFACES_DEMOTE_KEY in overlay)) {
+    return `${JSON.stringify(composed, null, 2)}\n`;
+  }
+  const demotion = applySharedSurfaceDemotion(
+    composed,
+    overlay[SHARED_SURFACES_DEMOTE_KEY],
+  );
+  if (!demotion.ok) {
+    throw new BlastRadiusOverlayError(overlayPath, demotion.detail);
+  }
+  return `${JSON.stringify(demotion.document, null, 2)}\n`;
 }
 
 /**
