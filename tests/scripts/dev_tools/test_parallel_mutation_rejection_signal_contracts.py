@@ -39,7 +39,8 @@ EXPECTED_CODES: tuple[str, ...] = (
 
 # A table row whose first cell is a single backticked code.
 TABLE_CODE_ROW = re.compile(r"^\| `([a-z_]+)` \|", re.MULTILINE)
-# An emitted signal line naming a concrete code (a placeholder such as <code> does not match).
+# An emitted signal line naming a concrete code; a placeholder such as <code>
+# does not match.
 SIGNAL_CODE = re.compile(r"PARALLEL_MUTATION_REJECTED: ([a-z_]+)")
 
 PREREQUISITES_HEADING = "## Prerequisites"

@@ -49,7 +49,7 @@ BeforeAll {
         }.GetNewClosure()
     }
 
-    function New-RejectionResolution {
+    function Get-RejectionResolution {
         param([string] $Status)
         return [pscustomobject]@{ Resolved = $false; CheckpointPath = $null; WorktreeRoot = $null; Status = $Status; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; Detail = 'synthetic' }
     }
@@ -162,7 +162,7 @@ Describe 'validate-orchestrator-output-rejection helpers' {
             Set-RejectionLiveText -Live @('/synthetic-worktrees/w-a')
 
             # Act
-            $result = Get-OrchestratorOutputRejectionDecision -ArtifactType 'parallel-orchestrator-state' -Resolution (New-RejectionResolution -Status 'NoTarget') `
+            $result = Get-OrchestratorOutputRejectionDecision -ArtifactType 'parallel-orchestrator-state' -Resolution (Get-RejectionResolution -Status 'NoTarget') `
                 -AgentOutput 'PARALLEL_MUTATION_REJECTED: kickoff_artifact_missing' -SessionRoot $script:Session
 
             # Assert
@@ -184,7 +184,7 @@ Describe 'validate-orchestrator-output-rejection helpers' {
             Mock Test-ParallelRunStateAbsent { $absent }.GetNewClosure()
 
             # Act
-            $result = Get-OrchestratorOutputRejectionDecision -ArtifactType $ArtifactType -Resolution (New-RejectionResolution -Status $Status) `
+            $result = Get-OrchestratorOutputRejectionDecision -ArtifactType $ArtifactType -Resolution (Get-RejectionResolution -Status $Status) `
                 -AgentOutput $Output -SessionRoot $script:Session
 
             # Assert

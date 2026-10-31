@@ -129,7 +129,7 @@ BeforeAll {
         return [pscustomobject]@{ Thrown = $thrown; ExitCode = $exitCode; Stderr = $errorWriter.ToString() }
     }
 
-    function New-NoTargetResolution {
+    function Get-NoTargetResolution {
         return [pscustomobject]@{ Resolved = $false; CheckpointPath = $null; WorktreeRoot = $null; Status = 'NoTarget'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; Detail = 'synthetic' }
     }
 }
@@ -316,7 +316,7 @@ Describe 'validate-orchestrator-output parallel mutation rejection' {
             $text = ConvertTo-OutputCheckpointText -RouteId 'parallel' -Field 'parallel_slug' -Value 'run-a'
             Set-OutputRunTopology -Live @($script:Session, '/synthetic-worktrees/w-par') -Parallel @{ '/synthetic-worktrees/w-par' = $text }
             Set-OutputCheckpointRead
-            Mock Resolve-OrchestratorOutputCheckpointPath { New-NoTargetResolution }
+            Mock Resolve-OrchestratorOutputCheckpointPath { Get-NoTargetResolution }
 
             # Act
             $result = Invoke-RejectionValidation -Output "parallel_slug: run-a`nPARALLEL_MUTATION_REJECTED: run_not_started"
@@ -352,7 +352,7 @@ Describe 'validate-orchestrator-output parallel mutation rejection' {
             # Arrange
             Set-OutputRunTopology -Live @($script:Session)
             Set-OutputCheckpointRead
-            Mock Resolve-OrchestratorOutputCheckpointPath { New-NoTargetResolution }
+            Mock Resolve-OrchestratorOutputCheckpointPath { Get-NoTargetResolution }
 
             # Act
             $withSignal = Get-OrchestratorOutputBlockDecision -AgentOutput "Final summary.`nPARALLEL_MUTATION_REJECTED: run_not_started" -CheckpointPath $Leaf -ArtifactType $ArtifactType -SessionRoot $script:Session
@@ -371,7 +371,7 @@ Describe 'validate-orchestrator-output parallel mutation rejection' {
         It 'exits 0 for a valid signal with no live parallel checkpoint' {
             # Arrange
             Mock Import-Module { }
-            Mock Resolve-OrchestratorOutputCheckpointPath { New-NoTargetResolution }
+            Mock Resolve-OrchestratorOutputCheckpointPath { Get-NoTargetResolution }
             Mock Get-WorktreeItemLiveRoot { return , [string[]] @() }
             Mock Get-WorktreeRunCheckpointText { $null }
             $stdin = ConvertTo-OutputPayload -Output "Stopped without writing state.`nPARALLEL_MUTATION_REJECTED: kickoff_artifact_missing"

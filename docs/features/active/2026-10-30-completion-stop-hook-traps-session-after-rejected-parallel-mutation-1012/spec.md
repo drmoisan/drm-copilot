@@ -184,6 +184,10 @@ Not changed: `.claude/settings.json` and its bundle copy; `.claude/agents/parall
 #### Rollback/feature-flag considerations (if applicable):
 - No feature flag. Rollback is a revert of the change set; removing the guarded dot-source and the single call restores the previous decision path exactly. The rule section and skill instructions are additive text.
 
+### Implementation decisions (recorded at execution):
+- Fourth helper (plan Design Decision 2): the sibling `.claude/hooks/validate-orchestrator-output-rejection.ps1` holds a fourth helper, `Get-ParallelMutationRejectionHint -ArtifactType -Status -AgentOutput`, in addition to the three named above. It returns the text appended to an unresolved block message: an empty string unless the artifact type is `parallel-orchestrator-state` and the status is `NoTarget`; otherwise one hint line naming `PARALLEL_MUTATION_REJECTED: <code>` and `## Mutation Rejection Signal (issue #1012)`, plus a line listing the allowed codes when the last non-blank line begins with `PARALLEL_MUTATION_REJECTED:` and carries no valid code. Keeping the hint in the sibling keeps the code array referenced only there and limits the main-hook edit to one guarded load statement, one decision call, and one message append.
+- Bundle copies and batch budget (plan Design Decision 6): the two bundle PowerShell copies and the five bundle Markdown copies are written by a copy script run under `sh`, which the batch-budget hook does not see, so only the two source PowerShell files were written through `Write` or `Edit`. Direct mode therefore suffices; the executing worktree's checkpoint also selected the large route.
+
 ### Technical specifications (interfaces/contracts):
 
 #### Inputs/outputs and formats:
@@ -276,26 +280,53 @@ Out of scope: no relaxation of validation when a checkpoint exists or state was 
 
 
 ## Acceptance Criteria
-- [ ] AC-1: For each code `kickoff_artifact_missing`, `run_not_started`, `items_in_flight`, and `unknown_item`, a `parallel-orchestrator-state` stop whose final line is `PARALLEL_MUTATION_REJECTED: <code>`, with no live parallel checkpoint, returns `Ok` through `Invoke-OrchestratorOutputValidation` with `stop_hook_active` false and with `stop_hook_active` true (rows in `tests/scripts/claude-hooks/validate-orchestrator-output.MutationRejection.Tests.ps1`).
-- [ ] AC-2: A script-tail row in `validate-orchestrator-output.MutationRejection.Tests.ps1` shows the hook exits 0 for a valid signal with no live parallel checkpoint.
-- [ ] AC-3: A valid signal with a resolved parallel checkpoint runs full validation: `Get-CheckpointFileContent` and the routing seam are invoked, and a structurally invalid checkpoint still blocks.
-- [ ] AC-4: With no signal and no checkpoint, the parallel stop blocks as `NoTarget` on both stops; the existing test `R8 blocks a parallel validation as NoTarget when no live parallel checkpoint exists` passes without modification, and the block message carries one appended hint line naming `PARALLEL_MUTATION_REJECTED: <code>` and `## Mutation Rejection Signal (issue #1012)`.
-- [ ] AC-5: No allow occurs for a non-conforming signal: token on an earlier line, token followed by text, lowercase prefix, uppercase code, backtick-wrapped, bold-wrapped, double space after the colon, unknown code, or empty output (unit rows in `validate-orchestrator-output-rejection.Tests.ps1`); trailing CRLF and trailing blank lines after a valid line are tolerated.
-- [ ] AC-6: A final line with the `PARALLEL_MUTATION_REJECTED:` prefix and a code outside the closed set produces a repairable block whose message lists the allowed codes.
-- [ ] AC-7: A valid signal with resolver `Status` `Ambiguous`, or with a `Rejected` leaf, blocks as today.
-- [ ] AC-8: A valid signal with no resolvable checkpoint blocks when any live root holds non-blank parallel checkpoint text that is unparseable, has a non-object root, is off-route, lacks a slug, or records the slug the output names; other-slug and blank text do not defeat the allow.
-- [ ] AC-9: A valid signal on `orchestrator-state` and on `epic-orchestrator-state` produces the same decision as without the signal; `O-5 epic target not derivable blocks always`, `E-ORC-2 blocks with exit 2 when the checkpoint cannot be resolved`, R9, R10, R11, `H5 does not run the port for the parallel checkpoint type`, `denies a missing parallel checkpoint (fail closed)`, and `S2-6 passes the cross-check for every existing SubagentStop registration unchanged` pass without modification.
-- [ ] AC-10: `.claude/rules/parallel-orchestration.md` contains `## Mutation Rejection Signal (issue #1012)` immediately after `## Enum Ownership (F6/F7/F8 consume, never extend)` and before `## F7 Seam`, defining the line grammar and the closed code set exactly once, stating it is an output signal and not one of the nine enums, and stating the hook behavior and the consume-never-redefine rule.
-- [ ] AC-11: A Pester parity row reads the rule section and asserts its code set equals the script-scope array in `validate-orchestrator-output-rejection.ps1`.
-- [ ] AC-12: `test_parallel_mutation_rejection_signal_contracts.py` passes, asserting that `parallel-run`, `parallel-add`, `parallel-close`, and `parallel-remove` each emit only their mapped code on each mapped STOP path in the emission table, cite `## Mutation Rejection Signal (issue #1012)` by heading, and do not restate the full member set.
-- [ ] AC-13: `parallel-add`, `parallel-close`, and `parallel-remove` each state that the run-existence check is evaluated first, and the affected skills state that the unmapped STOP paths listed in this spec emit no signal; all pinned fragments listed under Boundaries and invariants remain byte-stable and their tests pass.
-- [ ] AC-14: The changed or new source files listed as items 1–7 under Files/modules to change are byte-identical to their bundle copies (items 8–14), `pack-manifests/core.json` lists `.claude/hooks/validate-orchestrator-output-rejection.ps1`, and `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_push_down_issue_824_follow_ups.py`, and `test_claude_rules_frontmatter.py` pass.
-- [ ] AC-15: `hook-dependency-guard-completeness.Tests.ps1` (S1–S6) and the no-Python-in-hooks suite pass; the new sibling is loaded by a single-statement guarded `try` with `Add-HookDependencyFailure`, imports no module, and starts no process.
-- [ ] AC-16: `.claude/settings.json`, `.claude/agents/parallel-orchestrator.md`, `.claude/skills/parallel-orchestrate/SKILL.md`, the execution-environment brief, and every `.codex/`, `.agents/`, and `.github/` file are unchanged in the branch diff.
-- [ ] AC-17: `validate-orchestrator-output-rejection.ps1` and `validate-orchestrator-output.ps1` each report at or above 85% line coverage in `artifacts/pester/powershell-coverage.xml`.
-- [ ] AC-18: The full toolchain passes in a single pass (format, lint, type-check, architecture, unit, contract, integration) for the changed PowerShell and Python files, the new suites satisfy `enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` AC-6, and three seeded shuffled runs plus one single-process run over `tests/scripts` pass, with evidence under `evidence/qa-gates/` and `evidence/regression-testing/`.
-- [ ] AC-19: No changed or new file exceeds 800 logical lines.
+- [x] AC-1: For each code `kickoff_artifact_missing`, `run_not_started`, `items_in_flight`, and `unknown_item`, a `parallel-orchestrator-state` stop whose final line is `PARALLEL_MUTATION_REJECTED: <code>`, with no live parallel checkpoint, returns `Ok` through `Invoke-OrchestratorOutputValidation` with `stop_hook_active` false and with `stop_hook_active` true (rows in `tests/scripts/claude-hooks/validate-orchestrator-output.MutationRejection.Tests.ps1`).
+- [x] AC-2: A script-tail row in `validate-orchestrator-output.MutationRejection.Tests.ps1` shows the hook exits 0 for a valid signal with no live parallel checkpoint.
+- [x] AC-3: A valid signal with a resolved parallel checkpoint runs full validation: `Get-CheckpointFileContent` and the routing seam are invoked, and a structurally invalid checkpoint still blocks.
+- [x] AC-4: With no signal and no checkpoint, the parallel stop blocks as `NoTarget` on both stops; the existing test `R8 blocks a parallel validation as NoTarget when no live parallel checkpoint exists` passes without modification, and the block message carries one appended hint line naming `PARALLEL_MUTATION_REJECTED: <code>` and `## Mutation Rejection Signal (issue #1012)`.
+- [x] AC-5: No allow occurs for a non-conforming signal: token on an earlier line, token followed by text, lowercase prefix, uppercase code, backtick-wrapped, bold-wrapped, double space after the colon, unknown code, or empty output (unit rows in `validate-orchestrator-output-rejection.Tests.ps1`); trailing CRLF and trailing blank lines after a valid line are tolerated.
+- [x] AC-6: A final line with the `PARALLEL_MUTATION_REJECTED:` prefix and a code outside the closed set produces a repairable block whose message lists the allowed codes.
+- [x] AC-7: A valid signal with resolver `Status` `Ambiguous`, or with a `Rejected` leaf, blocks as today.
+- [x] AC-8: A valid signal with no resolvable checkpoint blocks when any live root holds non-blank parallel checkpoint text that is unparseable, has a non-object root, is off-route, lacks a slug, or records the slug the output names; other-slug and blank text do not defeat the allow.
+- [x] AC-9: A valid signal on `orchestrator-state` and on `epic-orchestrator-state` produces the same decision as without the signal; `O-5 epic target not derivable blocks always`, `E-ORC-2 blocks with exit 2 when the checkpoint cannot be resolved`, R9, R10, R11, `H5 does not run the port for the parallel checkpoint type`, `denies a missing parallel checkpoint (fail closed)`, and `S2-6 passes the cross-check for every existing SubagentStop registration unchanged` pass without modification.
+- [x] AC-10: `.claude/rules/parallel-orchestration.md` contains `## Mutation Rejection Signal (issue #1012)` immediately after `## Enum Ownership (F6/F7/F8 consume, never extend)` and before `## F7 Seam`, defining the line grammar and the closed code set exactly once, stating it is an output signal and not one of the nine enums, and stating the hook behavior and the consume-never-redefine rule.
+- [x] AC-11: A Pester parity row reads the rule section and asserts its code set equals the script-scope array in `validate-orchestrator-output-rejection.ps1`.
+- [x] AC-12: `test_parallel_mutation_rejection_signal_contracts.py` passes, asserting that `parallel-run`, `parallel-add`, `parallel-close`, and `parallel-remove` each emit only their mapped code on each mapped STOP path in the emission table, cite `## Mutation Rejection Signal (issue #1012)` by heading, and do not restate the full member set.
+- [x] AC-13: `parallel-add`, `parallel-close`, and `parallel-remove` each state that the run-existence check is evaluated first, and the affected skills state that the unmapped STOP paths listed in this spec emit no signal; all pinned fragments listed under Boundaries and invariants remain byte-stable and their tests pass.
+- [x] AC-14: The changed or new source files listed as items 1–7 under Files/modules to change are byte-identical to their bundle copies (items 8–14), `pack-manifests/core.json` lists `.claude/hooks/validate-orchestrator-output-rejection.ps1`, and `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_push_down_issue_824_follow_ups.py`, and `test_claude_rules_frontmatter.py` pass.
+- [x] AC-15: `hook-dependency-guard-completeness.Tests.ps1` (S1–S6) and the no-Python-in-hooks suite pass; the new sibling is loaded by a single-statement guarded `try` with `Add-HookDependencyFailure`, imports no module, and starts no process.
+- [x] AC-16: `.claude/settings.json`, `.claude/agents/parallel-orchestrator.md`, `.claude/skills/parallel-orchestrate/SKILL.md`, the execution-environment brief, and every `.codex/`, `.agents/`, and `.github/` file are unchanged in the branch diff.
+- [x] AC-17: `validate-orchestrator-output-rejection.ps1` and `validate-orchestrator-output.ps1` each report at or above 85% line coverage in `artifacts/pester/powershell-coverage.xml`.
+- [x] AC-18: The full toolchain passes in a single pass (format, lint, type-check, architecture, unit, contract, integration) for the changed PowerShell and Python files, the new suites satisfy `enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` AC-6, and three seeded shuffled runs plus one single-process run over `tests/scripts` pass, with evidence under `evidence/qa-gates/` and `evidence/regression-testing/`.
+- [x] AC-19: No changed or new file exceeds 800 logical lines.
 - [ ] AC-20 (CI-dependent): The CI run on the PR head, including the Linux `poshqc / PowerShell hook suites` job, concludes `success`.
+
+### Acceptance Criteria Evidence
+
+Paths are relative to this feature folder.
+
+| AC | Evidence |
+| --- | --- |
+| AC-1 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md`; `evidence/qa-gates/pester-coverage.2026-10-31T11-13.md` (MutationRejection AC-1 rows, 8 of 8 passed) |
+| AC-2 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md`; `evidence/qa-gates/pester-coverage.2026-10-31T11-13.md` (script-tail row passed) |
+| AC-3 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (AC-3 rows passed) |
+| AC-4 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (AC-4 rows and R8 passed); `evidence/qa-gates/assertion-preservation.2026-10-31T10-57.md` (R8 suite unmodified) |
+| AC-5 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (parser rows in validate-orchestrator-output-rejection.Tests.ps1 passed) |
+| AC-6 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (invalid-code rows passed) |
+| AC-7 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (Ambiguous and Rejected rows passed) |
+| AC-8 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (scan rows and AC-8 rows passed) |
+| AC-9 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (AC-9 rows, O-5, E-ORC-2, R9, R10, R11, H5, the fail-closed dispatch row, and S2-6 passed); `evidence/qa-gates/assertion-preservation.2026-10-31T10-57.md` |
+| AC-10 | `evidence/qa-gates/python-contracts.2026-10-31T10-56.md` (rule-section tests passed) |
+| AC-11 | `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (parity row passed) |
+| AC-12 | `evidence/qa-gates/python-contracts.2026-10-31T10-56.md` (skill emission tests passed) |
+| AC-13 | `evidence/qa-gates/python-contracts.2026-10-31T10-56.md` (run-existence and unmapped-path tests and the pinned-fragment modules passed) |
+| AC-14 | `evidence/qa-gates/mirror-parity.2026-10-31T10-57.md` |
+| AC-15 | `evidence/qa-gates/pester-coverage.2026-10-31T11-13.md` (hook-dependency-guard-completeness and no-Python suites passed); `evidence/regression-testing/hook-suites.2026-10-31T10-50.md` (S1 through S6 rows; AST row) |
+| AC-16 | `evidence/qa-gates/scope-check.2026-10-31T10-57.md` |
+| AC-17 | `evidence/qa-gates/coverage-comparison.2026-10-31T11-13.md` |
+| AC-18 | `evidence/qa-gates/poshqc-format.2026-10-31T10-56.md`, `evidence/qa-gates/pssa.2026-10-31T10-56.md`, `evidence/qa-gates/python-black.2026-10-31T10-56.md`, `evidence/qa-gates/python-ruff.2026-10-31T10-56.md`, `evidence/qa-gates/python-pyright.2026-10-31T10-56.md`, `evidence/qa-gates/pester-coverage.2026-10-31T11-13.md`, `evidence/qa-gates/python-contracts.2026-10-31T10-56.md`, `evidence/qa-gates/mirror-parity.2026-10-31T10-57.md`, `evidence/regression-testing/isolation.2026-10-31T11-33.md` |
+| AC-19 | `evidence/qa-gates/line-counts.2026-10-31T10-58.md` |
+| AC-20 | pending CI on the pull request head; checked off at S9 by the executing orchestrator run |
 
 ## Risks & Mitigations
 - Technical or operational risks:
