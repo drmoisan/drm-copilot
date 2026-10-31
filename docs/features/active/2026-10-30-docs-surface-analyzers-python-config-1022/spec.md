@@ -3,11 +3,22 @@
 - **Issue:** #1022
 - **Parent (optional):** epic #1019 (documentation-estate-tooling), child 1022, wave 1, band C4
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T22-55
+- **Last Updated:** 2026-10-31T05-10
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 
 ## Revision Note
+
+Version 0.3 (planner revision after the single-pass preflight) aligns this spec with the 1020 spec
+on this branch, which now carries the D3/D5 amendment: the declaration-lines digest is owned by
+1020 (`ConvertTo-DocsDeclarationText` and `Get-DocsDeclarationSha256` in `DocsSurface.psm1`),
+`source_sha256` is built only through `New-DocsSurfaceElement -SourceText`, `architecture-component`
+elements carry `line_range` `null` with the whole-file declaration digest, and the `-Json` envelope
+is validated through `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'`. 1022 creates no
+digest function. The placeholder child numbers are replaced by the promoted issue numbers (1031 for
+the Python-native analyzer, 1033 for the TypeScript and .NET analyzers, 1036 for the MCP tools,
+1034 for CI enforcement). The corpus-coverage statements name the four diagnostic rows that are
+proven by in-test constructed inputs instead of corpus entries.
 
 This is the PowerShell re-preparation of issue #1022 under owner decision D1 (a new planning cycle
 with a fresh allowance of one planner revision and the single-pass preflight). The Python package
@@ -23,13 +34,16 @@ in this feature folder. Binding inputs: the epic manifest
 Language (2026-10-30, refined)` and its artifact-class table, `## Owner Decisions`, `### Amendment
 of 1020 required by D3 and D5`, `### PowerShell contracts from the re-preparation of 1020`,
 `### Command contract decisions from the first preparation of 1023`, `### Analyzer decisions from
-the first preparation of 1022`, `### 1022 - docs-surface-analyzers-python-config` and
-`### 900011 - docs-surface-analyzer-python-native`), the 1020 spec
+the first preparation of 1022`, `### Native-analyzer contracts from the preparation of 1031
+(binding)`, `### 1022 - docs-surface-analyzers-python-config` and
+`### 1031 - docs-surface-analyzer-python-native`), the 1020 spec
 `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/spec.md`
-(`## Decisions Later Children Must Honor`), and the orchestrator decisions recorded in
-`## Decisions` below. The 1020 spec on this branch does not yet carry the D3/D5 amendment; where
-this spec cites an amended contract, the epic text is the source and `## Dependency on 1020`
-states how the plan verifies it.
+(`### DocsSurface.psm1 (pure)`, `#### Declaration-lines digest (D5)`,
+`### DocsAnalyzerRegistry.psm1`, `## Decisions Later Children Must Honor`), and the orchestrator
+decisions recorded in `## Decisions` below. The 1020 spec on this branch carries the D3/D5
+amendment (it was revised after version 0.2 of this spec); where the epic summary and the 1020
+spec state the same contract, the 1020 spec text is the source, and `## Dependency on 1020` states
+how the plan verifies it on the integration branch.
 
 ## Overview
 
@@ -46,10 +60,11 @@ Python and configuration surfaces, a pure snapshot builder, and the `inventory` 
 `.claude/lib/docs/Invoke-DocsCommand.ps1`. Under owner decision D3 this scanner is the
 always-available baseline: it needs PowerShell 7.4 only, runs in every destination repository, and
 keeps a documented precision limit (`## Precision Limit`) that the coverage ledger (1023) records
-as a `deferred` entry with an owner. The Python-native analyzer (child 900011, wave 2, python pack
+as a `deferred` entry with an owner. The Python-native analyzer (child 1031, wave 2, python pack
 only) later replaces the scanner for the four Python identifiers when the python pack and an
-interpreter are available, and reproduces this feature's identity and digest contracts
-(`## Contracts for 900011 and Later Children`).
+interpreter are available, and reproduces this feature's declaration and line-range contracts
+(`## Contracts for 1031 and Later Children`); identifiers and digests are computed for both methods
+by the shared 1020 functions.
 
 The feature consumes the contracts planned by 1020 and does not re-create them. It edits no 1020
 file except the anchored row insertions in `DocsAnalyzerRegistry.psm1` and `Invoke-DocsCommand.ps1`
@@ -85,9 +100,11 @@ The Architecture module keeps the epic file name while its function and identifi
 - No dynamic dispatch. No `&` call through a variable, member or expression appears in a 1022
   module (enforced by `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`);
   any seam is a `[scriptblock]`-typed parameter declared in the same file.
-- Every element is built with 1020 `New-DocsSurfaceElement` and records `analysis_method: scanner`,
-  `source_sha256` equal to the declaration-lines digest, and `line_range` per
-  `## Contracts for 900011 and Later Children`.
+- Every element is built with 1020 `New-DocsSurfaceElement -SourceText <captured input text>
+  -LineRange @(start, end)` (no `-LineRange` for `architecture-component`) and records
+  `analysis_method: scanner`; `source_sha256` is computed inside `New-DocsSurfaceElement` by 1020
+  `Get-DocsDeclarationSha256`, and `line_range` follows `## Contracts for 1031 and Later Children`.
+  No 1022 module computes, supplies or re-implements a digest.
 - Diagnostics are built with 1020 `New-DocsDiagnostic`, at most one per `(analyzer, code, path)`;
   the message states the occurrence count and the first line number and never quotes source text
   or configuration values.
@@ -181,7 +198,10 @@ The Architecture module keeps the epic file name while its function and identifi
 
 - One `architecture-component` per package (directory holding `__init__.py` among the inputs) and
   per module (`*.py` input); declaration = dotted name; property `component_kind` (`package` or
-  `module`).
+  `module`). `line_range` is `null` and `source_sha256` is the 1020 whole-file declaration digest
+  (`New-DocsSurfaceElement -SourceText` without `-LineRange`; 1020 `#### Declaration-lines digest
+  (D5)`, architecture-component exception), so an edit anywhere in the module text changes the
+  component digest.
 - Internal import edges from `import` and `from ... import` statements at any indentation
   (including `TYPE_CHECKING` blocks), relative imports resolved against the module's package,
   longest dotted-prefix match against input modules and packages. Edges are indexed scalar
@@ -416,7 +436,7 @@ import 1020's `DocsJson.psm1` and `DocsSurface.psm1` and never `DiscoveryEncodin
 
 | File | Exported functions |
 |---|---|
-| `DocsSourceText.psm1` | `ConvertTo-DocsSourceLine`, `Get-DocsDeclarationDigest -Line <string[]> -Span <int[][]>`, `ConvertTo-DocsKeyPathDeclaration -Segment <string[]>`, `Get-DocsModuleDottedName -Path -SourceRoot <string[]>`, `Find-DocsPathOrGlobMatch -Path <string> -Entry <object[]>`, `New-DocsDiagnosticAggregate`, `Add-DocsDiagnosticOccurrence`, `Select-DocsUniqueElement` |
+| `DocsSourceText.psm1` | `ConvertTo-DocsSourceLine -Text <string>`, `ConvertTo-DocsLineRange -Span <int[][]>` (pure, non-hashing: `@(start, end)` from the first line of the first span to the last line of the last span), `ConvertTo-DocsKeyPathDeclaration -Segment <string[]>`, `Get-DocsModuleDottedName -Path -SourceRoot <string[]>`, `Find-DocsPathOrGlobMatch -Path <string> -Entry <object[]>`, `New-DocsDiagnosticAggregate`, `Add-DocsDiagnosticOccurrence`, `Select-DocsUniqueElement` |
 | `DocsPythonTokens.psm1` | `Get-DocsPythonToken -Text <string>` returning `@{ Tokens; Diagnostics }` |
 | `DocsPythonSyntax.psm1` | `Get-DocsPythonLogicalLine -Token <object[]>`, `Get-DocsPythonImportTable`, `Get-DocsPythonReceiverTable`, `Read-DocsPythonCall`, `ConvertFrom-DocsPythonStringToken`, `Get-DocsPythonDefinitionHeader`, `Get-DocsPythonEnclosingBlock` |
 | `DocsTomlKeys.psm1` | `Get-DocsTomlKey -Text <string>`, `Get-DocsTomlScriptEntry` |
@@ -481,8 +501,9 @@ its functions are not called, because Mermaid treats a backslash as an ordinary 
   `python-public-api`), each declaring the scanner method in the field the amended row grammar
   defines (decision 3). Example:
   `[pscustomobject]@{ Id = 'config-files'; Version = '1.0.0'; ElementKinds = @('config-key'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerConfigFiles.psm1'); Function = 'Invoke-DocsAnalyzerConfigFiles' }`
-  plus the method field. The other rows use the values in the `## Behavior` analyzer table. 1022
-  never touches the 900004 or 900011 anchors.
+  plus the method field (`AnalysisMethod = 'scanner'` per 1020 `### DocsAnalyzerRegistry.psm1`).
+  The other rows use the values in the `## Behavior` analyzer table. 1022 never touches the 1033
+  or 1031 anchors (the executed 1020 may still label them `900004` and `900011`).
 - `Invoke-DocsCommand.ps1`: one row under the 1022 inventory anchor:
   `[pscustomobject]@{ Name = 'inventory'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsInventory.psm1'); Function = 'Invoke-DocsInventoryCommand'; Option = @{ Profile = 'value'; Analyzer = 'multi'; Revision = 'value'; Write = 'switch' } }`.
 
@@ -501,9 +522,9 @@ its functions are not called, because Mermaid treats a backslash as an ordinary 
   snapshot numbers are integers, so `ConvertTo-DocsCanonicalJson` can render the envelope.
 - `-Json` envelope: canonical JSON `{command, exit_code, findings, ok, result}` with `command`
   `inventory`. Every exit path's envelope validates against
-  `schemas/docs/v1/docs-command-envelope.schema.json` (D5) through the validation function the
-  amended 1020 exposes; if it exposes none, the test calls `Test-Json` with the self-contained
-  runtime copy under `.claude/lib/docs/schemas/v1/`.
+  `schemas/docs/v1/docs-command-envelope.schema.json` (D5) through 1020
+  `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'` (1020 `## Decisions Later Children
+  Must Honor`, envelope schema bullet); the test asserts validity (no finding), never message text.
 
 Example invocations:
 
@@ -540,7 +561,10 @@ Example invocations:
 - `inputs[]`: `{path, sha256, size}` for every captured input whose `text` is not `$null`; `sha256`
   is the whole-file digest of the exact bytes (`Get-DocsBytesSha256Hex`). Over-bound, undecodable
   and withheld env files have no `inputs` entry and no element.
-- Element `source_sha256` is the declaration-lines digest, not the whole-file digest (decision 1).
+- Element `source_sha256` is the 1020 declaration-lines digest (`Get-DocsDeclarationSha256` over
+  the captured text and `line_range`, computed by `New-DocsSurfaceElement`), not the whole-file
+  input digest (decision 1); the one exception is `architecture-component`, whose `line_range` is
+  `null` and whose declaration digest covers every line of the normalized file (1020 OQ-7).
 - Byte identity holds for identical input bytes, profile, revision, analyzer selection and clock
   value, regardless of the order in which `Context.ListFile` returns paths.
 - Invariants: every `element_id` equals `Get-DocsElementId` of its kind, path and declaration;
@@ -550,11 +574,19 @@ Example invocations:
 - No caching, persistence or migration. The only write is the optional `-Write` snapshot through
   `Context.WriteText`.
 
-## Contracts for 900011 and Later Children
+## Contracts for 1031 and Later Children
 
-The Python-native analyzer (900011) reproduces every contract in this section exactly for every
-construct both analyzers classify, so element identifiers and `source_sha256` values are equal
-across methods and ledger entries and evidence pins stay valid when the method changes.
+The Python-native analyzer (1031) reproduces the declaration strings and line ranges in this
+section exactly for every construct both analyzers classify, so element identifiers and
+`source_sha256` values are equal across methods and ledger entries and evidence pins stay valid
+when the method changes. Two contracts are owned by 1020 and restated here for later children
+(1031, 1023): the digest is 1020's `Get-DocsDeclarationSha256` over the captured input text and
+`line_range`, computed only inside `New-DocsSurfaceElement -SourceText` (no child supplies or
+re-implements a digest), and `architecture-component` elements carry `line_range` `null` with the
+whole-file declaration digest (1020 `#### Declaration-lines digest (D5)`, architecture-component
+exception). Per the epic `### Native-analyzer contracts from the preparation of 1031 (binding)`,
+the 1031 Python helper emits raw facts only (kind, path, declaration, line span) and PowerShell
+computes every identifier and digest with the shared 1020 functions.
 
 ### Declaration string per kind
 
@@ -573,24 +605,39 @@ disagreement is resolved by revising this spec before execution, not by the exec
 
 ### Source normalization and declaration-lines digest (D5)
 
-Normalization (`ConvertTo-DocsSourceLine`):
+The digest rule is owned by 1020 (`#### Declaration-lines digest (D5)` in the 1020 spec) and is
+reproduced here only so that the scanner's line numbers agree with it. The five 1020 steps of
+`ConvertTo-DocsDeclarationText -Text [-LineRange]`:
 
-1. Decode the captured bytes as strict UTF-8 (undecodable input is the 1020 diagnostic; no element).
-2. Remove one leading U+FEFF.
-3. Replace `\r\n` with `\n`, then each remaining `\r` with `\n`. No other character is a line break
+1. Remove one leading U+FEFF if present.
+2. Replace every CRLF with LF, then every remaining CR with LF. No other character is a line break
    (form feed, U+2028, U+2029 and U+0085 are not).
-4. Split on `\n`; when the text ends with `\n`, drop the final empty element. Lines are numbered
-   from 1. Trailing whitespace and tabs are kept; no Unicode normalization is applied.
+3. If the text ends with LF, remove exactly one trailing LF. Split on LF into lines numbered from 1;
+   the empty text has zero lines.
+4. With `-LineRange @(start, end)`, select lines `start` through `end` inclusive (a range outside
+   the text throws `DOCS_DIGEST_RANGE_INVALID`); without `-LineRange` (permitted only for
+   `architecture-component`), select every line.
+5. Return the selected lines, each followed by exactly one LF; no trimming, no tab or whitespace
+   change, no Unicode normalization.
 
-Digest (`Get-DocsDeclarationDigest`): for each span `[start, end]` in order, lines `start` through
-`end`, each followed by one `\n`, concatenated; the digest is the lowercase hex SHA-256 of the
-UTF-8 bytes (`Get-DocsSha256Hex -Text`). An empty span list yields the digest of the empty string.
-The value is stored in element `source_sha256`.
+`Get-DocsDeclarationSha256 -Text [-LineRange]` is the lowercase hex SHA-256 of the UTF-8 bytes of
+that text. The captured bytes are decoded as strict UTF-8 by 1020 `New-DocsCapturedInput` before
+any 1022 function sees them (undecodable input is the 1020 diagnostic; no element).
+
+1022's `ConvertTo-DocsSourceLine -Text` applies steps 1 to 3 and returns the numbered lines the
+scanners tokenize, so every line number a scanner reports is a line number of the 1020 canonical
+text. Each analyzer passes the captured input text and the site's `line_range` to
+`New-DocsSurfaceElement -SourceText <text> -LineRange @(start, end)`, which computes
+`source_sha256`; `Invoke-DocsAnalyzer` recomputes `Get-DocsDeclarationSha256` over the same text
+and range and rejects an element whose digest differs. 1022 contains no digest function; the
+value in `source_sha256` is always the 1020 computation.
 
 A "statement span" runs from the line of the statement's first token to the line of its last
 token, including bracket and backslash continuations and any triple-quoted string inside it. A
 "header span" runs from the line of a given decorator's `@` to the line of the `:` that ends the
-`def` or `class` header.
+`def` or `class` header. A site has exactly one contiguous span; `ConvertTo-DocsLineRange -Span`
+reduces the token spans a recognizer collects to `@(start, end)` (first line of the first span to
+last line of the last span) and performs no hashing.
 
 | Kind and site | Span | `line_range` |
 |---|---|---|
@@ -606,22 +653,25 @@ token, including bracket and backslash continuations and any triple-quoted strin
 | `public-symbol` `def` or `class` | header span from the topmost decorator | span |
 | `public-symbol` assignment or import binding | statement span of the first top-level binding | span |
 | `public-symbol` unresolved | the line or lines of its string in `__all__` | span |
-| `architecture-component` module or package (`__init__.py`) | every import statement span in source order, a line included once | `null` |
+| `architecture-component` module or package (`__init__.py`) | no span: the digest covers every line of the normalized file (`New-DocsSurfaceElement -SourceText` without `-LineRange`) | `null` |
 | `config-key` TOML key | key line through end of value; a table header runs to the last non-blank, non-comment line before the next header | span |
 | `config-key` env key | the key line plus continuation lines of a multi-line quoted value | span |
 | `config-key` JSON Schema property | member name line through the end of its value | span |
 | `config-key` YAML key | key line through the last non-blank, non-comment line of its value block | span |
 
-`line_range` "span" means `{start, end}` from the first line of the first span to the last line of
-the last span.
+`line_range` "span" means `{start, end}` of that one contiguous span, and the digest covers lines
+`start` through `end` of the 1020 canonical text.
 
-Reproduction notes for 900011 (Python, standard library only): decode with `bytes.decode("utf-8")`,
-apply the same normalization steps, and split with `str.split("\n")`, never `str.splitlines()`,
-which also splits on form feed and U+2028. Statement spans equal `stmt.lineno` through
-`stmt.end_lineno`. Decorator start lines and the header `:` line come from the `tokenize` module,
-because `ast` gives the decorator expression line (after `@`) and no line for the header colon.
-Typer parameter spans equal `arg.lineno` through the larger of the annotation and default
-`end_lineno`.
+Reproduction notes for 1031 (Python, standard library only): the helper emits line spans, not
+digests. Decode with `bytes.decode("utf-8")`, apply steps 1 to 3 above, and split with
+`str.split("\n")`, never `str.splitlines()`, which also splits on form feed and U+2028, so that the
+emitted line numbers are line numbers of the 1020 canonical text. Statement spans equal
+`stmt.lineno` through `stmt.end_lineno`. Decorator start lines and the header `:` line come from
+the `tokenize` module, because `ast` gives the decorator expression line (after `@`) and no line
+for the header colon. Typer parameter spans equal `arg.lineno` through the larger of the
+annotation and default `end_lineno`. The PowerShell adapter then builds each element through
+`New-DocsSurfaceElement -SourceText -LineRange`, so the digest is the same 1020 computation for
+both methods.
 
 ### Element identifier
 
@@ -633,7 +683,7 @@ the backslash and C0 controls escaped; a single trailing LF). Python reproductio
 `json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n"`; sort order
 agrees because the three keys are ASCII letters.
 
-### Other element fields 900011 reproduces
+### Other element fields 1031 reproduces
 
 - `path`: the file holding the declaring site (`pyproject.toml` for a console script).
 - `name`: last declaration segment for CLI, configuration and architecture kinds; the handler
@@ -651,10 +701,10 @@ agrees because the three keys are ASCII letters.
 - Every 1022 element records `analysis_method: scanner`; 1022 registry rows declare the scanner
   method.
 - For `python-cli`, `python-http`, `python-public-api` and `python-architecture`, the amended 1020
-  registry selection returns the 900011 native row when its availability probe succeeds and the
+  registry selection returns the 1031 native row when its availability probe succeeds and the
   1022 scanner row otherwise; the native analyzer records `analysis_method: native`.
   `config-files` has no native row and stays scanner-only.
-- `DocsInventory.psm1` calls the registry selection and does not choose methods itself, so 900011
+- `DocsInventory.psm1` calls the registry selection and does not choose methods itself, so 1031
   edits no 1022 file.
 
 ### Shared fixtures
@@ -663,15 +713,23 @@ agrees because the three keys are ASCII letters.
   place): `inputs` (path to source text; CRLF, CR and BOM cases expressed as JSON escapes),
   `expected_elements` (kind, path, declaration, element_id, name, parent declaration, line_range,
   source_sha256, properties, `analysis_method: scanner`) and `expected_diagnostics` (code, path,
-  analyzer_id). It covers every classified form and every diagnostic row of the shared lexer,
-  `python-cli`, `python-http`, `python-public-api` and `python-architecture` tables of
-  `## Precision Limit`, plus `pyproject.toml` script tables. 900011's Python tests read it without
+  analyzer_id). It covers every classified form and every 1022-owned diagnostic row of the shared
+  lexer, `python-cli`, `python-http`, `python-public-api` and `python-architecture` tables of
+  `## Precision Limit`, plus `pyproject.toml` script tables, except four rows that cannot be
+  committed as JSON text and are proven by inputs constructed in test code instead (marked
+  `in-test` in the corpus census): the two 1020-owned capture rows (undecodable bytes cannot be a
+  JSON string; the over-bound case needs a string above 1,048,576 bytes), `python-token-limit`
+  (above 262,144 tokens) and `architecture-edge-limit` (above 1000 input modules). The row "the
+  owning analyzer's dynamic code" is not a separate code: it maps to `cli-dynamic-registration`,
+  `http-dynamic-route` and `public-api-dynamic-all`. 1031's Python tests read the file without
   editing it and add their own expectations for constructs the scanner reports as diagnostics.
 - `tests/scripts/claude-lib/docs/fixtures/config-surface-corpus.json` covers the `config-files`
-  table and is scanner-only; 900011 does not use it.
+  table and is scanner-only; 1031 does not use it. `config-key-limit` (above 10,000 keys) may be
+  built in test code and is then marked `in-test` in the same way.
 - Golden identifiers and digests in both files are recorded once from an independent hash
-  computation (not the code under test), with the computation recorded under
-  `<FEATURE>/evidence/other/`.
+  computation (not the code under test) that applies the five 1020 digest steps and the element
+  identifier rule, self-checked against the 1020 golden vector D1, with the computation recorded
+  under `<FEATURE>/evidence/other/`.
 
 ## Decisions
 
@@ -687,9 +745,13 @@ agrees because the three keys are ASCII letters.
    `Select-DocsAnalyzerRegistration`, the method on `analyzers[]`) belongs to the 1020 amendment.
    1022 rows declare the scanner method in whatever field the amended row grammar defines; Phase 0
    verifies the field exists (coordinator item C3).
-4. **Digest function ownership.** 1022 owns `Get-DocsDeclarationDigest` in `DocsSourceText.psm1`; it
-   is the reference implementation that 900011 reproduces in Python. 1020 should not add a
-   competing digest function (coordinator item C4).
+4. **Digest function ownership.** 1020 owns the declaration-lines digest:
+   `ConvertTo-DocsDeclarationText` and `Get-DocsDeclarationSha256 -Text [-LineRange]` in
+   `DocsSurface.psm1`, computed inside `New-DocsSurfaceElement -SourceText` and recomputed by
+   `Invoke-DocsAnalyzer`. 1022 creates no digest function and only supplies the captured text and
+   the site `line_range`; `architecture-component` passes no range and receives the whole-file
+   declaration digest. 1031 emits line spans and the shared 1020 function computes its digests
+   (coordinator item C4, resolved).
 5. **Path-or-glob matcher.** Implemented by 1022 as the exported pure function
    `Find-DocsPathOrGlobMatch` in `DocsSourceText.psm1` (exact, prefix plus `/`, case-sensitive glob,
    first match wins) for its own exclusion handling. 1023 and 1024 may import it rather than copy
@@ -742,8 +804,8 @@ agrees because the three keys are ASCII letters.
 - The optional import of an existing discovery inventory snapshot JSON into
   `python-architecture`. Deferred; no mapping rule from discovery `component` records to docs
   declarations is stated. Coordinator item C7.
-- The Python-native analyzer (900011), TypeScript and .NET analyzers (900004), the coverage ledger
-  (1023), reference generation (1024), MCP tools (900007) and CI enforcement (900008).
+- The Python-native analyzer (1031), TypeScript and .NET analyzers (1033), the coverage ledger
+  (1023), reference generation (1024), MCP tools (1036) and CI enforcement (1034).
 - Class members as public symbols; recording the PowerShell or Python version in the snapshot;
   reading Git history (`-Revision` is recorded as supplied).
 
@@ -765,14 +827,23 @@ agrees because the three keys are ASCII letters.
     `ListFile`, `WriteText`, `UtcNow`, the in-memory test context in `Docs.TestSupport.psm1`, and
     the dispatch-table row form (`Invoke-DocsCommand.ps1`);
   - the snapshot schema `$defs/element` has `analysis_method` (`native` | `scanner`) and the
-    amended registry row grammar has a method field;
-  - `schemas/docs/v1/docs-command-envelope.schema.json` exists, and the envelope validation
-    function (or the self-contained runtime copy for the `Test-Json` fallback) is identified;
+    amended registry row grammar has a method field (`AnalysisMethod` per 1020
+    `### DocsAnalyzerRegistry.psm1`);
+  - `schemas/docs/v1/docs-command-envelope.schema.json` exists and
+    `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'` accepts that kind (the 1020
+    envelope validation route);
   - the 1022 anchors exist in `DocsAnalyzerRegistry.psm1` and `Invoke-DocsCommand.ps1` (literal
     `1022` or placeholder `900003` label, recorded verbatim);
   - the diagnostic codes `New-DocsCapturedInput` emits for over-bound and undecodable input are
     recorded;
-  - `.claude/lib/docs` has no declaration-digest function competing with `Get-DocsDeclarationDigest`.
+  - the digest contract: `ConvertTo-DocsDeclarationText -Text [-LineRange]` and
+    `Get-DocsDeclarationSha256 -Text [-LineRange]` exist in `DocsSurface.psm1` with those
+    parameters; `New-DocsSurfaceElement` has the parameters `-Kind -Path -Declaration -Name
+    -AnalyzerId -AnalysisMethod -SourceText [-ParentId] [-LineRange] [-Property] [-Extension]` and
+    no digest parameter; `Invoke-DocsAnalyzer` recomputes `Get-DocsDeclarationSha256` over the
+    captured text and `line_range` and rejects a differing digest; the five normalization steps of
+    1020 `#### Declaration-lines digest (D5)` are recorded as the rule the plan's golden-vector
+    helper reproduces.
 - Any mismatch stops execution and is reported to the coordinator; the plan does not work around
   a missing or different 1020 contract.
 - 1022 edits no 1020 file except the anchored row insertions in `DocsAnalyzerRegistry.psm1` and
@@ -818,23 +889,24 @@ split), with the same class and rule.
 ## Owner Questions
 
 None. Every artifact follows the language rule: all logic is PowerShell under `.claude/lib/docs/`,
-and the Python-native analyzer permitted by D3 is delivered by 900011, not by this feature.
+and the Python-native analyzer permitted by D3 is delivered by 1031, not by this feature.
 
 ## Coordinator Items
 
 | ID | Route to | Item |
 |---|---|---|
-| C1 | 1020 | State in the amendment that element `source_sha256` carries the declaration-lines digest and `inputs[].sha256` the whole-file digest (decision 1). |
+| C1 | 1020 | State in the amendment that element `source_sha256` carries the declaration-lines digest and `inputs[].sha256` the whole-file digest (decision 1). Resolved: the 1020 spec `#### Declaration-lines digest (D5)` states it. |
 | C2 | 1020 | If the amendment adds an `information` severity to `New-DocsDiagnostic`, a later remediation may switch `env-file-not-captured` to it; 1022 does not depend on it (decision 2). |
-| C3 | 1020 | The native-or-scanner selection mechanism (method field on registry rows, per-identifier selection in `Select-DocsAnalyzerRegistration`, method on `analyzers[]`) belongs to the amendment; 1022 rows declare the scanner method in that field (decision 3). |
-| C4 | 1020 | Do not add a declaration-digest function; 1022's `Get-DocsDeclarationDigest` is the reference implementation (decision 4). |
+| C3 | 1020 | The native-or-scanner selection mechanism (method field on registry rows, per-identifier selection in `Select-DocsAnalyzerRegistration`, method on `analyzers[]`) belongs to the amendment; 1022 rows declare the scanner method in that field (decision 3). Resolved: the field is `AnalysisMethod` (1020 `### DocsAnalyzerRegistry.psm1`). |
+| C4 | 1020 | Resolved in the opposite direction from the first draft: 1020 owns `ConvertTo-DocsDeclarationText` and `Get-DocsDeclarationSha256`, `source_sha256` is built only through `New-DocsSurfaceElement -SourceText`, and 1022 adds no digest function (decision 4). No action remains for 1020. |
 | C5 | 1023, 1024 (or 1020) | `Find-DocsPathOrGlobMatch` (exact, prefix plus `/`, case-sensitive glob with `*`, `**`, `?`, first match wins) is exported by 1022's `DocsSourceText.psm1`; 1023 and 1024 may import it instead of copying it, or the coordinator may move it to 1020 (decision 5). |
 | C6 | 1023 | The single-write-boundary test must allow `Context.WriteText` from `DocsInventory.psm1` for the snapshot (decision 6). |
 | C7 | epic | Assign external distribution dependencies and the optional discovery-snapshot import to a later child, or drop them (decision 7). |
-| C8 | 1020 | Confirm that a command function may return exit 2 with one `DOCS_CLI_ARGUMENTS` finding for usage errors only the command can detect, and that the registry and dispatch anchors carry the label `1022` (placeholder `900003` in the current text). |
+| C8 | 1020 | Confirm that a command function may return exit 2 with one `DOCS_CLI_ARGUMENTS` finding for usage errors only the command can detect, and that the registry and dispatch anchors carry the label `1022` (the 1020 spec `## Decisions Later Children Must Honor` now names the registry anchor `# --- 1022: Python and configuration analyzers ---`; Phase 0 reads the executed literal). |
 | C9 | 1020 | Name the diagnostic codes `New-DocsCapturedInput` emits for over-bound and undecodable input (proposed `input-over-bound`, `input-encoding-invalid`). |
 | C10 | 1023 | Record the `## Precision Limit` of this spec as one `deferred` ledger entry with an owner and a target per scanner analyzer, carrying `analysis_method: scanner`. |
-| C11 | 900011 | Reproduce `## Contracts for 900011 and Later Children` exactly and reuse `python-surface-corpus.json` without editing it. |
+| C11 | 1031 | Reproduce the declaration strings and line ranges of `## Contracts for 1031 and Later Children` exactly, emit line spans only (digests come from 1020 `Get-DocsDeclarationSha256` through `New-DocsSurfaceElement`), and reuse `python-surface-corpus.json` without editing it. |
+| C12 | 1023 | Compare `source_sha256` as an opaque value and expect `line_range` `null` on every `architecture-component` element, whose digest covers the whole normalized file. |
 
 ## Constraints & Risks
 
@@ -845,8 +917,8 @@ and the Python-native analyzer permitted by D3 is delivered by 900011, not by th
   listed undetectable construct (`## Precision Limit`), recorded by 1023 as `deferred`.
 - Execution depends on 1020 merging into the integration branch with the D3/D5 amendment
   (`## Dependency on 1020`).
-- Append-only conflicts in `DocsAnalyzerRegistry.psm1` (900004, 900011), `Invoke-DocsCommand.ps1`
-  (1021, 1023, 1024, 900008) and `core.json` are resolved inside 1022's remediation loop.
+- Append-only conflicts in `DocsAnalyzerRegistry.psm1` (1033, 1031), `Invoke-DocsCommand.ps1`
+  (1021, 1023, 1024, 1034) and `core.json` are resolved inside 1022's remediation loop.
 - Performance: a character loop in PowerShell would be slow on 1 MiB inputs; the lexer advances by
   whole regex matches, and size-bound tests use one comment or key line so a single match consumes
   it.
@@ -890,9 +962,12 @@ and the Python-native analyzer permitted by D3 is delivered by 900011, not by th
 - Property-style tests: at least one per pure exported function, each with a seeded
   `[System.Random]` whose seed is printed in the failure message. Covered properties include
   determinism of repeated calls; byte-identical snapshots under permuted input order and repeated
-  builds with a fixed clock; `element_id` equal to `Get-DocsElementId` of its fields; digest
-  invariance under trailing-newline presence and CRLF/LF/CR variants; digest change when a line
-  inside the span changes and no change when a line outside it changes; value redaction with marker
+  builds with a fixed clock; `element_id` equal to `Get-DocsElementId` of its fields;
+  `source_sha256` equal to 1020 `Get-DocsDeclarationSha256` over the captured text and
+  `line_range` (no range for `architecture-component`); digest invariance under trailing-newline
+  presence and CRLF/LF/CR variants; digest change when a line inside `line_range` changes and no
+  change when a line outside it changes (for `architecture-component`, a change anywhere in the
+  module text changes the digest); value redaction with marker
   values in every value position; key-path quoting injectivity; the size bound at 1,048,575,
   1,048,576 and 1,048,577 bytes.
 - Every diagnostic row of `## Precision Limit` has a test asserting the code, the blocking flag and
@@ -927,8 +1002,8 @@ and the Python-native analyzer permitted by D3 is delivered by 900011, not by th
 - [ ] A non-template env-family file (`.env`, `.env.<other>`, `<name>.env`) under a source root is never passed to `Context.ReadBytes` (asserted by the in-memory context's call record), has no `inputs` entry and no element, and yields an `env-file-not-captured` non-blocking `warning` naming its path; only `.env.example`, `.env.sample`, `.env.template` and `.env.dist` produce `config-key` elements.
 - [ ] The built fixture snapshot validates against `surface-inventory-snapshot.schema.json` through `Test-DocsArtifactText -ArtifactKind 'surface-inventory-snapshot'` with no `error` finding, and each `inputs[].sha256` equals the SHA-256 of the corresponding whole-file fixture bytes with `size` equal to their length.
 - [ ] Every element in every snapshot produced by the Pester suites records `analysis_method: scanner`, and every 1022 registry row declares the scanner method in the field defined by the amended registry row grammar.
-- [ ] Every element's `source_sha256` equals `Get-DocsDeclarationDigest` over the spans defined in `## Contracts for 900011 and Later Children`, and a seeded property test asserts that changing any line inside an element's span changes its digest, changing a line outside every span leaves it unchanged, and CRLF, CR, LF and trailing-newline variants leave it unchanged.
-- [ ] The golden `element_id` and `source_sha256` values in both corpus files were recorded from an independent hash computation documented under `<FEATURE>/evidence/other/`, and `python-surface-corpus.json` covers every classified form and every diagnostic row of the shared lexer, `python-cli`, `python-http`, `python-public-api` and `python-architecture` tables.
+- [ ] Every element's `source_sha256` equals 1020 `Get-DocsDeclarationSha256 -Text <captured input text> -LineRange <line_range>` (no range for `architecture-component`, whose `line_range` is `null`) over the `line_range` defined in `## Contracts for 1031 and Later Children`, and a seeded property test asserts that changing any line inside an element's `line_range` changes its digest, changing a line outside it leaves it unchanged, CRLF, CR, LF and trailing-newline variants leave it unchanged, and an edit anywhere in a module's text changes its `architecture-component` digest.
+- [ ] The golden `element_id` and `source_sha256` values in both corpus files were recorded from an independent hash computation that applies the five 1020 digest steps and is self-checked against the 1020 golden vector D1, documented under `<FEATURE>/evidence/other/`, and `python-surface-corpus.json` covers every classified form and every 1022-owned diagnostic row of the shared lexer, `python-cli`, `python-http`, `python-public-api` and `python-architecture` tables except the four in-test rows named in `### Shared fixtures` (the two 1020 capture rows, `python-token-limit` and `architecture-edge-limit`), which are proven by inputs constructed in test code and marked `in-test` in the corpus census.
 - [ ] `inventory` exits 0 for a fixture with no blocking diagnostic, 1 with a blocking diagnostic or an invalid or absent profile, 2 for an unknown `-Analyzer` identifier, an identifier with no selected element kind, an invalid `-Revision` or a non-relative `-Profile` (each with a `DOCS_CLI_ARGUMENTS` finding naming the value and `result` `null`), and 3 for an exceeded aggregate bound or a read failure (with `DOCS_CLI_RUNTIME`), each asserted through `Invoke-DocsCommandCli` with the 1020 in-memory context and a fixed clock.
 - [ ] The `-Json` output of every `inventory` exit path (0, 1, 2 and 3) validates against `schemas/docs/v1/docs-command-envelope.schema.json`, asserted by the command suite.
 - [ ] Without `-Write` the command makes no `Context.WriteText` call; with `-Write` it makes one `Context.WriteText` call to the profile `artifact_paths.inventory_snapshot` with mode `create` when the file is absent and `overwrite` when it exists; `DocsInventory.psm1` is the only 1022 module that references the command context.
