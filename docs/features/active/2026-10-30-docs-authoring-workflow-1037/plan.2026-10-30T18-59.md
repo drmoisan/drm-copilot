@@ -1,64 +1,223 @@
 # docs-authoring-workflow - Plan
 
 - **Issue:** #1037
-- **Parent (optional):** none
+- **Parent (optional):** epic #1019 (documentation-estate-tooling), wave 4, band C4; depends on #1036
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30T18-59
-- **Status:** Draft
-- **Version:** 0.1
+- **Last Updated:** 2026-10-31
+- **Status:** Draft (preparation mode; planning only)
+- **Version:** 1.0
+- **Work Mode:** full-feature
+- **Branch:** `feature/docs-authoring-workflow-1037`; integration base `epic/documentation-estate-tooling-integration`
+- **Requirement sources:** `spec.md`, `user-story.md`, `research/2026-10-30T23-33-docs-authoring-workflow-research.md` (this folder); `docs/features/epics/documentation-estate-tooling/epic.md` governs every cross-child contract (see `## Open Questions / Notes`).
 
 ## Required References
 
-- General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../../.github/instructions/general-code-change.instructions.md)
-- General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../../.github/instructions/general-unit-test.instructions.md)
-- (Add language-specific policies as needed, e.g. `python-code-change.instructions.md`)
+- Policy order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`.
+- Execution environment: `.claude/skills/execution-environment/SKILL.md` owns tool routes, launchers, the batch budget, hook context and CI shape; this plan cites its headings and does not restate them.
+- Evidence: `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. `<FEATURE>` is `docs/features/active/2026-10-30-docs-authoring-workflow-1037`. Every evidence file is `<FEATURE>/evidence/<kind>/<name>.<timestamp>.md` with the write-time UTC stamp and the fields `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; a consumer selects the lexicographically greatest `<name>.*.md`.
+- `SCRATCH` resolves to `<session scratchpad>/issue-1037/`; scratch file names start with `issue-1037-`; evidence records the literal token `SCRATCH`, never a host path.
+- Diff anchor: `BASE` is the merge base of `origin/epic/documentation-estate-tooling-integration` and `HEAD`, recomputed when used.
 
-**All work must comply with these policies; do not duplicate their content here.**
+## Named Sets
+
+- Roles R = `docs-architect`, `docs-author`, `docs-reconciler`, `docs-coverage-reviewer`.
+- Skills K = `documentation-workflow`, `docs-init`, `docs-inventory-surface`, `docs-plan-ia`, `docs-author-page`, `docs-reconcile-behavior`, `docs-review-coverage`, `docs-validate`.
+- Templates T = `tutorial`, `how-to`, `explanation`, `cli-reference`, `http-reference`, `config-reference`, `api-reference`, `architecture-overview` (files `<t>.md` under `docs-author-page/templates/`).
+- Docs MCP tools M (1036) = `run_docs_check`, `run_docs_inventory`, `run_docs_coverage`, `update_docs_ledger`, `generate_docs_reference`, `validate_docs_artifacts`.
+- Subcommands (owners per epic `### Naming contract`) = `init`, `validate-profile` (1020); `check` (1021); `inventory` (1022); `coverage`, `update-ledger`, `validate` (1023); `generate-reference` (1024); `surface-delta` (1034).
+- Hook prefixes (new contract): `DOCS_ROLE_OUTPUT_BLOCKED:` for `validate-docs-role-output.ps1`; `DOCS_ROLE_WRITE_SCOPE_BLOCKED:` for `enforce-docs-role-write-scope.ps1`.
+
+## Artifact Classification
+
+Rules: R1 = owner directive clause (1), pushed-down skills, helpers, hooks and libs are PowerShell or bash; D = epic `### Artifact classes for this epic`; G = owner permission to call existing tooling. "Avoid new Python" applies to every row. Brace sets expand over the Named Sets; each row lists exactly the files it expands to, and [P7-T7] compares the expansion with the branch diff.
+
+| File (create unless noted) | Class | Language | Rule |
+|---|---|---|---|
+| `.github/agents/{R}.agent.md`; `extensions/drm-copilot/resources/customizations/.github/agents/{R}.agent.md` | agent | Markdown | D |
+| `.claude/agents/{R}.md`; `extensions/drm-copilot/resources/claude-customizations/.claude/agents/{R}.md` | agent | Markdown | D |
+| `.codex/agents/{R}.toml`; `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/{R}.toml` | agent | TOML | D |
+| `.github/skills/{K}/SKILL.md`, `.claude/skills/{K}/SKILL.md`, `.agents/skills/{K}/SKILL.md` and the three bundle copies under `customizations/.github/skills/`, `claude-customizations/.claude/skills/`, `codex-and-agents-customizations/.agents/skills/` | skill | Markdown | D |
+| `<each of the six skill roots>/docs-author-page/templates/{T}.md` | skill (data) | Markdown | D |
+| `.claude/hooks/docs-role-contract.ps1`, `.claude/hooks/validate-docs-role-output.ps1`, `.claude/hooks/enforce-docs-role-write-scope.ps1` and copies under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` | hook | PowerShell | R1 |
+| `.claude/settings.json` and `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json` (edit) | schema/config/data | JSON | D |
+| `config/orchestration-routing.json` and `extensions/drm-copilot/resources/config/orchestration-routing.json` (edit) | schema/config/data | JSON | D |
+| `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` (edit) | schema/config/data | JSON | D |
+| Codex generator run `scripts.dev_tools.generate_codex_agent_variants` (write once, then `--check`) | generator task (existing Python, called) | n/a | G |
+| `tests/scripts/claude-hooks/{docs-role-contract,validate-docs-role-output,enforce-docs-role-write-scope}.Tests.ps1` | test | PowerShell (Pester) | D |
+| `tests/scripts/claude-runtime/DocsAuthoringRoles.Helpers.ps1`, `tests/scripts/claude-runtime/docs-authoring-roles.{Allowlist,Skills,Templates,Mirrors,Registration}.Tests.ps1` | test | PowerShell (Pester) | D |
+| `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1`, `tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1` (edit: additive rows) | test | PowerShell (Pester) | D |
+| `<FEATURE>/**` (plan, evidence, AC check-off in `spec.md` and `user-story.md`) | documentation | Markdown | D |
+
+No MCP tool, extension command, Python file, TypeScript file, `.codex/config.toml` or `.claude/lib/docs/` file is created or edited.
 
 ## Implementation Plan (Atomic Tasks)
 
-> **Instructions for this section:**
-> - Break work into **Phases** (broad buckets) and **Atomic Tasks** (binary, 5-30 min units).
-> - Use `- [ ] [P#-T#]` for every task.
-> - Start every task with a **strong verb** (Implement, Create, Update, Verify).
-> - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
-> - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
-> - Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
-> - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
-> - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+Execution runs in the item worktree under a non-terminal exempt-route checkpoint (brief `## Batch Budget`): six non-test PowerShell production files are written. Hook behavior is proven by Pester only (brief `## Hook Execution Context`). Pester runs, counts and coverage follow brief `## PowerShell Route and PoshQC MCP Limits`: counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, never from PoshQC MCP summaries.
 
-### Phase 0: Compliance & Context
-- [ ] [P0-T1] Confirm alignment with repo policies by reading `.github/instructions/general-code-change.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, and `.github/instructions/python-unit-test.instructions.md` before touching code
-  - Acceptance: Development log contains policy review timestamp prior to Phase 1 commits
+### Phase 0 — Baseline and Preconditions
 
-### Phase 1: <Phase Name>
-- [ ] [P1-T1] <Atomic task with strong verb>
-- [ ] [P1-T2] <Atomic task>
-  - Preconditions: <optional>
-  - Acceptance: <optional>
+- [ ] [P0-T1] Read the policy files in the order of `## Required References` and write `<FEATURE>/evidence/other/phase0-instructions-read.<timestamp>.md` with `Timestamp:`, `Policy Order:` and the list of files read.
+  - Acceptance: the artifact exists with all three fields and lists the six files in order.
+- [ ] [P0-T2] Verify the upstream contracts on the branch head: `.claude/lib/docs/Invoke-DocsCommand.ps1` exists and its `$script:DocsCommandRow` table (`Get-DocsCommandTable`) holds rows named `init`, `validate-profile`, `check`, `inventory`, `coverage`, `update-ledger`, `validate`, `generate-reference`, `surface-delta`; `extensions/drm-copilot/src/repo-automation-tool-names.ts` contains each name of M; `.claude/settings.json` carries the 1034 entry for `enforce-docs-complete-gate.ps1`. Record each row's `Option` map and the 1036 input field names into `<FEATURE>/evidence/other/upstream-contracts.<timestamp>.md`.
+  - Acceptance: the artifact lists nine rows with their option maps and six tool names; any absence records `BLOCKED: upstream not merged`, and execution stops before [P1-T1].
+- [ ] [P0-T3] Confirm that `artifacts/orchestration/orchestrator-state.json` in the item worktree selects the `large`, `remediation` or `preparation` route and is non-terminal (`Test-BatchBudgetLargePathRoute` in `.claude/hooks/enforce-batch-budget-route.ps1`); record it in `<FEATURE>/evidence/other/route-check.<timestamp>.md`.
+  - Acceptance: the artifact names the route and `terminal: false`; otherwise `BLOCKED` and execution stops.
+- [ ] [P0-T4] Capture the PowerShell static baseline (PoshQC format check and a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `.claude/hooks`) in `<FEATURE>/evidence/baseline/powershell-static.<timestamp>.md`.
+  - Acceptance: `Output Summary:` states the formatter's changed-file count (the number of `Formatted:` log lines) and the analyzer finding count as numbers; the formatter runs in check mode (`Invoke-PoshQCFormat` with a no-op `-WriteFile` scriptblock) so the tree is unchanged (`git status --porcelain` identical before and after).
+- [ ] [P0-T5] Capture the Pester baseline: a fresh single-process `Invoke-PoshQCTest` run over `tests/scripts` with coverage, recorded in `<FEATURE>/evidence/baseline/pester-coverage.<timestamp>.md`.
+  - Acceptance: `Output Summary:` holds total, passed and failed counts read from `artifacts/pester/pester-junit.xml`, the overall line coverage percent read from `artifacts/pester/powershell-coverage.xml`, and the names of any pre-existing failures.
+- [ ] [P0-T6] Capture the contract and regression baseline: the Python tests listed in [P6-T6], the Codex generator `--check` (brief `## Contract Tests That Pin Mirrored Files`), the full Python suite in the `quality-checks7` shape and the full Jest suite in `extensions/drm-copilot/`, recorded in `<FEATURE>/evidence/baseline/contract-tests.<timestamp>.md`.
+  - Acceptance: `Output Summary:` holds pass and fail counts for each of the three suites and the generator exit code; pre-existing failures are listed by node ID or test name.
 
-### Phase 2: <Phase Name>
-- [ ] [P2-T1] <Atomic task>
-- [ ] [P2-T2] <Atomic task>
+### Phase 1 — Role Contract Helper and SubagentStop Check
+
+- [ ] [P1-T1] Create `.claude/hooks/docs-role-contract.ps1` (dot-sourced, not registered, no dependency of its own, no output at load, no `Write-Output`, `Write-Host` or `Write-Warning`): `Get-DocsRoleName` returns R; `Get-DocsRoleRequiredToken -Role` returns the common tokens `docs-role`, `docs-result`, `docs-findings` plus the role tokens of spec `## SubagentStop Output Check`; `ConvertFrom-DocsRoleOutput -Text` (pure) parses lines `^(?<token>docs-[a-z-]+):[ ]*(?<value>.*)$` into an ordinal map and reports duplicate tokens; `Test-DocsRoleOutput -Role -Text -TestFile <scriptblock>` returns `@{ Ok; Repairable; Message }` applying the value rules (result `PASS|FAIL|BLOCKED`; non-negative integers; exit codes 0 to 3; `PASS` requires exit code 0 for author, reconciler and reviewer; repository-relative forward-slash paths that exist through `-TestFile`; author pages end `.md`; architect `## Information Architecture` heading required when `PASS`; element ids match `^(?:cli-command|cli-option|http-route|config-key|public-symbol|architecture-component)-[0-9a-f]{64}$` or `none`; mode `profile|ledger|matrix|docs-complete`; revision `^(?:[0-9a-f]{40}|[0-9a-f]{64})$`; receipt id a non-blank token without whitespace or `none`). Every failing message names its token.
+  - Acceptance: the file is under 500 logical lines and is exercised by [P1-T2].
+- [ ] [P1-T2] Create `tests/scripts/claude-hooks/docs-role-contract.Tests.ps1` with in-memory text and a mocked `-TestFile` scriptblock: one `It` per role for a complete valid output; one case per required token removed (`-ForEach` over role and token); one case per value rule above, including duplicate token, `PASS` with non-zero exit code, absolute path, absent path, non-`.md` page, a 39-character revision, an uppercase-hex revision, an element id with a foreign kind, and `docs-role` naming another role; `AfterAll` removes the dot-sourced functions.
+  - Acceptance: the suite passes in a targeted Pester run and per-file line coverage of `.claude/hooks/docs-role-contract.ps1` is at least 85% in `artifacts/pester/powershell-coverage.xml`; recorded in `<FEATURE>/evidence/regression-testing/docs-role-contract.<timestamp>.md`.
+- [ ] [P1-T3] Create `.claude/hooks/validate-docs-role-output.ps1` following `.claude/hooks/validate-task-researcher-output.ps1`: bootstrap try for `hook-dependency-guard.ps1`; single-statement guarded dot-sources `. (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1')` and `. (Join-Path $PSScriptRoot 'docs-role-contract.ps1')`; no script-scope `$ErrorActionPreference = 'Stop'` assignment (keeps `hook-dependency-failure.SpecialCases.Tests.ps1` C8 rows unchanged); `Invoke-DocsRoleOutputValidation -InputText` returns the dependency decision first, reads the envelope through `Read-SubagentStopEnvelope`, allows an `AgentType` outside R, treats an envelope anomaly as non-repairable, and calls `Test-DocsRoleOutput` with a `Test-DocsRoleOutputFile` seam; repairable failures (missing or invalid token) block on every stop; non-repairable failures block once and are allowed when `StopHookActive` is set (precedent `Invoke-RequiredArtifactOutputValidation`); body skipped when dot-sourced; tail check and `Exit-SubagentStopBlock` with prefix `DOCS_ROLE_OUTPUT_BLOCKED:`; an unhandled error blocks with that prefix, the first error line and a fixed fail-closed sentence.
+  - Acceptance: the file is under 500 logical lines and is exercised by [P1-T4].
+- [ ] [P1-T4] Create `tests/scripts/claude-hooks/validate-docs-role-output.Tests.ps1`: `Invoke-DocsRoleOutputValidation -InputText` cases for each role (valid allow; one invalid value blocks); non-docs `agent_type` allows; each envelope anomaly blocks and is allowed under `stop_hook_active`; a missing token still blocks under `stop_hook_active`; a dependency failure (`Add-HookDependencyFailure` in session state) blocks; `Read-SubagentStopEnvelope` mocked to throw yields exit 2 with the prefix. Script-route cases run the hook with in-memory stdin and captured stderr: one `It` per role for a complete valid output shows exit 0; a `-ForEach` over a literal role-by-token table (the three common tokens for each role plus that role's tokens of spec `## SubagentStop Output Check`, 24 rows) removes each token in turn from an otherwise valid output and shows exit 2 with stderr starting `DOCS_ROLE_OUTPUT_BLOCKED:` and containing that token name; one `It` per role asserts that the table's tokens for the role equal `Get-DocsRoleRequiredToken -Role`, so the table cannot drift from the contract. Linux-safe (`Join-Path`, forward slashes, no drive letters); `AfterAll` restores console streams and removes added functions and variables.
+  - Acceptance: the suite passes with the 24 per-token script-route rows and the four valid-output script-route cases present in the JUnit file (`It` names include `blocks with exit 2 naming the removed token <token> for <role>` and `exits 0 for a complete valid output from <role>`), and line coverage of `.claude/hooks/validate-docs-role-output.ps1` is at least 85%; recorded in `<FEATURE>/evidence/regression-testing/validate-docs-role-output.<timestamp>.md`.
+
+### Phase 2 — Write-Scope Hook, Bundle Copies and Registration
+
+- [ ] [P2-T1] Create `.claude/hooks/enforce-docs-role-write-scope.ps1` following `.claude/hooks/enforce-epic-invocation-origin.ps1`: guarded imports of `hook-dependency-guard.ps1`, `HookPayload.psm1` (`-ErrorAction Stop`) and `docs-role-contract.ps1`; `Invoke-DocsRoleWriteScopeDecision -HookInputRaw` returns the dependency decision first (deny with prefix `DOCS_ROLE_WRITE_SCOPE_BLOCKED:`), reads `agent_type` like `Get-EpicInvocationOriginCallerAgentType`, returns `$null` (no output, exit 0) when it is absent or outside R, and otherwise applies rules 1 to 6 of spec `## Write-Scope Hook Contract` with reasons `DOCS_ROLE_WRITE_SCOPE_BLOCKED: rule <n> ...`; the target is `tool_input.file_path` (or `notebook_path`), normalized against the root from the seam `Get-DocsWriteScopeRepositoryRoot` (payload `cwd`); the profile is read only through the seam `Get-DocsWriteScopeProfileText` at `docs/documentation-estate/docs-profile.json` and parsed with the built-in `ConvertFrom-Json -AsHashtable` inside the hook (no `.claude/lib/docs/` import, so the dependency closure stays within core files); an absent, unreadable or unparseable profile or a non-string `artifact_paths` value skips rule 5 only; entrypoint runs the bootstrap tail check and the `Get-HookDependencyFailureDecision` check before it calls `Read-ClaudeHookRawPayload` (as `enforce-epic-invocation-origin.ps1` does; B1 asserts zero payload reads on a dependency failure), and writes deny JSON at exit 0; no script-scope `$ErrorActionPreference = 'Stop'`.
+  - Acceptance: the file is under 500 logical lines and is exercised by [P2-T2].
+- [ ] [P2-T2] Create `tests/scripts/claude-hooks/enforce-docs-role-write-scope.Tests.ps1` with in-memory payloads and mocked seams: `docs-author` denied for the profile path, each of `inventory_snapshot`, `coverage_ledger`, `parity_matrix`, `evidence_pins`, `validation_receipt`, a `.json` page, each of `.claude/`, `.github/`, `.codex/`, `.agents/`, an absolute path outside the root and a relative path escaping with `..`; each Write-class tool (`Write`, `Edit`, `MultiEdit`, `NotebookEdit`) denied for the other three roles; `Bash` denied for all four roles; `docs-author` allowed for `docs/guide/index.md`; no `agent_type` and `agent_type` `atomic-executor` allowed with no output; absent and unparseable profile still deny non-`.md` and protected-directory writes; dependency failure denies; each deny reason starts with the prefix and names its rule.
+  - Acceptance: the suite passes and line coverage of `.claude/hooks/enforce-docs-role-write-scope.ps1` is at least 85%; recorded in `<FEATURE>/evidence/regression-testing/enforce-docs-role-write-scope.<timestamp>.md`.
+- [ ] [P2-T3] Copy the three hook files byte-identically to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` (a copy, not a Write call, so the batch budget does not see it).
+  - Acceptance: SHA-256 of each source equals its copy, recorded in `<FEATURE>/evidence/other/hook-bundle-hashes.<timestamp>.md`.
+- [ ] [P2-T4] Edit `.claude/settings.json`: append `{ "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash", "hooks": [{ "type": "command", "command": "pwsh -NoProfile -File .claude/hooks/enforce-docs-role-write-scope.ps1" }] }` to `hooks.PreToolUse` and `{ "matcher": "docs-architect|docs-author|docs-reconciler|docs-coverage-reviewer", "hooks": [{ "type": "command", "command": "pwsh -NoProfile -File .claude/hooks/validate-docs-role-output.ps1" }] }` to `hooks.SubagentStop`, LF endings, then copy the file byte-identically to the bundle copy. Docs tools are not added to `permissions.allow` (1036 OQ-B decided here; `defaultPermissionMode` is `bypassPermissions`). Existing asserting tests, dispositions: `tests/scripts/claude-runtime/claude-settings.Tests.ps1` unchanged (its matchers `Bash`, `Agent`, the fifteen-agent group and the prd-feature group are untouched); `tests/scripts/claude-hooks/PreToolUsePayload.Contract.Tests.ps1` unchanged (derives the hook set; the new hook imports `HookPayload.psm1` and calls `Read-ClaudeHookRawPayload`); `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1` and `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1` unchanged (derive from settings; shape rules met in [P1-T3] and [P2-T1]); `hook-dependency-failure.SpecialCases.Tests.ps1` unchanged (no script-scope Stop preference); `hook-dependency-failure.Claude.Tests.ps1` updated in [P2-T5]; `subagentstop-uncaught-error.Tests.ps1` updated in [P2-T6]; `test_push_down_claude_resource_contracts.py` and `test_push_down_pack_manifest_dependency_closure.py` unchanged (copies and core entries land in [P2-T3] and [P5-T1]).
+  - Acceptance: both copies parse as JSON, have equal SHA-256, and contain no CR byte.
+- [ ] [P2-T5] Update `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` by adding two `$script:ReasonPrefix` rows (`.claude/hooks/enforce-docs-role-write-scope.ps1` = `DOCS_ROLE_WRITE_SCOPE_BLOCKED:`, `.claude/hooks/validate-docs-role-output.ps1` = `DOCS_ROLE_OUTPUT_BLOCKED:`); reason: test B4 requires a prefix row for every discovered registered hook (precedent: 1034 adds its row). No other line changes.
+  - Acceptance: B1, B2, B3 and B4 pass for the new hooks in a targeted run recorded in `<FEATURE>/evidence/regression-testing/hook-guard-suites.<timestamp>.md`.
+- [ ] [P2-T6] Update `tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1` by adding one `$script:ValidatorRows` row for `.claude/hooks/validate-docs-role-output.ps1` with prefix `DOCS_ROLE_OUTPUT_BLOCKED:`; reason: test U2 requires a row for every hook that dot-sources `subagentstop-envelope.ps1` in a guarded try. No other line changes.
+  - Acceptance: U1 and U2 pass in the targeted run recorded with [P2-T5].
+- [ ] [P2-T7] Run the targeted Pester suites `docs-role-contract`, `validate-docs-role-output`, `enforce-docs-role-write-scope`, `hook-dependency-failure.Claude`, `hook-dependency-failure.SpecialCases`, `subagentstop-uncaught-error`, `PreToolUsePayload.Contract`, `claude-settings`, `hook-dependency-guard-completeness` and `hook-imported-modules-no-stdout` in one process; record in `<FEATURE>/evidence/regression-testing/phase2-hook-suites.<timestamp>.md`.
+  - Acceptance: zero failed tests in the JUnit file.
+- [ ] [P2-T8] Scan every created or changed file (paths from `git diff --name-only BASE` plus every path in `git status --porcelain`, untracked included) case-insensitively for the patterns `r[g]f` and `fore[c]ast`; record in `<FEATURE>/evidence/qa-gates/hygiene-scan.<timestamp>.md`.
+  - Acceptance: zero matches; a match is removed and the scan rerun before [P2-T9].
+- [ ] [P2-T9] Commit the Phase 1 and Phase 2 files with a message file through the route in the brief.
+  - Acceptance: `git status --porcelain` is empty for the committed paths after the commit.
+
+### Phase 3 — Roles on Every Host
+
+- [ ] [P3-T1] Create `.github/agents/{R}.agent.md` (canonical): frontmatter `name`, `description`, `tools` with `read/readFile`, `search` and `drmcopilotextension/<tool>` items for the role's MCP tools from spec `## Role and Tool-Allowlist Contract`; `docs-author` adds `edit/createFile` and `edit/editFiles`; no `execute`, `agent`, `memory:`, `model:`, `disallowedTools`, `Write(` or `Edit(` text. Body: purpose, prepared inputs, the skills the role runs, the MCP inputs it supplies (1036 field names, including `actor_kind: agent` and `actor_id: <role>` for `update_docs_ledger`, `write: true` only for an applied ledger change), the write-scope rules, and a `## Report` section requiring the result tokens of spec `## SubagentStop Output Check`, one per line.
+  - Acceptance: four files exist and are checked by [P6-T1].
+- [ ] [P3-T2] Create `.claude/agents/{R}.md` as the Claude host rewrite: tools `Read`, `Grep`, `Glob` (plus bare `Write`, `Edit` for `docs-author`) and quoted `"mcp__drm-copilot__<tool>"` items; `skills:` preloads per the role table (`docs-architect`: `docs-inventory-surface`, `docs-plan-ia`; `docs-author`: `docs-author-page`; `docs-reconciler`: `docs-reconcile-behavior`; `docs-coverage-reviewer`: `docs-review-coverage`, `docs-validate`); no `memory:`, `model:`, `hooks:`, `disallowedTools`, `Bash`, path-scoped entry, `.github/`, `drmcopilotextension` or `.agent.md` text.
+  - Acceptance: four files exist; `test_claude_rules_frontmatter.py::test_every_agent_preloaded_skill_resolves_to_an_existing_skill_file` passes once [P4-T1] lands.
+- [ ] [P3-T3] Create `.codex/agents/{R}.toml` following `.codex/agents/discovery-capability-sentinel.toml`: keys `name`, `description`, `developer_instructions` only, no `model` lines; instructions carry the wrapper header, `Applied rewrites:`, `Canonical migration source:` naming `.github/agents/<role>.agent.md`, then the canonical text with Claude-form tool names.
+  - Acceptance: `test_codex_full_migration_inventory.py::test_codex_agent_contracts_follow_expected_wrapper_or_native_patterns` and `test_codex_agent_role_schema.py` pass in [P6-T6].
+- [ ] [P3-T4] Copy the twelve agent files byte-identically to `extensions/drm-copilot/resources/customizations/.github/agents/`, `extensions/drm-copilot/resources/claude-customizations/.claude/agents/` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/`.
+  - Acceptance: twelve equal SHA-256 pairs recorded in `<FEATURE>/evidence/other/agent-bundle-hashes.<timestamp>.md`.
+
+### Phase 4 — Skills and Page Templates on Every Host
+
+- [ ] [P4-T1] Create `.claude/skills/{K}/SKILL.md` (frontmatter `name`, `description` only, after `.claude/skills/discovery-workflow/SKILL.md`) with the content of spec `## Per-Skill Contract`: `documentation-workflow` dispatches `docs-init`, then inventory, plan, author, reconcile, review, validate in that order; root steps use `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command <name>` with only option names recorded in [P0-T2] (`init` dry run then `-Write`, `-Force` only on explicit request; `inventory -Write` and `generate-reference -Write` are root steps because `run_docs_inventory` and `generate_docs_reference` never persist; `validate` receipt persistence through the write-receipt switch only from root or CI); role steps name only tools in M with 1036 input fields; `docs-review-coverage` has the root run `surface-delta` (options taken from the `surface-delta` row recorded in [P0-T2]; the 1034 spec row declares `-Base` and `-Profile` only), write `<FEATURE>/evidence/qa-gates/docs-surface-delta.<timestamp>.md` with `Timestamp`, `Command`, `EXIT_CODE`, `Output Summary`, and states that the review finding `surface-change-without-ledger-change` is owned by 1034 and raised by `feature-review`; `docs-author-page` requires linking every new page from its root entry page (`README.md` or `index.md`); role links use `../../../.claude/agents/<role>.md`; no consuming product name, no `SCRATCH` text, no unqualified `spec.md §` citation.
+  - Acceptance: eight files exist and are checked by [P6-T2].
+- [ ] [P4-T2] Create `.claude/skills/docs-author-page/templates/{T}.md`: front matter `---`, one `<key>: <JSON value>` line for each of `owner`, `last_reviewed`, `audience`, `diataxis_mode`, `surface_refs` with placeholders, `---`; `diataxis_mode` `"tutorial"`, `"how-to"`, `"explanation"` (explanation and architecture-overview) or `"reference"` (four reference families); tutorial and how-to bodies contain an ordered step list (a line matching `^ {0,3}[0-9]{1,9}[.)] +\S`); reference and explanation bodies contain no heading starting `how to ` or matching `^step\s+[0-9]+\b` (case-insensitive); only the four reference templates contain one `<!-- docs:generated:start id=<element-id> -->` and `<!-- docs:generated:end id=<element-id> -->` pair with prose around it (1021 `## Decisions Later Children Must Honor`, 900009 bullet).
+  - Acceptance: eight files exist and are checked by [P6-T3].
+- [ ] [P4-T3] Create `.github/skills/{K}/SKILL.md` and `.github/skills/docs-author-page/templates/{T}.md`: same content as the Claude copies except no `.claude/` text, role links to `../../agents/<role>.agent.md`, root steps written as `Invoke-DocsCommand.ps1 -Command <name>` and marked unavailable without the docs helper library, and a `## Prerequisites` section stating the docs helper library delivered by the Claude customization push-down and PowerShell 7.4 (Q7 default). Templates are byte-identical to the Claude templates.
+  - Acceptance: sixteen files exist and are checked by [P6-T2] and [P6-T4].
+- [ ] [P4-T4] Create `.agents/skills/{K}/SKILL.md` and `.agents/skills/docs-author-page/templates/{T}.md` with the same rules as [P4-T3] and role links to `../../../.codex/agents/<role>.toml`.
+  - Acceptance: sixteen files exist and are checked by [P6-T2] and [P6-T4].
+- [ ] [P4-T5] Copy the forty-eight skill and template files byte-identically to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/`, `extensions/drm-copilot/resources/customizations/.github/skills/` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/`.
+  - Acceptance: forty-eight equal SHA-256 pairs recorded in `<FEATURE>/evidence/other/skill-bundle-hashes.<timestamp>.md`.
+
+### Phase 5 — Manifests, Generator and Routing
+
+- [ ] [P5-T1] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: add each `.claude/agents/{R}.md`, `.claude/skills/{K}/SKILL.md`, `.claude/skills/docs-author-page/templates/{T}.md` and the three `.claude/hooks/` files once, keeping the file's indentation and LF endings.
+  - Acceptance: the file parses, each of the 23 paths occurs exactly once, `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass in [P6-T6].
+- [ ] [P5-T2] Edit `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`: add each `.codex/agents/{R}.toml`, `.agents/skills/{K}/SKILL.md` and `.agents/skills/docs-author-page/templates/{T}.md` once in the `json.dumps` indent-2 form.
+  - Acceptance: the file parses and each of the 20 paths occurs exactly once.
+- [ ] [P5-T3] Run the Codex generator `scripts.dev_tools.generate_codex_agent_variants` in module form once in write mode, then with `--check` (generator task; called, not extended; docs roles are not added to `GENERATED_AGENT_FAMILIES`); record both in `<FEATURE>/evidence/other/codex-generator.<timestamp>.md`.
+  - Acceptance: the write run changes no path other than the Codex `core.json` (`git status --porcelain` before and after compared and recorded); the `--check` run exits 0.
+- [ ] [P5-T4] Edit `config/orchestration-routing.json`: add a top-level `docs_operations` object after `codex_model_policy`, keyed by each skill of K with `{ "logical_agent": <role or "root">, "mcp_tools": [...] }` from spec `## Per-Skill Contract` (`documentation-workflow` and `docs-init` map to `root` with an empty list; `docs-validate` maps to `docs-coverage-reviewer`); copy the file byte-identically to `extensions/drm-copilot/resources/config/orchestration-routing.json`. `routes`, `model_policy`, `model_budget`, `codex_topology_policy`, `discovery_operations` and `codex_model_policy` are unchanged. Asserting tests, dispositions: `test_orchestration_routing_config_parity.py` and `test_codex_topology_policy_config_parity.py::test_tracked_and_bundled_routing_configs_are_byte_identical` unchanged (copies identical); `test_codex_discovery_routing.py`, `test_codex_model_policy_config_parity.py`, `CodexDeployment.GeneratedFamilies.Parity.Tests.ps1` unchanged (blocks they read are untouched); `test_push_down_claude_routing_merge.py` and `claude-routing-merge-parity.test.ts` unchanged (source-only top-level keys are appended by the merge).
+  - Acceptance: both files parse, have equal SHA-256, and a JSON comparison of every pre-existing top-level key against `BASE` shows no difference.
+
+### Phase 6 — Structural Suites and Contract Tests
+
+- [ ] [P6-T1] Create `tests/scripts/claude-runtime/DocsAuthoringRoles.Helpers.ps1` (frontmatter and token readers over committed files, Named Sets) and `tests/scripts/claude-runtime/docs-authoring-roles.Allowlist.Tests.ps1`: for each role, the Claude native tool set equals the role table and holds no `Write`, `Edit`, `MultiEdit`, `NotebookEdit` or `Bash` for the three read-only roles and only bare `Write` and `Edit` without `Bash` for `docs-author`; the Copilot set holds no `edit/` or `execute` item for the read-only roles and no `execute` item for `docs-author`; the Codex embedded `tools:` block matches the Claude set; no copy contains `Write(`, `Edit(`, `disallowedTools` or `memory:`; each MCP set equals the role table on every host; `update_docs_ledger` occurs only in `docs-reconciler`; every tool of M is held by at least one role.
+  - Acceptance: the suite passes; `It` names include `excludes Write-class and Bash tools from the read-only roles` and `holds update_docs_ledger only in docs-reconciler`.
+- [ ] [P6-T2] Create `tests/scripts/claude-runtime/docs-authoring-roles.Skills.Tests.ps1`: in all six copies of every skill, each `mcp__drm-copilot__<x>`, `drmcopilotextension/<x>` and backticked `*_docs_*` token is in M and is present in `extensions/drm-copilot/src/repo-automation-tool-names.ts` (membership); each `-Command <name>` names a `Name` row parsed from the `$script:DocsCommandRow` lines of `.claude/lib/docs/Invoke-DocsCommand.ps1` (membership); each `-<Option>` after the `-Command <name>` token on that line is a key of that row's `Option` map or `Json`, `Help`, `RepositoryRoot`; `.github/skills` and `.agents/skills` copies contain no `.claude/` text and contain a `## Prerequisites` heading naming the push-down docs helper library and PowerShell 7.4; `documentation-workflow` lists the seven skills in dispatch order.
+  - Acceptance: the suite passes; `It` names include `references only docs MCP tools defined by 1036` and `references only dispatch-table subcommands and options`.
+- [ ] [P6-T3] Create `tests/scripts/claude-runtime/docs-authoring-roles.Templates.Tests.ps1`: for each template in each of the six locations, the front matter parses line by line with each value parsed as JSON, the five fields are present, `diataxis_mode` equals the mode mapping, tutorial and how-to have an ordered step line, reference and explanation templates have no instructional heading, generated-block markers occur only in the four reference templates.
+  - Acceptance: the suite passes for 48 template files.
+- [ ] [P6-T4] Create `tests/scripts/claude-runtime/docs-authoring-roles.Mirrors.Tests.ps1`: each role exists at the six agent locations and each skill and template at the six skill locations of spec `## Mirror Set`; every bundle copy is byte-identical to its source; the `.github` and `.agents` template copies equal the Claude templates; every Claude file of this feature is listed once in the Claude `core.json` and every Codex and `.agents` file once in the Codex `core.json`; the three hook bundle copies are byte-identical.
+  - Acceptance: the suite passes.
+- [ ] [P6-T5] Create `tests/scripts/claude-runtime/docs-authoring-roles.Registration.Tests.ps1`: both settings copies carry exactly one `SubagentStop` group with the docs matcher and the `validate-docs-role-output.ps1` command and exactly one `PreToolUse` group with matcher `Write|Edit|MultiEdit|NotebookEdit|Bash` and the write-scope command, and are byte-identical; `docs_operations` maps every skill of K to the expected logical agent and tool list, each listed tool is held by that role's Claude agent file, and both routing copies are byte-identical.
+  - Acceptance: the suite passes; together the five structural suites stay under 500 logical lines each.
+- [ ] [P6-T6] Run the contract tests with pytest: `tests/scripts/dev_tools/` modules `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_codex_agent_wrapper_contracts.py`, `test_codex_handoff_contract_parity.py`, `test_claude_rules_frontmatter.py`, `test_quality_checks_workflow_contracts.py`, `test_push_down_issue_824_follow_ups.py`, `test_typescript_toolchain_instruction_contracts.py`, `test_codex_full_migration_inventory.py`, `test_discovery_publication_contracts.py`, `test_orchestration_routing_config_parity.py`, `test_codex_topology_policy_config_parity.py`, `test_skill_bundle_contract_repo.py`, `test_codex_agent_role_schema.py`, `test_scratch_location_contracts.py`, `test_codex_model_policy_config_parity.py`, `test_parallel_orchestrator_surface_contracts.py`; then the Codex generator `--check`; then Jest `test/lib/push-down/claude-pack-manifest-completeness.test.ts` through `node run-jest.cjs` in `extensions/drm-copilot/`; record in `<FEATURE>/evidence/regression-testing/contract-tests.<timestamp>.md`.
+  - Acceptance: zero new failures relative to [P0-T6]; generator exit 0; Jest suite passes.
+- [ ] [P6-T7] Repeat the hygiene scan of [P2-T8] into a new `hygiene-scan.<timestamp>.md`.
+  - Acceptance: zero matches.
+- [ ] [P6-T8] Commit the Phase 3 to Phase 6 files.
+  - Acceptance: `git status --porcelain` is empty for the committed paths.
+
+### Phase 7 — Final QA Loop and Closure
+
+- [ ] [P7-T1] Run the PoshQC formatter over the changed `.ps1` files; record in `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md`.
+  - Acceptance: `git status --porcelain` is identical before and after; a change restarts the loop from this task.
+- [ ] [P7-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the three hooks, the nine new test files and the two edited test files; record in `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
+  - Acceptance: zero findings; a finding is fixed and the loop restarts at [P7-T1].
+- [ ] [P7-T3] Run a fresh single-process `Invoke-PoshQCTest` over `tests/scripts` with coverage; record in `<FEATURE>/evidence/qa-gates/pester-coverage.<timestamp>.md` the JUnit counts and the per-file line coverage of the three new `.claude/hooks/` files and overall line coverage, compared with [P0-T5].
+  - Acceptance: zero failed tests other than baseline failures listed in [P0-T5]; each new hook file at least 85%; overall line coverage not below the baseline value; no production file excluded from `config/poshqc-coverage.json`.
+- [ ] [P7-T4] Run the eight new suites and the two edited suites in one process in seeded shuffled file order with seeds 1037, 2074 and 3111 (launcher under `SCRATCH`); record each seed and its file order in `<FEATURE>/evidence/regression-testing/pester-shuffle.<timestamp>.md`, together with the JUnit counts of the fresh single-process run of [P7-T3].
+  - Acceptance: zero failures for every seed; an order dependence is fixed on both sides and all seeds rerun.
+- [ ] [P7-T5] Run the full Python suite in the `quality-checks7` shape and the full Jest suite in `extensions/drm-copilot/` (data-file consumers of settings, manifests and routing); record in `<FEATURE>/evidence/qa-gates/python-jest-regression.<timestamp>.md`.
+  - Acceptance: no failing test other than the pre-existing failures listed in [P0-T6].
+- [ ] [P7-T6] Verify scope: `git diff --name-only BASE` together with `git status --porcelain` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`, no `.codex/config.toml` and no `.claude/lib/docs/` path; the nine new test files contain none of `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName`, `$env:TEMP` (fixed-string search); each new hook file is under 500 logical lines; record in `<FEATURE>/evidence/qa-gates/scope-check.<timestamp>.md`.
+  - Acceptance: every check reports zero offending paths or tokens.
+- [ ] [P7-T7] Compare the expansion of `## Artifact Classification` with the branch file list of [P7-T6]; record in `<FEATURE>/evidence/qa-gates/classification-check.<timestamp>.md`.
+  - Acceptance: every changed or created path is covered by exactly one row and no row expands to an absent file.
+- [ ] [P7-T8] Write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` by walking the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from `BASE`, one PASS, FAIL or N/A row per checklist item.
+  - Acceptance: no FAIL row; a FAIL is fixed, the loop reruns from [P7-T1], and the self-review is rewritten.
+- [ ] [P7-T9] Check off each satisfied item in `## Acceptance Criteria` of `<FEATURE>/spec.md` and `<FEATURE>/user-story.md` per the acceptance-criteria-tracking skill, citing its evidence artifact. Two groups stay unchecked: the N4-affected items (spec AC 9 and AC 11 and user-story AC 7, whose "without modification" clause is false once [P2-T5] and [P2-T6] add rows), with the gap and its cause recorded; and the CI-dependent items (spec AC 17, user-story AC 11), which the orchestrator checks off at S9 from the `pending-CI` record of [P7-T10]. Write the item-to-evidence mapping, the N4 gap and the N5 deviation to `<FEATURE>/evidence/qa-gates/ac-tracking.<timestamp>.md`; `spec.md` and `user-story.md` text other than checkboxes is not edited.
+  - Acceptance: every satisfied non-CI item is checked with an evidence reference; the N4-affected items are unchecked with the gap recorded in the `ac-tracking` artifact; the CI-dependent items are unchecked.
+- [ ] [P7-T10] Write `<FEATURE>/evidence/qa-gates/ci-pending.<timestamp>.md` listing the six CI contexts this feature relies on (`poshqc / PowerShell hook suites (Linux)` is not a ruleset-required context; the other five are) (`poshqc / PowerShell QC`, `poshqc / PowerShell hook suites (Linux)` and `quality-checks7 / Code Quality & Tests` for 3.10, 3.11, 3.12 and 3.13), each with status `pending-CI`, the CI-dependent items they gate (spec AC 17, user-story AC 11), and the note that the orchestrator records their conclusions from a run whose `CI full run` job succeeded (brief `## CI Shape and Required Checks`) and checks those items off at S9.
+  - Acceptance: the artifact lists exactly six contexts, each with `pending-CI`; spec AC 17 and user-story AC 11 remain unchecked.
+- [ ] [P7-T11] Repeat the hygiene scan of [P2-T8] into a new `hygiene-scan.<timestamp>.md`.
+  - Acceptance: zero matches.
+- [ ] [P7-T12] Commit the Phase 7 changes and push the branch.
+  - Acceptance: `git status --porcelain` is empty and the remote branch head equals `HEAD`; the executor's run ends here and needs no pull request or CI result.
+
+## Size Justification
+
+The plan has 52 tasks (above the 40-task guideline; it stays under 400 lines) because the feature spans four hosts and three bundles (24 agent files, 96 skill and template files, six hook files), each new hook needs its own test task, two existing completeness guards need separate additive edits, three commit points each need a hygiene scan, and the final QA loop carries format, analyze, coverage, isolation, cross-language regression, scope, classification, self-review, AC-tracking and CI-pending tasks. Copies produced by one copy step and files produced by one generator run are counted as one task.
 
 ## Pre-Mortem
 
-<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
-- Review checklists:
-- Coverage:
-- Mirror parity:
-- File size:
-- Test isolation:
-- CI-only behavior:
-- Evidence:
+- Review checklists: a reviewer can flag a docs role with Write, Edit or Bash beyond the design, a `memory:` field, a path-scoped entry presented as enforcement, or a skill naming an undefined option; [P6-T1] and [P6-T2] assert each, and [P7-T8] walks the three audit templates.
+- Coverage: the three new `.claude/hooks/` files are inside `config/poshqc-coverage.json`; [P1-T2], [P1-T4] and [P2-T2] cover every token rule, deny rule, pass-through, `StopHookActive` path and dependency failure; [P7-T3] reads per-file line coverage (at least 85%, no PowerShell branch gate) from `artifacts/pester/powershell-coverage.xml`.
+- Mirror parity: copies are produced in [P2-T3], [P3-T4] and [P4-T5]; the only generator is [P5-T3] (Codex generator write once, then `--check`); [P6-T4] and [P6-T6] run the suites of brief `## Contract Tests That Pin Mirrored Files`. No fact stated by the execution-environment brief changes (no CI job, required context, tool route or batch-budget rule), so no brief-update task is needed. Bundle copies are made by a copy step, not Write or Edit, so they do not consume the PowerShell batch budget; execution runs under the exempt route anyway ([P0-T3]).
+- File size: each hook stays under 500 logical lines; the structural suite is split by concern from the start into five files plus one helper; Markdown is exempt.
+- Test isolation: [P7-T4] runs seeded shuffled file-order Pester runs with seeds 1037, 2074 and 3111 over the new and edited suites in one process, and [P7-T3] is the fresh single-process run over `tests/scripts`; no Python or Jest test changes, so no reversed-order Python run or seeded Jest run applies. Each suite removes in `AfterAll` what it adds.
+- CI-only behavior: `tests/scripts/claude-hooks` also runs in `poshqc / PowerShell hook suites (Linux)` on a case-sensitive file system; tests use `Join-Path`, forward-slash relative paths and no drive letters; settings and routing edits contain no CR so the `eol=lf` rule keeps the copies identical; no test reads gitignored `artifacts/` state. The six CI contexts of [P7-T10] are recorded as `pending-CI` in [P7-T10], and the orchestrator confirms them at S9 from a run whose `CI full run` job succeeded.
+- Evidence: every command step writes `Timestamp`, `Command`, `EXIT_CODE`, `Output Summary` under `<FEATURE>/evidence/<kind>/` with write-time stamps and `SCRATCH` for scratch paths; counts come from JUnit and coverage files, not PoshQC MCP summaries.
 
 ## Test Plan
 
-- Unit: ...
-- Integration: ...
-- Manual/CLI: ...
-- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
+- Unit (Pester): `docs-role-contract.Tests.ps1`, `validate-docs-role-output.Tests.ps1`, `enforce-docs-role-write-scope.Tests.ps1` under `tests/scripts/claude-hooks/`.
+- Structural (Pester): `docs-authoring-roles.{Allowlist,Skills,Templates,Mirrors,Registration}.Tests.ps1` under `tests/scripts/claude-runtime/`.
+- Existing guards: `hook-dependency-failure.Claude.Tests.ps1` and `subagentstop-uncaught-error.Tests.ps1` (additive rows); all other listed suites unchanged.
+- Contract and regression: [P6-T6] list, Codex generator `--check`, full Python and Jest suites ([P7-T5]).
+- Coverage evidence: baseline `<FEATURE>/evidence/baseline/pester-coverage.<timestamp>.md`; post-change `<FEATURE>/evidence/qa-gates/pester-coverage.<timestamp>.md` (includes the comparison).
 
 ## Open Questions / Notes
 
-- ...
+Reconciliations (epic governs where spec and epic differ):
+
+- N1. Mirrors: the epic `### 1037` Files bullet says mirrors are produced by existing generators. The existing generators do not produce non-generated agents or skills (research section 1.3); the only applicable generator is the Codex generator, run in [P5-T3]; all other copies are hand-authored or byte copies (spec OQ-4 default). No generator is extended. OQ-4 (epic text correction) stays open.
+- N2. 1036 OQ-A: `run_docs_inventory` and `generate_docs_reference` never persist. Snapshot and generated reference pages are therefore written by root steps (`inventory -Write`, `generate-reference -Write`); `docs-author` edits prose around markers with Write and Edit. The spec per-skill table wording is read accordingly.
+- N3. 1036 OQ-B: the docs tools are not added to `.claude/settings.json` `permissions.allow` or `.codex/config.toml` (spec OQ-2 default).
+- N4. Spec AC "`hook-dependency-failure.Claude.Tests.ps1` ... pass without modification" and the mirror AC's "without modification" cannot hold: B4 in that file and U2 in `subagentstop-uncaught-error.Tests.ps1` require a row for every new hook. [P2-T5] and [P2-T6] add rows only (1034 precedent). Orchestrator decision (option b): spec AC 9 and AC 11 and user-story AC 7 stay unchecked, and [P7-T9] records the gap in `<FEATURE>/evidence/qa-gates/ac-tracking.<timestamp>.md`; `spec.md` and `user-story.md` wording is not edited.
+- N5. Surface-delta finding codes differ between the 1034 spec and the epic (`DOCS_SURFACE_DELTA_UNLEDGERED`); skills name no surface-delta finding code, only the subcommand, its dispatch-row options (recorded in [P0-T2]), the evidence artifact name and the 1034 review finding.
+- N6. The spec names one structural suite `docs-authoring-roles.Tests.ps1`; it is split by concern into five files from the start, as the spec allows.
+- N7. `StopHookActive`: missing and invalid tokens are repairable and block on every stop; an envelope anomaly is non-repairable and is allowed on re-entry (precedent `validate-required-artifact-output.ps1`); dependency failure and unhandled errors always block.
+- N8. Copilot tool equivalence: `read/readFile` and `search` for read access, `edit/createFile` and `edit/editFiles` for Write and Edit, any `execute` item for Bash.
+- N9. The write-scope hook reads only the default profile path; a profile at another path leaves rule 5 inactive while rules 1 to 4 and 6 stay in force.
+- N10. Upstream files (`.claude/lib/docs/Invoke-DocsCommand.ps1`, the 1036 tool names) are not in the tree at planning time; [P0-T2] blocks execution until they are merged.
+- N11. CI-dependent items (spec AC 17, user-story AC 11) are orchestrator-owned at S9 (orchestrator decision, option a). [P7-T10] records the six CI contexts as `pending-CI`; the executor's run ends at [P7-T12] without waiting for a pull request.
+
+Contracts for 1038: role names and allowlists; `update_docs_ledger` only in `docs-reconciler`; skill names and `documentation-workflow` order; `docs_operations` map; root-only steps (`init`, `validate-profile`, `inventory -Write`, `generate-reference -Write`, receipt persistence); template paths and front-matter form; result tokens; hook prefixes `DOCS_ROLE_OUTPUT_BLOCKED:` and `DOCS_ROLE_WRITE_SCOPE_BLOCKED:`; write-scope rules 1 to 6; Codex and Copilot prerequisite statement; a new docs role extends `Get-DocsRoleName`, the SubagentStop matcher and `docs_operations` together.
