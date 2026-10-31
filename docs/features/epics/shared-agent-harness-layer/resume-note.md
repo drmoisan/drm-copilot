@@ -23,7 +23,7 @@ No cleared plan has an open preflight defect.
 
 | Child | Issue | Wave | depends_on | State at pause |
 | --- | --- | --- | --- | --- |
-| 8 vendored-code coverage carve-out | #1049 | 3 | 1029 | Preparation orchestrator was running at pause (adopts #1049; branch `feature/pushed-down-vendored-code-coverage-carve-out-1049`, last pushed head 146324e12). The epic planner has no message channel to it, so it could not be told to stop; it commits and pushes after each step. Status of research, spec, plan and preflight is unknown at the time of this note. |
+| 8 vendored-code coverage carve-out | #1049 | 3 | 1029 | Paused before preflight (updated after its hand-back). Branch `feature/pushed-down-vendored-code-coverage-carve-out-1049`, pushed head 2362ce80f. Folder docs/features/active/2026-10-31-pushed-down-vendored-code-coverage-carve-out-1049; research research/research.2026-10-31T18-20.md; plan plan.2026-10-31T14-03.md (54 tasks, plan validators pass). Child checkpoint next_step `S4b_preflight:atomic-executor`, paused_for_quota true, no failure recorded. Known item for preflight: [P4-T13] cites "the AC mapping below", which is not in the plan file. Not yet fanned in. |
 | 9 CI workflows per ecosystem pack | #1050 | 4 | 1049, 1028, 1029 | Not started. Promoted record committed. |
 | 10 integration MCP tools and skill | #1051 | 5 | 1049, 1050 | Not started. Promoted record committed. |
 
@@ -55,9 +55,12 @@ Promoted records: docs/features/potential/promoted/2026-10-31-pushed-down-vendor
 
 ## Exact next step
 
-1. Read the #1049 preparation result from its branch and its worktree checkpoint (preparation
-   status, plan path, preflight signal). If it is not ALL CLEAR, resume it from its recorded
-   `next_step` with a replacement preparation-mode orchestrator that adopts the branch.
+1. Resume #1049 at its executor preflight (single pass, at most one planner revision) with a
+   replacement preparation-mode orchestrator that adopts the branch and copies the child checkpoint.
+   Owner questions from #1049 carry provisional defaults in its spec (OQ-1: the destination check
+   lives in the bundled PoshQC module, run by the PoshQC MCP tools against a destination, rather
+   than a module pushed into destinations; OQ-2, OQ-3, OQ-5, OQ-6 yes; OQ-4, OQ-7 deferred); a
+   different answer before execution requires re-planning.
 2. Prepare #1050, then #1051, each adopting its existing issue, one at a time within the agent cap.
 3. Fan in children 8 to 10, back-fill their `feature_folder` values in epic.md, then write
    `artifacts/orchestration/epic-kickoff-shared-agent-harness-layer.md` and its committed copy
