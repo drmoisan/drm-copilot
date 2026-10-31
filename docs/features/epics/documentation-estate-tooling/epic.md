@@ -142,6 +142,16 @@ Consequences applied in this document:
 - Q6-Q10 (raised by 1020) were not addressed by these decisions; their provisional defaults stand.
 - The language rule is otherwise unchanged.
 
+- **P1-P4 (2026-10-31, all approved).** P1: one further requirements-change cycle for 1020 (remove
+  real-process and real-timer `Invoke-DocsProcess` tests in favor of injected seams; fix the
+  `patternProperties` walk, the empty `accept.txt` read, absolute template `Source` paths, and the
+  zero-row registry assertion, which becomes a membership assertion). P2: one reconciliation
+  revision for 1024 to use 1021's current finding names. P3: one reconciliation revision for 1033;
+  precision-limit diagnostics carry the `docs.precision-limit` marker (1023 wins over 1033 spec row
+  C5). P4: 1037's push-down copy of `orchestration-routing.json` gets the `docs_operations` block,
+  and 1037 may hand-author mirrors the existing generators cannot produce; both are recorded as
+  explicit exceptions in its plan.
+
 ### Amendment of 1020 required by D3 and D5
 
 1020 was cleared before these decisions. Its schemas and contracts gain: an `analysis_method`
