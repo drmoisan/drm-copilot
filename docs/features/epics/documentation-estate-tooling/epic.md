@@ -454,6 +454,14 @@ acknowledgement before execution:
   1022's prepared contract settles it (whole normalized file, `line_range: null`, through 1020's
   `New-DocsSurfaceElement`); 1031's [P0-T3] recomputation verifies it at execution.
 
+Outcome of 1037's preparation (2026-10-31, `PREFLIGHT: ALL CLEAR`), open items:
+- The existing generators do not produce mirrors for new agents or skills; the plan runs only the
+  Codex agent-variant generator and authors or byte-copies the other mirrors (the 900009/1037
+  Files bullet's generator wording is superseded).
+- The push-down copy `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`
+  is not updated by the plan, so push-down destinations would not receive the `docs_operations`
+  block. Owner decision pending (1037 OQ-5).
+
 ### Command contract decisions from the first preparation of 1023 (language-independent)
 
 - Exit codes: 0 pass, 1 findings, 2 usage or input error, 3 internal or I/O error (extends the
