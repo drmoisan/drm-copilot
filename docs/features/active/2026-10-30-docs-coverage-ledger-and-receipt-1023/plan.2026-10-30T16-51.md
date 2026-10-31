@@ -107,7 +107,7 @@ No hook, skill, agent, MCP tool, extension command, schema, example, Python, or 
 
 ### Phase 1 — Test Support and the Ledger Module
 
-- [ ] [P1-T1] Create `TESTS/DocsLedger.TestSupport.psm1` per `## Design Notes` and `TESTS/DocsLedger.TestSupport.Tests.ps1`. The fixture snapshot holds one element of each of the six kinds built with 1020 `New-DocsSurfaceElement` (mixed-case declarations, both `analysis_method` values), one scanner and one native analyzer, and one precision-limit diagnostic built with `New-DocsDiagnostic` carrying the `docs.precision-limit` marker; the fixture profile sets `artifact_paths`, `documentation_roots`, `page_owners`, and `completion_gates.docs_complete`.
+- [ ] [P1-T1] Create `TESTS/DocsLedger.TestSupport.psm1` per `## Design Notes` and `TESTS/DocsLedger.TestSupport.Tests.ps1`. The fixture snapshot holds one element of each of the six kinds built with 1020 `New-DocsSurfaceElement` (mixed-case declarations, both `analysis_method` values), one scanner and one native analyzer, and one precision-limit diagnostic built with `New-DocsDiagnostic` and then given the `docs.precision-limit` marker in its `extensions` member (the 1020 constructor `New-DocsDiagnostic -Code -Path -Message -AnalyzerId [-Blocking]` takes no extensions argument); the fixture profile sets `artifact_paths`, `documentation_roots`, `page_owners`, and `completion_gates.docs_complete`.
   - Tests: `It 'records every context call in order'`, `It 'returns written text on a later ReadBytes'`, `It 'raises the injected read and write failures'`, `It 'fixture snapshot produces no finding from Test-DocsArtifactText'`, `It 'fixture profile loads without an error finding'`, `It 'shuffle is a permutation and deterministic per seed'`.
   - Acceptance (suite form): `DocsLedger.TestSupport.Tests.ps1`; evidence `p1-test-support`.
 - [ ] [P1-T2] Create `LIB/DocsLedger.psm1` with `ConvertTo-DocsSnapshotView`, `Test-DocsPrecisionLimitDiagnostic`, `Get-DocsPrecisionLimitElementId`, `New-DocsLedgerEntry`, `New-DocsPrecisionLimitEntry`, and `New-DocsLedgerDocument` (imports `DocsJson.psm1`, `DocsFinding.psm1`, `DocsSurface.psm1`), plus `TESTS/DocsLedger.Tests.ps1` and the six properties of `## Pure Function Property Map` in `TESTS/DocsLedger.Properties.Tests.ps1`.
@@ -172,7 +172,7 @@ No hook, skill, agent, MCP tool, extension command, schema, example, Python, or 
   - Tests: `It 're-pins the same element and page under the same pin_id and clears staleness'`, `It 'unpin removes the pin and its id from every row'`, `It 'set-dimension creates the row and derives evidence_pin_ids'`, `It 'sync-refs refreshes analysis_method and sets both refs'`, `It 'rejects pin, unpin and set-dimension on a precision-limit id'`, `It 'writes only through Invoke-DocsArtifactWrite with Write'`, `It 'exits 3 with one DOCS_CLI_RUNTIME naming the path on a digest conflict'` (written paths in `related_paths`), `It 'exits 3 for an injected write failure, an injected read failure and a non-UTC clock'`, `It 'emits schema-valid byte-identical Json envelopes'`, `It 'prints the summary line without Json'`.
   - Acceptance (suite form): `DocsLedgerCommands.UpdateLedger.Tests.ps1`; evidence `p4-update-ledger-pins`.
 - [ ] [P4-T6] Add `Invoke-DocsValidateCommand` to `LIB/DocsLedgerCommands.psm1`, with `TESTS/DocsLedgerCommands.Validate.Tests.ps1`.
-  - Tests: `It 'makes zero WriteText calls without WriteReceipt in every mode'`, `It 'writes only the receipt at validation_receipt on pass and on fail with WriteReceipt'`, `It 'pins the receipt revision to the Revision argument'`, `It 'exits 2 for WriteReceipt with any other mode'`, `It 'reports DOCS_LEDGER_LIMIT_UNRECORDED in ledger mode'`, `It 'exits 1 with DOCS_SNAPSHOT_UNPINNED for a null snapshot revision in docs-complete'`, `It 'exits 1 with null result when the profile does not load'`, `It 'exits 2 for a missing Mode, an invalid Revision and an unknown option before any read'`, `It 'exits 3 for an injected read failure, a receipt write failure and a non-UTC clock'`, `It 'emits schema-valid byte-identical Json envelopes'`, `It 'prints the summary line without Json'`.
+  - Tests: `It 'makes zero WriteText calls without WriteReceipt in every mode'`, `It 'writes only the receipt at validation_receipt on pass and on fail with WriteReceipt'` (the written text, parsed with `ConvertFrom-DocsJsonText`, carries `id`, `mode`, `repository`, `revision`, and `validation_result` equal to those of the receipt in `result`; these are the fields the 1034 hook reads), `It 'pins the receipt revision to the Revision argument'`, `It 'exits 2 for WriteReceipt with any other mode'`, `It 'reports DOCS_LEDGER_LIMIT_UNRECORDED in ledger mode'`, `It 'exits 1 with DOCS_SNAPSHOT_UNPINNED for a null snapshot revision in docs-complete'`, `It 'exits 1 with null result when the profile does not load'`, `It 'exits 2 for a missing Mode, an invalid Revision and an unknown option before any read'`, `It 'exits 3 for an injected read failure, a receipt write failure and a non-UTC clock'`, `It 'emits schema-valid byte-identical Json envelopes'`, `It 'prints the summary line without Json'`.
   - Acceptance (suite form): `DocsLedgerCommands.Validate.Tests.ps1`; evidence `p4-validate`.
 
 ### Phase 5 — Write-Boundary Proof and Integration
@@ -292,19 +292,19 @@ Suites are under `TESTS`; evidence names are under `FEATURE/evidence/regression-
 | S9 | P3-T3, P3-T4 | `DocsValidation.Tests.ps1` schema-valid receipt cases | `p3-validation-ledger`, `p3-validation-complete` |
 | S10, U17 | P3-T1, P3-T3 | `DocsReceipt.Tests.ps1` identity property and receipt cases; `DocsValidation.Tests.ps1` receipt cases | `p3-receipt`, `p3-validation-ledger` |
 | S11 | P3-T1 | `DocsReceipt.Tests.ps1` pin and sort cases | `p3-receipt` |
-| S12, U15 | P3-T3, P3-T4, P4-T6 | `DocsValidation.Tests.ps1` unpinned and mismatch cases; Validate unpinned case | `p3-validation-complete`, `p4-validate` |
+| S12, U15 | P3-T3, P3-T4, P4-T6 | `DocsValidation.Tests.ps1` unpinned and mismatch cases; Validate unpinned case | `p3-validation-ledger`, `p3-validation-complete`, `p4-validate` |
 | S13 | P3-T4 | `DocsValidation.Tests.ps1` gate cases | `p3-validation-complete` |
 | S14 | P2-T1, P2-T4 | `DocsParity.Tests.ps1` matrix-code cases; `DocsEvidencePins.Tests.ps1` inconsistency cases | `p2-parity-matrix`, `p2-evidence-pins` |
 | S15 | P2-T3 | `DocsParity.Tests.ps1` glob table and owner cases | `p2-parity-core` |
 | S16 | P2-T3 | `DocsParity.Tests.ps1` score cases | `p2-parity-core` |
-| S17 | P4-T1, P4-T4, P4-T5 | `DocsLedgerCommands.Tests.ps1` argument cases; UpdateLedger operation cases | `p4-arguments`, `p4-update-ledger-pins` |
+| S17 | P4-T1, P4-T4, P4-T5 | `DocsLedgerCommands.Tests.ps1` argument cases; UpdateLedger operation cases | `p4-arguments`, `p4-update-ledger-dispositions`, `p4-update-ledger-pins` |
 | S18, U5 | P4-T4 | UpdateLedger newly-introduced-rule cases | `p4-update-ledger-dispositions` |
 | S19, U4, U8 | P3-T2, P4-T4, P4-T5 | `DocsLedgerMutation.Tests.ps1`; UpdateLedger dry-run, write and conflict cases | `p3-mutation`, `p4-update-ledger-pins` |
 | S20, U1, U18 | P4-T3, P4-T6 | `DocsLedgerCommands.Tests.ps1` zero-write case; Validate write cases | `p4-coverage`, `p4-validate` |
 | S21, U9 | P5-T1 | `DocsWriteBoundary.Tests.ps1` | `p5-write-boundary` |
 | S22, U16, U19 | P4-T1, P4-T3, P4-T5, P4-T6 | exit 0/1/2/3 cases in the three command suites | `p4-coverage`, `p4-update-ledger-pins`, `p4-validate` |
 | S23 | P4-T3, P4-T5, P4-T6 | envelope schema and determinism cases in the three command suites | `p4-coverage`, `p4-update-ledger-pins`, `p4-validate` |
-| S24 | P4-T3, P4-T5, P4-T6 | summary-line cases in the three command suites | `p4-coverage`, `p4-validate` |
+| S24 | P4-T3, P4-T5, P4-T6 | summary-line cases in the three command suites | `p4-coverage`, `p4-update-ledger-pins`, `p4-validate` |
 | S25, U2 | P4-T3 | `DocsLedgerCommands.Tests.ps1` result and absent-ledger cases | `p4-coverage` |
 | S26, U20 | P3-T1 | `DocsReceipt.Tests.ps1` gate-decision cases | `p3-receipt` |
 | S27 | P4-T2 | `DocsLedgerCommands.Tests.ps1` dispatch-row cases | `p4-dispatch` |
