@@ -65,7 +65,7 @@ No hook, skill, agent, MCP tool, extension command, schema, example, Python, or 
 
 | Test | Behavior it asserts | Task | Disposition |
 |---|---|---|---|
-| `TESTS/Invoke-DocsCommand.Tests.ps1` (1020) | `Test-DocsCommandTable` has no finding for the committed table; anchor order read from the script text; `-Help` lists the table rows | [P4-T2] | Unchanged when [P0-T1] records no exact row-count, row-set, or help-text assertion; otherwise updated in [P4-T2], test file only, to expect the five rows, because the 1023 rows are added by design under the 1023 anchor |
+| `TESTS/Invoke-DocsCommand.Tests.ps1` (1020) | `Test-DocsCommandTable` has no finding for the committed table; anchor order read from the script text; `-Help` lists the table rows | [P4-T2] | Unchanged when [P0-T1] records no exact row-count, row-set, or help-text assertion; otherwise updated in [P4-T2], test file only, to expect the three 1023 rows in addition to the rows present at `MERGE_BASE`, because the 1023 rows are added by design under the 1023 anchor |
 | `TESTS/Docs.Manifest.Tests.ps1` (1020) | every `LIB` file is listed once in `core.json` and SHA-256 identical in `BUNDLE` | [P6-T2] | Unchanged; gains eight cases that pass once [P6-T1] and [P6-T2] land |
 | `TESTS/DocsNeutrality.Tests.ps1` (1020) | no configured consumer identifier digest in any `LIB` file | [P6-T2] | Unchanged; gains one case per new file |
 | `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` | every `.psm1` under `.claude/lib` states `$script:ConventionToken` and the strict-mode pair | [P6-T2] | Unchanged; gains eight modules |
