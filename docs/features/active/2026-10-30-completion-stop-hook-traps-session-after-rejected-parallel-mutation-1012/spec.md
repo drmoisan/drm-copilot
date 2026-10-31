@@ -299,7 +299,7 @@ Out of scope: no relaxation of validation when a checkpoint exists or state was 
 - [x] AC-17: `validate-orchestrator-output-rejection.ps1` and `validate-orchestrator-output.ps1` each report at or above 85% line coverage in `artifacts/pester/powershell-coverage.xml`.
 - [x] AC-18: The full toolchain passes in a single pass (format, lint, type-check, architecture, unit, contract, integration) for the changed PowerShell and Python files, the new suites satisfy `enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` AC-6, and three seeded shuffled runs plus one single-process run over `tests/scripts` pass, with evidence under `evidence/qa-gates/` and `evidence/regression-testing/`.
 - [x] AC-19: No changed or new file exceeds 800 logical lines.
-- [ ] AC-20 (CI-dependent): The CI run on the PR head, including the Linux `poshqc / PowerShell hook suites` job, concludes `success`.
+- [x] AC-20 (CI-dependent): The CI run on the PR head, including the Linux `poshqc / PowerShell hook suites` job, concludes `success`.
 
 ### Acceptance Criteria Evidence
 
