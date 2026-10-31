@@ -56,7 +56,7 @@ The repository's two large test suites run slowly, locally and in CI.
 - [ ] The slow-file profile of Pester test files at or above 10 s is recorded as diagnosis, with non-trivial fixes filed as follow-ups.
 - [ ] Pester suites pass when run as concurrent shards and under seeded shuffled file-order runs, with no cross-file state leaks and no ordering workarounds.
 - [ ] Every changed or new PoshQC file has a bundled mirror, and the bundled parity test passes with the new module path.
-- [ ] The brief's `## Test Runtime` section is updated in every copy and the mirror contract tests pass.
+- [x] The brief's `## Test Runtime` section is updated in every copy and the mirror contract tests pass.
 - [ ] `test_quality_checks_workflow_contracts.py` passes with the changed pytest step, and the PoshQC and workflow contract tests pass with the changed Pester path.
 - [ ] No new Python script is added.
 

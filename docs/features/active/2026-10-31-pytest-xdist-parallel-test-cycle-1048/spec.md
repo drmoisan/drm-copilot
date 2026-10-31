@@ -146,7 +146,7 @@ Owner decisions that bind this spec are recorded in `owner-decisions.md` in this
 
 ### Documentation and constraints
 
-- [ ] `## Test Runtime` is updated in every copy of the execution-environment brief for both runners, retaining all pinned tokens, and `## Test Isolation Checks` gains the concurrent-run bullet; the mirror contract tests pass.
+- [x] `## Test Runtime` is updated in every copy of the execution-environment brief for both runners, retaining all pinned tokens, and `## Test Isolation Checks` gains the concurrent-run bullet; the mirror contract tests pass.
 - [ ] No new Python script is added, and the changed files include no Python enforcement-hook invocation.
 - [ ] The Linux hook-suite job is unchanged and its non-required status is recorded as an observation.
 - [x] The explanation of the Pester test file count difference is recorded from the discovery count.
