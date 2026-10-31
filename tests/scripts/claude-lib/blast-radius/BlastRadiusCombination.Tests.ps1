@@ -122,6 +122,13 @@ Describe 'BlastRadiusCombination (issue #1013)' {
             { Get-BlastRadiusCombination -Item $repeated -Config $data['config'] -Relation $script:ConflictRelation } | Should -Throw
         }
 
+        It 'rejects a repeated item key with the distinct-keys message' {
+            $data = Read-CombinationCase -Path $script:ChainPath -Index 0
+            $item = @($data['case']['items'])
+            $repeated = @($item[0], $item[0])
+            { Get-BlastRadiusCombination -Item $repeated -Config $data['config'] -Relation $script:ConflictRelation } | Should -Throw -ExpectedMessage '*must be distinct*'
+        }
+
         It 'requires the relation' {
             $data = Read-CombinationCase -Path $script:ChainPath -Index 0
             { Get-BlastRadiusCombination -Item @($data['case']['items']) -Config $data['config'] } | Should -Throw

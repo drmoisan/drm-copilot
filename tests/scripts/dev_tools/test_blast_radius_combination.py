@@ -204,6 +204,21 @@ def test_find_combinations_does_not_mutate_its_inputs() -> None:
     assert config == config_before
 
 
+def test_find_combinations_rejects_a_repeated_item_key() -> None:
+    """Two items sharing one key are rejected with the distinct-keys message."""
+    from scripts.dev_tools._blast_radius_combination import find_combinations
+
+    fixture = load_fixture("combination-component-chain")
+    case = records(fixture["cases"])[0]
+    items = case_items(case)
+    config = case_config(fixture, case)
+    tolerance = cast("dict[str, object]", config["conflict_tolerance"])
+    assert cast("int", tolerance["tolerance_percent"]) > 0
+
+    with pytest.raises(ValueError, match="must be distinct"):
+        find_combinations([items[0], items[0]], config)
+
+
 @pytest.mark.parametrize(
     ("label", "paths_a", "paths_b", "mergeable", "expected"),
     [
