@@ -260,4 +260,43 @@ Describe 'Invoke-PoshQCParallelTest' {
         $result.ExitCode | Should -Be 0
         $result.WallClockSeconds | Should -BeGreaterOrEqual 0
     }
+
+    It 'PR10-OMITTED-ROOT-USES-CURRENT-LOCATION defaults the root to the current location when -Root is omitted' {
+        # Arrange
+        $state = & $script:NewState
+        $seams = & $script:NewSeams $state
+        $seams.Remove('Root')
+
+        # Act
+        Push-Location -LiteralPath $PSScriptRoot
+        try {
+            $expectedRoot = (Get-Location).ProviderPath
+            $null = Invoke-PoshQCParallelTest @seams -WorkerCount 1
+        } finally {
+            Pop-Location
+        }
+
+        # Assert
+        $state.Started[0].Arguments[4] | Should -Match ([regex]::Escape("-Root '$expectedRoot'"))
+        $state.Resets[0].StartsWith((Join-Path $expectedRoot 'artifacts/pester/parallel'), [System.StringComparison]::Ordinal) | Should -BeTrue -Because 'the shard directories live under the current location'
+    }
+
+    It 'PR11-RELATIVE-ROOT-RESOLVES-AGAINST-CURRENT-LOCATION resolves a relative -Root against the current location' {
+        # Arrange
+        $state = & $script:NewState
+        $seams = & $script:NewSeams $state
+        $seams.Root = 'relative-root'
+
+        # Act
+        Push-Location -LiteralPath $PSScriptRoot
+        try {
+            $expectedRoot = [IO.Path]::GetFullPath([IO.Path]::Combine((Get-Location).ProviderPath, 'relative-root'))
+            $null = Invoke-PoshQCParallelTest @seams -WorkerCount 1
+        } finally {
+            Pop-Location
+        }
+
+        # Assert
+        $state.Started[0].Arguments[4] | Should -Match ([regex]::Escape("-Root '$expectedRoot'"))
+    }
 }
