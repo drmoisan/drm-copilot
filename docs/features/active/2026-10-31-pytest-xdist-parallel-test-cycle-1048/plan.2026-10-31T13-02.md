@@ -119,7 +119,7 @@
 
 ### Phase 7 — Weights File, Concurrent-Run Comparison, Pester Isolation, and Diagnosis
 
-- [ ] [P7-T1] Download the `poshqc-test-results-shard-1`, `poshqc-test-results-shard-2`, and `poshqc-test-results-shard-3` artifacts of the P0-T5 run into `SCRATCH/issue-1048-ci-junit/` with `gh run download`, run `Export-PoshQCShardWeight` over the `pester-junit.xml` file in each shard directory, write `config/poshqc-shard-weights.json`, and record `FEATURE/evidence/other/shard-weights-generation.<timestamp>.md`.
+- [x] [P7-T1] Download the `poshqc-test-results-shard-1`, `poshqc-test-results-shard-2`, and `poshqc-test-results-shard-3` artifacts of the P0-T5 run into `SCRATCH/issue-1048-ci-junit/` with `gh run download`, run `Export-PoshQCShardWeight` over the `pester-junit.xml` file in each shard directory, write `config/poshqc-shard-weights.json`, and record `FEATURE/evidence/other/shard-weights-generation.<timestamp>.md`.
   - Acceptance: the four schema fields; the summary records the run id, the number of files listed, and that `PoshQC.ShardWeights.Tests.ps1` passes; the weights file parses through `ConvertFrom-PoshQCShardWeightJson` without error and lists no absolute path (no entry begins with `/` or contains `:`).
 - [ ] [P7-T2] Record the shard assignment the committed weights produce: run `Select-PoshQCShardTestFile` for shards 1 to 3 over the test files the default enumeration returns for the scan folders of `config/poshqc-scan.json`, and sum each shard's weights, in `FEATURE/evidence/other/shard-balance-projection.<timestamp>.md`.
   - Acceptance: three rows with file count and projected milliseconds, and the projected spread compared with the P0-T5 measured spread.
