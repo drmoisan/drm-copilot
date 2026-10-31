@@ -19,7 +19,7 @@ intent:
     - Line coverage >= 85% and branch coverage >= 75% (where measured) for changed code.
 features:
   - issue_num: 1025
-    feature_folder: harness-survey-gold-standard-contracts-parity-matrix
+    feature_folder: 2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025
     depends_on: []
   - issue_num: 1035
     feature_folder: 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035
