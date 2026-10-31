@@ -102,7 +102,7 @@ Matrix upkeep: for each selected entry whose single source now exists, child 3 r
 - Excluded: Codex metadata `agents/openai.yaml`; skills with no selected matrix entry (tool-only skills), which are neither written nor deleted.
 - An extra file in a generated `.claude/skills/<name>/` folder with no source counterpart is reported as drift.
 - Content: approved positive differences from child 1's approval artifact are ported into the shared bodies (child 1 Q4); contract linking follows child 1 Q2.
-- The first generated write of `.claude/skills/epic-orchestrate/SKILL.md` changes its pinned hash; `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment in the same change.
+- `.claude/skills/epic-orchestrate/SKILL.md` is a protected target (PQ-2): the skill mirror renders it byte-equal to its post-merge content, so its pinned hash does not change and `PINNED_FROZEN_SURFACE_HASHES` is not re-baselined.
 
 ### Surface: path-scoped rules
 
@@ -119,7 +119,7 @@ Matrix upkeep: for each selected entry whose single source now exists, child 3 r
 - Codex variant families: for families the source marks as variant families (the set in `GENERATED_AGENT_FAMILIES`), the base is emitted in the alias form that `render_base_alias` produces, using the C3 values from `config/orchestration-routing.json` `codex_model_policy`. The existing Python generator then writes the variants unchanged (research section 2, option A); its `--check` remains the authority on alias form.
 - `hooks:` frontmatter is reproduced exactly, so `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py` passes.
 - Write scopes (D-16): under OQ-9's default, the `Write(`/`Edit(` literals in the source are passed through unchanged, including each agent's existing leading-slash spelling; the generator computes no literal. Child 2's spec states that the base Codex files of `atomic-planner`, `prd-feature`, `feature-review`, `status-updater` and `epic-review` carry these literals as text; a search of `.codex/agents` on this branch confirms `Write(` text in Codex agent files. (Research section 1.4 states that Codex agents carry no write scopes; that statement does not match the tree.) Research section 7 proposed rendering docs-root scopes from child 2's PowerShell resolver; OQ-9 supersedes that proposal because the resolver carries no write-scope rules.
-- The first generated write of `.claude/agents/epic-orchestrator.md` is re-baselined in `PINNED_FROZEN_SURFACE_HASHES` as for the skill mirror.
+- `.claude/agents/epic-orchestrator.md` is a protected target (PQ-2): the agent generator renders it byte-equal to its post-merge content, so, as for the skill mirror, `PINNED_FROZEN_SURFACE_HASHES` is not re-baselined.
 
 ### Edge cases
 
@@ -174,7 +174,7 @@ A repository-internal generator is neither an MCP tool nor an extension command,
 | Parity-matrix checks used by child 3 (matrix upkeep assertion that no selected entry with an existing source keeps `pending-source:`) | CI, inside the repository gate | Same as above; reads JSON with `ConvertFrom-Json`; child 1's PowerShell modules are reused, not duplicated | PowerShell |
 | Survey tooling | None in child 3 (child 1 owns the survey); any session helper is PowerShell in the session scratch location and is not committed | No-new-Python sentence | PowerShell (uncommitted) or none |
 | Codex agent-variant generation (`scripts/dev_tools/generate_codex_agent_variants.py`) | Repository and CI (`Verify Codex agent deployment profiles` in `.github/workflows/_quality-checks.yml`) | "Existing Python is tolerated: reuse, call": reused unchanged, called by its own CLI, not edited, not invoked from PowerShell | Existing Python (unchanged) |
-| `PINNED_FROZEN_SURFACE_HASHES` re-baseline in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` | CI | "Extend in place": a constant update in an existing Python test helper; no new Python file | Existing Python (in-place edit) |
+| `PINNED_FROZEN_SURFACE_HASHES` in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` | CI | Not changed: both pinned files are protected targets that render byte-equal (PQ-2); no Python file is edited | Existing Python (unchanged) |
 | D-16 write-scope literal handling in the agent generator | Repository and CI | PowerShell cannot import child 2's TypeScript source; raised as OQ-9, not decided here | PowerShell pass-through (OQ-9 default); child 2's TypeScript checker remains the assertion |
 | Source data (`scripts/harness-generation/sources/**`, `.agents/skills/**`) | Data | Not code | JSON and Markdown |
 | MCP wrapper over a generator | MCP server package | Clause (2) | Not in child 3 scope; TypeScript if child 4 requests one |
@@ -202,9 +202,9 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 - One plan file carrying a `## Size Justification` (OQ-8), with phases:
   - Phase 0: gate and baseline evidence.
   - Phase 1: framework (common module, entry script, unit tests), `quality-tiers.yml` entry, MCP source and generator, `AGENTS.md` rewrite and `CLAUDE.md` import, instructions check.
-  - Phase 2: skill mirror (generator, tests, content reconciliation in child 1's batches, first generation, hash re-baseline).
+  - Phase 2: skill mirror (generator, tests, content reconciliation in child 1's batches, first generation, pinned-hash contract tests with `PINNED_FROZEN_SURFACE_HASHES` unchanged).
   - Phase 3: rules (sources, generator, per-target substitutions, tests, first generation).
-  - Phase 4: agents (sources, generator, alias form, Python variant run, D-16 pass-through, tests, first generation, hash re-baseline).
+  - Phase 4: agents (sources, generator, alias form, Python variant run, D-16 pass-through, tests, first generation, pinned-hash contract tests with `PINNED_FROZEN_SURFACE_HASHES` unchanged).
   - Phase 5: repository gate and parity-matrix upkeep.
   - Phase 6: QA (toolchain loop, coverage, isolation, contract-test sweep, language and edit-scope evidence).
 - New production files (planned names): `scripts/harness-generation/HarnessGeneration.psm1`, `HarnessSkillMirror.psm1`, `HarnessRuleGeneration.psm1`, `HarnessMcpConfig.psm1`, `HarnessAgentGeneration.psm1`, `HarnessInstructions.psm1`, `Invoke-HarnessGeneration.ps1`.
@@ -245,7 +245,7 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 - [ ] For every matrix entry selected for the skill mirror in `### Matrix Consumption`, `.claude/skills/<name>/` and its bundle copy equal the rendered mirror of `.agents/skills/<name>/`, and `-Surface skills -Check` exits 0 on the committed tree.
 - [ ] Unit tests show that a skill with no selected matrix entry is neither written nor deleted, that `agents/openai.yaml` is not mirrored, and that an extra file in a generated `.claude/skills/<name>/` folder is reported.
 - [ ] Each approved positive difference in child 1's approval artifact that ports into a shared skill is applied in `.agents/skills/<name>/SKILL.md`, recorded per Diff ID in `<FEATURE>/evidence/qa-gates/`.
-- [ ] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment in the same change as the first generated write of a pinned file, and the tests that read `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` pass.
+- [ ] `PINNED_FROZEN_SURFACE_HASHES` is unchanged, because both pinned files are protected targets that render byte-equal (PQ-2), and the tests that read `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` pass unchanged.
 
 ### Path-scoped rules
 
