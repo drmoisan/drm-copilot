@@ -25,6 +25,14 @@ an `open`-mode run never auto-completes. Read that section before applying anyth
 - The run's `mode` is `open`. A `closed`-mode run completes through its completion predicate — every
   non-withdrawn item `merged` or `worktree_removed` — and needs no close. Report that and stop
   rather than closing a `closed`-mode run to force completion.
+- The run-existence check is evaluated first. When no checkpoint tracks the `parallel_slug` named
+  in `$ARGUMENTS`, stop without changing state and emit the rejection signal defined in
+  `## Mutation Rejection Signal (issue #1012)` of `.claude/rules/parallel-orchestration.md`: put
+  the line `parallel_slug: <slug>` before the signal, and end the final output with the literal
+  line `PARALLEL_MUTATION_REJECTED: run_not_started` as its last line, with no formatting and no
+  trailing text.
+- The `closed`-mode stop follows the run-existence check while the run's checkpoint exists, so it
+  emits no rejection signal and validates against that checkpoint.
 
 ## Re-Derive Durable State Before Applying Anything
 
@@ -56,7 +64,9 @@ which is exactly what the gate exists to prevent. The re-derivation is mandatory
    stderr line naming EVERY in-flight key, so the rejection names all the work that must finish
    first rather than one item at a time. On rejection: report the blocking keys and stop. A
    rejected close appends NO `mutations[]` entry and makes NO state change — do not record the
-   attempt.
+   attempt. On that rejection, put the line `parallel_slug: <slug>` before the signal and end the
+   final output with the literal line `PARALLEL_MUTATION_REJECTED: items_in_flight` as its last
+   line, with no formatting and no trailing text, per `## Mutation Rejection Signal (issue #1012)`.
 
 3. **Append exactly one run-scoped `mutations[]` entry** for a successful close, built by the
    bundled entry point:
