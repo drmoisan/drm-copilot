@@ -3,9 +3,9 @@
 - **Issue:** #1032
 - **Parent (optional):** epic #1018, child 6
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30
+- **Last Updated:** 2026-10-31
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 0.2
 - **Work Mode:** full-feature
 - **Selected when:** the main plan's `<FEATURE>/evidence/other/agents-branch-selection.*.md` records `SelectedBranch: A` (E3 result records `EXIT_CODE: 0`: both the Copilot CLI and the Copilot cloud agent read `.claude/agents`).
 
@@ -34,7 +34,7 @@ Branch A retires only `.github/agents` files outside every native binding, and o
 | --- | --- | --- | --- |
 | UA-A1 | The main plan is complete: every task checked, the greatest `self-review.*.md` has no FAIL row, and the greatest `agents-branch-selection.*.md` records `SelectedBranch: A`. | P0-T2 | Stop |
 | UA-A2 | `C1/survey/difference-approval.md` (`## Disposition Proposals`, `## Owner Overrides`, `## Disputed Cases`) records no owner approval to drop any `copilot:agent:*` entry (OQ2 default). | P0-T3 | Stop |
-| UA-A3 | At `MB`, the `.github/agents/*.agent.md` file set equals the set the main plan's Phase 0 recorded, and the matrix holds one `copilot:agent:*` entry per file and one `copilot:handoff:*` entry per handoff-bearing file. | P0-T3 | Stop |
+| UA-A3 | The `.github/agents/*.agent.md` file set at Branch A start, recorded by P0-T3 with one `git hash-object` value per file and the count, matches the matrix: one `copilot:agent:*` id per recorded file and one `copilot:handoff:*` id per recorded handoff-bearing file (a file whose frontmatter has `handoffs:`). Cross-checks only: the recorded file names equal the `.github/agents` names in the main plan's greatest `github-native-inventory.*.md` (main P0-T7), and the two id counts equal the per-kind counts in the main plan's greatest `phase0-upstream-child1.*.md` (main P0-T4). | P0-T3 | Stop |
 | UA-A4 | `Get-DiscoveryAgentProfilePath` still resolves `.github/agents/<role>.agent.md` for `github-copilot`. | P0-T3 | Stop |
 
 ## Edit Set
@@ -46,9 +46,11 @@ Branch A retires only `.github/agents` files outside every native binding, and o
 | Planned artifact | Change | Classification |
 | --- | --- | --- |
 | `config/harness-parity-matrix.json` | Edit | JSON data (child 1 schema) |
-| Binding-resolution helper | Not committed | PowerShell under `SCRATCH` |
+| Binding-resolution helper (P1-T3) and the `.github/agents` hash-record helper (P0-T3, P1-T4) | Not committed | PowerShell under `SCRATCH` |
+| Parity-matrix repository gate and `AGENT-PESTER` suites | Run only, not edited | PowerShell |
+| `AGENT-PY` modules | Run only, not edited | Existing Python tests, tolerated (called) |
 
-No artifact adds Python, and nothing is pushed down. No case needs an owner language decision.
+No artifact adds Python, nothing is pushed down, and no MCP tool, extension command, skill or hook is added or changed. No case needs an owner language decision.
 
 ## Implementation Plan (Atomic Tasks)
 
@@ -58,21 +60,21 @@ No artifact adds Python, and nothing is pushed down. No case needs an owner lang
   - Acceptance: `<FEATURE>/evidence/baseline/branch-a-instructions-read.<timestamp>.md` carries `Timestamp:`, `Policy Order:` and the six files.
 - [ ] [P0-T2] Re-read the main plan evidence to confirm UA-A1.
   - Acceptance: `<FEATURE>/evidence/baseline/branch-a-main-plan-check.<timestamp>.md` records the main plan's checked-task count against its total, the self-review path with zero FAIL rows, and the `SelectedBranch` value; any mismatch records `blocked: premise_falsified` and the task stays unchecked.
-- [ ] [P0-T3] Check UA-A2 to UA-A4 against the tree at `MB`: read the three approval sections for any `copilot:agent:` id marked for dropping, compare the `.github/agents` file list and the matrix `copilot:agent:*` and `copilot:handoff:*` ids with the main plan's Phase 0 evidence, and read `$script:AgentProfileLayout` in `.claude/lib/discovery-validation/DiscoveryStartRecord.psm1`.
-  - Acceptance: `<FEATURE>/evidence/baseline/branch-a-recheck.<timestamp>.md` records each assumption as `holds` or `differs`, with counts; any `differs` records `blocked: premise_falsified` and the task stays unchecked.
+- [ ] [P0-T3] Check UA-A2 to UA-A4: read the three approval sections for any `copilot:agent:` id marked for dropping; record every `.github/agents/*.agent.md` file in the working tree at Branch A start with its `git hash-object` value, and the file count; compare that set with the matrix `copilot:agent:*` ids and the handoff-bearing files with the `copilot:handoff:*` ids; cross-check the file names against the main plan's greatest `github-native-inventory.*.md` and the two id counts against the main plan's greatest `phase0-upstream-child1.*.md`; read `$script:AgentProfileLayout` in `.claude/lib/discovery-validation/DiscoveryStartRecord.psm1`.
+  - Acceptance: `<FEATURE>/evidence/baseline/branch-a-recheck.<timestamp>.md` lists every `.github/agents/*.agent.md` file with its hash, the file count, the handoff-bearing file count, the `copilot:agent:*` and `copilot:handoff:*` id counts, the two cross-check results, and each assumption as `holds` or `differs`; any `differs` records `blocked: premise_falsified` and the task stays unchecked.
 - [ ] [P0-T4] Run `AGENT-PY` in one pytest process and `AGENT-PESTER` through `Invoke-PoshQCTest`.
   - Acceptance: `<FEATURE>/evidence/baseline/branch-a-tests-baseline.<timestamp>.md` records `EXIT_CODE: 0` for pytest with the pass count, and zero failed per Pester suite from `artifacts/pester/pester-junit.xml`.
 
 ### Phase 1 — Matrix, Bindings and Outcome
 
-- [ ] [P1-T1] In `config/harness-parity-matrix.json`, set every entry whose `id` starts with `copilot:agent:` to `disposition` `native`, `decision_status` `approved`, `reason` "Branch A under OQ2 default: kept in .github/agents because the file is in the handoff closure, a prompt binding or a discovery profile binding, or has no .claude/agents equivalent; no owner-approved drop.", and `decision_ref` `#1025:evidence/other/<E3 result file name>`; remove `target_paths` and `generated_from` from those entries.
+- [ ] [P1-T1] In `config/harness-parity-matrix.json`, set every entry whose `id` starts with `copilot:agent:` to `disposition` `native`, `decision_status` `approved`, `reason` "Branch A under OQ2 default: kept in .github/agents because the file is in the handoff closure, a prompt binding or a discovery profile binding, or has no .claude/agents equivalent; no owner-approved drop.", and `decision_ref` `#1025:evidence/other/<E3 result file name>` (the file name of the E3 result path recorded in the lexicographically greatest `<FEATURE>/evidence/other/agents-branch-selection.*.md`; Branch A is selected only when that file exists with `EXIT_CODE: 0`, so `approved` follows spec R4); remove `target_paths` and `generated_from` from those entries.
   - Acceptance: `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1` passes with zero failed in `artifacts/pester/pester-junit.xml`; every `copilot:agent:` entry is `native` and `approved`.
 - [ ] [P1-T2] Set every entry whose `id` starts with `copilot:handoff:` to `disposition` `native`, `decision_status` `approved`, `reason` "Handoffs stay native in .github/agents (settled design).", and `decision_ref` `#1018:epic.md#shared-design`.
   - Acceptance: the repository gate passes with zero failed; every `copilot:handoff:` entry is `native` and `approved`.
 - [ ] [P1-T3] Write a PowerShell helper under `SCRATCH` (not committed) that reads every `agent:` value from `.github/prompts/**/*.prompt.md` frontmatter and every `agent:` value under `handoffs:` in `.github/agents/*.agent.md`, and resolves each to a `.github/agents` file by `name:` or, for files without `name:`, by file stem, or to the built-in `agent`, comparing binding and `name:` values after removing surrounding single or double quotes; run it.
   - Acceptance: `<FEATURE>/evidence/other/agent-binding-resolution.<timestamp>.md` lists every binding with its resolved file and records zero unresolved bindings.
-- [ ] [P1-T4] Record the Branch A outcome: the `.github/agents` file set and hashes equal the main plan's Phase 0 set, every file has a `native` matrix entry with a reason, and the agent names that collide with `.claude/agents` are listed as a recorded risk for the Copilot CLI and cloud agent (the collision controls apply to VS Code only).
-  - Acceptance: `<FEATURE>/evidence/other/agents-branch-outcome.<timestamp>.md` records `Branch: A (OQ2 default)`, zero removed or added agent files, zero `dropped` `copilot:agent:` entries, and the collision-name list.
+- [ ] [P1-T4] Record the Branch A outcome: the `.github/agents` file set and `git hash-object` values equal the P0-T3 record in the greatest `branch-a-recheck.*.md`, every file has a `native` matrix entry with a reason, and the agent names that collide with `.claude/agents` are listed as a recorded risk for the Copilot CLI and cloud agent (the collision controls apply to VS Code only).
+  - Acceptance: `<FEATURE>/evidence/other/agents-branch-outcome.<timestamp>.md` records `Branch: A (OQ2 default)`, each file with its current hash and its P0-T3 hash (all equal), zero removed or added agent files, zero `dropped` `copilot:agent:` entries, and the collision-name list.
 
 ### Phase 2 — Final QA, Evidence and Self-Review
 
@@ -97,7 +99,7 @@ No artifact adds Python, and nothing is pushed down. No case needs an owner lang
 - File size: this plan edits field values in existing matrix entries and adds no entry; P2-T3 runs `FileSizePolicy.RepoGate.Tests.ps1` against `config/file-size-baseline.json`.
 - Test isolation: P2-T1 runs a reversed-order run of the agent-pinning Python modules; P2-T2 runs three seeded shuffled file-order runs of the touched Pester suites under `tests/scripts/harness` with each seed recorded; no Jest test changes, so no Jest run is required.
 - CI-only behavior: the matrix gate runs in `poshqc / PowerShell QC` on Windows shards; P1-T1, P1-T2 and P2-T2 run it locally before push.
-- Evidence: every task names its artifact under `<FEATURE>/evidence/<kind>/` with a write-time stamp; command artifacts carry `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`; the helper path is recorded as `SCRATCH`.
+- Evidence: every task names its artifact under `<FEATURE>/evidence/<kind>/` with a write-time stamp; command artifacts carry `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`; the helper path is recorded as `SCRATCH`; the agent file set and hashes are recorded at Branch A start (P0-T3) and re-compared in P1-T4, with the main plan's P0-T4 and P0-T7 records used as cross-checks only.
 
 ## Open Questions / Notes
 
