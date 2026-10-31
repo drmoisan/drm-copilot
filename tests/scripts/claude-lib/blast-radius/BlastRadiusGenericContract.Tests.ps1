@@ -65,7 +65,7 @@ BeforeAll {
         return Get-Content -LiteralPath (Join-Path $script:RepoRoot $RelativePath) -Raw | ConvertFrom-Json -AsHashtable
     }
 
-    function New-ScenarioRadius {
+    function Get-ScenarioRadius {
         param([string] $FeatureFolder, [hashtable] $Config)
         # Derive and normalize the way the planner records a declared radius,
         # then append the tier map after normalization (the planner append
@@ -85,11 +85,11 @@ BeforeAll {
         }
     }
 
-    function New-ScenarioItem {
+    function Get-ScenarioItem {
         param([hashtable] $Config)
         return @(
-            @{ key = 41; radius = (New-ScenarioRadius -FeatureFolder '2026-10-30-item-41' -Config $Config) },
-            @{ key = 42; radius = (New-ScenarioRadius -FeatureFolder '2026-10-30-item-42' -Config $Config) }
+            @{ key = 41; radius = (Get-ScenarioRadius -FeatureFolder '2026-10-30-item-41' -Config $Config) },
+            @{ key = 42; radius = (Get-ScenarioRadius -FeatureFolder '2026-10-30-item-42' -Config $Config) }
         )
     }
 }
@@ -188,7 +188,7 @@ Describe 'Generic contract-token rejection (issue #1006)' {
         ) {
             # Arrange
             $config = Read-CommittedTable -RelativePath $RelativePath
-            $items = New-ScenarioItem -Config $config
+            $items = Get-ScenarioItem -Config $config
             $radius = @{}
             foreach ($item in $items) { $radius[[long]$item['key']] = $item['radius'] }
 
@@ -215,7 +215,7 @@ Describe 'Generic contract-token rejection (issue #1006)' {
             # tolerance set to zero.
             $config = Read-CommittedTable -RelativePath $RelativePath
             $config['conflict_tolerance']['tolerance_percent'] = 0
-            $items = @(New-ScenarioItem -Config $config)
+            $items = @(Get-ScenarioItem -Config $config)
 
             # Act
             $result = Get-BlastRadiusConflictEdge -Item $items -Config $config -Relation ${function:Test-BlastRadiusConflict}

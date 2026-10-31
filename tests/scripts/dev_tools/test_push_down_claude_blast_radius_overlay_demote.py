@@ -197,6 +197,18 @@ def test_composing_a_composed_result_again_is_identical() -> None:
     assert twice == once
 
 
+def test_document_without_shared_surfaces_keeps_that_key_absent() -> None:
+    """An already append-only entry in a document with no surface list adds no key."""
+    base: JsonObject = {
+        "version": 1,
+        "conflict_tolerance": {"append_only_paths": [TIER_MAP]},
+    }
+
+    composed = _compose(base, DEMOTE_TIER_MAP)
+
+    assert composed == base
+
+
 @pytest.mark.parametrize(
     ("label", "value"),
     [("a non-list value", TIER_MAP), ("a non-string member", [TIER_MAP, 3])],

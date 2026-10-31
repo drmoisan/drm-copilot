@@ -294,7 +294,8 @@ def _apply_shared_surface_demotion(
         raise BlastRadiusOverlayError(
             overlay_path,
             f'key "{SHARED_SURFACES_DEMOTE_KEY}" requires '
-            f"{_CONFLICT_TOLERANCE_KEY}.{_APPEND_ONLY_PATHS_KEY} in the composed document",
+            f"{_CONFLICT_TOLERANCE_KEY}.{_APPEND_ONLY_PATHS_KEY} "
+            "in the composed document",
         )
     append_only_list = cast("list[object]", append_only)
     shared_value = composed.get(_SHARED_SURFACES_KEY)

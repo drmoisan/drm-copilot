@@ -73,7 +73,7 @@ function compose(base: JsonObject, overlay: JsonObject): JsonObject {
 
 /** Return the `conflict_tolerance` block of a parsed document. */
 function tolerance(document: JsonObject): JsonObject {
-  return document.conflict_tolerance as JsonObject;
+  return document["conflict_tolerance"] as JsonObject;
 }
 
 /** Compose an overlay that must fail and return the error message. */
@@ -92,8 +92,8 @@ describe("issue #1006 shared-surface demotion semantics", () => {
   it("moves the entry and keeps the remaining order", () => {
     const composed = compose(BASE, DEMOTE_TIER_MAP);
 
-    expect(composed.shared_surfaces).toEqual(["a.json", "b.json"]);
-    expect(tolerance(composed).append_only_paths).toEqual([
+    expect(composed["shared_surfaces"]).toEqual(["a.json", "b.json"]);
+    expect(tolerance(composed)["append_only_paths"]).toEqual([
       "**/CHANGELOG.md",
       TIER_MAP,
     ]);
@@ -112,8 +112,8 @@ describe("issue #1006 shared-surface demotion semantics", () => {
       [SHARED_SURFACES_DEMOTE_KEY]: ["c.json", TIER_MAP],
     });
 
-    expect(composed.shared_surfaces).toEqual(["a.json", "b.json"]);
-    expect(tolerance(composed).append_only_paths).toEqual([
+    expect(composed["shared_surfaces"]).toEqual(["a.json", "b.json"]);
+    expect(tolerance(composed)["append_only_paths"]).toEqual([
       "**/CHANGELOG.md",
       "docs/log.md",
       "c.json",
@@ -246,9 +246,9 @@ describe("issue #1006 AC-04 destination push-down", () => {
     const composed = JSON.parse(seeded.readTextFile(TARGET)) as JsonObject;
 
     // Assert
-    expect(tolerance(composed).append_only_paths).toContain(TIER_MAP);
-    expect(composed.shared_surfaces).not.toContain(TIER_MAP);
-    expect(tolerance(composed).tolerance_percent).toBe(5000);
+    expect(tolerance(composed)["append_only_paths"]).toContain(TIER_MAP);
+    expect(composed["shared_surfaces"]).not.toContain(TIER_MAP);
+    expect(tolerance(composed)["tolerance_percent"]).toBe(5000);
     expect(composed).not.toHaveProperty(SHARED_SURFACES_DEMOTE_KEY);
   });
 });
