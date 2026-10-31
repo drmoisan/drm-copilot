@@ -3,9 +3,9 @@
 - **Issue:** #1025
 - **Parent (optional):** epic #1018 (shared agent-harness layer across Claude Code, Codex and GitHub Copilot), child 1
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-31 (owner-authorized revision H1)
+- **Last Updated:** 2026-10-31 (coordinator decision H2)
 - **Status:** Draft
-- **Version:** 0.3 (H1: `quality-tiers.yml` classification of `scripts/harness`; identifier encoding and duplicate tie-break)
+- **Version:** 0.4 (H2: owner override precedence over experiment results; `native` override drops `target_paths` and `generated_from`; see `## Owner Stop`). 0.3 (H1: `quality-tiers.yml` classification of `scripts/harness`; identifier encoding and duplicate tie-break)
 - **Work Mode:** full-feature
 - **Primary research input:** `docs/features/active/2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025/research/research.2026-10-30T21-08.md`
 - **Epic manifest:** `docs/features/epics/shared-agent-harness-layer/epic.md`
@@ -438,6 +438,11 @@ Follows the stop (plan B):
 - Write contracts and bundle copies for any single-ecosystem skill the owner approves as `shared`; remove the contract and bundle copy for any skill the owner moves off `shared`; revise contracts affected by overrides.
 - Record runbook results in `consumers` and dispositions; set `decision_status: approved` on every settled entry.
 - Re-run the repository gate, the bundle-parity test and the full toolchain loop; record final evidence.
+
+Decision H2 (coordinator, 2026-10-31, under the owner's standing instruction), applied by plan B `## Decision Application Rules`:
+
+- An owner override in `## Owner Overrides` of the approval artifact takes precedence over an experiment result that sets a disposition, including the E3 result for `copilot:agent:*` entries and generally; the experiment result still sets `consumers` and `notes`.
+- An override to `native` removes `target_paths` and `generated_from`, which have no meaning for a `native` entry (`### Disposition Semantics`). Such an entry never carries a `pending-source:<kind>` placeholder and is settled with `decision_status: approved` unless a deferred runbook other than E3 governs its `consumers`.
 
 ## Implementation Strategy
 
