@@ -172,9 +172,32 @@ explicitly not an integration branch: no item branch ever merges into it, it nev
 item branch, and it holds only `docs/features/parallel/<slug>/**`, a subtree no item's blast radius
 may include. Each item opens its own pull request against `main`.
 
-**Read access.** Readers — validators and the future `parallel-orchestrator` — reach both artifact
-classes by ref: `git fetch origin <branch>` followed by `git show <ref>:<path>`, without checking
-the ref out, per the technique documented in `.claude/skills/epic-run/SKILL.md`.
+**Plan-home checkout.** After the last preparation child has terminated (the re-plan delegations
+for a V1 or V2 failure count as preparation children) and before `## Manifest Authoring`, the
+planner prepares the plan-home branch in its own session checkout: it runs `git fetch origin main`
+and then `git checkout -b parallel/<slug>-plan origin/main`. When the branch already exists, as on
+a resumed run, it runs `git checkout parallel/<slug>-plan` instead of recreating it. If the
+checkout is refused, stop planning and report the refusal; do not stash, force, or reset. The run
+folder is written in place, committed through the pathspec-bearing forms of
+`### Integration Commit Form (issue #539)`, and pushed with
+`git push -u origin parallel/<slug>-plan`. The checkout stays on `parallel/<slug>-plan` for the
+remainder of the run.
+
+**Read access.** Readers — validators, the planner itself, and the future `parallel-orchestrator` —
+reach both artifact classes by ref: `git fetch origin <branch>` followed by `git show <ref>:<path>`,
+without checking the ref out, per the technique documented in `.claude/skills/epic-run/SKILL.md`.
+The planner reads each item's approved plan text and `spec.md` text for `### Planner procedure`, and
+performs the git-integrity check, with `git fetch origin <branch>` followed by
+`git show origin/<branch>:<path>` or `git cat-file -e`; it never checks an item branch out.
+
+**No planner worktrees.** The planner runs no `git worktree add` for any step of planning: it
+authors `parallel/<slug>-plan` in its own session checkout and reads item text by ref. The only
+worktrees created during planning are the preparation children's `isolation: "worktree"` worktrees,
+and the Claude Code runtime creates and removes them: it removes one immediately when the child
+leaves no changes, and otherwise through its periodic sweep once the commits are pushed and the
+tree is clean. A worktree the planner creates itself is outside every record the removal gates read
+and outside the runtime sweep, so it stays registered after the run closes and only the
+repository-wide cleanup apply mode can remove it.
 
 Three residual risks are recorded rather than eliminated:
 

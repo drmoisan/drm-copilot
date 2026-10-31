@@ -105,6 +105,11 @@ An item whose radius fails V1 or V2 is re-planned through a follow-up preparatio
 carrying the findings as plan-revision instructions. It is never dropped, and never withdrawn on
 your own initiative; withdrawal is a caller decision made through F6's remove operation.
 
+**No planner worktrees.** The planner runs no `git worktree add` for any step. It authors
+`parallel/<slug>-plan` in its own session checkout and reads item text by ref, as the
+**No planner worktrees.** paragraph in the Artifact Home section of the `parallel-plan` skill
+specifies.
+
 ## Checkpoint Persistence
 
 Update `artifacts/orchestration/parallel-planner-state.json` after every completed step with:
@@ -141,6 +146,8 @@ Do not report completion until:
 7. The final report lists, per item, the `plan-path:`, branch name, preflight status, and
    radius-validation result; plus the cohort table, the manifest path, both kickoff paths, and the
    statement that execution has NOT started.
+8. The planner created no worktree: it runs no `git worktree add` for any step, and
+   `parallel/<slug>-plan` is checked out in its own session checkout and pushed.
 
 ## Upstream Library Invocation
 
