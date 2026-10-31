@@ -74,9 +74,10 @@ function Resolve-PrAuthorWorktreeTarget {
         determinism policy forbids. Mocking here lets a test state the resolution outcome it
         is exercising and nothing else. A branch the command names (--head, --branch, or
         branch:) is resolved by the shared resolver Resolve-HookTargetWorktree, given only the
-        session root and that branch (issue #1011). When that yields no selection, the
-        portable-identity resolver Resolve-WorktreeItemTarget runs, and a NoTarget result for a
-        command with no signal passes through Resolve-PrAuthorCurrentBranchTarget, which
+        session root and that branch (issue #1011), unless the command also carries a canonical
+        issue number line, which Resolve-WorktreeItemTarget decides so the branch/issue agreement
+        check applies. Without a selection, Resolve-WorktreeItemTarget runs, and a NoTarget result
+        for a command with no signal passes through Resolve-PrAuthorCurrentBranchTarget, which
         re-resolves the current branch (#989).
     .OUTPUTS
         A target result object built by New-WorktreeResolutionTargetResult.
@@ -89,7 +90,8 @@ function Resolve-PrAuthorWorktreeTarget {
 
     $sessionRoot = (Get-Location).Path
     $branch = Find-WorktreeResolutionBranchSignal -Text $CommandText
-    if ($null -ne $branch) {
+    $issueSignal = Find-WorktreeItemIssueSignal -Text $CommandText
+    if ($null -ne $branch -and @($issueSignal).Count -eq 0) {
         $shared = Resolve-HookTargetWorktree -SessionRoot $sessionRoot -CommandBranch $branch
         $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $shared -CommandText $CommandText -SessionRoot $sessionRoot
         if ($null -ne $mapped) { return $mapped }
@@ -104,12 +106,13 @@ function ConvertFrom-PrAuthorHookTargetResult {
         Map a Resolve-HookTargetWorktree result onto a pr-author target result, or $null (issue #1011).
     .DESCRIPTION
         Returns $null (no selection) when Result is null, when CommandText carries no branch
-        signal, when Result.Source is not CommandOperand, or when Result names no root. Only a
-        CommandOperand result selects: Resolve-PrAuthorWorktreeTarget passes the resolver no path
-        argument, so such a result is branch-derived, and a FilePath, SessionRoot, or
+        signal, when Result.Source is not CommandOperand, when Result names no root, or when that
+        root fails Test-WorktreeResolutionRootMarker (a registration whose directory is gone).
+        Only a CommandOperand result selects, being branch-derived; a FilePath, SessionRoot, or
         DelegationIdentity result never selects the worktree (issue #673). An ambiguous result
-        maps to Ambiguous; a root equal to SessionRoot (OrdinalIgnoreCase) maps to SessionRoot
-        and any other root to OtherWorktree. Reason codes come from New-WorktreeResolutionTargetResult.
+        maps to Ambiguous. Labelling is delegated to ConvertTo-WorktreeItemResolvedResult, which
+        maps a root equal to SessionRoot, or to the worktree enclosing it, to SessionRoot and any
+        other root to OtherWorktree.
     .PARAMETER Result
         The Resolve-HookTargetWorktree result.
     .PARAMETER CommandText
@@ -134,9 +137,8 @@ function ConvertFrom-PrAuthorHookTargetResult {
         return (New-WorktreeResolutionTargetResult -Status Ambiguous -SessionRoot $SessionRoot -Signal Branch -SignalValue $branch -Candidate @($Result.Candidates) -Detail $detail)
     }
     if ([string]::IsNullOrEmpty([string]$Result.WorktreeRoot)) { return $null }
-    $isSession = [string]::Equals((ConvertTo-HookTargetWorktreeNormalizedPath -Path $Result.WorktreeRoot), (ConvertTo-HookTargetWorktreeNormalizedPath -Path $SessionRoot), [System.StringComparison]::OrdinalIgnoreCase)
-    $status = if ($isSession) { 'SessionRoot' } else { 'OtherWorktree' }
-    return (New-WorktreeResolutionTargetResult -Status $status -SessionRoot $SessionRoot -WorktreeRoot $Result.WorktreeRoot -Signal Branch -SignalValue $branch -Detail $detail)
+    if (-not (Test-WorktreeResolutionRootMarker -Path $Result.WorktreeRoot)) { return $null }
+    return (ConvertTo-WorktreeItemResolvedResult -WorktreeRoot $Result.WorktreeRoot -SessionRoot $SessionRoot -Branch $branch -Detail $detail)
 }
 
 function Get-PrAuthorTargetCheckpointResolution {
