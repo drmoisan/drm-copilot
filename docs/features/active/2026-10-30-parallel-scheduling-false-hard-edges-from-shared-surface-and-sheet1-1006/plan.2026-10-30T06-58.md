@@ -157,9 +157,9 @@ The new Python module imports `scripts.dev_tools._blast_radius_token_shapes` as 
 
 ### Phase 7 — Mirrors and Contracts
 
-- [ ] [P7-T1] Write and run `SCRATCH/issue-1006-mirror.sh`, which copies files 6 to 10 and `.claude/rules/parallel-orchestration.md` to the same relative paths under `BUNDLE/` and prints a SHA-256 pair per file. Acceptance: `FEATURE/evidence/other/mirror-parity.<timestamp>.md` lists six pairs with equal hashes.
-- [ ] [P7-T2] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py -q -p no:cacheprovider`. Acceptance: `FEATURE/evidence/qa-gates/push-down-contracts.<timestamp>.md` records `EXIT_CODE: 0` and zero failures.
-- [ ] [P7-T3] Run `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check`. Acceptance: `FEATURE/evidence/qa-gates/codex-generator-check.<timestamp>.md` records the same `EXIT_CODE:` as P0-T10 and no file named in its output.
+- [x] [P7-T1] Write and run `SCRATCH/issue-1006-mirror.sh`, which copies files 6 to 10 and `.claude/rules/parallel-orchestration.md` to the same relative paths under `BUNDLE/` and prints a SHA-256 pair per file. Acceptance: `FEATURE/evidence/other/mirror-parity.<timestamp>.md` lists six pairs with equal hashes.
+- [x] [P7-T2] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py -q -p no:cacheprovider`. Acceptance: `FEATURE/evidence/qa-gates/push-down-contracts.<timestamp>.md` records `EXIT_CODE: 0` and zero failures.
+- [x] [P7-T3] Run `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check`. Acceptance: `FEATURE/evidence/qa-gates/codex-generator-check.<timestamp>.md` records the same `EXIT_CODE:` as P0-T10 and no file named in its output.
 
 ### Phase 8 — Verification Loop and Final QA
 

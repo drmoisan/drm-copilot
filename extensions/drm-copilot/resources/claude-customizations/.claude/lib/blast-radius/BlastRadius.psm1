@@ -246,7 +246,8 @@ function Get-NormalizedDeclaredRadius {
 
     .OUTPUTS
         System.Collections.Hashtable. A new radius carrying the surviving paths,
-        contracts re-filtered by the ASCII-letter rule, and modules and shared
+        contracts re-filtered by the ASCII-letter rule and the generic sheet-tab
+        rule of Test-GenericContractToken (issue #1006), and modules and shared
         surfaces re-resolved from the surviving paths. Throws when the radius
         source is observed: an observed radius records a diff listing rather than
         a plan-text harvest, so the plan-text acceptance rules do not apply to it
@@ -297,9 +298,12 @@ function Get-NormalizedDeclaredRadius {
             -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config)))
     $concrete = [string[]]@(Get-ConcreteEntry -Entry $paths)
 
+    # Keep a recorded contract only when it carries an ASCII letter and is not a
+    # default spreadsheet sheet-tab name (issue #1006).
     $contract = [System.Collections.Generic.List[string]]::new()
     foreach ($identifier in @($normalized['contracts'])) {
-        if ($script:ContractLetterPattern.IsMatch([string]$identifier)) {
+        if ($script:ContractLetterPattern.IsMatch([string]$identifier) -and
+            -not (Test-GenericContractToken -Token ([string]$identifier))) {
             $contract.Add([string]$identifier)
         }
     }
