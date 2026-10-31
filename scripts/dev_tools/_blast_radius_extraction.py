@@ -48,6 +48,7 @@ from typing import TYPE_CHECKING, Literal
 from scripts.dev_tools._blast_radius_token_shapes import (
     contains_placeholder_marker,
     is_file_shaped_component,
+    is_generic_contract_token,
     spans_multiple_feature_folders,
 )
 
@@ -420,8 +421,9 @@ def extract_contract_identifiers(spec_text: str) -> tuple[str, ...]:
     Returns:
         tuple[str, ...]: Identifiers, deduplicated and ordinally sorted. Tokens
         containing a separator are excluded as path references, as are tokens
-        carrying no ASCII letter; a spec with no qualifying section yields an
-        empty tuple.
+        carrying no ASCII letter and default spreadsheet sheet-tab names that
+        ``is_generic_contract_token`` recognizes (issue #1006); a spec with no
+        qualifying section yields an empty tuple.
 
     Raises:
         None.
@@ -460,9 +462,14 @@ def extract_contract_identifiers(spec_text: str) -> tuple[str, ...]:
         # Inside a qualifying section an inline-code token without a separator is
         # a contract identifier; a token with one is a path reference and is
         # recorded at the paths level instead. A token carrying no ASCII letter
-        # is notation, not an identifier, and is dropped.
+        # is notation, not an identifier, and is dropped, as is a default
+        # spreadsheet sheet-tab name such as Sheet1 (issue #1006).
         for token in extract_inline_code_tokens(line):
-            if "/" not in token and CONTRACT_LETTER_RE.search(token) is not None:
+            if (
+                "/" not in token
+                and CONTRACT_LETTER_RE.search(token) is not None
+                and not is_generic_contract_token(token)
+            ):
                 identifiers.add(token)
 
     return tuple(sorted(identifiers))

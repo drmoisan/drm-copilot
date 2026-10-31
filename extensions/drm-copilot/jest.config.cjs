@@ -348,6 +348,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1006: the shared-surface demotion directive of the overlay.
+    "./src/lib/push-down/claude-blast-radius-overlay-demote.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #697: the Codex/agents publisher gained the virtual resource-pair
     // map. This map carries no `global` key, so the file is gated only by its
     // own entry here.
