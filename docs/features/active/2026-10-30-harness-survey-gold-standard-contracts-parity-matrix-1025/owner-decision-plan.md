@@ -71,6 +71,7 @@ OWNER QUESTION: none. No artifact needs the E2 exception.
 - The owner stop was recorded per plan A `## Owner Stop (Orchestrator-Owned, After Plan A)` and the latest `<FEATURE>/evidence/other/owner-stop.*.md` is committed.
 - Resume conditions R1 to R4 hold, and the latest `<FEATURE>/evidence/other/resume-check.*.md` reads `Resume: READY` and is committed. A newly inventoried feature or skill name (R4 failure) is a re-planning stop; plan B is not delegated.
 - The branch contains `origin/main` (`git merge-base --is-ancestor origin/main HEAD` exits 0).
+- The owner's `Approval` edits are committed, so entry check Y1 finds no path in `## Excluded Paths` in `git status --porcelain`.
 
 ## Executor Entry Checks (Before [P0-T1])
 
@@ -177,7 +178,7 @@ Applied by P1-T2 and P1-T3 in this order; values not named stay as plan A wrote 
 - `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` | `test_pushed_roots_carry_no_hard_coded_solution_file`
 - `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` | `reports zero ratchet violations against config/file-size-baseline.json`
 - `scripts/dev_tools/generate_codex_agent_variants.py` | `--check`
-- `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, `feature-audit.yyyy-MM-ddTHH-mm.md` | file presence
+- `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `docs/features/templates/policy_audit/code-review.yyyy-MM-ddTHH-mm.md`, `docs/features/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md` | file presence
 
 ## Pre-Mortem
 
