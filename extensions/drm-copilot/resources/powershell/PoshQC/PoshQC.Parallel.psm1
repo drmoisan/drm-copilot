@@ -389,7 +389,8 @@ function Invoke-PoshQCParallelTest {
         [scriptblock] $StartShardProcess = { param([string[]] $ArgumentList, [string] $LogPath) Invoke-PoshQCPwshExe -PwshArgs $ArgumentList -LogPath $LogPath },
         [scriptblock] $WaitShardProcess = {
             param($Process)
-            Wait-Process -Id $Process.Id
+            # Wait on the held process object: a lookup by id fails once a fast shard has already exited.
+            $Process.WaitForExit()
             [int] $Process.ExitCode
         },
         [scriptblock] $ReadText = {

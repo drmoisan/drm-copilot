@@ -4,7 +4,7 @@ Timestamp: 2026-10-31T19-18
 Command: record of micro-actions and policy-driven adjustments made during execution
 EXIT_CODE: 0
 Output Summary:
-Four deviations were needed to satisfy the plan's own acceptance conditions or repository policy. None adds a task or changes what a task asserts.
+Five deviations were needed to satisfy the plan's own acceptance conditions or repository policy. None adds a task or changes what a task asserts.
 
 ## D1: P1-T5 and P6-T3, governed-JSON validation
 
@@ -24,6 +24,11 @@ Four deviations were needed to satisfy the plan's own acceptance conditions or r
 - Plan text: P5-T3 acceptance is "`PoshQC.ParallelMerge.Tests.ps1` passes all eleven cases", while the sub-module registration is assigned to P5-T5.
 - Observation: functions in `PoshQC.Parallel.psm1` are loaded only when `PoshQC.psm1` dot-sources the file from its sub-module list and are callable only when `Export-ModuleMember` lists them, so the P5-T3 acceptance cannot hold before that registration.
 - Adjustment: P5-T3 added `PoshQC.Parallel.psm1` to the sub-module list (after `PoshQC.CoverageMerge.psm1`, before `PoshQC.Testing.psm1`) and the five names to `Export-ModuleMember` in `PoshQC.psm1`. P5-T5 added the five names to `FunctionsToExport` in `PoshQC.psd1` and ran its verification (MC05 and `Get-Command -Module PoshQC`).
+
+## D5: P7-T3, defect found by the first concurrent run
+
+- Observation: the first `Invoke-PoshQCParallelTest` run (8 workers) stopped with `Wait-Process: Cannot find a process with the process identifier ...`. The default `WaitShardProcess` seam called `Wait-Process -Id`, which fails when a shard process has already exited before the runner waits on it, because the lookup by id no longer finds the process.
+- Fix (in P7-T3, mechanically necessary to complete the concurrent run): the default seam calls `$Process.WaitForExit()` on the process object the runner holds and then reads `ExitCode`. In PR09, the fake process object returned by the mocked `Invoke-PoshQCPwshExe` reports exit code 99 until its `WaitForExit` script method runs, so the asserted overall exit code of 0 proves the default seam waited on every shard; the `Wait-Process` mock and its assertion were removed. `PoshQC.ParallelRunner.Tests.ps1` and `PoshQC.ParallelMerge.Tests.ps1` pass (21 passed), and the bundled copy was re-mirrored (see the mirror-hash record).
 
 ## D4: P4-T1, SW03 call scope
 

@@ -226,8 +226,13 @@ Describe 'Invoke-PoshQCParallelTest' {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Remove-Item -MockWith { }
             Mock -CommandName New-Item -MockWith { }
-            Mock -CommandName Invoke-PoshQCPwshExe -MockWith { [pscustomobject]@{ Id = 4242; ExitCode = 0 } }
-            Mock -CommandName Wait-Process -MockWith { }
+            # The fake process reports exit code 99 until its WaitForExit method runs, so an overall exit code of 0
+            # proves the default WaitShardProcess seam waited on every shard's process object.
+            Mock -CommandName Invoke-PoshQCPwshExe -MockWith {
+                $fakeProcess = [pscustomobject]@{ Id = 4242; ExitCode = 99 }
+                $fakeProcess | Add-Member -MemberType ScriptMethod -Name WaitForExit -Value { $this.ExitCode = 0 }
+                $fakeProcess
+            }
             Mock -CommandName Set-Content -MockWith { }
             Mock -CommandName Write-Information -MockWith { }
             Mock -CommandName Get-Content -MockWith { $null }
@@ -246,7 +251,6 @@ Describe 'Invoke-PoshQCParallelTest' {
             Should -Invoke -CommandName Remove-Item -Times 2 -Exactly
             Should -Invoke -CommandName New-Item -Times 2 -Exactly -ParameterFilter { $ItemType -eq 'Directory' }
             Should -Invoke -CommandName Invoke-PoshQCPwshExe -Times 2 -Exactly -ParameterFilter { $PwshArgs[0] -eq '-NoLogo' -and $LogPath -like '*shard.log' }
-            Should -Invoke -CommandName Wait-Process -Times 2 -Exactly -ParameterFilter { $Id -eq 4242 }
             Should -Invoke -CommandName Set-Content -Times 3 -Exactly
             Should -Invoke -CommandName Write-Information -ParameterFilter { [string] $MessageData -like 'Invoke-PoshQCParallelTest: workers=2;*' }
             $run
