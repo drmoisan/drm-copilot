@@ -5,8 +5,7 @@
     "config/blast-radius.json",
     "config/orchestration-routing.json",
     "package-lock.json",
-    "poetry.lock",
-    "quality-tiers.yml"
+    "poetry.lock"
   ],
   "shared_surface_globs": [],
   "mandate_reads": [
@@ -37,7 +36,8 @@
     "default_band": "C1",
     "append_only_paths": [
       "**/CHANGELOG.md",
-      "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+      "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+      "quality-tiers.yml"
     ]
   },
   "write_intent_extraction": true,

@@ -255,19 +255,45 @@ Three constraints bound the mandate-read exclusion:
 1. **The planner remains obliged to enumerate a genuine write explicitly.** An exclusion describes
    the default reading relationship, not a permanent ban. When an item's plan will actually write an
    excluded path, the planner appends that exact path to the declared radius after normalization.
-2. **`quality-tiers.yml` stays a shared surface.** It is listed in both `shared_surfaces` and
-   `mandate_reads`: the first governs what happens when an item really writes it, the second governs
-   what happens when an item merely cites it.
+2. **`quality-tiers.yml` is an append-only registry and a mandate read (issue #1006).** Every item
+   that adds a module appends one entry to it, so both committed truth tables list it in
+   `conflict_tolerance.append_only_paths` and in `mandate_reads`, not in `shared_surfaces`. When an
+   item really writes it, the planner-appended or observed path contends on `path_overlap` at the
+   `append_only` weight and is never a hard edge; when an item merely cites it, the mandate-read
+   exclusion drops the citation. Separator-free token acceptance for it through the root-surface rule
+   (`config_root_surfaces`, `Get-ConfigRootSurface`) no longer applies, because that rule reads only
+   the separator-free entries of `shared_surfaces`; the planner append obligation in constraint 1 and
+   `detect_escaped_paths` in constraint 3 are the backstops.
 3. **`detect_escaped_paths` makes the read/write distinction exact at execution time.** The
    derivation heuristic reads intent from plan text and can be wrong in either direction; drift
    detection compares the declared radius against the paths a diff actually touched, so an item that
    wrote an excluded path is caught against observed evidence rather than against prose.
 
-The extractor additionally rejects four token shapes that were never write claims: a wildcard-free
+The extractor additionally rejects five token shapes that were never write claims: a wildcard-free
 token whose final component names a directory rather than a file, a `docs/features/` glob whose
 wildcard occupies or truncates the feature-folder segment, a contract token carrying no ASCII
-letter, and a token containing a placeholder or interpolation marker. `artifacts/` is not a known
-top-level segment, so a bare `artifacts/**` subtree claim no longer satisfies the shape rules.
+letter, a token containing a placeholder or interpolation marker, and a contract token that is a
+default spreadsheet sheet name (`Sheet` or `Chart` followed by ASCII digits, compared
+case-insensitively). `artifacts/` is not a known top-level segment, so a bare `artifacts/**`
+subtree claim no longer satisfies the shape rules.
+
+#### Generic contract-token rejection (issue #1006)
+
+A spreadsheet application names a new worksheet or chart sheet with a default stem followed by a
+number, so a spec that mentions `Sheet1` in an interface section names a worksheet, not an
+exported symbol, schema, or CLI identifier. Two unrelated items that both named `Sheet1` received a
+hard `contract_dependency` edge. The stems are a code constant, not a truth-table key:
+`GENERIC_CONTRACT_STEMS` in `scripts/dev_tools/_blast_radius_token_shapes.py` and
+`$script:GenericContractStem` in `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1`, pinned equal
+across Python and PowerShell by a Pester parity test that reads the Python source. Workbook and
+object names such as `Book1` and `Table1` are a different class and are not rejected. The predicate
+(`is_generic_contract_token`, `Test-GenericContractToken`) first requires an ASCII token, because a
+.NET case-insensitive match folds the Kelvin sign and the long s to ASCII letters while Python
+`re.ASCII` does not (the issue #903 precedent). It is applied at all six contract-filtering sites:
+`extract_contract_identifiers`, `extract_write_intent_contracts`, and `normalize_declared_radius` in
+Python, and `Get-ContractIdentifier`, `Get-WriteIntentSpecContract`, and
+`Get-NormalizedDeclaredRadius` in PowerShell, so a previously recorded `Sheet1` is dropped on
+recompute. TypeScript has no contract extractor, so no TypeScript parity applies.
 
 ### Mechanically-mergeable path class (issue #643)
 
@@ -674,8 +700,19 @@ keys are appended after the base keys. An overlay `version` must equal the base 
 forbidden-glob guard (`**`, `docs/**`, `tests/**`) applies to the composed module map, including
 overlay-authored modules. A malformed overlay, a `version` mismatch, or a forbidden glob raises an
 error before any write, so `config/blast-radius.json` keeps its prior bytes. With no overlay
-present, the written file is byte-identical to the base document. The overlay cannot remove a
-shipped surface or a derived module.
+present, the written file is byte-identical to the base document. A destination demotes a shipped
+shared surface with the overlay directive `shared_surfaces_demote`, a list of strings (issue
+#1006). It is applied after all other keys are composed: each named entry is removed from
+`shared_surfaces`, with the order of the remaining entries preserved, and unioned into
+`conflict_tolerance.append_only_paths`, base entries first. The directive is consumed, not emitted,
+so the composed file stays within the truth-table key set. An entry that is already an append-only
+path and not a shared surface is accepted as a no-op, so composing a composed result again yields
+identical output. The directive fails closed, before any write, on a non-list value, a non-string
+member, a composed document without `conflict_tolerance.append_only_paths` (no partial
+`conflict_tolerance` is created), or an unknown entry that is neither a shared surface nor an
+append-only path. Demotion never touches `modules`, so the forbidden-glob guard is unchanged. A
+demoted entry that a `shared_surface_globs` pattern still matches stays shared through the glob; the
+bundled glob list is empty. The overlay still cannot remove a derived module.
 
 ## Enforcement
 
