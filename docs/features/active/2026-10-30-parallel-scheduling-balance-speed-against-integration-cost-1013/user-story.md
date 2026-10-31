@@ -69,9 +69,9 @@ As a parallel-run operator, I want each item's total tolerated integration cost 
 
 Acceptance Criteria:
 
-- [ ] US-01 An item whose tolerated overlaps exceed its aggregate cap has its cheapest-to-serialize pair converted to an edge, deterministically, in both Python and PowerShell (spec AC-02, AC-03).
-- [ ] US-02 At `tolerance_percent` 0 the edge set equals strict scheduling, and the existing strict-identity pins pass with test bodies unchanged (spec AC-04).
-- [ ] US-03 The set-level scheduling properties are pinned and the rule text narrows the monotonicity statement to the pairwise decision (spec AC-05).
+- [x] US-01 An item whose tolerated overlaps exceed its aggregate cap has its cheapest-to-serialize pair converted to an edge, deterministically, in both Python and PowerShell (spec AC-02, AC-03).
+- [x] US-02 At `tolerance_percent` 0 the edge set equals strict scheduling, and the existing strict-identity pins pass with test bodies unchanged (spec AC-04).
+- [x] US-03 The set-level scheduling properties are pinned and the rule text narrows the monotonicity statement to the pairwise decision (spec AC-05).
 
 ### Story 2 — Planning-time issue combination (parallel-run operator)
 
@@ -79,13 +79,13 @@ As a parallel-run operator, I want qualifying pairs combined into one item at pl
 
 Acceptance Criteria:
 
-- [ ] US-04 A pair meeting the combination threshold, with candidates limited to `contract_dependency` or same-file overlap, is combined by the library with deterministic members, primary, pairs, and estimated savings (spec AC-10).
-- [ ] US-18 A pair that shares only contracts has a nonzero cost (`conflict_tolerance.weights.contract` summed once per shared contract identifier) and is combined when that cost meets the threshold; `contract_dependency` remains a hard edge class, and at `tolerance_percent` 0 the edge set stays identical to strict scheduling (spec AC-27, AC-28, AC-29).
+- [x] US-04 A pair meeting the combination threshold, with candidates limited to `contract_dependency` or same-file overlap, is combined by the library with deterministic members, primary, pairs, and estimated savings (spec AC-10).
+- [x] US-18 A pair that shares only contracts has a nonzero cost (`conflict_tolerance.weights.contract` summed once per shared contract identifier) and is combined when that cost meets the threshold; `contract_dependency` remains a hard edge class, and at `tolerance_percent` 0 the edge set stays identical to strict scheduling (spec AC-27, AC-28, AC-29).
 - [ ] US-05 The planner combines without operator approval, re-plans on the primary branch, assigns the combined item a band from a fresh complexity assessment, and records `combined_issue_nums` and the `combinations` list (spec AC-11, AC-14).
-- [ ] US-06 The combined item runs as one child with one branch and one PR whose autoclose line names every member issue; no umbrella issue is created (spec AC-12, AC-13).
-- [ ] US-07 A combined item that fails review or CI remediates as one unit and never splits back into separate PRs (spec AC-16).
-- [ ] US-08 The plan report lists each combination with its members, pairs, threshold, and estimated savings, and lists not-combined qualifying pairs with the reason (spec AC-17).
-- [ ] US-09 `parallel-add` reports a qualifying overlap with an unstarted item without combining it (spec AC-15).
+- [x] US-06 The combined item runs as one child with one branch and one PR whose autoclose line names every member issue; no umbrella issue is created (spec AC-12, AC-13).
+- [x] US-07 A combined item that fails review or CI remediates as one unit and never splits back into separate PRs (spec AC-16).
+- [x] US-08 The plan report lists each combination with its members, pairs, threshold, and estimated savings, and lists not-combined qualifying pairs with the reason (spec AC-17).
+- [x] US-09 `parallel-add` reports a qualifying overlap with an unstarted item without combining it (spec AC-15).
 
 ### Story 3 — Telemetry without tuning (parallel-run operator)
 
@@ -93,8 +93,8 @@ As a parallel-run operator, I want observed merge-conflict resolution time recor
 
 Acceptance Criteria:
 
-- [ ] US-10 Observed resolution time per tolerated pair is recorded in the orchestrator checkpoint and projected into the run's `parallel-status.md` (spec AC-06).
-- [ ] US-11 No code reads the recorded telemetry, and no weight changes automatically (spec AC-07).
+- [x] US-10 Observed resolution time per tolerated pair is recorded in the orchestrator checkpoint and projected into the run's `parallel-status.md` (spec AC-06).
+- [x] US-11 No code reads the recorded telemetry, and no weight changes automatically (spec AC-07).
 
 ### Story 4 — Defaults and threshold override (destination maintainer)
 
@@ -102,10 +102,10 @@ As a destination maintainer, I want nonzero default scheduling tolerance and a d
 
 Acceptance Criteria:
 
-- [ ] US-12 A destination with no overlay receives `tolerance_percent` 100 and `combination_threshold_percent` 400 from the published truth table (spec AC-01).
-- [ ] US-13 `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other members, and its accept, reject, and default behavior is equal across Python and PowerShell (spec AC-08).
-- [ ] US-14 The committed value is equal in both truth tables, and a destination overlay value is composed identically by the TypeScript and Python composers (spec AC-09).
-- [ ] US-19 `conflict_tolerance.weights.contract` is a required integer of at least 1, validated like the other weights with fail-fast errors naming the key and booleans rejected, equal across Python and PowerShell, carried by the TypeScript push-down and overlay surfaces, and committed byte-equal in both truth tables; a destination overlay can change it (spec AC-09, AC-26).
+- [x] US-12 A destination with no overlay receives `tolerance_percent` 100 and `combination_threshold_percent` 400 from the published truth table (spec AC-01).
+- [x] US-13 `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other members, and its accept, reject, and default behavior is equal across Python and PowerShell (spec AC-08).
+- [x] US-14 The committed value is equal in both truth tables, and a destination overlay value is composed identically by the TypeScript and Python composers (spec AC-09).
+- [x] US-19 `conflict_tolerance.weights.contract` is a required integer of at least 1, validated like the other weights with fail-fast errors naming the key and booleans rejected, equal across Python and PowerShell, carried by the TypeScript push-down and overlay surfaces, and committed byte-equal in both truth tables; a destination overlay can change it (spec AC-09, AC-26).
 
 ### Story 5 — Delivered consistently to destinations (destination maintainer)
 
@@ -113,24 +113,24 @@ As a destination maintainer, I want the bundled copies and pack manifest to matc
 
 Acceptance Criteria:
 
-- [ ] US-15 Mirrored and bundled copies are byte-identical to their sources, the pack manifest lists the new modules, and the contract tests pass (spec AC-18, AC-19, AC-20).
-- [ ] US-16 The change stays within its declared scope: no edge-reason enum change, no validated checkpoint schema change, no validator, drift, or hook change (spec AC-22), and it is delivered on top of merged #1006 (spec AC-21).
-- [ ] US-17 Fail-before evidence, coverage, toolchain, file-size, and isolation gates pass and are recorded (spec AC-23, AC-24, AC-25).
+- [x] US-15 Mirrored and bundled copies are byte-identical to their sources, the pack manifest lists the new modules, and the contract tests pass (spec AC-18, AC-19, AC-20).
+- [x] US-16 The change stays within its declared scope: no edge-reason enum change, no validated checkpoint schema change, no validator, drift, or hook change (spec AC-22), and it is delivered on top of merged #1006 (spec AC-21).
+- [x] US-17 Fail-before evidence, coverage, toolchain, file-size, and isolation gates pass and are recorded (spec AC-23, AC-24, AC-25).
 
 ### Issue Acceptance Criteria Traceability
 
 Issue acceptance criteria, restated from `issue.md`, with their story and spec traceability:
 
-- [ ] A destination with no overlay receives a nonzero default `tolerance_percent` from the published truth table (US-12; spec AC-01).
-- [ ] An item whose tolerated overlaps exceed its aggregate cap has its cheapest pair converted to an edge; at `tolerance_percent` 0 the edge set equals strict scheduling (US-01, US-02, US-03; spec AC-02 to AC-05).
-- [ ] Observed merge-resolution time per tolerated pair is recorded, and no weight changes automatically (US-10, US-11; spec AC-06, AC-07).
+- [x] A destination with no overlay receives a nonzero default `tolerance_percent` from the published truth table (US-12; spec AC-01).
+- [x] An item whose tolerated overlaps exceed its aggregate cap has its cheapest pair converted to an edge; at `tolerance_percent` 0 the edge set equals strict scheduling (US-01, US-02, US-03; spec AC-02 to AC-05).
+- [x] Observed merge-resolution time per tolerated pair is recorded, and no weight changes automatically (US-10, US-11; spec AC-06, AC-07).
 - [ ] A pair meeting the combination threshold becomes one item with one branch and one PR closing both issues; its complexity band comes from a fresh assessment (US-04, US-05, US-06; spec AC-10 to AC-14).
-- [ ] `parallel-add` reports a qualifying overlap with an unstarted item without combining it (US-09; spec AC-15).
-- [ ] A combined item that fails review or CI remediates as one unit (US-07; spec AC-16).
-- [ ] `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other keys, and equal across Python, PowerShell, and TypeScript where ported (US-13, US-14; spec AC-08, AC-09).
-- [ ] The plan report lists each combination and its estimated savings (US-08; spec AC-17).
-- [ ] Mirrored and bundled copies, pack manifest, and contract tests pass (US-15; spec AC-18, AC-19).
-- [ ] A pair that shares only a contract has a nonzero cost from `conflict_tolerance.weights.contract` (summed once per shared contract identifier, validated like the other weights) and can qualify for combination; at `tolerance_percent` 0 the edge set equals strict scheduling (US-18, US-19; spec AC-26 to AC-29).
+- [x] `parallel-add` reports a qualifying overlap with an unstarted item without combining it (US-09; spec AC-15).
+- [x] A combined item that fails review or CI remediates as one unit (US-07; spec AC-16).
+- [x] `combination_threshold_percent` is read from `conflict_tolerance`, validated like the other keys, and equal across Python, PowerShell, and TypeScript where ported (US-13, US-14; spec AC-08, AC-09).
+- [x] The plan report lists each combination and its estimated savings (US-08; spec AC-17).
+- [x] Mirrored and bundled copies, pack manifest, and contract tests pass (US-15; spec AC-18, AC-19).
+- [x] A pair that shares only a contract has a nonzero cost from `conflict_tolerance.weights.contract` (summed once per shared contract identifier, validated like the other weights) and can qualify for combination; at `tolerance_percent` 0 the edge set equals strict scheduling (US-18, US-19; spec AC-26 to AC-29).
 
 ## Non-Goals
 
