@@ -83,7 +83,7 @@ was observed in one consumer repository.
 - [ ] Codex and Copilot skill copies contain no `.claude/` path and state the Claude push-down docs library and PowerShell 7.4 prerequisite.
 - [ ] Mirror and push-down parity tests pass for all new agents, skills and templates, every bundle copy is byte-identical, every Claude and Codex file is listed in its pack manifest, and the existing contract tests and the Codex generator `--check` pass without modification.
 - [ ] Each page template carries the front-matter fields `owner`, `last_reviewed`, `audience`, `diataxis_mode` and `surface_refs` with the `diataxis_mode` value of the `spec.md` mode mapping.
-- [ ] The SubagentStop and PreToolUse hooks are registered in `.claude/settings.json` and its byte-identical bundle copy, and the `docs_operations` routing block is present in `config/orchestration-routing.json` and its byte-identical bundle copy.
+- [ ] The SubagentStop and PreToolUse hooks are registered in `.claude/settings.json` and its byte-identical bundle copy, and the `docs_operations` routing block is present in `config/orchestration-routing.json` and its two byte-identical bundle copies (the `extensions/drm-copilot/resources/config/` copy and the `extensions/drm-copilot/resources/claude-customizations/config/` push-down copy).
 - [ ] No Python or TypeScript file is added or modified, `.codex/config.toml` is unchanged, and no test creates a temporary file.
 - [ ] (CI-dependent) `poshqc / PowerShell QC` and `poshqc / PowerShell hook suites (Linux)` pass on the pull request head.
 

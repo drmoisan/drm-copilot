@@ -78,7 +78,9 @@ In scope:
   `.claude/hooks/validate-docs-role-output.ps1` (SubagentStop), and
   `.claude/hooks/enforce-docs-role-write-scope.ps1` (PreToolUse), each with a bundle copy.
 - Edits: `.claude/settings.json` and its bundle copy; `config/orchestration-routing.json` and its
-  bundle copy; the Claude and Codex `pack-manifests/core.json` files.
+  two bundle copies (`extensions/drm-copilot/resources/config/orchestration-routing.json` and the
+  push-down copy `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`);
+  the Claude and Codex `pack-manifests/core.json` files.
 - Pester suites for the hooks and for the structural role, skill, mirror and routing contracts.
 
 ## Non-Goals
@@ -113,7 +115,7 @@ directive permission to call existing tooling. "Avoid new Python" applies to eve
 | `docs-author-page/templates/*.md` on each host and bundle | skill (data) | Markdown | D |
 | `.claude/hooks/docs-role-contract.ps1`, `validate-docs-role-output.ps1`, `enforce-docs-role-write-scope.ps1` and bundle copies under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` | hook | PowerShell | R1 |
 | `.claude/settings.json` and bundle copy (edit) | schema/config/data | JSON | D |
-| `config/orchestration-routing.json` and `extensions/drm-copilot/resources/config/orchestration-routing.json` (edit) | schema/config/data | JSON | D |
+| `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and the push-down copy `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` (edit; all carry the same `docs_operations` block and are byte-identical to the source) | schema/config/data | JSON | D |
 | Claude and Codex `pack-manifests/core.json` (edit) | schema/config/data | JSON | D |
 | Codex generator run (write once, then `--check`) | generator task (existing Python, called) | n/a | G |
 | `tests/scripts/claude-hooks/docs-role-contract.Tests.ps1`, `validate-docs-role-output.Tests.ps1`, `enforce-docs-role-write-scope.Tests.ps1` | test | PowerShell (Pester) | D |
@@ -272,7 +274,10 @@ emits. The Copilot bundle has no manifest.
   each entry `{ "logical_agent": "<role or root>", "mcp_tools": [ ... ] }`, with the values of the
   per-skill table (`documentation-workflow` and `docs-init` map to `root`; `docs-validate` maps to
   `docs-coverage-reviewer`). The bundled copy
-  `extensions/drm-copilot/resources/config/orchestration-routing.json` is edited identically. No
+  `extensions/drm-copilot/resources/config/orchestration-routing.json` and the push-down copy
+  `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` are
+  edited identically, carry the same `docs_operations` block and are byte-identical to
+  `config/orchestration-routing.json`. No
   runtime reader consumes the block; the roles suite pins it (OQ-5).
 - `.claude/settings.json`: one `SubagentStop` entry and one `PreToolUse` entry as defined above; the
   bundled copy `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json` is
@@ -341,7 +346,7 @@ Test rules:
 - [ ] Mirror and push-down parity tests pass for all new agents and skills: each role exists at every agent location and each skill and template at every skill location listed in `## Mirror Set`, every bundle copy is byte-identical to its source, every Claude and Codex file is listed in its `pack-manifests/core.json` (`docs-authoring-roles.Tests.ps1`), and the existing contract tests named in `## Tests` pass without modification, including the Codex generator `--check`.
 - [ ] Each of the templates `tutorial.md`, `how-to.md`, `explanation.md`, `cli-reference.md`, `http-reference.md`, `config-reference.md`, `api-reference.md` and `architecture-overview.md` exists under `docs-author-page/templates/` with the fields `owner`, `last_reviewed`, `audience`, `diataxis_mode` and `surface_refs` and the `diataxis_mode` value of the mode mapping (`docs-authoring-roles.Tests.ps1`).
 - [ ] `.claude/settings.json` contains the `SubagentStop` entry for `validate-docs-role-output.ps1` with matcher `docs-architect|docs-author|docs-reconciler|docs-coverage-reviewer` and the `PreToolUse` entry for `enforce-docs-role-write-scope.ps1` with matcher `Write|Edit|MultiEdit|NotebookEdit|Bash`; the bundled copy is byte-identical; `hook-dependency-failure.Claude.Tests.ps1` and `hook-dependency-guard-completeness.Tests.ps1` pass without modification.
-- [ ] `config/orchestration-routing.json` contains a `docs_operations` block whose entries map each skill listed in `## Scope` to the logical agent and MCP tools of `## Per-Skill Contract`, each listed tool is held by that role, the bundled copy is byte-identical, `routes`, `generated_agent_families` and `discovery_operations` are unchanged, and `test_orchestration_routing_config_parity.py` and `test_codex_topology_policy_config_parity.py` pass.
+- [ ] `config/orchestration-routing.json` contains a `docs_operations` block whose entries map each skill listed in `## Scope` to the logical agent and MCP tools of `## Per-Skill Contract`, each listed tool is held by that role, both bundled copies, `extensions/drm-copilot/resources/config/orchestration-routing.json` and the push-down copy `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`, are byte-identical to the source, `routes`, `generated_agent_families` and `discovery_operations` are unchanged, and `test_orchestration_routing_config_parity.py` and `test_codex_topology_policy_config_parity.py` pass.
 - [ ] No Python or TypeScript file is added or modified and `.codex/config.toml` is unchanged: `git diff --name-only` from the merge base of the integration branch lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs` and no `.codex/config.toml`; the plan's artifact classification table lists every created or edited file with class, language and permitting rule.
 - [ ] No test creates a temporary file: no new suite contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`.
 - [ ] Pester line coverage is at least 85% for each new production file under `.claude/hooks/`, read from `artifacts/pester/powershell-coverage.xml`, with no production file excluded; figures are recorded under `<FEATURE>/evidence/qa-gates/`.
@@ -385,9 +390,14 @@ that default; an owner answer may change the affected criteria through a specifi
    byte-identical copies (the named generators do not produce them), and the Copilot bundle
    `extensions/drm-copilot/resources/customizations/.github/` is included. Open: correct the epic
    `### 900009` Files bullet, which names the generators as producers and omits the Copilot bundle.
+   Owner decision P4 resolved this question: mirrors that the existing generators cannot produce for
+   new agents and skills are hand-authored or byte-copied, and each is recorded as an explicit
+   exception in the plan.
 5. **OQ-5 - Routing entry.** Provisional default: keep a `docs_operations` block in
    `config/orchestration-routing.json` and its bundled copy (skill-to-role routing entries, as the
    epic requires). It has no runtime reader and is pinned by Pester.
+   Owner decision P4 resolved this question: the block is kept, and the push-down copy
+   `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` is included.
 6. **OQ-6 - Accuracy recording.** Provisional default: `docs-coverage-reviewer` stays read-only; only
    `docs-reconciler` holds `update_docs_ledger`.
 7. **Q7 - Codex reach of the docs lib.** Provisional default: the docs lib ships in the Claude bundle
