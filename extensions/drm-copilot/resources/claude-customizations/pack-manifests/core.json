@@ -89,6 +89,7 @@
     ".claude/hooks/validate-feature-review-coverage-metrics.ps1",
     ".claude/hooks/validate-feature-review-coverage-rules.ps1",
     ".claude/hooks/validate-feature-review-coverage.ps1",
+    ".claude/hooks/validate-orchestrator-output-rejection.ps1",
     ".claude/hooks/validate-orchestrator-output-resolution.ps1",
     ".claude/hooks/validate-orchestrator-output-routing.ps1",
     ".claude/hooks/validate-orchestrator-output-feature-folder.ps1",

@@ -29,6 +29,17 @@ this operation may and may not disturb. Read that section before applying anythi
 - `$ARGUMENTS` names exactly one item: a GitHub issue number or reference, or a path to an entry
   under `docs/features/potential/`. An argument naming more than one item is rejected; admit one
   item per invocation so each admission decision and its mutation entry stay attributable.
+- The run-existence check is evaluated first, before any argument-shape check: a pending or
+  not-started run, and a run whose `parallel_slug` no checkpoint tracks, are rejected before the
+  argument is examined.
+- On either run-existence rejection, change no state and emit the rejection signal defined in
+  `## Mutation Rejection Signal (issue #1012)` of `.claude/rules/parallel-orchestration.md`: when
+  the run's slug is known, put the line `parallel_slug: <slug>` before the signal, and end the
+  final output with the literal line `PARALLEL_MUTATION_REJECTED: run_not_started` as its last
+  line, with no formatting and no trailing text.
+- A closed run and an argument naming more than one item are rejected only after the run-existence
+  check, while the run's checkpoint exists; each of these rejections emits no rejection signal, and
+  the stop validates against that checkpoint.
 
 ## Re-Derive Durable State Before Applying Anything
 
@@ -212,6 +223,8 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
 - This operation never moves, restates, or re-derives an in-flight item's cohort or state.
 - This operation performs no destructive side effect: it closes no pull request and removes no
   worktree. Those belong to `/parallel-remove` with `--disposition abandon`.
+- The step 5 stop and a failed preparation each emits no rejection signal: the run's checkpoint
+  already exists and state is already written, so the stop validates against that checkpoint.
 
 ## Completion Requirements
 
