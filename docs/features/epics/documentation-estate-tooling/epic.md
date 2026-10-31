@@ -352,6 +352,21 @@ provisional defaults.
   (`285786ec4`) is kept; the duplicate set remains unpushed on the relaunch worktree branch and was
   not deleted.
 
+### 1020 amendment outcome (2026-10-31)
+
+- The amendment cycle fixed the six round-1 defects (1031 preconditions: `python/` manifest
+  exclusion, `$script:DocsAnalyzerNativeRow` table under `# --- 1031: Python-native analyzers ---`,
+  `InvokeProcess` context member `(FilePath, ArgumentList, StdinText, TimeoutSeconds) -> @{ExitCode;
+  Stdout; Stderr; TimedOut}`, `New-DocsDiagnostic -Severity error|warning|information`; anchors use
+  real issue numbers and any `# --- 900NNN:` anchor is rejected).
+- The confirming preflight halted it (`validator_failed`): planned `Invoke-DocsProcess` tests start
+  a real process, wait real time and resolve an executable on PATH, which
+  `.claude/rules/powershell.md` forbids. Required change: `Invoke-DocsProcess` becomes a thin seam;
+  argument validation and result shaping move into pure functions tested in memory.
+- Pending owner authorization: one requirements-change cycle for 1020 covering that defect and the
+  three 1020 items 1021 reported (`patternProperties` walk, empty `accept.txt` read, absolute
+  template `Source` paths).
+
 ### Page-check contracts from the PowerShell preparation of 1021 (binding)
 
 - Page-metadata schema `urn:drm-copilot:docs:1.0.0:page-metadata` (fields `owner`,
