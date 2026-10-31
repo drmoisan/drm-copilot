@@ -89,7 +89,7 @@ The new text must respect existing contract tests:
 
 ## Acceptance Criteria
 
-- [ ] `tests/scripts/dev_tools/test_parallel_planner_no_scratch_worktree_contracts.py` exists and, before any text change to the planner-surface files, its positive assertions fail (expect-fail regression run recorded under `evidence/regression-testing/` with a non-zero expected exit code).
+- [x] `tests/scripts/dev_tools/test_parallel_planner_no_scratch_worktree_contracts.py` exists and, before any text change to the planner-surface files, its positive assertions fail (expect-fail regression run recorded under `evidence/regression-testing/` with a non-zero expected exit code).
 - [ ] Test `test_skill_artifact_home_states_planner_runs_no_worktree_add` passes: `## Artifact Home` in `.claude/skills/parallel-plan/SKILL.md` contains the prohibition fragment "runs no `git worktree add`" within a paragraph headed **No planner worktrees.**.
 - [ ] Test `test_skill_no_planner_worktrees_names_runtime_as_remover` passes: the **No planner worktrees.** paragraph states that the preparation children's `isolation: "worktree"` worktrees are created and removed by the Claude Code runtime, and that a planner-created worktree is outside the removal-gate records and the runtime sweep.
 - [ ] Test `test_skill_artifact_home_contains_plan_home_checkout_command` passes: `## Artifact Home` contains `git checkout -b parallel/<slug>-plan origin/main`, the resume form `git checkout parallel/<slug>-plan`, and `git push -u origin parallel/<slug>-plan`.
