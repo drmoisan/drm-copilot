@@ -13,7 +13,9 @@ Edge rule:
     edge iff conflict AND (hard OR cost * 100 > benefit * tolerance_percent),
     with hard, cost, and benefit defined by ``decide_pair``, ``pair_cost``, and
     ``pair_benefit``. The recorded reason is the first kind of the relation's
-    reason list, so the reason enum is unchanged.
+    reason list, so the reason enum is unchanged. ``schedule_conflict_edges``
+    then applies the aggregate cap of ``_blast_radius_aggregate`` (issue
+    #1013), promoting tolerated overlaps until every item is within its cap.
 
 Invariants, constraints, and side effects:
     No overlap semantics are defined here: the entry-pair overlap primitive, the
@@ -29,6 +31,7 @@ from dataclasses import asdict, dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
+from scripts.dev_tools._blast_radius_aggregate import select_capped_pairs
 from scripts.dev_tools._blast_radius_conflicts import (
     CONFLICT_CONTRACT_DEPENDENCY,
     CONFLICT_SHARED_SURFACE_OVERLAP,
@@ -53,6 +56,7 @@ if TYPE_CHECKING:
     ]
 
 __all__ = [
+    "COMBINATION_THRESHOLD_DEFAULT",
     "CONFIG_CONFLICT_TOLERANCE",
     "HARD_REASON_KINDS",
     "STRICT_CONFLICT_TOLERANCE",
@@ -83,6 +87,11 @@ WEIGHT_NAMES: tuple[str, ...] = tuple(
 )
 BAND_NAMES: tuple[str, ...] = ("C1", "C2", "C3", "C4")
 
+# The one optional member (issue #1013): the issue-combination threshold, a
+# percentage of the pair benefit, read as this default when absent.
+_COMBINATION_THRESHOLD = "combination_threshold_percent"
+COMBINATION_THRESHOLD_DEFAULT = 400
+
 # Reason kinds that make a conflict an edge at every tolerance: a shared surface
 # or a contract dependency cannot be reconciled by a merge step.
 HARD_REASON_KINDS: tuple[str, ...] = (
@@ -106,6 +115,8 @@ class ConflictTolerance:
         default_band (str): Band used for an item that records none.
         append_only_paths (tuple[str, ...]): Append-only file patterns, matched
             with the mergeable matcher.
+        combination_threshold_percent (int): Percentage of the pair benefit a
+            candidate pair's cost must reach to qualify for issue combination.
     """
 
     tolerance_percent: int
@@ -113,6 +124,7 @@ class ConflictTolerance:
     band_durations: Mapping[str, int]
     default_band: str
     append_only_paths: tuple[str, ...]
+    combination_threshold_percent: int = COMBINATION_THRESHOLD_DEFAULT
 
     def __post_init__(self) -> None:
         """Copy both maps into read-only views so the record stays immutable."""
@@ -235,7 +247,11 @@ def config_conflict_tolerance(config: Mapping[str, object]) -> ConflictTolerance
     if value is None:
         return STRICT_CONFLICT_TOLERANCE
 
-    member = _require_names(require_mapping(value, _LABEL), _MEMBER_NAMES, _LABEL)
+    raw = require_mapping(value, _LABEL)
+    # The optional member joins the exact name set only when it is present, so
+    # every other unknown name is still rejected.
+    optional = (_COMBINATION_THRESHOLD,) if _COMBINATION_THRESHOLD in raw else ()
+    member = _require_names(raw, _MEMBER_NAMES + optional, _LABEL)
     default_band = member["default_band"]
     if default_band not in BAND_NAMES:
         raise ValueError(f'{_LABEL}["default_band"] must be one of {BAND_NAMES}.')
@@ -251,6 +267,15 @@ def config_conflict_tolerance(config: Mapping[str, object]) -> ConflictTolerance
         default_band=cast("str", default_band),
         append_only_paths=require_str_tuple(
             member["append_only_paths"], f'{_LABEL}["append_only_paths"]'
+        ),
+        combination_threshold_percent=(
+            _require_int(
+                member[_COMBINATION_THRESHOLD],
+                f'{_LABEL}["{_COMBINATION_THRESHOLD}"]',
+                minimum=0,
+            )
+            if optional
+            else COMBINATION_THRESHOLD_DEFAULT
         ),
     )
 
@@ -385,7 +410,7 @@ def schedule_conflict_edges(
         ValueError: If two items share a key, or conflict_tolerance or a band is
             invalid.
     """
-    config_conflict_tolerance(config)
+    tolerance = config_conflict_tolerance(config)
     ordered = _ordered_items(items)
 
     # Pairs are visited in (a, b) order with a < b, so both lists come out sorted.
@@ -423,7 +448,40 @@ def schedule_conflict_edges(
                         decision.benefit,
                     )
                 )
-    return SchedulingResult(edges=tuple(edges), tolerated_overlaps=tuple(tolerated))
+    return _apply_aggregate_cap(edges, tolerated, ordered, tolerance)
+
+
+def _apply_aggregate_cap(
+    edges: list[ConflictEdge],
+    tolerated: list[ToleratedOverlap],
+    ordered: Sequence[SchedulingItem],
+    tolerance: ConflictTolerance,
+) -> SchedulingResult:
+    """Promote the cap-selected tolerated overlaps to edges (issue #1013, D-2).
+
+    Each promoted overlap becomes a non-hard edge recording its first reason,
+    cost, and benefit; both lists are re-sorted by ``(a, b)``. At tolerance 0
+    nothing is tolerated, so the pass is a no-op.
+    """
+    bands = {item.key: item.band for item in ordered}
+    promoted = set(select_capped_pairs(tolerated, bands, tolerance))
+    for overlap in tolerated:
+        if (overlap.a, overlap.b) in promoted:
+            edges.append(
+                ConflictEdge(
+                    overlap.a,
+                    overlap.b,
+                    overlap.reasons[0],
+                    False,
+                    overlap.cost,
+                    overlap.benefit,
+                )
+            )
+    kept = [o for o in tolerated if (o.a, o.b) not in promoted]
+    return SchedulingResult(
+        edges=tuple(sorted(edges, key=lambda edge: (edge.a, edge.b))),
+        tolerated_overlaps=tuple(kept),
+    )
 
 
 def _path_pair_weight(entry_a: str, entry_b: str, tolerance: ConflictTolerance) -> int:
