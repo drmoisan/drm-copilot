@@ -31,7 +31,7 @@ features:
     feature_folder: 2026-10-30-push-down-consolidation-and-ecosystem-packs-1029
     depends_on: [1028]
   - issue_num: 1030
-    feature_folder: hook-parity-across-claude-codex-copilot
+    feature_folder: 2026-10-30-hook-parity-across-claude-codex-copilot-1030
     depends_on: [1028]
   - issue_num: 1032
     feature_folder: retire-github-skills-and-thin-copilot-layer
