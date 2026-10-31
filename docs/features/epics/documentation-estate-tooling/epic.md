@@ -363,9 +363,16 @@ provisional defaults.
   a real process, wait real time and resolve an executable on PATH, which
   `.claude/rules/powershell.md` forbids. Required change: `Invoke-DocsProcess` becomes a thin seam;
   argument validation and result shaping move into pure functions tested in memory.
-- Pending owner authorization: one requirements-change cycle for 1020 covering that defect and the
+- Pending owner authorization: one requirements-change cycle for 1020 covering that defect, the
   three 1020 items 1021 reported (`patternProperties` walk, empty `accept.txt` read, absolute
-  template `Source` paths).
+  template `Source` paths), and the item 1022 reported: 1020's registry suite asserts the committed
+  registry has zero rows, which contradicts the membership-assertion decision and would stop 1022
+  at its [P0-T3] check.
+
+Contracts from the PowerShell preparation of 1022 (binding): 1022 has no digest function of its
+own; `source_sha256` is always 1020's `Get-DocsDeclarationSha256` through
+`New-DocsSurfaceElement -SourceText [-LineRange]`. `architecture-component` elements carry
+`line_range: null` and a whole-file normalized digest; 1023 treats digests as opaque values.
 
 ### Page-check contracts from the PowerShell preparation of 1021 (binding)
 
