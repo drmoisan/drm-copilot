@@ -50,6 +50,8 @@ Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTarge
 # feature folder exists in every checkout branched from main, so it places a call in many at
 # once. The item is identified by its canonical issue number and its branch instead.
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop
+# Shared target-worktree resolver (issues #1009, #1011): resolves the branch a --head names.
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/HookTargetWorktree.psm1') -Force -ErrorAction Stop
 # Epic scope (issue #663): the epic integration pull request is gated against the epic checkpoint.
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop
@@ -70,10 +72,14 @@ function Resolve-PrAuthorWorktreeTarget {
         directly would depend on the machine's live worktrees and would pass or fail
         according to what other sessions happen to have checked out, which the repository's
         determinism policy forbids. Mocking here lets a test state the resolution outcome it
-        is exercising and nothing else. A NoTarget result for a command with no signal passes
-        through Resolve-PrAuthorCurrentBranchTarget, which re-resolves the current branch (#989).
+        is exercising and nothing else. A branch the command names (--head, --branch, or
+        branch:) is resolved by the shared resolver Resolve-HookTargetWorktree, given only the
+        session root and that branch (issue #1011). When that yields no selection, the
+        portable-identity resolver Resolve-WorktreeItemTarget runs, and a NoTarget result for a
+        command with no signal passes through Resolve-PrAuthorCurrentBranchTarget, which
+        re-resolves the current branch (#989).
     .OUTPUTS
-        The target result object from Resolve-WorktreeItemTarget.
+        A target result object built by New-WorktreeResolutionTargetResult.
     #>
     [CmdletBinding()]
     param(
@@ -81,8 +87,56 @@ function Resolve-PrAuthorWorktreeTarget {
         [string] $CommandText
     )
 
-    $target = Resolve-WorktreeItemTarget -Text $CommandText -SessionRoot (Get-Location).Path
+    $sessionRoot = (Get-Location).Path
+    $branch = Find-WorktreeResolutionBranchSignal -Text $CommandText
+    if ($null -ne $branch) {
+        $shared = Resolve-HookTargetWorktree -SessionRoot $sessionRoot -CommandBranch $branch
+        $mapped = ConvertFrom-PrAuthorHookTargetResult -Result $shared -CommandText $CommandText -SessionRoot $sessionRoot
+        if ($null -ne $mapped) { return $mapped }
+    }
+    $target = Resolve-WorktreeItemTarget -Text $CommandText -SessionRoot $sessionRoot
     return (Resolve-PrAuthorCurrentBranchTarget -CommandText $CommandText -Target $target)
+}
+
+function ConvertFrom-PrAuthorHookTargetResult {
+    <#
+    .SYNOPSIS
+        Map a Resolve-HookTargetWorktree result onto a pr-author target result, or $null (issue #1011).
+    .DESCRIPTION
+        Returns $null (no selection) when Result is null, when CommandText carries no branch
+        signal, when Result.Source is not CommandOperand, or when Result names no root. Only a
+        CommandOperand result selects: Resolve-PrAuthorWorktreeTarget passes the resolver no path
+        argument, so such a result is branch-derived, and a FilePath, SessionRoot, or
+        DelegationIdentity result never selects the worktree (issue #673). An ambiguous result
+        maps to Ambiguous; a root equal to SessionRoot (OrdinalIgnoreCase) maps to SessionRoot
+        and any other root to OtherWorktree. Reason codes come from New-WorktreeResolutionTargetResult.
+    .PARAMETER Result
+        The Resolve-HookTargetWorktree result.
+    .PARAMETER CommandText
+        The Bash command text under evaluation.
+    .PARAMETER SessionRoot
+        The session root the result is compared with.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [AllowNull()][object] $Result,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $CommandText,
+        [Parameter(Mandatory)][string] $SessionRoot
+    )
+
+    $branch = Find-WorktreeResolutionBranchSignal -Text $CommandText
+    if ($null -eq $Result -or $null -eq $branch -or $Result.Source -cne 'CommandOperand') { return $null }
+    $detail = if ([string]::IsNullOrWhiteSpace([string]$Result.Detail)) { "branch '$branch' resolved by the shared resolver" } else { [string]$Result.Detail }
+    if ($Result.Ambiguous) {
+        return (New-WorktreeResolutionTargetResult -Status Ambiguous -SessionRoot $SessionRoot -Signal Branch -SignalValue $branch -Candidate @($Result.Candidates) -Detail $detail)
+    }
+    if ([string]::IsNullOrEmpty([string]$Result.WorktreeRoot)) { return $null }
+    $isSession = [string]::Equals((ConvertTo-HookTargetWorktreeNormalizedPath -Path $Result.WorktreeRoot), (ConvertTo-HookTargetWorktreeNormalizedPath -Path $SessionRoot), [System.StringComparison]::OrdinalIgnoreCase)
+    $status = if ($isSession) { 'SessionRoot' } else { 'OtherWorktree' }
+    return (New-WorktreeResolutionTargetResult -Status $status -SessionRoot $SessionRoot -WorktreeRoot $Result.WorktreeRoot -Signal Branch -SignalValue $branch -Detail $detail)
 }
 
 function Get-PrAuthorTargetCheckpointResolution {
