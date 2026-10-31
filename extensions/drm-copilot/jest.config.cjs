@@ -536,5 +536,24 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1003: the worktree-session launch module, both session command
+    // builders, and the extension entry point (baseline above both floors).
+    // Per-file entries only; the map has no `global` key.
+    "./src/worktree-session-launch.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/claude-worktree-session.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/codex-worktree-session.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/extension.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };

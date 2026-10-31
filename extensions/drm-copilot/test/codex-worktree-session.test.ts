@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 
+import { VENV_ACTIVATE_COMMAND } from "../src/claude-worktree-session";
 import {
   buildCodexTrustCommand,
   buildCodexWorktreeSessionCommands,
@@ -55,13 +56,13 @@ describe("buildCodexWorktreeSessionCommands", () => {
     const commands = buildCodexWorktreeSessionCommands(baseInput);
 
     expect(commands.ensureParentDirectory).toBe(
-      "New-Item -ItemType Directory -Force -Path 'C:/workspace-wt' | Out-Null",
+      "New-Item -ItemType Directory -Force -Path 'C:/workspace-wt' -ErrorAction Stop | Out-Null",
     );
     expect(commands.git).toBe(
       "git -C 'C:/workspace' worktree add 'C:/workspace-wt/2026-04-20T09-59' -b 'workspace-wt-2026-04-20T09-59'",
     );
     expect(commands.setLocation).toBe(
-      "Set-Location 'C:/workspace-wt/2026-04-20T09-59'",
+      "Set-Location 'C:/workspace-wt/2026-04-20T09-59' -ErrorAction Stop",
     );
     expect(commands.trustCodexProject).toContain(
       "$codexConfig = Join-Path $HOME '.codex/config.toml'",
@@ -112,7 +113,7 @@ describe("buildCodexWorktreeSessionCommands", () => {
     });
 
     expect(commands.poetryInstall).toBe("poetry install --with dev");
-    expect(commands.activate).toBe("& './.venv/Scripts/Activate.ps1'");
+    expect(commands.activate).toBe(VENV_ACTIVATE_COMMAND);
   });
 
   it("emits a guarded post-codex script command when configured", () => {

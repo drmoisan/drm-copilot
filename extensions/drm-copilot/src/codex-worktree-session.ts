@@ -1,6 +1,7 @@
 import {
   deriveWorktreeGroupDirectory,
   quoteForPwsh,
+  VENV_ACTIVATE_COMMAND,
 } from "./claude-worktree-session";
 
 /**
@@ -22,13 +23,13 @@ export interface CodexWorktreeSessionCommandInput {
 }
 
 /**
- * Ordered PowerShell commands that constitute a Codex worktree session.
+ * Ordered PowerShell commands that constitute a Codex worktree session. The
+ * launch module emits them in field order as statements of one script.
  */
 export interface CodexWorktreeSessionCommands {
   /**
    * Idempotent guard that creates the `<repoName>-wt` grouping directory before
-   * `git worktree add` runs. The handler must send this via its own
-   * `terminal.sendText` immediately before
+   * `git worktree add` runs. The launch module emits it immediately before
    * {@link CodexWorktreeSessionCommands.git}.
    */
   readonly ensureParentDirectory: string;
@@ -47,7 +48,8 @@ export interface CodexWorktreeSessionCommands {
  * are loaded by the Codex CLI.
  *
  * @param worktreePath The worktree path created by the preceding git command.
- * @returns A single PowerShell command string suitable for Terminal.sendText.
+ * @returns A single PowerShell statement list that the launch module emits as
+ *          one step of the session script.
  */
 export function buildCodexTrustCommand(worktreePath: string): string {
   const quotedPath = quoteForPwsh(worktreePath);
@@ -68,12 +70,13 @@ export function buildCodexTrustCommand(worktreePath: string): string {
 }
 
 /**
- * Builds the ordered terminal commands that create the worktree, mark it as a
- * trusted Codex project, run optional setup, and start Codex.
+ * Builds the ordered PowerShell commands that create the worktree, mark it as
+ * a trusted Codex project, run optional setup, and start Codex.
  *
  * @param input The repository root, destination worktree path, branch name,
  *              poetry flag, optional objective, and optional post script path.
- * @returns The commands to send as separate terminal lines.
+ * @returns The session commands, in the order the launch module composes them
+ *          into one script.
  */
 export function buildCodexWorktreeSessionCommands(
   input: CodexWorktreeSessionCommandInput,
@@ -87,7 +90,7 @@ export function buildCodexWorktreeSessionCommands(
   const groupDirectory = deriveWorktreeGroupDirectory(input.worktreePath);
   const ensureParentDirectory = `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(
     groupDirectory,
-  )} | Out-Null`;
+  )} -ErrorAction Stop | Out-Null`;
 
   const trimmedObjective = input.objective?.trim() ?? "";
   const objectiveSuffix =
@@ -97,9 +100,7 @@ export function buildCodexWorktreeSessionCommands(
   const poetryInstall = input.usePoetry
     ? "poetry install --with dev"
     : undefined;
-  const activate = input.usePoetry
-    ? "& './.venv/Scripts/Activate.ps1'"
-    : undefined;
+  const activate = input.usePoetry ? VENV_ACTIVATE_COMMAND : undefined;
 
   const trimmedPostCodexPath = input.postCodexScriptPath?.trim() ?? "";
   const postCodex =
@@ -110,7 +111,7 @@ export function buildCodexWorktreeSessionCommands(
   return {
     ensureParentDirectory,
     git: `git -C ${quotedRepoRoot} worktree add ${quotedPath} -b ${quotedBranch}`,
-    setLocation: `Set-Location ${quotedPath}`,
+    setLocation: `Set-Location ${quotedPath} -ErrorAction Stop`,
     trustCodexProject: buildCodexTrustCommand(input.worktreePath),
     poetryInstall,
     activate,

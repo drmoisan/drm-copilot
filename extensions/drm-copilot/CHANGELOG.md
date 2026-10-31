@@ -46,6 +46,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   allow out-of-scope paths when their evaluation-only dependency fails to load, and they still
   deny in-scope paths. Repositories that received the Claude push-down at 1.1.19, 1.1.20, or
   1.1.21 must re-run the Claude push-down to receive the missing files.
+- Claude and Codex worktree sessions in Linux dev containers (issue #1003): the setup steps and
+  the agent launch were typed into the terminal input stream and could arrive at the shell as one
+  concatenated line, which failed with a PowerShell `ParserError`. Both sessions now deliver setup
+  and launch as one encoded PowerShell script at process start (`-NoExit -EncodedCommand`) in a
+  terminal created with `hideFromUser`, and activate the virtual environment through a runtime
+  probe of `.venv/Scripts` and `.venv/bin`. Setup is now fail-fast: it stops at the first failed
+  step and does not launch the agent, where previously every line ran regardless of earlier
+  failures. Each step prints a progress banner, and the 5-second launch delay is removed.
 
 ## [0.0.1] - 2026-05-02
 
