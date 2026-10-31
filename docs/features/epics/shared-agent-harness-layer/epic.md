@@ -34,7 +34,7 @@ features:
     feature_folder: 2026-10-30-hook-parity-across-claude-codex-copilot-1030
     depends_on: [1028]
   - issue_num: 1032
-    feature_folder: retire-github-skills-and-thin-copilot-layer
+    feature_folder: 2026-10-30-retire-github-skills-and-thin-copilot-layer-1032
     depends_on: [1029, 1030]
   - issue_num: 1016
     feature_folder: dev-docs-root-migration-and-feature-folder-rename
