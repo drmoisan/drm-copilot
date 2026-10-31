@@ -128,7 +128,7 @@ Owner decisions that bind this spec are recorded in `owner-decisions.md` in this
 
 ### Part 2: Pester
 
-- [ ] `Invoke-PoshQCTest` accepts `-TestResultPath` and `-CoverageOutputPath`, and unit tests show that omitting them leaves the settings-file paths unchanged.
+- [x] `Invoke-PoshQCTest` accepts `-TestResultPath` and `-CoverageOutputPath`, and unit tests show that omitting them leaves the settings-file paths unchanged.
 - [ ] `scripts/powershell/PoshQC/PoshQC.Parallel.psm1` exists, is registered in `PoshQC.psm1` and exported from `PoshQC.psd1`, and `Invoke-PoshQCParallelTest` starts one process per shard, waits for all, and merges results.
 - [ ] The worker count defaults to half the logical core count capped at 8 and is overridable by parameter, with unit tests for the default, the cap and the override.
 - [ ] `Merge-PoshQCJunitReport` produces one JUnit document with summed `tests`, `errors`, `failures`, `disabled`, root `time` equal to the longest shard wall-clock, and unit tests cover passing, failing and empty-shard inputs.
