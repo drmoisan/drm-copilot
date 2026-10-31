@@ -376,6 +376,17 @@ own; `source_sha256` is always 1020's `Get-DocsDeclarationSha256` through
 `New-DocsSurfaceElement -SourceText [-LineRange]`. `architecture-component` elements carry
 `line_range: null` and a whole-file normalized digest; 1023 treats digests as opaque values.
 
+### Ledger contracts from the PowerShell preparation of 1023 (binding)
+
+- 1023 owns `DOCS_STALE_PAGE` and `DOCS_BOUND_PAGE_MISSING`; the earlier names `DOCS_PAGE_STALE`
+  and `DOCS_PAGE_MISSING` are superseded (the `DOCS_PAGE_*` prefix is 1021's, `DOCS_COMPLETE_*` is
+  1034's). The persisted receipt carries `revision`, `mode`, `repository`, `validation_result`,
+  `id`.
+- Precision-limit diagnostics carry the `docs.precision-limit` marker in `extensions`; 1033's spec
+  row C5 (no marker) must be reconciled to this before 1033 executes.
+- 1034's kept plan validates the receipt with its own `Test-DocsCompleteGateReceipt`; the field
+  set agrees with 1023's `Get-DocsReceiptGateDecision`.
+
 ### Page-check contracts from the PowerShell preparation of 1021 (binding)
 
 - Page-metadata schema `urn:drm-copilot:docs:1.0.0:page-metadata` (fields `owner`,
