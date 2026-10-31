@@ -3,19 +3,27 @@
 - Issue: #1020
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-30T22-50
-- Authoritative specification: `spec.md` in this folder (PowerShell design, version 0.4; the
+- Last Updated: 2026-10-31
+- Authoritative specification: `spec.md` in this folder (PowerShell design, version 0.5; the
   earlier Python package design is withdrawn)
+- Requirements source: `docs/features/epics/documentation-estate-tooling/epic.md` on branch
+  `origin/epic/documentation-estate-tooling-integration`
 
 ## Revision Note
 
 This revision follows `spec.md` version 0.4, the requirements amendment for owner decisions D3 and
 D5 (a new planning cycle under D1). It adds the analysis method (`native` or `scanner`) recorded
 per snapshot element, snapshot analyzer and ledger entry; the declaration-lines digest; the
-`-Json` envelope schema; the 900011 analyzer-registry anchor and the corrected anchor numbers
+`-Json` envelope schema; the 1031 analyzer-registry anchor and the corrected anchor numbers
 (1022 and 1024 replace stale placeholders); and the shared audience identifier pattern. Existing
 acceptance criteria keep their order; changed wording is in U1, U8 and U9, and the new criteria are
 appended as U15 to U18.
+
+The follow-up revision for `spec.md` version 0.5 applies the binding 1031 preconditions of the
+integration-branch epic and replaces every placeholder number with its real issue number (1031,
+1033, 1034, 1036, 1037, 1038). U6 now excludes the `.claude/lib/docs/python/` subtree, which only
+the python pack lists; U9 adds the separate native provider table; U8 and U17 name 1036; and U19
+is appended for the process member and the `information` diagnostic severity.
 
 ## Story Statement
 
@@ -124,10 +132,10 @@ repositories is PowerShell or bash, so these contracts are delivered as PowerShe
 - [ ] A maintainer running `Invoke-DocsCommand.ps1 -Command init` receives a starter profile that validates; nothing is written without `-Write`, and an existing profile is not overwritten without `-Force` (`DocsProfileCommands.Tests.ps1`).
 - [ ] The same element kind, path and declaration always produce the same element identifier over a seeded set of inputs, distinct boundary inputs produce distinct identifiers, and recorded golden vectors match (`DocsSurface.Tests.ps1`).
 - [ ] A neutrality test fails when a configured consumer identifier digest (SHA-256, never text) matches text under `.claude/lib/docs/` or `schemas/docs/`, so no consumer repository's name ships in the framework (`DocsNeutrality.Tests.ps1`).
-- [ ] The push-down copy of every file under `.claude/lib/docs/` is byte-identical to its source and listed in the Claude core pack manifest, so a destination repository receives exactly what this repository tests (`Docs.Manifest.Tests.ps1`, plus the existing push-down contract tests passing unmodified).
+- [ ] The push-down copy of every file under `.claude/lib/docs/` except `.claude/lib/docs/python/**` is byte-identical to its source and listed in the Claude core pack manifest, so a destination repository receives exactly what this repository tests, while the `.claude/lib/docs/python/` subtree stays reserved for the python pack (`Docs.Manifest.Tests.ps1`, including a test that its exclusion filter drops only `.claude/lib/docs/python/` paths, plus the existing push-down contract tests passing unmodified).
 - [ ] The runtime schema copies under `.claude/lib/docs/schemas/v1/` are byte-identical to the canonical schemas under `schemas/docs/v1/`, so a destination validates against the same schemas this repository tests (`DocsSchemaContract.Tests.ps1`).
-- [ ] Every subcommand reports exit code 0 for success, 1 for findings, 2 for usage errors and 3 for internal or environment errors (including PowerShell below 7.4), and with `-Json` writes exactly one deterministic envelope `{command, exit_code, findings, ok, result}`, with `command` `null` for a missing or unknown command, that 900007 can parse (`Invoke-DocsCommand.Tests.ps1`).
-- [ ] A feature author can add a subcommand or analyzer by inserting a row under the feature's own anchor; the committed dispatch table carries the anchors 1020, 1021, 1022, 1023, 1024 and 900008 in that order, the empty analyzer registry carries the anchors 1022, 900004 and 900011 in that order, both validate with no findings, and invalid rows (duplicate name, duplicate identifier and analysis-method pair, reserved option, module outside `.claude/lib/docs/`) are rejected before any module is imported (`Invoke-DocsCommand.Tests.ps1`, `DocsAnalyzerRegistry.Tests.ps1`).
+- [ ] Every subcommand reports exit code 0 for success, 1 for findings, 2 for usage errors and 3 for internal or environment errors (including PowerShell below 7.4), and with `-Json` writes exactly one deterministic envelope `{command, exit_code, findings, ok, result}`, with `command` `null` for a missing or unknown command, that 1036 can parse (`Invoke-DocsCommand.Tests.ps1`).
+- [ ] A feature author can add a subcommand or analyzer by inserting a row under the feature's own anchor; the committed dispatch table carries the anchors 1020, 1021, 1022, 1023, 1024 and 1034 in that order, the empty scanner table of the analyzer registry carries the anchors 1022 and 1033 in that order, a separate empty native table carries the 1031 anchor so a native analyzer is added without editing the scanner table, no anchor carries a placeholder number, the registry validates the rows of both tables, both the dispatch table and the registry validate with no findings, and invalid rows (duplicate name, duplicate identifier and analysis-method pair, reserved option, module outside `.claude/lib/docs/`) are rejected before any module is imported (`Invoke-DocsCommand.Tests.ps1`, `DocsAnalyzerRegistry.Tests.ps1`).
 - [ ] `.claude/lib/docs` is classified in `quality-tiers.yml` (tier T3, provisional per OQ-4) and the tier check passes.
 - [ ] No new Python or TypeScript file is added, and the plan's classification table shows every created or edited file's class and language.
 - [ ] Discovery runtime, discovery schema and `.claude/lib/discovery-validation/` files are unchanged by this feature.
@@ -135,8 +143,9 @@ repositories is PowerShell or bash, so these contracts are delivered as PowerShe
 - [ ] (CI-dependent) The `poshqc / PowerShell QC` check on `windows-latest` passes on the pull request head.
 - [ ] A reviewer can tell how each element was analyzed: every snapshot element, snapshot analyzer entry and ledger entry carries `analysis_method` `native` or `scanner`, a missing or unknown value is rejected with a finding that locates the field, the element identifier is the same for both methods, and the registry accepts a native analyzer only alongside a scanner for the same identifier (`DocsSchemaContract.Tests.ps1`, `DocsSurface.Tests.ps1`, `DocsAnalyzerRegistry.Tests.ps1`).
 - [ ] A page is not marked stale by edits outside the documented declaration: a Pester test proves that the element digest is unchanged by edits outside the declaration's line range, by inserted lines above it, and by CRLF, BOM and final-newline differences, and changes for an edit inside the range; a declaration without a line range is rejected for every kind except `architecture-component`; and analyzer output whose digest differs from the recomputed declaration-lines digest is rejected (`DocsSurface.Tests.ps1`, `DocsSchemaContract.Tests.ps1`, `DocsAnalyzerRegistry.Tests.ps1`).
-- [ ] 900007 and other callers can rely on a published envelope contract: `schemas/docs/v1/docs-command-envelope.schema.json` ships with a byte-identical runtime copy, bundle copy and `core.json` line, a Pester test validates `Invoke-DocsCommand.ps1 -Json` output against it for success, findings, usage-error, runtime-error and `-Help` runs, and envelopes that break the exit-code, `ok`, finding-count or key-set rules are rejected (`Invoke-DocsCommand.Tests.ps1`, `DocsSchemaContract.Tests.ps1`).
+- [ ] 1036 and other callers can rely on a published envelope contract: `schemas/docs/v1/docs-command-envelope.schema.json` ships with a byte-identical runtime copy, bundle copy and `core.json` line, a Pester test validates `Invoke-DocsCommand.ps1 -Json` output against it for success, findings, usage-error, runtime-error and `-Help` runs, and envelopes that break the exit-code, `ok`, finding-count or key-set rules are rejected (`Invoke-DocsCommand.Tests.ps1`, `DocsSchemaContract.Tests.ps1`).
 - [ ] A maintainer's audience identifiers follow one pattern shared with page metadata: the profile schema references the docs common `audience-id` definition, identifiers such as `maintainers` and `2nd-line` are accepted, and identifiers such as `Readers`, `docs.v2`, `a_b` and `-x` are rejected (`DocsProfile.Tests.ps1`, `DocsSchemaContract.Tests.ps1`).
+- [ ] The author of the Python-native analyzer (1031) finds its preconditions in place: the command context offers a process member `InvokeProcess` that returns the exit code, standard output and standard error of a child process and reports a timeout, tests can replace it with an in-memory fake that records each call, and `New-DocsDiagnostic` accepts the severity `information`, which is never blocking (`Invoke-DocsCommand.Tests.ps1`, `DocsSurface.Tests.ps1`).
 
 ## Owner Questions
 
@@ -155,13 +164,14 @@ available).
 ## Non-Goals
 
 - The page checker, the `check` subcommand and the `page-metadata` schema (1021).
-- Surface analyzers and the `inventory` subcommand (1022, 900004), and the Python-native analyzer
-  and its pack packaging (900011); this feature defines only the registry, the analysis method and
-  the digest contract they follow.
+- Surface analyzers and the `inventory` subcommand (1022, 1033), and the Python-native analyzer
+  and its pack packaging (1031); this feature defines only the registry, the analysis method, the
+  digest contract, the process member and the diagnostic severities they follow, and creates no
+  file under `.claude/lib/docs/python/`.
 - Coverage ledger, parity matrix and evidence-pin semantics, staleness, the `docs-complete` receipt
   logic and their subcommands (1023); this feature defines only their schemas.
-- The reference-page generator (1024), MCP tool wrappers (900007), CI and hook enforcement and
-  the workflow template content (900008), documentation roles and skills (900009).
+- The reference-page generator (1024), MCP tool wrappers (1036), CI and hook enforcement and
+  the workflow template content (1034), documentation roles and skills (1037).
 - Codex `.codex/lib/docs/` publication (OQ-2).
 - A docs-site build.
 - Any Python or TypeScript code, and any change to discovery runtime behavior or files.
