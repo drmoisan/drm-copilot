@@ -278,7 +278,7 @@ describe("buildWorktreeSessionCommands", () => {
     expect(commands.poetryInstall).toBe("poetry install --with dev");
   });
 
-  it("emits a relative-path activate command for the worktree-local venv when usePoetry is true", () => {
+  it("emits the runtime venv activation probe for Windows and Linux layouts when usePoetry is true", () => {
     // Arrange / Act
     const commands = buildWorktreeSessionCommands({
       ...baseInput,
@@ -287,7 +287,12 @@ describe("buildWorktreeSessionCommands", () => {
     });
 
     // Assert
-    expect(commands.activate).toBe("& './.venv/Scripts/Activate.ps1'");
+    expect(commands.activate).toContain("./.venv/Scripts/Activate.ps1");
+    expect(commands.activate).toContain("./.venv/bin/Activate.ps1");
+    expect(commands.activate).toContain(
+      "No virtual environment activation script found under ./.venv",
+    );
+    expect(commands.activate).toContain("& $venvActivate");
   });
 
   it("emits a claude command without a trailing objective when objective is undefined", () => {
