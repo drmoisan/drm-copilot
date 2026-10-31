@@ -79,9 +79,10 @@ writes and the `gh pr create` / `gh pr edit --body-file` handoff.
 - Auto-close bullets must use exactly `- Closes #NNN` format. Three sources are valid:
   1. the PR-context "Issues to autoclose" list;
   2. the PR-context "Author-asserted autoclose issues" list (rendered from the PR Intent);
-  3. an issue named as author-asserted in the delegation prompt, on the line
-     `Author-asserted autoclose issues: #NNN`. This source is valid even when the PR context
-     lists no verified autoclose issues.
+  3. each issue named on the line `Author-asserted autoclose issues: #NNN [#NNN ...]` in the
+     delegation prompt; a combined parallel item (issue #1013) names every member issue on that
+     one line, and each named issue gets its own `- Closes #NNN` bullet. This source is valid even
+     when the PR context lists no verified autoclose issues.
 - Emit the fallback `- None` bullet only when no source has an entry.
 - GitHub validation applies to the two PR-context lists: if it is unavailable or unverified for
   an entry on those lists, do not emit `Closes` for that entry. An issue named as author-asserted
