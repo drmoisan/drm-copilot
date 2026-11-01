@@ -333,3 +333,34 @@ def test_main_verbose_mode_reformatted(
 
     captured = capsys.readouterr()
     assert "reformatted" in captured.out
+
+
+def test_format_file_writes_utf8_with_lf_line_endings(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """format_file must write UTF-8 with LF endings regardless of the platform.
+
+    Scenario: an unformatted file is rewritten while Path.write_text records its
+    keyword arguments. Expected outcome: the write requests UTF-8 encoding and a
+    literal LF newline, so Windows text mode cannot translate it to CRLF.
+    """
+    # Arrange
+    target = Path("data.json")
+    writes: list[dict[str, Any]] = []
+
+    def read_text(self: Path, *args: Any, **kwargs: Any) -> str:
+        return '{"b":1,"a":2}'
+
+    def write_text(self: Path, data: str, *args: Any, **kwargs: Any) -> int:
+        writes.append(dict(kwargs))
+        return len(data)
+
+    monkeypatch.setattr(Path, "read_text", read_text, raising=False)
+    monkeypatch.setattr(Path, "write_text", write_text, raising=False)
+
+    # Act
+    changed, failed, _ = fmt.format_file(target, check=False)
+
+    # Assert
+    assert (changed, failed) == (True, False)
+    assert writes == [{"encoding": "utf-8", "newline": "\n"}]

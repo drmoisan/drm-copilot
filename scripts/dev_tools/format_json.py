@@ -45,7 +45,9 @@ def format_file(path: Path, check: bool) -> tuple[bool, bool, str]:
             - failed: True when the file cannot be parsed as valid JSON.
             - message: Human-readable status string.
     """
-    original = path.read_text()
+    # Universal-newline reading keeps a file that differs only in line endings
+    # from being reported or rewritten on every run.
+    original = path.read_text(encoding="utf-8")
     try:
         parsed = json.loads(original)
     except json.JSONDecodeError as exc:
@@ -57,7 +59,9 @@ def format_file(path: Path, check: bool) -> tuple[bool, bool, str]:
         return False, False, f"{path}: already formatted"
     if check:
         return True, False, f"{path}: would reformat"
-    path.write_text(formatted)
+    # The repository stores LF (.gitattributes eol=lf); write LF and UTF-8
+    # explicitly so Windows text-mode translation does not emit CRLF.
+    path.write_text(formatted, encoding="utf-8", newline="\n")
     return True, False, f"{path}: reformatted"
 
 
