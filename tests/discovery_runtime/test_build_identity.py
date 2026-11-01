@@ -27,7 +27,7 @@ def package() -> JsonObject:
         (
             ("name", "drm-copilot-discovery"),
             ("version", "2.0.0"),
-            ("python", ">=3.10,<4.0"),
+            ("python", ">=3.11,<4.0"),
             (
                 "dependencies",
                 JsonObject(

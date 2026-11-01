@@ -15,16 +15,10 @@ from __future__ import annotations
 
 import json
 import re
-import sys
+import tomllib
 from pathlib import Path
 
 import pytest
-
-# tomllib is stdlib only from Python 3.11; the supported floor 3.10 uses tomli.
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DOC = REPO_ROOT / "docs" / "engineering" / "legacy-discovery-and-parity"
@@ -453,11 +447,11 @@ def test_execution_environment_fact_is_unchanged_across_copies() -> None:
 
     canonical = read(".github/skills/execution-environment/SKILL.md").encode("utf-8")
     # The committed copies: .claude, .agents and the three bundle mirrors; the packaged
-    # mcp-server resources are build output and are not part of the committed set.
+    # mcp-server resources and agent worktrees are not part of the committed set.
     copies = sorted(
         path
         for path in REPO_ROOT.rglob("execution-environment/SKILL.md")
-        if not {"node_modules", ".git", "packages"} & set(path.parts)
+        if not {"node_modules", ".git", "packages", "worktrees"} & set(path.parts)
     )
     assert len(copies) == 6, [str(path) for path in copies]
     for path in copies:

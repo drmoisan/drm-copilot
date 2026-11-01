@@ -24,7 +24,7 @@ Side Effects:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -61,7 +61,7 @@ from scripts.dev_tools.codex_native_converter.models_intermediate import (
 )
 
 
-class SourceEcosystem(str, Enum):
+class SourceEcosystem(StrEnum):
     """Describe a supported source runtime ecosystem.
 
     Purpose:
@@ -86,7 +86,7 @@ class SourceEcosystem(str, Enum):
     CLAUDE = "claude"
 
 
-class SourceKind(str, Enum):
+class SourceKind(StrEnum):
     """Describe the type of source artifact discovered in a source tree.
 
     Purpose:
@@ -122,7 +122,7 @@ class SourceKind(str, Enum):
     UNKNOWN = "unknown"
 
 
-class ConversionClass(str, Enum):
+class ConversionClass(StrEnum):
     """Describe how a source artifact should be converted.
 
     Purpose:

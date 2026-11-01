@@ -18,7 +18,7 @@ Neither the extension nor the MCP package contains Python business logic.
 
 ## Local setup
 
-1. **Install the wheel** into a Python 3.10 or later interpreter you trust for this
+1. **Install the wheel** into a Python 3.11 or later interpreter you trust for this
    repository, for example the repository's own virtual environment. The gateway client
    detects the workspace `.venv` interpreter first, then `py`, then `python`; an explicit
    interpreter path can be configured per invocation.

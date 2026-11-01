@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import stat
-import sys
 from contextlib import contextmanager
-from importlib import import_module
 from pathlib import Path
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
@@ -102,24 +100,6 @@ def test_streaming_limits_stop_at_first_excess_entry(
             )
     assert consumed == [0, 1]
     assert closed == [True]
-
-
-def test_metadata_uses_approved_parser_when_tomllib_is_unavailable(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """MonkeyPatch simulates the 3.10 import surface using the available TOML reader.
-
-    Return None; assert real bounded metadata semantics without package installs,
-    filesystem fixtures or persistent import changes. Assertion failures propagate.
-    """
-    reader = import_module("tomllib" if sys.version_info >= (3, 11) else "tomli")
-    monkeypatch.setitem(sys.modules, "tomllib", None)
-    monkeypatch.setitem(sys.modules, "tomli", reader)
-    result = identity.package_metadata(
-        MemoryFileSystem().content[identity.PROJECT_PATH]
-    )
-    assert result["name"] == "drm-copilot-discovery"
-    assert result["python"] == ">=3.10,<4.0"
 
 
 @pytest.mark.parametrize("operation", ("enumerate", "read", "source"))
@@ -278,7 +258,7 @@ def test_metadata_limits_and_exact_declared_requirements() -> None:
     content = MemoryFileSystem().content[identity.PROJECT_PATH]
     result = identity.package_metadata(content)
     assert result["name"] == "drm-copilot-discovery"
-    assert result["python"] == ">=3.10,<4.0"
+    assert result["python"] == ">=3.11,<4.0"
     with pytest.raises(ResourceError):
         identity.package_metadata(content, limits=ParseLimits(document_bytes=20))
     with pytest.raises(ResourceError):

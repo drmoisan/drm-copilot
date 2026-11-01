@@ -21,7 +21,7 @@ creates a temporary file, starts a subprocess, or invokes ``git`` or ``gh``.
 from __future__ import annotations
 
 import random
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -48,7 +48,7 @@ MAX_ITEMS = 10
 START_GENERATION = 4
 
 # The single timestamp every constructed entry records.
-FIXED_NOW = datetime(2026, 8, 8, 11, 0, tzinfo=timezone.utc)
+FIXED_NOW = datetime(2026, 8, 8, 11, 0, tzinfo=UTC)
 
 # The four unstarted item states, cycled when labelling generated items.
 UNSTARTED_STATE_CYCLE = ("proposed", "admitted", "prepared", "scheduled")

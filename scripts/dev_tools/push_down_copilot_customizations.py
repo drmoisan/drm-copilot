@@ -13,7 +13,7 @@ import json
 import os
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path, PureWindowsPath
 from typing import TypedDict
 
@@ -354,7 +354,7 @@ def push_down_customizations(
     effective_source = source_root if source_root is not None else repo_root
     effective_artifact = artifact_root if artifact_root is not None else repo_root
     validate_destination(destination_root, repo_root, fs)
-    started_at = datetime.now(timezone.utc)
+    started_at = datetime.now(UTC)
     created_count = 0
     overwritten_count = 0
     rewritten_reference_count = 0
@@ -403,7 +403,7 @@ def push_down_customizations(
             )
         )
 
-    finished_at = datetime.now(timezone.utc)
+    finished_at = datetime.now(UTC)
     provisional_summary = PushDownSummary(
         repo_root=repo_root.as_posix(),
         destination_root=destination_root.as_posix(),

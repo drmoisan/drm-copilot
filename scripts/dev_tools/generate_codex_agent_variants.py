@@ -5,14 +5,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 from scripts.dev_tools._codex_discovery_routing import (
     DISCOVERY_GENERATED_AGENT_FAMILIES,

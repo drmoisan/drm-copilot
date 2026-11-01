@@ -26,6 +26,7 @@ import io
 import os
 import subprocess
 import sys
+from fnmatch import fnmatchcase
 from itertools import count
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, cast
@@ -550,8 +551,44 @@ def mem_fs_path(monkeypatch: pytest.MonkeyPatch) -> Path:
             return True
         if "/**/" in pattern:
             zero_depth_pattern = pattern.replace("/**/", "/")
-            return candidate.match(zero_depth_pattern)
-        return False
+            if candidate.match(zero_depth_pattern):
+                return True
+        # PurePath.match treats ``**`` as one segment, so a nested path such as
+        # ``docs/a/b/x.json`` misses ``docs/**/*.json``; fall back to a full,
+        # segment-wise match where ``**`` spans any number of segments.
+        return _segments_match(candidate.parts, PurePosixPath(pattern).parts)
+
+    def _segments_match(parts: tuple[str, ...], patterns: tuple[str, ...]) -> bool:
+        """Match path segments against glob segments with recursive ``**``.
+
+        Args:
+            parts (tuple[str, ...]): Remaining candidate path segments.
+            patterns (tuple[str, ...]): Remaining glob segments.
+
+        Returns:
+            bool: ``True`` when every candidate segment is consumed by the
+            pattern, with ``**`` matching zero or more whole segments.
+
+        Raises:
+            None.
+
+        Side Effects:
+            None.
+        """
+        if not patterns:
+            return not parts
+        head, rest = patterns[0], patterns[1:]
+        # A ``**`` segment may consume any number of leading segments, including
+        # none; every other segment must match exactly one candidate segment.
+        if head == "**":
+            return any(
+                _segments_match(parts[index:], rest) for index in range(len(parts) + 1)
+            )
+        return (
+            bool(parts)
+            and fnmatchcase(parts[0], head)
+            and _segments_match(parts[1:], rest)
+        )
 
     def _glob(self: Path, pattern: str) -> Iterator[Path]:
         """Support in-memory glob lookups for fixture-managed paths."""

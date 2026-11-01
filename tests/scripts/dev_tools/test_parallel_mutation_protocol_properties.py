@@ -30,7 +30,7 @@ creates a temporary file, starts a subprocess, reads the wall clock, or invokes
 from __future__ import annotations
 
 import random
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 import pytest
@@ -66,7 +66,7 @@ MAX_ITEMS = 12
 
 # The generation every case starts from, and the timestamp every entry records.
 START_GENERATION = 4
-FIXED_NOW = datetime(2026, 8, 8, 11, 0, tzinfo=timezone.utc)
+FIXED_NOW = datetime(2026, 8, 8, 11, 0, tzinfo=UTC)
 
 # The four unstarted item states, cycled when labelling generated items.
 UNSTARTED_STATE_CYCLE = ("proposed", "admitted", "prepared", "scheduled")

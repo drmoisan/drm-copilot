@@ -37,7 +37,7 @@ unit suite only.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -116,7 +116,7 @@ def _fixed_clock() -> datetime:
         the fixture's ``--at`` string, so it only has to be deterministic.
     """
 
-    return datetime(2026, 10, 11, 8, 29, tzinfo=timezone.utc)
+    return datetime(2026, 10, 11, 8, 29, tzinfo=UTC)
 
 
 def _fixture_paths() -> list[Path]:

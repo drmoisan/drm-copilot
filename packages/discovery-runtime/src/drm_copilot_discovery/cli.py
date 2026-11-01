@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -237,7 +237,7 @@ def _create_io(root: str, repository: RepositoryReader | None) -> ServiceIO:
 
 def _clock() -> datetime:
     """Return current aware UTC datetime for installed execution; read clock only."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _execute(

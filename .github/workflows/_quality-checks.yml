@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
       - name: Check out repository
@@ -99,21 +99,24 @@ jobs:
           poetry run python -m scripts.dev_tools.check_quality_tiers
         continue-on-error: false
 
-      - name: Run tests with Pytest
-        if: ${{ inputs.run-heavy }}
+      # Coverage is measured and gated on Python 3.13 only; the other versions run the
+      # same tests without coverage instrumentation as a compatibility check.
+      - name: Run tests with Pytest (compatibility, no coverage)
+        if: ${{ inputs.run-heavy && matrix.python-version != '3.13' }}
         run: |
-          poetry run pytest -n auto --cov --cov-branch \
-            --cov-report=xml \
-            --cov-report=json:artifacts/python/coverage.json \
-            --cov-report=term-missing
+          poetry run pytest -n auto
+        continue-on-error: false
+
+      - name: Run tests with Pytest and coverage
+        if: ${{ inputs.run-heavy && matrix.python-version == '3.13' }}
+        run: |
+          poetry run pytest -n auto --cov --cov-branch             --cov-report=xml             --cov-report=json:artifacts/python/coverage.json             --cov-report=term-missing
         continue-on-error: false
 
       - name: Enforce Python coverage thresholds
-        if: ${{ inputs.run-heavy }}
+        if: ${{ inputs.run-heavy && matrix.python-version == '3.13' }}
         run: |
-          poetry run python -m scripts.dev_tools.check_python_coverage_thresholds \
-            --report artifacts/python/coverage.json \
-            --min-line 85 --min-branch 75
+          poetry run python -m scripts.dev_tools.check_python_coverage_thresholds             --report artifacts/python/coverage.json             --min-line 85 --min-branch 75
         continue-on-error: false
 
       - name: Upload coverage to Codecov

@@ -11,7 +11,7 @@ variant file matches its canonical bundled counterpart.
 
 from __future__ import annotations
 
-import sys
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -19,11 +19,6 @@ from typing import Any
 import pytest
 
 from scripts.dev_tools.resolve_codex_deployment import GENERATED_AGENT_FAMILIES
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BUNDLE_ROOT = (

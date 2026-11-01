@@ -8,7 +8,7 @@ separate from uninspected ledger proposals. Construction performs no I/O.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Literal, cast
 
 from drm_copilot_discovery.models import JsonObject
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 SCHEMA_VERSION_V1 = "1.0.0"
 
 
-class UnitType(str, Enum):
+class UnitType(StrEnum):
     """Neutral category of an enumerated inventory unit.
 
     A ``str`` enum so members compare and serialize as their plain string value.

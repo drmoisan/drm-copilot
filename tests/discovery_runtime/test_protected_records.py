@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, cast
 
 import pytest
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 LIMITS = ParseLimits()
 # Inside the control grant's window (issued 00:00:00Z, expires 00:01:00Z).
-NOW = datetime(2026, 1, 1, 0, 0, 45, tzinfo=timezone.utc)
+NOW = datetime(2026, 1, 1, 0, 0, 45, tzinfo=UTC)
 RUNTIME = RuntimeIdentity(
     package_version="2.0.0",
     schema_version="2.0.0",

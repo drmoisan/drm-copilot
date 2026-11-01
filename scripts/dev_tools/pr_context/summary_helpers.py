@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from .models import (
@@ -404,7 +404,7 @@ def append_generation_timestamp(head_sha: str | None = None) -> str:
     Returns:
         Formatted freshness header with UTC time and the head-SHA line.
     """
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")
+    timestamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S %Z")
     sha_text = head_sha if head_sha else UNKNOWN_HEAD_SHA_PLACEHOLDER
     return (
         section(GENERATED_CONTEXT_SECTION_TITLE)

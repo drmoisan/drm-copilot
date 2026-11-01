@@ -1,15 +1,15 @@
 {
   "$schema": "../../../../schemas/discovery/v1/feature-contract.schema.json",
-  "schema_version": "1.0.0",
-  "id": "placeholder-feature-contract",
-  "title": "Placeholder feature title",
-  "description": "Placeholder summary of the contracted behavior.",
-  "status": "draft",
   "acceptance_criteria": [
     {
       "id": "placeholder-acceptance-criterion",
       "statement": "Placeholder checkable acceptance statement.",
       "verification": "manual"
     }
-  ]
+  ],
+  "description": "Placeholder summary of the contracted behavior.",
+  "id": "placeholder-feature-contract",
+  "schema_version": "1.0.0",
+  "status": "draft",
+  "title": "Placeholder feature title"
 }
