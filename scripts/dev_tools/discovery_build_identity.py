@@ -6,7 +6,7 @@ unit tests use memory. This helper neither refreshes resources nor builds wheels
 
 from __future__ import annotations
 
-from importlib import import_module
+import tomllib
 from typing import TYPE_CHECKING, cast
 
 from drm_copilot_discovery.build_identity import (
@@ -67,12 +67,7 @@ def package_metadata(
     # Bound dotted/container syntax before the standard TOML decoder allocates.
     if sum(content.count(token) for token in (b".", b"[", b"{")) > 1024:
         raise ResourceError("Package metadata exceeds syntax limits")
-    # Match the approved builder convention without importing a missing 3.10 module.
-    try:
-        reader = import_module("tomllib")
-    except ModuleNotFoundError:
-        reader = import_module("tomli")
-    loads = cast("Callable[[str], object]", reader.loads)
+    loads = cast("Callable[[str], object]", tomllib.loads)
     try:
         decoded = loads(content.decode("utf-8"))
         ReportBudget(limits).check(decoded)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from hashlib import sha256
 from typing import TYPE_CHECKING, Literal, NoReturn, cast
 
@@ -247,7 +247,7 @@ def invoke(
         bounded_object(request, limits=ParseLimits()),
         io=io,
         repository_reader=io.repository,
-        clock=lambda: datetime(2026, 10, 20, tzinfo=timezone.utc),
+        clock=lambda: datetime(2026, 10, 20, tzinfo=UTC),
         analyzer_registry=InstalledInventoryRegistry(),
     )
 

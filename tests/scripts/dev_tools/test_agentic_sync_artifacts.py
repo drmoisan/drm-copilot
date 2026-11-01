@@ -21,9 +21,7 @@ from tests.scripts.dev_tools.agentic_sync_test_support import InMemorySyncFileSy
 
 def test_build_artifact_path_uses_timestamp() -> None:
     """Artifact path should include timestamp and folder path."""
-    started = agentic_sync.datetime(
-        2026, 2, 9, 12, 34, 56, tzinfo=agentic_sync.timezone.utc
-    )
+    started = agentic_sync.datetime(2026, 2, 9, 12, 34, 56, tzinfo=agentic_sync.UTC)
     repo_root = Path("/repo")
     path = agentic_sync.build_artifact_path(repo_root, started)
     assert "artifacts" in path.parts
@@ -48,12 +46,8 @@ def test_render_sync_summary_serializes_actions() -> None:
     summary = agentic_sync.SyncSummary(
         repo_left="/left",
         repo_right="/right",
-        started_at=agentic_sync.datetime(
-            2026, 2, 9, 12, 0, tzinfo=agentic_sync.timezone.utc
-        ),
-        finished_at=agentic_sync.datetime(
-            2026, 2, 9, 12, 1, tzinfo=agentic_sync.timezone.utc
-        ),
+        started_at=agentic_sync.datetime(2026, 2, 9, 12, 0, tzinfo=agentic_sync.UTC),
+        finished_at=agentic_sync.datetime(2026, 2, 9, 12, 1, tzinfo=agentic_sync.UTC),
         force_direction=None,
         actions=[action],
     )
@@ -80,12 +74,8 @@ def test_write_sync_artifact_creates_dir_and_writes() -> None:
     summary = agentic_sync.SyncSummary(
         repo_left="/left",
         repo_right="/right",
-        started_at=agentic_sync.datetime(
-            2026, 2, 9, 12, 0, tzinfo=agentic_sync.timezone.utc
-        ),
-        finished_at=agentic_sync.datetime(
-            2026, 2, 9, 12, 1, tzinfo=agentic_sync.timezone.utc
-        ),
+        started_at=agentic_sync.datetime(2026, 2, 9, 12, 0, tzinfo=agentic_sync.UTC),
+        finished_at=agentic_sync.datetime(2026, 2, 9, 12, 1, tzinfo=agentic_sync.UTC),
         force_direction=None,
         actions=[action],
     )
@@ -170,8 +160,8 @@ def test_main_runs_sync(monkeypatch: pytest.MonkeyPatch) -> None:
     summary = agentic_sync.SyncSummary(
         repo_left="/left",
         repo_right="/right",
-        started_at=agentic_sync.datetime.now(agentic_sync.timezone.utc),
-        finished_at=agentic_sync.datetime.now(agentic_sync.timezone.utc),
+        started_at=agentic_sync.datetime.now(agentic_sync.UTC),
+        finished_at=agentic_sync.datetime.now(agentic_sync.UTC),
         force_direction=None,
         actions=[],
     )

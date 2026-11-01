@@ -16,7 +16,7 @@ file, starts a subprocess, or invokes ``git`` or ``gh``.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -41,7 +41,7 @@ from scripts.dev_tools.parallel_mutation_protocol import (
 
 # The single timestamp every entry in this module records, so a test can assert
 # the value came from the injected seam rather than from the wall clock.
-FIXED_NOW = datetime(2026, 8, 8, 10, 15, tzinfo=timezone.utc)
+FIXED_NOW = datetime(2026, 8, 8, 10, 15, tzinfo=UTC)
 
 # The generation every test starts from.
 START_GENERATION = 7

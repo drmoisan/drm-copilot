@@ -88,7 +88,7 @@ def test_runtime_metadata_has_bounded_dependencies_and_minimum_python() -> None:
     assert dependency_names == {"python", "PyYAML", "jsonschema", "referencing", "lxml"}
     assert 'name = "drm-copilot-discovery"' in text
     assert 'version = "2.0.0"' in text
-    assert 'python = ">=3.10,<4.0"' in text
+    assert 'python = ">=3.11,<4.0"' in text
     assert 'build-backend = "poetry.core.masonry.api"' in text
     assert runtime.__version__ == "2.0.0"
     assert (SOURCE / "py.typed").is_file()

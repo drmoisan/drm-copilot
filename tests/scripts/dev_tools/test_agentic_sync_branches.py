@@ -171,8 +171,8 @@ def _install_cli_fakes(
     summary = agentic_sync.SyncSummary(
         repo_left="/left",
         repo_right="/right",
-        started_at=agentic_sync.datetime.now(agentic_sync.timezone.utc),
-        finished_at=agentic_sync.datetime.now(agentic_sync.timezone.utc),
+        started_at=agentic_sync.datetime.now(agentic_sync.UTC),
+        finished_at=agentic_sync.datetime.now(agentic_sync.UTC),
         force_direction=None,
         actions=[],
     )

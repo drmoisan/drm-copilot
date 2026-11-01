@@ -1,7 +1,7 @@
 # Discovery runtime
 
 `drm-copilot-discovery` is the authoritative Python package for the reusable
-legacy discovery and parity capability. It requires Python 3.10 or later and
+legacy discovery and parity capability. It requires Python 3.11 or later and
 contains domain-neutral artifact behavior. Consuming repositories own their
 profiles, observations, evidence, decisions, and target verification.
 
