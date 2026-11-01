@@ -51,7 +51,6 @@ _REQUIRED_CONTEXTS = (
     "poshqc / PowerShell QC",
     "shell-coverage / Shell Coverage (Bats + kcov)",
     "security-scan / Security Scanning",
-    "quality-checks7 / Code Quality & Tests (3.10)",
     "quality-checks7 / Code Quality & Tests (3.11)",
     "quality-checks7 / Code Quality & Tests (3.12)",
     "quality-checks7 / Code Quality & Tests (3.13)",

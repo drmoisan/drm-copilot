@@ -130,11 +130,10 @@ The decision is `code=true` (a full run) for every event other than `pull_reques
 | 4 | `poshqc / PowerShell QC` | the `poshqc` job runs with every step gated (as the aggregator with `if: always()` in the sharded shape); every other `_poshqc.yml` job skipped at job level | `success` |
 | 5 | `shell-coverage / Shell Coverage (Bats + kcov)` | job runs; every step skipped, including the upload step | `success` |
 | 6 | `security-scan / Security Scanning` | job runs; every step skipped | `success` |
-| 7 | `quality-checks7 / Code Quality & Tests (3.10)` | matrix expands; every step skipped | `success` |
-| 8 | `quality-checks7 / Code Quality & Tests (3.11)` | same as row 7 | `success` |
-| 9 | `quality-checks7 / Code Quality & Tests (3.12)` | same as row 7 | `success` |
-| 10 | `quality-checks7 / Code Quality & Tests (3.13)` | same as row 7 | `success` |
-| 11 | `build-check / Build Package` | job runs; every step skipped | `success` |
+| 7 | `quality-checks7 / Code Quality & Tests (3.11)` | matrix expands; every step skipped | `success` |
+| 8 | `quality-checks7 / Code Quality & Tests (3.12)` | same as row 7 | `success` |
+| 9 | `quality-checks7 / Code Quality & Tests (3.13)` | same as row 7 | `success` |
+| 10 | `build-check / Build Package` | job runs; every step skipped | `success` |
 
 Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full run` is `skipped`, and the `root-typescript-tests` and `npm-audit-gate` callers are `skipped`.
 
