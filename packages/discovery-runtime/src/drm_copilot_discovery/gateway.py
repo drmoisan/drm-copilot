@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol, cast, get_args
 
@@ -363,7 +363,7 @@ OPTION_LOCAL_REFUSED = (
 
 def utc_now() -> datetime:
     """Return the current aware UTC instant; the gateway's only clock read."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _parse_options(arguments: tuple[str, ...]) -> dict[str, str] | str:

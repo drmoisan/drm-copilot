@@ -91,7 +91,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -157,7 +157,7 @@ def default_timestamp() -> str:
     Side Effects:
         Reads the system clock.
     """
-    return datetime.now(tz=timezone.utc).strftime(TIMESTAMP_FORMAT)
+    return datetime.now(tz=UTC).strftime(TIMESTAMP_FORMAT)
 
 
 def build_parser() -> argparse.ArgumentParser:
