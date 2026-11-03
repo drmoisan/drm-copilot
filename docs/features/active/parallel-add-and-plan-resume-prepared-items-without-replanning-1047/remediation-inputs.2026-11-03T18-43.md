@@ -2,7 +2,7 @@
 
 Review-Verdict: REMEDIATION_REQUIRED
 
-Remediation-Mode: proportionate
+Remediation-Mode: design
 
 - Feature folder: `docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047`
 - Branch: `feature/parallel-add-and-plan-resume-prepared-items-1047` @ `793096c82`
@@ -37,9 +37,29 @@ Remediation-Mode: proportionate
 - Expected result: repo-wide Python line coverage at or above 85% and branch coverage at or above 75%. Record both figures in a new `evidence/qa-gates/python-coverage.<timestamp>.md`.
 - Verification: `ls artifacts/python/lcov.info`; LF and LH (lines) and BRF and BRH (branches) totals summed from that file.
 
+## Orchestrator-Added In-Cycle Items (non-blocking Minor findings, fixed in this item)
+
+The orchestrator brings the three Minor code-review findings into this cycle under the repository practice of fixing related findings inside the item before merge. Item M1 adds a subcommand to the helper's command-line surface and changes `.claude/skills/parallel-plan/SKILL.md` prose, which is a public-interface change, so this cycle runs in design mode. They do not change the blocking count of this review.
+
+### M1 - Expose the recorded-edge reuse rule as a helper subcommand
+
+- Source: `code-review.2026-11-03T18-43.md` Findings Table, Minor row for `Get-ParallelAdmissionRecordedEdge`.
+- Required action: expose `Get-ParallelAdmissionRecordedEdge` through a new `Invoke-ParallelAdmission.ps1` subcommand (for example `reuse-edges`), and point `.claude/skills/parallel-plan/SKILL.md` `### Seeding procedure` step 7 at the subcommand instead of the manual `git show` and hash comparison. Update every mirror and bundle copy of the changed files, any pinned surface hash or fragment, and the tests that cover the CLI dispatch.
+
+### M2 - State the `git fetch` side effect accurately
+
+- Source: `code-review.2026-11-03T18-43.md` Findings Table, Minor row for the header wording.
+- Required action: amend the `Invoke-ParallelAdmission.ps1` header and the git seam synopsis to state that `assess` runs `git fetch --quiet origin` (updating remote-tracking refs and needing network access), keeping the helper's behavior unchanged.
+
+### M3 - Surface git stderr on failure
+
+- Source: `code-review.2026-11-03T18-43.md` Findings Table, Minor row for discarded git stderr.
+- Required action: capture git stderr in `Invoke-ParallelAdmissionGit` and include its first line in the message thrown by `Invoke-ParallelAdmissionGitChecked`, with tests for the message content through the existing git seam.
+
 ## Do Not Do
 
-- Do not edit production code, tests, skills, rules, agents, settings, or bundle copies for these findings; they concern artifacts only.
+- Do not edit production code, tests, skills, rules, agents, settings, or bundle copies for R1 and R2; they concern artifacts only. Edits for M1 to M3 are limited to the files those items name, their tests, mirrors, bundle copies, and pinned contract data.
+- Produce the R1 and R2 coverage artifacts after the M1 to M3 edits land, so the recorded figures describe the final head.
 - Do not commit anything under `artifacts/` (gitignored), and do not write evidence outside `<FEATURE>/evidence/<kind>/`.
 - Do not change coverage configuration, thresholds, `config/poshqc-coverage.json`, or `pyproject.toml`.
 - Do not rewrite earlier evidence records; add new timestamped files.
