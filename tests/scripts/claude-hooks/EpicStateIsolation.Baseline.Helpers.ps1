@@ -66,6 +66,22 @@ function Register-EpicStateBaselineMock {
         $listing = 'worktree ' + ((Get-Location).Path -replace '\\', '/')
         Mock -CommandName 'Get-OrchestrationGateWorktreeList' -MockWith { $listing }.GetNewClosure()
     }
+    # Issue #1026: the cleanup legs read a temporary root and a staged index. A suite that
+    # requests the Get-CheckpointContent baseline also gets null-shaped mocks of both gate
+    # seams (no temporary root, a failed staged-index read), so no cleanup leg starts git.
+    if ($Seam -contains 'Get-CheckpointContent' -and (Get-Command -Name 'Get-OrchestrationGateTemporaryRoot' -ErrorAction SilentlyContinue)) {
+        Mock -CommandName 'Get-OrchestrationGateTemporaryRoot' -MockWith { , [string[]] @() }
+    }
+    if ($Seam -contains 'Get-CheckpointContent' -and (Get-Command -Name 'Get-OrchestrationGateStagedIndex' -ErrorAction SilentlyContinue)) {
+        Mock -CommandName 'Get-OrchestrationGateStagedIndex' -MockWith { [pscustomobject]@{ ExitCode = -1; Output = '' } }
+    }
+    # Issue #1026 (R1-1): the PR-author cleanup exemption resolves the published consolidation
+    # branch. A suite that requests the Get-CleanupWorktreeManifestContent baseline also gets a
+    # script-scope mock of that seam with an empty Remote and Head, so K6 fails closed and no
+    # git process runs.
+    if ($Seam -contains 'Get-CleanupWorktreeManifestContent' -and (Get-Command -Name 'Get-PrAuthorCleanupPublishedHead' -ErrorAction SilentlyContinue)) {
+        Mock -CommandName 'Get-PrAuthorCleanupPublishedHead' -MockWith { [pscustomobject]@{ Remote = ''; Head = '' } }
+    }
 }
 
 function Import-EpicStateProbeModule {

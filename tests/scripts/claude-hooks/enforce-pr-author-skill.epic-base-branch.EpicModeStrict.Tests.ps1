@@ -30,6 +30,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride strict epic_
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         $script:MissingCheckpointPath = Join-Path $PSScriptRoot 'no-such-checkpoint-1001.json'
     }
 
