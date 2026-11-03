@@ -218,11 +218,11 @@ Text constraints for every task in this phase:
 
 ### Phase 7 — Integration Scenario Evidence
 
-- [ ] [P7-T1] Record the seed scenario. Inputs: the `Seed from prepared items` Describe counts, and the branch-current exit codes of `validate-parallel-manifest.sh` on `tests/fixtures/parallel_admission/seed-parallel.md`, `scripts/dev_tools/validate_orchestration_artifacts.py` `parallel-planner-state --require-ready-for-execution` on `seed-planner-state.json`, and `parallel-orchestrator-state` on `seed-orchestrator-state.json`.
+- [x] [P7-T1] Record the seed scenario. Inputs: the `Seed from prepared items` Describe counts, and the branch-current exit codes of `validate-parallel-manifest.sh` on `tests/fixtures/parallel_admission/seed-parallel.md`, `scripts/dev_tools/validate_orchestration_artifacts.py` `parallel-planner-state --require-ready-for-execution` on `seed-planner-state.json`, and `parallel-orchestrator-state` on `seed-orchestrator-state.json`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/integration-seed.<timestamp>.md` records zero Describe failures and exit 0 for each validator, and is marked as local evidence with no network or GitHub mutation.
-- [ ] [P7-T2] Record the half-prepared scenario from the `Add a half-prepared item` Describe of `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1`.
+- [x] [P7-T2] Record the half-prepared scenario from the `Add a half-prepared item` Describe of `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1`.
   - Acceptance: `integration-half-prepared.<timestamp>.md` under `evidence/regression-testing/` records zero failures and the asserted `resume_stage`.
-- [ ] [P7-T3] Record the closed-run scenario from the `Add to a closed run` Describe of `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1`.
+- [x] [P7-T3] Record the closed-run scenario from the `Add to a closed run` Describe of `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1`.
   - Acceptance: `integration-closed-run.<timestamp>.md` under `evidence/regression-testing/` records zero failures and the asserted stderr prefix `PARALLEL_ADMISSION_REJECTED: run_closed:`.
 
 ### Phase 8 — Final QA Loop and Self-Review

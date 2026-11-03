@@ -43,15 +43,15 @@ Every item admitted by `/parallel-add` or seeded by `/parallel-plan` goes throug
 
 ## Acceptance Criteria
 
-- [ ] An item whose branch holds research, a spec, a plan, or a cleared preflight is admitted without repeating any completed stage, and the run checkpoint records its `preparation_status` (`none`, `research`, `spec`, `plan`, or `cleared`). Verified by Pester `assess` cases and the local "half-prepared item" integration scenario.
-- [ ] When no file the plan cites or writes changed on `main` since the recorded base commit, a `cleared` item is admitted with no preparation child, no preflight, and no plan revision. Verified by Pester staleness cases and the local seed integration scenario.
+- [x] An item whose branch holds research, a spec, a plan, or a cleared preflight is admitted without repeating any completed stage, and the run checkpoint records its `preparation_status` (`none`, `research`, `spec`, `plan`, or `cleared`). Verified by Pester `assess` cases and the local "half-prepared item" integration scenario.
+- [x] When no file the plan cites or writes changed on `main` since the recorded base commit, a `cleared` item is admitted with no preparation child, no preflight, and no plan revision. Verified by Pester staleness cases and the local seed integration scenario.
 - [x] When cited files changed, the item goes through the unchanged single-pass preflight contract, a stage is redone only when its premise is falsified, and superseded artifacts are kept as new timestamped files. Verified by Pester verdict-to-action cases.
 - [x] The preparation child writes a receipt with the plan hash and base commit, and the execution child stops before any other step when the plan blob hash at its head differs from the admitted hash. Verified by Pester hash cases and the kickoff plan-hash fragment pin in `test_parallel_orchestrator_surface_contracts.py`.
-- [ ] `/parallel-add` against a closed run fails with `PARALLEL_ADMISSION_REJECTED: run_closed` emitted by the admission helper. Verified by the Pester guard matrix and the local "add to a closed run" integration scenario.
-- [ ] `/parallel-plan` seeds a new run from prepared items without preparation children, and the manifest, planner-state, and orchestrator-state validators accept the result. Verified by the local seed integration scenario with validator exit codes recorded.
+- [x] `/parallel-add` against a closed run fails with `PARALLEL_ADMISSION_REJECTED: run_closed` emitted by the admission helper. Verified by the Pester guard matrix and the local "add to a closed run" integration scenario.
+- [x] `/parallel-plan` seeds a new run from prepared items without preparation children, and the manifest, planner-state, and orchestrator-state validators accept the result. Verified by the local seed integration scenario with validator exit codes recorded.
 - [x] The band comes from `--band`, then the planner checkpoint, then a fresh assessment with a written rationale. Verified by Pester band-source cases.
 - [ ] An `--after` precedence input is honored by the cohort table, and a cohort table that violates it is rejected by the helper and by the cohort barrier hook. Verified by Pester precedence and hook suites.
-- [ ] Conflict edges are stored in a committed `parallel-scheduling.json` that a re-seed from another checkout reads. Verified by Pester record cases and the local seed integration scenario.
+- [x] Conflict edges are stored in a committed `parallel-scheduling.json` that a re-seed from another checkout reads. Verified by Pester record cases and the local seed integration scenario.
 - [x] The parent orchestrator keeps an item at `pr_open` while its CI green gate is pending and re-delegates the child to resume at that gate. Verified by the fragment pin in `test_parallel_orchestrator_surface_contracts.py`.
 - [ ] The helper is PowerShell with no new or edited Python or TypeScript, mirrors and bundles are byte-equal, and the push-down, pack-manifest, dependency-closure, and parallel contract tests pass. Verified by the scope diff and contract test runs recorded under `evidence/`.
 
