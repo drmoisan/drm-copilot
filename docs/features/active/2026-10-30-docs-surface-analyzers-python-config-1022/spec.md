@@ -1057,7 +1057,7 @@ and the Python-native analyzer permitted by D3 is delivered by 1031, not by this
 - [ ] Pester line coverage is at least 85% for each new `.claude/lib/docs/` file, read from `artifacts/pester/powershell-coverage.xml` produced by the `poshqc / PowerShell QC shard` jobs on `windows-latest` and aggregated by the required check `poshqc / PowerShell QC`, with no production file excluded from measurement.
 - [ ] No new test creates a temporary file (`.claude/hooks/check-powershell-test-purity.ps1` reports no violation), CRLF and CR cases exist only as JSON escapes or in-code strings, and every new production file is below 500 lines.
 - [ ] The plan's artifact classification table lists every created or edited file with its class, language and permitting rule, and a diff of the 1022 branch against the integration branch contains no Python, TypeScript, hook, skill, agent, MCP tool or extension command file.
-- [ ] Phase 0 evidence under `<FEATURE>/evidence/other/` records, before any 1022 production file is created, the verification of every item in `## Dependency on 1020`.
+- [x] Phase 0 evidence under `<FEATURE>/evidence/other/` records, before any 1022 production file is created, the verification of every item in `## Dependency on 1020`.
 
 ## Definition of Done
 
