@@ -229,37 +229,37 @@ Text constraints for every task in this phase:
 
 Restart at P8-T1 whenever a task fails or changes a file.
 
-- [ ] [P8-T1] Format every new or edited `.ps1` and `.psm1` file (the three under `.claude/lib/parallel-admission/`, `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`, and the new and edited test files) with `Invoke-Formatter` and the PoshQC settings.
+- [x] [P8-T1] Format every new or edited `.ps1` and `.psm1` file (the three under `.claude/lib/parallel-admission/`, `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`, and the new and edited test files) with `Invoke-Formatter` and the PoshQC settings.
   - Acceptance: a before-and-after SHA256 comparison shows no file changed, recorded in `<FEATURE>/evidence/qa-gates/poshqc-format.<timestamp>.md`.
-- [ ] [P8-T2] Run `Invoke-ScriptAnalyzer` directly with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the same files.
+- [x] [P8-T2] Run `Invoke-ScriptAnalyzer` directly with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the same files.
   - Acceptance: zero findings, recorded in `poshqc-analyze.<timestamp>.md` under `evidence/qa-gates/`.
-- [ ] [P8-T3] Run a branch-current `Invoke-PoshQCTest` over `tests/scripts/claude-lib/parallel-admission`, the four cohort-barrier suites, `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, and `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1`.
+- [x] [P8-T3] Run a branch-current `Invoke-PoshQCTest` over `tests/scripts/claude-lib/parallel-admission`, the four cohort-barrier suites, `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, and `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1`.
   - Acceptance: zero failures in the JUnit file. Line coverage of at least 85% for `ParallelAdmission.psm1`, `ParallelAdmissionPrecedence.psm1`, and `Invoke-ParallelAdmission.ps1`, and coverage of the helpers file at or above its P0-T3 baseline, all read from the coverage XML and recorded in `pester-coverage.<timestamp>.md` under `evidence/qa-gates/`.
-- [ ] [P8-T4] Write the coverage comparison for `.claude/lib/parallel-admission/` and `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`.
+- [x] [P8-T4] Write the coverage comparison for `.claude/lib/parallel-admission/` and `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/coverage-delta.<timestamp>.md` lists baseline, post-change, and new-file figures, and states the outcome as remediation-required if any value is missing or below threshold.
-- [ ] [P8-T5] Run the Black check on `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`.
+- [x] [P8-T5] Run the Black check on `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`.
   - Acceptance: exit 0, and the printed line contains `would be left unchanged` (`black-final.<timestamp>.md` under `evidence/qa-gates/`).
-- [ ] [P8-T6] Run Ruff on `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`.
+- [x] [P8-T6] Run Ruff on `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`.
   - Acceptance: exit 0 with `All checks passed!` (`ruff-final.<timestamp>.md`).
-- [ ] [P8-T7] Run Pyright on `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`.
+- [x] [P8-T7] Run Pyright on `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`.
   - Acceptance: exit 0 with `0 errors` (`pyright-final.<timestamp>.md`).
-- [ ] [P8-T8] Run `-n auto` over the `## Contract Test Set` under `tests/scripts/dev_tools/` with `--strict-markers`.
+- [x] [P8-T8] Run `-n auto` over the `## Contract Test Set` under `tests/scripts/dev_tools/` with `--strict-markers`.
   - Acceptance: zero failures (`<FEATURE>/evidence/regression-testing/pytest-n-auto.<timestamp>.md`).
-- [ ] [P8-T9] Run the node IDs of `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`, the only test module whose pins changed, in reversed order in one process.
+- [x] [P8-T9] Run the node IDs of `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`, the only test module whose pins changed, in reversed order in one process.
   - Acceptance: zero failures, with the reversed node order recorded (`python-reversed.<timestamp>.md` under `evidence/regression-testing/`).
-- [ ] [P8-T10] Run the touched Pester files in one process in a seeded shuffled file order, with seeds 11, 23, and 47. The touched files are the five suites under `tests/scripts/claude-lib/parallel-admission/` and `tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Tests.ps1`.
+- [x] [P8-T10] Run the touched Pester files in one process in a seeded shuffled file order, with seeds 11, 23, and 47. The touched files are the five suites under `tests/scripts/claude-lib/parallel-admission/` and `tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Tests.ps1`.
   - Acceptance: zero failures per seed, with each seed and file order recorded (`pester-shuffle.<timestamp>.md` under `evidence/regression-testing/`).
-- [ ] [P8-T11] Run the concurrent-shard Pester run through `Invoke-PoshQCParallelTest` over `tests/scripts`.
+- [x] [P8-T11] Run the concurrent-shard Pester run through `Invoke-PoshQCParallelTest` over `tests/scripts`.
   - Acceptance: zero failures (`pester-parallel-shards.<timestamp>.md` under `evidence/regression-testing/`).
-- [ ] [P8-T12] Run a fresh single-process Pester run over `tests/scripts`, which is the CI shape.
+- [x] [P8-T12] Run a fresh single-process Pester run over `tests/scripts`, which is the CI shape.
   - Acceptance: zero failures in the JUnit file (`pester-full.<timestamp>.md` under `evidence/regression-testing/`).
-- [ ] [P8-T13] Record the scope and gate-intent evidence for `.claude/lib/bash/`, `tests/shell/`, and every changed path: the merge-base `git diff --name-only --no-renames` plus `git status --porcelain`.
+- [x] [P8-T13] Record the scope and gate-intent evidence for `.claude/lib/bash/`, `tests/shell/`, and every changed path: the merge-base `git diff --name-only --no-renames` plus `git status --porcelain`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/scope-diff.<timestamp>.md` shows:
     - no `.ts` path and no added `.py` path;
     - exactly one modified `.py` path, `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`;
     - no path under `.claude/lib/bash/`, `tests/shell/`, or `.claude/skills/orchestrate/`.
   - It records `test_parallel_mutation_run_bash_parity.py` passing in the P6-T6 run, and lists the bats parity and Linux hook-suite results as CI-dependent items checked at S9 (`shell-coverage / Shell Coverage (Bats + kcov)`, `poshqc / PowerShell hook suites (Linux)`).
-- [ ] [P8-T14] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, and `feature-audit.yyyy-MM-ddTHH-mm.md` against the merge-base branch diff.
+- [x] [P8-T14] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, and `feature-audit.yyyy-MM-ddTHH-mm.md` against the merge-base branch diff.
   - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` holds one PASS, FAIL, or N/A row per checklist item and no FAIL row. A FAIL is fixed, the loop restarts at P8-T1, and the self-review is rewritten.
 
 ## Contract Test Set

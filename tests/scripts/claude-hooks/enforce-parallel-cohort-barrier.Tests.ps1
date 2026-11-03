@@ -287,7 +287,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         BeforeAll {
             $script:PrecedencePrompt = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $script:PrecedenceTail = '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[],' +
-                '"precedence":[{"before":101,"after":102,"source":"operator","recorded_at":"2026-11-03T10-00"}]}'
+            '"precedence":[{"before":101,"after":102,"source":"operator","recorded_at":"2026-11-03T10-00"}]}'
         }
 
         It 'allows when the predecessor is <Label>' -ForEach @(

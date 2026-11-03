@@ -185,20 +185,28 @@ function Get-ParallelPrecedenceNeighbor {
     param([AllowEmptyCollection()][string[]] $Edge = @(), [AllowEmptyCollection()][object[]] $Pair = @())
 
     $neighbor = @{}
-    $link = {
-        param([long] $Left, [long] $Right)
-        foreach ($side in @(@($Left, $Right), @($Right, $Left))) {
-            if (-not $neighbor.ContainsKey($side[0])) { $neighbor[$side[0]] = [System.Collections.Generic.HashSet[long]]::new() }
-            [void]$neighbor[$side[0]].Add($side[1])
-        }
-    }
     foreach ($text in @($Edge)) {
         if ([string]::IsNullOrWhiteSpace($text)) { continue }
         if ($text -notmatch '^\s*([0-9]+):([0-9]+)\s*$') { throw "Conflict edge '$text' is not of the form <a>:<b>." }
-        & $link ([long]$Matches[1]) ([long]$Matches[2])
+        Add-ParallelPrecedenceNeighborLink -Neighbor $neighbor -Left ([long]$Matches[1]) -Right ([long]$Matches[2])
     }
-    foreach ($edgePair in @($Pair)) { & $link $edgePair[0] $edgePair[1] }
+    foreach ($edgePair in @($Pair)) { Add-ParallelPrecedenceNeighborLink -Neighbor $neighbor -Left $edgePair[0] -Right $edgePair[1] }
     return $neighbor
+}
+
+function Add-ParallelPrecedenceNeighborLink {
+    <#
+    .SYNOPSIS
+        Record one undirected link in a neighbor map (key to HashSet of keys), in both directions.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param([hashtable] $Neighbor, [long] $Left, [long] $Right)
+
+    foreach ($side in @(@($Left, $Right), @($Right, $Left))) {
+        if (-not $Neighbor.ContainsKey($side[0])) { $Neighbor[$side[0]] = [System.Collections.Generic.HashSet[long]]::new() }
+        [void]$Neighbor[$side[0]].Add($side[1])
+    }
 }
 
 function Invoke-ParallelPrecedenceLift {
@@ -434,10 +442,10 @@ function New-ParallelSchedulingRecord {
     )
 
     if ([string]::IsNullOrWhiteSpace($Slug)) { throw 'New-ParallelSchedulingRecord requires -Slug.' }
-    $byPair = { @{ Expression = { [long]$_['a'] } }, @{ Expression = { [long]$_['b'] } } }
+    $byPair = @(@{ Expression = { [long]$_['a'] } }, @{ Expression = { [long]$_['b'] } })
     # Each projection is parenthesized so the pipeline enumerates its rows rather than passing the array as one object.
-    $edges = @((ConvertTo-ParallelSchedulingProjection -Value $Edge -Key @('a', 'b', 'reason')) | Sort-Object -Property (& $byPair))
-    $tolerated = @((ConvertTo-ParallelSchedulingProjection -Value $ToleratedOverlap -Key @('a', 'b', 'reasons', 'cost', 'benefit')) | Sort-Object -Property (& $byPair))
+    $edges = @((ConvertTo-ParallelSchedulingProjection -Value $Edge -Key @('a', 'b', 'reason')) | Sort-Object -Property $byPair)
+    $tolerated = @((ConvertTo-ParallelSchedulingProjection -Value $ToleratedOverlap -Key @('a', 'b', 'reasons', 'cost', 'benefit')) | Sort-Object -Property $byPair)
     $precedence = @((ConvertTo-ParallelSchedulingProjection -Value $Precedence -Key @('before', 'after', 'source', 'recorded_at')) |
             Sort-Object -Property @{ Expression = { [long]$_['before'] } }, @{ Expression = { [long]$_['after'] } })
     $items = @((ConvertTo-ParallelSchedulingProjection -Value $Item -Key $script:RecordItemKey) | Sort-Object -Property @{ Expression = { [long]$_['issue_num'] } })
