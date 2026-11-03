@@ -3,14 +3,15 @@
     Dot-sourced record-resolution and barrier helpers for enforce-parallel-cohort-barrier.ps1.
 
 .DESCRIPTION
-    Holds the five resolution helpers the Layer 1 parallel cohort barrier uses once a
+    Holds the six resolution helpers the Layer 1 parallel cohort barrier uses once a
     delegation has been identified as a parallel-mode orchestrator call:
 
       - Find-ParallelCohortBarrierItemRecord: resolves the items[] record for a folder.
       - Find-ParallelCohortBarrierItemByKey: resolves an items[] record by issue_num.
       - Find-ParallelCohortBarrierCohortIndex: projects the current-generation coloring.
       - Get-ParallelCohortBarrierConflictNeighborList: collects conflict-edge neighbours.
-      - Test-ParallelCohortBarrierClear: applies the per-edge barrier rule.
+      - Get-ParallelCohortBarrierPrecedencePredecessorList: collects precedence[] predecessors (issue #1047).
+      - Test-ParallelCohortBarrierClear: applies the per-edge barrier rule and the precedence rule.
 
     They are split out of the parent hook, .claude/hooks/enforce-parallel-cohort-barrier.ps1,
     because that file stood at 499 lines -- one below the 500-line limit -- with no room
@@ -215,11 +216,60 @@ function Get-ParallelCohortBarrierConflictNeighborList {
     return $neighborList
 }
 
+function Get-ParallelCohortBarrierPrecedencePredecessorList {
+    <#
+    .SYNOPSIS
+        Return the before keys of every precedence[] entry whose after equals the supplied item key.
+    .DESCRIPTION
+        precedence[] is the top-level operator ordering input of issue #1047
+        ({before, after, source, recorded_at}); it is a separating input, not a
+        depends_on key. An absent precedence key yields an empty list.
+    .PARAMETER Checkpoint
+        Parsed parallel checkpoint, or $null when absent/unreadable.
+    .PARAMETER IssueKey
+        The item primary key (issue_num) rendered as a string.
+    .OUTPUTS
+        System.Object[] holding each predecessor item key rendered as a string.
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param(
+        [AllowNull()]
+        $Checkpoint,
+
+        [AllowNull()]
+        [string] $IssueKey
+    )
+
+    $predecessorList = @()
+    if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($IssueKey)) {
+        return $predecessorList
+    }
+    if (@($Checkpoint.PSObject.Properties.Name) -notcontains 'precedence') {
+        return $predecessorList
+    }
+    foreach ($entry in @($Checkpoint.precedence)) {
+        if ($null -eq $entry) {
+            continue
+        }
+        $entryProps = @($entry.PSObject.Properties.Name)
+        if ($entryProps -notcontains 'before' -or $entryProps -notcontains 'after') {
+            continue
+        }
+        if (([string]$entry.after) -eq $IssueKey) {
+            $predecessorList += [string]$entry.before
+        }
+    }
+    return $predecessorList
+}
+
 function Test-ParallelCohortBarrierClear {
     <#
     .SYNOPSIS
         Decision logic: true only when every conflicting neighbor in a strictly prior
-        current-generation cohort has merge_status merged or worktree_removed.
+        current-generation cohort has merge_status merged or worktree_removed, and every
+        precedence[] predecessor has merge_status merged or worktree_removed or state
+        withdrawn (a blocked predecessor holds; a missing predecessor record fails closed).
     .PARAMETER Checkpoint
         Parsed parallel checkpoint, or $null when absent/unreadable.
     .PARAMETER ItemRecord
@@ -271,6 +321,22 @@ function Test-ParallelCohortBarrierClear {
             return $false
         }
         if ($script:AllowedMergeStatuses -notcontains ([string]$neighborRecord.merge_status)) {
+            return $false
+        }
+    }
+
+    # Precedence (issue #1047): the target starts only after each predecessor has merged or
+    # been withdrawn, whatever its cohort. An absent precedence key leaves the decision unchanged.
+    foreach ($predecessorKey in @(Get-ParallelCohortBarrierPrecedencePredecessorList -Checkpoint $Checkpoint -IssueKey $targetKey)) {
+        $predecessorRecord = Find-ParallelCohortBarrierItemByKey -Checkpoint $Checkpoint -IssueKey $predecessorKey
+        if ($null -eq $predecessorRecord) {
+            return $false
+        }
+        $predecessorProps = @($predecessorRecord.PSObject.Properties.Name)
+        if ($predecessorProps -contains 'state' -and ([string]$predecessorRecord.state) -eq 'withdrawn') {
+            continue
+        }
+        if ($predecessorProps -notcontains 'merge_status' -or $script:AllowedMergeStatuses -notcontains ([string]$predecessorRecord.merge_status)) {
             return $false
         }
     }

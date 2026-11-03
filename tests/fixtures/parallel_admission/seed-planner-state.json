@@ -1,0 +1,99 @@
+{
+  "objective": "seed parallel run admission-seed from prepared items",
+  "parallel_slug": "admission-seed",
+  "parallel_manifest_path": "docs/features/parallel/admission-seed/parallel.md",
+  "mode": "open",
+  "max_concurrency": 4,
+  "items": [
+    {
+      "issue_num": 1101,
+      "feature_folder": "docs/features/active/admission-seed-alpha-1101",
+      "kind": "feature",
+      "state": "prepared",
+      "blast_radius": {
+        "paths": ["scripts/sample/alpha.ps1", "docs/features/active/admission-seed-alpha-1101/**"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-03T10-00"
+      },
+      "preparation_status": "prepared",
+      "research_path": "docs/features/active/admission-seed-alpha-1101/research/research.2026-11-01T10-00.md",
+      "plan_path": "docs/features/active/admission-seed-alpha-1101/plan.2026-11-02T09-00.md",
+      "preflight_status": "PREFLIGHT: ALL CLEAR",
+      "plan_hash": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+      "base_commit": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0",
+      "branch_name": "feature/admission-seed-alpha-1101",
+      "complexity_band": "C2",
+      "complexity_assessment": {
+        "band": "C2",
+        "floor": "C1",
+        "signals_present": [],
+        "rationale": "One PowerShell script and its tests; no shared contract.",
+        "assessed_at": "2026-11-03T10-00"
+      },
+      "model_routing_receipt": {
+        "agent": "orchestrator",
+        "phase": "execution",
+        "complexity_band": "C2",
+        "fable_policy": "disabled",
+        "table_model": "sonnet",
+        "clamped_from": null,
+        "model": "sonnet"
+      }
+    },
+    {
+      "issue_num": 1102,
+      "feature_folder": "docs/features/active/admission-seed-beta-1102",
+      "kind": "feature",
+      "state": "prepared",
+      "blast_radius": {
+        "paths": ["scripts/sample/beta.ps1", "docs/features/active/admission-seed-beta-1102/**"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-03T10-00"
+      },
+      "preparation_status": "prepared",
+      "research_path": "docs/features/active/admission-seed-beta-1102/research/research.2026-11-01T11-00.md",
+      "plan_path": "docs/features/active/admission-seed-beta-1102/plan.2026-11-02T10-00.md",
+      "preflight_status": "PREFLIGHT: ALL CLEAR",
+      "plan_hash": "c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2",
+      "base_commit": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0",
+      "branch_name": "feature/admission-seed-beta-1102",
+      "complexity_band": "C2",
+      "complexity_assessment": {
+        "band": "C2",
+        "floor": "C1",
+        "signals_present": [],
+        "rationale": "One PowerShell script and its tests; no shared contract.",
+        "assessed_at": "2026-11-03T10-00"
+      },
+      "model_routing_receipt": {
+        "agent": "orchestrator",
+        "phase": "execution",
+        "complexity_band": "C2",
+        "fable_policy": "disabled",
+        "table_model": "sonnet",
+        "clamped_from": null,
+        "model": "sonnet"
+      }
+    }
+  ],
+  "cohorts": [
+    {"index": 0, "generation": 0, "item_keys": [1101]},
+    {"index": 1, "generation": 0, "item_keys": [1102]}
+  ],
+  "conflict_edges": [],
+  "tolerated_overlaps": [],
+  "precedence": [
+    {"before": 1101, "after": 1102, "source": "operator", "recorded_at": "2026-11-03T10-00"}
+  ],
+  "recolor_generation": 0,
+  "completed_steps": ["manifest_parsed", "items_assessed", "cohorts_seeded"],
+  "next_step": "PARALLEL_EXECUTION_READY",
+  "last_updated": "2026-11-03T10-00",
+  "kickoff_prompt_path": "artifacts/orchestration/parallel-kickoff-admission-seed.md"
+}
