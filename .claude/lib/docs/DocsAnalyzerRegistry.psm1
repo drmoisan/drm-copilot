@@ -108,10 +108,13 @@ function Test-DocsAnalyzerModulePath {
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param([AllowNull()] [object] $Module)
+    param(
+        [AllowNull()] [object] $Module,
+        [string] $ScriptRoot = $PSScriptRoot
+    )
 
     if ($Module -isnot [string] -or [string]::IsNullOrWhiteSpace($Module)) { return $false }
-    $root = [System.IO.Path]::GetFullPath($PSScriptRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+    $root = [System.IO.Path]::GetFullPath($ScriptRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
     $full = [System.IO.Path]::GetFullPath($Module)
     $comparison = if ($IsWindows) { [System.StringComparison]::OrdinalIgnoreCase } else { [System.StringComparison]::Ordinal }
     return $full.StartsWith($root, $comparison) -and ([System.IO.Path]::GetFileName($full) -like 'DocsAnalyzer*.psm1')
