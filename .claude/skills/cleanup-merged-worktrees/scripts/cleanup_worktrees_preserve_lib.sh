@@ -12,12 +12,13 @@
 # cleanup_worktrees_actions_lib.sh, because it calls cleanup_wt_git (defined in the
 # enumeration library) and consolidation_worktree_path (defined in the actions library).
 #
-# Two-phase design. preserve_plan performs NO writes: it reads and validates the manifest
-# and every record, verifies each source file exists, runs the host-token pre-pass,
-# decides each index outcome, and emits the PRESERVE| and ACTION| records plus an internal
-# plan stream. preserve_commit_plan is the only function that writes and is entered only
-# when the pre-pass reported no match, which is what keeps the writing phase thin enough
-# to leave in the coverage denominator rather than exclude from measurement.
+# Two-phase design. preserve_plan writes no index, ref, or working-tree file: it validates
+# the manifest and every record, verifies each source exists, runs the host-token
+# pre-pass, takes each staging and index decision, and emits the PRESERVE| and ACTION|
+# records plus an internal plan stream. Its one write is the exception stated in
+# cleanup_worktrees_preserve_merge_lib.sh: unreferenced blob objects created by
+# `hash-object -w` and `merge-file --object-id`. preserve_commit_plan is the only writer of
+# files and is entered only when the pre-pass reported no match.
 #
 # Seams. All git commands go through cleanup_wt_git (CLEANUP_WT_GIT_BIN); jq resolves
 # through preserve_resolve_jq (CLEANUP_WT_JQ_BIN); the manifest path comes from
@@ -174,9 +175,8 @@ preserve_validate_record() {
 	# ACTION|preserve-stage|<target-path>|SKIPPED-INVALID; the first violation in the chain
 	# below wins, because one bad field skips the record whatever the others say.
 	#
-	# change_class is validated for vocabulary but does NOT change the staging action: an
-	# untracked and a modified record are both copied to target_path and staged, stated
-	# here so no later change invents a divergent path for one of them.
+	# change_class is validated here for vocabulary only; its effect on staging belongs to
+	# preserve_merge_decide (absent target copied, existing target guarded or merged).
 	#
 	# host_token_scan is refused when it is absent, is not a JSON object, is missing either
 	# member, or carries a result outside clean/tokens_present: a record whose scan metadata
@@ -236,16 +236,18 @@ preserve_validate_record() {
 }
 
 preserve_plan_one() {
-	# Plan one manifest record. Performs no write of any kind.
+	# Plan one manifest record. Writes no index, ref, or working-tree file; the staging
+	# decision may write unreferenced blob objects (`hash-object -w`, `merge-file
+	# --object-id`), the exception cleanup_worktrees_preserve_merge_lib.sh states.
 	#
-	# The PRESERVE| report record is emitted for every record that survives validation,
-	# before any per-record outcome is known, because that record identifies the finding at
-	# its origin exactly as DIRTY|<worktree-path>|<status-line> does. The destination
-	# outcome travels separately on the ACTION| result channel.
+	# The PRESERVE| record is emitted for every record that survives validation, before any
+	# per-record outcome is known, as DIRTY|<worktree-path>|<status-line> is; the outcome
+	# travels separately on the ACTION| result channel. The source file is read by plain
+	# file I/O at <worktree_path>/<source_path>, never through git (see the header).
 	#
-	# The source file is located by plain file I/O at <worktree_path>/<source_path> and is
-	# never read through git: the repository-root .claude/agent-memory tree is gitignored,
-	# so a git-mediated read would be refused or would need a force flag.
+	# The plan entry carries ten columns: target_path, source file, destination file, index
+	# action, index path, index line, terminator token, leading-terminator flag, staging
+	# mode (`copy` or `merge`), and the merged blob id (empty for `copy`).
 	#
 	# Args: $1 = the tab-separated record. Returns 0 when the record was planned and 1 when
 	# it was skipped, refused, or reported.
@@ -294,6 +296,11 @@ preserve_plan_one() {
 		printf 'cleanup-worktrees: destination is ignored, refusing to force: %s\n' "$tgt" >&2
 		return 1
 	fi
+	# The staging decision (merge library): a repeated target_path is refused, and a target
+	# that already exists is guarded or merged rather than overwritten. A refusal returns
+	# before the index decision, so a refused record produces no index record either.
+	preserve_merge_check_duplicate "$tgt" || return 1
+	preserve_merge_decide "${PRESERVE_FIELDS[2]}" "$wt" "$src" "$tgt" "$PRESERVE_CWT" || return 1
 	# The index decision, including the line-ending re-derivation it rests on, lives in
 	# the line-ending library. A memory_index_line of JSON null means the file is not a
 	# memory entry: it is copied and staged, and no index is read, created, or appended to.
@@ -307,16 +314,19 @@ preserve_plan_one() {
 		ipre=$PRESERVE_INDEX_PRE
 	fi
 	local entry
-	printf -v entry '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
-		"$tgt" "$srcfile" "$PRESERVE_CWT/$tgt" "$iaction" "$ipath" "$iline" "$iterm" "$ipre"
+	printf -v entry '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+		"$tgt" "$srcfile" "$PRESERVE_CWT/$tgt" "$iaction" "$ipath" "$iline" "$iterm" "$ipre" \
+		"$PRESERVE_STAGE_MODE" "$PRESERVE_STAGE_OID"
 	PRESERVE_PLAN_STREAM+=("$entry")
 	return 0
 }
 
 preserve_plan() {
-	# Phase 1 of the two-phase driver: read, validate, decide, and report. It performs no
-	# write of any kind, so a failure anywhere in it leaves the consolidation worktree
-	# byte-unchanged and there is nothing to undo.
+	# Phase 1 of the two-phase driver: read, validate, decide, and report. It writes no
+	# index, ref, or working-tree file, so a failure anywhere in it leaves the consolidation
+	# worktree byte-unchanged and there is nothing to undo. The one exception is the staging
+	# decision's unreferenced blob objects (`hash-object -w`, `merge-file --object-id`),
+	# which nothing references unless phase 2 stages the merged result.
 	#
 	# Records are processed in LC_ALL=C order of the pair (worktree_path, source_path)
 	# rather than in manifest array order, because the report stream's ordering is
@@ -324,10 +334,8 @@ preserve_plan() {
 	# a contract. The sort is field-aware rather than whole-line, so a worktree_path that
 	# is a prefix of another cannot reorder the pair.
 	#
-	# The decisions are accumulated on two globals rather than returned, because a record's
-	# outcome has to survive the loop: PRESERVE_PLAN_STREAM carries one tab-separated entry
-	# per record that reached the writing phase, and PRESERVE_EXIT accumulates the
-	# per-record skip signal that becomes the pass's exit code.
+	# Outcomes survive the loop on globals: PRESERVE_PLAN_STREAM (one entry per planned
+	# record), PRESERVE_EXIT (the per-record skip signal), and PRESERVE_SEEN_TARGETS.
 	#
 	# Returns 0 when the pass may proceed to the writing phase, 1 when the manifest itself
 	# was rejected, 3 on the host-token hard stop, and 127 when a required tool could not
@@ -337,6 +345,9 @@ preserve_plan() {
 	PRESERVE_EXIT=0
 	PRESERVE_BLOCKED=0
 	PRESERVE_CWT=""
+	# Read by preserve_merge_check_duplicate in the merge library (SC2034 cannot see it).
+	# shellcheck disable=SC2034
+	PRESERVE_SEEN_TARGETS=""
 	local manifest records sorted line rc=0
 	manifest=${CLEANUP_WT_MANIFEST_PATH:-artifacts/orchestration/cleanup-worktrees-manifest.json}
 	PRESERVE_CWT=$(consolidation_worktree_path) || return $?
@@ -353,31 +364,26 @@ preserve_plan() {
 		[[ -n $line ]] || continue
 		preserve_plan_one "$line" || PRESERVE_EXIT=1
 	done <<<"$sorted"
-	# The hard stop is evaluated only after every record has been examined, so the pass
-	# reports every match rather than only the first, and the writing phase is not entered
-	# for any record. Nothing has been written at this point, so there is nothing to undo.
+	# The hard stop is evaluated after every record is examined, so every match is reported
+	# and the writing phase is entered for no record; no file has been written to undo.
 	((PRESERVE_BLOCKED == 0)) || return 3
 	return 0
 }
 
 preserve_commit_plan() {
-	# Phase 2: the only function in this library that writes anything.
+	# Phase 2: the only function in this library that writes files. It executes each plan
+	# entry's decisions with exactly four kinds of operation: mkdir -p of the destination
+	# directory, the content write, the index append or creation, and the staging call. It
+	# takes no staging decision of its own, which keeps it thin enough to stay measured.
 	#
-	# It consumes the plan stream phase 1 built and performs exactly four kinds of
-	# operation: mkdir -p of the destination directory, a verbatim byte copy of the source,
-	# the destination index append or creation, and the staging call. Every decision was
-	# already taken in phase 1, so this function contains no policy and is thin enough to
-	# leave in the coverage denominator rather than exclude from measurement.
+	# The content write follows column 9. `merge` writes the merged blob phase 1 recorded
+	# (`cat-file blob <oid>`); `copy` or empty copies the source byte for byte. Neither
+	# applies a line-ending transformation to the preserved content; the line-ending
+	# obligation is scoped to the index append, and staging re-normalizes tracked text.
 	#
-	# The copy is verbatim. No line-ending transformation is applied to the preserved
-	# file's own content: transforming it would alter content the editorial pass judged
-	# worth keeping, and the staging call re-normalizes tracked text anyway. The
-	# line-ending obligation is scoped to the index append, where the defect occurred.
-	#
-	# A non-zero result from any of the three operations emits
-	# ACTION|preserve-stage|<target-path>|FAILED and contributes to exit 1; it never aborts
-	# the remaining records, because each record's write is independent of the others.
-	local entry tgt srcfile dstfile iaction ipath iline iterm ipre fail
+	# A failed operation emits ACTION|preserve-stage|<target-path>|FAILED and contributes to
+	# exit 1; it never aborts the remaining records, whose writes are independent.
+	local entry tgt srcfile dstfile iaction ipath iline iterm ipre mode oid fail
 	((${#PRESERVE_PLAN_STREAM[@]} > 0)) || return 0
 	for entry in "${PRESERVE_PLAN_STREAM[@]}"; do
 		preserve_split_tsv "$entry"
@@ -389,10 +395,12 @@ preserve_commit_plan() {
 		iline=${PRESERVE_FIELDS[5]}
 		iterm=${PRESERVE_FIELDS[6]}
 		ipre=${PRESERVE_FIELDS[7]}
-		fail=""
+		mode=${PRESERVE_FIELDS[8]-} oid=${PRESERVE_FIELDS[9]-} fail=""
 		if ! mkdir -p -- "${dstfile%/*}" 2>/dev/null; then
 			fail="cannot create the destination directory"
-		elif ! cat -- "$srcfile" >"$dstfile" 2>/dev/null; then
+		elif [[ $mode == "merge" ]] && ! cleanup_wt_git -C "$PRESERVE_CWT" cat-file blob "$oid" >"$dstfile"; then
+			fail="reading the merged blob failed"
+		elif [[ $mode != "merge" ]] && ! cat -- "$srcfile" >"$dstfile" 2>/dev/null; then
 			fail="the verbatim byte copy failed"
 		elif [[ $iaction != "none" ]] &&
 			! preserve_render_index_append "$ipath" "$iline" "$iterm" "$ipre"; then

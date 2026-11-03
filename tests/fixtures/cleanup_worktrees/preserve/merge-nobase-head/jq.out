@@ -1,0 +1,2 @@
+tests/fixtures/cleanup_worktrees/preserve/merge-nobase-head/wt	notes/bad.md	modified	PRESERVE	STILL_RELEVANT	notes/bad.md	true	false	- [Bad note](bad.md) - a note that main has extended	lf	object	clean	cleanup-wt-host-tokens-v1	preserve/merge-nobase-head fixture: main has a line the source lacks
+tests/fixtures/cleanup_worktrees/preserve/merge-nobase-head/wt	notes/ok.md	modified	PRESERVE	STILL_RELEVANT	notes/ok.md	true	true		lf	object	clean	cleanup-wt-host-tokens-v1	preserve/merge-nobase-head fixture: main is a line-subsequence of the source
