@@ -65,23 +65,23 @@
 
 ### Phase 2 — Precedence and Scheduling-Record Module
 
-- [ ] [P2-T1] Create `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1` with the same conventions. Add `Test-ParallelPrecedenceInput -Entry -ItemKey`, which throws a message starting with `precedence_unknown_item` for an unresolved key and with `precedence_cycle` for a self-pair or a cycle. Add `ConvertTo-ParallelPrecedenceEdge`, which returns normalized `a:b` separating edges. Add Describes to `tests/scripts/claude-lib/parallel-admission/ParallelAdmissionPrecedence.Tests.ps1` covering: an unknown key; a self-pair; a two-node cycle; a three-node cycle; an acyclic chain; and normalization.
+- [x] [P2-T1] Create `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1` with the same conventions. Add `Test-ParallelPrecedenceInput -Entry -ItemKey`, which throws a message starting with `precedence_unknown_item` for an unresolved key and with `precedence_cycle` for a self-pair or a cycle. Add `ConvertTo-ParallelPrecedenceEdge`, which returns normalized `a:b` separating edges. Add Describes to `tests/scripts/claude-lib/parallel-admission/ParallelAdmissionPrecedence.Tests.ps1` covering: an unknown key; a self-pair; a two-node cycle; a three-node cycle; an acyclic chain; and normalization.
   - Acceptance: those Describes pass with zero failures.
-- [ ] [P2-T2] In `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, add `Invoke-ParallelPrecedenceLift -Cohort -Edge -Precedence -Pinned -Floor`. It visits items in topological order (ties by ascending key) and moves an unstarted `after` item to the smallest index above every `before` index that no conflict neighbor holds. Pinned items never move, unstarted items move only upward, and the result keeps every cohort an independent set. Add a Describe covering: an already-satisfied table unchanged; a single lift; a lift past a conflict neighbor; a pinned `before` item; a pinned `after` item unchanged; a chain; independence preserved; and a second application changing nothing.
+- [x] [P2-T2] In `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, add `Invoke-ParallelPrecedenceLift -Cohort -Edge -Precedence -Pinned -Floor`. It visits items in topological order (ties by ascending key) and moves an unstarted `after` item to the smallest index above every `before` index that no conflict neighbor holds. Pinned items never move, unstarted items move only upward, and the result keeps every cohort an independent set. Add a Describe covering: an already-satisfied table unchanged; a single lift; a lift past a conflict neighbor; a pinned `before` item; a pinned `after` item unchanged; a chain; independence preserved; and a second application changing nothing.
   - Acceptance: that Describe passes with zero failures.
-- [ ] [P2-T3] In `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, add `Get-ParallelActivePrecedence -Precedence -Item` and `Test-ParallelPrecedenceCohortTable -Checkpoint`.
+- [x] [P2-T3] In `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, add `Get-ParallelActivePrecedence -Precedence -Item` and `Test-ParallelPrecedenceCohortTable -Checkpoint`.
   - An entry is inactive when its `before` item has `merge_status` `merged` or `worktree_removed`, or `state` `withdrawn`. A `blocked` predecessor holds (D6).
   - A combined item inherits the union of its members' entries (through `combined_issue_nums`), and a pair inside one combination is dropped.
   - The table check fails with `precedence_violated` when a current-generation cohort places an `after` item at or before an active `before` item.
   - Add Describes for each predecessor state, the combination rules, a satisfying table, and a violating table.
   - Acceptance: those Describes pass with zero failures.
-- [ ] [P2-T4] In `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, add `New-ParallelSchedulingRecord -Slug -Edge -ToleratedOverlap -Precedence -Item` and `Get-ParallelSchedulingRecordReuse -Record -IssueNum -CurrentPlanHash`.
+- [x] [P2-T4] In `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, add `New-ParallelSchedulingRecord -Slug -Edge -ToleratedOverlap -Precedence -Item` and `Get-ParallelSchedulingRecordReuse -Record -IssueNum -CurrentPlanHash`.
   - The record carries exactly `schema_version`, `parallel_slug`, `edges`, `tolerated_overlaps`, `precedence`, and `items`, and each item carries `issue_num`, `branch_name`, `plan_path`, `plan_hash`, `base_commit`, `preparation_status`, and `complexity_band`.
   - Tolerated overlaps are projected to `a`, `b`, `reasons`, `cost`, and `benefit`.
   - Reuse returns the item's recorded edges only when its recorded `plan_hash` equals `-CurrentPlanHash`, and otherwise returns a recompute marker.
   - Add Describes for record keys, projection, deterministic key order, a reuse match, a hash mismatch, and an unknown item.
   - Acceptance: those Describes pass with zero failures.
-- [ ] [P2-T5] Verify `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1` against `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` and the 700-line advisory tier.
+- [x] [P2-T5] Verify `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1` against `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` and the 700-line advisory tier.
   - Acceptance: zero convention failures, and a line count of at most 700 is recorded in `module-size.<timestamp>.md`.
 
 ### Phase 3 — CLI Entry Script and Integration Fixtures
