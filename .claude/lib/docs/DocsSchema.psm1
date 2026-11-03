@@ -55,6 +55,7 @@ function Get-DocsSchemaName {
         'docs-validation-receipt'
         'docs-command-envelope'
         # --- 1021: page-metadata ---
+        'page-metadata'
     )
 }
 
@@ -76,6 +77,7 @@ function Get-DocsSchemaPath {
         'docs-evidence-pin'          = (Join-Path -Path $PSScriptRoot -ChildPath 'schemas/v1/docs-evidence-pin.schema.json')
         'docs-validation-receipt'    = (Join-Path -Path $PSScriptRoot -ChildPath 'schemas/v1/docs-validation-receipt.schema.json')
         'docs-command-envelope'      = (Join-Path -Path $PSScriptRoot -ChildPath 'schemas/v1/docs-command-envelope.schema.json')
+        'page-metadata'              = (Join-Path -Path $PSScriptRoot -ChildPath 'schemas/v1/page-metadata.schema.json')
     }
 }
 
