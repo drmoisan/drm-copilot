@@ -78,8 +78,8 @@
 
 ### Phase 4 — Mirrors and Contract Tests
 
-- [ ] [P4-T1] Copy `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`, `.claude/hooks/enforce-pr-author-skill.cleanup.ps1`, and `.claude/skills/cleanup-merged-worktrees/SKILL.md` to their paths under `extensions/drm-copilot/resources/claude-customizations/`, and `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/`. Acceptance: equal SHA256 for each of the four pairs, and the four gate-cleanup sibling copies are still equal.
-- [ ] [P4-T2] Run the ten contract modules and the generator `--check` of P0-T6; record counts in `<FEATURE>/evidence/other/contract-tests.<timestamp>.md`. Acceptance: zero failures and generator exit 0.
+- [x] [P4-T1] Copy `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`, `.claude/hooks/enforce-pr-author-skill.cleanup.ps1`, and `.claude/skills/cleanup-merged-worktrees/SKILL.md` to their paths under `extensions/drm-copilot/resources/claude-customizations/`, and `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/`. Acceptance: equal SHA256 for each of the four pairs, and the four gate-cleanup sibling copies are still equal.
+- [x] [P4-T2] Run the ten contract modules and the generator `--check` of P0-T6; record counts in `<FEATURE>/evidence/other/contract-tests.<timestamp>.md`. Acceptance: zero failures and generator exit 0.
 
 ### Phase 5 — Final QA Loop, Isolation, Scope, and Self-Review
 

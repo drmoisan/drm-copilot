@@ -24,7 +24,11 @@
                                                   Get-CleanupWorktreeManifestContent passes
                                                   Test-CleanupManifestText with the
                                                   Get-CleanupWorktreeManifestUtcNow clock.
-      K6 CLEANUP_EXEMPTION_DIFF_FAILED          - refs/remotes/origin/main resolves to a commit and
+      K6 CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH - refs/remotes/origin/documentationandmemories and
+                                                  HEAD resolve to the same commit
+                                                  (Get-PrAuthorCleanupPublishedHead), so the push
+                                                  precedes gh pr create.
+         CLEANUP_EXEMPTION_DIFF_FAILED          - refs/remotes/origin/main resolves to a commit and
                                                   git diff <commit>...HEAD exits 0 with output that
                                                   ends with NUL when non-empty.
          CLEANUP_EXEMPTION_EMPTY_DIFF           - the diff lists at least one path.
@@ -88,6 +92,37 @@ function Test-PrAuthorCleanupContextCommand {
     return $false
 }
 
+function Get-PrAuthorCleanupPublishedHead {
+    <#
+    .SYNOPSIS
+        Resolve the published consolidation branch and HEAD of a worktree (test seam).
+    .DESCRIPTION
+        Runs git rev-parse --verify --quiet <ref>^{commit} through Invoke-PrAuthorDocsOnlyGitExe
+        for refs/remotes/origin/<consolidation branch> and for HEAD. Each value is the printed
+        commit, or an empty string when the call throws, exits non-zero, or prints a value that
+        is not a 40- or 64-digit lowercase hex commit. Never throws. Tests mock this function.
+    .PARAMETER WorktreeRoot
+        The consolidation worktree root.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject with Remote and Head.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([AllowNull()][AllowEmptyString()][string] $WorktreeRoot)
+
+    $resolved = foreach ($ref in @("refs/remotes/origin/$($script:CleanupContextBranch)", 'HEAD')) {
+        try {
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $WorktreeRoot -GitArgs @('rev-parse', '--verify', '--quiet', ($ref + '^{commit}'))
+        }
+        catch {
+            $result = $null
+        }
+        $value = if ($null -ne $result -and $result.ExitCode -eq 0) { ([string]$result.Output).Trim() } else { '' }
+        if ($value -cmatch '^[0-9a-f]{40}([0-9a-f]{24})?$') { $value } else { '' }
+    }
+    return [pscustomobject]@{ Remote = [string]$resolved[0]; Head = [string]$resolved[1] }
+}
+
 function Get-PrAuthorCleanupExemptionFailure {
     <#
     .SYNOPSIS
@@ -127,6 +162,19 @@ function Get-PrAuthorCleanupExemptionFailure {
     }
     if (-not $manifestValid) {
         return "CLEANUP_EXEMPTION_MANIFEST_INVALID: the session-root manifest $($script:CleanupContextManifestRelativePath) is absent, invalid, older than $($script:CleanupContextFreshnessHours) hours, in the future, or has no run_id."
+    }
+
+    try {
+        $published = Get-PrAuthorCleanupPublishedHead -WorktreeRoot $WorktreeRoot
+    }
+    catch {
+        $published = $null
+    }
+    if ($null -eq $published -or [string]::IsNullOrEmpty([string]$published.Remote)) {
+        return "CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH: refs/remotes/origin/$branch does not resolve to a commit in the consolidation worktree; push the branch before gh pr create."
+    }
+    if ([string]::IsNullOrEmpty([string]$published.Head) -or [string]$published.Remote -cne [string]$published.Head) {
+        return "CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH: refs/remotes/origin/$branch differs from the consolidation worktree HEAD; push the branch again before gh pr create."
     }
 
     try {

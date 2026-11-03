@@ -188,7 +188,10 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    gate admits that commit only when every staged path is under those two prefixes.
 
 4. **Push and hand off PR creation to `Agent(pr-author)`.** Push the consolidation
-   branch (`git -C <consolidation root> push -u origin documentationandmemories`). Refresh the
+   branch (`git -C <consolidation root> push -u origin documentationandmemories`).
+   The push precedes `gh pr create`: the PR-author gate requires
+   `refs/remotes/origin/documentationandmemories` to resolve to the same commit as the
+   consolidation worktree `HEAD`, so push again after any later commit in that worktree. Refresh the
    PR-context bundle with `mcp__drm-copilot__collect_pr_context` using base branch `main` and
    `workspace_root` set to the consolidation worktree, so that
    `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` exist beneath the
