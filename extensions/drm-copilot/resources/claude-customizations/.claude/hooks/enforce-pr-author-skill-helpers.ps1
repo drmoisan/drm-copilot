@@ -374,7 +374,7 @@ function Get-PrAuthorBypassReason {
         is resolved once (issue #850), and the deny precedence is: the resolution reason
         (no-target or ambiguity code, or an underivable epic worktree), PR_CONTEXT_MISSING when the
         context summary is absent beneath the resolved worktree, ORCHESTRATOR_STATE_PREFLIGHT_FAILED
-        unless Get-PrAuthorDocsOnlyExemption exempts a docs-only gh pr create (issue #901), then
+        unless Get-PrAuthorPreflightExemption exempts a docs-only gh pr create (issue #901), then
         receipt checks 1-6 via Test-PrAuthorReceiptVerification. Returns $null for all allowed
         patterns.
     .PARAMETER CommandText
@@ -482,7 +482,7 @@ function Get-PrAuthorBypassReason {
             } else {
                 $preflightResult.ErrorText
             }
-            $exemption = Get-PrAuthorDocsOnlyExemption -CommandText $CommandText -WorktreeRoot $artifact.ArtifactRoot -CheckpointPath $checkpointPath
+            $exemption = Get-PrAuthorPreflightExemption -CommandText $CommandText -WorktreeRoot $artifact.ArtifactRoot -CheckpointPath $checkpointPath
             if (-not $exemption.Exempt) {
                 return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: $preflightSummary (docs-only exemption not applied: $($exemption.Reason))"
             }
