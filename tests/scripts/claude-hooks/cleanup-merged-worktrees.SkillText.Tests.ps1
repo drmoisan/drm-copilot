@@ -84,6 +84,11 @@ Describe 'cleanup-merged-worktrees skill text (issue #1026)' {
             $script:Step4 | Should -Match ([regex]::Escape('exactly one `branch: documentationandmemories` label'))
         }
 
+        It 'states that the push precedes gh pr create and that the pushed branch must equal the consolidation worktree HEAD' {
+            $script:Step4 | Should -Match ([regex]::Escape('The push precedes `gh pr create`'))
+            $script:Step4 | Should -Match ([regex]::Escape('`refs/remotes/origin/documentationandmemories` to resolve to the same commit as the consolidation worktree `HEAD`'))
+        }
+
         It 'no longer requires --require-pr-creation-ready for consolidation pull requests' {
             $script:Step4 | Should -Not -Match ([regex]::Escape('--require-pr-creation-ready'))
             $script:Step4 | Should -Not -Match ([regex]::Escape('pr_author_preflight'))
@@ -105,6 +110,11 @@ Describe 'cleanup-merged-worktrees skill text (issue #1026)' {
             $script:HookContext | Should -Match ([regex]::Escape('hook-cleanup-context.ps1'))
             $script:HookContext | Should -Match ([regex]::Escape('Get-OrchestrationGateTemporaryRoot'))
             $script:HookContext | Should -Match ([regex]::Escape('`gh pr create --head documentationandmemories --base main`'))
+        }
+
+        It 'states the published-head condition and the consolidation sub-code in Hook Execution Context' {
+            $script:HookContext | Should -Match ([regex]::Escape('the pushed `refs/remotes/origin/documentationandmemories` resolves to the same commit as the consolidation worktree `HEAD`'))
+            $script:HookContext | Should -Match ([regex]::Escape('appends a cleanup sub-code (`Cleanup leg not applied`)'))
         }
     }
 }

@@ -2,7 +2,7 @@
 
 - Date captured: 2026-10-30
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates/ (Issue #1026)
+- Status: Promoted -> docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/ (Issue #1026)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
