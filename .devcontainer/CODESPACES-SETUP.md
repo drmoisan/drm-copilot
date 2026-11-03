@@ -32,7 +32,7 @@ This avoids conflicts where one environment's config interferes with the other.
    - Look for **"Dev container configuration"** section
    - Click the dropdown to expand options
    - **Select:** `.devcontainer/codespaces/devcontainer.json`
-   - Leave other settings as default (Machine type: 2-core is fine, can upgrade later)
+   - Leave other settings as default. The configuration declares `hostRequirements` of 16 cores, 64 GB memory and 64 GB storage, so only machine types that meet it are offered. The full test suites run under `pytest -n auto` and concurrent Pester shards, and agent orchestration runs many processes at once, so a 2-core machine is not enough.
 
 6. **Click "Create codespace"**
 
