@@ -302,8 +302,8 @@ Bounded by a small number of git calls per record with an existing target, and l
 - [x] Bundle mirrors and manifest updated: the new library and the edited `SKILL.md`, `cleanup-worktrees.sh`, and `cleanup_worktrees_preserve_lib.sh` are byte-identical in the bundle, and `core.json` lists the new library. `test_push_down_claude_resource_contracts.py` and `test_push_down_claude_pack_manifest_completeness.py` pass.
 - [x] Documentation updated: `SKILL.md` contains a subsection that enumerates the full `ACTION|preserve-stage` vocabulary including `REFUSED-WOULD-REGRESS` and describes per-`change_class` staging. The `cleanup-worktrees.sh` `usage` text no longer describes preserve mode as an unconditional verbatim copy. The `preserve_validate_record` comment no longer says `change_class` does not affect staging. `merge_queue_documentation_expectations.py` assertions still pass.
 - [x] Git stub comments corrected: the stub header no longer cites production line numbers or states that no `-w` behavior exists.
-- [ ] Shell QC passes: `bash scripts/bash/shell-qc.sh check` (shfmt and shellcheck) and `bash scripts/bash/shell-qc.sh test --coverage` (bats with kcov) pass. The aggregate line coverage stays at or above 85%, and `cleanup_worktrees_preserve_merge_lib.sh` reaches at least 85% line coverage per the recorded `cov.xml`.
-- [ ] File-size tiers respected: no changed or new production file exceeds 500 logical lines without a recorded justification, no file reaches 801 lines, and `tests/fixtures/cleanup_worktrees/stub-bin/git` stays below 500 lines.
+- [x] Shell QC passes: `bash scripts/bash/shell-qc.sh check` (shfmt and shellcheck) and `bash scripts/bash/shell-qc.sh test --coverage` (bats with kcov) pass. The aggregate line coverage stays at or above 85%, and `cleanup_worktrees_preserve_merge_lib.sh` reaches at least 85% line coverage per the recorded `cov.xml`.
+- [x] File-size tiers respected: no changed or new production file exceeds 500 logical lines without a recorded justification, no file reaches 801 lines, and `tests/fixtures/cleanup_worktrees/stub-bin/git` stays below 500 lines.
 
 ## Risks & Mitigations
 - Technical or operational risks:

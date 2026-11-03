@@ -259,3 +259,33 @@ merge_assert_merge_entry() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"REFUSED-WOULD-REGRESS"* ]]
 }
+
+# --- object-store read failures -------------------------------------------------------
+# The stub replays one answer per key, so a read failure for one blob of an otherwise
+# successful scenario is injected by redefining cleanup_wt_git in this test's own process:
+# the named blob read fails with exit 128 and every other call goes to the recording stub.
+# Each bats test runs in its own process, so the redefinition cannot reach another test.
+
+merge_fail_blob_read() {
+    MERGE_FAIL_OID=$1
+    cleanup_wt_git() {
+        if [[ " $* " == *" cat-file blob ${MERGE_FAIL_OID} "* ]]; then
+            printf 'stub-git: %s (forced failure)\n' "$*" >&2
+            return 128
+        fi
+        "${STUB}" "$@"
+    }
+}
+
+@test "an unreadable base blob is refused by G1" {
+    merge_fail_blob_read base0001
+    merge_assert_refused merge-repro "G1: the base blob could not be read"
+    [[ "$output" != *"merge-file"* ]]
+    [[ "$output" != *"hash-object"* ]]
+}
+
+@test "an unreadable merged blob is refused by G2" {
+    merge_fail_blob_read merged01
+    merge_assert_refused merge-repro "G2: the merged blob could not be read"
+    [[ "$output" == *"merge-file --union --object-id main0001 base0001 wt000001"* ]]
+}
