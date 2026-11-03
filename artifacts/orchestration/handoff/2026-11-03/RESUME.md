@@ -5,7 +5,7 @@ Paused by the owner so the work can be re-opened in a Codespace. Every branch be
 | Run | Branch | Pushed head | Resume point | Checkpoint file |
 |---|---|---|---|---|
 | Epic #1019, child #1020 (wave 0) | feature/docs-profile-and-artifact-schemas-1020-r2 | c26df1dd4 | atomic execution at P6-T3 (33 of 44 tasks done) | orchestrator-state.issue-1020-child.json |
-| Epic #1019 integration branch | epic/documentation-estate-tooling-integration | 013111c72 | wave 0 running; wave 1 starts when #1020 merges | epic-orchestrator-state.epic-1019.json |
+| Epic #1019 integration branch | epic/documentation-estate-tooling-integration | 1b1a200b9 | on HOLD at wave 0 (epic status records the pause); wave 1 starts when #1020 merges | epic-orchestrator-state.epic-1019.json |
 | #1026 | bug/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026 | 0cc5fa237 | atomic execution at P9-T5 | orchestrator-state.issue-1026.json |
 | #1047 | feature/parallel-add-and-plan-resume-prepared-items-1047 | 7edb0d6db | feature review (S7), a full re-run | orchestrator-state.issue-1047.json |
 

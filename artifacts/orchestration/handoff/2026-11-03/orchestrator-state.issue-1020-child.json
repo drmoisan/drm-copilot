@@ -36,7 +36,7 @@
     {"tool": "validate_orchestration_artifacts", "ok": true, "evidence": "Preparation run: plan artifact validated before and after preflight fixes"}
   ],
   "completed_steps": ["S0_change_budget", "S3_promotion", "S3b_research", "S3c_feature_documents", "S4_atomic_planning", "S4b_preflight"],
-  "next_step": "resume atomic execution at P6-T3",
+  "next_step": "resume atomic execution at P6-T3 (P6-T3 coverage run passed 3784 tests, 0 failures, all docs files >=85%; missed-line attribution check and evidence outstanding)",
   "last_updated": "2026-11-03T15:05:00Z",
   "step5_status": "delegated",
   "step6_status": "pending",
