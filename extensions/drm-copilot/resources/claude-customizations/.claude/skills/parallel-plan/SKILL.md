@@ -532,10 +532,13 @@ The library returns the partition; the planner supplies the record fields.
    from the recorded `conflict_edges`, `tolerated_overlaps`, `precedence`, and `items`; the helper
    prints the content and makes no git write. Write it to
    `docs/features/parallel/<slug>/parallel-scheduling.json` and commit it on `parallel/<slug>-plan`
-   with the manifest. A re-seed reads the committed record by ref
-   (`git show origin/parallel/<slug>-plan:docs/features/parallel/<slug>/parallel-scheduling.json`)
-   and reuses an item's recorded edges only when that item's recorded `plan_hash` equals its current
-   plan blob hash; every other item's edges are recomputed.
+   with the manifest. A re-seed applies the reuse rule per item with
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 reuse-edges -Slug <slug> -IssueNum <issue> -PlanHash <plan_hash>`,
+   where `<plan_hash>` is the item's `plan_hash` from its `assess` output. The helper reads the
+   committed record by ref from `origin/parallel/<slug>-plan`, runs no fetch, and prints
+   `{action, edges, reason}`. On `action` `reuse` the printed `edges` are that item's recorded
+   edges and are reused; on `action` `recompute` (reason `record_missing`, `unknown_item`, or
+   `plan_hash_changed`) that item's edges are recomputed.
 
 ### Recomputation parity (planner-owned check)
 

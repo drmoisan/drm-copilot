@@ -73,7 +73,7 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-Module -Name ParallelAdmission, ParallelAdmissionPrecedence -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name ParallelAdmission, ParallelAdmissionPrecedence, ParallelAdmissionJson -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Seed from prepared items' {
@@ -154,6 +154,20 @@ Describe 'Seed from prepared items' {
         $reuse = Get-ParallelAdmissionRecordedEdge -Slug 'admission-seed' -IssueNum 1102 -CurrentPlanHash 'ffffffffffffffffffffffffffffffffffffffff'
 
         $reuse.action | Should -Be 'recompute'
+    }
+
+    It 'reuse-edges reuses the committed record for a matching plan hash' {
+        $script:GitResponse['show origin/parallel/admission-seed-plan:docs/features/parallel/admission-seed/parallel-scheduling.json'] = @($script:Fixture['seed-scheduling-record.json'] -split "`n")
+        $record = ConvertFrom-ParallelAdmissionJson -Text $script:Fixture['seed-scheduling-record.json']
+        $expected = @(@($record['edges']) | Where-Object { $_['a'] -eq 1102 -or $_['b'] -eq 1102 } | ForEach-Object { '{0}:{1}' -f $_['a'], $_['b'] })
+
+        $outcome = Invoke-ParallelAdmissionCli -Subcommand 'reuse-edges' -Slug 'admission-seed' -IssueNum '1102' -PlanHash $script:Planner['items'][1]['plan_hash']
+
+        $outcome.ExitCode | Should -Be 0
+        $json = ConvertFrom-EmittedJson $outcome.Stdout
+        $json.GetProperty('action').GetString() | Should -Be 'reuse'
+        $json.GetProperty('reason').GetString() | Should -Be 'plan_hash_matches'
+        @($json.GetProperty('edges').EnumerateArray() | ForEach-Object { '{0}:{1}' -f $_.GetProperty('a').GetInt64(), $_.GetProperty('b').GetInt64() }) | Should -Be $expected
     }
 }
 

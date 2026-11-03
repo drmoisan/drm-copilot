@@ -5,16 +5,19 @@
 .DESCRIPTION
     Entry point the parallel-planner and parallel-orchestrator forks call as
     `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 <subcommand> ...`
-    with the subcommands guard-run, assess, order-cohorts, test-cohorts, and
-    record (feature spec `## API / CLI Surface`). The decisions are the pure
-    functions of ParallelAdmission.psm1 and ParallelAdmissionPrecedence.psm1; this
-    script owns the I/O through three seams: Invoke-ParallelAdmissionGit (every
-    git call, read-only by ref), Read-ParallelAdmissionJsonText (every file read),
-    and Get-ParallelAdmissionUtcNow (the clock). No file and no git write is made.
+    with the subcommands guard-run, assess, order-cohorts, test-cohorts, record,
+    and reuse-edges (feature spec `## API / CLI Surface`). The decisions are the
+    pure functions of ParallelAdmission.psm1 and ParallelAdmissionPrecedence.psm1,
+    and ParallelAdmissionJson.psm1 reads and writes the JSON; this script owns the
+    I/O through three seams: Invoke-ParallelAdmissionGit (every git call),
+    Read-ParallelAdmissionJsonText (every file read), and
+    Get-ParallelAdmissionUtcNow (the clock).
 
-    JSON is read with System.Text.Json, which keeps timestamp strings and the
-    integer and boolean distinction (the Invoke-ParallelDriftDetection.ps1
-    precedent). No parameter is Mandatory, so a missing option exits 2.
+    Side effects: assess runs `git fetch --quiet origin`, which updates the
+    remote-tracking refs and the object store and needs network access; a fetch
+    failure exits 1 with the failure prefix. Every other git call reads by ref,
+    and the helper writes no file. No parameter is Mandatory, so a missing option
+    exits 2.
 
     Exit codes: 0 prints one JSON object; 1 is a rule rejection with one stderr
     line "PARALLEL_ADMISSION_REJECTED: <code>: <detail>" (run_closed,
@@ -28,6 +31,7 @@ param(
     [string] $CheckpointPath, [string] $ManifestMode, [string] $Branch, [string] $FeatureFolder, [string] $Receipt,
     [string] $Band, [string] $PlannerCheckpointPath, [string] $Main, [string] $Cohorts, [string] $Edges,
     [string] $Precedence, [string] $Pinned, [string] $Floor, [string] $RunFolder, [string] $Entry,
+    [string] $Slug, [string] $IssueNum, [string] $PlanHash, [string] $Ref,
     [Parameter(ValueFromRemainingArguments = $true)][string[]] $Remaining
 )
 
@@ -36,6 +40,7 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmission.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmissionPrecedence.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmissionJson.psm1') -Force -ErrorAction Stop
 
 $script:AdmissionUsagePrefix = 'parallel admission usage error: '
 $script:AdmissionFailurePrefix = 'parallel admission failed: '
@@ -50,22 +55,23 @@ $script:AdmissionRequiredOption = @{
     'order-cohorts' = @('Cohorts')
     'test-cohorts'  = @('CheckpointPath')
     'record'        = @('RunFolder', 'Entry')
+    'reuse-edges'   = @('Slug', 'IssueNum', 'PlanHash')
 }
-$script:AdmissionIntegerTypeName = @('System.Int16', 'System.Int32', 'System.Int64', 'System.Byte', 'System.SByte', 'System.UInt16', 'System.UInt32', 'System.UInt64')
 $script:AdmissionSpecTemplatePath = 'docs/features/templates/feature/spec.md'
 $script:AdmissionPlanTemplatePath = 'docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md'
 
 function Invoke-ParallelAdmissionGit {
     <#
     .SYNOPSIS
-        Run one read-only git command and return ExitCode and Output lines; the only process call and its test seam.
+        Run one git command and return ExitCode, Output (stdout lines), and Stderr (stderr lines); the only process call and its test seam.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param([string[]] $GitArgs)
 
-    $output = & git @GitArgs 2>$null
-    return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = [string[]]@($output) }
+    # 2>&1 interleaves the streams; stderr lines arrive as ErrorRecord objects and are split off by type.
+    $all = @(& git @GitArgs 2>&1)
+    return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = [string[]]@($all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }); Stderr = [string[]]@($all | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] } | ForEach-Object { $_.ToString() }) }
 }
 
 function Read-ParallelAdmissionJsonText {
@@ -90,122 +96,6 @@ function Get-ParallelAdmissionUtcNow {
     param()
 
     return [datetime]::UtcNow
-}
-
-function ConvertFrom-ParallelAdmissionJsonElement {
-    <#
-    .SYNOPSIS
-        Convert one System.Text.Json element: objects to ordinal hashtables, arrays to object arrays, integers to Int64.
-    #>
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'JSON object keys are case-sensitive; the @{} literal is case-insensitive, so an ordinal-comparer hashtable is required (issue #763 precedent).')]
-    [CmdletBinding()]
-    [OutputType([hashtable], [System.Object[]], [string], [long], [double], [bool])]
-    param([System.Text.Json.JsonElement] $Element)
-
-    switch ($Element.ValueKind) {
-        ([System.Text.Json.JsonValueKind]::Object) {
-            $table = [hashtable]::new([System.StringComparer]::Ordinal)
-            foreach ($property in $Element.EnumerateObject()) {
-                $table[$property.Name] = ConvertFrom-ParallelAdmissionJsonElement -Element $property.Value
-            }
-            return $table
-        }
-        ([System.Text.Json.JsonValueKind]::Array) {
-            $list = [System.Collections.Generic.List[object]]::new()
-            foreach ($member in $Element.EnumerateArray()) { $list.Add((ConvertFrom-ParallelAdmissionJsonElement -Element $member)) }
-            return , $list.ToArray()
-        }
-        ([System.Text.Json.JsonValueKind]::String) { return $Element.GetString() }
-        ([System.Text.Json.JsonValueKind]::Number) {
-            $integral = [long]0
-            if ($Element.TryGetInt64([ref] $integral)) { return $integral }
-            return $Element.GetDouble()
-        }
-        ([System.Text.Json.JsonValueKind]::True) { return $true }
-        ([System.Text.Json.JsonValueKind]::False) { return $false }
-        default { return $null }
-    }
-}
-
-function ConvertFrom-ParallelAdmissionJson {
-    <#
-    .SYNOPSIS
-        Parse JSON text with System.Text.Json into PowerShell values; an array root is not unrolled.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable], [System.Object[]], [object])]
-    param([string] $Text)
-
-    $document = [System.Text.Json.JsonDocument]::Parse($Text)
-    try {
-        $value = ConvertFrom-ParallelAdmissionJsonElement -Element $document.RootElement
-    } finally {
-        $document.Dispose()
-    }
-    if ($value -is [array]) { return , $value }
-    return $value
-}
-
-function Write-ParallelAdmissionJsonValue {
-    <#
-    .SYNOPSIS
-        Write one value to a JSON writer, sorting object keys ordinally at every depth.
-    #>
-    [CmdletBinding()]
-    [OutputType([void])]
-    param([System.Text.Json.Utf8JsonWriter] $Writer, [AllowNull()][object] $Value)
-
-    # Strings and dictionaries are tested before IEnumerable, which both also implement.
-    if ($null -eq $Value) { $Writer.WriteNullValue(); return }
-    if ($Value -is [bool]) { $Writer.WriteBooleanValue($Value); return }
-    if ($Value -is [string]) { $Writer.WriteStringValue($Value); return }
-    if ($script:AdmissionIntegerTypeName -contains $Value.GetType().FullName) { $Writer.WriteNumberValue([long]$Value); return }
-    if ($Value -is [double] -or $Value -is [single] -or $Value -is [decimal]) { $Writer.WriteNumberValue([double]$Value); return }
-    if ($Value -is [System.Collections.IDictionary] -or $Value -is [System.Management.Automation.PSCustomObject]) {
-        $pairs = [System.Collections.Generic.SortedDictionary[string, object]]::new([System.StringComparer]::Ordinal)
-        if ($Value -is [System.Collections.IDictionary]) {
-            foreach ($key in $Value.Keys) { $pairs[[string]$key] = $Value[$key] }
-        } else {
-            foreach ($property in $Value.PSObject.Properties) { $pairs[$property.Name] = $property.Value }
-        }
-        $Writer.WriteStartObject()
-        foreach ($pair in $pairs.GetEnumerator()) {
-            $Writer.WritePropertyName($pair.Key)
-            Write-ParallelAdmissionJsonValue -Writer $Writer -Value $pair.Value
-        }
-        $Writer.WriteEndObject()
-        return
-    }
-    if ($Value -is [System.Collections.IEnumerable]) {
-        $Writer.WriteStartArray()
-        foreach ($member in $Value) { Write-ParallelAdmissionJsonValue -Writer $Writer -Value $member }
-        $Writer.WriteEndArray()
-        return
-    }
-    throw "ConvertTo-ParallelAdmissionJson cannot serialize a value of type $($Value.GetType().FullName)."
-}
-
-function ConvertTo-ParallelAdmissionJson {
-    <#
-    .SYNOPSIS
-        Serialize a value to indented JSON with ordinally sorted keys and LF line endings.
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([AllowNull()][object] $Value)
-
-    $stream = [System.IO.MemoryStream]::new()
-    $options = [System.Text.Json.JsonWriterOptions]@{ Indented = $true; Encoder = [System.Text.Encodings.Web.JavaScriptEncoder]::UnsafeRelaxedJsonEscaping }
-    $writer = [System.Text.Json.Utf8JsonWriter]::new($stream, $options)
-    try {
-        Write-ParallelAdmissionJsonValue -Writer $writer -Value $Value
-        $writer.Flush()
-        # The writer's indentation follows the platform newline; LF keeps the output identical on every host.
-        return [System.Text.Encoding]::UTF8.GetString($stream.ToArray()).Replace("`r`n", "`n")
-    } finally {
-        $writer.Dispose()
-        $stream.Dispose()
-    }
 }
 
 function Resolve-ParallelAdmissionPath {
@@ -316,6 +206,13 @@ function Get-ParallelAdmissionUsageError {
     if ($Subcommand -ceq 'record' -and $Option['RunFolder'] -notmatch '^docs/features/parallel/[^/\s]+/?$') {
         return "-RunFolder must be docs/features/parallel/<slug>; got '$($Option['RunFolder'])'."
     }
+    if (-not [string]::IsNullOrEmpty($Option['Slug']) -and $Option['Slug'] -match '[/\s]') {
+        return "-Slug must be a run slug without '/' or whitespace; got '$($Option['Slug'])'."
+    }
+    $issueValue = [long]0
+    if (-not [string]::IsNullOrEmpty($Option['IssueNum']) -and -not ($Option['IssueNum'] -match '^[0-9]+$' -and [long]::TryParse($Option['IssueNum'], [ref] $issueValue) -and $issueValue -gt 0)) {
+        return "-IssueNum must be a positive integer; got '$($Option['IssueNum'])'."
+    }
     return $null
 }
 
@@ -364,14 +261,19 @@ function Invoke-ParallelAdmissionGuardRun {
 function Invoke-ParallelAdmissionGitChecked {
     <#
     .SYNOPSIS
-        Run one git command through the seam and throw when it exits non-zero.
+        Run one git command through the seam and throw when it exits non-zero, naming the first non-blank stderr line.
     #>
     [CmdletBinding()]
     [OutputType([string[]], [System.Object[]])]
     param([string[]] $GitArgs)
 
     $result = Invoke-ParallelAdmissionGit -GitArgs $GitArgs
-    if ($result.ExitCode -ne 0) { throw "git $($GitArgs -join ' ') exited $($result.ExitCode)." }
+    if ($result.ExitCode -ne 0) {
+        # A result without a Stderr property (an older seam double) reads as empty; strict mode would throw on the access.
+        $stderrLine = @(if ($result.PSObject.Properties.Name -contains 'Stderr') { $result.Stderr | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } })
+        if ($stderrLine.Count -gt 0) { throw "git $($GitArgs -join ' ') exited $($result.ExitCode): $($stderrLine[0].Trim())" }
+        throw "git $($GitArgs -join ' ') exited $($result.ExitCode)."
+    }
     return , [string[]]@($result.Output | Where-Object { $null -ne $_ })
 }
 
@@ -474,7 +376,8 @@ function Invoke-ParallelAdmissionAssess {
     .SYNOPSIS
         assess: report how far an item is prepared, whether main moved under its plan, and the next action.
     .DESCRIPTION
-        Every read is by ref through Invoke-ParallelAdmissionGit. The newest receipt
+        Fetches origin first (git fetch --quiet origin), then reads by ref through
+        Invoke-ParallelAdmissionGit. The newest receipt
         takes precedence over inference; plan_hash is the plan blob hash at the
         branch head; base_commit is the receipt's, else the merge base with main.
     #>
@@ -642,10 +545,26 @@ function Get-ParallelAdmissionRecordedEdge {
     param([string] $Slug, [long] $IssueNum, [AllowEmptyString()][string] $CurrentPlanHash, [string] $Ref = '')
 
     if ([string]::IsNullOrWhiteSpace($Ref)) { $Ref = "origin/parallel/$Slug-plan" }
-    $shown = Invoke-ParallelAdmissionGit -GitArgs @('show', "${Ref}:docs/features/parallel/$Slug/parallel-scheduling.json")
+    $recordPath = "docs/features/parallel/$Slug/parallel-scheduling.json"
+    $shown = Invoke-ParallelAdmissionGit -GitArgs @('show', "${Ref}:$recordPath")
     if ($shown.ExitCode -ne 0) { return [pscustomobject]@{ action = 'recompute'; reason = 'record_missing'; edges = [object[]]@() } }
     $record = ConvertFrom-ParallelAdmissionJson -Text (@($shown.Output) -join "`n")
+    if ($record -isnot [System.Collections.IDictionary]) { throw "Scheduling record ${Ref}:$recordPath must be a JSON object." }
     return Get-ParallelSchedulingRecordReuse -Record $record -IssueNum $IssueNum -CurrentPlanHash $CurrentPlanHash
+}
+
+function Invoke-ParallelAdmissionEdgeReuse {
+    <#
+    .SYNOPSIS
+        reuse-edges: apply the edge-reuse rule to one item from the committed scheduling record; no fetch runs.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([hashtable] $Option)
+
+    $reuse = Get-ParallelAdmissionRecordedEdge -Slug $Option.Slug -IssueNum ([long]$Option.IssueNum) -CurrentPlanHash $Option.PlanHash -Ref ([string]$Option.Ref)
+    $result = [ordered]@{ action = $reuse.action; edges = [object[]]@($reuse.edges); reason = $reuse.reason }
+    return ConvertTo-ParallelAdmissionCliOutcome -ExitCode 0 -Stdout (ConvertTo-ParallelAdmissionJson -Value $result)
 }
 
 function Invoke-ParallelAdmissionCli {
@@ -661,11 +580,13 @@ function Invoke-ParallelAdmissionCli {
     param(
         [string] $Subcommand, [string] $CheckpointPath, [string] $ManifestMode, [string] $Branch, [string] $FeatureFolder,
         [string] $Receipt, [string] $Band, [string] $PlannerCheckpointPath, [string] $Main, [string] $Cohorts, [string] $Edges,
-        [string] $Precedence, [string] $Pinned, [string] $Floor, [string] $RunFolder, [string] $Entry, [AllowNull()][string[]] $Remaining
+        [string] $Precedence, [string] $Pinned, [string] $Floor, [string] $RunFolder, [string] $Entry,
+        [string] $Slug, [string] $IssueNum, [string] $PlanHash, [string] $Ref, [AllowNull()][string[]] $Remaining
     )
 
     $option = @{ CheckpointPath = $CheckpointPath; ManifestMode = $ManifestMode; Branch = $Branch; FeatureFolder = $FeatureFolder; Receipt = $Receipt; Band = $Band
-        PlannerCheckpointPath = $PlannerCheckpointPath; Main = $Main; Cohorts = $Cohorts; Edges = $Edges; Precedence = $Precedence; Pinned = $Pinned; Floor = $Floor; RunFolder = $RunFolder; Entry = $Entry }
+        PlannerCheckpointPath = $PlannerCheckpointPath; Main = $Main; Cohorts = $Cohorts; Edges = $Edges; Precedence = $Precedence; Pinned = $Pinned; Floor = $Floor; RunFolder = $RunFolder; Entry = $Entry
+        Slug = $Slug; IssueNum = $IssueNum; PlanHash = $PlanHash; Ref = $Ref }
     $usage = Get-ParallelAdmissionUsageError -Subcommand $Subcommand -Option $option -Remaining $Remaining
     if ($null -ne $usage) { return ConvertTo-ParallelAdmissionCliOutcome -ExitCode 2 -Stderr "$($script:AdmissionUsagePrefix)$usage" }
     if ([string]::IsNullOrWhiteSpace($option.Main)) { $option.Main = $script:AdmissionDefaultMain }
@@ -676,7 +597,8 @@ function Invoke-ParallelAdmissionCli {
             'assess' { return Invoke-ParallelAdmissionAssess -Option $option }
             'order-cohorts' { return Invoke-ParallelAdmissionCohortOrder -Option $option }
             'test-cohorts' { return Invoke-ParallelAdmissionCohortTest -Option $option }
-            default { return Invoke-ParallelAdmissionRecord -Option $option }
+            'record' { return Invoke-ParallelAdmissionRecord -Option $option }
+            'reuse-edges' { return Invoke-ParallelAdmissionEdgeReuse -Option $option }
         }
     } catch {
         $message = $_.Exception.Message
@@ -692,7 +614,7 @@ if ($MyInvocation.InvocationName -ne '.') {
     $outcome = Invoke-ParallelAdmissionCli -Subcommand $Subcommand -CheckpointPath $CheckpointPath -ManifestMode $ManifestMode `
         -Branch $Branch -FeatureFolder $FeatureFolder -Receipt $Receipt -Band $Band -PlannerCheckpointPath $PlannerCheckpointPath `
         -Main $Main -Cohorts $Cohorts -Edges $Edges -Precedence $Precedence -Pinned $Pinned -Floor $Floor -RunFolder $RunFolder `
-        -Entry $Entry -Remaining $Remaining
+        -Entry $Entry -Slug $Slug -IssueNum $IssueNum -PlanHash $PlanHash -Ref $Ref -Remaining $Remaining
     if (-not [string]::IsNullOrEmpty($outcome.Stdout)) { [Console]::Out.WriteLine($outcome.Stdout) }
     if (-not [string]::IsNullOrEmpty($outcome.Stderr)) { [Console]::Error.WriteLine($outcome.Stderr) }
     exit $outcome.ExitCode

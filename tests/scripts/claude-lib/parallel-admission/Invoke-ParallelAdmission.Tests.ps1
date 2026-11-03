@@ -68,7 +68,7 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-Module -Name ParallelAdmission, ParallelAdmissionPrecedence -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name ParallelAdmission, ParallelAdmissionPrecedence, ParallelAdmissionJson -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Parameter surface' {
@@ -93,7 +93,7 @@ Describe 'Parameter surface' {
 
         $command.Parameters['Subcommand'].ParameterSets.Values.Position | Should -Be 0
         $command.Parameters['Remaining'].ParameterSets.Values.ValueFromRemainingArguments | Should -BeTrue
-        foreach ($name in @('CheckpointPath', 'ManifestMode', 'Branch', 'FeatureFolder', 'Band', 'Cohorts', 'Entry')) {
+        foreach ($name in @('CheckpointPath', 'ManifestMode', 'Branch', 'FeatureFolder', 'Band', 'Cohorts', 'Entry', 'Slug', 'IssueNum', 'PlanHash', 'Ref')) {
             $command.Parameters[$name].ParameterSets.Values.Position | Should -Be ([int]::MinValue)
         }
     }
@@ -104,8 +104,53 @@ Describe 'Parameter surface' {
         }
     }
 
+    It 'documents the fetch side effect of assess' {
+        # Arrange: the comment-based help of the script and of the git seam, whitespace collapsed.
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:EntryScriptPath, [ref] $null, [ref] $null)
+        $description = ($ast.GetHelpContent().Description -replace '\s+', ' ')
+        $seam = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Invoke-ParallelAdmissionGit' }, $true)
+        $synopsis = ($seam.GetHelpContent().Synopsis -replace '\s+', ' ')
+
+        # Assert
+        $description | Should -BeLike '*git fetch --quiet origin*'
+        $description | Should -BeLike '*network access*'
+        $description | Should -Not -BeLike '*no git write is made*'
+        $synopsis | Should -Not -BeNullOrEmpty
+        $synopsis | Should -Not -BeLike '*read-only*'
+    }
+
     It 'contains no observed_resolution token' {
         (Get-Content -LiteralPath $script:EntryScriptPath -Raw).Contains('observed_resolution') | Should -BeFalse
+    }
+}
+
+Describe 'Invoke-ParallelAdmissionGitChecked' {
+    It 'returns the output lines when git exits 0' {
+        Mock Invoke-ParallelAdmissionGit { [pscustomobject]@{ ExitCode = 0; Output = [string[]]@('a', 'b'); Stderr = [string[]]@() } }
+
+        $lines = Invoke-ParallelAdmissionGitChecked -GitArgs @('show', 'HEAD:x')
+
+        $lines | Should -Be @('a', 'b')
+    }
+
+    It 'throws with the first non-blank stderr line when <Case>' -ForEach @(
+        @{ Case = 'one stderr line is present'; Stderr = @("fatal: bad revision 'nope'") }
+        @{ Case = 'several stderr lines are present'; Stderr = @('', '  ', "  fatal: bad revision 'nope'  ", 'hint: second line') }
+    ) {
+        $script:CheckedStderr = [string[]]$Stderr
+        Mock Invoke-ParallelAdmissionGit { [pscustomobject]@{ ExitCode = 128; Output = [string[]]@(); Stderr = $script:CheckedStderr } }
+
+        { Invoke-ParallelAdmissionGitChecked -GitArgs @('show', 'nope:x') } | Should -Throw -ExpectedMessage "git show nope:x exited 128: fatal: bad revision 'nope'"
+    }
+
+    It 'throws the exit-code message when <Case>' -ForEach @(
+        @{ Case = 'Stderr is empty'; Result = [pscustomobject]@{ ExitCode = 128; Output = [string[]]@(); Stderr = [string[]]@() } }
+        @{ Case = 'the result has no Stderr property'; Result = [pscustomobject]@{ ExitCode = 128; Output = [string[]]@() } }
+    ) {
+        $script:CheckedResult = $Result
+        Mock Invoke-ParallelAdmissionGit { $script:CheckedResult }
+
+        { Invoke-ParallelAdmissionGitChecked -GitArgs @('show', 'nope:x') } | Should -Throw -ExpectedMessage 'git show nope:x exited 128.'
     }
 }
 
@@ -136,11 +181,25 @@ Describe 'Usage errors' {
         @{ Subcommand = 'order-cohorts'; Missing = 'Cohorts'; Arguments = @{ Edges = '1:2' } }
         @{ Subcommand = 'test-cohorts'; Missing = 'CheckpointPath'; Arguments = @{} }
         @{ Subcommand = 'record'; Missing = 'Entry'; Arguments = @{ RunFolder = 'docs/features/parallel/s' } }
+        @{ Subcommand = 'reuse-edges'; Missing = 'Slug'; Arguments = @{ IssueNum = '1102'; PlanHash = 'c2c2' } }
+        @{ Subcommand = 'reuse-edges'; Missing = 'IssueNum'; Arguments = @{ Slug = 'admission-seed'; PlanHash = 'c2c2' } }
+        @{ Subcommand = 'reuse-edges'; Missing = 'PlanHash'; Arguments = @{ Slug = 'admission-seed'; IssueNum = '1102' } }
     ) {
         $outcome = Invoke-ParallelAdmissionCli -Subcommand $Subcommand @Arguments
 
         $outcome.ExitCode | Should -Be 2
         $outcome.Stderr | Should -Be "$($script:UsagePrefix)$Subcommand requires -$Missing."
+    }
+
+    It 'exits 2 on reuse-edges <Name> <Value>' -ForEach @(
+        @{ Name = '-IssueNum'; Value = '0'; Arguments = @{ Slug = 'admission-seed'; IssueNum = '0' }; Message = "-IssueNum must be a positive integer; got '0'." }
+        @{ Name = '-IssueNum'; Value = 'x1'; Arguments = @{ Slug = 'admission-seed'; IssueNum = 'x1' }; Message = "-IssueNum must be a positive integer; got 'x1'." }
+        @{ Name = '-Slug'; Value = 'a/b'; Arguments = @{ Slug = 'a/b'; IssueNum = '1102' }; Message = "-Slug must be a run slug without '/' or whitespace; got 'a/b'." }
+    ) {
+        $outcome = Invoke-ParallelAdmissionCli -Subcommand 'reuse-edges' -PlanHash 'c2c2' @Arguments
+
+        $outcome.ExitCode | Should -Be 2
+        $outcome.Stderr | Should -BeExactly "$($script:UsagePrefix)$Message"
     }
 
     It 'exits 2 on a band outside C1 to C4' {
@@ -375,6 +434,41 @@ Describe 'assess' {
         $outcome.Stderr | Should -BeLike 'parallel admission failed: git ls-tree*'
     }
 
+    It 'fetches origin once before reading the branch' {
+        $script:GitCallOrder = [System.Collections.Generic.List[string]]::new()
+        Mock Invoke-ParallelAdmissionGit {
+            param([string[]] $GitArgs)
+            $key = $GitArgs -join ' '
+            $script:GitCallOrder.Add($key)
+            if ($script:GitResponse.ContainsKey($key)) { return [pscustomobject]@{ ExitCode = 0; Output = [string[]]@($script:GitResponse[$key]) } }
+            return [pscustomobject]@{ ExitCode = 1; Output = [string[]]@() }
+        }
+
+        $null = Invoke-ParallelAdmissionCli @script:AssessArguments
+
+        Should -Invoke Invoke-ParallelAdmissionGit -ParameterFilter { ($GitArgs -join ' ') -ceq 'fetch --quiet origin' } -Times 1 -Exactly
+        $script:GitCallOrder[0] | Should -BeExactly 'fetch --quiet origin'
+    }
+
+    It 'surfaces the git stderr line when the branch cannot be listed' {
+        $listKey = "ls-tree -r --name-only $($script:AssessBranch) -- $($script:AssessFolder)"
+        $script:GitResponse.Remove($listKey)
+        Mock Invoke-ParallelAdmissionGit {
+            param([string[]] $GitArgs)
+            $key = $GitArgs -join ' '
+            if ($key -ceq "ls-tree -r --name-only $($script:AssessBranch) -- $($script:AssessFolder)") {
+                return [pscustomobject]@{ ExitCode = 128; Output = [string[]]@(); Stderr = [string[]]@("fatal: Not a valid object name $($script:AssessBranch)") }
+            }
+            if ($script:GitResponse.ContainsKey($key)) { return [pscustomobject]@{ ExitCode = 0; Output = [string[]]@($script:GitResponse[$key]) } }
+            return [pscustomobject]@{ ExitCode = 1; Output = [string[]]@() }
+        }
+
+        $outcome = Invoke-ParallelAdmissionCli @script:AssessArguments
+
+        $outcome.ExitCode | Should -Be 1
+        $outcome.Stderr | Should -BeExactly 'parallel admission failed: git ls-tree -r --name-only origin/feature/sample-1101 -- docs/features/active/sample-1101 exited 128: fatal: Not a valid object name origin/feature/sample-1101'
+    }
+
     It 'exits 1 with the failure prefix when the receipt is not a JSON object' {
         $script:GitResponse = Get-AssessGitResponse -Receipt '[1, 2]'
 
@@ -530,5 +624,69 @@ Describe 'record' {
 
         $reuse.action | Should -Be 'recompute'
         $reuse.reason | Should -Be 'record_missing'
+    }
+}
+
+Describe 'reuse-edges' {
+    BeforeEach {
+        # An in-memory committed record: 1102 has two edges, 1101 and 1103 share one.
+        $script:ReuseRecord = '{"schema_version": 1, "parallel_slug": "admission-seed", "edges": [{"a": 1101, "b": 1102, "reason": "path_overlap"}, {"a": 1101, "b": 1103, "reason": "module_overlap"}, {"a": 1102, "b": 1104, "reason": "path_overlap"}], "tolerated_overlaps": [], "precedence": [], "items": [{"issue_num": 1102, "plan_hash": "c2c2"}]}'
+        $script:ReuseShow = @{ ExitCode = 0 }
+        Mock Invoke-ParallelAdmissionGit {
+            if ($script:ReuseShow.ExitCode -ne 0) { return [pscustomobject]@{ ExitCode = $script:ReuseShow.ExitCode; Output = [string[]]@() } }
+            return [pscustomobject]@{ ExitCode = 0; Output = [string[]]@($script:ReuseRecord -split "`n") }
+        }
+        $script:ReuseArguments = @{ Subcommand = 'reuse-edges'; Slug = 'admission-seed'; IssueNum = '1102' }
+    }
+
+    It 'reuses only the edges touching the item for a matching plan hash' {
+        $outcome = Invoke-ParallelAdmissionCli @script:ReuseArguments -PlanHash 'c2c2'
+
+        $outcome.ExitCode | Should -Be 0
+        $json = ConvertFrom-EmittedJson $outcome.Stdout
+        @($json.EnumerateObject() | ForEach-Object { $_.Name }) | Should -Be @('action', 'edges', 'reason')
+        $json.GetProperty('action').GetString() | Should -Be 'reuse'
+        $json.GetProperty('reason').GetString() | Should -Be 'plan_hash_matches'
+        @($json.GetProperty('edges').EnumerateArray() | ForEach-Object { '{0}:{1}' -f $_.GetProperty('a').GetInt64(), $_.GetProperty('b').GetInt64() }) | Should -Be @('1101:1102', '1102:1104')
+        $outcome.Stdout.Contains("`r") | Should -BeFalse
+    }
+
+    It 'recomputes with <Reason> when <Case>' -ForEach @(
+        @{ Case = 'the plan hash changed'; Arguments = @{ PlanHash = 'ffff' }; ExitCode = 0; Reason = 'plan_hash_changed' }
+        @{ Case = 'the item is not listed'; Arguments = @{ PlanHash = 'c2c2'; IssueNum = '4242' }; ExitCode = 0; Reason = 'unknown_item' }
+        @{ Case = 'git show exits 128'; Arguments = @{ PlanHash = 'c2c2' }; ExitCode = 128; Reason = 'record_missing' }
+    ) {
+        $script:ReuseShow.ExitCode = $ExitCode
+        $splat = $script:ReuseArguments.Clone()
+        foreach ($key in $Arguments.Keys) { $splat[$key] = $Arguments[$key] }
+
+        $outcome = Invoke-ParallelAdmissionCli @splat
+
+        $outcome.ExitCode | Should -Be 0
+        $json = ConvertFrom-EmittedJson $outcome.Stdout
+        $json.GetProperty('action').GetString() | Should -Be 'recompute'
+        $json.GetProperty('reason').GetString() | Should -Be $Reason
+        $json.GetProperty('edges').GetArrayLength() | Should -Be 0
+    }
+
+    It 'reads the record once by ref from <Expected> and runs no fetch' -ForEach @(
+        @{ Arguments = @{}; Expected = 'origin/parallel/admission-seed-plan' }
+        @{ Arguments = @{ Ref = 'origin/parallel/other-plan' }; Expected = 'origin/parallel/other-plan' }
+    ) {
+        $null = Invoke-ParallelAdmissionCli @script:ReuseArguments -PlanHash 'c2c2' @Arguments
+
+        Should -Invoke Invoke-ParallelAdmissionGit -ParameterFilter { ($GitArgs -join ' ') -ceq "show ${Expected}:docs/features/parallel/admission-seed/parallel-scheduling.json" } -Times 1 -Exactly
+        Should -Invoke Invoke-ParallelAdmissionGit -Times 1 -Exactly
+        Should -Invoke Invoke-ParallelAdmissionGit -ParameterFilter { $GitArgs[0] -ceq 'fetch' } -Times 0 -Exactly
+    }
+
+    It 'exits 1 with the failure prefix when the record is not a JSON object' {
+        $script:ReuseRecord = '[]'
+
+        $outcome = Invoke-ParallelAdmissionCli @script:ReuseArguments -PlanHash 'c2c2'
+
+        $outcome.ExitCode | Should -Be 1
+        $outcome.Stderr | Should -BeLike 'parallel admission failed: Scheduling record*'
+        $outcome.Stdout | Should -BeNullOrEmpty
     }
 }
