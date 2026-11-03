@@ -120,14 +120,14 @@
 
 ### Phase 4 — Cohort Barrier Precedence (Layer 1)
 
-- [ ] [P4-T1] Edit `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`.
+- [x] [P4-T1] Edit `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`.
   - Add `Get-ParallelCohortBarrierPrecedencePredecessorList`, which returns each `before` key whose `after` equals the target, from a checkpoint `precedence` array.
   - Extend `Test-ParallelCohortBarrierClear` to return `$false` unless each predecessor record has `merge_status` in `$script:AllowedMergeStatuses` or `state` `withdrawn`, failing closed on a missing predecessor record. An absent `precedence` key leaves the decision unchanged.
   - Update the header helper list from five to six.
   - Add Context `precedence predecessors` to `tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Tests.ps1` with allow cases (merged, worktree_removed, withdrawn, no `precedence` key) and deny cases (`pr_open`, `ci_green`, `blocked_ci_loop_limit`, a missing predecessor record). Fixtures use forward-slash relative paths and in-memory LF JSON.
   - Asserting tests: every existing Context in that file, and the suites `enforce-parallel-cohort-barrier.Payload.Tests.ps1`, `enforce-parallel-cohort-barrier.FolderResolution.Tests.ps1`, `enforce-parallel-cohort-barrier.WorktreeResolution.Tests.ps1`, `hook-import-failure-exemptions.FailClosed.Tests.ps1`, and `hook-dependency-failure.Claude.Tests.ps1`, are unchanged, because their checkpoints carry no `precedence` key. `test_parallel_cohort_barrier_parity.py` is unchanged because it exercises the Python Layer 2 corpus.
   - Acceptance: the new Context passes, and the four cohort-barrier suites report zero failures in the JUnit file.
-- [ ] [P4-T2] Verify the sizes of `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1` and `tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Tests.ps1`.
+- [x] [P4-T2] Verify the sizes of `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1` and `tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Tests.ps1`.
   - Acceptance: `enforce-parallel-cohort-barrier-helpers.ps1` stays under 500 logical lines and `enforce-parallel-cohort-barrier.Tests.ps1` under 700, both recorded in `module-size.<timestamp>.md`.
 
 ### Phase 5 — Skill, Rule, Agent, Settings, and Pin Text
