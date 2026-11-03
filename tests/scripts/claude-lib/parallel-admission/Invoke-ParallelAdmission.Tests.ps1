@@ -191,12 +191,15 @@ Describe 'Usage errors' {
         $outcome.Stderr | Should -Be "$($script:UsagePrefix)$Subcommand requires -$Missing."
     }
 
-    It 'exits 2 on reuse-edges <Name> <Value>' -ForEach @(
-        @{ Name = '-IssueNum'; Value = '0'; Arguments = @{ Slug = 'admission-seed'; IssueNum = '0' }; Message = "-IssueNum must be a positive integer; got '0'." }
-        @{ Name = '-IssueNum'; Value = 'x1'; Arguments = @{ Slug = 'admission-seed'; IssueNum = 'x1' }; Message = "-IssueNum must be a positive integer; got 'x1'." }
-        @{ Name = '-Slug'; Value = 'a/b'; Arguments = @{ Slug = 'a/b'; IssueNum = '1102' }; Message = "-Slug must be a run slug without '/' or whitespace; got 'a/b'." }
+    It 'exits 2 on <Subcommand> <Name> <Value>' -ForEach @(
+        @{ Subcommand = 'reuse-edges'; Name = '-IssueNum'; Value = '0'; Arguments = @{ Slug = 'admission-seed'; IssueNum = '0'; PlanHash = 'c2c2' }; Message = "-IssueNum must be a positive integer; got '0'." }
+        @{ Subcommand = 'reuse-edges'; Name = '-IssueNum'; Value = 'x1'; Arguments = @{ Slug = 'admission-seed'; IssueNum = 'x1'; PlanHash = 'c2c2' }; Message = "-IssueNum must be a positive integer; got 'x1'." }
+        @{ Subcommand = 'reuse-edges'; Name = '-Slug'; Value = 'a/b'; Arguments = @{ Slug = 'a/b'; IssueNum = '1102'; PlanHash = 'c2c2' }; Message = "-Slug must be a run slug without '/' or whitespace; got 'a/b'." }
+        @{ Subcommand = 'assess'; Name = '-Branch'; Value = '--upload-pack=x'; Arguments = @{ Branch = '--upload-pack=x'; FeatureFolder = 'docs/features/active/x' }; Message = "-Branch must not begin with '-'; got '--upload-pack=x'." }
+        @{ Subcommand = 'assess'; Name = '-Main'; Value = '--output=x'; Arguments = @{ Branch = 'origin/feature/x'; FeatureFolder = 'docs/features/active/x'; Main = '--output=x' }; Message = "-Main must not begin with '-'; got '--output=x'." }
+        @{ Subcommand = 'reuse-edges'; Name = '-Ref'; Value = '-p'; Arguments = @{ Slug = 'admission-seed'; IssueNum = '1102'; PlanHash = 'c2c2'; Ref = '-p' }; Message = "-Ref must not begin with '-'; got '-p'." }
     ) {
-        $outcome = Invoke-ParallelAdmissionCli -Subcommand 'reuse-edges' -PlanHash 'c2c2' @Arguments
+        $outcome = Invoke-ParallelAdmissionCli -Subcommand $Subcommand @Arguments
 
         $outcome.ExitCode | Should -Be 2
         $outcome.Stderr | Should -BeExactly "$($script:UsagePrefix)$Message"

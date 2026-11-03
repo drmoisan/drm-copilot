@@ -188,6 +188,10 @@ function Get-ParallelAdmissionUsageError {
     foreach ($name in $script:AdmissionRequiredOption[$Subcommand]) {
         if ([string]::IsNullOrWhiteSpace($Option[$name])) { return "$Subcommand requires -$name." }
     }
+    # A ref value is passed to git as a bare argument, so a leading '-' would be read as a git option.
+    foreach ($name in @('Branch', 'Main', 'Ref')) {
+        if (-not [string]::IsNullOrEmpty($Option[$name]) -and $Option[$name].StartsWith('-', [System.StringComparison]::Ordinal)) { return "-$name must not begin with '-'; got '$($Option[$name])'." }
+    }
     if (-not [string]::IsNullOrWhiteSpace($Option['Band']) -and $script:AdmissionBandName -cnotcontains $Option['Band']) {
         return "-Band must be one of $($script:AdmissionBandName -join ', '); got '$($Option['Band'])'."
     }
