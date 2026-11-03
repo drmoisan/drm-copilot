@@ -1,0 +1,63 @@
+{
+  "$schema": "urn:drm-copilot:docs:1.0.0:docs-coverage-ledger",
+  "schema_version": "1.0.0",
+  "artifact_kind": "docs-coverage-ledger",
+  "id": "example-repo.docs-coverage-ledger",
+  "extensions": {},
+  "repository": "example-repo",
+  "snapshot_ref": {
+    "artifact_kind": "surface-inventory-snapshot",
+    "path": "docs/documentation-estate/surface-inventory-snapshot.json",
+    "sha256": "7f62a6c9f6f380f34b7ca7b2b05d7d5f2a86a3108209a459fbb3f8b91fa18557"
+  },
+  "entries": [
+    {
+      "element_id": "cli-command-b9cda1283b765831a04bf07223320d70c1f07de9da312b21731f40e8790cf00a",
+      "kind": "cli-command",
+      "analysis_method": "native",
+      "disposition": "documented",
+      "page_bindings": [{"page_path": "docs/reference/cli-reference.md", "anchor": "inventory"}],
+      "rationale": null,
+      "owner": null,
+      "target": null,
+      "updated_by": {"kind": "agent", "id": "docs-reconciler"},
+      "extensions": {}
+    },
+    {
+      "element_id": "cli-option-4dac82ff130bd249bc5405947e1c0d29de1b7374d2aba5fb490213d36cd1ba85",
+      "kind": "cli-option",
+      "analysis_method": "native",
+      "disposition": "documented",
+      "page_bindings": [{"page_path": "docs/reference/cli-reference.md", "anchor": null}],
+      "rationale": null,
+      "owner": null,
+      "target": null,
+      "updated_by": {"kind": "agent", "id": "docs-reconciler"},
+      "extensions": {}
+    },
+    {
+      "element_id": "config-key-c861a7d842f18ab03e7ad64dbca3ac7283e51566286b3810ae6163f096fcc69b",
+      "kind": "config-key",
+      "analysis_method": "scanner",
+      "disposition": "excluded",
+      "page_bindings": [],
+      "rationale": "The timeout key is an internal tuning value that is not part of the supported configuration.",
+      "owner": null,
+      "target": null,
+      "updated_by": {"kind": "human", "id": "maintainer-team"},
+      "extensions": {}
+    },
+    {
+      "element_id": "http-route-953dac18dfc986f87330003d45e387536b6fa02b8b34b64b49245a2482d5136f",
+      "kind": "http-route",
+      "analysis_method": "scanner",
+      "disposition": "deferred",
+      "page_bindings": [],
+      "rationale": "The route is documented after the HTTP reference page exists.",
+      "owner": "docs-team",
+      "target": "Next minor release",
+      "updated_by": {"kind": "tool", "id": "drm-copilot-docs"},
+      "extensions": {}
+    }
+  ]
+}

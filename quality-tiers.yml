@@ -55,6 +55,9 @@ projects:
   - path: ".claude/lib/discovery-validation"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/docs"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle for the documentation profile, schemas, and command entry"
   - path: ".claude/lib/file-size-policy"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle; pure tiered file-size policy functions used by the PreToolUse hook and the repository gate"

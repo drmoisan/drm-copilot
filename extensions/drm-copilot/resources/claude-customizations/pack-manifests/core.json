@@ -277,6 +277,23 @@
     ".claude/skills/mermaid-diagram/references/gantt.md",
     ".claude/skills/mermaid-diagram/references/pie.md",
     ".claude/skills/mermaid-diagram/references/other-types.md",
-    ".claude/skills/validate-discovery-artifacts/SKILL.md"
+    ".claude/skills/validate-discovery-artifacts/SKILL.md",
+    ".claude/lib/docs/DocsJson.psm1",
+    ".claude/lib/docs/DocsFinding.psm1",
+    ".claude/lib/docs/DocsSurface.psm1",
+    ".claude/lib/docs/DocsSchema.psm1",
+    ".claude/lib/docs/DocsSchemaWalk.psm1",
+    ".claude/lib/docs/DocsAnalyzerRegistry.psm1",
+    ".claude/lib/docs/DocsProfile.psm1",
+    ".claude/lib/docs/DocsProfileCommands.psm1",
+    ".claude/lib/docs/Invoke-DocsCommand.ps1",
+    ".claude/lib/docs/schemas/v1/common.schema.json",
+    ".claude/lib/docs/schemas/v1/docs-profile.schema.json",
+    ".claude/lib/docs/schemas/v1/surface-inventory-snapshot.schema.json",
+    ".claude/lib/docs/schemas/v1/docs-coverage-ledger.schema.json",
+    ".claude/lib/docs/schemas/v1/docs-parity-matrix.schema.json",
+    ".claude/lib/docs/schemas/v1/docs-evidence-pin.schema.json",
+    ".claude/lib/docs/schemas/v1/docs-validation-receipt.schema.json",
+    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json"
   ]
 }
