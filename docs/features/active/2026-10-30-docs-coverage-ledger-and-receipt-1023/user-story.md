@@ -116,7 +116,7 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 
 - [ ] A maintainer running `-Command coverage` receives totals (including counts by analysis method), the undocumented elements, the deferred entries, the scanner precision limits, the stale pages and per-dimension parity counts and integer scores, and the subcommand makes no `WriteText` call (`DocsLedgerCommands.Tests.ps1`).
 - [ ] When the ledger, matrix or pin collection does not exist yet, `-Command coverage` reports every inventoried element as undocumented and exits 0 (`DocsLedgerCommands.Tests.ps1`).
-- [ ] A page is reported stale when a pin bound to it records a digest that differs from the current snapshot element, or when the pinned element no longer exists; a revision change alone does not make a page stale (`DocsStaleness.Tests.ps1`).
+- [x] A page is reported stale when a pin bound to it records a digest that differs from the current snapshot element, or when the pinned element no longer exists; a revision change alone does not make a page stale (`DocsStaleness.Tests.ps1`).
 
 ### Maintainer recording a disposition through update-ledger
 
