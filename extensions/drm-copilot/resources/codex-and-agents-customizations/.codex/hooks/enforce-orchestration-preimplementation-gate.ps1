@@ -30,6 +30,7 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-m
 # Epic-scope command and path legs (issue #707, porting issue #663 decision D2), plus the
 # two per-mode read seams relocated from this file to keep it inside the 500-line cap.
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-cleanup.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-cleanup.ps1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
@@ -448,6 +449,7 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (Test-OrchestrationReady -Payload $checkpoint) {
         return Get-OrchestrationPreimplementationGateAllowDecision
     }
+    if (Test-OrchestrationCleanupContextAllowed -FilePath $filePath -Content (Get-StringProperty -Value $toolInput -Name 'content') -Command $command -AllowPatchManifest) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
     return Get-OrchestrationPreimplementationGateBlockDecision -Reason 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
 }
 
@@ -477,7 +479,7 @@ try {
     # path enters the same untouched Test-ImplementationPath decision flow. Any
     # other well-formed tool name maps to no records, so the hook allows.
     foreach ($toolInput in @(ConvertTo-CodexFileEditInput -Payload $payload)) {
-        $mappedRaw = @{ file_path = [string]$toolInput.file_path } | ConvertTo-Json -Compress
+        $mappedRaw = @{ file_path = [string]$toolInput.file_path; content = $(if ($toolName -ceq 'Write') { [string]$toolInput.content } else { '' }) } | ConvertTo-Json -Compress
         $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $mappedRaw
         if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
             $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
