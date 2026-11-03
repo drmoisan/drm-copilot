@@ -181,3 +181,81 @@ merge_assert_merge_entry() {
     [[ "$output" != *"REFUSED-WOULD-REGRESS"* ]]
     merge_assert_merge_entry merge-repro
 }
+
+# --- base-available scenarios: merge outcomes ---------------------------------------
+
+@test "a clean merge plans the merged blob in merge mode" {
+    run merge_drive_plan merge-clean
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"cleanup-worktrees: merged notes/n.md"* ]]
+    # The decision's git calls, in the shapes the library documents; none forces.
+    [[ "$output" == *"hash-object -w --path=notes/n.md -- notes/n.md"* ]]
+    [[ "$output" == *"merge-file --union --object-id main0001 base0001 wt000001"* ]]
+    [[ "$output" == *"cat-file blob merged01"* ]]
+    [[ "$output" != *" --force"* ]]
+    merge_assert_merge_entry merge-clean
+}
+
+@test "both sides appending at end of file is merged with OK" {
+    merge_assert_merge_entry merge-eof-union
+    run merge_commit_to_null
+    [ "$status" -eq 0 ]
+    # The writing phase reads the merged blob and never copies the source file.
+    [[ "$output" == *"cat-file blob merged01"* ]]
+    [[ "$output" == *"ACTION|preserve-stage|notes/n.md|OK"* ]]
+}
+
+@test "an addition already on main merges to main content" {
+    merge_assert_merge_entry merge-already-on-main
+    # The stubbed merged blob is byte-identical to main's version.
+    cmp "${PRES}/merge-already-on-main/cat-file.merged01.out" \
+        "${PRES}/merge-already-on-main/consolidation/notes/n.md"
+    run merge_commit_to_null
+    [[ "$output" == *"ACTION|preserve-stage|notes/n.md|OK"* ]]
+}
+
+# --- base-available scenarios: refusals ---------------------------------------------
+
+@test "a worktree that deleted a base line is refused by G1" {
+    merge_assert_refused merge-g1 G1
+    # G1 runs before any object is written or merged.
+    [[ "$output" != *"merge-file"* ]]
+    [[ "$output" != *"hash-object"* ]]
+}
+
+@test "a merge-file error is refused and names the git exit code" {
+    merge_assert_refused merge-error "merge-file rc=129"
+}
+
+@test "a merged result missing a main line is refused by G2" {
+    merge_assert_refused merge-g2 G2
+}
+
+@test "a resurrected base line is refused by G3" {
+    merge_assert_refused merge-g3 G3
+}
+
+# --- absent targets and the help text -----------------------------------------------
+
+@test "an absent target is copied with no decision git call" {
+    local scen
+    for scen in modified untracked; do
+        run merge_drive_plan "$scen" /dev
+        [ "$status" -eq 0 ]
+        [[ "$output" != *"merge-file"* ]]
+        [[ "$output" != *"hash-object"* ]]
+        [[ "$output" != *"merge-base"* ]]
+        [[ "$output" != *"rev-parse"* ]]
+        merge_drive_plan "$scen" /dev >/dev/null 2>&1
+        [ "${#PRESERVE_PLAN_STREAM[@]}" -eq 1 ]
+        preserve_split_tsv "${PRESERVE_PLAN_STREAM[0]}"
+        [ "${PRESERVE_FIELDS[8]-}" = "copy" ]
+        [ -z "${PRESERVE_FIELDS[9]-}" ]
+    done
+}
+
+@test "--help documents REFUSED-WOULD-REGRESS" {
+    run bash "${WRAP}" --help
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"REFUSED-WOULD-REGRESS"* ]]
+}

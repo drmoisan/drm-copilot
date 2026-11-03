@@ -16,6 +16,7 @@ setup() {
     ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
     ALIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh"
+    MLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_merge_lib.sh"
     EOLLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh"
     PLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
     WRAP="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
@@ -29,13 +30,14 @@ setup() {
     # directory has to be the repository root for the tests to be independent of where
     # bats was invoked from.
     cd "${REPO_ROOT}" || return 1
-    # The five libraries are sourced here so the tests can call the production functions
+    # The six libraries are sourced here so the tests can call the production functions
     # directly instead of rebuilding a source chain in every test body. The source-guard
     # test deliberately does not rely on this: it sources the chain again in a fresh
     # subshell, which is the only place the no-work-at-source-time property is observable.
     source "${ELIB}"
     source "${LIB}"
     source "${ALIB}"
+    source "${MLIB}"
     source "${EOLLIB}"
     source "${PLIB}"
     return 0
@@ -69,7 +71,7 @@ setup() {
         CLEANUP_WT_STUB_SCENARIO="${PRES}/eol-stale" \
         CLEANUP_WT_MANIFEST_PATH="${PRES}/eol-stale/manifest.json" \
         CLEANUP_WT_CONSOLIDATION_PATH="${PRES}/eol-stale/consolidation" \
-        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${EOLLIB}' && source '${PLIB}' && preserve_plan"
+        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${MLIB}' && source '${EOLLIB}' && source '${PLIB}' && preserve_plan"
     [ "$status" -eq 0 ]
     [[ "$output" == *"ACTION|preserve-eol|"*"ADVISORY-MISMATCH"* ]]
     [[ "$output" == *"agent-memory/atomic-executor/MEMORY.md"* ]]
