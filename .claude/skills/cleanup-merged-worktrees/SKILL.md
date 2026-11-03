@@ -162,7 +162,9 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 2. **Editorial triage of the cherry-pick candidates.** Review each
    `COMMIT|...|UNIQUE|...` record — this is the LLM-judgment boundary. Confirm
    editorially that the unique commits are genuinely documentation/agent-memory
-   content (for example paths under `docs/**`, `.claude/agent-memory/**`, or `**/*.md`).
+   content: paths under the repository-relative prefixes `docs/` and `.claude/agent-memory/`,
+   compared case-sensitively. A Markdown file outside those two prefixes (for example
+   `CLAUDE.md` or `.claude/rules/*.md`) is not consolidation content.
    The script only reports the deterministic facts (SHA, paths, author, date); deciding
    what counts as documentation is this skill's responsibility.
 
@@ -174,21 +176,39 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    reuse it silently. Conflicts are aborted and surfaced as `CONFLICT` for editorial
    resolution, never auto-resolved.
 
+   **Cleanup context.** A cleanup run writes no orchestration checkpoint, so the enforcement
+   hooks recognize its operations by the cleanup context instead: the sanctioned-removal
+   manifest at the session root (`artifacts/orchestration/cleanup-worktrees-manifest.json` in
+   the main checkout where this skill runs, written whole with Write; see Sanctioned Removal
+   Manifest) and the consolidation worktree, identified by its branch
+   `documentationandmemories`. Any staging in that worktree beyond what the script performs
+   uses `git -C <consolidation root> add -- <path>` with paths under `docs/` or
+   `.claude/agent-memory/` only, and the commit uses
+   `git -C <consolidation root> commit -F <message file>` with no pathspec. The preimplementation
+   gate admits that commit only when every staged path is under those two prefixes.
+
 4. **Push and hand off PR creation to `Agent(pr-author)`.** Push the consolidation
-   branch (`git push`). Refresh the PR-context bundle with
-   `mcp__drm-copilot__collect_pr_context` using base branch `main` (producing
-   `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt`).
-   Validate the orchestrator-state checkpoint
-   (`artifacts/orchestration/orchestrator-state.json`) with `--require-pr-creation-ready`
-   and record the `pr_author_preflight` result; delegation is prohibited when that
-   validation fails. Then delegate PR creation to `Agent(pr-author)` per
-   `.claude/skills/pr-author/SKILL.md`, which owns the body-file and receipt contract;
-   defer to that skill for it rather than restating any value from it here. For `<N>`,
+   branch (`git -C <consolidation root> push -u origin documentationandmemories`). Refresh the
+   PR-context bundle with `mcp__drm-copilot__collect_pr_context` using base branch `main` and
+   `workspace_root` set to the consolidation worktree, so that
+   `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` exist beneath the
+   consolidation worktree. A consolidation pull request has no orchestrator-state checkpoint and
+   is not validated against one; the hooks perform the cleanup readiness check instead.
+   `enforce-model-routing-receipt.ps1` admits the `Agent(pr-author)` delegation, and
+   `enforce-pr-author-skill.ps1` admits `gh pr create`, only while a fresh, valid manifest exists
+   at the session root; the PR-author gate also requires an explicit
+   `--head documentationandmemories --base main` and a branch diff limited to `docs/` and
+   `.claude/agent-memory/`, and its receipt checks still apply. Then delegate PR creation to
+   `Agent(pr-author)` per `.claude/skills/pr-author/SKILL.md`, which owns the body-file and
+   receipt contract; defer to that skill for it rather than restating any value from it here.
+   The delegation is non-isolated and passes the absolute body path beneath the consolidation
+   worktree, as that skill's coordinator-session topology requires. For `<N>`,
    use the GitHub issue number the run executes under when the run has one. When the run
    has none, `<N>` is an arbitrary run-scoped identifier chosen by the pr-author agent.
-   The delegation prompt MUST carry a `branch: <name>` label naming the consolidation branch,
-   and the canonical issue number line when the run has an issue number.
-   `enforce-model-routing-receipt.ps1` identifies the item from those two lines and denies a
+   The delegation prompt MUST carry exactly one `branch: documentationandmemories` label, on
+   its own line, and no `--head` or `--branch` text, plus the canonical issue number line when
+   the run has an issue number.
+   `enforce-model-routing-receipt.ps1` identifies the item from those lines and denies a
    gated delegation it cannot identify. A cleanup run with no issue number is therefore
    identified by the branch label alone, which is why the label is required and the issue line
    is not.
@@ -396,6 +416,15 @@ specific files or commit SHAs, before step 9 acts on any finding.
 `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` read that document and admit a
 `git worktree remove <path>` command only when a record in it covers that exact path. A removal
 issued with no covering record is denied with each gate's existing, unchanged reason code.
+
+The manifest lives at the session root: the main checkout where this skill runs. Both removal
+gates, the PR-author gate, and the model-routing gate read the relative path
+`artifacts/orchestration/cleanup-worktrees-manifest.json` against the hook process location,
+which is the session root, so a manifest written in any other worktree is never read. Write the
+whole document with Write; the preimplementation gate admits that Write without a checkpoint
+only at the session-root spelling and only when the content carries the expected `tool` and
+`schema_version`. An Edit of the manifest is not supported without a checkpoint, and neither is a
+Codex `apply_patch` Update, Delete, or Move of it; rewrite the document with Write instead.
 
 The document is UTF-8 JSON with `snake_case` keys. It carries six top-level fields. Its `removals`
 and `preserved_files` entries are sibling arrays and are never nested: removal records are keyed by
