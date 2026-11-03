@@ -200,10 +200,14 @@ Describe 'enforce-pr-author-skill.ps1 cleanup exemption (issue #1026)' {
 
             # Act
             $reason = Get-CleanupPrReason -Command $script:Create
+            Mock Get-PrAuthorCleanupPublishedHead { throw 'simulated published-head failure (issue #1026)' }
+            $thrown = Get-CleanupPrReason -Command $script:Create
 
             # Assert
-            Assert-CleanupPrSubCode -Reason $reason -SubCode 'CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH'
-            $reason | Should -Match ([regex]::Escape('refs/remotes/origin/documentationandmemories does not resolve to a commit'))
+            foreach ($result in @($reason, $thrown)) {
+                Assert-CleanupPrSubCode -Reason $result -SubCode 'CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH'
+                $result | Should -Match ([regex]::Escape('refs/remotes/origin/documentationandmemories does not resolve to a commit'))
+            }
         }
 
         It 'denies a consolidation create when origin/documentationandmemories differs from HEAD with CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH' {
