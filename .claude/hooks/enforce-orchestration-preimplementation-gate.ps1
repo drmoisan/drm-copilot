@@ -24,6 +24,7 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-m
 # seams, the mode deny reason, and the target resolution with its import guard (issue
 # #690), all relocated to this sibling to keep the gate inside the 500-line cap.
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-cleanup.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-cleanup.ps1' -ErrorRecord $_ }
 
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
@@ -411,6 +412,7 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (Test-OrchestrationReady -Payload $checkpoint) {
         return Get-OrchestrationPreimplementationGateAllowDecision
     }
+    if (Test-OrchestrationCleanupContextAllowed -FilePath $filePath -Content (Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'content') -Command $command) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
     return Get-OrchestrationPreimplementationGateBlockDecision -Reason 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
 }
 
