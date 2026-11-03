@@ -307,7 +307,7 @@ Describe 'Test-DocsArtifactText' {
 
     It 'maps each Test-Json ErrorRecord to DOCS_SCHEMA_INVALID when the walk finds nothing' {
         # Arrange
-        Mock -CommandName Test-Json -ModuleName DocsSchema -MockWith { Write-Error -Message "The value does not match at '/name'"; $false }
+        Mock -CommandName Test-Json -ModuleName DocsSchema -MockWith { Write-Error -Message "The value does not match at '/name'" -ErrorAction SilentlyContinue; $false }
 
         # Act
         $result = Test-DocsArtifactText -ArtifactKind 'pattern' -JsonText '{"name":"b"}' -ComposedSchemaSet $script:PatternComposed

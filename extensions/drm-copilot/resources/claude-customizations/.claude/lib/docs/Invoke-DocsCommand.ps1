@@ -228,9 +228,12 @@ function Write-DocsFileText {
     .SYNOPSIS
         The only filesystem write primitive: writes UTF-8 without BOM with LF line endings.
     .DESCRIPTION
-        Mode 'create' refuses an existing file; 'overwrite' replaces it. No test executes this body.
+        Mode 'create' refuses an existing file; 'overwrite' replaces it. The function supports
+        ShouldProcess: under -WhatIf (or an inherited WhatIfPreference) it creates neither the
+        directory nor the file. The tests exercise only the -WhatIf path; the guarded write body
+        is not executed by a test because tests create no files.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory = $true)] [string] $FullPath,
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Text,
@@ -239,9 +242,11 @@ function Write-DocsFileText {
 
     $fileMode = if ($Mode -ceq 'create') { [System.IO.FileMode]::CreateNew } else { [System.IO.FileMode]::Create }
     $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes($Text.Replace("`r`n", "`n"))
-    [void][System.IO.Directory]::CreateDirectory([System.IO.Path]::GetDirectoryName($FullPath))
-    $stream = [System.IO.FileStream]::new($FullPath, $fileMode, [System.IO.FileAccess]::Write)
-    try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
+    if ($PSCmdlet.ShouldProcess($FullPath, "Write file ($Mode)")) {
+        [void][System.IO.Directory]::CreateDirectory([System.IO.Path]::GetDirectoryName($FullPath))
+        $stream = [System.IO.FileStream]::new($FullPath, $fileMode, [System.IO.FileAccess]::Write)
+        try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
+    }
 }
 
 function Get-DocsContextFullPath {
@@ -318,8 +323,7 @@ function Write-DocsContextText {
     .SYNOPSIS
         WriteText operation: checks the path and forwards to Write-DocsFileText (private helper).
     #>
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Forwards to Write-DocsFileText, the single write primitive; init asks for -Write explicitly.')]
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param([string] $Root, [AllowNull()] [AllowEmptyString()] [string] $RelativePath, [AllowEmptyString()] [string] $Text, [string] $Mode)
 
     Write-DocsFileText -FullPath (Get-DocsContextFullPath -Root $Root -RelativePath $RelativePath) -Text $Text -Mode $Mode

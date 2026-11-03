@@ -12,7 +12,9 @@
     real command context read-only against committed files with Write-DocsFileText mocked, the
     guarded top-level body run in process through the call operator with in-memory console
     writers, the InvokeProcess member with Invoke-DocsProcess mocked, and the two pure process
-    functions with plain values. No test writes a file or starts a child.
+    functions with plain values. The -WhatIf tests run the real Write-DocsFileText and the real
+    WriteText member under -WhatIf and assert that nothing is created. No test writes a file or
+    starts a child.
 #>
 
 BeforeAll {
@@ -292,6 +294,39 @@ Describe 'New-DocsCommandContext (read-only against committed files)' {
         # Act and Assert
         { & $script:RealContext.WriteText '/abs/new.md' 'body' 'create' } | Should -Throw -ExpectedMessage '*DOCS_CONTEXT_PATH_INVALID*'
         Should -Invoke -CommandName Write-DocsFileText -Times 0 -Exactly
+    }
+}
+
+Describe 'Write-DocsFileText and the WriteText member under -WhatIf' {
+    BeforeAll {
+        $script:WhatIfContext = New-DocsCommandContext -RepositoryRoot $script:RepositoryRootPath
+        $script:WhatIfRelativeDirectory = 'artifacts/docs-whatif-never-created'
+    }
+
+    It 'creates neither the file nor its directory when Write-DocsFileText runs with -WhatIf' {
+        # Arrange
+        $directory = Join-Path -Path $script:RepositoryRootPath -ChildPath "$script:WhatIfRelativeDirectory/direct"
+        $path = Join-Path -Path $directory -ChildPath 'never.md'
+
+        # Act
+        Write-DocsFileText -FullPath $path -Text 'body' -Mode 'create' -WhatIf
+
+        # Assert
+        [System.IO.File]::Exists($path) | Should -BeFalse -Because 'the ShouldProcess gate returns before the stream write'
+        [System.IO.Directory]::Exists($directory) | Should -BeFalse -Because 'the ShouldProcess gate returns before the directory creation'
+        [System.IO.Directory]::Exists((Join-Path -Path $script:RepositoryRootPath -ChildPath $script:WhatIfRelativeDirectory)) | Should -BeFalse
+    }
+
+    It 'writes nothing and throws nothing when the real WriteText member runs under a true WhatIfPreference' {
+        # Arrange
+        $relative = "$script:WhatIfRelativeDirectory/member/never.md"
+        $target = Join-Path -Path $script:RepositoryRootPath -ChildPath $relative
+        $writeText = $script:WhatIfContext.WriteText
+
+        # Act and Assert
+        { $WhatIfPreference = $true; & $writeText $relative 'body' 'create' } | Should -Not -Throw
+        [System.IO.File]::Exists($target) | Should -BeFalse -Because 'the inherited WhatIfPreference reaches the ShouldProcess gate of Write-DocsFileText'
+        [System.IO.Directory]::Exists((Split-Path -Path $target -Parent)) | Should -BeFalse
     }
 }
 
