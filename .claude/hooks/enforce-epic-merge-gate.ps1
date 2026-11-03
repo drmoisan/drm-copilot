@@ -12,6 +12,8 @@
       1. Child-feature path: artifacts/orchestration/orchestrator-state.json exists,
          epic_mode == true, and step9_status == "passed" (the per-feature orchestrator has
          already run S9 step 6's CI-green gate before attempting its own merge-on-green).
+         Only the JSON boolean true counts as epic mode; a string or number such as "false"
+         does not (issue #1001).
       2. Epic-integration path: artifacts/orchestration/epic-orchestrator-state.json exists,
          epic_merge_pr.ci_gate.conclusion == "success", and, when the command names an
          explicit PR number, that number matches epic_merge_pr.pr_number.
@@ -155,6 +157,10 @@ function Test-ChildCheckpointAllowsEpicMerge {
     <#
     .SYNOPSIS
         Decision logic for the child-feature checkpoint path (branch 1).
+    .DESCRIPTION
+        Only the JSON boolean true counts as epic mode: epic_mode must be a System.Boolean
+        $true after ConvertFrom-Json. A string or number such as "false", "true", or 1 is not
+        epic mode, so branch 1 declines and later branches decide (issue #1001).
     .PARAMETER Checkpoint
         Parsed child orchestrator checkpoint, or $null when absent/unreadable.
     .OUTPUTS
@@ -171,7 +177,7 @@ function Test-ChildCheckpointAllowsEpicMerge {
         return $false
     }
     $props = @($Checkpoint.PSObject.Properties.Name)
-    if ($props -notcontains 'epic_mode' -or -not [bool]$Checkpoint.epic_mode) {
+    if ($props -notcontains 'epic_mode' -or -not (($Checkpoint.epic_mode -is [bool]) -and $Checkpoint.epic_mode)) {
         return $false
     }
     if ($props -notcontains 'step9_status') {

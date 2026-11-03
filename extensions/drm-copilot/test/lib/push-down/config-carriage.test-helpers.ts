@@ -76,9 +76,11 @@ export const SOURCE_ROUTING = `${JSON.stringify(
  * instructed to read the policy rules before doing any work, so a `.claude/**`
  * umbrella matches nearly every radius and only suppresses concurrency.
  *
- * `shared_surfaces` carries the six-entry destination-portable set, of which
- * three — `package-lock.json`, `poetry.lock`, and `quality-tiers.yml` — are
- * separator-free. That matters: a separator-free shared surface is the sole
+ * `shared_surfaces` carries the five-entry destination-portable set, of which
+ * two— `package-lock.json` and `poetry.lock` — are
+ * separator-free; `quality-tiers.yml` is an append-only path under
+ * `conflict_tolerance` instead (issue #1006). The separator-free entries
+ * matter: a separator-free shared surface is the sole
  * gate on whether the extractor accepts a separator-free token at all, so
  * without one no destination can detect two items rewriting the same root build
  * file. `mandate_reads` carries the ten-entry read-by-mandate exclusion set.
@@ -98,7 +100,6 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
       "config/orchestration-routing.json",
       "package-lock.json",
       "poetry.lock",
-      "quality-tiers.yml",
     ],
     shared_surface_globs: [],
     mandate_reads: [
@@ -124,13 +125,21 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
     ],
     conflict_tolerance: {
       tolerance_percent: 100,
-      weights: { same_file: 8, possible_overlap: 2, append_only: 1, module: 2 },
+      weights: {
+        same_file: 8,
+        possible_overlap: 2,
+        append_only: 1,
+        module: 2,
+        contract: 8,
+      },
       band_durations: { C1: 1, C2: 2, C3: 4, C4: 8 },
       default_band: "C1",
       append_only_paths: [
         "**/CHANGELOG.md",
         "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+        "quality-tiers.yml",
       ],
+      combination_threshold_percent: 400,
     },
     write_intent_extraction: true,
     path_roots: [],

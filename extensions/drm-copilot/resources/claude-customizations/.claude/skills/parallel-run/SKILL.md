@@ -27,6 +27,12 @@ $ARGUMENTS
    - STOP without delegating anything when that path does not exist. Report that the run has no
      committed kickoff artifact: the user must run `/parallel-plan` first (or, for a run whose
      manifest was authored manually, invoke `/parallel-orchestrate <manifest-path>` directly).
+   - On that STOP, emit the rejection signal defined in `## Mutation Rejection Signal (issue #1012)`
+     of `.claude/rules/parallel-orchestration.md`: put the line `parallel_slug: <parallel-slug>`
+     before the signal, and end the final output with the literal line
+     `PARALLEL_MUTATION_REJECTED: kickoff_artifact_missing` as its last line, with no formatting and
+     no trailing text. No run checkpoint exists for this run, so the stop hook releases the stop on
+     that line.
    - Do not synthesize a kickoff prompt, do not fall back to the planner's working copy under
      `artifacts/orchestration/`, and do not launch a partial run in place of the STOP.
 3. Execute the kickoff artifact's `## Invocation Prompt` section as the run objective, applying the

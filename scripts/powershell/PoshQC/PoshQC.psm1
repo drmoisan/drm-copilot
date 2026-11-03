@@ -121,6 +121,7 @@ foreach ($subModuleName in @(
         'PoshQC.Analyzer.psm1',
         'PoshQC.Shard.psm1',
         'PoshQC.CoverageMerge.psm1',
+        'PoshQC.Parallel.psm1',
         'PoshQC.Testing.psm1'
     )) {
     $subModulePath = Join-Path $script:ModuleRoot $subModuleName
@@ -155,6 +156,11 @@ Export-ModuleMember -Function @(
     'Get-PoshQCCoverageLineSummary',
     'New-PoshQCShardManifest',
     'Test-PoshQCShardCompleteness',
-    'Test-PoshQCShardTestCount'
+    'Test-PoshQCShardTestCount',
+    'Get-PoshQCParallelWorkerCount',
+    'Merge-PoshQCJunitReport',
+    'ConvertTo-PoshQCShardWeight',
+    'Export-PoshQCShardWeight',
+    'Invoke-PoshQCParallelTest'
 ) -Alias @('Install-PoshQCTools')
 

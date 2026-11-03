@@ -264,4 +264,28 @@ Describe 'enforce-model-routing-receipt.ps1 author-asserted autoclose line (issu
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:ReceiptMissingReason
     }
+
+    It 'AA-13 allows a combined item line naming two issues with the checkpoint number first (issue #1013)' {
+        # Arrange: a combined item's child names every member issue on one line.
+        Set-FeatureCheckpointSeam -Checkpoint (New-FeatureCheckpoint -IssueNum '989')
+        $payload = New-AgentPayload -Prompt ($script:PromptHead + "`nAuthor-asserted autoclose issues: #989 #990")
+
+        # Act
+        $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw $payload
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    }
+
+    It 'AA-14 allows a combined item line naming two issues with the checkpoint number second (issue #1013)' {
+        # Arrange: the checkpoint records the second member's number.
+        Set-FeatureCheckpointSeam -Checkpoint (New-FeatureCheckpoint -IssueNum '990')
+        $payload = New-AgentPayload -Prompt ($script:PromptHead + "`nAuthor-asserted autoclose issues: #989 #990")
+
+        # Act
+        $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw $payload
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    }
 }

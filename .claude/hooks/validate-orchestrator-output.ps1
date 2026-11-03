@@ -57,6 +57,7 @@ Set-StrictMode -Version Latest
 
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-resolution.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-routing.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-routing.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-rejection.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-rejection.ps1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateEpicWaveBarrier.psm1' -ErrorRecord $_ }
@@ -235,6 +236,10 @@ function Get-OrchestratorOutputBlockDecision {
         the condition (message content, its checkpoint, or its runbook) and $false when it cannot
         (a registration argument, an internal evaluation failure, or a state it may not clear).
         The caller applies the re-entry policy to that flag.
+        An unresolved parallel-orchestrator-state checkpoint (status NoTarget) is allowed when the
+        output ends with a valid PARALLEL_MUTATION_REJECTED: <code> line and no live worktree holds
+        contradicting parallel checkpoint text (Get-OrchestratorOutputRejectionDecision, issue #1012);
+        otherwise the unresolved block carries the hint from Get-ParallelMutationRejectionHint.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -264,9 +269,12 @@ function Get-OrchestratorOutputBlockDecision {
         return @{ Ok = $false; Repairable = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: NoTarget (RESOLVER_FAILED): {1}' -f $ArtifactType, $_.Exception.Message) }
     }
     if (-not $resolution.Resolved) {
+        # Issue #1012: a parallel stop that wrote no state and ends with a valid rejection signal is allowed.
+        $rejectionDecision = Get-OrchestratorOutputRejectionDecision -ArtifactType $ArtifactType -Resolution $resolution -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
+        if ($null -ne $rejectionDecision) { return $rejectionDecision }
         $resolutionRepairable = ($resolution.Status -in @('NoTarget', 'Ambiguous')) -and ($ArtifactType -in @('epic-orchestrator-state', 'parallel-orchestrator-state'))
         return @{ Ok = $false; Repairable = $resolutionRepairable; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
-                $ArtifactType, $resolution.Status, $resolution.ReasonCode, $resolution.Detail) }
+                $ArtifactType, $resolution.Status, $resolution.ReasonCode, $resolution.Detail) + (Get-ParallelMutationRejectionHint -ArtifactType $ArtifactType -Status ([string]$resolution.Status) -AgentOutput ([string]$agentOutput)) }
     }
 
     $file = Get-CheckpointFileContent -Path $resolution.CheckpointPath

@@ -348,6 +348,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1006: the shared-surface demotion directive of the overlay.
+    "./src/lib/push-down/claude-blast-radius-overlay-demote.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #697: the Codex/agents publisher gained the virtual resource-pair
     // map. This map carries no `global` key, so the file is gated only by its
     // own entry here.
@@ -528,6 +533,25 @@ module.exports = {
       branches: 75,
     },
     "./src/repo-automation-tool-names.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1003: the worktree-session launch module, both session command
+    // builders, and the extension entry point (baseline above both floors).
+    // Per-file entries only; the map has no `global` key.
+    "./src/worktree-session-launch.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/claude-worktree-session.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/codex-worktree-session.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/extension.ts": {
       lines: 85,
       branches: 75,
     },

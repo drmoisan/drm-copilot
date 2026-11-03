@@ -2,7 +2,10 @@ import { describe, expect, it } from "@jest/globals";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { composeBlastRadiusOverlay } from "../../../src/lib/push-down/claude-blast-radius-overlay";
+import {
+  BlastRadiusOverlayError,
+  composeBlastRadiusOverlay,
+} from "../../../src/lib/push-down/claude-blast-radius-overlay";
 
 /**
  * Cross-language overlay composition corpus (issue #508 AC16).
@@ -29,11 +32,15 @@ const CORPUS_DIR = path.join(
   "blast_radius_overlay",
 );
 
-/** One corpus case. */
+/**
+ * One corpus case: an expected composed text, or (issue #1006) the full
+ * expected error message of a composition that must fail.
+ */
 interface CorpusCase {
   readonly base_text: string;
   readonly overlay_text: string;
-  readonly expected_text: string;
+  readonly expected_text?: string;
+  readonly expected_error?: string;
 }
 
 /** Read every corpus file as a `[name, case]` pair in file-name order. */
@@ -58,12 +65,23 @@ describe("issue #508 AC16 overlay composition corpus", () => {
   });
 
   it.each(corpus)("composes %s to its expected text", (_name, testCase) => {
-    expect(
+    const compose = (): string =>
       composeBlastRadiusOverlay(
         testCase.base_text,
         testCase.overlay_text,
         "config/blast-radius.local.json",
-      ),
-    ).toBe(testCase.expected_text);
+      );
+    if (testCase.expected_error === undefined) {
+      expect(compose()).toBe(testCase.expected_text);
+      return;
+    }
+    let thrown: unknown = null;
+    try {
+      compose();
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(BlastRadiusOverlayError);
+    expect((thrown as Error).message).toBe(testCase.expected_error);
   });
 });

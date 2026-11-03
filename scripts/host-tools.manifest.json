@@ -2,27 +2,72 @@
   "installPackages": {
     "windows": {
       "winget": [
-        { "id": "Git.Git", "name": "git" },
-        { "id": "Python.Python.3.13", "name": "python" },
-        { "id": "OpenJS.NodeJS.LTS", "name": "node" },
-        { "id": "Microsoft.PowerShell", "name": "pwsh" },
-        { "id": "GitHub.cli", "name": "gh" },
-        { "id": "Microsoft.VisualStudioCode", "name": "code" }
+        {
+          "id": "Git.Git",
+          "name": "git"
+        },
+        {
+          "id": "Python.Python.3.13",
+          "name": "python"
+        },
+        {
+          "id": "OpenJS.NodeJS.LTS",
+          "name": "node"
+        },
+        {
+          "id": "Microsoft.PowerShell",
+          "name": "pwsh"
+        },
+        {
+          "id": "GitHub.cli",
+          "name": "gh"
+        },
+        {
+          "id": "Microsoft.VisualStudioCode",
+          "name": "code"
+        }
       ]
     }
   },
-  "powershellModules": [
-    { "name": "Pester", "minimumVersion": "5.9.0" },
-    { "name": "PSScriptAnalyzer", "minimumVersion": "1.22.0" }
-  ],
-  "projectRepositories": [],
   "minimumVersions": {
-    "python": "3.13.12",
+    "node": "24.14.0",
     "poetry": "2.3.2",
     "pwsh": "7.6.6",
-    "node": "24.14.0"
+    "python": "3.13.12"
   },
-  "requiredCommands": ["git", "gh", "npm", "npx", "code", "bashdb", "copilot"],
-  "optionalCommands": ["wsl", "gt", "dotnet", "shellcheck", "shfmt", "bats", "actionlint"],
-  "pythonTools": ["black", "ruff", "pyright", "pytest"]
+  "optionalCommands": [
+    "wsl",
+    "gt",
+    "dotnet",
+    "shellcheck",
+    "shfmt",
+    "bats",
+    "actionlint"
+  ],
+  "powershellModules": [
+    {
+      "minimumVersion": "5.9.0",
+      "name": "Pester"
+    },
+    {
+      "minimumVersion": "1.22.0",
+      "name": "PSScriptAnalyzer"
+    }
+  ],
+  "projectRepositories": [],
+  "pythonTools": [
+    "black",
+    "ruff",
+    "pyright",
+    "pytest"
+  ],
+  "requiredCommands": [
+    "git",
+    "gh",
+    "npm",
+    "npx",
+    "code",
+    "bashdb",
+    "copilot"
+  ]
 }

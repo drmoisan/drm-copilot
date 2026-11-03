@@ -12,6 +12,8 @@ edge between two items of one cohort is a cohort-barrier violation.
 
 from __future__ import annotations
 
+from typing import cast
+
 from tests.scripts.dev_tools import (
     test_validate_parallel_orchestrator_state_structures as orchestrator_structures,
 )
@@ -77,6 +79,55 @@ def test_planner_state_accepts_tolerated_overlaps_list() -> None:
     """A planner checkpoint carrying tolerated_overlaps yields no errors."""
     state = build_valid_planner_state()
     state["tolerated_overlaps"] = [dict(TOLERATED_OVERLAP)]
+
+    assert validate_planner(state) == []
+    assert validate_planner(state, ready=True) == []
+
+
+# The observed_resolution telemetry object (issue #1013, spec D-3).
+OBSERVED_RESOLUTION: dict[str, object] = {
+    "later_item": 445,
+    "conflicted": True,
+    "conflict_detected_at": "2026-10-30T12-00",
+    "resolved_at": "2026-10-30T12-40",
+    "resolution_minutes": 40,
+    "recorded_at": "2026-10-30T12-41",
+}
+
+# A combination record in the planner's combinations list (issue #1013, D-5).
+COMBINATION: dict[str, object] = {
+    "members": [444, 990],
+    "primary": 444,
+    "pairs": [{"a": 444, "b": 990, "cost": 16, "benefit": 2}],
+    "estimated_savings": 16,
+}
+
+
+def test_orchestrator_state_accepts_observed_resolution() -> None:
+    """A tolerated overlap carrying observed_resolution yields no errors."""
+    state = build_valid_parallel_state()
+    state["tolerated_overlaps"] = [
+        dict(TOLERATED_OVERLAP, observed_resolution=dict(OBSERVED_RESOLUTION))
+    ]
+
+    assert validate_orchestrator(state) == []
+
+
+def test_orchestrator_state_accepts_combined_issue_nums() -> None:
+    """An orchestrator item carrying combined_issue_nums yields no errors."""
+    state = build_valid_parallel_state()
+    items = cast("list[dict[str, object]]", state["items"])
+    items[0]["combined_issue_nums"] = [990]
+
+    assert validate_orchestrator(state) == []
+
+
+def test_planner_state_accepts_combined_item_and_combinations_list() -> None:
+    """A planner combined item and a combinations list yield no errors."""
+    state = build_valid_planner_state()
+    items = cast("list[dict[str, object]]", state["items"])
+    items[0]["combined_issue_nums"] = [990]
+    state["combinations"] = [dict(COMBINATION)]
 
     assert validate_planner(state) == []
     assert validate_planner(state, ready=True) == []

@@ -12,18 +12,13 @@ from __future__ import annotations
 import json
 import posixpath
 import re
-import sys
+import tomllib
 from collections.abc import Callable, Iterable
 from pathlib import Path
 
 from scripts.dev_tools.push_down_codex_and_agents_customizations import (
     VIRTUAL_RESOURCE_PAIRS,
 )
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BUNDLE_ROOT = (

@@ -15,6 +15,8 @@ POSHQC_PARITY_PATHS = (
     "scripts/powershell/PoshQC/PoshQC.Coverage.psm1",
     "scripts/powershell/PoshQC/PoshQC.Shard.psm1",
     "scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1",
+    "scripts/powershell/PoshQC/PoshQC.Parallel.psm1",
+    "scripts/powershell/PoshQC/README.md",
     "scripts/powershell/PoshQC/PoshQC.psd1",
     "scripts/powershell/PoshQC/settings/pester.runsettings.psd1",
     "scripts/powershell/PoshQC/settings/pssa.settings.psd1",

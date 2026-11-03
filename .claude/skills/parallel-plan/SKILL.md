@@ -172,9 +172,32 @@ explicitly not an integration branch: no item branch ever merges into it, it nev
 item branch, and it holds only `docs/features/parallel/<slug>/**`, a subtree no item's blast radius
 may include. Each item opens its own pull request against `main`.
 
-**Read access.** Readers — validators and the future `parallel-orchestrator` — reach both artifact
-classes by ref: `git fetch origin <branch>` followed by `git show <ref>:<path>`, without checking
-the ref out, per the technique documented in `.claude/skills/epic-run/SKILL.md`.
+**Plan-home checkout.** After the last preparation child has terminated (the re-plan delegations
+for a V1 or V2 failure count as preparation children) and before `## Manifest Authoring`, the
+planner prepares the plan-home branch in its own session checkout: it runs `git fetch origin main`
+and then `git checkout -b parallel/<slug>-plan origin/main`. When the branch already exists, as on
+a resumed run, it runs `git checkout parallel/<slug>-plan` instead of recreating it. If the
+checkout is refused, stop planning and report the refusal; do not stash, force, or reset. The run
+folder is written in place, committed through the pathspec-bearing forms of
+`### Integration Commit Form (issue #539)`, and pushed with
+`git push -u origin parallel/<slug>-plan`. The checkout stays on `parallel/<slug>-plan` for the
+remainder of the run.
+
+**Read access.** Readers — validators, the planner itself, and the future `parallel-orchestrator` —
+reach both artifact classes by ref: `git fetch origin <branch>` followed by `git show <ref>:<path>`,
+without checking the ref out, per the technique documented in `.claude/skills/epic-run/SKILL.md`.
+The planner reads each item's approved plan text and `spec.md` text for `### Planner procedure`, and
+performs the git-integrity check, with `git fetch origin <branch>` followed by
+`git show origin/<branch>:<path>` or `git cat-file -e`; it never checks an item branch out.
+
+**No planner worktrees.** The planner runs no `git worktree add` for any step of planning: it
+authors `parallel/<slug>-plan` in its own session checkout and reads item text by ref. The only
+worktrees created during planning are the preparation children's `isolation: "worktree"` worktrees,
+and the Claude Code runtime creates and removes them: it removes one immediately when the child
+leaves no changes, and otherwise through its periodic sweep once the commits are pushed and the
+tree is clean. A worktree the planner creates itself is outside every record the removal gates read
+and outside the runtime sweep, so it stays registered after the run closes and only the
+repository-wide cleanup apply mode can remove it.
 
 Three residual risks are recorded rather than eliminated:
 
@@ -258,9 +281,11 @@ any work: the policy rules, the tier map, and the process artifacts. A citation 
 paths is evidence that the author obeyed the reading order, not evidence that the change will write
 the file, so `derive_blast_radius` drops it from the harvest and `validate_blast_radius` drops it
 from its plan-side extraction, which keeps V1 and V2 self-consistent. The extractor likewise rejects
-three token shapes that were never write claims: a wildcard-free token naming a directory rather
-than a file, a `docs/features/` glob whose wildcard spans every feature folder, and a contract token
-carrying no ASCII letter. These exclusions are part of the landed contract, so the prohibition now
+five token shapes that were never write claims: a wildcard-free token naming a directory rather
+than a file, a `docs/features/` glob whose wildcard occupies or truncates the feature-folder
+segment, a contract token carrying no ASCII letter, a token containing a placeholder or
+interpolation marker, and a contract token that is a default spreadsheet sheet name. These
+exclusions are part of the landed contract, so the prohibition now
 reads: do not narrow a radius beyond the configured exclusions in order to suppress a conflict edge.
 
 **Appending an excluded path is the planner's obligation, not an exception.** An exclusion describes
@@ -330,6 +355,41 @@ The kickoff artifact's `## Item Summary` `complexity` cell for the item equals i
 **Routing input, not a verdict.** The band is a routing input for model selection and edge
 derivation. It is distinct from the deliberately absent worthiness verdict: assessing a band never
 admits, rejects, or reorders an item.
+
+## Issue Combination
+
+Combination (issue #1013) runs once, at planning time, after every item is prepared, its radius is
+declared, and its band is assigned, and before cohort seeding. The rules are stated in
+`### Integration-cost scheduling (issue #722)` of `.claude/rules/parallel-orchestration.md`; this
+section states the planner's steps.
+
+1. **Find combinations.** Call Get-BlastRadiusCombination from the facade `BlastRadius.psm1` with
+   `-Item` (each item's key, declared radius, and band), `-Config` (the parsed truth table), and
+   `-Relation ${function:Test-BlastRadiusConflict}`. Combination proceeds without operator
+   approval. It returns nothing when `conflict_tolerance` is absent or tolerance_percent is 0.
+2. **P6 skip.** If applying every combination would leave fewer than two items (ready-gate
+   invariant P6), apply none, and report each qualifying pair as not combined with the reason
+   "applying the combinations would leave fewer than two items".
+3. **Re-plan on the primary branch.** For each combination, issue one follow-up preparation-mode
+   delegation on the primary item's pushed branch, the same re-plan posture as a V1 or V2 failure.
+   The delegation carries the unchanged preparation kickoff line, followed by the line
+   `Combined issues: #A #B` naming each other member by issue number and by branch name only.
+4. **Child work.** The child imports each other member's committed feature folder by path from that
+   member's pushed branch ref (a path checkout, not a branch merge, so there is still no fan-in
+   merge), authors one atomic plan in the primary feature folder covering every member's spec,
+   re-runs preflight, commits, and pushes.
+5. **Fresh assessment.** Re-derive the combined item's declared radius from the combined plan, read
+   by ref as `**Read access.**` describes, and run a fresh `## Complexity Assessment` for it.
+6. **Record.** Remove the non-primary members from `items[]`, record `combined_issue_nums` (the other
+   members' issue numbers) on the primary item, and add the combination (members, primary, pairs
+   with cost and benefit, `estimated_savings`) to the checkpoint's `combinations` list.
+7. **Capped scheduling.** Only then run the scheduling entry point over the post-combination item
+   set; its aggregate cap applies to every remaining item.
+
+Each combination re-plan delegation is a preparation child, so the `**Plan-home checkout.**` of
+`## Artifact Home` follows its termination. The planner reads the combined plan by ref and never
+checks an item branch out. The non-primary members' preparation branches stay in place and are
+reported, the same residual as risk 2 in `## Artifact Home`.
 
 ## Cohort Seeding
 
@@ -673,6 +733,9 @@ The final report to the operator must include:
   gate the report, does not change the cohort table, and no finding is escalated to Blocking.
 - Both kickoff artifact paths: `artifacts/orchestration/parallel-kickoff-<slug>.md` and
   `docs/features/parallel/<slug>/parallel-kickoff.md`.
+- The combination listing (issue #1013): each combination with its members, primary, qualifying
+  pairs with cost and benefit, the `combination_threshold_percent` applied, and
+  `estimated_savings`; and each qualifying pair that was not combined, with the reason.
 
 End with the statement that execution has NOT started and begins only when the operator runs
 `/parallel-run <slug>` or replays the kickoff prompt from the main session.

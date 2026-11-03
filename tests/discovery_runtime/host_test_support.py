@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from hashlib import sha256
 from typing import TYPE_CHECKING, Literal
 
@@ -209,6 +209,6 @@ def invoke_host(
         bounded_object(request, limits=ParseLimits()),
         io=host,
         repository_reader=host.service.repository,
-        clock=lambda: datetime(2026, 10, 20, tzinfo=timezone.utc),
+        clock=lambda: datetime(2026, 10, 20, tzinfo=UTC),
         analyzer_registry=InstalledInventoryRegistry(),
     )

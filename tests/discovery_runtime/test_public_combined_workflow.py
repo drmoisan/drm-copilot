@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import io
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 import pytest
@@ -177,7 +177,7 @@ def test_tampered_transport_is_refused_before_publication(
         stderr=stderr,
         create_io=lambda: target,
         repository_reader=target.repository,
-        clock=lambda: datetime(2026, 10, 20, tzinfo=timezone.utc),
+        clock=lambda: datetime(2026, 10, 20, tzinfo=UTC),
         analyzer_registry=InstalledInventoryRegistry(),
         limits=None,
         execute_request=execute,
