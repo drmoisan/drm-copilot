@@ -86,36 +86,36 @@
 
 ### Phase 3 — CLI Entry Script and Integration Fixtures
 
-- [ ] [P3-T1] Create `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`.
+- [x] [P3-T1] Create `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`.
   - It has no `Mandatory` parameter, the three seams, the JSON conversion helpers, the outcome record, subcommand dispatch, and the guarded entry-point body.
   - Usage errors exit 2: an unknown or missing subcommand, a missing required option, a `-Band` outside C1 to C4, and an unrecognized `-` argument.
   - Add Describes `Parameter surface` and `Usage errors` to `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Tests.ps1`. The suite dot-sources the script and mocks the seams.
   - Acceptance: both Describes pass with zero failures.
-- [ ] [P3-T2] In `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, implement `guard-run -CheckpointPath -ManifestMode` over `Test-ParallelAdmissionRunOpen`. An open run exits 0 with a JSON object; a closed or unknowable run exits 1 with stderr starting `PARALLEL_ADMISSION_REJECTED: run_closed:`. Add Describe `guard-run` with the guard matrix and an unreadable-checkpoint case (seam throws), which also exits 1.
+- [x] [P3-T2] In `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, implement `guard-run -CheckpointPath -ManifestMode` over `Test-ParallelAdmissionRunOpen`. An open run exits 0 with a JSON object; a closed or unknowable run exits 1 with stderr starting `PARALLEL_ADMISSION_REJECTED: run_closed:`. Add Describe `guard-run` with the guard matrix and an unreadable-checkpoint case (seam throws), which also exits 1.
   - Acceptance: that Describe passes with zero failures, and no case's output contains `PARALLEL_MUTATION_REJECTED`.
-- [ ] [P3-T3] Implement `assess -Branch -FeatureFolder -Receipt -Band -PlannerCheckpointPath -Main` (default `origin/main`).
+- [x] [P3-T3] Implement `assess -Branch -FeatureFolder -Receipt -Band -PlannerCheckpointPath -Main` (default `origin/main`).
   - All git reads are by ref through `Invoke-ParallelAdmissionGit`: fetch, `ls-tree -r --name-only`, `show`, `log -1 --format=%ct`, `merge-base`, `merge-base --is-ancestor`, `diff --name-only --no-renames`, `cat-file -e`, and `rev-parse <branch>:<plan_path>`.
   - It prints the `spec.md` `## API / CLI Surface` keys, with `plan_hash` equal to the mocked `rev-parse` output and `base_commit` taken from the receipt or else the merge base.
   - Add Describe `assess` covering: the JSON key set; hash recording; receipt-sourced base; merge-base fallback; each `next_action`; and a band source from the planner checkpoint (read seam).
   - Acceptance: that Describe passes with zero failures.
-- [ ] [P3-T4] In `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, implement `order-cohorts`, `test-cohorts -CheckpointPath`, and `record -RunFolder -Entry`.
+- [x] [P3-T4] In `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, implement `order-cohorts`, `test-cohorts -CheckpointPath`, and `record -RunFolder -Entry`.
   - The rejections exit 1 with stderr starting `PARALLEL_ADMISSION_REJECTED: precedence_cycle:`, `PARALLEL_ADMISSION_REJECTED: precedence_unknown_item:`, or `PARALLEL_ADMISSION_REJECTED: precedence_violated:`.
   - `record` prints content only, and the Pester case asserts that `Invoke-ParallelAdmissionGit` is invoked zero times.
   - Add one Describe per subcommand.
   - Acceptance: those Describes pass with zero failures.
-- [ ] [P3-T5] Create committed LF fixtures under `tests/fixtures/parallel_admission/` for slug `admission-seed`, items 1101 and 1102, with precedence 1102 after 1101 and no conflict edge:
+- [x] [P3-T5] Create committed LF fixtures under `tests/fixtures/parallel_admission/` for slug `admission-seed`, items 1101 and 1102, with precedence 1102 after 1101 and no conflict edge:
   - `seed-parallel.md`: a manifest in the block-YAML subset.
   - `seed-planner-state.json`: ready under P6 to P10, with `preparation_status: prepared`, `plan_hash`, `base_commit`, `precedence`, and cohorts `[[1101],[1102]]`. `model_routing_receipt` values are taken from `Resolve-DelegationModel -Agent orchestrator -Band C2 -FablePolicy disabled`.
   - `seed-orchestrator-state.json`: invariants 1 to 19, with items carrying `preparation_status: cleared`, `plan_hash`, `base_commit`, and `band_source`, plus top-level `precedence`.
   - `seed-scheduling-record.json`.
   - `closed-orchestrator-state.json`: `mode: closed`.
   - Acceptance: the five files exist, hold no drive letter or backslash path, and are listed in `git status --porcelain`.
-- [ ] [P3-T6] Create `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1` with three Describes. Each drives the CLI functions with in-memory branch trees behind a mocked `Invoke-ParallelAdmissionGit` and reads the committed fixtures as text.
+- [x] [P3-T6] Create `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1` with three Describes. Each drives the CLI functions with in-memory branch trees behind a mocked `Invoke-ParallelAdmissionGit` and reads the committed fixtures as text.
   - `Seed from prepared items`: both items assess `cleared`+`fresh` with `admit_prepared`. `order-cohorts` output equals the fixture cohorts. `test-cohorts` exits 0 on `seed-orchestrator-state.json` and 1 on an in-memory swapped-cohort copy. `record` output equals `seed-scheduling-record.json`. A mocked `git show origin/parallel/admission-seed-plan:docs/features/parallel/admission-seed/parallel-scheduling.json` returning that record reuses the edges for a matching hash.
   - `Add a half-prepared item`: research and spec only gives `preparation_status` `spec`, `resume_stage` `plan`, and `next_action` `resume_preparation`.
   - `Add to a closed run`: `guard-run` on `closed-orchestrator-state.json` with `-ManifestMode closed` exits 1 with `PARALLEL_ADMISSION_REJECTED: run_closed:`.
   - Acceptance: the three Describes pass with zero failures.
-- [ ] [P3-T7] Verify `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Tests.ps1`, and `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1` against the 700-line advisory tier.
+- [x] [P3-T7] Verify `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Tests.ps1`, and `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Integration.Tests.ps1` against the 700-line advisory tier.
   - Acceptance: each recorded logical line count is at most 700 in `module-size.<timestamp>.md`.
 
 ### Phase 4 — Cohort Barrier Precedence (Layer 1)

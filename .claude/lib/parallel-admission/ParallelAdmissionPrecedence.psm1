@@ -40,7 +40,7 @@ function ConvertTo-ParallelPrecedenceKey {
         Convert an item key (integer or decimal-digit string) to Int64, or return null.
     #>
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([object], [long])]
     param([AllowNull()][object] $Value)
 
     if ($null -eq $Value -or $Value -is [bool]) { return $null }
@@ -89,7 +89,7 @@ function Get-ParallelPrecedenceOrder {
         a cycle, which throws precedence_cycle naming them.
     #>
     [CmdletBinding()]
-    [OutputType([long[]])]
+    [OutputType([long[]], [System.Object[]])]
     param([AllowEmptyCollection()][object[]] $Pair = @(), [AllowEmptyCollection()][long[]] $ItemKey = @())
 
     $keys = [System.Collections.Generic.SortedSet[long]]::new()
@@ -157,7 +157,7 @@ function ConvertTo-ParallelPrecedenceEdge {
         edges are sorted by (a, b).
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [System.Object[]])]
     param([AllowNull()][AllowEmptyCollection()][object[]] $Entry = @())
 
     $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)

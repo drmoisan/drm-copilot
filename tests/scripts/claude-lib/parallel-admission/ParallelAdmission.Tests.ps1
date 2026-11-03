@@ -282,7 +282,7 @@ Describe 'Preparation receipt selection and stage resolution' {
 Describe 'Cited paths and the staleness verdict' {
     BeforeAll {
         $script:StalePlanText = @"
-### Phase 1 — Work
+### Phase 1 - Work
 
 - [ ] [P1-T1] Edit ``.claude/hooks/sample-hook.ps1`` and add ``tests/scripts/claude-hooks/sample-hook.Tests.ps1``.
 - [ ] [P1-T2] Write ``$($script:Folder)/evidence/other/notes.md``.

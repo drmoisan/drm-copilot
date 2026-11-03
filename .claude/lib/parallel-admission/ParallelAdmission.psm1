@@ -129,7 +129,7 @@ function Get-ParallelAdmissionLine {
         Split text into lines, accepting LF, CRLF, and CR terminators.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [System.Object[]])]
     param([AllowEmptyString()][string] $Text)
 
     return , [string[]]@($Text -split "`r`n|`n|`r")
@@ -360,7 +360,7 @@ function Get-ParallelAdmissionCitedPath {
         ordinally.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [System.Object[]])]
     param([AllowEmptyString()][string] $PlanText = '', [AllowEmptyCollection()][string[]] $DeclaredPath = @(), [string] $FeatureFolder)
 
     if ([string]::IsNullOrWhiteSpace($FeatureFolder)) { throw 'Get-ParallelAdmissionCitedPath requires -FeatureFolder.' }
