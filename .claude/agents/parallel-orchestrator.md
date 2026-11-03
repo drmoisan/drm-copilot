@@ -23,6 +23,7 @@ tools:
   - "Bash(bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
   - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
+  - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
   - "Bash(dotnet tool restore*)"
@@ -254,8 +255,9 @@ fields you write are `objective`, `route_id: "parallel"`, `parallel_slug`,
 `parallel_manifest_path`, `parallel_status_doc_path`, `mode`, `max_concurrency`,
 `completed_steps`, `next_step`, `last_updated`, `current_cohort`, `recolor_generation`,
 `cohorts[]`, `items[]` (each carrying `issue_num`, `feature_folder`, `state`, `blast_radius`,
-`worktree_path`, `branch_name`, `pr_number`, `pr_url`, `merge_status`, `merge_commit_sha`, and the
-lifecycle timestamps), and the three receipt arrays `delegation_receipts[]`, `skill_receipts[]`,
+`worktree_path`, `branch_name`, `pr_number`, `pr_url`, `merge_status`, `merge_commit_sha`, the
+admission fields `preparation_status`, `plan_hash`, `base_commit`, and `band_source`, and the
+lifecycle timestamps), the top-level `precedence[]` list, and the three receipt arrays `delegation_receipts[]`, `skill_receipts[]`,
 and `mcp_call_receipts[]` populated with the `parallel` route's required names from
 `config/orchestration-routing.json`.
 
@@ -263,7 +265,9 @@ The checkpoint schema is owned by F3 and is defined once in
 `.claude/rules/parallel-orchestration.md`, enforced by
 `scripts/dev_tools/validate_parallel_orchestrator_state.py`. You consume that schema and
 add no field to it that the rule file does not declare.
-`mergeable_conflicts_resolved` is the one declared optional item field.
+The declared optional item fields are `mergeable_conflicts_resolved`, `preparation_status`,
+`plan_hash`, `base_commit`, and `band_source`, and the declared optional top-level field is
+`precedence[]` (`## Prepared-Item Admission (issue #1047)` of the rule file).
 The `parallel-orchestrate` skill's `## Parallel-Level Checkpoint` section carries the
 full enumeration, the `merge_status` transition chain you write, and the arrays that are read-only
 to you. Validate through `mcp__drm-copilot__validate_orchestration_artifacts` with

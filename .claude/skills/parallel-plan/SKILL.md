@@ -1,7 +1,7 @@
 ---
 name: parallel-plan
 description: Prepare a set of thematically unrelated items for concurrent execution before any execution begins - item intake over issue numbers and potential-entry paths, concurrent preparation-mode child orchestrator delegations, blast-radius computation and V1-V3 validation, cohort seeding with a recomputation-parity check, run-manifest and planner-checkpoint authoring, and the parallel-orchestrator kickoff artifact.
-argument-hint: "[items: issue numbers and/or potential-entry paths]"
+argument-hint: "[items: issue numbers and/or potential-entry paths] [--after <later>:<earlier> ...]"
 context: fork
 agent: parallel-planner
 ---
@@ -16,7 +16,8 @@ $ARGUMENTS
 This skill frames work for the `parallel-planner` agent, parallel to how
 `.claude/skills/epic-plan/SKILL.md` frames work for `epic-planner`. The `parallel` surface
 schedules thematically unrelated items by computed blast-radius contention: there is no worthiness
-assessment, no operator-supplied ordering, and no shared branch into which item work merges.
+assessment, no operator-supplied ordering beyond the optional `--after <later>:<earlier>`
+precedence flags, and no shared branch into which item work merges.
 Planning ends at preflight clearance and cohort seeding; no atomic execution, PR authoring, or CI
 monitoring occurs under this skill.
 
@@ -62,13 +63,29 @@ identical forms.
 - **`kind`.** Record `kind: feature | bug` at intake from the item source (issue labels, or the
   potential entry's declared kind). When the source is indeterminate, default to `feature` and note
   the choice `[recommendation, not upstream-constrained]`.
+- **Admission assessment.** Run the same `assess` subcommand `/parallel-add` step 2 runs for every
+  item whose branch is pushed:
+  `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 assess -Branch origin/<item branch> -FeatureFolder <feature folder>`.
+  An item with no pushed branch (an unpromoted potential entry) takes `full_preparation`. Fan-out
+  takes only the items whose `next_action` is not `admit_prepared`. An item whose `next_action` is
+  `admit_prepared` (stage `cleared`, verdict `fresh`) runs no preparation child: record its
+  `plan_path`, `research_path`, `plan_hash`, `base_commit`, `branch_name`, and
+  `preflight_status: PREFLIGHT: ALL CLEAR` from the branch, set `preparation_status: prepared`
+  (the planner ready value that corresponds to the admission stage `cleared`), and record
+  `topology_receipt` as not applicable, because no preparation child ran for it.
+- **Precedence input.** Record each `--after <later>:<earlier>` flag as one top-level
+  `precedence[]` entry `{before, after, source, recorded_at}` with `source` `operator`, as
+  declared in `## Prepared-Item Admission (issue #1047)` of `.claude/rules/parallel-orchestration.md`.
+  The flags are optional and are never requested.
 
 The operator is never asked for ordering edges, cohort assignments, or a worthiness verdict.
 Intake proceeds directly to preparation fan-out.
 
 ## Preparation Fan-Out
 
-One preparation-mode `Agent(orchestrator)` run per item. Preparation produces documents and plans
+One preparation-mode `Agent(orchestrator)` run per incomplete item, that is, per item whose
+`assess` `next_action` is not `admit_prepared`; the waves below cover the incomplete items only.
+Preparation produces documents and plans
 rather than code, and items carry no ordering constraint, so preparations may run concurrently —
 but they are BOUNDED, not unbounded.
 
@@ -84,6 +101,8 @@ JSON array of arrays, returns the batches in order, and sorts the keys itself, s
 does not depend on caller ordering. Launch wave *k* as one message carrying that wave's `Agent`
 calls, each `isolation: "worktree"` and `run_in_background: true`.
 Create each preparation worktree's branch from `origin/main`.
+A resumed item (`next_action` `resume_preparation`) instead runs on its pushed branch, as
+`## Issue Combination` step 3 does, so its completed stages stay on that branch.
 Launch wave *k+1* only after every child of wave *k* has TERMINATED — not merely reported
 progress. All of this happens inside a single `/parallel-plan` invocation with no operator action
 between waves.
@@ -107,13 +126,18 @@ invocations after the initial plan. Use `/parallel-plan` for intake and `/parall
 admit an item into a run that is already in flight.
 
 Each delegation prompt includes this literal kickoff line, followed by the model-budget marker
-line and, for an issue-number item only, the issue-adoption line:
+line, for an issue-number item only, the issue-adoption line, for a resumed item only, the
+preparation-resume line, and the preparation-receipt line:
 
 > `Preparation mode: true. route_id: preparation. parallel_slug: <slug>. Perform promotion, research, feature documents (spec.md, user-story.md), atomic planning, and preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope for this run and are executed later by parallel-orchestrator. After the atomic-executor preflight returns PREFLIGHT: ALL CLEAR, commit the feature folder and plan to the current branch, push the current branch to origin, set out-of-scope step statuses to not-applicable, set next_step to S5_atomic_execution, and stop, reporting the plan-path and preflight status.`
 >
 > `model_budget.fable_policy: <disabled|available|preferred>.`
 >
 > `Issue adoption: this item's GitHub issue already exists. Verify it read-only (gh issue view), do not call potential_to_issue or the promotion-entry tool, and record a top-level issue_adoption object in the checkpoint per .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the checkpoint's promotion-type. When a lifecycle record for the item exists under docs/features/potential/promoted/, cite it as potential_record.`
+>
+> `Preparation resume: stage <stage>. Existing artifacts: <paths>. Do not repeat a completed stage; supersede with new timestamped files.`
+>
+> `Preparation receipt: before the commit, write <feature folder>/evidence/other/preparation-receipt.<yyyy-MM-ddTHH-mm>.json with schema_version, stage, research_path, spec_path, plan_path, plan_hash, base_commit, preflight_status, and recorded_at.`
 
 Properties of that line, each individually load-bearing:
 
@@ -143,6 +167,21 @@ to execution, so the execution child records its own adoption (see
 `.claude/skills/parallel-orchestrate/SKILL.md`, kickoff element 4). Because the preparation child
 creates and commits the feature folder, the execution child's adoption also waives
 `new_active_feature_folder` and records `feature_folder_record` for that committed folder.
+
+**Preparation-resume line.** The preparation-resume line is emitted only for a resumed item, after
+the issue-adoption line (or after the model-budget marker line for a potential-entry item). Its
+`<stage>` is the `assess` `resume_stage`, and its `<paths>` are the existing `research_path`,
+`spec_path`, and `plan_path` written relative to the feature folder. The line carries no mode
+marker and no active feature-folder path and does not match the hook issue-number pattern, so hook
+target resolution and mode classification are unchanged. A stale item resumes at preflight with
+the `assess` `changed_cited_paths` as findings under the unchanged single-pass rule of
+`.claude/skills/orchestrate/SKILL.md` `## Delegation Model`; a falsified premise resumes at `plan`,
+and a superseded artifact is replaced by a new timestamped file and never deleted.
+
+**Preparation-receipt line.** The preparation-receipt line is emitted for every delegated item. The
+child resolves `<feature folder>` to its own folder and writes the receipt declared in
+`## Prepared-Item Admission (issue #1047)` of `.claude/rules/parallel-orchestration.md` before its
+commit, so a later `assess` reads the stage, plan hash, and base commit from the branch.
 
 **No edit to shared surfaces.** No edit is made to `.claude/skills/orchestrate/SKILL.md` or to
 `config/orchestration-routing.json`, including the `preparation` route. The route mechanism is
@@ -437,7 +476,13 @@ The library returns the partition; the planner supplies the record fields.
    (hard classes, integer cost, pairwise benefit, and the configured `conflict_tolerance`). It
    returns `edges` and `tolerated_overlaps`. The -Relation argument is required; pass the facade's
    Test-BlastRadiusConflict function object as shown. Pass the returned `edges` pairs as
-   `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
+   `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`. Add each recorded
+   `precedence[]` pair to `--edges` as one more separating `<a>:<b>` edge with `a < b`, so the
+   coloring always separates the pair. Then pass the coloring through the precedence lift:
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 order-cohorts -Cohorts <compute-cohorts output> -Edges "<a>:<b> ..." -Precedence "<before>:<after> ..."`.
+   No item has started at seeding, so the call passes no option that holds an item in place, and
+   its `cohorts` output is the table steps 3 and 5 record. A `precedence_cycle` or
+   `precedence_unknown_item` rejection (exit 1) stops the run with the helper's stderr line.
    The detection relation inside the entry point contributes no `path_overlap` edge for a path
    matching the truth table's optional `mergeable_paths` list, and the path stays in the declared
    radius. When `Test-BlastRadiusConflict` is called directly (for example, while investigating a
@@ -482,6 +527,15 @@ The library returns the partition; the planner supplies the record fields.
    (the bash port of `compute_concurrency_batches(cohort_item_keys, max_concurrency)`), which fills
    slots in ascending item-key order. Recoloring under add, remove, or drift mutation is F6 and F8
    scope. This skill performs seeding only.
+7. **Durable scheduling record.** Build the record content with
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 record -RunFolder docs/features/parallel/<slug> -Entry <entry-json>`
+   from the recorded `conflict_edges`, `tolerated_overlaps`, `precedence`, and `items`; the helper
+   prints the content and makes no git write. Write it to
+   `docs/features/parallel/<slug>/parallel-scheduling.json` and commit it on `parallel/<slug>-plan`
+   with the manifest. A re-seed reads the committed record by ref
+   (`git show origin/parallel/<slug>-plan:docs/features/parallel/<slug>/parallel-scheduling.json`)
+   and reuses an item's recorded edges only when that item's recorded `plan_hash` equals its current
+   plan blob hash; every other item's edges are recomputed.
 
 ### Recomputation parity (planner-owned check)
 
@@ -492,12 +546,18 @@ skill discharges that obligation as documented procedure, not as a new module:
 
 1. After writing `cohorts[]` into the checkpoint and **before** emitting the kickoff artifact,
    re-invoke `compute_cohorts` over exactly the `item_keys` and `conflict_edges` recorded in the
-   checkpoint.
+   checkpoint (through `compute-cohorts.sh`), plus the separating edges of the recorded
+   `precedence[]` pairs, and pass the result through `order-cohorts` with the recorded precedence,
+   exactly as `### Seeding procedure` step 1 does.
 2. Assert that the recomputed list of lists maps to exactly the recorded `cohorts[]` at
    `generation: 0`: the same partition, the same `index` assignment, and the same ascending
-   `item_keys[]` ordering.
-3. A mismatch is a **Blocking** condition. Stop the run and report the mismatch. Do not
-   auto-correct the recorded cohorts, and do not emit the kickoff artifact.
+   `item_keys[]` ordering. Then run
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 test-cohorts -CheckpointPath artifacts/orchestration/parallel-planner-state.json`,
+   which rejects with `precedence_violated` when a cohort places an `after` item at or before an
+   active `before` item.
+3. A mismatch is a **Blocking** condition, and so is a `test-cohorts` rejection. Stop the run and
+   report the mismatch or the rejection. Do not auto-correct the recorded cohorts, and do not emit
+   the kickoff artifact.
 
 No production module is added for this check; it is a re-invocation of the landed library.
 
@@ -558,20 +618,22 @@ Write `artifacts/orchestration/parallel-planner-state.json` after every complete
 
 Top-level fields: `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`,
 `max_concurrency`, `plan_home_branch` (`parallel/<slug>-plan`), `items[]`, `cohorts[]`,
-`conflict_edges[]`, `recolor_generation`, `kickoff_prompt_path`
+`conflict_edges[]`, `precedence[]` (the operator precedence entries, declared in
+`## Prepared-Item Admission (issue #1047)` of the rule), `recolor_generation`, `kickoff_prompt_path`
 (`artifacts/orchestration/parallel-kickoff-<slug>.md`), `completed_steps`, `next_step`, and
 `last_updated`. F3's landed required-key set (planner invariant P1) is a strict subset of this
 list, and `plan_home_branch` is a permitted additional field.
 
 Per item: `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`, `complexity_assessment`,
 `preparation_status`,
-`research_path`, `plan_path`, `preflight_status`, `branch_name`, `worktree_path`, `blast_radius`
+`research_path`, `plan_path`, `plan_hash`, `base_commit`, `preflight_status`, `branch_name`, `worktree_path`, `blast_radius`
 (with `source: "declared"`), `radius_validation` (the `v1`, `v2`, and `v3` results with their
 severities), `model_routing_receipt`, and `topology_receipt`.
 
 **Deliberately absent:** any `epic_worthiness` analogue, any `depends_on` field, and any `wave`
 field. The parallel surface renders no worthiness verdict and expresses ordering only as
-blast-radius overlap.
+blast-radius overlap and as the operator `precedence[]` input, which is a separating input and not
+a dependency field.
 
 **Readiness contract.** Before reporting completion the checkpoint must satisfy F3's
 `require_ready_for_execution` gate: at least two items (invariant P6); every item
@@ -673,6 +735,11 @@ Structural requirements enforced by the contract module:
 - `## Integrity` is optional. When present it carries a `planning_commit:` field holding the head
   commit of `parallel/<slug>-plan` as run-level provenance and a per-item `plan-path | plan-hash`
   table whose hashes are 40 to 64 hex characters with no repeated plan path.
+
+The planner writes the `## Integrity` section with one row per item, whose `plan-hash` is that
+item's `assess` `plan_hash` (the plan blob hash at the item branch head), the same value recorded
+on the checkpoint item and in the durable scheduling record. The parallel orchestrator passes it to
+the item's execution child in kickoff element 4, which verifies it before any other step.
 
 Validate the artifact through `mcp__drm-copilot__validate_orchestration_artifacts` with
 `artifact_type: "parallel-kickoff"`. That artifact type dispatches to
