@@ -170,3 +170,14 @@ merge_assert_merge_entry() {
     run preserve_merge_extra_within $'m\nw\nw\n' $'m\n' $'m\nw\nw\n' $'m\n'
     [ "$status" -eq 0 ]
 }
+
+# --- the issue repro ------------------------------------------------------------------
+
+@test "an older modified snapshot never overwrites newer main lines" {
+    # The worktree holds an older snapshot plus one note; main has since gained two notes.
+    # A whole-file copy would drop both; the plan entry must instead stage the merged blob.
+    run merge_drive_plan merge-repro
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"REFUSED-WOULD-REGRESS"* ]]
+    merge_assert_merge_entry merge-repro
+}

@@ -94,8 +94,8 @@ Searched `tests/` for `preserve-stage`, `change_class`, `run_preserve`, `preserv
 
 ### Phase 3 — Fail-Before Evidence
 
-- [ ] [P3-T1] Add `an older modified snapshot never overwrites newer main lines` to `tests/shell/test_cleanup_worktrees_preserve_merge.bats`: drive `preserve_plan` on `merge-repro`, then assert exactly one plan entry whose column 9 is `merge` and column 10 is `merged01`, and no `REFUSED-WOULD-REGRESS`. Acceptance: the test name appears once in the file.
-- [ ] [P3-T2] [expect-fail] Run `npx --yes bats --filter 'older modified snapshot' tests/shell/test_cleanup_worktrees_preserve_merge.bats` against the unchanged `cleanup_worktrees_preserve_lib.sh` (MLIB present but not yet called). Acceptance: `<FEATURE>/evidence/regression-testing/fail-before-repro.<timestamp>.md` records `ExpectedExitCode: 1`, `EXIT_CODE: 1`, `not ok 1`, and an `Output Summary:` stating that the plan entry carried eight columns (whole-file copy) rather than mode `merge`.
+- [x] [P3-T1] Add `an older modified snapshot never overwrites newer main lines` to `tests/shell/test_cleanup_worktrees_preserve_merge.bats`: drive `preserve_plan` on `merge-repro`, then assert exactly one plan entry whose column 9 is `merge` and column 10 is `merged01`, and no `REFUSED-WOULD-REGRESS`. Acceptance: the test name appears once in the file.
+- [x] [P3-T2] [expect-fail] Run `npx --yes bats --filter 'older modified snapshot' tests/shell/test_cleanup_worktrees_preserve_merge.bats` against the unchanged `cleanup_worktrees_preserve_lib.sh` (MLIB present but not yet called). Acceptance: `<FEATURE>/evidence/regression-testing/fail-before-repro.<timestamp>.md` records `ExpectedExitCode: 1`, `EXIT_CODE: 1`, `not ok 1`, and an `Output Summary:` stating that the plan entry carried eight columns (whole-file copy) rather than mode `merge`.
 
 ### Phase 4 — Wire the Fix and Add Scenario Tests
 
