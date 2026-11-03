@@ -3,7 +3,7 @@
 - Issue: #1022
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-31T05-10
+- Last Updated: 2026-11-03T22-31
 
 ## Revision Note
 
@@ -12,6 +12,10 @@ design (a `dev.docs.inventory` Poetry console script, a `cli_inventory.py` modul
 modules and Pytest suites) is withdrawn. The inventory is now the `inventory` subcommand of
 `.claude/lib/docs/Invoke-DocsCommand.ps1`, implemented as PowerShell text scanners that need
 PowerShell 7.4 only. The design is stated in `spec.md` of this folder.
+
+Under orchestrator decision D-1022-exec-1 (spec version 0.4), diagnostic codes use the merged 1020
+diagnostic code grammar `^[A-Z][A-Z0-9_]*$` (for example `ENV_FILE_NOT_CAPTURED`), and the 1020
+over-bound and undecodable capture diagnostics are non-blocking warnings.
 
 ## Story Statement
 
@@ -64,7 +68,8 @@ using the same identifiers and digests (both computed by the shared 1020 functio
     with a diagnostic, so the owner sees the route and knows the prefix was not resolvable
     lexically.
   - The command writes a snapshot that validates against the inventory schema and exits 0, or 1 if
-    a blocking diagnostic (for example an unterminated string or an input above 1 MiB) is present.
+    a blocking diagnostic (for example an unterminated string) is present; an input above 1 MiB is
+    reported by a non-blocking warning and contributes no elements.
 - Scenario: Narrowed run during review
   - The CI maintainer runs `... -Command inventory -Analyzer python-cli -Revision <full object id> -Json`
     to inventory only the command-line surface at the checked-out commit.
@@ -85,7 +90,7 @@ using the same identifiers and digests (both computed by the shared 1020 functio
 - [ ] A route whose prefix cannot be resolved lexically still appears in the inventory with the literal `<dynamic>` prefix segment and a diagnostic, and every other construct listed in the spec's `## Precision Limit` produces its named diagnostic rather than missing output without explanation.
 - [ ] An input above the 1 MiB size bound, or a Python input containing a construct the lexer cannot classify, yields a diagnostic and contributes no elements, rather than a partial or guessed result.
 - [ ] Re-running the inventory over identical bytes, profile, revision and clock value produces a byte-identical snapshot, proven by a seeded property test that prints its seed on failure.
-- [ ] No configuration value appears in the snapshot; only keys and shapes are recorded, and a plain `.env` file is never read or hashed and is reported by an `env-file-not-captured` diagnostic naming its path.
+- [ ] No configuration value appears in the snapshot; only keys and shapes are recorded, and a plain `.env` file is never read or hashed and is reported by an `ENV_FILE_NOT_CAPTURED` diagnostic naming its path.
 - [ ] The snapshot validates against `surface-inventory-snapshot.schema.json` and records the SHA-256 digest and size of every captured input.
 - [ ] Every element records `analysis_method: scanner`.
 - [ ] An element's `source_sha256` changes when a line inside its declaration changes and does not change when a line outside its declaration changes or when only line endings change.
