@@ -115,6 +115,9 @@ Describe 'cleanup-merged-worktrees skill text (issue #1026)' {
         It 'states the published-head condition and the consolidation sub-code in Hook Execution Context' {
             $script:HookContext | Should -Match ([regex]::Escape('the pushed `refs/remotes/origin/documentationandmemories` resolves to the same commit as the consolidation worktree `HEAD`'))
             $script:HookContext | Should -Match ([regex]::Escape('appends a cleanup sub-code (`Cleanup leg not applied`)'))
+            $script:HookContext | Should -Match ([regex]::Escape('only after a cleanup leg has identified the consolidation worktree as the target and a later condition fails'))
+            $script:HookContext | Should -Match ([regex]::Escape('a call rejected by a prefilter keeps the unchanged deny text'))
+            $script:HookContext | Should -Not -Match ([regex]::Escape('denial whose target is the consolidation worktree appends'))
         }
     }
 }
