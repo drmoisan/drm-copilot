@@ -294,6 +294,19 @@
     ".claude/lib/docs/schemas/v1/docs-parity-matrix.schema.json",
     ".claude/lib/docs/schemas/v1/docs-evidence-pin.schema.json",
     ".claude/lib/docs/schemas/v1/docs-validation-receipt.schema.json",
-    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json"
+    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json",
+    ".claude/lib/docs/DocsPageMarkdown.psm1",
+    ".claude/lib/docs/DocsPageFrontMatter.psm1",
+    ".claude/lib/docs/DocsPageMetadata.psm1",
+    ".claude/lib/docs/DocsPageLinks.psm1",
+    ".claude/lib/docs/DocsPageDiataxis.psm1",
+    ".claude/lib/docs/DocsPageOrphans.psm1",
+    ".claude/lib/docs/DocsPageCheck.psm1",
+    ".claude/lib/docs/schemas/v1/page-metadata.schema.json",
+    ".claude/lib/docs/templates/page-check/markdownlint.json",
+    ".claude/lib/docs/templates/page-check/vale.ini",
+    ".claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml",
+    ".claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml",
+    ".claude/lib/docs/templates/page-check/vale/Project/accept.txt"
   ]
 }
