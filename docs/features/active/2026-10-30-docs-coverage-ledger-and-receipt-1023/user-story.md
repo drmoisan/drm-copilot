@@ -135,7 +135,7 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 ### CI proving docs-complete
 
 - [ ] `-Command validate -Mode docs-complete` exits 0 with a `pass` receipt on a complete fixture; with one undocumented element and one stale page it exits 1 and the findings name both; after both are fixed it exits 0 (`DocsCompleteIntegration.Tests.ps1`).
-- [ ] A ledger missing a disposition for any inventoried element fails validation naming the element's kind, declaration and element id (`DocsLedger.Tests.ps1`).
+- [x] A ledger missing a disposition for any inventoried element fails validation naming the element's kind, declaration and element id (`DocsLedger.Tests.ps1`).
 - [ ] With `-Mode docs-complete -WriteReceipt`, the receipt is written to the profile's `validation_receipt` path on both pass and fail, its `revision` equals the `-Revision` argument, and `-WriteReceipt` with any other mode exits 2 (`DocsLedgerCommands.Tests.ps1`).
 - [ ] Validation of a snapshot with a null `revision` in `docs-complete` mode fails with `DOCS_SNAPSHOT_UNPINNED`, so no receipt claims a revision the snapshot did not capture (`DocsValidation.Tests.ps1`).
 
