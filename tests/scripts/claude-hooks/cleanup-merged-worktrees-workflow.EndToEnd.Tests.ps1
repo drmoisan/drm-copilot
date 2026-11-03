@@ -141,6 +141,7 @@ BeforeAll {
         Mock Invoke-OrchestratorStatePreflight { @{ HasErrors = $true; ErrorText = '' } }
         Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'rev-parse' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = ('a' * 40) } }
         Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith { $diff }.GetNewClosure()
+        Mock Get-PrAuthorCleanupPublishedHead { [pscustomobject]@{ Remote = ('a' * 40); Head = ('a' * 40) } }
         Mock Get-PrBodyFileBytes { , [byte[]] @(0x41) }
         Mock Get-PrAuthorReceiptContent { $receipt }.GetNewClosure()
         Mock Get-PrContextSummaryLastWriteUtc { [datetime]::new(2026, 11, 3, 11, 0, 0, [System.DateTimeKind]::Utc) }

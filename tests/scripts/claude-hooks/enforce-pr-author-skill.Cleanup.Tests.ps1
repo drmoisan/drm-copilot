@@ -23,6 +23,7 @@ Describe 'enforce-pr-author-skill.ps1 cleanup exemption (issue #1026)' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
         . $script:UnderTest
+        $script:RealPublishedHead = ${function:Get-PrAuthorCleanupPublishedHead}
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         Mock Get-PrAuthorCheckpointContent { $null }
@@ -60,6 +61,7 @@ Describe 'enforce-pr-author-skill.ps1 cleanup exemption (issue #1026)' {
             Mock Get-PrContextSummaryLastWriteUtc { [datetime]::new(2026, 11, 3, 11, 0, 0, [System.DateTimeKind]::Utc) }
             Mock Get-CleanupWorktreeManifestContent { $manifestText }.GetNewClosure()
             Mock Get-CleanupWorktreeManifestUtcNow { $now }.GetNewClosure()
+            Mock Get-PrAuthorCleanupPublishedHead { [pscustomobject]@{ Remote = ('b' * 40); Head = ('b' * 40) } }
         }
 
         function Get-CleanupPrReason {
@@ -190,6 +192,62 @@ Describe 'enforce-pr-author-skill.ps1 cleanup exemption (issue #1026)' {
             foreach ($reason in @($failed, $unterminated, $thrown, $unresolved, $revParseThrown)) {
                 Assert-CleanupPrSubCode -Reason $reason -SubCode 'CLEANUP_EXEMPTION_DIFF_FAILED'
             }
+        }
+
+        It 'denies a consolidation create when origin/documentationandmemories is missing with CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH' {
+            # Arrange
+            Mock Get-PrAuthorCleanupPublishedHead { [pscustomobject]@{ Remote = ''; Head = ('b' * 40) } }
+
+            # Act
+            $reason = Get-CleanupPrReason -Command $script:Create
+
+            # Assert
+            Assert-CleanupPrSubCode -Reason $reason -SubCode 'CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH'
+            $reason | Should -Match ([regex]::Escape('refs/remotes/origin/documentationandmemories does not resolve to a commit'))
+        }
+
+        It 'denies a consolidation create when origin/documentationandmemories differs from HEAD with CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH' {
+            # Arrange
+            Mock Get-PrAuthorCleanupPublishedHead { [pscustomobject]@{ Remote = ('c' * 40); Head = ('b' * 40) } }
+
+            # Act
+            $reason = Get-CleanupPrReason -Command $script:Create
+
+            # Assert
+            Assert-CleanupPrSubCode -Reason $reason -SubCode 'CLEANUP_EXEMPTION_REMOTE_HEAD_MISMATCH'
+            $reason | Should -Match ([regex]::Escape('differs from the consolidation worktree HEAD'))
+        }
+    }
+
+    Context 'published-head seam body' {
+        It 'resolves the published consolidation branch and HEAD through the bounded docs-only git seam' {
+            # Arrange
+            $remoteRef = 'refs/remotes/origin/documentationandmemories^{commit}'
+            $remote = '1' * 40
+            $head = '2' * 64
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[3] -ceq 'refs/remotes/origin/documentationandmemories^{commit}' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = "$remote`n" } }.GetNewClosure()
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[3] -ceq 'HEAD^{commit}' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = $head } }.GetNewClosure()
+
+            # Act
+            $resolved = & $script:RealPublishedHead -WorktreeRoot $script:Root
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[3] -ceq 'refs/remotes/origin/documentationandmemories^{commit}' } -MockWith { [pscustomobject]@{ ExitCode = 1; Output = '' } }
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[3] -ceq 'HEAD^{commit}' } -MockWith { throw 'simulated rev-parse failure (issue #1026)' }
+            $failed = & $script:RealPublishedHead -WorktreeRoot $script:Root
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[3] -ceq 'refs/remotes/origin/documentationandmemories^{commit}' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = 'not-a-commit' } }
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[3] -ceq 'HEAD^{commit}' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = ('A' * 40) } }
+            $nonCommit = & $script:RealPublishedHead -WorktreeRoot $script:Root
+
+            # Assert
+            $resolved.Remote | Should -BeExactly $remote
+            $resolved.Head | Should -BeExactly $head
+            foreach ($result in @($failed, $nonCommit)) {
+                $result.Remote | Should -BeExactly ''
+                $result.Head | Should -BeExactly ''
+            }
+            Should -Invoke Invoke-PrAuthorDocsOnlyGitExe -Times 3 -Exactly -ParameterFilter {
+                $WorktreeRoot -eq $script:Root -and ($GitArgs -join ' ') -ceq "rev-parse --verify --quiet $remoteRef"
+            }
+            Should -Invoke Invoke-PrAuthorDocsOnlyGitExe -Times 3 -Exactly -ParameterFilter { ($GitArgs -join ' ') -ceq 'rev-parse --verify --quiet HEAD^{commit}' }
         }
     }
 
