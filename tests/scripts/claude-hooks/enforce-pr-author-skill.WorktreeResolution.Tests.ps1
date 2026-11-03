@@ -123,6 +123,7 @@ BeforeAll {
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     Mock Get-PrAuthorCurrentBranch { $null }
+    Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 }
 
 Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
