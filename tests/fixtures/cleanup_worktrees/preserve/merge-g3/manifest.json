@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/merge-g3/wt",
+      "source_path": "notes/n.md",
+      "change_class": "modified",
+      "disposition": "PRESERVE",
+      "verdict": "STILL_RELEVANT",
+      "target_path": "notes/n.md",
+      "memory_index_line": "- [Notes](n.md) - merged notes",
+      "line_ending": "lf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/merge-g3 fixture: main deleted a base line next to a worktree insertion"
+    }
+  ]
+}

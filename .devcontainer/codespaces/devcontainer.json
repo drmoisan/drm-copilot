@@ -6,6 +6,11 @@
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "vscode",
+  "hostRequirements": {
+    "cpus": 16,
+    "memory": "64gb",
+    "storage": "64gb"
+  },
   "containerEnv": {
     "TZ": "America/New_York",
     "BG_WORKTREE_PATH": "/workspaces/${localWorkspaceFolderBasename}-bg"
