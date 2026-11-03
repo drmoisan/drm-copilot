@@ -19,6 +19,9 @@ GOVERNED_GLOBS: Sequence[str] = (
 EXCLUDE_GLOBS: Sequence[str] = (
     "data/**",
     "artifacts/**",
+    # Feature folders hold finalized records (evidence, ruleset snapshots) that
+    # must never be rewritten by formatting or validation tooling.
+    "docs/features/**",
     "htmlcov/**",
     "coverage*/**",
     "**/node_modules/**",

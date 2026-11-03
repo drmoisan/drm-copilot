@@ -8,10 +8,10 @@ supported toolchains (Python and TypeScript).
 from __future__ import annotations
 
 import re
-from enum import Enum
+from enum import StrEnum
 
 
-class QCToolchain(str, Enum):
+class QCToolchain(StrEnum):
     """Supported QC toolchains."""
 
     PYTHON = "python"

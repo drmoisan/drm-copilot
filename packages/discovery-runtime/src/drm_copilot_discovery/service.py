@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import PurePosixPath, PureWindowsPath
 from typing import TYPE_CHECKING, Literal, cast, get_args
 
@@ -216,7 +216,7 @@ def _context(
     now = clock()
     if type(now) is not datetime or now.tzinfo is None or now.utcoffset() is None:
         raise OperationFailure("SERVICE_CLOCK", exit_code=3)
-    timestamp = now.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    timestamp = now.astimezone(UTC).isoformat().replace("+00:00", "Z")
     reads = SnapshotIO(
         workspace_root=initialization.workspace_root,
         metadata=initialization.metadata,

@@ -1,4 +1,4 @@
-{	
+{
     "coverage-gutters.coverageBaseDir": "**",
     "coverage-gutters.coverageFileNames": [
         "lcov.info",
@@ -36,7 +36,9 @@
     "powershell.powerShellDefaultVersion": "PowerShell 7 (Workspace)",
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestArgs": ["tests"],
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
     "python.testing.autoTestDiscoverOnSaveEnabled": false,
     "terminal.integrated.profiles.windows": {
         "PowerShell 7 (drm-copilot)": {
@@ -48,5 +50,21 @@
             ]
         }
     },
-    "terminal.integrated.defaultProfile.windows": "PowerShell 7 (drm-copilot)"
+    "terminal.integrated.defaultProfile.windows": "PowerShell 7 (drm-copilot)",
+    "ruff.importStrategy": "useBundled",
+    "pester.runTestsInNewProcess": true,
+    "pester.testFilePath": [
+        "tests/**/*.[tT]ests.[pP][sS]1",
+        "scripts/**/*.[tT]ests.[pP][sS]1"
+    ],
+    "python.terminal.activateEnvironment": false,
+    "python-envs.defaultEnvManager": "ms-python.python:poetry",
+    "python-envs.defaultPackageManager": "ms-python.python:poetry",
+    "terminal.integrated.automationProfile.windows": {
+        "path": "pwsh.exe",
+        "source": "PowerShell",
+        "args": [
+            "-NoProfile"
+        ]
+    }
 }
