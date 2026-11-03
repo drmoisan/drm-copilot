@@ -245,6 +245,15 @@ Describe 'Get-DocsPageLinkFinding' {
         $finding.message | Should -BeExactly "line 2: link target 'missing.md#x' does not resolve to a page or an existing path"
     }
 
+    It 'reports DOCS_PAGE_LINK_BROKEN without related_paths for a resolved path outside the relative-path grammar' {
+        # Act: a backslash is not a separator, so the target stays one segment holding a backslash
+        $result = Get-TestLinkFinding -PagePath 'docs/a.md' -Page @{ 'docs/a.md' = @('[w](..\b.md) [s](x*.md)') }
+
+        # Assert
+        @($result.Findings | ForEach-Object { $_.code }) | Should -Be @('DOCS_PAGE_LINK_BROKEN', 'DOCS_PAGE_LINK_BROKEN')
+        @($result.Findings | ForEach-Object { @($_.related_paths).Count }) | Should -Be @(0, 0)
+    }
+
     It 'reports DOCS_PAGE_LINK_ESCAPES_REPOSITORY for a target above the root' {
         $result = Get-TestLinkFinding -PagePath 'docs/a.md' -Page @{ 'docs/a.md' = @('[up](../../x.md)') }
         @($result.Findings | ForEach-Object { $_.code }) | Should -Be @('DOCS_PAGE_LINK_ESCAPES_REPOSITORY')

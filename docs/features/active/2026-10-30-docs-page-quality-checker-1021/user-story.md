@@ -74,12 +74,12 @@ consumer can adopt.
 
 ## Acceptance Criteria
 
-- [ ] Missing or malformed front-matter fields, a broken relative link, a missing heading anchor, a Diataxis mode mismatch and an orphan page each produce a distinct `DOCS_PAGE_*` finding code whose `artifact_path` names the failing page (`tests/scripts/claude-lib/docs/DocsPageCheck.Tests.ps1`).
-- [ ] `Invoke-DocsCommand.ps1 -Command check` exits 0 on a clean page set and 1 when any finding is present; `-Json` output is byte-identical across repeated runs and across a reversed page-listing order (`DocsPageCheck.Tests.ps1`).
-- [ ] The `-Command check -Json` stdout document validates against `schemas/docs/v1/docs-command-envelope.schema.json` (`DocsPageCheck.Tests.ps1`).
-- [ ] Generated-block markers, other HTML comments and fenced code produce no link, anchor or Diataxis-step finding, and a fixture page set in the 1024 output shape, linked from its root entry page, produces zero findings and exit code 0 (`DocsPageCheck.Tests.ps1`).
+- [x] Missing or malformed front-matter fields, a broken relative link, a missing heading anchor, a Diataxis mode mismatch and an orphan page each produce a distinct `DOCS_PAGE_*` finding code whose `artifact_path` names the failing page (`tests/scripts/claude-lib/docs/DocsPageCheck.Tests.ps1`).
+- [x] `Invoke-DocsCommand.ps1 -Command check` exits 0 on a clean page set and 1 when any finding is present; `-Json` output is byte-identical across repeated runs and across a reversed page-listing order (`DocsPageCheck.Tests.ps1`).
+- [x] The `-Command check -Json` stdout document validates against `schemas/docs/v1/docs-command-envelope.schema.json` (`DocsPageCheck.Tests.ps1`).
+- [x] Generated-block markers, other HTML comments and fenced code produce no link, anchor or Diataxis-step finding, and a fixture page set in the 1024 output shape, linked from its root entry page, produces zero findings and exit code 0 (`DocsPageCheck.Tests.ps1`).
 - [x] `schemas/docs/v1/page-metadata.schema.json` defines the fields `owner`, `last_reviewed`, `audience`, `diataxis_mode` and `surface_refs` (plus optional `title` and `extensions`) with an `audience` item pattern of `^[a-z0-9][a-z0-9-]*$`, and its runtime copy under `.claude/lib/docs/schemas/v1/` is byte-identical (`DocsPageMetadataSchema.Tests.ps1`).
-- [ ] The page-check modules import nothing from the ledger, analyzer-implementation or reference modules, proven by the static import-closure test `tests/scripts/claude-lib/docs/DocsPageImportIsolation.Tests.ps1` with a positive control.
+- [x] The page-check modules import nothing from the ledger, analyzer-implementation or reference modules, proven by the static import-closure test `tests/scripts/claude-lib/docs/DocsPageImportIsolation.Tests.ps1` with a positive control.
 - [ ] No consumer vocabulary or repository name ships in the base configuration under `.claude/lib/docs/templates/page-check/`; the Vale vocabulary file ships empty and is consumer-owned; `-Command init -Write` writes each base-configuration file with the bytes of its template (`DocsPageTemplates.Tests.ps1`, `DocsNeutrality.Tests.ps1`).
 - [ ] Every new or edited file under `.claude/lib/docs/` is listed in the Claude `pack-manifests/core.json` and its push-down copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/` is byte-identical (`Docs.Manifest.Tests.ps1`).
 - [ ] No Python or TypeScript file is added or modified by the feature diff.

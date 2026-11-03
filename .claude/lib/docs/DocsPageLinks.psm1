@@ -41,6 +41,9 @@ $script:DocsPageInlineLinkPattern = '(?<bang>!?)\[(?<text>(?:[^\[\]]|\[[^\[\]]*\
 $script:DocsPageDefinitionPattern = '^ {0,3}\[(?<label>[^\]]+)\]:[ \t]*(?<dest><[^<>]*>|\S+)'
 $script:DocsPageExplicitAnchorPattern = '(?i)<a\b[^>]*?\s(?:id|name)[ \t]*=[ \t]*(?:"(?<value>[^"]*)"|''(?<value>[^'']*)'')'
 $script:DocsPageSchemePattern = '^[A-Za-z][A-Za-z0-9+.-]*:'
+# A resolved path holding a character outside the docs common relative-path grammar cannot be a
+# finding related path; such a path is reported in the message only.
+$script:DocsPageUnrelatablePathPattern = '[\\:*?<>|\x00-\x1f  ]'
 $script:DocsPageSlugCategory = [System.Collections.Generic.HashSet[System.Globalization.UnicodeCategory]]::new(
     [System.Globalization.UnicodeCategory[]] @('UppercaseLetter', 'LowercaseLetter', 'TitlecaseLetter', 'ModifierLetter', 'OtherLetter', 'NonSpacingMark', 'SpacingCombiningMark', 'EnclosingMark', 'DecimalDigitNumber', 'LetterNumber', 'ConnectorPunctuation'))
 $script:DocsPageLinkNextAction = @{
@@ -305,7 +308,8 @@ function Get-DocsPageLinkFinding {
         $found = Find-DocsPageLinkPage -Path $path -PageSet $pages
         if ($null -eq $found.Page) {
             if (-not $found.Directory -and -not $existing.Contains($path)) {
-                $findings.Add((New-DocsPageLinkFinding -Code 'DOCS_PAGE_LINK_BROKEN' -PagePath $PagePath -Line $line -Message "link target '$target' does not resolve to a page or an existing path" -RelatedPath @($path)))
+                $related = if ($path -match $script:DocsPageUnrelatablePathPattern) { $null } else { [string[]] @($path) }
+                $findings.Add((New-DocsPageLinkFinding -Code 'DOCS_PAGE_LINK_BROKEN' -PagePath $PagePath -Line $line -Message "link target '$target' does not resolve to a page or an existing path" -RelatedPath $related))
             }
             continue
         }

@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
     The Diataxis mode audit of the documentation page checker: path-or-glob matching, directory
-    modes, mode signals and the five DOCS_PAGE_MODE_* rule findings.
+    modes, mode signals and the five Diataxis rule findings.
 
 .DESCRIPTION
     Test-DocsPagePathMatch is the shared path-or-glob rule: an exact match (-ceq), an ordinal
