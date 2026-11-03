@@ -202,18 +202,18 @@ Text constraints for every task in this phase:
 
 ### Phase 6 — Mirrors, Manifests, Classification, and Contract Runs
 
-- [ ] [P6-T1] Add `.claude/lib/parallel-admission/ParallelAdmission.psm1`, `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, and `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1` once each to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` `paths`, after the `parallel-drift` entries.
+- [x] [P6-T1] Add `.claude/lib/parallel-admission/ParallelAdmission.psm1`, `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, and `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1` once each to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` `paths`, after the `parallel-drift` entries.
   - Acceptance: each path occurs exactly once in `paths`.
-- [ ] [P6-T2] Create byte-equal bundle copies of the three lib files under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/parallel-admission/`.
+- [x] [P6-T2] Create byte-equal bundle copies of the three lib files under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/parallel-admission/`.
   - Acceptance: the SHA256 of each copy equals its primary, recorded in `<FEATURE>/evidence/other/mirror-hashes.<timestamp>.md`.
-- [ ] [P6-T3] Copy the final text of every edited `.claude` file to its bundle path under `extensions/drm-copilot/resources/claude-customizations/`. The files are the three skills, the rule, the two agents, `.claude/settings.json`, and `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`.
+- [x] [P6-T3] Copy the final text of every edited `.claude` file to its bundle path under `extensions/drm-copilot/resources/claude-customizations/`. The files are the three skills, the rule, the two agents, `.claude/settings.json`, and `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`.
   - Acceptance: every pair's SHA256 matches in `mirror-hashes.<timestamp>.md`.
-- [ ] [P6-T4] Create `tests/scripts/claude-lib/parallel-admission/ParallelAdmission.Manifest.Tests.ps1`, modeled on `ParallelDrift.Manifest.Tests.ps1`: disk discovery, core.json membership, entry script listed once, bundle counterpart present, and byte identity.
+- [x] [P6-T4] Create `tests/scripts/claude-lib/parallel-admission/ParallelAdmission.Manifest.Tests.ps1`, modeled on `ParallelDrift.Manifest.Tests.ps1`: disk discovery, core.json membership, entry script listed once, bundle counterpart present, and byte identity.
   - Acceptance: the suite passes with zero failures.
-- [ ] [P6-T5] Add `.claude/lib/parallel-admission` with tier `T3` and the rationale "Runtime library shipped in the `.claude` bundle" to `quality-tiers.yml`, after `.claude/lib/parallel-drift`. Run `scripts/dev_tools/check_quality_tiers.py` in module form. Precondition: the three `.claude/lib/parallel-admission/` files are in the git index (staged with a pathspec or committed), because project discovery reads `git ls-files` and an untracked directory leaves the new entry stale (QT007).
+- [x] [P6-T5] Add `.claude/lib/parallel-admission` with tier `T3` and the rationale "Runtime library shipped in the `.claude` bundle" to `quality-tiers.yml`, after `.claude/lib/parallel-drift`. Run `scripts/dev_tools/check_quality_tiers.py` in module form. Precondition: the three `.claude/lib/parallel-admission/` files are in the git index (staged with a pathspec or committed), because project discovery reads `git ls-files` and an untracked directory leaves the new entry stale (QT007).
   - Asserting tests (unchanged): `test_quality_tiers_contract_classification.py`, which checks a subset and restricts T1 and T2 only.
   - Acceptance: exit 0, with the discovered-project count one above the P0-T7 baseline, recorded in `<FEATURE>/evidence/other/quality-tiers.<timestamp>.md`.
-- [ ] [P6-T6] Run the `## Contract Test Set` under `tests/scripts/dev_tools/` serially with `--strict-markers`.
+- [x] [P6-T6] Run the `## Contract Test Set` under `tests/scripts/dev_tools/` serially with `--strict-markers`.
   - Acceptance: zero failures, with the counts recorded in `<FEATURE>/evidence/qa-gates/pytest-contracts.<timestamp>.md`.
 
 ### Phase 7 — Integration Scenario Evidence
