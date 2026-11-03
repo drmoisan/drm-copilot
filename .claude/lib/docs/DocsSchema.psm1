@@ -30,11 +30,11 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsJson.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFinding.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSchemaWalk.psm1') -ErrorAction Stop
 
 $script:DocsSchemaMinimumPowerShellVersion = [version] '7.4'
 $script:DocsSchemaCommonUrnPrefix = 'urn:drm-copilot:docs:1.0.0:common#/$defs/'
 $script:DocsSchemaLocalDefsPrefix = '#/$defs/'
-$script:DocsSchemaMaxRefDepth = 64
 
 function Get-DocsSchemaName {
     <#
@@ -355,60 +355,6 @@ function Test-DocsArtifactText {
     return Get-DocsOrderedFinding -Finding @(New-DocsSchemaFinding -Code 'DOCS_SCHEMA_INVALID' -Pointer '' -Message "The artifact does not conform to the '$ArtifactKind' schema." -NextAction 'Correct the artifact so it conforms to its schema.' -ArtifactPath $ArtifactPath)
 }
 
-function Get-DocsSchemaFieldName {
-    <#
-    .SYNOPSIS
-        Returns the unescaped last pointer segment, or '(root)' (private helper).
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Pointer)
-
-    if ($Pointer.Length -eq 0) { return '(root)' }
-    return $Pointer.Substring($Pointer.LastIndexOf('/') + 1).Replace('~1', '/').Replace('~0', '~')
-}
-
-function Get-DocsJsonTypeName {
-    <#
-    .SYNOPSIS
-        Returns the JSON type names that a parsed value satisfies (private helper).
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param([AllowNull()] [object] $Value)
-
-    if ($null -eq $Value) { return [string[]]@('null') }
-    if ($Value -is [bool]) { return [string[]]@('boolean') }
-    if ($Value -is [string]) { return [string[]]@('string') }
-    if ($Value -is [long] -or $Value -is [int]) { return [string[]]@('integer', 'number') }
-    if ($Value -is [double]) { if ([math]::Floor($Value) -eq $Value) { return [string[]]@('integer', 'number') } return [string[]]@('number') }
-    if ($Value -is [System.Collections.IDictionary]) { return [string[]]@('object') }
-    if ($Value -is [System.Collections.IList]) { return [string[]]@('array') }
-    return [string[]]@('unknown')
-}
-
-function Resolve-DocsSchemaLocalRef {
-    <#
-    .SYNOPSIS
-        Resolves a local '#/...' reference inside the root schema, or returns $null (private helper).
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.IDictionary], [object])]
-    param(
-        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $RootSchema,
-        [Parameter(Mandatory = $true)] [string] $Ref
-    )
-
-    if ($Ref -ceq '#') { return $RootSchema }
-    if (-not $Ref.StartsWith('#/', [System.StringComparison]::Ordinal)) { return $null }
-    $node = $RootSchema
-    foreach ($segment in $Ref.Substring(2).Split('/')) {
-        $part = $segment.Replace('~1', '/').Replace('~0', '~')
-        if ($node -is [System.Collections.IDictionary] -and $node.Contains($part)) { $node = $node[$part] } else { return $null }
-    }
-    return $node
-}
-
 function Get-DocsSchemaStructuralFinding {
     <#
     .SYNOPSIS
@@ -416,8 +362,9 @@ function Get-DocsSchemaStructuralFinding {
     .DESCRIPTION
         Evaluates $ref (local only, depth bounded at 64), type, required, properties,
         patternProperties, additionalProperties false, enum, const, items, minItems, maxItems,
-        allOf, if/then/else and anyOf. Every other keyword is left to Test-Json. Each finding
-        carries the instance pointer and a message that names the field. Inputs are not mutated.
+        allOf, if/then/else and anyOf; every other keyword is left to Test-Json. Each finding
+        carries the instance pointer and a message that names the field. The walk is implemented
+        by Get-DocsSchemaWalkFinding in DocsSchemaWalk.psm1.
     #>
     [CmdletBinding()]
     [OutputType([object[]])]
@@ -426,95 +373,10 @@ function Get-DocsSchemaStructuralFinding {
         [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyCollection()] [AllowEmptyString()] [object] $Instance,
         [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $RootSchema,
         [AllowEmptyString()] [string] $Pointer = '',
-        [AllowNull()] [string] $ArtifactPath,
-        [ValidateRange(0, 1024)] [int] $RefDepth = 0
+        [AllowNull()] [string] $ArtifactPath
     )
 
-    $findings = [System.Collections.Generic.List[object]]::new()
-    if ($Schema -isnot [System.Collections.IDictionary]) { return , $findings.ToArray() }
-    $field = Get-DocsSchemaFieldName -Pointer $Pointer
-    $walk = @{ RootSchema = $RootSchema; ArtifactPath = $ArtifactPath }
-    if ($Schema.Contains('$ref') -and $Schema['$ref'] -is [string]) {
-        if ($RefDepth -ge $script:DocsSchemaMaxRefDepth) {
-            $findings.Add((New-DocsSchemaFinding -Code 'DOCS_SCHEMA_TOO_DEEP' -Pointer $Pointer -ArtifactPath $ArtifactPath -Message "Schema reference expansion for '$field' exceeds $($script:DocsSchemaMaxRefDepth) levels." -NextAction 'Remove the reference cycle from the schema.'))
-            return , $findings.ToArray()
-        }
-        $target = Resolve-DocsSchemaLocalRef -RootSchema $RootSchema -Ref $Schema['$ref']
-        if ($null -ne $target) { $findings.AddRange((Get-DocsSchemaStructuralFinding @walk -Schema $target -Instance $Instance -Pointer $Pointer -RefDepth ($RefDepth + 1))) }
-    }
-    $types = @(Get-DocsJsonTypeName -Value $Instance)
-    if ($Schema.Contains('type')) {
-        $allowed = @($Schema['type'])
-        if (-not @($allowed | Where-Object { $types -ccontains [string] $_ }).Count) {
-            $findings.Add((New-DocsSchemaFinding -Code 'DOCS_SCHEMA_TYPE_MISMATCH' -Pointer $Pointer -ArtifactPath $ArtifactPath -Message "Field '$field' has JSON type '$($types[0])'; allowed: $($allowed -join ', ')." -NextAction "Give '$field' a value of an allowed type."))
-        }
-    }
-    foreach ($keyword in 'enum', 'const') {
-        if (-not $Schema.Contains($keyword)) { continue }
-        $options = if ($keyword -ceq 'const') { , [object[]]@(, $Schema['const']) } else { , [object[]]@($Schema['enum']) }
-        $actual = ConvertTo-DocsCanonicalJson -Value $Instance
-        $hit = $false
-        foreach ($option in $options) { if ((ConvertTo-DocsCanonicalJson -Value $option) -ceq $actual) { $hit = $true; break } }
-        if (-not $hit) {
-            $allowedText = (@($options | ForEach-Object { (ConvertTo-DocsCanonicalJson -Value $_).TrimEnd("`n") }) -join ', ')
-            $findings.Add((New-DocsSchemaFinding -Code 'DOCS_SCHEMA_VALUE_NOT_ALLOWED' -Pointer $Pointer -ArtifactPath $ArtifactPath -Message "Field '$field' has a value that is not allowed; allowed: $allowedText." -NextAction "Use one of the allowed values for '$field'."))
-        }
-    }
-    if ($types -ccontains 'object') {
-        $properties = if ($Schema.Contains('properties') -and $Schema['properties'] -is [System.Collections.IDictionary]) { $Schema['properties'] } else { @{} }
-        $patterns = if ($Schema.Contains('patternProperties') -and $Schema['patternProperties'] -is [System.Collections.IDictionary]) { $Schema['patternProperties'] } else { @{} }
-        if ($Schema.Contains('required')) {
-            foreach ($name in @($Schema['required'])) {
-                if (-not $Instance.Contains([string] $name)) {
-                    $findings.Add((New-DocsSchemaFinding -Code 'DOCS_SCHEMA_REQUIRED_MISSING' -Pointer (Get-DocsChildPointer -Pointer $Pointer -Part $name) -ArtifactPath $ArtifactPath -Message "Required field '$name' is missing." -NextAction "Add the required field '$name'."))
-                }
-            }
-        }
-        foreach ($member in @($Instance.Keys)) {
-            $memberPointer = Get-DocsChildPointer -Pointer $Pointer -Part $member
-            $known = $properties.Contains([string] $member)
-            if ($known) { $findings.AddRange((Get-DocsSchemaStructuralFinding @walk -Schema $properties[[string] $member] -Instance $Instance[$member] -Pointer $memberPointer -RefDepth $RefDepth)) }
-            foreach ($pattern in @($patterns.Keys)) {
-                if (-not [regex]::IsMatch([string] $member, [string] $pattern)) { continue }
-                $known = $true
-                $findings.AddRange((Get-DocsSchemaStructuralFinding @walk -Schema $patterns[$pattern] -Instance $Instance[$member] -Pointer $memberPointer -RefDepth $RefDepth))
-            }
-            if (-not $known -and $Schema.Contains('additionalProperties') -and $Schema['additionalProperties'] -is [bool] -and -not $Schema['additionalProperties']) {
-                $findings.Add((New-DocsSchemaFinding -Code 'DOCS_SCHEMA_PROPERTY_UNKNOWN' -Pointer $memberPointer -ArtifactPath $ArtifactPath -Message "Field '$member' is not allowed here." -NextAction "Remove the field '$member' or correct its name."))
-            }
-        }
-    }
-    if ($types -ccontains 'array') {
-        $count = @($Instance).Count
-        if ($Schema.Contains('items') -and $Schema['items'] -is [System.Collections.IDictionary]) {
-            for ($index = 0; $index -lt $count; $index++) {
-                $findings.AddRange((Get-DocsSchemaStructuralFinding @walk -Schema $Schema['items'] -Instance $Instance[$index] -Pointer ($Pointer + '/' + $index) -RefDepth $RefDepth))
-            }
-        }
-        $tooFew = $Schema.Contains('minItems') -and $count -lt [long] $Schema['minItems']
-        $tooMany = $Schema.Contains('maxItems') -and $count -gt [long] $Schema['maxItems']
-        if ($tooFew -or $tooMany) {
-            $findings.Add((New-DocsSchemaFinding -Code 'DOCS_SCHEMA_ITEM_COUNT' -Pointer $Pointer -ArtifactPath $ArtifactPath -Message "Field '$field' has $count items, outside the allowed bounds." -NextAction "Adjust the number of items in '$field'."))
-        }
-    }
-    foreach ($member in @(if ($Schema.Contains('allOf')) { $Schema['allOf'] })) {
-        $findings.AddRange((Get-DocsSchemaStructuralFinding @walk -Schema $member -Instance $Instance -Pointer $Pointer -RefDepth $RefDepth))
-    }
-    if ($Schema.Contains('if')) {
-        $holds = (Get-DocsSchemaStructuralFinding @walk -Schema $Schema['if'] -Instance $Instance -Pointer $Pointer -RefDepth $RefDepth).Count -eq 0
-        $branch = if ($holds) { 'then' } else { 'else' }
-        if ($Schema.Contains($branch)) { $findings.AddRange((Get-DocsSchemaStructuralFinding @walk -Schema $Schema[$branch] -Instance $Instance -Pointer $Pointer -RefDepth $RefDepth)) }
-    }
-    if ($Schema.Contains('anyOf')) {
-        $matched = $false
-        foreach ($member in @($Schema['anyOf'])) {
-            if ((Get-DocsSchemaStructuralFinding @walk -Schema $member -Instance $Instance -Pointer $Pointer -RefDepth $RefDepth).Count -eq 0) { $matched = $true; break }
-        }
-        if (-not $matched) {
-            $findings.Add((New-DocsSchemaFinding -Code 'DOCS_SCHEMA_NO_BRANCH_MATCH' -Pointer $Pointer -ArtifactPath $ArtifactPath -Message "Field '$field' matches none of the allowed forms." -NextAction "Give '$field' a value of one of the allowed forms."))
-        }
-    }
-    return , $findings.ToArray()
+    return Get-DocsSchemaWalkFinding -Schema $Schema -Instance $Instance -RootSchema $RootSchema -Pointer $Pointer -ArtifactPath $ArtifactPath
 }
 
 function Get-DocsRuntimeVersionError {

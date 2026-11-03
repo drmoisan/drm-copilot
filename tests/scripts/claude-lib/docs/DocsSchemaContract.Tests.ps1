@@ -93,7 +93,7 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-Module -Name DocsSchema, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name DocsSchema, DocsSchemaWalk, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Committed examples' {
