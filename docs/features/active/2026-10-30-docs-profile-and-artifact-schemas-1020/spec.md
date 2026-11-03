@@ -3,9 +3,9 @@
 - **Issue:** #1020
 - **Parent (optional):** #1019 (epic documentation-estate-tooling, child 1020, wave 0, band C3)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-31
+- **Last Updated:** 2026-11-03
 - **Status:** Draft
-- **Version:** 0.6 (owner decision P1: thin process seam, `patternProperties` walk, empty-file read, relative template sources, registry membership assertions)
+- **Version:** 0.7 (`Test-Json` recursion hazard: composition replaces the self-referential copied `json-value` with the empty schema and fails closed with `DOCS_SCHEMA_RECURSIVE_DEF` on any other self-referential copied definition; version 0.6 applied owner decision P1)
 - **Requirements source:** `docs/features/epics/documentation-estate-tooling/epic.md` on branch `origin/epic/documentation-estate-tooling-integration`
 - **Research (amendment design source):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T22-35-docs-profile-amendment-d3-d5-addendum-research.md`
 - **Research (primary design source):** `docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T21-45-docs-profile-powershell-design-addendum-research.md`
@@ -81,6 +81,19 @@ S2, S19 and S32 change wording. Changes:
 - The registry suite asserts membership (each owner anchor and each provider table exists, and a
   registered row is found by its `Id` and `AnalysisMethod`), never a row count of the committed
   tables.
+
+Version 0.7 records a defect found during execution of Phase 1 (evidence
+`evidence/other/testjson-recursive-ref-probe.2026-11-03T12-11.md`): on PowerShell 7.6.9,
+`Test-Json -Schema` throws a circular-reference exception for any `$defs` entry that references
+itself, so every composed artifact schema that reaches docs common `json-value` through
+`extensions` rejected its committed example. The committed schema files are unchanged, so the
+discovery v2 parity of docs common stays intact. Acceptance criteria keep their number and order;
+only the composition criterion (S14) changes wording. Changes:
+
+- `#### Schema composition (epic Q1 resolution)` gains a recursion-hazard step: the copied
+  `json-value` definition, which references itself, is replaced by the empty schema `{}` in the
+  composed text, and any other self-referential copied definition yields the new finding code
+  `DOCS_SCHEMA_RECURSIVE_DEF`, so no definition is silently widened.
 
 ## Overview
 
@@ -291,12 +304,35 @@ common URN refs, and `Join-DocsSchemaText` produces a self-contained schema in m
 `Test-Json` runs. No schema file carries a physically inlined copy of a docs common definition.
 Owner acceptance of this form is OQ-6.
 
+Recursion probe (PowerShell 7.6.9, 2026-11-03, evidence
+`evidence/other/testjson-recursive-ref-probe.2026-11-03T12-11.md`): `Test-Json -Schema` throws a
+circular-reference exception for any `$defs` entry that references itself (through `items`,
+`additionalProperties`, a dotted `$defs` name, or an `$anchor`), and returns `False` for the
+instance. A root self-reference `#` and a `$dynamicRef` to a root `$dynamicAnchor` validate. Docs
+common copies `json-value` from discovery v2 unchanged, and `json-value` references itself; every
+artifact schema reaches it through `extensions`, so without the step below each of the six
+artifact examples fails `Test-Json`. With the copied `json-value` replaced by `{}` in memory, all
+seven examples validate. `json-value` admits every JSON value (scalars, arrays of JSON values and
+objects of JSON values), so `{}` is semantically equivalent to it. The committed
+`common.schema.json` keeps the discovery definition, so its parity with discovery v2 is unchanged;
+the replacement exists only in the composed text. The composed text contains no self-referential
+definition, so the result does not depend on how the `Test-Json` of a given PowerShell release
+handles recursion.
+
 `Join-DocsSchemaText`:
 
 1. Parse both texts with `ConvertFrom-DocsJsonText`.
 2. Copy every docs common `$defs/<name>` into the target `$defs` as `common.<name>`. A target that
    already defines a `$defs` key beginning with `common.` yields `DOCS_SCHEMA_COMPOSITION_CONFLICT`.
-3. Rewrite every string-valued `$ref` keyword:
+3. Remove the recursion hazard. A copied definition is self-referential when its subtree, including
+   the definition object itself, contains a string-valued `$ref` equal to `#/$defs/<name>` for its
+   own docs common `<name>`. The copied `common.json-value` definition, when self-referential, is
+   replaced by the empty schema `{}`. Any other self-referential copied definition yields one
+   `error` finding `DOCS_SCHEMA_RECURSIVE_DEF` with pointer `/$defs/<name>` and a message naming
+   `<name>`; it is never replaced or widened, and the finding makes the composed set unusable
+   (exit 3 at the command boundary). Only direct self-reference is checked; docs common v1 holds no
+   indirect cycle through another definition.
+4. Rewrite every string-valued `$ref` keyword:
    - `urn:drm-copilot:docs:1.0.0:common#/$defs/<name>` becomes `#/$defs/common.<name>`; a `<name>`
      absent from docs common yields `DOCS_SCHEMA_REF_UNRESOLVED`;
    - inside the copied definitions, `#/$defs/<name>` becomes `#/$defs/common.<name>`;
@@ -305,10 +341,10 @@ Owner acceptance of this form is OQ-6.
      and is never fetched.
    Only keys named `$ref` whose value is a string are rewritten; a `properties` member named
    `$schema` or `$ref` maps to an object and is not a keyword.
-4. Remove the root `$id` from the composed schema; keep the root `$schema` for dialect selection.
+5. Remove the root `$id` from the composed schema; keep the root `$schema` for dialect selection.
    The probe shows no collision would occur; removal keeps the composed text free of any document
    identity and costs nothing.
-5. Serialize with `ConvertTo-DocsJsonText`.
+6. Serialize with `ConvertTo-DocsJsonText`.
 
 #### Artifact validation
 
@@ -775,7 +811,8 @@ Copied from discovery v2 common (pinned by a parity test, compared as canonical 
 `sha256`, `timestamp`, `extensions`, `validation-outcome`, and any definition those reference
 transitively. `timestamp` is the only deliberate divergence (the added pattern above) and is
 excluded from the parity comparison by name. In the tables below these names mean the docs common
-copies.
+copies. `json-value`, reached through `extensions`, is copied unchanged; only the composed text
+replaces it with `{}` (`#### Schema composition (epic Q1 resolution)`, step 3).
 
 Docs-specific definitions:
 
@@ -1324,7 +1361,7 @@ eight PowerShell files and eight runtime schema copies).
 - [ ] The existing push-down contract tests `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py` (including `test_every_psscriptroot_occurrence_is_recognized`) pass on the feature branch without modification.
 - [ ] The file set under `.claude/lib/docs/schemas/v1/` equals the file set under `schemas/docs/v1/` and each runtime copy is byte-identical to its canonical file (`DocsSchemaContract.Tests.ps1`).
 - [ ] Each docs common definition copied from discovery v2 common equals the discovery definition as canonical JSON, except `timestamp`, which carries the timestamp `pattern`; no docs schema contains a `$ref` to a discovery URN or to a file (`DocsSchemaContract.Tests.ps1`).
-- [ ] `Join-DocsSchemaText` rewrites docs common URN refs and refs inside copied definitions to `#/$defs/common.<name>`, leaves local refs unchanged, removes the root `$id`, returns `DOCS_SCHEMA_COMPOSITION_CONFLICT` for a target `$defs` key beginning `common.`, and returns `DOCS_SCHEMA_REF_UNRESOLVED` for an unknown common name and for a foreign URN, file or URI ref without retrieving it (`tests/scripts/claude-lib/docs/DocsSchema.Tests.ps1`).
+- [ ] `Join-DocsSchemaText` rewrites docs common URN refs and refs inside copied definitions to `#/$defs/common.<name>`, leaves local refs unchanged, removes the root `$id`, replaces the copied self-referential `common.json-value` definition with the empty schema `{}`, returns `DOCS_SCHEMA_RECURSIVE_DEF` for any other self-referential copied definition, returns `DOCS_SCHEMA_COMPOSITION_CONFLICT` for a target `$defs` key beginning `common.`, and returns `DOCS_SCHEMA_REF_UNRESOLVED` for an unknown common name and for a foreign URN, file or URI ref without retrieving it (`tests/scripts/claude-lib/docs/DocsSchema.Tests.ps1`).
 - [ ] `Test-DocsArtifactText` returns exactly one `DOCS_SCHEMA_INVALID` finding with pointer `''` when `Test-Json` returns `False` with no ErrorRecord and the structural walk finds nothing, and returns the walk findings when the walk reports an error (`DocsSchema.Tests.ps1`, using a schema constraint outside the walk subset and a stubbed `Test-Json` result where needed).
 - [ ] Exit codes follow 0/1/2/3 for every 1020 subcommand: 0 for success and `-Help`; 1 for `error` findings; 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` `null` for a missing `-Command`, an unknown command, an unknown option, a missing value, a repeated non-`multi` option and a non-relative path; 3 with exactly one finding (`DOCS_RUNTIME_UNSUPPORTED` through the `-PowerShellVersion` seam set below 7.4, or `DOCS_CLI_RUNTIME` for an injected exception) and one stderr line (`Invoke-DocsCommand.Tests.ps1`).
 - [ ] With `-Json`, stdout is exactly one canonical JSON document whose keys are `command`, `exit_code`, `findings`, `ok` and `result`, `command` is the subcommand name when `-Command` names a dispatch-table row and `null` for a missing or unknown command, `ok` is `true` exactly when `exit_code` is 0, and two runs with identical inputs, arguments and clock produce identical bytes; without `-Json`, the last line is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>` (`Invoke-DocsCommand.Tests.ps1`, `DocsFinding.Tests.ps1`).
