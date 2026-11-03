@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/merge-already-on-main/wt",
+      "source_path": "notes/n.md",
+      "change_class": "modified",
+      "disposition": "PRESERVE",
+      "verdict": "STILL_RELEVANT",
+      "target_path": "notes/n.md",
+      "memory_index_line": null,
+      "line_ending": "lf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/merge-already-on-main fixture: the worktree addition is already on main"
+    }
+  ]
+}
