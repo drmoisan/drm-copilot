@@ -383,7 +383,7 @@ function Invoke-ParallelAdmissionAssess {
         Fetches origin first (git fetch --quiet origin), then reads by ref through
         Invoke-ParallelAdmissionGit. The newest receipt
         takes precedence over inference; plan_hash is the plan blob hash at the
-        branch head; base_commit is the receipt's, else the merge base with main.
+        branch head; base_commit is the receipt's when it is a 40- or 64-character hex object name, else the merge base with main.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -417,7 +417,8 @@ function Invoke-ParallelAdmissionAssess {
     $preflightCleared = $stage.stage -ceq 'cleared' -and ($stage.source -ceq 'inference' -or (Get-ParallelAdmissionMapValue -Map $receipt -Key 'preflight_status') -ceq 'PREFLIGHT: ALL CLEAR')
 
     $baseCommit = Get-ParallelAdmissionMapValue -Map $receipt -Key 'base_commit'
-    if ([string]::IsNullOrWhiteSpace([string]$baseCommit)) { $baseCommit = [string[]](Invoke-ParallelAdmissionGitChecked -GitArgs @('merge-base', $main, $branch)) | Select-Object -First 1 }
+    # Only a full object name may reach git; any other value is treated as absent, so an option-shaped value is never passed.
+    if ([string]$baseCommit -cnotmatch '\A(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\z') { $baseCommit =[string[]](Invoke-ParallelAdmissionGitChecked -GitArgs @('merge-base', $main, $branch)) | Select-Object -First 1 }
     $plannerItem = Get-ParallelAdmissionPlannerItem -Path $Option.PlannerCheckpointPath -FeatureFolder $folder
     $staleness = [pscustomobject]@{ verdict = $null; changed_cited_paths = [string[]]@(); removed_cited_paths = [string[]]@() }
     if (@('plan', 'cleared') -ccontains $stage.stage -and -not [string]::IsNullOrWhiteSpace($planPath)) {

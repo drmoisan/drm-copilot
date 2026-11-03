@@ -51,7 +51,7 @@ BeforeAll {
         $response["log -1 --format=%ct $branch -- $($script:AssessFolder)/evidence/other/preflight-fixes.2026-11-02T10-00.md"] = @('1100')
         $response["rev-parse ${branch}:$($script:AssessPlan)"] = @('abc123')
         $response["merge-base $main $branch"] = @('base000')
-        foreach ($base in @('base000', 'receipt999')) {
+        foreach ($base in @('base000', ('a1' * 20), ('AB' * 32))) {
             $response["merge-base --is-ancestor $base $main"] = @()
             $response["diff --name-only --no-renames $base $main"] = $Changed
             $response["cat-file -e ${base}:.claude/hooks/sample-hook.ps1"] = @()
@@ -331,25 +331,25 @@ Describe 'assess' {
         Should -Invoke Invoke-ParallelAdmissionGit -ParameterFilter { ($GitArgs -join ' ') -eq "rev-parse $($script:AssessBranch):$($script:AssessPlan)" } -Times 1 -Exactly
     }
 
-    It 'falls back to the merge base when no receipt records a base commit' {
-        $json = ConvertFrom-EmittedJson (Invoke-ParallelAdmissionCli @script:AssessArguments).Stdout
-
-        $json.GetProperty('base_commit').GetString() | Should -Be 'base000'
-    }
-
-    It 'takes the base commit from the newest preparation receipt' {
-        $receipt = '{"schema_version": 1, "stage": "cleared", "plan_hash": "abc123", "base_commit": "receipt999", "preflight_status": "PREFLIGHT: ALL CLEAR", "recorded_at": "2026-11-02T11-00"}'
+    # A rejected receipt value takes the merge-base fallback and reaches no merge-base or diff call.
+    It 'takes the receipt base commit only when it is a full object name: <Case>' -ForEach @(
+        @{ Case = '40-char lowercase hex'; Base = ('a1' * 20); Expected = ('a1' * 20); Calls = 2 }, @{ Case = '64-char uppercase hex'; Base = ('AB' * 32); Expected = ('AB' * 32); Calls = 2 }
+        @{ Case = 'option-shaped'; Base = '--output=x'; Expected = 'base000'; Calls = 0 }, @{ Case = 'short hex'; Base = 'abc123'; Expected = 'base000'; Calls = 0 }
+        @{ Case = '40-char non-hex'; Base = ('g1' * 20); Expected = 'base000'; Calls = 0 }, @{ Case = 'empty'; Base = ''; Expected = 'base000'; Calls = 0 }
+    ) {
+        $receipt = '{"schema_version": 1, "stage": "cleared", "plan_hash": "abc123", "base_commit": "' + $Base + '", "preflight_status": "PREFLIGHT: ALL CLEAR", "recorded_at": "2026-11-02T11-00"}'
         $script:GitResponse = Get-AssessGitResponse -Receipt $receipt
 
         $json = ConvertFrom-EmittedJson (Invoke-ParallelAdmissionCli @script:AssessArguments).Stdout
 
-        $json.GetProperty('base_commit').GetString() | Should -Be 'receipt999'
+        $json.GetProperty('base_commit').GetString() | Should -BeExactly $Expected
         $json.GetProperty('next_action').GetString() | Should -Be 'admit_prepared'
-        Should -Invoke Invoke-ParallelAdmissionGit -ParameterFilter { ($GitArgs -join ' ') -eq 'merge-base origin/main origin/feature/sample-1101' } -Times 0 -Exactly
+        Should -Invoke Invoke-ParallelAdmissionGit -ParameterFilter { ($GitArgs -join ' ') -eq 'merge-base origin/main origin/feature/sample-1101' } -Times ([int]($Calls -eq 0)) -Exactly
+        Should -Invoke Invoke-ParallelAdmissionGit -ParameterFilter { @('merge-base', 'diff') -ccontains $GitArgs[0] -and $GitArgs -ccontains $Base } -Times $Calls -Exactly
     }
 
     It 'resumes at preflight when the receipt plan hash differs from the current blob hash' {
-        $receipt = '{"stage": "cleared", "plan_hash": "old999", "base_commit": "receipt999", "preflight_status": "PREFLIGHT: ALL CLEAR"}'
+        $receipt = '{"stage": "cleared", "plan_hash": "old999", "base_commit": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", "preflight_status": "PREFLIGHT: ALL CLEAR"}'
         $script:GitResponse = Get-AssessGitResponse -Receipt $receipt
 
         $json = ConvertFrom-EmittedJson (Invoke-ParallelAdmissionCli @script:AssessArguments).Stdout
