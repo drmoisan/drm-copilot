@@ -19,8 +19,10 @@
     long-name and an 8.3 short-name spelling under /synthetic-users; the staged-index seam
     returns NUL-terminated names. The entry-tail rows drive the hook in-process with a
     StringReader stdin. No row creates a file, starts a process, reads a clock, or touches the
-    network. Every deny row compares the decision with the decision the gate returns when the
-    cleanup leg is withheld.
+    network. Every deny row for an input rejected before consolidation identity, or for a
+    non-consolidation target, compares the decision with the decision the gate returns when the
+    cleanup leg is withheld; a denial after the consolidation worktree is identified as the
+    target asserts the appended cleanup sub-code.
 #>
 
 Describe 'Codex preimplementation gate cleanup legs (issue #1026)' {
@@ -79,13 +81,21 @@ Describe 'Codex preimplementation gate cleanup legs (issue #1026)' {
         function Assert-CodexUnchangedDeny {
             param([string[]] $MappedInput)
             $actual = @($MappedInput | ForEach-Object { Get-CodexCleanupDecision -MappedInput $_ | ConvertTo-Json -Compress -Depth 5 })
-            Mock Test-OrchestrationCleanupContextAllowed { $false }
+            Mock Get-OrchestrationCleanupContextResult { [pscustomobject]@{ Allowed = $false; DenySuffix = '' } }
             for ($index = 0; $index -lt $MappedInput.Count; $index++) {
                 $today = Get-CodexCleanupDecision -MappedInput $MappedInput[$index] | ConvertTo-Json -Compress -Depth 5
                 $actual[$index] | Should -BeExactly $today -Because "input $($MappedInput[$index]) must keep today's deny"
                 $actual[$index] | Should -Match '"permissionDecision":"deny"'
                 $actual[$index] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED:'
             }
+        }
+
+        # Asserts a deny whose reason is the unchanged blocked text followed by the cleanup sub-code.
+        function Assert-CodexSubCodeDeny {
+            param([Parameter(Mandatory)] $Decision, [Parameter(Mandatory)] [string] $SubCode)
+            $reason = [string]$Decision.hookSpecificOutput.permissionDecisionReason
+            $Decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $reason.StartsWith("$($script:Blocked) Cleanup leg not applied: $($SubCode): ", [System.StringComparison]::Ordinal) | Should -BeTrue -Because "the reason '$reason' must carry $SubCode after the unchanged text"
         }
 
         function Invoke-CodexGateEntrypoint {
@@ -235,20 +245,31 @@ Describe 'Codex preimplementation gate cleanup legs (issue #1026)' {
             # Arrange
             Set-CodexCleanupFixture -Staged "docs/research/y.md$($script:Nul)scripts/a.ps1$($script:Nul)"
 
-            # Act / Assert
-            Assert-CodexUnchangedDeny -MappedInput @(ConvertTo-CodexMappedInput -Command "git -C $($script:Consolidation) commit -F msg.txt")
+            # Act
+            $decision = Get-CodexCleanupDecision -MappedInput (ConvertTo-CodexMappedInput -Command "git -C $($script:Consolidation) commit -F msg.txt")
+
+            # Assert
+            Assert-CodexSubCodeDeny -Decision $decision -SubCode 'CLEANUP_LEG_STAGED_PATH_NOT_ALLOWLISTED'
         }
 
         It 'denies the commit when the staged index is empty or the staged-index seam fails' {
             # Arrange
             $mapped = ConvertTo-CodexMappedInput -Command "git -C $($script:Consolidation) commit -F msg.txt"
-            $actual = foreach ($variant in @(@{ Staged = ''; Code = 0 }, @{ Staged = "docs/research/y.md$($script:Nul)"; Code = 128 }, @{ Staged = 'docs/research/y.md'; Code = 0 })) {
-                Set-CodexCleanupFixture -Staged $variant.Staged -StagedExitCode $variant.Code
-                Get-CodexCleanupDecision -MappedInput $mapped
-            }
+            $variants = @(
+                @{ Staged = ''; Code = 0; SubCode = 'CLEANUP_LEG_STAGED_INDEX_EMPTY' }
+                @{ Staged = "docs/research/y.md$($script:Nul)"; Code = 128; SubCode = 'CLEANUP_LEG_STAGED_INDEX_UNREADABLE' }
+                @{ Staged = 'docs/research/y.md'; Code = 0; SubCode = 'CLEANUP_LEG_STAGED_INDEX_UNREADABLE' }
+            )
+
+            # Act
+            $actual = @(foreach ($variant in $variants) {
+                    Set-CodexCleanupFixture -Staged $variant.Staged -StagedExitCode $variant.Code
+                    Get-CodexCleanupDecision -MappedInput $mapped
+                })
 
             # Assert
-            foreach ($decision in $actual) { $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked }
+            $actual.Count | Should -Be $variants.Count
+            for ($index = 0; $index -lt $variants.Count; $index++) { Assert-CodexSubCodeDeny -Decision $actual[$index] -SubCode $variants[$index].SubCode }
         }
 
         It 'denies the commit with -a, --amend, --pathspec-from-file, or a pathspec operand' {
@@ -322,6 +343,24 @@ Describe 'Codex preimplementation gate cleanup legs (issue #1026)' {
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'appends CLEANUP_LEG_PATH_NOT_ALLOWLISTED to the deny for a non-allowlisted Write inside the consolidation worktree' {
+            # Act
+            $decision = Get-CodexCleanupDecision -MappedInput (ConvertTo-CodexMappedInput -FilePath "$($script:Consolidation)/scripts/docs/a.ps1")
+
+            # Assert
+            Assert-CodexSubCodeDeny -Decision $decision -SubCode 'CLEANUP_LEG_PATH_NOT_ALLOWLISTED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match ([regex]::Escape("'scripts/docs/a.ps1'"))
+        }
+
+        It 'keeps the exact deny text for the same Write beneath a non-consolidation worktree' {
+            # Act
+            $decision = Get-CodexCleanupDecision -MappedInput (ConvertTo-CodexMappedInput -FilePath "$($script:Feature)/scripts/docs/a.ps1")
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked
         }
     }
 

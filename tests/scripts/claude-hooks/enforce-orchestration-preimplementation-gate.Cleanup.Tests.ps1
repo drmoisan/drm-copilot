@@ -18,9 +18,11 @@
     /synthetic-users; the staged-index seam returns NUL-terminated names. No row creates a file,
     starts a process, reads a clock, or touches the network.
 
-    Every deny row compares the decision with the decision the gate returns when the cleanup
-    leg is withheld (Test-OrchestrationCleanupContextAllowed mocked to $false), so the deny text
-    is the text the gate returns today.
+    Every deny row for an input rejected before consolidation identity, or for a
+    non-consolidation target, compares the decision with the decision the gate returns when the
+    cleanup leg is withheld (Get-OrchestrationCleanupContextResult mocked to a denied result with
+    no suffix), so the deny text is the text the gate returns today. A denial after the
+    consolidation worktree is identified as the target asserts the appended cleanup sub-code.
 #>
 
 BeforeAll {
@@ -74,13 +76,21 @@ BeforeAll {
     function Assert-CleanupUnchangedDeny {
         param([string[]] $Payload)
         $actual = @($Payload | ForEach-Object { Get-CleanupDecision -Payload $_ | ConvertTo-Json -Compress -Depth 5 })
-        Mock Test-OrchestrationCleanupContextAllowed { $false }
+        Mock Get-OrchestrationCleanupContextResult { [pscustomobject]@{ Allowed = $false; DenySuffix = '' } }
         for ($index = 0; $index -lt $Payload.Count; $index++) {
             $today = Get-CleanupDecision -Payload $Payload[$index] | ConvertTo-Json -Compress -Depth 5
             $actual[$index] | Should -BeExactly $today -Because "payload $($Payload[$index]) must keep today's deny"
             $actual[$index] | Should -Match '"permissionDecision":"deny"'
             $actual[$index] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED:'
         }
+    }
+
+    # Asserts a deny whose reason is the unchanged blocked text followed by the cleanup sub-code.
+    function Assert-CleanupSubCodeDeny {
+        param([Parameter(Mandatory)] $Decision, [Parameter(Mandatory)] [string] $SubCode)
+        $reason = [string]$Decision.hookSpecificOutput.permissionDecisionReason
+        $Decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $reason.StartsWith("$($script:Blocked) Cleanup leg not applied: $($SubCode): ", [System.StringComparison]::Ordinal) | Should -BeTrue -Because "the reason '$reason' must carry $SubCode after the unchanged text"
     }
 }
 
@@ -194,20 +204,34 @@ Describe 'Claude preimplementation gate cleanup legs (issue #1026)' {
             # Arrange
             Set-CleanupListing -Staged "docs/research/y.md$($script:Nul)scripts/a.ps1$($script:Nul)"
 
-            # Act / Assert
-            Assert-CleanupUnchangedDeny -Payload @(ConvertTo-CleanupPayload -Tool 'Bash' -Command "git -C $($script:Consolidation) commit -F msg.txt")
+            # Act
+            $decision = Get-CleanupDecision -Payload (ConvertTo-CleanupPayload -Tool 'Bash' -Command "git -C $($script:Consolidation) commit -F msg.txt")
+
+            # Assert
+            Assert-CleanupSubCodeDeny -Decision $decision -SubCode 'CLEANUP_LEG_STAGED_PATH_NOT_ALLOWLISTED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match ([regex]::Escape("'scripts/a.ps1'"))
         }
 
         It 'denies the commit when the staged index is empty or the staged-index seam fails' {
             # Arrange
             $payload = ConvertTo-CleanupPayload -Tool 'Bash' -Command "git -C $($script:Consolidation) commit -F msg.txt"
-            $actual = foreach ($variant in @(@{ Staged = ''; Code = 0 }, @{ Staged = "docs/research/y.md$($script:Nul)"; Code = 1 }, @{ Staged = ''; Code = -1 }, @{ Staged = 'docs/research/y.md'; Code = 0 }, @{ Staged = $script:Nul; Code = 0 })) {
-                Set-CleanupListing -Staged $variant.Staged -StagedExitCode $variant.Code
-                Get-CleanupDecision -Payload $payload
-            }
+            $variants = @(
+                @{ Staged = ''; Code = 0; SubCode = 'CLEANUP_LEG_STAGED_INDEX_EMPTY' }
+                @{ Staged = "docs/research/y.md$($script:Nul)"; Code = 1; SubCode = 'CLEANUP_LEG_STAGED_INDEX_UNREADABLE' }
+                @{ Staged = ''; Code = -1; SubCode = 'CLEANUP_LEG_STAGED_INDEX_UNREADABLE' }
+                @{ Staged = 'docs/research/y.md'; Code = 0; SubCode = 'CLEANUP_LEG_STAGED_INDEX_UNREADABLE' }
+                @{ Staged = $script:Nul; Code = 0; SubCode = 'CLEANUP_LEG_STAGED_INDEX_EMPTY' }
+            )
+
+            # Act
+            $actual = @(foreach ($variant in $variants) {
+                    Set-CleanupListing -Staged $variant.Staged -StagedExitCode $variant.Code
+                    Get-CleanupDecision -Payload $payload
+                })
 
             # Assert
-            foreach ($decision in $actual) { $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked }
+            $actual.Count | Should -Be $variants.Count
+            for ($index = 0; $index -lt $variants.Count; $index++) { Assert-CleanupSubCodeDeny -Decision $actual[$index] -SubCode $variants[$index].SubCode }
         }
 
         It 'denies the commit with -a, --amend, --pathspec-from-file, or a pathspec operand' {
@@ -316,10 +340,28 @@ Describe 'Claude preimplementation gate cleanup legs (issue #1026)' {
 
         It 'denies a consolidation Write whose relative path is outside the allowlist' {
             # Arrange
-            $paths = @("$($script:Consolidation)/scripts/docs/a.ps1", "$($script:Consolidation)/artifacts/pr_body_7.json", "$($script:Consolidation)/.claude/rules/x.json")
+            $paths = @("$($script:Consolidation)/artifacts/pr_body_7.json", "$($script:Consolidation)/.claude/rules/x.json")
 
             # Act / Assert
             Assert-CleanupUnchangedDeny -Payload @($paths | ForEach-Object { ConvertTo-CleanupPayload -Tool 'Write' -FilePath $_ })
+        }
+
+        It 'appends CLEANUP_LEG_PATH_NOT_ALLOWLISTED to the deny for a non-allowlisted Write inside the consolidation worktree' {
+            # Act
+            $decision = Get-CleanupDecision -Payload (ConvertTo-CleanupPayload -Tool 'Write' -FilePath "$($script:Consolidation)/scripts/docs/a.ps1")
+
+            # Assert
+            Assert-CleanupSubCodeDeny -Decision $decision -SubCode 'CLEANUP_LEG_PATH_NOT_ALLOWLISTED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match ([regex]::Escape("'scripts/docs/a.ps1'"))
+        }
+
+        It 'keeps the exact deny text for the same Write beneath a non-consolidation worktree' {
+            # Act
+            $decision = Get-CleanupDecision -Payload (ConvertTo-CleanupPayload -Tool 'Write' -FilePath "$($script:Feature)/scripts/docs/a.ps1")
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked
         }
     }
 

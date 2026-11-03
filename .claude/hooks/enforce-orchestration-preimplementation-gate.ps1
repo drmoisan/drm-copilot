@@ -412,8 +412,8 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (Test-OrchestrationReady -Payload $checkpoint) {
         return Get-OrchestrationPreimplementationGateAllowDecision
     }
-    if (Test-OrchestrationCleanupContextAllowed -FilePath $filePath -Content (Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'content') -Command $command) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
+    if (($cleanup = Get-OrchestrationCleanupContextResult -FilePath $filePath -Content (Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'content') -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix)
 }
 
 function Invoke-OrchestrationPreimplementationGateEntryPoint {
