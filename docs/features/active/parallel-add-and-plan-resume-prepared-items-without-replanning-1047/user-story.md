@@ -50,10 +50,10 @@ Every item admitted by `/parallel-add` or seeded by `/parallel-plan` goes throug
 - [x] `/parallel-add` against a closed run fails with `PARALLEL_ADMISSION_REJECTED: run_closed` emitted by the admission helper. Verified by the Pester guard matrix and the local "add to a closed run" integration scenario.
 - [x] `/parallel-plan` seeds a new run from prepared items without preparation children, and the manifest, planner-state, and orchestrator-state validators accept the result. Verified by the local seed integration scenario with validator exit codes recorded.
 - [x] The band comes from `--band`, then the planner checkpoint, then a fresh assessment with a written rationale. Verified by Pester band-source cases.
-- [ ] An `--after` precedence input is honored by the cohort table, and a cohort table that violates it is rejected by the helper and by the cohort barrier hook. Verified by Pester precedence and hook suites.
+- [x] An `--after` precedence input is honored by the cohort table, and a cohort table that violates it is rejected by the helper and by the cohort barrier hook. Verified by Pester precedence and hook suites.
 - [x] Conflict edges are stored in a committed `parallel-scheduling.json` that a re-seed from another checkout reads. Verified by Pester record cases and the local seed integration scenario.
 - [x] The parent orchestrator keeps an item at `pr_open` while its CI green gate is pending and re-delegates the child to resume at that gate. Verified by the fragment pin in `test_parallel_orchestrator_surface_contracts.py`.
-- [ ] The helper is PowerShell with no new Python, no edited Python production file, and no new or edited TypeScript (an existing Python test-support module under `tests/` may gain fragment pins), mirrors and bundles are byte-equal, and the push-down, pack-manifest, dependency-closure, and parallel contract tests pass. Verified by the scope diff and contract test runs recorded under `evidence/`.
+- [x] The helper is PowerShell with no new Python, no edited Python production file, and no new or edited TypeScript (an existing Python test-support module under `tests/` may gain fragment pins), mirrors and bundles are byte-equal, and the push-down, pack-manifest, dependency-closure, and parallel contract tests pass. Verified by the scope diff and contract test runs recorded under `evidence/`.
 
 ## Non-Goals
 
