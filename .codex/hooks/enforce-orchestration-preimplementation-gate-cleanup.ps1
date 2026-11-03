@@ -201,7 +201,7 @@ function Test-OrchestrationCleanupScratchWrite {
     if ($normalized -notmatch '^([A-Za-z]:/|/(?!/))') {
         return $false
     }
-    $temporary = @(Get-OrchestrationGateTemporaryRoot)
+    $temporary = [string[]]@(Get-OrchestrationGateTemporaryRoot | ForEach-Object { $_ })
     if (@($temporary | Where-Object { Test-CleanupContextPathUnder -Path $normalized -Root $_ }).Count -eq 0) {
         return $false
     }
