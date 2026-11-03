@@ -474,7 +474,8 @@ These records serve the consolidation consumer and are never read by either gate
   consumer reads that worktree's `MEMORY.md`.
 - `source_path` — string, required, repo-relative within that worktree. The file to preserve.
 - `change_class` — string, required, either `untracked` or `modified`, recording whether staging
-  adds a new file or carries a working-tree modification.
+  adds a new file or carries a working-tree modification. How each class is staged is described
+  under `### Preserve staging outcomes`.
 - `disposition` — string, required, exactly `PRESERVE`.
 - `verdict` — string, required, a member of the step-5 verdict vocabulary listed above.
 - `target_path` — string, required, repo-relative on the consolidation branch. Required because the
@@ -527,6 +528,52 @@ These records serve the consolidation consumer and are never read by either gate
   ]
 }
 ```
+
+### Preserve staging outcomes
+
+`cleanup-worktrees.sh --preserve` reports each record's outcome as
+`ACTION|preserve-stage|<target_path>|<result>`. The result vocabulary is:
+
+- `OK` — the record was written and staged.
+- `FAILED` — a write or staging operation failed; the remaining records continue.
+- `SKIPPED-INVALID` — a record field failed validation.
+- `MISSING-SOURCE` — the source file does not exist in the named worktree.
+- `HOST-TOKEN-BLOCKED` — the incoming bytes carry a host-identifying token; the whole pass stops
+  with exit 3 and nothing is staged.
+- `IGNORED-TARGET` — the target path is ignored on the consolidation branch and is not forced.
+- `MISSING-WORKTREE` — the consolidation worktree does not exist.
+- `REFUSED-WOULD-REGRESS` — staging the record would lose a line that the consolidation branch
+  already carries, or the record repeats an earlier record's `target_path`.
+
+Staging depends on whether `<consolidation-worktree>/<target_path>` is an existing regular file:
+
+- Absent target, either `change_class`: the source is copied byte for byte.
+- Existing target, `untracked` record: the source is copied only when every line of the target is
+  present in the source in the same order; otherwise the record is refused.
+- Existing target, `modified` record with a merge base (the source path equals the target path, and
+  the file exists at the merge base of the worktree `HEAD` and the consolidation `HEAD`): the
+  worktree change must only add lines to the base (G1); a `git merge-file --union --object-id`
+  merge of the target, the base, and the source then runs; the merged result must keep every target
+  line (G2) and must add no line beyond the worktree's own additions (G3). The merged blob is
+  staged.
+- Existing target, `modified` record without a merge base: treated as an existing `untracked`
+  target.
+- A record whose `target_path` repeats an earlier record's in the same pass is refused; the first
+  record keeps the target.
+
+A refused record still emits its `PRESERVE|` record, writes a `cleanup-worktrees: refused` line to
+stderr naming the failed guard, appends no `MEMORY.md` index line, and makes the pass exit 1.
+
+Residuals:
+
+- A resurrected line textually identical to a line the worktree added cannot be distinguished by G3.
+- The merge path requires Git 2.43 or later for `merge-file --object-id`; an older Git fails the
+  merge and the record is refused.
+- The order in which `--union` places two insertions at the same position is not specified by Git;
+  G2 and G3 bound the result whatever the order.
+- The planning phase writes unreferenced blob objects (`hash-object -w`, `merge-file --object-id`)
+  to the object store; it writes no index, ref, or working-tree file.
+- A refused record is not consolidated; the operator consolidates it manually.
 
 ### Accepted residual
 

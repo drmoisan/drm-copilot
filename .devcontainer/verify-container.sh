@@ -96,9 +96,27 @@ else
 fi
 echo ""
 
+# Node Check
+echo "🟢 Node.js:"
+if command -v node &> /dev/null; then
+    NODE_VERSION=$(node --version 2>&1)
+    echo "   Version: $NODE_VERSION"
+    if [[ "$NODE_VERSION" == v20.* ]]; then
+        echo "   ✅ Node 20.x detected (expected; matches CI)"
+        NODE_OK=true
+    else
+        echo "   ❌ Expected Node 20.x (CI runs the TypeScript tests on Node 20)"
+        NODE_OK=false
+    fi
+else
+    echo "   ❌ Node not found"
+    NODE_OK=false
+fi
+echo ""
+
 # Shell Tools Check
 echo "🔧 Shell Tools:"
-declare -a TOOLS=("git" "gh" "shellcheck" "shfmt" "bashdb" "actionlint")
+declare -a TOOLS=("git" "gh" "shellcheck" "shfmt" "kcov" "bats" "bashdb" "actionlint" "claude" "cswap")
 TOOLS_OK=true
 
 for tool in "${TOOLS[@]}"; do
@@ -110,6 +128,17 @@ for tool in "${TOOLS[@]}"; do
         TOOLS_OK=false
     fi
 done
+
+# shfmt must match the version CI pins (.github/workflows/_shell-coverage.yml)
+if command -v shfmt &> /dev/null; then
+    SHFMT_ACTUAL=$(shfmt --version 2>&1 | head -n1)
+    if [ "$SHFMT_ACTUAL" = "v3.8.0" ]; then
+        echo "   ✅ shfmt matches the CI pin (v3.8.0)"
+    else
+        echo "   ❌ shfmt is $SHFMT_ACTUAL; CI pins v3.8.0"
+        TOOLS_OK=false
+    fi
+fi
 echo ""
 
 # Configuration File Check
@@ -148,6 +177,7 @@ if [ "${OS_OK:-false}" = true ] && \
    [ "${PYTHON_OK:-false}" = true ] && \
    [ "${POETRY_OK:-false}" = true ] && \
    [ "${PWSH_OK:-false}" = true ] && \
+   [ "${NODE_OK:-false}" = true ] && \
    [ "${TOOLS_OK:-false}" = true ] && \
    [ "${VENV_OK:-false}" = true ]; then
     echo "✅ All checks passed!"

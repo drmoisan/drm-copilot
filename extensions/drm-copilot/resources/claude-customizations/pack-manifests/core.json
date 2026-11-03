@@ -125,6 +125,7 @@
     ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh",
     ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh",
     ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh",
+    ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_merge_lib.sh",
     ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh",
     ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh",
     ".claude/skills/commit-message/SKILL.md",
