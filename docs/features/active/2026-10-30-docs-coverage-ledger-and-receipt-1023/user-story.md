@@ -130,7 +130,7 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 ### Maintainer recording a scanner precision limit
 
 - [ ] A precision-limit diagnostic in the snapshot without a ledger entry fails `-Command validate -Mode ledger` with `DOCS_LEDGER_LIMIT_UNRECORDED` naming the analyzer, code and path; after `-Operation set-disposition -Limit <diagnostic id> -Disposition deferred -Owner <id> -Target <text> -Write`, the ledger holds a `deferred` entry with `analysis_method` `scanner` and the finding is gone (`DocsLedgerCommands.Tests.ps1`).
-- [ ] In `docs-complete` mode a precision-limit entry passes when the profile's `allow_deferred` is true and yields `DOCS_DEFERRED_NOT_ALLOWED` when it is false (`DocsValidation.Tests.ps1`).
+- [x] In `docs-complete` mode a precision-limit entry passes when the profile's `allow_deferred` is true and yields `DOCS_DEFERRED_NOT_ALLOWED` when it is false (`DocsValidation.Tests.ps1`).
 
 ### CI proving docs-complete
 
@@ -142,10 +142,10 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 ### Downstream tool author consuming the contracts
 
 - [ ] Each of `coverage`, `update-ledger` and `validate`, with `-Json`, prints exactly one envelope that produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'`, and returns exit 0, 1, 2 or 3 with the meanings stated in the spec (`DocsLedgerCommands.Tests.ps1`).
-- [ ] Every emitted receipt produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-validation-receipt'`, and its `id` does not change when only `issued_at` differs (`DocsReceipt.Tests.ps1`, `DocsValidation.Tests.ps1`).
+- [x] Every emitted receipt produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-validation-receipt'`, and its `id` does not change when only `issued_at` differs (`DocsReceipt.Tests.ps1`, `DocsValidation.Tests.ps1`).
 - [ ] `-Command validate` without `-WriteReceipt` makes no `WriteText` call in any mode, so an MCP tool that does not pass that switch is read-only (`DocsLedgerCommands.Tests.ps1`).
 - [ ] An invalid argument returns exit 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and a null `result`, before any context read (`DocsLedgerCommands.Tests.ps1`).
-- [ ] `Get-DocsReceiptGateDecision` allows only a schema-valid `docs-complete` receipt with `validation_result` `pass` whose `revision` equals the supplied revision, and otherwise returns the reason `receipt-invalid`, `mode-not-docs-complete`, `result-fail` or `revision-mismatch` (`DocsReceipt.Tests.ps1`).
+- [x] `Get-DocsReceiptGateDecision` allows only a schema-valid `docs-complete` receipt with `validation_result` `pass` whose `revision` equals the supplied revision, and otherwise returns the reason `receipt-invalid`, `mode-not-docs-complete`, `result-fail` or `revision-mismatch` (`DocsReceipt.Tests.ps1`).
 
 ### Quality
 
