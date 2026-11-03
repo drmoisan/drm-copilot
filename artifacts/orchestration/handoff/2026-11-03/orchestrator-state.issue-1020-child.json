@@ -1,0 +1,82 @@
+{
+  "objective": "Epic #1019 child #1020 (docs-profile-and-artifact-schemas): resume at atomic execution of the committed, preflight-cleared plan; PR into epic/documentation-estate-tooling-integration; merge on green.",
+  "change_budget_estimate": "large: 16 production PowerShell files (8 under .claude/lib/docs plus 8 bundle mirrors), 24 JSON schema/example files, core pack manifest and quality-tiers edits, 13 Pester test/support files",
+  "path_selected": "large",
+  "route_id": "large",
+  "preparation_mode": false,
+  "lifecycle_ready": true,
+  "epic_mode": true,
+  "epic_issue": 1019,
+  "epic_feature_folder": "documentation-estate-tooling",
+  "epic_checkpoint_path": "artifacts/orchestration/epic-orchestrator-state.json",
+  "integration_branch": "epic/documentation-estate-tooling-integration",
+  "pr_base_branch": "epic/documentation-estate-tooling-integration",
+  "branch_name": "feature/docs-profile-and-artifact-schemas-1020-r2",
+  "promotion-type": "feature",
+  "short-name": "docs-profile-and-artifact-schemas",
+  "relativeFile": "docs/features/potential/2026-10-30-docs-profile-and-artifact-schemas.md",
+  "long-name": "2026-10-30-docs-profile-and-artifact-schemas",
+  "issue-num": "1020",
+  "feature-folder": "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020",
+  "work-mode": "full-feature",
+  "plan-path": "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/plan.2026-10-30T16-08.md",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "required_agents": ["task-researcher", "prd-feature", "atomic-planner", "atomic-executor", "feature-review", "pr-author"],
+  "required_skills": ["orchestrate", "feature-promotion-lifecycle", "atomic-plan-contract", "acceptance-criteria-tracking", "pr-context-artifacts", "pr-base-branch-merge-base"],
+  "required_mcp_tools": ["new_potential_entry", "potential_to_issue", "new_active_feature_folder", "collect_pr_context", "validate_orchestration_artifacts"],
+  "skill_receipts": [
+    {"skill": "orchestrate", "required": true, "evidence": "Resumed at S5 per Checkpoint Handling; epic-mode delegation."},
+    {"skill": "feature-promotion-lifecycle", "required": true, "evidence": "Carried forward from preparation run: MCP-only promotion sequence executed; promoted record retained."},
+    {"skill": "atomic-plan-contract", "required": true, "evidence": "Carried forward from preparation run: planner self-review and executor preflight PREFLIGHT: ALL CLEAR."}
+  ],
+  "mcp_call_receipts": [
+    {"tool": "new_potential_entry", "ok": true, "evidence": "Preparation run: created docs/features/potential/2026-10-30-docs-profile-and-artifact-schemas.md"},
+    {"tool": "potential_to_issue", "ok": true, "evidence": "Preparation run: promoted to https://github.com/drmoisan/drm-copilot/issues/1020"},
+    {"tool": "new_active_feature_folder", "ok": true, "evidence": "Preparation run: created docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020"},
+    {"tool": "validate_orchestration_artifacts", "ok": true, "evidence": "Preparation run: plan artifact validated before and after preflight fixes"}
+  ],
+  "completed_steps": ["S0_change_budget", "S3_promotion", "S3b_research", "S3c_feature_documents", "S4_atomic_planning", "S4b_preflight"],
+  "next_step": "resume atomic execution at P6-T3",
+  "last_updated": "2026-11-03T15:05:00Z",
+  "step5_status": "delegated",
+  "step6_status": "pending",
+  "step7_status": "pending",
+  "step8_status": "pending",
+  "step9_status": "pending",
+  "step10_status": "pending",
+  "delegation_receipts": {
+    "agents": [
+      {"step": "S3b_research", "agent_name": "task-researcher", "agent_id": "a56381a85ea9a62b5", "skill_source": ".claude/agents/task-researcher.md", "started_at": "2026-10-30T20:10:00Z", "completed_at": "2026-10-30T20:22:00Z", "result_signal": "research-path returned (preparation run)", "artifact_paths": ["docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/research/2026-10-30T20-30-docs-profile-and-artifact-schemas-research.md"]},
+      {"step": "S3c_feature_documents", "agent_name": "prd-feature", "agent_id": "a2ae30b25e9a29f86", "skill_source": ".claude/agents/prd-feature.md", "started_at": "2026-10-30T20:23:00Z", "completed_at": "2026-10-30T20:27:00Z", "result_signal": "spec-path and user-story-path returned (preparation run)", "artifact_paths": ["docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/spec.md", "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/user-story.md"]},
+      {"step": "S4_atomic_planning", "agent_name": "atomic-planner", "agent_id": "aeb797c8c1d190fef", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-10-30T20:28:00Z", "completed_at": "2026-10-30T20:35:00Z", "result_signal": "SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS (preparation run)", "artifact_paths": ["docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/plan.2026-10-30T16-08.md"]},
+      {"step": "S4b_preflight", "agent_name": "atomic-executor", "agent_id": "a5a14f35dc6280b2b", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-10-30T20:36:00Z", "completed_at": "2026-10-30T20:42:00Z", "result_signal": "PREFLIGHT: ALL CLEAR (preparation run)", "artifact_paths": ["docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/plan.2026-10-30T16-08.md"]},
+      {"step": "S5_atomic_execution_phases_0_2", "agent_name": "atomic-executor", "agent_id": "ab75360ab3a70f19c", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-03T11:48:00Z", "completed_at": "2026-11-03T12:58:00Z", "result_signal": "Phases 0-2 complete (16 tasks; commits cc1494603, c0e1a9732, 2fc4f9746 pushed); escalation: Test-Json circular-reference on recursive common.json-value blocks [P3-T4]", "artifact_paths": ["docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/evidence/other/testjson-recursive-ref-probe.2026-11-03T12-11.md"]},
+      {"step": "S5_plan_revision_recursive_ref", "agent_name": "atomic-planner", "agent_id": "abce309f698335ef4", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-03T13:00:00Z", "completed_at": "2026-11-03T13:08:00Z", "result_signal": "SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS; committed 3092a71cd", "artifact_paths": ["docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/plan.2026-10-30T16-08.md", "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/spec.md"]}
+    ],
+    "promotion": {
+      "potential_entry": {"ok":true,"tool":"new_potential_entry","summary":"Created a new potential entry for 'docs-profile-and-artifact-schemas'.","artifacts":["docs/features/potential/2026-10-30-docs-profile-and-artifact-schemas.md"]},
+      "issue": {"ok":true,"tool":"potential_to_issue","summary":"Promoted as a feature workflow in full-feature mode.","artifacts":["https://github.com/drmoisan/drm-copilot/issues/1020"],"destination_path":"docs/features/potential/promoted/2026-10-30-docs-profile-and-artifact-schemas.md","target_repository":"drmoisan/drm-copilot"},
+      "feature_folder": {"ok":true,"tool":"new_active_feature_folder","summary":"Created a new active feature feature folder for 'docs-profile-and-artifact-schemas'.","artifacts":["docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/issue.md"],"destination_path":"docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020"}
+    }
+  },
+  "complexity_assessments": [
+    {"phase": "research", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Preparation run assessment.", "assessed_at": "2026-10-30T20:09:00Z"},
+    {"phase": "feature_documents", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Preparation run assessment.", "assessed_at": "2026-10-30T20:09:00Z"},
+    {"phase": "planning", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Preparation run assessment.", "assessed_at": "2026-10-30T20:09:00Z"},
+    {"phase": "preflight", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Preparation run assessment.", "assessed_at": "2026-10-30T20:09:00Z"},
+    {"phase": "plan_revision", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Composition-contract amendment to spec and Phase 3 tasks.", "assessed_at": "2026-11-03T13:00:00Z"},
+    {"phase": "execution", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Epic-planner band C3; execution implements cross-feature schemas and module contracts.", "assessed_at": "2026-11-03T11:45:00Z"}
+  ],
+  "model_routing_receipts": [
+    {"agent": "task-researcher", "phase": "research", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "prd-feature", "phase": "feature_documents", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "planning", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-executor", "phase": "preflight", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "plan_revision", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-executor", "phase": "execution", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"}
+  ],
+  "model_routing_preflight": {"status": "pass", "checked_at": "2026-11-03T11:46:00Z", "validator_command": "poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing", "output_summary": "orchestrator-state validation passed"},
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "blocked_reason": "none"
+}

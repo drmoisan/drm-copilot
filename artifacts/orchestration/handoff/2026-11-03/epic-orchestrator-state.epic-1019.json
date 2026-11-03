@@ -1,0 +1,98 @@
+{
+  "objective": "Execute the prepared epic documentation-estate-tooling (#1019) per epic-kickoff.md: wave-scheduled child orchestrator runs resuming at atomic execution from committed plan-paths, merge-on-green fan-in to epic/documentation-estate-tooling-integration, then the final integration-to-main PR (merge only after coordinator sign-off).",
+  "route_id": "epic",
+  "epic_feature_folder": "documentation-estate-tooling",
+  "epic_manifest_path": "docs/features/epics/documentation-estate-tooling/epic.md",
+  "epic_status_doc_path": "docs/features/epics/documentation-estate-tooling/epic-status.md",
+  "integration_branch": "epic/documentation-estate-tooling-integration",
+  "epic_issue_num": 1019,
+  "max_parallel_features": 4,
+  "coordinator_guardrails": {
+    "received_at": "2026-11-03T11:40:00Z",
+    "main_merge_base_for_overlap_check": "7b8894b41",
+    "integration_tip_at_start": "34062758361d9729dc14d0d5beb7880e96035dbb",
+    "origin_main_at_start": "715241396b557ce198e44f5c4b606fbcd9082c3c",
+    "guardrail_2_replaced_at": "2026-11-03T11:55:00Z",
+    "max_agents_in_subtree": null,
+    "agent_cap_removed_at": "2026-11-03T12:00:00Z",
+    "children_one_at_a_time": false,
+    "per_child_agent_budget_note": "Owner instruction: no subtree agent cap and no pre-emptive throttling. All ready children of a wave launch together. On an actual 'Concurrent subagent limit reached' failure, wait and retry; never kill agents. Standalone orchestrators for 1041, 1027, 1026, 1047 share the 30 session slots.",
+    "weekly_budget_hold_threshold_points": 15,
+    "report_cost_per_wave": true,
+    "child_1020_launched_under_old_cap": "1020 was launched with a one-subagent-at-a-time instruction before the update; it cannot be re-messaged and is left to run.",
+    "commit_and_push_after_each_phase": true,
+    "halt_on_rate_limit_or_auth_error": true,
+    "report_at_each_wave_barrier": true,
+    "final_integration_pr_merge_requires_coordinator_notice": true,
+    "language_rule": "No new Python except #1031 analyzer; skills/hooks/libs PowerShell or bash; TypeScript only for MCP and extension commands.",
+    "required_checks_source": "ruleset 15241672 (11 required contexts); NPM Audit Gate not required"
+  },
+  "main_overlap_scan": {
+    "method": "plan text mentions of paths in git diff 7b8894b41..integration --name-only; mentions are triaged per child before launch",
+    "mentions": {
+      "1020": ["scripts/dev_tools/json_config.py"],
+      "1021": ["README.md"],
+      "1022": ["pyproject.toml"],
+      "1023": [".claude/skills/execution-environment/SKILL.md", "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"],
+      "1033": [],
+      "1024": [".claude/skills/execution-environment/SKILL.md", "README.md", "tests/scripts/dev_tools/test_codex_core_manifest_closure.py"],
+      "1031": ["pyproject.toml", "tests/discovery_runtime/test_package_contract.py"],
+      "1034": [".claude/skills/execution-environment/SKILL.md", ".codex/config.toml", "scripts/dev_tools/generate_codex_agent_variants.py"],
+      "1036": [".agents/skills/execution-environment/SKILL.md", ".claude/skills/execution-environment/SKILL.md", ".codex/config.toml", ".github/skills/execution-environment/SKILL.md", "README.md", "package.json", "tests/scripts/dev_tools/test_discovery_documentation_contracts.py", "tests/scripts/dev_tools/test_execution_environment_brief_contracts.py", "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"],
+      "1037": [".claude/skills/execution-environment/SKILL.md", ".codex/config.toml", "README.md"],
+      "1038": [".claude/skills/execution-environment/SKILL.md", "README.md", "tests/scripts/dev_tools/test_discovery_documentation_contracts.py", "tests/scripts/dev_tools/test_execution_environment_brief_contracts.py"]
+    },
+    "triage": {
+      "1020": "No write-set overlap. json_config.py is cited read-only (GOVERNED_GLOBS note); main added a docs/features/** EXCLUDE_GLOBS entry, which does not affect the plan premise. Pester-only feature, so pytest strictness changes do not apply."
+    }
+  },
+  "completed_steps": [
+    "startup: no prior epic checkpoint; kickoff artifact resolved from origin/epic/documentation-estate-tooling-integration",
+    "integration branch current with origin/main (rev-list count 0); no main-sync child needed for wave 0",
+    "all eleven prep branches are ancestors of the integration tip with zero commits ahead; execution starts fresh at wave 0",
+    "waves computed by longest-path layering from epic.md depends_on",
+    "main-merge overlap scan recorded; 1020 triaged clear"
+  ],
+  "next_step": "Await child 1020 completion; then re-derive its PR/merge state via gh pr view and git, mirror merge_status, remove its worktree, report the wave-0 barrier with cost (agents used, children merged) to the coordinator, run the overlap triage for 1021/1022/1023/1033, and launch all four wave-1 children in parallel in one message",
+  "last_updated": "2026-11-03T11:55:00Z",
+  "current_wave": 0,
+  "waves": [
+    {"wave_number": 0, "feature_folders": ["2026-10-30-docs-profile-and-artifact-schemas-1020"]},
+    {"wave_number": 1, "feature_folders": ["2026-10-30-docs-coverage-ledger-and-receipt-1023", "2026-10-30-docs-page-quality-checker-1021", "2026-10-30-docs-surface-analyzers-python-config-1022", "2026-10-30-docs-surface-analyzers-typescript-dotnet-1033"]},
+    {"wave_number": 2, "feature_folders": ["2026-10-30-docs-enforcement-and-ci-1034", "2026-10-30-docs-reference-generator-1024", "2026-10-30-docs-surface-analyzer-python-native-1031"]},
+    {"wave_number": 3, "feature_folders": ["2026-10-30-docs-mcp-tools-1036"]},
+    {"wave_number": 4, "feature_folders": ["2026-10-30-docs-authoring-workflow-1037"]},
+    {"wave_number": 5, "feature_folders": ["2026-10-30-documentation-estate-template-and-onboarding-1038"]}
+  ],
+  "features": [
+    {"issue_num": 1020, "feature_folder": "2026-10-30-docs-profile-and-artifact-schemas-1020", "resolved_folder": "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020", "plan_path": "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/plan.2026-10-30T16-08.md", "complexity_band": "C3", "depends_on": [], "wave_number": 0, "merge_status": "worktree_created", "branch_name": "feature/docs-profile-and-artifact-schemas-1020-r2", "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": "2026-11-03T11:45:00Z", "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1021, "feature_folder": "2026-10-30-docs-page-quality-checker-1021", "resolved_folder": "docs/features/active/2026-10-30-docs-page-quality-checker-1021", "plan_path": "docs/features/active/2026-10-30-docs-page-quality-checker-1021/plan.2026-10-30T16-13.md", "complexity_band": "C3", "depends_on": [1020], "wave_number": 1, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1022, "feature_folder": "2026-10-30-docs-surface-analyzers-python-config-1022", "resolved_folder": "docs/features/active/2026-10-30-docs-surface-analyzers-python-config-1022", "plan_path": "docs/features/active/2026-10-30-docs-surface-analyzers-python-config-1022/plan.2026-10-30T16-46.md", "complexity_band": "C4", "depends_on": [1020], "wave_number": 1, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1023, "feature_folder": "2026-10-30-docs-coverage-ledger-and-receipt-1023", "resolved_folder": "docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023", "plan_path": "docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023/plan.2026-10-30T16-51.md", "complexity_band": "C4", "depends_on": [1020], "wave_number": 1, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1033, "feature_folder": "2026-10-30-docs-surface-analyzers-typescript-dotnet-1033", "resolved_folder": "docs/features/active/2026-10-30-docs-surface-analyzers-typescript-dotnet-1033", "plan_path": "docs/features/active/2026-10-30-docs-surface-analyzers-typescript-dotnet-1033/plan.2026-10-30T18-39.md", "complexity_band": "C4", "depends_on": [1020], "wave_number": 1, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1024, "feature_folder": "2026-10-30-docs-reference-generator-1024", "resolved_folder": "docs/features/active/2026-10-30-docs-reference-generator-1024", "plan_path": "docs/features/active/2026-10-30-docs-reference-generator-1024/plan.2026-10-30T16-54.md", "complexity_band": "C3", "depends_on": [1020, 1021], "wave_number": 2, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1031, "feature_folder": "2026-10-30-docs-surface-analyzer-python-native-1031", "resolved_folder": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031", "plan_path": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/plan.2026-10-30T18-38.md", "complexity_band": "C3", "depends_on": [1022], "wave_number": 2, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1034, "feature_folder": "2026-10-30-docs-enforcement-and-ci-1034", "resolved_folder": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034", "plan_path": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/plan.2026-10-30T18-40.md", "complexity_band": "C3", "depends_on": [1021, 1023], "wave_number": 2, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1036, "feature_folder": "2026-10-30-docs-mcp-tools-1036", "resolved_folder": "docs/features/active/2026-10-30-docs-mcp-tools-1036", "plan_path": "docs/features/active/2026-10-30-docs-mcp-tools-1036/plan.2026-10-30T18-58.md", "complexity_band": "C3", "depends_on": [1021, 1022, 1023, 1024], "wave_number": 3, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1037, "feature_folder": "2026-10-30-docs-authoring-workflow-1037", "resolved_folder": "docs/features/active/2026-10-30-docs-authoring-workflow-1037", "plan_path": "docs/features/active/2026-10-30-docs-authoring-workflow-1037/plan.2026-10-30T18-59.md", "complexity_band": "C4", "depends_on": [1036], "wave_number": 4, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null},
+    {"issue_num": 1038, "feature_folder": "2026-10-30-documentation-estate-template-and-onboarding-1038", "resolved_folder": "docs/features/active/2026-10-30-documentation-estate-template-and-onboarding-1038", "plan_path": "docs/features/active/2026-10-30-documentation-estate-template-and-onboarding-1038/plan.2026-10-30T18-59.md", "complexity_band": "C3", "depends_on": [1034, 1037], "wave_number": 5, "merge_status": "not_started", "branch_name": null, "worktree_path": null, "pr_number": null, "pr_url": null, "merge_commit_sha": null, "blocked_reason": null, "worktree_created_at": null, "pr_opened_at": null, "merge_confirmed_at": null, "worktree_removed_at": null}
+  ],
+  "epic_merge_pr": {"pr_number": null, "pr_url": null, "ci_gate": null, "merge_commit_sha": null, "merged_at": null},
+  "model_routing_receipts": [
+    {"agent": "orchestrator", "phase": "epic-child-1020", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"}
+  ],
+  "complexity_assessments": [
+    {"phase": "epic-child-1020", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Defines the docs profile and artifact schemas consumed by every later child; band taken from epic-planner assessment.", "assessed_at": "2026-11-03T11:43:01Z"}
+  ],
+  "delegation_receipts": [
+    {"agent_name": "orchestrator", "phase": "epic-child-1020", "issue_num": 1020, "delegated_at": "2026-11-03T11:45:00Z", "status": "launched", "isolation": "worktree", "run_in_background": true, "model": "opus"}
+  ],
+  "skill_receipts": [
+    {"skill": "epic-orchestrate", "invoked_at": "2026-11-03T11:40:00Z", "status": "applied"},
+    {"skill": "acceptance-criteria-tracking", "invoked_at": "2026-11-03T11:40:00Z", "status": "applied"},
+    {"skill": "policy-compliance-order", "invoked_at": "2026-11-03T11:40:00Z", "status": "applied"}
+  ],
+  "mcp_call_receipts": [
+    {"tool": "validate_orchestration_artifacts", "called_at": "2026-11-03T11:44:00Z", "status": "success", "artifact_type": "epic-orchestrator-state"}
+  ]
+}
