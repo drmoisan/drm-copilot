@@ -131,3 +131,76 @@ Describe 'Get-EpicProgressWeeklyQuota' {
         [double]::IsNaN((Get-EpicProgressWeeklyQuota -Json '{"accounts":[{"active":true,"usage":{}}]}')) | Should -BeTrue
     }
 }
+
+Describe 'Get-EpicProgressTaskCount' {
+    It 'counts checked and unchecked task checkboxes' {
+        $plan = @(
+            '### Phase 0 - Setup'
+            '- [x] [P0-T1] Read the policies.'
+            '  - [x] [P0-T2] Capture the baseline.'
+            '- [ ] [P1-T1] Implement.'
+        ) -join "`n"
+
+        $count = Get-EpicProgressTaskCount -PlanText $plan
+
+        $count.Total | Should -Be 3
+        $count.Done | Should -Be 2
+    }
+
+    It 'ignores checkboxes without a task identifier' {
+        $plan = @(
+            '- [x] AC1: a criterion.'
+            '- [ ] AC2: another criterion.'
+            '- [ ] [P1-T1] Implement.'
+        ) -join "`n"
+
+        $count = Get-EpicProgressTaskCount -PlanText $plan
+
+        $count.Total | Should -Be 1
+        $count.Done | Should -Be 0
+    }
+}
+
+Describe 'Get-EpicProgressCurrentPhase' {
+    It 'returns the heading of the phase holding the first unchecked task' {
+        $plan = @(
+            '### Phase 0 - Setup'
+            '- [x] [P0-T1] Read.'
+            '### Phase 1 - Build the parser'
+            '- [ ] [P1-T1] Implement.'
+            '### Phase 2 - QA'
+            '- [ ] [P2-T1] Test.'
+        ) -join "`n"
+
+        Get-EpicProgressCurrentPhase -PlanText $plan | Should -Be 'Phase 1 - Build the parser'
+    }
+
+    It 'falls back to Phase N when no heading matches' {
+        Get-EpicProgressCurrentPhase -PlanText "- [x] [P0-T1] Read.`n- [ ] [P3-T1] Implement." | Should -Be 'Phase 3'
+    }
+
+    It 'returns an empty string when every task is checked' {
+        Get-EpicProgressCurrentPhase -PlanText "### Phase 0 - Setup`n- [x] [P0-T1] Read." | Should -Be ''
+    }
+}
+
+Describe 'Get-EpicProgressFeatureState' {
+    It 'classifies merged and worktree_removed features as Completed' {
+        Get-EpicProgressFeatureState -MergeStatus 'merged' -PrState '' -Done 0 | Should -Be 'Completed'
+        Get-EpicProgressFeatureState -MergeStatus 'worktree_removed' -PrState '' -Done 3 | Should -Be 'Completed'
+    }
+
+    It 'classifies a feature with a MERGED pull request as Completed' {
+        Get-EpicProgressFeatureState -MergeStatus 'in_progress' -PrState '#7 MERGED' -Done 2 | Should -Be 'Completed'
+    }
+
+    It 'classifies a started feature as Running' {
+        Get-EpicProgressFeatureState -MergeStatus 'not_started' -PrState '' -Done 1 | Should -Be 'Running'
+        Get-EpicProgressFeatureState -MergeStatus 'in_progress' -PrState '' -Done 0 | Should -Be 'Running'
+        Get-EpicProgressFeatureState -MergeStatus 'not_started' -PrState '#8 OPEN' -Done 0 | Should -Be 'Running'
+    }
+
+    It 'classifies an unstarted feature as Pending' {
+        Get-EpicProgressFeatureState -MergeStatus 'not_started' -PrState '' -Done 0 | Should -Be 'Pending'
+    }
+}

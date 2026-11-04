@@ -136,3 +136,73 @@ function Get-EpicProgressWeeklyQuota {
     }
     return [double] $active.usage.sevenDay.pct
 }
+
+function Get-EpicProgressTaskCount {
+    <#
+    .SYNOPSIS
+        Return Total and Done counts of '- [ ] [P#-T#]' and '- [x] [P#-T#]' plan checkboxes.
+    .PARAMETER PlanText
+        The full plan text. Checkboxes without a task identifier are not counted.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $PlanText)
+
+    $taskMatches = [regex]::Matches($PlanText, '(?m)^\s*- \[( |x)\] \[P\d+-T\d+\]')
+    $done = 0
+    foreach ($taskMatch in $taskMatches) {
+        if ($taskMatch.Groups[1].Value -eq 'x') { $done++ }
+    }
+    return [pscustomobject]@{ Total = $taskMatches.Count; Done = $done }
+}
+
+function Get-EpicProgressCurrentPhase {
+    <#
+    .SYNOPSIS
+        Return the heading text of the phase that holds the first unchecked task.
+    .DESCRIPTION
+        Returns the first level-2 to level-4 'Phase N' heading without its hash marks,
+        'Phase N' when no heading matches, and an empty string when every task is checked.
+    .PARAMETER PlanText
+        The full plan text.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $PlanText)
+
+    $first = [regex]::Match($PlanText, '(?m)^\s*- \[ \] \[P(\d+)-T\d+\]')
+    if (-not $first.Success) { return '' }
+    $phaseNumber = $first.Groups[1].Value
+    $heading = [regex]::Match($PlanText, "(?m)^#{2,4}\s+Phase\s+$phaseNumber\b[^\r\n]*")
+    if ($heading.Success) { return ($heading.Value -replace '^#+\s+', '').Trim() }
+    return "Phase $phaseNumber"
+}
+
+function Get-EpicProgressFeatureState {
+    <#
+    .SYNOPSIS
+        Classify a feature as Completed, Running, or Pending.
+    .DESCRIPTION
+        Completed when the merge status is 'merged' or 'worktree_removed' or the PR state
+        contains MERGED; Running when a task is checked, the merge status is not
+        'not_started', or a PR exists; Pending otherwise.
+    .PARAMETER MergeStatus
+        The checkpoint merge status ('not_started' when the feature has no entry).
+    .PARAMETER PrState
+        The pull-request text from ConvertFrom-EpicProgressPrList; empty when none.
+    .PARAMETER Done
+        The number of checked plan tasks.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $MergeStatus,
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $PrState,
+        [Parameter(Mandatory = $true)] [int] $Done
+    )
+
+    $isMerged = ($MergeStatus -eq 'merged') -or ($MergeStatus -eq 'worktree_removed') -or ($PrState -match 'MERGED')
+    if ($isMerged) { return 'Completed' }
+    if ($Done -gt 0 -or $MergeStatus -ne 'not_started' -or $PrState) { return 'Running' }
+    return 'Pending'
+}
