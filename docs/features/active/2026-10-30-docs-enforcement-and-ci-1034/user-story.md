@@ -64,7 +64,7 @@ Epic criteria:
 
 - [x] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
 - [x] `surface-delta` reports an added CLI command with no ledger change and reports nothing when the ledger records it.
-- [ ] The workflow template requires `pwsh` only.
+- [x] The workflow template requires `pwsh` only.
 - [ ] Mirror parity checks pass for the edited `feature-review` surfaces.
 
 Story criteria (consistent with `spec.md` `## Acceptance Criteria`):
@@ -75,8 +75,8 @@ Story criteria (consistent with `spec.md` `## Acceptance Criteria`):
 - [ ] The hook is registered in `.claude/settings.json` and its byte-identical bundle copy, and the registered-hook contract suites (dependency guard completeness, imported-module output silence, no interpreter invocation, payload contract, dependency-failure prefixes, settings membership) pass with no new exemption.
 - [x] `surface-delta` exits 1 with `DOCS_SURFACE_UNLEDGERED_ADDITION` for an added `cli-command` element with no ledger change, and exits 0 with no `error` finding when the head ledger records that element.
 - [x] `surface-delta` reports unledgered changed elements, ignores `line_range`-only and `analysis_method`-only differences, treats an absent base snapshot as empty, rejects an option-like or `..` `-Base` with exit 2, and reports an unresolved base, a missing head snapshot and a stale head snapshot with their finding codes.
-- [ ] The `surface-delta` row sits directly under the `# --- 900008: surface-delta ---` anchor, and the diff of the shared entry and init modules contains only added lines under the 900008 anchors (and the OQ-1 context members if assigned to this child).
-- [ ] `init` plans `.github/workflows/_docs-quality.yml` without `-Write`, writes it with `-Write`, and refuses an existing destination without `-Force`; the template uses `shell: pwsh` for every step, runs `check` and `validate -Mode docs-complete` through `Invoke-DocsCommand.ps1`, and contains no Python, Node.js or linter step.
+- [x] The `surface-delta` row sits directly under the `# --- 900008: surface-delta ---` anchor, and the diff of the shared entry and init modules contains only added lines under the 900008 anchors (and the OQ-1 context members if assigned to this child).
+- [x] `init` plans `.github/workflows/_docs-quality.yml` without `-Write`, writes it with `-Write`, and refuses an existing destination without `-Force`; the template uses `shell: pwsh` for every step, runs `check` and `validate -Mode docs-complete` through `Invoke-DocsCommand.ps1`, and contains no Python, Node.js or linter step.
 - [ ] `## Documentation Surface Check` is present in the procedure-bearing `feature-review` copies named in `spec.md` and each bundle copy is byte-identical; the delegating `feature-review` files are unchanged.
 - [ ] Every new `.claude/lib/docs/` file and the hook are listed once in the core pack manifest and byte-identical to their bundle copies, and the push-down resource, completeness, dependency-closure and Codex generator checks pass.
 - [ ] Pester line coverage is at least 85% for each new PowerShell production file, with no production file excluded from measurement.
