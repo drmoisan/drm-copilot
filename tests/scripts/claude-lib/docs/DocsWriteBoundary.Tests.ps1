@@ -10,7 +10,8 @@
     Parses every .ps1 and .psm1 under .claude/lib/docs with the PowerShell parser (the files are
     read once into memory) and asserts, through the pure AST helper Find-DocsWritePrimitive:
     no filesystem write primitive outside Write-DocsFileText in Invoke-DocsCommand.ps1; a
-    scriptblock named WriteText is invoked only inside Invoke-DocsArtifactWrite; among the 1023
+    scriptblock named WriteText is invoked only inside Invoke-DocsArtifactWrite and the 1024
+    page write Invoke-DocsReferencePageWrite in DocsReferenceWriter.psm1; among the 1023
     modules only DocsLedgerCommands.psm1 accesses the WriteText member; and
     Invoke-DocsArtifactWrite is referenced only from DocsLedgerCommands.psm1. A positive control
     proves the helper over an in-memory source string. No file is written.
@@ -137,13 +138,14 @@ Describe 'Write boundary of .claude/lib/docs' {
         $script:Allowlist['Invoke-DocsCommand.ps1/Write-DocsFileText'] | Should -BeExactly 'init create-only and explicit overwrite'
     }
 
-    It 'invokes a WriteText scriptblock only inside Invoke-DocsArtifactWrite' {
+    It 'invokes a WriteText scriptblock only inside Invoke-DocsArtifactWrite and the 1024 page write' {
         # Act
         $invocations = @(foreach ($name in $script:Source.Keys) { Find-DocsVariableInvocation -SourceText $script:Source[$name] -Path $name -VariableName 'WriteText' })
 
         # Assert
         $invocations.Count | Should -BeGreaterThan 0 -Because 'Invoke-DocsArtifactWrite invokes the scriptblock'
-        @($invocations | ForEach-Object { "$($_.Path)/$($_.Function)" } | Sort-Object -Unique) | Should -Be @('DocsLedgerMutation.psm1/Invoke-DocsArtifactWrite')
+        # The 1024 generate-reference command has its own write boundary (spec 1024 ### Write semantics).
+        @($invocations | ForEach-Object { "$($_.Path)/$($_.Function)" } | Sort-Object -Unique) | Should -Be @('DocsLedgerMutation.psm1/Invoke-DocsArtifactWrite', 'DocsReferenceWriter.psm1/Invoke-DocsReferencePageWrite')
     }
 
     It 'accesses the WriteText member only in DocsLedgerCommands.psm1 among 1023 modules' {
