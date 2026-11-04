@@ -24,7 +24,7 @@ Why earlier application blocks every pull request: a required context that no ru
 
 ## 2. Gate context name and current required contexts
 
-Gate context name, verified from a real `ci.yml` run on the issue #1074 branch: `CONTEXT-PENDING-CI-PROOF`. Reporting app (`app.id`, which must equal the `integration_id` in section 4): `CONTEXT-PENDING-CI-PROOF`.
+Gate context name, verified from a real `ci.yml` run on the issue #1074 branch: `CI Required Gate`. Reporting app (`app.id`, which must equal the `integration_id` in section 4): `15368` (`github-actions`). Verified on pull request #1077 run 41864628204 (head e3ef692e5fc34efa24c33f3513c12b32a1776f6e) through the check-runs API with `check_name=CI%20Required%20Gate`: `total_count` 1, `name` `CI Required Gate`, `app.id` 15368.
 
 The 20 contexts that ruleset 15241672 requires before the change (read on 2026-11-04 through a read-only `GET`; each has `integration_id` 15368):
 

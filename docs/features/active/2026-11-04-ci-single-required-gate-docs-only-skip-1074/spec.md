@@ -226,18 +226,18 @@ Seeded from issue:
 - [x] No new Python file is added by this change.
 - [x] `runbook/ruleset-single-required-gate.md` exists in the feature folder with these sections in this order: Preconditions and timing; Gate context name and current required contexts; Read and save the ruleset; Apply the change (API and web UI); Verification; Rollback; What does not change.
 - [x] The runbook's preconditions section states that the change is applied only after the pull request is merged and the gate has reported `success` on a `main` push run, gives the exact `gh run list` and `gh api .../check-runs?check_name=CI%20Required%20Gate` confirmation commands, and explains that applying it earlier blocks every pull request on a context that does not yet report.
-- [ ] The runbook's context-name section lists the full set of contexts currently required by ruleset 15241672 and states the gate context name and `app.id` 15368 as verified from a real `ci.yml` run on this branch (CI-dependent).
+- [x] The runbook's context-name section lists the full set of contexts currently required by ruleset 15241672 and states the gate context name and `app.id` 15368 as verified from a real `ci.yml` run on this branch (CI-dependent).
 - [x] The runbook's read-and-save section gives `gh api repos/drmoisan/drm-copilot/rulesets/15241672 > ruleset-15241672.backup.json` and states that the backup file is not committed.
 - [x] The runbook's apply section gives a `gh api --method PUT` command with a complete JSON body built from the backup by `pwsh` and by a `jq` equivalent, which replaces only `required_status_checks` with the single `CI Required Gate` context (`integration_id` 15368) and preserves `name`, `target`, `enforcement`, `conditions`, `bypass_actors`, and every other rule and parameter.
 - [x] The runbook's apply section gives the web UI path (Settings > Rules > Rulesets > protect-main > required status checks) and states the required token permission (repository Administration: write, or repository admin).
 - [x] The runbook's verification section describes a throwaway docs-only pull request (gate green, pull request mergeable, individual jobs still listed) and a code pull request (gate red when a needed job fails) with expected results.
 - [x] The runbook's rollback section gives the exact `gh api --method PUT` command that restores the saved backup and the web UI equivalent, and its final section states that pull requests into `epic/**` integration branches are not covered by ruleset 15241672.
 - [x] Every JSON body in the runbook is validated by a dry parse (`ConvertFrom-Json`) with the result recorded under `evidence/qa-gates/`, and no `PUT` against ruleset 15241672 is executed by this item.
-- [ ] (CI-dependent) Proof A: a full `ci.yml` run on the implementation head reports `CI Required Gate` as `success` with every summary row `success`, recorded under `evidence/other/`.
-- [ ] (CI-dependent) Proof B: a throwaway commit that makes one needed job fail produces a run in which `CI Required Gate` is `failure` and the summary row for that job shows `failure`, recorded under `evidence/other/`.
-- [ ] (CI-dependent) Proof C: the revert of the proof B commit produces a full run in which `CI Required Gate` is `success`, recorded under `evidence/other/`.
+- [x] (CI-dependent) Proof A: a full `ci.yml` run on the implementation head reports `CI Required Gate` as `success` with every summary row `success`, recorded under `evidence/other/`.
+- [x] (CI-dependent) Proof B: a throwaway commit that makes one needed job fail produces a run in which `CI Required Gate` is `failure` and the summary row for that job shows `failure`, recorded under `evidence/other/`.
+- [x] (CI-dependent) Proof C: the revert of the proof B commit produces a full run in which `CI Required Gate` is `success`, recorded under `evidence/other/`.
 - [ ] (CI-dependent) Proof D: a docs-only evidence commit produces a run in which `CI Required Gate` is `success` and the gate summary table shows `full-run-marker`, `root-typescript-tests`, and `npm-audit-gate` as `skipped` and `poshqc` as `success`, recorded under `evidence/other/`.
-- [ ] (CI-dependent) The proof B failing change is absent from the final pull request head tree.
+- [x] (CI-dependent) The proof B failing change is absent from the final pull request head tree.
 - [ ] (CI-dependent) The final pull request head commit touches at least one path outside the `config/ci-docs-only-paths.json` allowlist, and its full `ci.yml` run reports every context currently required by ruleset 15241672 as `success`, together with `CI Required Gate`.
 
 ## Risks & Mitigations
