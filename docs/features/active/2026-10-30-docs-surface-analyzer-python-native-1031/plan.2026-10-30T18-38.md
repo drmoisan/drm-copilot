@@ -179,29 +179,29 @@ Each analyzer emits raw facts only, `{analyzer_id, kind, declaration, name, pare
 
 A failure, or a step that changes a file, restarts the loop from [P6-T1]; a change to a `LIB` or `PYLIB` file repeats [P5-T1] first.
 
-- [ ] [P6-T1] Run `poetry run black --check .`.
+- [x] [P6-T1] Run `poetry run black --check .`.
   - Acceptance: exit 0 and output containing `would be left unchanged` with no `would reformat` line; `FEATURE/evidence/qa-gates/qa-black.<timestamp>.md` records the four fields.
-- [ ] [P6-T2] Run `poetry run ruff check .`.
+- [x] [P6-T2] Run `poetry run ruff check .`.
   - Acceptance: exit 0 with `All checks passed!`; `FEATURE/evidence/qa-gates/qa-ruff.<timestamp>.md` records the four fields.
-- [ ] [P6-T3] Run `poetry run pyright`, then a full `poetry run pyright --outputjson` with no path argument, then `poetry run pyright --outputjson .claude/lib/docs/python` as an additional check of the helper files.
+- [x] [P6-T3] Run `poetry run pyright`, then a full `poetry run pyright --outputjson` with no path argument, then `poetry run pyright --outputjson .claude/lib/docs/python` as an additional check of the helper files.
   - Acceptance: the first run reports `0 errors`; the full no-path JSON run reports `summary.errorCount` 0 and `summary.filesAnalyzed` equal to `PYRIGHT_FILES_BASELINE` (from the governing `baseline-pyright` artifact of [P0-T5]) plus 27 (derivation in `## Execution Context`), which proves the [P1-T1] `include` edit places the twelve `PYLIB` files in the configured analyzed set; the path-scoped JSON run reports `summary.filesAnalyzed` 12 and `summary.errorCount` 0; `FEATURE/evidence/qa-gates/qa-pyright.<timestamp>.md` records the four fields for each of the three runs, the baseline value, the expected sum and the observed count.
-- [ ] [P6-T4] Run the CI-shaped Python suite: `poetry run python -m pytest --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1031-final-coverage.json --cov` (bare `--cov` last, as in [P0-T6]).
+- [x] [P6-T4] Run the CI-shaped Python suite: `poetry run python -m pytest --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1031-final-coverage.json --cov` (bare `--cov` last, as in [P0-T6]).
   - Acceptance: 0 failed and 0 errors; `FEATURE/evidence/qa-gates/qa-pytest-coverage.<timestamp>.md` records the four fields, the counts and the JSON `totals` line and branch percentages. CI: `quality-checks7 / Code Quality & Tests (3.11)` through `(3.13)`.
-- [ ] [P6-T5] Measure the helper per file: `poetry run python -m pytest tests/scripts/claude-lib/docs/python --cov=docs_python_native --cov=run_docs_python_native --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1031-helper-coverage.json`.
+- [x] [P6-T5] Measure the helper per file: `poetry run python -m pytest tests/scripts/claude-lib/docs/python --cov=docs_python_native --cov=run_docs_python_native --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1031-helper-coverage.json`.
   - Acceptance: 0 failed; each of the twelve files has line coverage of at least 85 and branch coverage of at least 75 in the JSON `files` entries; `FEATURE/evidence/qa-gates/qa-python-per-file-coverage.<timestamp>.md` records each pair.
-- [ ] [P6-T6] Check for bytecode after [P6-T4] and [P6-T5]: list `__pycache__` directories and `.pyc` files under `PYLIB` and `MIRROR/python`.
+- [x] [P6-T6] Check for bytecode after [P6-T4] and [P6-T5]: list `__pycache__` directories and `.pyc` files under `PYLIB` and `MIRROR/python`.
   - Acceptance: both listings are empty; `FEATURE/evidence/qa-gates/qa-bytecode.<timestamp>.md` records them (S15).
-- [ ] [P6-T7] Run `Invoke-PoshQCFormat` over the repository with the same non-writing `WriteFile` seam as [P0-T7].
+- [x] [P6-T7] Run `Invoke-PoshQCFormat` over the repository with the same non-writing `WriteFile` seam as [P0-T7].
   - Acceptance: zero `Formatted:` lines for files this plan created or changed, no more `Formatted:` lines than the [P0-T7] count, and `git status --porcelain` identical before and after; `FEATURE/evidence/qa-gates/qa-poshqc-format.<timestamp>.md` records the four fields and both counts.
-- [ ] [P6-T8] Run a direct `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the PoshQC scan folders.
+- [x] [P6-T8] Run a direct `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the PoshQC scan folders.
   - Acceptance: zero findings in files this plan created or changed and a total not above [P0-T7]; `FEATURE/evidence/qa-gates/qa-poshqc-analyze.<timestamp>.md` records the counts.
 - [ ] [P6-T9] Run a single-process `Invoke-PoshQCTest` over `tests/scripts` with coverage in a new PowerShell process.
   - Acceptance: 0 failed and 0 errored in `artifacts/pester/pester-junit.xml`; `FEATURE/evidence/qa-gates/qa-pester-coverage.<timestamp>.md` records the counts and the overall line coverage. CI: `poshqc / PowerShell QC`.
-- [ ] [P6-T10] Compute coverage deltas from [P0-T6], [P0-T8], [P6-T4], [P6-T5] and [P6-T9].
+- [x] [P6-T10] Compute coverage deltas from [P0-T6], [P0-T8], [P6-T4], [P6-T5] and [P6-T9].
   - Acceptance: `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md` records baseline and post-change totals per language, the per-file Python pairs, and Pester line coverage of at least 85 for `LIB/DocsAnalyzerPythonNative.psm1`, `LIB/DocsPythonNativeProtocol.psm1`, `LIB/DocsAnalyzerRegistry.psm1` and `LIB/DocsInventory.psm1`, with every changed line of the three edited files covered and no production file excluded; a value below threshold is remediation-required, not PASS.
-- [ ] [P6-T11] Run the Jest gate over both touched suites, then `node run-jest.cjs --randomize --seed=<n> <both files>` with a recorded seed.
+- [x] [P6-T11] Run the Jest gate over both touched suites, then `node run-jest.cjs --randomize --seed=<n> <both files>` with a recorded seed.
   - Acceptance: both runs report 0 failed; `FEATURE/evidence/regression-testing/isolation-jest.<timestamp>.md` records the seed and counts.
-- [ ] [P6-T12] Run the fourteen new Python test modules in one process in reversed file order.
+- [x] [P6-T12] Run the fourteen new Python test modules in one process in reversed file order.
   - Acceptance: 0 failed; `FEATURE/evidence/regression-testing/isolation-python-reversed.<timestamp>.md` records the order and counts.
 - [ ] [P6-T13] Run three seeded shuffled file-order single-process Pester runs over the four new suites, the five edited docs suites (`TESTS/DocsAnalyzerRegistry.Tests.ps1`, `TESTS/DocsAnalyzerConfigFiles.Tests.ps1`, `TESTS/DocsInventorySnapshot.Tests.ps1`, `TESTS/DocsInventory.Tests.ps1`, `TESTS/DocsInventoryProperties.Tests.ps1`) and the guard suite, each order from `[System.Random]::new($seed)` with three distinct seeds.
   - Acceptance: each run reports 0 failed; `FEATURE/evidence/regression-testing/isolation-pester-shuffled.<timestamp>.md` records each seed, file order and counts. An order dependence is fixed on both sides and every seed re-run.
