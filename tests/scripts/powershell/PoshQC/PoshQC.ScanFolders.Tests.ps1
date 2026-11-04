@@ -214,6 +214,8 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
     It 'overrides run paths and preserves configured coverage paths when scan folders are supplied' {
         $script:capturedRunPaths = $null
         $script:capturedCoveragePaths = $null
+        # The coverage output directory would otherwise be created for real under the fixture root.
+        Mock -CommandName New-Item -ModuleName PoshQC -MockWith { } -ParameterFilter { $ItemType -eq 'Directory' }
 
         Invoke-PoshQCTest -Root '/repo' -ScanFolders @('/repo/src', '/repo/tests/powershell') -SettingsPath '/settings.psd1' -EnsureModule { } -TestPathExists { $true } -LoadSettings {
             @{
@@ -281,6 +283,9 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
 
         $script:capturedRunPaths | Should -Be @('/repo/src', '/repo/tests/powershell')
         ($script:capturedCoveragePaths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/repo/src/**/*.ps1')
+        Should -Invoke -CommandName New-Item -ModuleName PoshQC -Times 1 -Exactly -ParameterFilter {
+            $ItemType -eq 'Directory' -and $Path -eq (Join-Path '/repo' 'artifacts')
+        }
     }
 }
 

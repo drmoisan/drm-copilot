@@ -5,6 +5,11 @@ Describe "sync-agents-from-instructions.ps1" {
         $env:POSHQC_SKIP_SCRIPT_EXECUTION = '1'
         $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\scripts\dev-tools\sync-agents-from-instructions.ps1"
         . $script:scriptPath
+
+        # Portable fixture root: fully qualified on every host and never created; discovered
+        # file names and relative-path lengths are computed from it.
+        $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'sync-agents-from-instructions-root'
+        $script:Repo = Join-Path $script:FixtureRoot 'repo'
     }
 
     Context "Get-InstructionsBody" {
@@ -93,16 +98,16 @@ applyTo: "**"
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith {
                 @(
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\a.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\B.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\sub\c.instructions.md' }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'a.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'B.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'sub' 'c.instructions.md') }
                 )
             }
             Mock -CommandName Get-InstructionFileData -MockWith {
                 param($Path, $RepoRootParam)
 
                 [void]$RepoRootParam
-                $relativePath = $Path.Substring('C:\repo\'.Length) -replace '\\', '/'
+                $relativePath = $Path.Substring($script:Repo.Length + 1) -replace '\\', '/'
                 [pscustomobject]@{
                     Path            = $Path
                     RelativePath    = $relativePath
@@ -112,7 +117,7 @@ applyTo: "**"
                 }
             }
 
-            $result = Get-DiscoveredInstructionFile -RepoRootParam 'C:\repo'
+            $result = Get-DiscoveredInstructionFile -RepoRootParam $script:Repo
             $result.RelativePath | Should -Be @(
                 '.github/B.instructions.md'
                 '.github/a.instructions.md'
@@ -124,19 +129,19 @@ applyTo: "**"
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith {
                 @(
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\python-code-change.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-unit-test.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\typescript-code-change.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\csharp-code-change.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-code-change.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\powershell-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'python-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-unit-test.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'typescript-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'csharp-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'powershell-code-change.instructions.md') }
                 )
             }
             Mock -CommandName Get-InstructionFileData -MockWith {
                 param($Path, $RepoRootParam)
 
                 [void]$RepoRootParam
-                $relativePath = $Path.Substring('C:\repo\'.Length) -replace '\\', '/'
+                $relativePath = $Path.Substring($script:Repo.Length + 1) -replace '\\', '/'
                 [pscustomobject]@{
                     Path            = $Path
                     RelativePath    = $relativePath
@@ -146,7 +151,7 @@ applyTo: "**"
                 }
             }
 
-            $result = Get-DiscoveredInstructionFile -RepoRootParam 'C:\repo'
+            $result = Get-DiscoveredInstructionFile -RepoRootParam $script:Repo
             $result.RelativePath | Should -Be @(
                 '.github/instructions/general-code-change.instructions.md'
                 '.github/instructions/general-unit-test.instructions.md'
@@ -218,7 +223,7 @@ applyTo: "**"
             Mock -CommandName Get-InstructionsBody -MockWith {
                 param($Path)
 
-                if ($Path -eq (Join-Path -Path 'C:\repo' -ChildPath '.github/copilot-instructions.md')) {
+                if ($Path -eq (Join-Path -Path $script:Repo -ChildPath '.github/copilot-instructions.md')) {
                     return 'copilot body'
                 }
 
@@ -226,17 +231,17 @@ applyTo: "**"
             }
             Mock -CommandName Get-ChildItem -MockWith {
                 @(
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\python-code-change.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-unit-test.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\csharp-code-change.instructions.md' }
-                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'python-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-unit-test.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'csharp-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-code-change.instructions.md') }
                 )
             }
             Mock -CommandName Get-InstructionFileData -MockWith {
                 param($Path, $RepoRootParam)
 
                 [void]$RepoRootParam
-                $relativePath = $Path.Substring('C:\repo\'.Length) -replace '\\', '/'
+                $relativePath = $Path.Substring($script:Repo.Length + 1) -replace '\\', '/'
 
                 return [pscustomobject]@{
                     Path            = $Path
@@ -249,7 +254,7 @@ applyTo: "**"
         }
 
         It "emits general instruction files before language-specific instruction files in generated AGENTS.md output" {
-            $result = Get-AgentContent -RepoRootParam 'C:\repo'
+            $result = Get-AgentContent -RepoRootParam $script:Repo
 
             $generalCodeIndex = $result.Content.IndexOf('> - .github/instructions/general-code-change.instructions.md', [System.StringComparison]::Ordinal)
             $generalUnitIndex = $result.Content.IndexOf('> - .github/instructions/general-unit-test.instructions.md', [System.StringComparison]::Ordinal)

@@ -46,10 +46,16 @@ Describe 'Test-DiscoveryHostCapability.ps1 entry point' {
     }
 
     It 'exits 2 and writes the unsupported document when the workspace has no installed probe' {
-        $result = Invoke-ScriptEntry -Arguments @{ HostName = 'codex'; WorkspaceRoot = $script:GateWorkspaceRoot; SessionId = 'session-alpha' }
+        # A portable workspace root (fully qualified on every host, never created); the probe
+        # existence check is mocked to $false for paths under that root only.
+        $noProbeRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'test-discoveryhostcapability-entry-root'
+        $underNoProbeRoot = [scriptblock]::Create("([string]`$LiteralPath).StartsWith('$noProbeRoot', [System.StringComparison]::OrdinalIgnoreCase)")
+        Mock Test-Path { $false } -ParameterFilter $underNoProbeRoot
+        $result = Invoke-ScriptEntry -Arguments @{ HostName = 'codex'; WorkspaceRoot = $noProbeRoot; SessionId = 'session-alpha' }
         $result.Thrown | Should -BeNullOrEmpty
         $result.ExitCode | Should -Be 2
         ($result.Stdout | ConvertFrom-Json).status | Should -Be 'unsupported'
+        Should -Invoke Test-Path -Times 1 -Exactly -ParameterFilter $underNoProbeRoot
     }
 
     It 'dot-sources the <HostName> probe through the default seam and reports a session without observations unsupported' -ForEach @(
@@ -57,7 +63,9 @@ Describe 'Test-DiscoveryHostCapability.ps1 entry point' {
         @{ HostName = 'codex' }
         @{ HostName = 'github-copilot' }
     ) {
-        $gateHostEnvironment = $script:GateHostEnvironment
+        # The probe resolves its authority location against the real checkout, so the host
+        # environment must describe the host the suite runs on.
+        $gateHostEnvironment = $script:GateRunningHostEnvironment
         $probeStore = Get-GateStore -HostName $HostName
         Mock Get-DiscoveryTrustedHostEnvironment { $gateHostEnvironment }.GetNewClosure()
         Mock Get-DiscoveryDefaultStore { $probeStore }.GetNewClosure()

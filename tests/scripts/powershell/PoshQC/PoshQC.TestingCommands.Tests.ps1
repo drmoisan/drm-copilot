@@ -250,6 +250,8 @@ Describe 'Invoke-PoshQCTest' {
         $script:capturedCoveragePaths = $null
         $copyArgs = $null
         $customKoveragePath = '/repo/artifacts/custom.koverage.xml'
+        # The coverage output directory would otherwise be created for real under the fixture root.
+        Mock -CommandName New-Item -ModuleName PoshQC -MockWith { } -ParameterFilter { $ItemType -eq 'Directory' }
 
         Invoke-PoshQCTest -Root '/repo' -ScanFolders @('/repo/src', '/repo/tests/powershell') -SettingsPath '/settings.psd1' -KoverageOutputPath $customKoveragePath -EnsureModule { } -TestPathExists { $true } -LoadSettings {
             @{ Run = @{ Path = @('tests') }; Should = @{ ErrorAction = 'Stop' }; Output = @{ Verbosity = 'Detailed' }; TestResult = @{ Enabled = $false }; CodeCoverage = @{ Enabled = $true; Path = @('src/**/*.ps1'); OutputPath = 'artifacts/coverage.xml' } }
@@ -291,5 +293,8 @@ Describe 'Invoke-PoshQCTest' {
         $script:capturedRunPaths | Should -Be @('/repo/src', '/repo/tests/powershell')
         ($script:capturedCoveragePaths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/repo/src/**/*.ps1')
         $script:copyArgs[2] | Should -Be $customKoveragePath
+        Should -Invoke -CommandName New-Item -ModuleName PoshQC -Times 1 -Exactly -ParameterFilter {
+            $ItemType -eq 'Directory' -and $Path -eq (Join-Path '/repo' 'artifacts')
+        }
     }
 }
