@@ -79,12 +79,12 @@
 
 ### Phase 3 — Order Verification (post-fix, single process)
 
-- [ ] [P3-T1] `Forward` order over `REPRO` (46 files) to `RAW/order-forward.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-forward.<timestamp>.md` with the fields of `APPROVED` P3-T1. Acceptance: `RCR` holds.
-- [ ] [P3-T2] `Reversed` order to `RAW/order-reversed.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-reversed.<timestamp>.md` with the same fields. Acceptance: `RCR` holds.
-- [ ] [P3-T3] `Seeded` order, seed `1066`, to `RAW/order-seed-1066.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-seed-1066.<timestamp>.md` with the seed, the file order, and the same fields. Acceptance: `RCR` holds.
-- [ ] [P3-T4] `Seeded` order, seed `20261103`, to `RAW/order-seed-20261103.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-seed-20261103.<timestamp>.md` with the seed, the file order, and the same fields. Acceptance: `RCR` holds.
-- [ ] [P3-T5] `Seeded` order, seed `7`, to `RAW/order-seed-7.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-seed-7.<timestamp>.md` with the seed, the file order, and the same fields. Acceptance: `RCR` holds.
-- [ ] [P3-T6] `Leak` order over `REPRO` (46 files) to `RAW/order-leak.xml`, as the pass-after for `APPROVED` P0-T13. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-leak.<timestamp>.md` with the same fields and, for each `VS` container, its `LK1` profile beside its post-fix profile. Acceptance: `RCR` holds.
+- [x] [P3-T1] `Forward` order over `REPRO` (46 files) to `RAW/order-forward.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-forward.<timestamp>.md` with the fields of `APPROVED` P3-T1. Acceptance: `RCR` holds.
+- [x] [P3-T2] `Reversed` order to `RAW/order-reversed.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-reversed.<timestamp>.md` with the same fields. Acceptance: `RCR` holds.
+- [x] [P3-T3] `Seeded` order, seed `1066`, to `RAW/order-seed-1066.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-seed-1066.<timestamp>.md` with the seed, the file order, and the same fields. Acceptance: `RCR` holds.
+- [x] [P3-T4] `Seeded` order, seed `20261103`, to `RAW/order-seed-20261103.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-seed-20261103.<timestamp>.md` with the seed, the file order, and the same fields. Acceptance: `RCR` holds.
+- [x] [P3-T5] `Seeded` order, seed `7`, to `RAW/order-seed-7.xml`. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-seed-7.<timestamp>.md` with the seed, the file order, and the same fields. Acceptance: `RCR` holds.
+- [x] [P3-T6] `Leak` order over `REPRO` (46 files) to `RAW/order-leak.xml`, as the pass-after for `APPROVED` P0-T13. Apply `RCR` and write `<FEATURE>/evidence/regression-testing/order-leak.<timestamp>.md` with the same fields and, for each `VS` container, its `LK1` profile beside its post-fix profile. Acceptance: `RCR` holds.
 
 ### Phase 4 — Final QA Loop, AC Verification, and Self-Review
 
