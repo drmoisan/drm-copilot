@@ -21,3 +21,14 @@ Output Summary: all three section digest pairs are equal; the `user-story.md` di
 4. [P2-T4] `## Decisions Later Children Must Honor`, diagnostic-code bullet: uppercase words joined by `_` matching `^[A-Z][A-Z0-9_]*$`, the mapping rule, the kept stability sentence, and the shared codes `INPUT_OVER_BOUND`, `INPUT_UNDECODABLE`, `DECLARATION_INVALID`, `DUPLICATE_DECLARATION`.
 
 Token counts after the edit: `A-Z0-9_` occurs in 3 lines (subsection, C7 row, decisions bullet); case-insensitive `lowercase` occurs in 2 lines (the `lowercase hex` sentence of `## Inputs / Outputs` and the `Get-DocsDeclarationSha256` row), down from 5.
+
+## Checkbox state check ([P5-T8], appended 2026-11-04T15-33)
+
+Command: sh SCRATCH/issue-1033-sections.sh (counts of `- [x]` and `- [ ]` lines in `git show CYCLE_HEAD:<file>` and in the working file); EXIT_CODE: 0.
+
+| File | CYCLE_HEAD `[x]` / `[ ]` | Working `[x]` / `[ ]` | Equal |
+|---|---|---|---|
+| `FEATURE/spec.md` | 21 / 11 | 21 / 11 | yes |
+| `FEATURE/user-story.md` | 11 / 1 | 11 / 1 | yes |
+
+The CI-dependent criteria remain unchecked: S22 (`spec.md` `## Acceptance Criteria`, the `(CI-dependent)` item) and U12 (`user-story.md`, the `(CI-dependent)` item). No other checkbox changed.
