@@ -258,6 +258,18 @@ No existing line of the registry changes; no row is added under any other anchor
 
 ## Recognition Rules
 
+### Diagnostic code spelling (C7)
+
+This subsection is normative. Every diagnostic code that this specification names in hyphenated
+form (in `## Recognition Rules`, `## Scanner Precision Limit`, `## Extension-Result Manifest
+Import`, `## Acceptance Criteria` and elsewhere) is the code's specification name. Each code is
+emitted in its mapped form: every letter uppercased and every `-` replaced with `_`, which matches
+the 1020 `diagnostic.code` grammar `^[A-Z][A-Z0-9_]*$`. For example, `http-dynamic-route` is
+emitted as `HTTP_DYNAMIC_ROUTE` and `extension-finding-skipped` is emitted as
+`EXTENSION_FINDING_SKIPPED`. `Get-DocsScannerPrecisionLimit` returns the mapped form in its `code`
+column. The list of mapped spellings is `evidence/other/contract-reconciliation.2026-11-03T21-46.md`
+`## C7 adopted code spellings`.
+
 ### Declaration strings (1020 per-kind convention)
 
 | Kind | 1020 convention | Form used by this feature |
@@ -384,8 +396,9 @@ non-blocking `csharp-conditional-compilation`.
 ## Scanner Precision Limit
 
 This section is normative. Each row is a construct class that the scanner reports instead of
-classifying. Every code is a lowercase identifier, emitted at most once per
-`(analyzer_id, code, path)`, with the occurrence count and first line in the message.
+classifying. Each code is emitted in its mapped uppercase-underscore form
+(`### Diagnostic code spelling (C7)`), emitted at most once per `(analyzer_id, code, path)`, with
+the occurrence count and first line in the message.
 `Get-DocsScannerPrecisionLimit` returns exactly these rows.
 
 Emission contract (1023 `### #1022 and #1033 (PowerShell scanners) for precision-limit
@@ -610,7 +623,7 @@ feature's scope.
 | C4 | `New-DocsCapturedInput`: `-MaxBytes` default, BOM handling, codes and `analyzer_id` for oversize and undecodable inputs | Default 1048576 supplied by the inventory; one leading U+FEFF stripped before decoding; codes `input-over-bound` and `input-undecodable`; analyzers re-emit under their own identifier |
 | C5 | Precision-limit marker: 1020 v0.6 `New-DocsDiagnostic` takes `-Severity error\|warning\|information` and has no extensions parameter; 1023 requires the `docs.precision-limit` marker | Resolved in favor of 1023 (owner decision P3): every precision-limit diagnostic carries `extensions` with the key `docs.precision-limit` and value `{"element_kind": "<element kind>"}` (the row's `Element kind` in `## Scanner Precision Limit`), `path` never `$null`, severity `warning` (blocking `false`); `New-DocsScannerPrecisionLimitDiagnostic` in `DocsScannerCommon.psm1` builds the record with `New-DocsDiagnostic` and sets the marker on its `extensions` member, so no 1020 file is edited; diagnostics for other conditions carry no such key |
 | C6 | Registry: anchor literal; the row method field (1020: `AnalysisMethod`, value `scanner`); 1020's registry suite; the `DocsAnalyzer*.psm1` leaf rule | Resolved by 1020 v0.6 (owner decision P1): the anchor is `# --- 1033: TypeScript and .NET analyzers ---` in `$script:DocsAnalyzerRow`, and any `# --- 900NNN:` anchor is rejected; every row carries `AnalysisMethod = 'scanner'`; registry suites assert membership only (anchor and scanner table exist, rows found by `Id` and `AnalysisMethod` in `Get-DocsAnalyzerRegistration`), never a row count or exclusivity count of the committed table; 1020's suite is edited only if it still contains a row-count assertion; use `DocsAnalyzerExtensionImport.psm1` |
-| C7 | `diagnostic.code` grammar in docs common (1020 lists `code` without a type) | Discovery identifier grammar; this feature's codes use lowercase words joined by `-` |
+| C7 | `diagnostic.code` grammar in docs common (1020 lists `code` without a type) | Resolved by the merged 1020 grammar: `New-DocsDiagnostic` and `schemas/docs/v1/common.schema.json` require `^[A-Z][A-Z0-9_]*$`; this feature's codes are emitted in the mapped form of `### Diagnostic code spelling (C7)`, recorded in `evidence/other/contract-reconciliation.2026-11-03T21-46.md` |
 | C8 | Inventory merge precedence for an imported element colliding with a built-in element (1022 `DocsInventory.psm1`) | Built-in wins; imported element dropped with a non-blocking diagnostic |
 | C9 | Ledger representation of the scanner precision limit as `deferred` with an owner (1023) | Resolved by 1023 `### Scanner precision limits (D3)`: one `deferred` entry per `(analyzer_id, code, path)`, keyed from the marked diagnostic (element id over the marker's `element_kind`, the diagnostic `path` and the diagnostic `id`); this feature guarantees stable codes, the marker (C5), `## Scanner Precision Limit` and `Get-DocsScannerPrecisionLimit` |
 | C10 | Cross-child consistency with the re-prepared 1022: config key quoting and `[]` array segments, `<dynamic>` prefix rendering, shared codes `declaration-invalid`, `duplicate-declaration`, `input-over-bound`, `input-undecodable` | The strings in this specification; agreed in the epic `### Analyzer decisions` section |
@@ -624,10 +637,13 @@ The JSON envelope schema of D5 does not affect this feature, which adds no subco
   or C# analyzer emits the same element kinds, declarations and declaration-lines digests for every
   construct both classify, so ledger pins stay valid when the analysis method changes (as 900011 does
   for Python), and records `analysis_method: native`.
-- Diagnostic codes are lowercase words joined by `-` (within the discovery identifier grammar).
-  Codes are stable: changing, adding or removing one increments the analyzer's registration
-  `Version`. The shared codes `input-over-bound`, `input-undecodable`, `declaration-invalid` and
-  `duplicate-declaration` keep one meaning across analyzers.
+- Diagnostic codes are uppercase words joined by `_` and match `^[A-Z][A-Z0-9_]*$` (the 1020
+  `diagnostic.code` grammar). A code that this specification names in hyphenated form is emitted
+  in its mapped form: uppercase every letter and replace `-` with `_`
+  (`### Diagnostic code spelling (C7)`). Codes are stable: changing, adding or removing one
+  increments the analyzer's registration `Version`. The shared codes `INPUT_OVER_BOUND`,
+  `INPUT_UNDECODABLE`, `DECLARATION_INVALID` and `DUPLICATE_DECLARATION` keep one meaning across
+  analyzers.
 - Precision-limit rows are `(analyzer_id, code)` pairs, each with one fixed `element_kind`.
   `Get-DocsScannerPrecisionLimit` is the machine-readable source and `## Scanner Precision Limit` is
   the normative text. Precision-limit diagnostics are non-blocking `warning` diagnostics, emitted at
