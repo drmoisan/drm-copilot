@@ -293,4 +293,71 @@ Describe 'ConvertTo-DocsReferenceFrontMatterText' {
         # Assert
         $text | Should -BeExactly ("---`n" + 'extensions: {"acme.ratio":1.5}' + "`n---`n")
     }
+
+    It 'routes a non-integral extension number to the JSON writer without calling the canonical serializer' {
+        # Arrange
+        Mock -ModuleName DocsReferenceFrontMatter ConvertTo-DocsCanonicalJson { throw 'DOCS_TEST_CANONICAL_CALLED' }
+
+        # Act
+        $text = ConvertTo-DocsReferenceFrontMatterText -Value ([ordered]@{ extensions = [ordered]@{ 'acme.ratio' = 1.5 } })
+
+        # Assert
+        $text | Should -BeExactly ("---`n" + 'extensions: {"acme.ratio":1.5}' + "`n---`n")
+        Should -Invoke -ModuleName DocsReferenceFrontMatter -CommandName ConvertTo-DocsCanonicalJson -Exactly -Times 0
+    }
+
+    It 'routes an extension number above the safe-integer bound to the JSON writer' {
+        # Arrange
+        Mock -ModuleName DocsReferenceFrontMatter ConvertTo-DocsCanonicalJson { throw 'DOCS_TEST_CANONICAL_CALLED' }
+
+        # Act
+        $text = ConvertTo-DocsReferenceFrontMatterText -Value ([ordered]@{ extensions = [ordered]@{ 'acme.big' = [double] 1e17 } })
+
+        # Assert
+        $line = $text.Split("`n")[1]
+        $parsed = ConvertFrom-DocsJsonText -Text $line.Substring('extensions: '.Length)
+        $parsed.Findings.Count | Should -Be 0
+        $parsed.Value['acme.big'] | Should -Be 1e17
+        Should -Invoke -ModuleName DocsReferenceFrontMatter -CommandName ConvertTo-DocsCanonicalJson -Exactly -Times 0
+    }
+
+    It 'propagates an unrelated canonical serializer failure without calling the JSON writer' {
+        # Arrange
+        Mock -ModuleName DocsReferenceFrontMatter ConvertTo-DocsCanonicalJson { throw 'DOCS_TEST_UNRELATED_FAILURE' }
+        Mock -ModuleName DocsReferenceFrontMatter ConvertTo-DocsJsonText { '"unexpected"' }
+
+        # Act and Assert
+        { ConvertTo-DocsReferenceFrontMatterText -Value ([ordered]@{ owner = 'docs-team' }) } | Should -Throw -ExpectedMessage 'DOCS_TEST_UNRELATED_FAILURE'
+        Should -Invoke -ModuleName DocsReferenceFrontMatter -CommandName ConvertTo-DocsJsonText -Exactly -Times 0
+    }
+
+    It 'propagates a canonical serializer failure for an extensions value with only integral numbers' {
+        # Arrange
+        Mock -ModuleName DocsReferenceFrontMatter ConvertTo-DocsCanonicalJson { throw 'DOCS_TEST_UNRELATED_FAILURE' }
+        Mock -ModuleName DocsReferenceFrontMatter ConvertTo-DocsJsonText { '"unexpected"' }
+
+        # Act and Assert
+        { ConvertTo-DocsReferenceFrontMatterText -Value ([ordered]@{ extensions = [ordered]@{ 'acme.count' = [long] 3 } }) } | Should -Throw -ExpectedMessage 'DOCS_TEST_UNRELATED_FAILURE'
+        Should -Invoke -ModuleName DocsReferenceFrontMatter -CommandName ConvertTo-DocsJsonText -Exactly -Times 0
+    }
+
+    It 'propagates the canonical rejection of a non-integral number outside extensions' {
+        # Act and Assert
+        { ConvertTo-DocsReferenceFrontMatterText -Value ([ordered]@{ title = 1.5 }) } | Should -Throw -ExpectedMessage 'AUTHORIZATION_INPUT_INVALID*'
+    }
+
+    It 'routes a non-integral number nested in an extensions <Case> to the JSON writer' -ForEach @(
+        @{ Case = 'array'; Extensions = [ordered]@{ 'acme.list' = @([long] 1, 2.5) }; Expected = 'extensions: {"acme.list":[1,2.5]}' }
+        @{ Case = 'object'; Extensions = [ordered]@{ 'acme.obj' = [pscustomobject]@{ r = 0.25 } }; Expected = 'extensions: {"acme.obj":{"r":0.25}}' }
+    ) {
+        # Arrange
+        Mock -ModuleName DocsReferenceFrontMatter ConvertTo-DocsCanonicalJson { throw 'DOCS_TEST_CANONICAL_CALLED' }
+
+        # Act
+        $text = ConvertTo-DocsReferenceFrontMatterText -Value ([ordered]@{ extensions = $Extensions })
+
+        # Assert
+        $text | Should -BeExactly ("---`n" + $Expected + "`n---`n")
+        Should -Invoke -ModuleName DocsReferenceFrontMatter -CommandName ConvertTo-DocsCanonicalJson -Exactly -Times 0
+    }
 }
