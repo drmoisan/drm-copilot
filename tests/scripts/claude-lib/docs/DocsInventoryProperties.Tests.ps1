@@ -16,6 +16,10 @@
     1,048,577-byte size bound (the over-bound case is an IN_TEST_ROWS row); an unclassifiable
     Python input; case-distinct names with ordinal order under a culture whose collation differs;
     and the CORPUS_CODES census with the 1020 diagnostic code grammar.
+
+.NOTES
+    To reproduce a failure, re-run the failing It block with the seed printed in its failure
+    message. The suite writes no files and depends on no other suite, so it runs in any order.
 #>
 
 BeforeAll {
