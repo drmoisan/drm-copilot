@@ -48,7 +48,11 @@ Permitting rules: R1 = owner language rule clause (1), pushed-down skills, helpe
 | `L`DocsTypeScriptTokens.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsTypeScriptJsx.psm1 (only if the tokenizer would exceed 500 logical lines) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsCSharpTokens.psm1 | pushed-down helper/lib | PowerShell | R1 |
+| `L`DocsTypeScriptSyntax.psm1 (split from the TypeScript analyzers under the 500-line rule, [P3-T1]) | pushed-down helper/lib | PowerShell | R1 |
+| `L`DocsTypeScriptCliSupport.psm1 (split from `DocsAnalyzerTypeScriptCli.psm1` under the 500-line rule, [P3-T1]) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerTypeScriptCli.psm1 | pushed-down helper/lib | PowerShell | R1 |
+| `L`DocsTypeScriptHttpDeclaration.psm1 (split from the HTTP recognizer under the 500-line rule, [P3-T2]) | pushed-down helper/lib | PowerShell | R1 |
+| `L`DocsTypeScriptHttpSupport.psm1 (split from `DocsAnalyzerTypeScriptHttp.psm1` under the 500-line rule, [P3-T2]) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerTypeScriptHttp.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerTypeScriptExports.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerDotnetHttp.psm1 | pushed-down helper/lib | PowerShell | R1 |
@@ -63,7 +67,11 @@ Permitting rules: R1 = owner language rule clause (1), pushed-down skills, helpe
 | `T`DocsTypeScriptTokens.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsTypeScriptJsx.Tests.ps1 (only with the JSX split) | test | PowerShell (Pester) | D |
 | `T`DocsCSharpTokens.Tests.ps1 | test | PowerShell (Pester) | D |
+| `T`DocsTypeScriptSyntax.Tests.ps1 (with the [P3-T1] split) | test | PowerShell (Pester) | D |
+| `T`DocsTypeScriptCliSupport.Tests.ps1 (with the [P3-T1] split) | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerTypeScriptCli.Tests.ps1 | test | PowerShell (Pester) | D |
+| `T`DocsTypeScriptHttpDeclaration.Tests.ps1 (with the [P3-T2] split) | test | PowerShell (Pester) | D |
+| `T`DocsTypeScriptHttpSupport.Tests.ps1 (with the [P3-T2] split) | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerTypeScriptHttp.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerTypeScriptExports.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerDotnetHttp.Tests.ps1 | test | PowerShell (Pester) | D |
@@ -134,13 +142,13 @@ OQ-4 (`config-key` digest) is superseded for this plan by the 1020 v0.4 D5 recom
 
 Common to every analyzer task in Phases 3 to 5: the module follows spec `### Analyzer functions (pure; 1020 analyzer contract)` and its `Common analyzer rules:` list, builds every element with `New-DocsSurfaceElement -AnalysisMethod scanner -SourceText <the captured input's text> -LineRange <non-null range>` (parameter names per [P0-T4] C1), so that `source_sha256` is produced only by that call over the raw captured text and is never computed, masked, or supplied by the analyzer (1020 v0.4 D5: `Invoke-DocsAnalyzer` recomputes it with `Get-DocsDeclarationSha256` and rejects a differing digest); carries the `.NOTES` reference to `Get-DocsScannerPrecisionLimit`; produces every diagnostic through `ConvertTo-DocsScannerDiagnostic` under its own identifier, so a precision-limit code carries the `docs.precision-limit` marker and no other code does (proven across analyzers by [P6-T4]); and its suite asserts declarations, `parent_id`, `name`, properties, and `line_range`, plus one fixture per diagnostic code the spec assigns to that analyzer. Fixtures are single-quoted here-strings converted with `Docs.ScannerTestSupport.psm1`.
 
-- [ ] [P3-T1] Create `L`DocsAnalyzerTypeScriptCli.psm1 (`Invoke-DocsAnalyzerTypeScriptCli`) and `T`DocsAnalyzerTypeScriptCli.Tests.ps1 per spec `### \`typescript-cli\` (Commander and yargs)`.
+- [x] [P3-T1] Create `L`DocsAnalyzerTypeScriptCli.psm1 (`Invoke-DocsAnalyzerTypeScriptCli`) and `T`DocsAnalyzerTypeScriptCli.Tests.ps1 per spec `### \`typescript-cli\` (Commander and yargs)`.
   - Tests: Commander chains across several lines, `command('name <arg> [opt]')` positional elements, `.command(name, description)` returning the parent, tracked `sub` variables and `.addCommand`, `.option` with `short`, `.requiredOption` with `required`, inline `.addOption(new Option(...))`, `.argument`; yargs `.command` string and object forms with arrow-function and object builders, `.option`/`.options` key rules, `.positional`; root `name_source` literal and module; declarations such as `tool serve` and `tool serve --port`; codes `cli-dynamic-registration`, `cli-unbound-registration`, `cli-command-module-unresolved`.
   - Acceptance: 0 failures in the branch-current run; `FEATURE/evidence/regression-testing/p3-ts-cli.<timestamp>.md` records the counts. CI: `poshqc / PowerShell QC` (Windows shards).
-- [ ] [P3-T2] Create `L`DocsAnalyzerTypeScriptHttp.psm1 (`Invoke-DocsAnalyzerTypeScriptHttp`, two passes) and `T`DocsAnalyzerTypeScriptHttp.Tests.ps1 per spec `### \`typescript-http\` (Express and Fastify)`.
+- [x] [P3-T2] Create `L`DocsAnalyzerTypeScriptHttp.psm1 (`Invoke-DocsAnalyzerTypeScriptHttp`, two passes) and `T`DocsAnalyzerTypeScriptHttp.Tests.ps1 per spec `### \`typescript-http\` (Express and Fastify)`.
   - Tests: Express method set with `ANY` for `all`, path arrays, `route()` chains, a router in a second in-memory file mounted through a relative import with the composed prefix, a router mounted twice yielding two elements, an unmounted router with `mounted: false`; Fastify methods, `route({...})` with method arrays and `url` or `path`, `register` prefixes for inline, same-file, and relative-import plugins, `fp(fn)`; no implicit `HEAD`; codes `http-dynamic-route`, `http-prefix-dynamic` (element with `<dynamic>` and `prefix_resolved: false`), `http-mount-unresolved`.
   - Acceptance: 0 failures in the branch-current run; `FEATURE/evidence/regression-testing/p3-ts-http.<timestamp>.md` records the counts and the module's logical line count (at most 500, else split per `## Design Constraints From Existing Tests`). CI: `poshqc / PowerShell QC` (Windows shards).
-- [ ] [P3-T3] Create `L`DocsAnalyzerTypeScriptExports.psm1 (`Invoke-DocsAnalyzerTypeScriptExports`) and `T`DocsAnalyzerTypeScriptExports.Tests.ps1 per spec `### \`typescript-exports\``.
+- [x] [P3-T3] Create `L`DocsAnalyzerTypeScriptExports.psm1 (`Invoke-DocsAnalyzerTypeScriptExports`) and `T`DocsAnalyzerTypeScriptExports.Tests.ps1 per spec `### \`typescript-exports\``.
   - Tests: one `public-symbol` per exported name for each classified form with the module-path qualified declaration and `symbol_kind`; `type_only`, `local_name`, `reexport_from`; `export *` expanded from a relative in-memory module; a re-export cycle stopping with `ts-reexport-unresolved`; overload signatures merged into one element with `overloads`; codes `ts-export-pattern-unsupported`, `ts-export-assignment` (element `default` with `export_form: assignment`), `ts-ambient-module`, `ts-commonjs-export`; `.d.ts` and `.tsx` inputs selected.
   - Acceptance: 0 failures in the branch-current run; `FEATURE/evidence/regression-testing/p3-ts-exports.<timestamp>.md` records the counts. CI: `poshqc / PowerShell QC` (Windows shards).
 
