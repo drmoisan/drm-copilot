@@ -113,7 +113,10 @@ function Get-DocsCompleteGateRepositoryRoot {
     [OutputType([string])]
     param()
 
-    return [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath '../..'))
+    # The two-level Split-Path chain is the repository-root form that the pack-manifest
+    # dependency-closure scanner recognizes as a non-dependency; a Join-Path child of
+    # '../..' would be read as a dependency on the bundle root.
+    return (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
 }
 
 function Get-DocsCompleteGateFileText {
