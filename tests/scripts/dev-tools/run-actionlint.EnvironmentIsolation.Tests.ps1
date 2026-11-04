@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
-# Regression guard for issue #1066: run-actionlint.Tests.ps1 must leave the process environment and
-# $global:LASTEXITCODE as it found them. The guarded suite runs through a nested in-process Invoke-Pester
+# Regression guard for issue #1066: run-actionlint.Tests.ps1 must leave the process environment,
+# $global:LASTEXITCODE, global functions, and loaded modules as it found them. The guarded suite runs through a nested in-process Invoke-Pester
 # (no result file, no coverage, verbosity None), and the process environment is compared before and after
 # with case-insensitive keys, so the comparison holds on Windows (Path) and Linux (PATH) alike.
 Describe 'run-actionlint.Tests.ps1 environment isolation' {
@@ -59,12 +59,82 @@ Describe 'run-actionlint.Tests.ps1 environment isolation' {
                 }
             }
         }
+
+        # The sentinel container sets global LASTEXITCODE to the sentinel before the next container runs.
+        $script:newSentinelContainer = {
+            New-PesterContainer -Data @{ Sentinel = $script:lastExitCodeSentinel } -ScriptBlock {
+                param($Sentinel)
+                Describe 'nested LASTEXITCODE sentinel' {
+                    BeforeAll { $global:LASTEXITCODE = $Sentinel }
+                    It 'passes' { $true | Should -BeTrue }
+                }
+            }
+        }
+
+        # The probe container stores the global LASTEXITCODE it finds in the holder hashtable.
+        $script:newProbeContainer = {
+            param($Holder)
+            New-PesterContainer -Data @{ Holder = $Holder } -ScriptBlock {
+                param($Holder)
+                Describe 'nested LASTEXITCODE probe' {
+                    It 'reads global LASTEXITCODE' { $Holder.Value = $global:LASTEXITCODE }
+                }
+            }
+        }
+
+        # Returns the function names visible from the caller and the names of the loaded modules.
+        $script:getGlobalStateSnapshot = {
+            return @{
+                Functions = @(Get-ChildItem -Path Function: | ForEach-Object { $_.Name } | Sort-Object -Unique)
+                Modules   = @(Get-Module | ForEach-Object { $_.Name } | Sort-Object -Unique)
+            }
+        }
+
+        # Returns 'function added <name>', 'module removed <name>', and similar entries; names compare case-insensitively.
+        $script:getGlobalStateDelta = {
+            param($Before, $After)
+            $delta = [System.Collections.Generic.List[string]]::new()
+            foreach ($kind in @('Functions', 'Modules')) {
+                $label = if ($kind -eq 'Functions') { 'function' } else { 'module' }
+                $beforeNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@($Before[$kind]), [System.StringComparer]::OrdinalIgnoreCase)
+                $afterNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@($After[$kind]), [System.StringComparer]::OrdinalIgnoreCase)
+                foreach ($name in $After[$kind]) {
+                    if (-not $beforeNames.Contains($name)) { $delta.Add(('{0} added {1}' -f $label, $name)) }
+                }
+                foreach ($name in $Before[$kind]) {
+                    if (-not $afterNames.Contains($name)) { $delta.Add(('{0} removed {1}' -f $label, $name)) }
+                }
+            }
+            return @($delta | Sort-Object -Unique)
+        }
+
+        # Returns the entries of Left that are not in Right (case-insensitive).
+        $script:getEntriesNotIn = {
+            param($Left, $Right)
+            $known = [System.Collections.Generic.HashSet[string]]::new([string[]]@($Right), [System.StringComparer]::OrdinalIgnoreCase)
+            return @(@($Left) | Where-Object { -not $known.Contains($_) })
+        }
+
+        # Removes every loaded module and every function that the snapshot did not hold, modules first,
+        # because removing a module also removes the functions it exported.
+        $script:restoreGlobalState = {
+            param($Snapshot)
+            $modules = [System.Collections.Generic.HashSet[string]]::new([string[]]@($Snapshot.Modules), [System.StringComparer]::OrdinalIgnoreCase)
+            foreach ($module in @(Get-Module)) {
+                if (-not $modules.Contains($module.Name)) { Remove-Module -ModuleInfo $module -Force -ErrorAction SilentlyContinue }
+            }
+            $functions = [System.Collections.Generic.HashSet[string]]::new([string[]]@($Snapshot.Functions), [System.StringComparer]::OrdinalIgnoreCase)
+            foreach ($name in @(Get-ChildItem -Path Function: | ForEach-Object { $_.Name })) {
+                if (-not $functions.Contains($name)) { Remove-Item -LiteralPath ('Function:\{0}' -f $name) -Force -ErrorAction SilentlyContinue }
+            }
+        }
     }
 
     BeforeEach {
         $script:savedEnvironment = & $script:getEnvironmentSnapshot
         $script:savedHadLastExitCode = $null -ne (Get-Variable -Name LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue)
         $script:savedLastExitCode = if ($script:savedHadLastExitCode) { $global:LASTEXITCODE } else { $null }
+        $script:savedGlobalState = & $script:getGlobalStateSnapshot
     }
 
     AfterEach {
@@ -74,6 +144,7 @@ Describe 'run-actionlint.Tests.ps1 environment isolation' {
         } else {
             Remove-Variable -Name LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue
         }
+        & $script:restoreGlobalState $script:savedGlobalState
     }
 
     It 'nested harness leaves the process environment unchanged for an empty container' {
@@ -102,18 +173,34 @@ Describe 'run-actionlint.Tests.ps1 environment isolation' {
         $differingKeys | Should -BeNullOrEmpty -Because ('run-actionlint.Tests.ps1 must restore every environment variable it changes; differing keys: {0}' -f ($differingKeys -join ', '))
     }
 
-    It 'run-actionlint.Tests.ps1 leaves global LASTEXITCODE as the nested harness leaves it' {
+    It 'run-actionlint.Tests.ps1 leaves global LASTEXITCODE at the value set before it runs' {
         # Arrange
-        $global:LASTEXITCODE = $script:lastExitCodeSentinel
-        $null = & $script:invokeNestedPester (& $script:newControlContainer)
-        $controlValue = $global:LASTEXITCODE
-        $global:LASTEXITCODE = $script:lastExitCodeSentinel
+        $controlHolder = @{ Value = $null }
+        $targetHolder = @{ Value = $null }
+        $null = & $script:invokeNestedPester @((& $script:newSentinelContainer), (& $script:newProbeContainer $controlHolder))
 
         # Act
-        $null = & $script:invokeNestedPester (New-PesterContainer -Path $script:guardedTestPath)
-        $targetValue = $global:LASTEXITCODE
+        $null = & $script:invokeNestedPester @((& $script:newSentinelContainer), (New-PesterContainer -Path $script:guardedTestPath), (& $script:newProbeContainer $targetHolder))
 
         # Assert
-        $targetValue | Should -Be $controlValue -Because 'run-actionlint.Tests.ps1 must restore global LASTEXITCODE after each test'
+        $controlHolder.Value | Should -Be $script:lastExitCodeSentinel -Because 'precondition: when this fails, the nested harness overwrote global LASTEXITCODE between containers, so the check below cannot observe run-actionlint.Tests.ps1'
+        $targetHolder.Value | Should -Be $script:lastExitCodeSentinel -Because 'run-actionlint.Tests.ps1 must restore global LASTEXITCODE after each test'
+    }
+
+    It 'run-actionlint.Tests.ps1 leaves global functions and loaded modules as the nested harness leaves them' {
+        # Arrange
+        $controlBefore = & $script:getGlobalStateSnapshot
+        $null = & $script:invokeNestedPester (& $script:newControlContainer)
+        $controlDelta = @(& $script:getGlobalStateDelta $controlBefore (& $script:getGlobalStateSnapshot))
+        $targetBefore = & $script:getGlobalStateSnapshot
+
+        # Act
+        $result = & $script:invokeNestedPester (New-PesterContainer -Path $script:guardedTestPath)
+        $targetDelta = @(& $script:getGlobalStateDelta $targetBefore (& $script:getGlobalStateSnapshot))
+        $unexplained = @(& $script:getEntriesNotIn $targetDelta $controlDelta)
+
+        # Assert
+        $result.TotalCount | Should -BeGreaterThan 0 -Because 'the guarded suite must be discovered and run'
+        $unexplained | Should -BeNullOrEmpty -Because ('run-actionlint.Tests.ps1 must remove the global functions and modules it adds; entries: {0}' -f ($unexplained -join ', '))
     }
 }
