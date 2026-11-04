@@ -32,6 +32,24 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1'
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfile.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurfaceDelta.psm1') -ErrorAction Stop
 
+function Invoke-DocsContextMember {
+    <#
+    .SYNOPSIS
+        Invokes one command-context member with positional arguments (private helper).
+    .DESCRIPTION
+        Members are invoked only through this [scriptblock]-typed parameter, so the call target of
+        every context read is verifiable statically.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory = $true)] [scriptblock] $Member,
+        [AllowEmptyCollection()] [object[]] $ArgumentList = @()
+    )
+
+    return & $Member @ArgumentList
+}
+
 function New-DocsSurfaceDeltaUsageResult {
     <#
     .SYNOPSIS
@@ -93,8 +111,7 @@ function Read-DocsSurfaceDeltaWorkingText {
         [Parameter(Mandatory = $true)] [string] $Path
     )
 
-    $readText = $Context.ReadText
-    try { return [string] (& $readText $Path) } catch [System.Management.Automation.ItemNotFoundException] { return $null }
+    try { return [string] (Invoke-DocsContextMember -Member $Context.ReadText -ArgumentList @($Path)) } catch [System.Management.Automation.ItemNotFoundException] { return $null }
 }
 
 function Get-DocsSurfaceDeltaStaleInput {
@@ -110,15 +127,13 @@ function Get-DocsSurfaceDeltaStaleInput {
     )
 
     $stale = [System.Collections.Generic.List[string]]::new()
-    $testFile = $Context.TestFile
-    $readBytes = $Context.ReadBytes
     $inputs = if ($Snapshot.Contains('inputs') -and $null -ne $Snapshot['inputs']) { @($Snapshot['inputs']) } else { @() }
     foreach ($item in $inputs) {
         if ($item -isnot [System.Collections.IDictionary]) { continue }
         $path = [string] $item['path']
         if (-not (Test-DocsRelativePath -Path $path)) { $stale.Add($path); continue }
-        if (-not [bool] (& $testFile $path)) { $stale.Add($path); continue }
-        $digest = Get-DocsBytesSha256Hex -Bytes ([byte[]] (& $readBytes $path))
+        if (-not [bool] (Invoke-DocsContextMember -Member $Context.TestFile -ArgumentList @($path))) { $stale.Add($path); continue }
+        $digest = Get-DocsBytesSha256Hex -Bytes ([byte[]] (Invoke-DocsContextMember -Member $Context.ReadBytes -ArgumentList @($path)))
         if (-not [string]::Equals($digest, [string] $item['sha256'], [System.StringComparison]::Ordinal)) { $stale.Add($path) }
     }
     return , $stale.ToArray()
@@ -170,8 +185,7 @@ function Invoke-DocsSurfaceDeltaCommand {
     $ledgerPath = [string] $paths['coverage_ledger']
     $pinsPath = [string] $paths['evidence_pins']
 
-    $resolveRevision = $Context.ResolveRevision
-    $revision = & $resolveRevision $base
+    $revision = Invoke-DocsContextMember -Member $Context.ResolveRevision -ArgumentList @($base)
     $result = [ordered]@{ base_revision = $null; added = [string[]]@(); changed = [string[]]@(); removed = [string[]]@() }
     if ($null -eq $revision) {
         $outcome = Get-DocsSurfaceDeltaFinding -BaseRef $base -BaseResolved $false
@@ -179,13 +193,12 @@ function Invoke-DocsSurfaceDeltaCommand {
     }
     $result['base_revision'] = [string] $revision
 
-    $readRevisionText = $Context.ReadRevisionText
     $parseFindings = [System.Collections.Generic.List[object]]::new()
     $artifact = @{}
     foreach ($name in 'snapshot', 'ledger', 'pins') {
         $path = switch ($name) { 'snapshot' { $snapshotPath } 'ledger' { $ledgerPath } default { $pinsPath } }
         $head = Read-DocsSurfaceDeltaJson -Text (Read-DocsSurfaceDeltaWorkingText -Context $Context -Path $path) -ArtifactPath $path
-        $baseCopy = Read-DocsSurfaceDeltaJson -Text (& $readRevisionText ([string] $revision) $path) -ArtifactPath $path
+        $baseCopy = Read-DocsSurfaceDeltaJson -Text (Invoke-DocsContextMember -Member $Context.ReadRevisionText -ArgumentList @([string] $revision, $path)) -ArtifactPath $path
         foreach ($finding in @($head.Findings) + @($baseCopy.Findings)) { if ($null -ne $finding) { $parseFindings.Add($finding) } }
         $artifact["head-$name"] = $head.Value
         $artifact["base-$name"] = $baseCopy.Value
