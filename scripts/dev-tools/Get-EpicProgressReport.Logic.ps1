@@ -246,7 +246,7 @@ function Select-EpicProgressSample {
     return [pscustomobject]@{ Sample = $retained; Changed = $true }
 }
 
-function Format-EpicProgressHours {
+function Format-EpicProgressHour {
     <#
     .SYNOPSIS
         Format hours as 'H h MM min' from the rounded total minutes; 'n/a' when not finite.
@@ -579,9 +579,9 @@ function Get-EpicProgressTldrLine {
     $deviation = Format-EpicProgressNumber -Value $Summary.StandardDeviation -Digits 1
     $weekly = Get-EpicProgressWeeklyText -Value $Summary.WeeklyPct
 
-    return @(
+    return [string[]] @(
         "**TL;DR:** Epic #$($Summary.EpicIssue) is at $($Summary.Done) of $($Summary.Total) tasks ($percent%). $doneSentence $runSentence"
-        "**Elapsed:** $(Format-EpicProgressHours -Hours $Summary.ElapsedHours), with about $hoursLeft hours left on the wave-parallel estimate. **Weekly** quota is at $weekly."
+        "**Elapsed:** $(Format-EpicProgressHour -Hours $Summary.ElapsedHours), with about $hoursLeft hours left on the wave-parallel estimate. **Weekly** quota is at $weekly."
         "**Avg Velocity:** $velocity tasks / hr. **Recent Velocity:** $recent tasks / hr since last check-in. (SD of recent velocity: $deviation, from $($Summary.IntervalCount) intervals)"
         "**Estimated time remaining:** $($Summary.RangeText)"
     )
@@ -608,7 +608,7 @@ function Get-EpicProgressFullLine {
     $lines.Add('')
     $lines.Add("## Epic #$($Summary.EpicIssue) $($Summary.EpicName): status at $($Summary.NowUtc.ToString('HH:mm', $culture)) UTC, $($Summary.NowUtc.ToString('MMM d', $culture))")
     $lines.Add('')
-    $lines.Add("**Elapsed:** $(Format-EpicProgressHours -Hours $Summary.ElapsedHours) since $($Summary.StartUtc.ToString('HH:mm', $culture)) UTC. **Progress:** $($Summary.Done) of $($Summary.Total) tasks complete, **$percent%**.")
+    $lines.Add("**Elapsed:** $(Format-EpicProgressHour -Hours $Summary.ElapsedHours) since $($Summary.StartUtc.ToString('HH:mm', $culture)) UTC. **Progress:** $($Summary.Done) of $($Summary.Total) tasks complete, **$percent%**.")
     $lines.Add('')
     $lines.Add('| State | Features |')
     $lines.Add('|---|---|')
@@ -643,9 +643,9 @@ function Get-EpicProgressFullLine {
     $lines.Add("| **Total** | **$($Summary.Feature.Count)** | **$($Summary.Total)** | **$($Summary.Done)** |")
     $lines.Add('')
     $lines.Add("**Velocity:** $(Format-EpicProgressNumber -Value $Summary.Velocity -Digits 1) tasks per hour (one child's pace). **Remaining:** $($Summary.Remaining) tasks.")
-    $lines.Add("- Straight line, no parallelism: about $(Format-EpicProgressHours -Hours $Summary.StraightHours) (upper bound).")
+    $lines.Add("- Straight line, no parallelism: about $(Format-EpicProgressHour -Hours $Summary.StraightHours) (upper bound).")
     $overhead = Format-EpicProgressNumber -Value $Summary.WaveOverheadHours
-    $lines.Add("- Wave-parallel (longest chain $($Summary.CriticalPath.Tasks) tasks plus about $overhead h per open wave for review and CI): about **$(Format-EpicProgressHours -Hours $Summary.CriticalPath.Hours)**.")
+    $lines.Add("- Wave-parallel (longest chain $($Summary.CriticalPath.Tasks) tasks plus about $overhead h per open wave for review and CI): about **$(Format-EpicProgressHour -Hours $Summary.CriticalPath.Hours)**.")
     $delta = Format-EpicProgressNumber -Value $Summary.WeeklyDelta
     if ($delta -ne 'n/a' -and $Summary.WeeklyDelta -ge 0) { $delta = "+$delta" }
     $lines.Add("**Weekly quota (active account):** $(Get-EpicProgressWeeklyText -Value $Summary.WeeklyPct) used, $delta points since the epic started. This pool also covers the other runs in this session, so it is not the epic's cost alone.")

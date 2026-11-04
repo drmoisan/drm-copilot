@@ -296,3 +296,156 @@ function Get-EpicProgressUtcNow {
 
     return [datetime]::UtcNow
 }
+
+function Invoke-EpicProgressReport {
+    <#
+    .SYNOPSIS
+        Gather the report inputs through the I/O seams and return the report lines.
+    .DESCRIPTION
+        Wiring only. Runs git with exactly 'fetch -q origin', 'worktree list --porcelain',
+        and 'show <IntegrationBranch>:<path>'; runs 'gh pr list' only when gh is installed
+        and 'cswap list --json' only when cswap is installed; treats an unparseable
+        checkpoint or state file as empty; writes the state file only when the sample set
+        changed. Returns the TL;DR lines, followed by the Full lines unless Mode is TLDR.
+    .PARAMETER EpicFolder
+        The epic folder name; also the epic name in the status heading.
+    .PARAMETER StartUtc
+        The start instant.
+    .PARAMETER EpicIssue
+        The epic issue number; blank to read it from the kickoff file.
+    .PARAMETER IntegrationBranch
+        The integration branch; blank for the default.
+    .PARAMETER KickoffPath
+        The kickoff path on the integration branch; blank for the default.
+    .PARAMETER RepositoryRoot
+        The repository root; blank for the current location.
+    .PARAMETER CheckpointPath
+        The epic orchestrator checkpoint path; blank for the default.
+    .PARAMETER StatePath
+        The state file path; blank for the default under the temporary directory.
+    .PARAMETER BaselineDone
+        The tasks already complete at StartUtc.
+    .PARAMETER BaselineWeeklyPct
+        The weekly quota percentage at StartUtc.
+    .PARAMETER WaveOverheadHours
+        The hours added per open wave.
+    .PARAMETER SampleCap
+        The maximum number of samples kept.
+    .PARAMETER Mode
+        TLDR or Full.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $EpicFolder,
+        [Parameter(Mandatory = $true)] [datetime] $StartUtc,
+        [string] $EpicIssue = '',
+        [string] $IntegrationBranch = '',
+        [string] $KickoffPath = '',
+        [string] $RepositoryRoot = '',
+        [string] $CheckpointPath = '',
+        [string] $StatePath = '',
+        [int] $BaselineDone = 0,
+        [double] $BaselineWeeklyPct = 0,
+        [double] $WaveOverheadHours = 1.25,
+        [ValidateRange(1, 100000)] [int] $SampleCap = 14,
+        [ValidateSet('TLDR', 'Full')] [string] $Mode = 'Full'
+    )
+
+    $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -TempRoot ([System.IO.Path]::GetTempPath()) -CurrentLocation (Get-Location).ProviderPath
+    $null = Invoke-GitExe -GitArgs @('fetch', '-q', 'origin')
+    $worktreeLines = @(Invoke-GitExe -GitArgs @('worktree', 'list', '--porcelain'))
+    $worktreeOf = ConvertFrom-EpicProgressWorktreeList -PorcelainLine $worktreeLines
+    $kickoffText = @(Invoke-GitExe -GitArgs @('show', "$($setting.IntegrationBranch):$($setting.KickoffPath)")) -join "`n"
+
+    $epicIssueText = $setting.EpicIssue
+    if ([string]::IsNullOrWhiteSpace($epicIssueText)) { $epicIssueText = Get-EpicProgressIssueFromKickoff -KickoffText $kickoffText }
+    if ([string]::IsNullOrWhiteSpace($epicIssueText)) {
+        throw "The epic issue number could not be resolved: pass -EpicIssue or add an 'Epic issue: #<n>' line to $($setting.KickoffPath) on $($setting.IntegrationBranch)."
+    }
+
+    $checkpointFeature = @{}
+    if (Test-EpicProgressPath -Path $setting.CheckpointPath) {
+        $checkpointText = Read-EpicProgressFile -Path $setting.CheckpointPath
+        if (Test-EpicProgressJsonText -Json $checkpointText) {
+            $checkpoint = ConvertFrom-Json -InputObject $checkpointText
+            $checkpointEntries = @($checkpoint.features)
+            foreach ($checkpointEntry in $checkpointEntries) {
+                if ($null -ne $checkpointEntry -and $null -ne $checkpointEntry.issue_num) { $checkpointFeature["$($checkpointEntry.issue_num)"] = $checkpointEntry }
+            }
+        }
+    }
+
+    $ghInstalled = Test-EpicProgressCommand -Name 'gh'
+    $features = [System.Collections.Generic.List[object]]::new()
+    $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoffText)
+    foreach ($row in $rows) {
+        $checkpointEntry = $checkpointFeature[$row.Issue]
+        $branch = ''
+        $mergeStatus = 'not_started'
+        if ($null -ne $checkpointEntry) {
+            if ($checkpointEntry.branch_name) { $branch = [string] $checkpointEntry.branch_name }
+            if ($checkpointEntry.merge_status) { $mergeStatus = [string] $checkpointEntry.merge_status }
+        }
+        $prState = ''
+        if ($branch -and $ghInstalled) {
+            $prJson = @(Invoke-GhExe -GhArgs @('pr', 'list', '--head', $branch, '--state', 'all', '--json', 'number,state')) -join "`n"
+            $prState = ConvertFrom-EpicProgressPrList -Json $prJson
+        }
+        $planText = $null
+        if ($branch -and $worktreeOf.ContainsKey($branch)) {
+            $livePath = Join-Path -Path $worktreeOf[$branch] -ChildPath $row.PlanPath
+            if (Test-EpicProgressPath -Path $livePath) { $planText = Read-EpicProgressFile -Path $livePath }
+        }
+        if ($null -eq $planText) { $planText = @(Invoke-GitExe -GitArgs @('show', "$($setting.IntegrationBranch):$($row.PlanPath)")) -join "`n" }
+        $count = Get-EpicProgressTaskCount -PlanText $planText
+        $features.Add([pscustomobject]@{
+                Issue = $row.Issue; Wave = $row.Wave; Band = $row.Band; Total = $count.Total; Done = $count.Done
+                State = (Get-EpicProgressFeatureState -MergeStatus $mergeStatus -PrState $prState -Done $count.Done)
+                Phase = (Get-EpicProgressCurrentPhase -PlanText $planText); Pr = $prState
+            })
+    }
+
+    $weeklyPct = [double]::NaN
+    if (Test-EpicProgressCommand -Name 'cswap') {
+        $quotaJson = @(Invoke-CswapExe -CswapArgs @('list', '--json')) -join "`n"
+        $weeklyPct = Get-EpicProgressWeeklyQuota -Json $quotaJson
+    }
+
+    $samples = @()
+    if (Test-EpicProgressPath -Path $setting.StatePath) {
+        $stateText = Read-EpicProgressFile -Path $setting.StatePath
+        if (Test-EpicProgressJsonText -Json $stateText) { $samples = @(ConvertFrom-Json -InputObject $stateText) }
+    }
+    $nowUtc = (Get-EpicProgressUtcNow).ToUniversalTime()
+    $nowUnixSeconds = [DateTimeOffset]::new($nowUtc).ToUnixTimeSeconds()
+    $done = 0
+    foreach ($record in $features) { $done += $record.Done }
+    $selection = Select-EpicProgressSample -Sample $samples -NowUnixSeconds $nowUnixSeconds -Done $done -SampleCap $SampleCap
+    if ($selection.Changed) {
+        Write-EpicProgressState -Path $setting.StatePath -Content (ConvertTo-Json -InputObject $selection.Sample -Depth 3)
+    }
+
+    $summary = Get-EpicProgressSummary -Feature $features.ToArray() -BaselineDone $BaselineDone -StartUtc $StartUtc.ToUniversalTime() -NowUtc $nowUtc -Sample $selection.Sample -WaveOverheadHours $WaveOverheadHours -WeeklyPct $weeklyPct -BaselineWeeklyPct $BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $EpicFolder
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $tldrLines = Get-EpicProgressTldrLine -Summary $summary
+    $lines.AddRange([string[]] $tldrLines)
+    if ($Mode -ne 'TLDR') {
+        $fullLines = Get-EpicProgressFullLine -Summary $summary
+        $lines.AddRange([string[]] $fullLines)
+    }
+    return $lines.ToArray()
+}
+
+# Entry point: skipped when the script is dot-sourced for testing. Git runs in the
+# repository root, so the location is pushed there for the run and restored afterwards.
+if ($MyInvocation.InvocationName -ne '.') {
+    $entryRoot = $RepositoryRoot
+    if ([string]::IsNullOrWhiteSpace($entryRoot)) { $entryRoot = (Get-Location).ProviderPath }
+    Push-Location -LiteralPath $entryRoot
+    try {
+        Invoke-EpicProgressReport @PSBoundParameters
+    } finally {
+        Pop-Location
+    }
+}

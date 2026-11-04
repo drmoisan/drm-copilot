@@ -205,11 +205,11 @@ Describe 'Get-EpicProgressFeatureState' {
     }
 }
 
-Describe 'Format-EpicProgressHours, Format-EpicProgressClock, and Format-EpicProgressNumber' {
+Describe 'Format-EpicProgressHour, Format-EpicProgressClock, and Format-EpicProgressNumber' {
     It 'formats hours as H h MM min' {
-        Format-EpicProgressHours -Hours 5.25 | Should -Be '5 h 15 min'
-        Format-EpicProgressHours -Hours 1234.5 | Should -Be '1,234 h 30 min'
-        Format-EpicProgressHours -Hours 0 | Should -Be '0 h 00 min'
+        Format-EpicProgressHour -Hours 5.25 | Should -Be '5 h 15 min'
+        Format-EpicProgressHour -Hours 1234.5 | Should -Be '1,234 h 30 min'
+        Format-EpicProgressHour -Hours 0 | Should -Be '0 h 00 min'
     }
 
     It 'formats hours as HH:MM' {
@@ -219,18 +219,18 @@ Describe 'Format-EpicProgressHours, Format-EpicProgressClock, and Format-EpicPro
 
     It 'never prints 60 in the minute field' {
         # 1.995 hours is 119.7 minutes; both fields derive from the rounded 120 minutes.
-        Format-EpicProgressHours -Hours 1.995 | Should -Be '2 h 00 min'
+        Format-EpicProgressHour -Hours 1.995 | Should -Be '2 h 00 min'
         Format-EpicProgressClock -Hours 1.995 | Should -Be '02:00'
     }
 
     It 'returns n/a from each formatter for NaN' {
-        Format-EpicProgressHours -Hours ([double]::NaN) | Should -Be 'n/a'
+        Format-EpicProgressHour -Hours ([double]::NaN) | Should -Be 'n/a'
         Format-EpicProgressClock -Hours ([double]::NaN) | Should -Be 'n/a'
         Format-EpicProgressNumber -Value ([double]::NaN) -Digits 1 | Should -Be 'n/a'
     }
 
     It 'returns n/a from each formatter for infinity' {
-        Format-EpicProgressHours -Hours ([double]::PositiveInfinity) | Should -Be 'n/a'
+        Format-EpicProgressHour -Hours ([double]::PositiveInfinity) | Should -Be 'n/a'
         Format-EpicProgressClock -Hours ([double]::NegativeInfinity) | Should -Be 'n/a'
         Format-EpicProgressNumber -Value ([double]::PositiveInfinity) | Should -Be 'n/a'
     }
