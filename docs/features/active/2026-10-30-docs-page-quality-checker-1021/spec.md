@@ -798,7 +798,7 @@ No artifact fails the language rule; neither question concerns language.
 - [x] No Python or TypeScript file is added or modified: `git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`, and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
 - [x] No test creates a temporary file: no file under `tests/scripts/claude-lib/docs/` added or edited by this feature contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and every command test uses an in-memory command context.
 - [x] Pester line coverage is at least 85% for each of `DocsPageMarkdown.psm1`, `DocsPageFrontMatter.psm1`, `DocsPageLinks.psm1`, `DocsPageDiataxis.psm1`, `DocsPageOrphans.psm1` and `DocsPageCheck.psm1` (and any refinement split module), read from the PoshQC coverage report of a branch-current `Invoke-PoshQCTest` run with no production file excluded, and recorded under `<FEATURE>/evidence/coverage/` (no branch-coverage gate applies to Pester).
-- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` (Pester shards on `windows-latest`, with coverage) passes on the pull request head.
+- [x] (CI-dependent) The required check `poshqc / PowerShell QC` (Pester shards on `windows-latest`, with coverage) passes on the pull request head.
 
 ## Definition of Done
 
