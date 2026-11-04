@@ -335,6 +335,8 @@
     ".claude/lib/docs/DocsAnalyzerArchitecture.psm1",
     ".claude/lib/docs/DocsAnalyzerConfigFiles.psm1",
     ".claude/lib/docs/DocsInventorySnapshot.psm1",
-    ".claude/lib/docs/DocsInventory.psm1"
+    ".claude/lib/docs/DocsInventory.psm1",
+    ".claude/lib/docs/DocsPythonNativeProtocol.psm1",
+    ".claude/lib/docs/DocsAnalyzerPythonNative.psm1"
   ]
 }
