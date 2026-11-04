@@ -1,7 +1,7 @@
 ---
 name: parallel-add
 description: Admit one new item into a running parallel run — preparation via a preparation-mode child orchestrator run, conflict-edge computation against all items including in-flight ones, and the admission decision that either places the item in the current cohort or defers it and recolors the unstarted subgraph. Appends exactly one mutations[] entry. In-flight items are never moved.
-argument-hint: "[issue|potential-entry]"
+argument-hint: "[issue|potential-entry] [--after <earlier>] [--band <Cn>]"
 context: fork
 agent: parallel-orchestrator
 ---
@@ -28,7 +28,9 @@ this operation may and may not disturb. Read that section before applying anythi
   `/parallel-run` for that.
 - `$ARGUMENTS` names exactly one item: a GitHub issue number or reference, or a path to an entry
   under `docs/features/potential/`. An argument naming more than one item is rejected; admit one
-  item per invocation so each admission decision and its mutation entry stay attributable.
+  item per invocation so each admission decision and its mutation entry stay attributable. The
+  `--after <earlier>` and `--band <Cn>` flags are not items, so the multi-item rejection applies to
+  positional items only.
 - The run-existence check is evaluated first, before any argument-shape check: a pending or
   not-started run, and a run whose `parallel_slug` no checkpoint tracks, are rejected before the
   argument is examined.
@@ -37,6 +39,15 @@ this operation may and may not disturb. Read that section before applying anythi
   the run's slug is known, put the line `parallel_slug: <slug>` before the signal, and end the
   final output with the literal line `PARALLEL_MUTATION_REJECTED: run_not_started` as its last
   line, with no formatting and no trailing text.
+- After the run-existence check passes, apply the closed-run guard in code. Read the manifest mode
+  with `bash .claude/lib/bash/validate-parallel-manifest.sh --print-mode <manifest-path>`, then run
+  `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 guard-run -CheckpointPath artifacts/orchestration/parallel-orchestrator-state.json -ManifestMode <mode>`.
+  The guard rejects when either mode is `closed`, when a `mutations[]` entry has `op` `close`, or
+  when the two modes disagree. On exit 1, stop with the helper's stderr line
+  (`PARALLEL_ADMISSION_REJECTED: run_closed: <detail>`) as the reported reason, change no state,
+  and emit no mutation rejection signal: `run_closed` is an admission rejection code defined in
+  `## Prepared-Item Admission (issue #1047)` of `.claude/rules/parallel-orchestration.md`, not a
+  mutation rejection code.
 - A closed run and an argument naming more than one item are rejected only after the run-existence
   check, while the run's checkpoint exists; each of these rejections emits no rejection signal, and
   the stop validates against that checkpoint.
@@ -61,13 +72,39 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
 1. **Enter `proposed`.** Add the item to `items[]` in state `proposed` with its `issue_num` as the
    primary key. Item keys are integers throughout this surface; there is no string key.
 
-2. **Prepare the item.** Run preparation through a preparation-mode child `Agent(orchestrator)`
+2. **Prepare the item.** First assess how far the item's pushed branch is already prepared:
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 assess -Branch origin/<item branch> -FeatureFolder <feature folder> -PlannerCheckpointPath artifacts/orchestration/parallel-planner-state.json`,
+   adding `-Band <Cn>` when the operator passed `--band`. The helper reads the branch by ref, selects
+   the newest preparation receipt or infers the stage from the branch files, compares the files the
+   plan cites against `origin/main` since the base commit, and prints `next_action`.
+   - When `next_action` is `admit_prepared` (stage `cleared`, verdict `fresh`), run no preparation
+     child, no preflight, and no plan revision. Record the output's `preparation_status`,
+     `plan_hash`, `base_commit`, `complexity_band` (the `band.value`), and `band_source` (the
+     `band.source`) on the item, and continue with step 3.
+   - Otherwise delegate the preparation child described below on the item's pushed branch, not on
+     a new branch, and append after the unchanged kickoff line the resume line
+     `Preparation resume: stage <stage>. Existing artifacts: <paths>. Do not repeat a completed stage; supersede with new timestamped files.`
+     with `<stage>` set to the output's `resume_stage` and `<paths>` listing the existing
+     `research_path`, `spec_path`, and `plan_path` relative to the feature folder. A stale item
+     (verdict `stale`) resumes at preflight with the output's `changed_cited_paths` as the findings,
+     under the single-pass rule of `.claude/skills/orchestrate/SKILL.md` `## Delegation Model`
+     (trivial defects fixed in place, one planner revision for substantive defects, and a halt with
+     the defect list when a second round still fails). A plan that never cleared preflight always
+     runs preflight. A contract change found by that preflight, or a `premise_falsified` verdict
+     (a cited path removed on `main`), resumes at `plan`: the new plan is a new timestamped file,
+     and no superseded artifact is deleted.
+   - The band source order is `--band` (`band_source: caller`), then the planner checkpoint item's
+     `complexity_band` (`planner_checkpoint`), then the `## Complexity Assessment` procedure below
+     (`assessment`).
+
+   Otherwise run preparation through a preparation-mode child `Agent(orchestrator)`
    run, reusing the existing `route_id: preparation` contract UNCHANGED: promotion, research,
    `spec.md`, `user-story.md`, the atomic plan, and preflight clearance. Do not fork a variant
    contract for parallel admission. Preparation yields the item's DECLARED blast radius, and only
    the planner-computed declared radius is authoritative for scheduling. The item's lifecycle
    advances `proposed` -> `admitted` -> `prepared` during this step, recorded as item-state updates in
-   `items[]` with the checkpoint's lifecycle timestamps. After the admitted item's preflight
+   `items[]` with the checkpoint's lifecycle timestamps. When the band source is `assessment`, after
+   the admitted item's preflight
    clearance, perform the `parallel-plan` skill's `## Complexity Assessment` procedure for it, and
    record the resulting `complexity_band` on the admitted orchestrator-checkpoint item so step 3's
    edge derivation and the parent's model routing read the same band.
@@ -125,6 +162,11 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    `qualifies for combination; not combined (combination applies at planning time only)`. This
    step never combines items: it adds no checkpoint field and makes no `mutations[]` change for a
    qualifying pair.
+   Record each `--after <earlier>` flag as one top-level `precedence[]` entry
+   `{before, after, source, recorded_at}` with `before` the earlier item, `after` the candidate,
+   `source` `operator`, and `recorded_at` the current UTC minute. Each precedence pair is a
+   separating input, never a dependency key: add it to the edges passed to steps 4 and 5 as one
+   more `<a>:<b>` edge with `a < b`, so the coloring always separates the pair.
 
 4. **Decide admission.** Call the bundled entry point, which needs no Python interpreter:
 
@@ -166,12 +208,23 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    `.claude/skills/parallel-orchestrate/SKILL.md` — so the current cohort durably holds `scheduled`
    members that a candidate can contend with.
 
+   A candidate with an active unmerged predecessor (a `precedence[]` entry whose `before` item has a
+   `merge_status` other than `merged` or `worktree_removed` and a `state` other than `withdrawn`) is
+   forced to `defer_and_recolor` even when `admit` prints `admit_current_cohort`.
+
    A conflict with an unstarted member of the CURRENT cohort defers the candidate and recolors,
    because the next `max_concurrency` batch would otherwise launch the two concurrently. A conflict
    with an unstarted item OUTSIDE the current cohort does not defer: the cohort barrier keeps the
    two from running concurrently, so the coloring's existing separation already resolves it.
 
-5. **Apply the recolor result.** Write the recolor output field `cohort_assignments` into
+5. **Apply the recolor result.** Before writing, pass the recolor result through the precedence
+   lift: `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 order-cohorts -Cohorts <table-json> -Edges "<a>:<b> ..." -Precedence "<before>:<after> ..." -Pinned "<k> ..." -Floor <current_cohort>`,
+   which moves an unstarted `after` item above its `before` items and never moves a pinned item.
+   After writing, and before step 6 appends the mutation entry, run
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 test-cohorts -CheckpointPath artifacts/orchestration/parallel-orchestrator-state.json`;
+   on exit 1 (`precedence_violated`, `precedence_cycle`, or `precedence_unknown_item`), restore the
+   prior `cohorts[]` and `recolor_generation` and stop with the helper's stderr line.
+   Write the recolor output field `cohort_assignments` (as lifted) into
    `cohorts[]` and set the top-level `recolor_generation` to the output field `generation`. The
    result's key set equals the
    unstarted set exactly and contains no pinned key: no in-flight item changes cohort or state as a
@@ -216,12 +269,23 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    "parallel-orchestrator-state"`. A non-empty error list means the admission was applied
    incorrectly; correct the checkpoint rather than proceeding.
 
+8. **Rewrite the durable scheduling record.** Build the record content with
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 record -RunFolder docs/features/parallel/<slug> -Entry <entry-json>`,
+   where the entry carries the checkpoint's `conflict_edges`, `tolerated_overlaps`, `precedence`,
+   and `items`. The helper prints the content and makes no git write. Write it to
+   `docs/features/parallel/<slug>/parallel-scheduling.json` on `parallel/<slug>-plan` and commit it
+   with a pathspec under `docs/features/parallel/`, so a re-seed from another checkout reads the
+   recorded edges and plan hashes by ref.
+
 ## Constraints
 
 - One admission per invocation, one `mutations[]` entry per successful admission. A failed
   preparation appends no entry and leaves `items[]` without the candidate.
-- No field and no enum member is added to `mutations[]`, `items[]`, or any state or merge-status
-  enum. A `conflict_edges[]` entry may carry only the three tolerated extra fields `hard`, `cost`,
+- No field and no enum member is added to `mutations[]` or any state or merge-status enum. The only
+  fields added to `items[]` are the four tolerated fields `preparation_status`, `plan_hash`,
+  `base_commit`, and `band_source` declared in `## Prepared-Item Admission (issue #1047)` of
+  `.claude/rules/parallel-orchestration.md`, which also declares the top-level `precedence[]` list
+  this skill records. A `conflict_edges[]` entry may carry only the three tolerated extra fields `hard`, `cost`,
   and `benefit` (tolerated-not-validated, returned by the scheduling entry point), and no reason
   member is added: the four `conflict_edges[].reason` members are unchanged. The nine parallel
   enums are owned by `.claude/rules/parallel-orchestration.md` and are consumed, never extended.

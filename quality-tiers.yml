@@ -73,6 +73,9 @@ projects:
   - path: ".claude/lib/parallel-drift"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/parallel-admission"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
   - path: ".claude/lib/project-file-merge"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"

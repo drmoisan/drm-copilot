@@ -220,6 +220,14 @@ KICKOFF_RESUME_FRAGMENTS: tuple[str, ...] = (
     "promotion, research, or planning",
 )
 
+# Issue #1047: kickoff element 4 carries the admitted plan hash, and the child
+# verifies it before any other step.
+KICKOFF_PLAN_HASH_FRAGMENTS: tuple[str, ...] = (
+    "`plan-hash: <hex>`",
+    "before any other step, to run `git rev-parse HEAD:<plan-path>`",
+    "`blocked_reason: premise_falsified`",
+)
+
 COHORT_BARRIER_FRAGMENTS: tuple[str, ...] = (
     "An item may start only when every conflicting neighbour "
     "(`conflict_edges[]`) that sits in a strictly prior current-generation "
@@ -235,6 +243,15 @@ MERGE_ON_GREEN_FRAGMENTS: tuple[str, ...] = (
     "Execute `gh pr merge --merge <PR>`",
     "`.claude/skills/orchestrate/SKILL.md` is **not modified by this feature**",
     "Issue #997 amends `.claude/skills/orchestrate/SKILL.md` for standalone runs only",
+)
+
+# Issue #1047: the parent treats "PR open, step 9 pending" as not done and
+# re-delegates the child once to resume at the CI green gate.
+MERGE_ON_GREEN_TURN_GAP_FRAGMENTS: tuple[str, ...] = (
+    "keep `merge_status: pr_open` and treat the item as not done",
+    "re-delegate the child once to resume at the CI green gate",
+    "`step9_status`",
+    "`awaiting_ci`",
 )
 
 MERGE_CONFLICT_FRAGMENTS: tuple[str, ...] = (
@@ -311,6 +328,11 @@ SECTION_OBLIGATION_CASES: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ),
     ("kickoff-resume-at-plan-path", KICKOFF_HEADING, KICKOFF_RESUME_FRAGMENTS),
     (
+        "kickoff-plan-hash-verification",
+        KICKOFF_HEADING,
+        KICKOFF_PLAN_HASH_FRAGMENTS,
+    ),
+    (
         "cohort-barrier-and-slot-filling-order",
         COHORT_BARRIER_HEADING,
         COHORT_BARRIER_FRAGMENTS,
@@ -319,6 +341,11 @@ SECTION_OBLIGATION_CASES: tuple[tuple[str, str, tuple[str, ...]], ...] = (
         "merge-on-green-parent-executes-merge",
         MERGE_ON_GREEN_HEADING,
         MERGE_ON_GREEN_FRAGMENTS,
+    ),
+    (
+        "merge-on-green-turn-gap-redelegation",
+        MERGE_ON_GREEN_HEADING,
+        MERGE_ON_GREEN_TURN_GAP_FRAGMENTS,
     ),
     (
         "merge-conflict-exhaustion-and-f8-handoff",
