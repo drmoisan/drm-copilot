@@ -16,7 +16,7 @@ Describe "new-potential-entry.ps1 - template root resolution" {
     }
 
     It "uses the supplied template root when the bundled potential template exists" {
-        $templateRoot = "C:\bundled-feature-templates"
+        $templateRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'bundled-feature-templates'
         $bundledTemplatePath = Join-Path $templateRoot "potential/template.md"
         $bundledTemplateExists = $true
         $defaultTemplatePath = $script:expectedPaths['DefaultTemplatePath']
@@ -72,7 +72,7 @@ Describe "new-potential-entry.ps1 - template root resolution" {
     }
 
     It "falls back to the workspace template when the supplied template root lacks the potential template" {
-        $templateRoot = "C:\bundled-feature-templates"
+        $templateRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'bundled-feature-templates'
         $bundledTemplateExists = $false
         $defaultTemplatePath = $script:expectedPaths['DefaultTemplatePath']
         $targetPath = $script:expectedPaths['TargetPath']

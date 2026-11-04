@@ -9,7 +9,8 @@ function global:Get-DrmCopilotNormalizedPath {
         [string]$Path
     )
 
-    return [System.IO.Path]::GetFullPath($Path).TrimEnd('\', '/')
+    # Resolve relative input against the PowerShell location, not the process directory.
+    return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PWD.ProviderPath, $Path)).TrimEnd('\', '/')
 }
 
 function global:Test-DrmCopilotPathWithinRepo {
@@ -122,7 +123,8 @@ function global:Resolve-DrmCopilotActivationScriptPath {
         throw "Virtual environment activation script not found at $activationScriptPath"
     }
 
-    return [System.IO.Path]::GetFullPath($activationScriptPath)
+    # Test-Path above resolves against the PowerShell location; resolve the returned path the same way.
+    return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PWD.ProviderPath, $activationScriptPath))
 }
 
 function global:Start-DrmCopilotPromptSession {
