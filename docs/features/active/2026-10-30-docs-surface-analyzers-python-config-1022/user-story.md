@@ -96,8 +96,8 @@ using the same identifiers and digests (both computed by the shared 1020 functio
 - [x] An element's `source_sha256` changes when a line inside its declaration changes and does not change when a line outside its declaration changes or when only line endings change.
 - [x] `-Command inventory` exits 0 with no blocking diagnostic, 1 with a blocking diagnostic or an invalid profile, 2 for a usage error (including an unregistered `-Analyzer` identifier or one whose analyzer produces none of the profile's selected element kinds, named in the finding), and 3 for a runtime failure, and the `-Json` output of every exit path validates against `schemas/docs/v1/docs-command-envelope.schema.json`.
 - [x] Without `-Write` the command writes nothing; with `-Write` it writes only the snapshot at the profile's `artifact_paths.inventory_snapshot`.
-- [ ] The analyzers and the `inventory` subcommand are registered only under the 1022 anchors of `DocsAnalyzerRegistry.psm1` and `Invoke-DocsCommand.ps1`, and every new file is copied byte-identically to the push-down tree and listed in `pack-manifests/core.json`.
-- [ ] No file under `.claude/lib/docs/` invokes a Python or other interpreter (`enforcement-hooks-no-python-invocation.Tests.ps1` passes), and the feature adds no Python, TypeScript, hook, skill, agent or MCP file, as shown by the plan's artifact classification table.
+- [x] The analyzers and the `inventory` subcommand are registered only under the 1022 anchors of `DocsAnalyzerRegistry.psm1` and `Invoke-DocsCommand.ps1`, and every new file is copied byte-identically to the push-down tree and listed in `pack-manifests/core.json`.
+- [x] No file under `.claude/lib/docs/` invokes a Python or other interpreter (`enforcement-hooks-no-python-invocation.Tests.ps1` passes), and the feature adds no Python, TypeScript, hook, skill, agent or MCP file, as shown by the plan's artifact classification table.
 - [ ] Pester line coverage is at least 85% for each new `.claude/lib/docs/` file, measured by the `poshqc / PowerShell QC shard` jobs on `windows-latest` and enforced by the required check `poshqc / PowerShell QC`.
 
 ## Non-Goals
