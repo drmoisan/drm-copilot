@@ -51,6 +51,13 @@ BeforeAll {
         Set-Item -Path ("Function:\{0}" -f $fn.Name) -Value $fn.Body.GetScriptBlock()
     }
 
+    # Portable fixture root: fully qualified on every host (the checkout drive on
+    # Windows, '/' elsewhere) and never created, so fixture paths need no Windows drive letter.
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'activate-root'
+    $script:VenvRoot = Join-Path $script:FixtureRoot 'mix-calculator'
+    $script:VenvDir = Join-Path $script:VenvRoot '.venv'
+    $script:Sep = [System.IO.Path]::DirectorySeparatorChar
+
     # Reliable global:prompt restore for tests that install a global prompt.
     # Recreating from captured source text (rather than reassigning a captured
     # ScriptBlock) restores the original global function deterministically from
@@ -68,40 +75,49 @@ BeforeAll {
 
 Describe 'Get-RepoRelativePrompt (pure logic)' {
     It 'renders the at-root case with no relative segment' {
-        Get-RepoRelativePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvRoot 'C:\repo\mix-calculator' |
+        Get-RepoRelativePrompt -CurrentPath $script:VenvRoot -VenvRoot $script:VenvRoot |
             Should -Be '(mix-calculator)> '
     }
 
-    It 'renders a one-level descendant with a leading backslash' {
-        Get-RepoRelativePrompt -CurrentPath 'C:\repo\mix-calculator\.claude' -VenvRoot 'C:\repo\mix-calculator' |
-            Should -Be '(mix-calculator)\.claude> '
+    It 'renders a one-level descendant with a leading directory separator' {
+        Get-RepoRelativePrompt -CurrentPath (Join-Path $script:VenvRoot '.claude') -VenvRoot $script:VenvRoot |
+            Should -Be "(mix-calculator)$($script:Sep).claude> "
     }
 
     It 'renders deeper nesting with the full relative subpath' {
-        Get-RepoRelativePrompt -CurrentPath 'C:\repo\mix-calculator\scripts\dev-tools' -VenvRoot 'C:\repo\mix-calculator' |
-            Should -Be '(mix-calculator)\scripts\dev-tools> '
+        Get-RepoRelativePrompt -CurrentPath (Join-Path $script:VenvRoot 'scripts' 'dev-tools') -VenvRoot $script:VenvRoot |
+            Should -Be "(mix-calculator)$($script:Sep)scripts$($script:Sep)dev-tools> "
     }
 
     It 'renders the outside-tree case with a space-prefixed absolute path' {
-        Get-RepoRelativePrompt -CurrentPath 'D:\elsewhere' -VenvRoot 'C:\repo\mix-calculator' |
-            Should -Be '(mix-calculator) D:\elsewhere> '
+        $outside = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'elsewhere'
+        Get-RepoRelativePrompt -CurrentPath $outside -VenvRoot $script:VenvRoot |
+            Should -Be "(mix-calculator) $outside> "
     }
 
     It 'treats a sibling whose name shares the root prefix as outside the tree' {
-        # 'C:\repo\mix-calculator-extra' must not be treated as a descendant of
-        # 'C:\repo\mix-calculator'; the trailing-separator check guards this.
-        Get-RepoRelativePrompt -CurrentPath 'C:\repo\mix-calculator-extra' -VenvRoot 'C:\repo\mix-calculator' |
-            Should -Be '(mix-calculator) C:\repo\mix-calculator-extra> '
+        # A 'mix-calculator-extra' sibling must not be treated as a descendant of
+        # 'mix-calculator'; the trailing-separator check guards this.
+        $sibling = Join-Path $script:FixtureRoot 'mix-calculator-extra'
+        Get-RepoRelativePrompt -CurrentPath $sibling -VenvRoot $script:VenvRoot |
+            Should -Be "(mix-calculator) $sibling> "
     }
 
     It 'compares paths case-insensitively for the at-root case' {
-        Get-RepoRelativePrompt -CurrentPath 'c:\REPO\Mix-Calculator' -VenvRoot 'C:\repo\mix-calculator' |
+        Get-RepoRelativePrompt -CurrentPath $script:VenvRoot.ToUpperInvariant() -VenvRoot $script:VenvRoot |
             Should -Be '(mix-calculator)> '
     }
 
     It 'compares paths case-insensitively for the descendant case' {
-        Get-RepoRelativePrompt -CurrentPath 'C:\REPO\MIX-CALCULATOR\.claude' -VenvRoot 'C:\repo\mix-calculator' |
-            Should -Be '(mix-calculator)\.claude> '
+        Get-RepoRelativePrompt -CurrentPath (Join-Path $script:VenvRoot.ToUpperInvariant() '.claude') -VenvRoot $script:VenvRoot |
+            Should -Be "(mix-calculator)$($script:Sep).claude> "
+    }
+
+    It 'renders a descendant prompt with the platform directory separator' {
+        # Regression for the literal backslash in the descendant test: on a host whose
+        # separator is '/', a location below the venv root must render the relative form.
+        Get-RepoRelativePrompt -CurrentPath (Join-Path $script:VenvRoot 'docs') -VenvRoot $script:VenvRoot |
+            Should -Be "(mix-calculator)$([System.IO.Path]::DirectorySeparatorChar)docs> "
     }
 }
 
@@ -183,38 +199,38 @@ Describe 'Get-VenvAwarePrompt (prompt decision used by the shim)' {
     }
 
     It 'falls back to the default form when the venv value is empty (light background, unchanged)' {
-        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvEnv '' `
+        Get-VenvAwarePrompt -CurrentPath $script:VenvRoot -VenvEnv '' `
             -BackgroundColor ([System.ConsoleColor]::White) |
-            Should -Be 'PS C:\repo\mix-calculator> '
+            Should -Be "PS $($script:VenvRoot)> "
     }
 
     It 'falls back to the default form when the venv value is null (light background, unchanged)' {
-        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvEnv $null `
+        Get-VenvAwarePrompt -CurrentPath $script:VenvRoot -VenvEnv $null `
             -BackgroundColor ([System.ConsoleColor]::White) |
-            Should -Be 'PS C:\repo\mix-calculator> '
+            Should -Be "PS $($script:VenvRoot)> "
     }
 
     It 'derives the repo root from the venv parent and renders the at-root prompt (light background)' {
-        # VIRTUAL_ENV points at <repoRoot>\.venv, so its parent is the repo root.
-        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvEnv 'C:\repo\mix-calculator\.venv' `
+        # VIRTUAL_ENV points at <repoRoot>/.venv, so its parent is the repo root.
+        Get-VenvAwarePrompt -CurrentPath $script:VenvRoot -VenvEnv $script:VenvDir `
             -BackgroundColor ([System.ConsoleColor]::White) |
             Should -Be '(mix-calculator)> '
     }
 
     It 'renders a descendant prompt from the venv parent (light background)' {
-        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator\.claude' -VenvEnv 'C:\repo\mix-calculator\.venv' `
+        Get-VenvAwarePrompt -CurrentPath (Join-Path $script:VenvRoot '.claude') -VenvEnv $script:VenvDir `
             -BackgroundColor ([System.ConsoleColor]::White) |
-            Should -Be '(mix-calculator)\.claude> '
+            Should -Be "(mix-calculator)$($script:Sep).claude> "
     }
 
     It 'wraps the default form in green when the background is dark' {
-        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvEnv '' `
+        Get-VenvAwarePrompt -CurrentPath $script:VenvRoot -VenvEnv '' `
             -BackgroundColor ([System.ConsoleColor]::Black) |
-            Should -Be "$script:Green`PS C:\repo\mix-calculator> $script:Reset"
+            Should -Be "$script:Green`PS $($script:VenvRoot)> $script:Reset"
     }
 
     It 'wraps the venv-active form in green when the background is dark' {
-        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvEnv 'C:\repo\mix-calculator\.venv' `
+        Get-VenvAwarePrompt -CurrentPath $script:VenvRoot -VenvEnv $script:VenvDir `
             -BackgroundColor ([System.ConsoleColor]::Black) |
             Should -Be "$script:Green(mix-calculator)> $script:Reset"
     }
@@ -226,7 +242,7 @@ Describe 'Get-VenvAwarePrompt (prompt decision used by the shim)' {
         # bind, so the installed shim does not throw when
         # $Host.UI.RawUI.BackgroundColor is null. Deterministic: the null value is
         # supplied explicitly and does not depend on the ambient host.
-        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvEnv 'C:\repo\mix-calculator\.venv' `
+        Get-VenvAwarePrompt -CurrentPath $script:VenvRoot -VenvEnv $script:VenvDir `
             -BackgroundColor $null |
             Should -Be '(mix-calculator)> '
     }
@@ -234,37 +250,42 @@ Describe 'Get-VenvAwarePrompt (prompt decision used by the shim)' {
 
 Describe 'Resolve-RepoRoot (depth-robust ancestor walk)' {
     It 'returns the start directory when it directly contains .venv' {
-        $probe = { param([string] $Path) $Path -eq 'C:\repo\mix-calculator\.venv' }
-        Resolve-RepoRoot -StartDir 'C:\repo\mix-calculator' -PathExists $probe |
-            Should -Be 'C:\repo\mix-calculator'
+        $venvDir = $script:VenvDir
+        $probe = { param([string] $Path) $Path -eq $venvDir }.GetNewClosure()
+        Resolve-RepoRoot -StartDir $script:VenvRoot -PathExists $probe |
+            Should -Be $script:VenvRoot
     }
 
     It 'walks up from a two-level-deep start to the ancestor containing .venv' {
-        $probe = { param([string] $Path) $Path -eq 'C:\repo\mix-calculator\.venv' }
-        Resolve-RepoRoot -StartDir 'C:\repo\mix-calculator\scripts\dev-tools' -PathExists $probe |
-            Should -Be 'C:\repo\mix-calculator'
+        $venvDir = $script:VenvDir
+        $probe = { param([string] $Path) $Path -eq $venvDir }.GetNewClosure()
+        Resolve-RepoRoot -StartDir (Join-Path $script:VenvRoot 'scripts' 'dev-tools') -PathExists $probe |
+            Should -Be $script:VenvRoot
     }
 
     It 'walks up from a deeper start regardless of depth' {
-        $probe = { param([string] $Path) $Path -eq 'C:\repo\mix-calculator\.venv' }
-        Resolve-RepoRoot -StartDir 'C:\repo\mix-calculator\a\b\c\d' -PathExists $probe |
-            Should -Be 'C:\repo\mix-calculator'
+        $venvDir = $script:VenvDir
+        $probe = { param([string] $Path) $Path -eq $venvDir }.GetNewClosure()
+        Resolve-RepoRoot -StartDir (Join-Path $script:VenvRoot 'a' 'b' 'c' 'd') -PathExists $probe |
+            Should -Be $script:VenvRoot
     }
 
     It 'returns the nearest qualifying ancestor when multiple ancestors contain .venv' {
+        $venvDir = $script:VenvDir
+        $outerVenvDir = Join-Path $script:FixtureRoot '.venv'
         $probe = {
             param([string] $Path)
-            $Path -eq 'C:\repo\mix-calculator\.venv' -or $Path -eq 'C:\repo\.venv'
-        }
-        Resolve-RepoRoot -StartDir 'C:\repo\mix-calculator\scripts' -PathExists $probe |
-            Should -Be 'C:\repo\mix-calculator'
+            $Path -eq $venvDir -or $Path -eq $outerVenvDir
+        }.GetNewClosure()
+        Resolve-RepoRoot -StartDir (Join-Path $script:VenvRoot 'scripts') -PathExists $probe |
+            Should -Be $script:VenvRoot
     }
 
     It 'returns an empty string when no ancestor contains .venv' {
         # Probe never matches any path; -PathExists references $Path so no
         # candidate ever qualifies and the walk exhausts to the drive root.
         $probe = { param([string] $Path) $Path -eq '\\never\matches' }
-        Resolve-RepoRoot -StartDir 'C:\repo\mix-calculator\scripts\dev-tools' -PathExists $probe |
+        Resolve-RepoRoot -StartDir (Join-Path $script:VenvRoot 'scripts' 'dev-tools') -PathExists $probe |
             Should -Be ''
     }
 }
@@ -331,11 +352,11 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         Mock Test-Path { $true }
         Mock Invoke-VenvActivateScript { }
 
-        Invoke-VenvActivation -ScriptRoot 'C:\repo\mix-calculator\scripts\dev-tools'
+        Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools')
 
         $env:VIRTUAL_ENV_DISABLE_PROMPT | Should -Be '1'
         Should -Invoke Invoke-VenvActivateScript -Times 1 -ParameterFilter {
-            $ActivatePath -match '\.venv\\Scripts\\Activate\.ps1$'
+            $ActivatePath -match '\.venv[\\/]Scripts[\\/]Activate\.ps1$'
         }
         Get-Command -Name 'prompt' -CommandType Function | Should -Not -BeNullOrEmpty
     }
@@ -344,7 +365,7 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         Mock Test-Path { $false }
         Mock Invoke-VenvActivateScript { }
 
-        { Invoke-VenvActivation -ScriptRoot 'C:\repo\mix-calculator\scripts\dev-tools' } |
+        { Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools') } |
             Should -Throw "*Could not locate a '.venv' directory*"
         Should -Invoke Invoke-VenvActivateScript -Times 0
     }
@@ -358,7 +379,7 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         }
         Mock Invoke-VenvActivateScript { }
 
-        { Invoke-VenvActivation -ScriptRoot 'C:\repo\mix-calculator\scripts\dev-tools' } |
+        { Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools') } |
             Should -Throw '*venv missing at*'
         Should -Invoke Invoke-VenvActivateScript -Times 0
     }
@@ -367,13 +388,13 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         Mock Test-Path { $true }
         Mock Invoke-VenvActivateScript { }
 
-        Invoke-VenvActivation -ScriptRoot 'C:\repo\mix-calculator\scripts\dev-tools'
+        Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools')
 
         # Drive the installed prompt with a known venv value and verify delegation.
         # The prompt may be wrapped in a leading green ANSI sequence when the test
         # host background is dark, so allow an optional ESC[..m prefix before the
         # (project-name) segment.
-        $env:VIRTUAL_ENV = 'C:\repo\mix-calculator\.venv'
+        $env:VIRTUAL_ENV = $script:VenvDir
         $esc = [char]27
         prompt | Should -Match "^($esc\[\d+m)?\(mix-calculator\)"
     }
