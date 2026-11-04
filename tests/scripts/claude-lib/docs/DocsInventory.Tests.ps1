@@ -90,7 +90,7 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-Module -Name DocsInventory, DocsInventorySnapshot, DocsAnalyzerConfigFiles, DocsJsonSchemaKeys, DocsYamlKeys, DocsTomlKeys, DocsAnalyzerArchitecture, DocsAnalyzerPythonApi, DocsAnalyzerPythonHttp, DocsPythonHttpSites, DocsAnalyzerPythonCli, DocsPythonCliTyper, DocsPythonCliClick, DocsPythonCliArgparse, DocsPythonBindings, DocsPythonSyntax, DocsPythonTokens, DocsSourceText, DocsProfile, DocsAnalyzerRegistry, DocsSchema, DocsSchemaWalk, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name DocsInventory, DocsAnalyzerPythonNative, DocsPythonNativeProtocol, DocsInventorySnapshot, DocsAnalyzerConfigFiles, DocsJsonSchemaKeys, DocsYamlKeys, DocsTomlKeys, DocsAnalyzerArchitecture, DocsAnalyzerPythonApi, DocsAnalyzerPythonHttp, DocsPythonHttpSites, DocsAnalyzerPythonCli, DocsPythonCliTyper, DocsPythonCliClick, DocsPythonCliArgparse, DocsPythonBindings, DocsPythonSyntax, DocsPythonTokens, DocsSourceText, DocsProfile, DocsAnalyzerRegistry, DocsSchema, DocsSchemaWalk, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Invoke-DocsInventoryCommand' {
@@ -266,7 +266,7 @@ Describe 'Invoke-DocsInventoryCommand' {
             $rows.Count | Should -Be 1
             $rows[0].Function | Should -BeExactly 'Invoke-DocsInventoryCommand'
             Test-Path -LiteralPath $rows[0].Module | Should -BeTrue
-            @($rows[0].Option.Keys | Sort-Object) | Should -Be @('Analyzer', 'Profile', 'Revision', 'Write')
+            @($rows[0].Option.Keys | Sort-Object) | Should -Be @('AnalysisMethod', 'Analyzer', 'Profile', 'Revision', 'Write')
             $rows[0].Option['Analyzer'] | Should -BeExactly 'multi'
             $rows[0].Option['Write'] | Should -BeExactly 'switch'
         }

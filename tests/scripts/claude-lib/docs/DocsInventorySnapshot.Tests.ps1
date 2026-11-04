@@ -28,7 +28,9 @@ BeforeAll {
     $script:Composed = (Get-DocsComposedSchemaSet -SchemaSet (Get-DocsTestSchemaText)).Schemas
     $script:Clock = [datetime]::new(2026, 1, 1, 0, 0, 0, [System.DateTimeKind]::Utc)
     # Get-DocsAnalyzerRegistration returns a comma-wrapped array: assign it first, never pipe it directly.
-    $script:Registry = Get-DocsAnalyzerRegistration
+    # The committed registry also holds the issue #1031 native rows; this suite builds from the scanner rows.
+    $registration = Get-DocsAnalyzerRegistration
+    $script:Registry = [object[]]@($registration | Where-Object { [string] $_.AnalysisMethod -ceq 'scanner' })
 
     function Read-TestCorpus {
         param([string] $Name)

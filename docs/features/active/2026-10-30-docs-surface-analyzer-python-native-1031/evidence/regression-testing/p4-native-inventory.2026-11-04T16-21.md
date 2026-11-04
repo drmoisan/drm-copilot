@@ -1,0 +1,6 @@
+# [P4-T4] Invoke-DocsPythonNativeInventory
+
+Timestamp: 2026-11-04T16-21
+Command: sh SCRATCH/issue-1031-gate.sh issue-1031-p4t4.out tests/scripts/claude-lib/docs/DocsAnalyzerPythonNative.Tests.ps1 -NoCoverage (branch-current Invoke-PoshQCTest)
+EXIT_CODE: 0
+Output Summary: artifacts/pester/pester-junit.xml tests=20 failures=0 errors=0 (the 15 earlier cases plus 5 inventory cases). A parse-failed file (src/pkg/b.py, Python 2 print) yields the scanner elements pkg.b and pkg.b.g for that file while src/pkg/a.py elements record native (S5); the invoked rows are the native and scanner row of each identifier in identifier order; pyproject.toml elements record scanner and config-files, which has no native row, selects scanner; an unavailable helper falls back to the scanner rows with one PYTHON_NATIVE_UNAVAILABLE diagnostic, and -AnalysisMethod native returns the DOCS_PYTHON_NATIVE_UNAVAILABLE finding with no rows; a native output outside its registration returns the DOCS_ANALYZER_OUTPUT_INVALID finding; output is identical under seeded permutations of the captured inputs (seed 1031 in the -Because text). Suites that import the module and call the function pass a non-forcing ImportModule seam with -Global (see p4-parity).
