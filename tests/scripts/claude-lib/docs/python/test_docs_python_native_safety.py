@@ -1,0 +1,105 @@
+"""Safety tests (S7, S12, S15): the helper never runs, imports or hashes sources."""
+
+import ast
+import io
+import json
+import os
+import sys
+from pathlib import Path
+
+import docs_python_native
+from docs_python_native.protocol import main
+
+PYLIB = Path(docs_python_native.__file__).resolve().parents[1]
+FORBIDDEN_CALLS = frozenset({"exec", "eval", "compile", "__import__", "literal_eval"})
+FORBIDDEN_MODULES = frozenset({"importlib", "runpy", "subprocess", "hashlib"})
+FORBIDDEN_CONSTANTS = frozenset({"element_id", "parent_id", "source_sha256"})
+
+
+def _helper_trees() -> list[tuple[str, ast.Module]]:
+    files = sorted(PYLIB.rglob("*.py"))
+    assert len(files) == 12
+    return [
+        (p.relative_to(PYLIB).as_posix(), ast.parse(p.read_text(encoding="utf-8")))
+        for p in files
+    ]
+
+
+def _call_name(node: ast.Call) -> str | None:
+    if isinstance(node.func, ast.Name):
+        return node.func.id
+    if isinstance(node.func, ast.Attribute):
+        return node.func.attr
+    return None
+
+
+class TestStaticSafety:
+    def test_no_execution_import_or_hashing_primitive(self) -> None:
+        for name, tree in _helper_trees():
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Call):
+                    assert _call_name(node) not in FORBIDDEN_CALLS, name
+                if isinstance(node, ast.Import):
+                    assert (
+                        not {a.name.split(".")[0] for a in node.names}
+                        & FORBIDDEN_MODULES
+                    ), name
+                if isinstance(node, ast.ImportFrom):
+                    assert (node.module or "").split(".")[
+                        0
+                    ] not in FORBIDDEN_MODULES, name
+
+    def test_ast_parse_is_the_only_parse_call(self) -> None:
+        parse_calls: list[str] = []
+        for name, tree in _helper_trees():
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Attribute) and node.attr == "parse":
+                    assert (
+                        isinstance(node.value, ast.Name) and node.value.id == "ast"
+                    ), name
+                    parse_calls.append(name)
+        assert parse_calls == ["docs_python_native/source.py"]
+
+    def test_no_identity_or_digest_field_name(self) -> None:
+        for name, tree in _helper_trees():
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                    assert node.value not in FORBIDDEN_CONSTANTS, name
+
+
+class TestBehavioralSafety:
+    def test_analyzing_hostile_source_has_no_side_effect(self) -> None:
+        # Arrange: a module whose execution would exit, set an environment key and
+        # replace a module.
+        marker = "DOCS_NATIVE_SAFETY_MARKER"
+        source = (
+            "import os, sys\n"
+            f"os.environ['{marker}'] = '1'\n"
+            "sys.modules['json'] = None\n"
+            "raise SystemExit(3)\n"
+        )
+        request = {
+            "protocol_version": 1,
+            "analyzers": [
+                "python-architecture",
+                "python-cli",
+                "python-http",
+                "python-public-api",
+            ],
+            "source_roots": ["."],
+            "console_scripts": [],
+            "files": [{"path": "hostile.py", "text": source}],
+            "limits": {"max_files": 50000, "max_file_bytes": 1048576},
+        }
+        modules_before = dict(sys.modules)
+        stdout = io.BytesIO()
+        # Act
+        code = main(io.BytesIO(json.dumps(request).encode()), stdout)
+        # Assert
+        assert code == 0
+        assert json.loads(stdout.getvalue())["files"][0]["status"] == "ok"
+        assert marker not in os.environ
+        assert sys.modules["json"] is modules_before["json"]
+
+    def test_bytecode_writing_is_disabled(self) -> None:
+        assert sys.dont_write_bytecode is True
