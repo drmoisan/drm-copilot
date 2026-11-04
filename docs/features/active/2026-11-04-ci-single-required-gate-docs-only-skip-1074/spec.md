@@ -198,17 +198,17 @@ Seeded from issue:
 - [ ] `tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1` asserts that the gate's `needs:` set equals the set of every other top-level job id in `ci.yml`, derived from the file, and passes.
 - [ ] `tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1` includes mutation cases showing the pin fails when one `needs:` entry is removed and when `if: always()` is removed.
 - [ ] `tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1` asserts that the module's skippable-set constant equals the set of `ci.yml` jobs whose job-level `if:` contains `needs.changes.outputs.code != 'false'` (`full-run-marker`, `root-typescript-tests`, `npm-audit-gate`).
-- [ ] `scripts/ci/CiRequiredGate.psm1` exports `Get-CiRequiredGateDecision -NeedsJson` returning `Passed`, `Scope`, `Code`, `Rows`, and `SummaryText`, and performs no file, environment, or network I/O.
-- [ ] A Pester case in `tests/scripts/ci/CiRequiredGate.Tests.ps1` shows the docs-only scope (`code` exactly `false`) passes when `changes`, `quality-checks7`, `security-scan`, `docs-validation`, `build-check`, `poshqc`, `shell-coverage`, and `drm-copilot-extension-tests` are `success` and `full-run-marker`, `root-typescript-tests`, and `npm-audit-gate` are each `skipped` or `success`.
-- [ ] A Pester case shows the docs-only scope fails when any job outside the skippable set is `skipped`.
-- [ ] A Pester case shows the full scope passes only when every needed job is `success`, and fails when any job, including a skippable-set job, is `skipped`.
-- [ ] Pester cases show that `code` values `true`, empty string, absent, and any value other than exactly `false` select the full scope.
-- [ ] A Pester case shows the gate fails when any needed job result is `failure`.
-- [ ] A Pester case shows the gate fails when any needed job result is `cancelled`.
-- [ ] A Pester case shows the gate fails when any needed job result is a value outside {`success`, `failure`, `cancelled`, `skipped`}, including null.
-- [ ] A Pester case shows the gate fails when the `changes` result is not `success`, even when every other job is `success`.
-- [ ] Pester cases show the gate fails with a configuration-error verdict when `NEEDS_JSON` is blank, is not parseable JSON, is a JSON array or scalar, or lacks `changes`, `docs-validation`, or any skippable-set key.
-- [ ] A Pester case asserts `SummaryText` exactly: a header line with the scope and the raw `code` value, one table row per needed job with columns `Job`, `Result`, `Accepted`, and `Verdict`, and a final verdict line.
+- [x] `scripts/ci/CiRequiredGate.psm1` exports `Get-CiRequiredGateDecision -NeedsJson` returning `Passed`, `Scope`, `Code`, `Rows`, and `SummaryText`, and performs no file, environment, or network I/O.
+- [x] A Pester case in `tests/scripts/ci/CiRequiredGate.Tests.ps1` shows the docs-only scope (`code` exactly `false`) passes when `changes`, `quality-checks7`, `security-scan`, `docs-validation`, `build-check`, `poshqc`, `shell-coverage`, and `drm-copilot-extension-tests` are `success` and `full-run-marker`, `root-typescript-tests`, and `npm-audit-gate` are each `skipped` or `success`.
+- [x] A Pester case shows the docs-only scope fails when any job outside the skippable set is `skipped`.
+- [x] A Pester case shows the full scope passes only when every needed job is `success`, and fails when any job, including a skippable-set job, is `skipped`.
+- [x] Pester cases show that `code` values `true`, empty string, absent, and any value other than exactly `false` select the full scope.
+- [x] A Pester case shows the gate fails when any needed job result is `failure`.
+- [x] A Pester case shows the gate fails when any needed job result is `cancelled`.
+- [x] A Pester case shows the gate fails when any needed job result is a value outside {`success`, `failure`, `cancelled`, `skipped`}, including null.
+- [x] A Pester case shows the gate fails when the `changes` result is not `success`, even when every other job is `success`.
+- [x] Pester cases show the gate fails with a configuration-error verdict when `NEEDS_JSON` is blank, is not parseable JSON, is a JSON array or scalar, or lacks `changes`, `docs-validation`, or any skippable-set key.
+- [x] A Pester case asserts `SummaryText` exactly: a header line with the scope and the raw `code` value, one table row per needed job with columns `Job`, `Result`, `Accepted`, and `Verdict`, and a final verdict line.
 - [ ] `tests/scripts/ci/Invoke-CiRequiredGate.Tests.ps1` shows the entry reads `NEEDS_JSON` through the `-ReadVariable` seam and writes the summary through the `-OutputWriter` seam without reading or writing the real `$env:NEEDS_JSON` or `$env:GITHUB_STEP_SUMMARY`.
 - [ ] `scripts/ci/Invoke-CiRequiredGate.ps1` ends with an explicit `exit 0` for a passing decision and `exit 1` otherwise, per `.claude/rules/ci-workflows.md`, and a Pester case asserts that verdict-to-exit mapping and the dot-source guard.
 - [ ] The `ci.yml` diff against the base branch adds only the `ci-required-gate` job, and every existing job keeps its id, `name:`, `needs:`, `if:`, `uses:`, and `with:` values.
