@@ -1,9 +1,15 @@
 Set-StrictMode -Version Latest
 
 # Regression guard for issue #1066: run-actionlint.Tests.ps1 must leave the process environment,
-# $global:LASTEXITCODE, global functions, and loaded modules as it found them. The guarded suite runs through a nested in-process Invoke-Pester
-# (no result file, no coverage, verbosity None), and the process environment is compared before and after
-# with case-insensitive keys, so the comparison holds on Windows (Path) and Linux (PATH) alike.
+# $global:LASTEXITCODE, global functions, and loaded modules as it found them.
+#
+# The guarded suite runs through a nested in-process Invoke-Pester (no result file, no coverage,
+# verbosity None). It runs in-process because the leak being guarded is process-global state that
+# later suites in the same Pester process inherit; a child process would discard that state on exit
+# and could not detect it.
+#
+# The process environment is compared before and after with case-insensitive keys, so the
+# comparison holds on Windows (Path) and Linux (PATH) alike.
 Describe 'run-actionlint.Tests.ps1 environment isolation' {
     BeforeAll {
         $script:guardedTestPath = Join-Path -Path $PSScriptRoot -ChildPath 'run-actionlint.Tests.ps1'
