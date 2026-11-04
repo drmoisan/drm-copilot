@@ -149,8 +149,8 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 
 ### Quality
 
-- [ ] Every new `.claude/lib/docs/` module is mirrored byte-identically under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/` and listed in `pack-manifests/core.json`, and the push-down contract tests pass (`Docs.Manifest.Tests.ps1` in `poshqc / PowerShell QC`; the Python push-down contract tests in `quality-checks7 / Code Quality & Tests`).
-- [ ] Every pure function in the new modules has a property test with seeded deterministic generation or exhaustive enumeration, and no test creates a temporary file.
+- [x] Every new `.claude/lib/docs/` module is mirrored byte-identically under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/` and listed in `pack-manifests/core.json`, and the push-down contract tests pass (`Docs.Manifest.Tests.ps1` in `poshqc / PowerShell QC`; the Python push-down contract tests in `quality-checks7 / Code Quality & Tests`).
+- [x] Every pure function in the new modules has a property test with seeded deterministic generation or exhaustive enumeration, and no test creates a temporary file.
 - [ ] Pester line coverage is >= 85% for each new production file on `windows-latest` in `poshqc / PowerShell QC`.
 
 ## Non-Goals

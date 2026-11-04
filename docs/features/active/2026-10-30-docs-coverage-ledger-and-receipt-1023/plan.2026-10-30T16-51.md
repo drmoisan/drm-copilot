@@ -194,31 +194,31 @@ No hook, skill, agent, MCP tool, extension command, schema, example, Python, or 
 
 ### Phase 7 — Final QA Loop, Scope Checks, and Self-Review
 
-- [ ] [P7-T1] Run the check-only formatting comparison of [P0-T4] over every `.ps1` and `.psm1` this feature created or edited (`LIB`, `BUNDLE`, `TESTS`).
+- [x] [P7-T1] Run the check-only formatting comparison of [P0-T4] over every `.ps1` and `.psm1` this feature created or edited (`LIB`, `BUNDLE`, `TESTS`).
   - Acceptance: the differing-file count is 0 and `FEATURE/evidence/qa-gates/qa-format.<timestamp>.md` records the four fields. A non-zero count is repaired with `Invoke-PoshQCFormat` over those folders, [P6-T1] is re-run, and the loop restarts at [P7-T1]. CI: `poshqc / PowerShell QC static`.
-- [ ] [P7-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `LIB` and the 1023 files under `TESTS`.
+- [x] [P7-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `LIB` and the 1023 files under `TESTS`.
   - Acceptance: the finding count is 0 and `FEATURE/evidence/qa-gates/qa-pssa.<timestamp>.md` records the four fields; any finding is fixed and the loop restarts at [P7-T1]. CI: `poshqc / PowerShell QC static`.
-- [ ] [P7-T3] Run the branch-current `Invoke-PoshQCTest` over the default scan folders with coverage (the CI shape and the fresh single-process run over `tests/scripts`).
+- [x] [P7-T3] Run the branch-current `Invoke-PoshQCTest` over the default scan folders with coverage (the CI shape and the fresh single-process run over `tests/scripts`).
   - Acceptance: the JUnit file reports `failures="0"` and `errors="0"`, or only failures [P0-T6] recorded as pre-existing; `FEATURE/evidence/qa-gates/qa-pester-coverage.<timestamp>.md` records the four fields, the counts, and the line coverage of every new `LIB` file and of `LIB/Invoke-DocsCommand.ps1` as numbers. CI: `poshqc / PowerShell QC` (`windows-latest`).
-- [ ] [P7-T4] Compare coverage: baseline [P0-T6] against [P7-T3].
+- [x] [P7-T4] Compare coverage: baseline [P0-T6] against [P7-T3].
   - Acceptance: `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md` records the 1020 per-file baseline and post-change figures, the total before and after, and for each new `LIB` file a line coverage of at least 85; `LIB/Invoke-DocsCommand.ps1` is not below its baseline and its three new rows are covered. A figure below its floor is remediation-required, not PASS. Pester measures no branch coverage, so no branch gate applies.
-- [ ] [P7-T5] Run the touched Pester suites (every suite under `TESTS`) in one process in seeded shuffled file order, three runs with the seeds 101, 202, and 303.
+- [x] [P7-T5] Run the touched Pester suites (every suite under `TESTS`) in one process in seeded shuffled file order, three runs with the seeds 101, 202, and 303.
   - Acceptance: each run reports 0 failures in its JUnit file; `FEATURE/evidence/regression-testing/isolation-shuffled-pester.<timestamp>.md` records each seed, its file order, and its counts. An order dependence is fixed on both sides and every seed re-run.
-- [ ] [P7-T6] Check test purity over the 1023 files under `TESTS`: search them for `New-TemporaryFile`, `GetTempFileName`, `GetTempPath`, `env:TEMP`, `env:TMP`, `Start-Process`, and `Start-Sleep`, and confirm each suite holds an `AfterAll` block that removes the `Docs*` modules.
+- [x] [P7-T6] Check test purity over the 1023 files under `TESTS`: search them for `New-TemporaryFile`, `GetTempFileName`, `GetTempPath`, `env:TEMP`, `env:TMP`, `Start-Process`, and `Start-Sleep`, and confirm each suite holds an `AfterAll` block that removes the `Docs*` modules.
   - Acceptance: the search prints no line and exits 1; `FEATURE/evidence/qa-gates/qa-test-purity.<timestamp>.md` records the four fields with `ExpectedExitCode: 1`, the file count, and the suites lacking `AfterAll` (none).
-- [ ] [P7-T7] Re-run the push-down contract command and the Codex generator check of [P0-T7].
+- [x] [P7-T7] Re-run the push-down contract command and the Codex generator check of [P0-T7].
   - Acceptance: both exit 0 with 0 failed tests, or only failures [P0-T7] recorded as pre-existing; `FEATURE/evidence/qa-gates/qa-push-down-contracts.<timestamp>.md` and `FEATURE/evidence/qa-gates/qa-codex-generator-check.<timestamp>.md` record the four fields. CI: `quality-checks7 / Code Quality & Tests (3.10)` through `(3.13)`.
-- [ ] [P7-T8] Re-run the Jest manifest-completeness suite of [P0-T8].
+- [x] [P7-T8] Re-run the Jest manifest-completeness suite of [P0-T8].
   - Acceptance: 0 failed; `FEATURE/evidence/qa-gates/qa-jest-pack-completeness.<timestamp>.md` records the four fields. CI: `drm-copilot-extension-tests / drm-copilot Extension Tests (windows-latest)` and `(ubuntu-latest)`.
-- [ ] [P7-T9] Count logical lines of every file this feature created or edited under `LIB`, `BUNDLE`, and `TESTS`, then run `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` alone through the Pester route.
+- [x] [P7-T9] Count logical lines of every file this feature created or edited under `LIB`, `BUNDLE`, and `TESTS`, then run `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` alone through the Pester route.
   - Acceptance: no file exceeds 800 lines, each module above 500 lines carries a split or a recorded reason, and the suite reports 0 failures; `FEATURE/evidence/qa-gates/qa-file-size.<timestamp>.md` records the per-file counts and the suite result.
-- [ ] [P7-T10] Verify scope with `git diff --name-status MERGE_BASE HEAD` and `git status --porcelain --untracked-files=all`.
+- [x] [P7-T10] Verify scope with `git diff --name-status MERGE_BASE HEAD` and `git status --porcelain --untracked-files=all`.
   - Acceptance: every listed path is covered by `## Artifact Classification`; nothing under `schemas/`, `examples/`, `LIB/schemas/`, `.claude/lib/discovery-validation/`, `config/`, `packages/`, or `quality-tiers.yml` and no other 1020 module is listed; `git diff --numstat MERGE_BASE HEAD` reports 3 added and 0 deleted for each entry-script copy; `FEATURE/evidence/qa-gates/qa-scope.<timestamp>.md` records the `MERGE_BASE` derivation, both outputs, and the numstat rows.
-- [ ] [P7-T11] Run the forbidden-token scan with `SCRATCH/issue-1023-forbidden-token-scan.sh`: it collects every created or changed path from `git diff --name-only MERGE_BASE HEAD` and `git status --porcelain --untracked-files=all` (status columns stripped, deleted paths dropped), adds every file under `FEATURE`, and runs `grep -n -i -E 'r[g]f|fore[c]ast'` over them.
+- [x] [P7-T11] Run the forbidden-token scan with `SCRATCH/issue-1023-forbidden-token-scan.sh`: it collects every created or changed path from `git diff --name-only MERGE_BASE HEAD` and `git status --porcelain --untracked-files=all` (status columns stripped, deleted paths dropped), adds every file under `FEATURE`, and runs `grep -n -i -E 'r[g]f|fore[c]ast'` over them.
   - Acceptance: grep prints no line and exits 1; `FEATURE/evidence/qa-gates/qa-forbidden-tokens.<timestamp>.md` records the four fields with `ExpectedExitCode: 1` and the scanned file count. A match is removed and the loop restarts at [P7-T1].
-- [ ] [P7-T12] Check off each delivered criterion in `spec.md` and `user-story.md` `## Acceptance Criteria` per the `acceptance-criteria-tracking` skill section `## Check-Off Protocol`, one at a time after its mapped evidence passes; criteria that need the CI run follow `### CI-Dependent Criteria`.
+- [x] [P7-T12] Check off each delivered criterion in `spec.md` and `user-story.md` `## Acceptance Criteria` per the `acceptance-criteria-tracking` skill section `## Check-Off Protocol`, one at a time after its mapped evidence passes; criteria that need the CI run follow `### CI-Dependent Criteria`.
   - Acceptance: every criterion in `## Acceptance Criteria Traceability` is `[x]` with unchanged text or recorded as CI-pending; `FEATURE/evidence/qa-gates/ac-status.<timestamp>.md` carries the `### Acceptance Criteria Status` summary with total, checked, and remaining counts.
-- [ ] [P7-T13] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from `MERGE_BASE` and every criterion S1-S33 and U1-U23.
+- [x] [P7-T13] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from `MERGE_BASE` and every criterion S1-S33 and U1-U23.
   - Acceptance: `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` has one PASS, FAIL, or N/A row per checklist item and per criterion; a FAIL row is fixed, the loop re-run from [P7-T1], and the self-review rewritten; the plan does not complete with a FAIL row.
 
 ## Pure Function Property Map
