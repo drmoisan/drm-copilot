@@ -332,3 +332,95 @@ Describe 'Invoke-EpicProgressReport' {
         $script:stateWrites.Count | Should -Be 0
     }
 }
+
+Describe 'Get-EpicProgressReport.ps1 repository constraints' {
+    BeforeAll {
+        $script:productionPaths = @(
+            (Resolve-Path -LiteralPath $script:scriptPath).ProviderPath
+            (Resolve-Path -LiteralPath $script:logicPath).ProviderPath
+        )
+
+        function Get-TestCommandUse {
+            # Each command invocation in both production files with its enclosing function name.
+            $uses = [System.Collections.Generic.List[object]]::new()
+            foreach ($path in $script:productionPaths) {
+                $tokens = $null
+                $parseErrors = $null
+                $ast = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref] $tokens, [ref] $parseErrors)
+                $commands = $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true)
+                foreach ($command in $commands) {
+                    $parent = $command.Parent
+                    while ($null -ne $parent -and $parent -isnot [System.Management.Automation.Language.FunctionDefinitionAst]) { $parent = $parent.Parent }
+                    $functionName = ''
+                    if ($null -ne $parent) { $functionName = $parent.Name }
+                    $uses.Add([pscustomobject]@{ Name = $command.GetCommandName(); Function = $functionName })
+                }
+            }
+            $uses.ToArray()
+        }
+    }
+
+    It 'confines file writes to Write-EpicProgressState' {
+        $writeCommands = @('Set-Content', 'Add-Content', 'Out-File', 'New-Item', 'Remove-Item', 'Copy-Item', 'Move-Item')
+        $uses = @(Get-TestCommandUse)
+
+        $writes = @($uses | Where-Object { $writeCommands -contains $_.Name })
+
+        $writes.Count | Should -Be 1
+        $writes[0].Name | Should -Be 'Set-Content'
+        $writes[0].Function | Should -Be 'Write-EpicProgressState'
+    }
+
+    It 'confines native commands to their wrappers' {
+        $wrapperOf = @{ git = 'Invoke-GitExe'; gh = 'Invoke-GhExe'; cswap = 'Invoke-CswapExe' }
+        $uses = @(Get-TestCommandUse)
+
+        $native = @($uses | Where-Object { $_.Name -and $wrapperOf.ContainsKey($_.Name) })
+
+        $native.Count | Should -Be 3
+        foreach ($use in $native) {
+            $use.Function | Should -Be $wrapperOf[$use.Name] -Because "$($use.Name) may run only inside its wrapper"
+        }
+    }
+
+    It 'contains no recovered hardcoded value' {
+        $forbidden = @('documentation-estate-tooling', '1019', '/workspaces', '2026-11-04T13:55')
+
+        foreach ($path in $script:productionPaths) {
+            $text = Get-Content -LiteralPath $path -Raw
+            foreach ($token in $forbidden) {
+                $text.Contains($token) | Should -BeFalse -Because "$path must not contain '$token'"
+            }
+            # A drive-letter path; the lookbehind keeps a URL scheme such as https:// from matching.
+            $text | Should -Not -Match '(?<![A-Za-z])[A-Za-z]:[\\/]'
+        }
+    }
+
+    It 'documents every parameter in comment-based help' {
+        $tokens = $null
+        $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:productionPaths[0], [ref] $tokens, [ref] $parseErrors)
+        $parameterNames = @($ast.ParamBlock.Parameters | ForEach-Object { $_.Name.VariablePath.UserPath })
+
+        $help = Get-Help -Name $script:productionPaths[0] -Full
+
+        $parameterNames.Count | Should -Be 13
+        $help.Synopsis | Should -BeLike 'Print the TL;DR block*'
+        (($help.description | ForEach-Object { $_.Text }) -join ' ').Trim() | Should -Not -BeNullOrEmpty
+        $helpParameters = @($help.parameters.parameter)
+        foreach ($name in $parameterNames) {
+            $entry = @($helpParameters | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+            $entry | Should -Not -BeNullOrEmpty -Because "-$name must be documented"
+            (($entry.description | ForEach-Object { $_.Text }) -join ' ').Trim() | Should -Not -BeNullOrEmpty -Because "-$name needs a description"
+        }
+    }
+
+    It 'carries at least one example' {
+        $help = Get-Help -Name $script:productionPaths[0] -Full
+
+        $examples = @($help.examples.example)
+
+        $examples.Count | Should -BeGreaterOrEqual 1
+        $examples[0].code | Should -BeLike '*-EpicFolder example-epic*'
+    }
+}
