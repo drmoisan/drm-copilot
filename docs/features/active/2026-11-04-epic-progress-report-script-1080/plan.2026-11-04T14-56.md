@@ -114,7 +114,7 @@ Each task adds the named functions with comment-based help and the named tests, 
 
 Rule: if any of P2-T1 to P2-T11 fails or changes a file, fix the cause, commit and push the fix with that task, and restart from P2-T1.
 
-- [ ] [P2-T1] Run `SCRATCH/issue-1080-format-check.ps1` over the four change-set files; when it reports drift, apply `Invoke-Formatter` to the listed files and restart. Acceptance: `evidence/qa-gates/format.<timestamp>.md` records the printed literal `FORMAT-DIFF-COUNT=0`; committed and pushed.
+- [x] [P2-T1] Run `SCRATCH/issue-1080-format-check.ps1` over the four change-set files; when it reports drift, apply `Invoke-Formatter` to the listed files and restart. Acceptance: `evidence/qa-gates/format.<timestamp>.md` records the printed literal `FORMAT-DIFF-COUNT=0`; committed and pushed.
 - [ ] [P2-T2] Run `SCRATCH/issue-1080-pssa.ps1` over the four change-set files. Acceptance: `evidence/qa-gates/pssa.<timestamp>.md` records `PSSA-FINDINGS=0`; committed and pushed.
 - [ ] [P2-T3] Run the run script over the two new test files without shuffle. Acceptance: `evidence/qa-gates/pester-new-suites.<timestamp>.md` records `Failed=0`, the test total, and two `FILE` lines with `failed=0` (AC1); committed and pushed.
 - [ ] [P2-T4] Run `SCRATCH/issue-1080-coverage.ps1` on the P0-T7 route naming the two new production files. Acceptance: `evidence/qa-gates/coverage-final.<timestamp>.md` records both `COVERAGE` lines at 85 or above (AC1); committed and pushed.
