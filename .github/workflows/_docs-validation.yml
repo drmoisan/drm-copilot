@@ -35,7 +35,3 @@ jobs:
           if [ ! -f docs/code-change.instructions.md ]; then
             echo "WARNING: docs/code-change.instructions.md is missing"
           fi
-
-      - name: Issue 1074 proof B deliberate failure
-        shell: bash
-        run: exit 1
