@@ -304,6 +304,19 @@
     ".claude/lib/docs/DocsLedgerMutation.psm1",
     ".claude/lib/docs/DocsValidation.psm1",
     ".claude/lib/docs/DocsCoverageReport.psm1",
-    ".claude/lib/docs/DocsLedgerCommands.psm1"
+    ".claude/lib/docs/DocsLedgerCommands.psm1",
+    ".claude/lib/docs/DocsPageMarkdown.psm1",
+    ".claude/lib/docs/DocsPageFrontMatter.psm1",
+    ".claude/lib/docs/DocsPageMetadata.psm1",
+    ".claude/lib/docs/DocsPageLinks.psm1",
+    ".claude/lib/docs/DocsPageDiataxis.psm1",
+    ".claude/lib/docs/DocsPageOrphans.psm1",
+    ".claude/lib/docs/DocsPageCheck.psm1",
+    ".claude/lib/docs/schemas/v1/page-metadata.schema.json",
+    ".claude/lib/docs/templates/page-check/markdownlint.json",
+    ".claude/lib/docs/templates/page-check/vale.ini",
+    ".claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml",
+    ".claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml",
+    ".claude/lib/docs/templates/page-check/vale/Project/accept.txt"
   ]
 }

@@ -55,6 +55,7 @@ function Get-DocsCommandTable {
         [pscustomobject]@{ Name = 'init'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileCommands.psm1'); Function = 'Invoke-DocsInitCommand'; Option = @{ RepositoryId = 'value'; Profile = 'value'; Write = 'switch'; Force = 'switch' } }
         [pscustomobject]@{ Name = 'validate-profile'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileCommands.psm1'); Function = 'Invoke-DocsValidateProfileCommand'; Option = @{ Profile = 'value' } }
         # --- 1021: check ---
+        [pscustomobject]@{ Name = 'check'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsPageCheck.psm1'); Function = 'Invoke-DocsCheckCommand'; Option = @{ Profile = 'value'; Path = 'multi' } }
         # --- 1022: inventory ---
         # --- 1023: coverage, update-ledger, validate ---
         [pscustomobject]@{ Name = 'coverage'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsCoverageCommand'; Option = @{ Profile = 'value' } }

@@ -265,9 +265,12 @@ Describe 'Runtime copies, parity and references' {
         [string[]] $runtimeNames = @(Get-ChildItem -LiteralPath $runtime -File | ForEach-Object { $_.Name })
         [Array]::Sort($canonicalNames, [System.StringComparer]::Ordinal)
         [Array]::Sort($runtimeNames, [System.StringComparer]::Ordinal)
+        $schemaNames = Get-DocsSchemaName
+        [string[]] $registeredNames = @($schemaNames | ForEach-Object { "$_.schema.json" })
+        [Array]::Sort($registeredNames, [System.StringComparer]::Ordinal)
 
         # Assert
-        $canonicalNames.Count | Should -Be 8
+        $canonicalNames | Should -Be $registeredNames
         $runtimeNames | Should -Be $canonicalNames
         foreach ($name in $canonicalNames) {
             $left = Get-DocsBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes((Join-Path -Path $canonical -ChildPath $name)))
