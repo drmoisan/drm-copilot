@@ -131,9 +131,10 @@ minversion = "7.0"
 addopts = "-ra --cov-report=lcov:artifacts/python/lcov.info --strict-markers --strict-config"
 testpaths = ["tests"]
 xfail_strict = true
+pythonpath = [".claude/lib/docs/python"]
 
 [tool.coverage.run]
-source = ["src", "scripts/dev_tools", "packages/discovery-runtime/src"]
+source = ["src", "scripts/dev_tools", "packages/discovery-runtime/src", ".claude/lib/docs/python"]
 data_file = "artifacts/.coverage"
 omit = [
     "tests/*",
@@ -166,8 +167,10 @@ include = [
     "scripts",
     "src",
     "packages/discovery-runtime/src",
-    "tests"
+    "tests",
+    ".claude/lib/docs/python"
 ]
+extraPaths = [".claude/lib/docs/python"]
 exclude = [
   "**/__pycache__",
   ".idea",
