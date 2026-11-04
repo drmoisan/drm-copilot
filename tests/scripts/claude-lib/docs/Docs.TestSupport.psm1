@@ -6,10 +6,11 @@
 .DESCRIPTION
     New-DocsTestContext returns a new in-memory command context on every call, with the same
     member set as the real context of Invoke-DocsCommand.ps1 (RepositoryRoot, ReadText, ReadBytes,
-    TestFile, ListFile, WriteText, UtcNow, InvokeProcess). Files live in an ordinal hashtable of
-    repository-relative path to text; writes are recorded in a write log and applied to that map;
-    the clock returns a fixed value; the InvokeProcess fake starts nothing, records each call in a
-    call log and returns a caller-configured result. Nothing is cached at module scope.
+    TestFile, ListFile, WriteText, UtcNow, InvokeProcess, ResolveRevision, ReadRevisionText). Files
+    live in an ordinal hashtable of repository-relative path to text; writes are recorded in a
+    write log and applied to that map; the clock returns a fixed value; the InvokeProcess fake
+    starts nothing, records each call in a call log and returns a caller-configured result; the
+    revision members read caller-supplied in-memory maps. Nothing is cached at module scope.
 
     Get-DocsTestSchemaText and Get-DocsTestExampleText read the committed text of
     .claude/lib/docs/schemas/v1/*.schema.json and examples/docs/v1/*.example.json once per call.
@@ -91,7 +92,10 @@ function New-DocsTestContext {
         for which ReadText returns the empty string. ReadText of an absent path throws an
         item-not-found error, as the real member does. WriteText with Mode 'create' on an existing
         path throws. ProcessResult configures the InvokeProcess fake (default exit code 0, empty
-        streams, TimedOut false).
+        streams, TimedOut false). RevisionMap maps a ref to a full revision: ResolveRevision returns
+        the mapped revision, or $null for an unmapped ref. RevisionFile maps a full revision to a
+        map of repository-relative path to text: ReadRevisionText returns the mapped text, or $null
+        when the revision or the path is absent. Neither member starts a process.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Repository paths are case-sensitive; an ordinal-comparer hashtable is required.')]
@@ -101,7 +105,9 @@ function New-DocsTestContext {
         [AllowNull()] [System.Collections.IDictionary] $File,
         [datetime] $UtcNow = [datetime]::new(2026, 1, 1, 0, 0, 0, [System.DateTimeKind]::Utc),
         [AllowNull()] [System.Collections.IDictionary] $ProcessResult,
-        [string] $RepositoryRoot = 'in-memory-repository'
+        [string] $RepositoryRoot = 'in-memory-repository',
+        [AllowNull()] [System.Collections.IDictionary] $RevisionMap,
+        [AllowNull()] [System.Collections.IDictionary] $RevisionFile
     )
 
     $files = [hashtable]::new([System.StringComparer]::Ordinal)
@@ -115,6 +121,18 @@ function New-DocsTestContext {
         foreach ($key in $ProcessResult.Keys) { $result[[string] $key] = $ProcessResult[$key] }
     }
     $clock = $UtcNow
+    $revisions = [hashtable]::new([System.StringComparer]::Ordinal)
+    if ($null -ne $RevisionMap) {
+        foreach ($key in $RevisionMap.Keys) { $revisions[[string] $key] = [string] $RevisionMap[$key] }
+    }
+    $revisionFiles = [hashtable]::new([System.StringComparer]::Ordinal)
+    if ($null -ne $RevisionFile) {
+        foreach ($revisionKey in $RevisionFile.Keys) {
+            $pathMap = [hashtable]::new([System.StringComparer]::Ordinal)
+            foreach ($pathKey in $RevisionFile[$revisionKey].Keys) { $pathMap[[string] $pathKey] = [string] $RevisionFile[$revisionKey][$pathKey] }
+            $revisionFiles[[string] $revisionKey] = $pathMap
+        }
+    }
 
     $readText = {
         param($RelativePath)
@@ -157,16 +175,31 @@ function New-DocsTestContext {
         $processCallLog.Add([pscustomobject]@{ FilePath = $FilePath; ArgumentList = $ArgumentList; StdinText = $StdinText; TimeoutSeconds = $TimeoutSeconds })
         return @{ ExitCode = $result['ExitCode']; Stdout = $result['Stdout']; Stderr = $result['Stderr']; TimedOut = $result['TimedOut'] }
     }.GetNewClosure()
+    $resolveRevision = {
+        param($Ref)
+        $key = [string] $Ref
+        if ($revisions.ContainsKey($key)) { return $revisions[$key] }
+        return $null
+    }.GetNewClosure()
+    $readRevisionText = {
+        param($Revision, $RelativePath)
+        $revisionKey = [string] $Revision
+        $pathKey = [string] $RelativePath
+        if ($revisionFiles.ContainsKey($revisionKey) -and $revisionFiles[$revisionKey].ContainsKey($pathKey)) { return $revisionFiles[$revisionKey][$pathKey] }
+        return $null
+    }.GetNewClosure()
 
     $context = [pscustomobject]@{
-        RepositoryRoot = $RepositoryRoot
-        ReadText       = $readText
-        ReadBytes      = $readBytes
-        TestFile       = $testFile
-        ListFile       = $listFile
-        WriteText      = $writeText
-        UtcNow         = $utcNowMember
-        InvokeProcess  = $invokeProcess
+        RepositoryRoot   = $RepositoryRoot
+        ReadText         = $readText
+        ReadBytes        = $readBytes
+        TestFile         = $testFile
+        ListFile         = $listFile
+        WriteText        = $writeText
+        UtcNow           = $utcNowMember
+        InvokeProcess    = $invokeProcess
+        ResolveRevision  = $resolveRevision
+        ReadRevisionText = $readRevisionText
     }
     return @{ Context = $context; Files = $files; WriteLog = $writeLog; ProcessCallLog = $processCallLog }
 }
