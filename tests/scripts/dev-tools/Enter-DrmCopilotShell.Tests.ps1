@@ -4,8 +4,18 @@ Describe "DrmCopilotPromptSupport.ps1" {
     BeforeAll {
         $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
         $script:supportScriptPath = Join-Path -Path $scriptRoot -ChildPath "../../../scripts/dev-tools/DrmCopilotPromptSupport.ps1"
+        # Capture the global prompt before the support script can replace it; Set-DrmCopilotPrompt
+        # writes Function:\global:prompt, so the restore below targets the same global function.
+        $originalPromptFunction = Get-Item -LiteralPath Function:\prompt -ErrorAction SilentlyContinue
+        $script:originalPrompt = if ($null -ne $originalPromptFunction) { $originalPromptFunction.ScriptBlock } else { $null }
         . $script:supportScriptPath
-        $script:originalPrompt = $function:prompt
+
+        # The support script defines these functions in the global scope; AfterAll removes them.
+        $script:SupportGlobalFunctions = @(
+            'Get-DrmCopilotNormalizedPath', 'Test-DrmCopilotPathWithinRepo', 'Get-DrmCopilotPromptPath',
+            'Get-DrmCopilotPromptText', 'Set-DrmCopilotPrompt', 'Resolve-DrmCopilotActivationScriptPath',
+            'Start-DrmCopilotPromptSession'
+        )
 
         # Portable fixture root: fully qualified on every host (the checkout drive on Windows,
         # '/' elsewhere) and never created; every repository and environment path joins from it.
@@ -15,7 +25,18 @@ Describe "DrmCopilotPromptSupport.ps1" {
     }
 
     AfterEach {
-        $function:prompt = $script:originalPrompt
+        if ($null -ne $script:originalPrompt) {
+            Set-Item -Path Function:\global:prompt -Value $script:originalPrompt
+        }
+        else {
+            Remove-Item -Path Function:\prompt -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    AfterAll {
+        foreach ($functionName in $script:SupportGlobalFunctions) {
+            Remove-Item -Path ("Function:\{0}" -f $functionName) -Force -ErrorAction SilentlyContinue
+        }
     }
 
     Context "Get-DrmCopilotPromptPath" {
@@ -30,7 +51,7 @@ Describe "DrmCopilotPromptSupport.ps1" {
         It "returns a repo-relative path with a leading backslash for nested folders" {
             $result = Get-DrmCopilotPromptPath `
                 -RepoRootPath $script:RepoRoot `
-                -LocationPath (Join-Path $script:RepoRoot 'scripts' 'dev-tools')
+                -LocationPath (Join-Path -Path $script:RepoRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools')
 
             $result | Should -Be "\scripts\dev-tools"
         }

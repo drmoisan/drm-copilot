@@ -154,7 +154,7 @@ Describe 'Install-PoetryWithPip' {
             [pscustomobject]@{ Output = @('Successfully installed poetry-fixture-1.0'); ExitCode = 0 }
         }
         Mock -CommandName Get-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { $script:AppData } -ParameterFilter { $Name -eq 'APPDATA' }
-        Mock -CommandName Get-ChildItem -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Directory = [pscustomobject]@{ FullName = (Join-Path $script:AppData 'Python' 'Scripts') } } }
+        Mock -CommandName Get-ChildItem -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Directory = [pscustomobject]@{ FullName = (Join-Path -Path $script:AppData -ChildPath 'Python' -AdditionalChildPath 'Scripts') } } }
         Mock -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -MockWith { }
         Mock -CommandName Get-SessionPathFromMachineAndUser -ModuleName HostBootstrap -MockWith { 'C:\machine;C:\user' }
         Mock -CommandName Set-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { }
@@ -168,7 +168,7 @@ Describe 'Install-PoetryWithPip' {
             $FilePath -eq 'C:\fixture\python.exe' -and ($ArgumentList -join ' ') -eq '-m pip install --user poetry' -and $StreamToHost
         }
         Should -Invoke -CommandName Get-ChildItem -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $Path -eq (Join-Path $script:AppData 'Python') }
-        Should -Invoke -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $DirectoryPath -eq (Join-Path $script:AppData 'Python' 'Scripts') }
+        Should -Invoke -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $DirectoryPath -eq (Join-Path -Path $script:AppData -ChildPath 'Python' -AdditionalChildPath 'Scripts') }
         Should -Invoke -CommandName Set-HostEnvironmentVariable -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
             $Name -eq 'Path' -and $Value -eq 'C:\machine;C:\user' -and $Target -eq 'Process'
         }

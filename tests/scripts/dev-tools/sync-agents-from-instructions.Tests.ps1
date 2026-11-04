@@ -2,6 +2,9 @@ Set-StrictMode -Version Latest
 
 Describe "sync-agents-from-instructions.ps1" {
     BeforeAll {
+        # Save the prior value so AfterAll can restore it; the variable is process-wide and
+        # would otherwise suppress script execution in every later suite of the same process.
+        $script:PriorSkipScriptExecution = [Environment]::GetEnvironmentVariable('POSHQC_SKIP_SCRIPT_EXECUTION')
         $env:POSHQC_SKIP_SCRIPT_EXECUTION = '1'
         $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\scripts\dev-tools\sync-agents-from-instructions.ps1"
         . $script:scriptPath
@@ -10,6 +13,15 @@ Describe "sync-agents-from-instructions.ps1" {
         # file names and relative-path lengths are computed from it.
         $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'sync-agents-from-instructions-root'
         $script:Repo = Join-Path $script:FixtureRoot 'repo'
+    }
+
+    AfterAll {
+        if ($null -eq $script:PriorSkipScriptExecution) {
+            Remove-Item -Path Env:\POSHQC_SKIP_SCRIPT_EXECUTION -ErrorAction SilentlyContinue
+        }
+        else {
+            $env:POSHQC_SKIP_SCRIPT_EXECUTION = $script:PriorSkipScriptExecution
+        }
     }
 
     Context "Get-InstructionsBody" {
@@ -98,9 +110,9 @@ applyTo: "**"
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith {
                 @(
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'a.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'B.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'sub' 'c.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'a.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'B.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'sub', 'c.instructions.md') }
                 )
             }
             Mock -CommandName Get-InstructionFileData -MockWith {
@@ -129,12 +141,12 @@ applyTo: "**"
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith {
                 @(
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'python-code-change.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-unit-test.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'typescript-code-change.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'csharp-code-change.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-code-change.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'powershell-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'python-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'general-unit-test.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'typescript-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'csharp-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'general-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'powershell-code-change.instructions.md') }
                 )
             }
             Mock -CommandName Get-InstructionFileData -MockWith {
@@ -231,10 +243,10 @@ applyTo: "**"
             }
             Mock -CommandName Get-ChildItem -MockWith {
                 @(
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'python-code-change.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-unit-test.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'csharp-code-change.instructions.md') }
-                    [pscustomobject]@{ FullName = (Join-Path $script:Repo '.github' 'instructions' 'general-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'python-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'general-unit-test.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'csharp-code-change.instructions.md') }
+                    [pscustomobject]@{ FullName = (Join-Path -Path $script:Repo -ChildPath '.github' -AdditionalChildPath 'instructions', 'general-code-change.instructions.md') }
                 )
             }
             Mock -CommandName Get-InstructionFileData -MockWith {

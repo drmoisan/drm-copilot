@@ -85,7 +85,7 @@ Describe 'Get-RepoRelativePrompt (pure logic)' {
     }
 
     It 'renders deeper nesting with the full relative subpath' {
-        Get-RepoRelativePrompt -CurrentPath (Join-Path $script:VenvRoot 'scripts' 'dev-tools') -VenvRoot $script:VenvRoot |
+        Get-RepoRelativePrompt -CurrentPath (Join-Path -Path $script:VenvRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools') -VenvRoot $script:VenvRoot |
             Should -Be "(mix-calculator)$($script:Sep)scripts$($script:Sep)dev-tools> "
     }
 
@@ -259,14 +259,14 @@ Describe 'Resolve-RepoRoot (depth-robust ancestor walk)' {
     It 'walks up from a two-level-deep start to the ancestor containing .venv' {
         $venvDir = $script:VenvDir
         $probe = { param([string] $Path) $Path -eq $venvDir }.GetNewClosure()
-        Resolve-RepoRoot -StartDir (Join-Path $script:VenvRoot 'scripts' 'dev-tools') -PathExists $probe |
+        Resolve-RepoRoot -StartDir (Join-Path -Path $script:VenvRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools') -PathExists $probe |
             Should -Be $script:VenvRoot
     }
 
     It 'walks up from a deeper start regardless of depth' {
         $venvDir = $script:VenvDir
         $probe = { param([string] $Path) $Path -eq $venvDir }.GetNewClosure()
-        Resolve-RepoRoot -StartDir (Join-Path $script:VenvRoot 'a' 'b' 'c' 'd') -PathExists $probe |
+        Resolve-RepoRoot -StartDir (Join-Path -Path $script:VenvRoot -ChildPath 'a' -AdditionalChildPath 'b', 'c', 'd') -PathExists $probe |
             Should -Be $script:VenvRoot
     }
 
@@ -285,7 +285,7 @@ Describe 'Resolve-RepoRoot (depth-robust ancestor walk)' {
         # Probe never matches any path; -PathExists references $Path so no
         # candidate ever qualifies and the walk exhausts to the drive root.
         $probe = { param([string] $Path) $Path -eq '\\never\matches' }
-        Resolve-RepoRoot -StartDir (Join-Path $script:VenvRoot 'scripts' 'dev-tools') -PathExists $probe |
+        Resolve-RepoRoot -StartDir (Join-Path -Path $script:VenvRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools') -PathExists $probe |
             Should -Be ''
     }
 }
@@ -352,7 +352,7 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         Mock Test-Path { $true }
         Mock Invoke-VenvActivateScript { }
 
-        Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools')
+        Invoke-VenvActivation -ScriptRoot (Join-Path -Path $script:VenvRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools')
 
         $env:VIRTUAL_ENV_DISABLE_PROMPT | Should -Be '1'
         Should -Invoke Invoke-VenvActivateScript -Times 1 -ParameterFilter {
@@ -365,7 +365,7 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         Mock Test-Path { $false }
         Mock Invoke-VenvActivateScript { }
 
-        { Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools') } |
+        { Invoke-VenvActivation -ScriptRoot (Join-Path -Path $script:VenvRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools') } |
             Should -Throw "*Could not locate a '.venv' directory*"
         Should -Invoke Invoke-VenvActivateScript -Times 0
     }
@@ -379,7 +379,7 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         }
         Mock Invoke-VenvActivateScript { }
 
-        { Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools') } |
+        { Invoke-VenvActivation -ScriptRoot (Join-Path -Path $script:VenvRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools') } |
             Should -Throw '*venv missing at*'
         Should -Invoke Invoke-VenvActivateScript -Times 0
     }
@@ -388,7 +388,7 @@ Describe 'Invoke-VenvActivation (orchestration; seams mocked)' {
         Mock Test-Path { $true }
         Mock Invoke-VenvActivateScript { }
 
-        Invoke-VenvActivation -ScriptRoot (Join-Path $script:VenvRoot 'scripts' 'dev-tools')
+        Invoke-VenvActivation -ScriptRoot (Join-Path -Path $script:VenvRoot -ChildPath 'scripts' -AdditionalChildPath 'dev-tools')
 
         # Drive the installed prompt with a known venv value and verify delegation.
         # The prompt may be wrapped in a leading green ANSI sequence when the test

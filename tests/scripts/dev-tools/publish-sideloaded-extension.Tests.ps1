@@ -41,7 +41,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - real orchestrator' {
         # The mocks run while the entry script is executing, where $script: names the entry
         # script's scope, so they close over local copies of the fixture paths.
         $vsixDir = $script:VsixDir
-        $extensionRoot = Join-Path $script:Repo 'extensions' 'drm-copilot'
+        $extensionRoot = Join-Path -Path $script:Repo -ChildPath 'extensions' -AdditionalChildPath 'drm-copilot'
         Mock -CommandName Test-Path -ModuleName SideloadedExtensionPublish -MockWith {
             param([string]$LiteralPath)
             $LiteralPath -ne $vsixDir

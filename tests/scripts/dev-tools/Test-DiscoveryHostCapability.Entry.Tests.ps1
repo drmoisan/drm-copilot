@@ -45,6 +45,12 @@ Describe 'Test-DiscoveryHostCapability.ps1 entry point' {
         }
     }
 
+    AfterEach {
+        # The operator script exits with its verdict, which sets the process-wide exit code;
+        # reset it so a later suite in the same process does not observe it.
+        $global:LASTEXITCODE = 0
+    }
+
     It 'exits 2 and writes the unsupported document when the workspace has no installed probe' {
         # A portable workspace root (fully qualified on every host, never created); the probe
         # existence check is mocked to $false for paths under that root only.

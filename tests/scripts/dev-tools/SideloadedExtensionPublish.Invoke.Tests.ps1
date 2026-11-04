@@ -27,7 +27,7 @@ BeforeAll {
     $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'sideloadedextensionpublish-invoke-root'
     $script:Repo = Join-Path $script:FixtureRoot 'repo'
     $script:VsixDir = Join-Path $script:FixtureRoot 'vsix'
-    $script:ExtensionRoot = Join-Path $script:Repo 'extensions' 'drm-copilot'
+    $script:ExtensionRoot = Join-Path -Path $script:Repo -ChildPath 'extensions' -AdditionalChildPath 'drm-copilot'
 
     $script:publishArgs = @{
         RepoRoot      = $script:Repo

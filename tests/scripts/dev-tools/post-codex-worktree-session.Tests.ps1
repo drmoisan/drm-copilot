@@ -267,7 +267,7 @@ Describe "post-codex-worktree-session.ps1 - Resolve-CodexCustomizationSourceRoot
         $repoRoot = Join-Path $fixtureRoot 'repo'
         $result = Resolve-CodexCustomizationSourceRoot `
             -WorktreeRoot "C:/repo-wt" `
-            -ScriptRoot (Join-Path $repoRoot '.codex' 'scripts') `
+            -ScriptRoot (Join-Path -Path $repoRoot -ChildPath '.codex' -AdditionalChildPath 'scripts') `
             -InvokeGit { param([string[]] $GitArgs) $null = $GitArgs; return "" }
 
         $result | Should -Be $repoRoot.Replace('\', '/').TrimEnd('/')

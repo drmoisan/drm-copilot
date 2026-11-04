@@ -215,9 +215,12 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
         $script:capturedRunPaths = $null
         $script:capturedCoveragePaths = $null
         # The coverage output directory would otherwise be created for real under the fixture root.
+        # The call goes through the PoshQC instance Pester mocks: under a PoshQC-hosted run the bare
+        # command name can resolve to the host's own module instance, which the mock does not reach.
         Mock -CommandName New-Item -ModuleName PoshQC -MockWith { } -ParameterFilter { $ItemType -eq 'Directory' }
+        $invokePoshQCTest = (Get-Module -Name PoshQC).ExportedCommands['Invoke-PoshQCTest']
 
-        Invoke-PoshQCTest -Root '/repo' -ScanFolders @('/repo/src', '/repo/tests/powershell') -SettingsPath '/settings.psd1' -EnsureModule { } -TestPathExists { $true } -LoadSettings {
+        & $invokePoshQCTest -Root '/repo' -ScanFolders @('/repo/src', '/repo/tests/powershell') -SettingsPath '/settings.psd1' -EnsureModule { } -TestPathExists { $true } -LoadSettings {
             @{
                 Run          = @{ Path = @('tests') }
                 Should       = @{ ErrorAction = 'Stop' }
