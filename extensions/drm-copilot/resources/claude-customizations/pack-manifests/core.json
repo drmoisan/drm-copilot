@@ -294,6 +294,24 @@
     ".claude/lib/docs/schemas/v1/docs-parity-matrix.schema.json",
     ".claude/lib/docs/schemas/v1/docs-evidence-pin.schema.json",
     ".claude/lib/docs/schemas/v1/docs-validation-receipt.schema.json",
-    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json"
+    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json",
+    ".claude/lib/docs/DocsSourceText.psm1",
+    ".claude/lib/docs/DocsPythonTokens.psm1",
+    ".claude/lib/docs/DocsPythonSyntax.psm1",
+    ".claude/lib/docs/DocsPythonBindings.psm1",
+    ".claude/lib/docs/DocsTomlKeys.psm1",
+    ".claude/lib/docs/DocsYamlKeys.psm1",
+    ".claude/lib/docs/DocsJsonSchemaKeys.psm1",
+    ".claude/lib/docs/DocsPythonCliArgparse.psm1",
+    ".claude/lib/docs/DocsPythonCliClick.psm1",
+    ".claude/lib/docs/DocsPythonCliTyper.psm1",
+    ".claude/lib/docs/DocsAnalyzerPythonCli.psm1",
+    ".claude/lib/docs/DocsPythonHttpSites.psm1",
+    ".claude/lib/docs/DocsAnalyzerPythonHttp.psm1",
+    ".claude/lib/docs/DocsAnalyzerPythonApi.psm1",
+    ".claude/lib/docs/DocsAnalyzerArchitecture.psm1",
+    ".claude/lib/docs/DocsAnalyzerConfigFiles.psm1",
+    ".claude/lib/docs/DocsInventorySnapshot.psm1",
+    ".claude/lib/docs/DocsInventory.psm1"
   ]
 }
