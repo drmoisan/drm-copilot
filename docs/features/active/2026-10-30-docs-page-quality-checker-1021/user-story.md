@@ -82,7 +82,7 @@ consumer can adopt.
 - [x] The page-check modules import nothing from the ledger, analyzer-implementation or reference modules, proven by the static import-closure test `tests/scripts/claude-lib/docs/DocsPageImportIsolation.Tests.ps1` with a positive control.
 - [x] No consumer vocabulary or repository name ships in the base configuration under `.claude/lib/docs/templates/page-check/`; the Vale vocabulary file ships empty and is consumer-owned; `-Command init -Write` writes each base-configuration file with the bytes of its template (`DocsPageTemplates.Tests.ps1`, `DocsNeutrality.Tests.ps1`).
 - [x] Every new or edited file under `.claude/lib/docs/` is listed in the Claude `pack-manifests/core.json` and its push-down copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/` is byte-identical (`Docs.Manifest.Tests.ps1`).
-- [ ] No Python or TypeScript file is added or modified by the feature diff.
+- [x] No Python or TypeScript file is added or modified by the feature diff.
 - [ ] Pester line coverage is at least 85% for each new `DocsPage*.psm1` module, recorded under `<FEATURE>/evidence/coverage/`, and the required check `poshqc / PowerShell QC` (Pester shards on `windows-latest`, with coverage) passes on the pull request head (CI-dependent).
 
 ## Non-Goals

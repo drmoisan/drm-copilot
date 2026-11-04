@@ -110,6 +110,7 @@ function ConvertFrom-DocsPageBytes {
         A page above MaxBytes yields DOCS_PAGE_TOO_LARGE and an undecodable page
         DOCS_PAGE_ENCODING_INVALID; Text is then $null. A leading UTF-8 byte order mark is removed.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification = 'The exported name is fixed by the issue #1021 specification; Bytes names the byte-array input.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(

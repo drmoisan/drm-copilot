@@ -47,7 +47,7 @@ Describe 'Get-DocsPageSlug' {
         @{ Text = 'Use [the guide](guide.md) now'; Expected = 'use-the-guide-now' }
         @{ Text = 'Logo ![alt text](logo.png)'; Expected = 'logo-alt-text' }
         @{ Text = 'Tagged <code>x</code> heading'; Expected = 'tagged-x-heading' }
-        @{ Text = 'Ünïcode Größe'; Expected = 'ünïcode-größe' }
+        @{ Text = ('' + [char]0xDC + 'n' + [char]0xEF + 'code Gr' + [char]0xF6 + [char]0xDF + 'e'); Expected = ('' + [char]0xFC + 'n' + [char]0xEF + 'code-gr' + [char]0xF6 + [char]0xDF + 'e') }
         @{ Text = 'What? Why! (Really.)'; Expected = 'what-why-really' }
         @{ Text = 'snake_case name'; Expected = 'snake_case-name' }
         @{ Text = 'two  spaces'; Expected = 'two--spaces' }
@@ -103,7 +103,7 @@ Describe 'Get-DocsPageAnchor' {
         # Arrange
         $seed = 20261030
         $random = [System.Random]::new($seed)
-        $words = @('Alpha', 'Beta', 'beta', 'Gamma 1', 'Gamma', 'How', 'Ünit', '_x', 'a-b')
+        $words = @('Alpha', 'Beta', 'beta', 'Gamma 1', 'Gamma', 'How', ('' + [char]0xDC + 'nit'), '_x', 'a-b')
         for ($round = 0; $round -lt 25; $round++) {
             $lines = @(for ($n = 0; $n -lt $random.Next(1, 12); $n++) { '## ' + $words[$random.Next(0, $words.Count)] })
             $model = Get-TestModel -Line $lines
@@ -171,7 +171,7 @@ Describe 'Resolve-DocsPageLinkTarget' {
         @{ Target = './sub/x.md#Part-1'; Path = 'docs/a/sub/x.md'; Fragment = 'Part-1' }
         @{ Target = '../b/y.md?raw=1#z'; Path = 'docs/b/y.md'; Fragment = 'z' }
         @{ Target = '/README.md'; Path = 'README.md'; Fragment = $null }
-        @{ Target = 'my%20page.md#caf%C3%A9'; Path = 'docs/a/my page.md'; Fragment = 'café' }
+        @{ Target = 'my%20page.md#caf%C3%A9'; Path = 'docs/a/my page.md'; Fragment = ('caf' + [char]0xE9) }
         @{ Target = '#local'; Path = 'docs/a/page.md'; Fragment = 'local' }
         @{ Target = 'dir/'; Path = 'docs/a/dir'; Fragment = $null }
         @{ Target = 'x.md#'; Path = 'docs/a/x.md'; Fragment = $null }
@@ -216,10 +216,10 @@ Describe 'Get-DocsPageLinkFinding' {
     It 'resolves pages, README and index directories, page-directory prefixes and existing paths with no finding' {
         # Arrange
         $page = @{
-            'docs/README.md'       = @('[a](guide/) [b](api) [c](tree) [d](img.png) [e](README.md) [f](/docs/guide/index.md)')
-            'docs/guide/index.md'  = @('# Guide')
-            'docs/api/README.md'   = @('# API')
-            'docs/tree/deep/x.md'  = @('# X')
+            'docs/README.md'      = @('[a](guide/) [b](api) [c](tree) [d](img.png) [e](README.md) [f](/docs/guide/index.md)')
+            'docs/guide/index.md' = @('# Guide')
+            'docs/api/README.md'  = @('# API')
+            'docs/tree/deep/x.md' = @('# X')
         }
 
         # Act

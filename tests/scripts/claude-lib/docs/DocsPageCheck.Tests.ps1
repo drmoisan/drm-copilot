@@ -39,6 +39,7 @@ BeforeAll {
 
     function New-TestProfile {
         # Returns a parsed docs profile (ordinal keys are not required by the pure functions).
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory fixture factory in a test file; it changes no system state.')]
         param([object[]] $Root = @([ordered]@{ id = 'docs-root'; path = 'docs'; audience_ids = @('developers') }), [string[]] $Mode = @('tutorial', 'how-to', 'reference', 'explanation'))
         $text = Get-Content -LiteralPath (Join-Path -Path $script:RepositoryRoot -ChildPath 'examples/docs/v1/docs-profile.example.json') -Raw
         $value = (ConvertFrom-DocsJsonText -Text $text).Value
@@ -51,6 +52,7 @@ BeforeAll {
 
     function New-TestPage {
         # Builds page text from front-matter overrides (a $null value removes the field) and body lines.
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory fixture factory in a test file; it changes no system state.')]
         param([hashtable] $Field = @{}, [string[]] $Body = @('# Page', 'Text.'), [string[]] $ExtraLine = @())
         $lines = [System.Collections.Generic.List[string]]::new()
         $lines.Add('---')
@@ -65,6 +67,7 @@ BeforeAll {
 
     function New-TestPageSet {
         # The clean base set: an entry page linking a guide; Page entries replace or add pages, Remove drops them.
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory fixture factory in a test file; it changes no system state.')]
         param([hashtable] $Page = @{}, [string[]] $Remove = @())
         $set = [ordered]@{
             'docs/README.md' = New-TestPage -Body @('# Documentation', '- [Guide](guide.md)', '- [Reference](reference/cli.md)', '- [Lost](lost.md)')
@@ -76,8 +79,8 @@ BeforeAll {
     }
 
     function Invoke-TestCheck {
-        param([System.Collections.IDictionary] $PageText = (New-TestPageSet), [System.Collections.IDictionary] $Profile = (New-TestProfile), [string[]] $ExistingPath = @(), [string[]] $SelectedPath)
-        Get-DocsPageCheckFinding -PageText $PageText -Profile $Profile -ProfilePath $script:ProfilePath -ComposedSchemaSet $script:Composed -ExistingPath $ExistingPath -SelectedPath $SelectedPath
+        param([System.Collections.IDictionary] $PageText = (New-TestPageSet), [System.Collections.IDictionary] $DocsProfile = (New-TestProfile), [string[]] $ExistingPath = @(), [string[]] $SelectedPath)
+        Get-DocsPageCheckFinding -PageText $PageText -Profile $DocsProfile -ProfilePath $script:ProfilePath -ComposedSchemaSet $script:Composed -ExistingPath $ExistingPath -SelectedPath $SelectedPath
     }
 
     function Get-TestCodePath {
@@ -93,6 +96,7 @@ BeforeAll {
 
     function New-TestCommandContext {
         # Returns the in-memory context with recording TestFile and ListFile members and a UtcNow member that throws.
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory fixture factory in a test file; it changes no system state.')]
         param([System.Collections.IDictionary] $Page = $script:CleanSet, [hashtable] $Extra = @{}, [AllowNull()] [string] $ProfileText = $script:ProfileText, [switch] $ReverseListing)
         $files = @{}
         if (-not [string]::IsNullOrEmpty($ProfileText)) { $files[$script:ProfilePath] = $ProfileText }
@@ -132,17 +136,15 @@ Describe 'DocsPageCheck pure helpers' {
         $paths | Should -Be @('docs/api/x.md', 'docs/b.md')
     }
 
-    It 'decodes strict UTF-8 and removes a leading byte order mark' {
+    It 'decodes strict UTF-8, removes a leading byte order mark and decodes an empty page to the empty string' {
         # Act
         $result = ConvertFrom-DocsPageBytes -Bytes ([byte[]] @(0xEF, 0xBB, 0xBF, 0x23, 0x20, 0xC3, 0xA9)) -PagePath 'docs/a.md'
+        $empty = ConvertFrom-DocsPageBytes -Bytes ([byte[]] @()) -PagePath 'docs/a.md'
 
         # Assert
         $result.Text | Should -BeExactly ('# ' + [char]0xE9)
         $result.Findings.Count | Should -Be 0
-    }
-
-    It 'decodes an empty page to the empty string' {
-        (ConvertFrom-DocsPageBytes -Bytes ([byte[]] @()) -PagePath 'docs/a.md').Text | Should -BeExactly ''
+        $empty.Text | Should -BeExactly ''
     }
 
     It 'reports DOCS_PAGE_TOO_LARGE above MaxBytes and DOCS_PAGE_ENCODING_INVALID for invalid UTF-8' {
@@ -248,7 +250,7 @@ Describe 'Get-DocsPageCheckFinding rules' {
         $set['api/x.md'] = New-TestPage
 
         # Act
-        $outcome = Invoke-TestCheck -PageText $set -Profile (New-TestProfile -Root $roots)
+        $outcome = Invoke-TestCheck -PageText $set -DocsProfile (New-TestProfile -Root $roots)
 
         # Assert
         Get-TestCodePath -Outcome $outcome | Should -Be @('DOCS_PAGE_ORPHAN api/x.md', "DOCS_PAGE_ROOT_EMPTY $script:ProfilePath/documentation_roots/1/path", "DOCS_PAGE_ROOT_ENTRY_MISSING $script:ProfilePath/documentation_roots/2/path")
@@ -262,7 +264,7 @@ Describe 'Get-DocsPageCheckFinding rules' {
         $set = New-TestPageSet -Page @{ 'docs/reference/README.md' = (New-TestPage -Field @{ diataxis_mode = '"reference"' } -Body @('# Ref', '[cli](cli.md)')); 'docs/reference/cli.md' = $script:ReferencePage; 'docs/lost.md' = $script:LostPage }
 
         # Act
-        $outcome = Invoke-TestCheck -PageText $set -Profile (New-TestProfile -Root $roots)
+        $outcome = Invoke-TestCheck -PageText $set -DocsProfile (New-TestProfile -Root $roots)
 
         # Assert
         Get-TestCodePath -Outcome $outcome | Should -Be @()
@@ -276,7 +278,7 @@ Describe 'Get-DocsPageCheckFinding rules' {
         $set = New-TestPageSet -Page @{ 'docs/guide.md' = (New-TestPage -Body @('[x](a.md)')); 'docs/lost.md' = (New-TestPage -Body @('[x](b.md)')); 'docs/reference/cli.md' = $script:ReferencePage }
 
         # Act
-        $outcome = Invoke-TestCheck -PageText $set -Profile (New-TestProfile -Root $roots) -SelectedPath @('docs/guide.md', 'docs/none/')
+        $outcome = Invoke-TestCheck -PageText $set -DocsProfile (New-TestProfile -Root $roots) -SelectedPath @('docs/guide.md', 'docs/none/')
 
         # Assert
         Get-TestCodePath -Outcome $outcome | Should -Be @('DOCS_PAGE_PATH_UNMATCHED ', "DOCS_PAGE_ROOT_EMPTY $script:ProfilePath/documentation_roots/1/path", 'DOCS_PAGE_LINK_BROKEN docs/guide.md')
@@ -396,7 +398,7 @@ Describe 'DocsPageCheck finding-code catalog' {
         $selected = if ($_.ContainsKey('Selected')) { $Selected } else { $null }
 
         # Act
-        $outcome = Invoke-TestCheck -PageText $set -Profile (New-TestProfile @profileArguments) -SelectedPath $selected
+        $outcome = Invoke-TestCheck -PageText $set -DocsProfile (New-TestProfile @profileArguments) -SelectedPath $selected
 
         # Assert
         $hits = @($outcome.Findings | Where-Object { $_.code -ceq $Code -and [string] $_.artifact_path -ceq $Artifact })
@@ -462,17 +464,6 @@ Describe 'Invoke-DocsCheckCommand' {
         # Assert
         $result.ExitCode | Should -Be 1
         @($result.Findings | ForEach-Object { $_.code }) | Should -Be @($Code)
-    }
-
-    It 'exits 1 with DOCS_PROFILE_MISSING and result null for an absent profile' {
-        # Act
-        $result = Invoke-DocsCheckCommand -Argument ([ordered]@{ Profile = 'docs/none.json' }) -Context (New-TestCommandContext -ProfileText $null).Context
-
-        # Assert
-        $result.ExitCode | Should -Be 1
-        @($result.Findings | ForEach-Object { $_.code }) | Should -Be @('DOCS_PROFILE_MISSING')
-        $result.Findings[0].artifact_path | Should -BeExactly 'docs/none.json'
-        $result.Result | Should -BeNullOrEmpty
     }
 
     It 'returns the profile findings with exit 1, result null and no ListFile call for an invalid profile' {
@@ -625,13 +616,15 @@ Describe 'check through Invoke-DocsCommandCli' {
     It 'exits 1 when a finding is present and exits 1 with DOCS_PROFILE_MISSING for an absent profile' {
         # Act
         $findings = Invoke-TestCli -Context (New-TestCommandContext -Page $script:FindingSet).Context
-        $missing = Invoke-TestCli -Context (New-TestCommandContext -ProfileText '').Context
+        $missing = Invoke-TestCli -Argument @('-Profile', 'docs/none.json') -Context (New-TestCommandContext -ProfileText '').Context
+        $envelope = Get-TestEnvelope -Outcome $missing
 
         # Assert
         $findings.ExitCode | Should -Be 1
         $missing.ExitCode | Should -Be 1
-        @((Get-TestEnvelope -Outcome $missing).findings | ForEach-Object { $_.code }) | Should -Be @('DOCS_PROFILE_MISSING')
-        (Get-TestEnvelope -Outcome $missing).result | Should -BeNullOrEmpty
+        @($envelope.findings | ForEach-Object { $_.code }) | Should -Be @('DOCS_PROFILE_MISSING')
+        $envelope.findings[0].artifact_path | Should -BeExactly 'docs/none.json'
+        $envelope.result | Should -BeNullOrEmpty
     }
 
     It 'exits 2 with exactly one DOCS_CLI_ARGUMENTS and result null for <Case>' -ForEach @(

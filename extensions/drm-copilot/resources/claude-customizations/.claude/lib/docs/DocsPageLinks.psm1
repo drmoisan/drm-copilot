@@ -43,7 +43,7 @@ $script:DocsPageExplicitAnchorPattern = '(?i)<a\b[^>]*?\s(?:id|name)[ \t]*=[ \t]
 $script:DocsPageSchemePattern = '^[A-Za-z][A-Za-z0-9+.-]*:'
 # A resolved path holding a character outside the docs common relative-path grammar cannot be a
 # finding related path; such a path is reported in the message only.
-$script:DocsPageUnrelatablePathPattern = '[\\:*?<>|\x00-\x1f  ]'
+$script:DocsPageUnrelatablePathPattern = '[\\:*?<>|\x00-\x1fSEPARATORS]'.Replace('SEPARATORS', [string][char]0x2028 + [char]0x2029)
 $script:DocsPageSlugCategory = [System.Collections.Generic.HashSet[System.Globalization.UnicodeCategory]]::new(
     [System.Globalization.UnicodeCategory[]] @('UppercaseLetter', 'LowercaseLetter', 'TitlecaseLetter', 'ModifierLetter', 'OtherLetter', 'NonSpacingMark', 'SpacingCombiningMark', 'EnclosingMark', 'DecimalDigitNumber', 'LetterNumber', 'ConnectorPunctuation'))
 $script:DocsPageLinkNextAction = @{

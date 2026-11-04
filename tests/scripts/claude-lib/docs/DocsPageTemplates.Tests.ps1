@@ -24,11 +24,11 @@ BeforeAll {
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'Docs.TestSupport.psm1') -Force -ErrorAction Stop
 
     $script:Expected = [ordered]@{
-        '.claude/lib/docs/templates/page-check/markdownlint.json'                  = '.markdownlint.json'
-        '.claude/lib/docs/templates/page-check/vale.ini'                           = '.vale.ini'
+        '.claude/lib/docs/templates/page-check/markdownlint.json'                    = '.markdownlint.json'
+        '.claude/lib/docs/templates/page-check/vale.ini'                             = '.vale.ini'
         '.claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml' = '.vale/styles/DocsBase/HeadingPunctuation.yml'
-        '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'     = '.vale/styles/DocsBase/Placeholders.yml'
-        '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'            = '.vale/styles/config/vocabularies/Project/accept.txt'
+        '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'       = '.vale/styles/DocsBase/Placeholders.yml'
+        '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'              = '.vale/styles/config/vocabularies/Project/accept.txt'
     }
     $script:TemplateFile = @(Get-ChildItem -LiteralPath $script:TemplateRoot -File -Recurse)
     $script:SourceText = @{}
