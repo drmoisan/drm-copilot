@@ -1,8 +1,9 @@
 <#
 .SYNOPSIS
     Python binding tables for the issue #1022 scanners: the per-input import alias table, the
-    tracked-receiver table and definition headers (split from DocsPythonSyntax.psm1 under the
-    500-line module rule).
+    tracked-receiver table, definition headers (split from DocsPythonSyntax.psm1 under the
+    500-line module rule), qualified-name resolution through the alias table, and the shared
+    front-end that the four Python analyzers run over every input.
 
 .DESCRIPTION
     Every function takes the logical lines of Get-DocsPythonLogicalLine and returns new
@@ -24,6 +25,7 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsJson.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsPythonTokens.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsPythonSyntax.psm1') -ErrorAction Stop
 
 $script:DocsPythonFrameworkList = [string[]]@('argparse', 'click', 'typer', 'fastapi', 'flask')
@@ -237,7 +239,64 @@ function Get-DocsPythonDefinitionHeader {
     }
 }
 
+function Resolve-DocsPythonQualifiedName {
+    <#
+    .SYNOPSIS
+        Resolves a dotted name through the import alias table and returns its qualified form.
+    .DESCRIPTION
+        The first segment is looked up in Import.Alias; when bound, the alias Full value replaces
+        it (a relative Full keeps its leading dots). An unbound first segment is returned with its
+        remaining segments unchanged. An ambiguous first segment (PYTHON_BINDING_AMBIGUOUS)
+        returns $null, so a site on that name resolves to nothing.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Name,
+        [Parameter(Mandatory = $true)] [hashtable] $Import
+    )
+
+    if ($Name.Length -eq 0) { return $Name }
+    $parts = $Name.Split('.')
+    if ($Import['Ambiguous'].Contains($parts[0])) { return $null }
+    $target = $null
+    if (-not $Import['Alias'].TryGetValue($parts[0], [ref] $target)) { return $Name }
+    $rest = if ($parts.Count -gt 1) { '.' + ($parts[1..($parts.Count - 1)] -join '.') } else { '' }
+    return ([string] $target['Full']) + $rest
+}
+
+function Get-DocsPythonFrontEnd {
+    <#
+    .SYNOPSIS
+        Runs the shared Python front-end over one input text: lexer, logical lines, import table and receiver table.
+    .DESCRIPTION
+        Returns @{ Lines; Import; Receiver; Diagnostics; Blocked }. Diagnostics collects the
+        lexer, indentation, import-table and receiver-table records (Code, Severity, Blocking,
+        Line) in that order; Blocked is $true when any record is blocking, in which case Import
+        and Receiver are $null and the analyzer emits no element for the file. Every analyzer
+        reports these diagnostics under its own identifier.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [AllowNull()] [string] $Text)
+
+    $diagnostics = [System.Collections.Generic.List[object]]::new()
+    $lexed = Get-DocsPythonToken -Text $(if ($null -eq $Text) { '' } else { $Text })
+    foreach ($record in $lexed['Diagnostics']) { $diagnostics.Add($record) }
+    if ($diagnostics.Count -gt 0) { return @{ Lines = [object[]]@(); Import = $null; Receiver = $null; Diagnostics = $diagnostics.ToArray(); Blocked = $true } }
+    $grouped = Get-DocsPythonLogicalLine -Token $lexed['Tokens']
+    foreach ($record in $grouped['Diagnostics']) { $diagnostics.Add($record) }
+    if ($diagnostics.Count -gt 0) { return @{ Lines = $grouped['Lines']; Import = $null; Receiver = $null; Diagnostics = $diagnostics.ToArray(); Blocked = $true } }
+    $import = Get-DocsPythonImportTable -Line $grouped['Lines']
+    $receiver = Get-DocsPythonReceiverTable -Line $grouped['Lines']
+    foreach ($record in $import['Diagnostics']) { $diagnostics.Add($record) }
+    foreach ($record in $receiver['Diagnostics']) { $diagnostics.Add($record) }
+    return @{ Lines = $grouped['Lines']; Import = $import; Receiver = $receiver; Diagnostics = $diagnostics.ToArray(); Blocked = $false }
+}
+
 Export-ModuleMember -Function `
     Get-DocsPythonImportTable, `
     Get-DocsPythonReceiverTable, `
-    Get-DocsPythonDefinitionHeader
+    Get-DocsPythonDefinitionHeader, `
+    Resolve-DocsPythonQualifiedName, `
+    Get-DocsPythonFrontEnd

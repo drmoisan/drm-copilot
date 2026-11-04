@@ -86,7 +86,7 @@ using the same identifiers and digests (both computed by the shared 1020 functio
 ## Acceptance Criteria
 
 - [ ] Running the five analyzers over in-memory fixtures covering the nine input families argparse, Click, Typer, FastAPI, Flask, `pyproject.toml`, `.env` (template-style), JSON Schema and YAML yields exactly the expected commands, options, routes, public symbols, configuration keys and architecture components, asserted by Pester suites under `tests/scripts/claude-lib/docs/`.
-- [ ] A Typer command without an explicit name appears under its default name (function name lower-cased with underscores converted to hyphens), a command with an explicit name appears under that name, and an attached console script's name is the root of its command tree.
+- [x] A Typer command without an explicit name appears under its default name (function name lower-cased with underscores converted to hyphens), a command with an explicit name appears under that name, and an attached console script's name is the root of its command tree.
 - [ ] A route whose prefix cannot be resolved lexically still appears in the inventory with the literal `<dynamic>` prefix segment and a diagnostic, and every other construct listed in the spec's `## Precision Limit` produces its named diagnostic rather than missing output without explanation.
 - [ ] An input above the 1 MiB size bound, or a Python input containing a construct the lexer cannot classify, yields a diagnostic and contributes no elements, rather than a partial or guessed result.
 - [ ] Re-running the inventory over identical bytes, profile, revision and clock value produces a byte-identical snapshot, proven by a seeded property test that prints its seed on failure.

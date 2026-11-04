@@ -8,9 +8,9 @@
 .DESCRIPTION
     Covers the import alias table (every import form and placement, PYTHON_IMPORT_STAR_FRAMEWORK,
     PYTHON_IMPORT_NESTED_FRAMEWORK and PYTHON_BINDING_AMBIGUOUS with survival of other bindings),
-    the receiver table, and definition headers (decorators, parameters, spans and the
-    non-ASCII identifier mark for PYTHON_IDENTIFIER_NON_ASCII), each with a seeded property test.
-    Inputs are in-memory strings.
+    the receiver table, definition headers (decorators, parameters, spans and the
+    non-ASCII identifier mark for PYTHON_IDENTIFIER_NON_ASCII), qualified-name resolution and
+    the shared Python front-end, each with a seeded property test. Inputs are in-memory strings.
 #>
 
 BeforeAll {
@@ -289,6 +289,81 @@ Describe 'Get-DocsPythonDefinitionHeader' {
             $header['HeaderStart'] | Should -Be 1 -Because "seed $seed, iteration $iteration"
             $header['DefLine'] | Should -Be ($decoratorCount + 1) -Because "seed $seed, iteration $iteration"
             @($header['Parameter'] | ForEach-Object { $_['Name'] }) | Should -Be @(if ($parameterCount -gt 0) { 1..$parameterCount | ForEach-Object { "p$_" } }) -Because "seed $seed, iteration $iteration"
+        }
+    }
+}
+
+Describe 'Resolve-DocsPythonQualifiedName' {
+    It 'resolves module, member and aliased bindings, keeps unbound names and returns $null for an ambiguous name' {
+        # Arrange
+        $table = Get-DocsPythonImportTable -Line (Get-TestLine -Text "import argparse`nfrom click import group as g`nimport fastapi.routing`nfrom pkg.util import helper`nfrom pkg.config import helper`nfrom . import mod")
+
+        # Act / Assert
+        Resolve-DocsPythonQualifiedName -Name 'argparse.ArgumentParser' -Import $table | Should -BeExactly 'argparse.ArgumentParser'
+        Resolve-DocsPythonQualifiedName -Name 'g' -Import $table | Should -BeExactly 'click.group'
+        Resolve-DocsPythonQualifiedName -Name 'fastapi.APIRouter' -Import $table | Should -BeExactly 'fastapi.APIRouter'
+        Resolve-DocsPythonQualifiedName -Name 'mod.router' -Import $table | Should -BeExactly '.mod.router'
+        Resolve-DocsPythonQualifiedName -Name 'parser.add_argument' -Import $table | Should -BeExactly 'parser.add_argument'
+        Resolve-DocsPythonQualifiedName -Name 'helper' -Import $table | Should -BeNullOrEmpty
+        Resolve-DocsPythonQualifiedName -Name '' -Import $table | Should -BeExactly ''
+    }
+
+    It 'property: Resolve-DocsPythonQualifiedName replaces exactly the bound first segment' {
+        $seed = 102243
+        $random = [System.Random]::new($seed)
+        for ($iteration = 0; $iteration -lt 100; $iteration++) {
+            $module = 'm' + $random.Next(0, 1000)
+            $member = 'f' + $random.Next(0, 1000)
+            $alias = 'a' + $random.Next(0, 1000)
+            $tailCount = $random.Next(0, 4)
+            $tail = @(if ($tailCount -gt 0) { 1..$tailCount | ForEach-Object { 't' + $random.Next(0, 100) } })
+            $table = Get-DocsPythonImportTable -Line (Get-TestLine -Text "from $module import $member as $alias")
+            $suffix = if ($tail.Count -gt 0) { '.' + ($tail -join '.') } else { '' }
+            Resolve-DocsPythonQualifiedName -Name ($alias + $suffix) -Import $table | Should -BeExactly ($module + '.' + $member + $suffix) -Because "seed $seed, iteration $iteration"
+            Resolve-DocsPythonQualifiedName -Name ('z' + $alias + $suffix) -Import $table | Should -BeExactly ('z' + $alias + $suffix) -Because "seed $seed, iteration $iteration"
+        }
+    }
+}
+
+Describe 'Get-DocsPythonFrontEnd' {
+    It 'returns lines, import and receiver tables and no diagnostic for a clean input' {
+        $frontEnd = Get-DocsPythonFrontEnd -Text "import click`napp = click.Group()`n"
+        $frontEnd['Blocked'] | Should -BeFalse
+        $frontEnd['Diagnostics'].Count | Should -Be 0
+        $frontEnd['Lines'].Count | Should -Be 2
+        $frontEnd['Import']['Alias']['click']['Full'] | Should -BeExactly 'click'
+        $frontEnd['Receiver']['Receiver']['app']['Callee'] | Should -BeExactly 'click.Group'
+    }
+
+    It 'blocks on a lexer diagnostic and on an indentation diagnostic with no tables' {
+        $lexed = Get-DocsPythonFrontEnd -Text 'x = "open'
+        $lexed['Blocked'] | Should -BeTrue
+        $lexed['Diagnostics'][0]['Code'] | Should -BeExactly 'PYTHON_LEXER_UNTERMINATED'
+        $lexed['Import'] | Should -BeNullOrEmpty
+        $indented = Get-DocsPythonFrontEnd -Text "if a:`n        b = 1`n    c = 2"
+        $indented['Blocked'] | Should -BeTrue
+        $indented['Diagnostics'][0]['Code'] | Should -BeExactly 'PYTHON_INDENTATION_INVALID'
+        $indented['Receiver'] | Should -BeNullOrEmpty
+    }
+
+    It 'collects the non-blocking import and receiver diagnostics without blocking' {
+        $frontEnd = Get-DocsPythonFrontEnd -Text "from click import *`nfrom a import x`nfrom b import x`nr = A()`nr = B()`n"
+        $frontEnd['Blocked'] | Should -BeFalse
+        @($frontEnd['Diagnostics'] | ForEach-Object { $_['Code'] }) | Should -Be @('PYTHON_IMPORT_STAR_FRAMEWORK', 'PYTHON_BINDING_AMBIGUOUS', 'PYTHON_BINDING_AMBIGUOUS')
+        $frontEnd['Lines'].Count | Should -Be 5
+    }
+
+    It 'property: Get-DocsPythonFrontEnd yields one logical line and one receiver per generated binding' {
+        $seed = 102244
+        $random = [System.Random]::new($seed)
+        for ($iteration = 0; $iteration -lt 60; $iteration++) {
+            $count = $random.Next(0, 8)
+            $lines = @(if ($count -gt 0) { 1..$count | ForEach-Object { "r$_ = C$_(" + $random.Next(0, 9) + ')' } })
+            $frontEnd = Get-DocsPythonFrontEnd -Text (($lines -join "`n") + $(if ($random.Next(2) -eq 0) { "`n" } else { '' }))
+            $frontEnd['Blocked'] | Should -BeFalse -Because "seed $seed, iteration $iteration"
+            $frontEnd['Lines'].Count | Should -Be $count -Because "seed $seed, iteration $iteration"
+            $frontEnd['Receiver']['Receiver'].Count | Should -Be $count -Because "seed $seed, iteration $iteration"
+            $frontEnd['Diagnostics'].Count | Should -Be 0 -Because "seed $seed, iteration $iteration"
         }
     }
 }
