@@ -133,6 +133,42 @@ Describe 'Invoke-BootstrapHost' {
             $actual | Should -Contain '- Would install PowerShell modules: Pester 5.9.0, PSScriptAnalyzer 1.22.0'
             $actual[-1] | Should -BeExactly 'Dry run complete. Re-run with -Apply to install tools.'
         }
+
+        It 'forwards the committed managed minimum to each install helper' {
+            Mock Read-HostToolsManifest -ModuleName HostBootstrap { $script:CommittedManifest }
+            Mock Install-WithWinget -ModuleName HostBootstrap {
+                param([string]$Id, [string]$Name, [switch]$ApplyMode, [string]$MinimumVersion)
+                "fixture $Id $Name apply=$ApplyMode minimum=$MinimumVersion"
+            }
+
+            $null = Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'fixture-repo'
+
+            # Each package uses its own minimum; unmanaged entries keep the empty default.
+            foreach ($package in $script:CommittedManifest.installPackages.windows.winget) {
+                $expectedMinimum = ''
+                if ($script:CommittedManifest.minimumVersions.PSObject.Properties.Name -contains $package.name) {
+                    $expectedMinimum = [string]$script:CommittedManifest.minimumVersions.($package.name)
+                }
+                Should -Invoke Install-WithWinget -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
+                    $Id -eq $package.id -and $Name -eq $package.name -and $MinimumVersion -eq $expectedMinimum -and -not $ApplyMode
+                }
+            }
+            Should -Invoke Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
+                $MinimumVersion -eq '2.3.2' -and -not $ApplyMode
+            }
+        }
+    }
+
+    It 'accepts legacy manifests without minimumVersions under StrictMode' {
+        Mock Install-WithWinget -ModuleName HostBootstrap {
+            param([string]$Id, [string]$Name, [switch]$ApplyMode, [string]$MinimumVersion)
+            "fixture $Id $Name apply=$ApplyMode minimum=$MinimumVersion"
+        }
+
+        $null = Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'fixture-repo'
+
+        Should -Invoke Install-WithWinget -ModuleName HostBootstrap -Times 2 -Exactly -ParameterFilter { $MinimumVersion -eq '' }
+        Should -Invoke Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $MinimumVersion -eq '' }
     }
 
     Context 'failure paths' {
@@ -314,8 +350,8 @@ Describe 'Invoke-BootstrapHost' {
                 if ($Target -eq 'Process') { $script:calls.Add('PathRefresh') }
             }
             Mock -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -MockWith {
-                param([switch]$ApplyMode)
-                $null = $ApplyMode
+                param([switch]$ApplyMode, [string]$MinimumVersion)
+                $null = @($ApplyMode, $MinimumVersion)
                 $script:calls.Add('PoetryInstall')
             }
             Mock -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -MockWith { $script:calls.Add('ProjectPoetry') }

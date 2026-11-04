@@ -11,6 +11,14 @@ This brief states the environment facts that every researcher, planner, prefligh
 
 Maintenance rule: this brief is updated in the same change that alters any fact it states. It carries no line numbers and no commit identifiers; it cites files, symbols, headings, job names, and test names. The same text is byte-identical in six locations: `.claude/skills/execution-environment/SKILL.md`, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, and their bundled copies under `extensions/drm-copilot/resources/`. Where the Claude and Codex runtimes differ, both paths are named (`.claude/hooks/...` and `.codex/hooks/...`).
 
+## Development Toolchain Baseline
+
+The host manifest, both devcontainer Dockerfiles, and development CI use Python 3.13.17, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, and Poetry 2.3.2. Shell validation pins shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12. Host bootstrap treats manifest versions as minima and preserves equal/newer installations; the container verifier accepts later Python patches within 3.13 and checks the other selected pins.
+
+The devcontainer minor image can lag the Python patch, so both Dockerfiles copy the verified official Python runtime stage and select it and NodeSource ahead of older base-feature shims. Full configuration builds include the selected devcontainer features; a raw Dockerfile image alone does not prove feature-provided commands. Runtime verification uses an isolated Linux virtual environment rather than the host Windows environment.
+
+Python 3.11/3.12 compatibility jobs, consumer package engines, and independent release-publishing runtime pins remain unchanged. The shared version predicate lives in `scripts/bash/container_versions.sh`; `.devcontainer/verify-container.sh` resolves it relative to its own repository location.
+
 ## Tool Routes by Agent
 
 - `atomic-executor` has no PowerShell tool. Its `tools:` list is Read, Grep, Glob, Edit, Write, several `Bash(...)` entries, the four `mcp__drm-copilot__run_poshqc_*` tools, and `mcp__drm-copilot__validate_orchestration_artifacts`. A `(pattern)` suffix on a `tools:` entry admits the bare tool, so the executor has Bash, subject to the repository hooks and the runtime guard described under Command-Text Restrictions.

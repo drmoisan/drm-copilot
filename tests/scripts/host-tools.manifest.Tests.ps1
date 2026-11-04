@@ -52,10 +52,10 @@ Describe 'host-tools.manifest.json shape' {
     It 'AC02-MINIMUM-VERSIONS-PINNED pins python, poetry, pwsh, and node and each casts to version' {
         # Arrange
         $expected = [ordered]@{
-            python = '3.13.12'
+            python = '3.13.17'
             poetry = '2.3.2'
-            pwsh   = '7.6.6'
-            node   = '24.14.0'
+            pwsh   = '7.6.9'
+            node   = '26.13.0'
         }
 
         foreach ($name in $expected.Keys) {
@@ -118,9 +118,9 @@ Describe 'HostVerification sections over the committed manifest' {
             param([string]$Command, [string[]]$VersionArgs)
             $null = $VersionArgs
             switch ($Command) {
-                'python' { [version]'3.13.12' }
-                'pwsh' { [version]'7.6.6' }
-                'node' { [version]'24.14.0' }
+                'python' { [version]'3.13.17' }
+                'pwsh' { [version]'7.6.9' }
+                'node' { [version]'26.13.0' }
                 default { $null }
             }
         }

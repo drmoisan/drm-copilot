@@ -1,10 +1,10 @@
 # Recreating Your Codespace with Correct Configuration
 
-Your current Codespace is using GitHub's default universal image. Here's how to fix it with manual config selection.
+If a Codespace starts from GitHub's universal image, select this repository's Codespaces configuration explicitly when rebuilding or recreating it.
 
-## Current State (Verified)
+## Example of an outdated environment
 - ⚠️ OS: Ubuntu 24.04 (expected: Debian Bookworm)
-- ⚠️ Python: 3.12.1 (expected: 3.13.x)
+- ⚠️ Python: 3.12.1 (expected: 3.13.17)
 - ❌ PowerShell: Not installed
 - ❌ Shell tools: Missing shellcheck, shfmt, bashdb, actionlint
 
@@ -54,7 +54,7 @@ gh codespace delete --codespace <name-of-wrong-codespace>
 # Create new with explicit config path
 gh codespace create \
   --repo drmoisan/drm-copilot \
-  --branch feature/populate-open-stax-ck-12-manifest-#73 \
+  --branch main \
   --devcontainer-path .devcontainer/codespaces/devcontainer.json
 ```
 
@@ -67,9 +67,9 @@ Run these commands to verify everything works:
 bash .devcontainer/verify-container.sh
 
 # 2. Check Python tools
-python --version         # Should be 3.13.x
-poetry --version         # Should be 2.2.x
-pwsh --version          # Should be PowerShell 7.6.x
+python --version         # Should be 3.13.17
+poetry --version         # Should be 2.3.2
+pwsh --version          # Should be PowerShell 7.6.9
 
 # 3. Verify project setup
 poetry install          # Install dependencies
@@ -88,24 +88,23 @@ poetry run pyright --version
 
 The verification script should show:
 ```
-✅ All checks passed!
-
-Your dev container is correctly configured.
-Using: .devcontainer/devcontainer.json (Codespaces)
+[OK] .devcontainer/codespaces/devcontainer.json
+[OK] Workspace virtual environment Python 3.13.17
+All devcontainer checks passed.
 ```
 
 And you should have:
 - Debian Bookworm OS
-- Python 3.13.x
-- PowerShell 7.6+
-- Poetry 2.2.1
+- Python 3.13.17
+- PowerShell 7.6.9
+- Poetry 2.3.2
 - All shell tools (shellcheck, shfmt, bashdb, actionlint)
 
 ## Troubleshooting
 
 ### Rebuild doesn't fix it
 - Try **Option 2** (delete and recreate)
-- Ensure you're on a branch with the latest `.devcontainer/devcontainer.json`
+- Ensure you're on a branch with the latest `.devcontainer/codespaces/devcontainer.json`
 
 ### Build fails
 - Check Codespace logs in the terminal
@@ -113,17 +112,10 @@ And you should have:
 - Report issue with build logs
 
 ### Still shows wrong config
-- Verify `.devcontainer/devcontainer.json` exists and is not disabled
+- Verify `.devcontainer/codespaces/devcontainer.json` exists and is not disabled
 - Check file points to `codespaces/Dockerfile`
 - Confirm you're in a Codespace (not local Docker)
 
 ## Why This Happened
 
-GitHub Codespaces looks for configuration in this priority order:
-1. `.devcontainer/devcontainer.json` ← **NOW EXISTS** ✅
-2. `.devcontainer.json` (root)
-3. Falls back to universal image ← **WAS HAPPENING** ❌
-
-Your previous setup had the Codespaces config in `.devcontainer/codespaces/devcontainer.json`, which is not a standard location that Codespaces auto-detects.
-
-The fix moves (creates) a proper config at the standard location while keeping the local config separate for VS Code local development.
+A default Codespace can use the universal image when the repository configuration is not selected. This repository keeps both configurations in subdirectories; choose `.devcontainer/codespaces/devcontainer.json` for Codespaces and `.devcontainer/local/devcontainer.json` for local Docker. Neither requires creating a second root-level configuration.

@@ -1,0 +1,27 @@
+Timestamp: 2026-11-04T03-33
+Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-final.ps1 -Configuration codespaces (scenario stale; kcov includes actual .devcontainer entrypoints; disposable Docker image issue-1069-codespaces-full)
+EXIT_CODE: 0
+Output Summary: Devcontainer verification: codespaces
+[OK] Debian GNU/Linux 12 (bookworm)
+[FAIL] python reports unsupported version 3.12.0
+[FAIL] node reports unsupported version v18.0.0
+[FAIL] npm reports unsupported version 10.0.0
+[FAIL] pwsh reports unsupported version 7.4.0
+[FAIL] poetry reports unsupported version 1.0.0
+[FAIL] shfmt reports unsupported version v3.0.0
+[OK] shellcheck 0.11.0
+[OK] actionlint 1.7.12
+[OK] git is installed
+[OK] gh is installed
+[OK] kcov is installed
+[OK] bats is installed
+[OK] bashdb is installed
+[OK] claude is installed
+[OK] cswap is installed
+[OK] .devcontainer/codespaces/devcontainer.json
+[OK] Workspace virtual environment Python 3.13.17
+Devcontainer verification failed. Rebuild using .devcontainer/codespaces/devcontainer.json.
+See .devcontainer/TROUBLESHOOTING.md for setup guidance.
+
+Boundary version/setup fixtures isolate branches; native stage independently measures installed versions. Negative scenario exit is normalized only after observing the expected verifier failure.
+
