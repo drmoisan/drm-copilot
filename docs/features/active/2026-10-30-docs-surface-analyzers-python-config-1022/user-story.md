@@ -98,7 +98,7 @@ using the same identifiers and digests (both computed by the shared 1020 functio
 - [x] Without `-Write` the command writes nothing; with `-Write` it writes only the snapshot at the profile's `artifact_paths.inventory_snapshot`.
 - [x] The analyzers and the `inventory` subcommand are registered only under the 1022 anchors of `DocsAnalyzerRegistry.psm1` and `Invoke-DocsCommand.ps1`, and every new file is copied byte-identically to the push-down tree and listed in `pack-manifests/core.json`.
 - [x] No file under `.claude/lib/docs/` invokes a Python or other interpreter (`enforcement-hooks-no-python-invocation.Tests.ps1` passes), and the feature adds no Python, TypeScript, hook, skill, agent or MCP file, as shown by the plan's artifact classification table.
-- [ ] Pester line coverage is at least 85% for each new `.claude/lib/docs/` file, measured by the `poshqc / PowerShell QC shard` jobs on `windows-latest` and enforced by the required check `poshqc / PowerShell QC`.
+- [x] Pester line coverage is at least 85% for each new `.claude/lib/docs/` file, measured by the `poshqc / PowerShell QC shard` jobs on `windows-latest` and enforced by the required check `poshqc / PowerShell QC`.
 
 ## Non-Goals
 
