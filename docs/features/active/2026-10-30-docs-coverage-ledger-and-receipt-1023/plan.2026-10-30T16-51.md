@@ -178,10 +178,10 @@ No hook, skill, agent, MCP tool, extension command, schema, example, Python, or 
 
 ### Phase 5 — Write-Boundary Proof and Integration
 
-- [ ] [P5-T1] Create `TESTS/DocsWriteBoundary.Tests.ps1` with a pure helper `Find-DocsWritePrimitive -SourceText -Path` over the PowerShell parser AST, applied to every `.ps1` and `.psm1` under `LIB` read once into memory.
+- [x] [P5-T1] Create `TESTS/DocsWriteBoundary.Tests.ps1` with a pure helper `Find-DocsWritePrimitive -SourceText -Path` over the PowerShell parser AST, applied to every `.ps1` and `.psm1` under `LIB` read once into memory.
   - Tests: `It 'finds no filesystem write primitive outside Write-DocsFileText'` (the primitives and the allowlist reason "init create-only and explicit overwrite" of S21), `It 'invokes a WriteText scriptblock only inside Invoke-DocsArtifactWrite'`, `It 'accesses the WriteText member only in DocsLedgerCommands.psm1 among 1023 modules'`, `It 'references Invoke-DocsArtifactWrite only from DocsLedgerCommands.psm1'`, `It 'reports a write call in an in-memory source string'` (positive control).
   - Acceptance (suite form): `DocsWriteBoundary.Tests.ps1`; evidence `p5-write-boundary`.
-- [ ] [P5-T2] Create `TESTS/DocsCompleteIntegration.Tests.ps1` over one recording in-memory context: profile with `allow_deferred` false and `max_stale_pages` 0, snapshot pinned to a full revision, one element without an entry, one pin whose digest differs; commands run through `Invoke-DocsCommandCli`.
+- [x] [P5-T2] Create `TESTS/DocsCompleteIntegration.Tests.ps1` over one recording in-memory context: profile with `allow_deferred` false and `max_stale_pages` 0, snapshot pinned to a full revision, one element without an entry, one pin whose digest differs; commands run through `Invoke-DocsCommandCli`.
   - Tests: `It 'exits 0 with a pass receipt on the complete fixture'`, `It 'exits 1 with a fail receipt naming the undocumented element and the stale page'` (declaration, element id, page path), `It 'exits 0 with a pass receipt after set-disposition Write and pin Write'`.
   - Acceptance (suite form): `DocsCompleteIntegration.Tests.ps1`; evidence `p5-integration`.
 

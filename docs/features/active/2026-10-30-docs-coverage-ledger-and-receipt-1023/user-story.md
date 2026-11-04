@@ -125,7 +125,7 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 - [x] Each ledger entry records the `analysis_method` (`native` or `scanner`) of its current snapshot element (`DocsLedgerCommands.Tests.ps1`).
 - [x] Re-pinning an element to the same page replaces the existing pin instead of adding a second one, and the page is no longer stale (`DocsLedgerCommands.Tests.ps1`).
 - [x] If a document changed after the subcommand read it, the write is refused with exit 3 and one `DOCS_CLI_RUNTIME` finding naming the conflicting path (`DocsLedgerMutation.Tests.ps1`).
-- [ ] `update-ledger` is the only subcommand that changes the ledger, matrix or pin collection, as shown by `DocsWriteBoundary.Tests.ps1`.
+- [x] `update-ledger` is the only subcommand that changes the ledger, matrix or pin collection, as shown by `DocsWriteBoundary.Tests.ps1`.
 
 ### Maintainer recording a scanner precision limit
 
@@ -134,7 +134,7 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 
 ### CI proving docs-complete
 
-- [ ] `-Command validate -Mode docs-complete` exits 0 with a `pass` receipt on a complete fixture; with one undocumented element and one stale page it exits 1 and the findings name both; after both are fixed it exits 0 (`DocsCompleteIntegration.Tests.ps1`).
+- [x] `-Command validate -Mode docs-complete` exits 0 with a `pass` receipt on a complete fixture; with one undocumented element and one stale page it exits 1 and the findings name both; after both are fixed it exits 0 (`DocsCompleteIntegration.Tests.ps1`).
 - [x] A ledger missing a disposition for any inventoried element fails validation naming the element's kind, declaration and element id (`DocsLedger.Tests.ps1`).
 - [x] With `-Mode docs-complete -WriteReceipt`, the receipt is written to the profile's `validation_receipt` path on both pass and fail, its `revision` equals the `-Revision` argument, and `-WriteReceipt` with any other mode exits 2 (`DocsLedgerCommands.Tests.ps1`).
 - [x] Validation of a snapshot with a null `revision` in `docs-complete` mode fails with `DOCS_SNAPSHOT_UNPINNED`, so no receipt claims a revision the snapshot did not capture (`DocsValidation.Tests.ps1`).
