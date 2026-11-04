@@ -6,7 +6,7 @@
 .DESCRIPTION
     Every builder works in memory: text is encoded to UTF-8 in code (with an optional CRLF
     conversion and byte-order mark), wrapped by 1020's New-DocsCapturedInput, and returned. No
-    file is read or written, no TestDrive is used, no process is started and nothing is cached at
+    file is read or written, no Pester temporary drive is used, no process is started and nothing is cached at
     module scope. New-DocsTestExtensionManifest builds a valid discovery extension-result manifest,
     its inventory-snapshot result document and the referenced source input as captured inputs,
     with manifest_sha256 computed by ConvertTo-DocsCanonicalJson and Get-DocsSha256Hex.
