@@ -47,8 +47,10 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
   `python-architecture` (`requirements*.txt`, `setup.cfg`, `pyproject.toml`). The scanner's
   console-script entries are passed to the helper as data so the helper can attach a root command to
   its script element as the 1022 rules require.
-- The minimum interpreter version for the helper is Python 3.10 (equal to the repository floor and
-  the lowest CI matrix entry).
+- The minimum interpreter version for the helper is Python 3.11 (equal to the repository floor,
+  `requires-python >=3.11,<4.0` in `pyproject.toml`, and the lowest CI matrix entry). Owner
+  decision 2026-11-04: the floor was raised from 3.10 to 3.11 because the CI matrix is 3.11, 3.12
+  and 3.13; that matrix is the verification of the floor.
 
 ### Analysis method selection (provisional, OQ-C)
 
@@ -63,7 +65,7 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 ### Fallback rules (`auto`)
 
 - Process-level unavailability (python pack absent, no candidate interpreter resolves, version
-  below 3.10, timeout, non-zero exit, start error, invalid or oversized output, any protocol
+  below 3.11, timeout, non-zero exit, start error, invalid or oversized output, any protocol
   violation): the whole native result is discarded; the scanner runs for the four identifiers; every
   element records `analysis_method: scanner`; the exit code is unaffected.
 - Pack absence is silent (the normal state for a destination without the python pack). Every other
@@ -110,7 +112,7 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 
 - Reads `sys.stdin.buffer`, decodes UTF-8 explicitly, parses each file with `ast.parse` inside
   `warnings.catch_warnings()` so standard error stays empty, and walks nodes generically
-  (`ast.iter_child_nodes`) without naming node types introduced after 3.10.
+  (`ast.iter_child_nodes`) without naming node types introduced after 3.11.
 - Never imports, executes, compiles to code objects or evaluates analyzed sources.
 - Writes `json.dumps(..., ensure_ascii=True, sort_keys=True, separators=(",", ":"))` to
   `sys.stdout.buffer`; ASCII-only output is independent of the console code page.
@@ -176,7 +178,7 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
   kind, declaration, name, parent: {kind, declaration} | null, line_start, line_end, properties:
   [{name, value}]}], diagnostics: [{analyzer_id, code, line, blocking}]}]}`.
 - Helper exit codes: 0 response written; 2 request invalid (malformed JSON, unknown key, limit
-  exceeded); 3 internal error; 4 interpreter below 3.10. Every non-zero exit writes one protocol
+  exceeded); 3 internal error; 4 interpreter below 3.11. Every non-zero exit writes one protocol
   error object and is treated by the adapter as `exit-nonzero`.
 - Entry: `.claude/lib/docs/python/run_docs_python_native.py`, which calls
   `docs_python_native.protocol.main(stdin=..., stdout=...)`. Tests call `main` with `io.BytesIO`
@@ -207,8 +209,8 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 - Bytecode: importing the helper package in tests would create `__pycache__` under `.claude/`,
   which `test_push_down_claude_resource_contracts.py` reports as a repository file missing from the
   bundle.
-- Pyright runs with `pythonVersion = "3.12"`; an API newer than 3.10 is caught only by the 3.10 CI
-  job. Branch coverage of version-sensitive paths is the mitigation.
+- Pyright runs with `pythonVersion = "3.12"`; an API newer than 3.11 is caught only by the 3.11 CI
+  matrix job. Branch coverage of version-sensitive paths is the mitigation.
 - File size: the four analyzers cannot share one file below 800 lines; the helper is a package with
   one module per concern, each below 500 lines.
 - Host dependence: with `auto`, hosts with and without the pack and an interpreter inventory
@@ -345,7 +347,7 @@ another child's anchor or row.
   fallback.
 - 900007 and 900009 pass no method of their own; with the OQ-C default they forward
   `-AnalysisMethod` unchanged.
-- 900010's onboarding states the optional prerequisite: Python 3.10 or later and the python pack for
+- 900010's onboarding states the optional prerequisite: Python 3.11 or later and the python pack for
   native analysis; PowerShell 7.4 remains the only required runtime. It also states the OQ-D
   behavior.
 
@@ -358,13 +360,13 @@ pack only; E5 coverage). R marks a criterion the research shows is necessary.
 - [ ] (E1) For the shared 1022 Python parity fixture, a Pytest test calling the helper's `main` with in-memory streams asserts that the helper emits exactly the expected rows (shared rows plus native-only rows) as `(analyzer_id, kind, path, declaration, line_start, line_end)`, and a Pester test asserts that the adapter, fed a canned helper response equal to that row set, produces `element_id` and declaration-lines digest values equal to the scanner's for every shared row.
 - [ ] (E1) For every construct in the parity fixture that the 1022 scanner reports as a diagnostic and that `ast` can resolve, the native result contains a classified element and no corresponding diagnostic; dynamic forms that `ast` also cannot resolve yield the diagnostics defined by the 1022 rules (Pytest per analyzer identifier).
 - [ ] (E2) With the python pack absent (context file test false for `.claude/lib/docs/python/run_docs_python_native.py`), `inventory` exits 0, every element of `python-cli`, `python-http`, `python-public-api` and `python-architecture` records `analysis_method: scanner`, no diagnostic or error finding is added, and the interpreter seam is never called (Pester).
-- [ ] (E2) With the pack present and each of: no candidate resolving, version below 3.10 (helper exit 4), timeout, start error, non-zero exit, malformed JSON, unknown key, unknown kind, out-of-range line, invalid declaration, path not in the request, and oversized output, `inventory` with `-AnalysisMethod auto` exits 0 with scanner elements recording `analysis_method: scanner`, no error-severity finding, and exactly one non-blocking `DOCS_PYTHON_NATIVE_UNAVAILABLE` diagnostic carrying the matching reason token; when an earlier candidate fails and a later one succeeds, the later candidate's result is used (Pester).
+- [ ] (E2) With the pack present and each of: no candidate resolving, version below 3.11 (helper exit 4), timeout, start error, non-zero exit, malformed JSON, unknown key, unknown kind, out-of-range line, invalid declaration, path not in the request, and oversized output, `inventory` with `-AnalysisMethod auto` exits 0 with scanner elements recording `analysis_method: scanner`, no error-severity finding, and exactly one non-blocking `DOCS_PYTHON_NATIVE_UNAVAILABLE` diagnostic carrying the matching reason token; when an earlier candidate fails and a later one succeeds, the later candidate's result is used (Pester).
 - [ ] (E2, R) A helper response marking one file as a parse failure yields scanner elements with `analysis_method: scanner` for that file and native elements with `analysis_method: native` for the other files (Pester).
 - [ ] (E2, R, provisional OQ-C) `-AnalysisMethod native` exits 3 with one error finding `DOCS_PYTHON_NATIVE_UNAVAILABLE` and writes no snapshot when the pack, a usable interpreter or a valid response is absent; `-AnalysisMethod scanner` never calls the interpreter seam; an unknown value exits 2 with `DOCS_CLI_ARGUMENTS` (Pester).
 - [ ] (E3) A Pytest source-inspection test over every file under `.claude/lib/docs/python/` asserts that no call to `exec`, `eval`, `compile`, `__import__`, `importlib`, `runpy` or `subprocess` exists and that `ast.parse` is the only parsing entry; a behavioral Pytest test analyzes a fixture source whose execution would raise an exception or change interpreter state and asserts the analysis succeeds with no such effect.
 - [ ] (E4) Every file under `.claude/lib/docs/python/` is listed in the Claude `pack-manifests/python.json` and in no other Claude manifest; `pack-manifests/core.json` lists no path ending in `.py` and lists `.claude/lib/docs/DocsAnalyzerPythonNative.psm1`; the Codex python pack manifest is unchanged; the amended `Docs.Manifest.Tests.ps1`, `test_push_down_claude_pack_manifest_completeness.py` and `claude-pack-manifest-completeness.test.ts` pass.
 - [ ] (E5) Python line coverage is at least 85% and branch coverage at least 75% for each file of the helper, read from the coverage JSON report produced with the dotted `--cov=` module forms (`docs_python_native`, its submodules and `run_docs_python_native`), with the helper included in `[tool.coverage.run] source`; Pester line coverage is at least 85% for `DocsAnalyzerPythonNative.psm1` (and `DocsPythonNativeProtocol.psm1` if split) and for the edited `DocsAnalyzerRegistry.psm1`, with no production file excluded; figures are recorded under `<FEATURE>/evidence/coverage/`.
-- [ ] (E5, R) Black, Ruff and Pyright (strict, with `.claude/lib/docs/python` in `include` and `extraPaths`) report zero findings for the helper and its tests, and the existing pins `test_pyright_config_alignment.py`, `test_ruff_config_alignment.py` and `tests/discovery_runtime/test_package_contract.py` pass unmodified; the Python tests pass on the 3.10 CI matrix job.
+- [ ] (E5, R) Black, Ruff and Pyright (strict, with `.claude/lib/docs/python` in `include` and `extraPaths`) report zero findings for the helper and its tests, and the existing pins `test_pyright_config_alignment.py`, `test_ruff_config_alignment.py` and `tests/discovery_runtime/test_package_contract.py` pass unmodified; the Python tests pass on the 3.11 floor, verified by the CI matrix (3.11, 3.12 and 3.13).
 - [ ] (R) Every element in the inventory snapshot carries `analysis_method` with value `native` or `scanner`; `config-files` elements and elements from non-`.py` inputs always carry `scanner`; the snapshot validates against the amended `surface-inventory-snapshot.schema.json` (Pester).
 - [ ] (R) Identifiers and digests have a single implementation: the helper emits no `element_id`, `parent_id` or digest field and its source contains no `hashlib` import; the adapter obtains every `element_id` from `Get-DocsElementId` and every declaration-lines digest from the shared digest function, and contains no hashing primitive or canonical-JSON serialization of its own (Pester and Pytest source checks).
 - [ ] (R) `DocsAnalyzerRegistry.psm1` carries the native-provider row directly under the 900011 anchor, no other anchor or row is changed, registration validation returns no finding for the committed registry, and the registry test asserts membership of the row rather than set equality (Pester).
@@ -376,7 +378,7 @@ pack only; E5 coverage). R marks a criterion the research shows is necessary.
 - [ ] (R) No test creates a temporary file: no file under `tests/scripts/claude-lib/docs/` (including `python/`) contains `tempfile`, `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and the Python and PowerShell test-purity hooks report no violation.
 - [ ] (R) The helper output is deterministic: the same request yields byte-identical stdout, a permutation of the request file order yields identical output, and stdout contains only ASCII bytes (Pytest).
 - [ ] (R) No production file added or edited by this feature exceeds 500 logical lines, and every new `.claude/lib/docs/` PowerShell file passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`; `python -m scripts.dev_tools.check_quality_tiers` exits 0 with no new `quality-tiers.yml` entry.
-- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` and the `quality-checks` Python jobs, including the Python 3.10 matrix entry, pass on the pull request head.
+- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` and the `quality-checks` Python jobs, on every matrix entry (3.11, 3.12 and 3.13, where 3.11 is the helper floor), pass on the pull request head.
 
 ## Definition of Done
 
