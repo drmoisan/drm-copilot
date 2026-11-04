@@ -209,8 +209,8 @@ Seeded from issue:
 - [x] A Pester case shows the gate fails when the `changes` result is not `success`, even when every other job is `success`.
 - [x] Pester cases show the gate fails with a configuration-error verdict when `NEEDS_JSON` is blank, is not parseable JSON, is a JSON array or scalar, or lacks `changes`, `docs-validation`, or any skippable-set key.
 - [x] A Pester case asserts `SummaryText` exactly: a header line with the scope and the raw `code` value, one table row per needed job with columns `Job`, `Result`, `Accepted`, and `Verdict`, and a final verdict line.
-- [ ] `tests/scripts/ci/Invoke-CiRequiredGate.Tests.ps1` shows the entry reads `NEEDS_JSON` through the `-ReadVariable` seam and writes the summary through the `-OutputWriter` seam without reading or writing the real `$env:NEEDS_JSON` or `$env:GITHUB_STEP_SUMMARY`.
-- [ ] `scripts/ci/Invoke-CiRequiredGate.ps1` ends with an explicit `exit 0` for a passing decision and `exit 1` otherwise, per `.claude/rules/ci-workflows.md`, and a Pester case asserts that verdict-to-exit mapping and the dot-source guard.
+- [x] `tests/scripts/ci/Invoke-CiRequiredGate.Tests.ps1` shows the entry reads `NEEDS_JSON` through the `-ReadVariable` seam and writes the summary through the `-OutputWriter` seam without reading or writing the real `$env:NEEDS_JSON` or `$env:GITHUB_STEP_SUMMARY`.
+- [x] `scripts/ci/Invoke-CiRequiredGate.ps1` ends with an explicit `exit 0` for a passing decision and `exit 1` otherwise, per `.claude/rules/ci-workflows.md`, and a Pester case asserts that verdict-to-exit mapping and the dot-source guard.
 - [ ] The `ci.yml` diff against the base branch adds only the `ci-required-gate` job, and every existing job keeps its id, `name:`, `needs:`, `if:`, `uses:`, and `with:` values.
 - [ ] `tests/scripts/workflows/CiWorkflow.Tests.ps1`, `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1`, and `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` pass without modification.
 - [ ] `.github/workflows/_poshqc.yml` and every other reusable workflow file under `.github/workflows/` have no diff against the base branch.
