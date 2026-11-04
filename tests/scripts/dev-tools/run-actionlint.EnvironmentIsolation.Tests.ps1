@@ -64,6 +64,8 @@ Describe 'run-actionlint.Tests.ps1 environment isolation' {
         $script:newSentinelContainer = {
             New-PesterContainer -Data @{ Sentinel = $script:lastExitCodeSentinel } -ScriptBlock {
                 param($Sentinel)
+                # Referenced here as well, because the analyzer does not see the use inside the nested BeforeAll.
+                $null = $Sentinel
                 Describe 'nested LASTEXITCODE sentinel' {
                     BeforeAll { $global:LASTEXITCODE = $Sentinel }
                     It 'passes' { $true | Should -BeTrue }
@@ -76,6 +78,8 @@ Describe 'run-actionlint.Tests.ps1 environment isolation' {
             param($Holder)
             New-PesterContainer -Data @{ Holder = $Holder } -ScriptBlock {
                 param($Holder)
+                # Referenced here as well, because the analyzer does not see the use inside the nested It.
+                $null = $Holder
                 Describe 'nested LASTEXITCODE probe' {
                     It 'reads global LASTEXITCODE' { $Holder.Value = $global:LASTEXITCODE }
                 }
