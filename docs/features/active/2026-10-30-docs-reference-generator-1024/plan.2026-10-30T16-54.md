@@ -139,9 +139,9 @@ The item creates five production modules (six under the contingency), their bund
 
 ### Phase 8 — Push-Down Mirrors and Manifest
 
-- [ ] [P8-T1] Copy each NEW-MODULES file and the edited `LIB/Invoke-DocsCommand.ps1` to `BUNDLE/` after their last edit. Acceptance: `<FEATURE>/evidence/other/bundle-parity.<timestamp>.md` lists each source and bundle path with SHA-256 values computed at write time, and every pair is equal.
-- [ ] [P8-T2] Edit `CORE`: insert one `paths` entry per NEW-MODULES file (`.claude/lib/docs/<file>`) directly after the last existing `.claude/lib/docs/` entry (not after the final array element, whose line would gain a comma), each present exactly once; no other entry changes. Existing tests reading `CORE` keep the [P0-T4] dispositions. Acceptance: `git diff EPIC-BASE -- extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (merge base substituted) shows only added lines, one per NEW-MODULES file.
-- [ ] [P8-T3] Run `PTESTS/Docs.Manifest.Tests.ps1` through `Invoke-PoshQCTest` and the three Python push-down contract tests of [P0-T8] unmodified. Covers AC-19. Acceptance: `<FEATURE>/evidence/qa-gates/pushdown-parity.<timestamp>.md` records the four schema fields, zero Pester failures from the JUnit file (PESTER-CI) and zero Python failures.
+- [x] [P8-T1] Copy each NEW-MODULES file and the edited `LIB/Invoke-DocsCommand.ps1` to `BUNDLE/` after their last edit. Acceptance: `<FEATURE>/evidence/other/bundle-parity.<timestamp>.md` lists each source and bundle path with SHA-256 values computed at write time, and every pair is equal.
+- [x] [P8-T2] Edit `CORE`: insert one `paths` entry per NEW-MODULES file (`.claude/lib/docs/<file>`) directly after the last existing `.claude/lib/docs/` entry (not after the final array element, whose line would gain a comma), each present exactly once; no other entry changes. Existing tests reading `CORE` keep the [P0-T4] dispositions. Acceptance: `git diff EPIC-BASE -- extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (merge base substituted) shows only added lines, one per NEW-MODULES file.
+- [x] [P8-T3] Run `PTESTS/Docs.Manifest.Tests.ps1` through `Invoke-PoshQCTest` and the three Python push-down contract tests of [P0-T8] unmodified. Covers AC-19. Acceptance: `<FEATURE>/evidence/qa-gates/pushdown-parity.<timestamp>.md` records the four schema fields, zero Pester failures from the JUnit file (PESTER-CI) and zero Python failures.
 
 ### Phase 9 — Final QA Loop and Closure
 
