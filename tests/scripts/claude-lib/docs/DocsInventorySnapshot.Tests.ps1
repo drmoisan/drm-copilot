@@ -131,7 +131,12 @@ Describe 'New-DocsInventorySnapshot over both corpora' {
         $script:Snapshot['revision'] | Should -BeNullOrEmpty
         $script:Snapshot['captured_at'] | Should -BeExactly '2026-01-01T00:00:00Z'
         $script:Snapshot['profile_sha256'] | Should -BeExactly (Get-DocsSha256Hex -Text (ConvertTo-DocsCanonicalJson -Value $script:TestProfile))
-        @($script:Snapshot['analyzers'] | ForEach-Object { $_['id'] + ':' + $_['analysis_method'] + ':' + $_['version'] }) | Should -Be @('config-files:scanner:1.0.0', 'python-architecture:scanner:1.0.0', 'python-cli:scanner:1.0.0', 'python-http:scanner:1.0.0', 'python-public-api:scanner:1.0.0')
+        # Membership only: the committed registry also carries later children's rows (spec C6).
+        [string[]] $analyzerEntries = @($script:Snapshot['analyzers'] | ForEach-Object { $_['id'] + ':' + $_['analysis_method'] + ':' + $_['version'] })
+        foreach ($entry in @('config-files:scanner:1.0.0', 'python-architecture:scanner:1.0.0', 'python-cli:scanner:1.0.0', 'python-http:scanner:1.0.0', 'python-public-api:scanner:1.0.0')) {
+            $analyzerEntries -ccontains $entry | Should -BeTrue -Because "the snapshot lists the 1022 analyzer entry '$entry'"
+        }
+        Test-TestOrdinalOrder -Value @($script:Snapshot['analyzers'] | ForEach-Object { [string] $_['id'] }) | Should -BeTrue -Because 'analyzers are sorted by id'
     }
 
     It 'contains every expected element of both corpora with identical fields plus the one cross-corpus console-script element, sorted by element_id' {
