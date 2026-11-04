@@ -37,8 +37,8 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1'
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsExtensionShape.psm1') -ErrorAction Stop
 
 $script:DocsExtensionAnalyzerId = 'extension-import'
-$script:DocsExtensionSchema = 'urn:drm-copilot:discovery:2.0.0:extension-result-manifest'
-$script:DocsExtensionArtifactKind = 'extension-result-manifest'
+$script:DocsExtensionSchema = [string] (Get-DocsExtensionManifestIdentity)['Schema']
+$script:DocsExtensionArtifactKind = [string] (Get-DocsExtensionManifestIdentity)['ArtifactKind']
 
 function New-DocsExtensionDiagnostic {
     <#

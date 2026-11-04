@@ -109,6 +109,28 @@ Describe 'Get-DocsExtensionDiagnosticProblem' {
     }
 }
 
+Describe 'Get-DocsExtensionManifestIdentity' {
+    It 'returns the schema URN and artifact kind that Get-DocsExtensionShapeProblem enforces' {
+        # Arrange / Act
+        $identity = Get-DocsExtensionManifestIdentity
+        $second = Get-DocsExtensionManifestIdentity
+        $second['Schema'] = 'urn:changed'
+        $second['ArtifactKind'] = 'changed'
+        $third = Get-DocsExtensionManifestIdentity
+        $schema = [string] $identity['Schema']
+        $kind = [string] $identity['ArtifactKind']
+        $manifest = Get-TestManifest -Mutate ({ param($m) $m['$schema'] = $schema; $m['artifact_kind'] = $kind }.GetNewClosure())
+
+        # Assert
+        $identity['Schema'] | Should -BeExactly 'urn:drm-copilot:discovery:2.0.0:extension-result-manifest'
+        $identity['ArtifactKind'] | Should -BeExactly 'extension-result-manifest'
+        [object]::ReferenceEquals($identity, $second) | Should -BeFalse -Because 'each call returns a new hashtable'
+        $third['Schema'] | Should -BeExactly 'urn:drm-copilot:discovery:2.0.0:extension-result-manifest' -Because "a caller's change does not reach a later call"
+        $third['ArtifactKind'] | Should -BeExactly 'extension-result-manifest'
+        Get-DocsExtensionShapeProblem -Manifest $manifest -KnownManifestId @('other-run') | Should -BeNullOrEmpty
+    }
+}
+
 Describe 'Get-DocsExtensionShapeProblem' {
     It 'returns null for the valid parsed manifest' {
         Get-DocsExtensionShapeProblem -Manifest (Get-TestManifest) -KnownManifestId @('other-run') | Should -BeNullOrEmpty

@@ -9,8 +9,9 @@
     closed key set, the constants and the field shapes of
     schemas/discovery/v2/extension-result-manifest.schema.json (validation step 1 of the 1033
     specification), returning the first problem as text or $null. Get-DocsExtensionValue reads a
-    member of a dictionary or object record without unrolling an array member. Every function is
-    pure.
+    member of a dictionary or object record without unrolling an array member.
+    Get-DocsExtensionManifestIdentity returns the manifest schema URN and artifact kind, so this
+    module is their single source. Every function is pure.
 
 .NOTES
     Issue #1033. Requires PowerShell 7.4 or later. No external module dependencies.
@@ -35,6 +36,21 @@ $script:DocsExtensionKeyPattern = '^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$(?![\s\S])'
 $script:DocsExtensionSha256Pattern = '^[0-9a-f]{64}$(?![\s\S])'
 $script:DocsExtensionTimestampPattern = '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:Z|[+-][0-9]{2}:[0-9]{2})$(?![\s\S])'
 $script:DocsExtensionNewline = [regex]::new('\r\n|\r|\n', [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
+
+function Get-DocsExtensionManifestIdentity {
+    <#
+    .SYNOPSIS
+        Returns a new hashtable @{ Schema; ArtifactKind } with the extension-result manifest schema URN and artifact kind.
+    .DESCRIPTION
+        These are the values Get-DocsExtensionShapeProblem enforces; each call returns a new
+        hashtable, so a caller's change does not reach another caller.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param()
+
+    return @{ Schema = $script:DocsExtensionSchema; ArtifactKind = $script:DocsExtensionArtifactKind }
+}
 
 function Get-DocsExtensionValue {
     <#
@@ -260,6 +276,7 @@ function Get-DocsExtensionLineCount {
 }
 
 Export-ModuleMember -Function `
+    Get-DocsExtensionManifestIdentity, `
     Get-DocsExtensionValue, `
     Test-DocsExtensionKeySet, `
     Test-DocsExtensionArray, `

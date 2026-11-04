@@ -229,6 +229,16 @@ Describe 'Test-DocsExtensionManifest' {
 
 Describe 'Invoke-DocsAnalyzerExtensionImport' {
     Context 'merge' {
+        It 'takes the manifest schema URN and artifact kind from DocsExtensionShape and carries no copy of either literal' {
+            # Arrange / Act: the module source is read as text; nothing is written.
+            $moduleText = Get-Content -LiteralPath $script:ModulePath -Raw
+
+            # Assert
+            $moduleText.Contains('Get-DocsExtensionManifestIdentity') | Should -BeTrue -Because 'the values come from DocsExtensionShape.psm1'
+            $moduleText.Contains('urn:drm-copilot:discovery') | Should -BeFalse -Because 'the schema URN has one source'
+            $moduleText.Contains("'extension-result-manifest'") | Should -BeFalse -Because 'the artifact kind has one source'
+        }
+
         It 'merges a mappable finding as an element with recomputed identity and digest and copied scalars' {
             # Arrange
             $fixture = New-DocsTestExtensionManifest
