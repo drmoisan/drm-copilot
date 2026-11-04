@@ -107,7 +107,14 @@ Describe 'Invoke-DocsInventoryCommand' {
         $snapshot['revision'] | Should -BeNullOrEmpty
         $snapshot['captured_at'] | Should -BeExactly '2026-01-01T00:00:00Z'
         $snapshot['repository'] | Should -BeExactly 'repo'
-        @($snapshot['analyzers'] | ForEach-Object { $_['id'] }) | Should -Be @('config-files', 'python-architecture', 'python-cli', 'python-http', 'python-public-api')
+        # Membership only: the committed registry also carries later children's rows (spec C6).
+        [string[]] $analyzerIds = @($snapshot['analyzers'] | ForEach-Object { [string] $_['id'] })
+        foreach ($id in @('config-files', 'python-architecture', 'python-cli', 'python-http', 'python-public-api')) {
+            $analyzerIds -ccontains $id | Should -BeTrue -Because "the snapshot lists the 1022 analyzer '$id'"
+        }
+        [string[]] $sortedIds = [string[]] $analyzerIds.Clone()
+        [Array]::Sort($sortedIds, [System.StringComparer]::Ordinal)
+        ($analyzerIds -join "`n") | Should -BeExactly ($sortedIds -join "`n") -Because 'analyzers are listed in ordinal order of their id'
         Get-TestElementDeclaration -Result $result -Kind 'architecture-component' | Should -BeExactly 'app,pkg,pkg.mod'
         Get-TestElementDeclaration -Result $result -Kind 'public-symbol' | Should -BeExactly 'app.Thing,app.main,pkg.mod.value'
         Get-TestElementDeclaration -Result $result -Kind 'config-key' | Should -BeExactly 'KEY,name'
