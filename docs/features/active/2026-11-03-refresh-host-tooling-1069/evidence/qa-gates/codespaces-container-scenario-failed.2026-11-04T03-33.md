@@ -1,5 +1,5 @@
 Timestamp: 2026-11-04T03-33
-Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-final.ps1 -Configuration codespaces (scenario failed; kcov includes actual .devcontainer entrypoints; disposable Docker image issue-1069-codespaces-full)
+Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-final.ps1 -Configuration codespaces
 EXIT_CODE: 0
 Output Summary: Devcontainer verification: codespaces
 [OK] Debian GNU/Linux 12 (bookworm)
@@ -24,4 +24,3 @@ Devcontainer verification failed. Rebuild using .devcontainer/codespaces/devcont
 See .devcontainer/TROUBLESHOOTING.md for setup guidance.
 
 Boundary version/setup fixtures isolate branches; native stage independently measures installed versions. Negative scenario exit is normalized only after observing the expected verifier failure.
-

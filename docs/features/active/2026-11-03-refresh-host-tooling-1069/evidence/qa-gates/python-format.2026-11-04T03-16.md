@@ -3,5 +3,3 @@ Command: poetry run black --check tests/scripts/dev_tools/test_host_environment_
 EXIT_CODE: 0
 Output Summary: All done! \u2728 \U0001f370 \u2728
 368 files would be left unchanged.
-
-

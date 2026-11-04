@@ -13,5 +13,3 @@ golang.org/x/sync/errgroup.(*Group).Go.func1
 	golang.org/x/sync@v0.24.0/errgroup/errgroup.go:93
 runtime.goexit
 	runtime/asm_amd64.s:1264
-
-

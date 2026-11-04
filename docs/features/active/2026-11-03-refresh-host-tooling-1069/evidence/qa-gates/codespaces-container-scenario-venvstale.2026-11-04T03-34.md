@@ -1,5 +1,5 @@
 Timestamp: 2026-11-04T03-34
-Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-extra.ps1 -Configuration codespaces (scenario venvstale)
+Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-extra.ps1 -Configuration codespaces
 EXIT_CODE: 0
 Output Summary: Devcontainer verification: codespaces
 [OK] Debian GNU/Linux 12 (bookworm)
@@ -22,5 +22,3 @@ Output Summary: Devcontainer verification: codespaces
 [FAIL] Workspace virtual environment uses unsupported Python 3.12.0
 Devcontainer verification failed. Rebuild using .devcontainer/codespaces/devcontainer.json.
 See .devcontainer/TROUBLESHOOTING.md for setup guidance.
-
-

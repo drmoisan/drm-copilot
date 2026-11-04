@@ -61,4 +61,3 @@ built with go1.26.1 compiler for windows/amd64
     "vscode": "^1.118.0"
   }
 }
-

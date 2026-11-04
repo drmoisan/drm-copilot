@@ -21,5 +21,3 @@ Output Summary: Devcontainer verification: codespaces
 [OK] .devcontainer/codespaces/devcontainer.json
 [OK] Workspace virtual environment Python 3.13.17
 All devcontainer checks passed.
-
-

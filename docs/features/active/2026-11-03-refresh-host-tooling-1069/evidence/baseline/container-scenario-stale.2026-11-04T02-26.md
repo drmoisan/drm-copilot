@@ -13,5 +13,3 @@ For Codespaces:
   - Ensure .devcontainer/devcontainer.json exists
 
 See .devcontainer/TROUBLESHOOTING.md for more help.
-
-

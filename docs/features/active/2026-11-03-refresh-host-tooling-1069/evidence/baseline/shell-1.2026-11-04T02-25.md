@@ -17,5 +17,3 @@ Output Summary: +	if [ "$ENV_TYPE" = "codespaces" ]; then
 +	echo "See .devcontainer/TROUBLESHOOTING.md for more help."
 +	exit 1
  fi
-
-

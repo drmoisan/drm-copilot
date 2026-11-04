@@ -2,7 +2,7 @@
 
 - Date captured: 2026-11-03
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/refresh-host-tooling/ (Issue #1069)
+- Status: Promoted -> docs/features/active/2026-11-03-refresh-host-tooling-1069/ (Issue #1069)
 
 - Issue: #1069
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/1069
@@ -44,5 +44,4 @@ Keep release-publishing runtime pins and unrelated CLI versions unchanged unless
 ## Next Step
 
 - [x] Promote to GitHub issue (feature request template): issue #1069.
-- [x] Create `docs/features/active/refresh-host-tooling/` folder from the template: `docs/features/active/2026-11-03-refresh-host-tooling-1069/`.
-
+- [x] Create `docs/features/active/2026-11-03-refresh-host-tooling-1069/` folder from the template: `docs/features/active/2026-11-03-refresh-host-tooling-1069/`.

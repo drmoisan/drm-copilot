@@ -114,7 +114,7 @@ If you modify the Dockerfile or devcontainer.json:
 Edit the selected `.devcontainer/local/devcontainer.json` or `.devcontainer/codespaces/devcontainer.json` → `customizations.vscode.extensions[]`
 
 ### Changing Python/Tool Versions
-Edit `.devcontainer/Dockerfile` → `FROM` line and install commands
+Edit `.devcontainer/local/Dockerfile` and `.devcontainer/codespaces/Dockerfile` → `FROM` stages and install commands
 
 ### Post-Create Steps
 Edit `.devcontainer/post-create.sh` to add custom setup commands

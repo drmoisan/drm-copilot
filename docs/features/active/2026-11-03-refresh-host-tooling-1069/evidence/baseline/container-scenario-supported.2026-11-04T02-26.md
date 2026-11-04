@@ -12,6 +12,3 @@ VS Code tasks are available via:
 
 To build the package:
   poetry build
-
-
-

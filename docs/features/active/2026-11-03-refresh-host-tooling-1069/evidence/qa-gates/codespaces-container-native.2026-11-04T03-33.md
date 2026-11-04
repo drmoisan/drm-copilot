@@ -1,5 +1,5 @@
 Timestamp: 2026-11-04T03-33
-Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-final.ps1 -Configuration CONFIGURATION (native stage: docker run --rm --user root --mount type=bind,source=WORKSPACE,target=/workspaces/drm-copilot,readonly --mount type=volume,target=/workspaces/drm-copilot/.venv --entrypoint bash IMAGE -lc NATIVE_SCRIPT)
+Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-final.ps1 -Configuration codespaces
 EXIT_CODE: 0
 Output Summary: Python 3.13.17
 v26.13.0
@@ -37,5 +37,3 @@ Devcontainer verification: codespaces
 [OK] .devcontainer/codespaces/devcontainer.json
 [OK] Workspace virtual environment Python 3.13.17
 All devcontainer checks passed.
-
-

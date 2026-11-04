@@ -265,5 +265,3 @@ ok 49 container Python accepts its minimum and later patches within 3.13
 ok 50 container Python rejects stale patches wrong minors and malformed versions
 ok 51 container versions reject stale or different pinned tool releases
 ok 52 container versions reject unknown missing and malformed tool inputs
-
-

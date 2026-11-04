@@ -5,5 +5,3 @@ Output Summary: tests\scripts\dev_tools\test_host_environment_contracts.py .....
 .........                                                                [100%]
 
 ============================= 80 passed in 1.67s ==============================
-
-

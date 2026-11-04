@@ -5,5 +5,3 @@ Output Summary: tests\scripts\dev_tools\test_push_down_pack_manifest_dependency_
 .................                                                        [100%]
 
 ============================= 45 passed in 0.94s ==============================
-
-

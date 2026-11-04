@@ -9,11 +9,9 @@ Output Summary:     at resolveTool (WORKSPACE\run-node-tool.cjs:62:20)
     at runScriptInContext (node:internal/process/execution:483:60) {
   code: 'MODULE_NOT_FOUND',
   requireStack: [
-    'C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-11-03T20-43\\run-node-tool.cjs',
-    'C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-11-03T20-43\\[eval]'
+    'WORKSPACE\\run-node-tool.cjs',
+    'WORKSPACE\\[eval]'
   ]
 }
 
 Node.js v26.13.0
-
-

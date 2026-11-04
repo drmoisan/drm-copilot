@@ -17,5 +17,3 @@ built with go1.26.1 compiler for linux/amd64
 1.7.14
 2.1.316 (Claude Code)
 cswap 0.28.0
-
-

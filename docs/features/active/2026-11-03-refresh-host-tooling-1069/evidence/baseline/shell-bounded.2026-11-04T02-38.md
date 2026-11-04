@@ -11,5 +11,3 @@ ok 44 discover_shell_scripts output is sorted and de-duplicated
 ok 45 coverage_demo.sh runs successfully with default argument
 ok 46 coverage_demo.sh accepts a custom name argument
 ok 47 coverage_lib.sh greet_user function outputs greeting
-
-

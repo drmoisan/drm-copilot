@@ -13,5 +13,3 @@ Output Summary: +		echo "  - Ensure .devcontainer/devcontainer.json exists"
 +	echo "See .devcontainer/TROUBLESHOOTING.md for more help."
 +	exit 1
  fi
-
-

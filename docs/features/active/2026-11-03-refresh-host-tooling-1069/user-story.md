@@ -30,10 +30,10 @@ The host was updated using winget while repository manifests, container installa
 - [x] AC1: `scripts/host-tools.manifest.json` declares Python 3.13.17, Node.js 26.13.0, PowerShell 7.6.9, and Poetry 2.3.2 minima; existing package IDs and command classifications remain valid.
 - [x] AC2: Bootstrap installs missing managed tools and upgrades below-minimum managed tools only with `-Apply`; dry run performs no installation, and equal or newer versions are preserved without downgrades.
 - [x] AC3: Bootstrap reports unreadable installed versions and native installation failures explicitly, propagates failure, and never reports an unverified managed tool as compliant; deterministic tests cover these errors and minimum-version boundaries.
-- [ ] AC4: Both local and Codespaces images build and provide Python 3.13.17 or newer within 3.13, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, Poetry 2.3.2, shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12; their shared verifier accepts that baseline and rejects stale required versions.
-- [ ] AC5: Local mounts and Docker features, Codespaces resource settings, Python 3.11/3.12 compatibility testing, and consumer package engine requirements are preserved.
-- [ ] AC6: Development CI pins, the shared container scripts, README development guidance, current devcontainer guides, and any affected execution-environment mirrors consistently describe the selected baseline and intentional compatibility differences.
-- [ ] AC7: Changed behavior and configuration contracts pass the applicable ordered toolchains, coverage and isolation checks; actual build and runtime-verification results for both containers are recorded in canonical feature evidence.
+- [x] AC4: Both local and Codespaces images build and provide Python 3.13.17 or newer within 3.13, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, Poetry 2.3.2, shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12; their shared verifier accepts that baseline and rejects stale required versions.
+- [x] AC5: Local mounts and Docker features, Codespaces resource settings, Python 3.11/3.12 compatibility testing, and consumer package engine requirements are preserved.
+- [x] AC6: Development CI pins, the shared container scripts, README development guidance, current devcontainer guides, and any affected execution-environment mirrors consistently describe the selected baseline and intentional compatibility differences.
+- [x] AC7: Changed behavior and configuration contracts pass the applicable ordered toolchains, coverage and isolation checks; actual build and runtime-verification results for both containers are recorded in canonical feature evidence.
 
 
 ## Non-Goals

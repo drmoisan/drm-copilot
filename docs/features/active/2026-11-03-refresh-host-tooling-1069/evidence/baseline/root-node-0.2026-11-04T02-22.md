@@ -10,10 +10,8 @@ Output Summary:     at require.resolve (node:internal/modules/helpers:336:31)
     at Module.load (node:internal/modules/cjs/loader:1690:32) {
   code: 'MODULE_NOT_FOUND',
   requireStack: [
-    'C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-11-03T20-43\\run-node-tool.cjs'
+    'WORKSPACE\\run-node-tool.cjs'
   ]
 }
 
 Node.js v26.13.0
-
-

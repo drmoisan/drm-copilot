@@ -6,7 +6,7 @@ Output Summary: #28 [stage-2 22/22] RUN wget -qO- https://gh.io/copilot-install 
 #28 0.303 Downloading from: https://github.com/github/copilot-cli/releases/download/v0.0.377/copilot-linux-x64.tar.gz
 #28 5.026 ✓ Checksum validated
 #28 6.100 ✓ GitHub Copilot CLI installed to /usr/local/bin/copilot
-#28 6.101 
+#28 6.101
 #28 6.101 Installation complete! Run 'copilot help' to get started.
 #28 DONE 6.1s
 
@@ -21,5 +21,3 @@ Output Summary: #28 [stage-2 22/22] RUN wget -qO- https://gh.io/copilot-install 
 #29 unpacking to docker.io/library/issue-1069-codespaces-base:latest
 #29 unpacking to docker.io/library/issue-1069-codespaces-base:latest 5.6s done
 #29 DONE 15.8s
-
-

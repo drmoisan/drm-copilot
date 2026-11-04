@@ -15,5 +15,3 @@ Output Summary: #27 CACHED
 #29 naming to docker.io/library/issue-1069-local-base:latest done
 #29 unpacking to docker.io/library/issue-1069-local-base:latest done
 #29 DONE 0.1s
-
-

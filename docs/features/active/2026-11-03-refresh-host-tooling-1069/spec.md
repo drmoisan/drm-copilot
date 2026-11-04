@@ -51,7 +51,7 @@ The existing manifest is read and its managed minima are passed to the existing 
 
 Windows version strings and Linux package versions differ. The research verified amd64 NodeSource `26.13.0-1nodesource1` and Microsoft Debian `7.6.9-1.deb`; do not claim other architecture support without verification. Use the existing package/download mechanisms and preserve architecture handling where supported.
 
-The supported Python minor image tag is `3.13-bookworm`; an exact `3.13.17-bookworm` tag was not found. Determine its actual runtime during validation and use a verified supported installation method if the image lags the required patch. Do not introduce an invented tag or a knowingly failing version assertion.
+The supported MCR devcontainer minor image tag is `3.13-bookworm`; its runtime was verified as Python 3.13.12 and an exact MCR `3.13.17-bookworm` tag was unavailable. Both Dockerfiles therefore copy the verified official `python:3.13.17-bookworm` runtime stage and select it ahead of the older base-image shim. Actual full-image verification confirms Python 3.13.17.
 
 The shfmt update may change formatting of existing shell scripts. Include only required formatter changes and validate shared `.devcontainer` scripts explicitly because they are outside ordinary shell-QC discovery. Do not upgrade the host, change release behavior, or add unrelated tool dependencies.
 
@@ -66,15 +66,15 @@ The shfmt update may change formatting of existing shell scripts. Include only r
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos: AC1–AC7 in `issue.md` and `user-story.md`, with manifest/bootstrap tests, configuration checks, and actual image verification.
-- [ ] Behavior matches acceptance criteria in all documented environments: Windows bootstrap and both local/Codespaces image builds meet AC1–AC5.
-- [ ] Tests updated/added (unit/integration as applicable): manifest/version-selection and existing bootstrap assertions plus relevant workflow/container contracts cover AC1–AC6.
-- [ ] Edge cases and error handling covered by tests: missing, below, equal, newer, unreadable, dry-run, and failed-install scenarios prove AC2–AC3.
-- [ ] Docs updated (README, docs/features/active/... links): current development guidance and affected mirrors satisfy AC6 while describing intentional compatibility differences.
-- [ ] Telemetry/logging added or updated (if applicable): existing bootstrap output identifies compliance, planned work, and errors for AC2–AC3; no new telemetry is needed.
-- [ ] Toolchain pass completed (format → lint → type-check → test): applicable coverage/isolation checks and both actual image build/runtime results satisfy AC7 with canonical evidence.
+- [x] Acceptance criteria documented and mapped to tests or demos: AC1–AC7 in `issue.md` and `user-story.md`, with manifest/bootstrap tests, configuration checks, and actual image verification.
+- [x] Behavior matches acceptance criteria in all documented environments: Windows bootstrap and both local/Codespaces image builds meet AC1–AC5.
+- [x] Tests updated/added (unit/integration as applicable): manifest/version-selection and existing bootstrap assertions plus relevant workflow/container contracts cover AC1–AC6.
+- [x] Edge cases and error handling covered by tests: missing, below, equal, newer, unreadable, dry-run, and failed-install scenarios prove AC2–AC3.
+- [x] Docs updated (README, docs/features/active/... links): current development guidance and affected mirrors satisfy AC6 while describing intentional compatibility differences.
+- [x] Telemetry/logging added or updated (if applicable): existing bootstrap output identifies compliance, planned work, and errors for AC2–AC3; no new telemetry is needed.
+- [x] Toolchain pass completed (format → lint → type-check → test): applicable coverage/isolation checks and both actual image build/runtime results satisfy AC7 with canonical evidence.
 
 ## Seeded Test Conditions (from potential)
-- [ ] Unit coverage areas: managed-tool and Poetry minimum boundaries, unreadable output, native failure propagation, dry-run side effects, and unchanged unmanaged-command behavior.
-- [ ] Integration scenarios: both actual Docker builds and shared runtime verification; development workflow and mirrored-document contracts.
-- [ ] CLI/API examples: existing bootstrap dry run and `-Apply` retain their flags and report the selected manifest requirements.
+- [x] Unit coverage areas: managed-tool and Poetry minimum boundaries, unreadable output, native failure propagation, dry-run side effects, and unchanged unmanaged-command behavior.
+- [x] Integration scenarios: both actual Docker builds and shared runtime verification; development workflow and mirrored-document contracts.
+- [x] CLI/API examples: existing bootstrap dry run and `-Apply` retain their flags and report the selected manifest requirements.

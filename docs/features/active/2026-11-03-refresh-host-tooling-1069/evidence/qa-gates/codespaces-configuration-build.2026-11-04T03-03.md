@@ -17,5 +17,3 @@ Output Summary: #41 exporting config sha256:2fc7f8c3d3396a81560f6218306bc060e557
 ------
 
 {"outcome":"success","imageName":["issue-1069-codespaces-full"],"ociAuthDiagnostics":{"authLookupWouldBeBlocked":false,"registryRedirectWouldPreventCredentialForwarding":false,"authServerRedirect":false}}
-
-

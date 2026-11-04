@@ -13,5 +13,3 @@ ok 758 discover_shell_scripts finds a .sh file under the .codex root
 ok 759 discover_shell_scripts prunes the excluded node_modules directory
 ok 760 discover_shell_scripts ignores non-shell files (txt and ps1)
 ok 761 discover_shell_scripts output is sorted and de-duplicated
-
-

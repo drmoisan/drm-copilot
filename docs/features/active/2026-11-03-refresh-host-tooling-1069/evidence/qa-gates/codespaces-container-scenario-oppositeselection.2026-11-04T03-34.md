@@ -1,5 +1,5 @@
 Timestamp: 2026-11-04T03-34
-Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-extra.ps1 -Configuration codespaces (scenario oppositeselection)
+Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-extra.ps1 -Configuration codespaces
 EXIT_CODE: 0
 Output Summary: Devcontainer verification: local
 [OK] Debian GNU/Linux 12 (bookworm)
@@ -75,6 +75,3 @@ VS Code tasks are available via:
 
 To build the package:
   poetry build
-
-
-

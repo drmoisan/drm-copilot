@@ -15,5 +15,3 @@ tests\discovery_runtime\test_service_host_admission.py ...........       [ 34%]
 tests\discovery_runtime\test_service_inspection_guards.py .........      [ 34%]
 tests\discovery_runtime\test_service_migration.py .........              [ 34%]
 tests\discovery_runtime\test_service_mutation_guards.py ..........
-
-

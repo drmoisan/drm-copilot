@@ -2,7 +2,7 @@
 
 - Date captured: 2026-11-03
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/refresh-host-tooling/ (Issue #1069)
+- Status: Promoted -> docs/features/active/2026-11-03-refresh-host-tooling-1069/ (Issue #1069)
 
 - Issue: #1069
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/1069
@@ -24,10 +24,10 @@ Bootstrap must detect managed tools below the manifest minimum, preview required
 - [x] AC1: `scripts/host-tools.manifest.json` declares Python 3.13.17, Node.js 26.13.0, PowerShell 7.6.9, and Poetry 2.3.2 minima; existing package IDs and command classifications remain valid.
 - [x] AC2: Bootstrap installs missing managed tools and upgrades below-minimum managed tools only with `-Apply`; dry run performs no installation, and equal or newer versions are preserved without downgrades.
 - [x] AC3: Bootstrap reports unreadable installed versions and native installation failures explicitly, propagates failure, and never reports an unverified managed tool as compliant; deterministic tests cover these errors and minimum-version boundaries.
-- [ ] AC4: Both local and Codespaces images build and provide Python 3.13.17 or newer within 3.13, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, Poetry 2.3.2, shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12; their shared verifier accepts that baseline and rejects stale required versions.
-- [ ] AC5: Local mounts and Docker features, Codespaces resource settings, Python 3.11/3.12 compatibility testing, and consumer package engine requirements are preserved.
-- [ ] AC6: Development CI pins, the shared container scripts, README development guidance, current devcontainer guides, and any affected execution-environment mirrors consistently describe the selected baseline and intentional compatibility differences.
-- [ ] AC7: Changed behavior and configuration contracts pass the applicable ordered toolchains, coverage and isolation checks; actual build and runtime-verification results for both containers are recorded in canonical feature evidence.
+- [x] AC4: Both local and Codespaces images build and provide Python 3.13.17 or newer within 3.13, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, Poetry 2.3.2, shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12; their shared verifier accepts that baseline and rejects stale required versions.
+- [x] AC5: Local mounts and Docker features, Codespaces resource settings, Python 3.11/3.12 compatibility testing, and consumer package engine requirements are preserved.
+- [x] AC6: Development CI pins, the shared container scripts, README development guidance, current devcontainer guides, and any affected execution-environment mirrors consistently describe the selected baseline and intentional compatibility differences.
+- [x] AC7: Changed behavior and configuration contracts pass the applicable ordered toolchains, coverage and isolation checks; actual build and runtime-verification results for both containers are recorded in canonical feature evidence.
 
 ## Constraints & Risks
 
@@ -37,12 +37,11 @@ Keep release-publishing runtime pins and unrelated CLI versions unchanged unless
 
 ## Test Conditions to Consider
 
-- [ ] Unit coverage areas: missing, below-minimum, equal, newer, unreadable, and failed-install cases for managed tools and Poetry; fixtures isolate native executable calls.
-- [ ] Integration scenarios: real builds and version verification of both container images, plus development workflow/configuration parity checks.
-- [ ] CLI/API examples: bootstrap dry-run output previews stale-tool work; `-Apply` uses the manifest minima without downgrading compliant tools.
+- [x] Unit coverage areas: missing, below-minimum, equal, newer, unreadable, and failed-install cases for managed tools and Poetry; fixtures isolate native executable calls.
+- [x] Integration scenarios: real builds and version verification of both container images, plus development workflow/configuration parity checks.
+- [x] CLI/API examples: bootstrap dry-run output previews stale-tool work; `-Apply` uses the manifest minima without downgrading compliant tools.
 
 ## Next Step
 
 - [x] Promote to GitHub issue (feature request template): issue #1069.
-- [x] Create `docs/features/active/refresh-host-tooling/` folder from the template: `docs/features/active/2026-11-03-refresh-host-tooling-1069/`.
-
+- [x] Create `docs/features/active/2026-11-03-refresh-host-tooling-1069/` folder from the template: `docs/features/active/2026-11-03-refresh-host-tooling-1069/`.
