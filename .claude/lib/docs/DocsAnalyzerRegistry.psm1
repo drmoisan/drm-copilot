@@ -35,6 +35,13 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1'
 $script:DocsAnalyzerRow = @(
     # --- 1022: Python and configuration analyzers ---
     # --- 1033: TypeScript and .NET analyzers ---
+    [pscustomobject]@{ Id = 'typescript-cli'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('cli-command', 'cli-option'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerTypeScriptCli.psm1'); Function = 'Invoke-DocsAnalyzerTypeScriptCli' }
+    [pscustomobject]@{ Id = 'typescript-http'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('http-route'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerTypeScriptHttp.psm1'); Function = 'Invoke-DocsAnalyzerTypeScriptHttp' }
+    [pscustomobject]@{ Id = 'typescript-exports'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('public-symbol'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerTypeScriptExports.psm1'); Function = 'Invoke-DocsAnalyzerTypeScriptExports' }
+    [pscustomobject]@{ Id = 'dotnet-http'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('http-route'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerDotnetHttp.psm1'); Function = 'Invoke-DocsAnalyzerDotnetHttp' }
+    [pscustomobject]@{ Id = 'dotnet-config'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('config-key'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerDotnetConfig.psm1'); Function = 'Invoke-DocsAnalyzerDotnetConfig' }
+    [pscustomobject]@{ Id = 'dotnet-public-api'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('public-symbol'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerDotnetApi.psm1'); Function = 'Invoke-DocsAnalyzerDotnetApi' }
+    [pscustomobject]@{ Id = 'extension-import'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('cli-command', 'cli-option', 'http-route', 'config-key', 'public-symbol', 'architecture-component'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerExtensionImport.psm1'); Function = 'Invoke-DocsAnalyzerExtensionImport' }
 )
 
 $script:DocsAnalyzerNativeRow = @(

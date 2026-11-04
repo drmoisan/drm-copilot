@@ -294,6 +294,23 @@
     ".claude/lib/docs/schemas/v1/docs-parity-matrix.schema.json",
     ".claude/lib/docs/schemas/v1/docs-evidence-pin.schema.json",
     ".claude/lib/docs/schemas/v1/docs-validation-receipt.schema.json",
-    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json"
+    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json",
+    ".claude/lib/docs/DocsScannerCommon.psm1",
+    ".claude/lib/docs/DocsTypeScriptTokens.psm1",
+    ".claude/lib/docs/DocsCSharpTokens.psm1",
+    ".claude/lib/docs/DocsTypeScriptSyntax.psm1",
+    ".claude/lib/docs/DocsTypeScriptCliSupport.psm1",
+    ".claude/lib/docs/DocsAnalyzerTypeScriptCli.psm1",
+    ".claude/lib/docs/DocsTypeScriptHttpDeclaration.psm1",
+    ".claude/lib/docs/DocsTypeScriptHttpSupport.psm1",
+    ".claude/lib/docs/DocsAnalyzerTypeScriptHttp.psm1",
+    ".claude/lib/docs/DocsAnalyzerTypeScriptExports.psm1",
+    ".claude/lib/docs/DocsCSharpSyntax.psm1",
+    ".claude/lib/docs/DocsAnalyzerDotnetHttp.psm1",
+    ".claude/lib/docs/DocsAnalyzerDotnetConfig.psm1",
+    ".claude/lib/docs/DocsCSharpMember.psm1",
+    ".claude/lib/docs/DocsAnalyzerDotnetApi.psm1",
+    ".claude/lib/docs/DocsExtensionShape.psm1",
+    ".claude/lib/docs/DocsAnalyzerExtensionImport.psm1"
   ]
 }
