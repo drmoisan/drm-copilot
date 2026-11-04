@@ -6,9 +6,9 @@
 
 **For GitHub Codespaces:**
 1. Go to repository on GitHub
-2. Click **Code** → **Codespaces** → **Create codespace**
-3. Wait for build (~3-5 minutes)
-4. Verify setup: `bash .devcontainer/verify-container.sh`
+2. Choose **Code** → **Codespaces** → **Configure and create codespace**
+3. Select `.devcontainer/codespaces/devcontainer.json` and create the Codespace
+4. After setup completes, verify: `bash .devcontainer/verify-container.sh`
 
 **For Local Docker:**
 1. Ensure Docker Desktop is running

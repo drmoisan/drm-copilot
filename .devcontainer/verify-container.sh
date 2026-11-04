@@ -1,211 +1,114 @@
-#!/bin/bash
-# verify-container.sh - Verify dev container configuration and environment
-
+#!/usr/bin/env bash
+# Verify the development baseline and mounted workspace in either devcontainer.
 set -euo pipefail
 
-echo "========================================="
-echo "Dev Container Environment Verification"
-echo "========================================="
-echo ""
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+REPO_ROOT=$(dirname -- "$SCRIPT_DIR")
+# The source path is derived from this entrypoint rather than the caller's directory.
+# shellcheck source=scripts/bash/container_versions.sh
+# shellcheck disable=SC1091
+source "$REPO_ROOT/scripts/bash/container_versions.sh"
 
-# Detect environment
-if [ "${CODESPACES:-}" = "true" ]; then
-    echo "🌐 Environment: GitHub Codespaces"
-    ENV_TYPE="codespaces"
+# Read a tool's native version output and normalize it for the pure predicate.
+# Argument: required tool name. Prints its parsed version; returns 1 on native failure.
+read_container_tool_version() {
+	local tool=$1 output
+	if ! output=$("$tool" --version 2>&1); then
+		return 1
+	fi
+	# Native version formats differ; consume complete output to avoid pipefail/SIGPIPE.
+	case "$tool" in
+	python | pwsh) printf '%s\n' "$output" | awk 'NR == 1 { print $2 }' ;;
+	poetry) printf '%s\n' "$output" | sed -nE 's/.*version ([0-9.]+).*/\1/p' ;;
+	shellcheck) printf '%s\n' "$output" | awk '/^version:/ { print $2 }' ;;
+	*) printf '%s\n' "$output" | awk 'NR == 1 { print $1 }' ;;
+	esac
+}
+
+# Verify presence and supported version; diagnostics explain any failed requirement.
+# Argument: managed tool name. Returns 0 when supported and 1 otherwise.
+check_container_tool_version() {
+	local tool=$1 version
+	if ! command -v "$tool" >/dev/null 2>&1; then
+		printf '[FAIL] %s is not installed\n' "$tool"
+		return 1
+	fi
+	if ! version=$(read_container_tool_version "$tool"); then
+		printf '[FAIL] %s version command failed\n' "$tool"
+		return 1
+	fi
+	if container_tool_version_supported "$tool" "$version"; then
+		printf '[OK] %s %s\n' "$tool" "$version"
+		return 0
+	fi
+	printf '[FAIL] %s reports unsupported version %s\n' "$tool" "${version:-unreadable}"
+	return 1
+}
+
+status=0
+if [[ ${CODESPACES:-} == true ]]; then
+	config=codespaces
 else
-    echo "🐳 Environment: Local Docker"
-    ENV_TYPE="local"
+	config=local
 fi
-echo ""
+printf 'Devcontainer verification: %s\n' "$config"
 
-# OS Check
-echo "📦 Operating System:"
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    echo "   Name: $PRETTY_NAME"
-    echo "   ID: $ID"
-    echo "   Version: $VERSION_ID"
-    
-    if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "12" ]; then
-        echo "   ✅ Debian Bookworm detected (expected)"
-        OS_OK=true
-    else
-        echo "   ⚠️  Unexpected OS (expected Debian 12 Bookworm)"
-        OS_OK=false
-    fi
+if [[ -f /etc/os-release ]]; then
+	# The system supplies this file; its contents are outside repository static analysis.
+	# shellcheck source=/dev/null
+	source /etc/os-release
+	if [[ $ID == debian && $VERSION_ID == 12 ]]; then
+		printf '[OK] %s\n' "$PRETTY_NAME"
+	else
+		printf '[FAIL] Expected Debian 12 Bookworm\n'
+		status=1
+	fi
 else
-    echo "   ❌ Cannot detect OS"
-    OS_OK=false
+	printf '[FAIL] Cannot determine operating system\n'
+	status=1
 fi
-echo ""
 
-# Python Check
-echo "🐍 Python:"
-if command -v python &> /dev/null; then
-    PYTHON_VERSION=$(python --version 2>&1 | awk '{print $2}')
-    echo "   Version: $PYTHON_VERSION"
-    
-    if [[ "$PYTHON_VERSION" == 3.13.* ]]; then
-        echo "   ✅ Python 3.13 detected (expected)"
-        PYTHON_OK=true
-    else
-        echo "   ⚠️  Unexpected version (expected 3.13.x)"
-        PYTHON_OK=false
-    fi
-else
-    echo "   ❌ Python not found"
-    PYTHON_OK=false
-fi
-echo ""
-
-# Poetry Check
-echo "📝 Poetry:"
-if command -v poetry &> /dev/null; then
-    POETRY_VERSION=$(poetry --version 2>&1 | awk '{print $3}' | tr -d ')')
-    echo "   Version: $POETRY_VERSION"
-    
-    if [[ "$POETRY_VERSION" == 2.2.* ]]; then
-        echo "   ✅ Poetry 2.2.x detected (expected)"
-        POETRY_OK=true
-    else
-        echo "   ⚠️  Unexpected version (expected 2.2.1)"
-        POETRY_OK=false
-    fi
-else
-    echo "   ❌ Poetry not found"
-    POETRY_OK=false
-fi
-echo ""
-
-# PowerShell Check
-echo "⚡ PowerShell:"
-if command -v pwsh &> /dev/null; then
-    PWSH_VERSION=$(pwsh --version 2>&1 | head -n1)
-    echo "   $PWSH_VERSION"
-    
-    if [[ "$PWSH_VERSION" == *"7.6."* ]]; then
-        echo "   ✅ PowerShell 7.6.x detected (expected)"
-        PWSH_OK=true
-    else
-        echo "   ⚠️  Unexpected version (expected 7.6+)"
-        PWSH_OK=false
-    fi
-else
-    echo "   ❌ PowerShell not found"
-    PWSH_OK=false
-fi
-echo ""
-
-# Node Check
-echo "🟢 Node.js:"
-if command -v node &> /dev/null; then
-    NODE_VERSION=$(node --version 2>&1)
-    echo "   Version: $NODE_VERSION"
-    if [[ "$NODE_VERSION" == v20.* ]]; then
-        echo "   ✅ Node 20.x detected (expected; matches CI)"
-        NODE_OK=true
-    else
-        echo "   ❌ Expected Node 20.x (CI runs the TypeScript tests on Node 20)"
-        NODE_OK=false
-    fi
-else
-    echo "   ❌ Node not found"
-    NODE_OK=false
-fi
-echo ""
-
-# Shell Tools Check
-echo "🔧 Shell Tools:"
-declare -a TOOLS=("git" "gh" "shellcheck" "shfmt" "kcov" "bats" "bashdb" "actionlint" "claude" "cswap")
-TOOLS_OK=true
-
-for tool in "${TOOLS[@]}"; do
-    if command -v "$tool" &> /dev/null; then
-        VERSION=$($tool --version 2>&1 | head -n1 || echo "installed")
-        echo "   ✅ $tool: $VERSION"
-    else
-        echo "   ❌ $tool: not found"
-        TOOLS_OK=false
-    fi
+# All managed runtime, formatter and lint versions use the same pure contract.
+for tool in python node npm pwsh poetry shfmt shellcheck actionlint; do
+	if ! check_container_tool_version "$tool"; then
+		status=1
+	fi
 done
 
-# shfmt must match the version CI pins (.github/workflows/_shell-coverage.yml)
-if command -v shfmt &> /dev/null; then
-    SHFMT_ACTUAL=$(shfmt --version 2>&1 | head -n1)
-    if [ "$SHFMT_ACTUAL" = "v3.8.0" ]; then
-        echo "   ✅ shfmt matches the CI pin (v3.8.0)"
-    else
-        echo "   ❌ shfmt is $SHFMT_ACTUAL; CI pins v3.8.0"
-        TOOLS_OK=false
-    fi
-fi
-echo ""
+# Preserve required supporting CLI presence independently of the managed version pins.
+for tool in git gh kcov bats bashdb claude cswap; do
+	if command -v "$tool" >/dev/null 2>&1; then
+		printf '[OK] %s is installed\n' "$tool"
+	else
+		printf '[FAIL] %s is not installed\n' "$tool"
+		status=1
+	fi
+done
 
-# Configuration File Check
-echo "📄 Configuration Files:"
-if [ -f "/workspaces/drm-copilot/.devcontainer/devcontainer.json" ]; then
-    echo "   ✅ .devcontainer/devcontainer.json (Codespaces config)"
-fi
-if [ -f "/workspaces/drm-copilot/.devcontainer/local/devcontainer.json" ]; then
-    echo "   ✅ .devcontainer/local/devcontainer.json (Local config)"
-fi
-echo ""
-
-# Virtual Environment Check
-echo "🏗️  Python Virtual Environment:"
-if [ -d "/workspaces/drm-copilot/.venv" ]; then
-    echo "   ✅ .venv directory exists"
-    if [ -f "/workspaces/drm-copilot/.venv/bin/python" ]; then
-        VENV_PYTHON=$(/workspaces/drm-copilot/.venv/bin/python --version)
-        echo "   ✅ Python in venv: $VENV_PYTHON"
-        VENV_OK=true
-    else
-        echo "   ⚠️  Python not found in .venv"
-        VENV_OK=false
-    fi
+if [[ -f "$REPO_ROOT/.devcontainer/$config/devcontainer.json" ]]; then
+	printf '[OK] .devcontainer/%s/devcontainer.json\n' "$config"
 else
-    echo "   ⚠️  .venv directory not found"
-    VENV_OK=false
+	printf '[FAIL] Missing .devcontainer/%s/devcontainer.json\n' "$config"
+	status=1
 fi
-echo ""
 
-# Summary
-echo "========================================="
-echo "Summary"
-echo "========================================="
-if [ "${OS_OK:-false}" = true ] && \
-   [ "${PYTHON_OK:-false}" = true ] && \
-   [ "${POETRY_OK:-false}" = true ] && \
-   [ "${PWSH_OK:-false}" = true ] && \
-   [ "${NODE_OK:-false}" = true ] && \
-   [ "${TOOLS_OK:-false}" = true ] && \
-   [ "${VENV_OK:-false}" = true ]; then
-    echo "✅ All checks passed!"
-    echo ""
-    echo "Your dev container is correctly configured."
-    if [ "$ENV_TYPE" = "codespaces" ]; then
-        echo "Using: .devcontainer/devcontainer.json (Codespaces)"
-    else
-        echo "Using: .devcontainer/local/devcontainer.json (Local)"
-    fi
-    exit 0
+if [[ -f "$REPO_ROOT/.venv/bin/python" ]]; then
+	venv_version=$("$REPO_ROOT/.venv/bin/python" --version 2>&1 | awk '{ print $2 }')
+	if container_tool_version_supported python "$venv_version"; then
+		printf '[OK] Workspace virtual environment Python %s\n' "$venv_version"
+	else
+		printf '[FAIL] Workspace virtual environment uses unsupported Python %s\n' "$venv_version"
+		status=1
+	fi
 else
-    echo "⚠️  Some checks failed!"
-    echo ""
-    echo "Your environment may not match the expected configuration."
-    if [ "$ENV_TYPE" = "codespaces" ]; then
-        echo ""
-        echo "For Codespaces:"
-        echo "  - Try deleting and recreating the Codespace"
-        echo "  - Ensure .devcontainer/devcontainer.json exists"
-    else
-        echo ""
-        echo "For Local Docker:"
-        echo "  - Try rebuilding the container: F1 → Dev Containers: Rebuild Container"
-        echo "  - Ensure you selected .devcontainer/local/devcontainer.json"
-        echo "  - See .devcontainer/CONFIG-GUIDE.md for help"
-    fi
-    echo ""
-    echo "See .devcontainer/TROUBLESHOOTING.md for more help."
-    exit 1
+	printf '[FAIL] Workspace Linux virtual environment is missing\n'
+	status=1
 fi
+
+if ((status == 0)); then
+	printf 'All devcontainer checks passed.\n'
+else
+	printf 'Devcontainer verification failed. Rebuild using .devcontainer/%s/devcontainer.json.\n' "$config"
+	printf 'See .devcontainer/TROUBLESHOOTING.md for setup guidance.\n'
+fi
+exit "$status"

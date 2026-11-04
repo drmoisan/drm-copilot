@@ -40,13 +40,14 @@ This directory contains the Docker Dev Container configuration for the DRM Copil
 ## What's Included
 
 ### Base Environment
-- **Debian Bookworm** (latest stable)
-- **Python 3.13** with Poetry package manager
-- **PowerShell 7.6+** for cross-platform scripting
+- **Debian 12 (Bookworm)**
+- **Python 3.13.17** with Poetry 2.3.2
+- **Node.js 26.13.0 / npm 11.20.0** for development and CI
+- **PowerShell 7.6.9** for cross-platform scripting
 - **Git** and **GitHub CLI** (gh)
 - **Graphite CLI** (`gt`) for the Graphite VS Code extension
 - **GitHub Copilot CLI** (`copilot`) for the `atomic_executor` tool
-- **actionlint** for GitHub Actions workflow linting
+- **shfmt 3.14.1**, **ShellCheck 0.11.0**, and **actionlint 1.7.12**
 - **bashdb** for Bash debugging
 
 ### Python Tooling
@@ -110,10 +111,10 @@ If you modify the Dockerfile or devcontainer.json:
 ## Customization
 
 ### Adding Extensions
-Edit `.devcontainer/devcontainer.json` → `customizations.vscode.extensions[]`
+Edit the selected `.devcontainer/local/devcontainer.json` or `.devcontainer/codespaces/devcontainer.json` → `customizations.vscode.extensions[]`
 
 ### Changing Python/Tool Versions
-Edit `.devcontainer/Dockerfile` → `FROM` line and install commands
+Edit `.devcontainer/local/Dockerfile` and `.devcontainer/codespaces/Dockerfile` → `FROM` stages and install commands
 
 ### Post-Create Steps
 Edit `.devcontainer/post-create.sh` to add custom setup commands
