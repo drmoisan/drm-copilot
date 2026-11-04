@@ -204,3 +204,92 @@ Describe 'Get-EpicProgressFeatureState' {
         Get-EpicProgressFeatureState -MergeStatus 'not_started' -PrState '' -Done 0 | Should -Be 'Pending'
     }
 }
+
+Describe 'Format-EpicProgressHours, Format-EpicProgressClock, and Format-EpicProgressNumber' {
+    It 'formats hours as H h MM min' {
+        Format-EpicProgressHours -Hours 5.25 | Should -Be '5 h 15 min'
+        Format-EpicProgressHours -Hours 1234.5 | Should -Be '1,234 h 30 min'
+        Format-EpicProgressHours -Hours 0 | Should -Be '0 h 00 min'
+    }
+
+    It 'formats hours as HH:MM' {
+        Format-EpicProgressClock -Hours 5.25 | Should -Be '05:15'
+        Format-EpicProgressClock -Hours 22.5 | Should -Be '22:30'
+    }
+
+    It 'never prints 60 in the minute field' {
+        # 1.995 hours is 119.7 minutes; both fields derive from the rounded 120 minutes.
+        Format-EpicProgressHours -Hours 1.995 | Should -Be '2 h 00 min'
+        Format-EpicProgressClock -Hours 1.995 | Should -Be '02:00'
+    }
+
+    It 'returns n/a from each formatter for NaN' {
+        Format-EpicProgressHours -Hours ([double]::NaN) | Should -Be 'n/a'
+        Format-EpicProgressClock -Hours ([double]::NaN) | Should -Be 'n/a'
+        Format-EpicProgressNumber -Value ([double]::NaN) -Digits 1 | Should -Be 'n/a'
+    }
+
+    It 'returns n/a from each formatter for infinity' {
+        Format-EpicProgressHours -Hours ([double]::PositiveInfinity) | Should -Be 'n/a'
+        Format-EpicProgressClock -Hours ([double]::NegativeInfinity) | Should -Be 'n/a'
+        Format-EpicProgressNumber -Value ([double]::PositiveInfinity) | Should -Be 'n/a'
+    }
+
+    It 'rounds a number to the given digits with invariant text' {
+        Format-EpicProgressNumber -Value 42.857 -Digits 1 | Should -Be '42.9'
+        Format-EpicProgressNumber -Value 5.25 -Digits 0 | Should -Be '5'
+        Format-EpicProgressNumber -Value 1.25 | Should -Be '1.25'
+    }
+}
+
+Describe 'Select-EpicProgressSample' {
+    It 'adds the first sample' {
+        $result = Select-EpicProgressSample -Sample @() -NowUnixSeconds 1000 -Done 5 -SampleCap 14
+
+        $result.Changed | Should -BeTrue
+        $result.Sample.Count | Should -Be 1
+        $result.Sample[0].ts | Should -Be 1000
+        $result.Sample[0].done | Should -Be 5
+    }
+
+    It 'adds a sample 90 seconds after the last' {
+        $existing = @([pscustomobject]@{ ts = 1000; done = 5 })
+
+        $result = Select-EpicProgressSample -Sample $existing -NowUnixSeconds 1090 -Done 6 -SampleCap 14
+
+        $result.Changed | Should -BeTrue
+        ($result.Sample.ts -join ',') | Should -Be '1000,1090'
+    }
+
+    It 'does not add a sample 89 seconds after the last' {
+        $existing = @([pscustomobject]@{ ts = 1000; done = 5 })
+
+        $result = Select-EpicProgressSample -Sample $existing -NowUnixSeconds 1089 -Done 6 -SampleCap 14
+
+        $result.Changed | Should -BeFalse
+        $result.Sample.Count | Should -Be 1
+        $result.Sample[0].ts | Should -Be 1000
+    }
+
+    It 'drops samples without a timestamp when adding' {
+        $existing = @(
+            [pscustomobject]@{ done = 1 }
+            [pscustomobject]@{ ts = 900; done = 2 }
+            [pscustomobject]@{ done = 3 }
+        )
+
+        $result = Select-EpicProgressSample -Sample $existing -NowUnixSeconds 950 -Done 4 -SampleCap 14
+
+        $result.Changed | Should -BeTrue
+        ($result.Sample.ts -join ',') | Should -Be '900,950'
+    }
+
+    It 'keeps only the last SampleCap samples' {
+        $existing = @(0, 100, 200, 300, 400 | ForEach-Object { [pscustomobject]@{ ts = $_; done = 1 } })
+
+        $result = Select-EpicProgressSample -Sample $existing -NowUnixSeconds 1000 -Done 2 -SampleCap 3
+
+        $result.Sample.Count | Should -Be 3
+        ($result.Sample.ts -join ',') | Should -Be '300,400,1000'
+    }
+}

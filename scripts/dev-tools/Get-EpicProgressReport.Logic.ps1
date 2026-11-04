@@ -206,3 +206,96 @@ function Get-EpicProgressFeatureState {
     if ($Done -gt 0 -or $MergeStatus -ne 'not_started' -or $PrState) { return 'Running' }
     return 'Pending'
 }
+
+function Select-EpicProgressSample {
+    <#
+    .SYNOPSIS
+        Apply the sample-retention rule for one check-in; return Sample and Changed.
+    .DESCRIPTION
+        A sample (ts, done) is added only when there is no previous sample, the previous
+        sample has no 'ts', or it is at least 90 seconds older than now. On add, samples
+        without 'ts' are dropped and only the last SampleCap samples are kept.
+    .PARAMETER Sample
+        The samples read from the state file.
+    .PARAMETER NowUnixSeconds
+        The current instant in Unix seconds.
+    .PARAMETER Done
+        The checked task count now.
+    .PARAMETER SampleCap
+        The maximum number of samples kept.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Sample,
+        [Parameter(Mandatory = $true)] [long] $NowUnixSeconds,
+        [Parameter(Mandatory = $true)] [int] $Done,
+        [Parameter(Mandatory = $true)] [ValidateRange(1, 100000)] [int] $SampleCap
+    )
+
+    $last = $null
+    if ($Sample.Count -gt 0) { $last = $Sample[$Sample.Count - 1] }
+    $add = ($null -eq $last) -or -not ($last.PSObject.Properties.Name -contains 'ts') -or (($NowUnixSeconds - [long] $last.ts) -ge 90)
+    if (-not $add) { return [pscustomobject]@{ Sample = $Sample; Changed = $false } }
+    $kept = [System.Collections.Generic.List[object]]::new()
+    foreach ($entry in $Sample) {
+        if ($null -ne $entry -and $entry.PSObject.Properties.Name -contains 'ts') { $kept.Add($entry) }
+    }
+    $kept.Add([pscustomobject]@{ ts = $NowUnixSeconds; done = $Done })
+    $retained = [object[]] @($kept | Select-Object -Skip ([math]::Max(0, $kept.Count - $SampleCap)))
+    return [pscustomobject]@{ Sample = $retained; Changed = $true }
+}
+
+function Format-EpicProgressHours {
+    <#
+    .SYNOPSIS
+        Format hours as 'H h MM min' from the rounded total minutes; 'n/a' when not finite.
+    .PARAMETER Hours
+        The hours to format.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [double] $Hours)
+
+    if ([double]::IsNaN($Hours) -or [double]::IsInfinity($Hours)) { return 'n/a' }
+    $minutes = [math]::Round($Hours * 60, [System.MidpointRounding]::AwayFromZero)
+    $wholeHours = [math]::Floor($minutes / 60)
+    return [string]::Format([cultureinfo]::InvariantCulture, '{0:N0} h {1:00} min', $wholeHours, ($minutes - 60 * $wholeHours))
+}
+
+function Format-EpicProgressClock {
+    <#
+    .SYNOPSIS
+        Format hours as 'HH:MM' from the rounded total minutes; 'n/a' when not finite.
+    .PARAMETER Hours
+        The hours to format.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [double] $Hours)
+
+    if ([double]::IsNaN($Hours) -or [double]::IsInfinity($Hours)) { return 'n/a' }
+    $minutes = [math]::Round($Hours * 60)
+    $wholeHours = [math]::Floor($minutes / 60)
+    return [string]::Format([cultureinfo]::InvariantCulture, '{0:00}:{1:00}', $wholeHours, ($minutes - 60 * $wholeHours))
+}
+
+function Format-EpicProgressNumber {
+    <#
+    .SYNOPSIS
+        Return a number rounded to Digits decimals as invariant text; 'n/a' when not finite.
+    .PARAMETER Value
+        The number to format.
+    .PARAMETER Digits
+        The decimal digits kept (0 to 15). The default of 15 prints the value unrounded.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [double] $Value,
+        [ValidateRange(0, 15)] [int] $Digits = 15
+    )
+
+    if ([double]::IsNaN($Value) -or [double]::IsInfinity($Value)) { return 'n/a' }
+    return ([math]::Round($Value, $Digits)).ToString([cultureinfo]::InvariantCulture)
+}
