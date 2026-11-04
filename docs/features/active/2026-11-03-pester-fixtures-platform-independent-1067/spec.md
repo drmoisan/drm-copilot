@@ -12,6 +12,8 @@
 ## Context
 Seventeen Pester suites under `tests/scripts/dev-tools` and `tests/scripts/powershell/PoshQC` use Windows-specific fixtures and fail on Linux. The Linux baseline (`evidence/baseline/linux-pester-baseline.2026-11-03T22-49.md`) records 921 tests across the two trees: 823 passed, 89 failed, 9 skipped. All 89 failures are in 17 suites; every other suite in both trees passes. The figures "308 tests, 219 passed, 89 failed" that the issue cites are the 17-suite subset from the issue 1026 run, not the totals for the two trees.
 
+Post-merge re-verification: after `main` (including sibling issue #1066, PR #1070) was merged into this branch, the same run (`evidence/baseline/linux-pester-baseline.2026-11-04T03-19.md`) records 925 tests: 827 passed, 89 failed, 9 skipped. The four added tests are the new `tests/scripts/dev-tools/run-actionlint.EnvironmentIsolation.Tests.ps1`, which passes. The 89 failures are in the same 17 suites with the same per-suite counts, and `tests/scripts/dev-tools/run-actionlint.Tests.ps1` still has no failure, so the scope below is unchanged.
+
 The fixtures must be platform independent so that the suites pass on Windows and Linux. Reading the failures also exposed four production defects (D1 to D4 below) that are fixed in this item.
 
 Environment:
@@ -68,7 +70,7 @@ Logs / Screenshots:
   - Test-isolation fixes in three of the touched suites (`sync-agents-from-instructions.Tests.ps1`, `Enter-DrmCopilotShell.Tests.ps1`, `Test-DiscoveryHostCapability.Entry.Tests.ps1`).
   - Removal of the personal user-profile path embedded in `Enter-DrmCopilotShell.Tests.ps1`.
 - Out of scope / non-goals:
-  - `tests/scripts/dev-tools/run-actionlint.Tests.ps1`. Sibling issue #1066 fixes its `$env:PATH` leak and merges to `main` first. This item merges `main` before planning and edits that file only if host-fixture failures appear there after the merge; the baseline records none.
+  - `tests/scripts/dev-tools/run-actionlint.Tests.ps1`. Sibling issue #1066 fixes its `$env:PATH` leak and merges to `main` first. This item merges `main` before planning and edits that file only if host-fixture failures appear there after the merge; the baseline records none, and the post-merge baseline confirms none after #1066 merged.
   - A shared test helper or any change to shared test support. `tests/scripts/claude-lib/discovery-validation/DiscoveryGate.TestSupport.ps1` is used unchanged.
   - `-Skip` conditions, TestDrive, and temporary files.
   - The POSIX venv layout in `activate.ps1` `Invoke-VenvActivation` (it joins `.venv\Scripts\Activate.ps1`, the Windows layout; the script is wired only through the Windows terminal profile). This is recorded as a known limitation, not a defect of this item.
