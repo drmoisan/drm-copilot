@@ -294,6 +294,16 @@
     ".claude/lib/docs/schemas/v1/docs-parity-matrix.schema.json",
     ".claude/lib/docs/schemas/v1/docs-evidence-pin.schema.json",
     ".claude/lib/docs/schemas/v1/docs-validation-receipt.schema.json",
-    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json"
+    ".claude/lib/docs/schemas/v1/docs-command-envelope.schema.json",
+    ".claude/lib/docs/DocsLedger.psm1",
+    ".claude/lib/docs/DocsLedgerRules.psm1",
+    ".claude/lib/docs/DocsEvidencePins.psm1",
+    ".claude/lib/docs/DocsStaleness.psm1",
+    ".claude/lib/docs/DocsParity.psm1",
+    ".claude/lib/docs/DocsReceipt.psm1",
+    ".claude/lib/docs/DocsLedgerMutation.psm1",
+    ".claude/lib/docs/DocsValidation.psm1",
+    ".claude/lib/docs/DocsCoverageReport.psm1",
+    ".claude/lib/docs/DocsLedgerCommands.psm1"
   ]
 }

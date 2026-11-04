@@ -187,9 +187,9 @@ No hook, skill, agent, MCP tool, extension command, schema, example, Python, or 
 
 ### Phase 6 — Push-Down Registration
 
-- [ ] [P6-T1] Create the bundle copies with one copy script `SCRATCH/issue-1023-mirror.sh`: each new `LIB` module (and any split module) to `BUNDLE`, and `LIB/Invoke-DocsCommand.ps1` over its `BUNDLE` copy.
+- [x] [P6-T1] Create the bundle copies with one copy script `SCRATCH/issue-1023-mirror.sh`: each new `LIB` module (and any split module) to `BUNDLE`, and `LIB/Invoke-DocsCommand.ps1` over its `BUNDLE` copy.
   - Acceptance: `git status --porcelain --untracked-files=all -- extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs` lists exactly the new module copies and the modified entry script; each copy's SHA-256 equals its source; `FEATURE/evidence/other/bundle-mirror.<timestamp>.md` records the listing and digests. Any later edit to a `LIB` file re-runs this script.
-- [ ] [P6-T2] Append one `paths` entry per new `LIB` file to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, after the existing `.claude/lib/docs/` entries, each exactly once.
+- [x] [P6-T2] Append one `paths` entry per new `LIB` file to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, after the existing `.claude/lib/docs/` entries, each exactly once.
   - Acceptance (suite form): `TESTS/Docs.Manifest.Tests.ps1`, `TESTS/DocsNeutrality.Tests.ps1`, `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`; evidence `p6-registration`.
 
 ### Phase 7 — Final QA Loop, Scope Checks, and Self-Review
