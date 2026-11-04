@@ -1,0 +1,22 @@
+# Suite Evidence: update-ledger dispositions ([P4-T4])
+
+Timestamp: 2026-11-04T00-47
+Command: sh SCRATCH/issue-1023-pester-run.sh tests/scripts/claude-lib/docs (PowerShell 7: Import-Module scripts/powershell/PoshQC/PoshQC.psd1; Invoke-PoshQCTest -Root <worktree root> -ScanFolders tests/scripts/claude-lib/docs, coverage enabled; counts from artifacts/pester/pester-junit.xml and coverage from artifacts/pester/powershell-coverage.xml by SCRATCH/issue-1023-pester-summary.ps1)
+EXIT_CODE: 4
+ExpectedExitCode: 4
+Output Summary: DocsLedgerCommands.UpdateLedger.Tests.ps1 tests=21 failures=0 errors=0 (11 cases of [P4-T4] in `Describe 'update-ledger set-disposition and remove-entry'`, 10 cases of [P4-T5]). Line coverage of `.claude/lib/docs/DocsLedgerCommands.psm1`: 99.13 (343 covered, 3 missed). The run exit 4 is the four Docs.Manifest.Tests.ps1 cases deferred to Phase 6.
+
+## Named suites (artifacts/pester/pester-junit.xml)
+
+| Suite | tests | failures | errors | skipped |
+|---|---|---|---|---|
+| `tests/scripts/claude-lib/docs/DocsLedgerCommands.UpdateLedger.Tests.ps1` | 21 | 0 | 0 | 0 |
+
+[P4-T4] tests: `plans the ledger write and makes no WriteText call without Write` (and `skipped` for an identical entry), `records analysis_method from the current element`, `removes matrix rows and pins of a dropped binding` (and a kept binding with an anchored second page drops nothing), `exits 1 naming the missing rationale for excluded and writes nothing`, `exits 1 naming the missing owner or target for deferred` (element and `-Limit`), `exits 0 when only pre-existing errors for other elements exist and carries no error finding`, `set-disposition Limit writes the deferred scanner entry and clears DOCS_LEDGER_LIMIT_UNRECORDED` (the written entry's `element_id` equals `Get-DocsElementId -Kind cli-command -Path src/app/Dynamic.ps1 -Declaration <diagnostic id>`, `analysis_method` `scanner`, marker fields `analyzer_id`, `code`, `diagnostic_id`; `Get-DocsLedgerFinding` over the written ledger reports no `DOCS_LEDGER_LIMIT_UNRECORDED`), `remove-entry removes the entry, rows and pins` (removing the entry of a current element or limit is a newly-introduced error, exit 1), `remove-entry removes the entry, rows and pins of an element that left the snapshot` (orphan and resolved-limit removals, exit 0), `exits 1 with DOCS_UPDATE_TARGET_INVALID for an absent element or limit` (five cases, no write), `creates a document with the 1020 header and a repository-derived id` (`id` = `Get-DocsStableId -Prefix docs-coverage-ledger -Value @{ repository }`, mode `create`, an absent unchanged matrix or pin collection is not created).
+
+## Files
+
+- Added to `.claude/lib/docs/DocsLedgerCommands.psm1`: `Invoke-DocsUpdateLedgerCommand -Argument -Context`, the operation dispatcher `Invoke-DocsLedgerOperation` (written with every arm in this task; the `pin`, `unpin`, `set-dimension` and `sync-refs` arms are verified in [P4-T5]), `Get-DocsLedgerCommandRuleFinding`, `Get-DocsLedgerCommandFindingKey` (identity over every field except `pointer`) and `New-DocsLedgerCommandTargetFinding`. The commit call to `Invoke-DocsArtifactWrite` (`-DryRun` without `-Write`) is in place because the `-Limit` case asserts the written ledger; its conflict and failure paths are verified in [P4-T5].
+- Newly-introduced rule as implemented: the rules of each changed document (ledger rules, pin rules, matrix rules over the page-path set and `page_owners`) and the schema of its text are evaluated after the operation and compared with the same rule sets before it; an error absent before fails the operation (exit 1, the new errors, nothing written); `preexisting_errors` counts the error findings of every rule set before it. Evaluating only the changed documents is what makes a new binding recordable (a set-disposition that touches only the ledger does not trip `DOCS_MATRIX_ROW_MISSING`; the row is added by `set-dimension`). A dropped binding changes the matrix and the pins, so a `DOCS_MATRIX_LEDGER_REF` warning is introduced until `sync-refs` runs; exit-0 envelopes carry such warnings only.
+- `remove-entry` targets the ledger entry, not the snapshot element (an orphan entry names an element that left the snapshot); every other element operation requires the element in the current snapshot (`DOCS_UPDATE_TARGET_INVALID` otherwise, including a precision-limit id).
+- Created `tests/scripts/claude-lib/docs/DocsLedgerCommands.UpdateLedger.Tests.ps1` (651 lines after [P4-T5]).

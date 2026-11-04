@@ -92,6 +92,22 @@ Describe 'Dispatch table' {
         $script:ScriptText.IndexOf("Name = 'init'", [System.StringComparison]::Ordinal) | Should -BeGreaterThan $positions[0]
         $script:ScriptText.IndexOf("Name = 'validate-profile'", [System.StringComparison]::Ordinal) | Should -BeLessThan $positions[1]
     }
+
+    It 'contains the check row directly under the 1021 anchor' {
+        # Arrange
+        $lines = @($script:ScriptText -split "`n" | ForEach-Object { $_.TrimEnd("`r") })
+        $anchor = [array]::IndexOf($lines, '        # --- 1021: check ---')
+        $row = @((Get-DocsCommandTable) | Where-Object { [string] $_.Name -ceq 'check' })
+
+        # Assert
+        $anchor | Should -BeGreaterThan 0
+        $lines[$anchor + 1] | Should -Match "Name = 'check'"
+        $row.Count | Should -Be 1
+        $row[0].Function | Should -BeExactly 'Invoke-DocsCheckCommand'
+        $row[0].Module | Should -BeLike '*DocsPageCheck.psm1'
+        $row[0].Option['Profile'] | Should -BeExactly 'value'
+        $row[0].Option['Path'] | Should -BeExactly 'multi'
+    }
 }
 
 Describe 'ConvertFrom-DocsCommandArgument' {

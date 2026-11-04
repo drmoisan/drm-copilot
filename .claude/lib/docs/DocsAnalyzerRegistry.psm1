@@ -34,6 +34,11 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1'
 
 $script:DocsAnalyzerRow = @(
     # --- 1022: Python and configuration analyzers ---
+    [pscustomobject]@{ Id = 'config-files'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('config-key'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerConfigFiles.psm1'); Function = 'Invoke-DocsAnalyzerConfigFiles' }
+    [pscustomobject]@{ Id = 'python-architecture'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('architecture-component'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerArchitecture.psm1'); Function = 'Invoke-DocsAnalyzerPythonArchitecture' }
+    [pscustomobject]@{ Id = 'python-cli'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('cli-command', 'cli-option'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonCli.psm1'); Function = 'Invoke-DocsAnalyzerPythonCli' }
+    [pscustomobject]@{ Id = 'python-http'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('http-route'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonHttp.psm1'); Function = 'Invoke-DocsAnalyzerPythonHttp' }
+    [pscustomobject]@{ Id = 'python-public-api'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('public-symbol'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonApi.psm1'); Function = 'Invoke-DocsAnalyzerPythonApi' }
     # --- 1033: TypeScript and .NET analyzers ---
     [pscustomobject]@{ Id = 'typescript-cli'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('cli-command', 'cli-option'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerTypeScriptCli.psm1'); Function = 'Invoke-DocsAnalyzerTypeScriptCli' }
     [pscustomobject]@{ Id = 'typescript-http'; Version = '1.0.0'; AnalysisMethod = 'scanner'; ElementKinds = @('http-route'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerTypeScriptHttp.psm1'); Function = 'Invoke-DocsAnalyzerTypeScriptHttp' }

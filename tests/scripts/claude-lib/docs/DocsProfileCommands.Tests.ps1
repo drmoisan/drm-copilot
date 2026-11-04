@@ -27,6 +27,12 @@ BeforeAll {
     $script:ExampleProfile = (Get-DocsTestExampleText)['docs-profile']
     $script:ProfilePath = 'docs/documentation-estate/docs-profile.json'
 
+    # The committed text of every default init template source, read read-only, so -Write tests can supply them in memory.
+    $script:RepositoryRoot = [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath '../../../..'))
+    $script:DefaultTemplateFiles = @{}
+    $defaultRows = Get-DocsInitTemplate
+    foreach ($row in $defaultRows) { $script:DefaultTemplateFiles[[string] $row.Source] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath $row.Source)) }
+
     function New-TestProfileText {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory fixture factory in a test file; it changes no system state.')]
         param([scriptblock] $Mutate)
@@ -128,15 +134,15 @@ Describe 'Invoke-DocsInitCommand' {
     }
 
     It 'creates the profile with mode create under -Write' {
-        # Arrange
-        $test = New-DocsTestContext
+        # Arrange (the default template rows read their sources, so the context supplies them)
+        $test = New-DocsTestContext -File $script:DefaultTemplateFiles
 
         # Act
         $result = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $test.Context
 
-        # Assert
+        # Assert: the profile plus one write per default template row
         $result.ExitCode | Should -Be 0
-        $test.WriteLog.Count | Should -Be 1
+        $test.WriteLog.Count | Should -Be (1 + $script:DefaultTemplateFiles.Count)
         $test.WriteLog[0].RelativePath | Should -BeExactly $script:ProfilePath
         $test.WriteLog[0].Mode | Should -BeExactly 'create'
     }
@@ -158,7 +164,9 @@ Describe 'Invoke-DocsInitCommand' {
 
     It 'overwrites the profile with mode overwrite under -Write -Force' {
         # Arrange
-        $test = New-DocsTestContext -File @{ $script:ProfilePath = '{}' }
+        $files = @{ $script:ProfilePath = '{}' }
+        foreach ($key in $script:DefaultTemplateFiles.Keys) { $files[$key] = $script:DefaultTemplateFiles[$key] }
+        $test = New-DocsTestContext -File $files
 
         # Act
         $result = Invoke-DocsInitCommand -Argument @{ Write = $true; Force = $true } -Context $test.Context
