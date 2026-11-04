@@ -3,11 +3,18 @@
 - **Issue:** #1022
 - **Parent (optional):** epic #1019 (documentation-estate-tooling), child 1022, wave 1, band C4
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-31T05-10
+- **Last Updated:** 2026-11-03T22-31
 - **Status:** Draft
-- **Version:** 0.3
+- **Version:** 0.4
 
 ## Revision Note
+
+Version 0.4 (execution-stage design revision under orchestrator decision D-1022-exec-1) conforms
+every diagnostic code this feature emits to the merged 1020 diagnostic code grammar
+`^[A-Z][A-Z0-9_]*$`, rewriting each former lowercase hyphenated code mechanically (for example
+`PYTHON_LEXER_UNTERMINATED`), and aligns the two 1020-owned capture rows with the merged 1020
+behavior (`DOCS_INPUT_TOO_LARGE` and `DOCS_INPUT_NOT_UTF8`, non-blocking `warning`, `analyzer_id`
+`docs-capture`). The rewritten acceptance criteria are listed in `## Decisions`.
 
 Version 0.3 (planner revision after the single-pass preflight) aligns this spec with the 1020 spec
 on this branch, which now carries the D3/D5 amendment: the declaration-lines digest is owned by
@@ -105,7 +112,8 @@ The Architecture module keeps the epic file name while its function and identifi
   `analysis_method: scanner`; `source_sha256` is computed inside `New-DocsSurfaceElement` by 1020
   `Get-DocsDeclarationSha256`, and `line_range` follows `## Contracts for 1031 and Later Children`.
   No 1022 module computes, supplies or re-implements a digest.
-- Diagnostics are built with 1020 `New-DocsDiagnostic`, at most one per `(analyzer, code, path)`;
+- Diagnostics are built with 1020 `New-DocsDiagnostic`, with a code in the 1020 diagnostic code
+  grammar `^[A-Z][A-Z0-9_]*$`, at most one per `(analyzer, code, path)`;
   the message states the occurrence count and the first line number and never quotes source text
   or configuration values.
 - No configuration value, default value, literal argument value other than declaration-forming
@@ -231,7 +239,7 @@ the only 1022 function that uses the 1020 command context, and only through `Con
    registry selection of the amended 1020, not by 1022.
 4. List files under each source root with `Context.ListFile`; apply `surface_selection.exclusions`
    with `Find-DocsPathOrGlobMatch` (`## API / CLI Surface`); withhold every non-template env-family
-   file without reading it and emit `env-file-not-captured` for it.
+   file without reading it and emit `ENV_FILE_NOT_CAPTURED` for it.
 5. Apply the aggregate bounds (more than 50,000 inputs, or more than 256 MiB in total, exits 3 with
    `DOCS_CLI_RUNTIME` and no snapshot).
 6. Read each remaining file with `Context.ReadBytes` and wrap it with
@@ -245,7 +253,7 @@ the only 1022 function that uses the 1020 command context, and only through `Con
    `Context.WriteText`, mode `overwrite` when the file exists, else `create`.
 
 `New-DocsInventorySnapshot` merges analyzer outputs, filters elements to
-`surface_selection.element_kinds`, removes duplicates (`duplicate-declaration`), sorts, and builds
+`surface_selection.element_kinds`, removes duplicates (`DUPLICATE_DECLARATION`), sorts, and builds
 the header, `id` and `profile_sha256` (`## Data & State`).
 
 ## Precision Limit
@@ -259,8 +267,11 @@ records `analysis_method: scanner`.
 
 Common rules:
 
-- Codes follow the identifier grammar `^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$` inherited by the docs
-  `diagnostic.code`.
+- Codes follow the 1020 diagnostic code grammar `^[A-Z][A-Z0-9_]*$`, which 1020
+  `New-DocsDiagnostic` enforces (`$script:DocsSurfaceCodePattern` in `DocsSurface.psm1`) and the
+  docs common schema states for `$defs/diagnostic` `code` (`schemas/docs/v1/common.schema.json`).
+  Codes are not identifiers: analyzer identifiers, `analyzer_id` values, element kinds and property
+  names keep the identifier grammar.
 - Blocking diagnostics have severity `error`; non-blocking diagnostics have severity `warning`
   (decision 2). Any blocking diagnostic makes `inventory` exit 1.
 - "Site" means one registration call, decorator or binding; "file" means the whole input. A
@@ -280,63 +291,63 @@ parenthesized multi-line `from` imports, at indentation 0 or inside top-level `i
 
 | Construct | Code | Level | Blocking | Effect |
 |---|---|---|---|---|
-| Bytes that are not strict UTF-8 (1020 `New-DocsCapturedInput`) | owned by 1020 (proposed `input-encoding-invalid`) | input | yes | no element for the file; no `inputs` entry |
-| Input above 1 MiB (1020 `New-DocsCapturedInput -MaxBytes 1048576`) | owned by 1020 (proposed `input-over-bound`) | input | yes | no element for the file; no `inputs` entry |
-| A coding cookie naming any other encoding | `python-encoding-unsupported` | input | yes | no element for the file |
-| Unterminated single-, double- or triple-quoted string, unbalanced bracket, or backslash continuation at end of input | `python-lexer-unterminated` | input | yes | no element for the file |
-| A character outside the token grammar outside strings and comments (for example `$`, `?`, backtick), bracket depth above 64, or f-string replacement fields nested more than two levels | `python-lexer-unclassified` | input | yes | no element for the file |
-| More than 262,144 tokens in one input | `python-token-limit` | input | yes | no element for the file |
-| A dedent to a column not on the indentation stack | `python-indentation-invalid` | input | yes | no element for the file |
-| A declaration-forming identifier containing a non-ASCII character (the scanner applies no NFKC normalization) | `python-identifier-non-ascii` | site | no | no element for the site |
+| Bytes that are not strict UTF-8 (1020 `New-DocsCapturedInput`) | `DOCS_INPUT_NOT_UTF8`, owned by 1020 (`analyzer_id` `docs-capture`, severity `warning`, captured `text` `$null`) | input | no (1020 decision; 1022 records it as emitted and does not re-classify it) | no element for the file; no `inputs` entry |
+| Input above 1 MiB (1020 `New-DocsCapturedInput -MaxBytes 1048576`) | `DOCS_INPUT_TOO_LARGE`, owned by 1020 (`analyzer_id` `docs-capture`, severity `warning`, captured `text` `$null`) | input | no (1020 decision; 1022 records it as emitted and does not re-classify it) | no element for the file; no `inputs` entry |
+| A coding cookie naming any other encoding | `PYTHON_ENCODING_UNSUPPORTED` | input | yes | no element for the file |
+| Unterminated single-, double- or triple-quoted string, unbalanced bracket, or backslash continuation at end of input | `PYTHON_LEXER_UNTERMINATED` | input | yes | no element for the file |
+| A character outside the token grammar outside strings and comments (for example `$`, `?`, backtick), bracket depth above 64, or f-string replacement fields nested more than two levels | `PYTHON_LEXER_UNCLASSIFIED` | input | yes | no element for the file |
+| More than 262,144 tokens in one input | `PYTHON_TOKEN_LIMIT` | input | yes | no element for the file |
+| A dedent to a column not on the indentation stack | `PYTHON_INDENTATION_INVALID` | input | yes | no element for the file |
+| A declaration-forming identifier containing a non-ASCII character (the scanner applies no NFKC normalization) | `PYTHON_IDENTIFIER_NON_ASCII` | site | no | no element for the site |
 | A string in a declaration position that is a bytes or f-string, carries a backslash in a non-raw string, or is implicitly concatenated with such a part | the owning analyzer's dynamic code | site | no | no element for the site |
-| `from <framework> import *` where `<framework>` is `argparse`, `click`, `typer`, `fastapi` or `flask` | `python-import-star-framework` | site | no | no element for sites that resolve only through the star import |
-| A framework module imported inside a `def` or `class` body | `python-import-nested-framework` | site | no | no element for sites that resolve only through the nested import |
-| An import alias or tracked receiver name bound to two different targets in one input | `python-binding-ambiguous` | site | no | no element for sites on that name |
+| `from <framework> import *` where `<framework>` is `argparse`, `click`, `typer`, `fastapi` or `flask` | `PYTHON_IMPORT_STAR_FRAMEWORK` | site | no | no element for sites that resolve only through the star import |
+| A framework module imported inside a `def` or `class` body | `PYTHON_IMPORT_NESTED_FRAMEWORK` | site | no | no element for sites that resolve only through the nested import |
+| An import alias or tracked receiver name bound to two different targets in one input | `PYTHON_BINDING_AMBIGUOUS` | site | no | no element for sites on that name |
 
 ### `python-cli`
 
 | Construct | Code | Level | Blocking | Effect |
 |---|---|---|---|---|
-| Non-literal command name, option string or argument name (variable, f-string, escaped string, concatenation with a non-literal, `*args`, `**kwargs`) | `cli-dynamic-registration` | site | no | no element for the site |
-| A registration site inside a `for` or `while` body or a comprehension | `cli-registration-in-loop` | site | no | no element for the site |
-| `.add_argument(`, `.add_parser(`, `.add_subparsers(`, `.add_command(`, `.add_typer(`, or a `@X.command`, `@X.group`, `@X.callback` decorator on an untracked receiver (function parameter, attribute such as `self.parser`, call result) | `cli-unbound-registration` | site | no | no element for the site |
-| `parents=[...]` on `ArgumentParser` or `add_parser` | `cli-parents-unresolved` | site | no | no element for the inherited arguments; the parser itself is classified |
-| Click `cls=`, constructed `click.Group(...)`, `click.Command(...)`, `click.CommandCollection(...)`, lazy or plugin groups, Typer `cls=` | `cli-custom-class` | site | no | no element for the site |
-| A decorator name bound in the input to a framework call or a list of them, or a decorator applied by call (`click.command()(f)`) | `cli-decorator-indirect` | site | no | no element for the site |
-| A Typer parameter whose default or annotation is not a classified form | `cli-typer-parameter-unresolved` | site | no | no element for the parameter |
-| A script-table entry that is not a one-line string, or whose key is a quoted key with escapes | `cli-console-script-unsupported` | site | no | no element for the entry |
+| Non-literal command name, option string or argument name (variable, f-string, escaped string, concatenation with a non-literal, `*args`, `**kwargs`) | `CLI_DYNAMIC_REGISTRATION` | site | no | no element for the site |
+| A registration site inside a `for` or `while` body or a comprehension | `CLI_REGISTRATION_IN_LOOP` | site | no | no element for the site |
+| `.add_argument(`, `.add_parser(`, `.add_subparsers(`, `.add_command(`, `.add_typer(`, or a `@X.command`, `@X.group`, `@X.callback` decorator on an untracked receiver (function parameter, attribute such as `self.parser`, call result) | `CLI_UNBOUND_REGISTRATION` | site | no | no element for the site |
+| `parents=[...]` on `ArgumentParser` or `add_parser` | `CLI_PARENTS_UNRESOLVED` | site | no | no element for the inherited arguments; the parser itself is classified |
+| Click `cls=`, constructed `click.Group(...)`, `click.Command(...)`, `click.CommandCollection(...)`, lazy or plugin groups, Typer `cls=` | `CLI_CUSTOM_CLASS` | site | no | no element for the site |
+| A decorator name bound in the input to a framework call or a list of them, or a decorator applied by call (`click.command()(f)`) | `CLI_DECORATOR_INDIRECT` | site | no | no element for the site |
+| A Typer parameter whose default or annotation is not a classified form | `CLI_TYPER_PARAMETER_UNRESOLVED` | site | no | no element for the parameter |
+| A script-table entry that is not a one-line string, or whose key is a quoted key with escapes | `CLI_CONSOLE_SCRIPT_UNSUPPORTED` | site | no | no element for the entry |
 
 ### `python-http`
 
 | Construct | Code | Level | Blocking | Effect |
 |---|---|---|---|---|
-| Non-literal route path or method list | `http-dynamic-route` | site | no | no element for the site |
-| Non-literal mount or router prefix | `http-prefix-dynamic` | site | no | route emitted with the literal segment `<dynamic>` and property `prefix_resolved: false` |
-| A route registration inside a `for` or `while` body or a comprehension | `http-route-in-loop` | site | no | no element for the site |
-| `.mount(...)`, or `include_router`/`register_blueprint` of a router that is not a tracked receiver in the inputs | `http-mount-unresolved` | site | no | no element for the mounted application's routes through that mount |
-| A decorator on an untracked receiver whose first argument is a literal string beginning with `/` | `http-unbound-route` | site | no | no element for the site |
-| `add_url_rule(..., view_func=X.as_view(...))` without literal `methods`, and class-based route helpers | `http-method-view-unresolved` | site | no | no element for the site |
-| A router inclusion cycle, or composition depth above 16 | `http-include-unresolved` | site | no | routes keep their own prefix with property `mounted: false` |
+| Non-literal route path or method list | `HTTP_DYNAMIC_ROUTE` | site | no | no element for the site |
+| Non-literal mount or router prefix | `HTTP_PREFIX_DYNAMIC` | site | no | route emitted with the literal segment `<dynamic>` and property `prefix_resolved: false` |
+| A route registration inside a `for` or `while` body or a comprehension | `HTTP_ROUTE_IN_LOOP` | site | no | no element for the site |
+| `.mount(...)`, or `include_router`/`register_blueprint` of a router that is not a tracked receiver in the inputs | `HTTP_MOUNT_UNRESOLVED` | site | no | no element for the mounted application's routes through that mount |
+| A decorator on an untracked receiver whose first argument is a literal string beginning with `/` | `HTTP_UNBOUND_ROUTE` | site | no | no element for the site |
+| `add_url_rule(..., view_func=X.as_view(...))` without literal `methods`, and class-based route helpers | `HTTP_METHOD_VIEW_UNRESOLVED` | site | no | no element for the site |
+| A router inclusion cycle, or composition depth above 16 | `HTTP_INCLUDE_UNRESOLVED` | site | no | routes keep their own prefix with property `mounted: false` |
 
 ### `python-public-api`
 
 | Construct | Code | Level | Blocking | Effect |
 |---|---|---|---|---|
-| `__all__` built by concatenation, comprehension, `list(...)`, star-unpacking, a non-literal element, or modified inside a function, loop, or top-level `if`/`try` block | `public-api-dynamic-all` | input | no | fallback to the naming rule with property `basis: naming` (elements are not removed) |
-| A name in `__all__` with no top-level binding | `public-api-name-unresolved` | site | no | element kept with `symbol_kind: unresolved` |
-| `from x import *` at top level in a module with a literal `__all__` | `public-api-star-import` | input | no | informative; elements unchanged |
-| One name defined in several top-level branches | `public-api-conditional-definition` | site | no | the first definition by line is emitted |
-| Tuple or list unpacking target at top level | `public-api-unpacking-target` | site | no | no element for the unpacked names |
-| A path segment that is not a Python identifier | `public-api-module-not-importable` | input | no | no element for the file |
+| `__all__` built by concatenation, comprehension, `list(...)`, star-unpacking, a non-literal element, or modified inside a function, loop, or top-level `if`/`try` block | `PUBLIC_API_DYNAMIC_ALL` | input | no | fallback to the naming rule with property `basis: naming` (elements are not removed) |
+| A name in `__all__` with no top-level binding | `PUBLIC_API_NAME_UNRESOLVED` | site | no | element kept with `symbol_kind: unresolved` |
+| `from x import *` at top level in a module with a literal `__all__` | `PUBLIC_API_STAR_IMPORT` | input | no | informative; elements unchanged |
+| One name defined in several top-level branches | `PUBLIC_API_CONDITIONAL_DEFINITION` | site | no | the first definition by line is emitted |
+| Tuple or list unpacking target at top level | `PUBLIC_API_UNPACKING_TARGET` | site | no | no element for the unpacked names |
+| A path segment that is not a Python identifier | `PUBLIC_API_MODULE_NOT_IMPORTABLE` | input | no | no element for the file |
 
 ### `python-architecture`
 
 | Construct | Code | Level | Blocking | Effect |
 |---|---|---|---|---|
-| `importlib.import_module(`, `__import__(`, `importlib.util.spec_from_file_location(` | `architecture-dynamic-import` | site | no | the edge is not followed |
-| A relative import that climbs above the source root or appears in a module outside any package | `architecture-relative-import-unresolved` | site | no | the edge is not recorded |
-| More than 1000 edges on one component | `architecture-edge-limit` | site | no | `import_count` kept; edge properties dropped |
-| A path segment that is not a Python identifier | `architecture-module-name-invalid` | input | no | no element for the file |
+| `importlib.import_module(`, `__import__(`, `importlib.util.spec_from_file_location(` | `ARCHITECTURE_DYNAMIC_IMPORT` | site | no | the edge is not followed |
+| A relative import that climbs above the source root or appears in a module outside any package | `ARCHITECTURE_RELATIVE_IMPORT_UNRESOLVED` | site | no | the edge is not recorded |
+| More than 1000 edges on one component | `ARCHITECTURE_EDGE_LIMIT` | site | no | `import_count` kept; edge properties dropped |
+| A path segment that is not a Python identifier | `ARCHITECTURE_MODULE_NAME_INVALID` | input | no | no element for the file |
 
 ### `config-files`
 
@@ -357,31 +368,31 @@ contain no `: `; single-line flow collections as values.
 
 | Format | Construct | Code | Level | Blocking | Effect |
 |---|---|---|---|---|---|
-| TOML | Unterminated string or array, malformed header, key without `=`, duplicate key or table redefinition, multi-line inline table | `toml-invalid` | input | yes | no element for the file |
-| TOML | Inline-table value | `toml-inline-table-not-expanded` | site | no | key emitted with `value_type: table`; inner keys not emitted |
-| TOML | A quoted key containing a backslash escape | `toml-key-escape-unsupported` | site | no | no element for the key |
-| env | Any other env-family file (`.env`, `.env.<other>`, `<name>.env`) | `env-file-not-captured` (analyzer `docs-inventory`) | input | no | file not read, not hashed, no `inputs` entry, no element |
-| env | A line that is not blank, a comment or a key line | `env-line-unrecognized` | site | no | no element for the line |
-| env | A quoted value still open at end of input | `env-invalid` | input | yes | no element for the file |
-| env | A key repeated | `env-key-duplicate` | site | no | first occurrence kept |
-| JSON Schema | Any `ConvertFrom-DocsJsonText` finding (invalid JSON, duplicate key, depth) | `json-invalid` | input | yes | no element for the file |
-| JSON Schema | Remote `$ref`, missing target, cycle, or depth above 16 | `json-schema-ref-unresolved` | site | no | no element beneath the reference |
-| JSON Schema | `if`/`then`/`else`, `not`, `patternProperties`, schema-valued `additionalProperties`, `dependentSchemas`, `prefixItems`, `unevaluatedProperties` | `json-schema-keyword-not-expanded` | site | no | keys beneath the keyword are not enumerated |
-| YAML | Tab indentation, a dedent to an unknown column, an unterminated quoted scalar, a continuation line containing `: ` | `yaml-invalid` | input | yes | no element for the file |
-| YAML | A second document (`---` after content, content after `...`) | `yaml-multi-document` | input | no | no element for the file |
-| YAML | Anchors `&x`, aliases `*x`, merge keys `<<` | `yaml-anchor-alias` | input | no | no element for the file |
-| YAML | Tags (`!x`, `!!x`), complex keys (`? `), directives (`%YAML`), flow collections spanning lines | `yaml-unsupported` | input | no | no element for the file |
-| YAML | A single-line flow collection as a value | `yaml-flow-collection-not-expanded` | site | no | key emitted with `value_type` `object` or `array`; inner keys not emitted |
-| YAML | A double-quoted key containing an escape | `yaml-key-escape-unsupported` | site | no | no element for the key |
-| YAML | A root that is not a mapping | `yaml-root-not-mapping` | input | no | no element for the file |
-| any | More than 10,000 keys in one input | `config-key-limit` | input | yes | no element for the file |
+| TOML | Unterminated string or array, malformed header, key without `=`, duplicate key or table redefinition, multi-line inline table | `TOML_INVALID` | input | yes | no element for the file |
+| TOML | Inline-table value | `TOML_INLINE_TABLE_NOT_EXPANDED` | site | no | key emitted with `value_type: table`; inner keys not emitted |
+| TOML | A quoted key containing a backslash escape | `TOML_KEY_ESCAPE_UNSUPPORTED` | site | no | no element for the key |
+| env | Any other env-family file (`.env`, `.env.<other>`, `<name>.env`) | `ENV_FILE_NOT_CAPTURED` (analyzer `docs-inventory`) | input | no | file not read, not hashed, no `inputs` entry, no element |
+| env | A line that is not blank, a comment or a key line | `ENV_LINE_UNRECOGNIZED` | site | no | no element for the line |
+| env | A quoted value still open at end of input | `ENV_INVALID` | input | yes | no element for the file |
+| env | A key repeated | `ENV_KEY_DUPLICATE` | site | no | first occurrence kept |
+| JSON Schema | Any `ConvertFrom-DocsJsonText` finding (invalid JSON, duplicate key, depth) | `JSON_INVALID` | input | yes | no element for the file |
+| JSON Schema | Remote `$ref`, missing target, cycle, or depth above 16 | `JSON_SCHEMA_REF_UNRESOLVED` | site | no | no element beneath the reference |
+| JSON Schema | `if`/`then`/`else`, `not`, `patternProperties`, schema-valued `additionalProperties`, `dependentSchemas`, `prefixItems`, `unevaluatedProperties` | `JSON_SCHEMA_KEYWORD_NOT_EXPANDED` | site | no | keys beneath the keyword are not enumerated |
+| YAML | Tab indentation, a dedent to an unknown column, an unterminated quoted scalar, a continuation line containing `: ` | `YAML_INVALID` | input | yes | no element for the file |
+| YAML | A second document (`---` after content, content after `...`) | `YAML_MULTI_DOCUMENT` | input | no | no element for the file |
+| YAML | Anchors `&x`, aliases `*x`, merge keys `<<` | `YAML_ANCHOR_ALIAS` | input | no | no element for the file |
+| YAML | Tags (`!x`, `!!x`), complex keys (`? `), directives (`%YAML`), flow collections spanning lines | `YAML_UNSUPPORTED` | input | no | no element for the file |
+| YAML | A single-line flow collection as a value | `YAML_FLOW_COLLECTION_NOT_EXPANDED` | site | no | key emitted with `value_type` `object` or `array`; inner keys not emitted |
+| YAML | A double-quoted key containing an escape | `YAML_KEY_ESCAPE_UNSUPPORTED` | site | no | no element for the key |
+| YAML | A root that is not a mapping | `YAML_ROOT_NOT_MAPPING` | input | no | no element for the file |
+| any | More than 10,000 keys in one input | `CONFIG_KEY_LIMIT` | input | yes | no element for the file |
 
 ### Inventory level (`analyzer_id` `docs-inventory`)
 
 | Construct | Code | Level | Blocking | Effect |
 |---|---|---|---|---|
-| A declaration rejected by `Get-DocsElementId` (`DOCS_IDENTITY_INPUT_INVALID`) | `declaration-invalid` | site | no | no element for the site |
-| Two sites with the same kind, path and declaration | `duplicate-declaration` | site | no | the first site by line is kept |
+| A declaration rejected by `Get-DocsElementId` (`DOCS_IDENTITY_INPUT_INVALID`) | `DECLARATION_INVALID` | site | no | no element for the site |
+| Two sites with the same kind, path and declaration | `DUPLICATE_DECLARATION` | site | no | the first site by line is kept |
 | More than 50,000 inputs or more than 256 MiB in total | none (finding `DOCS_CLI_RUNTIME`) | run | n/a | exit 3, no snapshot |
 
 ### Undetectable constructs (no element, no diagnostic)
@@ -412,14 +423,14 @@ contain no `: `; single-line flow collections as values.
 
 | Bound | Value | Effect when exceeded |
 |---|---|---|
-| Bytes per input | 1,048,576 (1 MiB) | 1020 over-bound diagnostic (blocking); no element and no `inputs` entry for that file |
+| Bytes per input | 1,048,576 (1 MiB) | 1020 over-bound diagnostic `DOCS_INPUT_TOO_LARGE` (non-blocking `warning`); no element and no `inputs` entry for that file |
 | Inputs per run | 50,000 | exit 3, `DOCS_CLI_RUNTIME`, no snapshot |
 | Bytes per run | 256 MiB | exit 3, `DOCS_CLI_RUNTIME`, no snapshot |
-| Tokens per Python input | 262,144 | `python-token-limit` |
-| Bracket depth | 64 | `python-lexer-unclassified` |
-| Keys per configuration input | 10,000 | `config-key-limit` |
-| Edges per architecture component | 1000 | `architecture-edge-limit` |
-| JSON Schema `$ref` depth and HTTP composition depth | 16 | `json-schema-ref-unresolved`, `http-include-unresolved` |
+| Tokens per Python input | 262,144 | `PYTHON_TOKEN_LIMIT` |
+| Bracket depth | 64 | `PYTHON_LEXER_UNCLASSIFIED` |
+| Keys per configuration input | 10,000 | `CONFIG_KEY_LIMIT` |
+| Edges per architecture component | 1000 | `ARCHITECTURE_EDGE_LIMIT` |
+| JSON Schema `$ref` depth and HTTP composition depth | 16 | `JSON_SCHEMA_REF_UNRESOLVED`, `HTTP_INCLUDE_UNRESOLVED` |
 
 - Versioning: each `analyzers[].version` is the registry row `Version` (`1.0.0`). Declaration
   strings, normalization and spans are part of element identity and digests; a later change to
@@ -718,13 +729,13 @@ agrees because the three keys are ASCII letters.
   `## Precision Limit`, plus `pyproject.toml` script tables, except four rows that cannot be
   committed as JSON text and are proven by inputs constructed in test code instead (marked
   `in-test` in the corpus census): the two 1020-owned capture rows (undecodable bytes cannot be a
-  JSON string; the over-bound case needs a string above 1,048,576 bytes), `python-token-limit`
-  (above 262,144 tokens) and `architecture-edge-limit` (above 1000 input modules). The row "the
-  owning analyzer's dynamic code" is not a separate code: it maps to `cli-dynamic-registration`,
-  `http-dynamic-route` and `public-api-dynamic-all`. 1031's Python tests read the file without
+  JSON string; the over-bound case needs a string above 1,048,576 bytes), `PYTHON_TOKEN_LIMIT`
+  (above 262,144 tokens) and `ARCHITECTURE_EDGE_LIMIT` (above 1000 input modules). The row "the
+  owning analyzer's dynamic code" is not a separate code: it maps to `CLI_DYNAMIC_REGISTRATION`,
+  `HTTP_DYNAMIC_ROUTE` and `PUBLIC_API_DYNAMIC_ALL`. 1031's Python tests read the file without
   editing it and add their own expectations for constructs the scanner reports as diagnostics.
 - `tests/scripts/claude-lib/docs/fixtures/config-surface-corpus.json` covers the `config-files`
-  table and is scanner-only; 1031 does not use it. `config-key-limit` (above 10,000 keys) may be
+  table and is scanner-only; 1031 does not use it. `CONFIG_KEY_LIMIT` (above 10,000 keys) may be
   built in test code and is then marked `in-test` in the same way.
 - Golden identifiers and digests in both files are recorded once from an independent hash
   computation (not the code under test) that applies the five 1020 digest steps and the element
@@ -738,7 +749,7 @@ agrees because the three keys are ASCII letters.
 1. **Digest placement.** The declaration-lines digest is stored in element `source_sha256`; the
    whole-file digest stays in `inputs[].sha256`. 1023 compares pins against `source_sha256` as
    opaque values, so 1023 is unchanged.
-2. **Severity of `env-file-not-captured`.** Emitted as a non-blocking `warning` through 1020
+2. **Severity of `ENV_FILE_NOT_CAPTURED`.** Emitted as a non-blocking `warning` through 1020
    `New-DocsDiagnostic` as specified today. 1022 does not depend on an `information` severity; a
    later remediation may switch it if the 1020 amendment adds one (coordinator item C2).
 3. **Native-or-scanner selection.** The mechanism (a method field on registry rows, selection in
@@ -764,6 +775,36 @@ agrees because the three keys are ASCII letters.
 8. **Console-script root-name order.** The console-script name comes first when the root is
    attached, then a literal name, then the module dotted name. This replaces the withdrawn order
    (literal first) and prevents a duplicate root when a script is attached.
+
+### Execution-stage decision D-1022-exec-1 (binding)
+
+- **Diagnostic code grammar.** Phase 0 found that the merged 1020 `New-DocsDiagnostic` validates
+  `-Code` against `^[A-Z][A-Z0-9_]*$` and throws `DOCS_IDENTITY_INPUT_INVALID` otherwise, that the
+  docs common schema `$defs/diagnostic` `code` carries the same pattern, and that the 1020 test
+  `tests/scripts/claude-lib/docs/DocsSurface.Tests.ps1`
+  (`It 'rejects an invalid code, path, message or analyzer identifier'`) asserts that the lowercase
+  code `bad` is rejected. Version 0.3 of this spec stated the lowercase identifier grammar for codes,
+  which no 1022 diagnostic could satisfy on the executed 1020.
+- **Resolution.** The merged 1020 test and contract are binding, and this feature edits no 1020
+  file beyond the anchored registry and dispatch rows and the `core.json` append (`## Dependency on
+  1020`). Every code 1022 emits is therefore rewritten mechanically from lowercase hyphenated form
+  to uppercase with underscores (the version 0.3 code `python-lexer-unterminated` becomes
+  `PYTHON_LEXER_UNTERMINATED`);
+  no 1020 file is edited. Identifiers that are not diagnostic codes keep their grammar: analyzer
+  identifiers, `analyzer_id` values (`docs-inventory`, `docs-capture`), element kinds, element
+  identifiers, property names and command names.
+- **Capture rows.** `DOCS_INPUT_TOO_LARGE` and `DOCS_INPUT_NOT_UTF8` are non-blocking `warning`
+  diagnostics with `analyzer_id` `docs-capture` and captured `text` `$null` (a 1020 decision); 1022
+  records them as emitted and does not re-classify them.
+- **Rewritten acceptance criteria.** The text of these `## Acceptance Criteria` items changed only
+  to replace a lowercase code literal with its uppercase form: S3 (`HTTP_PREFIX_DYNAMIC`), S4
+  (`PUBLIC_API_DYNAMIC_ALL`), S6 (`PYTHON_LEXER_UNCLASSIFIED`; S6 asserts no blocking flag for the
+  1020 over-bound diagnostic, so its capture wording is unchanged), S9 (`ENV_FILE_NOT_CAPTURED`; the
+  `ReadBytes` assertion now names the recording `ReadBytes` wrapper, because Phase 0 recorded that
+  the 1020 in-memory context keeps no `ReadBytes` call record) and S13 (`PYTHON_TOKEN_LIMIT`,
+  `ARCHITECTURE_EDGE_LIMIT`). User story U6 changed in the same way (`ENV_FILE_NOT_CAPTURED`). The
+  number of criteria is unchanged.
+- **Sibling.** Child 1033 has the same divergence and resolves it under its own run.
 
 ### Language-independent decisions carried from the withdrawn design
 
@@ -896,14 +937,14 @@ and the Python-native analyzer permitted by D3 is delivered by 1031, not by this
 | ID | Route to | Item |
 |---|---|---|
 | C1 | 1020 | State in the amendment that element `source_sha256` carries the declaration-lines digest and `inputs[].sha256` the whole-file digest (decision 1). Resolved: the 1020 spec `#### Declaration-lines digest (D5)` states it. |
-| C2 | 1020 | If the amendment adds an `information` severity to `New-DocsDiagnostic`, a later remediation may switch `env-file-not-captured` to it; 1022 does not depend on it (decision 2). |
+| C2 | 1020 | If the amendment adds an `information` severity to `New-DocsDiagnostic`, a later remediation may switch `ENV_FILE_NOT_CAPTURED` to it; 1022 does not depend on it (decision 2). |
 | C3 | 1020 | The native-or-scanner selection mechanism (method field on registry rows, per-identifier selection in `Select-DocsAnalyzerRegistration`, method on `analyzers[]`) belongs to the amendment; 1022 rows declare the scanner method in that field (decision 3). Resolved: the field is `AnalysisMethod` (1020 `### DocsAnalyzerRegistry.psm1`). |
 | C4 | 1020 | Resolved in the opposite direction from the first draft: 1020 owns `ConvertTo-DocsDeclarationText` and `Get-DocsDeclarationSha256`, `source_sha256` is built only through `New-DocsSurfaceElement -SourceText`, and 1022 adds no digest function (decision 4). No action remains for 1020. |
 | C5 | 1023, 1024 (or 1020) | `Find-DocsPathOrGlobMatch` (exact, prefix plus `/`, case-sensitive glob with `*`, `**`, `?`, first match wins) is exported by 1022's `DocsSourceText.psm1`; 1023 and 1024 may import it instead of copying it, or the coordinator may move it to 1020 (decision 5). |
 | C6 | 1023 | The single-write-boundary test must allow `Context.WriteText` from `DocsInventory.psm1` for the snapshot (decision 6). |
 | C7 | epic | Assign external distribution dependencies and the optional discovery-snapshot import to a later child, or drop them (decision 7). |
 | C8 | 1020 | Confirm that a command function may return exit 2 with one `DOCS_CLI_ARGUMENTS` finding for usage errors only the command can detect, and that the registry and dispatch anchors carry the label `1022` (the 1020 spec `## Decisions Later Children Must Honor` now names the registry anchor `# --- 1022: Python and configuration analyzers ---`; Phase 0 reads the executed literal). |
-| C9 | 1020 | Name the diagnostic codes `New-DocsCapturedInput` emits for over-bound and undecodable input (proposed `input-over-bound`, `input-encoding-invalid`). |
+| C9 | 1020 | Name the diagnostic codes `New-DocsCapturedInput` emits for over-bound and undecodable input. Resolved: the merged 1020 emits `DOCS_INPUT_TOO_LARGE` and `DOCS_INPUT_NOT_UTF8`, each a non-blocking `warning` with `analyzer_id` `docs-capture`. |
 | C10 | 1023 | Record the `## Precision Limit` of this spec as one `deferred` ledger entry with an owner and a target per scanner analyzer, carrying `analysis_method: scanner`. |
 | C11 | 1031 | Reproduce the declaration strings and line ranges of `## Contracts for 1031 and Later Children` exactly, emit line spans only (digests come from 1020 `Get-DocsDeclarationSha256` through `New-DocsSurfaceElement`), and reuse `python-surface-corpus.json` without editing it. |
 | C12 | 1023 | Compare `source_sha256` as an opaque value and expect `line_range` `null` on every `architecture-component` element, whose digest covers the whole normalized file. |
@@ -928,7 +969,8 @@ and the Python-native analyzer permitted by D3 is delivered by 1031, not by this
   version and checks out with `eol=lf`; tests build CRLF cases in code or JSON escapes and assert
   codes and pointers, not `Test-Json` message text.
 - UNVERIFIED and confirmed during planning: every amended-1020 contract; the `New-DocsCapturedInput`
-  diagnostic codes; the Typer lower-casing rule, the Flask prefix join and the Click suffix list;
+  diagnostic codes (confirmed in Phase 0 as `DOCS_INPUT_TOO_LARGE` and `DOCS_INPUT_NOT_UTF8`); the
+  diagnostic code grammar (confirmed in Phase 0 as `^[A-Z][A-Z0-9_]*$`, decision D-1022-exec-1); the Typer lower-casing rule, the Flask prefix join and the Click suffix list;
   `Test-Json` behavior for the envelope schema on the CI PowerShell version.
 
 ## Implementation Strategy
@@ -991,31 +1033,31 @@ and the Python-native analyzer permitted by D3 is delivered by 1031, not by this
 
 ## Acceptance Criteria
 
-- [ ] Each of the five analyzers (`python-cli`, `python-http`, `python-public-api`, `config-files`, `python-architecture`) emits exactly the expected elements (kind, path, declaration, `element_id`, name, `parent_id`, `line_range`, `source_sha256`, properties) for in-memory fixtures covering the nine input families argparse, Click, Typer, FastAPI, Flask, `pyproject.toml`, `.env` (template-style), JSON Schema and YAML, asserted by Pester suites under `tests/scripts/claude-lib/docs/` that read `fixtures/python-surface-corpus.json` and `fixtures/config-surface-corpus.json` in place.
-- [ ] `python-cli` tests assert argparse nested subcommands and positional arguments, Click group and command naming including suffix removal, Typer explicit and default names, console-script entries from `[project.scripts]`, `[project.gui-scripts]` and `[tool.poetry.scripts]` with the console-script name used as the root of an attached command tree, `attached: false` for an unattached script, and a `cli-command` parent for every `cli-option`.
-- [ ] `python-http` tests assert FastAPI `include_router` and router prefix composition, Flask `url_prefix` joining and replacement, one element per method, and that an unresolvable prefix yields a route declared with the literal `<dynamic>` segment, property `prefix_resolved: false` and an `http-prefix-dynamic` diagnostic.
-- [ ] `python-public-api` tests assert the literal `__all__` forms (assignment, annotated assignment, `+=`, `extend`, `append`), the naming rule when `__all__` is absent, exclusion of `_`-prefixed modules and names, and the `public-api-dynamic-all` fallback with `basis: naming`; `python-architecture` tests assert package and module components and internal import edges (including relative imports) stored as `import_count` plus ordinally sorted `import-NNNN` properties, and that no external-dependency component is emitted.
-- [ ] Every diagnostic row of `## Precision Limit` has a Pester test asserting its code, severity and blocking flag, its stated effect (no element for the site, no element for the file, or the stated alternative), and, for site-level rows, that classified sites in the same input still produce their elements.
-- [ ] An input of 1,048,577 bytes yields the 1020 over-bound diagnostic with no element and no `inputs` entry for that path while 1,048,576 bytes is accepted, and a Python input containing an unclassifiable construct yields `python-lexer-unclassified` with no element from that file, so no partial or guessed result is produced.
-- [ ] Re-running the inventory over identical bytes, profile, revision, analyzer selection and clock value produces a byte-identical snapshot, proven by a seeded property test in `DocsInventoryProperties.Tests.ps1` that permutes the order of `Context.ListFile` results and repeats builds, printing the seed on failure.
-- [ ] No configuration value is exported: a seeded property test places marker values in every value position of TOML, template env, JSON Schema (including `default`, `enum`, `const`, `examples`) and YAML inputs and asserts that no marker appears in the snapshot text and that element properties carry only key and shape names.
-- [ ] A non-template env-family file (`.env`, `.env.<other>`, `<name>.env`) under a source root is never passed to `Context.ReadBytes` (asserted by the in-memory context's call record), has no `inputs` entry and no element, and yields an `env-file-not-captured` non-blocking `warning` naming its path; only `.env.example`, `.env.sample`, `.env.template` and `.env.dist` produce `config-key` elements.
-- [ ] The built fixture snapshot validates against `surface-inventory-snapshot.schema.json` through `Test-DocsArtifactText -ArtifactKind 'surface-inventory-snapshot'` with no `error` finding, and each `inputs[].sha256` equals the SHA-256 of the corresponding whole-file fixture bytes with `size` equal to their length.
-- [ ] Every element in every snapshot produced by the Pester suites records `analysis_method: scanner`, and every 1022 registry row declares the scanner method in the field defined by the amended registry row grammar.
-- [ ] Every element's `source_sha256` equals 1020 `Get-DocsDeclarationSha256 -Text <captured input text> -LineRange <line_range>` (no range for `architecture-component`, whose `line_range` is `null`) over the `line_range` defined in `## Contracts for 1031 and Later Children`, and a seeded property test asserts that changing any line inside an element's `line_range` changes its digest, changing a line outside it leaves it unchanged, CRLF, CR, LF and trailing-newline variants leave it unchanged, and an edit anywhere in a module's text changes its `architecture-component` digest.
-- [ ] The golden `element_id` and `source_sha256` values in both corpus files were recorded from an independent hash computation that applies the five 1020 digest steps and is self-checked against the 1020 golden vector D1, documented under `<FEATURE>/evidence/other/`, and `python-surface-corpus.json` covers every classified form and every 1022-owned diagnostic row of the shared lexer, `python-cli`, `python-http`, `python-public-api` and `python-architecture` tables except the four in-test rows named in `### Shared fixtures` (the two 1020 capture rows, `python-token-limit` and `architecture-edge-limit`), which are proven by inputs constructed in test code and marked `in-test` in the corpus census.
-- [ ] `inventory` exits 0 for a fixture with no blocking diagnostic, 1 with a blocking diagnostic or an invalid or absent profile, 2 for an unknown `-Analyzer` identifier, an identifier with no selected element kind, an invalid `-Revision` or a non-relative `-Profile` (each with a `DOCS_CLI_ARGUMENTS` finding naming the value and `result` `null`), and 3 for an exceeded aggregate bound or a read failure (with `DOCS_CLI_RUNTIME`), each asserted through `Invoke-DocsCommandCli` with the 1020 in-memory context and a fixed clock.
-- [ ] The `-Json` output of every `inventory` exit path (0, 1, 2 and 3) validates against `schemas/docs/v1/docs-command-envelope.schema.json`, asserted by the command suite.
-- [ ] Without `-Write` the command makes no `Context.WriteText` call; with `-Write` it makes one `Context.WriteText` call to the profile `artifact_paths.inventory_snapshot` with mode `create` when the file is absent and `overwrite` when it exists; `DocsInventory.psm1` is the only 1022 module that references the command context.
-- [ ] The five analyzer rows sit directly under the 1022 anchor of `DocsAnalyzerRegistry.psm1` and the `inventory` row under the 1022 anchor of `Invoke-DocsCommand.ps1`; a diff of the 1022 branch against the integration branch shows no other changed line in those files and no change to any other 1020 file except the `core.json` append; `Test-DocsAnalyzerRegistration` and `Test-DocsCommandTable` return no finding.
-- [ ] Every created or edited `.claude/lib/docs/` file has a byte-identical copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`, every new file is listed in `pack-manifests/core.json` and none in `pack-manifests/python.json`, and `Docs.Manifest.Tests.ps1`, `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass.
-- [ ] No file under `.claude/lib/docs/` contains an interpreter invocation or an `&` call through a variable, member or expression: `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with its empty allowlist.
-- [ ] Every pure exported function listed in the `## API / CLI Surface` module layout has at least one property-style Pester test using a seeded `[System.Random]` whose seed appears in the failure message.
-- [ ] A fixture whose Python names differ only by letter case (for example `App` and `app`) yields distinct elements, and snapshot ordering equals ordinal ordering on a host whose culture sorts those strings differently.
-- [ ] Pester line coverage is at least 85% for each new `.claude/lib/docs/` file, read from `artifacts/pester/powershell-coverage.xml` produced by the `poshqc / PowerShell QC shard` jobs on `windows-latest` and aggregated by the required check `poshqc / PowerShell QC`, with no production file excluded from measurement.
-- [ ] No new test creates a temporary file (`.claude/hooks/check-powershell-test-purity.ps1` reports no violation), CRLF and CR cases exist only as JSON escapes or in-code strings, and every new production file is below 500 lines.
-- [ ] The plan's artifact classification table lists every created or edited file with its class, language and permitting rule, and a diff of the 1022 branch against the integration branch contains no Python, TypeScript, hook, skill, agent, MCP tool or extension command file.
-- [ ] Phase 0 evidence under `<FEATURE>/evidence/other/` records, before any 1022 production file is created, the verification of every item in `## Dependency on 1020`.
+- [x] Each of the five analyzers (`python-cli`, `python-http`, `python-public-api`, `config-files`, `python-architecture`) emits exactly the expected elements (kind, path, declaration, `element_id`, name, `parent_id`, `line_range`, `source_sha256`, properties) for in-memory fixtures covering the nine input families argparse, Click, Typer, FastAPI, Flask, `pyproject.toml`, `.env` (template-style), JSON Schema and YAML, asserted by Pester suites under `tests/scripts/claude-lib/docs/` that read `fixtures/python-surface-corpus.json` and `fixtures/config-surface-corpus.json` in place.
+- [x] `python-cli` tests assert argparse nested subcommands and positional arguments, Click group and command naming including suffix removal, Typer explicit and default names, console-script entries from `[project.scripts]`, `[project.gui-scripts]` and `[tool.poetry.scripts]` with the console-script name used as the root of an attached command tree, `attached: false` for an unattached script, and a `cli-command` parent for every `cli-option`.
+- [x] `python-http` tests assert FastAPI `include_router` and router prefix composition, Flask `url_prefix` joining and replacement, one element per method, and that an unresolvable prefix yields a route declared with the literal `<dynamic>` segment, property `prefix_resolved: false` and an `HTTP_PREFIX_DYNAMIC` diagnostic.
+- [x] `python-public-api` tests assert the literal `__all__` forms (assignment, annotated assignment, `+=`, `extend`, `append`), the naming rule when `__all__` is absent, exclusion of `_`-prefixed modules and names, and the `PUBLIC_API_DYNAMIC_ALL` fallback with `basis: naming`; `python-architecture` tests assert package and module components and internal import edges (including relative imports) stored as `import_count` plus ordinally sorted `import-NNNN` properties, and that no external-dependency component is emitted.
+- [x] Every diagnostic row of `## Precision Limit` has a Pester test asserting its code, severity and blocking flag, its stated effect (no element for the site, no element for the file, or the stated alternative), and, for site-level rows, that classified sites in the same input still produce their elements.
+- [x] An input of 1,048,577 bytes yields the 1020 over-bound diagnostic with no element and no `inputs` entry for that path while 1,048,576 bytes is accepted, and a Python input containing an unclassifiable construct yields `PYTHON_LEXER_UNCLASSIFIED` with no element from that file, so no partial or guessed result is produced.
+- [x] Re-running the inventory over identical bytes, profile, revision, analyzer selection and clock value produces a byte-identical snapshot, proven by a seeded property test in `DocsInventoryProperties.Tests.ps1` that permutes the order of `Context.ListFile` results and repeats builds, printing the seed on failure.
+- [x] No configuration value is exported: a seeded property test places marker values in every value position of TOML, template env, JSON Schema (including `default`, `enum`, `const`, `examples`) and YAML inputs and asserts that no marker appears in the snapshot text and that element properties carry only key and shape names.
+- [x] A non-template env-family file (`.env`, `.env.<other>`, `<name>.env`) under a source root is never passed to `Context.ReadBytes` (asserted by a recording `ReadBytes` wrapper over the in-memory context), has no `inputs` entry and no element, and yields an `ENV_FILE_NOT_CAPTURED` non-blocking `warning` naming its path; only `.env.example`, `.env.sample`, `.env.template` and `.env.dist` produce `config-key` elements.
+- [x] The built fixture snapshot validates against `surface-inventory-snapshot.schema.json` through `Test-DocsArtifactText -ArtifactKind 'surface-inventory-snapshot'` with no `error` finding, and each `inputs[].sha256` equals the SHA-256 of the corresponding whole-file fixture bytes with `size` equal to their length.
+- [x] Every element in every snapshot produced by the Pester suites records `analysis_method: scanner`, and every 1022 registry row declares the scanner method in the field defined by the amended registry row grammar.
+- [x] Every element's `source_sha256` equals 1020 `Get-DocsDeclarationSha256 -Text <captured input text> -LineRange <line_range>` (no range for `architecture-component`, whose `line_range` is `null`) over the `line_range` defined in `## Contracts for 1031 and Later Children`, and a seeded property test asserts that changing any line inside an element's `line_range` changes its digest, changing a line outside it leaves it unchanged, CRLF, CR, LF and trailing-newline variants leave it unchanged, and an edit anywhere in a module's text changes its `architecture-component` digest.
+- [x] The golden `element_id` and `source_sha256` values in both corpus files were recorded from an independent hash computation that applies the five 1020 digest steps and is self-checked against the 1020 golden vector D1, documented under `<FEATURE>/evidence/other/`, and `python-surface-corpus.json` covers every classified form and every 1022-owned diagnostic row of the shared lexer, `python-cli`, `python-http`, `python-public-api` and `python-architecture` tables except the four in-test rows named in `### Shared fixtures` (the two 1020 capture rows, `PYTHON_TOKEN_LIMIT` and `ARCHITECTURE_EDGE_LIMIT`), which are proven by inputs constructed in test code and marked `in-test` in the corpus census.
+- [x] `inventory` exits 0 for a fixture with no blocking diagnostic, 1 with a blocking diagnostic or an invalid or absent profile, 2 for an unknown `-Analyzer` identifier, an identifier with no selected element kind, an invalid `-Revision` or a non-relative `-Profile` (each with a `DOCS_CLI_ARGUMENTS` finding naming the value and `result` `null`), and 3 for an exceeded aggregate bound or a read failure (with `DOCS_CLI_RUNTIME`), each asserted through `Invoke-DocsCommandCli` with the 1020 in-memory context and a fixed clock.
+- [x] The `-Json` output of every `inventory` exit path (0, 1, 2 and 3) validates against `schemas/docs/v1/docs-command-envelope.schema.json`, asserted by the command suite.
+- [x] Without `-Write` the command makes no `Context.WriteText` call; with `-Write` it makes one `Context.WriteText` call to the profile `artifact_paths.inventory_snapshot` with mode `create` when the file is absent and `overwrite` when it exists; `DocsInventory.psm1` is the only 1022 module that references the command context.
+- [x] The five analyzer rows sit directly under the 1022 anchor of `DocsAnalyzerRegistry.psm1` and the `inventory` row under the 1022 anchor of `Invoke-DocsCommand.ps1`; a diff of the 1022 branch against the integration branch shows no other changed line in those files and no change to any other 1020 file except the `core.json` append; `Test-DocsAnalyzerRegistration` and `Test-DocsCommandTable` return no finding.
+- [x] Every created or edited `.claude/lib/docs/` file has a byte-identical copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`, every new file is listed in `pack-manifests/core.json` and none in `pack-manifests/python.json`, and `Docs.Manifest.Tests.ps1`, `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass.
+- [x] No file under `.claude/lib/docs/` contains an interpreter invocation or an `&` call through a variable, member or expression: `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with its empty allowlist.
+- [x] Every pure exported function listed in the `## API / CLI Surface` module layout has at least one property-style Pester test using a seeded `[System.Random]` whose seed appears in the failure message.
+- [x] A fixture whose Python names differ only by letter case (for example `App` and `app`) yields distinct elements, and snapshot ordering equals ordinal ordering on a host whose culture sorts those strings differently.
+- [x] Pester line coverage is at least 85% for each new `.claude/lib/docs/` file, read from `artifacts/pester/powershell-coverage.xml` produced by the `poshqc / PowerShell QC shard` jobs on `windows-latest` and aggregated by the required check `poshqc / PowerShell QC`, with no production file excluded from measurement.
+- [x] No new test creates a temporary file (`.claude/hooks/check-powershell-test-purity.ps1` reports no violation), CRLF and CR cases exist only as JSON escapes or in-code strings, and every new production file is below 500 lines.
+- [x] The plan's artifact classification table lists every created or edited file with its class, language and permitting rule, and a diff of the 1022 branch against the integration branch contains no Python, TypeScript, hook, skill, agent, MCP tool or extension command file.
+- [x] Phase 0 evidence under `<FEATURE>/evidence/other/` records, before any 1022 production file is created, the verification of every item in `## Dependency on 1020`.
 
 ## Definition of Done
 
