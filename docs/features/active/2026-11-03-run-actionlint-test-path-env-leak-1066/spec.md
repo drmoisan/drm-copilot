@@ -79,7 +79,7 @@ The Add-DirectoryToPath Describe saves and restores PATH in BeforeEach and After
 - [x] Single-process runs of tests/scripts/dev-tools in forward, reversed, and at least three seeded shuffled file orders (seeds and file orders recorded) show the PATH-induced victim failures removed and no new failures compared with the baseline failure set, compared by test-name set difference from JUnit so the #1067 host failures cancel.
 - [x] The full seven-stage toolchain passes in a single pass for the changed PowerShell files (format, PSScriptAnalyzer lint, type check not applicable, architecture-boundary tests, Pester unit tests, contract/schema checks, integration tests), with line coverage not reduced and no coverage `exclude` entry added for a production path.
 - [x] Changed and new test files stay under 700 lines each.
-- [ ] CI required checks are green on the PR head. (CI-dependent: checked off by the item's orchestrator run at S9 after the CI green gate records success.)
+- [x] CI required checks are green on the PR head. (CI-dependent: checked off by the item's orchestrator run at S9 after the CI green gate records success.)
 
 ## Risks & Mitigations
 - Nested Invoke-Pester shares process-wide Mock/Pester state: verify in single-process and Invoke-PoshQCParallelTest runs; fall back to the static AST guard.
