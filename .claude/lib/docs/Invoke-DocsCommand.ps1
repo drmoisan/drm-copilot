@@ -56,6 +56,7 @@ function Get-DocsCommandTable {
         [pscustomobject]@{ Name = 'validate-profile'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileCommands.psm1'); Function = 'Invoke-DocsValidateProfileCommand'; Option = @{ Profile = 'value' } }
         # --- 1021: check ---
         # --- 1022: inventory ---
+        [pscustomobject]@{ Name = 'inventory'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsInventory.psm1'); Function = 'Invoke-DocsInventoryCommand'; Option = @{ Profile = 'value'; Analyzer = 'multi'; Revision = 'value'; Write = 'switch' } }
         # --- 1023: coverage, update-ledger, validate ---
         # --- 1024: generate-reference ---
         # --- 1034: surface-delta ---
