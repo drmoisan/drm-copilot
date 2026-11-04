@@ -55,8 +55,10 @@ Permitting rules: R1 = owner language rule clause (1), pushed-down skills, helpe
 | `L`DocsTypeScriptHttpSupport.psm1 (split from `DocsAnalyzerTypeScriptHttp.psm1` under the 500-line rule, [P3-T2]) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerTypeScriptHttp.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerTypeScriptExports.psm1 | pushed-down helper/lib | PowerShell | R1 |
+| `L`DocsCSharpSyntax.psm1 (split from the .NET analyzers under the 500-line rule, [P4-T1]) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerDotnetHttp.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerDotnetConfig.psm1 | pushed-down helper/lib | PowerShell | R1 |
+| `L`DocsCSharpMember.psm1 (split from `DocsAnalyzerDotnetApi.psm1` under the 500-line rule, [P4-T3]) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerDotnetApi.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerExtensionImport.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerRegistry.psm1 (edit: rows under the 1033 anchor) | pushed-down helper/lib | PowerShell | R1 |
@@ -74,8 +76,10 @@ Permitting rules: R1 = owner language rule clause (1), pushed-down skills, helpe
 | `T`DocsTypeScriptHttpSupport.Tests.ps1 (with the [P3-T2] split) | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerTypeScriptHttp.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerTypeScriptExports.Tests.ps1 | test | PowerShell (Pester) | D |
+| `T`DocsCSharpSyntax.Tests.ps1 (with the [P4-T1] split) | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerDotnetHttp.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerDotnetConfig.Tests.ps1 | test | PowerShell (Pester) | D |
+| `T`DocsCSharpMember.Tests.ps1 (with the [P4-T3] split) | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerDotnetApi.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerExtensionImport.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1 | test | PowerShell (Pester) | D |
@@ -154,13 +158,13 @@ Common to every analyzer task in Phases 3 to 5: the module follows spec `### Ana
 
 ### Phase 4 — .NET Analyzers
 
-- [ ] [P4-T1] Create `L`DocsAnalyzerDotnetHttp.psm1 (`Invoke-DocsAnalyzerDotnetHttp`) and `T`DocsAnalyzerDotnetHttp.Tests.ps1 per spec `### \`dotnet-http\``.
+- [x] [P4-T1] Create `L`DocsAnalyzerDotnetHttp.psm1 (`Invoke-DocsAnalyzerDotnetHttp`) and `T`DocsAnalyzerDotnetHttp.Tests.ps1 per spec `### \`dotnet-http\``.
   - Tests: controller detection, class prefix, `[controller]`, `[action]` without `Async`, literal `[area]`, `/` and `~/` overrides, multiple verbs and routes as combinations, `AcceptVerbs`, literal `+` folding; `MapGet` through `MapPatch`, `MapMethods` with array and collection expression, `Map` as `ANY`, nested `MapGroup` variables and chains; codes `http-dynamic-route`, `http-prefix-dynamic`, `http-receiver-unresolved`, `http-route-token-unresolved`, `http-endpoint-kind-unsupported` (once per kind and file), `dotnet-route-inherited-unresolved`, `dotnet-conventional-routing-unresolved`, `csharp-conditional-compilation`.
   - Acceptance: 0 failures in the branch-current run; `FEATURE/evidence/regression-testing/p4-dotnet-http.<timestamp>.md` records the counts. CI: `poshqc / PowerShell QC` (Windows shards).
-- [ ] [P4-T2] Create `L`DocsAnalyzerDotnetConfig.psm1 (`Invoke-DocsAnalyzerDotnetConfig`: `System.Text.Json.JsonDocument` validity gate plus a lexical JSONC key walker for key lines) and `T`DocsAnalyzerDotnetConfig.Tests.ps1 per spec `### \`dotnet-config\``.
+- [x] [P4-T2] Create `L`DocsAnalyzerDotnetConfig.psm1 (`Invoke-DocsAnalyzerDotnetConfig`: `System.Text.Json.JsonDocument` validity gate plus a lexical JSONC key walker for key lines) and `T`DocsAnalyzerDotnetConfig.Tests.ps1 per spec `### \`dotnet-config\``.
   - Tests: in-memory `appsettings.json` and `appsettings.Development.json` with comments and trailing commas yield one `config-key` per member path with bare and quoted segments and `[]` array segments, `value_type`, `configuration_path`, and `environment`; every configuration value is a distinctive string absent from the canonical JSON output (`ConvertTo-DocsTestOutputText`); each `config-key` element's `source_sha256` equals 1020 `Get-DocsDeclarationSha256 -Text <the raw captured text> -LineRange @(<key line>, <key line>)`, with the key's line as `line_range` start and end; `json-invalid` for invalid JSON (including an empty `appsettings.json`), a non-object root, and depth above 64; `duplicate-declaration` keeps the first line; `input-key-limit` with no element above the key bound (set low through the test parameter).
   - Acceptance: 0 failures in the branch-current run; `FEATURE/evidence/regression-testing/p4-dotnet-config.<timestamp>.md` records the counts. CI: `poshqc / PowerShell QC` (Windows shards).
-- [ ] [P4-T3] Create `L`DocsAnalyzerDotnetApi.psm1 (`Invoke-DocsAnalyzerDotnetApi`) and `T`DocsAnalyzerDotnetApi.Tests.ps1 per spec `### \`dotnet-public-api\``.
+- [x] [P4-T3] Create `L`DocsAnalyzerDotnetApi.psm1 (`Invoke-DocsAnalyzerDotnetApi`) and `T`DocsAnalyzerDotnetApi.Tests.ps1 per spec `### \`dotnet-public-api\``.
   - Tests: public types in file-scoped and block namespaces, nested types by effective accessibility, generics with source-spelled type parameters, a `partial` type split across two in-memory paths (one type element at the ordinally first path, `partial_parts`); overloads with distinct declarations, constructors, indexers, operators and conversion operators, events, constants, enum members, positional record parameters; `accessibility` values; no element for `internal`, `private`, `private protected`, `file`, and explicit interface implementations; codes `duplicate-declaration` (members in `#if` regions), `csharp-declaration-unrecognized`, `csharp-conditional-compilation`.
   - Acceptance: 0 failures in the branch-current run; `FEATURE/evidence/regression-testing/p4-dotnet-api.<timestamp>.md` records the counts and the module's logical line count (at most 500, else split). CI: `poshqc / PowerShell QC` (Windows shards).
 

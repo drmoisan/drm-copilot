@@ -108,7 +108,7 @@ children and are out of scope here.
 
 ## Acceptance Criteria
 
-- [ ] Each of `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config` and `dotnet-public-api` emits the expected elements for in-memory TypeScript and C# (or `appsettings*.json`) fixtures covering the constructs listed in the specification's `## Recognition Rules` (the analyzer suites under `tests/scripts/claude-lib/docs/`, run by `poshqc / PowerShell QC`).
+- [x] Each of `typescript-cli`, `typescript-http`, `typescript-exports`, `dotnet-http`, `dotnet-config` and `dotnet-public-api` emits the expected elements for in-memory TypeScript and C# (or `appsettings*.json`) fixtures covering the constructs listed in the specification's `## Recognition Rules` (the analyzer suites under `tests/scripts/claude-lib/docs/`, run by `poshqc / PowerShell QC`).
 - [ ] An extension-result manifest whose captured-input digest does not match is rejected with one blocking diagnostic and contributes no element, each validation step has its own rejection code, and a matching manifest is merged as inert data with recomputed identifiers and digests (`DocsAnalyzerExtensionImport.Tests.ps1`, run by `poshqc / PowerShell QC`).
 - [ ] Re-running any analyzer over identical bytes, in any input order, produces byte-identical output (`DocsScannerContract.Tests.ps1`, run by `poshqc / PowerShell QC`).
 - [ ] An input above the 1 MiB size bound, an undecodable input, or a construct the scanner cannot classify yields a diagnostic, not a partial or guessed result; a lexical error in one file does not remove other files' elements (`DocsScannerContract.Tests.ps1`, run by `poshqc / PowerShell QC`).
