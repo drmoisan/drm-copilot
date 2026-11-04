@@ -217,15 +217,50 @@ function Resolve-DocsReferenceFrontMatterValue {
     return @{ Value = $value; Finding = [object[]] $findings.ToArray() }
 }
 
+function Test-DocsReferenceCanonicalNumberRejected {
+    <#
+    .SYNOPSIS
+        Returns $true when Value holds a number that canonical JSON rejects (private helper).
+    .DESCRIPTION
+        A [double], [single] or [decimal] is rejected when it is non-integral or its magnitude
+        exceeds 9007199254740991, the safe-integer bound of ConvertTo-DiscoveryCanonicalFragment.
+        IDictionary values, PSCustomObject property values and the items of a non-string
+        IEnumerable are walked recursively. Every other value, including $null and strings,
+        returns $false.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([AllowNull()] [object] $Value)
+
+    if ($Value -is [double] -or $Value -is [single] -or $Value -is [decimal]) {
+        return ([math]::Floor([double] $Value) -ne [double] $Value) -or ([math]::Abs([double] $Value) -gt 9007199254740991)
+    }
+    # A list keeps a nested container as one child; pipeline output would unroll it.
+    $children = [System.Collections.Generic.List[object]]::new()
+    if ($Value -is [System.Collections.IDictionary]) {
+        foreach ($item in $Value.Values) { $children.Add($item) }
+    } elseif ($Value -is [System.Management.Automation.PSCustomObject]) {
+        foreach ($property in $Value.PSObject.Properties) { $children.Add($property.Value) }
+    } elseif ($Value -is [System.Collections.IEnumerable] -and $Value -isnot [string]) {
+        foreach ($item in $Value) { $children.Add($item) }
+    }
+    foreach ($child in $children) {
+        if (Test-DocsReferenceCanonicalNumberRejected -Value $child) { return $true }
+    }
+    return $false
+}
+
 function ConvertTo-DocsReferenceFrontMatterText {
     <#
     .SYNOPSIS
         Returns the canonical front-matter block of Value, LF-terminated.
     .DESCRIPTION
         Fields present in Value are written in the fixed order owner, last_reviewed, audience,
-        diataxis_mode, surface_refs, title, extensions as '<key>: <JSON value>'. A value that
-        canonical JSON rejects (a non-integral number inside extensions) is written with
-        ConvertTo-DocsJsonText.
+        diataxis_mode, surface_refs, title, extensions as '<key>: <JSON value>'. Only an
+        extensions value holding a number that canonical JSON rejects (non-integral, or above the
+        safe-integer bound; see Test-DocsReferenceCanonicalNumberRejected) is written with
+        ConvertTo-DocsJsonText. Every other value is written with ConvertTo-DocsCanonicalJson,
+        and any exception from that call propagates unchanged.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -235,10 +270,10 @@ function ConvertTo-DocsReferenceFrontMatterText {
     foreach ($key in @('owner', 'last_reviewed', 'audience', 'diataxis_mode', 'surface_refs', 'title', 'extensions')) {
         if (-not $Value.Contains($key)) { continue }
         $field = $Value[$key]
-        try {
-            $json = ConvertTo-DocsCanonicalJson -Value $field
-        } catch {
-            $json = ConvertTo-DocsJsonText -Value $field
+        $json = if ($key -ceq 'extensions' -and (Test-DocsReferenceCanonicalNumberRejected -Value $field)) {
+            ConvertTo-DocsJsonText -Value $field
+        } else {
+            ConvertTo-DocsCanonicalJson -Value $field
         }
         $json = [regex]::Replace($json.TrimEnd("`n"), '[\x85\p{Zl}\p{Zp}]', { param($Match) '\u{0:x4}' -f [int] $Match.Value[0] })
         [void]$builder.Append($key).Append(': ').Append($json).Append("`n")
