@@ -30,10 +30,10 @@
     }
   },
   "minimumVersions": {
-    "node": "24.14.0",
+    "node": "26.13.0",
     "poetry": "2.3.2",
-    "pwsh": "7.6.6",
-    "python": "3.13.12"
+    "pwsh": "7.6.9",
+    "python": "3.13.17"
   },
   "optionalCommands": [
     "wsl",

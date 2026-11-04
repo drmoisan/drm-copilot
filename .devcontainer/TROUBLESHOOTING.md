@@ -47,7 +47,7 @@ F1 → Dev Containers: Rebuild Container Without Cache
 **Check poetry.lock**
 ```bash
 # Inside container:
-poetry lock --check
+poetry check --lock
 ```
 
 **Clear Poetry Cache**
@@ -58,7 +58,7 @@ poetry install --no-cache
 
 **Verify Python Version**
 ```bash
-python --version  # Should be 3.13.x
+python --version  # Should be 3.13.17
 poetry env info
 ```
 

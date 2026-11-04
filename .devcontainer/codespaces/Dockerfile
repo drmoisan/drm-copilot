@@ -1,4 +1,6 @@
-# Use Python 3.13 base image with Debian Bookworm
+# The devcontainer minor image currently carries an older Python patch.
+FROM python:3.13.17-bookworm AS python-runtime
+
 # Stage 1: Build kcov from source so the container matches CI (.github/workflows/_shell-coverage.yml).
 # kcov is not available via apt in Bookworm, the kcov/kcov image publishes no v43 tag, and its
 # "latest" tag is unpinned. Keep KCOV_VERSION equal to the CI value.
@@ -29,6 +31,14 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # Stage 2: Main devcontainer image
 FROM mcr.microsoft.com/devcontainers/python:3.13-bookworm
 
+# Select the verified Python runtime and NodeSource binaries ahead of base feature shims.
+COPY --from=python-runtime /usr/local/ /usr/local/
+ENV PYTHON_PATH=/usr/local \
+    PYTHON_VERSION=3.13.17 \
+    NVM_DIR="" \
+    PATH="/usr/local/bin:/usr/local/py-utils/bin:/usr/local/jupyter:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin"
+RUN python --version && test "$(python --version)" = "Python 3.13.17"
+
 # Copy the kcov install tree from the build stage
 COPY --from=kcov-build /opt/kcov/ /usr/local/
 
@@ -46,8 +56,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     wget \
     apt-transport-https \
     software-properties-common \
-    # Shell QC tooling (shfmt is installed below at the CI-pinned version)
-    shellcheck \
+    # Shell QC tooling (formatting and lint binaries are pinned below)
     bats \
     # Runtime libraries for the kcov build copied from the first stage
     binutils \
@@ -66,21 +75,31 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     xclip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js. CI runs the extension and root TypeScript tests on Node 20
-# (node-version "20" in .github/workflows), and Debian Bookworm packages Node 18, so install
-# from NodeSource. Node is required for Claude Code, Graphite CLI, ESLint, Jest and bash-language-server.
-ARG NODE_MAJOR=20
+# Match the updated host development runtime; preserve independent consumer engine support.
+ARG NODE_MAJOR=26
+ARG NODE_VERSION=26.13.0
 RUN wget -qO- "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get install -y --no-install-recommends "nodejs=${NODE_VERSION}-1nodesource1" \
+    && test "$(node --version)" = "v${NODE_VERSION}" \
+    && test "$(npm --version)" = "11.20.0" \
     && rm -rf /var/lib/apt/lists/*
 
 # Install shfmt at the version CI pins (.github/workflows/_shell-coverage.yml); the Bookworm
 # package is older and formats differently. Keep SHFMT_VERSION equal to the CI value.
-ARG SHFMT_VERSION=3.8.0
+ARG SHFMT_VERSION=3.14.1
 RUN arch="$(dpkg --print-architecture)" \
     && wget -q -O /usr/local/bin/shfmt \
     "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_${arch}" \
     && chmod +x /usr/local/bin/shfmt
+
+# Bookworm's ShellCheck package is older than the development baseline.
+ARG SHELLCHECK_VERSION=0.11.0
+RUN arch="$(uname -m)" \
+    && wget -q -O /tmp/shellcheck.tar.xz \
+    "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${arch}.tar.xz" \
+    && tar -xJf /tmp/shellcheck.tar.xz -C /tmp \
+    && install -m 755 "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck \
+    && rm -rf /tmp/shellcheck.tar.xz "/tmp/shellcheck-v${SHELLCHECK_VERSION}"
 
 # Build and install bashdb (not packaged for all Debian/Ubuntu bases)
 RUN git clone --depth 1 https://github.com/Trepan-Debuggers/bashdb /tmp/bashdb \
@@ -96,13 +115,13 @@ RUN git clone --depth 1 https://github.com/Trepan-Debuggers/bashdb /tmp/bashdb \
 RUN printf '%s\n' '#!/usr/bin/env bash' 'exec xclip -selection clipboard "$@"' > /usr/local/bin/clip.exe \
     && chmod +x /usr/local/bin/clip.exe
 
-# Install PowerShell 7.6 from Microsoft repository (the repository baseline is 7.6;
-# the wildcard takes the newest 7.6.x patch and refuses a 7.7 upgrade)
+# Use the verified Debian package version for the updated PowerShell baseline.
+ARG POWERSHELL_VERSION=7.6.9
 RUN wget -q https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb \
     && dpkg -i packages-microsoft-prod.deb \
     && rm packages-microsoft-prod.deb \
     && apt-get update \
-    && apt-get install -y "powershell=7.6.*" \
+    && apt-get install -y "powershell=${POWERSHELL_VERSION}-1.deb" \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Graphite CLI for the Graphite VS Code extension.
@@ -120,7 +139,7 @@ ARG CLAUDE_SWAP_VERSION=0.28.0
 RUN pip install --no-cache-dir "claude-swap==${CLAUDE_SWAP_VERSION}"
 
 # Install Poetry
-RUN pip install --no-cache-dir poetry==2.2.1
+RUN pip install --no-cache-dir poetry==2.3.2
 
 # Configure Poetry to create virtual environments in project directory
 RUN poetry config virtualenvs.in-project true

@@ -292,8 +292,16 @@ Limitations: the push-down never deletes destination files, so a file already pr
 ### Extension development
 
 - VS Code (engine `^1.138.0`)
-- Node.js 20+ recommended
-- npm
+- Node.js 26.13.0
+- npm 11.20.0
+
+### Development environment baseline
+
+The Windows host manifest and both devcontainers use Python 3.13.17, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, and Poetry 2.3.2. Shell validation uses shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12. Both containers accept later Python patches within 3.13 and retain their separate platform settings.
+
+Run `scripts/dev-tools/bootstrap-host.ps1` without `-Apply` to preview missing or below-minimum managed tools. Apply mode installs or upgrades them according to `scripts/host-tools.manifest.json`; equal or newer host versions remain unchanged, and unreadable versions fail explicitly.
+
+Python 3.11/3.12 compatibility jobs, consumer engine requirements, and release-publishing runtime pins remain independent of this development baseline.
 
 ### Standalone MCP package
 
