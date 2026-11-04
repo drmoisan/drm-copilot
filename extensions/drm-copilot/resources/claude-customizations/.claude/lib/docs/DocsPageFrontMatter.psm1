@@ -156,15 +156,19 @@ function ConvertFrom-DocsPageFlowSequence {
     $items = [System.Collections.Generic.List[string]]::new()
     $current = [System.Text.StringBuilder]::new()
     $quote = [char] 0
+    # Escape state of the current double-quoted item: a backslash escapes exactly the next character.
+    $escaped = $false
     $closedAt = -1
     for ($index = 1; $index -lt $Text.Length; $index++) {
         $char = $Text[$index]
         if ($quote -ne [char] 0) {
             [void]$current.Append($char)
-            if ($char -eq $quote -and -not ($quote -eq [char]'"' -and $Text[$index - 1] -eq [char]'\')) { $quote = [char] 0 }
+            if ($escaped) { $escaped = $false; continue }
+            if ($quote -eq [char]'"' -and $char -eq [char]'\') { $escaped = $true; continue }
+            if ($char -eq $quote) { $quote = [char] 0 }
             continue
         }
-        if ($char -eq [char]"'" -or $char -eq [char]'"') { $quote = $char; [void]$current.Append($char); continue }
+        if ($char -eq [char]"'" -or $char -eq [char]'"') { $quote = $char; $escaped = $false; [void]$current.Append($char); continue }
         if ($char -eq [char]'[' -or $char -eq [char]'{') { return New-DocsPageScalarResult -Ok $false -Construct 'nested flow collection' }
         if ($char -eq [char]']') { $closedAt = $index; break }
         if ($char -eq [char]',') { $items.Add($current.ToString()); [void]$current.Clear(); continue }

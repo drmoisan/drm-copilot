@@ -266,6 +266,8 @@ function Get-DocsPageCheckFinding {
         path; links, anchors and reachability are still computed over the full page set.
         Result is {page_count, profile_path, roots[{id, page_count, path}]} with roots in
         profile order. Findings are in Get-DocsOrderedFinding order, not truncated.
+        LinkMap is the @{ Model; Link } result of the private link-map helper Get-DocsPageLinkMap
+        for the same PageText; when it is $null the map is built here.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -275,7 +277,8 @@ function Get-DocsPageCheckFinding {
         [Parameter(Mandatory = $true)] [string] $ProfilePath,
         [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $ComposedSchemaSet,
         [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [string[]] $ExistingPath,
-        [AllowNull()] [AllowEmptyCollection()] [string[]] $SelectedPath
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $SelectedPath,
+        [AllowNull()] [hashtable] $LinkMap = $null
     )
 
     [string[]] $pageSet = @($PageText.Keys | ForEach-Object { [string] $_ })
@@ -306,7 +309,8 @@ function Get-DocsPageCheckFinding {
         else { $entries.Add($entry) }
     }
 
-    $map = Get-DocsPageLinkMap -PageText $PageText
+    $map = $LinkMap
+    if ($null -eq $map) { $map = Get-DocsPageLinkMap -PageText $PageText }
     $anchors = @{}
     foreach ($page in $map.Model.Keys) { $anchors[$page] = Get-DocsPageAnchor -LineModel $map.Model[$page].LineModel }
     $edges = @{}
@@ -410,11 +414,13 @@ function Invoke-DocsCheckCommand {
     }
     [string[]] $pageSet = @($pageText.Keys)
     $existing = [System.Collections.Generic.List[string]]::new()
-    $external = Get-DocsPageExternalTarget -PageLink (Get-DocsPageLinkMap -PageText $pageText).Link -PagePath $pageSet
+    # The link map is built once per run and shared by the external-target probe and the page rules.
+    $linkMap = Get-DocsPageLinkMap -PageText $pageText
+    $external = Get-DocsPageExternalTarget -PageLink $linkMap.Link -PagePath $pageSet
     foreach ($path in $external) {
         if ([bool] (Invoke-DocsContextMember -Member $Context.TestFile -ArgumentList @($path))) { $existing.Add($path) }
     }
-    $outcome = Get-DocsPageCheckFinding -PageText $pageText -Profile $check.Profile -ProfilePath $profilePath -ComposedSchemaSet $composed.Schemas -ExistingPath $existing.ToArray() -SelectedPath $selected
+    $outcome = Get-DocsPageCheckFinding -PageText $pageText -Profile $check.Profile -ProfilePath $profilePath -ComposedSchemaSet $composed.Schemas -ExistingPath $existing.ToArray() -SelectedPath $selected -LinkMap $linkMap
     $all = [object[]] (@($check.Findings) + @($outcome.Findings) | Where-Object { $null -ne $_ })
     $exitCode = if (Test-DocsFindingHasError -Finding $all) { 1 } else { 0 }
     $line = "check: pages=$($outcome.Result['page_count']) roots=$(@($outcome.Result['roots']).Count)"

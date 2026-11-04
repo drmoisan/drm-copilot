@@ -258,10 +258,30 @@ Describe 'ConvertFrom-DocsPageYamlScalar value forms' {
         $result.Value | Should -Be @('dev', "o'ps", 'qa', [long] 3)
     }
 
+    It 'resolves a flow sequence whose double-quoted item ends in an escaped backslash' {
+        # Act (single-quoted literals: each backslash is an ordinary character)
+        $backslash = ConvertFrom-DocsPageYamlScalar -Text '["a\\", b]'
+        $escapedQuote = ConvertFrom-DocsPageYamlScalar -Text '["a\\\"", b]'
+        $backslashBlock = ConvertFrom-TestBlock -Line @('tags: ["a\\", b]')
+        $escapedQuoteBlock = ConvertFrom-TestBlock -Line @('tags: ["a\\\"", b]')
+        $unterminatedBlock = ConvertFrom-TestBlock -Line @('tags: ["a\", b]')
+
+        # Assert
+        $backslash.Ok | Should -BeTrue
+        $backslash.Value | Should -Be @('a\', 'b')
+        $escapedQuote.Ok | Should -BeTrue
+        $escapedQuote.Value | Should -Be @('a\"', 'b')
+        @(Get-TestCode -Result $backslashBlock).Count | Should -Be 0
+        $backslashBlock.Value['tags'] | Should -Be @('a\', 'b')
+        @(Get-TestCode -Result $escapedQuoteBlock).Count | Should -Be 0
+        Get-TestCode -Result $unterminatedBlock | Should -Be @('DOCS_PAGE_FRONT_MATTER_UNSUPPORTED')
+    }
+
     It 'reports the construct <Construct> for <Text>' -ForEach @(
         @{ Text = '[a, [b]]'; Construct = 'nested flow collection' }
         @{ Text = '[a, {b: 1}]'; Construct = 'nested flow collection' }
         @{ Text = '[a, b'; Construct = 'unclosed flow sequence' }
+        @{ Text = '["a\", b]'; Construct = 'unclosed flow sequence' }
         @{ Text = '{a: 1}'; Construct = 'flow mapping' }
         @{ Text = '"\x41"'; Construct = 'YAML escape' }
         @{ Text = '[a, "\x41"]'; Construct = 'YAML escape' }
