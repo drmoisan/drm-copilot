@@ -69,8 +69,8 @@ The Add-DirectoryToPath Describe saves and restores PATH in BeforeEach and After
 - Toolchain: format, PSScriptAnalyzer, Pester for changed files, per `.claude/rules/powershell.md`.
 
 ## Acceptance Criteria
-- [ ] The leaking test "Add-DirectoryToPath handles paths with trailing separator" no longer leaves `$env:PATH` changed: `$env:PATH` after run-actionlint.Tests.ps1 equals its value before, verified by a single-process run.
-- [ ] A save/restore of `$env:PATH` covers every Context in run-actionlint.Tests.ps1 (Describe level preferred), so no Context depends on a sibling Context's restore.
+- [x] The leaking test "Add-DirectoryToPath handles paths with trailing separator" no longer leaves `$env:PATH` changed: `$env:PATH` after run-actionlint.Tests.ps1 equals its value before, verified by a single-process run.
+- [x] A save/restore of `$env:PATH` covers every Context in run-actionlint.Tests.ps1 (Describe level preferred), so no Context depends on a sibling Context's restore.
 - [ ] Every other unrestored process-global mutation in run-actionlint.Tests.ps1 identified by research, including `$global:LASTEXITCODE` set by the `Invoke-ActionlintExe` and `Invoke-ActionlintCommand` mocks and tests, is saved and restored, and no other environment variable, location, alias, or global state remains altered after the file runs.
 - [x] A regression guard exists that fails if the guarded suite changes `$env:PATH` or any other process environment variable without restoring it (full-environment comparison, case-insensitive keys), uses no temporary files, and edits no production file.
 - [ ] The regression guard passes on the fixed tree, including when run in the same process with other tests/scripts/dev-tools suites, and leaves the process environment unchanged itself.

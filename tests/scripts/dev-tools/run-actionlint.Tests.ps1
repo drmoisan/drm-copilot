@@ -16,6 +16,30 @@ Describe "run-actionlint.ps1" {
         . (Import-ScriptFunction -Path $script:scriptPath -Name 'Invoke-ActionlintCommand')
     }
 
+    # Save and restore process-global state around every test in every Context (issue #1066): $env:PATH
+    # (value and existence) and $global:LASTEXITCODE (existence and value). Only assignments and
+    # Remove-Variable are used, because the Install-Actionlint Context mocks Test-Path, Join-Path,
+    # Remove-Item, New-Item, and Write-Information while this AfterEach runs.
+    BeforeEach {
+        $script:describeHadPath = $null -ne [System.Environment]::GetEnvironmentVariable('PATH')
+        $script:describeSavedPath = $env:PATH
+        $script:describeHadLastExitCode = $null -ne (Get-Variable -Name LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue)
+        $script:describeSavedLastExitCode = if ($script:describeHadLastExitCode) { $global:LASTEXITCODE } else { $null }
+    }
+
+    AfterEach {
+        if ($script:describeHadPath) {
+            $env:PATH = $script:describeSavedPath
+        } else {
+            [System.Environment]::SetEnvironmentVariable('PATH', $null)
+        }
+        if ($script:describeHadLastExitCode) {
+            $global:LASTEXITCODE = $script:describeSavedLastExitCode
+        } else {
+            Remove-Variable -Name LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue
+        }
+    }
+
     Context "Resolve-ActionlintPath" {
         It "resolves paths correctly from script location" {
             # Arrange
@@ -222,16 +246,6 @@ Describe "run-actionlint.ps1" {
     }
 
     Context "Add-DirectoryToPath" {
-        BeforeEach {
-            # Save original PATH
-            $script:originalPath = $env:PATH
-        }
-
-        AfterEach {
-            # Restore original PATH
-            $env:PATH = $script:originalPath
-        }
-
         It "adds directory to PATH when not present" {
             # Arrange
             $separator = [IO.Path]::PathSeparator
