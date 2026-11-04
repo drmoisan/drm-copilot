@@ -102,7 +102,7 @@ Pester criteria run locally through `Invoke-PoshQCTest` and in CI under the requ
 - [x] No rendered heading begins, case-insensitively, with `how to ` or `step <n>` (the headings 1021 reports on a reference page as `DOCS_PAGE_MODE_INSTRUCTION_HEADING`), and every marker is a standalone line with blank lines inside and outside the block (Pester, `poshqc / PowerShell QC`).
 - [x] Each new `DocsReference*.psm1` module and the edited `Invoke-DocsCommand.ps1` are byte-identical to their push-down copies, each new module is listed in the Claude `core.json`, and the existing push-down contract tests pass unmodified.
 - [x] No Python or TypeScript file is added or modified, and no new test creates a temporary file.
-- [x] Pester line coverage is at least 85% for each new module under `.claude/lib/docs/`, with no production file excluded from measurement.
+- [ ] Pester line coverage is at least 85% for each new module under `.claude/lib/docs/`, with no production file excluded from measurement.
 
 ## Non-Goals
 
