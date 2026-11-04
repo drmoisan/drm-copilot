@@ -28,6 +28,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/lib/docs/DocsJson.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/lib/docs/DocsSchema.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/lib/docs/DocsSurface.psm1') -ErrorAction Stop
 
@@ -269,6 +270,122 @@ function New-DocsReferenceRandomProfile {
             validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json'
         }
     }
+}
+
+function New-DocsReferenceFixedProfile {
+    <#
+    .SYNOPSIS
+        Returns a fixed, schema-valid and semantically valid docs profile for example tests.
+    .DESCRIPTION
+        Audiences 'end-users' and 'maintainers'; the documentation root 'docs' with audience
+        'maintainers'; page owners 'docs-team' for '<OutputDirectory>/**' and 'maintainer-team' for
+        'docs'; all four Diataxis modes; directory modes 'docs/guides' (how-to) and OutputDirectory
+        (reference). DirectoryMode and Mode replace the directory_modes and modes lists.
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [string] $OutputDirectory = 'docs/reference',
+        [string] $RepositoryId = 'example-repo',
+        [AllowNull()] [object[]] $DirectoryMode,
+        [AllowNull()] [string[]] $Mode
+    )
+
+    $profileValue = New-DocsReferenceRandomProfile -Random ([System.Random]::new(1)) -OutputDirectory $OutputDirectory -RepositoryId $RepositoryId
+    $profileValue['audiences'] = [object[]]@([ordered]@{ id = 'end-users'; description = 'Audience end-users.' }, [ordered]@{ id = 'maintainers'; description = 'Audience maintainers.' })
+    $profileValue['documentation_roots'] = [object[]]@([ordered]@{ id = 'docs-root'; path = 'docs'; audience_ids = [string[]]@('maintainers') })
+    $modes = if ($null -eq $DirectoryMode) { [object[]]@([ordered]@{ path_or_glob = 'docs/guides'; mode = 'how-to' }, [ordered]@{ path_or_glob = $OutputDirectory; mode = 'reference' }) } else { $DirectoryMode }
+    $profileValue['diataxis_policy']['directory_modes'] = [object[]] $modes
+    $profileValue['diataxis_policy']['modes'] = if ($null -eq $Mode) { [string[]]@('tutorial', 'how-to', 'reference', 'explanation') } else { $Mode }
+    return $profileValue
+}
+
+function New-DocsReferenceFixedElement {
+    <#
+    .SYNOPSIS
+        Returns one valid snapshot element with fixed name, analyzer and line range for example tests.
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $Kind,
+        [Parameter(Mandatory = $true)] [string] $Declaration,
+        [string] $Path = 'src/tool.py',
+        [AllowNull()] [string] $ParentId,
+        [string] $AnalysisMethod = 'scanner',
+        [string] $SourceText = "line one`n"
+    )
+
+    $range = if ($Kind -ceq 'architecture-component') { $null } else { [int[]]@(1, 1) }
+    return New-DocsSurfaceElement -Kind $Kind -Path $Path -Declaration $Declaration -Name 'name' -AnalyzerId 'test-analyzer' -AnalysisMethod $AnalysisMethod -SourceText $SourceText -ParentId $ParentId -LineRange $range -Property ([ordered]@{})
+}
+
+function ConvertTo-DocsReferenceSnapshotText {
+    <#
+    .SYNOPSIS
+        Serializes a schema-valid surface inventory snapshot that holds the given element records.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Element,
+        [string] $Repository = 'example-repo',
+        [string] $CapturedAt = '2026-01-02T03:04:05Z'
+    )
+
+    $snapshot = [ordered]@{
+        '$schema'      = 'urn:drm-copilot:docs:1.0.0:surface-inventory-snapshot'
+        schema_version = '1.0.0'
+        artifact_kind  = 'surface-inventory-snapshot'
+        id             = "$Repository.snapshot"
+        extensions     = [ordered]@{}
+        repository     = $Repository
+        revision       = $null
+        profile_sha256 = 'a' * 64
+        analyzers      = [object[]]@([ordered]@{ id = 'test-analyzer'; version = '1'; analysis_method = 'scanner' })
+        inputs         = [object[]]@()
+        elements       = [object[]] $Element
+        diagnostics    = [object[]]@()
+        captured_at    = $CapturedAt
+    }
+    return ConvertTo-DocsJsonText -Value $snapshot
+}
+
+function New-DocsReferenceFileMap {
+    <#
+    .SYNOPSIS
+        Returns an ordinal path-to-text map for an in-memory repository holding the generator inputs.
+    .DESCRIPTION
+        The map holds every runtime schema text (SchemaTextMap, default Get-DocsReferenceSchemaTextMap),
+        the profile at docs/documentation-estate/docs-profile.json (omitted when ProfileValue is
+        $null; ProfileText replaces the serialized profile), the snapshot of Element at
+        docs/documentation-estate/surface-inventory-snapshot.json (omitted when Element is $null;
+        SnapshotText replaces it), and every entry of Page.
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Repository paths are case-sensitive; an ordinal-comparer hashtable is required.')]
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [AllowNull()] [System.Collections.IDictionary] $ProfileValue,
+        [AllowNull()] [string] $ProfileText,
+        [AllowNull()] [object[]] $Element,
+        [AllowNull()] [string] $SnapshotText,
+        [AllowNull()] [System.Collections.IDictionary] $Page,
+        [AllowNull()] [System.Collections.IDictionary] $SchemaTextMap
+    )
+
+    $files = [hashtable]::new([System.StringComparer]::Ordinal)
+    $schemaText = if ($null -eq $SchemaTextMap) { Get-DocsReferenceSchemaTextMap } else { $SchemaTextMap }
+    foreach ($key in @($schemaText.Keys)) { $files[[string] $key] = [string] $schemaText[$key] }
+    if (-not [string]::IsNullOrEmpty($ProfileText)) { $files['docs/documentation-estate/docs-profile.json'] = $ProfileText }
+    elseif ($null -ne $ProfileValue) { $files['docs/documentation-estate/docs-profile.json'] = ConvertTo-DocsJsonText -Value $ProfileValue -Indented }
+    if (-not [string]::IsNullOrEmpty($SnapshotText)) { $files['docs/documentation-estate/surface-inventory-snapshot.json'] = $SnapshotText }
+    elseif ($null -ne $Element) { $files['docs/documentation-estate/surface-inventory-snapshot.json'] = ConvertTo-DocsReferenceSnapshotText -Element $Element }
+    if ($null -ne $Page) { foreach ($key in @($Page.Keys)) { $files[[string] $key] = [string] $Page[$key] } }
+    return $files
 }
 
 function Get-DocsReferenceShuffled {
@@ -517,6 +634,10 @@ Export-ModuleMember -Function `
     New-DocsReferenceRandomElement, `
     New-DocsReferenceRandomProse, `
     New-DocsReferenceRandomProfile, `
+    New-DocsReferenceFixedProfile, `
+    New-DocsReferenceFixedElement, `
+    ConvertTo-DocsReferenceSnapshotText, `
+    New-DocsReferenceFileMap, `
     Get-DocsReferenceShuffled, `
     New-DocsReferenceMemoryContext, `
     Get-DocsReferenceSchemaTextMap, `

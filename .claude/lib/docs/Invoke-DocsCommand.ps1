@@ -59,6 +59,7 @@ function Get-DocsCommandTable {
         # --- 1022: inventory ---
         # --- 1023: coverage, update-ledger, validate ---
         # --- 1024: generate-reference ---
+        [pscustomobject]@{ Name = 'generate-reference'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReferenceWriter.psm1'); Function = 'Invoke-DocsGenerateReferenceCommand'; Option = @{ Profile = 'value'; Snapshot = 'value'; OutputDirectory = 'value'; Write = 'switch' } }
         # --- 1034: surface-delta ---
     )
 }
