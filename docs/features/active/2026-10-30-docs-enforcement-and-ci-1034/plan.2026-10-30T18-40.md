@@ -195,11 +195,11 @@ Found by searching `tests/` for `New-DocsCommandContext`, `New-DocsTestContext`,
 
 The section text is identical in every copy. It states: not applicable, with no finding, when `docs/documentation-estate/docs-profile.json` is absent on the branch head; the reviewer lists changed paths with `git diff --name-only <merge-base>..HEAD`; when a changed path lies under a profile `surface_selection.source_roots` entry, the reviewer requires the newest `<FEATURE>/evidence/qa-gates/docs-surface-delta.<timestamp>.md` with `Timestamp`, `Command`, `EXIT_CODE` and `Output Summary`; an absent artifact or `EXIT_CODE: 1` raises Blocking finding `surface-change-without-ledger-change` with `Remediability: autonomous` and a `Remediability-Evidence:` line; the reviewer inspects evidence and does not rerun tooling. No tool is added to any frontmatter (OQ-6 default), and the text names no consuming product.
 
-- [ ] [P5-T1] Add `## Documentation Surface Check` to `.claude/agents/feature-review.md` directly after the `## File Size Advisory` section.
+- [x] [P5-T1] Add `## Documentation Surface Check` to `.claude/agents/feature-review.md` directly after the `## File Size Advisory` section.
   - Acceptance: the heading occurs once in the file; the frontmatter `tools:` list is unchanged.
-- [ ] [P5-T2] Add the same section to the `developer_instructions` body of `.codex/agents/feature-review.toml` directly after its `## File Size Advisory` section, with text containing no triple single quote.
+- [x] [P5-T2] Add the same section to the `developer_instructions` body of `.codex/agents/feature-review.toml` directly after its `## File Size Advisory` section, with text containing no triple single quote.
   - Acceptance: the heading occurs once in the file and the file still parses as TOML with `tomllib`.
-- [ ] [P5-T3] Add the same section to `.agents/skills/feature-review/SKILL.md` and `.github/skills/feature-review-workflow/SKILL.md`, each directly after its `## File Size Advisory` section.
+- [x] [P5-T3] Add the same section to `.agents/skills/feature-review/SKILL.md` and `.github/skills/feature-review-workflow/SKILL.md`, each directly after its `## File Size Advisory` section.
   - Acceptance: the heading occurs once in each file; `.github/agents/feature-review.agent.md` and every `.codex/agents/feature-reviewer*.toml` show no change in `git diff MERGE_BASE HEAD` together with `git status --porcelain`.
 
 ### Phase 6 — Push-Down Mirrors and Pack Manifest
