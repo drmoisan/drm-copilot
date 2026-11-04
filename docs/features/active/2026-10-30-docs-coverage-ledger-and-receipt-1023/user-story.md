@@ -114,37 +114,37 @@ Pester criteria are verified by suites under `tests/scripts/claude-lib/docs/`, r
 
 ### Maintainer measuring coverage
 
-- [ ] A maintainer running `-Command coverage` receives totals (including counts by analysis method), the undocumented elements, the deferred entries, the scanner precision limits, the stale pages and per-dimension parity counts and integer scores, and the subcommand makes no `WriteText` call (`DocsLedgerCommands.Tests.ps1`).
-- [ ] When the ledger, matrix or pin collection does not exist yet, `-Command coverage` reports every inventoried element as undocumented and exits 0 (`DocsLedgerCommands.Tests.ps1`).
+- [x] A maintainer running `-Command coverage` receives totals (including counts by analysis method), the undocumented elements, the deferred entries, the scanner precision limits, the stale pages and per-dimension parity counts and integer scores, and the subcommand makes no `WriteText` call (`DocsLedgerCommands.Tests.ps1`).
+- [x] When the ledger, matrix or pin collection does not exist yet, `-Command coverage` reports every inventoried element as undocumented and exits 0 (`DocsLedgerCommands.Tests.ps1`).
 - [x] A page is reported stale when a pin bound to it records a digest that differs from the current snapshot element, or when the pinned element no longer exists; a revision change alone does not make a page stale (`DocsStaleness.Tests.ps1`).
 
 ### Maintainer recording a disposition through update-ledger
 
-- [ ] `-Command update-ledger` without `-Write` reports the planned writes and makes no `WriteText` call; with `-Write` it writes the ledger, matrix or pin collection only through `Invoke-DocsArtifactWrite` (`DocsLedgerCommands.Tests.ps1`).
-- [ ] Recording `excluded` without a rationale, or `deferred` without an owner or a target, exits 1, names the missing field for that element, and writes nothing; existing errors for other elements do not block a valid update (`DocsLedgerCommands.Tests.ps1`).
-- [ ] Each ledger entry records the `analysis_method` (`native` or `scanner`) of its current snapshot element (`DocsLedgerCommands.Tests.ps1`).
-- [ ] Re-pinning an element to the same page replaces the existing pin instead of adding a second one, and the page is no longer stale (`DocsLedgerCommands.Tests.ps1`).
-- [ ] If a document changed after the subcommand read it, the write is refused with exit 3 and one `DOCS_CLI_RUNTIME` finding naming the conflicting path (`DocsLedgerMutation.Tests.ps1`).
+- [x] `-Command update-ledger` without `-Write` reports the planned writes and makes no `WriteText` call; with `-Write` it writes the ledger, matrix or pin collection only through `Invoke-DocsArtifactWrite` (`DocsLedgerCommands.Tests.ps1`).
+- [x] Recording `excluded` without a rationale, or `deferred` without an owner or a target, exits 1, names the missing field for that element, and writes nothing; existing errors for other elements do not block a valid update (`DocsLedgerCommands.Tests.ps1`).
+- [x] Each ledger entry records the `analysis_method` (`native` or `scanner`) of its current snapshot element (`DocsLedgerCommands.Tests.ps1`).
+- [x] Re-pinning an element to the same page replaces the existing pin instead of adding a second one, and the page is no longer stale (`DocsLedgerCommands.Tests.ps1`).
+- [x] If a document changed after the subcommand read it, the write is refused with exit 3 and one `DOCS_CLI_RUNTIME` finding naming the conflicting path (`DocsLedgerMutation.Tests.ps1`).
 - [ ] `update-ledger` is the only subcommand that changes the ledger, matrix or pin collection, as shown by `DocsWriteBoundary.Tests.ps1`.
 
 ### Maintainer recording a scanner precision limit
 
-- [ ] A precision-limit diagnostic in the snapshot without a ledger entry fails `-Command validate -Mode ledger` with `DOCS_LEDGER_LIMIT_UNRECORDED` naming the analyzer, code and path; after `-Operation set-disposition -Limit <diagnostic id> -Disposition deferred -Owner <id> -Target <text> -Write`, the ledger holds a `deferred` entry with `analysis_method` `scanner` and the finding is gone (`DocsLedgerCommands.Tests.ps1`).
+- [x] A precision-limit diagnostic in the snapshot without a ledger entry fails `-Command validate -Mode ledger` with `DOCS_LEDGER_LIMIT_UNRECORDED` naming the analyzer, code and path; after `-Operation set-disposition -Limit <diagnostic id> -Disposition deferred -Owner <id> -Target <text> -Write`, the ledger holds a `deferred` entry with `analysis_method` `scanner` and the finding is gone (`DocsLedgerCommands.Tests.ps1`).
 - [x] In `docs-complete` mode a precision-limit entry passes when the profile's `allow_deferred` is true and yields `DOCS_DEFERRED_NOT_ALLOWED` when it is false (`DocsValidation.Tests.ps1`).
 
 ### CI proving docs-complete
 
 - [ ] `-Command validate -Mode docs-complete` exits 0 with a `pass` receipt on a complete fixture; with one undocumented element and one stale page it exits 1 and the findings name both; after both are fixed it exits 0 (`DocsCompleteIntegration.Tests.ps1`).
 - [x] A ledger missing a disposition for any inventoried element fails validation naming the element's kind, declaration and element id (`DocsLedger.Tests.ps1`).
-- [ ] With `-Mode docs-complete -WriteReceipt`, the receipt is written to the profile's `validation_receipt` path on both pass and fail, its `revision` equals the `-Revision` argument, and `-WriteReceipt` with any other mode exits 2 (`DocsLedgerCommands.Tests.ps1`).
-- [ ] Validation of a snapshot with a null `revision` in `docs-complete` mode fails with `DOCS_SNAPSHOT_UNPINNED`, so no receipt claims a revision the snapshot did not capture (`DocsValidation.Tests.ps1`).
+- [x] With `-Mode docs-complete -WriteReceipt`, the receipt is written to the profile's `validation_receipt` path on both pass and fail, its `revision` equals the `-Revision` argument, and `-WriteReceipt` with any other mode exits 2 (`DocsLedgerCommands.Tests.ps1`).
+- [x] Validation of a snapshot with a null `revision` in `docs-complete` mode fails with `DOCS_SNAPSHOT_UNPINNED`, so no receipt claims a revision the snapshot did not capture (`DocsValidation.Tests.ps1`).
 
 ### Downstream tool author consuming the contracts
 
-- [ ] Each of `coverage`, `update-ledger` and `validate`, with `-Json`, prints exactly one envelope that produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'`, and returns exit 0, 1, 2 or 3 with the meanings stated in the spec (`DocsLedgerCommands.Tests.ps1`).
+- [x] Each of `coverage`, `update-ledger` and `validate`, with `-Json`, prints exactly one envelope that produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-command-envelope'`, and returns exit 0, 1, 2 or 3 with the meanings stated in the spec (`DocsLedgerCommands.Tests.ps1`).
 - [x] Every emitted receipt produces no finding from `Test-DocsArtifactText -ArtifactKind 'docs-validation-receipt'`, and its `id` does not change when only `issued_at` differs (`DocsReceipt.Tests.ps1`, `DocsValidation.Tests.ps1`).
-- [ ] `-Command validate` without `-WriteReceipt` makes no `WriteText` call in any mode, so an MCP tool that does not pass that switch is read-only (`DocsLedgerCommands.Tests.ps1`).
-- [ ] An invalid argument returns exit 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and a null `result`, before any context read (`DocsLedgerCommands.Tests.ps1`).
+- [x] `-Command validate` without `-WriteReceipt` makes no `WriteText` call in any mode, so an MCP tool that does not pass that switch is read-only (`DocsLedgerCommands.Tests.ps1`).
+- [x] An invalid argument returns exit 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and a null `result`, before any context read (`DocsLedgerCommands.Tests.ps1`).
 - [x] `Get-DocsReceiptGateDecision` allows only a schema-valid `docs-complete` receipt with `validation_result` `pass` whose `revision` equals the supplied revision, and otherwise returns the reason `receipt-invalid`, `mode-not-docs-complete`, `result-fail` or `revision-mismatch` (`DocsReceipt.Tests.ps1`).
 
 ### Quality

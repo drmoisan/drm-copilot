@@ -114,7 +114,9 @@ function New-DocsLedgerTestContext {
     if ($null -ne $File) {
         foreach ($key in $File.Keys) {
             $value = $File[$key]
-            $bytes = if ($null -eq $value) { [byte[]]@() } elseif ($value -is [byte[]]) { [byte[]] $value.Clone() } else { $utf8.GetBytes([string] $value) }
+            # Assigned directly (not through an if expression) so an empty file stays an empty byte array, not $null.
+            [byte[]] $bytes = [byte[]]::new(0)
+            if ($value -is [byte[]]) { $bytes = [byte[]] $value.Clone() } elseif ($null -ne $value) { $bytes = $utf8.GetBytes([string] $value) }
             $files[[string] $key] = $bytes
         }
     }
@@ -359,7 +361,9 @@ function New-DocsLedgerTestEntry {
     )
 
     if (-not $PSBoundParameters.ContainsKey('PageBinding')) {
-        $PageBinding = if ($Disposition -ceq 'documented') { @([ordered]@{ page_path = 'docs/reference/Cli.md'; anchor = $null }) } else { @() }
+        # Assigned directly (not through an if expression) so an empty binding list stays empty, not $null.
+        $PageBinding = [object[]]@()
+        if ($Disposition -ceq 'documented') { $PageBinding = @([ordered]@{ page_path = 'docs/reference/Cli.md'; anchor = $null }) }
     }
     $extensions = [ordered]@{}
     if ($null -ne $Extension) { foreach ($key in $Extension.Keys) { $extensions[[string] $key] = $Extension[$key] } }
