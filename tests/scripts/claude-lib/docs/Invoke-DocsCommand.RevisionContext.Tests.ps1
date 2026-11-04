@@ -104,7 +104,7 @@ Describe 'Resolve-DocsContextRevision' {
 }
 
 Describe 'Read-DocsContextRevisionText' {
-    It 'returns stdout without its leading BOM and records argv ending in show and <revision>:<path>' {
+    It 'returns stdout without its leading BOM and records argv ending in show and the revision-qualified path' {
         # Arrange
         $recorder = Get-TestRecordingProcess -Result @{ ExitCode = 0; Stdout = ([string][char]0xFEFF) + '{"a":1}'; Stderr = ''; TimedOut = $false }
 
