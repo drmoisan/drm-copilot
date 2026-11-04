@@ -53,7 +53,7 @@ AfterAll {
 }
 
 Describe 'Get-DocsSchemaName and Get-DocsSchemaPath' {
-    It 'lists the eight schema names in fixed order followed by the 1021 anchor in the module text' {
+    It 'lists the eight 1020 schema names first in fixed order followed by the 1021 anchor in the module text' {
         # Arrange
         $expected = @('common', 'docs-profile', 'surface-inventory-snapshot', 'docs-coverage-ledger', 'docs-parity-matrix', 'docs-evidence-pin', 'docs-validation-receipt', 'docs-command-envelope')
         $moduleText = Get-Content -LiteralPath (Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsSchema.psm1') -Raw
@@ -61,13 +61,29 @@ Describe 'Get-DocsSchemaName and Get-DocsSchemaPath' {
         # Act
         $names = Get-DocsSchemaName
 
-        # Assert
-        $names | Should -Be $expected
+        # Assert (membership plus the order of the 1020 names; later children append under their anchors)
+        @($names | Select-Object -First $expected.Count) | Should -Be $expected
+        foreach ($name in $expected) { @($names | Where-Object { $_ -ceq $name }).Count | Should -Be 1 -Because "'$name' is listed once" }
         $envelopeAt = $moduleText.IndexOf("'docs-command-envelope'`r", [System.StringComparison]::Ordinal)
         if ($envelopeAt -lt 0) { $envelopeAt = $moduleText.IndexOf("'docs-command-envelope'`n", [System.StringComparison]::Ordinal) }
         $anchorAt = $moduleText.IndexOf('# --- 1021: page-metadata ---', [System.StringComparison]::Ordinal)
         $envelopeAt | Should -BeGreaterThan 0
         $anchorAt | Should -BeGreaterThan $envelopeAt
+    }
+
+    It 'registers page-metadata (issue 1021) after the 1021 anchor with a runtime path row' {
+        # Arrange
+        $moduleText = Get-Content -LiteralPath (Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsSchema.psm1') -Raw
+        $anchorAt = $moduleText.IndexOf('# --- 1021: page-metadata ---', [System.StringComparison]::Ordinal)
+
+        # Act
+        $names = Get-DocsSchemaName
+        $paths = Get-DocsSchemaPath
+
+        # Assert
+        $names | Should -Contain 'page-metadata'
+        $moduleText.IndexOf("'page-metadata'", [System.StringComparison]::Ordinal) | Should -BeGreaterThan $anchorAt
+        ($paths['page-metadata'] -replace '\\', '/') | Should -BeLike '*/.claude/lib/docs/schemas/v1/page-metadata.schema.json'
     }
 
     It 'maps every schema name to one literal runtime path under schemas/v1' {
@@ -238,6 +254,17 @@ Describe 'Get-DocsComposedSchemaSet' {
         @($set.Findings).Count | Should -Be 0
         @($set.Schemas.Keys) | Should -Not -Contain 'common'
         $set.Schemas.Count | Should -Be ($script:SchemaText.Count - 1)
+    }
+
+    It 'composes page-metadata from the committed set into a schema Test-DocsArtifactText accepts (issue 1021)' {
+        # Act
+        $set = Get-DocsComposedSchemaSet -SchemaSet $script:SchemaText
+        $findings = Test-DocsArtifactText -ArtifactKind 'page-metadata' -JsonText '{"owner":"team-docs"}' -ComposedSchemaSet $set.Schemas
+
+        # Assert
+        @($set.Schemas.Keys) | Should -Contain 'page-metadata'
+        $set.Schemas['page-metadata'].Text | Should -Not -BeNullOrEmpty
+        @($findings).Count | Should -Be 0
     }
 
     It 'returns the DOCS_SCHEMA_RECURSIVE_DEF finding once for a common text holding tree' {
