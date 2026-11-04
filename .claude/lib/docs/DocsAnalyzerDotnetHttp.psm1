@@ -14,7 +14,8 @@
     folded. Minimal APIs: receiver.MapGet .. MapPatch, MapMethods with array or collection
     expressions, Map as ANY, MapGroup variables and chains composing prefixes. Elements are
     built only through New-DocsSurfaceElement -AnalysisMethod scanner -SourceText; the digest
-    is never computed here. Every function is pure.
+    is never computed here. Attribute and Map* names match by exact case, as C# names are
+    case-sensitive. Every function is pure.
 
 .NOTES
     Issue #1033. Requires PowerShell 7.4 or later. No external module dependencies.
@@ -36,8 +37,11 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsScannerCommon
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1') -ErrorAction Stop
 
 $script:DocsDotnetHttpAnalyzerId = 'dotnet-http'
-$script:DocsDotnetVerbAttribute = @{ HttpGet = 'GET'; HttpPost = 'POST'; HttpPut = 'PUT'; HttpDelete = 'DELETE'; HttpPatch = 'PATCH'; HttpHead = 'HEAD'; HttpOptions = 'OPTIONS' }
-$script:DocsDotnetMapMethod = @{ MapGet = 'GET'; MapPost = 'POST'; MapPut = 'PUT'; MapDelete = 'DELETE'; MapPatch = 'PATCH' }
+# Ordinal comparers: C# attribute and method names are case-sensitive, so a wrong-case name is not a route.
+$script:DocsDotnetVerbAttribute = [System.Collections.Generic.Dictionary[string, string]]::new([System.StringComparer]::Ordinal)
+foreach ($pair in @(@('HttpGet', 'GET'), @('HttpPost', 'POST'), @('HttpPut', 'PUT'), @('HttpDelete', 'DELETE'), @('HttpPatch', 'PATCH'), @('HttpHead', 'HEAD'), @('HttpOptions', 'OPTIONS'))) { $script:DocsDotnetVerbAttribute.Add($pair[0], $pair[1]) }
+$script:DocsDotnetMapMethod = [System.Collections.Generic.Dictionary[string, string]]::new([System.StringComparer]::Ordinal)
+foreach ($pair in @(@('MapGet', 'GET'), @('MapPost', 'POST'), @('MapPut', 'PUT'), @('MapDelete', 'DELETE'), @('MapPatch', 'PATCH'))) { $script:DocsDotnetMapMethod.Add($pair[0], $pair[1]) }
 $script:DocsDotnetUnsupportedMap = [string[]]@('MapHub', 'MapGrpcService', 'MapHealthChecks', 'MapFallback', 'MapRazorPages')
 $script:DocsDotnetConventionalMap = [string[]]@('MapControllerRoute', 'MapDefaultControllerRoute')
 

@@ -330,6 +330,20 @@ Describe 'Invoke-DocsAnalyzerDotnetHttp' {
             $output['Diagnostics'].Count | Should -Be 3
         }
 
+        It 'recognizes verb attributes and Map* methods by their exact case and ignores a wrong-case name' {
+            # Arrange: C# names are case-sensitive, so Httpget, HTTPPOST, Mapget and MapPOST are not routes.
+            $controller = "public class ItemsController : ControllerBase`n{`n    [Httpget(`"a`")] public IActionResult A() => Ok();`n    [HTTPPOST(`"b`")] public IActionResult B() => Ok();`n    [HttpGet(`"c`")] public IActionResult C() => Ok();`n}"
+            $program = "app.Mapget(`"/lower`", h);`napp.MapPOST(`"/upper`", h);`napp.MapGet(`"/ok`", h);"
+            $inputs = @((New-DocsTestCapturedInput -Path 'src/ItemsController.cs' -Text $controller), (New-DocsTestCapturedInput -Path 'src/Program.cs' -Text $program))
+
+            # Act
+            $output = Invoke-DocsAnalyzerDotnetHttp -CapturedInput $inputs -Selection $null
+
+            # Assert
+            Get-TestDeclaration -Output $output | Should -Be @('GET /c', 'GET /ok') -Because 'only the exact-case HttpGet attribute and MapGet call are routes'
+            $output['Diagnostics'].Count | Should -Be 0
+        }
+
         It 'throws for a null captured-input list' {
             { Invoke-DocsAnalyzerDotnetHttp -CapturedInput $null -Selection $null } | Should -Throw
         }
