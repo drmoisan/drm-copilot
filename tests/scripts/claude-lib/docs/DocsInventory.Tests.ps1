@@ -13,6 +13,9 @@
     (no WriteText call without it; one call with mode create or overwrite), the recording
     ReadBytes wrapper proving a non-template env-family file is never read, and the scan of the
     other seventeen new module texts for a Context reference.
+
+    The analyzer-list assertion checks membership of the 1022 identifiers and ordinal order only,
+    because later children (for example #1033) register further rows in the shared registry.
 #>
 
 BeforeAll {

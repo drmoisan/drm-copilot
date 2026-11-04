@@ -767,7 +767,7 @@ built in memory.
 - [x] No Python or TypeScript file is added or modified: `git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`, and the plan carries the artifact classification table of `## Artifact Classification`.
 - [x] No test creates a temporary file: no file this feature adds or edits under `tests/scripts/claude-lib/docs/` contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`.
 - [x] Pester line coverage is at least 85% for each new production module (`DocsScannerCommon.psm1`, `DocsTypeScriptTokens.psm1`, `DocsTypeScriptJsx.psm1` when created, `DocsCSharpTokens.psm1`, `DocsAnalyzerTypeScriptCli.psm1`, `DocsAnalyzerTypeScriptHttp.psm1`, `DocsAnalyzerTypeScriptExports.psm1`, `DocsAnalyzerDotnetHttp.psm1`, `DocsAnalyzerDotnetConfig.psm1`, `DocsAnalyzerDotnetApi.psm1`, `DocsAnalyzerExtensionImport.psm1`), read from the PoshQC coverage report with no production file excluded from measurement, recorded under `<FEATURE>/evidence/coverage/` (no branch-coverage gate applies to Pester).
-- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` (Windows shards, coverage) and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
+- [x] (CI-dependent) The required check `poshqc / PowerShell QC` (Windows shards, coverage) and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
 
 ## Definition of Done
 

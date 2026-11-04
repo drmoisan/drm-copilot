@@ -119,7 +119,7 @@ children and are out of scope here.
 - [x] The push-down copy of every new or edited `.claude/lib/docs/` file is byte-identical to its source and listed in the Claude `core.json` (`Docs.Manifest.Tests.ps1`, run by `poshqc / PowerShell QC`, and the existing push-down contract tests passing unmodified).
 - [x] No new Python or TypeScript file is added, and the plan carries the artifact classification table.
 - [x] Pester line coverage is at least 85% for each new module, no test creates a temporary file, and no test starts a process, waits on a real timer or resolves an executable on PATH (every input is built in memory).
-- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` (Windows shards, coverage) passes on the pull request head.
+- [x] (CI-dependent) The required check `poshqc / PowerShell QC` (Windows shards, coverage) passes on the pull request head.
 
 ## Owner Questions
 
