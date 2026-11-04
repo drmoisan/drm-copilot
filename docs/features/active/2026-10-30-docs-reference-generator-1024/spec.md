@@ -825,7 +825,7 @@ All Pester criteria run locally through `Invoke-PoshQCTest` and in CI under the 
 - [x] Pester line coverage is at least 85% for each of `DocsReferencePlan.psm1`, `DocsReferenceRender.psm1`, `DocsReferenceMarkers.psm1`, `DocsReferenceFrontMatter.psm1` and `DocsReferenceWriter.psm1` (and `DocsReferenceReport.psm1` if created), read from the PoshQC coverage report produced by `Invoke-PoshQCTest`, with no production file excluded from measurement (no branch-coverage gate applies to Pester); the figures are recorded under `<FEATURE>/evidence/coverage/`.
 - [x] The upstream-symbol confirmation record under `<FEATURE>/evidence/other/` lists every 1020 and 1021 symbol in `### Upstream symbols consumed` with its confirmed module and signature on the integration branch, and no 1024 task consumes a symbol before it is confirmed.
 - [x] Test isolation is verified: three seeded shuffled file-order runs and one fresh single-process run over `tests/scripts` pass, each recorded under `<FEATURE>/evidence/regression-testing/` with its seed.
-- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` (aggregating `PowerShell QC shard 1` to `shard 3` on `windows-latest`), `poshqc / PowerShell QC static` and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
+- [x] (CI-dependent) The required check `poshqc / PowerShell QC` (aggregating `PowerShell QC shard 1` to `shard 3` on `windows-latest`), `poshqc / PowerShell QC static` and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
 
 ## Definition of Done
 

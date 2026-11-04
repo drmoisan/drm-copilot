@@ -16,7 +16,10 @@
     The rendered block is '---', one '<key>: <JSON value>' line per field in the order owner,
     last_reviewed, audience, diataxis_mode, surface_refs, title, extensions, then '---'. JSON
     values are canonical JSON without the trailing LF, with U+0085, U+2028 and U+2029 written as
-    \u escapes so that every value stays on one line.
+    \u escapes so that every value stays on one line. The one exception is an extensions value
+    that holds a number canonical JSON rejects (a non-integral number or one beyond the
+    safe-integer bound): that value is written by ConvertTo-DocsJsonText. A canonical-serializer
+    failure for any other value propagates to the caller.
 
     Every function is pure: no filesystem, clock, process, environment or module-scope mutable
     state; inputs are not mutated.
