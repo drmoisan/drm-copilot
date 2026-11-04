@@ -70,10 +70,12 @@ Describe "DrmCopilotPromptSupport.ps1" {
             # The location delegate is built from literal text so it keeps its value after the
             # production code re-binds it with GetNewClosure.
             $docsPath = Join-Path $script:RepoRoot 'docs'
+            # The escape keeps the single-quoted literal valid for any path, including one with a quote.
+            $escapedDocsPath = [System.Management.Automation.Language.CodeGeneration]::EscapeSingleQuotedStringContent($docsPath)
             Set-DrmCopilotPrompt `
                 -RepoRootPath $script:RepoRoot `
                 -PromptName "drm-copilot" `
-                -GetLocationPath ([scriptblock]::Create("'$docsPath'"))
+                -GetLocationPath ([scriptblock]::Create("'$escapedDocsPath'"))
 
             (& $function:prompt) | Should -Be "(drm-copilot):\docs> "
         }
@@ -84,6 +86,8 @@ Describe "DrmCopilotPromptSupport.ps1" {
             $script:capturedActivationScriptPath = $null
             $script:capturedPromptName = $null
             $scriptsPath = Join-Path $script:RepoRoot 'scripts'
+            # The escape keeps the single-quoted literal valid for any path, including one with a quote.
+            $escapedScriptsPath = [System.Management.Automation.Language.CodeGeneration]::EscapeSingleQuotedStringContent($scriptsPath)
 
             Start-DrmCopilotPromptSession `
                 -RepoRootPath $script:RepoRoot `
@@ -98,7 +102,7 @@ Describe "DrmCopilotPromptSupport.ps1" {
                 $script:capturedActivationScriptPath = $ActivationScriptPath
                 $script:capturedPromptName = $ResolvedPromptName
             } `
-                -GetLocationPath ([scriptblock]::Create("'$scriptsPath'")) `
+                -GetLocationPath ([scriptblock]::Create("'$escapedScriptsPath'")) `
                 -ResolveActivationScriptPath {
                 param([string]$RepoRootPath, [string]$VirtualEnvironmentPath)
                 $null = $RepoRootPath

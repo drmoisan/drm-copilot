@@ -55,7 +55,9 @@ Describe 'Test-DiscoveryHostCapability.ps1 entry point' {
         # A portable workspace root (fully qualified on every host, never created); the probe
         # existence check is mocked to $false for paths under that root only.
         $noProbeRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'test-discoveryhostcapability-entry-root'
-        $underNoProbeRoot = [scriptblock]::Create("([string]`$LiteralPath).StartsWith('$noProbeRoot', [System.StringComparison]::OrdinalIgnoreCase)")
+        # The escape keeps the single-quoted literal valid for any path, including one with a quote.
+        $escapedNoProbeRoot = [System.Management.Automation.Language.CodeGeneration]::EscapeSingleQuotedStringContent($noProbeRoot)
+        $underNoProbeRoot = [scriptblock]::Create("([string]`$LiteralPath).StartsWith('$escapedNoProbeRoot', [System.StringComparison]::OrdinalIgnoreCase)")
         Mock Test-Path { $false } -ParameterFilter $underNoProbeRoot
         $result = Invoke-ScriptEntry -Arguments @{ HostName = 'codex'; WorkspaceRoot = $noProbeRoot; SessionId = 'session-alpha' }
         $result.Thrown | Should -BeNullOrEmpty
