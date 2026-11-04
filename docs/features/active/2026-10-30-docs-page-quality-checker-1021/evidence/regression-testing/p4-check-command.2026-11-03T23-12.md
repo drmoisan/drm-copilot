@@ -1,0 +1,14 @@
+# P4 Check Command - Issue #1021
+
+Timestamp: 2026-11-03T23-12
+Task: [P4-T2]
+Command: `sh SCRATCH/issue-1021-failnames.sh tests/scripts/claude-lib/docs/DocsPageCheck.Tests.ps1 issue-1021-p4-cmd.txt` (PowerShell 7 `Invoke-Pester` with the repository run settings over the branch-current suite; `Run.PassThru`)
+EXIT_CODE: 0
+Output Summary: TOTAL=68 PASSED=68 FAILED=0 SKIPPED=0 NOTRUN=0 FAILED_BLOCKS=0 FAILED_CONTAINERS=0 (55 rule and catalog tests from [P4-T1] plus 13 command tests). CI: CI-PESTER.
+
+## Scope
+
+- `Invoke-DocsCheckCommand` added to `.claude/lib/docs/DocsPageCheck.psm1`, following spec `### check subcommand` flow steps 1 to 7: argument validation with `Test-DocsRelativePath` (exit 2, one `DOCS_CLI_ARGUMENTS`, result null); profile read through `Context.ReadText` with an item-not-found error mapped to `DOCS_PROFILE_MISSING` (exit 1, result null); `Read-DocsSchemaSet` and `Get-DocsComposedSchemaSet` (composition findings throw `DOCS_SCHEMA_COMPOSITION_FAILED`, reported as exit 3 by the entry boundary); `ConvertFrom-DocsProfileText` (an error finding returns those findings, exit 1, result null, no page check); `Context.ListFile` per root in profile order, `Get-DocsPageCandidatePath`, `Context.ReadBytes`, `ConvertFrom-DocsPageBytes`; `Context.TestFile` once per `Get-DocsPageExternalTarget` path; `Get-DocsPageCheckFinding` with `-Path` selection; `New-DocsCommandResult -Command 'check'` with the line `check: pages=<n> roots=<n>`.
+- Context members are called through the module's private `Invoke-DocsContextMember`, whose `[scriptblock]` parameter is invoked with `&` (CR-10 form recorded in `1020-precondition`). `CR-3 gate: option A`, so no `Get-DocsPageComposedSchemaSet` call exists.
+- Command contexts of `tests/scripts/claude-lib/docs/DocsPageCheck.Tests.ps1` (in-memory context of `Docs.TestSupport.psm1` with recording `TestFile` and `ListFile` members and a throwing `UtcNow` member): exit 0 with no `error` finding on the clean set; exit 1 for the missing-field, broken-link and Diataxis families; exit 1 with `DOCS_PROFILE_MISSING` and result null; an invalid profile returns its findings, exit 1, result null and no `ListFile` call; exit 2 for a non-relative `-Profile` and `-Path`; `TestFile` called once per external target and never for a page (recorded calls `docs/data/x.json`, `docs/img.png`, `docs/missing.txt`); `UtcNow` never read (the member throws); `result` has exactly `page_count`, `profile_path` and `roots`, with `roots` in profile order and `page_count` counting distinct pages across nested roots; the command line; the 1024-shape fixture exits 0 with zero findings; `-Path` selection and `DOCS_PAGE_PATH_UNMATCHED`; an uncomposable schema set throws.
+- Correction during the task: the first run reported one failed container because a `-ForEach` row called a `BeforeAll` helper at discovery time; the page text is now built in the `It` body.

@@ -42,6 +42,11 @@ function Get-DocsInitTemplate {
 
     $rows = @(
         # --- 1021: page-check configuration ---
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/markdownlint.json'; Destination = '.markdownlint.json' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale.ini'; Destination = '.vale.ini' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml'; Destination = '.vale/styles/DocsBase/HeadingPunctuation.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'; Destination = '.vale/styles/DocsBase/Placeholders.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'; Destination = '.vale/styles/config/vocabularies/Project/accept.txt' }
         # --- 1034: docs workflow ---
     )
     return , [object[]]$rows
