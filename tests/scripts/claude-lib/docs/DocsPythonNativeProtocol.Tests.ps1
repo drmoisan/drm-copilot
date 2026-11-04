@@ -22,17 +22,17 @@ BeforeAll {
     $script:FixtureRoot = Join-Path -Path $PSScriptRoot -ChildPath 'fixtures'
     $script:AllIds = [string[]]@('python-architecture', 'python-cli', 'python-http', 'python-public-api')
 
-    function New-TestInput {
+    function ConvertTo-TestInput {
         param([string] $Path, [string] $Text)
         return New-DocsCapturedInput -Path $Path -Bytes ([System.Text.UTF8Encoding]::new($false).GetBytes($Text))
     }
 
     function Get-TestInput {
         return [object[]]@(
-            (New-TestInput -Path 'src/pkg/b.py' -Text "import click`n@click.command()`ndef go():`n    pass`n"),
-            (New-TestInput -Path 'src/pkg/a.py' -Text ([string][char]0xFEFF + "x = 1`r`ny = 2`r`n")),
-            (New-TestInput -Path 'pyproject.toml' -Text "[project.scripts]`ntool = `"pkg.b:go`"`n"),
-            (New-TestInput -Path 'config/app.yaml' -Text "name: v`n")
+            (ConvertTo-TestInput -Path 'src/pkg/b.py' -Text "import click`n@click.command()`ndef go():`n    pass`n"),
+            (ConvertTo-TestInput -Path 'src/pkg/a.py' -Text ([string][char]0xFEFF + "x = 1`r`ny = 2`r`n")),
+            (ConvertTo-TestInput -Path 'pyproject.toml' -Text "[project.scripts]`ntool = `"pkg.b:go`"`n"),
+            (ConvertTo-TestInput -Path 'config/app.yaml' -Text "name: v`n")
         )
     }
 
@@ -40,7 +40,7 @@ BeforeAll {
         return New-DocsPythonNativeRequest -CapturedInput (Get-TestInput) -AnalyzerId $script:AllIds -SourceRoot @('src') -ConsoleScript (Get-DocsPythonNativeConsoleScript -CapturedInput (Get-TestInput))
     }
 
-    function New-TestResponseText {
+    function ConvertTo-TestResponseText {
         # Builds a canned response for the Get-TestInput request; Mutate edits the parsed object.
         param([scriptblock] $Mutate)
         $response = [ordered]@{
@@ -121,7 +121,7 @@ Describe 'New-DocsPythonNativeRequest' {
     It 'maps the 1022 corpus pyproject.toml script tables to the 1031 corpus console_scripts' {
         $surface = (ConvertFrom-DocsJsonText -Text ([System.IO.File]::ReadAllText((Join-Path $script:FixtureRoot 'python-surface-corpus.json'), [System.Text.UTF8Encoding]::new($false)))).Value
         $native = (ConvertFrom-DocsJsonText -Text ([System.IO.File]::ReadAllText((Join-Path $script:FixtureRoot 'python-native-corpus.json'), [System.Text.UTF8Encoding]::new($false)))).Value
-        $captured = @(New-TestInput -Path 'pyproject.toml' -Text ([string] $surface['inputs']['pyproject.toml']))
+        $captured = @(ConvertTo-TestInput -Path 'pyproject.toml' -Text ([string] $surface['inputs']['pyproject.toml']))
         $scripts = Get-DocsPythonNativeConsoleScript -CapturedInput $captured
         (ConvertTo-DocsCanonicalJson -Value @($scripts)) | Should -BeExactly (ConvertTo-DocsCanonicalJson -Value @($native['console_scripts']))
     }
@@ -129,7 +129,7 @@ Describe 'New-DocsPythonNativeRequest' {
 
 Describe 'Test-DocsPythonNativeResponse and ConvertFrom-DocsPythonNativeResponse' {
     It 'accepts the canned response and builds native elements, parents, diagnostics and the parse-failed list' {
-        $outcome = Get-TestOutcome -Stdout (New-TestResponseText)
+        $outcome = Get-TestOutcome -Stdout (ConvertTo-TestResponseText)
         $outcome.Reason | Should -BeNullOrEmpty
         $output = $outcome.Native.Output
         $api = @($output['python-public-api'].Elements)
@@ -144,13 +144,13 @@ Describe 'Test-DocsPythonNativeResponse and ConvertFrom-DocsPythonNativeResponse
     }
 
     It 'passes a helper diagnostic code through unchanged' {
-        $outcome = Get-TestOutcome -Stdout (New-TestResponseText)
+        $outcome = Get-TestOutcome -Stdout (ConvertTo-TestResponseText)
         @($outcome.Native.Output['python-cli'].Diagnostics | ForEach-Object { $_['code'] }) | Should -Be @('CLI_DYNAMIC_REGISTRATION')
         @($outcome.Native.Output['python-cli'].Diagnostics)[0]['severity'] | Should -BeExactly 'warning'
     }
 
     It 'lists a parse-error file in ParseFailed and maps a blocking diagnostic to error' {
-        $text = New-TestResponseText -Mutate { param($r) $r['files'][1]['status'] = 'parse-error'; $r['files'][1]['facts'] = @(); $r['files'][0]['diagnostics'][0]['blocking'] = $true }
+        $text = ConvertTo-TestResponseText -Mutate { param($r) $r['files'][1]['status'] = 'parse-error'; $r['files'][1]['facts'] = @(); $r['files'][0]['diagnostics'][0]['blocking'] = $true }
         $outcome = Get-TestOutcome -Stdout $text
         @($outcome.Native.ParseFailed) | Should -Be @('src/pkg/b.py')
         @($outcome.Native.Output['python-cli'].Diagnostics)[0]['severity'] | Should -BeExactly 'error'
@@ -176,7 +176,7 @@ Describe 'Test-DocsPythonNativeResponse and ConvertFrom-DocsPythonNativeResponse
         @{ Name = 'non-object properties'; Mutate = { param($r) $r['files'][0]['facts'][0]['properties'] = 'x' }; Raw = $null }
         @{ Name = 'oversized output'; Mutate = $null; Raw = ('x' * 67108865) }
     ) {
-        $stdout = if ($null -ne $Raw) { $Raw } else { New-TestResponseText -Mutate $Mutate }
+        $stdout = if ($null -ne $Raw) { $Raw } else { ConvertTo-TestResponseText -Mutate $Mutate }
         (Get-TestOutcome -Stdout $stdout).Reason | Should -BeExactly 'output-invalid' -Because $Name
     }
 

@@ -51,8 +51,9 @@ BeforeAll {
         return ConvertTo-DocsCanonicalJson -Value ([ordered]@{ files = $files; protocol_version = 1 })
     }
 
-    function New-TestNativeContext {
+    function Get-TestNativeContext {
         # Wraps the in-memory context; Invoke replaces InvokeProcess and records each call.
+        # Invoke receives the four seam arguments positionally; a fake that ignores them declares no parameter.
         param([bool] $Pack = $true, [scriptblock] $Invoke)
         $test = New-DocsTestContext -File (Get-TestFile -Pack $Pack)
         $calls = [System.Collections.Generic.List[string]]::new()
@@ -60,7 +61,7 @@ BeforeAll {
         $recording = {
             param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds)
             $calls.Add([string] $FilePath)
-            return (& $inner $FilePath)
+            return (& $inner $FilePath $ArgumentList $StdinText $TimeoutSeconds)
         }.GetNewClosure()
         $base = $test.Context
         $context = [pscustomobject]@{
@@ -99,7 +100,7 @@ AfterAll {
 Describe 'inventory -AnalysisMethod' {
     It 'uses the native analyzers when the helper answers, with scanner elements for config-files and non-.py inputs' {
         $ok = $script:OkText
-        $test = New-TestNativeContext -Invoke { param($FilePath) @{ ExitCode = 0; Stdout = $ok; Stderr = ''; TimedOut = $false } }.GetNewClosure()
+        $test = Get-TestNativeContext -Invoke { @{ ExitCode = 0; Stdout = $ok; Stderr = ''; TimedOut = $false } }.GetNewClosure()
         $run = Invoke-TestCli -Context $test.Context
         $run.Outcome.ExitCode | Should -Be 0
         $run.Codes | Should -BeNullOrEmpty
@@ -111,7 +112,7 @@ Describe 'inventory -AnalysisMethod' {
     }
 
     It 'is silent with the pack absent: exit 0, scanner elements, no added diagnostic and zero InvokeProcess calls (S3)' {
-        $test = New-TestNativeContext -Pack $false -Invoke { param($FilePath) throw 'never called' }
+        $test = Get-TestNativeContext -Pack $false -Invoke { throw 'never called' }
         $run = Invoke-TestCli -Context $test.Context
         $run.Outcome.ExitCode | Should -Be 0
         $run.Codes | Should -BeNullOrEmpty
@@ -122,13 +123,13 @@ Describe 'inventory -AnalysisMethod' {
 
     It 'falls back to the scanner under auto with one PYTHON_NATIVE_UNAVAILABLE diagnostic naming <Reason> (S4)' -ForEach @(
         @{ Reason = 'interpreter-not-found'; Invoke = { param($FilePath) throw "DOCS_PROCESS_START_FAILED: the process '$FilePath' could not be started: missing" } }
-        @{ Reason = 'version-below-floor'; Invoke = { param($FilePath) @{ ExitCode = 4; Stdout = ''; Stderr = ''; TimedOut = $false } } }
-        @{ Reason = 'timeout'; Invoke = { param($FilePath) @{ ExitCode = $null; Stdout = ''; Stderr = ''; TimedOut = $true } } }
-        @{ Reason = 'exit-nonzero'; Invoke = { param($FilePath) @{ ExitCode = 1; Stdout = ''; Stderr = ''; TimedOut = $false } } }
-        @{ Reason = 'start-error'; Invoke = { param($FilePath) throw 'access denied' } }
-        @{ Reason = 'output-invalid'; Invoke = { param($FilePath) @{ ExitCode = 0; Stdout = '{}'; Stderr = ''; TimedOut = $false } } }
+        @{ Reason = 'version-below-floor'; Invoke = { @{ ExitCode = 4; Stdout = ''; Stderr = ''; TimedOut = $false } } }
+        @{ Reason = 'timeout'; Invoke = { @{ ExitCode = $null; Stdout = ''; Stderr = ''; TimedOut = $true } } }
+        @{ Reason = 'exit-nonzero'; Invoke = { @{ ExitCode = 1; Stdout = ''; Stderr = ''; TimedOut = $false } } }
+        @{ Reason = 'start-error'; Invoke = { throw 'access denied' } }
+        @{ Reason = 'output-invalid'; Invoke = { @{ ExitCode = 0; Stdout = '{}'; Stderr = ''; TimedOut = $false } } }
     ) {
-        $test = New-TestNativeContext -Invoke $Invoke
+        $test = Get-TestNativeContext -Invoke $Invoke
         $run = Invoke-TestCli -Context $test.Context
         $run.Outcome.ExitCode | Should -Be 0
         @($run.Envelope['findings'] | Where-Object { $_['severity'] -ceq 'error' }).Count | Should -Be 0
@@ -143,7 +144,7 @@ Describe 'inventory -AnalysisMethod' {
     }
 
     It 'exits 3 under native with one DOCS_PYTHON_NATIVE_UNAVAILABLE finding and no WriteText call' {
-        $test = New-TestNativeContext -Pack $false -Invoke { param($FilePath) throw 'never called' }
+        $test = Get-TestNativeContext -Pack $false -Invoke { throw 'never called' }
         $run = Invoke-TestCli -Context $test.Context -Arguments @('-AnalysisMethod', 'native', '-Write')
         $run.Outcome.ExitCode | Should -Be 3
         $run.Codes | Should -Be @('DOCS_PYTHON_NATIVE_UNAVAILABLE')
@@ -151,7 +152,7 @@ Describe 'inventory -AnalysisMethod' {
     }
 
     It 'makes zero InvokeProcess calls under scanner' {
-        $test = New-TestNativeContext -Invoke { param($FilePath) throw 'never called' }
+        $test = Get-TestNativeContext -Invoke { throw 'never called' }
         $run = Invoke-TestCli -Context $test.Context -Arguments @('-AnalysisMethod', 'scanner')
         $run.Outcome.ExitCode | Should -Be 0
         $test.Calls.Count | Should -Be 0
@@ -159,7 +160,7 @@ Describe 'inventory -AnalysisMethod' {
     }
 
     It 'exits 2 with DOCS_CLI_ARGUMENTS for an unknown -AnalysisMethod value (S6)' {
-        $test = New-TestNativeContext -Invoke { param($FilePath) throw 'never called' }
+        $test = Get-TestNativeContext -Invoke { throw 'never called' }
         $run = Invoke-TestCli -Context $test.Context -Arguments @('-AnalysisMethod', 'fast')
         $run.Outcome.ExitCode | Should -Be 2
         $run.Codes | Should -Be @('DOCS_CLI_ARGUMENTS')

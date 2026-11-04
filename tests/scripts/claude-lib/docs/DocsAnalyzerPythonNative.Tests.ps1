@@ -23,16 +23,16 @@ BeforeAll {
     $script:HelperPath = '.claude/lib/docs/python/run_docs_python_native.py'
     $script:AllIds = [string[]]@('python-architecture', 'python-cli', 'python-http', 'python-public-api')
 
-    function New-TestInput {
+    function ConvertTo-TestInput {
         param([string] $Path, [string] $Text)
         return New-DocsCapturedInput -Path $Path -Bytes ([System.Text.UTF8Encoding]::new($false).GetBytes($Text))
     }
 
     function Get-TestInput {
         return [object[]]@(
-            (New-TestInput -Path 'src/pkg/a.py' -Text "def f():`n    pass`n"),
-            (New-TestInput -Path 'src/pkg/b.py' -Text "def g():`n    print `"x`"`n"),
-            (New-TestInput -Path 'pyproject.toml' -Text "[project.scripts]`ntool = `"pkg.a:f`"`n[tool.demo]`nkey = 1`n")
+            (ConvertTo-TestInput -Path 'src/pkg/a.py' -Text "def f():`n    pass`n"),
+            (ConvertTo-TestInput -Path 'src/pkg/b.py' -Text "def g():`n    print `"x`"`n"),
+            (ConvertTo-TestInput -Path 'pyproject.toml' -Text "[project.scripts]`ntool = `"pkg.a:f`"`n[tool.demo]`nkey = 1`n")
         )
     }
 
@@ -56,7 +56,7 @@ BeforeAll {
         return ConvertTo-DocsCanonicalJson -Value $response
     }
 
-    function New-TestContext {
+    function Get-TestContext {
         # Result maps a candidate to a result hashtable or to the string 'start-failed' / 'throw'.
         param([bool] $PackPresent = $true, [System.Collections.IDictionary] $Result = @{})
         $calls = [System.Collections.Generic.List[object]]::new()
@@ -99,7 +99,7 @@ BeforeAll {
 
     function Invoke-TestInventory {
         param([object] $Context, [string] $Method = 'auto', [object[]] $CapturedInput = (Get-TestInput))
-        $selection = [hashtable]::new([System.StringComparer]::Ordinal)
+        $selection = @{}
         $selection['source_roots'] = @('src')
         $selection['element_kinds'] = @(Get-DocsElementKind)
         return Invoke-DocsPythonNativeInventory -Registration (Get-TestNativeRow) -CapturedInput $CapturedInput -Selection $selection -AnalyzerId $script:AllIds -SourceRoot @('src') -AnalysisMethod $Method -Context $Context -ImportModule $script:NonForcingImport
@@ -114,7 +114,7 @@ AfterAll {
 
 Describe 'Invoke-DocsPythonNativeInterpreter' {
     It 'passes -I -B -X utf8 before the helper path, -3 first for py, the request and a 120-second bound' {
-        $test = New-TestContext -Result @{ python3 = 'start-failed'; python = 'start-failed'; py = 'start-failed' }
+        $test = Get-TestContext -Result @{ python3 = 'start-failed'; python = 'start-failed'; py = 'start-failed' }
         $result = Invoke-TestResult -Context $test.Context
         $result.Reason | Should -BeExactly 'interpreter-not-found'
         @($test.Calls | ForEach-Object { $_.FilePath }) | Should -Be @('python3', 'python', 'py')
@@ -133,7 +133,7 @@ Describe 'Invoke-DocsPythonNativeInterpreter' {
 
 Describe 'Get-DocsPythonNativeResult' {
     It 'reports pack-absent silently with zero InvokeProcess calls' {
-        $test = New-TestContext -PackPresent $false
+        $test = Get-TestContext -PackPresent $false
         $result = Invoke-TestResult -Context $test.Context
         $result.Available | Should -BeFalse
         $result.Reason | Should -BeExactly 'pack-absent'
@@ -151,7 +151,7 @@ Describe 'Get-DocsPythonNativeResult' {
         @{ Reason = 'start-error'; Results = @{ python3 = 'throw' } }
         @{ Reason = 'output-invalid'; Results = @{ python3 = @{ ExitCode = 0; Stdout = 'not json'; Stderr = ''; TimedOut = $false } } }
     ) {
-        $test = New-TestContext -Result $Results
+        $test = Get-TestContext -Result $Results
         $result = Invoke-TestResult -Context $test.Context
         $result.Available | Should -BeFalse
         $result.Reason | Should -BeExactly $Reason
@@ -166,17 +166,17 @@ Describe 'Get-DocsPythonNativeResult' {
 
     It 'gives output-invalid when a valid-looking response fails the 1020 conversion' {
         $text = (Get-TestResponseText).Replace('"pkg.a.f"', '" pkg.a.f"')
-        $result = Invoke-TestResult -Context (New-TestContext -Result @{ python3 = @{ ExitCode = 0; Stdout = $text; Stderr = ''; TimedOut = $false } }).Context
+        $result = Invoke-TestResult -Context (Get-TestContext -Result @{ python3 = @{ ExitCode = 0; Stdout = $text; Stderr = ''; TimedOut = $false } }).Context
         $result.Reason | Should -BeExactly 'output-invalid'
     }
 
     It 'treats a non-dictionary seam result as start-error' {
-        $result = Invoke-TestResult -Context (New-TestContext -Result @{ python3 = 'unexpected text' }).Context
+        $result = Invoke-TestResult -Context (Get-TestContext -Result @{ python3 = 'unexpected text' }).Context
         $result.Reason | Should -BeExactly 'start-error'
     }
 
     It 'uses the second candidate when the first fails' {
-        $test = New-TestContext -Result @{ python3 = @{ ExitCode = 3; Stdout = ''; Stderr = ''; TimedOut = $false }; python = $script:Ok }
+        $test = Get-TestContext -Result @{ python3 = @{ ExitCode = 3; Stdout = ''; Stderr = ''; TimedOut = $false }; python = $script:Ok }
         $result = Invoke-TestResult -Context $test.Context
         $result.Available | Should -BeTrue
         $result.Diagnostic | Should -BeNullOrEmpty
@@ -185,18 +185,18 @@ Describe 'Get-DocsPythonNativeResult' {
     }
 
     It 'returns the DOCS_PYTHON_NATIVE_UNAVAILABLE finding under native, including pack-absent' {
-        $absent = Invoke-TestResult -Context (New-TestContext -PackPresent $false).Context -Method 'native'
+        $absent = Invoke-TestResult -Context (Get-TestContext -PackPresent $false).Context -Method 'native'
         $absent.Finding['code'] | Should -BeExactly 'DOCS_PYTHON_NATIVE_UNAVAILABLE'
         $absent.Diagnostic | Should -BeNullOrEmpty
-        $failed = Invoke-TestResult -Context (New-TestContext).Context -Method 'native'
+        $failed = Invoke-TestResult -Context (Get-TestContext).Context -Method 'native'
         $failed.Finding['code'] | Should -BeExactly 'DOCS_PYTHON_NATIVE_UNAVAILABLE'
         $failed.Finding['message'].Contains('interpreter-not-found') | Should -BeTrue
     }
 
     It 'makes zero TestFile and InvokeProcess calls under scanner and without .py inputs' {
-        $test = New-TestContext -Result @{ python3 = $script:Ok }
+        $test = Get-TestContext -Result @{ python3 = $script:Ok }
         (Invoke-TestResult -Context $test.Context -Method 'scanner').Available | Should -BeFalse
-        (Invoke-TestResult -Context $test.Context -CapturedInput @(New-TestInput -Path 'pyproject.toml' -Text "a = 1`n")).Available | Should -BeFalse
+        (Invoke-TestResult -Context $test.Context -CapturedInput @(ConvertTo-TestInput -Path 'pyproject.toml' -Text "a = 1`n")).Available | Should -BeFalse
         (Get-DocsPythonNativeResult -CapturedInput (Get-TestInput) -AnalyzerId @() -SourceRoot @('src') -AnalysisMethod 'auto' -Context $test.Context).Available | Should -BeFalse
         $test.Calls.Count | Should -Be 0
         $test.Tests.Count | Should -Be 0
@@ -217,7 +217,7 @@ Describe 'Native analyzer functions' {
 
 Describe 'Invoke-DocsPythonNativeInventory' {
     It 'keeps scanner elements for a parse-failed file and native elements for the others (S5)' {
-        $test = New-TestContext -Result @{ python3 = $script:Ok }
+        $test = Get-TestContext -Result @{ python3 = $script:Ok }
         $result = Invoke-TestInventory -Context $test.Context
         $result.Finding | Should -BeNullOrEmpty
         @($result.Rows | ForEach-Object { "$($_.Id):$($_.AnalysisMethod)" }) | Should -Be @('python-architecture:native', 'python-architecture:scanner', 'python-cli:native', 'python-cli:scanner', 'python-http:native', 'python-http:scanner', 'python-public-api:native', 'python-public-api:scanner')
@@ -228,7 +228,7 @@ Describe 'Invoke-DocsPythonNativeInventory' {
     }
 
     It 'records scanner for pyproject.toml elements and for config-files, which has no native row' {
-        $result = Invoke-TestInventory -Context (New-TestContext -Result @{ python3 = $script:Ok }).Context
+        $result = Invoke-TestInventory -Context (Get-TestContext -Result @{ python3 = $script:Ok }).Context
         $pyproject = @($result.Outputs | ForEach-Object { $_.Elements } | Where-Object { $_['path'] -ceq 'pyproject.toml' })
         $pyproject.Count | Should -BeGreaterThan 0
         @($pyproject | ForEach-Object { $_['analysis_method'] } | Sort-Object -Unique) | Should -Be @('scanner')
@@ -237,7 +237,7 @@ Describe 'Invoke-DocsPythonNativeInventory' {
     }
 
     It 'falls back to the scanner rows with the diagnostic when the helper is unavailable, and returns the finding under native' {
-        $test = New-TestContext -Result @{ python3 = @{ ExitCode = 4; Stdout = ''; Stderr = ''; TimedOut = $false } }
+        $test = Get-TestContext -Result @{ python3 = @{ ExitCode = 4; Stdout = ''; Stderr = ''; TimedOut = $false } }
         $result = Invoke-TestInventory -Context $test.Context
         @($result.Rows | ForEach-Object { $_.AnalysisMethod } | Sort-Object -Unique) | Should -Be @('scanner')
         @($result.Diagnostics | ForEach-Object { $_['code'] }) | Should -Be @('PYTHON_NATIVE_UNAVAILABLE')
@@ -253,22 +253,22 @@ Describe 'Invoke-DocsPythonNativeInventory' {
         $broken = [object[]]@($rows | ForEach-Object {
                 if ($_.AnalysisMethod -ceq 'native' -and $_.Id -ceq 'python-public-api') { [pscustomobject]@{ Id = $_.Id; Version = $_.Version; AnalysisMethod = 'native'; ElementKinds = @('http-route'); Module = $_.Module; Function = $_.Function } } else { $_ }
             })
-        $selection = [hashtable]::new([System.StringComparer]::Ordinal)
+        $selection = @{}
         $selection['source_roots'] = @('src')
         $selection['element_kinds'] = @(Get-DocsElementKind)
-        $context = (New-TestContext -Result @{ python3 = $script:Ok }).Context
+        $context = (Get-TestContext -Result @{ python3 = $script:Ok }).Context
         $result = Invoke-DocsPythonNativeInventory -Registration $broken -CapturedInput (Get-TestInput) -Selection $selection -AnalyzerId $script:AllIds -SourceRoot @('src') -AnalysisMethod 'auto' -Context $context -ImportModule $script:NonForcingImport
         $result.Finding['code'] | Should -BeExactly 'DOCS_ANALYZER_OUTPUT_INVALID'
         $result.Rows.Count | Should -Be 0
     }
 
     It 'property: output is identical under a seeded permutation of the captured inputs' {
-        $baseline = ConvertTo-DocsCanonicalJson -Value @((Invoke-TestInventory -Context (New-TestContext -Result @{ python3 = $script:Ok }).Context).Outputs)
+        $baseline = ConvertTo-DocsCanonicalJson -Value @((Invoke-TestInventory -Context (Get-TestContext -Result @{ python3 = $script:Ok }).Context).Outputs)
         $seed = 1031
         $random = [System.Random]::new($seed)
         for ($round = 0; $round -lt 5; $round++) {
             $shuffled = @(Get-TestInput | Sort-Object { $random.Next() })
-            $outputs = (Invoke-TestInventory -Context (New-TestContext -Result @{ python3 = $script:Ok }).Context -CapturedInput $shuffled).Outputs
+            $outputs = (Invoke-TestInventory -Context (Get-TestContext -Result @{ python3 = $script:Ok }).Context -CapturedInput $shuffled).Outputs
             ConvertTo-DocsCanonicalJson -Value @($outputs) | Should -BeExactly $baseline -Because "seed $seed round $round"
         }
     }

@@ -44,7 +44,7 @@ BeforeAll {
     foreach ($key in $script:Surface['inputs'].Keys) { $sources[[string] $key] = $script:Surface['inputs'][$key] }
     foreach ($key in $script:Native['native_inputs'].Keys) { $sources[[string] $key] = $script:Native['native_inputs'][$key] }
     $script:Captured = [object[]]@(foreach ($key in $sources.Keys) { New-DocsCapturedInput -Path ([string] $key) -Bytes ([System.Text.Encoding]::UTF8.GetBytes([string] $sources[$key])) })
-    $script:Selection = [hashtable]::new([System.StringComparer]::Ordinal)
+    $script:Selection = @{}
     $script:Selection['source_roots'] = $script:Roots
 
     function ConvertTo-TestFact {
@@ -89,7 +89,7 @@ BeforeAll {
     $check = Test-DocsPythonNativeResponse -ResponseText $canned.Text -Request $canned.Request
     $check.Valid | Should -BeTrue -Because $check.Problem
     $converted = ConvertFrom-DocsPythonNativeResponse -Response $check.Response -CapturedInput $script:Captured
-    $script:NativeSelection = [hashtable]::new([System.StringComparer]::Ordinal)
+    $script:NativeSelection = @{}
     $script:NativeSelection['source_roots'] = $script:Roots
     $script:NativeSelection['python_native'] = $converted.Output
     $script:NativeOutput = @{}
