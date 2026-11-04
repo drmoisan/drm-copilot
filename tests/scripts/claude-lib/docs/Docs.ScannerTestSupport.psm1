@@ -156,11 +156,12 @@ function New-DocsTestExtensionManifest {
     )
 
     $sourceInput = New-DocsTestCapturedInput -Path $SourcePath -Text $SourceText
-    $findings = if ($null -eq $Finding) {
-        @(New-DocsTestFinding -FindingId 'finding-handle' -Kind 'public-symbol' -RepositoryId $RepositoryId -Revision $Revision -Path $SourcePath -Sha256 $sourceInput['sha256'] -AdapterId $AdapterId -AdapterVersion $AdapterVersion -Symbol 'Service.handle' -LineRange @(2, 2) -Property ([ordered]@{ name = 'handle' }))
-    } else {
-        @(& $Finding $sourceInput)
-    }
+    # The array wrapper sits outside the if-expression so that a single finding stays a JSON array.
+    [object[]] $findings = @(if ($null -eq $Finding) {
+            New-DocsTestFinding -FindingId 'finding-handle' -Kind 'public-symbol' -RepositoryId $RepositoryId -Revision $Revision -Path $SourcePath -Sha256 $sourceInput['sha256'] -AdapterId $AdapterId -AdapterVersion $AdapterVersion -Symbol 'Service.handle' -LineRange @(2, 2) -Property ([ordered]@{ name = 'handle' })
+        } else {
+            & $Finding $sourceInput
+        })
     $result = [ordered]@{
         '$schema'                 = 'urn:drm-copilot:discovery:2.0.0:inventory-snapshot'
         schema_version            = '2.0.0'

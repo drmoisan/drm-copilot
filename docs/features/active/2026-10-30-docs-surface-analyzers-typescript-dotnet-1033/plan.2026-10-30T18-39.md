@@ -60,6 +60,7 @@ Permitting rules: R1 = owner language rule clause (1), pushed-down skills, helpe
 | `L`DocsAnalyzerDotnetConfig.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsCSharpMember.psm1 (split from `DocsAnalyzerDotnetApi.psm1` under the 500-line rule, [P4-T3]) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerDotnetApi.psm1 | pushed-down helper/lib | PowerShell | R1 |
+| `L`DocsExtensionShape.psm1 (split from `DocsAnalyzerExtensionImport.psm1` under the 500-line rule, [P5-T1]) | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerExtensionImport.psm1 | pushed-down helper/lib | PowerShell | R1 |
 | `L`DocsAnalyzerRegistry.psm1 (edit: rows under the 1033 anchor) | pushed-down helper/lib | PowerShell | R1 |
 | `B`<each of the twelve `L` files above> (create; edit for the registry copy) | pushed-down helper/lib (mirror) | PowerShell | R1 |
@@ -81,6 +82,7 @@ Permitting rules: R1 = owner language rule clause (1), pushed-down skills, helpe
 | `T`DocsAnalyzerDotnetConfig.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsCSharpMember.Tests.ps1 (with the [P4-T3] split) | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerDotnetApi.Tests.ps1 | test | PowerShell (Pester) | D |
+| `T`DocsExtensionShape.Tests.ps1 (with the [P5-T1] split) | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerExtensionImport.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsAnalyzerRegistry.TypeScriptDotnet.Tests.ps1 | test | PowerShell (Pester) | D |
 | `T`DocsScannerContract.Tests.ps1 | test | PowerShell (Pester) | D |
@@ -170,11 +172,11 @@ Common to every analyzer task in Phases 3 to 5: the module follows spec `### Ana
 
 ### Phase 5 — Extension-Result Manifest Import
 
-- [ ] [P5-T1] Create `L`DocsAnalyzerExtensionImport.psm1 with `Test-DocsExtensionManifest` (validation steps 1 through 7 of spec `## Extension-Result Manifest Import`, returning `@{ Ok; Diagnostics; Manifest; ResultDocument }`) and `T`DocsAnalyzerExtensionImport.Tests.ps1 (`Context 'validation'`).
+- [x] [P5-T1] Create `L`DocsAnalyzerExtensionImport.psm1 with `Test-DocsExtensionManifest` (validation steps 1 through 7 of spec `## Extension-Result Manifest Import`, returning `@{ Ok; Diagnostics; Manifest; ResultDocument }`) and `T`DocsAnalyzerExtensionImport.Tests.ps1 (`Context 'validation'`).
   - Behavior: `ConvertFrom-DocsJsonText` parsing; closed key-set and constant checks in PowerShell (no `Test-Json`); `manifest_sha256` recomputation; the first failing check yields exactly one blocking diagnostic at the manifest path; `input_manifest_sha256` carried and not verified; step 3 compares `repository.id` with `Selection.repository_id` only when that key is present and non-null, and otherwise emits non-blocking `extension-repository-unverified` and continues; likewise `repository.revision` is compared only when `Selection.revision` is present and non-null, otherwise non-blocking `extension-revision-unverified` and the check continues (so a `-Selection` carrying neither key, which is what 1022 inventory step 7 passes per [P0-T4] C3, still accepts a valid manifest).
   - Tests: the valid manifest from `New-DocsTestExtensionManifest` returns `Ok` true with `Selection` carrying `repository_id` and `revision`; the same manifest with a `Selection` that has neither key returns `Ok` true with exactly the two non-blocking diagnostics `extension-repository-unverified` and `extension-revision-unverified` and no blocking diagnostic; one mutation per step yields exactly one blocking diagnostic with that step's code (`extension-manifest-invalid`, `extension-manifest-digest-mismatch`, `extension-repository-mismatch` with `repository_id` present and different, `extension-adapter-invalid`, `extension-input-not-captured`, `extension-input-digest-mismatch`, `extension-result-digest-mismatch`, `extension-result-invalid`, `extension-finding-source-mismatch`); a fractional number reports step 1's code.
   - Acceptance: 0 failures in the branch-current run; `FEATURE/evidence/regression-testing/p5-ext-validation.<timestamp>.md` records the counts. CI: `poshqc / PowerShell QC` (Windows shards).
-- [ ] [P5-T2] Add `Invoke-DocsAnalyzerExtensionImport` (selection, per-manifest validation, step 8 merge as inert data) to `L`DocsAnalyzerExtensionImport.psm1 with the registry-import rule of `## Design Constraints From Existing Tests`, and add `Context 'merge'` to `T`DocsAnalyzerExtensionImport.Tests.ps1.
+- [x] [P5-T2] Add `Invoke-DocsAnalyzerExtensionImport` (selection, per-manifest validation, step 8 merge as inert data) to `L`DocsAnalyzerExtensionImport.psm1 with the registry-import rule of `## Design Constraints From Existing Tests`, and add `Context 'merge'` to `T`DocsAnalyzerExtensionImport.Tests.ps1.
   - Tests: each mappable finding becomes an element with `analyzer_id` `extension-import`, a recomputed `element_id`, a digest computed from the captured text, and `adapter_id`, `adapter_version`, `classification`, `confidence`, `finding_id` copied unchanged; only `value_type` copied for `config-key` (a distinctive value in another property is absent from the output); `cli-option` with and without `parent_symbol`; one non-blocking `extension-finding-skipped` (severity `warning`) with counts per reason and no `docs.precision-limit` key in its `extensions` (not a precision limit, spec `## Scanner Precision Limit`); analysis method from `docs.analysis-method`, `scanner` when absent (OQ-1); a source-input digest mismatch yields exactly one blocking `extension-input-digest-mismatch` and no element; with `registered_analyzer_ids` absent, a call through 1020 `Invoke-DocsAnalyzer` succeeds twice in a row and `Get-DocsAnalyzerRegistration` stays callable (no re-entry break).
   - Acceptance: 0 failures in the branch-current run of the whole suite; `FEATURE/evidence/regression-testing/p5-ext-merge.<timestamp>.md` records the counts. CI: `poshqc / PowerShell QC` (Windows shards).
 
