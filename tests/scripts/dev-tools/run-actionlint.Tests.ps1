@@ -1,10 +1,15 @@
 Set-StrictMode -Version Latest
 
-$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
-. (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
-
 Describe "run-actionlint.ps1" {
     BeforeAll {
+        # Record whether the global Import-ScriptFunction helper and the Microsoft.PowerShell.Archive module
+        # (auto-loaded by the Expand-Archive mock) exist before this file runs, so the Describe AfterAll removes
+        # only what this file added (issue #1066). TestHelpers.ps1 is dot-sourced here rather than at file scope,
+        # because file-scope code runs during discovery, before this capture.
+        $script:describeHadImportScriptFunction = $ExecutionContext.SessionState.InvokeProvider.Item.Exists('Function:\Import-ScriptFunction')
+        $script:describeHadArchiveModule = $null -ne (Get-Module -Name Microsoft.PowerShell.Archive)
+        . ([System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, '..', 'powershell', 'Support', 'TestHelpers.ps1')))
+
         $script:scriptPath = Join-Path $PSScriptRoot '..\..\..\scripts\dev-tools\run-actionlint.ps1' -Resolve
 
         # Import all functions from the script for testing
@@ -37,6 +42,18 @@ Describe "run-actionlint.ps1" {
             $global:LASTEXITCODE = $script:describeSavedLastExitCode
         } else {
             Remove-Variable -Name LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue
+        }
+    }
+
+    # Remove the global helper and the Archive module only when they were absent before this file ran. No command
+    # mocked in a Context is called here.
+    AfterAll {
+        $functionPath = 'Function:\Import-ScriptFunction'
+        if (-not $script:describeHadImportScriptFunction -and $ExecutionContext.SessionState.InvokeProvider.Item.Exists($functionPath)) {
+            $ExecutionContext.SessionState.InvokeProvider.Item.Remove($functionPath, $false)
+        }
+        if (-not $script:describeHadArchiveModule -and $null -ne (Get-Module -Name Microsoft.PowerShell.Archive)) {
+            Remove-Module -Name Microsoft.PowerShell.Archive
         }
     }
 

@@ -72,10 +72,10 @@
 
 ### Phase 2 — F1 Fix and Direct Verification
 
-- [ ] [P2-T1] Edit `TARGET` per RD1. Acceptance: the file parses with zero errors. Outside the Describe, the file holds only the `Set-StrictMode` statement. The Describe directly holds one `BeforeAll`, one `AfterAll`, one `BeforeEach`, and one `AfterEach`. An AST scan finds no command named in `MOCKED` in the `AfterAll`, in the two capture statements, or in the `TestHelpers.ps1` dot-source expression, and the scan result is recorded in `<FEATURE>/evidence/other/target-rd1.<timestamp>.md`.
-- [ ] [P2-T2] Run `TARGET` alone to `RAW/target-post-rd1.xml` and write `<FEATURE>/evidence/other/target-postfix.<timestamp>.md`. Acceptance: 35 testcases and no failing key.
-- [ ] [P2-T3] Run `GUARD` alone to `RAW/guard-alone-post-rd1.xml` and write `<FEATURE>/evidence/regression-testing/pass-after-guard.<timestamp>.md`. Acceptance: `EXIT_CODE: 0` and all `G` testcases pass.
-- [ ] [P2-T4] Run `SCRATCH/issue-1066-global-state.ps1` over `TARGET` and then over `GUARD`, and write `<FEATURE>/evidence/regression-testing/global-state-pass-after.<timestamp>.md` with both results (supersedes `APPROVED` P2-T4). Acceptance: `EXIT_CODE: 0` for both runs, and both printed differences are empty (environment, location, aliases, functions, global variables, and `$global:LASTEXITCODE`).
+- [x] [P2-T1] Edit `TARGET` per RD1. Acceptance: the file parses with zero errors. Outside the Describe, the file holds only the `Set-StrictMode` statement. The Describe directly holds one `BeforeAll`, one `AfterAll`, one `BeforeEach`, and one `AfterEach`. An AST scan finds no command named in `MOCKED` in the `AfterAll`, in the two capture statements, or in the `TestHelpers.ps1` dot-source expression, and the scan result is recorded in `<FEATURE>/evidence/other/target-rd1.<timestamp>.md`.
+- [x] [P2-T2] Run `TARGET` alone to `RAW/target-post-rd1.xml` and write `<FEATURE>/evidence/other/target-postfix.<timestamp>.md`. Acceptance: 35 testcases and no failing key.
+- [x] [P2-T3] Run `GUARD` alone to `RAW/guard-alone-post-rd1.xml` and write `<FEATURE>/evidence/regression-testing/pass-after-guard.<timestamp>.md`. Acceptance: `EXIT_CODE: 0` and all `G` testcases pass.
+- [x] [P2-T4] Run `SCRATCH/issue-1066-global-state.ps1` over `TARGET` and then over `GUARD`, and write `<FEATURE>/evidence/regression-testing/global-state-pass-after.<timestamp>.md` with both results (supersedes `APPROVED` P2-T4). Acceptance: `EXIT_CODE: 0` for both runs, and both printed differences are empty (environment, location, aliases, functions, global variables, and `$global:LASTEXITCODE`).
 
 ### Phase 3 — Order Verification (post-fix, single process)
 
