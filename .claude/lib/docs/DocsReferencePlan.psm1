@@ -385,16 +385,16 @@ function Get-DocsReferencePagePlan {
         $members = @($Element | Where-Object { $family['Kind'] -ccontains [string] $_['kind'] })
         if ($members.Count -eq 0 -and $ExistingPagePath -cnotcontains $path) { continue }
         $ordered = Get-DocsReferencePageElement -FileName $family['FileName'] -PagePath $path -Element $members
-        $context = Get-DocsReferencePageContext -Profile $Profile -PagePath $path -ProfilePath $ProfilePath
-        [object[]] $pageFinding = @($ordered.Finding) + @($context.Finding)
+        $pageContext = Get-DocsReferencePageContext -Profile $Profile -PagePath $path -ProfilePath $ProfilePath
+        [object[]] $pageFinding = @($ordered.Finding) + @($pageContext.Finding)
         $all.AddRange($pageFinding)
         $pages.Add([ordered]@{
                 Path     = $path
                 Title    = $family['Title']
                 Element  = [object[]] $ordered.Element
-                Owner    = $context.Owner
-                RootId   = $context.RootId
-                Audience = [string[]] $context.Audience
+                Owner    = $pageContext.Owner
+                RootId   = $pageContext.RootId
+                Audience = [string[]] $pageContext.Audience
                 Finding  = $pageFinding
             })
     }

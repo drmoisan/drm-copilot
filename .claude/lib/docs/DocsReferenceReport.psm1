@@ -63,17 +63,17 @@ function Format-DocsReferenceDiff {
     )
 
     if ($Edit.Count -eq 0) { return '' }
-    $context = 3
+    $contextLines = 3
     $builder = [System.Text.StringBuilder]::new()
     $source = if ($IsNewPage) { '/dev/null' } else { "a/$PagePath" }
     [void]$builder.Append("--- $source`n+++ b/$PagePath`n")
     $first = 0
     while ($first -lt $Edit.Count) {
         $last = $first
-        while ($last + 1 -lt $Edit.Count -and $Edit[$last + 1].BeforeStart - ($Edit[$last].BeforeStart + $Edit[$last].BeforeCount) -le 2 * $context) { $last++ }
-        $start = [math]::Max(0, $Edit[$first].BeforeStart - $context)
+        while ($last + 1 -lt $Edit.Count -and $Edit[$last + 1].BeforeStart - ($Edit[$last].BeforeStart + $Edit[$last].BeforeCount) -le 2 * $contextLines) { $last++ }
+        $start = [math]::Max(0, $Edit[$first].BeforeStart - $contextLines)
         $lastEnd = $Edit[$last].BeforeStart + $Edit[$last].BeforeCount
-        $end = [math]::Min($BeforeLine.Count, $lastEnd + $context)
+        $end = [math]::Min($BeforeLine.Count, $lastEnd + $contextLines)
         $afterStart = $Edit[$first].AfterStart - ($Edit[$first].BeforeStart - $start)
         $afterEnd = $Edit[$last].AfterStart + $Edit[$last].AfterCount + ($end - $lastEnd)
         $beforeCount = $end - $start
