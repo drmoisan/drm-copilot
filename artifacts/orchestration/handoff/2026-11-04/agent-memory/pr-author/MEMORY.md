@@ -1,0 +1,1 @@
+- [Epic-child PR closing refs empty](epic-child-pr-closing-refs-empty.md) — a PR into an epic integration branch gets closingIssuesReferences [] even with a correct Closes line

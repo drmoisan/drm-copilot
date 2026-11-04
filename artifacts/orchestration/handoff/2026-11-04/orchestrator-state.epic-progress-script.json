@@ -1,0 +1,71 @@
+{
+  "objective": "Add a tested, parameterized epic progress report tool at scripts/dev-tools/Get-EpicProgressReport.ps1 (issue 1080), recreated from the recovered coordinator script, with pure logic separated from I/O and a mirrored Pester test.",
+  "change_budget_estimate": "Small: one production PowerShell file (at most three if a module split is needed) plus one mirrored Pester test file.",
+  "path_selected": "small",
+  "route_id": "small",
+  "promotion-type": "feature",
+  "short-name": "epic-progress-report-script",
+  "long-name": "epic-progress-report-script",
+  "relativeFile": "docs/features/potential/promoted/2026-11-04-epic-progress-report-script.md",
+  "issue-num": "1080",
+  "feature-folder": "docs/features/active/2026-11-04-epic-progress-report-script-1080",
+  "work-mode": "minor-audit",
+  "plan-path": "docs/features/active/2026-11-04-epic-progress-report-script-1080/plan.2026-11-04T14-56.md",
+  "branch": "feature/epic-progress-report-script",
+  "lifecycle_ready": true,
+  "epic_mode": false,
+  "completed_steps": ["step1_promotion", "step2_feature_folder", "step3_acceptance_criteria_finalized", "step4_atomic_planning", "step4b_preflight_all_clear"],
+  "next_step": "S5_atomic_execution",
+  "resume_point": "Owner pause. Executor stopped after P2-T7: P0-T1..P2-T7 checked and pushed; branch head f2087cc9008842d151b22cfdaeb3fd55a2291402 equals origin, tree clean. Resume by delegating atomic-executor (opus) to continue plan-path at P2-T8 (recreate the SCRATCH helper scripts from the plan's contracts if the container changed), then feature-review, pr-author, S9 CI gate and merge.",
+  "last_completed_task": "P2-T7",
+  "next_task": "P2-T8",
+  "branch_head_sha": "f2087cc9008842d151b22cfdaeb3fd55a2291402",
+  "preflight": { "iterations": 1, "final_status": "clear", "signal": "PREFLIGHT: ALL CLEAR", "fix_record": "docs/features/active/2026-11-04-epic-progress-report-script-1080/evidence/other/preflight-fixes.2026-11-04T20-16.md" },
+  "last_updated": "2026-11-04T21:04:00Z",
+  "step5_status": "in_progress",
+  "step6_status": "pending",
+  "step7_status": "pending",
+  "step8_status": "pending",
+  "step9_status": "pending",
+  "step10_status": "pending",
+  "model_budget": { "fable_policy": "disabled", "source": "owner instruction for this session" },
+  "complexity_assessments": [
+    { "phase": "planning", "band": "C3", "floor": "C1", "signals_present": [], "rationale": "Single-file PowerShell tool; owner instruction requires opus for every delegation, so band C3 is selected above the C1 floor.", "assessed_at": "2026-11-04T20:45:00Z" },
+    { "phase": "execution", "band": "C3", "floor": "C1", "signals_present": [], "rationale": "Same scope; opus per owner instruction.", "assessed_at": "2026-11-04T20:45:00Z" },
+    { "phase": "review", "band": "C3", "floor": "C1", "signals_present": [], "rationale": "Same scope; opus per owner instruction.", "assessed_at": "2026-11-04T20:45:00Z" },
+    { "phase": "pr_authoring", "band": "C3", "floor": "C1", "signals_present": [], "rationale": "Same scope; opus per owner instruction.", "assessed_at": "2026-11-04T20:45:00Z" }
+  ],
+  "model_routing_receipts": [
+    { "agent": "atomic-planner", "phase": "planning", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "atomic-executor", "phase": "execution", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "feature-review", "phase": "review", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "pr-author", "phase": "pr_authoring", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" }
+  ],
+  "issue_adoption": {
+    "issue_num": "1080",
+    "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1080",
+    "origin": "filed_before_orchestration",
+    "verified_via": "gh issue view",
+    "verified_at": "2026-11-04T20:45:00Z",
+    "evidence": "Issue 1080 was promoted and its active feature folder created by the coordinating session before this orchestrator run; the MCP receipts of those calls are not available to this run and are not reproduced.",
+    "waived_tools": ["potential_to_issue", "new_potential_entry", "new_active_feature_folder"],
+    "potential_record": "docs/features/potential/promoted/2026-11-04-epic-progress-report-script.md",
+    "feature_folder_record": {
+      "path": "docs/features/active/2026-11-04-epic-progress-report-script-1080",
+      "verified_via": "git_cat_file_head",
+      "verified_at": "2026-11-04T20:44:00Z",
+      "evidence": "git cat-file -t HEAD:docs/features/active/2026-11-04-epic-progress-report-script-1080 printed tree after commit 749691a1c."
+    }
+  },
+  "completion_gate_residuals": [
+    "Promotion (potential entry, issue 1080, active feature folder) was performed by the coordinating session; no raw MCP promotion receipts exist in this checkpoint. Recorded under issue_adoption instead of delegation_receipts.promotion.",
+    "minor-audit work mode: acceptance criteria were finalized in issue.md under ## Acceptance Criteria; no spec.md is created because the minor-audit integrity check treats spec.md as a defect."
+  ],
+  "model_routing_preflight": { "status": "pass", "checked_at": "2026-11-04T20:46:00Z", "validator_command": "poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing", "output_summary": "orchestrator-state validation passed" },
+  "delegation_receipts": { "agents": [
+    { "step": "S4_atomic_planning", "agent_name": "atomic-planner", "agent_id": "atomic-planner-1080-plan", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-04T20:00:00Z", "completed_at": "2026-11-04T20:10:00Z", "result_signal": "PREFLIGHT: READY FOR EXECUTOR PREFLIGHT; SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS", "artifact_paths": ["docs/features/active/2026-11-04-epic-progress-report-script-1080/plan.2026-11-04T14-56.md"] },
+    { "step": "S4_preflight", "agent_name": "atomic-executor", "agent_id": "atomic-executor-1080-preflight", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-04T20:11:00Z", "completed_at": "2026-11-04T20:19:00Z", "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED", "artifact_paths": ["docs/features/active/2026-11-04-epic-progress-report-script-1080/evidence/other/preflight-fixes.2026-11-04T20-16.md"] },
+    { "step": "S5_atomic_execution", "agent_name": "atomic-executor", "agent_id": "atomic-executor-1080-execute-1", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-04T20:20:00Z", "completed_at": "2026-11-04T21:03:00Z", "result_signal": "PAUSED after P2-T7 on owner instruction; next P2-T8", "artifact_paths": ["scripts/dev-tools/Get-EpicProgressReport.ps1", "scripts/dev-tools/Get-EpicProgressReport.Logic.ps1", "tests/scripts/dev-tools/Get-EpicProgressReport.Tests.ps1", "tests/scripts/dev-tools/Get-EpicProgressReport.Logic.Tests.ps1"] }
+  ] },
+  "blocked_reason": "none"
+}

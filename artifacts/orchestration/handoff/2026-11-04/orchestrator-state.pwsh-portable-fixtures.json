@@ -1,0 +1,473 @@
+{
+  "objective": "Make the Pester fixtures in 17 suites under tests/scripts/dev-tools and tests/scripts/powershell/PoshQC platform independent so they pass on Windows and Linux (issue 1067). Stage 1: research and spec, then pause until issue 1066 merges into main and this branch is updated from main; stage 2: plan and execute.",
+  "change_budget_estimate": "Large: 17 Pester test suites across two test trees, possibly shared test support and production defects behind the failures; cross-cutting test-fixture change.",
+  "path_selected": "large",
+  "route_id": "large",
+  "promotion-type": "bug",
+  "short-name": "pester-fixtures-platform-independent",
+  "long-name": "pester-fixtures-platform-independent",
+  "relativeFile": "docs/features/potential/promoted/2026-11-03-pester-fixtures-platform-independent.md",
+  "issue-num": "1067",
+  "feature-folder": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/plan.2026-11-03T17-43.md",
+  "branch": "bug/pester-fixtures-platform-independent",
+  "epic_mode": false,
+  "lifecycle_ready": true,
+  "stage": "stage2",
+  "completed_steps": ["step1_promotion", "step1b_promotion_files_committed", "S2_research", "S3_feature_documents", "S4a_merge_origin_main", "S4b_spec_reverified", "S4_atomic_planning", "S4_preflight", "S5_atomic_execution", "S6a_merge_origin_main_2", "S7_feature_review", "remediation.cycle_1", "S7_reaudit", "S8_create_pr", "S9_ci_green", "S9_merge"],
+  "next_step": "DONE",
+  "pr_merge": { "merge_commit_sha": "61338f51ff42c7412be880a00be2ea3050a2ab6c", "target_branch": "main", "merged_at": "2026-11-04T17:01:37Z", "confirmed_via": "gh pr view 1078 state MERGED; git merge-base --is-ancestor <merge commit> origin/main exit 0; issue 1067 CLOSED (COMPLETED)" },
+  "human_interaction": { "requirements": [ { "response": "scope_change", "resolution": "Resolved by the coordinator, who fast-forwarded the session-root checkout to origin/main (includes merge commit 61338f51f), so the feature folder exists there.", "description": "Writing step10_status completed is denied by the PreToolUse hook enforce-completion-consistency.ps1 (COMPLETION_CONSISTENCY_BLOCKED). Test-IsValidFeatureFolder runs Test-Path on the relative feature-folder against the hook process root (the session-root main checkout, at 11f188d1b, which predates the merge and lacks the folder) instead of the checkpoint's worktree. Resolution options: fast-forward the session-root main checkout to origin/main (outside this run's allowed worktree), or fix the hook to resolve the folder against the checkpoint's worktree. The run did not bypass the hook." } ] },
+  "blocking_findings_resolved": true,
+  "deferred_in_item": { "finding": "R1-F3 PoshQC.Testing.psm1 trampoline comment (plus bundle mirror)", "disposition": "Comment-only correction in the final code-touching commit together with the AC2 check-off after S9, so ci.yml runs in full on the final head." },
+  "review_artifacts": { "timestamp": "2026-11-04T15-30", "verdict": "PASS", "blocking_count": 0, "commit": "edfad2011" },
+  "remediation_loop": {
+    "current_cycle": 0,
+    "completed_attempts": 1,
+    "review_outcomes": [
+      { "verdict": "PASS", "findings": [], "inputs_path": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-inputs.2026-11-04T15-30.md" },
+      { "verdict": "PASS", "findings": [], "inputs_path": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-inputs.2026-11-04T16-16.md" }
+    ],
+    "cycles": [
+      {
+        "entry_timestamp": "2026-11-04T15-31",
+        "inputs_path": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-inputs.2026-11-04T15-31.md",
+        "plan_path": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-plan.2026-11-04T15-31.md",
+        "preflight": { "iterations": 1, "final_status": "clear" },
+        "execution_status": "complete",
+        "commit": "7c31fb1d21431dd8d0961f32c30baae50bc70d74",
+        "audit_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/code-review.2026-11-04T16-16.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/feature-audit.2026-11-04T16-16.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/policy-audit.2026-11-04T16-16.md"],
+        "reaudit_commit": "53bbd2067",
+        "blocking_count": 0,
+        "exit_condition_met": true,
+        "candidate_applied": true,
+        "plan_revisions": 1,
+        "opened_for": "Related non-blocking findings fixed inside the item per owner instruction; the review verdict was PASS, so no opened_by_review is recorded."
+      }
+    ]
+  },
+  "s5_result": { "final_exec_head": "996d90e17", "commits": ["5e521434b", "faf708b01", "996d90e17"], "plan_tasks": "63/63", "ac_checked": "11/12 (AC2 pending CI)", "toolchain": "format 0, PSSA 0, Pester 17 suites 317/317, two trees 934, tests/scripts 14153 failed 0, parallel 8 shards failed 0" },
+  "main_merge_2": { "merged": "11f188d1b (PR #1073)", "merge_commit": "089e55e5c", "conflicts": "none", "post_merge_run": "tests/scripts/dev-tools + tests/scripts/powershell/PoshQC + host-tools.manifest: 962 tests, 0 failed, 9 skipped (skips in three suites outside the 17)", "pushed": true },
+  "executor_reported_followups": ["PoshQC.Testing.psm1 comment says the Pester run is hosted in the global scope; under a PoshQC-hosted run it runs in PoshQC module scope (mock -ModuleName miss)", "link-feature-docs.Tests.ps1 and link-parent-child.Tests.ps1 set POSHQC_SKIP_SCRIPT_EXECUTION without restoring it"],
+  "preflight": { "iterations": 1, "final_status": "clear", "signal": "PREFLIGHT: ALL CLEAR", "convergence": "CONVERGENCE: NO FURTHER ROUNDS EXPECTED", "fix_record": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/evidence/other/preflight-fixes.2026-11-04T03-38.md", "fix_count": 10 },
+  "stage_pause": {
+    "status": "RESUMED",
+    "awaiting": null,
+    "stage1_head": "031e7277e",
+    "paused_at": "2026-11-03T23:06:30Z",
+    "resumed_at": "2026-11-04T03:12:00Z",
+    "resume_basis": "Coordinator reported issue 1066 merged via PR 1070 (merge commit 930486d46); verified as ancestor of origin/main; merged into branch at d6727d7aa."
+  },
+  "pr_author_receipt": { "agent": "pr-author", "agent_id": "a3a97460fb3ce33e2", "pr_number": 1078, "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1078", "body_path": "artifacts/pr_body_1067.md", "receipt_path": "artifacts/pr_body_1067.receipt.json", "body_sha256": "f79fd7dfd9a661833c1a68c7b3da436c11b271b0da576e413865fdd0225abaf7", "closing_issues": [1067], "created_at": "2026-11-04T16:22:58Z" },
+  "pr_gate": { "pr_number": 1078, "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1078", "head_branch": "bug/pester-fixtures-platform-independent", "head_sha": "4af758170ea12c9aebe202f375ccf4c0762d83ec", "base": "main" },
+  "ci_gate": { "head_sha": "4af758170ea12c9aebe202f375ccf4c0762d83ec", "pr_pipeline_run_id": 41870532870, "conclusion": "success", "checks_total": 25, "required_contexts_success": 20, "full_run": true, "verified_at": "2026-11-04T17:01:01Z" },
+  "last_verified_ci_sha": "4af758170ea12c9aebe202f375ccf4c0762d83ec",
+  "final_commit": { "sha": "4af758170ea12c9aebe202f375ccf4c0762d83ec", "contents": "R1-F3 comment-only correction (source + byte-identical mirror), AC2 check-off in spec.md, evidence/qa-gates/ci-gate.2026-11-04T16-44.md", "comment_fix_agent": "powershell-typed-engineer af4e773538def578f", "comment_fix_checks": "probe confirmed module-scope hosting; diff comment-only (0 non-comment lines); cmp identical; formatter no diff; PSSA 0; Pester PoshQC tree 231 total 0 failed 7 skipped; mirror contract tests 23 passed" },
+  "ci_gate_history": [ { "head_sha": "53bbd206703412e5ed0396e17417928ca135d306", "pr_pipeline_run_id": 41866713315, "conclusion": "success", "checks_total": 25, "required_contexts_success": 20, "full_run": true, "verified_at": "2026-11-04T16:39:19Z" } ],
+  "final_head_plan": "Commit AC2 check-off with the R1-F3 comment-only correction (PoshQC.Testing.psm1 and its bundle mirror) so ci.yml runs in full on the final head, then re-run S9 on that head.",
+  "pr_author_preflight": { "status": "pass", "checked_at": "2026-11-04T16:21:00Z", "checkpoint_path": "artifacts/orchestration/orchestrator-state.json", "validator_command": "poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state artifacts/orchestration/orchestrator-state.json --require-pr-creation-ready --require-model-routing", "output_summary": "orchestrator-state validation passed; EXIT=0; PR context refreshed against main at head 53bbd2067" },
+  "model_budget": { "fable_policy": "disabled", "source": "coordinator instruction for this session" },
+  "last_updated": "2026-11-04T17:03:00Z",
+  "model_routing_preflight": { "status": "pass", "checked_at": "2026-11-04T13:45:00Z", "validator_command": "poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing", "output_summary": "orchestrator-state validation passed; EXIT=0" },
+  "required_contexts_confirmed": { "ruleset": "15241672", "checked_at": "2026-11-04T13:50:00Z", "count": 20, "contexts": ["drm-copilot-extension-tests / drm-copilot Extension Tests (ubuntu-latest)", "drm-copilot-extension-tests / drm-copilot Extension Tests (windows-latest)", "docs-validation / Documentation Validation", "poshqc / PowerShell QC", "shell-coverage / Shell Coverage (Bats + kcov)", "security-scan / Security Scanning", "quality-checks7 / Code Quality & Tests (3.11)", "quality-checks7 / Code Quality & Tests (3.12)", "quality-checks7 / Code Quality & Tests (3.13)", "build-check / Build Package", "NPM Audit Gate / npm audit (extensions/drm-copilot)", "NPM Audit Gate / npm audit (.)", "NPM Audit Gate / npm audit (packages/mcp-server)", "root-typescript-tests / Root TypeScript Tests (ubuntu-latest)", "root-typescript-tests / Root TypeScript Tests (windows-latest)", "poshqc / PowerShell QC shard 1", "poshqc / PowerShell QC shard 2", "poshqc / PowerShell QC shard 3", "poshqc / PowerShell QC static", "poshqc / PowerShell hook suites (Linux)"] },
+  "resume_after_restart": { "at": "2026-11-04T13:45:00Z", "head": "f76ce569c", "observed": "Codespace restart lost the S5 executor. Plan 56/63 checked (P6-T1..P6-T12 checked uncommitted); 12 modified tracked files and Phase 6 evidence uncommitted. Remaining P6-T13..P6-T19." },
+  "research_decisions": {
+    "production_fixes_in_scope": ["D1 scripts/dev-tools/activate.ps1 separator", "D2 scripts/dev-tools/HostBootstrapWorkspace.psm1 GetFullPath against PowerShell location", "D3 scripts/dev-tools/DrmCopilotPromptSupport.ps1 GetFullPath against PowerShell location", "D4 scripts/powershell/PoshQC/PoshQC.ScanConfig.psm1 host-independent drive-qualified rejection plus bundle mirror"],
+    "shared_test_helper": "none; per-file GetPathRoot($PSScriptRoot) root idiom",
+    "linux_ci_leg": "deferred; recorded as owner decision (one workflow line but about 14 companion mirror and contract edits, and an unresolved Pester 5.9.1 JUnit-export throw on Linux)"
+  },
+  "owner_decisions_open": ["Add tests/scripts/dev-tools and tests/scripts/powershell/PoshQC to the ubuntu-latest PowerShell job (deferred by research for issue 1067)."],
+  "step5_status": "completed",
+  "step6_status": "completed",
+  "step7_status": "completed",
+  "step8_status": "delegated",
+  "step9_status": "passed",
+  "step10_status": "completed",
+  "blocked_reason": "none",
+  "required_agents": ["task-researcher", "prd-feature", "atomic-planner", "atomic-executor", "feature-review", "pr-author"],
+  "required_skills": ["orchestrate", "feature-promotion-lifecycle", "atomic-plan-contract", "acceptance-criteria-tracking", "pr-context-artifacts", "pr-base-branch-merge-base"],
+  "required_mcp_tools": ["new_potential_bug_entry", "potential_to_issue", "new_active_feature_folder", "collect_pr_context", "validate_orchestration_artifacts"],
+  "delegation_receipts": {
+    "promotion": {
+      "potential_entry": {
+        "performed_by": "coordinator",
+        "note": "Potential entry created and promoted by the coordinating session before this run; no raw MCP receipt was handed to this run.",
+        "path": "docs/features/potential/promoted/2026-11-03-pester-fixtures-platform-independent.md"
+      },
+      "issue": {
+        "performed_by": "coordinator",
+        "note": "Issue created by the coordinating session before this run; verified read-only with gh issue view.",
+        "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1067"
+      },
+      "feature_folder": {
+        "performed_by": "coordinator",
+        "note": "Active feature folder created by the coordinating session before this run; committed in 8b337df4e.",
+        "path": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067"
+      }
+    },
+    "agents": [
+      {
+        "step": "S2_research",
+        "agent_name": "task-researcher",
+        "agent_id": "a9a07e8c6d6ab7ac6",
+        "skill_source": ".claude/agents/task-researcher.md",
+        "started_at": "2026-11-03T22:51:00Z",
+        "completed_at": "2026-11-03T23:01:30Z",
+        "result_signal": "RESEARCH_COMPLETE",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/research/research.2026-11-03T22-55.md"]
+      },
+      {
+        "step": "S3_feature_documents",
+        "agent_name": "prd-feature",
+        "agent_id": "a7d2248790116de95",
+        "skill_source": ".claude/agents/prd-feature.md",
+        "started_at": "2026-11-03T23:02:45Z",
+        "completed_at": "2026-11-03T23:05:40Z",
+        "result_signal": "FEATURE_DOCUMENTS_COMPLETE",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/spec.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/user-story.md"]
+      },
+      {
+        "step": "S4_atomic_planning",
+        "agent_name": "atomic-planner",
+        "agent_id": "ac8434fa602d129b6",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-11-04T03:21:00Z",
+        "completed_at": "2026-11-04T03:30:30Z",
+        "result_signal": "PLAN_WRITTEN; SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS; 63 tasks; MCP and branch-current CLI plan validation passed",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/plan.2026-11-03T17-43.md"]
+      },
+      {
+        "step": "S4_preflight",
+        "agent_name": "atomic-executor",
+        "agent_id": "a117bdcb58b44ca0e",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-04T03:32:00Z",
+        "completed_at": "2026-11-04T03:39:30Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/plan.2026-11-03T17-43.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/evidence/other/preflight-fixes.2026-11-04T03-38.md"]
+      },
+      {
+        "step": "S5_atomic_execution_resume",
+        "agent_name": "atomic-executor",
+        "agent_id": "ad2369513bfce848f",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-04T13:46:00Z",
+        "completed_at": "2026-11-04T15:19:00Z",
+        "result_signal": "EXECUTION_COMPLETE; 63/63 tasks; HEAD 996d90e17 pushed",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/plan.2026-11-03T17-43.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/evidence/other/execution-deviations.2026-11-04T13-58.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/evidence/qa-gates/self-review.2026-11-04T15-18.md"]
+      },
+      {
+        "step": "S7_feature_review",
+        "agent_name": "feature-review",
+        "agent_id": "adea5022d69f50a04",
+        "skill_source": ".claude/agents/feature-review.md",
+        "started_at": "2026-11-04T15:22:00Z",
+        "completed_at": "2026-11-04T15:30:00Z",
+        "result_signal": "review-status: PASS",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/policy-audit.2026-11-04T15-30.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/code-review.2026-11-04T15-30.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/feature-audit.2026-11-04T15-30.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-inputs.2026-11-04T15-30.md"]
+      },
+      {
+        "step": "remediation.cycle_1.plan",
+        "agent_name": "atomic-planner",
+        "agent_id": "accbbb225f31b8517",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-11-04T15:33:00Z",
+        "completed_at": "2026-11-04T15:45:00Z",
+        "result_signal": "PLAN_WRITTEN; 26 tasks; validator ok; SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS; two sibling findings reported, added as R1-F4/R1-F5 for one revision",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-plan.2026-11-04T15-31.md"]
+      },
+      {
+        "step": "remediation.cycle_1.plan_revision",
+        "agent_name": "atomic-planner",
+        "agent_id": "a0c213dab2fb3545d",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-11-04T15:38:00Z",
+        "completed_at": "2026-11-04T15:41:00Z",
+        "result_signal": "PLAN_REVISED in place v1.1; 31 tasks; validator ok",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-plan.2026-11-04T15-31.md"]
+      },
+      {
+        "step": "remediation.cycle_1.execute",
+        "agent_name": "atomic-executor",
+        "agent_id": "aff9dd592e59b8f9a",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-04T15:42:00Z",
+        "completed_at": "2026-11-04T16:12:00Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; 31/31 tasks; commit 7c31fb1d2 pushed",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/evidence/other/preflight-fixes.2026-11-04T15-42.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/evidence/other/execution-deviations.2026-11-04T16-02.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/evidence/qa-gates/self-review.2026-11-04T16-11.md"]
+      },
+      {
+        "step": "remediation.cycle_1.reaudit",
+        "agent_name": "feature-review",
+        "agent_id": "a349e9eae9c0626ea",
+        "skill_source": ".claude/agents/feature-review.md",
+        "started_at": "2026-11-04T16:15:00Z",
+        "completed_at": "2026-11-04T16:21:00Z",
+        "result_signal": "review-status: PASS",
+        "artifact_paths": ["docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/policy-audit.2026-11-04T16-16.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/code-review.2026-11-04T16-16.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/feature-audit.2026-11-04T16-16.md", "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067/remediation-inputs.2026-11-04T16-16.md"]
+      },
+      {
+        "step": "S8_create_pr",
+        "agent_name": "pr-author",
+        "agent_id": "a3a97460fb3ce33e2",
+        "skill_source": ".claude/agents/pr-author.md",
+        "started_at": "2026-11-04T16:21:00Z",
+        "completed_at": "2026-11-04T16:23:00Z",
+        "result_signal": "PR #1078 opened; closing #1067",
+        "artifact_paths": ["artifacts/pr_body_1067.md", "artifacts/pr_body_1067.receipt.json"]
+      },
+      {
+        "step": "S9_final_comment_fix",
+        "agent_name": "powershell-typed-engineer",
+        "agent_id": "af4e773538def578f",
+        "skill_source": ".claude/agents/powershell-typed-engineer.md",
+        "started_at": "2026-11-04T16:40:00Z",
+        "completed_at": "2026-11-04T16:44:00Z",
+        "result_signal": "COMMENT_FIX_COMPLETE; committed by orchestrator as 4af758170",
+        "artifact_paths": ["scripts/powershell/PoshQC/PoshQC.Testing.psm1", "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1"]
+      }
+    ]
+  },
+  "issue_adoption": {
+    "issue_num": "1067",
+    "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1067",
+    "origin": "filed_before_orchestration",
+    "verified_via": "gh_issue_view",
+    "verified_at": "2026-11-03T22:44:00Z",
+    "evidence": "gh issue view 1067 returned number 1067, state OPEN, title 'Bug: pester-fixtures-platform-independent'.",
+    "waived_tools": ["potential_to_issue", "new_potential_bug_entry", "new_active_feature_folder"],
+    "potential_record": "docs/features/potential/promoted/2026-11-03-pester-fixtures-platform-independent.md",
+    "feature_folder_record": {
+      "path": "docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067",
+      "verified_via": "git_cat_file_head",
+      "verified_at": "2026-11-03T22:45:00Z",
+      "evidence": "git cat-file -t HEAD:docs/features/active/2026-11-03-pester-fixtures-platform-independent-1067 printed tree at 8b337df4e."
+    }
+  },
+  "skill_receipts": [
+    { "skill": "orchestrate", "required": true, "evidence": "Run followed the orchestrate skill: S5 resume, S7 review and re-audit, remediation cycle 1, S8 pr-author handoff, S9 CI gate and standalone green-CI merge of PR #1078." },
+    { "skill": "feature-promotion-lifecycle", "required": true, "evidence": "Pre-existing issue path: issue 1067 adopted read-only with feature_folder_record (see issue_adoption); promotion tools waived, not re-run." },
+    { "skill": "atomic-plan-contract", "required": true, "evidence": "Plan plan.2026-11-03T17-43.md (63/63) and remediation-plan.2026-11-04T15-31.md (31/31) validated with validate_orchestration_artifacts; single-pass preflight ALL CLEAR on both." },
+    { "skill": "acceptance-criteria-tracking", "required": true, "evidence": "spec.md 12/12 checked; AC2 (CI-dependent) checked by the orchestrator at S9 in commit 4af758170 and re-verified by CI run 41870532870 on that head." },
+    { "skill": "pr-context-artifacts", "required": true, "evidence": "collect_pr_context run against main at heads 089e55e5c, 7c31fb1d2 and 53bbd2067 before review, re-audit and PR authoring." },
+    { "skill": "pr-base-branch-merge-base", "required": true, "evidence": "Base main; merge base of origin/main and HEAD 11f188d1b supplied to both feature reviews after merging origin/main at 089e55e5c." }
+  ],
+  "mcp_call_receipts": [
+    { "tool": "collect_pr_context", "ok": true, "evidence": "ok:true, base main, explicit target_ref bug/pester-fixtures-platform-independent, resolved_head_sha 53bbd206703412e5ed0396e17417928ca135d306 (latest call before PR authoring)." },
+    { "tool": "validate_orchestration_artifacts", "ok": true, "evidence": "Plan validation ok for both plans (planner and executor calls); feature-review validated policy-audit, code-review and feature-audit for 2026-11-04T15-30 and 2026-11-04T16-16." }
+  ],
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "completion_gate_residuals": [
+    "Promotion MCP calls (new_potential_bug_entry, potential_to_issue, new_active_feature_folder) were performed by the coordinating session; their raw receipts are not available to this run. Waived through issue_adoption rather than fabricated."
+  ],
+  "complexity_assessments": [
+    {
+      "phase": "S2_research",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Research spans 17 suites with five failure causes, a CI-leg feasibility decision, and possible production defects; judgment-heavy, cross-cutting over test fixtures but no contract or floor signal.",
+      "assessed_at": "2026-11-03T22:50:00Z"
+    },
+    {
+      "phase": "S3_feature_documents",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Spec must turn a 17-suite, four-production-defect research taxonomy into verifiable acceptance criteria with Windows and Linux evidence and isolation requirements; cross-cutting over test fixtures, no floor signal.",
+      "assessed_at": "2026-11-03T23:02:30Z"
+    },
+    {
+      "phase": "S4_atomic_planning",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Plan spans 17 test files, five production files including a bundle mirror, regression tests for four defects, isolation runs and Windows CI evidence; cross-cutting over test fixtures with no contract or floor signal.",
+      "assessed_at": "2026-11-04T03:20:30Z"
+    },
+    {
+      "phase": "S4_preflight",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Single-pass preflight must check every citation of a large multi-file plan against the tree and classify defects.",
+      "assessed_at": "2026-11-04T03:20:30Z"
+    },
+    {
+      "phase": "S5_atomic_execution",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Executes 63 tasks across 17 test files and five production files with fail-before evidence, coverage, isolation runs and a toolchain loop; cross-cutting over test fixtures, no floor signal.",
+      "assessed_at": "2026-11-04T03:40:30Z"
+    },
+    {
+      "phase": "S5_atomic_execution_resume",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Adopts uncommitted Phase 6 work after a restart, re-verifies it, and runs the remaining seven Phase 6 tasks (parallel isolation run, prohibited-construct and scope checks, self-review, AC reconciliation, commit).",
+      "assessed_at": "2026-11-04T13:45:00Z"
+    },
+    {
+      "phase": "S7_feature_review",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Full policy, code and feature audit of a 22-file PowerShell diff (17 suites, five production files including a bundle mirror) against 12 acceptance criteria with cross-platform and isolation evidence.",
+      "assessed_at": "2026-11-04T15:24:00Z"
+    },
+    {
+      "phase": "remediation.cycle_1.plan",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Proportionate plan for two test-only fixes across four suites, with isolation re-runs, a full toolchain loop and a self-review.",
+      "assessed_at": "2026-11-04T15:31:00Z"
+    },
+    {
+      "phase": "remediation.cycle_1.execute",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Single-pass preflight plus execution of the cycle plan across four suites with isolation and toolchain evidence.",
+      "assessed_at": "2026-11-04T15:31:00Z"
+    },
+    {
+      "phase": "remediation.cycle_1.reaudit",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Full re-audit of the whole branch diff after the cycle 1 test fixes.",
+      "assessed_at": "2026-11-04T16:13:00Z"
+    },
+    {
+      "phase": "S8_create_pr",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "PR body for a 24-file PowerShell change with four production fixes, a bundle mirror, two review rounds, a remediation cycle and an open owner decision.",
+      "assessed_at": "2026-11-04T16:21:00Z"
+    },
+    {
+      "phase": "S9_final_comment_fix",
+      "band": "C3",
+      "floor": "C1",
+      "signals_present": [],
+      "rationale": "Comment-only correction in a production module and its bundle mirror that must first verify the actual Pester hosting session state so the comment is accurate.",
+      "assessed_at": "2026-11-04T16:40:00Z"
+    }
+  ],
+  "model_routing_receipts": [
+    {
+      "agent": "task-researcher",
+      "phase": "S2_research",
+      "complexity_band": "C3",
+      "fable_policy": "available",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "prd-feature",
+      "phase": "S3_feature_documents",
+      "complexity_band": "C3",
+      "fable_policy": "available",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "S4_atomic_planning",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S4_preflight",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S5_atomic_execution",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S5_atomic_execution_resume",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "feature-review",
+      "phase": "S7_feature_review",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "remediation.cycle_1.plan",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "remediation.cycle_1.execute",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "powershell-typed-engineer",
+      "phase": "S9_final_comment_fix",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "pr-author",
+      "phase": "S8_create_pr",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "feature-review",
+      "phase": "remediation.cycle_1.reaudit",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ]
+}

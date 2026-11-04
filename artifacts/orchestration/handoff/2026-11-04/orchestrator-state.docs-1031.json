@@ -1,0 +1,195 @@
+{
+  "objective": "Execute the prepared epic child feature #1031 (Python-native docs surface analyzer) from its committed, approved, preflight-cleared plan, starting at atomic execution (P0-T1), through feature review, PR into epic/documentation-estate-tooling-integration, S9 CI-green gate, and merge-on-green into the integration branch.",
+  "change_budget_estimate": "Twelve new Python helper files (D3 exception), two new PowerShell modules, three edited PowerShell lib files, pyproject.toml, two pack manifests, .vscodeignore, prepack.cjs, guard helpers, bundle mirrors; fourteen Pytest modules, four new Pester suites, one Jest edit.",
+  "path_selected": "large",
+  "route_id": "large",
+  "lifecycle_ready": true,
+  "epic_mode": true,
+  "epic_context": {
+    "epic_feature_folder": "documentation-estate-tooling",
+    "integration_branch": "epic/documentation-estate-tooling-integration",
+    "epic_checkpoint_path": "artifacts/orchestration/epic-orchestrator-state.json",
+    "epic_issue_num": "1019",
+    "depends_on": ["1022"],
+    "upstream_merges": [
+      {"issue_num": "1022", "pr_number": 1072, "merge_commit_sha": "a94dea9a4be0743f00ff78de095c51e14d513b20"}
+    ]
+  },
+  "promotion-type": "feature",
+  "short-name": "docs-surface-analyzer-python-native",
+  "relativeFile": "docs/features/potential/promoted/2026-10-30-docs-surface-analyzer-python-native.md",
+  "long-name": "2026-10-30-docs-surface-analyzer-python-native",
+  "issue-num": "1031",
+  "feature-folder": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031",
+  "work-mode": "full-feature",
+  "plan-path": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/plan.2026-10-30T18-38.md",
+  "branch_name": "feature/docs-surface-analyzer-python-native-1031-r2",
+  "worktree_path": "/workspaces/drm-copilot-wt/docs-1031",
+  "base_branch": "epic/documentation-estate-tooling-integration",
+  "model_budget": {"fable_policy": "disabled"},
+  "completed_steps": ["S1_change_budget", "S2_scope", "S3_promotion", "S4_atomic_planning"],
+  "next_step": "S5_atomic_execution",
+  "last_updated": "2026-11-04T21:10:00Z",
+  "step5_status": "in_progress",
+  "step6_status": "not_started",
+  "step7_status": "not_started",
+  "step8_status": "not_started",
+  "step9_status": "pending",
+  "step10_status": "not_started",
+  "blocked_reason": null,
+  "preparation_provenance": {
+    "note": "Promotion, research, feature documents, atomic planning, and preflight were completed by the preparation-mode child run launched by epic-planner and committed to the integration branch; this run starts at S5 and re-runs none of them.",
+    "preflight_status_record": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/evidence/other/preflight-status.2026-10-31T16-43.md",
+    "preflight_signal": "PREFLIGHT: ALL CLEAR"
+  },
+  "issue_adoption": {
+    "issue_num": "1031",
+    "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1031",
+    "origin": "epic_decomposition",
+    "verified_via": "gh_issue_view",
+    "verified_at": "2026-11-04T14:00:00Z",
+    "evidence": "gh issue view 1031 --json number,title,state,url returned number 1031, state OPEN, title 'Feature: docs-surface-analyzer-python-native'.",
+    "waived_tools": ["potential_to_issue", "new_potential_entry", "new_active_feature_folder"],
+    "potential_record": "docs/features/potential/promoted/2026-10-30-docs-surface-analyzer-python-native.md",
+    "feature_folder_record": {
+      "path": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031",
+      "verified_via": "git_cat_file_head",
+      "verified_at": "2026-11-04T14:00:00Z",
+      "evidence": "git cat-file -t HEAD:docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031 prints tree at branch tip a94dea9a4."
+    }
+  },
+  "delegation_receipts": {
+    "agents": [
+      {
+        "step": "S3_research",
+        "agent_name": "task-researcher",
+        "agent_id": "preparation-run",
+        "skill_source": "task-research",
+        "started_at": "2026-10-30T22:00:00Z",
+        "completed_at": "2026-10-30T22:48:00Z",
+        "result_signal": "research artifact written (preparation run)",
+        "artifact_paths": ["docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/research/research.2026-10-30T22-48.md"]
+      },
+      {
+        "step": "S3_feature_documents",
+        "agent_name": "prd-feature",
+        "agent_id": "preparation-run",
+        "skill_source": "prd-feature",
+        "started_at": "2026-10-30T22:50:00Z",
+        "completed_at": "2026-10-30T23:30:00Z",
+        "result_signal": "spec.md and user-story.md written (preparation run)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/spec.md",
+          "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/user-story.md"
+        ]
+      },
+      {
+        "step": "S4_atomic_planning",
+        "agent_name": "atomic-planner",
+        "agent_id": "preparation-run",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-10-30T23:30:00Z",
+        "completed_at": "2026-10-31T05:00:00Z",
+        "result_signal": "plan version 1.0 written (preparation run)",
+        "artifact_paths": ["docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/plan.2026-10-30T18-38.md"]
+      },
+      {
+        "step": "S4_preflight",
+        "agent_name": "atomic-executor",
+        "agent_id": "preparation-run",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-10-31T05:21:00Z",
+        "completed_at": "2026-10-31T16:43:00Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR (preparation run)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/evidence/other/preflight-status.2026-10-31T16-43.md",
+          "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/evidence/other/preflight-fixes.2026-10-31T05-21.md"
+        ]
+      }
+    ]
+  },
+  "skill_receipts": [
+    {"skill": "orchestrate", "required": true, "evidence": "read:.claude/skills/orchestrate/SKILL.md"},
+    {"skill": "feature-promotion-lifecycle", "required": true, "evidence": "read:.claude/skills/feature-promotion-lifecycle/SKILL.md (preloaded)"},
+    {"skill": "atomic-plan-contract", "required": true, "evidence": "read:.claude/skills/atomic-plan-contract/SKILL.md (preloaded)"},
+    {"skill": "acceptance-criteria-tracking", "required": true, "evidence": "read:.claude/skills/acceptance-criteria-tracking/SKILL.md (preloaded)"},
+    {"skill": "pr-context-artifacts", "required": true, "evidence": "read:.claude/skills/pr-context-artifacts/SKILL.md"},
+    {"skill": "pr-base-branch-merge-base", "required": true, "evidence": "PRBaseBranch supplied explicitly by the epic kickoff as epic/documentation-estate-tooling-integration"}
+  ],
+  "pr_base_branch": {
+    "selected": "epic/documentation-estate-tooling-integration",
+    "source": "epic kickoff (explicit)",
+    "merge_base_sha_at_start": "a94dea9a4be0743f00ff78de095c51e14d513b20"
+  },
+  "mcp_call_receipts": [],
+  "model_routing_preflight": {
+    "status": "pass",
+    "checked_at": "2026-11-04T19:31:00Z",
+    "validator_command": "poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing",
+    "output_summary": "orchestrator-state validation passed; exit 0"
+  },
+  "complexity_assessments": [
+    {"phase": "S3_research", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Preparation-run delegation recorded under the epic-planner band C3 for child 1031.", "assessed_at": "2026-11-04T14:01:00Z"},
+    {"phase": "S3_feature_documents", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Preparation-run delegation recorded under the epic band C3.", "assessed_at": "2026-11-04T14:01:00Z"},
+    {"phase": "S4_atomic_planning", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Preparation-run delegation recorded under the epic band C3.", "assessed_at": "2026-11-04T14:01:00Z"},
+    {"phase": "S5_atomic_execution", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Epic band C3: Python-native helper plus PowerShell adapter consuming the 1020 registry and 1022 inventory contracts across module boundaries.", "assessed_at": "2026-11-04T14:01:00Z"},
+    {"phase": "S5_plan_revision", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Single permitted plan revision after the P0-T4 fail-closed stop; same C3 item.", "assessed_at": "2026-11-04T14:40:00Z"},
+    {"phase": "S5_plan_revision_owner_decision", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Single planner revision permitted by the owner decision (helper floor 3.11); same C3 item.", "assessed_at": "2026-11-04T14:46:00Z"},
+    {"phase": "S6_pre_review_commit", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Commit message for the same C3 item.", "assessed_at": "2026-11-04T14:01:00Z"},
+    {"phase": "S7_feature_review", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Review of the helper, adapter, registry rows, guard change and packaging; item band C3.", "assessed_at": "2026-11-04T14:01:00Z"},
+    {"phase": "S8_create_pr", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "PR body for the same C3 item into the epic integration branch.", "assessed_at": "2026-11-04T14:01:00Z"}
+  ],
+  "model_routing_receipts": [
+    {"agent": "task-researcher", "phase": "S3_research", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "prd-feature", "phase": "S3_feature_documents", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "S4_atomic_planning", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-executor", "phase": "S5_atomic_execution", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "S5_plan_revision", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "S5_plan_revision_owner_decision", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "commit-message", "phase": "S6_pre_review_commit", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "feature-review", "phase": "S7_feature_review", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "pr-author", "phase": "S8_create_pr", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"}
+  ],
+  "execution_delegations": [
+    {"delegation": 1, "phases": "0-3", "agent": "atomic-executor", "model": "opus", "started_at": "2026-11-04T14:04:00Z", "status": "blocked_at_P0-T4", "head_after": "96942411800e46a62757701819407f10e88cff15", "notes": "P0-T1..P0-T3 checked. P0-T4 BLOCKED: unplanned existing-test change (DocsAnalyzerConfigFiles.Tests.ps1, DocsInventorySnapshot.Tests.ps1). Also reported: New-DocsDiagnostic requires upper-case codes, contradicting deviation 4."},
+    {"delegation": 2, "phases": "plan-revision", "agent": "atomic-planner", "model": "opus", "started_at": "2026-11-04T14:40:00Z", "status": "complete", "head_after": "a2f52685b", "notes": "Installed plan validator ok:true; SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS."},
+    {"delegation": 3, "phases": "confirming-preflight", "agent": "atomic-executor", "model": "opus", "started_at": "2026-11-04T14:55:00Z", "status": "complete", "head_after": "e16379da5", "notes": "PREFLIGHT: REVISIONS REQUIRED. Six trivial fixes in place (preflight-fixes.2026-11-04T14-40.md). One substantive defect: S10/U10/S22/U22 require a Python 3.10 CI job, but the quality-checks matrix is 3.11-3.13 and pyproject requires python >=3.11; needs an owner/spec decision on the helper floor (3.11, or keep 3.10 with a non-CI proof)."},
+    {"delegation": 4, "phases": "plan-revision-owner-decision", "agent": "atomic-planner", "model": "opus", "started_at": "2026-11-04T14:47:00Z", "status": "complete", "head_after": "cf420f81f", "notes": "Floor 3.10 -> 3.11 in Execution Context, P3-T2, traceability S10/U10 S22/U22, Pre-Mortem CI-only bullet. Installed and branch-current plan validators pass. SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS."},
+    {"delegation": 5, "phases": "owner-decision-preflight", "agent": "atomic-executor", "model": "opus", "started_at": "2026-11-04T14:55:00Z", "status": "complete", "head_after": "672c5e21d", "notes": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; two trivial fixes (preflight-fixes.2026-11-04T14-52.md); status record preflight-status.2026-11-04T14-52.md."},
+    {"delegation": 6, "phases": "0-6 (resume at P0-T4)", "agent": "atomic-executor", "model": "opus", "started_at": "2026-11-04T14:55:00Z", "status": "interrupted", "head_after": "3090e42fd", "notes": "Atomic execution resumed at P0-T4 after owner-decision preflight ALL CLEAR. Executor process lost when the Codespace terminated during the Phase 6 QA loop. Phases 0-5 committed by the executor (last executor commit 3090e42fd). Uncommitted work at the stop (four 1031 Pester suites with New- to ConvertTo- helper renames, Phase 6 QA evidence, plan checkboxes) recovered by the orchestrator in bbef268db and c83bdf64c."},
+    {"delegation": 7, "phases": "6 (restart at P6-T1 on merged head e34dbba74)", "agent": "atomic-executor", "model": "opus", "started_at": "2026-11-04T19:41:00Z", "status": "paused", "head_after": "9ebaece97", "notes": "Commit and push after every completed task. Re-ran P6-T1..P6-T14 on the merged head; stopped after P6-T14 on owner instruction. Next P6-T15."}
+  ],
+  "blocked_detail": {
+    "rule": "atomic-plan-contract Single-Pass Preflight: at most one return to the planner; second preflight still reports a substantive defect, halt with blocked_reason validator_failed.",
+    "defect": "Acceptance criteria S10, S22 (spec.md) and U10, U22 (user-story.md) name a Python 3.10 CI matrix job that no longer exists (matrix 3.11/3.12/3.13; pyproject python >=3.11,<4.0, both confirmed by the orchestrator). Executors and planners may not rewrite AC text.",
+    "decision_needed": "Owner chooses (a) raise the helper floor to 3.11 and amend S10/U10/S22/U22 and the spec floor statement, or (b) keep 3.10 and amend the criteria to a non-CI proof (for example ast.parse feature_version=(3, 10) over PYLIB). Then one planner revision and one preflight, and resume at P0-T4.",
+    "resume_at": "P0-T4"
+  },
+  "owner_decisions": [
+    {"decision": "option (i): raise the helper Python floor to 3.11; amend S10/S22 and U10/U22 to state the 3.11 floor verified by the CI matrix 3.11/3.12/3.13", "decided_by": "epic coordinator under the owner's standing instruction", "recorded_in": "artifacts/orchestration/epic-orchestrator-state.json owner_decisions[1031]", "applied_commit": "b94002659", "applied_at": "2026-11-04T14:46:00Z", "rounds_permitted": "one planner revision and one preflight"}
+  ],
+  "resume_point": {
+    "recorded_at": "2026-11-04T21:10:00Z",
+    "reason": "Owner instruction: pause at the next task boundary; work moves outside this container",
+    "branch": "feature/docs-surface-analyzer-python-native-1031-r2",
+    "branch_head_sha": "9ebaece97de4c963b19311814b6804b22f688769",
+    "branch_matches_origin": true,
+    "resumed_at": "2026-11-04T19:40:00Z",
+    "integration_merge": "e34dbba74 merged origin/epic/documentation-estate-tooling-integration at 729ff55ef (1024 PR #1075, 1033 PR #1076); core.json bundle append conflict resolved keeping all sibling rows",
+    "worktree_clean": true,
+    "last_completed_task": "P6-T14 (evidence committed; checkbox left unchecked as pending-CI)",
+    "plan_checked_tasks": "P0-T1..P6-T8, P6-T10..P6-T13",
+    "unchecked_tasks": "P6-T9 and P6-T14 (pending-CI on poshqc / PowerShell QC: local single-process Pester has 409 failures, none branch-only and none under tests/scripts/claude-lib/docs or tests/scripts/claude-runtime, compared against a merge-base run with 414), P6-T15..P6-T20",
+    "next_task": "P6-T15 (quality tiers and logical line counts), then P6-T16..P6-T20 including P6-T19 AC check-off and the P6-T20 self-review",
+    "interrupted_batch": "none; atomic-executor delegation 7 stopped cleanly after P6-T14 on owner instruction",
+    "last_code_touching_commit": "bbef268db (every later commit adds evidence or plan checkboxes only, except the merge e34dbba74, which touched code); the final PR head must be code-touching",
+    "remaining_after_s5": "S6 pre-review commit, S7 feature review and remediation loop, S8 pr-author into epic/documentation-estate-tooling-integration, S9 CI gate via Invoke-CiGateParser.ps1 (20 required contexts of ruleset 15241672), S10 merge-on-green with gh pr merge --merge --match-head-commit",
+    "possibly_half_done": [
+      "No spec.md or user-story.md AC item is checked yet (0 of 22 each); check-off belongs to P6-T19 and feature review",
+      "Executor scratch helpers for P6-T15/P6-T16 lived in the container temp directory and may need to be recreated"
+    ]
+  },
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "artifact_errors": []
+}

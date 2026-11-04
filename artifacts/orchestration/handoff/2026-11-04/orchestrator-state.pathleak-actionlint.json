@@ -1,0 +1,199 @@
+{
+  "objective": "Fix the $env:PATH leak in tests/scripts/dev-tools/run-actionlint.Tests.ps1 (issue 1066) and add a regression guard so process-environment changes are restored in every suite.",
+  "change_budget_estimate": "One Pester test file (run-actionlint.Tests.ps1) plus a minimal regression guard (one test or CI-level check); test-only change set. Route large because work mode is full-bug and the guard may touch shared Pester/CI infrastructure.",
+  "path_selected": "large",
+  "route_id": "large",
+  "promotion-type": "bug",
+  "short-name": "run-actionlint-test-path-env-leak",
+  "long-name": "run-actionlint-test-path-env-leak",
+  "relativeFile": "docs/features/potential/promoted/2026-11-03-run-actionlint-test-path-env-leak.md",
+  "issue-num": "1066",
+  "feature-folder": "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/plan.2026-11-03T17-43.md",
+  "branch": "bug/test-path-leak-run-actionlint",
+  "lifecycle_ready": true,
+  "epic_mode": false,
+  "completed_steps": ["step1_promotion", "S2_research", "S3_feature_documents", "S4_atomic_planning", "S4_preflight", "S5_atomic_execution", "remediation.cycle_1", "S6_feature_review", "S7_pr_creation_gate"],
+  "next_step": "S10_complete",
+  "last_updated": "2026-11-04T03:14:00Z",
+  "pr_merge": { "merge_commit_sha": "930486d46c8e6712df2638eb432da4491e1aa51f", "target_branch": "main", "merged_at": "2026-11-04T03:12:47Z", "confirmation": "gh pr view state MERGED; git merge-base --is-ancestor against origin/main exit 0; issue #1066 CLOSED" },
+  "ci_gate": {
+    "head_sha": "64b3a23447e54958d16c744aa4df40fd10af25bd",
+    "pr_pipeline_run_id": "41764110378",
+    "pr_pipeline_run_url": "https://github.com/drmoisan/drm-copilot/actions/runs/41764110378",
+    "conclusion": "success",
+    "verified_at": "2026-11-04T03:12:08Z",
+    "required_contexts_green": 20,
+    "merge_state_status": "CLEAN",
+    "previous_head_note": "Head 964caff0c (docs-only AC11 check-off) was BLOCKED with 12 of 20 required contexts reporting; resolved by the coordinator-directed comment-only commit 64b3a2344, which ran full CI.",
+    "note": "Docs-only change-scope run on the AC11 check-off head: 11 pass, 6 skipped. 12 of 20 required contexts are present and passing; 8 matrix-expanded required contexts (poshqc shard 1-3, NPM Audit Gate x3, root-typescript-tests x2) never report because their jobs are skipped at job level in docs-only mode; mergeStateStatus BLOCKED. The prior head 86ef18ef1 passed all 22 checks (run 41761495839, all 20 required contexts green)."
+  },
+  "ci_gate_history": [
+    { "head_sha": "86ef18ef1f26c919f1d133f3b68b7eeffab13f97", "pr_pipeline_run_id": "41761495839", "pr_pipeline_run_url": "https://github.com/drmoisan/drm-copilot/actions/runs/41761495839", "conclusion": "success", "verified_at": "2026-11-04T02:52:22Z", "checks": "22 pass / 0 fail; all 20 required contexts green" }
+  ],
+  "last_verified_ci_sha": "64b3a23447e54958d16c744aa4df40fd10af25bd",
+  "human_interaction": {
+    "requirements": [
+      { "id": "HI-1", "response": "scope_change", "description": "Resolved: the coordinator directed a comment-only test-file edit (commit 64b3a2344) so the final head ran full CI; all 20 required contexts green; no Actions write permission needed." }
+    ]
+  },
+  "blocking_findings_resolved": true,
+  "pr_creation_gate": { "blocking_findings_resolved": true, "ac_verification": "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/qa-gates/ac-verification.2026-11-04T02-19.md", "ac_pending_ci": ["AC11"], "toolchain_last_run": "pass (cycle 1 QA loop pass 2; review re-run format/PSSA/Pester 39/39)" },
+  "remediation_loop": {
+    "current_cycle": 0,
+    "completed_attempts": 1,
+    "review_outcomes": [
+      { "verdict": "PASS", "findings": [], "artifacts": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/policy-audit.2026-11-04T02-30.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/code-review.2026-11-04T02-30.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/feature-audit.2026-11-04T02-30.md"] }
+    ],
+    "cycles": [
+      {
+        "entry_timestamp": "2026-11-04T01:03:00Z",
+        "inputs_path": "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/remediation-inputs.2026-11-04T01-03.md",
+        "plan_path": "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/remediation-plan.2026-11-04T01-03.md",
+        "preflight": { "iterations": 1, "final_status": "clear" },
+        "execution_status": "complete",
+        "candidate_head": "06ec23743acb447cc473ea27de9a1b2f06bc2762",
+        "audit_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/code-review.2026-11-04T02-30.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/feature-audit.2026-11-04T02-30.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/policy-audit.2026-11-04T02-30.md"],
+        "blocking_count": 0,
+        "exit_condition_met": true,
+        "candidate_applied": true,
+        "origin": "execution-time finding at P2-T4 (scope-change rule); not opened by a review"
+      }
+    ]
+  },
+  "preflight_status": { "rounds": 2, "final_signal": "PREFLIGHT: ALL CLEAR", "execution_block": "Executor BLOCKED at P0-T6 with one substantive defect (wrong reproduction file set); using the single permitted planner revision, then preflight round 2." },
+  "step5_status": "completed",
+  "step6_status": "completed",
+  "step7_status": "completed",
+  "step8_status": "delegated",
+  "step9_status": "passed",
+  "step10_status": "pending",
+  "blocked_reason": "none",
+  "required_agents": ["task-researcher", "prd-feature", "atomic-planner", "atomic-executor", "feature-review", "pr-author"],
+  "required_skills": ["orchestrate", "feature-promotion-lifecycle", "atomic-plan-contract", "acceptance-criteria-tracking", "pr-context-artifacts", "pr-base-branch-merge-base"],
+  "required_mcp_tools": ["new_potential_bug_entry", "potential_to_issue", "new_active_feature_folder", "collect_pr_context", "validate_orchestration_artifacts"],
+  "delegation_receipts": {
+    "promotion": {
+      "potential_entry": {
+        "performed_by": "coordinator session",
+        "mcp_receipt": null,
+        "note": "The coordinator created the potential entry and promoted it before this orchestrator run; no raw MCP receipt payload was handed to this run. The record is committed at the relativeFile path."
+      },
+      "issue": {
+        "performed_by": "coordinator session",
+        "mcp_receipt": null,
+        "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1066",
+        "note": "Issue filed before this run; adopted under issue_adoption."
+      },
+      "feature_folder": {
+        "performed_by": "coordinator session",
+        "mcp_receipt": null,
+        "note": "Feature folder created by the coordinator and committed in 70a98f5af on the item branch; adopted under issue_adoption.feature_folder_record."
+      }
+    },
+    "agents": [
+      { "step": "S2_research", "agent_name": "task-researcher", "agent_id": "a17d8503bfb182f66", "skill_source": ".claude/agents/task-researcher.md", "started_at": "2026-11-03T22:48:14Z", "completed_at": "2026-11-03T22:49:51Z", "result_signal": "research written; recommends Describe-level PATH restore and nested-run environment-equality guard (fallback static AST guard)", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/research/research.md"] },
+      { "step": "S3_feature_documents", "agent_name": "prd-feature", "agent_id": "a33cf708a485c34f5", "skill_source": ".claude/agents/prd-feature.md", "started_at": "2026-11-03T22:50:10Z", "completed_at": "2026-11-03T22:51:05Z", "result_signal": "spec.md written; 11 acceptance criteria (1 CI-dependent); no user-story.md (full-bug)", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/spec.md"] },
+      { "step": "S4_atomic_planning", "agent_name": "atomic-planner", "agent_id": "a227ce29e024975f2", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-03T22:53:00Z", "completed_at": "2026-11-03T23:01:00Z", "result_signal": "plan written in place; 38 tasks; installed validator ok; PLANNER-INTERNAL-REVIEW: PASS; SELF-REVIEW: RE-DERIVED THIS PASS", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/plan.2026-11-03T17-43.md"] },
+      { "step": "S4_preflight", "agent_name": "atomic-executor", "agent_id": "a087e7bc16ad28642", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-03T23:03:30Z", "completed_at": "2026-11-03T23:05:00Z", "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; one PREFLIGHT-FIX on DD1", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/plan.2026-11-03T17-43.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/other/preflight-fixes.2026-11-03T23-03.md"] },
+      { "step": "S5_atomic_execution", "agent_name": "atomic-executor", "agent_id": "a3d6a606ff0d57bc5", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-03T23:07:00Z", "completed_at": "2026-11-03T23:22:00Z", "result_signal": "BLOCKED at P0-T6: victim set V empty over the 37 dev-tools suites; victims located in 8 suites under claude-hooks, codex-hooks, codex-scripts (105 keys); plan defect: wrong reproduction file set", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/baseline/victim-set.2026-11-03T23-20.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/regression-testing/fail-before-exception.2026-11-03T23-20.md"] },
+      { "step": "S4_plan_revision", "agent_name": "atomic-planner", "agent_id": "a96fa229c867fbac2", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-03T23:24:30Z", "completed_at": "2026-11-03T23:33:00Z", "result_signal": "plan revised in place (46 tasks, size justification); VICTIMS/REPRO/Leak order; container-profile comparison; MCP validator ok", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/plan.2026-11-03T17-43.md"] },
+      { "step": "S4_preflight_round2", "agent_name": "atomic-executor", "agent_id": "a089b3341f7acf0bf", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-03T23:35:00Z", "completed_at": "2026-11-03T23:37:00Z", "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; no fixes", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/plan.2026-11-03T17-43.md"] },
+      { "step": "S5_atomic_execution_resume", "agent_name": "atomic-executor", "agent_id": "ab893126c013b8e46", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-03T23:38:30Z", "completed_at": "2026-11-04T01:01:00Z", "result_signal": "BLOCKED at P2-T4: global function Import-ScriptFunction and Archive module left loaded; GuardForm b; P0-T6..P2-T3 checked; last push a45d7c0de", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/regression-testing/global-state-pass-after.2026-11-04T00-58.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/other/guard-decision.2026-11-04T00-56.md"] },
+      { "step": "remediation.cycle_1.plan", "agent_name": "atomic-planner", "agent_id": "a6df8e27b4605efe0", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-04T01:06:00Z", "completed_at": "2026-11-04T01:10:00Z", "result_signal": "remediation plan written; 30 tasks; installed validator ok; PLANNER-INTERNAL-REVIEW: PASS", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/remediation-plan.2026-11-04T01-03.md"] },
+      { "step": "remediation.cycle_1.execute", "agent_name": "atomic-executor", "agent_id": "a4cb61875f5b3716d", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-04T01:11:30Z", "completed_at": "2026-11-04T02:22:00Z", "result_signal": "PREFLIGHT: ALL CLEAR (1 fix); all 30 tasks checked; RCR holds in 6 orders; P2-T4 empty difference; AC 10/11 checked (AC11 pending-CI); self-review no FAIL; last push 06ec23743", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/qa-gates/self-review.2026-11-04T02-19.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/evidence/qa-gates/ac-verification.2026-11-04T02-19.md"] },
+      { "step": "S6_feature_review", "agent_name": "feature-review", "agent_id": "ad1895dad2b79dfcb", "skill_source": ".claude/agents/feature-review.md", "started_at": "2026-11-04T02:25:30Z", "completed_at": "2026-11-04T02:31:30Z", "result_signal": "review-status: PASS; 0 blocking; AC1-AC10 PASS; AC11 PENDING-CI", "artifact_paths": ["docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/policy-audit.2026-11-04T02-30.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/code-review.2026-11-04T02-30.md", "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066/feature-audit.2026-11-04T02-30.md"] },
+      { "step": "S8_create_pr", "agent_name": "pr-author", "agent_id": "ac6943c8dab0b01fd", "skill_source": ".claude/agents/pr-author.md", "started_at": "2026-11-04T02:32:40Z", "completed_at": "2026-11-04T02:34:00Z", "result_signal": "PR #1070 opened into main; closingIssuesReferences #1066", "artifact_paths": ["artifacts/pr_body_1066.md", "artifacts/pr_body_1066.receipt.json"] }
+    ]
+  },
+  "issue_adoption": {
+    "issue_num": "1066",
+    "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1066",
+    "origin": "filed_before_orchestration",
+    "verified_via": "gh_issue_view",
+    "verified_at": "2026-11-03T22:46:00Z",
+    "evidence": "gh issue view 1066 --json number,state,title,url returned number 1066, state OPEN, title 'Bug: run-actionlint-test-path-env-leak'.",
+    "waived_tools": ["potential_to_issue", "new_potential_bug_entry", "new_active_feature_folder"],
+    "potential_record": "docs/features/potential/promoted/2026-11-03-run-actionlint-test-path-env-leak.md",
+    "feature_folder_record": {
+      "path": "docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066",
+      "verified_via": "git_cat_file_head",
+      "verified_at": "2026-11-03T22:46:30Z",
+      "evidence": "git cat-file -t HEAD:docs/features/active/2026-11-03-run-actionlint-test-path-env-leak-1066 printed tree after commit 70a98f5af."
+    }
+  },
+  "skill_receipts": [
+    { "skill": "orchestrate", "required": true, "evidence": "read:.claude/skills/orchestrate/SKILL.md" },
+    { "skill": "feature-promotion-lifecycle", "required": true, "evidence": "loaded in session context; promotion performed by coordinator and adopted" },
+    { "skill": "atomic-plan-contract", "required": true, "evidence": "loaded in session context" },
+    { "skill": "acceptance-criteria-tracking", "required": true, "evidence": "loaded in session context" }
+  ],
+  "mcp_call_receipts": [
+    { "tool": "collect_pr_context", "ok": true, "evidence": "collect_pr_context base main, target_ref bug/test-path-leak-run-actionlint, head 06ec23743; artifacts/pr_context.summary.txt written at 2026-11-04T02:24Z" },
+    { "tool": "validate_orchestration_artifacts", "ok": true, "evidence": "plan artifact plan.2026-11-03T17-43.md validated by MCP (ok true) at 2026-11-03T23:02Z; branch-current Python plan validator also exit 0" }
+  ],
+  "complexity_assessments": [
+    { "phase": "S2_research", "band": "C2", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Research confined to one Pester test file and the existing Pester/PoshQC/CI structure for a guard; no product contract change.", "assessed_at": "2026-11-03T22:48:00Z" },
+    { "phase": "S3_feature_documents", "band": "C2", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "spec.md for a localized test-isolation bug with a small guard.", "assessed_at": "2026-11-03T22:48:00Z" },
+    { "phase": "S4_atomic_planning", "band": "C3", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Plan must design a regression guard that fits shared Pester/CI structure without breaking other suites; judged above floor for that design risk.", "assessed_at": "2026-11-03T22:48:00Z" },
+    { "phase": "S4_preflight", "band": "C2", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Read-only plan validation against the tree.", "assessed_at": "2026-11-03T22:48:00Z" },
+    { "phase": "S5_atomic_execution", "band": "C3", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Execution includes single-process ordered and seeded Pester runs and before/after failure comparison against 89 pre-existing host failures; judged above floor.", "assessed_at": "2026-11-03T22:48:00Z" },
+    { "phase": "S6_feature_review", "band": "C3", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Full three-artifact review of the branch diff.", "assessed_at": "2026-11-03T22:48:00Z" },
+    { "phase": "S6_pre_review_commit", "band": "C2", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Mechanical diff-to-message task.", "assessed_at": "2026-11-03T22:48:00Z" },
+    { "phase": "remediation.cycle_1.plan", "band": "C3", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Remediation plan for global-state restore and a guard assertion that can fail, plus carried-forward Phase 3-4 runs.", "assessed_at": "2026-11-04T01:06:00Z" },
+    { "phase": "remediation.cycle_1.execute", "band": "C3", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "Single-pass preflight plus execution including long single-process and parallel Pester runs.", "assessed_at": "2026-11-04T01:06:00Z" },
+    { "phase": "S8_create_pr", "band": "C2", "floor": "C1", "signals_present": ["single_file_localized_edit"], "rationale": "PR body authoring from the PR-context bundle.", "assessed_at": "2026-11-03T22:48:00Z" }
+  ],
+  "model_routing_receipts": [
+    { "agent": "task-researcher", "phase": "S2_research", "complexity_band": "C2", "fable_policy": "disabled", "table_model": "sonnet", "clamped_from": null, "model": "sonnet" },
+    { "agent": "prd-feature", "phase": "S3_feature_documents", "complexity_band": "C2", "fable_policy": "disabled", "table_model": "sonnet", "clamped_from": null, "model": "sonnet" },
+    { "agent": "atomic-planner", "phase": "S4_atomic_planning", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "atomic-executor", "phase": "S4_preflight", "complexity_band": "C2", "fable_policy": "disabled", "table_model": "sonnet", "clamped_from": null, "model": "sonnet" },
+    { "agent": "atomic-executor", "phase": "S5_atomic_execution", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "feature-review", "phase": "S6_feature_review", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "commit-message", "phase": "S6_pre_review_commit", "complexity_band": "C2", "fable_policy": "disabled", "table_model": "sonnet", "clamped_from": null, "model": "sonnet" },
+    { "agent": "atomic-planner", "phase": "remediation.cycle_1.plan", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "atomic-executor", "phase": "remediation.cycle_1.execute", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "pr-author", "phase": "S8_create_pr", "complexity_band": "C2", "fable_policy": "disabled", "table_model": "sonnet", "clamped_from": null, "model": "sonnet" }
+  ],
+  "model_routing_preflight": { "status": "pass", "checked_at": "2026-11-03T22:49:00Z", "validator_command": "poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing", "output_summary": "orchestrator-state validation passed; exit 0" },
+  "required_status_contexts": {
+    "ruleset_id": 15241672,
+    "confirmed_at": "2026-11-03T22:50:00Z",
+    "confirmed_via": "gh api repos/drmoisan/drm-copilot/rulesets/15241672",
+    "count": 20,
+    "contexts": [
+      "drm-copilot-extension-tests / drm-copilot Extension Tests (ubuntu-latest)",
+      "drm-copilot-extension-tests / drm-copilot Extension Tests (windows-latest)",
+      "docs-validation / Documentation Validation",
+      "poshqc / PowerShell QC",
+      "shell-coverage / Shell Coverage (Bats + kcov)",
+      "security-scan / Security Scanning",
+      "quality-checks7 / Code Quality & Tests (3.11)",
+      "quality-checks7 / Code Quality & Tests (3.12)",
+      "quality-checks7 / Code Quality & Tests (3.13)",
+      "build-check / Build Package",
+      "NPM Audit Gate / npm audit (extensions/drm-copilot)",
+      "NPM Audit Gate / npm audit (.)",
+      "NPM Audit Gate / npm audit (packages/mcp-server)",
+      "root-typescript-tests / Root TypeScript Tests (ubuntu-latest)",
+      "root-typescript-tests / Root TypeScript Tests (windows-latest)",
+      "poshqc / PowerShell QC shard 1",
+      "poshqc / PowerShell QC shard 2",
+      "poshqc / PowerShell QC shard 3",
+      "poshqc / PowerShell QC static",
+      "poshqc / PowerShell hook suites (Linux)"
+    ]
+  },
+  "pr_author_preflight": { "status": "pass", "checked_at": "2026-11-04T02:32:20Z", "checkpoint_path": "artifacts/orchestration/orchestrator-state.json", "validator_command": "poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state artifacts/orchestration/orchestrator-state.json --require-pr-creation-ready --require-model-routing", "output_summary": "orchestrator-state validation passed; exit 0" },
+  "pr_author_receipt": { "pr_number": 1070, "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1070", "body_path": "artifacts/pr_body_1066.md", "receipt_path": "artifacts/pr_body_1066.receipt.json", "sha256": "f4df577369b6301240d53d48e8321c8c22ca4cd3fe7ee83c261681d48da21fcc", "closing_issues": ["#1066"] },
+  "pr_gate": { "pr_number": 1070, "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1070", "head_branch": "bug/test-path-leak-run-actionlint", "head_sha": "64b3a23447e54958d16c744aa4df40fd10af25bd" },
+  "local_execution_overrides": [
+    { "step": "S9_ci_green", "performed_by": "orchestrator", "authorized_by": "coordinator instruction 2026-11-04", "change": "comment-only header edit in tests/scripts/dev-tools/run-actionlint.EnvironmentIsolation.Tests.ps1 (commit 64b3a2344) so the final head runs full CI", "verification": "Invoke-Formatter unchanged; PSScriptAnalyzer 0 findings; Pester TARGET+GUARD 39/39" }
+  ],
+  "delegation_bypasses": [],
+  "completion_gate_residuals": [
+    "Promotion MCP receipts (new_potential_bug_entry, potential_to_issue, new_active_feature_folder) were not produced by this run; the coordinator performed promotion before the run. Recorded as issue_adoption waivers with origin filed_before_orchestration rather than fabricated receipts."
+  ]
+}

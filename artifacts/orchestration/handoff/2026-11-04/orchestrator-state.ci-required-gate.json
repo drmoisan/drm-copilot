@@ -1,0 +1,586 @@
+{
+  "objective": "Replace the 20 individually required CI contexts with one required gate job that aggregates every CI job, so the docs-only fast pass in ci.yml can pass without faking results and the individual jobs stay visible (issue 1074). The ruleset change itself is applied by the coordinator or owner after the gate has run green on main; the plan must supply the exact command and a rollback command but must not apply it.",
+  "change_budget_estimate": "Medium: .github/workflows/ci.yml (gate job), possibly .github/workflows/_poshqc.yml, workflow pin tests, the execution-environment brief (six copies), .github/workflows/README.md and other docs listing required checks, and a ruleset runbook in the feature folder.",
+  "path_selected": "large",
+  "route_id": "large",
+  "promotion-type": "bug",
+  "short-name": "ci-single-required-gate-docs-only-skip",
+  "relativeFile": "docs/features/potential/promoted/2026-11-04-ci-single-required-gate-docs-only-skip.md",
+  "long-name": "ci-single-required-gate-docs-only-skip",
+  "issue-num": "1074",
+  "feature-folder": "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/plan.2026-11-04T09-46.md",
+  "branch": "bug/ci-single-required-gate",
+  "lifecycle_ready": true,
+  "epic_mode": false,
+  "completed_steps": [
+    "step1_promotion",
+    "S2_research",
+    "S3_feature_documents",
+    "S4_atomic_planning",
+    "S4_preflight",
+    "S5_atomic_execution_phases_0_6",
+    "S7_feature_review",
+    "S8_create_pr",
+    "S7_reaudit_1",
+    "S9_ci_green",
+    "S9_merge",
+    "S10_complete"
+  ],
+  "next_step": "complete",
+  "last_updated": "2026-11-04T20:40:00Z",
+  "remediation_loop": {
+    "current_cycle": 0,
+    "completed_attempts": 0,
+    "review_outcomes": [
+      {
+        "verdict": "AWAITING_CI",
+        "findings": [
+          {
+            "remediability": "awaiting_ci"
+          },
+          {
+            "remediability": "awaiting_ci"
+          },
+          {
+            "remediability": "awaiting_ci"
+          },
+          {
+            "remediability": "awaiting_ci"
+          }
+        ],
+        "inputs_path": "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/remediation-inputs.2026-11-04T16-00.md"
+      },
+      {
+        "verdict": "AWAITING_CI",
+        "findings": [
+          {
+            "remediability": "awaiting_ci"
+          }
+        ],
+        "inputs_path": "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/remediation-inputs.2026-11-04T17-18.md"
+      }
+    ],
+    "cycles": []
+  },
+  "awaiting_ci_resolution": "Review 0 is AWAITING_CI (F1 green workflow run, F2 PowerShell coverage from poshqc CI artifact, F3 Python coverage from quality-checks7 3.13, F4 CI-dependent AC). The awaited ci.yml run can only exist on a pull_request event for this branch (no dispatch rights), so the wait is resolved by opening the PR (S8) and then running Phase 7 proofs and a re-audit before merge. blocked_reason stays none because the wait is actionable by this run, not by an external party.",
+  "preflight": {
+    "rounds": 1,
+    "final_status": "clear"
+  },
+  "execution_note": "Phases 0-6 complete at cd5923ff8; Phase 7 (post-PR CI proof) deferred to a separate atomic-executor delegation after S8.",
+  "step5_status": "completed",
+  "step6_status": "not-applicable",
+  "step7_status": "completed",
+  "step8_status": "delegated",
+  "step9_status": "passed",
+  "step10_status": "completed",
+  "blocked_reason": "none",
+  "required_agents": [
+    "task-researcher",
+    "prd-feature",
+    "atomic-planner",
+    "atomic-executor",
+    "feature-review",
+    "pr-author"
+  ],
+  "required_skills": [
+    "orchestrate",
+    "feature-promotion-lifecycle",
+    "atomic-plan-contract",
+    "acceptance-criteria-tracking",
+    "pr-context-artifacts",
+    "pr-base-branch-merge-base"
+  ],
+  "required_mcp_tools": [
+    "new_potential_bug_entry",
+    "potential_to_issue",
+    "new_active_feature_folder",
+    "collect_pr_context",
+    "validate_orchestration_artifacts"
+  ],
+  "coordinator_addenda": [
+    "2026-11-04: ruleset change applied by a human; runbook is a first-class deliverable at <feature-folder>/runbook/ruleset-single-required-gate.md with sections in order: (1) preconditions and timing with confirm command, (2) gate context name verified from a real run plus the current 20 contexts, (3) read-and-save backup (not committed), (4) change via gh api PUT with body built from backup by pwsh or jq preserving all fields, plus web UI path and required token permission, (5) verification with docs-only and code PRs, (6) rollback command and UI equivalent, (7) what does not change (epic integration PRs). Validate JSON body with a dry parse only; apply nothing; report runbook path."
+  ],
+  "model_budget": {
+    "fable_policy": "disabled",
+    "source": "owner instruction for this session"
+  },
+  "delegation_receipts": {
+    "agents": [
+      {
+        "step": "S2_research",
+        "agent_name": "task-researcher",
+        "agent_id": "task-researcher-s2-1074",
+        "skill_source": ".claude/agents/task-researcher.md",
+        "started_at": "2026-11-04T15:45:00Z",
+        "completed_at": "2026-11-04T16:05:00Z",
+        "result_signal": "research complete; two ORCHESTRATOR-CONFIRM items (nested-skip caller result, check-run app id) deferred to live run",
+        "artifact_paths": [
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/research/research.2026-11-04.md"
+        ]
+      },
+      {
+        "step": "S3_feature_documents",
+        "agent_name": "prd-feature",
+        "agent_id": "prd-feature-s3-1074",
+        "skill_source": ".claude/agents/prd-feature.md",
+        "started_at": "2026-11-04T16:10:00Z",
+        "completed_at": "2026-11-04T16:30:00Z",
+        "result_signal": "spec.md completed; 45 AC, 7 CI-dependent; no user-story.md (full-bug)",
+        "artifact_paths": [
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/spec.md"
+        ]
+      },
+      {
+        "step": "S4_atomic_planning",
+        "agent_name": "atomic-planner",
+        "agent_id": "atomic-planner-s4-1074",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-11-04T16:35:00Z",
+        "completed_at": "2026-11-04T16:55:00Z",
+        "result_signal": "plan written: 40 tasks, 8 phases; MCP plan validator ok; branch Python CLI plan validator exit 0",
+        "artifact_paths": [
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/plan.2026-11-04T09-46.md"
+        ]
+      },
+      {
+        "step": "S4_preflight",
+        "agent_name": "atomic-executor",
+        "agent_id": "atomic-executor-s4-preflight-1074",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-04T16:58:00Z",
+        "completed_at": "2026-11-04T17:20:00Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; 12 in-place fixes",
+        "artifact_paths": [
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/evidence/other/preflight-fixes.2026-11-04T15-23.md"
+        ]
+      },
+      {
+        "step": "S5_atomic_execution",
+        "agent_name": "atomic-executor",
+        "agent_id": "atomic-executor-s5-1074",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-04T17:23:00Z",
+        "completed_at": "2026-11-04T17:55:00Z",
+        "result_signal": "Phases 0-6 complete (33 tasks); head cd5923ff8; Pester 410/0; coverage 100% and 90%; actionlint 0; pytest 167/0; self-review 0 FAIL; 38/45 AC checked, 7 CI-dependent open",
+        "artifact_paths": [
+          "scripts/ci/CiRequiredGate.psm1",
+          "scripts/ci/Invoke-CiRequiredGate.ps1",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/evidence/qa-gates/self-review.2026-11-04T15-52.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/runbook/ruleset-single-required-gate.md"
+        ]
+      },
+      {
+        "step": "S7_feature_review",
+        "agent_name": "feature-review",
+        "agent_id": "feature-review-s7-1074",
+        "skill_source": ".claude/agents/feature-review.md",
+        "started_at": "2026-11-04T18:02:00Z",
+        "completed_at": "2026-11-04T18:15:00Z",
+        "result_signal": "review-status AWAITING_CI; 4 blocking findings all awaiting_ci; three artifacts validator ok",
+        "artifact_paths": [
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/policy-audit.2026-11-04T16-00.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/code-review.2026-11-04T16-00.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/feature-audit.2026-11-04T16-00.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/remediation-inputs.2026-11-04T16-00.md"
+        ]
+      },
+      {
+        "step": "S8_create_pr",
+        "agent_name": "pr-author",
+        "agent_id": "pr-author-s8-1074",
+        "skill_source": ".claude/agents/pr-author.md",
+        "started_at": "2026-11-04T18:28:00Z",
+        "completed_at": "2026-11-04T18:40:00Z",
+        "result_signal": "PR #1077 opened; closingIssuesReferences [#1074]",
+        "artifact_paths": [
+          "artifacts/pr_body_1074.md",
+          "artifacts/pr_body_1074.receipt.json"
+        ]
+      },
+      {
+        "step": "S9_phase7_ci_proof",
+        "agent_name": "atomic-executor",
+        "agent_id": "atomic-executor-p7-1074",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-04T18:45:00Z",
+        "completed_at": "2026-11-04T19:50:00Z",
+        "result_signal": "Phase 7 complete; proofs A green (41864628204), B red (41868374284), C green (41871788989), D docs-only green (41874737526); context CI Required Gate app 15368",
+        "artifact_paths": [
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/evidence/other/proof-a-full-run.2026-11-04T16-31.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/evidence/other/proof-b-gate-red.2026-11-04T16-51.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/evidence/other/proof-c-revert-green.2026-11-04T17-08.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/evidence/other/proof-d-docs-only.2026-11-04T17-11.md"
+        ]
+      },
+      {
+        "step": "S7_reaudit_1",
+        "agent_name": "feature-review",
+        "agent_id": "feature-review-reaudit1-1074",
+        "skill_source": ".claude/agents/feature-review.md",
+        "started_at": "2026-11-04T19:56:00Z",
+        "completed_at": "2026-11-04T20:05:00Z",
+        "result_signal": "review-status AWAITING_CI; 1 blocking finding (AC-45 final-head full run, awaiting_ci, owned by S9); review 0 findings F1-F4 closed; validators ok",
+        "artifact_paths": [
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/policy-audit.2026-11-04T17-18.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/code-review.2026-11-04T17-18.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/feature-audit.2026-11-04T17-18.md",
+          "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074/remediation-inputs.2026-11-04T17-18.md"
+        ]
+      }
+    ]
+  },
+  "orchestrator_confirmations": [
+    "2026-11-04: gh pr checks 1073 shows top-level ci.yml jobs report under bare job name ('CI full run', 'Change scope'); a job named 'CI Required Gate' is expected to report as 'CI Required Gate'. Final confirmation from a run on this branch remains a plan item."
+  ],
+  "ci_proof_sequencing_decision": "ci.yml runs on pull_request only for this branch, so CI proofs require an open PR. Sequence: implement and pass local QA; feature review (modified-workflow-needs-green-run is expected to be the only finding, class awaiting_ci); open PR via pr-author; run proof sequence on the PR (full green, throwaway failing commit -> gate red, revert -> full green, docs-only evidence commit -> gate green with skips); re-audit with green-run evidence; check off CI-dependent AC; final code-touching no-behavior commit so all 20 current required contexts report; S9 on final head; merge.",
+  "skill_receipts": [
+    {
+      "skill": "orchestrate",
+      "required": true,
+      "evidence": "read:.claude/skills/orchestrate/SKILL.md"
+    },
+    {
+      "skill": "feature-promotion-lifecycle",
+      "required": true,
+      "evidence": "read:.claude/skills/feature-promotion-lifecycle/SKILL.md (loaded in session)"
+    },
+    {
+      "skill": "atomic-plan-contract",
+      "required": true,
+      "evidence": "read:.claude/skills/atomic-plan-contract/SKILL.md (loaded in session)"
+    },
+    {
+      "skill": "acceptance-criteria-tracking",
+      "required": true,
+      "evidence": "read:.claude/skills/acceptance-criteria-tracking/SKILL.md (loaded in session)"
+    },
+    {
+      "skill": "pr-context-artifacts",
+      "required": true,
+      "evidence": "collect_pr_context MCP produced artifacts/pr_context.summary.txt and appendix"
+    },
+    {
+      "skill": "pr-base-branch-merge-base",
+      "required": true,
+      "evidence": "base main; merge-base 11f188d1b4f3726d854ddc00f8ad4c810138f049 via git merge-base origin/main HEAD"
+    }
+  ],
+  "mcp_call_receipts": [
+    {
+      "tool": "validate_orchestration_artifacts",
+      "ok": true,
+      "evidence": "plan validator ok (planner and preflight passes) for plan.2026-11-04T09-46.md"
+    },
+    {
+      "tool": "collect_pr_context",
+      "ok": true,
+      "evidence": "Collected PR context against base main; head cd5923ff8330dba3afb7b970d1b5476e8e559e4d; artifacts/pr_context.summary.txt"
+    },
+    {
+      "tool": "collect_pr_context",
+      "ok": true,
+      "evidence": "Collected PR context against base main; head e3ef692e5fc34efa24c33f3513c12b32a1776f6e"
+    },
+    {
+      "tool": "collect_pr_context",
+      "ok": true,
+      "evidence": "Collected PR context against base main; head f707c32b0a56c81774d6c7fbd6490a0045b5cbe8"
+    }
+  ],
+  "issue_adoption": {
+    "issue_num": "1074",
+    "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1074",
+    "origin": "filed_before_orchestration",
+    "verified_via": "gh_issue_view",
+    "verified_at": "2026-11-04T15:35:00Z",
+    "evidence": "gh issue view 1074 --json number,title,state,url returned number 1074, state OPEN, title 'Bug: ci-single-required-gate-docs-only-skip'. The coordinator session performed the promotion before this run.",
+    "waived_tools": [
+      "potential_to_issue",
+      "new_potential_bug_entry",
+      "new_active_feature_folder"
+    ],
+    "potential_record": "docs/features/potential/promoted/2026-11-04-ci-single-required-gate-docs-only-skip.md",
+    "feature_folder_record": {
+      "path": "docs/features/active/2026-11-04-ci-single-required-gate-docs-only-skip-1074",
+      "verified_via": "git_cat_file_head",
+      "verified_at": "2026-11-04T15:36:00Z",
+      "evidence": "git cat-file -t HEAD:<feature-folder> printed tree after commit 2d9452668 on bug/ci-single-required-gate."
+    }
+  },
+  "completion_gate_residuals": [
+    "Promotion (potential entry, potential_to_issue, active feature folder) was performed by the coordinator session before this run; no raw MCP promotion receipts exist in this checkpoint. delegation_receipts.promotion.* is intentionally absent and the three promotion tools are waived through issue_adoption instead of fabricated receipts."
+  ],
+  "complexity_assessments": [
+    {
+      "phase": "S2_research",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Changes the required-status-check contract consumed by branch protection, every orchestration S9 gate, and the execution-environment brief; cross-workflow behavior.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "S3_feature_documents",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Spec defines the gate contract replacing 20 required contexts.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "S4_atomic_planning",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Plan spans ci.yml, reusable workflows, pin tests, mirrored brief copies and the runbook.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "S4_preflight",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Preflight of a cross-cutting workflow plan.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "S5_atomic_execution",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Workflow and contract edits with CI proof in both directions.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "S7_feature_review",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Review of a required-check contract change.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "S8_create_pr",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "PR body for a required-check contract change.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "commit_message",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Commit messages for a required-check contract change; opus per owner instruction.",
+      "assessed_at": "2026-11-04T15:40:00Z"
+    },
+    {
+      "phase": "S9_phase7_ci_proof",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Post-PR CI proof in both directions for the required gate.",
+      "assessed_at": "2026-11-04T18:42:00Z"
+    },
+    {
+      "phase": "S7_reaudit_1",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Re-audit with CI green-run evidence.",
+      "assessed_at": "2026-11-04T19:55:00Z"
+    }
+  ],
+  "model_routing_receipts": [
+    {
+      "agent": "task-researcher",
+      "phase": "S2_research",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "prd-feature",
+      "phase": "S3_feature_documents",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "S4_atomic_planning",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S4_preflight",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S5_atomic_execution",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "feature-review",
+      "phase": "S7_feature_review",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "pr-author",
+      "phase": "S8_create_pr",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "commit-message",
+      "phase": "commit_message",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S9_phase7_ci_proof",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "feature-review",
+      "phase": "S7_reaudit_1",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ],
+  "model_routing_preflight": {
+    "status": "pass",
+    "checked_at": "2026-11-04T15:42:00Z",
+    "validator_command": "poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing",
+    "output_summary": "orchestrator-state validation passed; exit 0"
+  },
+  "pr_author_preflight": {
+    "status": "pass",
+    "checked_at": "2026-11-04T18:27:00Z",
+    "checkpoint_path": "artifacts/orchestration/orchestrator-state.json",
+    "validator_command": "poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing --require-pr-creation-ready",
+    "output_summary": "orchestrator-state validation passed; exit 0"
+  },
+  "pr_author_receipt": {
+    "pr_number": 1077,
+    "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1077",
+    "body_path": "artifacts/pr_body_1074.md",
+    "receipt_path": "artifacts/pr_body_1074.receipt.json",
+    "sha256": "9be63326a5c9a93acd669492daa7699f7df7818150e4a1ec1b9356eaba79f314"
+  },
+  "pr_gate": {
+    "pr_number": 1077,
+    "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1077",
+    "base": "main",
+    "head_sha": "99b72f1fd4cc817a1c31c5815926f2ce8ca924c9",
+    "head_branch": "bug/ci-single-required-gate"
+  },
+  "gate_context_verified": {
+    "context": "CI Required Gate",
+    "app_id": 15368,
+    "verified_on_runs": [
+      41864628204,
+      41868374284,
+      41871788989,
+      41874737526
+    ]
+  },
+  "ac45_checkoff_note": "AC-45 is self-referential to the final PR head: it is checked off in the final code-touching commit so that the final head carries a full CI run (a later docs-only check-off commit would leave 8 required contexts unreported). S9 on that head verifies it before merge; a non-success S9 result reverts the check-off through the CI-failure remediation loop.",
+  "reviewer_out_of_scope_write": "The re-audit feature-review agent wrote a note to .claude/agent-memory/feature-review/review-artifact-validator-gotchas.md in the root checkout (outside this worktree). Not modified by this run; reported to the coordinator.",
+  "ci_gate": {
+    "head_sha": "99b72f1fd4cc817a1c31c5815926f2ce8ca924c9",
+    "pr_pipeline_run_id": "41877311137",
+    "pr_pipeline_run_url": "https://github.com/drmoisan/drm-copilot/actions/runs/41877311137",
+    "conclusion": "success",
+    "verified_at": "2026-11-04T21:10:00Z",
+    "checks_total": 26,
+    "checks_pass": 26,
+    "checks_pending": 0,
+    "checks_fail": 0,
+    "required_contexts_total": 20,
+    "required_contexts_pass": 20,
+    "gate_context": "CI Required Gate",
+    "merge_state_status": "CLEAN",
+    "full_run": "Change scope success; CI full run success"
+  },
+  "last_verified_ci_sha": "99b72f1fd4cc817a1c31c5815926f2ce8ca924c9",
+  "pr_merge": {
+    "merge_commit_sha": "d80558cf705c14f94a0c4a98ce75544116ea710b",
+    "target_branch": "main",
+    "merged_at": "2026-11-04T19:41:08Z",
+    "confirmation": "gh pr view state MERGED; git merge-base --is-ancestor d80558cf7 origin/main exit 0"
+  },
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "main_push_gate": {
+    "run_id": 41899321179,
+    "run_url": "https://github.com/drmoisan/drm-copilot/actions/runs/41899321179",
+    "event": "push",
+    "head_sha": "d80558cf705c14f94a0c4a98ce75544116ea710b",
+    "run_conclusion": "success",
+    "check_name": "CI Required Gate",
+    "check_conclusion": "success",
+    "app_id": 15368,
+    "verified_at": "2026-11-04T20:40:00Z",
+    "note": "Precondition for the owner ruleset runbook is met; nothing applied to the ruleset."
+  }
+}

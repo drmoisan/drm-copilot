@@ -1,0 +1,667 @@
+{
+  "objective": "Execute the prepared epic child feature #1034 (docs enforcement and CI) from its committed, approved, preflight-cleared plan, starting at atomic execution (Phase 0), through feature review, PR into epic/documentation-estate-tooling-integration, S9 CI-green gate, and merge-on-green into the integration branch.",
+  "change_budget_estimate": "Four new production PowerShell files (DocsCompleteGate.psm1, DocsSurfaceDelta.psm1, DocsSurfaceDeltaCommands.psm1, enforce-docs-complete-gate.ps1) plus a YAML template, two edited PowerShell files, settings.json, four feature-review surfaces, twelve bundle copies and core.json; five new Pester suites.",
+  "path_selected": "large",
+  "route_id": "large",
+  "lifecycle_ready": true,
+  "epic_mode": true,
+  "epic_context": {
+    "epic_feature_folder": "documentation-estate-tooling",
+    "integration_branch": "epic/documentation-estate-tooling-integration",
+    "epic_checkpoint_path": "artifacts/orchestration/epic-orchestrator-state.json",
+    "epic_issue_num": "1019",
+    "depends_on": [
+      "1021",
+      "1023"
+    ],
+    "upstream_merges": [
+      {
+        "issue_num": "1021",
+        "pr_number": 1068,
+        "merge_commit_sha": "d2407173898d531a261433a10a3d8a483a1bf593"
+      },
+      {
+        "issue_num": "1023",
+        "pr_number": 1071,
+        "merge_commit_sha": "06012704f6e86aa86d41f84b2e191fd40c2a5602"
+      },
+      {
+        "issue_num": "1022",
+        "pr_number": 1072,
+        "merge_commit_sha": "a94dea9a4be0743f00ff78de095c51e14d513b20"
+      }
+    ]
+  },
+  "promotion-type": "feature",
+  "short-name": "docs-enforcement-and-ci",
+  "relativeFile": "docs/features/potential/promoted/2026-10-30-docs-enforcement-and-ci.md",
+  "long-name": "2026-10-30-docs-enforcement-and-ci",
+  "issue-num": "1034",
+  "feature-folder": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034",
+  "work-mode": "full-feature",
+  "plan-path": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/plan.2026-10-30T18-40.md",
+  "branch_name": "feature/docs-enforcement-and-ci-1034-r2",
+  "worktree_path": "/workspaces/drm-copilot-wt/docs-1034",
+  "base_branch": "epic/documentation-estate-tooling-integration",
+  "model_budget": {
+    "fable_policy": "disabled"
+  },
+  "completed_steps": [
+    "S1_change_budget",
+    "S2_scope",
+    "S3_promotion",
+    "S4_atomic_planning",
+    "S4_plan_revision_2_and_repreflight"
+  ],
+  "next_step": "S5_atomic_execution_resume_at_P7-T4",
+  "last_updated": "2026-11-04T21:32:00Z",
+  "step5_status": "in_progress",
+  "step6_status": "not_started",
+  "step7_status": "not_started",
+  "step8_status": "not_started",
+  "step9_status": "pending",
+  "step10_status": "not_started",
+  "blocked_reason": null,
+  "preparation_provenance": {
+    "note": "Promotion, research, feature documents, atomic planning, and preflight were completed by the preparation-mode child run launched by epic-planner (pushed preparation commit 20e9aa408) and committed to the integration branch; this run starts at S5 and re-runs none of them.",
+    "preflight_status_record": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-status.2026-10-31T16-43.md",
+    "preflight_signal": "PREFLIGHT: ALL CLEAR"
+  },
+  "issue_adoption": {
+    "issue_num": "1034",
+    "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1034",
+    "origin": "epic_decomposition",
+    "verified_via": "gh_issue_view",
+    "verified_at": "2026-11-04T03:13:00Z",
+    "evidence": "gh issue view 1034 --json number,title,state,url returned number 1034, state OPEN, title 'Feature: docs-enforcement-and-ci'.",
+    "waived_tools": [
+      "potential_to_issue",
+      "new_potential_entry",
+      "new_active_feature_folder"
+    ],
+    "potential_record": "docs/features/potential/promoted/2026-10-30-docs-enforcement-and-ci.md",
+    "feature_folder_record": {
+      "path": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034",
+      "verified_via": "git_cat_file_head",
+      "verified_at": "2026-11-04T03:13:00Z",
+      "evidence": "git cat-file -t HEAD:docs/features/active/2026-10-30-docs-enforcement-and-ci-1034 prints tree at branch tip 06012704f."
+    }
+  },
+  "delegation_receipts": {
+    "agents": [
+      {
+        "step": "S3_research",
+        "agent_name": "task-researcher",
+        "agent_id": "preparation-run",
+        "skill_source": "task-research",
+        "started_at": "2026-10-30T19:00:00Z",
+        "completed_at": "2026-10-30T20:00:00Z",
+        "result_signal": "research artifact written (preparation run)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/research/research.2026-10-30.md"
+        ]
+      },
+      {
+        "step": "S3_feature_documents",
+        "agent_name": "prd-feature",
+        "agent_id": "preparation-run",
+        "skill_source": "prd-feature",
+        "started_at": "2026-10-30T20:00:00Z",
+        "completed_at": "2026-10-30T22:00:00Z",
+        "result_signal": "spec.md and user-story.md written (preparation run)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/spec.md",
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/user-story.md"
+        ]
+      },
+      {
+        "step": "S4_atomic_planning",
+        "agent_name": "atomic-planner",
+        "agent_id": "preparation-run",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-10-30T22:40:00Z",
+        "completed_at": "2026-10-30T23:40:00Z",
+        "result_signal": "plan version 1.0 written (preparation run)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/plan.2026-10-30T18-40.md"
+        ]
+      },
+      {
+        "step": "S4_preflight",
+        "agent_name": "atomic-executor",
+        "agent_id": "preparation-run",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-10-30T23:37:00Z",
+        "completed_at": "2026-10-31T16:43:00Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR (preparation run)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-status.2026-10-31T16-43.md",
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-fixes.2026-10-30T23-37.md",
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-fixes.2026-10-30T23-50.md"
+        ]
+      },
+      {
+        "step": "S4_plan_revision",
+        "agent_name": "atomic-planner",
+        "agent_id": "ad22af55cdb7652b7",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-11-04T13:57:00Z",
+        "completed_at": "2026-11-04T14:12:40Z",
+        "result_signal": "plan version 1.1 written; validator ok; SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/plan.2026-10-30T18-40.md"
+        ]
+      },
+      {
+        "step": "S4_repreflight",
+        "agent_name": "atomic-executor",
+        "agent_id": "af364a0735c5fbaf3",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-11-04T14:15:00Z",
+        "completed_at": "2026-11-04T14:26:00Z",
+        "result_signal": "PREFLIGHT: REVISIONS REQUIRED",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-fixes.2026-11-04T14-24.md"
+        ]
+      },
+      {
+        "step": "S4_plan_revision_2",
+        "agent_name": "atomic-planner",
+        "agent_id": "a3fbbfa2d3f89ace5",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-11-04T14:45:58Z",
+        "completed_at": "2026-11-04T14:48:31Z",
+        "result_signal": "plan version 1.2 written; MCP and branch-current plan validators pass; SELF-REVIEW: RE-DERIVED THIS PASS; PLANNER-INTERNAL-REVIEW: PASS",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/plan.2026-10-30T18-40.md"
+        ]
+      },
+      {
+        "step": "S4_repreflight_2",
+        "agent_name": "atomic-executor",
+        "agent_id": "aaf6cf5315d3304ec",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-11-04T14:49:30Z",
+        "completed_at": "2026-11-04T14:56:00Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-fixes.2026-11-04T14-54.md"
+        ]
+      },
+      {
+        "step": "S5_atomic_execution",
+        "agent_name": "atomic-executor",
+        "agent_id": "a619b797245bda05a",
+        "skill_source": "atomic-plan-contract",
+        "started_at": "2026-11-04T14:58:00Z",
+        "completed_at": "2026-11-04T16:10:00Z",
+        "result_signal": "Phases 0-3 complete; last task P3-T8",
+        "artifact_paths": [
+          "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/plan.2026-10-30T18-40.md"
+        ]
+      }
+    ]
+  },
+  "skill_receipts": [
+    {
+      "skill": "orchestrate",
+      "required": true,
+      "evidence": "read:.claude/skills/orchestrate/SKILL.md"
+    },
+    {
+      "skill": "feature-promotion-lifecycle",
+      "required": true,
+      "evidence": "read:.claude/skills/feature-promotion-lifecycle/SKILL.md (preloaded)"
+    },
+    {
+      "skill": "atomic-plan-contract",
+      "required": true,
+      "evidence": "read:.claude/skills/atomic-plan-contract/SKILL.md (preloaded)"
+    },
+    {
+      "skill": "acceptance-criteria-tracking",
+      "required": true,
+      "evidence": "read:.claude/skills/acceptance-criteria-tracking/SKILL.md (preloaded)"
+    },
+    {
+      "skill": "pr-context-artifacts",
+      "required": true,
+      "evidence": "read:.claude/skills/pr-context-artifacts/SKILL.md"
+    },
+    {
+      "skill": "pr-base-branch-merge-base",
+      "required": true,
+      "evidence": "PRBaseBranch supplied explicitly by the epic kickoff as epic/documentation-estate-tooling-integration"
+    }
+  ],
+  "pr_base_branch": {
+    "selected": "epic/documentation-estate-tooling-integration",
+    "source": "epic kickoff (explicit)",
+    "merge_base_sha_at_start": "06012704f6e86aa86d41f84b2e191fd40c2a5602"
+  },
+  "mcp_call_receipts": [],
+  "model_routing_preflight": {
+    "status": "pass",
+    "checked_at": "2026-11-04T03:14:00Z",
+    "validator_command": "poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing",
+    "output_summary": "orchestrator-state validation passed; exit 0"
+  },
+  "complexity_assessments": [
+    {
+      "phase": "S3_research",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Preparation-run delegation recorded under the epic-planner band C3 for child 1034 (consumes the 1020/1021/1023 contracts across module boundaries).",
+      "assessed_at": "2026-11-04T03:14:00Z"
+    },
+    {
+      "phase": "S3_feature_documents",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Preparation-run delegation recorded under the epic band C3 (spec for hook, surface-delta subcommand, workflow template, review check).",
+      "assessed_at": "2026-11-04T03:14:00Z"
+    },
+    {
+      "phase": "S4_atomic_planning",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Preparation-run delegation recorded under the epic band C3 (41-task plan).",
+      "assessed_at": "2026-11-04T03:14:00Z"
+    },
+    {
+      "phase": "S5_atomic_execution",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Epic band C3: gate behavior across CI template, hook and review agent; alters an existing review contract and consumes the 1020 dispatch and 1023 receipt contracts.",
+      "assessed_at": "2026-11-04T03:14:00Z"
+    },
+    {
+      "phase": "S6_pre_review_commit",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Commit message for the same C3 item.",
+      "assessed_at": "2026-11-04T03:14:00Z"
+    },
+    {
+      "phase": "S7_feature_review",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Review of the hook, subcommand, template, review-section mirrors and manifests; item band C3.",
+      "assessed_at": "2026-11-04T03:14:00Z"
+    },
+    {
+      "phase": "S8_create_pr",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "PR body for the same C3 item into the epic integration branch.",
+      "assessed_at": "2026-11-04T03:14:00Z"
+    },
+    {
+      "phase": "S4_plan_revision",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Single permitted plan revision adding the OQ-1 context-member edit to the 1034 file set; cross-module contract change to the 1020 entry script.",
+      "assessed_at": "2026-11-04T05:10:00Z"
+    },
+    {
+      "phase": "S4_repreflight",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Re-preflight of the revised C3 plan.",
+      "assessed_at": "2026-11-04T05:10:00Z"
+    },
+    {
+      "phase": "S4_plan_revision_2",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Authorized second revision/re-preflight of the C3 plan (baseline-relative tests/scripts gates and concurrent-shard isolation run).",
+      "assessed_at": "2026-11-04T14:46:00Z"
+    },
+    {
+      "phase": "S4_repreflight_2",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Authorized second revision/re-preflight of the C3 plan (baseline-relative tests/scripts gates and concurrent-shard isolation run).",
+      "assessed_at": "2026-11-04T14:46:00Z"
+    },
+    {
+      "phase": "S5_atomic_execution_resume",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Resume of C3 execution at P7-T3.",
+      "assessed_at": "2026-11-04T17:40:00Z"
+    }
+  ],
+  "model_routing_receipts": [
+    {
+      "agent": "task-researcher",
+      "phase": "S3_research",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "prd-feature",
+      "phase": "S3_feature_documents",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "S4_atomic_planning",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S5_atomic_execution",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "commit-message",
+      "phase": "S6_pre_review_commit",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "feature-review",
+      "phase": "S7_feature_review",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "pr-author",
+      "phase": "S8_create_pr",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "S4_plan_revision",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S4_repreflight",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "S4_plan_revision_2",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S4_repreflight_2",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "S5_atomic_execution_resume",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ],
+  "execution_delegations": [
+    {
+      "delegation": 1,
+      "phases": "0-3",
+      "agent": "atomic-executor",
+      "model": "opus",
+      "started_at": "2026-11-04T03:16:00Z",
+      "status": "blocked_at_P0-T2",
+      "head_after": "c870afa778367af064aa51973ae142672755e866",
+      "notes": "P0-T1 checked. P0-T2 preconditions 2, 3 and 4 FAIL (evidence/baseline/upstream-preconditions.2026-11-04T03-16.md); confirmed by the orchestrator with git grep on origin/epic/documentation-estate-tooling-integration at 06012704f."
+    },
+    {
+      "delegation": 2,
+      "phases": "0-3",
+      "agent": "atomic-executor",
+      "agent_id": "a619b797245bda05a",
+      "model": "opus",
+      "started_at": "2026-11-04T14:58:00Z",
+      "completed_at": "2026-11-04T16:10:00Z",
+      "status": "complete_through_P3-T8",
+      "head_after": "eb11ca2a88b3efdf82c09e08a3fe4a0e640ed795",
+      "phase_commits": {
+        "0": "db9984e78",
+        "1": "436e15219",
+        "2": "13dfa0c54",
+        "3": "eb11ca2a8"
+      },
+      "notes": "P0-T2 all five preconditions pass; P0-T9 baseline 14619 passed / 409 failed / 6 failed blocks. Docs.Manifest.Tests.ps1 has 4 expected failures until P6."
+    },
+    {
+      "delegation": 3,
+      "phases": "4-7 (excluding P7-T11)",
+      "agent": "atomic-executor",
+      "agent_id": "ae24f6adbb5d70b9d",
+      "model": "opus",
+      "started_at": "2026-11-04T16:12:00Z",
+      "status": "interrupted_codespace_loss",
+      "head_after": "8aa32dc32e0471379a08928486024726ddd70bb2",
+      "phase_commits": {
+        "4": "6b32a490a",
+        "5": "557b106cb",
+        "6": "78d66d165",
+        "7_partial": [
+          "16df519d4",
+          "8aa32dc32"
+        ]
+      },
+      "notes": "Agent process lost when the Codespace terminated. Phases 4-6 complete and committed by the executor. In Phase 7 the loop pass-1 P7-T3 run found one new failure (enforcement-hooks-no-python-invocation.Tests.ps1: five DynamicInvocation sites in DocsSurfaceDeltaCommands.psm1); the executor fixed it with the Invoke-DocsContextMember helper, recopied the bundle copy, and re-ran P7-T1 format and P7-T2 PSSA (loop pass 2, both PASS at 17-00). The orchestrator committed those uncommitted files as 16df519d4 and 8aa32dc32. Pester has not been re-run on the fix."
+    },
+    {
+      "delegation": 4,
+      "phases": "7 (loop pass 3, P7-T1..P7-T10, P7-T12)",
+      "agent": "atomic-executor",
+      "agent_id": "a99bfed72912c9b87",
+      "model": "opus",
+      "started_at": "2026-11-04T17:42:00Z",
+      "status": "stopped_no_commit",
+      "notes": "Per-task commit and push mandated. Session resumed after a restart (~19:22Z); no commit after 967f3637b, worktree clean, SCRATCH/issue-1034 absent. No task completed. Correction: the agent was not dead. It resumed after the session restart, found delegation 5 running in the same worktree, stopped without committing, and removed only its own untracked files. Delegation 5 committed P7-T1 as 51cf228c0 with its artifact intact."
+    },
+    {
+      "delegation": 5,
+      "phases": "7 (loop pass 3, P7-T1..P7-T10, P7-T12)",
+      "agent": "atomic-executor",
+      "model": "opus",
+      "started_at": "2026-11-04T19:47:00Z",
+      "status": "stopped_at_pause_after_P7-T3",
+      "notes": "Relaunch of delegation 4; per-task commit and push mandated; SCRATCH launchers must be recreated. Loop passes 4 and 5 restarted after fixes b531f0350 (test name) and c933878b6 (hook repo-root derivation). Pass 5: P7-T1 b71caaead, P7-T2 e26ad3a63, P7-T3 9b575e1cc.",
+      "agent_id": "a5dc07c2a7bf5a5a7",
+      "completed_at": "2026-11-04T21:31:00Z",
+      "head_after": "9b575e1ccf5fb677dcf3a987ed573b6ff76d9e32"
+    }
+  ],
+  "blocked_detail": {
+    "precondition_2": "New-DocsCommandContext (1020, .claude/lib/docs/Invoke-DocsCommand.ps1) has no ResolveRevision or ReadRevisionText member and no test drives them. Per plan precondition 2 (OQ-1 default) the run stops BLOCKED on 1020; the alternative (this item owns the members) requires an epic update and a spec/plan revision.",
+    "precondition_3": "1022 inventory dispatch row is not merged into the integration branch (only the '# --- 1022: inventory ---' anchor exists); 1022 has no pull request yet.",
+    "merged_anchor_names_observed": {
+      "dispatcher": "# --- 1034: surface-delta ---",
+      "init": "# --- 1034: docs workflow ---",
+      "receipt_artifact_kind": "docs-validation-receipt"
+    },
+    "repreflight": "Single-pass rule exhausted: the plan returned to the planner once (v1.1) and the confirming re-preflight still reports two substantive defects in P7-T8 (baseline-relative tests/scripts acceptance; missing concurrent-shard Pester isolation run). Both are planner-owned changes. Resolution requires a coordinator decision to authorize one further planner revision."
+  },
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "artifact_errors": [],
+  "owner_decisions": [
+    {
+      "id": "OQ-1",
+      "decision": "option (a): #1034 owns the additive ResolveRevision and ReadRevisionText edit to New-DocsCommandContext; #1020 is not reopened",
+      "decided_by": "epic coordinator under the standing autonomy instruction",
+      "recorded_in": "artifacts/orchestration/epic-orchestrator-state.json",
+      "recorded_at": "2026-11-04T05:05:00Z"
+    },
+    {
+      "id": "T11-whitespace",
+      "decision": "Spec criterion T11 is evaluated on git diff --ignore-all-space; the only permitted non-additive lines are the whitespace-only realignment of the eight existing New-DocsCommandContext member lines forced by PSAlignAssignmentStatement (CheckHashtable).",
+      "decided_by": "orchestrator under the standing autonomy instruction",
+      "recorded_at": "2026-11-04T14:14:00Z"
+    },
+    {
+      "id": "second-planner-revision-exception",
+      "decision": "One additional atomic-planner revision plus one re-preflight is authorized as an explicit exception to the single-pass preflight rule. The revision adds a Phase 0 tests/scripts baseline capture and makes P7-T3 and P7-T8 baseline-relative (no new failures versus the baseline), and adds the concurrent-shard Invoke-PoshQCParallelTest isolation run including in the Test isolation Pre-Mortem bullet. A non-ALL-CLEAR re-preflight halts with blocked_reason validator_failed; no third round.",
+      "cause": "second substantive preflight defect set after the option (a) revision",
+      "decided_by": "epic coordinator under the owner's standing instruction",
+      "recorded_in": "artifacts/orchestration/epic-orchestrator-state.json",
+      "recorded_at": "2026-11-04T14:46:00Z"
+    },
+    {
+      "id": "per-task-commit",
+      "decision": "Executors commit and push after every completed task; checkpoint resume_point updated after each task.",
+      "decided_by": "owner via coordinator",
+      "recorded_at": "2026-11-04T17:40:00Z"
+    },
+    {
+      "id": "baseline-after-sibling-merge",
+      "decision": "Under the P0-T9 baseline-relative rule, a failure in a suite introduced by the 1024/1033 sibling merge counts as pre-existing only when the same test also fails at the integration tip 729ff55ef on this host; otherwise it is a new failure.",
+      "decided_by": "orchestrator under the standing autonomy instruction",
+      "recorded_at": "2026-11-04T17:40:00Z"
+    }
+  ],
+  "upstream_merge_into_branch": {
+    "merged_ref": "origin/epic/documentation-estate-tooling-integration",
+    "merged_tip": "a94dea9a4be0743f00ff78de095c51e14d513b20",
+    "merge_commit": "f97edf14a896c75ddbe3d3aa376f33cb2de45f4c",
+    "conflicts": "none",
+    "pushed": true
+  },
+  "plan_revision_head": "7f76c08d1",
+  "repreflight": {
+    "status": "revisions_required",
+    "agent": "atomic-executor",
+    "agent_id": "af364a0735c5fbaf3",
+    "model": "opus",
+    "started_at": "2026-11-04T14:15:00Z",
+    "completed_at": "2026-11-04T14:26:00Z",
+    "signal": "PREFLIGHT: REVISIONS REQUIRED",
+    "convergence": "CONVERGENCE: NO FURTHER ROUNDS EXPECTED",
+    "fix_record": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-fixes.2026-11-04T14-24.md",
+    "defects": [
+      "P7-T8: fresh single-process tests/scripts run cannot reach zero failures on this host (409 pre-existing failures, 6 errors in 1021-1023 runs; #1070 PATH-leak fix on main not in branch); needs a Phase 0 tests/scripts-wide baseline and baseline-relative acceptance (also P7-T3)",
+      "P7-T8 / Pre-Mortem Test isolation: missing concurrent-shard Invoke-PoshQCParallelTest run required by the execution-environment brief"
+    ]
+  },
+  "repreflight_2": {
+    "status": "clear",
+    "agent": "atomic-executor",
+    "model": "opus",
+    "signal": "PREFLIGHT: ALL CLEAR",
+    "convergence": "CONVERGENCE: NO FURTHER ROUNDS EXPECTED",
+    "fix_record": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/other/preflight-fixes.2026-11-04T14-54.md",
+    "fixes": 2,
+    "defects": []
+  },
+  "resume_point": {
+    "recorded_at": "2026-11-04T21:30:00Z",
+    "reason": "owner instruction: pause at next marked-off task set; work moves outside this container",
+    "branch": "feature/docs-enforcement-and-ci-1034-r2",
+    "head_sha": "9b575e1ccf5fb677dcf3a987ed573b6ff76d9e32",
+    "pushed": true,
+    "last_completed_task": "P7-T3 (final QA loop pass 5)",
+    "next_task": "P7-T4 (re-run coverage delta for loop pass 5; its [x] box is from pass 4, commit f31aad407, and is stale relative to pass 5)",
+    "then": "P7-T5..P7-T10, P7-T12; P7-T11 is CI-owned after the PR",
+    "interrupted_batch": null,
+    "possibly_half_done": "none; the executor stopped cleanly after P7-T3 pass 5 and no executor is running. P7-T8 isolation scripts are prepared in SCRATCH but not run (SCRATCH may not survive the move).",
+    "merge_base": "729ff55ef (origin/epic/documentation-estate-tooling-integration tip); P7-T9 and P7-T12 must anchor on it",
+    "remaining_after_execution": [
+      "S6 pre-review commit",
+      "S7 feature review",
+      "S8 PR into epic/documentation-estate-tooling-integration via pr-author",
+      "S9 CI gate on ruleset 15241672 contexts",
+      "S10 merge-on-green into the integration branch"
+    ],
+    "ac_status": "spec.md 25/29 checked; user-story.md 13/16 checked; CI-dependent criterion pending-CI"
+  },
+  "paused": true,
+  "upstream_merge_into_branch_2": {
+    "merged_ref": "origin/epic/documentation-estate-tooling-integration",
+    "merged_tip": "729ff55ef",
+    "merge_commit": "967f3637b",
+    "siblings": [
+      "1024 PR #1075",
+      "1033 PR #1076"
+    ],
+    "conflicts": "core.json anchored append point; resolved keeping all sibling entries and the four 1034 entries",
+    "pushed": true
+  }
+}

@@ -1,0 +1,995 @@
+{
+  "objective": "Execute the prepared epic documentation-estate-tooling (#1019) per epic-kickoff.md: wave-scheduled child orchestrator runs resuming at atomic execution from committed plan-paths, merge-on-green fan-in to epic/documentation-estate-tooling-integration, then the final integration-to-main PR (merge only after coordinator sign-off).",
+  "route_id": "epic",
+  "epic_feature_folder": "documentation-estate-tooling",
+  "epic_manifest_path": "docs/features/epics/documentation-estate-tooling/epic.md",
+  "epic_status_doc_path": "docs/features/epics/documentation-estate-tooling/epic-status.md",
+  "integration_branch": "epic/documentation-estate-tooling-integration",
+  "epic_issue_num": 1019,
+  "max_parallel_features": 4,
+  "coordinator_guardrails": {
+    "received_at": "2026-11-03T11:40:00Z",
+    "main_merge_base_for_overlap_check": "7b8894b41",
+    "integration_tip_at_start": "34062758361d9729dc14d0d5beb7880e96035dbb",
+    "origin_main_at_start": "715241396b557ce198e44f5c4b606fbcd9082c3c",
+    "guardrail_2_replaced_at": "2026-11-03T11:55:00Z",
+    "max_agents_in_subtree": null,
+    "agent_cap_removed_at": "2026-11-03T12:00:00Z",
+    "children_one_at_a_time": false,
+    "per_child_agent_budget_note": "Owner instruction: no subtree agent cap and no pre-emptive throttling. All ready children of a wave launch together. On an actual 'Concurrent subagent limit reached' failure, wait and retry; never kill agents. Standalone orchestrators for 1041, 1027, 1026, 1047 share the 30 session slots.",
+    "weekly_budget_hold_threshold_points": 15,
+    "report_cost_per_wave": true,
+    "child_1020_launched_under_old_cap": "1020 was launched with a one-subagent-at-a-time instruction before the update; it cannot be re-messaged and is left to run.",
+    "commit_and_push_after_each_phase": true,
+    "halt_on_rate_limit_or_auth_error": true,
+    "report_at_each_wave_barrier": true,
+    "final_integration_pr_merge_requires_coordinator_notice": true,
+    "language_rule": "No new Python except #1031 analyzer; skills/hooks/libs PowerShell or bash; TypeScript only for MCP and extension commands.",
+    "required_checks_source": "ruleset 15241672 (11 required contexts); NPM Audit Gate not required",
+    "resume_2026_11_03": {
+      "received_at": "2026-11-03T19:05:00Z",
+      "environment": "Linux Codespace, single account 3, weekly stop threshold 93 percent",
+      "required_checks_source": "ruleset 15241672 (20 required contexts); NPM Audit Gate not required",
+      "pytest_main_change": "--strict-markers --strict-config and -n auto in CI; new tests must register markers and be order-independent",
+      "integration_tip": "5e535f7a6",
+      "origin_main": "01706c697"
+    },
+    "fable_policy": "disabled",
+    "fable_disabled_2026_11_04": {
+      "received_at": "2026-11-04T01:40:00Z",
+      "rule": "all future child launches resolve with fable_policy disabled; C4 cells clamp to opus with clamped_from fable, clamp_reason fable_disabled; launch prompts state model_budget.fable_policy: disabled.",
+      "wave1_relaunch": "1022, 1023, 1033 paused and relaunched on opus by the coordinator, not by epic-orchestrator; their checkpoint rows are left unchanged here"
+    }
+  },
+  "main_overlap_scan": {
+    "method": "plan text mentions of paths in git diff 7b8894b41..integration --name-only; mentions are triaged per child before launch",
+    "mentions": {
+      "1020": [
+        "scripts/dev_tools/json_config.py"
+      ],
+      "1021": [
+        "README.md"
+      ],
+      "1022": [
+        "pyproject.toml"
+      ],
+      "1023": [
+        ".claude/skills/execution-environment/SKILL.md",
+        "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"
+      ],
+      "1024": [
+        ".claude/skills/execution-environment/SKILL.md",
+        "README.md",
+        "tests/scripts/dev_tools/test_codex_core_manifest_closure.py"
+      ],
+      "1031": [
+        "pyproject.toml",
+        "tests/discovery_runtime/test_package_contract.py"
+      ],
+      "1033": [],
+      "1034": [
+        ".claude/skills/execution-environment/SKILL.md",
+        ".codex/config.toml",
+        "scripts/dev_tools/generate_codex_agent_variants.py"
+      ],
+      "1036": [
+        ".agents/skills/execution-environment/SKILL.md",
+        ".claude/skills/execution-environment/SKILL.md",
+        ".codex/config.toml",
+        ".github/skills/execution-environment/SKILL.md",
+        "README.md",
+        "package.json",
+        "tests/scripts/dev_tools/test_discovery_documentation_contracts.py",
+        "tests/scripts/dev_tools/test_execution_environment_brief_contracts.py",
+        "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"
+      ],
+      "1037": [
+        ".claude/skills/execution-environment/SKILL.md",
+        ".codex/config.toml",
+        "README.md"
+      ],
+      "1038": [
+        ".claude/skills/execution-environment/SKILL.md",
+        "README.md",
+        "tests/scripts/dev_tools/test_discovery_documentation_contracts.py",
+        "tests/scripts/dev_tools/test_execution_environment_brief_contracts.py"
+      ]
+    },
+    "triage": {
+      "1020": "No write-set overlap. json_config.py is cited read-only (GOVERNED_GLOBS note); main added a docs/features/** EXCLUDE_GLOBS entry, which does not affect the plan premise. Pester-only feature, so pytest strictness changes do not apply.",
+      "1021": "Clear. README.md is page-fixture content (entry-page preference), not a write. core.json is a named append-only shared edit point; sibling conflicts resolve in the child remediation loop. Pester-only.",
+      "1022": "Clear. pyproject.toml appears only as fixture corpus content and a basename rule. core.json append; P5 numstat acceptance is relative to MERGE_BASE and must be evaluated on the child own diff before any sibling conflict merge. Pester-only.",
+      "1023": "Clear. execution-environment SKILL.md read in the policy order only; push-down pytest contract tests run read-only as a P0-T7 baseline and must run under the new --strict-markers/-n auto options. core.json append.",
+      "1033": "Clear. core.json append; shared registry append points with 1022 resolved in the child remediation loop.",
+      "1024": "Clear. test_codex_core_manifest_closure.py reads the Codex core.json, which 1024 does not edit; execution-environment SKILL.md read in policy order only; README.md is integration-test fixture content. Claude core.json and the Invoke-DocsCommand dispatch table are append points shared with running 1022/1023/1033 (resolve in child remediation loop). Pester-only.",
+      "1034": "Clear. execution-environment SKILL.md read only; .codex/config.toml and generate_codex_agent_variants.py are --check baselines, not edited. No main change since 7b8894b41 touches .claude/settings.json, .claude/hooks/, hook-dependency-failure.Claude.Tests.ps1 or tests/scripts/claude-runtime. Claude core.json and Invoke-DocsCommand.ps1 are append points shared with running 1022/1024/1033. Execution-time check from epic.md: hook module visibility (hook must call only DocsCompleteGate.psm1 predicates)."
+    },
+    "rescan_2026_11_03": {
+      "range": "7b8894b41..origin/epic/documentation-estate-tooling-integration (includes main 01706c697)",
+      "mentions": {
+        "1021": [
+          "README.md",
+          "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        ],
+        "1022": [
+          "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+          "pyproject.toml"
+        ],
+        "1023": [
+          ".claude/skills/execution-environment/SKILL.md",
+          "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+          "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"
+        ],
+        "1033": [
+          "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        ]
+      }
+    }
+  },
+  "completed_steps": [
+    "startup: no prior epic checkpoint; kickoff artifact resolved from origin/epic/documentation-estate-tooling-integration",
+    "integration branch current with origin/main (rev-list count 0); no main-sync child needed for wave 0",
+    "all eleven prep branches are ancestors of the integration tip with zero commits ahead; execution starts fresh at wave 0",
+    "waves computed by longest-path layering from epic.md depends_on",
+    "main-merge overlap scan recorded; 1020 triaged clear",
+    "hold lifted by coordinator 2026-11-03T19:05Z after Codespace move; 1020 relaunched at P6-T3 in its existing worktree",
+    "wave-1 overlap re-triage against integration tip including main 01706c697: 1021/1022/1023/1033 clear; core.json is a tolerated shared append point",
+    "1020 PR #1063 observed open into the integration branch at head 15dc7bbb0 (gh pr list); child still running its CI gate",
+    "1020 PR #1063 merged at fd6ee4e5a (gh pr view MERGED 2026-11-03T21:30:43Z; ancestor of origin integration tip)",
+    "1020 worktree removed (gated git worktree remove)",
+    "wave-0 barrier cleared: 1020 worktree_removed; reported to coordinator",
+    "wave-1 main-sync check: rev-list count 0 (origin/main 01706c697); no sync child",
+    "wave 1 launched: 1021 opus, 1022/1023/1033 fable, item worktrees on -r2 branches from integration tip fd6ee4e5a",
+    "1021 PR #1068 observed open into the integration branch (gh pr list); child in its CI gate",
+    "fable_policy set to disabled per owner instruction; future launches clamp C4 to opus",
+    "1021 PR #1068 merged at d24071738 (gh pr view MERGED 2026-11-04T01:31:46Z; ancestor of origin integration tip)",
+    "1021 worktree removed (gated git worktree remove)",
+    "1024 launched early under the per-edge barrier: depends_on 1020 and 1021 both worktree_removed; opus, fable_policy disabled; -r2 branch from integration tip d24071738",
+    "1033 returned HOLD_FOR_OPUS_RELAUNCH at a4cda3680 (P6-T1 next); relaunch is coordinator-managed",
+    "1022 returned HOLD_FOR_OPUS_RELAUNCH at 7e1cb0a8f (P6-T1 next, worktree clean, child finished); relaunch is coordinator-managed",
+    "1023 returned HOLD_FOR_OPUS_RELAUNCH at 2171aa820 (execution complete, S6 feature review next, worktree clean); relaunch is coordinator-managed",
+    "1023 child finished with no live background children (task notification); executor concern cleared",
+    "1023 PR #1071 merged at 06012704f (gh pr view MERGED 2026-11-04T03:09:33Z; ancestor of origin integration tip); pause record cleared",
+    "1023 worktree removed (gated git worktree remove)",
+    "1034 launched: depends_on 1021 and 1023 both worktree_removed; opus, fable_policy disabled; -r2 branch from integration tip 06012704f. 1031 held (1022 not merged); 1036+ held",
+    "1034 returned blocked at P0-T2 (human_decision_required); both precondition failures verified by git grep; worktree kept at c870afa77",
+    "original 1033 child (fable) finished with no live background children; its Phase 5-7 executor is no longer live",
+    "resume 2026-11-04T13:58Z after Codespace restart: 1022 PR #1072 verified MERGED 2026-11-04T13:55:59Z at a94dea9a4 (gh pr view; ancestor of origin integration tip); stale 1020 paused record moved to pause_history",
+    "1022 worktree removed (gated git worktree remove)",
+    "1034 block cleared: owner-level decision (a) recorded; implicit dependency on 1022 satisfied by PR #1072 merge",
+    "wave-2 overlap re-triage for 1031/1034 against integration tip a94dea9a4 and running 1024/1033 branch diffs: 1031 plan touches DocsAnalyzerRegistry.psm1 and Invoke-DocsCommand.ps1 (also changed by 1033), 1034 touches Invoke-DocsCommand.ps1 and pack-manifests/core.json (also changed by 1024/1033); all are per-child anchored append points, tolerated (resolution in the later child fan-in); no same-logic edits",
+    "main-sync deferred: origin/main is 95 commits ahead; 1024/1033 running, so the sync child runs at the wave-3 pre-launch check (quiet point)",
+    "1031 worktree created on -r2 branch from integration tip a94dea9a4 and pushed; 1031 launched (opus) and 1034 relaunched (opus) at P0-T2 with decision (a) planner-revision instruction",
+    "1034 first relaunch attempt denied by preimplementation gate (target-ambiguous: the 1022 implicit-upstream line cited the 1022 feature-folder paths, and 1022 is not in 1034 manifest depends_on); relaunched with the 1022 line citing PR and commit only",
+    "epic-status.md regenerated in the integration worktree but not committed: direct commits to the integration branch are denied by the preimplementation gate (merge-in-progress predicate); projection to be committed with the next integration merge",
+    "1034 relaunch returned blocked (single-pass planner rule exhausted at re-preflight); branch head b2fa27107 verified clean and pushed; awaiting coordinator authorization for one more planner revision",
+    "1031 returned blocked (single-pass planner rule exhausted: Python 3.10 CI criterion unsatisfiable against the 3.11-3.13 matrix and python >=3.11); branch head e16379da5 verified clean and pushed",
+    "coordinator decisions recorded: 1031 option (i) Python 3.11 floor; 1034 one-time exception to the single-pass rule; main-sync stays deferred until 1024 and 1033 merge",
+    "1031 relaunched (opus) for one planner revision + preflight, resume P0-T4; 1034 relaunched (opus) for the authorized revision + re-preflight, resume P0-T2 if ALL CLEAR",
+    "1033 PR #1076 verified MERGED 2026-11-04T17:03:18Z at 5357b6e3e (gh pr view; ancestor of origin integration tip); worktree removal deferred (coordinator-run child)",
+    "1024 PR #1075 observed open into the integration branch (gh pr list)",
+    "1024 PR #1075 verified MERGED 2026-11-04T17:11:19Z at 729ff55ef (gh pr view; ancestor of origin integration tip); 1033 re-verified; coordinator confirmed both children finished",
+    "1033 and 1024 worktrees removed (gated, separate git worktree remove commands)",
+    "post-termination re-derivation: 1024 (729ff55ef) and 1033 (5357b6e3e) re-confirmed ancestors of origin integration tip; docs-1024/docs-1033 already removed; 1031 and 1034 recorded paused",
+    "epic-status.md regenerated at integration tip 729ff55ef; git commit denied by PREIMPLEMENTATION_GATE_BLOCKED target-not-ready (predicate 'merge-in-progress'); file left modified and unstaged in the integration worktree, to be committed with the main-sync merge",
+    "1031 and 1034 paused records updated with post-commit pushed heads (c83bdf64c, 8aa32dc32; verified against origin) and per-item resume points"
+  ],
+  "next_step": "HOLD; on resume, relaunch 1031 and 1034 from their per-item checkpoints, run the main-sync child (main is far ahead of the integration branch), then launch 1036 (dependencies 1021, 1022, 1023, 1024 merged; 1037 and 1038 later); stop before the integration-to-main PR and ask the owner",
+  "last_updated": "2026-11-04T19:40:00Z",
+  "current_wave": 2,
+  "waves": [
+    {
+      "wave_number": 0,
+      "feature_folders": [
+        "2026-10-30-docs-profile-and-artifact-schemas-1020"
+      ]
+    },
+    {
+      "wave_number": 1,
+      "feature_folders": [
+        "2026-10-30-docs-coverage-ledger-and-receipt-1023",
+        "2026-10-30-docs-page-quality-checker-1021",
+        "2026-10-30-docs-surface-analyzers-python-config-1022",
+        "2026-10-30-docs-surface-analyzers-typescript-dotnet-1033"
+      ]
+    },
+    {
+      "wave_number": 2,
+      "feature_folders": [
+        "2026-10-30-docs-enforcement-and-ci-1034",
+        "2026-10-30-docs-reference-generator-1024",
+        "2026-10-30-docs-surface-analyzer-python-native-1031"
+      ]
+    },
+    {
+      "wave_number": 3,
+      "feature_folders": [
+        "2026-10-30-docs-mcp-tools-1036"
+      ]
+    },
+    {
+      "wave_number": 4,
+      "feature_folders": [
+        "2026-10-30-docs-authoring-workflow-1037"
+      ]
+    },
+    {
+      "wave_number": 5,
+      "feature_folders": [
+        "2026-10-30-documentation-estate-template-and-onboarding-1038"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "issue_num": 1020,
+      "feature_folder": "2026-10-30-docs-profile-and-artifact-schemas-1020",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020",
+      "plan_path": "docs/features/active/2026-10-30-docs-profile-and-artifact-schemas-1020/plan.2026-10-30T16-08.md",
+      "complexity_band": "C3",
+      "depends_on": [],
+      "wave_number": 0,
+      "merge_status": "worktree_removed",
+      "branch_name": "feature/docs-profile-and-artifact-schemas-1020-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1020",
+      "pr_number": 1063,
+      "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1063",
+      "merge_commit_sha": "fd6ee4e5a0815fa69b03fc56c0ea82d49b2f5ee3",
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-03T11:45:00Z",
+      "pr_opened_at": "2026-11-03T21:05:42Z",
+      "merge_confirmed_at": "2026-11-03T21:30:43Z",
+      "worktree_removed_at": "2026-11-03T21:52:00Z",
+      "final_head_sha": "64484bdcd204773aecd9e0fde07fc4eaf1f57e64",
+      "pause_history": [
+        {
+          "reported_at": "2026-11-03T14:43:00Z",
+          "reason": "child reported pause on owner instruction (not issued by epic-orchestrator)",
+          "pushed_head_sha": "c26df1dd4ea6e37d7687ee8ac0dcf3539297e613",
+          "commits_ahead_of_integration": 8,
+          "worktree_clean": true,
+          "last_completed_task": "P6-T2",
+          "next_task": "P6-T3",
+          "tasks_checked": 33,
+          "tasks_unchecked": 11,
+          "pr_opened": false,
+          "child_usage": {
+            "subagent_tokens": 189369,
+            "tool_uses": 81,
+            "duration_ms": 10639508
+          },
+          "resumed_at": "2026-11-03T19:05:00Z",
+          "resumed_head_sha": "90101535cae027ddb7f30a6edb04816c76606492"
+        }
+      ]
+    },
+    {
+      "issue_num": 1021,
+      "feature_folder": "2026-10-30-docs-page-quality-checker-1021",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-page-quality-checker-1021",
+      "plan_path": "docs/features/active/2026-10-30-docs-page-quality-checker-1021/plan.2026-10-30T16-13.md",
+      "complexity_band": "C3",
+      "depends_on": [
+        1020
+      ],
+      "wave_number": 1,
+      "merge_status": "worktree_removed",
+      "branch_name": "feature/docs-page-quality-checker-1021-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1021",
+      "pr_number": 1068,
+      "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1068",
+      "merge_commit_sha": "d2407173898d531a261433a10a3d8a483a1bf593",
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-03T21:55:00Z",
+      "pr_opened_at": "2026-11-04T01:15:45Z",
+      "merge_confirmed_at": "2026-11-04T01:31:46Z",
+      "worktree_removed_at": "2026-11-04T01:46:00Z",
+      "final_head_sha": "53d9f90b4c8acf3189a3d872bfcf7dc544d3d0af",
+      "child_usage": {
+        "subagent_tokens": 272969,
+        "tool_uses": 97,
+        "duration_ms": 14296929
+      }
+    },
+    {
+      "issue_num": 1022,
+      "feature_folder": "2026-10-30-docs-surface-analyzers-python-config-1022",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-surface-analyzers-python-config-1022",
+      "plan_path": "docs/features/active/2026-10-30-docs-surface-analyzers-python-config-1022/plan.2026-10-30T16-46.md",
+      "complexity_band": "C4",
+      "depends_on": [
+        1020
+      ],
+      "wave_number": 1,
+      "merge_status": "worktree_removed",
+      "branch_name": "feature/docs-surface-analyzers-python-config-1022-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1022",
+      "pr_number": 1072,
+      "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1072",
+      "merge_commit_sha": "a94dea9a4be0743f00ff78de095c51e14d513b20",
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-03T21:55:00Z",
+      "pr_opened_at": null,
+      "merge_confirmed_at": "2026-11-04T13:55:59Z",
+      "worktree_removed_at": "2026-11-04T13:59:00Z",
+      "final_head_sha": "ca85d33eda4c0033f6b9776d1b4c078e9bd3589a",
+      "relaunched_by": "coordinator (opus)",
+      "pause_history": [
+        {
+          "reported_at": "2026-11-04T02:10:00Z",
+          "reason": "held for opus relaunch after fable_policy disabled (coordinator-managed relaunch)",
+          "pushed_head_sha": "7e1cb0a8f7fc00db51cd3939460f03b1facccad7",
+          "last_completed_phase": "P5",
+          "next_task": "P6-T1",
+          "tasks_checked": 33,
+          "tasks_total": 47,
+          "pr_opened": false,
+          "worktree_clean": true,
+          "child_finished": true,
+          "child_usage": {
+            "subagent_tokens": 365875,
+            "tool_uses": 155,
+            "duration_ms": 16063338
+          }
+        }
+      ]
+    },
+    {
+      "issue_num": 1023,
+      "feature_folder": "2026-10-30-docs-coverage-ledger-and-receipt-1023",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023",
+      "plan_path": "docs/features/active/2026-10-30-docs-coverage-ledger-and-receipt-1023/plan.2026-10-30T16-51.md",
+      "complexity_band": "C4",
+      "depends_on": [
+        1020
+      ],
+      "wave_number": 1,
+      "merge_status": "worktree_removed",
+      "branch_name": "feature/docs-coverage-ledger-and-receipt-1023-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1023",
+      "pr_number": 1071,
+      "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1071",
+      "merge_commit_sha": "06012704f6e86aa86d41f84b2e191fd40c2a5602",
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-03T21:55:00Z",
+      "pr_opened_at": "2026-11-04T02:50:13Z",
+      "merge_confirmed_at": "2026-11-04T03:09:33Z",
+      "worktree_removed_at": "2026-11-04T03:21:00Z",
+      "pause_history": [
+        {
+          "reported_at": "2026-11-04T02:15:00Z",
+          "reason": "held for opus relaunch after fable_policy disabled (coordinator-managed relaunch)",
+          "pushed_head_sha": "2171aa820c0959b47f5fd380cfb98b449fc030be",
+          "last_completed_task": "P7-T13",
+          "next_step": "S6_feature_review",
+          "tasks_checked": 43,
+          "tasks_total": 43,
+          "ac_checked": "54/56 (S32, U23 pending-CI)",
+          "pr_opened": false,
+          "worktree_clean": true,
+          "child_finished": true,
+          "child_usage": {
+            "subagent_tokens": 385425,
+            "tool_uses": 185,
+            "duration_ms": 16865463
+          }
+        }
+      ],
+      "final_head_sha": "0127e5485adc2be93fa433fdcc2eb8753335a276",
+      "relaunched_by": "coordinator (opus)"
+    },
+    {
+      "issue_num": 1033,
+      "feature_folder": "2026-10-30-docs-surface-analyzers-typescript-dotnet-1033",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-surface-analyzers-typescript-dotnet-1033",
+      "plan_path": "docs/features/active/2026-10-30-docs-surface-analyzers-typescript-dotnet-1033/plan.2026-10-30T18-39.md",
+      "complexity_band": "C4",
+      "depends_on": [
+        1020
+      ],
+      "wave_number": 1,
+      "merge_status": "worktree_removed",
+      "branch_name": "feature/docs-surface-analyzers-typescript-dotnet-1033-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1033",
+      "pr_number": 1076,
+      "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1076",
+      "merge_commit_sha": "5357b6e3ec8a0c69f319630e78a944d1a0497098",
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-03T21:55:00Z",
+      "pr_opened_at": null,
+      "merge_confirmed_at": "2026-11-04T17:03:18Z",
+      "worktree_removed_at": "2026-11-04T17:13:40Z",
+      "final_head_sha": "4990dfe59aae88b073574e2972c16833361cbc16",
+      "relaunched_by": "coordinator (opus)",
+      "pause_history": [
+        {
+          "reported_at": "2026-11-04T02:05:00Z",
+          "reason": "held for opus relaunch after fable_policy disabled (coordinator-managed relaunch)",
+          "pushed_head_sha": "a4cda3680fd13eb2d012d3616f82139a1d87afff",
+          "last_completed_task": "P5-T2",
+          "next_task": "P6-T1",
+          "tasks_checked": 22,
+          "tasks_total": 42,
+          "pr_opened": false,
+          "uncommitted_entries_at_record": 2,
+          "original_child_finished": true,
+          "child_usage": {
+            "subagent_tokens": 352233,
+            "tool_uses": 185,
+            "duration_ms": 21248475
+          }
+        }
+      ]
+    },
+    {
+      "issue_num": 1024,
+      "feature_folder": "2026-10-30-docs-reference-generator-1024",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-reference-generator-1024",
+      "plan_path": "docs/features/active/2026-10-30-docs-reference-generator-1024/plan.2026-10-30T16-54.md",
+      "complexity_band": "C3",
+      "depends_on": [
+        1020,
+        1021
+      ],
+      "wave_number": 2,
+      "merge_status": "worktree_removed",
+      "branch_name": "feature/docs-reference-generator-1024-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1024",
+      "pr_number": 1075,
+      "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1075",
+      "merge_commit_sha": "729ff55ef6b8fcfcf632d9d2220a674bb437bf7e",
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-04T01:55:00Z",
+      "pr_opened_at": null,
+      "merge_confirmed_at": "2026-11-04T17:11:19Z",
+      "worktree_removed_at": "2026-11-04T17:13:40Z",
+      "final_head_sha": "bb72e4a790502418dc64e5c910abdf8b7ec355d1",
+      "relaunched_by": "coordinator (opus)"
+    },
+    {
+      "issue_num": 1031,
+      "feature_folder": "2026-10-30-docs-surface-analyzer-python-native-1031",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031",
+      "plan_path": "docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/plan.2026-10-30T18-38.md",
+      "complexity_band": "C3",
+      "depends_on": [
+        1022
+      ],
+      "wave_number": 2,
+      "merge_status": "worktree_created",
+      "branch_name": "feature/docs-surface-analyzer-python-native-1031-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1031",
+      "pr_number": null,
+      "pr_url": null,
+      "merge_commit_sha": null,
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-04T14:00:00Z",
+      "pr_opened_at": null,
+      "merge_confirmed_at": null,
+      "worktree_removed_at": null,
+      "owner_decisions": [
+        {
+          "decided_at": "2026-11-04T14:45:00Z",
+          "decided_by": "coordinator under the owner's standing instruction to follow the coordinator's recommendations",
+          "option": "i",
+          "decision": "Raise the helper Python floor to 3.11; amend spec S10/S22 and user-story U10/U22 to state the 3.11 floor and that the CI matrix (3.11/3.12/3.13) is the verification. Then one planner revision and one preflight; resume at P0-T4.",
+          "rationale": "CI matrix and pyproject (python >=3.11,<4.0) define the project floor; a 3.10 job is unsupportable and an outside-CI proof would be unverifiable."
+        }
+      ],
+      "block_history": [
+        {
+          "reported_at": "2026-11-04T14:43:00Z",
+          "pushed_head_sha": "e16379da5",
+          "worktree_clean": true,
+          "tasks_checked": "P0-T1..P0-T3",
+          "resume_at": "P0-T4 after planner revision and preflight",
+          "child_usage": {
+            "subagent_tokens": 168719,
+            "tool_uses": 40,
+            "duration_ms": 2555651
+          },
+          "blocked_reason": "human_decision_required: single-pass planner rule exhausted. Second preflight after the one permitted plan revision: spec S10/S22 and user-story U10/U22 require a Python 3.10 CI job, but _quality-checks.yml matrix is 3.11/3.12/3.13 and pyproject requires python >=3.11 (verified by epic-orchestrator via git grep at the integration tip). Owner choice: raise the helper floor to 3.11 and amend those criteria, or keep 3.10 with a non-CI proof; then one planner revision plus one preflight, resume at P0-T4.",
+          "cleared_at": "2026-11-04T14:45:00Z"
+        }
+      ],
+      "paused": {
+        "reported_at": "2026-11-04T19:29:00Z",
+        "reason": "Codespace terminated; owner instruction: commit in-flight work and pause. Item is being committed-and-held by its own orchestrator; resume from the per-item checkpoint.",
+        "branch_name": "feature/docs-surface-analyzer-python-native-1031-r2",
+        "worktree_path": "/workspaces/drm-copilot-wt/docs-1031",
+        "pushed_head_sha_at_record": "3090e42fd",
+        "pushed_head_sha": "c83bdf64c1fa5ca175f6ad3c2dd017708acee396",
+        "wip_commits": [
+          "bbef268db",
+          "c83bdf64c"
+        ],
+        "pushed": true,
+        "worktree_clean": true,
+        "resume_point": "S5_atomic_execution (per-item checkpoint next_step)"
+      }
+    },
+    {
+      "issue_num": 1034,
+      "feature_folder": "2026-10-30-docs-enforcement-and-ci-1034",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034",
+      "plan_path": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/plan.2026-10-30T18-40.md",
+      "complexity_band": "C3",
+      "depends_on": [
+        1021,
+        1023
+      ],
+      "wave_number": 2,
+      "merge_status": "worktree_created",
+      "branch_name": "feature/docs-enforcement-and-ci-1034-r2",
+      "worktree_path": "/workspaces/drm-copilot-wt/docs-1034",
+      "pr_number": null,
+      "pr_url": null,
+      "merge_commit_sha": null,
+      "blocked_reason": null,
+      "worktree_created_at": "2026-11-04T03:30:00Z",
+      "pr_opened_at": null,
+      "merge_confirmed_at": null,
+      "worktree_removed_at": null,
+      "implicit_dependencies": [
+        {
+          "issue_num": 1022,
+          "reason": "inventory dispatch row (# --- 1022: inventory ---) required by 1034; absent from epic.md manifest",
+          "satisfied_at": "2026-11-04T13:55:59Z",
+          "satisfied_by": "PR #1072 merge a94dea9a4"
+        }
+      ],
+      "owner_decision": {
+        "decided_at": "2026-11-04T13:58:00Z",
+        "decided_by": "coordinator under standing autonomy instruction (owner-level)",
+        "option": "a",
+        "decision": "#1034 owns the additive edit to New-DocsCommandContext (ResolveRevision and ReadRevisionText); 1020 is not reopened. Requires one atomic-planner revision of the 1034 file set and a re-preflight (single-pass: plan returns to the planner at most once)."
+      },
+      "block_history": [
+        {
+          "reported_at": "2026-11-04T03:40:00Z",
+          "pushed_head_sha": "c870afa778367af064aa51973ae142672755e866",
+          "worktree_clean": true,
+          "tasks_checked": "P0-T1 only",
+          "resume_at": "P0-T2 (re-run preconditions)",
+          "evidence": "docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/baseline/upstream-preconditions.2026-11-04T03-16.md",
+          "verified_by_epic_orchestrator": "git grep at origin integration tip: no ResolveRevision/ReadRevisionText under .claude/lib/docs or its tests on the integration branch or the 1022/1033/1024 branches (only 1034 docs cite them); # --- 1022: inventory --- anchor has no row",
+          "implicit_dependency": 1022,
+          "child_notes": [
+            "merged anchors: # --- 1034: surface-delta --- and # --- 1034: docs workflow --- (plan cites 900008)",
+            "receipt artifact_kind is docs-validation-receipt",
+            "P7-T11 cites quality-checks7 (3.10), which ci.yml does not run"
+          ],
+          "child_usage": {
+            "subagent_tokens": 149367,
+            "tool_uses": 33,
+            "duration_ms": 340660
+          },
+          "blocked_reason": "human_decision_required: P0-T2 upstream preconditions fail at integration tip 06012704f. (a) 1020 New-DocsCommandContext lacks ResolveRevision/ReadRevisionText (1034 spec OQ-1 says the owner must choose a 1020 amendment or 1034 ownership of the additive edit; the latter needs a planner revision of the 1034 file set). (b) 1022 inventory dispatch row not merged (anchor only); 1034 needs the inventory command, an implicit dependency on 1022 absent from the epic.md manifest.",
+          "cleared_at": "2026-11-04T13:59:00Z"
+        },
+        {
+          "reported_at": "2026-11-04T14:35:00Z",
+          "pushed_head_sha": "b2fa2710765893209273d4fa3b2ecb21a7f2036b",
+          "worktree_clean": true,
+          "tasks_checked": "P0-T1 only",
+          "resume_at": "S4 plan revision after re-preflight failure, then P0-T2",
+          "integration_merged_into_branch": "f97edf14a",
+          "child_usage": {
+            "subagent_tokens": 195166,
+            "tool_uses": 101,
+            "duration_ms": 1539626
+          },
+          "child_notes": [
+            "spec T11 evaluated with git diff --ignore-all-space (PSAlignAssignmentStatement realigns eight existing New-DocsCommandContext lines)",
+            "P6-T2 core.json insertion point fixed in place (evidence/other/preflight-fixes.2026-11-04T14-24.md)"
+          ],
+          "blocked_reason": "human_decision_required: single-pass planner rule exhausted. Plan revised once for decision (a) (v1.1, 7f76c08d1); re-preflight returned REVISIONS REQUIRED on P7-T8: (1) tests/scripts single-process run cannot reach zero failures on this host (pre-existing failures; #1070 PATH-leak fix is on main, not on the integration branch) - needs a Phase 0 tests/scripts baseline and baseline-relative acceptance for P7-T8/P7-T3 as in the 1022 plan; (2) missing concurrent-shard Invoke-PoshQCParallelTest isolation run. Needs coordinator authorization for one more planner revision plus re-preflight.",
+          "cleared_at": "2026-11-04T14:45:00Z"
+        }
+      ],
+      "owner_decisions": [
+        {
+          "decided_at": "2026-11-04T14:45:00Z",
+          "decided_by": "coordinator under the owner's standing instruction to follow the coordinator's recommendations",
+          "decision": "Explicit exception to the single-pass rule: ONE additional planner revision plus a re-preflight. Revision must (a) add a Phase 0 tests/scripts baseline capture and make P7-T8 and P7-T3 baseline-relative (no new failures versus baseline, as in the 1022 plan), because the #1070 PATH-leak fix and #1067 fixture fixes are on main but not on the integration branch; (b) add the concurrent-shard Invoke-PoshQCParallelTest isolation run required by the execution-environment brief. If the re-preflight is not ALL CLEAR, halt with blocked_reason validator_failed; no third round. If clear, resume at P0-T2.",
+          "exception_cause": "second substantive preflight defect set after the option (a) revision"
+        }
+      ],
+      "paused": {
+        "reported_at": "2026-11-04T19:29:00Z",
+        "reason": "Codespace terminated; owner instruction: commit in-flight work and pause. Item is being committed-and-held by its own orchestrator; resume from the per-item checkpoint.",
+        "branch_name": "feature/docs-enforcement-and-ci-1034-r2",
+        "worktree_path": "/workspaces/drm-copilot-wt/docs-1034",
+        "pushed_head_sha_at_record": "78d66d165",
+        "pushed_head_sha": "8aa32dc32e0471379a08928486024726ddd70bb2",
+        "pushed": true,
+        "worktree_clean": true,
+        "resume_point": "S5_atomic_execution_resume_at_P7-T3 (per-item checkpoint next_step)"
+      }
+    },
+    {
+      "issue_num": 1036,
+      "feature_folder": "2026-10-30-docs-mcp-tools-1036",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-mcp-tools-1036",
+      "plan_path": "docs/features/active/2026-10-30-docs-mcp-tools-1036/plan.2026-10-30T18-58.md",
+      "complexity_band": "C3",
+      "depends_on": [
+        1021,
+        1022,
+        1023,
+        1024
+      ],
+      "wave_number": 3,
+      "merge_status": "not_started",
+      "branch_name": null,
+      "worktree_path": null,
+      "pr_number": null,
+      "pr_url": null,
+      "merge_commit_sha": null,
+      "blocked_reason": null,
+      "worktree_created_at": null,
+      "pr_opened_at": null,
+      "merge_confirmed_at": null,
+      "worktree_removed_at": null
+    },
+    {
+      "issue_num": 1037,
+      "feature_folder": "2026-10-30-docs-authoring-workflow-1037",
+      "resolved_folder": "docs/features/active/2026-10-30-docs-authoring-workflow-1037",
+      "plan_path": "docs/features/active/2026-10-30-docs-authoring-workflow-1037/plan.2026-10-30T18-59.md",
+      "complexity_band": "C4",
+      "depends_on": [
+        1036
+      ],
+      "wave_number": 4,
+      "merge_status": "not_started",
+      "branch_name": null,
+      "worktree_path": null,
+      "pr_number": null,
+      "pr_url": null,
+      "merge_commit_sha": null,
+      "blocked_reason": null,
+      "worktree_created_at": null,
+      "pr_opened_at": null,
+      "merge_confirmed_at": null,
+      "worktree_removed_at": null
+    },
+    {
+      "issue_num": 1038,
+      "feature_folder": "2026-10-30-documentation-estate-template-and-onboarding-1038",
+      "resolved_folder": "docs/features/active/2026-10-30-documentation-estate-template-and-onboarding-1038",
+      "plan_path": "docs/features/active/2026-10-30-documentation-estate-template-and-onboarding-1038/plan.2026-10-30T18-59.md",
+      "complexity_band": "C3",
+      "depends_on": [
+        1034,
+        1037
+      ],
+      "wave_number": 5,
+      "merge_status": "not_started",
+      "branch_name": null,
+      "worktree_path": null,
+      "pr_number": null,
+      "pr_url": null,
+      "merge_commit_sha": null,
+      "blocked_reason": null,
+      "worktree_created_at": null,
+      "pr_opened_at": null,
+      "merge_confirmed_at": null,
+      "worktree_removed_at": null
+    }
+  ],
+  "epic_merge_pr": {
+    "pr_number": null,
+    "pr_url": null,
+    "ci_gate": null,
+    "merge_commit_sha": null,
+    "merged_at": null
+  },
+  "model_routing_receipts": [
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1020",
+      "complexity_band": "C3",
+      "fable_policy": "available",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1020-resume",
+      "complexity_band": "C3",
+      "fable_policy": "available",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1021",
+      "complexity_band": "C3",
+      "fable_policy": "available",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1022",
+      "complexity_band": "C4",
+      "fable_policy": "available",
+      "table_model": "fable",
+      "clamped_from": null,
+      "model": "fable"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1023",
+      "complexity_band": "C4",
+      "fable_policy": "available",
+      "table_model": "fable",
+      "clamped_from": null,
+      "model": "fable"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1033",
+      "complexity_band": "C4",
+      "fable_policy": "available",
+      "table_model": "fable",
+      "clamped_from": null,
+      "model": "fable"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1024",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1034",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1031",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1034-relaunch",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1031-relaunch",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "orchestrator",
+      "phase": "epic-child-1034-relaunch-2",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ],
+  "complexity_assessments": [
+    {
+      "phase": "epic-child-1020",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Defines the docs profile and artifact schemas consumed by every later child; band taken from epic-planner assessment.",
+      "assessed_at": "2026-11-03T11:43:01Z"
+    },
+    {
+      "phase": "epic-child-1031",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Python-native surface analyzer consuming the 1022 analyzer contract; band from epic-planner assessment.",
+      "assessed_at": "2026-11-04T14:02:00Z"
+    }
+  ],
+  "delegation_receipts": [
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1020",
+      "issue_num": 1020,
+      "delegated_at": "2026-11-03T11:45:00Z",
+      "status": "returned_paused",
+      "returned_at": "2026-11-03T14:43:00Z",
+      "isolation": "worktree",
+      "run_in_background": true,
+      "model": "opus"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1020-resume",
+      "issue_num": 1020,
+      "delegated_at": "2026-11-03T19:05:00Z",
+      "status": "returned_done",
+      "isolation": "existing_item_worktree",
+      "run_in_background": true,
+      "model": "opus",
+      "returned_at": "2026-11-03T21:35:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1021",
+      "issue_num": 1021,
+      "delegated_at": "2026-11-03T21:55:00Z",
+      "status": "returned_done",
+      "isolation": "item_worktree",
+      "run_in_background": true,
+      "model": "opus",
+      "returned_at": "2026-11-04T01:45:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1022",
+      "issue_num": 1022,
+      "delegated_at": "2026-11-03T21:55:00Z",
+      "status": "returned_paused",
+      "isolation": "item_worktree",
+      "run_in_background": true,
+      "model": "fable",
+      "returned_at": "2026-11-04T02:10:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1023",
+      "issue_num": 1023,
+      "delegated_at": "2026-11-03T21:55:00Z",
+      "status": "returned_paused",
+      "isolation": "item_worktree",
+      "run_in_background": true,
+      "model": "fable",
+      "returned_at": "2026-11-04T02:15:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1033",
+      "issue_num": 1033,
+      "delegated_at": "2026-11-03T21:55:00Z",
+      "status": "returned_paused",
+      "isolation": "item_worktree",
+      "run_in_background": true,
+      "model": "fable",
+      "returned_at": "2026-11-04T02:05:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1024",
+      "issue_num": 1024,
+      "delegated_at": "2026-11-04T01:55:00Z",
+      "status": "delegated",
+      "isolation": "item_worktree",
+      "run_in_background": true,
+      "model": "opus"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1034",
+      "issue_num": 1034,
+      "delegated_at": "2026-11-04T03:30:00Z",
+      "status": "returned_blocked",
+      "isolation": "item_worktree",
+      "run_in_background": true,
+      "model": "opus",
+      "returned_at": "2026-11-04T03:40:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1031",
+      "issue_num": 1031,
+      "delegated_at": "2026-11-04T14:02:00Z",
+      "status": "returned_blocked",
+      "isolation": "item_worktree",
+      "run_in_background": true,
+      "model": "opus",
+      "returned_at": "2026-11-04T14:43:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1034-relaunch",
+      "issue_num": 1034,
+      "delegated_at": "2026-11-04T14:02:00Z",
+      "status": "returned_blocked",
+      "isolation": "existing_item_worktree",
+      "run_in_background": true,
+      "model": "opus",
+      "returned_at": "2026-11-04T14:35:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1031-relaunch",
+      "issue_num": 1031,
+      "delegated_at": "2026-11-04T14:45:00Z",
+      "status": "interrupted_codespace_termination",
+      "isolation": "existing_item_worktree",
+      "run_in_background": true,
+      "model": "opus",
+      "returned_at": "2026-11-04T19:29:00Z"
+    },
+    {
+      "agent_name": "orchestrator",
+      "phase": "epic-child-1034-relaunch-2",
+      "issue_num": 1034,
+      "delegated_at": "2026-11-04T14:45:00Z",
+      "status": "interrupted_codespace_termination",
+      "isolation": "existing_item_worktree",
+      "run_in_background": true,
+      "model": "opus",
+      "returned_at": "2026-11-04T19:29:00Z"
+    }
+  ],
+  "skill_receipts": [
+    {
+      "skill": "epic-orchestrate",
+      "invoked_at": "2026-11-03T11:40:00Z",
+      "status": "applied"
+    },
+    {
+      "skill": "acceptance-criteria-tracking",
+      "invoked_at": "2026-11-03T11:40:00Z",
+      "status": "applied"
+    },
+    {
+      "skill": "policy-compliance-order",
+      "invoked_at": "2026-11-03T11:40:00Z",
+      "status": "applied"
+    }
+  ],
+  "mcp_call_receipts": [
+    {
+      "tool": "validate_orchestration_artifacts",
+      "called_at": "2026-11-03T11:44:00Z",
+      "status": "success",
+      "artifact_type": "epic-orchestrator-state"
+    }
+  ],
+  "hold_history": [
+    {
+      "since": "2026-11-03T14:43:00Z",
+      "reason": "Child 1020 paused on an owner instruction relayed outside this agent; epic holds until the coordinator says to resume. Integration tip at hold: 013111c72a6cc70afb128f44b50f069e52644170 (adds only the epic-status.md projection).",
+      "lifted_at": "2026-11-03T19:05:00Z",
+      "lifted_by": "coordinator resume instruction after Codespace move"
+    },
+    {
+      "since": "2026-11-04T19:29:00Z",
+      "reason": "Codespace terminated abruptly; owner instruction to commit in-flight work and pause. Integration tip at hold: 729ff55ef6b8fcfcf632d9d2220a674bb437bf7e."
+    }
+  ],
+  "model_budget": {
+    "fable_policy": "disabled",
+    "set_at": "2026-11-04T01:40:00Z",
+    "source": "owner instruction relayed by coordinator"
+  }
+}

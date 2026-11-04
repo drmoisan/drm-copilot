@@ -1,0 +1,1 @@
+- [Review artifact validator gotchas](review-artifact-validator-gotchas.md) — exact 1.2.1 bullet format, `Check-off` heading case, gitignored coverage artifacts vanish on resume, shard-union fallback

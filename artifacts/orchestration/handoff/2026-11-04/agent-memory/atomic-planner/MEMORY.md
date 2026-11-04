@@ -1,0 +1,4 @@
+- [Plan literal collisions](plan-literal-collisions.md) — `-Skip` grep hits `-SkipX` switches; 8-digit seeds can trip the G12 SHA rule
+- [PSSA hashtable alignment vs added-lines-only diffs](pssa-hashtable-alignment-breaks-added-lines-only-diffs.md) — longer new key realigns siblings; assert with `git diff --ignore-all-space`
+- [Per-task push vs code-touching head](per-task-push-vs-code-touching-head.md) — fold a small real code edit into the final self-review commit
+- [Pester JUnit sources on failing hosts](pester-junit-sources-on-failing-hosts.md) — no merged parallel JUnit when shards fail, 0x1B export truncation, unstable keys; compare per-container counts
