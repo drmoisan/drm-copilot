@@ -238,7 +238,7 @@ Seeded from issue:
 - [x] (CI-dependent) Proof C: the revert of the proof B commit produces a full run in which `CI Required Gate` is `success`, recorded under `evidence/other/`.
 - [x] (CI-dependent) Proof D: a docs-only evidence commit produces a run in which `CI Required Gate` is `success` and the gate summary table shows `full-run-marker`, `root-typescript-tests`, and `npm-audit-gate` as `skipped` and `poshqc` as `success`, recorded under `evidence/other/`.
 - [x] (CI-dependent) The proof B failing change is absent from the final pull request head tree.
-- [ ] (CI-dependent) The final pull request head commit touches at least one path outside the `config/ci-docs-only-paths.json` allowlist, and its full `ci.yml` run reports every context currently required by ruleset 15241672 as `success`, together with `CI Required Gate`.
+- [x] (CI-dependent) The final pull request head commit touches at least one path outside the `config/ci-docs-only-paths.json` allowlist, and its full `ci.yml` run reports every context currently required by ruleset 15241672 as `success`, together with `CI Required Gate`.
 
 ## Risks & Mitigations
 - Technical or operational risks:

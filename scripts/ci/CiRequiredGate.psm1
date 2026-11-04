@@ -206,6 +206,9 @@ function Get-CiRequiredGateDecision {
     if (-not ($changesResult -is [string] -and $changesResult -ceq 'success')) {
         $reasons.Add('changes result is not success')
     }
+    # Defense in depth: the committed ci.yml always lists these jobs under needs
+    # (pinned by CiRequiredGateWorkflow.Tests.ps1), so this branch fires only when
+    # the needs list and the module constants drift apart in a future edit.
     if ($scope -ceq 'docs-only') {
         $absent = @($script:CiRequiredGateDocsOnlyRequiredJobs | Where-Object { $jobIds -cnotcontains $_ })
         if ($absent.Count -gt 0) {

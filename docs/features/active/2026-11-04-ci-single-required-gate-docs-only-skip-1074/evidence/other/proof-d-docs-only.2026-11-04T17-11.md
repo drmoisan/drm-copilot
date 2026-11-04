@@ -36,4 +36,4 @@ Verdict: PASS
 
 `gh pr checks 1077` lists the job-level skips under unexpanded or caller-only names (`poshqc / PowerShell QC shard ${{ matrix.shard }}`, `NPM Audit Gate`, `root-typescript-tests`), so the required contexts `poshqc / PowerShell QC shard 1` to `3`, `root-typescript-tests / Root TypeScript Tests (ubuntu-latest)` and `(windows-latest)`, and the three `NPM Audit Gate / npm audit (...)` contexts do not report. This is the defect the single required gate addresses once the runbook is applied after merge.
 
-This file is left uncommitted for the orchestrator's S9 commit.
+This file was committed by the orchestrator in the commit that followed proof D.
