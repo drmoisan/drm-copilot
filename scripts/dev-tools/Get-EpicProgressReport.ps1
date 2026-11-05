@@ -81,6 +81,11 @@
     pwsh -NoProfile -File scripts/dev-tools/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -BaselineDone 40 -EpicIssue 12
 
     Prints the full report for epic issue 12, counting 40 tasks as complete at the start.
+
+.NOTES
+    The tool is read-only toward the repository and GitHub: it runs only git fetch, git
+    show, git worktree list, and gh pr list, and the only file it writes is the state file
+    at -StatePath (issue #1080).
 #>
 
 [CmdletBinding()]
