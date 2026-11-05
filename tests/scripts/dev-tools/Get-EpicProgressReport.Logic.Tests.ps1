@@ -48,6 +48,22 @@ Describe 'ConvertFrom-EpicProgressKickoffRow' {
     It 'returns no rows for an empty kickoff' {
         @(ConvertFrom-EpicProgressKickoffRow -KickoffText '').Count | Should -Be 0
     }
+
+    It 'parses a feature row with variable whitespace around cells' {
+        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText '|  12345|Beta|  2 |large|docs/b/plan.md|')
+
+        $rows.Count | Should -Be 1
+        $rows[0].Issue | Should -Be '12345'
+        $rows[0].Wave | Should -Be 2
+        $rows[0].Band | Should -Be 'large'
+        $rows[0].PlanPath | Should -Be 'docs/b/plan.md'
+    }
+
+    It 'throws a clear error for a non-numeric wave cell' {
+        $kickoff = '| 12 | Alpha | two | small | docs/a/plan.md |'
+
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Throw -ExpectedMessage "*#12 has a non-numeric wave cell 'two'*"
+    }
 }
 
 Describe 'Get-EpicProgressIssueFromKickoff' {

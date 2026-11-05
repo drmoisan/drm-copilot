@@ -32,8 +32,11 @@ function ConvertFrom-EpicProgressKickoffRow {
         Return one record (Issue, Wave, Band, PlanPath) per feature row of a kickoff table.
     .DESCRIPTION
         A feature row is a Markdown table row whose first cell is a numeric issue number of
-        any length. Cells 1, 3, 4, and 5 hold the issue, the wave, the band, and the
-        repository-relative plan path. Header and separator rows are ignored.
+        any length; any whitespace, including none, may surround each cell. Cells 1, 3, 4,
+        and 5 hold the issue, the wave, the band, and the repository-relative plan path.
+        Header and separator rows are ignored. A feature row whose wave cell is not all
+        digits raises a terminating error naming the issue and the cell, because a skipped
+        row would understate the epic's task total.
     .PARAMETER KickoffText
         The full text of the kickoff file.
     #>
@@ -43,9 +46,13 @@ function ConvertFrom-EpicProgressKickoffRow {
 
     $lines = $KickoffText -split '\r?\n'
     foreach ($line in $lines) {
-        if ($line -notmatch '^\| (\d+) \|') { continue }
+        if ($line -notmatch '^\|\s*(\d+)\s*\|') { continue }
         $cells = @($line -split '\|' | ForEach-Object { $_.Trim() })
-        [pscustomobject]@{ Issue = $cells[1]; Wave = [int] $cells[3]; Band = $cells[4]; PlanPath = $cells[5] }
+        if ($cells[3] -notmatch '^\d+$') {
+            throw "The kickoff row for issue #$($cells[1]) has a non-numeric wave cell '$($cells[3])'."
+        }
+        $wave = [int]::Parse($cells[3], [cultureinfo]::InvariantCulture)
+        [pscustomobject]@{ Issue = $cells[1]; Wave = $wave; Band = $cells[4]; PlanPath = $cells[5] }
     }
 }
 
