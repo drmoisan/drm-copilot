@@ -36,7 +36,7 @@ jobs:
         if: ${{ inputs.run-heavy }}
         uses: snok/install-poetry@v1
         with:
-          version: latest
+          version: 2.5.1
 
       - name: Build package
         if: ${{ inputs.run-heavy }}

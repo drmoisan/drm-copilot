@@ -2,12 +2,34 @@ Set-StrictMode -Version Latest
 
 Describe "link-feature-docs.ps1" {
     BeforeAll {
+        # Save the prior value for AfterAll; the variable is process-wide and would leak to later suites.
+        $script:PriorSkipScriptExecution = [Environment]::GetEnvironmentVariable('POSHQC_SKIP_SCRIPT_EXECUTION')
+        # Save any existing gh function for AfterAll; the stub below is global and would leak to later suites.
+        $priorGhFunctionItem = Get-Item -LiteralPath Function:\gh -ErrorAction SilentlyContinue
+        $script:PriorGhFunction = if ($null -ne $priorGhFunctionItem) { $priorGhFunctionItem.ScriptBlock } else { $null }
         $env:POSHQC_SKIP_SCRIPT_EXECUTION = '1'
         $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\scripts\dev-tools\link-feature-docs.ps1"
         . $script:scriptPath
         function global:gh {
             param([Parameter(ValueFromRemainingArguments = $true)]$Args)
             $null = $Args
+        }
+    }
+
+    AfterAll {
+        if ($null -eq $script:PriorSkipScriptExecution) {
+            Remove-Item -Path Env:\POSHQC_SKIP_SCRIPT_EXECUTION -ErrorAction SilentlyContinue
+        }
+        else {
+            $env:POSHQC_SKIP_SCRIPT_EXECUTION = $script:PriorSkipScriptExecution
+        }
+
+        if ($null -ne $script:PriorGhFunction) {
+            Set-Item -Path Function:\global:gh -Value $script:PriorGhFunction
+        }
+        else {
+            # The unqualified path resolves the global stub; Remove-Item ignores a 'global:' qualifier here.
+            Remove-Item -Path Function:\gh -Force -ErrorAction SilentlyContinue
         }
     }
 

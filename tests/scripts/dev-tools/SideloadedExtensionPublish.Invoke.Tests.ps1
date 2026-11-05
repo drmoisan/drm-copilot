@@ -24,9 +24,14 @@ BeforeAll {
     Mock -CommandName Stop-Process -ModuleName SideloadedExtensionPublish -MockWith { throw 'unmocked host seam: Stop-Process' }
     Mock -CommandName Get-Process -ModuleName SideloadedExtensionPublish -MockWith { throw 'unmocked host seam: Get-Process' }
 
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'sideloadedextensionpublish-invoke-root'
+    $script:Repo = Join-Path $script:FixtureRoot 'repo'
+    $script:VsixDir = Join-Path $script:FixtureRoot 'vsix'
+    $script:ExtensionRoot = Join-Path -Path $script:Repo -ChildPath 'extensions' -AdditionalChildPath 'drm-copilot'
+
     $script:publishArgs = @{
-        RepoRoot      = 'C:\fixture\repo'
-        VsixOutputDir = 'C:\fixture\vsix'
+        RepoRoot      = $script:Repo
+        VsixOutputDir = $script:VsixDir
         Now           = { [datetime]::new(2026, 1, 2, 3, 4, 5) }
     }
 }
@@ -44,7 +49,7 @@ Describe 'Invoke-SideloadedExtensionPublish' {
 
         Mock -CommandName Test-Path -ModuleName SideloadedExtensionPublish -MockWith { $true }
         Mock -CommandName Assert-RequiredCommandAvailable -ModuleName SideloadedExtensionPublish -MockWith { }
-        Mock -CommandName Resolve-ExtensionProjectRoot -ModuleName SideloadedExtensionPublish -MockWith { 'C:\fixture\repo\extensions\drm-copilot' }
+        Mock -CommandName Resolve-ExtensionProjectRoot -ModuleName SideloadedExtensionPublish -MockWith { $script:ExtensionRoot }
         Mock -CommandName Write-Information -ModuleName SideloadedExtensionPublish -MockWith { }
         Mock -CommandName Invoke-NpmCiWithRetry -ModuleName SideloadedExtensionPublish -MockWith { $script:recorder.CallOrder.Add('npm ci') }
         Mock -CommandName Invoke-ProjectCompile -ModuleName SideloadedExtensionPublish -MockWith { $script:recorder.CallOrder.Add('compile') }
@@ -73,10 +78,10 @@ Describe 'Invoke-SideloadedExtensionPublish' {
             $callOrder = @(InModuleScope SideloadedExtensionPublish { $script:recorder.CallOrder.ToArray() })
             $callOrder | Should -Be @('npm ci', 'compile', 'vsce package', 'code --install-extension')
             Should -Invoke -CommandName Invoke-NpmCiWithRetry -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
-                $WorkingDirectory -eq 'C:\fixture\repo\extensions\drm-copilot' -and -not $ForceCleanup
+                $WorkingDirectory -eq $script:ExtensionRoot -and -not $ForceCleanup
             }
             Should -Invoke -CommandName Invoke-ExternalCommand -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
-                $FilePath -eq 'code' -and $ArgumentList.Count -eq 2 -and $WorkingDirectory -eq 'C:\fixture\repo'
+                $FilePath -eq 'code' -and $ArgumentList.Count -eq 2 -and $WorkingDirectory -eq $script:Repo
             }
         }
 
@@ -118,7 +123,7 @@ Describe 'Invoke-SideloadedExtensionPublish' {
             $result = @(Invoke-SideloadedExtensionPublish @script:publishArgs)
 
             $result.Count | Should -Be 1
-            ($result[-1] -replace '\\', '/') | Should -BeLike 'C:/fixture/vsix/drm-copilot-20260102-030405.vsix'
+            ($result[-1] -replace '\\', '/') | Should -BeLike ((Join-Path $script:VsixDir 'drm-copilot-20260102-030405.vsix') -replace '\\', '/')
             Should -Invoke -CommandName Write-Information -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
                 $MessageData -like 'VSIX created: *drm-copilot-20260102-030405.vsix'
             }
@@ -136,21 +141,21 @@ Describe 'Invoke-SideloadedExtensionPublish' {
         It 'creates the output directory through New-Item when it is absent' {
             Mock -CommandName Test-Path -ModuleName SideloadedExtensionPublish -MockWith {
                 param([string]$LiteralPath)
-                $LiteralPath -ne 'C:\fixture\vsix'
+                $LiteralPath -ne $script:VsixDir
             }
             Mock -CommandName New-Item -ModuleName SideloadedExtensionPublish -MockWith { }
 
             $null = Invoke-SideloadedExtensionPublish @script:publishArgs
 
             Should -Invoke -CommandName New-Item -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
-                $ItemType -eq 'Directory' -and $Path -eq 'C:\fixture\vsix'
+                $ItemType -eq 'Directory' -and $Path -eq $script:VsixDir
             }
         }
 
         It 'throws when RepoRoot does not exist' {
             Mock -CommandName Test-Path -ModuleName SideloadedExtensionPublish -MockWith { $false }
 
-            { Invoke-SideloadedExtensionPublish @script:publishArgs } | Should -Throw -ExpectedMessage 'RepoRoot does not exist: C:\fixture\repo'
+            { Invoke-SideloadedExtensionPublish @script:publishArgs } | Should -Throw -ExpectedMessage "RepoRoot does not exist: $($script:Repo)"
             Should -Invoke -CommandName Assert-RequiredCommandAvailable -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
         }
 

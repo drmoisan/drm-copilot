@@ -29,6 +29,7 @@ Describe 'Get-PrAuthorBodyPathBindingReason body number (issue #901, #850 note L
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 
         $script:ItemRoot = '/synthetic-worktrees/item-901'
     }

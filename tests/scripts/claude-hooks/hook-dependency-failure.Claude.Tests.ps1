@@ -37,6 +37,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path -replace '\\', '/'
         . (Join-Path $PSScriptRoot '../claude-runtime/HookDependencyGraph.Helpers.ps1')
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Reset-EpicStateProbeModuleBinding
         Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         if (Get-Command Get-ArtifactFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ArtifactFileContent' -Surface 'Codex' }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
@@ -141,7 +142,12 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         $failedDependency = $Dependency
         $failedChildPath = $ChildPath
         if ($Kind -eq 'Module') { Mock Import-Module { throw "simulated load failure: $failedDependency" } -ParameterFilter { $Name -like "*$failedDependency" } }
-        else { Mock Join-Path { throw "simulated load failure: $failedDependency" } -ParameterFilter { $ChildPath -eq $failedChildPath } }
+        else { $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+            Mock Join-Path {
+                # Only the selected dependency fails; other path joins retain native semantics.
+                if ($ChildPath -eq $failedChildPath) { throw "simulated load failure: $failedDependency"; return }
+                & $originalJoinPath @PesterBoundParameters
+            } }
         Mock Read-ClaudeHookRawPayload { '' }
         Mock Resolve-ClaudeHookToolInput { [pscustomobject]@{ IsValid = $false; Anomaly = 'Empty'; Value = $null } }
         $prefix = $script:ReasonPrefix[$Hook]
@@ -169,7 +175,12 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         # Arrange: no helper function is defined in the test scope, and the helper dot-source fails.
         foreach ($name in 'Add-HookDependencyFailure', 'Test-HookDependencyFailure', 'Get-HookDependencyFailureReason', 'Get-HookDependencyFailureDecision') { Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue }
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-dependency-guard.ps1') { throw 'simulated load failure: hook-dependency-guard.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         # Act
         try {
             . (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook)
@@ -184,7 +195,12 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
 
     It 'B3: <Event> <Hook> exits 2 with the bootstrap reason when hook-dependency-guard.ps1 fails to load' -ForEach $script:HookRows {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-dependency-guard.ps1') { throw 'simulated load failure: hook-dependency-guard.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
         finally { Initialize-HookDependencyState }
         $result.ExitCode | Should -Be 2

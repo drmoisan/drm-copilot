@@ -1,0 +1,4 @@
+Timestamp: 2026-11-04T03-40
+Command: pwsh -NoProfile -File SCRATCH/issue-1069-container-final.ps1 -Configuration local; pwsh -NoProfile -File SCRATCH/issue-1069-container-extra.ps1 -Configuration local
+EXIT_CODE: 0
+Output Summary: Both native full-image runtime and every instrumented controlled scenario passed. Verifier60/62=96.77% vs baseline124/134=92.54%; setup116/129=89.92% vs83/128=64.84%. Coverage is the union of line hits across supported, overlay, fallback, stale, missing, failed, wrongos, supportingmissing, venvmissing, venvstale, configmissing and opposite selection scenarios. Actual installed versions are measured in native artifact as vscode from /tmp using an isolated Linux venv. Setup scenarios stub package/native boundaries; no host bootstrap Apply or package installation occurs in that scenario stage. The image builds separately prove installability. Uncovered verifier lines67,68 are existing missing OS-file diagnostics; no production exclusion.

@@ -11,6 +11,7 @@
       "Bash(bash .claude/lib/bash/mutate-parallel-run.sh*)",
       "Bash(bash .claude/lib/bash/remove-parallel-item.sh*)",
       "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)",
+      "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1*)",
       "Read",
       "Edit(docs/**)",
       "Edit(artifacts/**)",

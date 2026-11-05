@@ -47,7 +47,7 @@ F1 → Dev Containers: Rebuild Container Without Cache
 **Check poetry.lock**
 ```bash
 # Inside container:
-poetry lock --check
+poetry check --lock
 ```
 
 **Clear Poetry Cache**
@@ -58,7 +58,7 @@ poetry install --no-cache
 
 **Verify Python Version**
 ```bash
-python --version  # Should be 3.13.x
+python --version  # Should be 3.13.18
 poetry env info
 ```
 
@@ -186,10 +186,11 @@ Add to devcontainer.json:
 - Task Explorer is removed from the allow list; ensure it is not installed in the container.
 
 **Keep artifacts off the code workspace**
-- Use the dedicated bind mount `/workspaces/lexile-artifacts` (host `${localWorkspaceFolder}/../lexile-artifacts`) for large data to reduce directory walks inside the code workspace.
+- Keep large data out of source directories and exclude artifact directories from workspace scans.
 
 **Keep workspace on a fast path**
-- Workspace now lives on a named volume to avoid host bind latency. A read-only host bind seeds the volume on first create (excluding `.venv`, `artifacts`, and `data` to prevent long copies); rebuild the container if you need to refresh from host. Prefer WSL2 backend for Docker Desktop.
+- Local Docker mounts the host checkout directly, while Linux volumes hold `.venv` and all three `node_modules` directories. Host edits are visible without rebuilding. Prefer the WSL2 backend and a checkout in the WSL filesystem for faster source I/O.
+- The old `drm-copilot-workspace` volume is no longer used. Recover container-only changes from it before removing it.
 
 **Rebuild after config changes**
 - `F1 → Dev Containers: Rebuild Container` to ensure extension set and mounts are applied.

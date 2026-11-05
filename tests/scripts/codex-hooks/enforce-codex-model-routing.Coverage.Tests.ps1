@@ -115,6 +115,13 @@ Describe 'Codex enforce-codex-model-routing coverage (issue #786)' {
         }
 
         It 'reads the transcript-keyed attestation and denies profile drift' {
+            # Bootstrap dependencies remain real; only attestation state is supplied by the fixture.
+            Mock Get-CodexAuthorityStateRoot { '/synthetic-root/state' } -ParameterFilter { $SessionId -eq 's-786' }
+            $originalTestPath = Get-Command Test-Path -CommandType Cmdlet
+            Mock Test-Path { & $originalTestPath @PesterBoundParameters } -ParameterFilter {
+                ([string]$LiteralPath).Replace('\', '/') -match '/\.codex/.*\.ps[dm]?1$' -or
+                ([string]$Path).Replace('\', '/') -match '/\.codex/.*\.ps[dm]?1$'
+            }
             Mock Test-Path { $true } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
             Mock Get-Content { '{"schema_version":1,"agent_type":"atomic-executor"}' } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
             $result = Invoke-ModelRoutingEntry -Stdin '{"session_id":"s-786","transcript_path":"/synthetic-root/t.jsonl","agent_type":"atomic-executor","model":"m"}'
