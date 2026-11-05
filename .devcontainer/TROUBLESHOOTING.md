@@ -58,7 +58,7 @@ poetry install --no-cache
 
 **Verify Python Version**
 ```bash
-python --version  # Should be 3.13.17
+python --version  # Should be 3.13.18
 poetry env info
 ```
 

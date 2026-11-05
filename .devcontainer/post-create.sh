@@ -24,22 +24,15 @@ cd "$WORKSPACE_DIR"
 export WORKSPACE_DIR
 echo "Workspace directory: $WORKSPACE_DIR"
 
-# Docker Desktop exposes the host checkout as root-owned to the container user.
-# Trust only this workspace so Git works for setup, terminals, and extensions.
-if ! git config --global --get-all safe.directory | grep -Fxq "$WORKSPACE_DIR"; then
-	git config --global --add safe.directory "$WORKSPACE_DIR"
-fi
+# Resolve helpers from the selected workspace rather than the shell's starting directory.
+# shellcheck source=.devcontainer/lib/workspace.sh
+source "$WORKSPACE_DIR/.devcontainer/lib/workspace.sh"
+trust_workspace_git "$WORKSPACE_DIR"
 
 # -----------------------------------------------------------------------------
 # Prepare container-owned dependency volumes without changing host dependencies
 # -----------------------------------------------------------------------------
-# Docker creates empty named volumes as root; only their mount roots need ownership.
-# Codespaces has no dependency mounts, so it uses the same setup without this step.
-for dependency_dir in .venv node_modules extensions/drm-copilot/node_modules packages/mcp-server/node_modules; do
-	if mountpoint -q "$dependency_dir"; then
-		sudo chown "$(id -u):$(id -g)" "$dependency_dir"
-	fi
-done
+prepare_dependency_mounts "$WORKSPACE_DIR"
 
 # -----------------------------------------------------------------------------
 # Fix Docker socket permissions
@@ -135,15 +128,7 @@ echo "Installing Python dependencies with Poetry..."
 poetry config virtualenvs.in-project true --local
 
 # If the venv exists but is clearly broken, recreate it
-if [ -d ".venv" ] && [ ! -x ".venv/bin/python" ]; then
-	echo "Detected broken .venv; removing and recreating..."
-	# Keep the mount itself so recovery also works for a fresh dependency volume.
-	if mountpoint -q .venv; then
-		find .venv -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
-	else
-		rm -rf .venv
-	fi
-fi
+reset_broken_workspace_venv "$WORKSPACE_DIR"
 
 if [ -f "poetry.lock" ]; then
 	echo "poetry.lock found; installing locked dependencies..."
@@ -237,8 +222,8 @@ echo "Ensuring PowerShell QC dependencies..."
 pwsh -NoLogo -NoProfile -Command - <<'PWSH'
 $ErrorActionPreference = 'Stop'
 $required = @(
-    @{ Name = 'PSScriptAnalyzer'; Version = '1.22.0' },
-    @{ Name = 'Pester'; Version = '5.9.0'; UpperBound = '6.0.0' }
+    @{ Name = 'PSScriptAnalyzer'; Version = '1.25.0' },
+    @{ Name = 'Pester'; Version = '6.2.0'; UpperBound = '7.0.0' }
 )
 
 $gallery = Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
@@ -289,9 +274,10 @@ PWSH
 # -----------------------------------------------------------------------------
 # Git configuration reminder
 # -----------------------------------------------------------------------------
-if [ ! -f ~/.gitconfig ]; then
+# Workspace trust creates a global config; verify identity values independently.
+if ! git config user.name >/dev/null 2>&1 || ! git config user.email >/dev/null 2>&1; then
 	echo ""
-	echo "Git configuration not found. You may want to run:"
+	echo "Git identity is incomplete. Configure missing values with:"
 	echo "  git config --global user.name 'Your Name'"
 	echo "  git config --global user.email 'your.email@example.com'"
 fi

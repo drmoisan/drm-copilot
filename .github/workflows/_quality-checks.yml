@@ -39,7 +39,7 @@ jobs:
         if: ${{ inputs.run-heavy }}
         uses: snok/install-poetry@v1
         with:
-          version: 2.3.2
+          version: 2.5.1
           virtualenvs-create: true
           virtualenvs-in-project: true
 

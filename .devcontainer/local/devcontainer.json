@@ -6,6 +6,9 @@
   },
   "containerEnv": {
     "BG_WORKTREE_PATH": "/workspaces/drm-copilot-bg",
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "core.fsmonitor",
+    "GIT_CONFIG_VALUE_0": "false",
     "TZ": "America/New_York"
   },
   "customizations": {
@@ -92,12 +95,6 @@
   },
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {
       "version": "latest"
     }
   },

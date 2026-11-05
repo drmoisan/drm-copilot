@@ -41,10 +41,12 @@ This directory contains the Docker Dev Container configuration for the DRM Copil
 
 ### Base Environment
 - **Debian 12 (Bookworm)**
-- **Python 3.13.17** with Poetry 2.3.2
+- **Python 3.13.18** with Poetry 2.5.1
 - **Node.js 26.13.0 / npm 11.20.0** for development and CI
 - **PowerShell 7.6.9** for cross-platform scripting
-- **Git** and **GitHub CLI** (gh)
+- **Git >=2.56.0** and **GitHub CLI 2.103.3** (`gh`)
+- **.NET SDK 10.0.403**, **uv 0.13.7**, and **claude-swap 0.29.0** (`cswap`)
+- **Claude Code 2.1.318** and **Codex CLI 0.166.0**, including the native Codex package
 - **Graphite CLI** (`gt`) for the Graphite VS Code extension
 - **GitHub Copilot CLI** (`copilot`) for the `atomic_executor` tool
 - **shfmt 3.14.1**, **ShellCheck 0.11.0**, and **actionlint 1.7.12**
@@ -58,8 +60,8 @@ This directory contains the Docker Dev Container configuration for the DRM Copil
 - All project dependencies from `pyproject.toml`
 
 ### PowerShell Tooling
-- **PSScriptAnalyzer** (linter)
-- **Pester** (test framework)
+- **PSScriptAnalyzer 1.25.0** (linter)
+- **Pester 6.2.0** (test framework; JaCoCo coverage and JUnit test results)
 - **PoshQC** module (from workspace)
 
 ### VS Code Extensions (allow list)
@@ -79,6 +81,10 @@ This directory contains the Docker Dev Container configuration for the DRM Copil
 - The Docker outside-of-Docker feature provides access to the host Docker daemon
 
 Both configurations run `bash .devcontainer/post-create.sh` against their actual workspace. Setup installs the lock-file dependencies and runs `.devcontainer/verify-container.sh` before reporting completion.
+
+Both Dockerfiles use the same pinned base, `mcr.microsoft.com/devcontainers/python:3.3.2-3.13-bookworm`, and the same image-managed tool versions. Local Docker adds access to the host Docker daemon; Codespaces retains its platform resource settings. Local Git disables the host Windows fsmonitor through container environment variables while preserving the host repository configuration.
+
+Codex startup update checks are disabled in `/etc/codex/config.toml`, and credentials use the file store under the user's Codex directory. Claude, cswap, and Codex state directories are owned by `vscode`; authentication is performed by the user. Python bytecode is stored under `/tmp/pycache` instead of the shared source tree.
 
 The former `${localWorkspaceFolderBasename}-workspace` volume is no longer used. It is retained so any container-only work can be recovered before removal.
 
