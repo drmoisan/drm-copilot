@@ -59,7 +59,12 @@ Describe 'preimplementation gate modes handler proof on the codex surface' {
 
     It 'H2 codex preimplementation gate denies that epic delegation naming feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load' {
         # Arrange: re-dot-source the gate, which re-dot-sources the modes sibling, with the resolver forced to fail.
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:CodexGateHook
             $script:OrchestrationFeatureFolderResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -75,7 +80,12 @@ Describe 'preimplementation gate modes handler proof on the codex surface' {
     }
 
     It 'H2 codex preimplementation gate denies that parallel delegation naming feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load' {
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:CodexGateHook
             $script:OrchestrationFeatureFolderResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'

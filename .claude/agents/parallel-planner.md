@@ -18,6 +18,7 @@ tools:
   - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
   - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
   - "Bash(bash .claude/lib/bash/report-lane-assertion.sh*)"
+  - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1*)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
@@ -127,10 +128,13 @@ Update `artifacts/orchestration/parallel-planner-state.json` after every complet
 `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`, `max_concurrency`,
 `plan_home_branch`, `items[]`, `cohorts[]`, `conflict_edges[]`, `recolor_generation`,
 `kickoff_prompt_path`, `completed_steps`, `next_step`, and `last_updated`. Also record the
-`tolerated_overlaps` list returned by Get-BlastRadiusConflictEdge (tolerated-not-validated).
+`tolerated_overlaps` list returned by Get-BlastRadiusConflictEdge (tolerated-not-validated) and the
+top-level `precedence[]` list of operator precedence entries (tolerated-not-validated, declared in
+`## Prepared-Item Admission (issue #1047)` of `.claude/rules/parallel-orchestration.md`).
 
 Each `items[]` entry carries `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`,
-`complexity_assessment`, `preparation_status`, `research_path`, `plan_path`, `preflight_status`, `branch_name`,
+`complexity_assessment`, `preparation_status`, `research_path`, `plan_path`, `plan_hash`,
+`base_commit`, `preflight_status`, `branch_name`,
 `worktree_path`, `blast_radius`, `radius_validation`, `model_routing_receipt`, and
 `topology_receipt`. No `epic_worthiness` analogue, no `depends_on` field, and no `wave` field is
 written at any level.

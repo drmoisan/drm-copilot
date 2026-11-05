@@ -97,9 +97,11 @@ Once your Codespace is created, you should have:
 
 ### ✅ Correct Configuration
 - **OS:** Debian Bookworm (not Ubuntu)
-- **Python:** 3.13.x (not 3.12.x)
-- **Poetry:** 2.2.1
-- **PowerShell:** 7.6+
+- **Python:** 3.13.18 (not 3.12.x)
+- **Poetry:** 2.5.1
+- **Node.js/npm:** 26.13.0 / 11.20.0
+- **shfmt/ShellCheck/actionlint:** 3.14.1 / 0.11.0 / 1.7.12
+- **PowerShell:** 7.6.9
 - **Shell tools:** shellcheck, shfmt, bashdb, actionlint
 
 ### Verification Command

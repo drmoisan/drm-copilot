@@ -44,17 +44,25 @@ _REQUIRED_HEADINGS = (
     "## Test Runtime",
     "## Test Isolation Checks",
 )
+# The 20 contexts of ruleset 15241672 read on 2026-11-04, plus the issue #1074 gate.
+_OS = ("ubuntu-latest", "windows-latest")
 _REQUIRED_CONTEXTS = (
-    "drm-copilot-extension-tests / drm-copilot Extension Tests (ubuntu-latest)",
-    "drm-copilot-extension-tests / drm-copilot Extension Tests (windows-latest)",
+    *(f"drm-copilot-extension-tests / drm-copilot Extension Tests ({o})" for o in _OS),
+    *(f"root-typescript-tests / Root TypeScript Tests ({o})" for o in _OS),
+    *(f"quality-checks7 / Code Quality & Tests (3.{v})" for v in (11, 12, 13)),
+    *(f"NPM Audit Gate / npm audit ({m})" for m in (".", "packages/mcp-server")),
+    "NPM Audit Gate / npm audit (extensions/drm-copilot)",
+    *(f"poshqc / PowerShell QC{s}" for s in ("", " static", " shard 1", " shard 2")),
+    "poshqc / PowerShell QC shard 3",
+    "poshqc / PowerShell hook suites (Linux)",
     "docs-validation / Documentation Validation",
-    "poshqc / PowerShell QC",
     "shell-coverage / Shell Coverage (Bats + kcov)",
     "security-scan / Security Scanning",
-    "quality-checks7 / Code Quality & Tests (3.11)",
-    "quality-checks7 / Code Quality & Tests (3.12)",
-    "quality-checks7 / Code Quality & Tests (3.13)",
     "build-check / Build Package",
+    "CI Required Gate",
+)
+_REMOVED_DOCS_ONLY_CLAIM = (
+    "every required context reports `success` without running its suite"
 )
 _CLAUDE_AGENTS = (
     "task-researcher",
@@ -245,17 +253,21 @@ def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
             "`scripts/ci/Invoke-CiChangeScope.ps1`",
             "`config/ci-docs-only-paths.json`",
             "`run-heavy: false`",
-            "every required context reports `success` without running its suite",
             "`merge_group`",
             "ruleset 15241672",
-            "2026-10-16",
             "Refresh rule",
+            "`scripts/ci/Invoke-CiRequiredGate.ps1`",
+            "never report on a docs-only run",
+            "2026-11-04",
+            "single required context",
+            "reports no expanded context",
             *(f"`{context}`" for context in _REQUIRED_CONTEXTS),
         ),
     )
 
     # Assert
     assert missing == [], f"CI section lacks {missing}"
+    assert _REMOVED_DOCS_ONLY_CLAIM not in section, "the false docs-only claim remains"
 
 
 def test_brief_is_preloaded_by_four_claude_agents() -> None:
@@ -475,7 +487,7 @@ def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> Non
             "-n auto",
             "addopts",
             "physical cores",
-            "Pester 5",
+            "Pester 6",
             "Invoke-PoshQCParallelTest",
             "testsuite",
         ),

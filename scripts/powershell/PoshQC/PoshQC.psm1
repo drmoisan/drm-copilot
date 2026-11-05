@@ -53,9 +53,9 @@ function Install-PoshQCTool {
     }
 
     $requiredModules = @(
-        @{ Name = 'PSScriptAnalyzer'; Version = '1.22.0' },
-        # Issue #953 (D8): UpperBound is exclusive; an installed Pester 6.x does not satisfy the requirement.
-        @{ Name = 'Pester'; Version = '5.9.0'; UpperBound = '6.0.0' }
+        @{ Name = 'PSScriptAnalyzer'; Version = '1.25.0' },
+        # The selected Pester 6 range excludes the next major until separately validated (issue #1082).
+        @{ Name = 'Pester'; Version = '6.2.0'; UpperBound = '7.0.0' }
     )
 
     # Issue #953 (CR-3): one version-range predicate serves the present check and the post-install check.
