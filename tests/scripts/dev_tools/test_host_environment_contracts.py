@@ -72,26 +72,43 @@ def test_verifier_uses_repository_relative_predicate_and_selected_configuration(
     assert "container_tool_version_supported python" in source
 
 
-def test_local_workspace_mounts_and_docker_feature_are_preserved() -> None:
-    """The tooling update retains local workspace/data volumes and Docker access."""
+def test_local_workspace_uses_live_source_and_isolated_linux_dependencies() -> None:
+    """Local source stays current while dependency mounts never copy host packages."""
     config = cast(
         "dict[str, object]", json.loads(_text(".devcontainer/local/devcontainer.json"))
     )
     assert config["workspaceFolder"] == "/workspaces/drm-copilot"
     assert config["workspaceMount"] == (
-        "source=${localWorkspaceFolderBasename}-workspace,"
-        "target=/workspaces/drm-copilot,type=volume"
+        "source=${localWorkspaceFolder},"
+        "target=/workspaces/drm-copilot,type=bind,consistency=cached"
     )
     assert config["mounts"] == [
-        "source=${localWorkspaceFolder},target=/workspaces/drm-copilot-host,type=bind,consistency=cached,readonly",
-        "source=${localWorkspaceFolder}/artifacts,target=/workspaces/drm-copilot/artifacts,type=bind,consistency=cached",
+        "source=${localWorkspaceFolderBasename}-local-venv,target=/workspaces/drm-copilot/.venv,type=volume,volume-nocopy",
+        "source=${localWorkspaceFolderBasename}-local-node-modules,target=/workspaces/drm-copilot/node_modules,type=volume,volume-nocopy",
+        "source=${localWorkspaceFolderBasename}-local-extension-node-modules,target=/workspaces/drm-copilot/extensions/drm-copilot/node_modules,type=volume,volume-nocopy",
+        "source=${localWorkspaceFolderBasename}-local-mcp-node-modules,target=/workspaces/drm-copilot/packages/mcp-server/node_modules,type=volume,volume-nocopy",
         "source=${localWorkspaceFolderBasename}-workspace-bg,target=/workspaces/drm-copilot-bg,type=volume",
-        "source=${localWorkspaceFolder}/data,target=/workspaces/drm-copilot/data,type=bind,consistency=cached",
     ]
     features = cast("dict[str, object]", config["features"])
     assert features["ghcr.io/devcontainers/features/docker-outside-of-docker:1"] == {
         "version": "latest"
     }
+
+
+@pytest.mark.parametrize("environment", ["local", "codespaces"])
+def test_containers_share_setup_and_verify_before_reporting_success(
+    environment: str,
+) -> None:
+    """Neither environment can report setup complete before checking runtime pins."""
+    config = cast(
+        "dict[str, object]",
+        json.loads(_text(f".devcontainer/{environment}/devcontainer.json")),
+    )
+    assert config["postCreateCommand"] == "bash .devcontainer/post-create.sh"
+    source = _text(".devcontainer/post-create.sh")
+    assert source.index("bash .devcontainer/verify-container.sh") < source.index(
+        "Dev Container Setup Complete!"
+    )
 
 
 def test_codespaces_resources_and_features_are_preserved() -> None:

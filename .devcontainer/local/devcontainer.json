@@ -81,9 +81,7 @@
             "path": "/bin/bash"
           },
           "pwsh": {
-            "args": [
-              "-NoLogo"
-            ],
+            "args": ["-NoLogo"],
             "icon": "terminal-powershell",
             "path": "/usr/bin/pwsh"
           }
@@ -104,14 +102,15 @@
     }
   },
   "mounts": [
-    "source=${localWorkspaceFolder},target=/workspaces/drm-copilot-host,type=bind,consistency=cached,readonly",
-    "source=${localWorkspaceFolder}/artifacts,target=/workspaces/drm-copilot/artifacts,type=bind,consistency=cached",
-    "source=${localWorkspaceFolderBasename}-workspace-bg,target=/workspaces/drm-copilot-bg,type=volume",
-    "source=${localWorkspaceFolder}/data,target=/workspaces/drm-copilot/data,type=bind,consistency=cached"
+    "source=${localWorkspaceFolderBasename}-local-venv,target=/workspaces/drm-copilot/.venv,type=volume,volume-nocopy",
+    "source=${localWorkspaceFolderBasename}-local-node-modules,target=/workspaces/drm-copilot/node_modules,type=volume,volume-nocopy",
+    "source=${localWorkspaceFolderBasename}-local-extension-node-modules,target=/workspaces/drm-copilot/extensions/drm-copilot/node_modules,type=volume,volume-nocopy",
+    "source=${localWorkspaceFolderBasename}-local-mcp-node-modules,target=/workspaces/drm-copilot/packages/mcp-server/node_modules,type=volume,volume-nocopy",
+    "source=${localWorkspaceFolderBasename}-workspace-bg,target=/workspaces/drm-copilot-bg,type=volume"
   ],
   "name": "DRM Copilot Dev Container",
-  "postCreateCommand": "bash -lc 'set -euo pipefail; bash /workspaces/drm-copilot-host/.devcontainer/local/seed-workspace.sh /workspaces/drm-copilot-host /workspaces/drm-copilot; cd /workspaces/drm-copilot; bash .devcontainer/post-create.sh'",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteUser": "vscode",
   "workspaceFolder": "/workspaces/drm-copilot",
-  "workspaceMount": "source=${localWorkspaceFolderBasename}-workspace,target=/workspaces/drm-copilot,type=volume"
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/drm-copilot,type=bind,consistency=cached"
 }

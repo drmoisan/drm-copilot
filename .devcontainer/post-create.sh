@@ -24,46 +24,20 @@ cd "$WORKSPACE_DIR"
 export WORKSPACE_DIR
 echo "Workspace directory: $WORKSPACE_DIR"
 
+# Docker Desktop exposes the host checkout as root-owned to the container user.
+# Trust only this workspace so Git works for setup, terminals, and extensions.
+if ! git config --global --get-all safe.directory | grep -Fxq "$WORKSPACE_DIR"; then
+	git config --global --add safe.directory "$WORKSPACE_DIR"
+fi
+
 # -----------------------------------------------------------------------------
-# Remove stale data subdirectories that can linger on the named workspace volume
+# Prepare container-owned dependency volumes without changing host dependencies
 # -----------------------------------------------------------------------------
-# The workspace lives on a named Docker volume for performance. Because we seed
-# the volume from the host with exclusions (notably the entire data/ tree),
-# old container-only folders under data/ can persist across rebuilds. These
-# stale directories (e.g., data/gutenberg, data/sets) do not exist on the host
-# and should not remain inside the container. Clean them here unless they are
-# active mount points.
-echo ""
-echo "Cleaning stale data directories..."
-STALE_DATA_DIRS=(
-	"$WORKSPACE_DIR/data/gutenberg"
-	"$WORKSPACE_DIR/data/sets"
-)
-
-is_mount_point() {
-	local target="$1"
-	# Prefer mountpoint when available; fall back to /proc/self/mounts grep.
-	if command -v mountpoint >/dev/null 2>&1; then
-		mountpoint -q "$target" && return 0
-		return 1
-	fi
-
-	# Fallback: exact path match in mount table
-	if grep -E "[[:space:]]${target//\//\\/}[[:space:]]" /proc/self/mounts >/dev/null 2>&1; then
-		return 0
-	fi
-	return 1
-}
-
-for dir in "${STALE_DATA_DIRS[@]}"; do
-	if [ -d "$dir" ]; then
-		if is_mount_point "$dir"; then
-			echo "Skipping $dir (mounted)"
-			continue
-		fi
-
-		echo "Removing stale directory: $dir"
-		rm -rf "$dir"
+# Docker creates empty named volumes as root; only their mount roots need ownership.
+# Codespaces has no dependency mounts, so it uses the same setup without this step.
+for dependency_dir in .venv node_modules extensions/drm-copilot/node_modules packages/mcp-server/node_modules; do
+	if mountpoint -q "$dependency_dir"; then
+		sudo chown "$(id -u):$(id -g)" "$dependency_dir"
 	fi
 done
 
@@ -163,7 +137,12 @@ poetry config virtualenvs.in-project true --local
 # If the venv exists but is clearly broken, recreate it
 if [ -d ".venv" ] && [ ! -x ".venv/bin/python" ]; then
 	echo "Detected broken .venv; removing and recreating..."
-	rm -rf .venv
+	# Keep the mount itself so recovery also works for a fresh dependency volume.
+	if mountpoint -q .venv; then
+		find .venv -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+	else
+		rm -rf .venv
+	fi
 fi
 
 if [ -f "poetry.lock" ]; then
@@ -320,6 +299,9 @@ fi
 # -----------------------------------------------------------------------------
 # Completion banner
 # -----------------------------------------------------------------------------
+# A successful dependency install must also satisfy the pinned runtime contract.
+bash .devcontainer/verify-container.sh
+
 echo ""
 echo "==================================="
 echo "Dev Container Setup Complete!"

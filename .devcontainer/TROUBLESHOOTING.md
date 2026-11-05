@@ -186,10 +186,11 @@ Add to devcontainer.json:
 - Task Explorer is removed from the allow list; ensure it is not installed in the container.
 
 **Keep artifacts off the code workspace**
-- Use the dedicated bind mount `/workspaces/lexile-artifacts` (host `${localWorkspaceFolder}/../lexile-artifacts`) for large data to reduce directory walks inside the code workspace.
+- Keep large data out of source directories and exclude artifact directories from workspace scans.
 
 **Keep workspace on a fast path**
-- Workspace now lives on a named volume to avoid host bind latency. A read-only host bind seeds the volume from the host's committed history on first create. The volume survives a rebuild; a rebuild fast-forwards a clean volume on the same branch and otherwise prints a warning naming the volume and host commits. To start fresh, delete the `drm-copilot-workspace` volume and rebuild. Prefer WSL2 backend for Docker Desktop.
+- Local Docker mounts the host checkout directly, while Linux volumes hold `.venv` and all three `node_modules` directories. Host edits are visible without rebuilding. Prefer the WSL2 backend and a checkout in the WSL filesystem for faster source I/O.
+- The old `drm-copilot-workspace` volume is no longer used. Recover container-only changes from it before removing it.
 
 **Rebuild after config changes**
 - `F1 → Dev Containers: Rebuild Container` to ensure extension set and mounts are applied.

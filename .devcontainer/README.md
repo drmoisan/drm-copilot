@@ -72,17 +72,21 @@ This directory contains the Docker Dev Container configuration for the DRM Copil
 - ChatGPT, GitHub Actions
 
 ### Mounts and Storage Layout
-- Workspace stored on a named volume: `${localWorkspaceFolderBasename}-workspace -> /workspaces/drm-copilot`
+- Local workspace bind mount: `${localWorkspaceFolder} -> /workspaces/drm-copilot`; host edits and uncommitted changes are immediately available inside the container
 - Dedicated background worktree volume: `${localWorkspaceFolderBasename}-workspace-bg -> /workspaces/drm-copilot-bg` (used by background tasks)
-- Host workspace mounted read-only at `/workspaces/drm-copilot-host`; `local/seed-workspace.sh` checks out the host's committed branch into the volume on first create and fast-forwards a clean volume on rebuild (untracked host content such as `node_modules` and `.venv` is never copied)
-- Dedicated artifact bind mount: `${localWorkspaceFolder}/../drm-artifacts -> /workspaces/drm-artifacts` (keeps large data outside the scanned code workspace)
-- Docker socket bind: `/var/run/docker.sock -> /var/run/docker.sock`
+- Local Linux dependency volumes cover `.venv` and each `node_modules` directory (root, extension, MCP server). `volume-nocopy` prevents Windows dependencies from entering these volumes
+- `artifacts/` and `data/` use the workspace bind mount directly
+- The Docker outside-of-Docker feature provides access to the host Docker daemon
+
+Both configurations run `bash .devcontainer/post-create.sh` against their actual workspace. Setup installs the lock-file dependencies and runs `.devcontainer/verify-container.sh` before reporting completion.
+
+The former `${localWorkspaceFolderBasename}-workspace` volume is no longer used. It is retained so any container-only work can be recovered before removal.
 
 ## Container Features
 
 ### Virtual Environment
-Poetry creates a virtual environment at `/workspace/.venv` which is:
-- Mounted from your local `.venv` folder for persistence
+Poetry creates a virtual environment at `/workspaces/drm-copilot/.venv` which is:
+- Stored in a dedicated Linux volume locally, separate from the host environment
 - Automatically activated in the terminal
 - Configured as the default Python interpreter
 
@@ -143,9 +147,9 @@ The container does **not** include secrets. To use OpenAI API:
 - Check extension compatibility with container architecture
 
 ### Performance issues on Windows
-- The workspace now lives on a named volume to avoid host bind latency; a read-only host bind is used only to seed the volume from committed history and to fast-forward a clean volume on rebuild
-- Ensure Docker Desktop uses the WSL 2 backend; keep host-side edits in sync by rebuilding the container if you need a fresh copy from the host
-- Keep large artifacts under `/workspaces/lexile-artifacts` instead of inside the code volume
+- Dependency directories use Linux volumes to reduce package I/O across the Windows bind mount
+- Use the WSL 2 backend. For faster source I/O, open a checkout stored in the WSL filesystem
+- Host edits are visible immediately; rebuild after Dockerfile or mount changes
 - Avoid aggressive workspace scanners (Task Explorer removed from allow list)
 
 ## Benefits Over Local Development
