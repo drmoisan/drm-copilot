@@ -81,6 +81,11 @@ Describe 'I/O seams without side effects' {
 
         Test-Path -LiteralPath $target | Should -BeFalse
     }
+
+    It 'returns the last native exit code' {
+        # Reads $LASTEXITCODE without assigning it, so no global state changes.
+        Get-EpicProgressLastExitCode | Should -Be $LASTEXITCODE
+    }
 }
 
 Describe 'Invoke-EpicProgressReport' {
@@ -199,6 +204,30 @@ Describe 'Invoke-EpicProgressReport' {
             $script:stateWrites.Add([pscustomobject]@{ Path = $Path; Content = $Content })
         }
         Mock Get-EpicProgressUtcNow { return $script:fixedNow }
+        # The fetch exit code comes from the fixture, never from the ambient $LASTEXITCODE.
+        $script:fetchExitCode = 0
+        Mock Get-EpicProgressLastExitCode { return $script:fetchExitCode }
+    }
+
+    It 'warns when git fetch fails' {
+        $script:fetchExitCode = 128
+        $arguments = $script:reportParameter.Clone()
+        $arguments['Mode'] = 'TLDR'
+
+        $lines = @(Invoke-EpicProgressReport @arguments -WarningVariable fetchWarnings -WarningAction SilentlyContinue)
+
+        @($fetchWarnings).Count | Should -Be 1
+        "$($fetchWarnings[0])" | Should -BeLike 'git fetch -q origin failed with exit code 128;*'
+        ($lines -join "`n") | Should -Be ($script:expectedTldr -join "`n")
+    }
+
+    It 'does not warn when git fetch succeeds' {
+        $arguments = $script:reportParameter.Clone()
+        $arguments['Mode'] = 'TLDR'
+
+        $null = Invoke-EpicProgressReport @arguments -WarningVariable fetchWarnings -WarningAction SilentlyContinue
+
+        @($fetchWarnings).Count | Should -Be 0
     }
 
     It 'prints the four TL;DR lines in TLDR mode' {

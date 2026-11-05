@@ -302,6 +302,18 @@ function Get-EpicProgressUtcNow {
     return [datetime]::UtcNow
 }
 
+function Get-EpicProgressLastExitCode {
+    <#
+    .SYNOPSIS
+        Return the exit code of the most recent native command ($LASTEXITCODE).
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param()
+
+    return $LASTEXITCODE
+}
+
 function Invoke-EpicProgressReport {
     <#
     .SYNOPSIS
@@ -311,7 +323,9 @@ function Invoke-EpicProgressReport {
         and 'show <IntegrationBranch>:<path>'; runs 'gh pr list' only when gh is installed
         and 'cswap list --json' only when cswap is installed; treats an unparseable
         checkpoint or state file as empty; writes the state file only when the sample set
-        changed. Returns the TL;DR lines, followed by the Full lines unless Mode is TLDR.
+        changed. When 'git fetch -q origin' exits with a non-zero code, writes a warning
+        naming the code and continues with the last fetched state of the integration branch.
+        Returns the TL;DR lines, followed by the Full lines unless Mode is TLDR.
     .PARAMETER EpicFolder
         The epic folder name; also the epic name in the status heading.
     .PARAMETER StartUtc
@@ -359,6 +373,10 @@ function Invoke-EpicProgressReport {
 
     $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -TempRoot ([System.IO.Path]::GetTempPath()) -CurrentLocation (Get-Location).ProviderPath
     $null = Invoke-GitExe -GitArgs @('fetch', '-q', 'origin')
+    $fetchExitCode = Get-EpicProgressLastExitCode
+    if ($fetchExitCode -ne 0) {
+        Write-Warning "git fetch -q origin failed with exit code $fetchExitCode; the report uses the last fetched state of $($setting.IntegrationBranch)."
+    }
     $worktreeLines = @(Invoke-GitExe -GitArgs @('worktree', 'list', '--porcelain'))
     $worktreeOf = ConvertFrom-EpicProgressWorktreeList -PorcelainLine $worktreeLines
     $kickoffText = @(Invoke-GitExe -GitArgs @('show', "$($setting.IntegrationBranch):$($setting.KickoffPath)")) -join "`n"
