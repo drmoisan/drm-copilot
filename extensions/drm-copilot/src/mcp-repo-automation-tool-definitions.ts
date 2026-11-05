@@ -31,6 +31,13 @@ export interface ToolDefinition {
     readonly required?: ReadonlyArray<string>;
     readonly additionalProperties: false;
   };
+  /** MCP tool annotations; untrusted hints for clients (issue #1036). */
+  readonly annotations?: {
+    readonly readOnlyHint?: boolean;
+    readonly destructiveHint?: boolean;
+    readonly idempotentHint?: boolean;
+    readonly openWorldHint?: boolean;
+  };
 }
 
 export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
