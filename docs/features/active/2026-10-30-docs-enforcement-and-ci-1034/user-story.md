@@ -65,7 +65,7 @@ Epic criteria:
 - [x] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
 - [x] `surface-delta` reports an added CLI command with no ledger change and reports nothing when the ledger records it.
 - [x] The workflow template requires `pwsh` only.
-- [ ] Mirror parity checks pass for the edited `feature-review` surfaces.
+- [x] Mirror parity checks pass for the edited `feature-review` surfaces.
 
 Story criteria (consistent with `spec.md` `## Acceptance Criteria`):
 
