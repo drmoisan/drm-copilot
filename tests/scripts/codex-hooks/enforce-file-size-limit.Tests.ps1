@@ -281,6 +281,11 @@ Describe 'Codex enforce-file-size-limit.ps1' {
         }
 
         It 'denies an Update when the reconstruction call yields no record for the patched path' {
+            # Parse the initial record normally; only reconstruction returns no record.
+            $initialParser = (Get-Command ConvertTo-CodexFileEditInput -CommandType Function).ScriptBlock
+            Mock ConvertTo-CodexFileEditInput -ParameterFilter { -not $ResolveUpdateContent } -MockWith {
+                & $initialParser @PesterBoundParameters
+            }
             Mock ConvertTo-CodexFileEditInput { @() } -ParameterFilter { $ResolveUpdateContent }
             $payload = ConvertTo-CodexFileSizePatchPayload -Patch "*** Begin Patch`n*** Update File: src/app.ts`n@@`n+x`n*** End Patch"
 

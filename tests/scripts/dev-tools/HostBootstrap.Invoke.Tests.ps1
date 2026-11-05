@@ -137,7 +137,7 @@ Describe 'Invoke-BootstrapHost' {
                 $actual | Should -Contain "- Would install $($pkg.name) using winget id '$($pkg.id)'"
             }
             @($actual | Where-Object { $_ -like '- Would install * using winget id *' }).Count | Should -Be @($script:CommittedManifest.installPackages.windows.winget).Count
-            $actual | Should -Contain '- Would install PowerShell modules: Pester 5.9.0, PSScriptAnalyzer 1.22.0'
+            $actual | Should -Contain '- Would install PowerShell modules: Pester 6.2.0, PSScriptAnalyzer 1.25.0'
             $actual[-1] | Should -BeExactly 'Dry run complete. Re-run with -Apply to install tools.'
         }
 
@@ -161,7 +161,7 @@ Describe 'Invoke-BootstrapHost' {
                 }
             }
             Should -Invoke Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
-                $MinimumVersion -eq '2.3.2' -and -not $ApplyMode
+                $MinimumVersion -eq '2.5.1' -and -not $ApplyMode
             }
         }
     }

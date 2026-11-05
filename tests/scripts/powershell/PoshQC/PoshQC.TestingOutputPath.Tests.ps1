@@ -21,7 +21,7 @@ BeforeAll {
     $script:SettingsTable = @{
         Run          = @{ Path = @('tests') }
         TestResult   = @{ Enabled = $true; OutputFormat = 'JUnitXml'; OutputPath = 'artifacts/pester/pester-junit.xml' }
-        CodeCoverage = @{ Enabled = $true; OutputFormat = 'CoverageGutters'; OutputPath = 'artifacts/pester/powershell-coverage.xml' }
+        CodeCoverage = @{ Enabled = $true; OutputFormat = 'JaCoCo'; OutputPath = 'artifacts/pester/powershell-coverage.xml' }
     }
 
     # Returns the splat of every Invoke-PoshQCTest seam. BuildConfiguration returns a real Pester

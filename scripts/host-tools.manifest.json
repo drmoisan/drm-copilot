@@ -31,9 +31,9 @@
   },
   "minimumVersions": {
     "node": "26.13.0",
-    "poetry": "2.3.2",
+    "poetry": "2.5.1",
     "pwsh": "7.6.9",
-    "python": "3.13.17"
+    "python": "3.13.18"
   },
   "optionalCommands": [
     "wsl",
@@ -46,11 +46,11 @@
   ],
   "powershellModules": [
     {
-      "minimumVersion": "5.9.0",
+      "minimumVersion": "6.2.0",
       "name": "Pester"
     },
     {
-      "minimumVersion": "1.22.0",
+      "minimumVersion": "1.25.0",
       "name": "PSScriptAnalyzer"
     }
   ],

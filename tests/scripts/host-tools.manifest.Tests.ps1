@@ -52,8 +52,8 @@ Describe 'host-tools.manifest.json shape' {
     It 'AC02-MINIMUM-VERSIONS-PINNED pins python, poetry, pwsh, and node and each casts to version' {
         # Arrange
         $expected = [ordered]@{
-            python = '3.13.17'
-            poetry = '2.3.2'
+            python = '3.13.18'
+            poetry = '2.5.1'
             pwsh   = '7.6.9'
             node   = '26.13.0'
         }
@@ -68,7 +68,7 @@ Describe 'host-tools.manifest.json shape' {
         }
     }
 
-    It 'AC03-POWERSHELL-MODULES-PINNED lists Pester 5.9.0 and PSScriptAnalyzer 1.22.0' {
+    It 'AC03-POWERSHELL-MODULES-PINNED lists Pester 6.2.0 and PSScriptAnalyzer 1.25.0' {
         # Arrange
         $modules = @($script:Manifest.powershellModules)
 
@@ -78,9 +78,9 @@ Describe 'host-tools.manifest.json shape' {
 
         # Assert
         $pester.Count | Should -Be 1
-        $pester[0].minimumVersion | Should -BeExactly '5.9.0'
+        $pester[0].minimumVersion | Should -BeExactly '6.2.0'
         $analyzer.Count | Should -Be 1
-        $analyzer[0].minimumVersion | Should -BeExactly '1.22.0'
+        $analyzer[0].minimumVersion | Should -BeExactly '1.25.0'
     }
 
     It 'AC04-ENTRY-SHAPES has non-empty winget id and name, an empty projectRepositories array, and non-empty command strings' {
@@ -118,21 +118,21 @@ Describe 'HostVerification sections over the committed manifest' {
             param([string]$Command, [string[]]$VersionArgs)
             $null = $VersionArgs
             switch ($Command) {
-                'python' { [version]'3.13.17' }
+                'python' { [version]'3.13.18' }
                 'pwsh' { [version]'7.6.9' }
                 'node' { [version]'26.13.0' }
                 default { $null }
             }
         }
         Mock -CommandName Get-PoetryVersionInfo -ModuleName HostVerification -MockWith {
-            [pscustomobject]@{ IsAvailable = $true; Version = [version]'2.3.2'; Source = 'poetry' }
+            [pscustomobject]@{ IsAvailable = $true; Version = [version]'2.5.1'; Source = 'poetry' }
         }
         Mock -CommandName Get-Module -ModuleName HostVerification -MockWith {
             param([string[]]$Name)
             $moduleName = @($Name)[0]
             switch ($moduleName) {
-                'Pester' { [pscustomobject]@{ Name = $moduleName; Version = [version]'5.9.0' } }
-                'PSScriptAnalyzer' { [pscustomobject]@{ Name = $moduleName; Version = [version]'1.22.0' } }
+                'Pester' { [pscustomobject]@{ Name = $moduleName; Version = [version]'6.2.0' } }
+                'PSScriptAnalyzer' { [pscustomobject]@{ Name = $moduleName; Version = [version]'1.25.0' } }
                 default { $null }
             }
         }

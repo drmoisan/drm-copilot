@@ -16,17 +16,32 @@
 #>
 
 Describe 'enforce-parallel-cohort-barrier.ps1' {
+
+    BeforeEach {
+        # Restore only committed-fixture reads for this test; other paths retain the null baseline.
+        Mock Get-ParallelCohortBarrierCheckpointContent -MockWith {
+            if ($Path -notlike "/synthetic-worktrees/*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_b0a0a398_GetParallelCohortBarrierCheckpointContent @PesterBoundParameters
+        }
+    }
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-cohort-barrier.ps1").Path
         . $script:UnderTest
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        # Capture the committed-fixture reader while retaining the null isolation baseline.
+        $script:FixtureReader_b0a0a398_GetParallelCohortBarrierCheckpointContent = (Get-Command -Name Get-ParallelCohortBarrierCheckpointContent -CommandType Function).ScriptBlock
         Mock Get-ParallelCohortBarrierCheckpointContent -ParameterFilter { $Path -notlike "/synthetic-worktrees/*" } -MockWith { $null }
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
         Mock Resolve-ParallelCohortBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
+    }
+
+    AfterAll {
+        # The hook replaces the run module; discard only the stale fixture-owned scope binding.
+        Reset-EpicStateProbeModuleBinding
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }

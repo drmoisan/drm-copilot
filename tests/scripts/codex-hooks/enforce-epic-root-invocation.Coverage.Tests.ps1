@@ -76,6 +76,13 @@ Describe 'Codex enforce-epic-root-invocation coverage (issue #786)' {
         }
 
         It 'reads the transcript-keyed attestation and allows valid provenance' {
+            # Bootstrap dependencies remain real; only attestation state is supplied by the fixture.
+            Mock Get-CodexAuthorityStateRoot { '/synthetic-root/state' } -ParameterFilter { $SessionId -eq 's-786' }
+            $originalTestPath = Get-Command Test-Path -CommandType Cmdlet
+            Mock Test-Path { & $originalTestPath @PesterBoundParameters } -ParameterFilter {
+                ([string]$LiteralPath).Replace('\', '/') -match '/\.codex/.*\.ps[dm]?1$' -or
+                ([string]$Path).Replace('\', '/') -match '/\.codex/.*\.ps[dm]?1$'
+            }
             Mock Test-Path { $true } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
             Mock Get-Content { '{"agent_type":"epic-planner","provenance_valid":true}' } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
             $result = Invoke-RootInvocationEntry -Stdin '{"session_id":"s-786","transcript_path":"/synthetic-root/t.jsonl","agent_type":"epic-planner"}'

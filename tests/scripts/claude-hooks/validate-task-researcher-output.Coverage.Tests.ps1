@@ -155,7 +155,12 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 2 with the validate-task-researcher-output: prefix when subagentstop-envelope.ps1 fails to load' -Tag 'E3-Entry' {
         # Arrange: only the helper dot-source fails; the dependency guard loads normally.
-        Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'subagentstop-envelope.ps1') { throw 'simulated load failure: subagentstop-envelope.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $script:ResearchPath"
         # Act
         try { $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin }

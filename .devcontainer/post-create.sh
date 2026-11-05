@@ -24,48 +24,15 @@ cd "$WORKSPACE_DIR"
 export WORKSPACE_DIR
 echo "Workspace directory: $WORKSPACE_DIR"
 
+# Resolve helpers from the selected workspace rather than the shell's starting directory.
+# shellcheck source=.devcontainer/lib/workspace.sh
+source "$WORKSPACE_DIR/.devcontainer/lib/workspace.sh"
+trust_workspace_git "$WORKSPACE_DIR"
+
 # -----------------------------------------------------------------------------
-# Remove stale data subdirectories that can linger on the named workspace volume
+# Prepare container-owned dependency volumes without changing host dependencies
 # -----------------------------------------------------------------------------
-# The workspace lives on a named Docker volume for performance. Because we seed
-# the volume from the host with exclusions (notably the entire data/ tree),
-# old container-only folders under data/ can persist across rebuilds. These
-# stale directories (e.g., data/gutenberg, data/sets) do not exist on the host
-# and should not remain inside the container. Clean them here unless they are
-# active mount points.
-echo ""
-echo "Cleaning stale data directories..."
-STALE_DATA_DIRS=(
-	"$WORKSPACE_DIR/data/gutenberg"
-	"$WORKSPACE_DIR/data/sets"
-)
-
-is_mount_point() {
-	local target="$1"
-	# Prefer mountpoint when available; fall back to /proc/self/mounts grep.
-	if command -v mountpoint >/dev/null 2>&1; then
-		mountpoint -q "$target" && return 0
-		return 1
-	fi
-
-	# Fallback: exact path match in mount table
-	if grep -E "[[:space:]]${target//\//\\/}[[:space:]]" /proc/self/mounts >/dev/null 2>&1; then
-		return 0
-	fi
-	return 1
-}
-
-for dir in "${STALE_DATA_DIRS[@]}"; do
-	if [ -d "$dir" ]; then
-		if is_mount_point "$dir"; then
-			echo "Skipping $dir (mounted)"
-			continue
-		fi
-
-		echo "Removing stale directory: $dir"
-		rm -rf "$dir"
-	fi
-done
+prepare_dependency_mounts "$WORKSPACE_DIR"
 
 # -----------------------------------------------------------------------------
 # Fix Docker socket permissions
@@ -161,10 +128,7 @@ echo "Installing Python dependencies with Poetry..."
 poetry config virtualenvs.in-project true --local
 
 # If the venv exists but is clearly broken, recreate it
-if [ -d ".venv" ] && [ ! -x ".venv/bin/python" ]; then
-	echo "Detected broken .venv; removing and recreating..."
-	rm -rf .venv
-fi
+reset_broken_workspace_venv "$WORKSPACE_DIR"
 
 if [ -f "poetry.lock" ]; then
 	echo "poetry.lock found; installing locked dependencies..."
@@ -194,6 +158,23 @@ poetry run black --version
 poetry run ruff --version
 poetry run pyright --version
 poetry run pytest --version
+
+# -----------------------------------------------------------------------------
+# Node.js dependencies
+# -----------------------------------------------------------------------------
+# The three npm projects are independent (no npm workspaces, no file: links), so
+# each lock file is installed separately. npm ci replaces any existing
+# node_modules, which also removes trees copied from a Windows host.
+echo ""
+echo "Installing Node.js dependencies..."
+for npm_project in . extensions/drm-copilot packages/mcp-server; do
+	if [ -f "$npm_project/package-lock.json" ]; then
+		echo "npm ci in $npm_project"
+		(cd "$npm_project" && npm ci --no-audit --no-fund)
+	else
+		echo "Skipping $npm_project (no package-lock.json)"
+	fi
+done
 
 # -----------------------------------------------------------------------------
 # GitHub Copilot CLI verification
@@ -241,8 +222,8 @@ echo "Ensuring PowerShell QC dependencies..."
 pwsh -NoLogo -NoProfile -Command - <<'PWSH'
 $ErrorActionPreference = 'Stop'
 $required = @(
-    @{ Name = 'PSScriptAnalyzer'; Version = '1.22.0' },
-    @{ Name = 'Pester'; Version = '5.9.0'; UpperBound = '6.0.0' }
+    @{ Name = 'PSScriptAnalyzer'; Version = '1.25.0' },
+    @{ Name = 'Pester'; Version = '6.2.0'; UpperBound = '7.0.0' }
 )
 
 $gallery = Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
@@ -293,9 +274,10 @@ PWSH
 # -----------------------------------------------------------------------------
 # Git configuration reminder
 # -----------------------------------------------------------------------------
-if [ ! -f ~/.gitconfig ]; then
+# Workspace trust creates a global config; verify identity values independently.
+if ! git config user.name >/dev/null 2>&1 || ! git config user.email >/dev/null 2>&1; then
 	echo ""
-	echo "Git configuration not found. You may want to run:"
+	echo "Git identity is incomplete. Configure missing values with:"
 	echo "  git config --global user.name 'Your Name'"
 	echo "  git config --global user.email 'your.email@example.com'"
 fi
@@ -303,6 +285,9 @@ fi
 # -----------------------------------------------------------------------------
 # Completion banner
 # -----------------------------------------------------------------------------
+# A successful dependency install must also satisfy the pinned runtime contract.
+bash .devcontainer/verify-container.sh
+
 echo ""
 echo "==================================="
 echo "Dev Container Setup Complete!"

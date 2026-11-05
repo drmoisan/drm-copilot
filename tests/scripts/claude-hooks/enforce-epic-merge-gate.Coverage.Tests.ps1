@@ -4,9 +4,9 @@
     Entry-point coverage for .claude/hooks/enforce-epic-merge-gate.ps1 (issue #786).
 
 .DESCRIPTION
-    Runs the gate through the & route with a non-merge Bash payload on stdin (restored in
-    finally), so the tail after the dependency checks, including the final exit statement,
-    executes in-process. No test creates, renames, moves, or deletes a file.
+    Runs the gate through the & route with a non-merge Bash payload supplied by the shared-reader
+    seam, so the tail after the dependency checks, including the final exit statement, executes
+    in-process without relying on a physical console. No test creates, renames, moves, or deletes a file.
 #>
 
 Describe 'enforce-epic-merge-gate entry point (issue #786)' {
@@ -27,19 +27,20 @@ Describe 'enforce-epic-merge-gate entry point (issue #786)' {
     It 'exits 0 without a deny for a command that is not a merge' {
         # Arrange: a Bash payload outside the gate's trigger scope.
         $payload = '{"session_id":"c-786","hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git status"}}'
-        $priorIn = [System.Console]::In
+        Mock Read-ClaudeHookRawPayload { $payload }
+        $priorExitCode = $global:LASTEXITCODE
         try {
-            [System.Console]::SetIn([System.IO.StringReader]::new($payload))
             $global:LASTEXITCODE = 0
             # Act
             $stdout = @(& $script:Hook)
             $exitCode = $LASTEXITCODE
         }
         finally {
-            [System.Console]::SetIn($priorIn)
+            $global:LASTEXITCODE = $priorExitCode
         }
         # Assert
         $exitCode | Should -Be 0
         (($stdout | ForEach-Object { [string]$_ }) -join "`n") | Should -Not -Match '"permissionDecision":"deny"'
+        Should -Invoke Read-ClaudeHookRawPayload -Times 1 -Exactly
     }
 }
