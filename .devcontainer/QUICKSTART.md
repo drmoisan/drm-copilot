@@ -77,7 +77,7 @@ Ctrl+` or Terminal → New Terminal
 
 ### What Persists
 - Your workspace files live on a named volume (`${localWorkspaceFolderBasename}-workspace` at `/workspaces/drm-copilot`)
-- A read-only host bind (`/workspaces/drm-copilot-host`) is used only to seed the volume on first create; `.venv`, `artifacts`, and `data` are excluded from the seed to avoid long copies. Rebuild the container if you need to refresh from host.
+- A read-only host bind (`/workspaces/drm-copilot-host`) is used by `.devcontainer/local/seed-workspace.sh` to check out the host's current branch into the volume on first create. Only committed history is copied; untracked content (`node_modules`, `.venv`, `.claude/worktrees`) and uncommitted changes are not. The volume survives a rebuild: on a rebuild the script fast-forwards the volume to the host commit when the volume is clean and on the same branch, and otherwise prints a warning and leaves it unchanged. Delete the volume to start fresh.
 - Dedicated artifacts folder bound to host sibling path `${localWorkspaceFolder}/../lexile-artifacts` at `/workspaces/lexile-artifacts`
 - `.venv` folder (mounted from host)
 - Git configuration

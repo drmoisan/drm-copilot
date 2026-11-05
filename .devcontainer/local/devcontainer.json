@@ -110,7 +110,7 @@
     "source=${localWorkspaceFolder}/data,target=/workspaces/drm-copilot/data,type=bind,consistency=cached"
   ],
   "name": "DRM Copilot Dev Container",
-  "postCreateCommand": "bash -lc 'set -euo pipefail; sudo mkdir -p /workspaces/drm-copilot; sudo chown -R vscode:vscode /workspaces/drm-copilot; if [ ! -d /workspaces/drm-copilot/.git ] && [ -d /workspaces/drm-copilot-host ]; then tar -C /workspaces/drm-copilot-host --exclude=.venv --exclude=artifacts --exclude=data -cf - . | tar -C /workspaces/drm-copilot -xf -; fi; sudo chown -R vscode:vscode /workspaces/drm-copilot; bash .devcontainer/post-create.sh'",
+  "postCreateCommand": "bash -lc 'set -euo pipefail; bash /workspaces/drm-copilot-host/.devcontainer/local/seed-workspace.sh /workspaces/drm-copilot-host /workspaces/drm-copilot; cd /workspaces/drm-copilot; bash .devcontainer/post-create.sh'",
   "remoteUser": "vscode",
   "workspaceFolder": "/workspaces/drm-copilot",
   "workspaceMount": "source=${localWorkspaceFolderBasename}-workspace,target=/workspaces/drm-copilot,type=volume"

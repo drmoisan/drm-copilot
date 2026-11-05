@@ -189,7 +189,7 @@ Add to devcontainer.json:
 - Use the dedicated bind mount `/workspaces/lexile-artifacts` (host `${localWorkspaceFolder}/../lexile-artifacts`) for large data to reduce directory walks inside the code workspace.
 
 **Keep workspace on a fast path**
-- Workspace now lives on a named volume to avoid host bind latency. A read-only host bind seeds the volume on first create (excluding `.venv`, `artifacts`, and `data` to prevent long copies); rebuild the container if you need to refresh from host. Prefer WSL2 backend for Docker Desktop.
+- Workspace now lives on a named volume to avoid host bind latency. A read-only host bind seeds the volume from the host's committed history on first create. The volume survives a rebuild; a rebuild fast-forwards a clean volume on the same branch and otherwise prints a warning naming the volume and host commits. To start fresh, delete the `drm-copilot-workspace` volume and rebuild. Prefer WSL2 backend for Docker Desktop.
 
 **Rebuild after config changes**
 - `F1 → Dev Containers: Rebuild Container` to ensure extension set and mounts are applied.

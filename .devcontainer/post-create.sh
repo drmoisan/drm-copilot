@@ -196,6 +196,23 @@ poetry run pyright --version
 poetry run pytest --version
 
 # -----------------------------------------------------------------------------
+# Node.js dependencies
+# -----------------------------------------------------------------------------
+# The three npm projects are independent (no npm workspaces, no file: links), so
+# each lock file is installed separately. npm ci replaces any existing
+# node_modules, which also removes trees copied from a Windows host.
+echo ""
+echo "Installing Node.js dependencies..."
+for npm_project in . extensions/drm-copilot packages/mcp-server; do
+	if [ -f "$npm_project/package-lock.json" ]; then
+		echo "npm ci in $npm_project"
+		(cd "$npm_project" && npm ci --no-audit --no-fund)
+	else
+		echo "Skipping $npm_project (no package-lock.json)"
+	fi
+done
+
+# -----------------------------------------------------------------------------
 # GitHub Copilot CLI verification
 # -----------------------------------------------------------------------------
 echo ""

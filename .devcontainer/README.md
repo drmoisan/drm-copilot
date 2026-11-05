@@ -74,7 +74,7 @@ This directory contains the Docker Dev Container configuration for the DRM Copil
 ### Mounts and Storage Layout
 - Workspace stored on a named volume: `${localWorkspaceFolderBasename}-workspace -> /workspaces/drm-copilot`
 - Dedicated background worktree volume: `${localWorkspaceFolderBasename}-workspace-bg -> /workspaces/drm-copilot-bg` (used by background tasks)
-- Host workspace mounted read-only at `/workspaces/drm-copilot-host` for initial bootstrap copy into the volume on first create (excludes `.venv`, `artifacts`, `data` to avoid slow transfers)
+- Host workspace mounted read-only at `/workspaces/drm-copilot-host`; `local/seed-workspace.sh` checks out the host's committed branch into the volume on first create and fast-forwards a clean volume on rebuild (untracked host content such as `node_modules` and `.venv` is never copied)
 - Dedicated artifact bind mount: `${localWorkspaceFolder}/../drm-artifacts -> /workspaces/drm-artifacts` (keeps large data outside the scanned code workspace)
 - Docker socket bind: `/var/run/docker.sock -> /var/run/docker.sock`
 
@@ -143,7 +143,7 @@ The container does **not** include secrets. To use OpenAI API:
 - Check extension compatibility with container architecture
 
 ### Performance issues on Windows
-- The workspace now lives on a named volume to avoid host bind latency; a read-only host bind is only used to seed the volume on first create
+- The workspace now lives on a named volume to avoid host bind latency; a read-only host bind is used only to seed the volume from committed history and to fast-forward a clean volume on rebuild
 - Ensure Docker Desktop uses the WSL 2 backend; keep host-side edits in sync by rebuilding the container if you need a fresh copy from the host
 - Keep large artifacts under `/workspaces/lexile-artifacts` instead of inside the code volume
 - Avoid aggressive workspace scanners (Task Explorer removed from allow list)
