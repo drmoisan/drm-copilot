@@ -78,7 +78,7 @@ Story criteria (consistent with `spec.md` `## Acceptance Criteria`):
 - [x] The `surface-delta` row sits directly under the `# --- 900008: surface-delta ---` anchor, and the diff of the shared entry and init modules contains only added lines under the 900008 anchors (and the OQ-1 context members if assigned to this child).
 - [x] `init` plans `.github/workflows/_docs-quality.yml` without `-Write`, writes it with `-Write`, and refuses an existing destination without `-Force`; the template uses `shell: pwsh` for every step, runs `check` and `validate -Mode docs-complete` through `Invoke-DocsCommand.ps1`, and contains no Python, Node.js or linter step.
 - [x] `## Documentation Surface Check` is present in the procedure-bearing `feature-review` copies named in `spec.md` and each bundle copy is byte-identical; the delegating `feature-review` files are unchanged.
-- [ ] Every new `.claude/lib/docs/` file and the hook are listed once in the core pack manifest and byte-identical to their bundle copies, and the push-down resource, completeness, dependency-closure and Codex generator checks pass.
+- [x] Every new `.claude/lib/docs/` file and the hook are listed once in the core pack manifest and byte-identical to their bundle copies, and the push-down resource, completeness, dependency-closure and Codex generator checks pass.
 - [x] Pester line coverage is at least 85% for each new PowerShell production file, with no production file excluded from measurement.
 - [ ] No Python or TypeScript file is added or modified, and no test creates a temporary file.
 
