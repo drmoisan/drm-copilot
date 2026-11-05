@@ -319,6 +319,20 @@ Describe 'Get-EpicProgressRecentVelocityInterval' {
         $intervals[0] | Should -Be 2
     }
 
+    It 'counts a pair exactly two minutes apart' {
+        # 120 / 3600.0 and 2 / 60 are the same double, so this pair sits on the inclusive boundary.
+        $samples = @(
+            [pscustomobject]@{ ts = 0; done = 0 }
+            [pscustomobject]@{ ts = 120; done = 1 }
+        )
+
+        $intervals = @(Get-EpicProgressRecentVelocityInterval -Sample $samples)
+
+        $intervals.Count | Should -Be 1
+        $intervals[0] | Should -BeGreaterOrEqual (30 - 1e-9)
+        $intervals[0] | Should -BeLessOrEqual (30 + 1e-9)
+    }
+
     It 'clamps a negative interval rate to zero' {
         $samples = @(
             [pscustomobject]@{ ts = 0; done = 5 }
