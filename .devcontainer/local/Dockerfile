@@ -31,8 +31,26 @@ FROM mcr.microsoft.com/devcontainers/python:3.3.2-3.13-bookworm
 USER root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Keep the selected base's Python and Git; do not copy an older Python over it.
+# Versions. An ARG is scoped to the stage that declares it, so these must follow this FROM.
 ARG GIT_VERSION=2.56.0
+ARG NODE_VERSION=26.13.0
+ARG SHFMT_VERSION=3.14.1
+ARG SHELLCHECK_VERSION=0.11.0
+ARG POWERSHELL_VERSION=7.6.9
+ARG GH_VERSION=2.103.3
+ARG GRAPHITE_CLI_VERSION=1.7.14
+ARG CLAUDE_CODE_VERSION=2.1.318
+ARG CODEX_VERSION=0.166.0
+ARG UV_VERSION=0.13.7
+ARG CLAUDE_SWAP_VERSION=0.29.0
+ARG DOTNET_SDK_VERSION=10.0.403
+ARG POETRY_VERSION=2.5.1
+ARG PESTER_VERSION=6.2.0
+ARG PSSA_VERSION=1.25.0
+ARG ACTIONLINT_VERSION=1.7.12
+ARG COPILOT_CLI_VERSION=0.0.377
+
+# Keep the selected base's Python and Git; do not copy an older Python over it.
 ENV NVM_DIR="" \
     DOTNET_CLI_TELEMETRY_OPTOUT=1 \
     DOTNET_ROOT=/usr/share/dotnet \
@@ -82,7 +100,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && rm -rf /var/lib/apt/lists/*
 
 # Match the updated host development runtime; preserve independent consumer engine support.
-ARG NODE_VERSION=26.13.0
+
 RUN arch="$(dpkg --print-architecture)" \
     && case "$arch" in amd64) node_arch=x64 ;; arm64) node_arch=arm64 ;; *) exit 1 ;; esac \
     && curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz" \
@@ -93,14 +111,14 @@ RUN arch="$(dpkg --print-architecture)" \
 
 # Install shfmt at the version CI pins (.github/workflows/_shell-coverage.yml); the Bookworm
 # package is older and formats differently. Keep SHFMT_VERSION equal to the CI value.
-ARG SHFMT_VERSION=3.14.1
+
 RUN arch="$(dpkg --print-architecture)" \
     && wget -q -O /usr/local/bin/shfmt \
     "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_${arch}" \
     && chmod +x /usr/local/bin/shfmt
 
 # Bookworm's ShellCheck package is older than the development baseline.
-ARG SHELLCHECK_VERSION=0.11.0
+
 RUN arch="$(uname -m)" \
     && wget -q -O /tmp/shellcheck.tar.xz \
     "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${arch}.tar.xz" \
@@ -123,7 +141,7 @@ RUN printf '%s\n' '#!/usr/bin/env bash' 'exec xclip -selection clipboard "$@"' >
     && chmod +x /usr/local/bin/clip.exe
 
 # Use the verified Debian package version for the updated PowerShell baseline.
-ARG POWERSHELL_VERSION=7.6.9
+
 RUN wget -q https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb \
     && dpkg -i packages-microsoft-prod.deb \
     && rm packages-microsoft-prod.deb \
@@ -132,7 +150,7 @@ RUN wget -q https://packages.microsoft.com/config/debian/12/packages-microsoft-p
     && rm -rf /var/lib/apt/lists/*
 
 # Install GitHub CLI here so a floating devcontainer feature cannot change its pin.
-ARG GH_VERSION=2.103.3
+
 RUN arch="$(dpkg --print-architecture)" \
     && curl -fsSL -o /tmp/gh.deb \
     "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${arch}.deb" \
@@ -143,44 +161,41 @@ RUN arch="$(dpkg --print-architecture)" \
 
 # Install Graphite CLI for the Graphite VS Code extension.
 # Pinned for repeatable devcontainer builds.
-ARG GRAPHITE_CLI_VERSION=1.7.14
+
 RUN npm install -g "@withgraphite/graphite-cli@${GRAPHITE_CLI_VERSION}"
 
 # Install the Claude Code CLI, pinned to the version this repository's orchestration is run with.
 # Authenticate inside the container (claude, then /login); credentials are not baked into the image.
-ARG CLAUDE_CODE_VERSION=2.1.318
+
 RUN npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
 
 # Install claude-swap (the cswap account switcher), pinned. It requires Python 3.12 or newer.
-ARG CODEX_VERSION=0.166.0
+
 RUN npm install -g --include=optional "@openai/codex@${CODEX_VERSION}" \
     && mkdir -p /etc/codex \
     && printf 'check_for_update_on_startup = false\ncli_auth_credentials_store = "file"\n' > /etc/codex/config.toml
 
 # Use the selected base Python for cswap and keep tool environments outside the workspace.
-ARG UV_VERSION=0.13.7
-ARG CLAUDE_SWAP_VERSION=0.29.0
 RUN curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" \
     | env UV_UNMANAGED_INSTALL=/usr/local/bin sh \
     && UV_TOOL_DIR=/opt/uv/tools UV_TOOL_BIN_DIR=/usr/local/bin UV_PYTHON_DOWNLOADS=never \
     uv tool install "claude-swap==${CLAUDE_SWAP_VERSION}" --python 3.13
 
-ARG DOTNET_SDK_VERSION=10.0.403
+
 RUN curl -fsSL -o /tmp/dotnet-install.sh https://dot.net/v1/dotnet-install.sh \
     && bash /tmp/dotnet-install.sh --version "${DOTNET_SDK_VERSION}" --install-dir /usr/share/dotnet \
     && ln -sf /usr/share/dotnet/dotnet /usr/local/bin/dotnet \
     && rm -f /tmp/dotnet-install.sh
 
 # Install Poetry
-ARG POETRY_VERSION=2.5.1
+
 RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install "poetry==${POETRY_VERSION}"
 
 # Set working directory
 WORKDIR /workspaces/drm-copilot
 
 # Install the selected PowerShell modules for every container user.
-ARG PESTER_VERSION=6.2.0
-ARG PSSA_VERSION=1.25.0
+
 RUN pwsh -NoLogo -NoProfile -Command " \
     \$ErrorActionPreference = 'Stop'; \
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted; \
@@ -202,13 +217,13 @@ RUN mkdir -p ~/.config/powershell
 # Install actionlint for GitHub Actions workflow linting, pinned for repeatable builds.
 # The installer script is fetched from the same tag as the binary.
 USER root
-ARG ACTIONLINT_VERSION=1.7.12
+
 RUN wget -q -O - "https://raw.githubusercontent.com/rhysd/actionlint/v${ACTIONLINT_VERSION}/scripts/download-actionlint.bash" \
     | bash -s -- "${ACTIONLINT_VERSION}" /usr/local/bin
 
 # Install GitHub Copilot CLI (real agentic CLI, not the VS Code extension shim).
 # Pinned to a known-good release for repeatable devcontainer builds.
-ARG COPILOT_CLI_VERSION=0.0.377
+
 RUN wget -qO- https://gh.io/copilot-install \
     | VERSION="${COPILOT_CLI_VERSION}" PREFIX="/usr/local" bash
 USER vscode

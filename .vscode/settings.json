@@ -57,9 +57,7 @@
         "tests/**/*.[tT]ests.[pP][sS]1",
         "scripts/**/*.[tT]ests.[pP][sS]1"
     ],
-    "python.terminal.activateEnvironment": false,
-    "python-envs.defaultEnvManager": "ms-python.python:poetry",
-    "python-envs.defaultPackageManager": "ms-python.python:poetry",
+    "python.terminal.activateEnvironment": false,    
     "terminal.integrated.automationProfile.windows": {
         "path": "pwsh.exe",
         "source": "PowerShell",
