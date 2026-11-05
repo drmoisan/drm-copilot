@@ -161,7 +161,7 @@ Keep dependency I/O in Linux volumes locally. Host source changes require no see
 - [x] AC9: Relevant host manifest/bootstrap and development CI contracts match the selected baseline, retain minimum-aware host handling for newer compliant installations, and preserve Python compatibility jobs and published consumer engine ranges.
 - [x] AC10: Regression, contract and applicable format/lint/type/test loops pass for changed behavior, with numeric baseline/final coverage evidence where required and no regression in changed-code coverage or report compatibility.
 - [x] AC11: Active container guides, relevant repository documentation, and all six execution-environment source/bundle mirrors describe the implemented baseline, workspace/dependency storage and recovery behavior consistently; mirror/contract validation passes.
-- [ ] AC12: Every GitHub check on the final pull-request head passes or is skipped according to repository rules, and CI-dependent acceptance evidence records that exact head.
+- [x] AC12: Every GitHub check on the final pull-request head passes or is skipped according to repository rules, and CI-dependent acceptance evidence records that exact head.
 
 ## Risks & Mitigations
 
