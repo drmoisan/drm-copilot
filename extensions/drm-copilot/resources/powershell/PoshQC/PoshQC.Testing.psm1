@@ -183,7 +183,7 @@ function Invoke-PoshQCTest {
         [scriptblock] $EnsureModule = {
             param([string] $Name, [string] $ErrorMessage, [string] $MinimumVersion, [string] $MaximumVersion)
             # Issue #953 (CR-1): only an installed version inside the supported range counts as present, so a host
-            # whose only Pester is 6.x or the inbox 3.4.0 receives the actionable message instead of an import error.
+            # whose only Pester is 7.x or the inbox 3.4.0 receives the actionable message instead of an import error.
             if (-not (Get-Module -ListAvailable -FullyQualifiedName @{ ModuleName = $Name; ModuleVersion = $MinimumVersion; MaximumVersion = $MaximumVersion })) { throw $ErrorMessage }
             # Import globally so Pester's Describe/It/Mock resolve in test containers. Under the default
             # $InvokePester trampoline, test code runs in this module's session state, not the global
@@ -327,7 +327,7 @@ function Invoke-PoshQCTest {
         $Root = [IO.Path]::GetFullPath([IO.Path]::Combine($PWD.ProviderPath, $Root))
     }
 
-    & $EnsureModule 'Pester' "Pester is not installed in the supported range (5.9.0 to 5.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.9.0' '5.99.99'
+    & $EnsureModule 'Pester' "Pester is not installed in the supported range (6.2.0 to 6.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first." '6.2.0' '6.99.99'
 
     if (-not (& $TestPathExists $SettingsPath)) {
         throw "Settings not found: $SettingsPath"

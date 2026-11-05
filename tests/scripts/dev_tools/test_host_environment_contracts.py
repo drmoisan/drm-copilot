@@ -21,22 +21,62 @@ def _minimums() -> dict[str, str]:
     return cast("dict[str, str]", manifest["minimumVersions"])
 
 
+def test_host_manifest_selects_current_runtime_and_module_minimums() -> None:
+    """Host bootstrap consumes the selected minima without unrelated app installs."""
+    assert _minimums() == {
+        "node": "26.13.0",
+        "poetry": "2.5.1",
+        "pwsh": "7.6.9",
+        "python": "3.13.18",
+    }
+    manifest = json.loads(_text("scripts/host-tools.manifest.json"))
+    assert manifest["powershellModules"] == [
+        {"minimumVersion": "6.2.0", "name": "Pester"},
+        {"minimumVersion": "1.25.0", "name": "PSScriptAnalyzer"},
+    ]
+
+
 @pytest.mark.parametrize("environment", ["local", "codespaces"])
 def test_container_installations_match_managed_host_minimums(environment: str) -> None:
-    """Both Dockerfiles select real Python stages and the same managed baseline."""
+    """Both images retain the pinned base runtime and the selected current tools."""
     source = _text(f".devcontainer/{environment}/Dockerfile")
     arguments = dict(re.findall(r"^ARG ([A-Z_]+)=(\S+)$", source, re.MULTILINE))
     minimums = _minimums()
 
     assert arguments["NODE_VERSION"] == minimums["node"]
     assert arguments["POWERSHELL_VERSION"] == minimums["pwsh"]
-    assert f"poetry=={minimums['poetry']}" in source
-    assert f"FROM python:{minimums['python']}-bookworm AS python-runtime" in source
-    assert "COPY --from=python-runtime /usr/local/ /usr/local/" in source
+    assert tuple(map(int, arguments["POETRY_VERSION"].split("."))) >= tuple(
+        map(int, minimums["poetry"].split("."))
+    )
+    assert 'pipx install "poetry==${POETRY_VERSION}"' in source
+    assert (
+        source.count("FROM mcr.microsoft.com/devcontainers/python:3.3.2-3.13-bookworm")
+        == 2
+    )
+    assert 'test "$(python --version)" = "Python 3.13.18"' in source
+    assert "COPY --from=python-runtime" not in source
     assert 'PATH="/usr/local/bin:' in source
     assert arguments["SHFMT_VERSION"] == "3.14.1"
     assert arguments["SHELLCHECK_VERSION"] == "0.11.0"
     assert arguments["ACTIONLINT_VERSION"] == "1.7.12"
+    expected = {
+        "GIT_VERSION": "2.56.0",
+        "POETRY_VERSION": "2.5.1",
+        "GH_VERSION": "2.103.3",
+        "DOTNET_SDK_VERSION": "10.0.403",
+        "PESTER_VERSION": "6.2.0",
+        "PSSA_VERSION": "1.25.0",
+        "UV_VERSION": "0.13.7",
+        "CLAUDE_CODE_VERSION": "2.1.318",
+        "CLAUDE_SWAP_VERSION": "0.29.0",
+        "CODEX_VERSION": "0.166.0",
+    }
+    assert {key: arguments[key] for key in expected} == expected
+    assert (
+        'npm install -g --include=optional "@openai/codex@${CODEX_VERSION}"' in source
+    )
+    assert 'cli_auth_credentials_store = "file"' in source
+    assert "PYTHONPYCACHEPREFIX=/tmp/pycache" in source
 
 
 @pytest.mark.parametrize(
@@ -45,7 +85,18 @@ def test_container_installations_match_managed_host_minimums(environment: str) -
         ("node", "26.13.0"),
         ("npm", "11.20.0"),
         ("pwsh", "7.6.9"),
-        ("poetry", "2.3.2"),
+        ("poetry", "2.5.1"),
+        ("gh", "2.103.3"),
+        ("dotnet", "10.0.403"),
+        ("uv", "0.13.7"),
+        ("claude", "2.1.318"),
+        ("cswap", "0.29.0"),
+        ("codex", "0.166.0"),
+        ("pester", "6.2.0"),
+        ("pssa", "1.25.0"),
+        ("gt", "1.7.14"),
+        ("copilot", "0.0.377"),
+        ("kcov", "43"),
         ("shfmt", "3.14.1"),
         ("shellcheck", "0.11.0"),
         ("actionlint", "1.7.12"),
@@ -67,35 +118,59 @@ def test_verifier_uses_repository_relative_predicate_and_selected_configuration(
     assert 'source "$REPO_ROOT/scripts/bash/container_versions.sh"' in source
     assert '"$REPO_ROOT/.devcontainer/$config/devcontainer.json"' in source
     assert (
-        "for tool in python node npm pwsh poetry shfmt shellcheck actionlint" in source
+        "for tool in python git node npm pwsh poetry gh dotnet uv claude cswap codex "
+        "shfmt shellcheck actionlint gt copilot kcov pester pssa" in source
     )
     assert "container_tool_version_supported python" in source
 
 
-def test_local_workspace_mounts_and_docker_feature_are_preserved() -> None:
-    """The tooling update retains local workspace/data volumes and Docker access."""
+def test_local_workspace_uses_live_source_and_isolated_linux_dependencies() -> None:
+    """Local source stays current while dependency mounts never copy host packages."""
     config = cast(
         "dict[str, object]", json.loads(_text(".devcontainer/local/devcontainer.json"))
     )
     assert config["workspaceFolder"] == "/workspaces/drm-copilot"
     assert config["workspaceMount"] == (
-        "source=${localWorkspaceFolderBasename}-workspace,"
-        "target=/workspaces/drm-copilot,type=volume"
+        "source=${localWorkspaceFolder},"
+        "target=/workspaces/drm-copilot,type=bind,consistency=cached"
     )
     assert config["mounts"] == [
-        "source=${localWorkspaceFolder},target=/workspaces/drm-copilot-host,type=bind,consistency=cached,readonly",
-        "source=${localWorkspaceFolder}/artifacts,target=/workspaces/drm-copilot/artifacts,type=bind,consistency=cached",
+        "source=${localWorkspaceFolderBasename}-local-venv,target=/workspaces/drm-copilot/.venv,type=volume,volume-nocopy",
+        "source=${localWorkspaceFolderBasename}-local-node-modules,target=/workspaces/drm-copilot/node_modules,type=volume,volume-nocopy",
+        "source=${localWorkspaceFolderBasename}-local-extension-node-modules,target=/workspaces/drm-copilot/extensions/drm-copilot/node_modules,type=volume,volume-nocopy",
+        "source=${localWorkspaceFolderBasename}-local-mcp-node-modules,target=/workspaces/drm-copilot/packages/mcp-server/node_modules,type=volume,volume-nocopy",
         "source=${localWorkspaceFolderBasename}-workspace-bg,target=/workspaces/drm-copilot-bg,type=volume",
-        "source=${localWorkspaceFolder}/data,target=/workspaces/drm-copilot/data,type=bind,consistency=cached",
     ]
     features = cast("dict[str, object]", config["features"])
-    assert features["ghcr.io/devcontainers/features/docker-outside-of-docker:1"] == {
-        "version": "latest"
+    assert features == {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+            "version": "latest"
+        }
     }
+    environment = cast("dict[str, str]", config["containerEnv"])
+    assert environment["GIT_CONFIG_COUNT"] == "1"
+    assert environment["GIT_CONFIG_KEY_0"] == "core.fsmonitor"
+    assert environment["GIT_CONFIG_VALUE_0"] == "false"
 
 
-def test_codespaces_resources_and_features_are_preserved() -> None:
-    """Codespaces retains the existing resource requests and public tool features."""
+@pytest.mark.parametrize("environment", ["local", "codespaces"])
+def test_containers_share_setup_and_verify_before_reporting_success(
+    environment: str,
+) -> None:
+    """Neither environment can report setup complete before checking runtime pins."""
+    config = cast(
+        "dict[str, object]",
+        json.loads(_text(f".devcontainer/{environment}/devcontainer.json")),
+    )
+    assert config["postCreateCommand"] == "bash .devcontainer/post-create.sh"
+    source = _text(".devcontainer/post-create.sh")
+    assert source.index("bash .devcontainer/verify-container.sh") < source.index(
+        "Dev Container Setup Complete!"
+    )
+
+
+def test_codespaces_resources_and_image_managed_clis_are_preserved() -> None:
+    """Codespaces keeps resources without floating features replacing image pins."""
     config = cast(
         "dict[str, object]",
         json.loads(_text(".devcontainer/codespaces/devcontainer.json")),
@@ -105,10 +180,7 @@ def test_codespaces_resources_and_features_are_preserved() -> None:
         "memory": "64gb",
         "storage": "64gb",
     }
-    assert config["features"] == {
-        "ghcr.io/devcontainers/features/git:1": {"version": "latest"},
-        "ghcr.io/devcontainers/features/github-cli:1": {"version": "latest"},
-    }
+    assert "features" not in config
 
 
 @pytest.mark.parametrize(

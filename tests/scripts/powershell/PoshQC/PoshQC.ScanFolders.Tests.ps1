@@ -126,13 +126,13 @@ Describe 'Invoke-PoshQCSuite' {
 
             Invoke-PoshQCSuite -Root '/repo' -ScanFolders @('/repo/src')
 
-            Assert-MockCalled -CommandName Invoke-PoshQCFormat -Times 1 -Exactly -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-PoshQCFormat -Times 1 -Exactly -Scope It -ParameterFilter {
                 $Root -eq '/repo' -and $ScanFolders.Count -eq 1 -and $ScanFolders[0] -eq '/repo/src'
             }
-            Assert-MockCalled -CommandName Invoke-PoshQCAnalyze -Times 1 -Exactly -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-PoshQCAnalyze -Times 1 -Exactly -Scope It -ParameterFilter {
                 $Root -eq '/repo' -and $ScanFolders.Count -eq 1 -and $ScanFolders[0] -eq '/repo/src'
             }
-            Assert-MockCalled -CommandName Invoke-PoshQCTest -Times 1 -Exactly -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-PoshQCTest -Times 1 -Exactly -Scope It -ParameterFilter {
                 $Root -eq '/repo' -and $ScanFolders.Count -eq 1 -and $ScanFolders[0] -eq '/repo/src'
             }
         }

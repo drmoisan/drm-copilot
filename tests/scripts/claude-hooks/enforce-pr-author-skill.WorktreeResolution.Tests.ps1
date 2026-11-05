@@ -58,8 +58,14 @@ BeforeAll {
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    # Capture the committed-fixture reader while retaining the null isolation baseline.
+    $script:FixtureReader_2775590d_GetOrchestratorStateCheckpoint = & (Get-Module -Name OrchestratorState) { (Get-Command -Name Get-OrchestratorStateCheckpoint -CommandType Function).ScriptBlock }
     Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState -ParameterFilter { $CheckpointPath -notlike "*tests?fixtures*" } -MockWith { $null }
+    # Capture the committed-fixture reader while retaining the null isolation baseline.
+    $script:FixtureReader_2775590d_GetPrAuthorCheckpointContent = (Get-Command -Name Get-PrAuthorCheckpointContent -CommandType Function).ScriptBlock
     Mock Get-PrAuthorCheckpointContent -ParameterFilter { $CheckpointPath -notlike "*tests?fixtures*" } -MockWith { $null }
+    # Capture the committed-fixture reader while retaining the null isolation baseline.
+    $script:FixtureReader_2775590d_GetPrAuthorReceiptContent = (Get-Command -Name Get-PrAuthorReceiptContent -CommandType Function).ScriptBlock
     Mock Get-PrAuthorReceiptContent -ParameterFilter { $ReceiptFilePath -notlike "*tests?fixtures*" } -MockWith { $null }
     Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
     Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
@@ -127,6 +133,22 @@ BeforeAll {
 }
 
 Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
+
+    BeforeEach {
+        # Restore only committed-fixture reads for this test; other paths retain the null baseline.
+        Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState -MockWith {
+            if ($CheckpointPath -notlike "*tests?fixtures*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_2775590d_GetOrchestratorStateCheckpoint @PesterBoundParameters
+        }
+        Mock Get-PrAuthorCheckpointContent -MockWith {
+            if ($CheckpointPath -notlike "*tests?fixtures*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_2775590d_GetPrAuthorCheckpointContent @PesterBoundParameters
+        }
+        Mock Get-PrAuthorReceiptContent -MockWith {
+            if ($ReceiptFilePath -notlike "*tests?fixtures*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_2775590d_GetPrAuthorReceiptContent @PesterBoundParameters
+        }
+    }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 

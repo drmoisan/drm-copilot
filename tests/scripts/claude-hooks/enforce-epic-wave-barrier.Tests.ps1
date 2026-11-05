@@ -6,12 +6,22 @@
 #>
 
 Describe 'enforce-epic-wave-barrier.ps1' {
+
+    BeforeEach {
+        # Restore only committed-fixture reads for this test; other paths retain the null baseline.
+        Mock Get-EpicWaveBarrierCheckpointContent -MockWith {
+            if ($Path -notlike "/synthetic-worktrees/*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_e23677d9_GetEpicWaveBarrierCheckpointContent @PesterBoundParameters
+        }
+    }
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-wave-barrier.ps1").Path
         . $script:UnderTest
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        # Capture the committed-fixture reader while retaining the null isolation baseline.
+        $script:FixtureReader_e23677d9_GetEpicWaveBarrierCheckpointContent = (Get-Command -Name Get-EpicWaveBarrierCheckpointContent -CommandType Function).ScriptBlock
         Mock Get-EpicWaveBarrierCheckpointContent -ParameterFilter { $Path -notlike "/synthetic-worktrees/*" } -MockWith { $null }
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }

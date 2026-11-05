@@ -39,6 +39,7 @@ Describe 'Claude hook dependency-failure special cases (issue #786)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path -replace '\\', '/'
         . (Join-Path $PSScriptRoot '../claude-runtime/HookDependencyGraph.Helpers.ps1')
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Reset-EpicStateProbeModuleBinding
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         if (Get-Command Get-ArtifactFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ArtifactFileContent' -Surface 'Codex' }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
@@ -152,7 +153,12 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
     It 'C2: reports a nested hook-command-scanner.ps1 load failure under enforce-pr-author-skill.epic-base-branch.ps1 as that top-level dependency' {
         # Arrange: the nested scanner path resolves to a file that does not exist.
         Mock Import-Module { }
-        Mock Join-Path { 'synthetic-missing/hook-command-scanner.ps1' } -ParameterFilter { $ChildPath -eq 'hook-command-scanner.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-command-scanner.ps1') { 'synthetic-missing/hook-command-scanner.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-pr-author-skill.ps1' }
         finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
@@ -162,7 +168,12 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
 
     It 'C3: denies through the merge gate when enforce-epic-merge-gate-authorization.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-epic-merge-gate-authorization.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-epic-merge-gate-authorization.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-authorization.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-authorization.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
         finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
@@ -237,7 +248,12 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
 
     It 'C9: denies through the merge gate when enforce-epic-merge-gate-green-ci.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-epic-merge-gate-green-ci.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-epic-merge-gate-green-ci.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-green-ci.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-green-ci.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
         finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result

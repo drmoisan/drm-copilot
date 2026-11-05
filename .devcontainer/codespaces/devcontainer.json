@@ -15,15 +15,6 @@
     "TZ": "America/New_York",
     "BG_WORKTREE_PATH": "/workspaces/${localWorkspaceFolderBasename}-bg"
   },
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {
-      "version": "latest"
-    }
-  },
-
   "customizations": {
     "codespaces": {
       "repositories": {

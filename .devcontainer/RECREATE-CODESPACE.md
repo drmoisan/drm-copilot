@@ -4,7 +4,7 @@ If a Codespace starts from GitHub's universal image, select this repository's Co
 
 ## Example of an outdated environment
 - ⚠️ OS: Ubuntu 24.04 (expected: Debian Bookworm)
-- ⚠️ Python: 3.12.1 (expected: 3.13.17)
+- ⚠️ Python: 3.12.1 (expected: 3.13.18)
 - ❌ PowerShell: Not installed
 - ❌ Shell tools: Missing shellcheck, shfmt, bashdb, actionlint
 
@@ -67,8 +67,8 @@ Run these commands to verify everything works:
 bash .devcontainer/verify-container.sh
 
 # 2. Check Python tools
-python --version         # Should be 3.13.17
-poetry --version         # Should be 2.3.2
+python --version         # Should be 3.13.18
+poetry --version         # Should be 2.5.1
 pwsh --version          # Should be PowerShell 7.6.9
 
 # 3. Verify project setup
@@ -89,15 +89,15 @@ poetry run pyright --version
 The verification script should show:
 ```
 [OK] .devcontainer/codespaces/devcontainer.json
-[OK] Workspace virtual environment Python 3.13.17
+[OK] Workspace virtual environment Python 3.13.18
 All devcontainer checks passed.
 ```
 
 And you should have:
 - Debian Bookworm OS
-- Python 3.13.17
+- Python 3.13.18
 - PowerShell 7.6.9
-- Poetry 2.3.2
+- Poetry 2.5.1
 - All shell tools (shellcheck, shfmt, bashdb, actionlint)
 
 ## Troubleshooting

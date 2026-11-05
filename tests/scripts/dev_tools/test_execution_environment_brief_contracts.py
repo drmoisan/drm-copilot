@@ -487,7 +487,7 @@ def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> Non
             "-n auto",
             "addopts",
             "physical cores",
-            "Pester 5",
+            "Pester 6",
             "Invoke-PoshQCParallelTest",
             "testsuite",
         ),
