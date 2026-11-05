@@ -45,3 +45,9 @@ All 115 measured changed Bash lines and all three measured changed PowerShell ru
 Canonical/bundled runtime copies are checked byte-for-byte in the contracts evidence. Bundled copies are outside the established configured instrumentation roots; their canonical measured line coverage is traced through exact byte parity, not claimed as separately instrumented coverage or added to the denominator. Every configured production file remains in each final shard.
 
 Raw evidence: SCRATCH/issue-1082-final-cohort-numeric-summary.json; SCRATCH/issue-1082-changed-line-coverage.json; baseline/final Python coverage JSON; baseline/final Bash XML; original baseline Pester XML; final cohort merged JaCoCo/JUnit under SCRATCH/stage/current-source-final/artifacts/pester. Invalid HOME probes, interrupted diagnostics, and older failing snapshots do not contribute to final coverage.
+
+## Independent full-main scope disclosure
+
+Independent review against main merge base df65c30ccc98f89f9808e84ca393c8d75c805641 measures the entire branch's changed Bash lines as **122/123 covered (99.187%)**. The earlier **115/115** figure uses the executor's retained preimplementation snapshot and excludes earlier branch changes. That historical comparison is preserved with its original scope.
+
+The sole uncovered changed line is `.devcontainer/post-create.sh:175`, the missing-package-lock skip message. Complete post-create coverage is 101/118 (85.593%); its added npm block is 13/14 (92.857%). Governing thresholds pass. No production or test source changed for this disclosure. Independent review artifacts retain the recomputation and source/report binding; AC12 remains pending exact-head CI.

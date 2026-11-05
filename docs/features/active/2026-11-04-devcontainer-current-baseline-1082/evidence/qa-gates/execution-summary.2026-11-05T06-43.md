@@ -24,3 +24,9 @@ AC Status Summary:11/12 delivered;AC12 pending outerCI. This is a local handoff,
 Plan reconciliation: all 28 implementation/local-delivery tasks have matching canonical evidence; outer review/CI are explicitly unverified.
 
 Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.
+
+## Independent full-main scope disclosure
+
+Independent review against main merge base df65c30ccc98f89f9808e84ca393c8d75c805641 measures the entire branch's changed Bash lines as **122/123 covered (99.187%)**. The earlier **115/115** figure uses the executor's retained preimplementation snapshot and excludes earlier branch changes. That historical comparison is preserved with its original scope.
+
+The sole uncovered changed line is `.devcontainer/post-create.sh:175`, the missing-package-lock skip message. Complete post-create coverage is 101/118 (85.593%); its added npm block is 13/14 (92.857%). Governing thresholds pass. No production or test source changed for this disclosure. Independent review artifacts retain the recomputation and source/report binding; AC12 remains pending exact-head CI.
