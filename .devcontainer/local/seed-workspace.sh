@@ -3,7 +3,7 @@
 #
 # The local devcontainer keeps the workspace on a named Docker volume, which
 # survives "Rebuild Container". This script runs before post-create.sh and:
-#   - on first create (no .git in the volume), checks out the host's current
+#   - on first create (or an interrupted seed with no HEAD), checks out the host's current
 #     branch from the host repository's committed history. Untracked host
 #     content (node_modules, .venv, .claude/worktrees, Windows build output)
 #     is never copied, and uncommitted host changes are not carried over.
@@ -40,20 +40,25 @@ seed_workspace() {
 	# The volume already contains the artifacts/ and data/ mount points, so
 	# git clone cannot be used; initialize in place instead.
 	git_ws init --quiet
-	git_ws remote add host "$HOST_DIR"
+	# An interrupted seed may already have configured its remotes.
+	if git_ws remote get-url host >/dev/null 2>&1; then
+		git_ws remote set-url host "$HOST_DIR"
+	else
+		git_ws remote add host "$HOST_DIR"
+	fi
 	origin_url="$(host_git remote get-url origin 2>/dev/null || true)"
-	if [ -n "$origin_url" ]; then
+	if [ -n "$origin_url" ] && ! git_ws remote get-url origin >/dev/null 2>&1; then
 		git_ws remote add origin "$origin_url"
 	fi
 	fetch_host_refs
 	if [ -n "$host_branch" ]; then
 		# --no-track: the read-only host remote must never become the upstream.
-		git_ws checkout --quiet --no-track -B "$host_branch" "refs/remotes/host/$host_branch"
+		git_ws checkout --quiet --no-track -B "$host_branch" "refs/remotes/host/$host_branch" || return $?
 		if git_ws rev-parse --verify --quiet "refs/remotes/origin/$host_branch" >/dev/null; then
 			git_ws branch --quiet --set-upstream-to="origin/$host_branch" "$host_branch"
 		fi
 	else
-		git_ws checkout --quiet --detach "$host_head"
+		git_ws checkout --quiet --detach "$host_head" || return $?
 	fi
 	echo "Seeded workspace at $(git_ws rev-parse --short HEAD)."
 }
@@ -95,11 +100,14 @@ main() {
 	host_branch="$(host_git symbolic-ref --quiet --short HEAD || true)"
 	host_head="$(host_git rev-parse HEAD)"
 
-	if [ -d "$WORKSPACE_DIR/.git" ]; then
+	# A .git directory alone does not mean the first checkout completed.
+	if git_ws rev-parse --verify --quiet 'HEAD^{commit}' >/dev/null; then
 		refresh_workspace "$host_branch" "$host_head"
 	else
 		seed_workspace "$host_branch" "$host_head"
 	fi
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+	main "$@"
+fi
