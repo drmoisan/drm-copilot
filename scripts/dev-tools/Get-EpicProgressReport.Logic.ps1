@@ -477,7 +477,8 @@ function Get-EpicProgressSummary {
     .PARAMETER BaselineDone
         The checked task count at the start instant.
     .PARAMETER StartUtc
-        The start instant (UTC).
+        The start instant (UTC). A start after NowUtc counts as zero elapsed time, so the
+        report shows 0 h 00 min elapsed, zero average velocity, and n/a estimates.
     .PARAMETER NowUtc
         The current instant (UTC).
     .PARAMETER Sample
@@ -514,7 +515,7 @@ function Get-EpicProgressSummary {
         $total += [int] $record.Total
         $done += [int] $record.Done
     }
-    $elapsedHours = ($NowUtc - $StartUtc).TotalHours
+    $elapsedHours = [math]::Max(0.0, ($NowUtc - $StartUtc).TotalHours)
     $velocity = Get-EpicProgressAverageVelocity -Done $done -BaselineDone $BaselineDone -ElapsedHours $elapsedHours
     $straightHours = [double]::NaN
     if ($velocity -gt 0) { $straightHours = ($total - $done) / $velocity }

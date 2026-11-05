@@ -570,5 +570,16 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
             $tldr[1] | Should -Be '**Elapsed:** 0 h 00 min, with about n/a hours left on the wave-parallel estimate. **Weekly** quota is at 42.5%.'
             $tldr[2] | Should -Be '**Avg Velocity:** 0 tasks / hr. **Recent Velocity:** n/a tasks / hr since last check-in. (SD of recent velocity: n/a, from 0 intervals)'
         }
+
+        It 'clamps elapsed time at zero when the start is after now' {
+            # A start 30 minutes in the future would otherwise print -1 h 30 min.
+            $features = @(Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 4 -Done 2 -State 'Running')
+            $summary = Get-TestSummary -Feature $features -StartUtc $script:nowUtc.AddMinutes(30)
+
+            $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
+
+            $summary.ElapsedHours | Should -Be 0
+            $tldr[1] | Should -Be '**Elapsed:** 0 h 00 min, with about n/a hours left on the wave-parallel estimate. **Weekly** quota is at 42.5%.'
+        }
     }
 }
