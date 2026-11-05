@@ -56,8 +56,11 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
 
             $profileValue = $ProfileText
             $receiptValue = $ReceiptText
-            Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq 'repo-root/docs/documentation-estate/docs-profile.json' } -MockWith ({ $profileValue }.GetNewClosure())
-            Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq 'repo-root/docs/documentation-estate/docs-validation-receipt.json' } -MockWith ({ $receiptValue }.GetNewClosure())
+            # The hook joins the root and the relative path with Join-Path, which inserts the
+            # platform separator; the expected paths are built the same way so the filters match
+            # on Windows and Linux.
+            Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/docs-profile.json') } -MockWith ({ $profileValue }.GetNewClosure())
+            Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/docs-validation-receipt.json') } -MockWith ({ $receiptValue }.GetNewClosure())
         }
 
         function Set-TestPullRequestSeam {
