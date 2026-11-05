@@ -1,6 +1,6 @@
 Timestamp: 2026-11-05T03-06
 Started: 2026-11-05T03:01:34.2641259Z
-Command: poetry run pytest -q -n auto --cov --cov-branch --cov-report=term --cov-report=json:C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082/issue-1082-baseline-python-parallel.json --junitxml=C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082/issue-1082-baseline-python-parallel-junit.xml -o addopts=-ra --strict-markers --strict-config
+Command: poetry run pytest -q -n auto --cov --cov-branch --cov-report=term --cov-report=json:SCRATCH/issue-1082-baseline-python-parallel.json --junitxml=SCRATCH/issue-1082-baseline-python-parallel-junit.xml -o addopts=-ra --strict-markers --strict-config
 EXIT_CODE: 0
 Output Summary:
 
@@ -41,7 +41,7 @@ scripts\dev_tools\validate_parallel_planner_state.py                            
 scripts\dev_tools\validate_policy_audit_artifact.py                                         125     12     74     11    88%
 ---------------------------------------------------------------------------------------------------------------------------
 TOTAL                                                                                     33367   1097  12516    550    96%
-Coverage JSON written to file C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082/issue-1082-baseline-python-parallel.json
+Coverage JSON written to file SCRATCH/issue-1082-baseline-python-parallel.json
 =========================== short test summary info ===========================
 SKIPPED [1] tests\scripts\dev_tools\test_parallel_manifest_bash_parity.py:231: manifest_m1_non_mapping_frontmatter declares no accessor expectation.
 SKIPPED [1] tests\scripts\dev_tools\test_parallel_manifest_bash_parity.py:231: manifest_m1_unterminated_fence declares no accessor expectation.
@@ -53,3 +53,5 @@ SKIPPED [1] tests\scripts\dev_tools\test_blast_radius_regression_452.py:483: Iss
 ```
 
 Raw output: SCRATCH/issue-1082-python-tests-host-parallel.log
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.

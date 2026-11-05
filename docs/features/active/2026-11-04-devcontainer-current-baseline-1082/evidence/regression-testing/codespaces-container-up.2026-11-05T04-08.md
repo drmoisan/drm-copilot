@@ -1,6 +1,6 @@
 Timestamp: 2026-11-05T04-08
 Started: 2026-11-05T04:07:12.8525144Z
-Command: pwsh -NoLogo -NoProfile -File C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082\issue-1082-container.ps1 codespaces
+Command: pwsh -NoLogo -NoProfile -File SCRATCH\issue-1082-container.ps1 codespaces
 EXIT_CODE: 0
 Output Summary:
 
@@ -53,3 +53,5 @@ To build the package:
 ```
 
 Raw output: SCRATCH/issue-1082-codespaces-container-up.log
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.

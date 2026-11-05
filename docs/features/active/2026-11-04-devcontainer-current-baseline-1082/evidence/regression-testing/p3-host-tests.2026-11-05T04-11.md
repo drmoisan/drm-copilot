@@ -1,6 +1,6 @@
 Timestamp: 2026-11-05T04-11
 Started: 2026-11-05T04:11:22.1153669Z
-Command: C:/Program Files/Git/bin/sh.exe C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082\issue-1082-current-powershell.sh host
+Command: C:/Program Files/Git/bin/sh.exe SCRATCH\issue-1082-current-powershell.sh host
 EXIT_CODE: 0
 Output Summary:
 
@@ -53,3 +53,5 @@ RESULT=Passed passed=104 failed=0 skipped=0
 ```
 
 Raw output: SCRATCH/issue-1082-p3-host-tests.log
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.

@@ -1,6 +1,6 @@
 Timestamp: 2026-11-05T03-01
 Started: 2026-11-05T02:59:36.9633778Z
-Command: poetry run pytest -q --cov --cov-branch --cov-report=term --cov-report=json:C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082/issue-1082-baseline-python.json --junitxml=C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082/issue-1082-baseline-python-junit.xml -o addopts=-ra --strict-markers --strict-config
+Command: poetry run pytest -q --cov --cov-branch --cov-report=term --cov-report=json:SCRATCH/issue-1082-baseline-python.json --junitxml=SCRATCH/issue-1082-baseline-python-junit.xml -o addopts=-ra --strict-markers --strict-config
 EXIT_CODE: -1
 Output Summary:
 
@@ -53,3 +53,5 @@ Output Summary:
 ```
 
 Raw output: SCRATCH/issue-1082-python-tests-host.log
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.

@@ -1,6 +1,6 @@
 Timestamp: 2026-11-05T04-05
 Started: 2026-11-05T04:05:50.5087620Z
-Command: pwsh -NoLogo -NoProfile -File C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082\issue-1082-preservation.ps1
+Command: pwsh -NoLogo -NoProfile -File SCRATCH\issue-1082-preservation.ps1
 EXIT_CODE: 0
 Output Summary:
 
@@ -16,3 +16,5 @@ d121cd8769a9f6e7048f513bb96993ca5eb631aaad9e92a65a45e27b21d70500 exited
 ```
 
 Raw output: SCRATCH/issue-1082-local-container-preservation.log
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.

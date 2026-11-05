@@ -92,6 +92,24 @@ function Import-EpicStateProbeModule {
     }
 }
 
+function Reset-EpicStateProbeModuleBinding {
+    # Discard only this fixture root's scope module when a hook replaced its bound run dependency.
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
+    param()
+
+    $scopePath = [IO.Path]::GetFullPath((Join-Path $script:EpicStateBaselineRepoRoot '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'))
+    $runPath = [IO.Path]::GetFullPath((Join-Path $script:EpicStateBaselineRepoRoot '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'))
+    $currentRun = @(Get-Module WorktreeRunResolution -All | Where-Object { $_.Path -eq $runPath })
+    foreach ($scope in @(Get-Module EpicScopeResolution -All | Where-Object { $_.Path -eq $scopePath })) {
+        $boundRun = & $scope { (Get-Command Resolve-WorktreeEpicTarget -ErrorAction Stop).Module }
+        if ($boundRun.Path -ne $runPath) { continue }
+        $matchingInstance = @($currentRun | Where-Object { [object]::ReferenceEquals($_, $boundRun) })
+        if ($matchingInstance.Count -eq 0 -and $PSCmdlet.ShouldProcess($scope.Path, 'Remove stale fixture module binding')) {
+            Remove-Module -ModuleInfo $scope -Force -ErrorAction Stop
+        }
+    }
+}
+
 function Invoke-EpicStateProbeItemCheckpoint {
     # Item-checkpoint seam: the observer is a Test-Path mock in module scope WorktreeItemResolution, which the real seam calls before it reads.
     Import-EpicStateProbeModule -Name 'WorktreeItemResolution'

@@ -1,6 +1,6 @@
 Timestamp: 2026-11-05T04-04
 Started: 2026-11-05T04:02:41.7117015Z
-Command: pwsh -NoLogo -NoProfile -File C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082\issue-1082-container.ps1 fresh
+Command: pwsh -NoLogo -NoProfile -File SCRATCH\issue-1082-container.ps1 fresh
 EXIT_CODE: 0
 Output Summary:
 
@@ -53,3 +53,5 @@ To build the package:
 ```
 
 Raw output: SCRATCH/issue-1082-local-container-fresh-up.log
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.

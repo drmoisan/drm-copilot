@@ -61,7 +61,12 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
         @{ Copy = 'bundle'; Hook = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1' }
     ) {
         # Arrange: fail only the thresholds dot-source; every other Join-Path call runs normally.
-        Mock Join-Path { throw 'simulated load failure: feature-review-coverage-thresholds.ps1' } -ParameterFilter { $ChildPath -eq 'feature-review-coverage-thresholds.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-review-coverage-thresholds.ps1') { throw 'simulated load failure: feature-review-coverage-thresholds.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         Initialize-ThresholdsGuardDependencyState
 
         # Act
@@ -79,7 +84,12 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
         @{ Copy = 'bundle'; Hook = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1' }
     ) {
         # Arrange: fail only the thresholds dot-source and start from an empty failure list.
-        Mock Join-Path { throw 'simulated load failure: feature-review-coverage-thresholds.ps1' } -ParameterFilter { $ChildPath -eq 'feature-review-coverage-thresholds.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-review-coverage-thresholds.ps1') { throw 'simulated load failure: feature-review-coverage-thresholds.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         Initialize-ThresholdsGuardDependencyState
         $hookPath = Join-Path $script:RepoRoot $Hook
         $thrown = $null
@@ -103,7 +113,12 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
         @{ Copy = 'bundle'; Hook = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1' }
     ) {
         # Arrange: the TG2 arrangement, which records the thresholds failure in this It.
-        Mock Join-Path { throw 'simulated load failure: feature-review-coverage-thresholds.ps1' } -ParameterFilter { $ChildPath -eq 'feature-review-coverage-thresholds.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-review-coverage-thresholds.ps1') { throw 'simulated load failure: feature-review-coverage-thresholds.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         Initialize-ThresholdsGuardDependencyState
         $hookPath = Join-Path $script:RepoRoot $Hook
 
@@ -124,7 +139,12 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
         @{ Copy = 'bundle'; Hook = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1' }
     ) {
         # Arrange: fail only the E1 helper dot-source; every other Join-Path call runs normally.
-        Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'subagentstop-envelope.ps1') { throw 'simulated load failure: subagentstop-envelope.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         Initialize-ThresholdsGuardDependencyState
 
         # Act

@@ -1,6 +1,6 @@
 Timestamp: 2026-11-05T04-13
 Started: 2026-11-05T04:13:37.7266307Z
-Command: C:/Program Files/Git/bin/sh.exe C:\Users\DANMOI~1\AppData\Local\Temp\codex-container-baseline\issue-1082\issue-1082-current-powershell.sh poshqc
+Command: C:/Program Files/Git/bin/sh.exe SCRATCH\issue-1082-current-powershell.sh poshqc
 EXIT_CODE: 0
 Output Summary:
 
@@ -53,3 +53,5 @@ RESULT=Passed passed=224 failed=0 skipped=7
 ```
 
 Raw output: SCRATCH/issue-1082-p3-bundle-poshqc-tests.log
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.
