@@ -227,7 +227,7 @@ Any failing step, or any step that changes a file, restarts the loop from P7-T1.
   - Acceptance: the artifact records baseline (P0-T5) and post-change (P7-T3) line coverage over the same three scan folders, and new-file line coverage; every line added to `Invoke-DocsCommand.ps1` (the `surface-delta` row and the P3-T1 helper, closure and member lines) and to `DocsProfileCommands.psm1` is covered; neither file's coverage decreases.
 - [x] [P7-T5] Re-run the Pytest module set of P0-T6 without coverage and write `FEATURE/evidence/qa-gates/python-contracts.<timestamp>.md`.
   - Acceptance: zero failures.
-- [ ] [P7-T6] Re-run the Codex generator check of P0-T7 and write `FEATURE/evidence/qa-gates/codex-generator-check.<timestamp>.md`.
+- [x] [P7-T6] Re-run the Codex generator check of P0-T7 and write `FEATURE/evidence/qa-gates/codex-generator-check.<timestamp>.md`.
   - Acceptance: exit code 0.
 - [ ] [P7-T7] Re-run the Jest test of P0-T8 and write `FEATURE/evidence/qa-gates/jest-manifest.<timestamp>.md`.
   - Acceptance: zero failures.
