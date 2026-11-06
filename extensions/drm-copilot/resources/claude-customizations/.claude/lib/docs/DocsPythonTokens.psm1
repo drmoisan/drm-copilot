@@ -83,8 +83,7 @@ function Read-DocsPythonStringEnd {
             $index += 2
             continue
         }
-        # Compare a slice: passing $Text itself to a .NET method costs time proportional to its length per call on an AMSI-enabled host.
-        if ($braceDepth -eq 0 -and $index + $Quote.Length -le $Text.Length -and [string]::CompareOrdinal($Text.Substring($index, $Quote.Length), $Quote) -eq 0) {
+        if ($braceDepth -eq 0 -and [string]::CompareOrdinal($Text, $index, $Quote, 0, $Quote.Length) -eq 0) {
             return @{ End = $index + $Quote.Length; HasEscape = $hasEscape; NestingExceeded = $nestingExceeded }
         }
         if (-not $isTriple -and $character -eq "`n" -and $braceDepth -eq 0) { break }
@@ -104,7 +103,7 @@ function Read-DocsPythonStringEnd {
                 continue
             }
             if ($braceDepth -gt 0 -and ($character -eq '''' -or $character -eq '"')) {
-                $innerQuote = if ($index + 3 -le $Text.Length -and [string]::CompareOrdinal($Text.Substring($index, 3), [string] $character * 3) -eq 0) { [string] $character * 3 } else { [string] $character }
+                $innerQuote = if ([string]::CompareOrdinal($Text, $index, [string] $character * 3, 0, 3) -eq 0) { [string] $character * 3 } else { [string] $character }
                 $inner = Read-DocsPythonStringEnd -Text $Text -Start ($index + $innerQuote.Length) -Quote $innerQuote -IsFormat $true -Level ($Level + 1)
                 if ($inner['NestingExceeded']) { return @{ End = -1; HasEscape = $hasEscape; NestingExceeded = $true } }
                 if ($inner['End'] -lt 0) { return @{ End = -1; HasEscape = $hasEscape; NestingExceeded = $false } }
@@ -150,16 +149,8 @@ function Get-DocsPythonToken {
     $lineStart = 0
     $depth = 0
     $counted = 0
-    $match = $null
     while ($position -lt $source.Length) {
-        # NextMatch continues at the previous match end through \G and passes no argument. A Match call passes
-        # the whole source, which costs time proportional to its length per call on an AMSI-enabled host, so it
-        # runs only for the first token and after a string token, whose body the pattern does not consume.
-        if ($null -ne $match -and $match.Index + $match.Length -eq $position) {
-            $match = $match.NextMatch()
-        } else {
-            $match = $script:DocsPythonTokenPattern.Match($source, $position)
-        }
+        $match = $script:DocsPythonTokenPattern.Match($source, $position)
         if (-not $match.Success) {
             $diagnostics.Add(@{ Code = 'PYTHON_LEXER_UNCLASSIFIED'; Severity = 'error'; Blocking = $true; Line = $line })
             return @{ Tokens = $tokens.ToArray(); Diagnostics = $diagnostics.ToArray() }

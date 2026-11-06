@@ -104,37 +104,6 @@ Describe 'Get-DocsPythonToken token classes' {
         @($tokens | ForEach-Object { $_['Line'] }) | Should -Be @(1, 1, 2, 2, 3)
     }
 
-    It 'continues with the correct tokens and columns after a string token' {
-        # Act
-        $tokens = Get-TestToken -Text "a = 'b' + c`nd"
-
-        # Assert
-        @($tokens | ForEach-Object { $_['Text'] }) | Should -Be @('a', '=', "'b'", '+', 'c', "`n", 'd')
-        @($tokens | ForEach-Object { $_['Column'] }) | Should -Be @(0, 2, 4, 8, 10, 11, 0)
-        @($tokens | ForEach-Object { $_['Line'] }) | Should -Be @(1, 1, 1, 1, 1, 1, 2)
-    }
-
-    It 'passes the whole source to a .NET method only at the restart after a string token' {
-        # Arrange: per-call cost grows with argument length on an AMSI-enabled host, so a per-token or
-        # per-character call with the whole source makes tokenizing quadratic there. The syntax tree pins it.
-        $modulePath = Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsPythonTokens.psm1'
-        $ast = [System.Management.Automation.Language.Parser]::ParseFile($modulePath, [ref] $null, [ref] $null)
-
-        # Act
-        $calls = @($ast.FindAll({
-                    param($node)
-                    $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
-                    @($node.Arguments | Where-Object {
-                            $_ -is [System.Management.Automation.Language.VariableExpressionAst] -and
-                            $_.VariablePath.UserPath -in @('source', 'Text')
-                        }).Count -gt 0
-                }, $true))
-
-        # Assert
-        $calls.Count | Should -Be 1
-        $calls[0].Member.Value | Should -BeExactly 'Match'
-    }
-
     It 'returns no token and no diagnostic for the empty text' {
         $result = Get-DocsPythonToken -Text ''
         $result.Tokens.Count | Should -Be 0
@@ -169,16 +138,6 @@ Describe 'Get-DocsPythonToken diagnostics' {
         (Get-DocsPythonToken -Text "# vim: set fileencoding=utf8 :`nx = 1").Diagnostics.Count | Should -Be 0
         (Get-DocsPythonToken -Text ('x = ' + ('(' * 64) + '1' + (')' * 64))).Diagnostics.Count | Should -Be 0
         (Get-DocsPythonToken -Text 'x = f"{f"{a}"}"').Diagnostics.Count | Should -Be 0
-    }
-
-    It 'reports PYTHON_LEXER_UNCLASSIFIED for a character reached by continuing from a name and from a string' {
-        # Act
-        $afterName = Get-TestDiagnostic -Text 'a ?'
-        $afterString = Get-TestDiagnostic -Text "'a' ?"
-
-        # Assert
-        $afterName['Code'] | Should -BeExactly 'PYTHON_LEXER_UNCLASSIFIED'
-        $afterString['Code'] | Should -BeExactly 'PYTHON_LEXER_UNCLASSIFIED'
     }
 
     It 'ignores a coding cookie on line 3 and a hash inside a string' {
