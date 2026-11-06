@@ -29,14 +29,17 @@ function Test-EpicProgressJsonText {
 function ConvertFrom-EpicProgressKickoffRow {
     <#
     .SYNOPSIS
-        Return one record (Issue, Wave, Band, PlanPath) per feature row of a kickoff table.
+        Return one record (Issue, Wave, Band, PlanPath) per row of the kickoff feature table.
     .DESCRIPTION
-        A feature row is a Markdown table row whose first cell is a numeric issue number of
-        any length; any whitespace, including none, may surround each cell. Cells 1, 3, 4,
-        and 5 hold the issue, the wave, the band, and the repository-relative plan path.
-        Header and separator rows are ignored. A feature row whose wave cell is not all
-        digits raises a terminating error naming the issue and the cell, because a skipped
-        row would understate the epic's task total.
+        Only the feature-summary table is read: the table whose header row's first cell is
+        'issue_num' or 'Issue' (case-insensitive). Lines before that header are skipped, and
+        the first line after it that is not a table row ends the table, so every other table
+        (for example the wave summary) is ignored. Inside the table, a feature row is a row
+        whose first cell is a numeric issue number of any length; any whitespace, including
+        none, may surround each cell, and the separator row is ignored. Cells 1, 3, 4, and 5
+        hold the issue, the wave, the band, and the repository-relative plan path. A feature
+        row whose wave cell is not all digits raises a terminating error naming the issue and
+        the cell, because a skipped row would understate the epic's task total.
     .PARAMETER KickoffText
         The full text of the kickoff file.
     #>
@@ -45,7 +48,13 @@ function ConvertFrom-EpicProgressKickoffRow {
     param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $KickoffText)
 
     $lines = $KickoffText -split '\r?\n'
+    $inFeatureTable = $false
     foreach ($line in $lines) {
+        if (-not $inFeatureTable) {
+            $inFeatureTable = $line -match '^\|\s*(issue_num|issue)\s*\|'
+            continue
+        }
+        if ($line -notmatch '^\s*\|') { break }
         if ($line -notmatch '^\|\s*(\d+)\s*\|') { continue }
         $cells = @($line -split '\|' | ForEach-Object { $_.Trim() })
         if ($cells[3] -notmatch '^\d+$') {

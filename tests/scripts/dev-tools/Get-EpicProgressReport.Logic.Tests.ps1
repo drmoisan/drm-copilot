@@ -50,7 +50,9 @@ Describe 'ConvertFrom-EpicProgressKickoffRow' {
     }
 
     It 'parses a feature row with variable whitespace around cells' {
-        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText '|  12345|Beta|  2 |large|docs/b/plan.md|')
+        $kickoff = @('| Issue | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '|  12345|Beta|  2 |large|docs/b/plan.md|') -join "`n"
+
+        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff)
 
         $rows.Count | Should -Be 1
         $rows[0].Issue | Should -Be '12345'
@@ -60,9 +62,51 @@ Describe 'ConvertFrom-EpicProgressKickoffRow' {
     }
 
     It 'throws a clear error for a non-numeric wave cell' {
-        $kickoff = '| 12 | Alpha | two | small | docs/a/plan.md |'
+        $kickoff = @('| Issue | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '| 12 | Alpha | two | small | docs/a/plan.md |') -join "`n"
 
         { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Throw -ExpectedMessage "*#12 has a non-numeric wave cell 'two'*"
+    }
+
+    It 'returns only rows of the feature-summary table' {
+        # The repository header spelling, followed by a wave-summary table with numeric first cells.
+        $kickoff = @(
+            '| issue_num | feature_folder | wave | complexity | plan-path |'
+            '| --- | --- | --- | --- | --- |'
+            '| 630 | f/a | 0 | C3 | docs/a/plan.md |'
+            '| 631 | f/b | 1 | C2 | docs/b/plan.md |'
+            ''
+            '| wave | features | width |'
+            '| --- | --- | --- |'
+            '| 0 | 630 | 2 |'
+            '| 1 | 631 | 1 |'
+            '| 2 | 632 | 1 |'
+        ) -join "`n"
+
+        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff)
+
+        $rows.Count | Should -Be 2
+        ($rows.Issue -join ',') | Should -Be '630,631'
+        ($rows.Wave -join ',') | Should -Be '0,1'
+        @($rows | Where-Object { [string]::IsNullOrWhiteSpace($_.PlanPath) }).Count | Should -Be 0
+    }
+
+    It 'ignores a numeric-first row with a non-digit wave position outside the feature table' {
+        # The cell read as the wave in the first table is 'n/a'; the row is outside the feature table.
+        $kickoff = @(
+            '| id | note | detail | extra |'
+            '|---|---|---|---|'
+            '| 7 | notes | n/a | more |'
+            ''
+            '| Issue | Title | Wave | Band | Plan |'
+            '|---|---|---|---|---|'
+            '| 12 | Alpha | 1 | small | docs/a/plan.md |'
+        ) -join "`n"
+
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Not -Throw
+        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff)
+
+        $rows.Count | Should -Be 1
+        $rows[0].Issue | Should -Be '12'
     }
 }
 
