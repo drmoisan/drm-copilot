@@ -82,7 +82,7 @@ Execution runs in the item worktree under a non-terminal exempt-route checkpoint
 
 ### Phase 0 — Baseline and Preconditions
 
-- [ ] [P0-T1] Read the policy files in the order of `## Required References` and write `<FEATURE>/evidence/other/phase0-instructions-read.<timestamp>.md` with `Timestamp:`, `Policy Order:` and the list of files read.
+- [x] [P0-T1] Read the policy files in the order of `## Required References` and write `<FEATURE>/evidence/other/phase0-instructions-read.<timestamp>.md` with `Timestamp:`, `Policy Order:` and the list of files read.
   - Acceptance: the artifact exists with all three fields and lists the six files in order.
 - [ ] [P0-T2] Verify the upstream contracts on the branch head: `.claude/lib/docs/Invoke-DocsCommand.ps1` exists and its `$script:DocsCommandRow` table (`Get-DocsCommandTable`) holds rows named `init`, `validate-profile`, `check`, `inventory`, `coverage`, `update-ledger`, `validate`, `generate-reference`, `surface-delta`; `extensions/drm-copilot/src/repo-automation-tool-names.ts` contains each name of M; `.claude/settings.json` carries the 1034 entry for `enforce-docs-complete-gate.ps1`. Record each row's `Option` map and the 1036 input field names into `<FEATURE>/evidence/other/upstream-contracts.<timestamp>.md`.
   - Acceptance: the artifact lists nine rows with their option maps and six tool names; any absence records `BLOCKED: upstream not merged`, and execution stops before [P1-T1].
