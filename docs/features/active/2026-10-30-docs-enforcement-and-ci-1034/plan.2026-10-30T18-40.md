@@ -84,6 +84,7 @@ R1 = owner directive clause (1): pushed-down skills, helpers, hooks and libs are
 | `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1` | test | PowerShell (Pester) | D |
 | `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` (edit: one `$script:ReasonPrefix` row) | test | PowerShell (Pester) | D |
 | Any further suite under `tests/scripts/claude-lib/docs/` that P0-T3 records as enumerating the complete subcommand or init planned-write set (edit only where recorded) | test | PowerShell (Pester) | D |
+| `tests/scripts/claude-hooks/cleanup-merged-worktrees-workflow.EndToEnd.Tests.ps1` (edit: one `$script:ExemptHook` row; executor-marked during Phase 7, see `## Notes`) | test | PowerShell (Pester) | D |
 | `FEATURE/**` (plan, evidence) | documentation | Markdown | D |
 
 ## Existing Asserting Tests and Dispositions
@@ -298,6 +299,7 @@ The plan holds 45 tasks, five above the 40-task guideline, and stays under 400 p
 ## Notes
 
 - EVIDENCE_LOCATION_OVERRIDE_REJECTED: `<FEATURE>/evidence/coverage/` (spec coverage criterion) replaced with `<FEATURE>/evidence/qa-gates/`.
+- Executor deviation (Phase 7, QA loop pass 8): the integration merge brought the issue #1026 inventory guard in `cleanup-merged-worktrees-workflow.EndToEnd.Tests.ps1`, which fails until a hook registered in `.claude/settings.json` is composed or exempted with a reason. The test `lists every hook registered for the Bash, Write|Edit, and Agent matchers as composed or exempted` failed on `enforce-docs-complete-gate.ps1`, a new failure under the baseline-relative rule. One `$script:ExemptHook` row was added and no assertion changed; the suite is held to the `TOUCHED_SUITES` standard and included in the P7-T8 shuffled runs. No task was added, removed or reordered.
 - The spec names the Linux hook job by its job id; this plan cites the check name `poshqc / PowerShell hook suites (Linux)`.
 - The spec and user story spell the anchors with the former placeholder `900008`; the merged anchors are `# --- 1034: surface-delta ---` and `# --- 1034: docs workflow ---`, and `Invoke-DocsCommand.Tests.ps1` and `DocsProfileCommands.Tests.ps1` forbid any `# --- 900NNN:` anchor line, so this plan uses the merged spelling.
 - Spec criterion T11 requires the merge-base diff to show no changed or removed line. `PSAlignAssignmentStatement` with `CheckHashtable` in `pssa.settings.psd1` realigns the returned literal of `New-DocsCommandContext` once the longer member names are added, so the plan asserts the criterion on the whitespace-insensitive diff and limits the whitespace-sensitive removed lines to the eight realigned member lines (P3-T1, P3-T7).
