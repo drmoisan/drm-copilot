@@ -153,6 +153,18 @@ Describe 'ConvertFrom-EpicProgressKickoffRow' {
         $rows[0].Wave | Should -Be 1
         $rows[0].PlanPath | Should -Be 'docs/a/plan.md'
     }
+
+    It 'throws a clear error for a feature row with fewer than five cells' {
+        $kickoff = @('| Issue | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '| 5 | Alpha | 1 | small |') -join "`n"
+
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Throw -ExpectedMessage '*#5 has 4 cells*'
+    }
+
+    It 'throws a clear error for a feature row with a blank plan cell' {
+        $kickoff = @('| Issue | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '| 5 | Alpha | 1 | small |  |') -join "`n"
+
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Throw -ExpectedMessage '*#5 has a blank plan cell*'
+    }
 }
 
 Describe 'Get-EpicProgressIssueFromKickoff' {

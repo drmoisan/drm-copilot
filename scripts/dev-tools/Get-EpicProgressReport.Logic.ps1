@@ -41,7 +41,9 @@ function ConvertFrom-EpicProgressKickoffRow {
         none, may surround each cell, and the separator row is ignored. Cells 1, 3, 4, and 5
         hold the issue, the wave, the band, and the repository-relative plan path. A feature
         row whose wave cell is not all digits raises a terminating error naming the issue and
-        the cell, because a skipped row would understate the epic's task total. Kickoff text
+        the cell, because a skipped row would understate the epic's task total. For the same
+        reason, a feature row with fewer than five cells, and a feature row whose plan cell is
+        blank, each raise a terminating error naming the issue. Kickoff text
         that holds a non-whitespace character but no such header raises a terminating error;
         empty or whitespace-only text returns no rows.
     .PARAMETER KickoffText
@@ -62,6 +64,14 @@ function ConvertFrom-EpicProgressKickoffRow {
         if ($trimmed -notmatch '^\|') { break }
         if ($trimmed -notmatch '^\|\s*(\d+)\s*\|') { continue }
         $cells = @($trimmed -split '\|' | ForEach-Object { $_.Trim() })
+        $cellCount = $cells.Count - 1
+        if ($trimmed.EndsWith('|')) { $cellCount-- }
+        if ($cellCount -lt 5) {
+            throw "The kickoff row for issue #$($cells[1]) has $cellCount cells; a feature row needs 5 (issue, title, wave, band, plan path)."
+        }
+        if ([string]::IsNullOrWhiteSpace($cells[5])) {
+            throw "The kickoff row for issue #$($cells[1]) has a blank plan cell."
+        }
         $wave = 0
         if (-not [int]::TryParse($cells[3], [System.Globalization.NumberStyles]::None, [cultureinfo]::InvariantCulture, [ref] $wave)) {
             throw "The kickoff row for issue #$($cells[1]) has a non-numeric wave cell '$($cells[3])'."
