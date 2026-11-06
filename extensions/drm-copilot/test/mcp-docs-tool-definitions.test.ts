@@ -8,6 +8,8 @@ import {
   DOCS_MUTATING_TOOLS,
   DOCS_TOOL_DEFINITIONS,
 } from "../src/mcp-docs-tool-definitions";
+import { REPO_AUTOMATION_TOOL_DEFINITIONS } from "../src/mcp-repo-automation-tool-definitions";
+import { toolDefinitions } from "../src/mcp-tool-definitions";
 import {
   DOCS_ACTOR_KINDS,
   DOCS_DIMENSION_STATES,
@@ -149,5 +151,39 @@ describe("DOCS_TOOL_DEFINITIONS", () => {
     expect(propertiesOf("run_docs_check")["paths"]).not.toHaveProperty(
       "uniqueItems",
     );
+  });
+
+  it("spreads the same definition objects into both definition surfaces", () => {
+    // Arrange
+    const surfaces: ReadonlyArray<
+      readonly [string, ReadonlyArray<{ readonly name: string }>]
+    > = [
+      ["REPO_AUTOMATION_TOOL_DEFINITIONS", REPO_AUTOMATION_TOOL_DEFINITIONS],
+      ["toolDefinitions", toolDefinitions],
+    ];
+
+    for (const [label, surface] of surfaces) {
+      // Act
+      const start = surface.findIndex(
+        (entry) => entry.name === "run_docs_check",
+      );
+      const slice = surface.slice(start, start + DOCS_TOOL_DEFINITIONS.length);
+
+      // Assert
+      expect({ label, start: start >= 0 }).toEqual({ label, start: true });
+      expect({
+        label,
+        sameObjects: slice.every(
+          (entry, index) => entry === DOCS_TOOL_DEFINITIONS[index],
+        ),
+      }).toEqual({ label, sameObjects: true });
+      expect({
+        label,
+        next: surface[start + DOCS_TOOL_DEFINITIONS.length]?.name,
+      }).toEqual({
+        label,
+        next: "validate_discovery_artifacts",
+      });
+    }
   });
 });
