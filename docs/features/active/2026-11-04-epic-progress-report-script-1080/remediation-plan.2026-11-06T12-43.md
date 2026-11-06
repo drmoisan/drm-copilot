@@ -109,7 +109,7 @@ Each task runs `issue-1080-run.sh` over both change-set test files; acceptance i
 
 Rule: if any of P2-T1 to P2-T8 fails or changes a file, fix the cause, commit and push the fix, and restart from P2-T1.
 
-- [ ] [P2-T1] Run `sh SCRATCH/issue-1080-format-check.sh` over the four change-set files; on drift apply `Invoke-Formatter` to the listed files and restart. Acceptance: `evidence/qa-gates/format.<timestamp>.md` records the printed literal `FORMAT-DIFF-COUNT=0`; committed and pushed.
+- [x] [P2-T1] Run `sh SCRATCH/issue-1080-format-check.sh` over the four change-set files; on drift apply `Invoke-Formatter` to the listed files and restart. Acceptance: `evidence/qa-gates/format.<timestamp>.md` records the printed literal `FORMAT-DIFF-COUNT=0`; committed and pushed.
 - [ ] [P2-T2] Run `sh SCRATCH/issue-1080-pssa.sh` over the four change-set files. Acceptance: `evidence/qa-gates/pssa.<timestamp>.md` records `PSSA-FINDINGS=0`; committed and pushed.
 - [ ] [P2-T3] Run `issue-1080-run.sh` over the two change-set test files without shuffle. Acceptance: `evidence/qa-gates/pester-suites.<timestamp>.md` records `Failed=0` and `FILE` lines with `tests=74 failed=0` (Logic) and `tests=32 failed=0` (script); committed and pushed.
 - [ ] [P2-T4] Run `issue-1080-cov.sh` naming both production files. Acceptance: `evidence/qa-gates/coverage-final.<timestamp>.md` records both `COVERAGE` values at 85 or above, the P0-T5 baseline values beside them, and every `MISSED` line with the function that holds it, none inside `ConvertFrom-EpicProgressKickoffRow` (changed-line coverage 100%); committed and pushed.
