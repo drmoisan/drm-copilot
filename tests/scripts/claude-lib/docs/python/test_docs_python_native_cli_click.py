@@ -8,19 +8,23 @@ from docs_python_native.source import parse_module
 
 
 def _recognize(text: str) -> CliResult:
+    """Parse a source text and run the Click recognizer over it."""
     parsed = parse_module(text)
     return recognize_click(parsed, build_tables(parsed))
 
 
 def _site(result: CliResult, site_id: str) -> CliSite:
+    """Return the recognized site with the given identifier."""
     return next(site for site in result.sites if site.site_id == site_id)
 
 
 def _options(result: CliResult, parent: str) -> list[CliSite]:
+    """Return the option sites whose parent is the given site."""
     return [s for s in result.sites if s.kind == "option" and s.parent_id == parent]
 
 
 def _codes(result: CliResult) -> list[str]:
+    """Return the raw diagnostic codes of a recognizer result."""
     return sorted(d.code for d in result.diagnostics)
 
 
@@ -70,6 +74,8 @@ cli_group.add_command(other.module_cmd)
 
 
 class TestDefaultName:
+    """Scenarios for default name in docs_python_native.cli_click."""
+
     @pytest.mark.parametrize(
         ("function_name", "expected"),
         [
@@ -84,11 +90,15 @@ class TestDefaultName:
     def test_lower_cases_replaces_underscores_and_strips_one_suffix(
         self, function_name: str, expected: str
     ) -> None:
+        """Scenario: lower cases replaces underscores and strips one suffix."""
         assert click_default_name(function_name) == expected
 
 
 class TestTree:
+    """Scenarios for tree in docs_python_native.cli_click."""
+
     def test_root_group_with_literal_name_and_option(self) -> None:
+        """Scenario: root group with literal name and option."""
         result = _recognize(TREE)
         root = _site(result, "cli_group")
         assert (root.kind, root.name, root.span, root.attach, root.is_group) == (
@@ -108,6 +118,7 @@ class TestTree:
         }
 
     def test_commands_and_parameters_under_tracked_groups(self) -> None:
+        """Scenario: commands and parameters under tracked groups."""
         result = _recognize(TREE)
         sync = _site(result, "sync_command")
         assert (sync.parent_id, sync.default_name, sync.span) == (
@@ -127,6 +138,7 @@ class TestTree:
         )
 
     def test_add_command_reparents_with_and_without_name(self) -> None:
+        """Scenario: add command reparents with and without name."""
         result = _recognize(TREE)
         plain = _site(result, "plain_cmd")
         extra = _site(result, "extra_command")
@@ -141,7 +153,10 @@ class TestTree:
 
 
 class TestDiagnostics:
+    """Scenarios for diagnostics in docs_python_native.cli_click."""
+
     def test_click_diagnostic_classes(self) -> None:
+        """Scenario: each Click diagnostic is reported and drops only its site."""
         text = (
             "import click\n"
             "class G(click.Group):\n    pass\n"
@@ -175,11 +190,13 @@ class TestDiagnostics:
         assert roots == ["fine", "ok_group", "options"]
 
     def test_unparsed_input_yields_nothing(self) -> None:
+        """Scenario: unparsed input yields no sites."""
         assert _recognize("x = (\n").sites == []
 
     def test_group_closure_tracks_nested_groups_declared_before_their_parent(
         self,
     ) -> None:
+        """Scenario: group closure tracks nested groups declared before their parent."""
         text = (
             "import click\n"
             "@outer.group()\ndef inner():\n    pass\n"

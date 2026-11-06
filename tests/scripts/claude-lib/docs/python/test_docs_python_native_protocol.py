@@ -17,6 +17,7 @@ from docs_python_native.protocol import (
 
 
 def _request(**overrides: object) -> dict[str, object]:
+    """Build a valid request object with selected keys overridden."""
     request: dict[str, object] = {
         "protocol_version": 1,
         "analyzers": ["python-public-api", "python-architecture"],
@@ -38,6 +39,7 @@ def _run(
     version_info: Sequence[object] = (3, 13, 0),
     run: Callable[[Request], dict[str, object]] | None = None,
 ) -> tuple[int, Any, bytes]:
+    """Run main over the encoded request and return the exit code and decoded output."""
     stdout = io.BytesIO()
     if run is None:
         code = main(io.BytesIO(data), stdout, version_info=version_info)
@@ -49,11 +51,15 @@ def _run(
 
 
 def _encode(value: object) -> bytes:
+    """Encode a request object as UTF-8 JSON bytes."""
     return json.dumps(value).encode("utf-8")
 
 
 class TestValidRequest:
+    """Scenarios for valid request in docs_python_native.protocol."""
+
     def test_round_trip_reports_status_facts_and_sorted_files(self) -> None:
+        """Scenario: round trip reports status facts and sorted files."""
         code, response, raw = _run(_encode(_request()))
         assert code == EXIT_OK
         assert response["protocol_version"] == 1
@@ -66,6 +72,7 @@ class TestValidRequest:
         assert all(byte < 0x80 for byte in raw)
 
     def test_import_diagnostics_are_reported_under_each_selected_analyzer(self) -> None:
+        """Scenario: import diagnostics are reported under each selected analyzer."""
         request = _request(
             files=[{"path": "src/m.py", "text": "from click import *\n"}]
         )
@@ -78,6 +85,7 @@ class TestValidRequest:
         ]
 
     def test_all_four_analyzers_dispatch(self) -> None:
+        """Scenario: all four analyzers dispatch and report their declarations."""
         request = _request(
             analyzers=[
                 "python-cli",
@@ -111,6 +119,8 @@ class TestValidRequest:
 
 
 class TestInvalidRequest:
+    """Scenarios for invalid request in docs_python_native.protocol."""
+
     @pytest.mark.parametrize(
         "data",
         [
@@ -122,6 +132,7 @@ class TestInvalidRequest:
         ],
     )
     def test_malformed_bytes_are_invalid(self, data: bytes) -> None:
+        """Scenario: malformed request bytes give request-invalid and exit code 2."""
         code, response, _raw = _run(data)
         assert code == EXIT_INVALID
         error = response["error"]
@@ -162,6 +173,7 @@ class TestInvalidRequest:
         ],
     )
     def test_each_request_defect_is_invalid(self, overrides: dict[str, object]) -> None:
+        """Scenario: each request defect exits 2 and quotes no source text."""
         request = _request(**overrides)
         code, response, _raw = _run(_encode(request))
         assert code == EXIT_INVALID, overrides
@@ -170,8 +182,13 @@ class TestInvalidRequest:
 
 
 class TestFailures:
+    """Scenarios for failures in docs_python_native.protocol."""
+
     def test_injected_analyzer_exception_is_internal_error(self) -> None:
+        """Scenario: injected analyzer exception is internal error."""
+
         def failing(_request: Request) -> dict[str, object]:
+            """Raise an internal error in place of the request runner."""
             raise KeyError("secret source text")
 
         code, response, _raw = _run(_encode(_request()), run=failing)
@@ -181,6 +198,7 @@ class TestFailures:
         assert "secret" not in str(error["message"])
 
     def test_interpreter_below_floor(self) -> None:
+        """Scenario: an interpreter below the floor gives version-below-floor."""
         code, response, _raw = _run(_encode(_request()), version_info=(3, 10, 14))
         assert code == EXIT_FLOOR
         error = response["error"]

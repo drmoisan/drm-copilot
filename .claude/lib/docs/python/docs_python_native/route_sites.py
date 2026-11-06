@@ -40,13 +40,23 @@ if TYPE_CHECKING:
 
 
 def method_list(call: ast.Call) -> tuple[str, ...] | None:
-    """Return the upper-case literal methods= list, ('GET',) when absent, else None."""
+    """Return the HTTP methods of a generic route or route call.
+
+    Args:
+        call: The api_route, route, add_api_route or add_url_rule call.
+
+    Returns:
+        ("GET",) when methods= is absent; the unique upper-case literal methods in
+        source order; None when methods= is not a non-empty literal list or tuple of
+        literal strings.
+    """
     node = keyword(call, "methods")
     if node is None:
         return ("GET",)
     if not isinstance(node, (ast.List, ast.Tuple)) or not node.elts:
         return None
     methods: list[str] = []
+    # Upper-case each literal and keep first occurrences; a non-literal gives None.
     for item in node.elts:
         value = literal_string(item)
         if value is None:
@@ -57,9 +67,20 @@ def method_list(call: ast.Call) -> tuple[str, ...] | None:
 
 
 def _receivers(entry: RouteFile, name: str) -> dict[str, RouteReceiver]:
+    """Return the receivers of one framework in a file.
+
+    Args:
+        entry: The file's pass-1 state.
+        name: The framework key ("fastapi" or "flask").
+
+    Returns:
+        Receiver name to RouteReceiver for every receiver whose qualified constructor
+        belongs to the framework; an app never carries a prefix.
+    """
     tables = entry.analyzed.tables
     definition = FRAMEWORKS[name]
     found: dict[str, RouteReceiver] = {}
+    # Keep only receivers built by one of the framework's constructors.
     for receiver in tables.receivers.values():
         kind = definition.constructors.get(tables.qualify(receiver.callee) or "")
         if kind is None:
@@ -76,12 +97,29 @@ def _receivers(entry: RouteFile, name: str) -> dict[str, RouteReceiver]:
 
 
 def _first_literal(call: ast.Call | None) -> str | None:
+    """Return the literal first positional argument of a call.
+
+    Args:
+        call: A call node, or None.
+
+    Returns:
+        The literal string of the first argument, or None when absent or not literal.
+    """
     if call is None or not call.args:
         return None
     return literal_string(call.args[0])
 
 
 def collect_sites(entry: RouteFile, output: AnalyzerOutput) -> None:
+    """Collect the receivers, routes and mounts of one file (pass 1).
+
+    Args:
+        entry: The file's pass-1 state; its receivers, routes and mounts are filled.
+        output: The analyzer output that receives the pass-1 diagnostics.
+
+    Returns:
+        None. Mutates entry and output.
+    """
     analyzed = entry.analyzed
     tree = analyzed.parsed.tree
     if tree is None:
@@ -90,13 +128,19 @@ def collect_sites(entry: RouteFile, output: AnalyzerOutput) -> None:
     owner = statement_index(tree)
     header_nodes = function_header_nodes(tree)
     tracked: dict[str, str] = {}
+    # Register the receivers of both frameworks and remember which framework owns each.
     for name in FRAMEWORKS:
         receivers = _receivers(entry, name)
         entry.receivers.update(receivers)
+        # Map each receiver name to the framework that owns it.
         tracked.update({key: name for key in receivers})
+    # Visit definitions for decorator routes and calls for route, mount and
+    # unsupported mount registrations; decorator calls are skipped as calls.
     for node, context in walk_with_context(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            # Each decorator is tried against each framework; the receiver decides.
             for name in FRAMEWORKS:
+                # Check every decorator of the definition against this framework.
                 for decorator in node.decorator_list:
                     _decorator_route(
                         entry, node, decorator, name, tracked, context.in_loop, output
@@ -111,6 +155,8 @@ def collect_sites(entry: RouteFile, output: AnalyzerOutput) -> None:
         span = site_span(node, owner.get(node))
         framework = tracked[parts[0]]
         definition = FRAMEWORKS[framework]
+        # Routing: the route call registers a route (not inside a loop); a mount()
+        # call is never resolved; include_router or register_blueprint mounts a child.
         if parts[1] == definition.call:
             if context.in_loop:
                 output.add_diagnostic(path, "HTTP_ROUTE_IN_LOOP", span[0])
@@ -131,6 +177,20 @@ def _decorator_route(
     in_loop: bool,
     output: AnalyzerOutput,
 ) -> None:
+    """Record a decorator route, or the diagnostic that replaces it.
+
+    Args:
+        entry: The file's pass-1 state; a route is appended to entry.routes.
+        function: The decorated function.
+        decorator: One decorator of the function.
+        framework: The framework the decorator is checked against.
+        tracked: Receiver name to its framework.
+        in_loop: True when the definition lies in a loop body.
+        output: Receives HTTP_UNBOUND_ROUTE, HTTP_ROUTE_IN_LOOP or HTTP_DYNAMIC_ROUTE.
+
+    Returns:
+        None.
+    """
     callee = leading_chain(decorator)
     parts = callee.split(".") if callee is not None else []
     definition = FRAMEWORKS[framework]
@@ -140,6 +200,8 @@ def _decorator_route(
     literal = _first_literal(call)
     path = entry.analyzed.path
     line = decorator_line(entry.analyzed.parsed, decorator)
+    # An untracked receiver is reported only when the name is unbound in the file and
+    # the path looks like a route, as the 1022 scanner does.
     if tracked.get(parts[0]) != framework:
         tables = entry.analyzed.tables
         if (
@@ -152,6 +214,8 @@ def _decorator_route(
     if in_loop:
         output.add_diagnostic(path, "HTTP_ROUTE_IN_LOOP", line)
         return
+    # Routing: the generic route reads methods=, websocket is its own method, and any
+    # other attribute is the method name itself.
     if parts[1] == GENERIC_METHODS[framework]:
         methods = method_list(call) if call is not None else None
     elif parts[1] == "websocket":
@@ -176,9 +240,24 @@ def _call_route(
     span: tuple[int, int],
     output: AnalyzerOutput,
 ) -> None:
+    """Record an add_api_route or add_url_rule route, or its diagnostic.
+
+    Args:
+        entry: The file's pass-1 state; a route is appended to entry.routes.
+        call: The route call.
+        receiver: The receiver name the call is made on.
+        framework: "fastapi" or "flask".
+        span: The logical-line span of the call.
+        output: Receives HTTP_METHOD_VIEW_UNRESOLVED or HTTP_DYNAMIC_ROUTE.
+
+    Returns:
+        None.
+    """
     path = entry.analyzed.path
     methods = method_list(call)
     view = keyword(call, "view_func")
+    # A Flask class-based view registered without a literal methods= list has methods
+    # that only the view class defines, so the route cannot be enumerated.
     if (
         framework == "flask"
         and not (keyword(call, "methods") is not None and methods is not None)
@@ -204,6 +283,19 @@ def _mount(
     line: int,
     output: AnalyzerOutput,
 ) -> None:
+    """Record an include_router or register_blueprint mount.
+
+    Args:
+        entry: The file's pass-1 state; a mount is appended to entry.mounts.
+        call: The mount call.
+        parent: The mounting receiver name.
+        definition: The framework rules of the receiver.
+        line: The mount line.
+        output: Receives HTTP_MOUNT_UNRESOLVED when the child is not a dotted name.
+
+    Returns:
+        None.
+    """
     child = dotted_name(call.args[0]) if call.args else None
     if child is None:
         output.add_diagnostic(entry.analyzed.path, "HTTP_MOUNT_UNRESOLVED", line)

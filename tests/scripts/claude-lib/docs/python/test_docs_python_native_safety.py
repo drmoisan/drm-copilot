@@ -17,6 +17,7 @@ FORBIDDEN_CONSTANTS = frozenset({"element_id", "parent_id", "source_sha256"})
 
 
 def _helper_trees() -> list[tuple[str, ast.Module]]:
+    """Parse every helper file and pin the helper file count."""
     files = sorted(PYLIB.rglob("*.py"))
     assert len(files) == 18
     return [
@@ -26,6 +27,7 @@ def _helper_trees() -> list[tuple[str, ast.Module]]:
 
 
 def _call_name(node: ast.Call) -> str | None:
+    """Return the dotted name of a call's callee, or None."""
     if isinstance(node.func, ast.Name):
         return node.func.id
     if isinstance(node.func, ast.Attribute):
@@ -34,8 +36,13 @@ def _call_name(node: ast.Call) -> str | None:
 
 
 class TestStaticSafety:
+    """Scenarios for static safety of every helper file."""
+
     def test_no_execution_import_or_hashing_primitive(self) -> None:
+        """Scenario: no helper file calls or imports an execution or hashing API."""
+        # Inspect every helper file.
         for name, tree in _helper_trees():
+            # Check every node of the file's syntax tree.
             for node in ast.walk(tree):
                 if isinstance(node, ast.Call):
                     assert _call_name(node) not in FORBIDDEN_CALLS, name
@@ -50,8 +57,11 @@ class TestStaticSafety:
                     ] not in FORBIDDEN_MODULES, name
 
     def test_ast_parse_is_the_only_parse_call(self) -> None:
+        """Scenario: ast.parse in source.py is the only parse call."""
         parse_calls: list[str] = []
+        # Inspect every helper file.
         for name, tree in _helper_trees():
+            # Check every node of the file's syntax tree.
             for node in ast.walk(tree):
                 if isinstance(node, ast.Attribute) and node.attr == "parse":
                     assert (
@@ -61,14 +71,20 @@ class TestStaticSafety:
         assert parse_calls == ["docs_python_native/source.py"]
 
     def test_no_identity_or_digest_field_name(self) -> None:
+        """Scenario: no helper constant names an identity or digest field."""
+        # Inspect every helper file.
         for name, tree in _helper_trees():
+            # Check every node of the file's syntax tree.
             for node in ast.walk(tree):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str):
                     assert node.value not in FORBIDDEN_CONSTANTS, name
 
 
 class TestBehavioralSafety:
+    """Scenarios for behavioral safety of the helper."""
+
     def test_analyzing_hostile_source_has_no_side_effect(self) -> None:
+        """Scenario: analyzing hostile source has no side effect."""
         # Arrange: a module whose execution would exit, set an environment key and
         # replace a module.
         marker = "DOCS_NATIVE_SAFETY_MARKER"
@@ -102,4 +118,5 @@ class TestBehavioralSafety:
         assert sys.modules["json"] is modules_before["json"]
 
     def test_bytecode_writing_is_disabled(self) -> None:
+        """Scenario: the test process runs with bytecode writing disabled."""
         assert sys.dont_write_bytecode is True

@@ -10,11 +10,13 @@ ROOTS = ["src"]
 
 
 def _file(path: str, text: str) -> AnalyzedFile:
+    """Build an AnalyzedFile from an in-memory path and source text."""
     parsed = parse_module(text)
     return AnalyzedFile(path, parsed, build_tables(parsed))
 
 
 def _facts(files: list[AnalyzedFile], scripts: list[ConsoleScript]) -> dict[str, Fact]:
+    """Run analyze_cli and map each fact declaration to its fact."""
     output = analyze_cli(files, ROOTS, scripts)
     return {fact.declaration: fact for facts in output.facts.values() for fact in facts}
 
@@ -34,7 +36,10 @@ TYPER = (
 
 
 class TestRootName:
+    """Scenarios for root name in docs_python_native.cli."""
+
     def test_order_is_script_then_literal_then_module(self) -> None:
+        """Scenario: order is script then literal then module."""
         site = CliSite("root", "click", "f", None, "lit", (1, 1), {})
         assert root_name(site, "script", "mod") == ("script", "console-script")
         assert root_name(site, None, "mod") == ("lit", "literal")
@@ -44,7 +49,10 @@ class TestRootName:
 
 
 class TestAttachment:
+    """Scenarios for attachment in docs_python_native.cli."""
+
     def test_attached_root_is_replaced_by_the_script(self) -> None:
+        """Scenario: attached root is replaced by the script."""
         files = [_file("src/pkg/cli.py", ARGPARSE)]
         scripts = [
             ConsoleScript("tool", "project.scripts", "pyproject.toml", "pkg.cli:build")
@@ -59,6 +67,7 @@ class TestAttachment:
         assert dict(run.properties) == {"framework": "argparse"}
 
     def test_unattached_root_keeps_its_literal_name(self) -> None:
+        """Scenario: unattached root keeps its literal name."""
         files = [_file("src/pkg/cli.py", ARGPARSE)]
         scripts = [
             ConsoleScript("a", "project.scripts", "pyproject.toml", "pkg.cli:other"),
@@ -77,6 +86,7 @@ class TestAttachment:
         )
 
     def test_module_named_root_and_ambiguous_module_target(self) -> None:
+        """Scenario: module named root and ambiguous module target."""
         files = [_file("src/pkg/t.py", TYPER), _file("lib/pkg/t.py", TYPER)]
         scripts = [ConsoleScript("t", "project.scripts", "pyproject.toml", "pkg.t:app")]
         output = analyze_cli(files, ["src", "lib"], scripts)
@@ -93,10 +103,12 @@ class TestAttachment:
         ]
 
     def test_root_without_any_name_is_dropped_with_its_children(self) -> None:
+        """Scenario: root without any name is dropped with its children."""
         facts = _facts([_file("elsewhere/t.py", TYPER)], [])
         assert facts == {}
 
     def test_recognizer_diagnostics_are_reported_per_path(self) -> None:
+        """Scenario: recognizer diagnostics are reported per path."""
         output = analyze_cli(
             [
                 _file(

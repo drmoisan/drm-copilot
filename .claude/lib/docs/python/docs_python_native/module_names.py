@@ -9,6 +9,14 @@ from __future__ import annotations
 
 
 def _identifier(segment: str) -> bool:
+    """Report whether a dotted-name segment is a Python identifier.
+
+    Args:
+        segment: One segment of a dotted module name.
+
+    Returns:
+        True when the segment is an identifier (str.isidentifier).
+    """
     return segment.isidentifier()
 
 
@@ -17,14 +25,24 @@ def module_dotted_name(
 ) -> str | None:
     """Return the dotted module name of a .py path under its longest containing root.
 
-    __init__.py gives the package name. None for a path under no root, a non-.py path, a
-    root-level __init__.py, or (when require_identifiers) a segment that is not an
-    identifier.
+    Args:
+        path: A repository-relative request path with forward slashes.
+        source_roots: The configured source roots; "." or "" stands for the
+            repository root and is used only when no other root contains the path.
+        require_identifiers: When True, a name with a non-identifier segment is
+            rejected; analyzers that report such modules pass False.
+
+    Returns:
+        The dotted name ("__init__.py" gives the package name), or None for a path
+        under no root, a non-.py path, a root-level __init__.py, or (when
+        require_identifiers) a segment that is not an identifier.
     """
     if not path.endswith(".py"):
         return None
     relative: str | None = None
     best = -1
+    # Keep the longest root that contains the path; the repository-root forms only
+    # apply when no named root has matched.
     for root in source_roots:
         trimmed = root.rstrip("/")
         if trimmed in (".", ""):
@@ -36,6 +54,7 @@ def module_dotted_name(
     if relative is None:
         return None
     stem = relative[:-3]
+    # A package __init__ names its directory; a root-level __init__ names nothing.
     if stem.endswith("/__init__"):
         stem = stem[: -len("/__init__")]
     elif stem == "__init__":
@@ -49,9 +68,19 @@ def module_dotted_name(
 
 
 def module_package(path: str, module: str | None) -> str | None:
-    """Return a module's package: itself for __init__.py, its parent, or '' at top."""
+    """Return the package that relative imports in a module resolve against.
+
+    Args:
+        path: The request path of the module.
+        module: The module's dotted name, or None.
+
+    Returns:
+        The module itself for __init__.py, its parent package otherwise, "" for a
+        top-level module, or None when module is None.
+    """
     if module is None:
         return None
+    # Routing: a package resolves against itself, a submodule against its parent.
     if path.endswith("/__init__.py"):
         return module
     if "." in module:
@@ -60,7 +89,16 @@ def module_package(path: str, module: str | None) -> str | None:
 
 
 def resolve_relative(module: str, package: str | None) -> str | None:
-    """Resolve a possibly relative dotted module against a package, or return None."""
+    """Resolve a possibly relative dotted module against a package.
+
+    Args:
+        module: The imported module text, with one leading dot per level.
+        package: The importing module's package, or None.
+
+    Returns:
+        The absolute dotted module; the module unchanged when it is absolute; None when
+        the package is empty or absent or the dots climb above the top package.
+    """
     level = len(module) - len(module.lstrip("."))
     if level == 0:
         return module

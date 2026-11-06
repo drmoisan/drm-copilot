@@ -10,15 +10,18 @@ from docs_python_native.source import parse_module
 
 
 def _recognize(text: str) -> CliResult:
+    """Parse a source text and run the Typer recognizer over it."""
     parsed = parse_module(text)
     return recognize_typer(parsed, build_tables(parsed))
 
 
 def _site(result: CliResult, site_id: str) -> CliSite:
+    """Return the recognized site with the given identifier."""
     return next(site for site in result.sites if site.site_id == site_id)
 
 
 def _options(result: CliResult, parent: str) -> dict[str, CliSite]:
+    """Map option names to the option sites whose parent is the given site."""
     return {
         s.name or "": s
         for s in result.sites
@@ -27,6 +30,7 @@ def _options(result: CliResult, parent: str) -> dict[str, CliSite]:
 
 
 def _codes(result: CliResult) -> list[str]:
+    """Return the raw diagnostic codes of a recognizer result."""
     return sorted(d.code for d in result.diagnostics)
 
 
@@ -76,6 +80,8 @@ typer.run(standalone)
 
 
 class TestPlainDefault:
+    """Scenarios for plain default in docs_python_native.cli_typer."""
+
     @pytest.mark.parametrize(
         ("text", "expected"),
         [
@@ -97,12 +103,16 @@ class TestPlainDefault:
         ],
     )
     def test_classifies_default_forms(self, text: str, expected: bool) -> None:
+        """Scenario: each default form is classified as plain or not plain."""
         expression = ast.parse(text, mode="eval").body
         assert plain_default(expression) is expected
 
 
 class TestTree:
+    """Scenarios for tree in docs_python_native.cli_typer."""
+
     def test_root_and_add_typer_subgroup(self) -> None:
+        """Scenario: add_typer reparents a child root as a command of the root."""
         result = _recognize(TREE)
         root = _site(result, "app")
         assert (root.kind, root.name, root.span, root.attach) == (
@@ -121,12 +131,14 @@ class TestTree:
         )
 
     def test_callback_parameters_become_root_options(self) -> None:
+        """Scenario: callback parameters become root options."""
         result = _recognize(TREE)
         (verbose,) = _options(result, "app").values()
         assert verbose.name == "--verbose" and verbose.properties["has_default"] is True
         assert result.diagnostics == []
 
     def test_command_parameters(self) -> None:
+        """Scenario: command parameters become options with their declared shapes."""
         result = _recognize(TREE)
         command = _site(result, "run_task")
         assert (command.parent_id, command.default_name, command.span) == (
@@ -155,6 +167,7 @@ class TestTree:
         assert options["--count"].span == (17, 17)
 
     def test_explicit_name_argument_and_run_root(self) -> None:
+        """Scenario: an explicit name and a typer.run root are both recognized."""
         result = _recognize(TREE)
         assert _site(result, "other").name == "explicit-name"
         (item,) = _options(result, "inner_thing").values()
@@ -170,7 +183,10 @@ class TestTree:
 
 
 class TestDiagnostics:
+    """Scenarios for diagnostics in docs_python_native.cli_typer."""
+
     def test_typer_diagnostic_classes(self) -> None:
+        """Scenario: each Typer diagnostic is reported and drops only its site."""
         text = (
             "import typer\n"
             "custom = typer.Typer(name='c', cls=K)\n"
@@ -203,4 +219,5 @@ class TestDiagnostics:
         assert sorted(_options(result, "unresolved")) == ["--other"]
 
     def test_unparsed_input_yields_nothing(self) -> None:
+        """Scenario: unparsed input yields no sites."""
         assert _recognize("x = (\n").sites == []

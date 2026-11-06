@@ -49,6 +49,13 @@ PARENTS = "CLI_PARENTS_UNRESOLVED"
 
 @dataclass(frozen=True)
 class _Node:
+    """The resolved role of an argparse receiver.
+
+    Attributes:
+        kind: "root", "subparsers", "command" or "group".
+        parser: The receiver name of the parser that options on this node attach to.
+    """
+
     kind: str
     parser: str
 
@@ -56,6 +63,17 @@ class _Node:
 def _resolve(
     name: str, tables: ModuleTables, memo: dict[str, _Node | None], visiting: set[str]
 ) -> _Node | None:
+    """Resolve a receiver name to its argparse role through its constructor chain.
+
+    Args:
+        name: The receiver name.
+        tables: The file's binding tables.
+        memo: Resolved roles by name; filled as names resolve.
+        visiting: Names on the current resolution path, to stop on a cycle.
+
+    Returns:
+        The role, or None for a name that is not an argparse receiver.
+    """
     if name in memo:
         return memo[name]
     receiver = tables.receivers.get(name)
@@ -64,12 +82,16 @@ def _resolve(
     visiting.add(name)
     parts = receiver.callee.split(".")
     node: _Node | None = None
+    # A qualified ArgumentParser is a root; a method call on a resolved receiver takes
+    # a role from the method and the parent's role; anything else stays unresolved.
     if tables.qualify(receiver.callee) == CONSTRUCTOR:
         node = _Node("root", name)
     elif len(parts) == 2 and parts[1] in METHODS:
         parent = _resolve(parts[0], tables, memo, visiting)
         if parent is not None:
             method = parts[1]
+            # Routing: add_subparsers on a parser, add_parser on a subparsers object,
+            # and a group method on a parser; other combinations give no role.
             if method == "add_subparsers" and parent.kind in ("root", "command"):
                 node = _Node("subparsers", parent.parser)
             elif method == "add_parser" and parent.kind == "subparsers":
@@ -82,7 +104,17 @@ def _resolve(
 
 
 def _innermost_function(tree: ast.Module, call: ast.Call) -> str | None:
+    """Return the name of the innermost function whose body contains a call.
+
+    Args:
+        tree: The module to search.
+        call: The parser constructor call.
+
+    Returns:
+        The function name (the latest-starting enclosing def), or None at module level.
+    """
     found: tuple[int, str] | None = None
+    # Among the defs whose body contains the call, keep the one that starts last.
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             if any(inner is call for stmt in node.body for inner in ast.walk(stmt)):
@@ -92,14 +124,26 @@ def _innermost_function(tree: ast.Module, call: ast.Call) -> str | None:
 
 
 def _option(call: ast.Call) -> tuple[str, dict[str, PropertyValue]] | None:
+    """Read the name and properties of an add_argument call.
+
+    Args:
+        call: The add_argument call.
+
+    Returns:
+        (name, properties), where the name is the first long flag, else the first short
+        flag, else the positional name; None when the call has a star argument, no
+        arguments, or a non-literal name.
+    """
     if has_star(call) or not call.args:
         return None
     strings: list[str] = []
+    # Every positional name must be a literal string.
     for argument in call.args:
         value = literal_string(argument)
         if value is None:
             return None
         strings.append(value)
+    # Split the declared names into long (--x) and short (-x) flags.
     longs = [s for s in strings if s.startswith("--")]
     shorts = [s for s in strings if s.startswith("-") and not s.startswith("--")]
     name = longs[0] if longs else shorts[0] if shorts else strings[0]
@@ -113,6 +157,7 @@ def _option(call: ast.Call) -> tuple[str, dict[str, PropertyValue]] | None:
     required = literal_bool(keyword(call, "required"))
     if required is not None:
         properties["required"] = required
+    # Copy the literal action and help keywords when present.
     for key in ("action", "help"):
         value = literal_string(keyword(call, key))
         if value is not None:
@@ -121,6 +166,15 @@ def _option(call: ast.Call) -> tuple[str, dict[str, PropertyValue]] | None:
 
 
 def _unbound_attribute(call: ast.Call) -> bool:
+    """Report whether a call invokes an argparse method on a non-name receiver.
+
+    Args:
+        call: Any call.
+
+    Returns:
+        True for receiver.method(...) where method is an argparse method and the
+        receiver is not a dotted name (for example a call or subscript).
+    """
     func = call.func
     return (
         isinstance(func, ast.Attribute)
@@ -130,7 +184,17 @@ def _unbound_attribute(call: ast.Call) -> bool:
 
 
 def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
-    """Return the argparse sites and diagnostics of one parsed input."""
+    """Return the argparse sites and diagnostics of one parsed input.
+
+    Args:
+        parsed: The parsed module.
+        tables: Its binding tables.
+
+    Returns:
+        The roots (bound ArgumentParser constructors), commands (add_parser) and
+        options (add_argument) with the 1022 diagnostics for unbound, looped and
+        dynamic registrations.
+    """
     result = CliResult()
     tree = parsed.tree
     if tree is None:
@@ -138,6 +202,8 @@ def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
     owner = statement_index(tree)
     memo: dict[str, _Node | None] = {}
     option_index = 0
+    # Each argparse call is classified in order: unbound receiver, constructor or
+    # method, loop placement, then command or option site.
     for node, context in walk_with_context(tree):
         if not isinstance(node, ast.Call):
             continue
@@ -156,6 +222,8 @@ def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
             continue
         bound = binding_name(tables, statement)
         target: _Node | None = None
+        # A constructor counts only as the bound receiver's own call; a method call
+        # must be on a resolvable receiver, and structural methods produce no site.
         if constructor:
             if bound is None or tables.receivers[bound].call is not node:
                 continue
@@ -198,10 +266,31 @@ def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
 
 
 def _looped(context: Context) -> bool:
+    """Report whether a registration repeats at run time.
+
+    Args:
+        context: The call's enclosing-block context.
+
+    Returns:
+        True inside a loop body or a comprehension.
+    """
     return context.in_loop or context.in_comprehension
 
 
 def _tracked_other(tables: ModuleTables, name: str) -> bool:
+    """Report whether a name is a receiver of some non-argparse callee.
+
+    Such a receiver (for example a Click group calling add_argument-like methods) is
+    silently skipped rather than reported as unbound.
+
+    Args:
+        tables: The file's binding tables.
+        name: The receiver name.
+
+    Returns:
+        True when the name is a receiver whose callee is neither an argparse method
+        nor the ArgumentParser constructor.
+    """
     other = tables.receivers.get(name)
     if other is None:
         return False
@@ -220,7 +309,22 @@ def _command_site(
     tree: ast.Module,
     result: CliResult,
 ) -> CliSite | None:
+    """Build the root or command site of an ArgumentParser or add_parser call.
+
+    Args:
+        call: The constructor or add_parser call.
+        constructor: True for an ArgumentParser constructor.
+        bound: The receiver name the call is bound to, or None.
+        target: The resolved role of the add_parser receiver, or None for a root.
+        span: The logical-line span of the call.
+        tree: The module, used to find the function a root lives in.
+        result: Receives CLI_DYNAMIC_REGISTRATION and CLI_PARENTS_UNRESOLVED.
+
+    Returns:
+        The site, or None when the name (prog= or the add_parser name) is dynamic.
+    """
     name: str | None = None
+    # A root reads an optional literal prog=; a command needs a literal first argument.
     if constructor:
         if has_keyword(call, "prog"):
             name = literal_string(keyword(call, "prog"))

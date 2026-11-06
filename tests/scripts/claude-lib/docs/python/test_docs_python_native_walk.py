@@ -6,7 +6,10 @@ from docs_python_native.walk import Context, walk_with_context
 
 
 class TestWalkWithContext:
+    """Scenarios for walk with context in docs_python_native.walk."""
+
     def test_contexts_follow_blocks_and_comprehensions(self) -> None:
+        """Scenario: contexts follow blocks and comprehensions."""
         text = (
             "if x:\n    a = 1\n"
             "for i in y:\n    b = 2\n"
@@ -15,6 +18,7 @@ class TestWalkWithContext:
             "try:\n    e = 1\nexcept E:\n    g = 1\n"
         )
         found: dict[str, Context] = {}
+        # Record the context of every assigned name.
         for node, context in walk_with_context(ast.parse(text)):
             if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
                 found[node.id] = context

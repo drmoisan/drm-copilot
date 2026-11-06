@@ -10,17 +10,20 @@ CAFE = "caf" + chr(0xE9)
 
 
 def _file(path: str, text: str) -> AnalyzedFile:
+    """Build an AnalyzedFile from an in-memory path and source text."""
     parsed = parse_module(text)
     return AnalyzedFile(path, parsed, build_tables(parsed))
 
 
 def _run(path: str, text: str) -> AnalyzerOutput:
+    """Run the public-api analyzer over one in-memory file."""
     return analyze_public_api([_file(path, text)], ROOTS)
 
 
 def _symbols(
     output: AnalyzerOutput,
 ) -> dict[str, tuple[str, str, tuple[int | None, int | None]]]:
+    """Map each public-symbol name to its kind, span and basis."""
     return {
         f.declaration: (
             str(dict(f.properties)["symbol_kind"]),
@@ -33,6 +36,7 @@ def _symbols(
 
 
 def _codes(output: AnalyzerOutput) -> list[str]:
+    """Return the raw diagnostic codes of an analyzer output."""
     return sorted(d.code for ds in output.diagnostics.values() for d in ds)
 
 
@@ -52,7 +56,10 @@ ALL = (
 
 
 class TestAllForms:
+    """Scenarios for all forms in docs_python_native.public_api."""
+
     def test_literal_all_forms_in_statement_order(self) -> None:
+        """Scenario: literal all forms in statement order."""
         output = _run("src/pkg/api.py", ALL)
         assert _symbols(output) == {
             "pkg.api.first": ("function", "all", (9, 9)),
@@ -67,6 +74,7 @@ class TestAllForms:
         ]
 
     def test_annotated_tuple_replaces_and_empty_list_is_literal(self) -> None:
+        """Scenario: annotated tuple replaces and empty list is literal."""
         result = read_all(
             parse_module("__all__ = ['a']\n__all__: list[str] = ('b',)\n")
         )
@@ -75,6 +83,7 @@ class TestAllForms:
         assert (empty.found, empty.dynamic, empty.names) == (True, False, [])
 
     def test_dynamic_forms_fall_back_to_the_naming_rule(self) -> None:
+        """Scenario: dynamic forms fall back to the naming rule."""
         dynamic_forms = [
             "__all__ = ['a'] + ['b']\n",
             "__all__ = [n for n in x]\n",
@@ -91,11 +100,13 @@ class TestAllForms:
             "if x:\n    __all__ = ['a']\n",
             "def f():\n    __all__.append('a')\n",
         ]
+        # Each dynamic __all__ form is found and marks the list dynamic.
         for text in dynamic_forms:
             result = read_all(parse_module(text))
             assert (result.found, result.dynamic) == (True, True), text
 
     def test_statements_not_starting_with_all_are_ignored(self) -> None:
+        """Scenario: statements not starting with all are ignored."""
         result = read_all(
             parse_module("__all__\nx = __all__\nprint(__all__)\n__all_x = 1\n")
         )
@@ -103,6 +114,7 @@ class TestAllForms:
         assert read_all(parse_module("x = (\n")).found is False
 
     def test_dynamic_all_reports_and_uses_naming(self) -> None:
+        """Scenario: dynamic all reports and uses naming."""
         output = _run(
             "src/pkg/dyn.py", "__all__ = ['one'] + ['two']\ndef one():\n    pass\n"
         )
@@ -129,7 +141,10 @@ NAMING = (
 
 
 class TestNamingRule:
+    """Scenarios for naming rule in docs_python_native.public_api."""
+
     def test_top_level_bindings_and_diagnostics(self) -> None:
+        """Scenario: top-level bindings give naming symbols and their diagnostics."""
         output = _run("src/pkg/naming.py", NAMING)
         symbols = _symbols(output)
         assert sorted(symbols) == sorted(
@@ -160,7 +175,10 @@ class TestNamingRule:
 
 
 class TestModuleRules:
+    """Scenarios for module rules in docs_python_native.public_api."""
+
     def test_private_outside_and_invalid_modules(self) -> None:
+        """Scenario: private, outside and invalid modules emit no symbol."""
         files = [
             _file("src/pkg/_private.py", "x = 1\n"),
             _file("src/_pkg/mod.py", "x = 1\n"),

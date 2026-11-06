@@ -9,11 +9,13 @@ ROOTS = ["src"]
 
 
 def _file(path: str, text: str) -> AnalyzedFile:
+    """Build an AnalyzedFile from an in-memory path and source text."""
     parsed = parse_module(text)
     return AnalyzedFile(path, parsed, build_tables(parsed))
 
 
 def _components(output: AnalyzerOutput) -> dict[str, dict[str, object]]:
+    """Map each architecture-component declaration to its properties."""
     return {
         f.declaration: {
             "name": f.name,
@@ -26,6 +28,7 @@ def _components(output: AnalyzerOutput) -> dict[str, dict[str, object]]:
 
 
 def _codes(output: AnalyzerOutput) -> list[tuple[str, str]]:
+    """Return the sorted (path, code) pairs of every raw diagnostic."""
     return sorted((path, d.code) for path, ds in output.diagnostics.items() for d in ds)
 
 
@@ -51,7 +54,10 @@ ARCH = (
 
 
 class TestComponents:
+    """Scenarios for components in docs_python_native.architecture."""
+
     def test_edges_and_diagnostics(self) -> None:
+        """Scenario: a package tree gives sorted components, edges and diagnostics."""
         files = [
             _file("src/pkg/__init__.py", "from . import util\n"),
             _file("src/pkg/util.py", "x = 1\n"),
@@ -96,6 +102,7 @@ class TestComponents:
         ]
 
     def test_edge_limit_drops_edge_properties_but_keeps_the_count(self) -> None:
+        """Scenario: edge limit drops edge properties but keeps the count."""
         modules = [_file(f"src/m{i:04d}.py", "x = 1\n") for i in range(1001)]
         hub = "\n".join(f"import m{i:04d}" for i in range(1001)) + "\n"
         output = analyze_architecture([*modules, _file("src/hub.py", hub)], ROOTS)
@@ -105,6 +112,7 @@ class TestComponents:
         assert output.diagnostics["src/hub.py"][0].code == "ARCHITECTURE_EDGE_LIMIT"
 
     def test_known_prefix_is_the_longest_match(self) -> None:
+        """Scenario: the longest known prefix wins; an unknown module gives None."""
         known = {"pkg", "pkg.util"}
         assert known_prefix("pkg.util.helper", known) == "pkg.util"
         assert known_prefix("pkg.other", known) == "pkg"

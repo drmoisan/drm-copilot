@@ -4,7 +4,10 @@ from docs_python_native.facts import AnalyzerOutput, Fact, RawDiagnostic
 
 
 class TestAnalyzerOutput:
+    """Scenarios for analyzer output in docs_python_native.facts."""
+
     def test_facts_sort_properties_and_serialize_parents(self) -> None:
+        """Scenario: facts sort properties and serialize parents."""
         output = AnalyzerOutput("python-cli")
         output.add_fact(
             "a.py",
@@ -29,6 +32,7 @@ class TestAnalyzerOutput:
         )
 
     def test_add_diagnostic_records_a_raw_diagnostic_per_path(self) -> None:
+        """Scenario: add diagnostic records a raw diagnostic per path."""
         output = AnalyzerOutput("python-http")
         output.add_diagnostic("a.py", "HTTP_DYNAMIC_ROUTE", 3)
         output.add_diagnostic("a.py", "HTTP_ROUTE_IN_LOOP", 5)
@@ -41,7 +45,10 @@ class TestAnalyzerOutput:
 
 
 class TestFactToJson:
+    """Scenarios for fact to json in docs_python_native.facts."""
+
     def test_fact_with_a_parent_serializes_kind_declaration_and_path(self) -> None:
+        """Scenario: fact with a parent serializes kind declaration and path."""
         fact = Fact(
             "python-cli",
             "cli-option",
@@ -68,11 +75,13 @@ class TestFactToJson:
         }
 
     def test_fact_without_a_parent_serializes_a_null_parent(self) -> None:
+        """Scenario: fact without a parent serializes a null parent."""
         fact = Fact("python-public-api", "public-symbol", "pkg.f", "f", None, 1, 1, ())
         assert fact.to_json()["parent"] is None
         assert fact.to_json()["properties"] == {}
 
     def test_fact_with_a_none_span_serializes_null_line_bounds(self) -> None:
+        """Scenario: fact with a none span serializes null line bounds."""
         fact = Fact(
             "python-architecture",
             "architecture-component",

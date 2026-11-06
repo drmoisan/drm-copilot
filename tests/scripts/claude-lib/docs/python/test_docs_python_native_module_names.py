@@ -9,6 +9,8 @@ from docs_python_native.module_names import (
 
 
 class TestModuleNames:
+    """Scenarios for module names in docs_python_native.module_names."""
+
     @pytest.mark.parametrize(
         ("path", "roots", "expected"),
         [
@@ -26,9 +28,11 @@ class TestModuleNames:
     def test_module_dotted_name(
         self, path: str, roots: list[str], expected: str | None
     ) -> None:
+        """Scenario: a path gives its dotted name under the longest root, or None."""
         assert module_dotted_name(path, roots) == expected
 
     def test_unvalidated_name_keeps_a_non_identifier_segment(self) -> None:
+        """Scenario: unvalidated name keeps a non identifier segment."""
         assert module_dotted_name(
             "src/pkg/bad-name.py", ["src"], require_identifiers=False
         ) == ("pkg.bad-name")
@@ -45,6 +49,7 @@ class TestModuleNames:
     def test_module_package(
         self, path: str, module: str | None, expected: str | None
     ) -> None:
+        """Scenario: a module gives itself for __init__, else its parent package."""
         assert module_package(path, module) == expected
 
     @pytest.mark.parametrize(
@@ -64,4 +69,5 @@ class TestModuleNames:
     def test_resolve_relative_climbs_and_stops_above_the_root(
         self, module: str, package: str | None, expected: str | None
     ) -> None:
+        """Scenario: resolve relative climbs and stops above the root."""
         assert resolve_relative(module, package) == expected

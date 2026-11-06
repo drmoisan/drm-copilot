@@ -10,15 +10,18 @@ ROOTS = ["src"]
 
 
 def _file(path: str, text: str) -> AnalyzedFile:
+    """Build an AnalyzedFile from an in-memory path and source text."""
     parsed = parse_module(text)
     return AnalyzedFile(path, parsed, build_tables(parsed))
 
 
 def _run(*files: tuple[str, str]) -> AnalyzerOutput:
+    """Run the http analyzer over in-memory (path, text) files."""
     return analyze_http([_file(p, t) for p, t in files], ROOTS)
 
 
 def _routes(output: AnalyzerOutput) -> dict[str, dict[str, object]]:
+    """Map each route declaration to its path, span, name and properties."""
     return {
         f.declaration: {
             "path": path,
@@ -32,10 +35,13 @@ def _routes(output: AnalyzerOutput) -> dict[str, dict[str, object]]:
 
 
 def _codes(output: AnalyzerOutput) -> list[tuple[str, str]]:
+    """Return the sorted (path, code) pairs of every raw diagnostic."""
     return sorted((path, d.code) for path, ds in output.diagnostics.items() for d in ds)
 
 
 class TestComposeTemplate:
+    """Scenarios for compose template in docs_python_native.routes."""
+
     @pytest.mark.parametrize(
         ("framework", "prefixes", "path", "expected"),
         [
@@ -50,6 +56,7 @@ class TestComposeTemplate:
     def test_composition_rules(
         self, framework: str, prefixes: list[str], path: str, expected: str
     ) -> None:
+        """Scenario: FastAPI concatenates prefixes and Flask joins them with a slash."""
         assert compose_template(framework, prefixes, path) == expected
 
 
@@ -81,7 +88,10 @@ ROUTERS = (
 
 
 class TestFastApi:
+    """Scenarios for FastAPI in docs_python_native.routes."""
+
     def test_routes_across_modules(self) -> None:
+        """Scenario: FastAPI routes compose prefixes across modules and mounts."""
         output = _run(("src/pkg/app.py", FASTAPI), ("src/pkg/routers.py", ROUTERS))
         routes = _routes(output)
         assert routes["GET /"]["span"] == (6, 7)
@@ -97,6 +107,7 @@ class TestFastApi:
         assert _codes(output) == [("src/pkg/app.py", "HTTP_PREFIX_DYNAMIC")] * 2
 
     def test_fastapi_diagnostics(self) -> None:
+        """Scenario: each FastAPI diagnostic class is reported for its construct."""
         text = (
             "from fastapi import FastAPI, APIRouter\n"
             "app = FastAPI()\n"
@@ -130,6 +141,7 @@ class TestFastApi:
         assert routes["GET /a/cycle"]["mounted"] is False
 
     def test_depth_above_sixteen_is_unresolved(self) -> None:
+        """Scenario: a mount chain above depth sixteen reports include-unresolved."""
         lines = ["from fastapi import FastAPI, APIRouter", "app = FastAPI()"]
         lines += [f"r{i} = APIRouter(prefix='/{i}')" for i in range(18)]
         lines += ["app.include_router(r0)"]
@@ -161,7 +173,10 @@ FLASK = (
 
 
 class TestFlask:
+    """Scenarios for Flask in docs_python_native.routes."""
+
     def test_blueprints_and_rules(self) -> None:
+        """Scenario: Flask blueprints and rules compose their prefixes and methods."""
         output = _run(("src/web.py", FLASK))
         routes = _routes(output)
         assert {"GET /", "GET /multi", "POST /multi"} <= set(routes)
@@ -177,6 +192,7 @@ class TestFlask:
         ]
 
     def test_unparsed_file_and_unknown_relative_child(self) -> None:
+        """Scenario: an unparsed file is skipped; an unknown child is unresolved."""
         output = _run(
             ("src/bad.py", "x = (\n"),
             (

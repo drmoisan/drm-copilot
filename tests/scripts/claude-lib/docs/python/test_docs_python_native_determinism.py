@@ -30,6 +30,7 @@ FILES = [
 
 
 def _run(files: list[dict[str, str]]) -> bytes:
+    """Run the helper main over the given files and return the raw response bytes."""
     request = {
         "protocol_version": 1,
         "analyzers": [
@@ -49,19 +50,23 @@ def _run(files: list[dict[str, str]]) -> bytes:
 
 
 def test_same_request_twice_gives_identical_bytes() -> None:
+    """Scenario: same request twice gives identical bytes."""
     assert _run(FILES) == _run(FILES)
 
 
 def test_every_rotation_and_the_reversal_give_identical_bytes() -> None:
+    """Scenario: every rotation and the reversal give identical bytes."""
     baseline = _run(FILES)
     orders = [FILES[i:] + FILES[:i] for i in range(len(FILES))] + [
         list(reversed(FILES))
     ]
+    # Every reordering of the request files must give the baseline bytes.
     for order in orders:
         assert _run(order) == baseline
 
 
 def test_non_ascii_identifier_gives_ascii_bytes() -> None:
+    """Scenario: non ascii identifier gives ascii bytes."""
     cafe = "caf" + E_ACUTE
     text = f"def {cafe}():\n    pass\n{E_ACUTE}t{E_ACUTE} = 1\n"
     output = _run([{"path": "src/m.py", "text": text}])

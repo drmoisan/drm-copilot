@@ -47,12 +47,23 @@ _LIMIT_KEYS = frozenset({"max_files", "max_file_bytes"})
 
 
 class RequestError(ValueError):
-    """An invalid request; the message names the defect without quoting source text."""
+    """An invalid request; the message names the defect without quoting source text.
+
+    Raised only by parse_request and its helpers; main maps it to exit code 2 and the
+    request-invalid error object.
+    """
 
 
 @dataclass(frozen=True)
 class Request:
-    """A validated request."""
+    """A validated request, as parse_request returns it.
+
+    Attributes:
+        analyzers: The requested analyzer identifiers (unique, all known).
+        source_roots: The configured source roots.
+        console_scripts: The console scripts read from pyproject.toml by the adapter.
+        files: (path, text) pairs with unique paths, each within the byte limit.
+    """
 
     analyzers: tuple[str, ...]
     source_roots: tuple[str, ...]
@@ -61,7 +72,19 @@ class Request:
 
 
 def _reject_duplicates(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    """Build a JSON object while rejecting a repeated key (json object_pairs_hook).
+
+    Args:
+        pairs: The key and value pairs of one JSON object in document order.
+
+    Returns:
+        The object as a dict.
+
+    Raises:
+        RequestError: A key occurs twice.
+    """
     result: dict[str, object] = {}
+    # Insert pairs in order; the first repeat makes the whole request invalid.
     for key, value in pairs:
         if key in result:
             raise RequestError("the request repeats an object key")
@@ -70,13 +93,38 @@ def _reject_duplicates(pairs: list[tuple[str, object]]) -> dict[str, object]:
 
 
 def _reject_constant(_name: str) -> object:
+    """Reject NaN and Infinity literals (json parse_constant hook).
+
+    Args:
+        _name: The constant text ("NaN", "Infinity" or "-Infinity"); unused.
+
+    Returns:
+        Never returns.
+
+    Raises:
+        RequestError: Always.
+    """
     raise RequestError("the request holds a non-finite number")
 
 
 def _object(value: object, keys: frozenset[str], where: str) -> dict[str, object]:
+    """Require a JSON object with exactly the given key set.
+
+    Args:
+        value: The decoded value.
+        keys: The required key set (closed: no key may be missing or extra).
+        where: The request location named in an error message.
+
+    Returns:
+        The object with string keys.
+
+    Raises:
+        RequestError: The value is not an object or its key set differs.
+    """
     if not isinstance(value, dict):
         raise RequestError(f"{where} must be an object")
     items = cast("dict[object, object]", value)
+    # Normalize keys to str so the key-set comparison is exact.
     found: dict[str, object] = {str(k): v for k, v in items.items()}
     if frozenset(found) != keys:
         raise RequestError(f"{where} must have exactly the keys {sorted(keys)}")
@@ -84,18 +132,55 @@ def _object(value: object, keys: frozenset[str], where: str) -> dict[str, object
 
 
 def _list(value: object, where: str) -> list[object]:
+    """Require a JSON array.
+
+    Args:
+        value: The decoded value.
+        where: The request location named in an error message.
+
+    Returns:
+        A copy of the array.
+
+    Raises:
+        RequestError: The value is not an array.
+    """
     if not isinstance(value, list):
         raise RequestError(f"{where} must be an array")
     return list(cast("list[object]", value))
 
 
 def _string(value: object, where: str) -> str:
+    """Require a JSON string.
+
+    Args:
+        value: The decoded value.
+        where: The request location named in an error message.
+
+    Returns:
+        The string.
+
+    Raises:
+        RequestError: The value is not a string.
+    """
     if not isinstance(value, str):
         raise RequestError(f"{where} must be a string")
     return value
 
 
 def _integer(value: object, where: str, maximum: int) -> int:
+    """Require an integer (not a boolean) from 1 to a maximum.
+
+    Args:
+        value: The decoded value.
+        where: The request location named in an error message.
+        maximum: The largest accepted value.
+
+    Returns:
+        The integer.
+
+    Raises:
+        RequestError: The value is not an integer in range.
+    """
     if (
         not isinstance(value, int)
         or isinstance(value, bool)
@@ -106,7 +191,18 @@ def _integer(value: object, where: str, maximum: int) -> int:
 
 
 def parse_request(data: bytes) -> Request:
-    """Decode and validate one request; raise RequestError for any defect."""
+    """Decode and validate one request.
+
+    Args:
+        data: The raw request bytes from standard input.
+
+    Returns:
+        The validated Request.
+
+    Raises:
+        RequestError: The bytes are not UTF-8 JSON, or any key, type, version, limit or
+            uniqueness rule is violated.
+    """
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError as error:
@@ -130,6 +226,7 @@ def parse_request(data: bytes) -> Request:
     max_bytes = _integer(
         limits["max_file_bytes"], "limits.max_file_bytes", MAX_FILE_BYTES
     )
+    # Every analyzer entry must be a string; uniqueness and membership follow.
     analyzers = [
         _string(a, "analyzers[]") for a in _list(root["analyzers"], "analyzers")
     ]
@@ -137,13 +234,16 @@ def parse_request(data: bytes) -> Request:
         raise RequestError("analyzers must be a non-empty array of unique identifiers")
     if any(a not in ANALYZERS for a in analyzers):
         raise RequestError("analyzers holds an unknown identifier")
+    # Every source root must be a string.
     roots = [
         _string(r, "source_roots[]")
         for r in _list(root["source_roots"], "source_roots")
     ]
     scripts: list[ConsoleScript] = []
+    # Validate each console-script entry against its closed key set.
     for item in _list(root["console_scripts"], "console_scripts"):
         entry = _object(item, _SCRIPT_KEYS, "console_scripts[]")
+        # The name, table and path fields must all be strings.
         fields = [
             _string(entry[k], f"console_scripts[].{k}")
             for k in ("name", "table", "path")
@@ -154,6 +254,7 @@ def parse_request(data: bytes) -> Request:
     raw_files = _list(root["files"], "files")
     if len(raw_files) > max_files:
         raise RequestError("files holds more entries than limits.max_files")
+    # Validate each file entry and its UTF-8 size against the byte limit.
     for item in raw_files:
         entry = _object(item, _FILE_KEYS, "files[]")
         path = _string(entry["path"], "files[].path")
@@ -167,9 +268,22 @@ def parse_request(data: bytes) -> Request:
 
 
 def run_request(request: Request) -> dict[str, object]:
-    """Run the selected analyzers and return the response object."""
+    """Run the selected analyzers and return the response object.
+
+    Every file is normalized and parsed once; files that parse get binding tables and
+    are analyzed; the binding diagnostics of each file are reported under every
+    analyzer. Facts are sorted by their canonical JSON and diagnostics are de-duplicated
+    and sorted, so the output does not depend on request order.
+
+    Args:
+        request: The validated request.
+
+    Returns:
+        {protocol_version, files}, with one entry per request path in path order.
+    """
     statuses: dict[str, str] = {}
     parsed_files: list[AnalyzedFile] = []
+    # Parse each file once; only parsed files are analyzed.
     for path, text in request.files:
         parsed = parse_module(normalize_source(text))
         statuses[path] = parsed.status
@@ -177,7 +291,11 @@ def run_request(request: Request) -> dict[str, object]:
             parsed_files.append(AnalyzedFile(path, parsed, build_tables(parsed)))
     roots = list(request.source_roots)
     outputs: list[AnalyzerOutput] = []
+    # Run each requested analyzer in identifier order.
     for analyzer in sorted(request.analyzers):
+        # Dispatch table: python-cli needs the console scripts, the other analyzers
+        # take files and roots; parse_request admitted only the four identifiers, so
+        # the final branch is python-architecture.
         if analyzer == "python-cli":
             output = analyze_cli(parsed_files, roots, list(request.console_scripts))
         elif analyzer == "python-http":
@@ -186,14 +304,19 @@ def run_request(request: Request) -> dict[str, object]:
             output = analyze_public_api(parsed_files, roots)
         else:
             output = analyze_architecture(parsed_files, roots)
+        # Report the shared binding diagnostics under this analyzer too.
         for analyzed in parsed_files:
+            # Each binding diagnostic of the file is copied into this output.
             for diagnostic in analyzed.tables.diagnostics:
                 output.add_diagnostic(analyzed.path, diagnostic.code, diagnostic.line)
         outputs.append(output)
     files: list[dict[str, object]] = []
+    # Assemble one response entry per path: sorted facts and unique sorted diagnostics.
     for path in sorted(statuses):
+        # Gather this path's facts from every analyzer output.
         facts = [f.to_json() for o in outputs for f in o.facts.get(path, [])]
         facts.sort(key=lambda fact: json.dumps(fact, sort_keys=True))
+        # De-duplicate (analyzer, code, line) triples across analyzer outputs.
         diagnostics = sorted(
             {
                 (o.analyzer_id, d.code, d.line)
@@ -216,13 +339,28 @@ def run_request(request: Request) -> dict[str, object]:
 
 
 def encode(value: dict[str, object]) -> bytes:
-    """Serialize a response or error object as canonical ASCII JSON bytes."""
+    """Serialize a response or error object as canonical ASCII JSON bytes.
+
+    Args:
+        value: The object to write.
+
+    Returns:
+        Sorted-key, compact, ASCII-escaped JSON bytes, independent of the code page.
+    """
     text = json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
     return text.encode("ascii")
 
 
 def error_object(code: str, message: str) -> dict[str, object]:
-    """Return a protocol error object."""
+    """Return a protocol error object.
+
+    Args:
+        code: The error code (request-invalid, internal-error, version-below-floor).
+        message: A message that never quotes source text.
+
+    Returns:
+        {protocol_version, error: {code, message}}.
+    """
     return {
         "protocol_version": PROTOCOL_VERSION,
         "error": {"code": code, "message": message},
@@ -236,7 +374,18 @@ def main(
     version_info: Sequence[object] = sys.version_info,
     run: Callable[[Request], dict[str, object]] = run_request,
 ) -> int:
-    """Read one request, write one response or error object, return the exit code."""
+    """Read one request, write one response or error object, and return the exit code.
+
+    Args:
+        stdin: The binary request stream.
+        stdout: The binary response stream; exactly one object is written.
+        version_info: The interpreter version; tests inject older versions.
+        run: The request runner; tests inject a failing runner.
+
+    Returns:
+        EXIT_OK, EXIT_INVALID for a RequestError, EXIT_INTERNAL for any other
+        exception, or EXIT_FLOOR for an interpreter below FLOOR.
+    """
     if tuple(version_info[:2]) < FLOOR:
         stdout.write(
             encode(

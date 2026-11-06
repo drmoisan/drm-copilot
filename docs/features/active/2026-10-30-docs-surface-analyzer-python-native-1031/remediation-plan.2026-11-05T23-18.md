@@ -107,26 +107,26 @@ Each task moves the symbols named in `## Remediation Design` verbatim (renames o
   - Acceptance: Pytest gate over `PYTESTS`; `FEATURE/evidence/regression-testing/r2-call-sites.<timestamp>.md` records the counts.
 - [x] [P2-T5] Create `PKG/route_model.py` and `PKG/route_sites.py` from `PKG/routes.py` with the renames in `## Remediation Design`, `PYTESTS/test_docs_python_native_route_model.py` (the two `FRAMEWORKS` entries: constructors, prefix key, method set, call and mount names) and `PYTESTS/test_docs_python_native_route_sites.py` (moved `TestMethodList` plus `collect_sites` cases for a decorator route, an `add_api_route` call, a mount and a route in a loop); `PKG/routes.py` imports from both; the `_helper_trees` pin becomes 18.
   - Acceptance: Pytest gate over `PYTESTS`; `FEATURE/evidence/regression-testing/r2-routes-split.<timestamp>.md` records the counts and the `lines=` value of every `PKG` file from the comment audit, each below 450.
-- [ ] [P2-T6] Commit the Phase 2 files under `.claude/lib/docs/python/docs_python_native/` and `tests/scripts/claude-lib/docs/python/` and the evidence, and push.
+- [x] [P2-T6] Commit the Phase 2 files under `.claude/lib/docs/python/docs_python_native/` and `tests/scripts/claude-lib/docs/python/` and the evidence, and push.
   - Acceptance: `git status --porcelain` prints nothing and `git rev-parse HEAD` equals `git rev-parse @{u}`.
 
 ### Phase 3 — Python Docstrings and Comments (F1)
 
 Each production task gives every function and class a Google-style docstring (purpose, `Args:`, `Returns:`, contract `Raises:`, side effects, and `Attributes:` for dataclasses), an intent comment directly above every loop and non-trivial comprehension, a decision-logic comment on every `if`/`elif` chain beyond a guard clause, and a meta-what comment above multi-step blocks; no code statement changes. Acceptance for each production task: the comment audit with `-Mode production` over the named files prints `VERDICT: PASS` with every `lines=` value below 500; the Pytest gate over `PYTESTS` passes; the named evidence file records both.
 
-- [ ] [P3-T1] Document `PKG/source.py`, `PKG/walk.py` (including `_block_kind`), `PKG/__init__.py` and `PYLIB/run_docs_python_native.py`.
+- [x] [P3-T1] Document `PKG/source.py`, `PKG/walk.py` (including `_block_kind`), `PKG/__init__.py` and `PYLIB/run_docs_python_native.py`.
   - Acceptance: as stated for the phase; `FEATURE/evidence/regression-testing/r3-source-walk.<timestamp>.md`.
-- [ ] [P3-T2] Document `PKG/imports.py`, `PKG/facts.py` and `PKG/module_names.py`.
+- [x] [P3-T2] Document `PKG/imports.py`, `PKG/facts.py` and `PKG/module_names.py`.
   - Acceptance: as stated for the phase; `FEATURE/evidence/regression-testing/r3-imports.<timestamp>.md`.
-- [ ] [P3-T3] Document `PKG/call_sites.py` and `PKG/cli_argparse.py`.
+- [x] [P3-T3] Document `PKG/call_sites.py` and `PKG/cli_argparse.py`.
   - Acceptance: as stated for the phase; `FEATURE/evidence/regression-testing/r3-argparse.<timestamp>.md`.
-- [ ] [P3-T4] Document `PKG/cli_click.py` (including `_pending`), `PKG/cli_typer.py` and `PKG/cli.py`.
+- [x] [P3-T4] Document `PKG/cli_click.py` (including `_pending`), `PKG/cli_typer.py` and `PKG/cli.py`.
   - Acceptance: as stated for the phase; `FEATURE/evidence/regression-testing/r3-cli.<timestamp>.md`.
-- [ ] [P3-T5] Document `PKG/route_model.py`, `PKG/route_sites.py` (including `collect_sites`) and `PKG/routes.py` (including `_chains` and `_emit`).
+- [x] [P3-T5] Document `PKG/route_model.py`, `PKG/route_sites.py` (including `collect_sites`) and `PKG/routes.py` (including `_chains` and `_emit`).
   - Acceptance: as stated for the phase; `FEATURE/evidence/regression-testing/r3-routes.<timestamp>.md`.
-- [ ] [P3-T6] Document `PKG/protocol.py` (including `_reject_duplicates`, `_object` and the analyzer dispatch chain of `run_request`), `PKG/public_api.py` and `PKG/architecture.py`.
+- [x] [P3-T6] Document `PKG/protocol.py` (including `_reject_duplicates`, `_object` and the analyzer dispatch chain of `run_request`), `PKG/public_api.py` and `PKG/architecture.py`.
   - Acceptance: as stated for the phase; `FEATURE/evidence/regression-testing/r3-protocol-api-arch.<timestamp>.md`.
-- [ ] [P3-T7] In every `.py` file of `tests/scripts/claude-lib/docs/python/` (the fifteen existing files, including `conftest.py`, and the six new test modules) add an intent comment above every loop, a one-line scenario docstring to every test function, test class and helper function, and a docstring to every module that lacks one; no assertion changes.
+- [x] [P3-T7] In every `.py` file of `tests/scripts/claude-lib/docs/python/` (the fifteen existing files, including `conftest.py`, and the six new test modules) add an intent comment above every loop, a one-line scenario docstring to every test function, test class and helper function, and a docstring to every module that lacks one; no assertion changes.
   - Acceptance: the comment audit with `-Mode test` over every `.py` file in `PYTESTS` prints `VERDICT: PASS`; the Pytest gate over `PYTESTS` reports the same pass count as [P2-T5]; `FEATURE/evidence/regression-testing/r3-tests.<timestamp>.md` records both.
 - [ ] [P3-T8] Commit the Phase 3 files under `.claude/lib/docs/python/` and `tests/scripts/claude-lib/docs/python/` and the evidence, and push.
   - Acceptance: `git status --porcelain` prints nothing and `git rev-parse HEAD` equals `git rev-parse @{u}`.

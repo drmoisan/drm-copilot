@@ -7,15 +7,18 @@ from docs_python_native.source import parse_module
 
 
 def _recognize(text: str) -> CliResult:
+    """Parse a source text and run the argparse recognizer over it."""
     parsed = parse_module(text)
     return recognize_argparse(parsed, build_tables(parsed))
 
 
 def _site(result: CliResult, name: str) -> CliSite:
+    """Return the recognized site with the given name."""
     return next(site for site in result.sites if site.name == name)
 
 
 def _codes(result: CliResult) -> list[str]:
+    """Return the raw diagnostic codes of a recognizer result."""
     return sorted(d.code for d in result.diagnostics)
 
 
@@ -41,7 +44,10 @@ def build():
 
 
 class TestTree:
+    """Scenarios for tree in docs_python_native.cli_argparse."""
+
     def test_root_spans_its_whole_statement_and_attaches_to_the_function(self) -> None:
+        """Scenario: root spans its whole statement and attaches to the function."""
         result = _recognize(TREE)
         root = _site(result, "tool")
         assert (root.kind, root.span, root.attach, root.parent_id) == (
@@ -52,6 +58,7 @@ class TestTree:
         )
 
     def test_options_carry_names_and_shapes(self) -> None:
+        """Scenario: options report their name, short form and shape properties."""
         result = _recognize(TREE)
         verbose = _site(result, "--verbose")
         assert verbose.properties == {
@@ -74,6 +81,7 @@ class TestTree:
         assert _site(result, "--level").properties["required"] is False
 
     def test_nested_subcommands_link_to_their_parser(self) -> None:
+        """Scenario: nested subcommands link to their parser."""
         result = _recognize(TREE)
         run = _site(result, "run")
         assert (run.kind, run.parent_id, run.properties) == (
@@ -85,7 +93,10 @@ class TestTree:
 
 
 class TestDiagnostics:
+    """Scenarios for diagnostics in docs_python_native.cli_argparse."""
+
     def test_each_diagnostic_removes_only_its_site(self) -> None:
+        """Scenario: each diagnostic removes only its site."""
         text = (
             "from argparse import ArgumentParser\n"
             "NAME = 'x'\n"
@@ -121,12 +132,14 @@ class TestDiagnostics:
         assert kept.site_id.startswith("#argparse-") and kept.parent_id == "child"
 
     def test_methods_on_a_tracked_non_argparse_receiver_are_silent(self) -> None:
+        """Scenario: methods on a tracked non argparse receiver are silent."""
         result = _recognize(
             "import typer\napp = typer.Typer()\napp.add_argument('--x')\n"
         )
         assert result.sites == [] and result.diagnostics == []
 
     def test_unassigned_constructor_and_unparsed_input_yield_nothing(self) -> None:
+        """Scenario: unassigned constructor and unparsed input yield nothing."""
         assert (
             _recognize("import argparse\nargparse.ArgumentParser(prog='x')\n").sites
             == []
@@ -134,6 +147,7 @@ class TestDiagnostics:
         assert _recognize("x = (\n").sites == []
 
     def test_root_outside_a_function_attaches_to_its_receiver(self) -> None:
+        """Scenario: root outside a function attaches to its receiver."""
         result = _recognize(
             "import argparse\nclass K:\n    p = argparse.ArgumentParser()\n"
             "q = argparse.ArgumentParser()\n"
@@ -142,6 +156,7 @@ class TestDiagnostics:
         assert all(site.name is None for site in result.sites)
 
     def test_add_argument_on_a_broken_receiver_chain_is_unbound(self) -> None:
+        """Scenario: add argument on a broken receiver chain is unbound."""
         result = _recognize(
             "import argparse\np = argparse.ArgumentParser()\ng = p.add_parser('x')\n"
             "g.add_argument('--y')\n"
