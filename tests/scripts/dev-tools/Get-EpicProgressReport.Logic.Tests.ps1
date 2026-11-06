@@ -132,6 +132,27 @@ Describe 'ConvertFrom-EpicProgressKickoffRow' {
         { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Not -Throw
         @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff).Count | Should -Be 0
     }
+
+    It 'reads a feature table whose header row is indented' {
+        $kickoff = @('  | Issue | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '| 12 | Alpha | 1 | small | docs/a/plan.md |') -join "`n"
+
+        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff)
+
+        $rows.Count | Should -Be 1
+        $rows[0].Issue | Should -Be '12'
+        $rows[0].PlanPath | Should -Be 'docs/a/plan.md'
+    }
+
+    It 'reads an indented row inside the feature table' {
+        # The indented row for issue 5 must be read, not skipped, so the task total is not understated.
+        $kickoff = @('| Issue | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '   | 5 | Alpha | 1 | small | docs/a/plan.md |', '| 6 | Beta | 2 | large | docs/b/plan.md |') -join "`n"
+
+        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff)
+
+        ($rows.Issue -join ',') | Should -Be '5,6'
+        $rows[0].Wave | Should -Be 1
+        $rows[0].PlanPath | Should -Be 'docs/a/plan.md'
+    }
 }
 
 Describe 'Get-EpicProgressIssueFromKickoff' {

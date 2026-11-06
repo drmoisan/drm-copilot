@@ -34,7 +34,9 @@ function ConvertFrom-EpicProgressKickoffRow {
         Only the feature-summary table is read: the table whose header row's first cell is
         'issue_num' or 'Issue' (case-insensitive). Lines before that header are skipped, and
         the first line after it that is not a table row ends the table, so every other table
-        (for example the wave summary) is ignored. Inside the table, a feature row is a row
+        (for example the wave summary) is ignored. Each line is trimmed before it is matched
+        and split, so leading whitespace before the first '|' is allowed on every table line,
+        and a blank line ends the table. Inside the table, a feature row is a row
         whose first cell is a numeric issue number of any length; any whitespace, including
         none, may surround each cell, and the separator row is ignored. Cells 1, 3, 4, and 5
         hold the issue, the wave, the band, and the repository-relative plan path. A feature
@@ -52,13 +54,14 @@ function ConvertFrom-EpicProgressKickoffRow {
     $lines = $KickoffText -split '\r?\n'
     $inFeatureTable = $false
     foreach ($line in $lines) {
+        $trimmed = $line.Trim()
         if (-not $inFeatureTable) {
-            $inFeatureTable = $line -match '^\|\s*(issue_num|issue)\s*\|'
+            $inFeatureTable = $trimmed -match '^\|\s*(issue_num|issue)\s*\|'
             continue
         }
-        if ($line -notmatch '^\s*\|') { break }
-        if ($line -notmatch '^\|\s*(\d+)\s*\|') { continue }
-        $cells = @($line -split '\|' | ForEach-Object { $_.Trim() })
+        if ($trimmed -notmatch '^\|') { break }
+        if ($trimmed -notmatch '^\|\s*(\d+)\s*\|') { continue }
+        $cells = @($trimmed -split '\|' | ForEach-Object { $_.Trim() })
         $wave = 0
         if (-not [int]::TryParse($cells[3], [System.Globalization.NumberStyles]::None, [cultureinfo]::InvariantCulture, [ref] $wave)) {
             throw "The kickoff row for issue #$($cells[1]) has a non-numeric wave cell '$($cells[3])'."
