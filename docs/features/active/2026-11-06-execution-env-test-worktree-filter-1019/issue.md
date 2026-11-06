@@ -58,10 +58,10 @@ The generator expression tests `set(path.parts)`, and `path` is absolute because
 
 ## Acceptance Criteria
 
-- [ ] AC1: The exclusion in `test_execution_environment_fact_is_unchanged_across_copies` is evaluated against `path.relative_to(REPO_ROOT).parts`, and no other production or test logic changes.
-- [ ] AC2: The assertion and the expected count of 6 are unchanged, and the excluded directory names are unchanged, so a nested agent worktree under the repository root stays excluded.
-- [ ] AC3: The test fails before the fix and passes after it when run from a checkout located under a directory named `worktrees`.
-- [ ] AC4: Black, Ruff, Pyright, and Pytest pass on the changed file.
+- [x] AC1: The exclusion in `test_execution_environment_fact_is_unchanged_across_copies` is evaluated against `path.relative_to(REPO_ROOT).parts`, and no other production or test logic changes.
+- [x] AC2: The assertion and the expected count of 6 are unchanged, and the excluded directory names are unchanged, so a nested agent worktree under the repository root stays excluded.
+- [x] AC3: The test fails before the fix and passes after it when run from a checkout located under a directory named `worktrees`.
+- [x] AC4: Black, Ruff, Pyright, and Pytest pass on the changed file.
 
 ## Next Step
 
