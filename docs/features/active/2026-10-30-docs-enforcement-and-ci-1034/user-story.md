@@ -80,7 +80,7 @@ Story criteria (consistent with `spec.md` `## Acceptance Criteria`):
 - [x] `## Documentation Surface Check` is present in the procedure-bearing `feature-review` copies named in `spec.md` and each bundle copy is byte-identical; the delegating `feature-review` files are unchanged.
 - [x] Every new `.claude/lib/docs/` file and the hook are listed once in the core pack manifest and byte-identical to their bundle copies, and the push-down resource, completeness, dependency-closure and Codex generator checks pass.
 - [x] Pester line coverage is at least 85% for each new PowerShell production file, with no production file excluded from measurement.
-- [ ] No Python or TypeScript file is added or modified, and no test creates a temporary file.
+- [x] No Python or TypeScript file is added or modified, and no test creates a temporary file.
 
 ## Non-Goals
 
