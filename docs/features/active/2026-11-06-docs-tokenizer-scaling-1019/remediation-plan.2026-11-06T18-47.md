@@ -4,7 +4,7 @@
 - **Parent (optional):** epic/documentation-estate-tooling-integration
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-06T18-47
-- **Status:** Authored by `atomic-planner`; awaiting combined preflight and execution
+- **Status:** Executed; AC-8 pending CI
 - **Version:** 1.0
 - **Remediation-Mode:** proportionate
 - **Requirements source (sole):** `remediation-inputs.2026-11-06T18-47.md` in this folder (F1 and its non-blocking items; the section `Decision for the Orchestrator, Outside This Cycle` is out of scope)
