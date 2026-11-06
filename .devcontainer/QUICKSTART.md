@@ -6,9 +6,9 @@
 
 **For GitHub Codespaces:**
 1. Go to repository on GitHub
-2. Click **Code** → **Codespaces** → **Create codespace**
-3. Wait for build (~3-5 minutes)
-4. Verify setup: `bash .devcontainer/verify-container.sh`
+2. Choose **Code** → **Codespaces** → **Configure and create codespace**
+3. Select `.devcontainer/codespaces/devcontainer.json` and create the Codespace
+4. After setup completes, verify: `bash .devcontainer/verify-container.sh`
 
 **For Local Docker:**
 1. Ensure Docker Desktop is running
@@ -76,10 +76,10 @@ Ctrl+` or Terminal → New Terminal
 ## File Persistence
 
 ### What Persists
-- Your workspace files live on a named volume (`${localWorkspaceFolderBasename}-workspace` at `/workspaces/drm-copilot`)
-- A read-only host bind (`/workspaces/drm-copilot-host`) is used only to seed the volume on first create; `.venv`, `artifacts`, and `data` are excluded from the seed to avoid long copies. Rebuild the container if you need to refresh from host.
-- Dedicated artifacts folder bound to host sibling path `${localWorkspaceFolder}/../lexile-artifacts` at `/workspaces/lexile-artifacts`
-- `.venv` folder (mounted from host)
+- Your host workspace is mounted directly at `/workspaces/drm-copilot`, including uncommitted edits, `artifacts/`, and `data/`
+- Linux dependency volumes persist `.venv` and the root, extension, and MCP server `node_modules` directories separately from host packages
+- Both local and Codespaces configurations run the shared post-create script and verify the runtime baseline before reporting success
+- The old `${localWorkspaceFolderBasename}-workspace` volume is retained but unused; recover any container-only changes before removing it
 - Git configuration
 - Installed VS Code extensions
 
@@ -120,11 +120,11 @@ sudo apt-get update
 ```
 
 ### Performance on Windows
-- Workspace now runs from a named volume to avoid host bind latency; host bind is read-only and only for bootstrap
+- Dependency directories use Linux volumes; source files use the host checkout directly
 - Use WSL 2 backend in Docker Desktop settings
-- Keep large artifacts in `/workspaces/lexile-artifacts` (host sibling) to avoid scanning overhead inside the code workspace
+- Keep large artifacts out of source directories to reduce scanning overhead
 - Aggressive workspace scanners are not allowed (Task Explorer removed)
-- The `.venv` mount helps performance by keeping packages on host
+- For faster source I/O, open a checkout stored in the WSL filesystem
 
 ## Tips
 

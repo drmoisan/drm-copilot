@@ -79,38 +79,38 @@ PowerShell entry.
 
 Epic criteria (verbatim):
 
-- [ ] Each of the six tools validates its input, invokes the matching subcommand with `-Json`, and returns structured output including the exit code and findings.
-- [ ] Invalid input is rejected before any process starts.
-- [ ] `update_docs_ledger` is the only mutating tool and routes through `-Command update-ledger`.
-- [ ] No logic beyond argument mapping and result parsing lives in TypeScript; every operation is reachable from a skill through `Invoke-DocsCommand.ps1`.
-- [ ] Jest line coverage >= 85% and branch coverage >= 75% on the new modules.
+- [x] Each of the six tools validates its input, invokes the matching subcommand with `-Json`, and returns structured output including the exit code and findings.
+- [x] Invalid input is rejected before any process starts.
+- [x] `update_docs_ledger` is the only mutating tool and routes through `-Command update-ledger`.
+- [x] No logic beyond argument mapping and result parsing lives in TypeScript; every operation is reachable from a skill through `Invoke-DocsCommand.ps1`.
+- [x] Jest line coverage >= 85% and branch coverage >= 75% on the new modules.
 
 ### Story 1 - Documentation role agent
 
-- [ ] Exit 1, 2 and 3 return `ok: false` results whose `docs` field carries the full envelope (`command`, `exit_code`, `findings`, `ok`, `result`) and whose `summary` has the form `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`; exit 0 returns `ok: true` with the envelope in `docs`.
-- [ ] Host failures (`DOCS_WORKSPACE_ROOT_INVALID`, `DOCS_ENTRY_SCRIPT_MISSING`, `DOCS_PWSH_UNAVAILABLE`, `DOCS_RUNTIME_UNAVAILABLE`, `DOCS_ENVELOPE_EMPTY`, `DOCS_ENVELOPE_MALFORMED`, `DOCS_ENVELOPE_EXIT_MISMATCH`, `DOCS_ENVELOPE_COMMAND_MISMATCH`) return `ok: false` without a `docs` field and with a message prefixed by the code.
-- [ ] `update_docs_ledger` without `write`, or with `write: false`, runs as a dry run (no `-Write` in the argv); only `write: true` emits `-Write`.
-- [ ] `run_docs_inventory` and `generate_docs_reference` never emit `-Write`, and `validate_docs_artifacts` never emits `-WriteReceipt` (OQ-A provisional default).
-- [ ] The tool listing carries `annotations` with `readOnlyHint: true` on the read-only docs tools and `readOnlyHint: false`, `destructiveHint: true` on `update_docs_ledger`, and `DOCS_MUTATING_TOOLS` equals `["update_docs_ledger"]`.
-- [ ] A string value beginning with `-` in any field is rejected before launch (OQ-C provisional default).
+- [x] Exit 1, 2 and 3 return `ok: false` results whose `docs` field carries the full envelope (`command`, `exit_code`, `findings`, `ok`, `result`) and whose `summary` has the form `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`; exit 0 returns `ok: true` with the envelope in `docs`.
+- [x] Host failures (`DOCS_WORKSPACE_ROOT_INVALID`, `DOCS_ENTRY_SCRIPT_MISSING`, `DOCS_PWSH_UNAVAILABLE`, `DOCS_RUNTIME_UNAVAILABLE`, `DOCS_ENVELOPE_EMPTY`, `DOCS_ENVELOPE_MALFORMED`, `DOCS_ENVELOPE_EXIT_MISMATCH`, `DOCS_ENVELOPE_COMMAND_MISMATCH`) return `ok: false` without a `docs` field and with a message prefixed by the code.
+- [x] `update_docs_ledger` without `write`, or with `write: false`, runs as a dry run (no `-Write` in the argv); only `write: true` emits `-Write`.
+- [x] `run_docs_inventory` and `generate_docs_reference` never emit `-Write`, and `validate_docs_artifacts` never emits `-WriteReceipt` (OQ-A provisional default).
+- [x] The tool listing carries `annotations` with `readOnlyHint: true` on the read-only docs tools and `readOnlyHint: false`, `destructiveHint: true` on `update_docs_ledger`, and `DOCS_MUTATING_TOOLS` equals `["update_docs_ledger"]`.
+- [x] A string value beginning with `-` in any field is rejected before launch (OQ-C provisional default).
 
 ### Story 2 - Skill author
 
-- [ ] Each tool launches `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command <subcommand> -Json <options>` with the working directory equal to `workspace_root`, using the workspace copy of the script.
-- [ ] Each tool's options match its row in spec `## Upstream Contract Dependencies`, and the PowerShell option names are held in one declarative table per tool.
-- [ ] The `docs` field equals the envelope the entry script printed, unchanged; `result` is not reshaped by TypeScript.
-- [ ] TypeScript does not reject an input whose only defect is a missing companion value that 1023 reports as a ledger finding; PowerShell reports it.
-- [ ] A missing entry script returns `DOCS_ENTRY_SCRIPT_MISSING` with a next action naming `push_down_claude_customizations`, and the launcher is not called.
-- [ ] The execution-environment brief bullet stating that the docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` is present and byte-identical in every copy listed in spec `## Implementation Strategy`.
+- [x] Each tool launches `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command <subcommand> -Json <options>` with the working directory equal to `workspace_root`, using the workspace copy of the script.
+- [x] Each tool's options match its row in spec `## Upstream Contract Dependencies`, and the PowerShell option names are held in one declarative table per tool.
+- [x] The `docs` field equals the envelope the entry script printed, unchanged; `result` is not reshaped by TypeScript.
+- [x] TypeScript does not reject an input whose only defect is a missing companion value that 1023 reports as a ledger finding; PowerShell reports it.
+- [x] A missing entry script returns `DOCS_ENTRY_SCRIPT_MISSING` with a next action naming `push_down_claude_customizations`, and the launcher is not called.
+- [x] The execution-environment brief bullet stating that the docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` is present and byte-identical in every copy listed in spec `## Implementation Strategy`.
 
 ### Story 3 - Extension maintainer
 
-- [ ] The existing enumeration tests follow spec `## Existing Tests That Enumerate the MCP Tool Set`: the listed updates are made and every row marked **Unchanged** passes without edit.
-- [ ] `REPO_AUTOMATION_TOOLS` has 49 entries with the docs names immediately after `render_subagent_tree` and before `validate_discovery_artifacts`.
-- [ ] A contract test reads the committed `schemas/docs/v1/docs-command-envelope.schema.json` read-only and checks its `required` set and `additionalProperties: false` against the parser.
-- [ ] `extensions/drm-copilot/jest.docs-coverage.json` registers an 85/75 entry for each new production file, merged into `jest.config.cjs` by one spread line, with per-file figures recorded under `evidence/coverage/`.
-- [ ] No test creates a temporary file or spawns `pwsh`; launcher, `FileSystem` and `pwsh` resolution are injected, and a seeded shuffled Jest run passes.
-- [ ] Every new file is below 500 logical lines and the seven-stage toolchain passes in a single pass.
+- [x] The existing enumeration tests follow spec `## Existing Tests That Enumerate the MCP Tool Set`: the listed updates are made and every row marked **Unchanged** passes without edit.
+- [x] `REPO_AUTOMATION_TOOLS` has 49 entries with the docs names immediately after `render_subagent_tree` and before `validate_discovery_artifacts`.
+- [x] A contract test reads the committed `schemas/docs/v1/docs-command-envelope.schema.json` read-only and checks its `required` set and `additionalProperties: false` against the parser.
+- [x] `extensions/drm-copilot/jest.docs-coverage.json` registers an 85/75 entry for each new production file, merged into `jest.config.cjs` by one spread line, with per-file figures recorded under `evidence/coverage/`.
+- [x] No test creates a temporary file or spawns `pwsh`; launcher, `FileSystem` and `pwsh` resolution are injected, and a seeded shuffled Jest run passes.
+- [x] Every new file is below 500 logical lines and the seven-stage toolchain passes in a single pass.
 
 ## Non-Goals
 

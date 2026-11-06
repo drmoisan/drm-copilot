@@ -1,4 +1,4 @@
-﻿[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAlignAssignmentStatement', '', Justification = 'Test mock data structures with nested hash tables are difficult to align uniformly')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAlignAssignmentStatement', '', Justification = 'Test mock data structures with nested hash tables are difficult to align uniformly')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock function parameters mirror real function signatures for testing')]
 param()
 
@@ -540,7 +540,7 @@ Describe 'Invoke-PoshQCTest' {
                             Enabled = $true
                             Path = @('src/**/*.ps1')
                             OutputPath = 'artifacts/coverage.xml'
-                            OutputFormat = 'CoverageGutters'
+                            OutputFormat = 'JaCoCo'
                         }
                     }
                 }
@@ -588,7 +588,7 @@ Describe 'Invoke-PoshQCTest' {
                             Enabled = $true
                             Path = @('src/**/*.ps1')
                             OutputPath = 'artifacts/coverage.xml'
-                            OutputFormat = 'CoverageGutters'
+                            OutputFormat = 'JaCoCo'
                         }
                     }
                 }
@@ -624,7 +624,7 @@ Describe 'Invoke-PoshQCTest' {
                     }
                     return $false
                 }
-                Mock -CommandName Invoke-Pester -MockWith { }
+                Mock -CommandName Invoke-Pester -RemoveParameterType Configuration -MockWith { }
                 Mock -CommandName Convert-PoshQCCoverageToRelative -MockWith { }
 
                 $enumerateTestsStub = {
@@ -656,7 +656,7 @@ Describe 'Invoke-PoshQCTest' {
                             Enabled = $true
                             Path = @('src/**/*.ps1')
                             OutputPath = 'artifacts/coverage.xml'
-                            OutputFormat = 'CoverageGutters'
+                            OutputFormat = 'JaCoCo'
                         }
                     }
                 }
@@ -680,7 +680,7 @@ Describe 'Invoke-PoshQCTest' {
                     return $config
                 }
                 Mock -CommandName New-Item -MockWith { }
-                Mock -CommandName Invoke-Pester -MockWith { }
+                Mock -CommandName Invoke-Pester -RemoveParameterType Configuration -MockWith { }
                 Mock -CommandName Convert-PoshQCCoverageToRelative -MockWith { }
 
                 $enumerateTestsStub = {
@@ -712,7 +712,7 @@ Describe 'Invoke-PoshQCTest' {
                             Enabled = $true
                             Path = @('src/**/*.ps1')
                             OutputPath = 'artifacts/coverage.xml'
-                            OutputFormat = 'CoverageGutters'
+                            OutputFormat = 'JaCoCo'
                         }
                     }
                 }
@@ -748,7 +748,7 @@ Describe 'Invoke-PoshQCTest' {
                     }
                     return $false
                 }
-                Mock -CommandName Invoke-Pester -MockWith { }
+                Mock -CommandName Invoke-Pester -RemoveParameterType Configuration -MockWith { }
                 Mock -CommandName Convert-PoshQCCoverageToRelative -MockWith { }
 
                 $enumerateTestsStub = {

@@ -16,17 +16,32 @@
 #>
 
 Describe 'enforce-parallel-cohort-barrier.ps1' {
+
+    BeforeEach {
+        # Restore only committed-fixture reads for this test; other paths retain the null baseline.
+        Mock Get-ParallelCohortBarrierCheckpointContent -MockWith {
+            if ($Path -notlike "/synthetic-worktrees/*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_b0a0a398_GetParallelCohortBarrierCheckpointContent @PesterBoundParameters
+        }
+    }
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-cohort-barrier.ps1").Path
         . $script:UnderTest
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        # Capture the committed-fixture reader while retaining the null isolation baseline.
+        $script:FixtureReader_b0a0a398_GetParallelCohortBarrierCheckpointContent = (Get-Command -Name Get-ParallelCohortBarrierCheckpointContent -CommandType Function).ScriptBlock
         Mock Get-ParallelCohortBarrierCheckpointContent -ParameterFilter { $Path -notlike "/synthetic-worktrees/*" } -MockWith { $null }
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
         Mock Resolve-ParallelCohortBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
+    }
+
+    AfterAll {
+        # The hook replaces the run module; discard only the stale fixture-owned scope binding.
+        Reset-EpicStateProbeModuleBinding
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
@@ -278,6 +293,76 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
+        }
+    }
+
+    Context 'precedence predecessors' {
+        # Item 102 must start after item 101 by operator precedence (issue #1047). The two
+        # items share no conflict edge, so only the precedence rule can deny the delegation.
+        BeforeAll {
+            $script:PrecedencePrompt = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $script:PrecedenceTail = '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[],' +
+            '"precedence":[{"before":101,"after":102,"source":"operator","recorded_at":"2026-11-03T10-00"}]}'
+        }
+
+        It 'allows when the predecessor is <Label>' -ForEach @(
+            @{ Label = 'merged'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"merged","merge_status":"merged"},' }
+            @{ Label = 'worktree_removed'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"merged","merge_status":"worktree_removed"},' }
+            @{ Label = 'withdrawn'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"withdrawn","merge_status":"not_started"},' }
+        ) {
+            $script:PrecedenceCheckpoint = '{"recolor_generation":2,"items":[' + $Predecessor +
+            '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
+            Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $script:PrecedenceCheckpoint }
+
+            $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $script:PrecedencePrompt
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'allows a checkpoint that carries no precedence key' {
+            Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
+                '{"recolor_generation":2,"items":[' +
+                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"pr_open"},' +
+                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[]}'
+            }
+
+            $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $script:PrecedencePrompt
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'denies when the predecessor merge_status is <Label>' -ForEach @(
+            @{ Label = 'pr_open'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"in_flight","merge_status":"pr_open"},' }
+            @{ Label = 'ci_green'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"in_flight","merge_status":"ci_green"},' }
+            @{ Label = 'blocked_ci_loop_limit'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"blocked","merge_status":"blocked_ci_loop_limit"},' }
+        ) {
+            $script:PrecedenceCheckpoint = '{"recolor_generation":2,"items":[' + $Predecessor +
+            '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
+            Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $script:PrecedenceCheckpoint }
+
+            $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $script:PrecedencePrompt
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
+        }
+
+        It 'denies when the predecessor has no items[] record' {
+            $script:PrecedenceCheckpoint = '{"recolor_generation":2,"items":[' +
+            '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
+            Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $script:PrecedenceCheckpoint }
+
+            $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $script:PrecedencePrompt
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
+        }
+
+        It 'returns no predecessor for a precedence entry that lacks an endpoint' {
+            $checkpoint = [pscustomobject]@{ precedence = @([pscustomobject]@{ before = 101 }, $null, [pscustomobject]@{ before = 103; after = 102 }) }
+
+            @(Get-ParallelCohortBarrierPrecedencePredecessorList -Checkpoint $checkpoint -IssueKey '102') | Should -Be @('103')
+            @(Get-ParallelCohortBarrierPrecedencePredecessorList -Checkpoint $null -IssueKey '102').Count | Should -Be 0
         }
     }
 

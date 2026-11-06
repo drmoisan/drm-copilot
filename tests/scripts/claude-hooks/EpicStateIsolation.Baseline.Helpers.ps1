@@ -66,6 +66,22 @@ function Register-EpicStateBaselineMock {
         $listing = 'worktree ' + ((Get-Location).Path -replace '\\', '/')
         Mock -CommandName 'Get-OrchestrationGateWorktreeList' -MockWith { $listing }.GetNewClosure()
     }
+    # Issue #1026: the cleanup legs read a temporary root and a staged index. A suite that
+    # requests the Get-CheckpointContent baseline also gets null-shaped mocks of both gate
+    # seams (no temporary root, a failed staged-index read), so no cleanup leg starts git.
+    if ($Seam -contains 'Get-CheckpointContent' -and (Get-Command -Name 'Get-OrchestrationGateTemporaryRoot' -ErrorAction SilentlyContinue)) {
+        Mock -CommandName 'Get-OrchestrationGateTemporaryRoot' -MockWith { , [string[]] @() }
+    }
+    if ($Seam -contains 'Get-CheckpointContent' -and (Get-Command -Name 'Get-OrchestrationGateStagedIndex' -ErrorAction SilentlyContinue)) {
+        Mock -CommandName 'Get-OrchestrationGateStagedIndex' -MockWith { [pscustomobject]@{ ExitCode = -1; Output = '' } }
+    }
+    # Issue #1026 (R1-1): the PR-author cleanup exemption resolves the published consolidation
+    # branch. A suite that requests the Get-CleanupWorktreeManifestContent baseline also gets a
+    # script-scope mock of that seam with an empty Remote and Head, so K6 fails closed and no
+    # git process runs.
+    if ($Seam -contains 'Get-CleanupWorktreeManifestContent' -and (Get-Command -Name 'Get-PrAuthorCleanupPublishedHead' -ErrorAction SilentlyContinue)) {
+        Mock -CommandName 'Get-PrAuthorCleanupPublishedHead' -MockWith { [pscustomobject]@{ Remote = ''; Head = '' } }
+    }
 }
 
 function Import-EpicStateProbeModule {
@@ -73,6 +89,24 @@ function Import-EpicStateProbeModule {
     param([Parameter(Mandatory)] [string[]] $Name)
     foreach ($item in $Name) {
         Import-Module (Join-Path $script:EpicStateBaselineRepoRoot ".claude/lib/worktree-resolution/$item.psm1") -ErrorAction Stop
+    }
+}
+
+function Reset-EpicStateProbeModuleBinding {
+    # Discard only this fixture root's scope module when a hook replaced its bound run dependency.
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
+    param()
+
+    $scopePath = [IO.Path]::GetFullPath((Join-Path $script:EpicStateBaselineRepoRoot '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'))
+    $runPath = [IO.Path]::GetFullPath((Join-Path $script:EpicStateBaselineRepoRoot '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'))
+    $currentRun = @(Get-Module WorktreeRunResolution -All | Where-Object { $_.Path -eq $runPath })
+    foreach ($scope in @(Get-Module EpicScopeResolution -All | Where-Object { $_.Path -eq $scopePath })) {
+        $boundRun = & $scope { (Get-Command Resolve-WorktreeEpicTarget -ErrorAction Stop).Module }
+        if ($boundRun.Path -ne $runPath) { continue }
+        $matchingInstance = @($currentRun | Where-Object { [object]::ReferenceEquals($_, $boundRun) })
+        if ($matchingInstance.Count -eq 0 -and $PSCmdlet.ShouldProcess($scope.Path, 'Remove stale fixture module binding')) {
+            Remove-Module -ModuleInfo $scope -Force -ErrorAction Stop
+        }
     }
 }
 

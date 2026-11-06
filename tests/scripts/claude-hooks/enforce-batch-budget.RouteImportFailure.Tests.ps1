@@ -110,7 +110,12 @@ Describe '<Hook> route helper import failure on the <Root> root (#984)' -ForEach
     It 'BB1 <Hook> allows <OutOfScope> when enforce-batch-budget-route.ps1 fails to load (#984)' {
         # Arrange: re-dot-source the hook with the route helper dot-source forced to fail.
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-batch-budget-route.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-batch-budget-route.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-batch-budget-route.ps1') { throw 'simulated load failure: enforce-batch-budget-route.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $hookPath
             Get-Bb984HandlerValue | Should -Be $script:Bb984RouteLeaf -Because 'E-CONSTRUCTION'
@@ -128,7 +133,12 @@ Describe '<Hook> route helper import failure on the <Root> root (#984)' -ForEach
     It 'BB2 <Hook> denies <InScope> naming enforce-batch-budget-route.ps1 without calling a seam when that file fails to load (#984)' {
         # Arrange
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-batch-budget-route.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-batch-budget-route.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-batch-budget-route.ps1') { throw 'simulated load failure: enforce-batch-budget-route.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $hookPath
             Get-Bb984HandlerValue | Should -Be $script:Bb984RouteLeaf -Because 'E-CONSTRUCTION'
@@ -167,7 +177,12 @@ Describe '<Hook> route helper import failure on the <Root> root (#984)' -ForEach
         # Arrange: the payload reader returns the in-memory envelope so the row does not depend on the host console.
         $envelope = @{ session_id = 'bb-984'; hook_event_name = 'PreToolUse'; tool_name = 'Write'; tool_input = @{ file_path = $OutOfScope; content = 'x' } } | ConvertTo-Json -Compress -Depth 5
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-batch-budget-route.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-batch-budget-route.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-batch-budget-route.ps1') { throw 'simulated load failure: enforce-batch-budget-route.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         Mock Read-ClaudeHookRawPayload { $envelope }
 
         # Act

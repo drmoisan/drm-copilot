@@ -36,7 +36,7 @@ function Get-HostManifest {
 function Install-WithWinget {
     <#
     .SYNOPSIS
-        Installs a package with winget in apply mode, with a pip fallback for poetry.
+        Installs missing packages or upgrades stale managed versions in apply mode.
     #>
     [CmdletBinding()]
     param(
@@ -47,24 +47,48 @@ function Install-WithWinget {
         [string]$Name,
 
         [Parameter()]
-        [switch]$ApplyMode
+        [switch]$ApplyMode,
+
+        [Parameter()]
+        [string]$MinimumVersion = ''
     )
 
+    $operation = 'install'
+    $installedVersion = $null
     if (Get-Command $Name -ErrorAction SilentlyContinue) {
-        Write-Output "[OK] $Name already installed"
-        return
+        if (-not $MinimumVersion) {
+            Write-Output "[OK] $Name already installed"
+            return
+        }
+
+        # A present command is compliant only when its reported version meets the manifest.
+        $installedVersion = Get-CommandVersion -Command $Name
+        if ($null -eq $installedVersion) {
+            throw "Unable to determine installed version for $Name; minimum is $MinimumVersion"
+        }
+        if ($installedVersion -ge [version]$MinimumVersion) {
+            Write-Output "[OK] $Name $installedVersion meets minimum $MinimumVersion"
+            return
+        }
+        $operation = 'upgrade'
     }
 
     if (-not $ApplyMode) {
-        Write-Output "- Would install $Name using winget id '$Id'"
+        if ($operation -eq 'upgrade') {
+            Write-Output "- Would upgrade $Name from $installedVersion to at least $MinimumVersion using winget id '$Id'"
+        }
+        else {
+            Write-Output "- Would install $Name using winget id '$Id'"
+        }
         return
     }
 
-    Write-Output "Installing $Name ($Id)"
+    $action = if ($operation -eq 'upgrade') { 'Upgrading' } else { 'Installing' }
+    Write-Output "$action $Name ($Id)"
 
     try {
         Invoke-HostBootstrapWinget -WingetArgs @(
-            "install",
+            $operation,
             "--id",
             $Id,
             "--exact",
@@ -77,7 +101,7 @@ function Install-WithWinget {
     catch {
         if ($Name -eq "poetry") {
             Write-Output "[WARN] winget install for poetry failed; trying python -m pip install --user poetry"
-            Install-PoetryWithPip -ApplyMode:$ApplyMode
+            Install-PoetryWithPip -ApplyMode:$ApplyMode -MinimumVersion $MinimumVersion
             return
         }
 
@@ -117,21 +141,43 @@ function Add-DirectoryToUserPath {
 function Install-PoetryWithPip {
     <#
     .SYNOPSIS
-        Installs poetry with python -m pip in apply mode and refreshes the session Path.
+        Installs or upgrades Poetry to its optional minimum and refreshes the session Path.
     #>
     [CmdletBinding()]
     param(
         [Parameter()]
-        [switch]$ApplyMode
+        [switch]$ApplyMode,
+
+        [Parameter()]
+        [string]$MinimumVersion = ''
     )
 
+    $installedVersion = $null
     if (Get-Command poetry -ErrorAction SilentlyContinue) {
-        Write-Output "[OK] poetry already installed"
-        return
+        if (-not $MinimumVersion) {
+            Write-Output "[OK] poetry already installed"
+            return
+        }
+
+        # Preserve compliant versions; unknown installed versions must not imply success.
+        $installedVersion = Get-CommandVersion -Command poetry
+        if ($null -eq $installedVersion) {
+            throw "Unable to determine installed version for poetry; minimum is $MinimumVersion"
+        }
+        if ($installedVersion -ge [version]$MinimumVersion) {
+            Write-Output "[OK] poetry $installedVersion meets minimum $MinimumVersion"
+            return
+        }
     }
 
+    $package = if ($MinimumVersion) { "poetry>=$MinimumVersion" } else { 'poetry' }
     if (-not $ApplyMode) {
-        Write-Output "- Would install poetry using python -m pip install --user poetry"
+        if ($installedVersion) {
+            Write-Output "- Would upgrade poetry from $installedVersion to at least $MinimumVersion using python -m pip"
+        }
+        else {
+            Write-Output "- Would install poetry using python -m pip install --user $package"
+        }
         return
     }
 
@@ -141,7 +187,12 @@ function Install-PoetryWithPip {
     }
 
     Write-Output "Installing poetry via python -m pip"
-    $pipResult = Invoke-HostNativeCommand -FilePath $pythonCommand.Source -ArgumentList @('-m', 'pip', 'install', '--user', 'poetry') -StreamToHost
+    $pipArguments = @('-m', 'pip', 'install', '--user')
+    if ($MinimumVersion) {
+        $pipArguments += '--upgrade'
+    }
+    $pipArguments += $package
+    $pipResult = Invoke-HostNativeCommand -FilePath $pythonCommand.Source -ArgumentList $pipArguments -StreamToHost
     if ($pipResult.ExitCode -ne 0) {
         throw "Poetry fallback install failed with exit code $($pipResult.ExitCode)"
     }
@@ -356,8 +407,17 @@ function Invoke-BootstrapHost {
 
     Write-Output ""
     Write-Output "Installing required packages:"
+    $minimumVersions = if ($manifest.PSObject.Properties.Name -contains 'minimumVersions') {
+        $manifest.minimumVersions
+    }
+    else { $null }
+    # Optional minima preserve legacy manifests while giving managed packages the shared baseline.
     foreach ($pkg in $wingetPackages) {
-        Install-WithWinget -Id $pkg.id -Name $pkg.name -ApplyMode:$Apply
+        $minimumVersion = ''
+        if ($null -ne $minimumVersions -and $minimumVersions.PSObject.Properties.Name -contains $pkg.name) {
+            $minimumVersion = [string]$minimumVersions.($pkg.name)
+        }
+        Install-WithWinget -Id $pkg.id -Name $pkg.name -ApplyMode:$Apply -MinimumVersion $minimumVersion
     }
 
     $sessionPath = Get-SessionPathFromMachineAndUser
@@ -366,7 +426,11 @@ function Invoke-BootstrapHost {
     }
 
     # Install poetry after the PATH refresh so a freshly installed python is visible.
-    Install-PoetryWithPip -ApplyMode:$Apply
+    $poetryMinimum = ''
+    if ($null -ne $minimumVersions -and $minimumVersions.PSObject.Properties.Name -contains 'poetry') {
+        $poetryMinimum = [string]$minimumVersions.poetry
+    }
+    Install-PoetryWithPip -ApplyMode:$Apply -MinimumVersion $poetryMinimum
 
     Write-Output ""
     if (Get-Command npm -ErrorAction SilentlyContinue) {

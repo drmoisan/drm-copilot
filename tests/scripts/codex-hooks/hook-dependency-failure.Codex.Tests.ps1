@@ -145,7 +145,12 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
         $failedDependency = $Dependency
         $failedChildPath = $ChildPath
         if ($Kind -eq 'Module') { Mock Import-Module { throw "simulated load failure: $failedDependency" } -ParameterFilter { $Name -like "*$failedDependency" } }
-        else { Mock Join-Path { throw "simulated load failure: $failedDependency" } -ParameterFilter { $ChildPath -eq $failedChildPath } }
+        else { $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+            Mock Join-Path {
+                # Only the selected dependency fails; other path joins retain native semantics.
+                if ($ChildPath -eq $failedChildPath) { throw "simulated load failure: $failedDependency"; return }
+                & $originalJoinPath @PesterBoundParameters
+            } }
         # Act
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
         finally { Initialize-HookDependencyState }
@@ -156,7 +161,12 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
     It 'B2: <Event> <Hook> sets the bootstrap flag without a function call when hook-dependency-guard.ps1 fails to load' -ForEach $script:HookRows {
         foreach ($name in 'Add-HookDependencyFailure', 'Test-HookDependencyFailure', 'Get-HookDependencyFailureReason', 'Get-HookDependencyFailureDecision') { Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue }
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-dependency-guard.ps1') { throw 'simulated load failure: hook-dependency-guard.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook)
             $flag = $script:HookDependencyGuardLoadFailed
@@ -169,7 +179,12 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
 
     It 'B3: <Event> <Hook> exits 2 with the bootstrap reason when hook-dependency-guard.ps1 fails to load' -ForEach $script:HookRows {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-dependency-guard.ps1') { throw 'simulated load failure: hook-dependency-guard.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
         finally { Initialize-HookDependencyState }
         $result.ExitCode | Should -Be 2
@@ -200,7 +215,12 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
     It 'X2: <Hook> denies naming epic-child-launch-contract.ps1 when the present file fails to load' -ForEach $script:ContractRows {
         # Arrange: the contract is reported present, and its path resolves to a file that does not exist.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -like '*epic-child-launch-contract.ps1' }
-        Mock Join-Path { 'synthetic-missing/epic-child-launch-contract.ps1' } -ParameterFilter { $ChildPath -eq 'scripts/epic-child-launch-contract.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'scripts/epic-child-launch-contract.ps1') { 'synthetic-missing/epic-child-launch-contract.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         # Act
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent 'PreToolUse' }
         finally { Initialize-HookDependencyState }
@@ -209,7 +229,12 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
     }
 
     It 'X3: validate-bash denies a dependency failure with HOOK_DEPENDENCY_LOAD_FAILED:' {
-        Mock Join-Path { throw 'simulated load failure: hook-command-scanner.ps1' } -ParameterFilter { $ChildPath -eq 'hook-command-scanner.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-command-scanner.ps1') { throw 'simulated load failure: hook-command-scanner.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook '.codex/hooks/validate-bash.ps1' -HookEvent 'PreToolUse' }
         finally { Initialize-HookDependencyState }
         Assert-DependencyBlock -Result $result -HookEvent 'PreToolUse' -Prefix 'HOOK_DEPENDENCY_LOAD_FAILED:' -Dependency 'hook-command-scanner.ps1'

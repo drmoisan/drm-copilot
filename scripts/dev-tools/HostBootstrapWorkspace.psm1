@@ -70,7 +70,9 @@ function Resolve-WorkspaceRoot {
         return (Get-Location).Path
     }
 
-    return [System.IO.Path]::GetFullPath($WorkspaceRootPath)
+    # Resolve relative input against the PowerShell location; GetFullPath alone would use the
+    # process directory, which Set-Location does not move. A rooted input is returned unchanged.
+    return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PWD.ProviderPath, $WorkspaceRootPath))
 }
 
 function Initialize-WorkspaceRoot {
@@ -171,7 +173,7 @@ function Resolve-ProjectRepoRoot {
     )
 
     if (-not [string]::IsNullOrWhiteSpace($RepoRootPath)) {
-        return [System.IO.Path]::GetFullPath($RepoRootPath)
+        return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PWD.ProviderPath, $RepoRootPath))
     }
 
     $defaultRepoRoot = [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath "..\.."))
@@ -182,7 +184,7 @@ function Resolve-ProjectRepoRoot {
     $drmProject = $Projects | Where-Object { $_.name -eq "drm-copilot" } | Select-Object -First 1
     if ($drmProject) {
         $drmTargetPath = if ($drmProject.targetPath) { [string]$drmProject.targetPath } else { "drm-copilot" }
-        return [System.IO.Path]::GetFullPath((Join-Path -Path $WorkspaceRootPath -ChildPath $drmTargetPath))
+        return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PWD.ProviderPath, (Join-Path -Path $WorkspaceRootPath -ChildPath $drmTargetPath)))
     }
 
     return ""

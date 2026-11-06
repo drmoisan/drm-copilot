@@ -292,8 +292,18 @@ Limitations: the push-down never deletes destination files, so a file already pr
 ### Extension development
 
 - VS Code (engine `^1.138.0`)
-- Node.js 20+ recommended
-- npm
+- Node.js 26.13.0
+- npm 11.20.0
+
+### Development environment baseline
+
+The Windows host manifest and both devcontainers use Python 3.13.18, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, and Poetry 2.5.1. Shell validation uses shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12. Both containers accept later Python patches within 3.13 and retain their separate platform settings.
+
+Both images also install Git >=2.56.0, GitHub CLI 2.103.3, .NET SDK 10.0.403, uv 0.13.7, Claude Code 2.1.318, claude-swap 0.29.0, Codex 0.166.0, Pester 6.2.0, and PSScriptAnalyzer 1.25.0. See [.devcontainer/README.md](.devcontainer/README.md) for the shared setup and local Linux dependency volumes.
+
+Run `scripts/dev-tools/bootstrap-host.ps1` without `-Apply` to preview missing or below-minimum managed tools. Apply mode installs or upgrades them according to `scripts/host-tools.manifest.json`; equal or newer host versions remain unchanged, and unreadable versions fail explicitly.
+
+Python 3.11/3.12 compatibility jobs, consumer engine requirements, and release-publishing runtime pins remain independent of this development baseline.
 
 ### Standalone MCP package
 
@@ -314,7 +324,7 @@ Limitations: the push-down never deletes destination files, so a file already pr
 
 - Python: Poetry-managed Black, Ruff, Pyright, and Pytest (installed via `poetry install`).
 - TypeScript: Node.js with Prettier, ESLint, `tsc`, and the configured test runner (installed via `npm ci`).
-- PowerShell: PowerShell 7+ and the bundled PoshQC module (PSScriptAnalyzer, Pester 5.x); install tooling with `Install-PoshQCTools`.
+- PowerShell: PowerShell 7+ and the bundled PoshQC module (PSScriptAnalyzer, Pester 6.2.x); install tooling with `Install-PoshQCTools`.
 - Modern C#: the .NET 8+ SDK with the CSharpier dotnet tool and the analyzer/test packages restored by the solution.
 - Legacy VSTO C#: the .NET Framework build toolchain (`msbuild`, `vstest.console.exe`) plus CSharpier.
 - Bash: `shfmt`, `shellcheck`, `bats`, and (for coverage) `kcov`.

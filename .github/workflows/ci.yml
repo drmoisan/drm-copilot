@@ -113,3 +113,33 @@ jobs:
     uses: ./.github/workflows/_npm-audit-gate.yml
     with:
       audit-level: moderate
+
+  ci-required-gate:
+    name: CI Required Gate
+    needs:
+      - changes
+      - full-run-marker
+      - quality-checks7
+      - security-scan
+      - docs-validation
+      - build-check
+      - poshqc
+      - shell-coverage
+      - drm-copilot-extension-tests
+      - root-typescript-tests
+      - npm-audit-gate
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Evaluate the CI job results
+        shell: pwsh
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: ./scripts/ci/Invoke-CiRequiredGate.ps1
