@@ -101,7 +101,7 @@ Epic criteria (verbatim):
 - [x] The `docs` field equals the envelope the entry script printed, unchanged; `result` is not reshaped by TypeScript.
 - [x] TypeScript does not reject an input whose only defect is a missing companion value that 1023 reports as a ledger finding; PowerShell reports it.
 - [x] A missing entry script returns `DOCS_ENTRY_SCRIPT_MISSING` with a next action naming `push_down_claude_customizations`, and the launcher is not called.
-- [ ] The execution-environment brief bullet stating that the docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` is present and byte-identical in every copy listed in spec `## Implementation Strategy`.
+- [x] The execution-environment brief bullet stating that the docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` is present and byte-identical in every copy listed in spec `## Implementation Strategy`.
 
 ### Story 3 - Extension maintainer
 
@@ -110,7 +110,7 @@ Epic criteria (verbatim):
 - [x] A contract test reads the committed `schemas/docs/v1/docs-command-envelope.schema.json` read-only and checks its `required` set and `additionalProperties: false` against the parser.
 - [x] `extensions/drm-copilot/jest.docs-coverage.json` registers an 85/75 entry for each new production file, merged into `jest.config.cjs` by one spread line, with per-file figures recorded under `evidence/coverage/`.
 - [x] No test creates a temporary file or spawns `pwsh`; launcher, `FileSystem` and `pwsh` resolution are injected, and a seeded shuffled Jest run passes.
-- [ ] Every new file is below 500 logical lines and the seven-stage toolchain passes in a single pass.
+- [x] Every new file is below 500 logical lines and the seven-stage toolchain passes in a single pass.
 
 ## Non-Goals
 

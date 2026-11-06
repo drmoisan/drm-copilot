@@ -404,11 +404,11 @@ Refined criteria:
 - [x] `runDocsCommand` is optional on `RepoAutomationService`; the existing `jest.Mocked<RepoAutomationService>` literals compile without edit, and a `repo-automation-service` test asserts that `runDocsCommand` uses the injected `docs` dependencies and `fileSystem`.
 - [x] Every row of `## Existing Tests That Enumerate the MCP Tool Set` holds: rows 1, 2 and 14 are updated as stated, and every row marked **Unchanged** passes without edit.
 - [x] `.codex/config.toml`, its bundle copy and `.claude/settings.json` are unchanged by this feature (OQ-B).
-- [ ] The execution-environment brief bullet for the docs tools is present and byte-identical in every copy listed under `## Implementation Strategy`, and the push-down resource contract tests pass.
+- [x] The execution-environment brief bullet for the docs tools is present and byte-identical in every copy listed under `## Implementation Strategy`, and the push-down resource contract tests pass.
 - [x] `extensions/drm-copilot/README.md` lists the docs tools, their inputs, the `docs` result field and the PowerShell 7.4 and pushed-down-lib prerequisite, and `extensions/drm-copilot/CHANGELOG.md` has an `### Added` entry under `## [Unreleased]`.
 - [x] `extensions/drm-copilot/jest.docs-coverage.json` holds an 85/75 entry for each new production file, `jest.config.cjs` merges it with one spread line, and the per-file figures from the Jest coverage output are recorded under `evidence/coverage/`.
 - [x] No new or edited test creates a temporary file or spawns `pwsh`; process launch, `FileSystem` and `pwsh` resolution are injected fakes, and a seeded shuffled run (`node run-jest.cjs --randomize --seed=<n>`) passes with evidence under `evidence/regression-testing/`.
-- [ ] Every new production and test file is below 500 logical lines, no edited file rises above 800, and the seven-stage toolchain passes in a single pass.
+- [x] Every new production and test file is below 500 logical lines, no edited file rises above 800, and the seven-stage toolchain passes in a single pass.
 
 ## Definition of Done
 
