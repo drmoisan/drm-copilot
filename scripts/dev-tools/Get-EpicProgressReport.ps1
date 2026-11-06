@@ -40,7 +40,8 @@
 
 .PARAMETER KickoffPath
     The repository-relative path of the kickoff file on the integration branch. Default:
-    docs/features/epics/<EpicFolder>/epic-kickoff.md.
+    docs/features/epics/<EpicFolder>/epic-kickoff.md. Only the feature-summary table, whose
+    header's first cell is issue_num or Issue, is read; every other table in the file is ignored.
 
 .PARAMETER RepositoryRoot
     The repository root in which git runs. Default: the current location.
