@@ -48,7 +48,7 @@
   - Acceptance: `<FEATURE>/evidence/baseline/pester-coverage.<timestamp>.md` records the total, passed and failed counts from `artifacts/pester/pester-junit.xml`, the per-container counts of the two merged suites, and the numeric per-file line coverage of `scripts/dev-tools/Get-EpicProgressReport.ps1` and `scripts/dev-tools/Get-EpicProgressReport.Logic.ps1` from `artifacts/pester/powershell-coverage.xml`; failed count is 0 for both merged suites.
 - [x] [P0-T7] Run the Python push-down contract modules `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`, `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py` and `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`.
   - Acceptance: `<FEATURE>/evidence/baseline/python-contract-tests.<timestamp>.md` records the passed and failed counts per module; failed count is 0.
-- [ ] [P0-T8] Record physical line counts (`@(Get-Content -LiteralPath <path>).Count`) of the four merged files.
+- [x] [P0-T8] Record physical line counts (`@(Get-Content -LiteralPath <path>).Count`) of the four merged files.
   - Acceptance: `<FEATURE>/evidence/baseline/file-size.<timestamp>.md` records each count; the Logic suite count is above 700, which is the split obligation of this plan.
 
 ### Phase 1 — Relocate and Split the Canonical Files
