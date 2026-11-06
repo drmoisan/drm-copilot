@@ -67,6 +67,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 - Every `mcp__drm-copilot__*` tool runs the installed extension, not the branch. `validate_orchestration_artifacts` applies the installed rule set, so validator rules added on a branch apply through MCP only after the extension release that carries them is installed.
 - Branch-current plan validation runs the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` with its `plan` subcommand, through Poetry in module form.
 - A push-down served by the MCP tools writes the installed extension's bundled payload; a repository-side edit under `extensions/drm-copilot/resources/` changes that payload only after a rebuild and reinstall.
+- The docs tools (`run_docs_check`, `run_docs_inventory`, `run_docs_coverage`, `update_docs_ledger`, `generate_docs_reference`, `validate_docs_artifacts`) run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh`, so a branch edit to the docs lib applies through MCP immediately, while the TypeScript wrapper is the installed extension.
 
 ## CI Shape and Required Checks
 

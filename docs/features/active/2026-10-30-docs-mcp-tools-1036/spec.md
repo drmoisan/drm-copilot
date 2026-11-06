@@ -375,40 +375,40 @@ from classification.
 
 Epic criteria (verbatim):
 
-- [ ] Each of the six tools validates its input, invokes the matching subcommand with `-Json`, and returns structured output including the exit code and findings.
-- [ ] Invalid input is rejected before any process starts.
-- [ ] `update_docs_ledger` is the only mutating tool and routes through `-Command update-ledger`.
-- [ ] No logic beyond argument mapping and result parsing lives in TypeScript; every operation is reachable from a skill through `Invoke-DocsCommand.ps1`.
-- [ ] Jest line coverage >= 85% and branch coverage >= 75% on the new modules.
+- [x] Each of the six tools validates its input, invokes the matching subcommand with `-Json`, and returns structured output including the exit code and findings.
+- [x] Invalid input is rejected before any process starts.
+- [x] `update_docs_ledger` is the only mutating tool and routes through `-Command update-ledger`.
+- [x] No logic beyond argument mapping and result parsing lives in TypeScript; every operation is reachable from a skill through `Invoke-DocsCommand.ps1`.
+- [x] Jest line coverage >= 85% and branch coverage >= 75% on the new modules.
 
 Refined criteria:
 
-- [ ] `REPO_AUTOMATION_TOOLS` lists `run_docs_check`, `run_docs_inventory`, `run_docs_coverage`, `update_docs_ledger`, `generate_docs_reference`, `validate_docs_artifacts` in that order, immediately after `render_subagent_tree` and immediately before `validate_discovery_artifacts`, and has 49 entries.
-- [ ] `src/mcp-tools.ts` contains a literal `case "<name>":` label for each docs tool, and `exposes one shared tool set to the standalone server and the extension provider` passes without edit.
-- [ ] Each docs tool definition has `additionalProperties: false`, lists `workspace_root` in `required`, and is identical on `REPO_AUTOMATION_TOOL_DEFINITIONS` and `toolDefinitions` (one shared constant spread into both).
-- [ ] `ToolDefinition` in both definition files accepts optional `annotations`; the read-only docs tools set `readOnlyHint: true`, `update_docs_ledger` sets `readOnlyHint: false` and `destructiveHint: true`, every docs tool sets `openWorldHint: false`, and a Jest `client.listTools()` test observes the annotations in the listing.
-- [ ] `DOCS_MUTATING_TOOLS` equals `["update_docs_ledger"]`, equals the set of docs definitions whose `readOnlyHint` is not `true`, and `update_docs_ledger` is the only docs definition with a `write` field; no docs definition has a `write_receipt` or output-file field.
-- [ ] For each tool, a Jest test asserts the exact argv `[<pwsh path>, "-NoProfile", "-File", ".claude/lib/docs/Invoke-DocsCommand.ps1", "-Command", <subcommand>, "-Json", ...options]` and that the options match the tool's row in `## Upstream Contract Dependencies`, emitted from one declarative table per tool.
-- [ ] `update_docs_ledger` emits `-Write` only when `write` is `true`; with `write` omitted or `false` the argv contains no `-Write`.
-- [ ] No argv built by `run_docs_inventory` or `generate_docs_reference` contains `-Write`, and no argv built by `validate_docs_artifacts` contains `-WriteReceipt`, for any accepted input.
-- [ ] No argv contains `-Command`, `-Json`, `-Help` or `-RepositoryRoot` derived from tool input, and an empty array or omitted field emits no option.
-- [ ] Each of these inputs is rejected with the launcher and `runDocsCommand` not called: an unknown key; a wrong type; an enum value outside its list; an empty string; a value failing its grammar (relative path, identifier, full revision, element id, page reference); a string value beginning with `-`; duplicate `pages` entries; an `update_docs_ledger` operation missing a required field or carrying a field its per-operation table does not permit; `validate_docs_artifacts` without `mode` or `revision`.
-- [ ] TypeScript does not reject an `update_docs_ledger` input whose only defect is a missing companion value that 1023 reports as a ledger finding (for example `disposition: "excluded"` without `rationale`).
-- [ ] A grammar parity test asserts that each TypeScript pattern string equals the corresponding `pattern` value in the committed docs-common schema (discovery v2 common while docs common is absent).
-- [ ] `DOCS_WORKSPACE_ROOT_INVALID`, `DOCS_ENTRY_SCRIPT_MISSING`, `DOCS_PWSH_UNAVAILABLE` and `DOCS_RUNTIME_UNAVAILABLE` are each produced by their condition in `### Host failure codes` with the launcher not called, returned as `ok: false` with a message prefixed by the code, and checked in the order workspace root, entry script, `pwsh`.
-- [ ] A launch error reported by the injected launcher returns `ok: false` with `DOCS_PWSH_UNAVAILABLE`, and no resolution falls back to Windows `powershell`.
-- [ ] `parseDocsEnvelope` returns `DOCS_ENVELOPE_EMPTY`, `DOCS_ENVELOPE_MALFORMED`, `DOCS_ENVELOPE_EXIT_MISMATCH` and `DOCS_ENVELOPE_COMMAND_MISMATCH` for each condition in `### Host failure codes`, and accepts valid envelopes for exit codes 0, 1, 2 and 3, tested with in-memory fixtures.
-- [ ] A contract test reads the committed `schemas/docs/v1/docs-command-envelope.schema.json` read-only and asserts that its top-level `required` set equals the parser's key set and that `additionalProperties` is `false`.
-- [ ] Exit 0 yields `ok: true`; exit 1, 2 and 3 yield `ok: false` results (not thrown) whose `docs` field equals the parsed envelope, whose `summary` has the form `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`, and which carry `stderr_excerpt` only for exit 3; through `InMemoryTransport` the call returns `structuredContent.docs` and `isError` set per exit code.
-- [ ] The process runs with `cwd` equal to `workspace_root`, one launch per call and no retry, through a `DiscoveryProcessLauncher` imported from `src/discovery-runtime.ts`, and `src/discovery-runtime.ts` is unchanged.
-- [ ] `runDocsCommand` is optional on `RepoAutomationService`; the existing `jest.Mocked<RepoAutomationService>` literals compile without edit, and a `repo-automation-service` test asserts that `runDocsCommand` uses the injected `docs` dependencies and `fileSystem`.
-- [ ] Every row of `## Existing Tests That Enumerate the MCP Tool Set` holds: rows 1, 2 and 14 are updated as stated, and every row marked **Unchanged** passes without edit.
-- [ ] `.codex/config.toml`, its bundle copy and `.claude/settings.json` are unchanged by this feature (OQ-B).
-- [ ] The execution-environment brief bullet for the docs tools is present and byte-identical in every copy listed under `## Implementation Strategy`, and the push-down resource contract tests pass.
-- [ ] `extensions/drm-copilot/README.md` lists the docs tools, their inputs, the `docs` result field and the PowerShell 7.4 and pushed-down-lib prerequisite, and `extensions/drm-copilot/CHANGELOG.md` has an `### Added` entry under `## [Unreleased]`.
-- [ ] `extensions/drm-copilot/jest.docs-coverage.json` holds an 85/75 entry for each new production file, `jest.config.cjs` merges it with one spread line, and the per-file figures from the Jest coverage output are recorded under `evidence/coverage/`.
-- [ ] No new or edited test creates a temporary file or spawns `pwsh`; process launch, `FileSystem` and `pwsh` resolution are injected fakes, and a seeded shuffled run (`node run-jest.cjs --randomize --seed=<n>`) passes with evidence under `evidence/regression-testing/`.
-- [ ] Every new production and test file is below 500 logical lines, no edited file rises above 800, and the seven-stage toolchain passes in a single pass.
+- [x] `REPO_AUTOMATION_TOOLS` lists `run_docs_check`, `run_docs_inventory`, `run_docs_coverage`, `update_docs_ledger`, `generate_docs_reference`, `validate_docs_artifacts` in that order, immediately after `render_subagent_tree` and immediately before `validate_discovery_artifacts`, and has 49 entries.
+- [x] `src/mcp-tools.ts` contains a literal `case "<name>":` label for each docs tool, and `exposes one shared tool set to the standalone server and the extension provider` passes without edit.
+- [x] Each docs tool definition has `additionalProperties: false`, lists `workspace_root` in `required`, and is identical on `REPO_AUTOMATION_TOOL_DEFINITIONS` and `toolDefinitions` (one shared constant spread into both).
+- [x] `ToolDefinition` in both definition files accepts optional `annotations`; the read-only docs tools set `readOnlyHint: true`, `update_docs_ledger` sets `readOnlyHint: false` and `destructiveHint: true`, every docs tool sets `openWorldHint: false`, and a Jest `client.listTools()` test observes the annotations in the listing.
+- [x] `DOCS_MUTATING_TOOLS` equals `["update_docs_ledger"]`, equals the set of docs definitions whose `readOnlyHint` is not `true`, and `update_docs_ledger` is the only docs definition with a `write` field; no docs definition has a `write_receipt` or output-file field.
+- [x] For each tool, a Jest test asserts the exact argv `[<pwsh path>, "-NoProfile", "-File", ".claude/lib/docs/Invoke-DocsCommand.ps1", "-Command", <subcommand>, "-Json", ...options]` and that the options match the tool's row in `## Upstream Contract Dependencies`, emitted from one declarative table per tool.
+- [x] `update_docs_ledger` emits `-Write` only when `write` is `true`; with `write` omitted or `false` the argv contains no `-Write`.
+- [x] No argv built by `run_docs_inventory` or `generate_docs_reference` contains `-Write`, and no argv built by `validate_docs_artifacts` contains `-WriteReceipt`, for any accepted input.
+- [x] No argv contains `-Command`, `-Json`, `-Help` or `-RepositoryRoot` derived from tool input, and an empty array or omitted field emits no option.
+- [x] Each of these inputs is rejected with the launcher and `runDocsCommand` not called: an unknown key; a wrong type; an enum value outside its list; an empty string; a value failing its grammar (relative path, identifier, full revision, element id, page reference); a string value beginning with `-`; duplicate `pages` entries; an `update_docs_ledger` operation missing a required field or carrying a field its per-operation table does not permit; `validate_docs_artifacts` without `mode` or `revision`.
+- [x] TypeScript does not reject an `update_docs_ledger` input whose only defect is a missing companion value that 1023 reports as a ledger finding (for example `disposition: "excluded"` without `rationale`).
+- [x] A grammar parity test asserts that each TypeScript pattern string equals the corresponding `pattern` value in the committed docs-common schema (discovery v2 common while docs common is absent).
+- [x] `DOCS_WORKSPACE_ROOT_INVALID`, `DOCS_ENTRY_SCRIPT_MISSING`, `DOCS_PWSH_UNAVAILABLE` and `DOCS_RUNTIME_UNAVAILABLE` are each produced by their condition in `### Host failure codes` with the launcher not called, returned as `ok: false` with a message prefixed by the code, and checked in the order workspace root, entry script, `pwsh`.
+- [x] A launch error reported by the injected launcher returns `ok: false` with `DOCS_PWSH_UNAVAILABLE`, and no resolution falls back to Windows `powershell`.
+- [x] `parseDocsEnvelope` returns `DOCS_ENVELOPE_EMPTY`, `DOCS_ENVELOPE_MALFORMED`, `DOCS_ENVELOPE_EXIT_MISMATCH` and `DOCS_ENVELOPE_COMMAND_MISMATCH` for each condition in `### Host failure codes`, and accepts valid envelopes for exit codes 0, 1, 2 and 3, tested with in-memory fixtures.
+- [x] A contract test reads the committed `schemas/docs/v1/docs-command-envelope.schema.json` read-only and asserts that its top-level `required` set equals the parser's key set and that `additionalProperties` is `false`.
+- [x] Exit 0 yields `ok: true`; exit 1, 2 and 3 yield `ok: false` results (not thrown) whose `docs` field equals the parsed envelope, whose `summary` has the form `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`, and which carry `stderr_excerpt` only for exit 3; through `InMemoryTransport` the call returns `structuredContent.docs` and `isError` set per exit code.
+- [x] The process runs with `cwd` equal to `workspace_root`, one launch per call and no retry, through a `DiscoveryProcessLauncher` imported from `src/discovery-runtime.ts`, and `src/discovery-runtime.ts` is unchanged.
+- [x] `runDocsCommand` is optional on `RepoAutomationService`; the existing `jest.Mocked<RepoAutomationService>` literals compile without edit, and a `repo-automation-service` test asserts that `runDocsCommand` uses the injected `docs` dependencies and `fileSystem`.
+- [x] Every row of `## Existing Tests That Enumerate the MCP Tool Set` holds: rows 1, 2 and 14 are updated as stated, and every row marked **Unchanged** passes without edit.
+- [x] `.codex/config.toml`, its bundle copy and `.claude/settings.json` are unchanged by this feature (OQ-B).
+- [x] The execution-environment brief bullet for the docs tools is present and byte-identical in every copy listed under `## Implementation Strategy`, and the push-down resource contract tests pass.
+- [x] `extensions/drm-copilot/README.md` lists the docs tools, their inputs, the `docs` result field and the PowerShell 7.4 and pushed-down-lib prerequisite, and `extensions/drm-copilot/CHANGELOG.md` has an `### Added` entry under `## [Unreleased]`.
+- [x] `extensions/drm-copilot/jest.docs-coverage.json` holds an 85/75 entry for each new production file, `jest.config.cjs` merges it with one spread line, and the per-file figures from the Jest coverage output are recorded under `evidence/coverage/`.
+- [x] No new or edited test creates a temporary file or spawns `pwsh`; process launch, `FileSystem` and `pwsh` resolution are injected fakes, and a seeded shuffled run (`node run-jest.cjs --randomize --seed=<n>`) passes with evidence under `evidence/regression-testing/`.
+- [x] Every new production and test file is below 500 logical lines, no edited file rises above 800, and the seven-stage toolchain passes in a single pass.
 
 ## Definition of Done
 
