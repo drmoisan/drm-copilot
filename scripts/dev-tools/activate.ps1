@@ -105,8 +105,8 @@ function Get-RepoRelativePrompt {
     .DESCRIPTION
         Returns `(<leaf>)<rel>> ` where <leaf> is the venv root's leaf name.
         - At the venv root: rel is empty (e.g. `(mix-calculator)> `).
-        - In a descendant: rel is the repo-relative path with a leading backslash
-          (e.g. `(mix-calculator)\.claude> `).
+        - In a descendant: rel is the repo-relative path with a leading directory separator
+          (e.g. `(mix-calculator)\.claude> ` on Windows).
         - Outside the venv tree: rel is ' <absolute-path>' (e.g.
           `(mix-calculator) D:\elsewhere> `).
         Path comparisons use OrdinalIgnoreCase so drive/path casing does not
@@ -135,7 +135,7 @@ function Get-RepoRelativePrompt {
     if ($CurrentPath.Equals($VenvRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
         $rel = ''
     }
-    elseif ($CurrentPath.StartsWith($VenvRoot + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
+    elseif ($CurrentPath.StartsWith($VenvRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
         $rel = $CurrentPath.Substring($VenvRoot.Length)
     }
     else {

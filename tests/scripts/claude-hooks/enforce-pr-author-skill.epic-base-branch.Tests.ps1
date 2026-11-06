@@ -29,6 +29,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }

@@ -129,6 +129,16 @@ completion notification. A blocked item (`blocked_ci_loop_limit` or `blocked_dri
 `merged` nor `worktree_removed`, so it holds every conflicting later-cohort neighbour and,
 transitively, the tail of its own conflict component; items outside that component are unaffected.
 
+**Precedence.** An item named as `after` in an active `precedence[]` entry (the operator ordering
+input declared in `## Prepared-Item Admission (issue #1047)` of
+`.claude/rules/parallel-orchestration.md`) may start only when its `before` item has `merge_status`
+`merged` or `worktree_removed`, whatever the two items' cohorts. A `withdrawn` predecessor releases
+the constraint, and a `blocked` predecessor holds its dependent. Layer 1 enforces this rule through
+`Test-ParallelCohortBarrierClear` in `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`,
+which denies a target whose predecessor is not released and fails closed on a missing predecessor
+record. Layer 2 does not check precedence: the Python orchestrator-state validator reads
+`conflict_edges[]` only.
+
 **`current_cohort` is a progress indicator, not a gate.** `current_cohort` is the LOWEST
 current-generation cohort index that still contains a non-terminal, non-withdrawn item. It is
 recomputed and written only on durable confirmation from `git worktree list --porcelain`,
@@ -265,6 +275,10 @@ carries exactly these five elements.
    execution from that plan rather than re-running promotion, research, or planning. The item's
    prepared feature folder and approved atomic plan are already committed and preflight-clear on the
    item's own pushed feature branch.
+   The prompt also carries the item's admitted plan hash as `plan-hash: <hex>` and instructs the child, before any other step, to run `git rev-parse HEAD:<plan-path>` and to stop with `blocked_reason: premise_falsified` when the printed hash differs from `<hex>`.
+   The `<hex>` value is the item's `plan_hash` from the orchestrator checkpoint item, else the
+   kickoff `## Integrity` row for its plan path. The check runs before the child reconciles with
+   `origin/main`, so a plan that changed after admission never reaches atomic execution.
    The execution child starts a new checkpoint in its own worktree, and the preparation checkpoint
    does not carry over, so the prompt also instructs the child to verify the item's GitHub issue
    read-only (gh issue view), not to call `potential_to_issue` or the promotion-entry tool, and to
@@ -404,6 +418,15 @@ Procedure, per item:
    CI-dependent acceptance criteria. When either check fails, do not record
    `merge_status: ci_green` and do not run `gh pr merge`; the item waits until its child pushes
    the check-off and re-runs S9, and the parent does not commit the check-off itself.
+   **Turn gap.** A child can end its turn with its pull request open and its CI green gate still
+   pending. On every child completion, read the child checkpoint
+   `<worktree>/artifacts/orchestration/orchestrator-state.json`, with the worktree path located by
+   `git worktree list --porcelain`. When its `step9_status` is not `passed` or its `blocked_reason`
+   is `awaiting_ci`, keep `merge_status: pr_open` and treat the item as not done: poll
+   `gh pr checks` through the parser above until the conclusion is terminal, then
+   re-delegate the child once to resume at the CI green gate, by the same re-delegation mechanism as
+   `## Per-Item Merge-Conflict Handling`; a CI-failure cycle counts toward `remediation_loop`.
+   Record `ci_green` only after that resumed run reports its CI green gate `passed`.
 3. Execute `gh pr merge --merge <PR>` for that item's pull request, whose base is `main`.
    Do not pass `--delete-branch` or `--auto`. A zero exit status does not prove a merge: when
    `main` uses a merge queue, `gh pr merge` exits 0 after it enqueues the pull request or enables
@@ -711,8 +734,9 @@ This section is consumption documentation only. The checkpoint schema is owned b
 as prose invariants in `.claude/rules/parallel-orchestration.md`, and enforced by
 `scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema;
 add no field to it that `.claude/rules/parallel-orchestration.md` does not declare,
-and extend no enum in it. `mergeable_conflicts_resolved` is the one declared optional item
-field.
+and extend no enum in it. The declared optional item fields are `mergeable_conflicts_resolved`,
+`preparation_status`, `plan_hash`, `base_commit`, and `band_source`, and the declared optional
+top-level field is `precedence[]` (`## Prepared-Item Admission (issue #1047)` of the rule).
 
 Fields `parallel-orchestrator` writes to `artifacts/orchestration/parallel-orchestrator-state.json`:
 `objective`, `route_id: "parallel"`, `parallel_slug`, `parallel_manifest_path`,

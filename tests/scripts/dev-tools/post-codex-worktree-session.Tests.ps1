@@ -260,12 +260,17 @@ Describe "post-codex-worktree-session.ps1 - Resolve-CodexCustomizationSourceRoot
     }
 
     It "falls back deterministically to the repository root implied by the script path" {
+        # The fallback resolves the script path with GetFullPath, so the script root is built
+        # from a portable fixture root (fully qualified on every host, never created); the
+        # expectation applies the production normalization (forward slashes, no trailing slash).
+        $fixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'post-codex-worktree-session-root'
+        $repoRoot = Join-Path $fixtureRoot 'repo'
         $result = Resolve-CodexCustomizationSourceRoot `
             -WorktreeRoot "C:/repo-wt" `
-            -ScriptRoot "C:/repo/.codex/scripts" `
+            -ScriptRoot (Join-Path -Path $repoRoot -ChildPath '.codex' -AdditionalChildPath 'scripts') `
             -InvokeGit { param([string[]] $GitArgs) $null = $GitArgs; return "" }
 
-        $result | Should -Be "C:/repo"
+        $result | Should -Be $repoRoot.Replace('\', '/').TrimEnd('/')
     }
 }
 

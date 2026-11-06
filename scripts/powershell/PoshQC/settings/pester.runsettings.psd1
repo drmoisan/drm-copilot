@@ -16,9 +16,9 @@
     }
     CodeCoverage = @{
         Enabled               = $true
-        # Use Pester's CoverageGutters format so VS Code Coverage Gutters
+        # Use Pester's JaCoCo format so VS Code Coverage Gutters
         # can map file paths correctly.
-        OutputFormat          = 'CoverageGutters'
+        OutputFormat          = 'JaCoCo'
         OutputPath            = 'artifacts/pester/powershell-coverage.xml'
         # Issue #527: no Path list. Invoke-PoshQCTest derives the coverage population from the
         # workspace (config/poshqc-coverage.json, else the effective test scan folders); see README.md.

@@ -25,6 +25,7 @@ BeforeAll {
     Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
     Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
     $script:PromptWithoutLine = "Open the pull request for the item.`nCanonical issue number for this feature is 1001.`nbranch: bug/merge-gate-epic-mode-string-false-1001"
 }
 

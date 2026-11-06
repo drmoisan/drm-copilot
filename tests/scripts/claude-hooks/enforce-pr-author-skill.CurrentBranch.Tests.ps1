@@ -45,6 +45,7 @@ BeforeAll {
     . (Join-Path $PSScriptRoot 'WorktreeResolutionFixture.Helpers.ps1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/HookTargetWorktree.psm1')
     $script:SharedNoSelection = [pscustomobject]@{ WorktreeRoot = $null; Source = 'CommandOperand'; Ambiguous = $false; ReasonCode = (Get-WorktreeResolutionNoTargetReasonCode); Detail = 'shared resolver not exercised by this suite'; Candidates = [string[]] @() }
     Mock Resolve-HookTargetWorktree { $script:SharedNoSelection }

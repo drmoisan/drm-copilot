@@ -73,6 +73,8 @@ import {
 } from "./mcp-handlers/template-validation-handlers";
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
 import { handlePortableHandoffTool } from "./mcp-handlers/orchestration-handoff-handlers";
+import { handleDocsTool } from "./mcp-handlers/docs-handlers";
+import type { DocsCommandEnvelope } from "./docs-command-envelope";
 
 export { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
 
@@ -109,6 +111,7 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly invocation?: PreparedInvocationSummary;
   readonly receipt?: FinalizedReceiptSummary;
   readonly sentinel?: SentinelObservationSummary;
+  readonly docs?: DocsCommandEnvelope;
 }
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -329,6 +332,15 @@ export async function dispatchRepoAutomationTool(
         return toMcpToolResult(
           await handleRenderSubagentTree(rawInput, service),
         );
+      }
+
+      case "run_docs_check":
+      case "run_docs_inventory":
+      case "run_docs_coverage":
+      case "update_docs_ledger":
+      case "generate_docs_reference":
+      case "validate_docs_artifacts": {
+        return await handleDocsTool(toolName, rawInput, service);
       }
 
       case "validate_discovery_artifacts": {

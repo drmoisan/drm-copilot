@@ -44,7 +44,7 @@ Describe 'validate-bash consumer rows, <Runtime> copy (issue #824)' -ForEach $sc
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot "$HookRoot/validate-bash.ps1")
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
     }
@@ -65,7 +65,7 @@ Describe 'pre-implementation gate consumer rows, <Runtime> copy (issue #824)' -F
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot "$HookRoot/enforce-orchestration-preimplementation-gate.ps1")
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
         if ($Runtime -eq 'claude') {
@@ -91,7 +91,7 @@ Describe 'epic merge gate consumer rows, <Runtime> copy (issue #824)' -ForEach $
         Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
         Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
         $script:CurrentRuntime = $Runtime
@@ -112,7 +112,7 @@ Describe 'pr-author epic base-branch consumer row, claude copy (issue #824)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.claude/hooks/enforce-pr-author-skill.ps1')
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
         Mock -CommandName Get-PrAuthorCheckpointContent -MockWith {
