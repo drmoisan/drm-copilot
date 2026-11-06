@@ -4,7 +4,7 @@
 - **Parent (optional):** epic/documentation-estate-tooling-integration
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-06T21-37
-- **Status:** Authored by `atomic-planner`; awaiting combined preflight and execution
+- **Status:** Executed; AC-8 pending CI
 - **Version:** 1.0
 - **Remediation-Mode:** proportionate
 - **Requirements source (sole):** `remediation-inputs.2026-11-06T21-37.md` in this folder (rows R1, R2, and R3; its `## Rows Out of Scope` and `## Do Not Do` sections bind this plan)
