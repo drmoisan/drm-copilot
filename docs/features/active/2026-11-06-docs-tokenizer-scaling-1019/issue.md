@@ -25,7 +25,7 @@ Apply the candidate production hunks byte for byte, so that 1034 can merge this 
 - [x] Behavior is unchanged: the existing `DocsPythonTokens.Tests.ps1` cases pass, new window-boundary cases pass, and a differential run over the unfixed and fixed modules reports identical tokens and diagnostics (`evidence/regression-testing/`).
 - [x] `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/DocsPythonTokens.psm1` is byte-identical to the module, and the push-down resource contract and manifest tests pass.
 - [x] The PowerShell toolchain (format, analyze, test) passes on the changed files, `DocsPythonTokens.psm1` line coverage is at least 85%, and the before and after suite durations are recorded under `evidence/qa-gates/`.
-- [ ] CI is green on the pull request head and the pull request is merged into `epic/documentation-estate-tooling-integration` (CI-dependent).
+- [x] CI is green on the pull request head and the pull request is merged into `epic/documentation-estate-tooling-integration` (CI-dependent).
 
 ## Dependencies / Risks
 
