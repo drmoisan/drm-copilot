@@ -1,4 +1,4 @@
-# Pester 5 tests for scripts/dev-tools/Get-EpicProgressReport.ps1 (issue #1080).
+# Pester 5 tests for .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 (issue #1080).
 # The script is dot-sourced with its two mandatory parameters bound, so the entry-point
 # block is skipped. Every I/O seam is either exercised without side effects (absent
 # command, absent path, a read of the script itself, a -WhatIf write) or mocked with a
@@ -6,8 +6,8 @@
 # the clock.
 
 BeforeAll {
-    $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../scripts/dev-tools/Get-EpicProgressReport.ps1'
-    $script:logicPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../scripts/dev-tools/Get-EpicProgressReport.Logic.ps1'
+    $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1'
+    $script:logicPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Logic.ps1'
     . $script:scriptPath -EpicFolder 'example-epic' -StartUtc ([datetime]::new(2026, 1, 5, 9, 0, 0, [System.DateTimeKind]::Utc))
 }
 

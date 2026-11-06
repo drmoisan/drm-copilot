@@ -1,9 +1,9 @@
-# Pester 5 tests for scripts/dev-tools/Get-EpicProgressReport.Logic.ps1 (issue #1080).
+# Pester 5 tests for .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Logic.ps1 (issue #1080).
 # Every function under test is pure, so each test supplies fixed in-memory input and
 # asserts the returned data; no file, process, network, or clock is touched.
 
 BeforeAll {
-    $script:logicPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../scripts/dev-tools/Get-EpicProgressReport.Logic.ps1'
+    $script:logicPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Logic.ps1'
     . $script:logicPath
 
     # Kickoff fixture with a two-digit and a five-digit feature issue and a mid-line marker.
