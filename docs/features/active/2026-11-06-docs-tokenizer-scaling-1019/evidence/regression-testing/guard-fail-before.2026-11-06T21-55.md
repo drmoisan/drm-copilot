@@ -40,15 +40,15 @@ F is Failed and P is Passed. Observed values equal the expected matrix in `[P2-T
 
 ## Failure Messages
 
-- unfixed, `passes`: Expected $null or empty, because a call in a loop must not receive the source text as an argument, but got @('[string]::CompareOrdinal($Text, $index, $Quote, 0, $Quote.Length)', '[string]::CompareOrdinal($Text, $index, [string] $character * 3, 0, 3)').
-- unfixed, `assigns`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got '$source = $lines -join "`n"'.
-- unfixed, `assigns`: Expected 1, because the window size must be assigned exactly once, but got 0.
-- candidate-tree, `assigns`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got '$source = $lines -join "`n"'.
-- candidate-tree, `assigns`: Expected 1, because the window size must be assigned exactly once, but got 0.
-- mutant-tree, `assigns`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got @('$source = $sourceText.Substring(0)', '$source = $sourceText.Substring($windowStart)', '$source = $sourceText.Substring($windowStart)').
-- mutant-tree, `passes`: Expected $null or empty, because Match inside the token loop must receive the bounded window $source as its first argument, but got '$script:DocsPythonTokenPattern.Match($sourceText.Substring($windowStart), $position)'.
-- mutant-r1-tree, `assigns`: Expected the actual value to be less than or equal to 65536, because a larger window restores whole-remainder Match calls on a string-heavy source, but got 1073741824.
-- mutant-r2-tree, `assigns`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got '[string] $source = $sourceText.Substring($windowStart)'.
+- unfixed, `passes no source text variable to a .NET method inside a loop`: Expected $null or empty, because a call in a loop must not receive the source text as an argument, but got @('[string]::CompareOrdinal($Text, $index, $Quote, 0, $Quote.Length)', '[string]::CompareOrdinal($Text, $index, [string] $character * 3, 0, 3)').
+- unfixed, `assigns the lexing window only from a Substring of the source text`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got '$source = $lines -join "`n"'.
+- unfixed, `assigns the window size once at module scope from an integer literal no greater than 65536`: Expected 1, because the window size must be assigned exactly once, but got 0.
+- candidate-tree, `assigns the lexing window only from a Substring of the source text`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got '$source = $lines -join "`n"'.
+- candidate-tree, `assigns the window size once at module scope from an integer literal no greater than 65536`: Expected 1, because the window size must be assigned exactly once, but got 0.
+- mutant-tree, `assigns the lexing window only from a Substring of the source text`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got @('$source = $sourceText.Substring(0)', '$source = $sourceText.Substring($windowStart)', '$source = $sourceText.Substring($windowStart)').
+- mutant-tree, `passes only the lexing window to Match inside the token loop`: Expected $null or empty, because Match inside the token loop must receive the bounded window $source as its first argument, but got '$script:DocsPythonTokenPattern.Match($sourceText.Substring($windowStart), $position)'.
+- mutant-r1-tree, `assigns the window size once at module scope from an integer literal no greater than 65536`: Expected the actual value to be less than or equal to 65536, because a larger window restores whole-remainder Match calls on a string-heavy source, but got 1073741824.
+- mutant-r2-tree, `assigns the lexing window only from a Substring of the source text`: Expected $null or empty, because the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...), but got '[string] $source = $sourceText.Substring($windowStart)'.
 
 ## Prior Result Cited
 
