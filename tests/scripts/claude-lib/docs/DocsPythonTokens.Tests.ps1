@@ -292,9 +292,12 @@ Describe 'Get-DocsPythonToken structural scaling guard' {
         # Act
         $assignments = @($function.FindAll({
                     param($node)
-                    $node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
-                    $node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
-                    $node.Left.VariablePath.UserPath -eq 'source'
+                    if ($node -isnot [System.Management.Automation.Language.AssignmentStatementAst]) { return $false }
+                    # A cast on the left side, stacked or not, must not hide the assignment from the rule below.
+                    $left = $node.Left
+                    while ($left -is [System.Management.Automation.Language.AttributedExpressionAst]) { $left = $left.Child }
+                    return $left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $left.VariablePath.UserPath -eq 'source'
                 }, $true))
         $offending = @($assignments | Where-Object {
                 $right = $_.Right
