@@ -104,6 +104,7 @@ def resolve_relative(module: str, package: str | None) -> str | None:
         return module
     if not package:
         return None
+    # Each extra dot climbs one package; climbing past the root is unresolved.
     parts = package.split(".")
     if level - 1 > len(parts):
         return None

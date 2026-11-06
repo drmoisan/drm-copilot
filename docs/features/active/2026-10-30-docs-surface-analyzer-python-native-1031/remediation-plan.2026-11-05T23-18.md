@@ -148,18 +148,18 @@ Each production task gives every function and class a Google-style docstring (pu
   - Acceptance: `git grep -c -e InvokeInterpreter -e Get-DocsDeclarationDigest -e AnalyzerIds -- docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/spec.md` prints nothing; `git grep -w -c PYTHON_NATIVE_UNAVAILABLE -- docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/spec.md` prints a count of at least 2; the added and removed lines beginning with `- [` in `git diff HEAD -- docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/spec.md` are exactly the S4 and S13 pairs, and in `git diff HEAD -- docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/user-story.md` exactly the U4 and U13 pairs, each pair keeping its checkbox marker; `FEATURE/evidence/other/r5-spec-reconciliation.<timestamp>.md` records these outputs and the edited headings.
 - [x] [P5-T2] Record the edit in the original plan: in `FEATURE/plan.2026-10-30T18-38.md` `## Open Questions / Notes`, coordinator item 3 states that remediation cycle 1 (`FEATURE/remediation-plan.2026-11-05T23-18.md` [P5-T1]) absorbed deviations 1 to 5 and 9 into the normative sections of `spec.md`, and that by owner decision the criterion texts of S4, U4, S13 and U13 were amended to deviations 4 and 1 with their checkbox state unchanged.
   - Acceptance: no added or removed line of `git diff HEAD -- docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/plan.2026-10-30T18-38.md` begins with `- [`; the coordinator item 3 line contains the token `remediation-plan.2026-11-05T23-18.md`.
-- [ ] [P5-T3] Commit `FEATURE/spec.md`, `FEATURE/user-story.md`, `FEATURE/plan.2026-10-30T18-38.md` and the Phase 5 evidence, and push.
+- [x] [P5-T3] Commit `FEATURE/spec.md`, `FEATURE/user-story.md`, `FEATURE/plan.2026-10-30T18-38.md` and the Phase 5 evidence, and push.
   - Acceptance: `git status --porcelain` prints nothing and `git rev-parse HEAD` equals `git rev-parse @{u}`.
 
 ### Phase 6 — Final QA Loop, Coverage Evidence, Isolation, and Self-Review
 
 A failure, or a step that changes a file, restarts the loop from [P6-T1]; a change to a `LIB` or `PYLIB` file repeats the mirror copy ([P1-T1], [P1-T2] or [P4-T1]) first.
 
-- [ ] [P6-T1] Run `poetry run black --check .` (covers `.claude/lib/docs/python` and `tests/scripts/claude-lib/docs/python`).
+- [x] [P6-T1] Run `poetry run black --check .` (covers `.claude/lib/docs/python` and `tests/scripts/claude-lib/docs/python`).
   - Acceptance: exit 0 and output containing `would be left unchanged` with no `would reformat` line; `FEATURE/evidence/qa-gates/r6-black.<timestamp>.md` records the four fields.
-- [ ] [P6-T2] Run `poetry run ruff check .` (covers `.claude/lib/docs/python` and `tests/scripts/claude-lib/docs/python`).
+- [x] [P6-T2] Run `poetry run ruff check .` (covers `.claude/lib/docs/python` and `tests/scripts/claude-lib/docs/python`).
   - Acceptance: exit 0 with `All checks passed!`; `FEATURE/evidence/qa-gates/r6-ruff.<timestamp>.md` records the four fields.
-- [ ] [P6-T3] Run `poetry run pyright`, a full `poetry run pyright --outputjson` with no path argument, and `poetry run pyright --outputjson .claude/lib/docs/python`.
+- [x] [P6-T3] Run `poetry run pyright`, a full `poetry run pyright --outputjson` with no path argument, and `poetry run pyright --outputjson .claude/lib/docs/python`.
   - Acceptance: the first run reports `0 errors`; the no-path JSON run reports `summary.errorCount` 0 and `summary.filesAnalyzed` equal to `PYRIGHT_FILES_REMEDIATION_BASELINE` plus 12 (six production and six test modules); the path-scoped run reports `summary.filesAnalyzed` 18 and `summary.errorCount` 0; `FEATURE/evidence/qa-gates/r6-pyright.<timestamp>.md` records the three runs, the baseline and the expected sum.
 - [ ] [P6-T4] Run the full Python suite with coverage, as in [P0-T4], writing `SCRATCH/issue-1031-final-coverage.json` (`poetry run python -m pytest --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1031-final-coverage.json --cov`).
   - Acceptance: 0 failed and 0 errors; `artifacts/python/lcov.info` exists and its modification time is later than the run start; `FEATURE/evidence/qa-gates/r6-pytest-coverage.<timestamp>.md` records the four fields, the counts and the JSON `totals` line and branch percentages.

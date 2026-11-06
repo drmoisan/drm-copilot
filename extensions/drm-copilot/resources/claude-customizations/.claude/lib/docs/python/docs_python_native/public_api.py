@@ -97,6 +97,7 @@ def _starts_with_all(parsed: ParsedModule, statement: ast.stmt) -> bool:
     """
     if isinstance(statement, ast.Expr) and isinstance(statement.value, ast.Name):
         return False
+    # The name must start the statement text and end at a non-identifier character.
     line = (
         parsed.lines[statement.lineno - 1]
         if statement.lineno <= len(parsed.lines)

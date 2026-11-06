@@ -143,6 +143,7 @@ def _parameters(function: FunctionNode) -> list[tuple[ast.arg, ast.expr | None]]
         are not included.
     """
     arguments = function.args
+    # Defaults align with the last positional parameters; earlier ones pad to None.
     positional = [*arguments.posonlyargs, *arguments.args]
     defaults: list[ast.expr | None] = [None] * (
         len(positional) - len(arguments.defaults)

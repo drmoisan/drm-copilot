@@ -105,6 +105,8 @@ def _child_key(
         The "path|name" key of a local receiver, or of a receiver in another request
         file reached through the import table; None when it cannot be resolved.
     """
+    # A bare name is a receiver of this file; otherwise the alias table must lead to a
+    # receiver of another request module.
     if "." not in child and child in entry.receivers:
         return entry.analyzed.path + "|" + child
     qualified = entry.analyzed.tables.qualify(child)

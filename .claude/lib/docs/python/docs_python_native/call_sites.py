@@ -189,6 +189,7 @@ def binding_name(tables: ModuleTables, statement: ast.stmt | None) -> str | None
         The bound name when the statement is the recorded binding of a receiver, else
         None (not an assignment, a non-name target, or another binding statement).
     """
+    # Only a single-name assignment whose statement is the recorded receiver binds.
     if not isinstance(statement, (ast.Assign, ast.AnnAssign)):
         return None
     target = (

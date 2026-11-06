@@ -128,6 +128,7 @@ def literal_name(call: ast.Call | None) -> tuple[str | None, bool]:
     """
     if call is None:
         return None, False
+    # name= wins over the first positional argument, matching Click's own signature.
     argument = keyword(call, "name")
     if argument is None and call.args:
         argument = call.args[0]
@@ -359,6 +360,8 @@ def _command_site(
     """
     span = header_span(parsed, item.node)
     line = span[0]
+    # Each guard reports one reason and drops the site. The order keeps a site's first
+    # defect: indirection, an unknown group, a loop, a custom class, a dynamic name.
     if item.indirect:
         result.diagnostics.append(RawDiagnostic(INDIRECT, line))
         return None
@@ -414,6 +417,7 @@ def _apply_add(
     Returns:
         None. The target becomes a command of the group, optionally renamed.
     """
+    # A looped call or an unknown group cannot reparent anything, so both stop early.
     if context.in_loop:
         result.diagnostics.append(RawDiagnostic(IN_LOOP, call.lineno))
         return
@@ -421,6 +425,7 @@ def _apply_add(
         if not tables.is_known_name(group):
             result.diagnostics.append(RawDiagnostic(UNBOUND, call.lineno))
         return
+    # Only a plain name of a recorded command can be reparented; others stay silent.
     first = call.args[0] if call.args else None
     if not isinstance(first, ast.Name):
         return

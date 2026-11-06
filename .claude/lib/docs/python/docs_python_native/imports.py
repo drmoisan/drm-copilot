@@ -110,6 +110,7 @@ class ModuleTables:
         """
         if name is None:
             return None
+        # Only the first segment is an alias; other segments are kept as written.
         parts = name.split(".")
         if parts[0] in self.ambiguous:
             return None
@@ -296,6 +297,7 @@ def _add_receiver(tables: ModuleTables, node: ast.stmt, context: Context) -> Non
     found = _receiver_call(node)
     if found is None:
         return
+    # A name stays ambiguous once two calls differ; a repeated call changes nothing.
     name, call = found
     if name in tables.receiver_ambiguous:
         return

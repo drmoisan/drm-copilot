@@ -300,6 +300,7 @@ def _mount(
     if child is None:
         output.add_diagnostic(entry.analyzed.path, "HTTP_MOUNT_UNRESOLVED", line)
         return
+    # A mount with no prefix keyword records given=False, unlike a literal empty prefix.
     node = keyword(call, definition.mount_key)
     prefix, dynamic = "", False
     if node is not None:
