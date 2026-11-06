@@ -1,7 +1,7 @@
 """Tests for docs_python_native.cli_click: commands, groups, parameters."""
 
 import pytest
-from docs_python_native.cli_argparse import CliResult, CliSite
+from docs_python_native.call_sites import CliResult, CliSite
 from docs_python_native.cli_click import click_default_name, recognize_click
 from docs_python_native.imports import build_tables
 from docs_python_native.source import parse_module

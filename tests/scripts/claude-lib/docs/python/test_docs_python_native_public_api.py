@@ -1,6 +1,7 @@
 """Tests for docs_python_native.public_api: __all__ forms and the naming rule."""
 
-from docs_python_native.imports import AnalyzedFile, AnalyzerOutput, build_tables
+from docs_python_native.facts import AnalyzerOutput
+from docs_python_native.imports import AnalyzedFile, build_tables
 from docs_python_native.public_api import analyze_public_api, read_all
 from docs_python_native.source import parse_module
 

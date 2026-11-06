@@ -8,16 +8,15 @@ request modules, and edge properties bounded at 1000 per component.
 from __future__ import annotations
 
 import ast
+from typing import TYPE_CHECKING
 
-from docs_python_native.imports import (
-    AnalyzedFile,
-    AnalyzerOutput,
-    FactValue,
-    ImportStatement,
-    module_dotted_name,
-    module_package,
-)
-from docs_python_native.source import dotted_name, walk_with_context
+from docs_python_native.facts import AnalyzerOutput, FactValue
+from docs_python_native.module_names import module_dotted_name, module_package
+from docs_python_native.source import dotted_name
+from docs_python_native.walk import walk_with_context
+
+if TYPE_CHECKING:
+    from docs_python_native.imports import AnalyzedFile, ImportStatement
 
 ANALYZER_ID = "python-architecture"
 EDGE_LIMIT = 1000

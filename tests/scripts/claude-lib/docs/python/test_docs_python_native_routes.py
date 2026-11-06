@@ -1,10 +1,9 @@
 """Tests for docs_python_native.routes: FastAPI and Flask sites, mounts, prefixes."""
 
-import ast
-
 import pytest
-from docs_python_native.imports import AnalyzedFile, AnalyzerOutput, build_tables
-from docs_python_native.routes import analyze_http, compose_template, method_list
+from docs_python_native.facts import AnalyzerOutput
+from docs_python_native.imports import AnalyzedFile, build_tables
+from docs_python_native.routes import analyze_http, compose_template
 from docs_python_native.source import parse_module
 
 ROOTS = ["src"]
@@ -52,26 +51,6 @@ class TestComposeTemplate:
         self, framework: str, prefixes: list[str], path: str, expected: str
     ) -> None:
         assert compose_template(framework, prefixes, path) == expected
-
-
-class TestMethodList:
-    @pytest.mark.parametrize(
-        ("text", "expected"),
-        [
-            ("f('/x')", ("GET",)),
-            ("f('/x', methods=['get', 'POST', 'GET'])", ("GET", "POST")),
-            ("f('/x', methods=('put',))", ("PUT",)),
-            ("f('/x', methods=[])", None),
-            ("f('/x', methods=METHODS)", None),
-            ("f('/x', methods=[m])", None),
-        ],
-    )
-    def test_reads_literal_method_lists(
-        self, text: str, expected: tuple[str, ...] | None
-    ) -> None:
-        call = ast.parse(text, mode="eval").body
-        assert isinstance(call, ast.Call)
-        assert method_list(call) == expected
 
 
 FASTAPI = (

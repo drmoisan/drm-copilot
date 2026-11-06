@@ -12,25 +12,14 @@ from __future__ import annotations
 import ast
 from dataclasses import dataclass, field
 
-from docs_python_native.source import (
-    Context,
-    ParsedModule,
-    dotted_name,
-    walk_with_context,
-)
+from docs_python_native.facts import RawDiagnostic
+from docs_python_native.source import ParsedModule, dotted_name
+from docs_python_native.walk import Context, walk_with_context
 
 FRAMEWORKS = frozenset({"argparse", "click", "typer", "fastapi", "flask"})
 STAR_FRAMEWORK = "PYTHON_IMPORT_STAR_FRAMEWORK"
 NESTED_FRAMEWORK = "PYTHON_IMPORT_NESTED_FRAMEWORK"
 BINDING_AMBIGUOUS = "PYTHON_BINDING_AMBIGUOUS"
-
-
-@dataclass(frozen=True)
-class RawDiagnostic:
-    """A site or input diagnostic before it is reported under an analyzer identifier."""
-
-    code: str
-    line: int
 
 
 @dataclass(frozen=True)
@@ -98,80 +87,6 @@ class AnalyzedFile:
     path: str
     parsed: ParsedModule
     tables: ModuleTables
-
-
-FactValue = str | bool | int
-
-
-@dataclass(frozen=True)
-class Fact:
-    """One raw element fact; PowerShell computes its identifiers and digest."""
-
-    analyzer_id: str
-    kind: str
-    declaration: str
-    name: str
-    parent: tuple[str, str, str] | None
-    line_start: int | None
-    line_end: int | None
-    properties: tuple[tuple[str, FactValue], ...]
-
-    def to_json(self) -> dict[str, object]:
-        """Return the protocol object of the fact."""
-        parent: dict[str, str] | None = None
-        if self.parent is not None:
-            parent = {
-                "kind": self.parent[0],
-                "declaration": self.parent[1],
-                "path": self.parent[2],
-            }
-        return {
-            "analyzer_id": self.analyzer_id,
-            "kind": self.kind,
-            "declaration": self.declaration,
-            "name": self.name,
-            "parent": parent,
-            "line_start": self.line_start,
-            "line_end": self.line_end,
-            "properties": dict(self.properties),
-        }
-
-
-@dataclass
-class AnalyzerOutput:
-    """Facts and raw diagnostics of one analyzer, keyed by request path."""
-
-    analyzer_id: str
-    facts: dict[str, list[Fact]] = field(default_factory=lambda: {})
-    diagnostics: dict[str, list[RawDiagnostic]] = field(default_factory=lambda: {})
-
-    def add_fact(
-        self,
-        path: str,
-        kind: str,
-        declaration: str,
-        name: str,
-        span: tuple[int, int] | None,
-        properties: dict[str, FactValue],
-        parent: tuple[str, str, str] | None = None,
-    ) -> None:
-        """Record one fact for a path; a None span records null line bounds."""
-        start, end = (None, None) if span is None else span
-        fact = Fact(
-            self.analyzer_id,
-            kind,
-            declaration,
-            name,
-            parent,
-            start,
-            end,
-            tuple(sorted(properties.items())),
-        )
-        self.facts.setdefault(path, []).append(fact)
-
-    def add_diagnostic(self, path: str, code: str, line: int) -> None:
-        """Record one raw diagnostic for a path."""
-        self.diagnostics.setdefault(path, []).append(RawDiagnostic(code, line))
 
 
 def _import_statement(
@@ -298,73 +213,3 @@ def build_tables(parsed: ParsedModule) -> ModuleTables:
         if isinstance(node, ast.stmt):
             _add_receiver(tables, node, context)
     return tables
-
-
-def _identifier(segment: str) -> bool:
-    return segment.isidentifier()
-
-
-def module_dotted_name(
-    path: str, source_roots: list[str], *, require_identifiers: bool = True
-) -> str | None:
-    """Return the dotted module name of a .py path under its longest containing root.
-
-    __init__.py gives the package name. None for a path under no root, a non-.py path, a
-    root-level __init__.py, or (when require_identifiers) a segment that is not an
-    identifier.
-    """
-    if not path.endswith(".py"):
-        return None
-    relative: str | None = None
-    best = -1
-    for root in source_roots:
-        trimmed = root.rstrip("/")
-        if trimmed in (".", ""):
-            if best < 0:
-                best, relative = 0, path
-            continue
-        if path.startswith(trimmed + "/") and len(trimmed) > best:
-            best, relative = len(trimmed), path[len(trimmed) + 1 :]
-    if relative is None:
-        return None
-    stem = relative[:-3]
-    if stem.endswith("/__init__"):
-        stem = stem[: -len("/__init__")]
-    elif stem == "__init__":
-        return None
-    if stem == "":
-        return None
-    dotted = stem.replace("/", ".")
-    if require_identifiers and not all(_identifier(part) for part in dotted.split(".")):
-        return None
-    return dotted
-
-
-def module_package(path: str, module: str | None) -> str | None:
-    """Return a module's package: itself for __init__.py, its parent, or '' at top."""
-    if module is None:
-        return None
-    if path.endswith("/__init__.py"):
-        return module
-    if "." in module:
-        return module[: module.rindex(".")]
-    return ""
-
-
-def resolve_relative(module: str, package: str | None) -> str | None:
-    """Resolve a possibly relative dotted module against a package, or return None."""
-    level = len(module) - len(module.lstrip("."))
-    if level == 0:
-        return module
-    if not package:
-        return None
-    parts = package.split(".")
-    if level - 1 > len(parts):
-        return None
-    kept = parts[: len(parts) - (level - 1)]
-    rest = module[level:]
-    if rest:
-        kept.append(rest)
-    if not kept:
-        return None
-    return ".".join(kept)

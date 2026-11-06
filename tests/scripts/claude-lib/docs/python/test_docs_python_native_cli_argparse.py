@@ -1,6 +1,7 @@
 """Tests for docs_python_native.cli_argparse: roots, subcommands, options."""
 
-from docs_python_native.cli_argparse import CliResult, CliSite, recognize_argparse
+from docs_python_native.call_sites import CliResult, CliSite
+from docs_python_native.cli_argparse import recognize_argparse
 from docs_python_native.imports import build_tables
 from docs_python_native.source import parse_module
 

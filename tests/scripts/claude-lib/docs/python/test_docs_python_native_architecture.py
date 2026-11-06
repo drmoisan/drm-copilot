@@ -1,7 +1,8 @@
 """Tests for docs_python_native.architecture: components, edges, diagnostics."""
 
 from docs_python_native.architecture import analyze_architecture, known_prefix
-from docs_python_native.imports import AnalyzedFile, AnalyzerOutput, build_tables
+from docs_python_native.facts import AnalyzerOutput
+from docs_python_native.imports import AnalyzedFile, build_tables
 from docs_python_native.source import parse_module
 
 ROOTS = ["src"]

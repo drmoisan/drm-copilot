@@ -1,8 +1,9 @@
 """Tests for docs_python_native.cli: root names, script attachment, parents."""
 
+from docs_python_native.call_sites import CliSite
 from docs_python_native.cli import ConsoleScript, analyze_cli, root_name
-from docs_python_native.cli_argparse import CliSite
-from docs_python_native.imports import AnalyzedFile, Fact, build_tables
+from docs_python_native.facts import Fact
+from docs_python_native.imports import AnalyzedFile, build_tables
 from docs_python_native.source import parse_module
 
 ROOTS = ["src"]

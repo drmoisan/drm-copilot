@@ -7,16 +7,21 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
-from docs_python_native.imports import AnalyzedFile, AnalyzerOutput, module_dotted_name
+from docs_python_native.facts import AnalyzerOutput
+from docs_python_native.module_names import module_dotted_name
 from docs_python_native.source import (
     ParsedModule,
     header_span,
     literal_string,
     node_span,
     statement_span,
-    walk_with_context,
 )
+from docs_python_native.walk import walk_with_context
+
+if TYPE_CHECKING:
+    from docs_python_native.imports import AnalyzedFile
 
 ANALYZER_ID = "python-public-api"
 _ALL = "__all__"

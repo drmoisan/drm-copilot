@@ -15,13 +15,15 @@ from typing import TYPE_CHECKING, BinaryIO, cast
 
 from docs_python_native.architecture import analyze_architecture
 from docs_python_native.cli import ConsoleScript, analyze_cli
-from docs_python_native.imports import AnalyzedFile, AnalyzerOutput, build_tables
+from docs_python_native.imports import AnalyzedFile, build_tables
 from docs_python_native.public_api import analyze_public_api
 from docs_python_native.routes import analyze_http
 from docs_python_native.source import PARSE_OK, normalize_source, parse_module
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+
+    from docs_python_native.facts import AnalyzerOutput
 
 PROTOCOL_VERSION = 1
 FLOOR = (3, 11)

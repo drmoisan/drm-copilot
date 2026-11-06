@@ -10,11 +10,17 @@ on pyproject.toml by the PowerShell scanner, not here.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
-from docs_python_native.cli_argparse import CliSite, recognize_argparse
+from docs_python_native.cli_argparse import recognize_argparse
 from docs_python_native.cli_click import recognize_click
 from docs_python_native.cli_typer import recognize_typer
-from docs_python_native.imports import AnalyzedFile, AnalyzerOutput, module_dotted_name
+from docs_python_native.facts import AnalyzerOutput
+from docs_python_native.module_names import module_dotted_name
+
+if TYPE_CHECKING:
+    from docs_python_native.call_sites import CliSite
+    from docs_python_native.imports import AnalyzedFile
 
 ANALYZER_ID = "python-cli"
 

@@ -5,12 +5,8 @@ from docs_python_native.imports import (
     BINDING_AMBIGUOUS,
     NESTED_FRAMEWORK,
     STAR_FRAMEWORK,
-    AnalyzerOutput,
     ModuleTables,
     build_tables,
-    module_dotted_name,
-    module_package,
-    resolve_relative,
 )
 from docs_python_native.source import parse_module
 
@@ -109,88 +105,3 @@ class TestDefinitions:
     def test_unparsed_module_has_empty_tables(self) -> None:
         tables = build_tables(parse_module("x = (\n"))
         assert tables.statements == [] and tables.receivers == {}
-
-
-class TestModuleNames:
-    @pytest.mark.parametrize(
-        ("path", "roots", "expected"),
-        [
-            ("src/pkg/mod.py", ["src"], "pkg.mod"),
-            ("src/pkg/__init__.py", ["src/"], "pkg"),
-            ("src/pkg/sub/mod.py", ["src", "src/pkg"], "sub.mod"),
-            ("mod.py", ["."], "mod"),
-            ("other/mod.py", ["src"], None),
-            ("src/pkg/data.txt", ["src"], None),
-            ("src/__init__.py", ["src"], None),
-            ("__init__.py", [""], None),
-            ("src/pkg/bad-name.py", ["src"], None),
-        ],
-    )
-    def test_module_dotted_name(
-        self, path: str, roots: list[str], expected: str | None
-    ) -> None:
-        assert module_dotted_name(path, roots) == expected
-
-    def test_unvalidated_name_keeps_a_non_identifier_segment(self) -> None:
-        assert module_dotted_name(
-            "src/pkg/bad-name.py", ["src"], require_identifiers=False
-        ) == ("pkg.bad-name")
-
-    @pytest.mark.parametrize(
-        ("path", "module", "expected"),
-        [
-            ("src/pkg/__init__.py", "pkg", "pkg"),
-            ("src/pkg/mod.py", "pkg.mod", "pkg"),
-            ("src/top.py", "top", ""),
-            ("x.py", None, None),
-        ],
-    )
-    def test_module_package(
-        self, path: str, module: str | None, expected: str | None
-    ) -> None:
-        assert module_package(path, module) == expected
-
-    @pytest.mark.parametrize(
-        ("module", "package", "expected"),
-        [
-            ("pkg.mod", "x", "pkg.mod"),
-            (".mod", "pkg.sub", "pkg.sub.mod"),
-            ("..mod", "pkg.sub", "pkg.mod"),
-            ("...mod", "pkg.sub", "mod"),
-            ("....mod", "pkg.sub", None),
-            (".", "pkg", "pkg"),
-            ("..", "pkg", None),
-            (".mod", "", None),
-            (".mod", None, None),
-        ],
-    )
-    def test_resolve_relative_climbs_and_stops_above_the_root(
-        self, module: str, package: str | None, expected: str | None
-    ) -> None:
-        assert resolve_relative(module, package) == expected
-
-
-class TestAnalyzerOutput:
-    def test_facts_sort_properties_and_serialize_parents(self) -> None:
-        output = AnalyzerOutput("python-cli")
-        output.add_fact(
-            "a.py",
-            "cli-option",
-            "r --x",
-            "--x",
-            (1, 2),
-            {"b": True, "a": "v"},
-            ("cli-command", "r", "a.py"),
-        )
-        output.add_fact("a.py", "architecture-component", "a", "a", None, {})
-        first, second = output.facts["a.py"]
-        assert first.to_json()["parent"] == {
-            "kind": "cli-command",
-            "declaration": "r",
-            "path": "a.py",
-        }
-        assert first.to_json()["properties"] == {"a": "v", "b": True}
-        assert (
-            second.to_json()["line_start"] is None
-            and second.to_json()["parent"] is None
-        )

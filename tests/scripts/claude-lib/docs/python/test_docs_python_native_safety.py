@@ -18,7 +18,7 @@ FORBIDDEN_CONSTANTS = frozenset({"element_id", "parent_id", "source_sha256"})
 
 def _helper_trees() -> list[tuple[str, ast.Module]]:
     files = sorted(PYLIB.rglob("*.py"))
-    assert len(files) == 12
+    assert len(files) == 18
     return [
         (p.relative_to(PYLIB).as_posix(), ast.parse(p.read_text(encoding="utf-8")))
         for p in files

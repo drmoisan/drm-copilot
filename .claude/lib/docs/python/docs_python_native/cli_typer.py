@@ -6,26 +6,25 @@ Reproduces DocsPythonCliTyper.psm1 of issue 1022 over the syntax tree.
 from __future__ import annotations
 
 import ast
+from typing import TYPE_CHECKING
 
-from docs_python_native.cli_argparse import (
+from docs_python_native.call_sites import (
     DYNAMIC,
     IN_LOOP,
     UNBOUND,
     CliResult,
     CliSite,
     PropertyValue,
+    decorator_call,
+    function_header_nodes,
     has_keyword,
     keyword,
+    leading_chain,
     site_span,
     statement_index,
 )
-from docs_python_native.cli_click import (
-    decorator_call,
-    function_header_nodes,
-    leading_chain,
-    literal_name,
-)
-from docs_python_native.imports import ModuleTables, RawDiagnostic
+from docs_python_native.cli_click import literal_name
+from docs_python_native.facts import RawDiagnostic
 from docs_python_native.source import (
     ParsedModule,
     dotted_name,
@@ -33,8 +32,11 @@ from docs_python_native.source import (
     literal_string,
     parameter_span,
     statement_span,
-    walk_with_context,
 )
+from docs_python_native.walk import walk_with_context
+
+if TYPE_CHECKING:
+    from docs_python_native.imports import ModuleTables
 
 CONSTRUCTOR = "typer.Typer"
 PARAMETERS = frozenset({"typer.Option", "typer.Argument"})

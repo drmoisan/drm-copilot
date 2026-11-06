@@ -7,29 +7,35 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from docs_python_native.cli_argparse import (
+from docs_python_native.call_sites import (
     DYNAMIC,
     IN_LOOP,
     UNBOUND,
     CliResult,
     CliSite,
     PropertyValue,
+    decorator_call,
+    function_header_nodes,
     has_keyword,
     has_star,
     keyword,
+    leading_chain,
     literal_bool,
 )
-from docs_python_native.imports import ModuleTables, RawDiagnostic
+from docs_python_native.facts import RawDiagnostic
 from docs_python_native.source import (
-    Context,
     ParsedModule,
     decorator_span,
     dotted_name,
     header_span,
     literal_string,
-    walk_with_context,
 )
+from docs_python_native.walk import Context, walk_with_context
+
+if TYPE_CHECKING:
+    from docs_python_native.imports import ModuleTables
 
 DECORATORS = frozenset({"click.command", "click.group"})
 PARAMETERS = frozenset({"click.option", "click.argument"})
@@ -47,42 +53,6 @@ def click_default_name(function_name: str) -> str:
         if name.endswith(suffix) and len(name) > len(suffix):
             return name[: -len(suffix)]
     return name
-
-
-def leading_chain(node: ast.expr) -> str | None:
-    """Return the dotted chain that starts an expression (its first callee)."""
-    current: ast.expr = node
-    while True:
-        chain = dotted_name(current)
-        if chain is not None:
-            return chain
-        if isinstance(current, ast.Call):
-            current = current.func
-        elif isinstance(current, (ast.Attribute, ast.Subscript)):
-            current = current.value
-        else:
-            return None
-
-
-def decorator_call(decorator: ast.expr) -> ast.Call | None:
-    """Return the decorator call when the decorator is NAME(.NAME)*(...), else None."""
-    current: ast.expr = decorator
-    while isinstance(current, ast.Call):
-        if dotted_name(current.func) is not None:
-            return current
-        current = current.func
-    return None
-
-
-def function_header_nodes(tree: ast.Module) -> set[ast.AST]:
-    """Return every node of a def header (decorators, parameters, return annotation)."""
-    nodes: set[ast.AST] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            for part in [*node.decorator_list, node.args, node.returns]:
-                if part is not None:
-                    nodes.update(ast.walk(part))
-    return nodes
 
 
 def _parameter(

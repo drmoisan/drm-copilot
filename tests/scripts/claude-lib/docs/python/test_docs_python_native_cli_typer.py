@@ -3,7 +3,7 @@
 import ast
 
 import pytest
-from docs_python_native.cli_argparse import CliResult, CliSite
+from docs_python_native.call_sites import CliResult, CliSite
 from docs_python_native.cli_typer import plain_default, recognize_typer
 from docs_python_native.imports import build_tables
 from docs_python_native.source import parse_module
