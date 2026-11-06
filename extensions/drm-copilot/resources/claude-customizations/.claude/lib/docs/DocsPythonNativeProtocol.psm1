@@ -41,6 +41,7 @@ function Get-DocsPythonNativeKind {
     .SYNOPSIS
         Returns the element kinds of an analyzer identifier from its committed scanner row, or an empty array.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '', Justification = 'The comma-wrapped return keeps an empty or one-kind [string[]] intact for callers; the declared output type is [string[]].')]
     [CmdletBinding()]
     [OutputType([string[]])]
     param([Parameter(Mandatory = $true)] [string] $AnalyzerId)
@@ -113,6 +114,7 @@ function New-DocsPythonNativeRequest {
         count, the bound Test-DocsPythonNativeResponse applies to the reported line ranges.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory that changes no system state.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Request paths are case-sensitive; an ordinal-comparer hashtable is required.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
@@ -286,6 +288,7 @@ function ConvertFrom-DocsPythonNativeResponse {
         code unchanged. ParseFailed lists the parse-error paths. Any rejection by the 1020
         functions (DOCS_IDENTITY_INPUT_INVALID, DOCS_DIGEST_RANGE_INVALID) is thrown.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Analyzer identifiers and paths are case-sensitive; ordinal-comparer hashtables are required.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(

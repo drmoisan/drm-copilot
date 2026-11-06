@@ -182,6 +182,7 @@ function Invoke-DocsAnalyzerPythonNativeCli {
     .SYNOPSIS
         The python-cli native analyzer: returns @{ Elements; Diagnostics } from Selection.python_native.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'CapturedInput', Justification = 'The 1020 analyzer contract passes -CapturedInput to every analyzer; this analyzer reads Selection.python_native only.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $CapturedInput, [Parameter(Mandatory = $true)] [AllowNull()] [object] $Selection)
@@ -194,6 +195,7 @@ function Invoke-DocsAnalyzerPythonNativeHttp {
     .SYNOPSIS
         The python-http native analyzer: returns @{ Elements; Diagnostics } from Selection.python_native.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'CapturedInput', Justification = 'The 1020 analyzer contract passes -CapturedInput to every analyzer; this analyzer reads Selection.python_native only.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $CapturedInput, [Parameter(Mandatory = $true)] [AllowNull()] [object] $Selection)
@@ -206,6 +208,7 @@ function Invoke-DocsAnalyzerPythonNativeApi {
     .SYNOPSIS
         The python-public-api native analyzer: returns @{ Elements; Diagnostics } from Selection.python_native.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'CapturedInput', Justification = 'The 1020 analyzer contract passes -CapturedInput to every analyzer; this analyzer reads Selection.python_native only.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $CapturedInput, [Parameter(Mandatory = $true)] [AllowNull()] [object] $Selection)
@@ -218,6 +221,7 @@ function Invoke-DocsAnalyzerPythonNativeArchitecture {
     .SYNOPSIS
         The python-architecture native analyzer: returns @{ Elements; Diagnostics } from Selection.python_native.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'CapturedInput', Justification = 'The 1020 analyzer contract passes -CapturedInput to every analyzer; this analyzer reads Selection.python_native only.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $CapturedInput, [Parameter(Mandatory = $true)] [AllowNull()] [object] $Selection)
@@ -264,8 +268,11 @@ function Invoke-DocsPythonNativeInventory {
         Rows lists every row invoked (native and scanner, unique on Id and AnalysisMethod) and
         Outputs one @{ Elements; Diagnostics } per row. Finding is the unavailability finding
         under -AnalysisMethod native, or the first analyzer-contract finding. ImportModule is
-        passed to Invoke-DocsAnalyzer only when given; production passes none.
+        passed to Invoke-DocsAnalyzer only when given; production passes none. A registration
+        with no scanner row for a native identifier is a contract defect: the function throws
+        DOCS_PYTHON_NATIVE_SCANNER_ROW_MISSING: <identifier> before invoking a scanner row.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Selection keys are case-sensitive; an ordinal-comparer hashtable is required.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
@@ -301,7 +308,9 @@ function Invoke-DocsPythonNativeInventory {
         $rows.Add($row)
         $outputs.Add(@{ Elements = $output.Elements; Diagnostics = $output.Diagnostics })
         if (-not $isNative) { continue }
-        $scannerRow = @($Registration | Where-Object { [string] $_.Id -ceq [string] $row.Id -and [string] $_.AnalysisMethod -ceq 'scanner' })[0]
+        $scannerRows = @($Registration | Where-Object { [string] $_.Id -ceq [string] $row.Id -and [string] $_.AnalysisMethod -ceq 'scanner' })
+        if ($scannerRows.Count -eq 0) { throw "DOCS_PYTHON_NATIVE_SCANNER_ROW_MISSING: $([string] $row.Id)" }
+        $scannerRow = $scannerRows[0]
         $scanned = Invoke-DocsPythonNativeRow -Row $scannerRow -CapturedInput $CapturedInput -Selection $Selection -ImportModule $ImportModule
         if (@($scanned.Findings).Count -gt 0) { return @{ Rows = [object[]]@(); Outputs = [object[]]@(); Diagnostics = $diagnostics; Finding = $scanned.Findings[0] } }
         $rows.Add($scannerRow)

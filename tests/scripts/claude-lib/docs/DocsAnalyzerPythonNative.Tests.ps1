@@ -262,6 +262,26 @@ Describe 'Invoke-DocsPythonNativeInventory' {
         $result.Rows.Count | Should -Be 0
     }
 
+    It 'throws DOCS_PYTHON_NATIVE_SCANNER_ROW_MISSING when a native row has no scanner row' {
+        # Arrange: a registration with the native python-cli row only, and a valid canned response for python-cli.
+        $rows = Get-TestNativeRow
+        $nativeOnly = [object[]]@($rows | Where-Object { $_.Id -ceq 'python-cli' -and $_.AnalysisMethod -ceq 'native' })
+        $response = [ordered]@{
+            files            = @(
+                [ordered]@{ diagnostics = @(); facts = @(); path = 'src/pkg/a.py'; status = 'ok' },
+                [ordered]@{ diagnostics = @(); facts = @(); path = 'src/pkg/b.py'; status = 'parse-error' }
+            )
+            protocol_version = 1
+        }
+        $canned = @{ ExitCode = 0; Stdout = (ConvertTo-DocsCanonicalJson -Value $response); Stderr = ''; TimedOut = $false }
+        $context = (Get-TestContext -Result @{ python3 = $canned }).Context
+        $selection = @{}
+        $selection['source_roots'] = @('src')
+        $selection['element_kinds'] = @(Get-DocsElementKind)
+        # Act / Assert: the missing scanner row is a named contract error, not a parameter-binding failure.
+        { Invoke-DocsPythonNativeInventory -Registration $nativeOnly -CapturedInput (Get-TestInput) -Selection $selection -AnalyzerId @('python-cli') -SourceRoot @('src') -AnalysisMethod 'auto' -Context $context -ImportModule $script:NonForcingImport } | Should -Throw -ExpectedMessage 'DOCS_PYTHON_NATIVE_SCANNER_ROW_MISSING: python-cli'
+    }
+
     It 'property: output is identical under a seeded permutation of the captured inputs' {
         $baseline = ConvertTo-DocsCanonicalJson -Value @((Invoke-TestInventory -Context (Get-TestContext -Result @{ python3 = $script:Ok }).Context).Outputs)
         $seed = 1031
