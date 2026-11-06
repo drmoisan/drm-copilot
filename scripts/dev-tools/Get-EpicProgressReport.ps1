@@ -42,6 +42,8 @@
     The repository-relative path of the kickoff file on the integration branch. Default:
     docs/features/epics/<EpicFolder>/epic-kickoff.md. Only the feature-summary table, whose
     header's first cell is issue_num or Issue, is read; every other table in the file is ignored.
+    Kickoff text without that header, a feature row with fewer than five cells, and a feature
+    row with a blank plan cell each raise a terminating error.
 
 .PARAMETER RepositoryRoot
     The repository root in which git runs. Default: the current location.
