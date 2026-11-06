@@ -76,7 +76,7 @@ criteria, R to criteria the research shows are necessary.
 - [x] (E1) For the shared 1022 Python parity fixture, the native analyzer emits the same element identifiers and declaration-lines digests as the scanner for every construct both classify (identifiers and digests computed by the adapter in PowerShell), and the helper emits exactly the expected shared and native-only rows.
 - [x] (E1) Constructs the 1022 scanner reports as diagnostics and that `ast` can resolve are classified as elements by the native analyzer; dynamic forms that `ast` also cannot resolve yield the 1022-defined diagnostics.
 - [x] (E2) Without the python pack, `inventory` succeeds with the scanner, records `analysis_method: scanner`, adds no diagnostic and raises no error.
-- [x] (E2) Without a usable interpreter, or when the helper times out, fails, or returns invalid output, `inventory` with the default method succeeds with the scanner, records `analysis_method: scanner`, raises no error, and adds one non-blocking `DOCS_PYTHON_NATIVE_UNAVAILABLE` diagnostic naming the reason.
+- [x] (E2) Without a usable interpreter, or when the helper times out, fails, or returns invalid output, `inventory` with the default method succeeds with the scanner, records `analysis_method: scanner`, raises no error, and adds one `information`-severity `PYTHON_NATIVE_UNAVAILABLE` snapshot diagnostic with `analyzer_id` `docs-inventory` naming the reason.
 - [x] (E2) A file the helper cannot parse falls back to scanner elements for that file only.
 - [x] (E2, provisional OQ-C) `-AnalysisMethod native` fails closed with exit 3 when native analysis is unavailable; `-AnalysisMethod scanner` never invokes the interpreter.
 - [x] (E3) The helper never imports, executes, compiles or evaluates analyzed code; `ast.parse` is its only parsing entry, verified by a source-inspection test and a behavioral test.
@@ -85,7 +85,7 @@ criteria, R to criteria the research shows are necessary.
 - [ ] (E5) Black, Ruff and Pyright (strict) report no findings for the helper and its tests, and the Python tests pass on the Python 3.11 floor, verified by the CI matrix (3.11, 3.12 and 3.13).
 - [x] (R) Every inventory element records `analysis_method` (`native` or `scanner`); `config-files` and non-`.py` elements always record `scanner`.
 - [x] (R) Element identifiers and digests have a single implementation in PowerShell (`Get-DocsElementId` and the shared declaration-digest function); the helper computes neither.
-- [x] (R) The native provider is registered under the 900011 anchor in `DocsAnalyzerRegistry.psm1` without changing any other anchor or row.
+- [x] (R) The native provider is registered as four 1020-form rows under the anchor `# --- 1031: Python-native analyzers ---` in `DocsAnalyzerRegistry.psm1` without changing any other anchor or row.
 - [x] (R) Every new or edited `.claude/lib/docs/` file is byte-identical to its push-down mirror and the push-down contract tests pass.
 - [x] (R) Tests write no bytecode under `.claude/`, and the adapter starts the interpreter with `-I`, `-B` and `-X utf8`.
 - [x] (R) The adapter reaches the interpreter only through a `[scriptblock]` seam supplied from the command context; Pester mocks that seam, no test starts a process, and Pytest drives the helper through `main` with in-memory streams.

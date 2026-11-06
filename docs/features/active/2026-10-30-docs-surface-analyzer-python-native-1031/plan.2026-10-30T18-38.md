@@ -272,5 +272,5 @@ The plan has 57 tasks, above the 40-task guideline, and stays below 400 physical
 
 - Coordinator item 1 (deviation 6): `-AnalysisMethod` and the native call require editing the 1022 `inventory` row and `DocsInventory.psm1`. If the coordinator prefers that 1022 add an extension point, [P0-T3] detects it (`INVENTORY_SEAM` `present`) and stops for one plan revision.
 - Coordinator item 2 (deviation 7): Q11's provisional default is kept by adding guard detection class 5; the guard becomes stricter for every guarded file.
-- Coordinator item 3: deviations 1 to 5 and 8 to 11 are not reflected in `spec.md`; a later spec revision can absorb them.
+- Coordinator item 3: remediation cycle 1 (`FEATURE/remediation-plan.2026-11-05T23-18.md` [P5-T1]) absorbed deviations 1 to 5 and 9 into the normative sections of `spec.md`, and by owner decision the criterion texts of S4, U4, S13 and U13 were amended to deviations 4 and 1 with their checkbox state unchanged. Deviations 8, 10 and 11 stay recorded in this plan only.
 - Q11 to Q14 stay on their provisional defaults; a different owner answer changes the affected tasks through a spec revision.
