@@ -27,7 +27,7 @@
 
 .PARAMETER StartUtc
     Mandatory. The instant from which elapsed time and average velocity are measured;
-    converted to UTC.
+    converted to UTC. A start after the current instant counts as zero elapsed time.
 
 .PARAMETER EpicIssue
     The epic issue number printed in the report. Default: the number on the first
