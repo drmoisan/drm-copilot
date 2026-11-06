@@ -18,7 +18,7 @@ Apply the candidate production hunks byte for byte, so that 1034 can merge this 
 
 ## Acceptance Criteria
 
-- [ ] Root cause is verified by measurement before any production change, and the measurements (call cost against source length, tokenizer time against source size for the unfixed module and the candidate) are recorded under `evidence/baseline/`.
+- [x] Root cause is verified by measurement before any production change, and the measurements (call cost against source length, tokenizer time against source size for the unfixed module and the candidate) are recorded under `evidence/baseline/`.
 - [ ] The production hunks of commit 1332ba34f are present byte for byte in `.claude/lib/docs/DocsPythonTokens.psm1`, and no loop in the module passes the whole source to a .NET method as an argument.
 - [ ] Tokenizer time is approximately linear in source length for a names-only source and a string-heavy source: doubling the source no more than about doubles the time, recorded under `evidence/qa-gates/`.
 - [ ] A structural regression guard in `DocsPythonTokens.Tests.ps1` uses no sleep, timing threshold, or temporary file, and is recorded failing on the unfixed module and on the candidate module and passing on the fixed module (`evidence/regression-testing/`).
