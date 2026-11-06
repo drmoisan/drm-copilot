@@ -9,7 +9,9 @@
     Covers every token class (raw strings with an escaped quote, triple-quoted strings across
     lines, nested f-string fields, keywords), every lexer diagnostic with its code, severity and
     blocking flag, the token limit (built in test code: 262,145 NAME tokens below 1,048,576
-    bytes) and the span-reconstruction property. Inputs are in-memory strings.
+    bytes) and the span-reconstruction property. Inputs are in-memory strings. The structural
+    scaling guard reads the module syntax tree to pin the bounded lexing window and its Match
+    argument, and the window-boundary cases cover tokens and diagnostics across window ends.
 #>
 
 BeforeAll {
@@ -298,15 +300,58 @@ Describe 'Get-DocsPythonToken structural scaling guard' {
                 $right = $_.Right
                 if ($right -is [System.Management.Automation.Language.PipelineAst]) { $right = $right.GetPureExpression() }
                 if ($right -is [System.Management.Automation.Language.CommandExpressionAst]) { $right = $right.Expression }
-                -not ($right -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
-                    $right.Member.Value -ceq 'Substring' -and
-                    $right.Expression -is [System.Management.Automation.Language.VariableExpressionAst] -and
-                    $right.Expression.VariablePath.UserPath -eq 'sourceText')
+                if (-not ($right -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+                        $right.Member.Value -ceq 'Substring' -and
+                        $right.Expression -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                        $right.Expression.VariablePath.UserPath -eq 'sourceText')) { return $true }
+                # The bound: exactly two arguments, the second [math]::Min($windowSize, ...), so the window never grows unbounded.
+                $arguments = @($right.Arguments | Where-Object { $null -ne $_ })
+                if ($arguments.Count -ne 2) { return $true }
+                $length = $arguments[1]
+                $bounded = $length -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+                $length.Member.Value -ceq 'Min' -and
+                $length.Expression -is [System.Management.Automation.Language.TypeExpressionAst] -and
+                $length.Expression.TypeName.Name -eq 'math' -and
+                @($length.Arguments | Where-Object { $null -ne $_ }).Count -gt 0 -and
+                $length.Arguments[0] -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                $length.Arguments[0].VariablePath.UserPath -ceq 'windowSize'
+                return -not $bounded
             })
 
         # Assert
         $assignments.Count | Should -BeGreaterThan 0 -Because 'the function must assign the lexing window'
-        @($offending | ForEach-Object { $_.Extent.Text }) | Should -BeNullOrEmpty -Because 'the window must always be a slice of the source text'
+        @($offending | ForEach-Object { $_.Extent.Text }) | Should -BeNullOrEmpty -Because 'the window must always be a slice of the source text bounded by [math]::Min($windowSize, ...)'
+    }
+
+    It 'passes only the lexing window to Match inside the token loop' {
+        # Arrange
+        $script:GuardParseErrorCount | Should -Be 0
+        $function = $script:GuardAst.Find({
+                param($node)
+                $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Get-DocsPythonToken'
+            }, $true)
+        $function | Should -Not -BeNullOrEmpty
+        $loops = @($function.Body.FindAll({
+                    param($node)
+                    $node -is [System.Management.Automation.Language.WhileStatementAst] -and
+                    $node.Parent -is [System.Management.Automation.Language.NamedBlockAst] -and
+                    $node.Parent.Parent -eq $function.Body
+                }, $false))
+        $loops.Count | Should -Be 1 -Because 'the token loop is the single while statement in the function body'
+
+        # Act
+        $matchCalls = @($loops[0].FindAll({
+                    param($node)
+                    $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $node.Member.Value -ceq 'Match'
+                }, $true))
+        $offending = @($matchCalls | Where-Object {
+                $first = @($_.Arguments | Where-Object { $null -ne $_ }) | Select-Object -First 1
+                -not ($first -is [System.Management.Automation.Language.VariableExpressionAst] -and $first.VariablePath.UserPath -ceq 'source')
+            })
+
+        # Assert
+        $matchCalls.Count | Should -BeGreaterThan 0 -Because 'the token loop must call Match'
+        @($offending | ForEach-Object { $_.Extent.Text }) | Should -BeNullOrEmpty -Because 'Match inside the token loop must receive the bounded window $source as its first argument'
     }
 }
 

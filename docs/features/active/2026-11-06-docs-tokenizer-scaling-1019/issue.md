@@ -29,7 +29,7 @@ Apply the candidate production hunks byte for byte, so that 1034 can merge this 
 
 ## Dependencies / Risks
 
-- 1031 and 1034 wait on this change. 1034 already carries the candidate hunks, and the merge is checked with `git merge-tree` before review.
+- 1031 and 1034 wait on this change. The 1034 tip has reverted the candidate hunks, and this change carries them; the merge is checked with `git merge-tree` before review.
 - Other modules, for example `DocsCSharpTokens.psm1`, also call `Regex.Match` with a whole source inside a loop. Their scaling is outside this item and is recorded in the root-cause evidence.
 
 ## Verification Steps

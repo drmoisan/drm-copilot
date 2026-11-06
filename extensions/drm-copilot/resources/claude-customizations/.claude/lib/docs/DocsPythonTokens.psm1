@@ -15,6 +15,8 @@
     outside strings and comments, bracket depth above 64, or f-string replacement fields nested
     more than two levels) and PYTHON_TOKEN_LIMIT (more than 262,144 non-whitespace tokens). The
     scan-record pattern of the Mermaid line scanner is followed; its functions are not called.
+    The token loop lexes a bounded window of the source, re-sliced after a string token and near
+    the window end, so no call in the loop passes the whole source as an argument.
 
     Every function is pure: no filesystem, clock, process, environment or module-scope mutable
     state.
@@ -23,6 +25,10 @@
     Issue #1022. Requires PowerShell 7.4 or later. No external module dependencies.
     Mirrored byte-identically under extensions/drm-copilot/resources/claude-customizations/.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
+    Issue #1019: the measured per-call cost that grows with string argument length is in the
+    PowerShell method-invocation layer (the same .NET call from compiled C# is flat). The AMSI
+    attribution in the retained comments in Read-DocsPythonStringEnd and at the token loop head
+    is unverified.
 #>
 
 Set-StrictMode -Version Latest
@@ -149,7 +155,7 @@ function Get-DocsPythonToken {
 
     $windowStart = 0
     $windowSize = $script:DocsPythonTokenWindowSize
-    # $source is a bounded window of $sourceText inside the loop, so "the whole source" in the loop-head comment means that window.
+    # $source is a bounded window of $sourceText inside the loop, so "the whole source" in the loop-head comment means that window; Match also runs after a margin rebase.
     $source = $sourceText.Substring(0, [math]::Min($windowSize, $sourceText.Length))
     $position = 0
     $line = 1

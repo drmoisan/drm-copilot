@@ -4,7 +4,7 @@
 - **Parent (optional):** epic/documentation-estate-tooling-integration
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-06T12-15
-- **Status:** Draft
+- **Status:** Executed; AC-8 pending CI
 - **Version:** 1.0
 - **Work Mode:** minor-audit (sole acceptance source: `issue.md` `## Acceptance Criteria`, eight criteria, numbered AC-1 to AC-8 in document order; AC-8 is CI-dependent; `spec.md`, `user-story.md`, and `research.md` are not required)
 
