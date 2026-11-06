@@ -329,6 +329,7 @@ def run_request(request: Request) -> dict[str, object]:
                 "path": path,
                 "status": statuses[path],
                 "facts": facts,
+                # Helper diagnostics never block; the adapter maps them to warnings.
                 "diagnostics": [
                     {"analyzer_id": a, "code": c, "line": n, "blocking": False}
                     for a, c, n in diagnostics

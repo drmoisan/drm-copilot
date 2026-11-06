@@ -6,26 +6,25 @@ Reproduces DocsPythonCliTyper.psm1 of issue 1022 over the syntax tree.
 from __future__ import annotations
 
 import ast
+from typing import TYPE_CHECKING
 
-from docs_python_native.cli_argparse import (
+from docs_python_native.call_sites import (
     DYNAMIC,
     IN_LOOP,
     UNBOUND,
     CliResult,
     CliSite,
     PropertyValue,
+    decorator_call,
+    function_header_nodes,
     has_keyword,
     keyword,
+    leading_chain,
     site_span,
     statement_index,
 )
-from docs_python_native.cli_click import (
-    decorator_call,
-    function_header_nodes,
-    leading_chain,
-    literal_name,
-)
-from docs_python_native.imports import ModuleTables, RawDiagnostic
+from docs_python_native.cli_click import literal_name
+from docs_python_native.facts import RawDiagnostic
 from docs_python_native.source import (
     ParsedModule,
     dotted_name,
@@ -33,8 +32,11 @@ from docs_python_native.source import (
     literal_string,
     parameter_span,
     statement_span,
-    walk_with_context,
 )
+from docs_python_native.walk import walk_with_context
+
+if TYPE_CHECKING:
+    from docs_python_native.imports import ModuleTables
 
 CONSTRUCTOR = "typer.Typer"
 PARAMETERS = frozenset({"typer.Option", "typer.Argument"})
@@ -54,6 +56,15 @@ _BRACKETED = (
 
 
 def _typer_call(node: ast.expr, tables: ModuleTables) -> tuple[ast.Call, bool] | None:
+    """Recognize a typer.Option(...) or typer.Argument(...) call.
+
+    Args:
+        node: Any expression.
+        tables: The file's binding tables, used to qualify the callee.
+
+    Returns:
+        (call, is_argument), or None when the node is not such a call.
+    """
     if isinstance(node, ast.Call):
         qualified = tables.qualify(dotted_name(node.func))
         if qualified in PARAMETERS:
@@ -64,10 +75,21 @@ def _typer_call(node: ast.expr, tables: ModuleTables) -> tuple[ast.Call, bool] |
 def _first_typer_call(
     node: ast.expr | None, tables: ModuleTables
 ) -> tuple[ast.Call, bool] | None:
+    """Return the first typer.Option or typer.Argument call inside an annotation.
+
+    Args:
+        node: The annotation (for example Annotated[str, typer.Option()]), or None.
+        tables: The file's binding tables.
+
+    Returns:
+        The first such call in source position order, or None.
+    """
     if node is None:
         return None
+    # Gather every call in the annotation and order them by source position.
     calls = [n for n in ast.walk(node) if isinstance(n, ast.Call)]
     calls.sort(key=lambda n: (n.lineno, n.col_offset))
+    # Return the earliest call that is a Typer parameter call.
     for call in calls:
         found = _typer_call(call, tables)
         if found is not None:
@@ -76,7 +98,15 @@ def _first_typer_call(
 
 
 def plain_default(node: ast.expr) -> bool:
-    """True for a literal, name, negative number, string or bracketed default."""
+    """Report whether a parameter default is a plain value Typer reads as a default.
+
+    Args:
+        node: The default expression.
+
+    Returns:
+        True for a literal, a name, an f-string, a negative number or a bracketed
+        display or comprehension; False for any other expression (for example a call).
+    """
     if isinstance(node, (ast.Constant, ast.Name, ast.JoinedStr)):
         return True
     if (
@@ -91,10 +121,27 @@ def plain_default(node: ast.expr) -> bool:
 
 
 def _is_ellipsis(node: ast.expr | None) -> bool:
+    """Report whether an expression is the ... constant (Typer's "required" marker).
+
+    Args:
+        node: Any expression, or None.
+
+    Returns:
+        True for the Ellipsis constant.
+    """
     return isinstance(node, ast.Constant) and node.value is Ellipsis
 
 
 def _parameters(function: FunctionNode) -> list[tuple[ast.arg, ast.expr | None]]:
+    """Pair every positional and keyword-only parameter with its default.
+
+    Args:
+        function: The function definition.
+
+    Returns:
+        (parameter, default or None) pairs in declaration order; *args and **kwargs
+        are not included.
+    """
     arguments = function.args
     positional = [*arguments.posonlyargs, *arguments.args]
     defaults: list[ast.expr | None] = [None] * (
@@ -109,13 +156,29 @@ def _parameters(function: FunctionNode) -> list[tuple[ast.arg, ast.expr | None]]
 def parameter_sites(
     function: FunctionNode, owner: str, tables: ModuleTables, result: CliResult
 ) -> list[CliSite]:
-    """Build the option and argument sites of a Typer function."""
+    """Build the option and argument sites of a Typer function.
+
+    Args:
+        function: The command, callback or run target function.
+        owner: The site identifier the parameters attach to.
+        tables: The file's binding tables.
+        result: Receives CLI_TYPER_PARAMETER_UNRESOLVED for a default that is neither
+            a Typer call nor a plain value.
+
+    Returns:
+        One option site per parameter; a parameter is positional when its Typer call is
+        typer.Argument, or when it has no Typer call and no default.
+    """
     sites: list[CliSite] = []
+    # Classify each parameter from its default first, then from its annotation.
     for argument, default in _parameters(function):
         annotation = argument.annotation
         typer_call: tuple[ast.Call, bool] | None = None
         has_default = False
         default_is_typer = False
+        # Routing: a Typer call default carries the declaration (its first argument is
+        # the default value); a plain default is a default value; anything else
+        # cannot be read and the parameter is reported and skipped.
         if default is not None:
             typer_call = _typer_call(default, tables)
             if typer_call is not None:
@@ -138,13 +201,17 @@ def parameter_sites(
             "has_default": has_default,
         }
         name = argument.arg
+        # An option is named by its first declared long flag, else short flag, else
+        # the parameter name in Typer's --kebab-case form.
         if not is_argument:
             declared: list[str] = []
             if typer_call is not None:
+                # Keep the literal flag declarations of the Typer call.
                 for item in typer_call[0].args:
                     value = literal_string(item)
                     if value is not None and value.startswith("-"):
                         declared.append(value)
+            # Split the declared flags into long (--x) and short (-x) forms.
             longs = [d for d in declared if d.startswith("--")]
             shorts = [d for d in declared if not d.startswith("--")]
             name = (
@@ -165,12 +232,24 @@ def parameter_sites(
 
 
 def recognize_typer(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
-    """Return the Typer sites and diagnostics of one parsed input."""
+    """Return the Typer sites and diagnostics of one parsed input.
+
+    Args:
+        parsed: The parsed module.
+        tables: Its binding tables.
+
+    Returns:
+        Root sites for typer.Typer receivers and typer.run targets, command sites for
+        @app.command, parameter sites for commands and callbacks, and add_typer
+        re-parenting, with the 1022 diagnostics.
+    """
     result = CliResult()
     tree = parsed.tree
     if tree is None:
         return result
     roots: dict[str, CliSite] = {}
+    # Every typer.Typer receiver becomes a root unless it uses cls=, is looped or has a
+    # dynamic name.
     for receiver in tables.receivers.values():
         if tables.qualify(receiver.callee) != CONSTRUCTOR:
             continue
@@ -201,6 +280,7 @@ def recognize_typer(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
         roots[receiver.name] = site
     header_nodes = function_header_nodes(tree)
     owner = statement_index(tree)
+    # Definitions carry @app.command/@app.callback; calls carry typer.run and add_typer.
     for node, context in walk_with_context(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             _decorated(parsed, node, context.in_loop, roots, tables, result)
@@ -218,6 +298,20 @@ def _decorated(
     tables: ModuleTables,
     result: CliResult,
 ) -> None:
+    """Record the command and callback sites of one decorated function.
+
+    Args:
+        parsed: The parsed module.
+        node: The function definition.
+        in_loop: True when the definition lies in a loop body.
+        roots: Typer root sites by receiver name.
+        tables: The file's binding tables.
+        result: Receives the sites and diagnostics.
+
+    Returns:
+        None.
+    """
+    # Each <receiver>.command or <receiver>.callback decorator is handled on its own.
     for decorator in node.decorator_list:
         callee = leading_chain(decorator)
         parts = callee.split(".") if callee is not None else []
@@ -236,6 +330,7 @@ def _decorated(
         if in_loop:
             result.diagnostics.append(RawDiagnostic(IN_LOOP, span[0]))
             continue
+        # A callback adds its parameters to the root; a command is a new site.
         if parts[1] == "callback":
             result.sites.extend(parameter_sites(node, owner.site_id, tables, result))
             continue
@@ -268,10 +363,25 @@ def _call_site(
     tables: ModuleTables,
     result: CliResult,
 ) -> None:
+    """Handle a typer.run(function) or parent.add_typer(child[, name=]) call.
+
+    Args:
+        parsed: The parsed module.
+        call: The call.
+        site: The logical-line span of the call.
+        in_loop: True when the call lies in a loop body.
+        roots: Typer root sites by receiver name; a child root is mutated.
+        tables: The file's binding tables.
+        result: Receives the sites and diagnostics.
+
+    Returns:
+        None.
+    """
     callee = dotted_name(call.func)
     if callee is None:
         return
     first = call.args[0] if call.args else None
+    # typer.run makes its target function a root with the function's parameters.
     if tables.qualify(callee) == "typer.run":
         if not isinstance(first, ast.Name) or first.id not in tables.definitions:
             return
@@ -313,6 +423,7 @@ def _call_site(
     if name_node is not None and name is None:
         result.diagnostics.append(RawDiagnostic(DYNAMIC, site[0]))
         return
+    # The child root becomes a command of the parent, spanning the add_typer call.
     child.kind = "command"
     child.parent_id = owner.site_id
     if name is not None:

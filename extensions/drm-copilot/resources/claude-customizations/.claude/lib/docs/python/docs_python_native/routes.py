@@ -1,35 +1,27 @@
 """The python-http analyzer: FastAPI and Flask routes with composed prefixes.
 
 Reproduces DocsPythonHttpSites.psm1 and DocsAnalyzerPythonHttp.psm1 of issue 1022: pass
-1 collects receivers, route sites and mounts per file; pass 2 resolves mounts through
-the import tables and composes each template (FastAPI verbatim, Flask joined).
+1 (route_sites.collect_sites) collects receivers, route sites and mounts per file; pass
+2 (this module) resolves mounts through the import tables and composes each template
+(FastAPI verbatim, Flask joined).
 """
 
 from __future__ import annotations
 
-import ast
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from docs_python_native.cli_argparse import keyword, site_span, statement_index
-from docs_python_native.cli_click import (
-    decorator_call,
-    function_header_nodes,
-    leading_chain,
-)
-from docs_python_native.imports import (
-    AnalyzedFile,
-    AnalyzerOutput,
+from docs_python_native.facts import AnalyzerOutput
+from docs_python_native.module_names import (
     module_dotted_name,
     module_package,
     resolve_relative,
 )
-from docs_python_native.source import (
-    decorator_line,
-    dotted_name,
-    header_end_line,
-    literal_string,
-    walk_with_context,
-)
+from docs_python_native.route_model import RouteFile, RouteReceiver, RouteSite
+from docs_python_native.route_sites import collect_sites
+
+if TYPE_CHECKING:
+    from docs_python_native.imports import AnalyzedFile
 
 ANALYZER_ID = "python-http"
 DEPTH_LIMIT = 16
@@ -37,92 +29,16 @@ DYNAMIC_SEGMENT = "<dynamic>"
 
 
 @dataclass(frozen=True)
-class _Framework:
-    constructors: dict[str, str]
-    prefix_key: str
-    methods: frozenset[str]
-    call: str
-    mount: str
-    mount_key: str
-
-
-FRAMEWORKS: dict[str, _Framework] = {
-    "fastapi": _Framework(
-        {"fastapi.FastAPI": "app", "fastapi.APIRouter": "router"},
-        "prefix",
-        frozenset(
-            {
-                "get",
-                "post",
-                "put",
-                "patch",
-                "delete",
-                "options",
-                "head",
-                "trace",
-                "api_route",
-                "websocket",
-            }
-        ),
-        "add_api_route",
-        "include_router",
-        "prefix",
-    ),
-    "flask": _Framework(
-        {"flask.Flask": "app", "flask.Blueprint": "blueprint"},
-        "url_prefix",
-        frozenset({"get", "post", "put", "patch", "delete", "route"}),
-        "add_url_rule",
-        "register_blueprint",
-        "url_prefix",
-    ),
-}
-_GENERIC = {"fastapi": "api_route", "flask": "route"}
-
-
-@dataclass(frozen=True)
-class _Receiver:
-    name: str
-    kind: str
-    framework: str
-    prefix: str
-    dynamic: bool
-    line: int
-
-
-@dataclass(frozen=True)
-class _Route:
-    receiver: str
-    methods: tuple[str, ...]
-    path: str
-    name: str
-    span: tuple[int, int]
-    protocol: str
-    framework: str
-
-
-@dataclass(frozen=True)
-class _Mount:
-    parent: str
-    child: str
-    prefix: str
-    dynamic: bool
-    given: bool
-    line: int
-
-
-@dataclass
-class _File:
-    analyzed: AnalyzedFile
-    module: str | None
-    package: str | None
-    receivers: dict[str, _Receiver] = field(default_factory=lambda: {})
-    routes: list[_Route] = field(default_factory=lambda: [])
-    mounts: list[_Mount] = field(default_factory=lambda: [])
-
-
-@dataclass(frozen=True)
 class _Segment:
+    """One prefix segment of a mount chain.
+
+    Attributes:
+        text: The literal prefix text ("" when dynamic).
+        dynamic: True when the prefix is not a literal.
+        path: The file that declares the prefix, for its diagnostic.
+        line: The declaring line, for its diagnostic.
+    """
+
     text: str
     dynamic: bool
     path: str
@@ -131,15 +47,33 @@ class _Segment:
 
 @dataclass(frozen=True)
 class _Edge:
+    """A mount edge from a child receiver to the receiver that includes it.
+
+    Attributes:
+        parent_key: The "path|name" key of the including receiver.
+        segment: The mount prefix segment, or None when the mount gives no prefix.
+    """
+
     parent_key: str
     segment: _Segment | None
 
 
 def compose_template(framework: str, prefixes: list[str], path: str) -> str:
-    """Compose a template: FastAPI concatenates; Flask joins prefixes with '/'."""
+    """Compose a route template from its prefix chain and its path.
+
+    Args:
+        framework: "fastapi" concatenates prefixes verbatim; "flask" joins non-empty
+            prefixes and the path with single slashes.
+        prefixes: The prefixes from the outermost receiver inwards.
+        path: The route path.
+
+    Returns:
+        The composed template.
+    """
     if framework == "fastapi":
         return "".join(prefixes) + path
     combined = ""
+    # Join the non-empty Flask prefixes with exactly one slash between neighbours.
     for segment in prefixes:
         if not segment:
             continue
@@ -153,189 +87,24 @@ def compose_template(framework: str, prefixes: list[str], path: str) -> str:
     return combined.rstrip("/") + "/" + path.lstrip("/")
 
 
-def method_list(call: ast.Call) -> tuple[str, ...] | None:
-    """Return the upper-case literal methods= list, ('GET',) when absent, else None."""
-    node = keyword(call, "methods")
-    if node is None:
-        return ("GET",)
-    if not isinstance(node, (ast.List, ast.Tuple)) or not node.elts:
-        return None
-    methods: list[str] = []
-    for item in node.elts:
-        value = literal_string(item)
-        if value is None:
-            return None
-        if value.upper() not in methods:
-            methods.append(value.upper())
-    return tuple(methods)
-
-
-def _receivers(entry: _File, name: str) -> dict[str, _Receiver]:
-    tables = entry.analyzed.tables
-    definition = FRAMEWORKS[name]
-    found: dict[str, _Receiver] = {}
-    for receiver in tables.receivers.values():
-        kind = definition.constructors.get(tables.qualify(receiver.callee) or "")
-        if kind is None:
-            continue
-        prefix, dynamic = "", False
-        node = keyword(receiver.call, definition.prefix_key)
-        if kind != "app" and node is not None:
-            value = literal_string(node)
-            prefix, dynamic = (value, False) if value is not None else ("", True)
-        found[receiver.name] = _Receiver(
-            receiver.name, kind, name, prefix, dynamic, receiver.statement.lineno
-        )
-    return found
-
-
-def _first_literal(call: ast.Call | None) -> str | None:
-    if call is None or not call.args:
-        return None
-    return literal_string(call.args[0])
-
-
-def _collect(entry: _File, output: AnalyzerOutput) -> None:
-    analyzed = entry.analyzed
-    tree = analyzed.parsed.tree
-    if tree is None:
-        return
-    path = analyzed.path
-    owner = statement_index(tree)
-    header_nodes = function_header_nodes(tree)
-    tracked: dict[str, str] = {}
-    for name in FRAMEWORKS:
-        receivers = _receivers(entry, name)
-        entry.receivers.update(receivers)
-        tracked.update({key: name for key in receivers})
-    for node, context in walk_with_context(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            for name in FRAMEWORKS:
-                for decorator in node.decorator_list:
-                    _decorator_route(
-                        entry, node, decorator, name, tracked, context.in_loop, output
-                    )
-            continue
-        if not isinstance(node, ast.Call) or node in header_nodes:
-            continue
-        callee = dotted_name(node.func)
-        parts = callee.split(".") if callee is not None else []
-        if len(parts) != 2 or parts[0] not in tracked:
-            continue
-        span = site_span(node, owner.get(node))
-        framework = tracked[parts[0]]
-        definition = FRAMEWORKS[framework]
-        if parts[1] == definition.call:
-            if context.in_loop:
-                output.add_diagnostic(path, "HTTP_ROUTE_IN_LOOP", span[0])
-                continue
-            _call_route(entry, node, parts[0], framework, span, output)
-        elif parts[1] == "mount":
-            output.add_diagnostic(path, "HTTP_MOUNT_UNRESOLVED", span[0])
-        elif parts[1] == definition.mount:
-            _mount(entry, node, parts[0], definition, span[0], output)
-
-
-def _decorator_route(
-    entry: _File,
-    function: ast.FunctionDef | ast.AsyncFunctionDef,
-    decorator: ast.expr,
-    framework: str,
-    tracked: dict[str, str],
-    in_loop: bool,
-    output: AnalyzerOutput,
-) -> None:
-    callee = leading_chain(decorator)
-    parts = callee.split(".") if callee is not None else []
-    definition = FRAMEWORKS[framework]
-    if len(parts) != 2 or parts[1] not in definition.methods:
-        return
-    call = decorator_call(decorator)
-    literal = _first_literal(call)
-    path = entry.analyzed.path
-    line = decorator_line(entry.analyzed.parsed, decorator)
-    if tracked.get(parts[0]) != framework:
-        tables = entry.analyzed.tables
-        if (
-            not tables.is_known_name(parts[0], include_classes=True)
-            and literal is not None
-            and literal.startswith("/")
-        ):
-            output.add_diagnostic(path, "HTTP_UNBOUND_ROUTE", line)
-        return
-    if in_loop:
-        output.add_diagnostic(path, "HTTP_ROUTE_IN_LOOP", line)
-        return
-    if parts[1] == _GENERIC[framework]:
-        methods = method_list(call) if call is not None else None
-    elif parts[1] == "websocket":
-        methods = ("WEBSOCKET",)
-    else:
-        methods = (parts[1].upper(),)
-    if literal is None or methods is None:
-        output.add_diagnostic(path, "HTTP_DYNAMIC_ROUTE", line)
-        return
-    span = (line, header_end_line(entry.analyzed.parsed, function))
-    protocol = "websocket" if parts[1] == "websocket" else "http"
-    entry.routes.append(
-        _Route(parts[0], methods, literal, function.name, span, protocol, framework)
-    )
-
-
-def _call_route(
-    entry: _File,
-    call: ast.Call,
-    receiver: str,
-    framework: str,
-    span: tuple[int, int],
-    output: AnalyzerOutput,
-) -> None:
-    path = entry.analyzed.path
-    methods = method_list(call)
-    view = keyword(call, "view_func")
-    if (
-        framework == "flask"
-        and not (keyword(call, "methods") is not None and methods is not None)
-        and isinstance(view, ast.Call)
-        and (dotted_name(view.func) or "").endswith(".as_view")
-    ):
-        output.add_diagnostic(path, "HTTP_METHOD_VIEW_UNRESOLVED", span[0])
-        return
-    literal = _first_literal(call)
-    if literal is None or methods is None:
-        output.add_diagnostic(path, "HTTP_DYNAMIC_ROUTE", span[0])
-        return
-    entry.routes.append(
-        _Route(receiver, methods, literal, literal, span, "http", framework)
-    )
-
-
-def _mount(
-    entry: _File,
-    call: ast.Call,
-    parent: str,
-    definition: _Framework,
-    line: int,
-    output: AnalyzerOutput,
-) -> None:
-    child = dotted_name(call.args[0]) if call.args else None
-    if child is None:
-        output.add_diagnostic(entry.analyzed.path, "HTTP_MOUNT_UNRESOLVED", line)
-        return
-    node = keyword(call, definition.mount_key)
-    prefix, dynamic = "", False
-    if node is not None:
-        value = literal_string(node)
-        prefix, dynamic = (value, False) if value is not None else ("", True)
-    entry.mounts.append(_Mount(parent, child, prefix, dynamic, node is not None, line))
-
-
 def _child_key(
-    entry: _File,
+    entry: RouteFile,
     child: str,
-    by_key: dict[str, tuple[_File, _Receiver]],
-    by_module: dict[str, _File],
+    by_key: dict[str, tuple[RouteFile, RouteReceiver]],
+    by_module: dict[str, RouteFile],
 ) -> str | None:
+    """Resolve a mounted expression to the key of a receiver.
+
+    Args:
+        entry: The mounting file.
+        child: The mounted dotted text.
+        by_key: Every receiver of the request by "path|name" key.
+        by_module: Request file by dotted module name.
+
+    Returns:
+        The "path|name" key of a local receiver, or of a receiver in another request
+        file reached through the import table; None when it cannot be resolved.
+    """
     if "." not in child and child in entry.receivers:
         return entry.analyzed.path + "|" + child
     qualified = entry.analyzed.tables.qualify(child)
@@ -352,11 +121,29 @@ def _child_key(
 
 def _chains(
     key: str,
-    by_key: dict[str, tuple[_File, _Receiver]],
+    by_key: dict[str, tuple[RouteFile, RouteReceiver]],
     included_by: dict[str, list[_Edge]],
     stack: set[str],
     depth: int = 0,
 ) -> tuple[list[list[_Segment]], bool]:
+    """Return every prefix chain from an app down to a receiver.
+
+    The recursion is bounded by DEPTH_LIMIT and a stack of the keys on the current path,
+    which is discarded on return, so sibling mounts that share an ancestor are not
+    reported as cycles.
+
+    Args:
+        key: The receiver key whose chains are wanted.
+        by_key: Every receiver by key.
+        included_by: Receiver key to the edges of the receivers that include it.
+        stack: The keys on the current recursion path; mutated and restored.
+        depth: The current recursion depth.
+
+    Returns:
+        (chains, cycle): one segment list per path to an app (an app gives one empty
+        chain; an unmounted router gives none), and True when a cycle or the depth
+        limit cut a path.
+    """
     entry, receiver = by_key[key]
     if receiver.kind == "app":
         return [[]], False
@@ -368,8 +155,11 @@ def _chains(
     own_segment = _Segment(
         receiver.prefix, receiver.dynamic, entry.analyzed.path, receiver.line
     )
+    # Extend every parent chain with this receiver's own segments.
     for edge in included_by.get(key, []):
         own: list[_Segment] = []
+        # FastAPI applies the mount prefix and then the router prefix; Flask uses the
+        # mount prefix instead of the blueprint prefix when one is given.
         if receiver.framework == "fastapi":
             if edge.segment is not None:
                 own.append(edge.segment)
@@ -380,31 +170,44 @@ def _chains(
             edge.parent_key, by_key, included_by, stack, depth + 1
         )
         cycle = cycle or parent_cycle
+        # Append this receiver's segments to every chain that reaches its parent.
         chains.extend(parent + own for parent in parents)
     stack.discard(key)
     return chains, cycle
 
 
 def analyze_http(files: list[AnalyzedFile], source_roots: list[str]) -> AnalyzerOutput:
-    """Return the python-http facts and diagnostics of the parsed request files."""
+    """Return the python-http facts and diagnostics of the parsed request files.
+
+    Args:
+        files: The parsed request files.
+        source_roots: The configured source roots for module names.
+
+    Returns:
+        The analyzer output with one http-route fact per method and composed template.
+    """
     output = AnalyzerOutput(ANALYZER_ID)
-    entries: list[_File] = []
-    by_key: dict[str, tuple[_File, _Receiver]] = {}
-    by_module: dict[str, _File] = {}
+    entries: list[RouteFile] = []
+    by_key: dict[str, tuple[RouteFile, RouteReceiver]] = {}
+    by_module: dict[str, RouteFile] = {}
+    # Pass 1: collect every file's sites in path order and index receivers and modules.
     for analyzed in sorted(files, key=lambda f: f.path):
         module = module_dotted_name(
             analyzed.path, source_roots, require_identifiers=False
         )
-        entry = _File(analyzed, module, module_package(analyzed.path, module))
-        _collect(entry, output)
+        entry = RouteFile(analyzed, module, module_package(analyzed.path, module))
+        collect_sites(entry, output)
         entries.append(entry)
+        # Index the file's receivers under their request-wide "path|name" keys.
         for name, receiver in entry.receivers.items():
             by_key[analyzed.path + "|" + name] = (entry, receiver)
         if module is not None and module not in by_module:
             by_module[module] = entry
     included_by: dict[str, list[_Edge]] = {}
+    # Pass 2a: resolve every mount to an edge; an app or unknown child is unresolved.
     for entry in entries:
         path = entry.analyzed.path
+        # Each mount of the file adds one edge under its resolved child key.
         for mount in entry.mounts:
             child = _child_key(entry, mount.child, by_key, by_module)
             if child is None or by_key[child][1].kind == "app":
@@ -418,19 +221,37 @@ def analyze_http(files: list[AnalyzedFile], source_roots: list[str]) -> Analyzer
             included_by.setdefault(child, []).append(
                 _Edge(path + "|" + mount.parent, segment)
             )
+    # Pass 2b: emit every route through every chain that reaches it.
     for entry in entries:
+        # Emit the routes of this file.
         for route in entry.routes:
             _emit(entry, route, by_key, included_by, output)
     return output
 
 
 def _emit(
-    entry: _File,
-    route: _Route,
-    by_key: dict[str, tuple[_File, _Receiver]],
+    entry: RouteFile,
+    route: RouteSite,
+    by_key: dict[str, tuple[RouteFile, RouteReceiver]],
     included_by: dict[str, list[_Edge]],
     output: AnalyzerOutput,
 ) -> None:
+    """Emit the facts of one route, one per method and prefix chain.
+
+    An unmounted router is emitted with its own prefix only (mounted false); a dynamic
+    segment becomes DYNAMIC_SEGMENT and reports HTTP_PREFIX_DYNAMIC; a cycle reports
+    HTTP_INCLUDE_UNRESOLVED.
+
+    Args:
+        entry: The file that declares the route.
+        route: The route.
+        by_key: Every receiver by key.
+        included_by: The mount edges by child key.
+        output: Receives the facts and diagnostics.
+
+    Returns:
+        None.
+    """
     path = entry.analyzed.path
     key = path + "|" + route.receiver
     receiver = by_key[key][1]
@@ -440,9 +261,11 @@ def _emit(
     mounted = bool(chains)
     if not chains:
         chains = [[_Segment(receiver.prefix, receiver.dynamic, path, receiver.line)]]
+    # Compose one template per chain and emit it for each method.
     for chain in chains:
         prefixes: list[str] = []
         resolved = True
+        # A dynamic segment is kept as a placeholder so the template stays stable.
         for segment in chain:
             if segment.dynamic:
                 resolved = False
@@ -451,6 +274,7 @@ def _emit(
             else:
                 prefixes.append(segment.text)
         template = compose_template(route.framework, prefixes, route.path)
+        # Methods are emitted in sorted order for deterministic output.
         for method in sorted(route.methods):
             output.add_fact(
                 path,

@@ -13,14 +13,20 @@
     ".claude/lib/docs/python/run_docs_python_native.py",
     ".claude/lib/docs/python/docs_python_native/__init__.py",
     ".claude/lib/docs/python/docs_python_native/architecture.py",
+    ".claude/lib/docs/python/docs_python_native/call_sites.py",
     ".claude/lib/docs/python/docs_python_native/cli.py",
     ".claude/lib/docs/python/docs_python_native/cli_argparse.py",
     ".claude/lib/docs/python/docs_python_native/cli_click.py",
     ".claude/lib/docs/python/docs_python_native/cli_typer.py",
+    ".claude/lib/docs/python/docs_python_native/facts.py",
     ".claude/lib/docs/python/docs_python_native/imports.py",
+    ".claude/lib/docs/python/docs_python_native/module_names.py",
     ".claude/lib/docs/python/docs_python_native/protocol.py",
     ".claude/lib/docs/python/docs_python_native/public_api.py",
+    ".claude/lib/docs/python/docs_python_native/route_model.py",
+    ".claude/lib/docs/python/docs_python_native/route_sites.py",
     ".claude/lib/docs/python/docs_python_native/routes.py",
-    ".claude/lib/docs/python/docs_python_native/source.py"
+    ".claude/lib/docs/python/docs_python_native/source.py",
+    ".claude/lib/docs/python/docs_python_native/walk.py"
   ]
 }

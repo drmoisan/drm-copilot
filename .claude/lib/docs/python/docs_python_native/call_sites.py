@@ -80,6 +80,7 @@ def has_star(call: ast.Call) -> bool:
     Returns:
         True when any positional argument is starred or any keyword is unnamed.
     """
+    # Either form unpacks arguments the recognizers cannot read statically.
     return any(isinstance(a, ast.Starred) for a in call.args) or any(
         k.arg is None for k in call.keywords
     )

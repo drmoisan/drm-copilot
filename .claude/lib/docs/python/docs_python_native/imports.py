@@ -172,6 +172,7 @@ def _import_statement(
             not context.blocks,
         )
     star = any(alias.name == "*" for alias in node.names)
+    # A star entry binds no name of its own, so only explicit names are kept.
     names = tuple(
         (alias.name, alias.asname) for alias in node.names if alias.name != "*"
     )

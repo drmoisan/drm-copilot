@@ -206,6 +206,7 @@ def _candidates(
     # Routing by statement type: definitions use their header span, imports and
     # assignments the statement span.
     if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        # The element kind separates classes, functions and async functions.
         kind = "class"
         if isinstance(node, ast.FunctionDef):
             kind = "function"

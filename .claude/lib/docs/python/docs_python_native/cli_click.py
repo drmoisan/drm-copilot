@@ -86,6 +86,7 @@ def _parameter(
         value = literal_string(argument)
         if value is None:
             return None
+        # A flag pair such as --on/--off declares each side as its own name.
         strings.extend(piece for piece in value.split("/") if piece)
     if not strings:
         return None

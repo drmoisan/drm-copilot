@@ -23,7 +23,18 @@ FLOOR_ERROR = (
 
 
 def ensure_package_path(path_list: "MutableSequence[str]", directory: str) -> None:
-    """Insert the script directory at the front of a module search path when absent."""
+    """Insert the script directory at the front of a module search path when absent.
+
+    Isolated mode (-I) leaves the script directory off sys.path, so the package next to
+    this script is made importable explicitly and nothing else is added.
+
+    Args:
+        path_list: The module search path to update (sys.path in production).
+        directory: The directory that holds the docs_python_native package.
+
+    Returns:
+        None. Mutates path_list only when the directory is not already present.
+    """
     if directory not in path_list:
         path_list.insert(0, directory)
 
@@ -33,7 +44,17 @@ def entry(
     stdout: "BinaryIO",
     version_info: "Sequence[object]" = sys.version_info,
 ) -> int:
-    """Check the interpreter floor, then delegate to the protocol main function."""
+    """Check the interpreter floor, then delegate to the protocol main function.
+
+    Args:
+        stdin: The binary request stream.
+        stdout: The binary response stream.
+        version_info: The interpreter version; tests inject older versions.
+
+    Returns:
+        4 after writing FLOOR_ERROR for an interpreter below FLOOR; otherwise the exit
+        code of docs_python_native.protocol.main.
+    """
     if tuple(version_info[:2]) < FLOOR:
         stdout.write(FLOOR_ERROR)
         return 4
