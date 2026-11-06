@@ -57,10 +57,10 @@ function ConvertFrom-EpicProgressKickoffRow {
         if ($line -notmatch '^\s*\|') { break }
         if ($line -notmatch '^\|\s*(\d+)\s*\|') { continue }
         $cells = @($line -split '\|' | ForEach-Object { $_.Trim() })
-        if ($cells[3] -notmatch '^\d+$') {
+        $wave = 0
+        if (-not [int]::TryParse($cells[3], [System.Globalization.NumberStyles]::None, [cultureinfo]::InvariantCulture, [ref] $wave)) {
             throw "The kickoff row for issue #$($cells[1]) has a non-numeric wave cell '$($cells[3])'."
         }
-        $wave = [int]::Parse($cells[3], [cultureinfo]::InvariantCulture)
         [pscustomobject]@{ Issue = $cells[1]; Wave = $wave; Band = $cells[4]; PlanPath = $cells[5] }
     }
 }

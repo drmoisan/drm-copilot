@@ -67,6 +67,12 @@ Describe 'ConvertFrom-EpicProgressKickoffRow' {
         { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Throw -ExpectedMessage "*#12 has a non-numeric wave cell 'two'*"
     }
 
+    It 'throws a clear error for a wave cell beyond the Int32 range' {
+        $kickoff = @('| Issue | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '| 12 | Alpha | 99999999999 | small | docs/a/plan.md |') -join "`n"
+
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Throw -ExpectedMessage "*#12 has a non-numeric wave cell '99999999999'*"
+    }
+
     It 'returns only rows of the feature-summary table' {
         # The repository header spelling, followed by a wave-summary table with numeric first cells.
         $kickoff = @(
