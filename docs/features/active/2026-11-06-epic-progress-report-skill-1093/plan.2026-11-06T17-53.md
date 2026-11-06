@@ -42,7 +42,7 @@
   - Acceptance: `<FEATURE>/evidence/baseline/it-name-inventory.<timestamp>.md` lists every name with a per-file count; the entry-suite list contains `defaults the state path under the temporary root and outside the repository`.
 - [x] [P0-T4] Capture the baseline formatter state of the two merged production files and the two merged suites without writing: compare each file's text with the `Invoke-Formatter` output under the PSSA settings file.
   - Acceptance: `<FEATURE>/evidence/baseline/powershell-format.<timestamp>.md` records a per-file `match` or `differs` result for the four files, and `git status --porcelain`, run before the artifact is written, is empty (the comparison wrote no file).
-- [ ] [P0-T5] Capture baseline analyzer findings for the same four files with a direct `Invoke-ScriptAnalyzer` run under the PSSA settings file.
+- [x] [P0-T5] Capture baseline analyzer findings for the same four files with a direct `Invoke-ScriptAnalyzer` run under the PSSA settings file.
   - Acceptance: `<FEATURE>/evidence/baseline/powershell-analyze.<timestamp>.md` records the finding count per file (expected 0) and each finding's rule name when nonzero.
 - [ ] [P0-T6] Run the branch-current Pester route with coverage over `tests/scripts/dev-tools`.
   - Acceptance: `<FEATURE>/evidence/baseline/pester-coverage.<timestamp>.md` records the total, passed and failed counts from `artifacts/pester/pester-junit.xml`, the per-container counts of the two merged suites, and the numeric per-file line coverage of `scripts/dev-tools/Get-EpicProgressReport.ps1` and `scripts/dev-tools/Get-EpicProgressReport.Logic.ps1` from `artifacts/pester/powershell-coverage.xml`; failed count is 0 for both merged suites.
