@@ -10,8 +10,9 @@
     lines, nested f-string fields, keywords), every lexer diagnostic with its code, severity and
     blocking flag, the token limit (built in test code: 262,145 NAME tokens below 1,048,576
     bytes) and the span-reconstruction property. Inputs are in-memory strings. The structural
-    scaling guard reads the module syntax tree to pin the bounded lexing window and its Match
-    argument, and the window-boundary cases cover tokens and diagnostics across window ends.
+    scaling guard reads the module syntax tree to pin the bounded lexing window, its Match
+    argument and the window size ceiling of 65,536, and the window-boundary cases cover tokens
+    and diagnostics across window ends.
 #>
 
 BeforeAll {
@@ -355,6 +356,33 @@ Describe 'Get-DocsPythonToken structural scaling guard' {
         # Assert
         $matchCalls.Count | Should -BeGreaterThan 0 -Because 'the token loop must call Match'
         @($offending | ForEach-Object { $_.Extent.Text }) | Should -BeNullOrEmpty -Because 'Match inside the token loop must receive the bounded window $source as its first argument'
+    }
+
+    It 'assigns the window size once at module scope from an integer literal no greater than 65536' {
+        # Arrange: the Substring bound is only as tight as this value, so the syntax tree pins the value as well as the shape.
+        $script:GuardParseErrorCount | Should -Be 0
+
+        # Act
+        $assignments = @($script:GuardAst.FindAll({
+                    param($node)
+                    if ($node -isnot [System.Management.Automation.Language.AssignmentStatementAst]) { return $false }
+                    $left = $node.Left
+                    while ($left -is [System.Management.Automation.Language.AttributedExpressionAst]) { $left = $left.Child }
+                    return $left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                    ($left.VariablePath.UserPath -replace '^script:', '') -eq 'DocsPythonTokenWindowSize'
+                }, $true))
+
+        # Assert
+        $assignments.Count | Should -Be 1 -Because 'the window size must be assigned exactly once'
+        $assignment = $assignments[0]
+        $assignment.Parent | Should -BeOfType ([System.Management.Automation.Language.NamedBlockAst]) -Because 'the window size must be assigned at module scope'
+        ($assignment.Parent.Parent -eq $script:GuardAst) | Should -BeTrue -Because 'the window size must be assigned at module scope, not inside a function or nested script block'
+        $right = $assignment.Right
+        if ($right -is [System.Management.Automation.Language.PipelineAst]) { $right = $right.GetPureExpression() }
+        if ($right -is [System.Management.Automation.Language.CommandExpressionAst]) { $right = $right.Expression }
+        $right | Should -BeOfType ([System.Management.Automation.Language.ConstantExpressionAst]) -Because 'the window size must be a literal, so the ceiling can be read from the syntax tree'
+        ($right.Value -is [int] -or $right.Value -is [long]) | Should -BeTrue -Because 'the window size must be an integer literal'
+        $right.Value | Should -BeLessOrEqual 65536 -Because 'a larger window restores whole-remainder Match calls on a string-heavy source'
     }
 }
 
