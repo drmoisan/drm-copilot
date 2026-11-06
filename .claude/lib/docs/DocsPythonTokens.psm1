@@ -15,6 +15,8 @@
     outside strings and comments, bracket depth above 64, or f-string replacement fields nested
     more than two levels) and PYTHON_TOKEN_LIMIT (more than 262,144 non-whitespace tokens). The
     scan-record pattern of the Mermaid line scanner is followed; its functions are not called.
+    The token loop lexes a bounded window of the source, re-sliced after a string token and near
+    the window end, so no call in the loop passes the whole source as an argument.
 
     Every function is pure: no filesystem, clock, process, environment or module-scope mutable
     state.
@@ -23,6 +25,10 @@
     Issue #1022. Requires PowerShell 7.4 or later. No external module dependencies.
     Mirrored byte-identically under extensions/drm-copilot/resources/claude-customizations/.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
+    Issue #1019: the measured per-call cost that grows with string argument length is in the
+    PowerShell method-invocation layer (the same .NET call from compiled C# is flat). The AMSI
+    attribution in the retained comments in Read-DocsPythonStringEnd and at the token loop head
+    is unverified.
 #>
 
 Set-StrictMode -Version Latest
@@ -34,6 +40,8 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSourceText.ps
 
 $script:DocsPythonTokenLimit = 262144
 $script:DocsPythonBracketLimit = 64
+$script:DocsPythonTokenWindowSize = 1024
+$script:DocsPythonTokenWindowMargin = 8
 $script:DocsPythonKeywordList = [string[]]@('def', 'class', 'async', 'import', 'from', 'as', 'for', 'while', 'if', 'elif', 'else', 'try', 'except', 'finally', 'with', 'lambda', 'return')
 $script:DocsPythonOperatorAlternation = '\*\*=|//=|>>=|<<=|\.\.\.|->|:=|\*\*|//|>>|<<|<=|>=|==|!=|\+=|-=|\*=|/=|%=|&=|\|=|\^=|@=|[-+*/%&|^~<>()\[\]{},:.;=@]'
 $script:DocsPythonNumberAlternation = '0[xX][0-9a-fA-F_]+|0[oO][0-7_]+|0[bB][01_]+|(?:[0-9][0-9_]*)?\.[0-9][0-9_]*(?:[eE][-+]?[0-9][0-9_]*)?[jJ]?|[0-9][0-9_]*\.?(?:[eE][-+]?[0-9][0-9_]*)?[jJ]?'
@@ -83,7 +91,8 @@ function Read-DocsPythonStringEnd {
             $index += 2
             continue
         }
-        if ($braceDepth -eq 0 -and [string]::CompareOrdinal($Text, $index, $Quote, 0, $Quote.Length) -eq 0) {
+        # Compare a slice: passing $Text itself to a .NET method costs time proportional to its length per call on an AMSI-enabled host.
+        if ($braceDepth -eq 0 -and $index + $Quote.Length -le $Text.Length -and [string]::CompareOrdinal($Text.Substring($index, $Quote.Length), $Quote) -eq 0) {
             return @{ End = $index + $Quote.Length; HasEscape = $hasEscape; NestingExceeded = $nestingExceeded }
         }
         if (-not $isTriple -and $character -eq "`n" -and $braceDepth -eq 0) { break }
@@ -103,7 +112,7 @@ function Read-DocsPythonStringEnd {
                 continue
             }
             if ($braceDepth -gt 0 -and ($character -eq '''' -or $character -eq '"')) {
-                $innerQuote = if ([string]::CompareOrdinal($Text, $index, [string] $character * 3, 0, 3) -eq 0) { [string] $character * 3 } else { [string] $character }
+                $innerQuote = if ($index + 3 -le $Text.Length -and [string]::CompareOrdinal($Text.Substring($index, 3), [string] $character * 3) -eq 0) { [string] $character * 3 } else { [string] $character }
                 $inner = Read-DocsPythonStringEnd -Text $Text -Start ($index + $innerQuote.Length) -Quote $innerQuote -IsFormat $true -Level ($Level + 1)
                 if ($inner['NestingExceeded']) { return @{ End = -1; HasEscape = $hasEscape; NestingExceeded = $true } }
                 if ($inner['End'] -lt 0) { return @{ End = -1; HasEscape = $hasEscape; NestingExceeded = $false } }
@@ -132,7 +141,7 @@ function Get-DocsPythonToken {
     param([Parameter(Mandatory = $true)] [AllowEmptyString()] [AllowNull()] [string] $Text)
 
     $lines = ConvertTo-DocsSourceLine -Text $Text
-    $source = $lines -join "`n"
+    $sourceText = $lines -join "`n"
     $tokens = [System.Collections.Generic.List[object]]::new()
     $diagnostics = [System.Collections.Generic.List[object]]::new()
 
@@ -144,16 +153,37 @@ function Get-DocsPythonToken {
         }
     }
 
+    $windowStart = 0
+    $windowSize = $script:DocsPythonTokenWindowSize
+    # $source is a bounded window of $sourceText inside the loop, so "the whole source" in the loop-head comment means that window; Match also runs after a margin rebase.
+    $source = $sourceText.Substring(0, [math]::Min($windowSize, $sourceText.Length))
     $position = 0
     $line = 1
     $lineStart = 0
     $depth = 0
     $counted = 0
+    $match = $null
     while ($position -lt $source.Length) {
-        $match = $script:DocsPythonTokenPattern.Match($source, $position)
+        # NextMatch continues at the previous match end through \G and passes no argument. A Match call passes
+        # the whole source, which costs time proportional to its length per call on an AMSI-enabled host, so it
+        # runs only for the first token and after a string token, whose body the pattern does not consume.
+        if ($null -ne $match -and $match.Index + $match.Length -eq $position) {
+            $match = $match.NextMatch()
+        } else {
+            $match = $script:DocsPythonTokenPattern.Match($source, $position)
+        }
         if (-not $match.Success) {
             $diagnostics.Add(@{ Code = 'PYTHON_LEXER_UNCLASSIFIED'; Severity = 'error'; Blocking = $true; Line = $line })
             return @{ Tokens = $tokens.ToArray(); Diagnostics = $diagnostics.ToArray() }
+        }
+        if ($windowStart + $source.Length -lt $sourceText.Length -and $match.Index + $match.Length -gt $source.Length - $script:DocsPythonTokenWindowMargin) {
+            $windowSize = if ($position -eq 0) { $windowSize * 2 } else { $script:DocsPythonTokenWindowSize }
+            $windowStart += $position
+            $lineStart -= $position
+            $position = 0
+            $source = $sourceText.Substring($windowStart, [math]::Min($windowSize, $sourceText.Length - $windowStart))
+            $match = $null
+            continue
         }
         $column = $position - $lineStart
         $token = $null
@@ -161,7 +191,7 @@ function Get-DocsPythonToken {
             $prefix = $match.Groups['prefix'].Value
             $quote = $match.Groups['quote'].Value
             $isFormat = $prefix.IndexOfAny([char[]]@('f', 'F')) -ge 0
-            $scan = Read-DocsPythonStringEnd -Text $source -Start ($match.Index + $match.Length) -Quote $quote -IsFormat $isFormat -Level 0
+            $scan = Read-DocsPythonStringEnd -Text $sourceText -Start ($windowStart + $match.Index + $match.Length) -Quote $quote -IsFormat $isFormat -Level 0
             if ($scan['NestingExceeded']) {
                 $diagnostics.Add(@{ Code = 'PYTHON_LEXER_UNCLASSIFIED'; Severity = 'error'; Blocking = $true; Line = $line })
                 return @{ Tokens = $tokens.ToArray(); Diagnostics = $diagnostics.ToArray() }
@@ -170,7 +200,7 @@ function Get-DocsPythonToken {
                 $diagnostics.Add(@{ Code = 'PYTHON_LEXER_UNTERMINATED'; Severity = 'error'; Blocking = $true; Line = $line })
                 return @{ Tokens = $tokens.ToArray(); Diagnostics = $diagnostics.ToArray() }
             }
-            $text = $source.Substring($position, $scan['End'] - $position)
+            $text = $sourceText.Substring($windowStart + $position, $scan['End'] - $windowStart - $position)
             $token = @{ Type = 'STRING'; Text = $text; Prefix = $prefix; Quote = $quote; IsTriple = ($quote.Length -eq 3); HasEscape = $scan['HasEscape']; IsBytes = ($prefix.IndexOfAny([char[]]@('b', 'B')) -ge 0); IsFormat = $isFormat; IsRaw = ($prefix.IndexOfAny([char[]]@('r', 'R')) -ge 0) }
         } elseif ($match.Groups['name'].Success) {
             $token = @{ Type = 'NAME'; Text = $match.Value; IsKeyword = ($script:DocsPythonKeywordList -ccontains $match.Value) }
@@ -220,6 +250,14 @@ function Get-DocsPythonToken {
             }
         }
         $tokens.Add($token)
+        if ($token['Type'] -ceq 'STRING') {
+            $windowSize = $script:DocsPythonTokenWindowSize
+            $windowStart += $position
+            $lineStart -= $position
+            $position = 0
+            $source = $sourceText.Substring($windowStart, [math]::Min($windowSize, $sourceText.Length - $windowStart))
+            $match = $null
+        }
     }
 
     if ($tokens.Count -gt 0 -and $tokens[$tokens.Count - 1]['Type'] -eq 'CONTINUATION') {
