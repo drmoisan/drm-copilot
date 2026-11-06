@@ -39,7 +39,9 @@ function ConvertFrom-EpicProgressKickoffRow {
         none, may surround each cell, and the separator row is ignored. Cells 1, 3, 4, and 5
         hold the issue, the wave, the band, and the repository-relative plan path. A feature
         row whose wave cell is not all digits raises a terminating error naming the issue and
-        the cell, because a skipped row would understate the epic's task total.
+        the cell, because a skipped row would understate the epic's task total. Kickoff text
+        that holds a non-whitespace character but no such header raises a terminating error;
+        empty or whitespace-only text returns no rows.
     .PARAMETER KickoffText
         The full text of the kickoff file.
     #>
@@ -62,6 +64,9 @@ function ConvertFrom-EpicProgressKickoffRow {
             throw "The kickoff row for issue #$($cells[1]) has a non-numeric wave cell '$($cells[3])'."
         }
         [pscustomobject]@{ Issue = $cells[1]; Wave = $wave; Band = $cells[4]; PlanPath = $cells[5] }
+    }
+    if (-not $inFeatureTable -and $KickoffText -match '\S') {
+        throw "The kickoff has no feature-summary table: no table header row whose first cell is 'issue_num' or 'Issue' was found."
     }
 }
 

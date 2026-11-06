@@ -114,6 +114,24 @@ Describe 'ConvertFrom-EpicProgressKickoffRow' {
         $rows.Count | Should -Be 1
         $rows[0].Issue | Should -Be '12'
     }
+
+    It 'throws a clear error for a kickoff whose feature-table header is not recognized' {
+        # 'Issue #' is neither accepted spelling, so the table is never entered and a 0-row report would follow.
+        $kickoff = @('| Issue # | Title | Wave | Band | Plan |', '|---|---|---|---|---|', '| 12 | Alpha | 1 | small | docs/a/plan.md |') -join "`n"
+
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Throw -ExpectedMessage "*no feature-summary table*'issue_num' or 'Issue'*"
+    }
+
+    It 'throws a clear error for a feature table with no header row' {
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText '| 12 | Alpha | 1 | small | docs/a/plan.md |' } | Should -Throw -ExpectedMessage "*no feature-summary table*'issue_num' or 'Issue'*"
+    }
+
+    It 'returns no rows for a whitespace-only kickoff' {
+        $kickoff = "   `t`n  "
+
+        { ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff } | Should -Not -Throw
+        @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff).Count | Should -Be 0
+    }
 }
 
 Describe 'Get-EpicProgressIssueFromKickoff' {
