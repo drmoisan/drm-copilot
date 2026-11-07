@@ -58,7 +58,7 @@ Found by searching `tests/` for `Add-ProcessReductionTouch`, `Get-ProcessReducti
 
 ### Phase 1 — Fixes
 
-- [ ] [P1-T1] Fix F1 in one commit: reword step 1 of `## Revert Steps` in `docs/engineering/process-reductions/0001-parallel-only-test-gates.md` and regenerate the matching hunk in `docs/engineering/process-reductions/patches/0006-test-suite-baseline-restored.patch`.
+- [x] [P1-T1] Fix F1 in one commit: reword step 1 of `## Revert Steps` in `docs/engineering/process-reductions/0001-parallel-only-test-gates.md` and regenerate the matching hunk in `docs/engineering/process-reductions/patches/0006-test-suite-baseline-restored.patch`.
   - The new step 1 reads: "1. Apply the blocks: revert every later entry that names any path in `## Files Changed`, newest-first, as README `## Revert Order` states; then run `git apply -R` of the patch when its check passes. Otherwise replace each `Current` with its `Prior`, which restores the core rule, and restore the other paths from the patch text." It names no entry.
   - In the `0006` patch, edit only the added line of the section for `0001-parallel-only-test-gates.md` (its `+1. Apply the blocks:` line) so that it carries the same text as the entry's new step 1. The hunk header, its removed line, its context, the section's `index` line, and every other section stay unchanged. Edit with the Edit tool on that one line; do not reformat the patch file.
   - Commit subject carries `reduction: 0001` and `reduction: 0006`. The `PRL-PARTIAL-REVERT-LINKED` targets are not touched.
