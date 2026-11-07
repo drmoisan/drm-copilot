@@ -155,8 +155,9 @@ Scans Pester test files and .ps1 helpers under tests/ for state that leaks betwe
 .DESCRIPTION
 Reads each .ps1 file under the scan folders that lie beneath tests/, reports each unpaired state write
 through Get-PoshQCLeakFinding, removes exempt names, and compares the rest with
-config/poshqc-leak-allowlist.json. Each unallowlisted finding, stale entry, and parse error is logged
-as one 'path | line | kind | name' message, and any of them ends in one throw. This function is the
+config/poshqc-leak-allowlist.json. Each unallowlisted finding, stale entry, file read failure
+(read-error), and parse failure (parse-error) is logged as one 'path | line | kind | name' message,
+and any of them ends in one throw. This function is the
 only I/O in the scan; every reader is an injectable seam.
 .PARAMETER Root
 The repository root.
@@ -191,12 +192,19 @@ function Invoke-PoshQCLeakScan {
         }
     }
 
-    # Scan each file; a parse error is recorded as a failure, never skipped.
+    # Scan each file; a read failure is recorded as read-error and a parse failure as parse-error,
+    # each as a failure that is never skipped. A file that cannot be read is not parsed.
     $findings = [System.Collections.Generic.List[object]]::new()
     $failures = [System.Collections.Generic.List[string]]::new()
     foreach ($relativePath in $files) {
         try {
-            foreach ($finding in @(Get-PoshQCLeakFinding -Content ([string] (& $ReadText "$rootPath/$relativePath")) -Path $relativePath)) { $findings.Add($finding) }
+            $text = [string] (& $ReadText "$rootPath/$relativePath")
+        } catch {
+            $failures.Add(('{0} | 0 | read-error | {1}' -f $relativePath, $_.Exception.Message))
+            continue
+        }
+        try {
+            foreach ($finding in @(Get-PoshQCLeakFinding -Content $text -Path $relativePath)) { $findings.Add($finding) }
         } catch {
             $failures.Add(('{0} | 0 | parse-error | {1}' -f $relativePath, $_.Exception.Message))
         }

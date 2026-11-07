@@ -299,4 +299,18 @@ Describe 'Invoke-PoshQCLeakScan (issue #1096)' {
         @($seam.Messages)[0..1] | Should -Be @('tests/scripts/a.Tests.ps1 | 1 | location | location', 'tests/scripts/a.Tests.ps1 | 2 | env | FOO')
         $seam.Messages[-1] | Should -BeLike 'Leak scan: 1 files, 2 findings, 0 exempt, 0 allowlisted, 2 failures.'
     }
+
+    It 'LI-14 reports a file read failure as read-error, not parse-error' {
+        # Arrange: the file is enumerated, but the injected reader throws for it.
+        $seam = Get-LeakScanSeam -Files @{ 'tests/scripts/locked.Tests.ps1' = '' } -Allowlist $null
+        $throwingReader = { param([string] $Path) throw "Access denied: $Path" }
+
+        # Act
+        $thrownMessage = $null
+        try { Invoke-PoshQCLeakScan -Root '/repo' -ScanFolders @('tests/scripts') -ReadText $throwingReader -ReadAllowlist $seam.ReadAllowlist -EnumerateFiles $seam.EnumerateFiles -Logger $seam.Logger } catch { $thrownMessage = $_.Exception.Message }
+
+        # Assert
+        $thrownMessage | Should -BeLike '*tests/scripts/locked.Tests.ps1 | 0 | read-error | Access denied*'
+        $thrownMessage | Should -Not -BeLike '*parse-error*'
+    }
 }

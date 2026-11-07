@@ -189,7 +189,8 @@ Contracts and validation rules:
 - Validation throws and names the file for: wrong version, bad JSON, unknown `kind`, blank field, blank `reason`, absolute path, `..` segment, duplicate entry, or an `exemptGlobalVariables` name other than `LASTEXITCODE`.
 - An item in `entries` that matches no raw finding is stale and fails the scan, so a fixed finding forces removal of its entry.
 - A parse error is a failure, never a skip.
-- The exit is non-zero on any finding, allowlist error, or parse error.
+- A file read failure is a separate failure, reported with kind `read-error`, and the file is not parsed.
+- The exit is non-zero on any finding, allowlist error, read failure, or parse error.
 
 CI step: `Scan Pester tests for leaked state` in `poshqc-static` in `.github/workflows/_poshqc.yml`, after `Analyze PowerShell`, with no `continue-on-error` and no step-level `if`. A throw under `shell: pwsh` fails the step, the job, `poshqc / PowerShell QC`, and `CI Required Gate`.
 
