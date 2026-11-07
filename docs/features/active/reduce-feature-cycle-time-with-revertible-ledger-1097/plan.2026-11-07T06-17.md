@@ -131,7 +131,7 @@ Found by searching the Python, Pester, and Jest test trees for the changed symbo
 
 ### Phase 3 — Final QA and Baseline Comparison
 
-- [ ] [P3-T1] Run format and lint, and type checking where it applies, over every `.py`, `.ts`, and `.ps1` file in the diff from the merge base of `origin/main` and `HEAD`, including `scripts/dev_tools/plan_gate_document.py`, and write `FEATURE/evidence/qa-gates/stage-f-format-lint.<timestamp>.md`.
+- [x] [P3-T1] Run format and lint, and type checking where it applies, over every `.py`, `.ts`, and `.ps1` file in the diff from the merge base of `origin/main` and `HEAD`, including `scripts/dev_tools/plan_gate_document.py`, and write `FEATURE/evidence/qa-gates/stage-f-format-lint.<timestamp>.md`.
   - Python: Black in check mode, Ruff, Pyright. TypeScript: Prettier in check mode, ESLint, and `tsc` against the Jest project. PowerShell: PoshQC format in check mode with a no-op `-WriteFile`, and a direct analyzer run.
   - Acceptance: Black reports no file to reformat, Prettier reports every file formatted, the PoshQC log holds an `Already formatted: ` line and no `Formatted: ` line per file, and Ruff, Pyright, ESLint, `tsc`, and the analyzer report zero findings. `EXIT_CODE:` is non-zero otherwise; a repair restarts this task and follows the later-fix rule of `## Execution Terms`.
 - [ ] [P3-T2] Run one `Invoke-PoshQCParallelTest`, with counts read from `artifacts/pester/pester-junit.xml`, and write `FEATURE/evidence/qa-gates/stage-f-powershell-test.<timestamp>.md` comparing it with the greatest `stage-f-powershell-test-baseline.*.md`.
