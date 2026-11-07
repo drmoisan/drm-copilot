@@ -89,7 +89,7 @@ No test suite runs in this phase.
   - `FRN-SECTION`, 4 in all. Per surface, a narrowing line under `## Rejected Scope Narrowing` and a PowerShell branch line are not reported as narrowing.
   - `FRN-PARITY`, one `It`. An AST read of both hook files shows equal `Get-CoverageNarrowingLine` definition text after line-ending normalization.
   - Acceptance: the file holds the four test groups with these counts, 65 `It` blocks in all. P2-T4 proves the pass result.
-- [ ] [P1-T4] Add one bullet at the end of `## Constraints & Risks` in `docs/features/active/2026-11-06-parallel-only-test-gates-and-leak-scan-1094/spec.md`.
+- [x] [P1-T4] Add one bullet at the end of `## Constraints & Risks` in `docs/features/active/2026-11-06-parallel-only-test-gates-and-leak-scan-1094/spec.md`.
   - The bullet states that a narrow hook change was required, that this item is therefore no longer text and contract tests only, and that this statement supersedes the text-only wording in `## Overview`, `### 2. Out of scope`, and `## Implementation Strategy`. It names both hooks, their bundle copies, and RF-6, and it states that the validators stay unchanged.
   - Acceptance: `git diff HEAD -- <FEATURE>/spec.md`, taken before this task's commit, shows one added line and no removed line, and no line under `## Acceptance Criteria` changes.
 

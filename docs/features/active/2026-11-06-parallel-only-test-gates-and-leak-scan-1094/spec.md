@@ -112,6 +112,7 @@ No public function, command, or configuration key is added or changed. The gates
 - A failed parallel run can leave older merged files in place, so `ExitCode` is read first.
 - `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md` have pinned hashes and are not edited.
 - This item runs alongside Epic #1019. It must not edit the epic's feature folders, and it must itself use the parallel-only gates.
+- A narrow hook change was required. RF-6 found that the coverage stop hooks reject the `N/A - no pre-change run` record the template prescribes, so `.claude/hooks/validate-feature-review-coverage-rules.ps1`, `.codex/hooks/validate-feature-review-coverage.ps1`, and their bundle copies change. This item is therefore no longer text and contract tests only, and this statement supersedes the text-only wording in `## Overview`, `### 2. Out of scope`, and `## Implementation Strategy`. The policy-audit validators stay unchanged.
 
 ## Decisions
 
