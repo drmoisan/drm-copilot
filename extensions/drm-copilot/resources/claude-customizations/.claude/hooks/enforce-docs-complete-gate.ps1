@@ -40,19 +40,30 @@
     What it establishes, and nothing beyond this: it looks up the selector of a command it reads
     as one plain gh pr merge, and with the gate enabled it denies PR_UNRESOLVED for these groups
     whichever pull request they name: the words gh pr merge or a gh api merge endpoint or
-    mutation in the unquoted text, including a compound command, a wrapper payload the shared
-    predicate reads, a word split by a backslash or a backslash-newline, and a comment joined to
-    a later command by a backslash-newline; and quoted or heredoc text holding those words beside
-    an unquoted evaluator word (sh, bash, zsh, dash, ksh, pwsh, powershell, eval, source).
+    mutation in the text the shared scanner reads as unquoted, including a compound command, a
+    wrapper payload the shared predicate reads, a word split by a backslash or a
+    backslash-newline, and a comment joined to a later command by a backslash-newline; and quoted
+    or heredoc text holding those words beside an unquoted evaluator word (sh, bash, zsh, dash,
+    ksh, pwsh, powershell, eval, source). The shared scanner keeps no comment state, reads << as
+    a heredoc opener wherever it appears, and does not nest double quotes inside a command
+    substitution inside double quotes, so a merge line that bash runs can read as quoted or
+    heredoc text and allow. The forms named are: a quote character in a # comment before and
+    after the merge line (# it's); a heredoc opener << in a # comment (# a<<b); a shift in
+    arithmetic (x=$((1<<4))); and double quotes nested in a command substitution inside double
+    quotes (echo "$(git log -1 --format="%h"; gh pr merge 12)").
 
     Outside what it can observe: any other way of causing a merge is not visible to it, and such
     a command allows. Known forms: other interpreters such as python -c and node -e; curl to the
     API; scripts on disk; computed command words ($a$b pr merge 12, $(echo 'gh pr merge 12')); a
     quoted command word outside the leading position; evaluators outside the named words (trap,
     fish, .); a gh alias; a mutation supplied from a file; a merge endpoint whose number is a
-    variable; a direct git push to main; and forms not modelled. This list is not complete: the
-    class is every form the text tests do not recognize, and a form missing from this list is
-    not thereby denied.
+    variable; a direct git push to main; an ANSI-C quoted command word ($'g\x68' pr merge 12);
+    arguments piped to gh through xargs gh (printf 'pr\nmerge\n12\n' | xargs gh); a shell alias
+    holding the merge (alias m='gh pr merge 12', then m); an encoded payload decoded with
+    base64 -d and piped to sh; a branch merge through gh api repos/o/r/merges, which merges
+    branches with no pull request; and forms not modelled. This list is not complete: the class
+    is every form the text tests do not recognize, and a form missing from this list is not
+    thereby denied.
 
     Ambient state: the profile and receipt are read from the local working tree. An ambient
     GH_REPO or GH_HOST, and any directory or environment change made by an earlier Bash call, are

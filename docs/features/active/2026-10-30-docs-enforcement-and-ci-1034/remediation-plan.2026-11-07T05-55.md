@@ -119,7 +119,7 @@ No tracked file outside `FEATURE/evidence/` changes in this phase.
 
 ### Phase 1 — Limit Text
 
-- [ ] [P1-T1] Apply `## Design: Limit Text` to the comment-based help of `.claude/hooks/enforce-docs-complete-gate.ps1`, and copy the file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
+- [x] [P1-T1] Apply `## Design: Limit Text` to the comment-based help of `.claude/hooks/enforce-docs-complete-gate.ps1`, and copy the file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
   - Only lines inside the `What it establishes` and `Outside what it can observe` paragraphs of the help block change.
   - Acceptance: `[System.Management.Automation.Language.Parser]::ParseFile` reports zero errors for the file; every line that `git diff -U0 CYCLE_START -- .claude/hooks/enforce-docs-complete-gate.ps1` adds or removes lies after the `What it establishes` line and before the `Ambient state` line of the help block; the logical line count is below 500; the SHA-256 of `HOOK` and `HOOK_BUNDLE` is equal.
 - [ ] [P1-T2] Apply `## Design: Limit Text` to the residual-limits bullet of `### Hook \`enforce-docs-complete-gate.ps1\`` in `FEATURE/spec.md`.
