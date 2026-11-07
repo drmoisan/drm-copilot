@@ -213,7 +213,7 @@ Other suites:
 
 ### Phase 0 — Baseline
 
-- [ ] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md` and `.claude/rules/tonality.md`, and write `FEATURE/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md` and `.claude/rules/tonality.md`, and write `FEATURE/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:` and the six paths in order.
 - [ ] [P0-T2] Fetch `origin/epic/documentation-estate-tooling-integration`, derive `MERGE_BASE`, confirm `artifacts/orchestration/orchestrator-state.json` selects the `large` or `remediation` route and is not terminal, and write `FEATURE/evidence/remediation-baseline/preconditions.<timestamp>.md`.
   - Acceptance: the artifact records `MERGE_BASE`, the route value, the logical line count of `HOOK`, and equal SHA-256 values for the `.claude/hooks` and `.codex/hooks` pair of `enforce-epic-merge-gate-command.ps1`. Any failure stops the run as BLOCKED.
