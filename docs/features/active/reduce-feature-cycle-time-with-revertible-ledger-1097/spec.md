@@ -154,12 +154,12 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 
 ## Acceptance Criteria
 
-- [ ] [A] `docs/engineering/process-reductions/` exists with a `README.md` index, and a test fails when the index and the entries disagree.
-- [ ] [A] A test fails if a ledger entry lacks a required section, covering a complete entry, a missing section, an empty section, and missing prior text, and it also iterates the real entries read-only.
-- [ ] [A] The structure test accepts a pending merge commit only in the exact form `Merge commit: pending (PR #N)`.
-- [ ] [A] `Invoke-ProcessReductionRevert` restores `Prior` text in memory, normalizes line endings before comparing, and throws when `Current` is absent.
-- [ ] [A] The review skill and all its mirrored copies state the standing rule, conditional on the ledger folder existing, and state that one-off waivers are not entries.
-- [ ] [A] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures, under the Testing Rule, at each stage.
+- [x] [A] `docs/engineering/process-reductions/` exists with a `README.md` index, and a test fails when the index and the entries disagree.
+- [x] [A] A test fails if a ledger entry lacks a required section, covering a complete entry, a missing section, an empty section, and missing prior text, and it also iterates the real entries read-only.
+- [x] [A] The structure test accepts a pending merge commit only in the exact form `Merge commit: pending (PR #N)`.
+- [x] [A] `Invoke-ProcessReductionRevert` restores `Prior` text in memory, normalizes line endings before comparing, and throws when `Current` is absent.
+- [x] [A] The review skill and all its mirrored copies state the standing rule, conditional on the ledger folder existing, and state that one-off waivers are not entries.
+- [x] [A] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures, under the Testing Rule, at each stage.
 - [ ] [B] Stage timing is recorded in the checkpoint and in committed evidence, and is reported per stage by `Get-StageTimingReport.ps1`, which labels figures as wall-clock and states that the merge stage is not captured.
 - [ ] [B] A test proves that `stage_timing` passes each validator and survives portable handoff.
 - [ ] [C] The merge guard commit precedes the readiness relaxation commit on the branch.
