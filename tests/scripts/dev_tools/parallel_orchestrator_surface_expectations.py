@@ -174,6 +174,12 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # confirmed by polling and ancestry check, and granted the epic agent the two
 # parser invocations its skill prescribes. Both digests moved, and the pin
 # stays live for both entries.
+#
+# RE-BASELINED by issue #1117. That change replaced step 3 of the epic skill's
+# `## Epic Integration Branch Lifecycle` section, which ran the main-sync as a
+# dedicated sync child item, with a plain merge of `origin/main` into the
+# integration branch performed by `epic-orchestrator`. Only the skill digest
+# moved; the agent digest is unchanged and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -181,7 +187,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "84b0555d0db146274fc5bfb9f06909c0b892a1f59522cc9feb0312d08721cf30",
+        "65f34506ae2d0505f47f79bfbfcbbd9d7c7f78dccc0e9213bc6c9b8222101b76",
     ),
 )
 

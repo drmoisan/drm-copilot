@@ -99,20 +99,11 @@ function of the DAG.
    `git fetch origin main` and then
    `git rev-list --count origin/epic/<epic-slug>-integration..origin/main`. A zero count
    proceeds directly to the wave. A non-zero count means `origin/main` has commits the
-   integration branch lacks, and the main-sync runs as a dedicated chore child item before the
-   wave launches, following the `epic-852-main-sync` / PR #882 pattern. Before delegating it,
-   `epic-orchestrator` writes the sync child's `features[]` row (with `depends_on: []`) and its
-   own `waves[]` entry to the epic checkpoint, because `enforce-epic-wave-barrier.ps1` denies a
-   delegation whose feature record is absent. The sync child must not reuse a manifest child's
-   issue number; it uses the epic issue number or a dedicated chore issue. Its branch is created
-   from the integration branch, merges `origin/main` with a merge commit
-   (`git merge --no-ff origin/main`; no rebase, no force-push), resolves any conflict inside its
-   own remediation loop, and opens a PR into the integration branch. The wave does not launch
-   until that PR has merged into the integration branch and the sync entry's `merge_status` is
-   `merged`. At most one main-sync child runs per wave: after it merges, `epic-orchestrator`
-   re-runs step 2 and launches the wave without repeating the count, and commits that reach
-   `origin/main` afterwards are picked up by the next wave's check or by the final integration
-   PR in step 6.
+   integration branch lacks. Before the wave launches, `epic-orchestrator` merges `origin/main`
+   into the integration branch (`git merge --no-ff origin/main`, resolving any conflicts; no
+   rebase, no force-push), pushes the integration branch, re-runs step 2, and launches the wave.
+   Commits that reach `origin/main` afterwards are picked up by the next wave's check or by the
+   final integration PR in step 6.
 4. Each child feature's worktree/branch (created via
    `Agent(orchestrator, isolation: "worktree", run_in_background: true)`) is branched from
    `origin/<integration_branch>`, not `origin/main`. The child's own `orchestrator` instance
