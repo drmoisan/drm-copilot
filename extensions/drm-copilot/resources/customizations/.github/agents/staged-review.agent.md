@@ -159,8 +159,8 @@ Default check-only sequence (adapt to repo policy):
 3) Type check
    - If Pyright: `poetry run pyright` (or repo-specific task)
 4) Tests
-   - Run the smallest applicable subset covering staged changes first (repo-specific)
-   - Then run the repo-required full test suite if policy requires it or if failures were found
+   - Run the parallel gates for the languages in scope: one `Invoke-PoshQCParallelTest` run for PowerShell and one `poetry run pytest -n auto` run for Python. Re-run a gate only after a fix.
+   - A focused run of one test file to debug a specific failure is debugging only.
 
 Rules:
 - Capture outputs and reference them in PolicyAudit.md evidence fields.

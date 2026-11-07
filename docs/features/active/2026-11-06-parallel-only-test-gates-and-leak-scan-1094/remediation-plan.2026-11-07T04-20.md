@@ -46,7 +46,7 @@ No test suite runs in this phase.
 
 ### Phase 1 — Fixes
 
-- [ ] [P1-T1] Fix RF-5 in Phase D, step `4) Tests`, of `.github/agents/staged-review.agent.md`, and copy the file to the Copilot bundle.
+- [x] [P1-T1] Fix RF-5 in Phase D, step `4) Tests`, of `.github/agents/staged-review.agent.md`, and copy the file to the Copilot bundle.
   - The two current bullets of step 4 are replaced. The step states the parallel gates for the languages in scope, one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run, each re-run only after a fix, and it carries the debugging statement.
   - Steps 1 to 3 and the `Rules:` list stay, so the evidence rule then applies to the gates.
   - `.claude/agents/staged-review.md` holds no test step, and `.codex/agents/staged-review.toml` holds none, so neither changes.
