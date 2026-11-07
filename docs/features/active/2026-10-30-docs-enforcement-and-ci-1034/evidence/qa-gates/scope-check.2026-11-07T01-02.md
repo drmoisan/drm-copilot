@@ -1,0 +1,6 @@
+# Scope Check - Issue 1034 (P7-T9, loop pass 9)
+
+Timestamp: 2026-11-07T01-02
+Command: git diff --name-only MERGE_BASE HEAD (MERGE_BASE e3e4aa551, from the live git merge-base origin/epic/documentation-estate-tooling-integration HEAD; HEAD 90e4405f2) together with git status --porcelain; then grep -c -E over the listed paths for the extension set .py, .ts, .tsx, .js, .mjs, .cjs and for the prefixes .github/workflows/, .codex/hooks/ and the path .codex/config.toml
+EXIT_CODE: 0
+Output Summary: PASS. 101 paths listed: 66 under FEATURE/ and 35 outside it. git status --porcelain is empty. Extension matches: 0. Matches for .github/workflows/, .codex/hooks/ or .codex/config.toml: 0. Each of the 35 paths outside FEATURE/ maps to a row of `## Artifact Classification`: the seven source rows and their seven bundle copies (14), the two settings copies (2), core.json (1), the two copies each of the four feature-review surfaces (8), and ten test files (10). The tenth test file, cleanup-merged-worktrees-workflow.EndToEnd.Tests.ps1, maps to a row the executor added in loop pass 8 and reports as a deviation (evidence/other/qa-loop-restart.2026-11-06T23-36.md); the mapping for that path is therefore not from the plan as approved. This artifact supersedes the artifact stamped 2026-11-06T17-12.
