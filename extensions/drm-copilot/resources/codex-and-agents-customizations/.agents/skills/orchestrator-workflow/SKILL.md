@@ -374,14 +374,14 @@ Required behavior:
       in deterministic filename order, including timestamped scaffolded plans.
     - The planning route MUST be `atomic-planner -> atomic-executor` for preflight validation.
     - The planner MUST update `${plan-path}` in place and MUST NOT create additional `plan.*.md` files for revisions.
-    - The approved plan MUST include explicit Phase 0 baseline evidence tasks and explicit final-QA evidence or coverage tasks for each language in scope where policy requires them.
+    - The approved plan MUST include explicit Phase 0 static baseline evidence tasks and explicit final-QA evidence or coverage tasks for each language in scope where policy requires them.
     - Do not mark Step 7 complete until delegate output includes both a concrete `plan-path` and final `PREFLIGHT: ALL CLEAR`.
     - Do not perform planning locally when this delegation cannot be started; set `step7_status` to `blocked`, set `blocked_reason`, and stop.
     - Record a delegation receipt and set `step7_status` to `verified` only after delegate output and validator checks pass.
 9. Spawn `atomic-executor` to execute the approved plan.
     Hard enforcement for Step 8:
-    - Do not mark Step 8 complete until execution output includes execution summary, QA summary, lint/type/test/coverage deltas, and numeric baseline/post/new-code coverage metrics where policy requires them.
-    - Do not accept PASS execution outcomes when required baseline or final-QA artifacts are missing, when checklist state is not backed by artifacts, or when coverage-bearing plan tasks remain unverified.
+    - Do not mark Step 8 complete until execution output includes execution summary, QA summary, lint and type-check deltas, and numeric per-file coverage from the single gate run where policy requires them.
+    - Do not accept PASS execution outcomes when required baseline or final-QA artifacts are missing, when checklist state is not backed by artifacts, or when coverage plan tasks remain unverified.
     - Do not perform execution locally when this delegation cannot be started; set `step8_status` to `blocked`, set `blocked_reason`, and stop.
     - Record a delegation receipt and set `step8_status` to `verified` only after delegate output and validator checks pass.
 10. Spawn `feature-reviewer` for post-implementation review.

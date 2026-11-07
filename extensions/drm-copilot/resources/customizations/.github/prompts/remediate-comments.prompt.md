@@ -37,7 +37,7 @@ Apply in this sequence:
    - `poetry run black .`
    - `poetry run ruff check`
    - `poetry run pyright`
-   - `poetry run pytest`
+   - `poetry run pytest -n auto`
    Restart from Black after any change or failure; resolve all errors before finishing.
 
 ## Completion Criteria

@@ -6,7 +6,8 @@ This ledger records every reduction of evidence, plan tasks, gates, or review pr
 
 | ID | Title | Date | Issue | Status |
 | --- | --- | --- | --- | --- |
-| [0001](0001-concurrent-review.md) | Concurrent review | 2026-11-07 | #1097 | Active |
+| [0001](0001-parallel-only-test-gates.md) | Parallel-only test gates | 2026-11-07 | #1094 | Active |
+| [0002](0002-concurrent-review.md) | Concurrent review | 2026-11-07 | #1097 | Active |
 
 A data row's ID cell is a link such as `[0001](0001-short-name.md)`, and its label equals the number of the linked file. Every entry file has one row, and every row has one entry file.
 

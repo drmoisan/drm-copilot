@@ -25,7 +25,7 @@ Always apply:
 Use `atomic-plan-contract` as the source of truth for:
 - phase and task formatting,
 - Phase 0 requirements,
-- baseline evidence tasks,
+- static baseline evidence tasks,
 - final QA requirements,
 - the design-level plan contract and the `## Pre-Mortem` section,
 - single-pass preflight behavior.
