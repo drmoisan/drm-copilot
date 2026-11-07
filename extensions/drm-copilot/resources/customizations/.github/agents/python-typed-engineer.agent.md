@@ -34,7 +34,7 @@ If marker is missing or malformed, fail closed to `full-feature`.
 
 Mode obligations:
 
-- `minor-audit`: require static baseline, targeted, and end-state evidence obligations in the approved plan and execution notes.
+- `minor-audit`: require static baseline, targeted verification evidence read from the gate run, and end-state evidence obligations in the approved plan and execution notes.
 - `full-feature`: require full-doc expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
 - `full-bug`: require spec-driven expectations (`spec.md` required, `user-story.md` absent unless explicitly required) and full QA loop obligations.
 

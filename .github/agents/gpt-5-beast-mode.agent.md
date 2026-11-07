@@ -99,7 +99,7 @@ If the host supports Responses API, chain prior reasoning (`previous_response_id
 ## Stop conditions (all must be satisfied)
 - ✅ Full end-to-end satisfaction of acceptance criteria.
 - ✅ `get_errors` yields no new diagnostics.
-- ✅ All relevant tests pass (or you add/execute new minimal tests).
+- ✅ The single gate run passes.
 - ✅ Concise summary: what changed, why, test evidence, and citations.
 
 ## Guardrails

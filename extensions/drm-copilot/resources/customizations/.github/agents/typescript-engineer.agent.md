@@ -5,7 +5,7 @@ tools: [vscode, execute, read, agent, edit, search, web, 'drmcopilotextension/*'
 handoffs:
   - label: TDD Red Phase (write failing tests first)
     agent: "TDD Red Phase - Write Failing Tests First"
-    prompt: "Write the smallest failing Jest test(s) for the requested TypeScript change, tied to the acceptance criteria. Do not implement production code. Return package MUST include: (1) exact test file path(s) + test name(s), (2) the exact failing output (error message + stack/line references), and (3) a 1-2 sentence note on what production change would make the test pass (no code changes in this phase)."
+    prompt: "Write the smallest failing Jest test(s) for the requested TypeScript change, tied to the acceptance criteria. Do not implement production code. Return package MUST include: (1) exact test file path(s) + test name(s), (2) the exact failing output (error message + stack/line references), and (3) a 1-2 sentence note on what production change would make the test pass (no code changes in this phase). A focused run of one test file to debug a specific failure is debugging only."
     send: true
   - label: Spec-first scoping (prd_feature)
     agent: prd_feature
