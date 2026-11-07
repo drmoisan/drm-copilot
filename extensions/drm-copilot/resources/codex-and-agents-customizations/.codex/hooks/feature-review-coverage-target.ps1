@@ -97,8 +97,15 @@ function Get-CodexReviewPolicyAuditPath {
         Accepts docs/features/active/<folder>/[<version>/]policy-audit.<timestamp>.md and
         docs/features/active/<folder>/audit/<timestamp>/policy-audit.md, relative or absolute, with /
         or \ separators, with or without a policy-audit-path: label. Separators are returned as /.
-        A $null or non-string message yields no paths. A path with a '..' segment yields reason code
-        AUDIT_PATH_TRAVERSAL. Returns Paths, ReasonCode, and Reason.
+        Candidates come from three sources, merged in first-seen order and de-duplicated: (1) the rest
+        of a line after policy-audit-path: (trimmed, one pair of surrounding backticks or quotes
+        removed, spaces kept); (2) the content of a single-line backtick, single-quote, or
+        double-quote span that holds docs/features/active/ (spaces kept); (3) each whitespace-delimited
+        token. Trailing . , : ; after .md are not part of a path. A candidate is examined only when it
+        holds docs/features/active/ exactly once, so a source that spans two audit paths is skipped and
+        the token scan extracts both. A '..' segment in an examined candidate is checked before the
+        shape test and yields reason code AUDIT_PATH_TRAVERSAL. A $null or non-string message yields no
+        paths. Returns Paths, ReasonCode, and Reason.
     .PARAMETER Message
         The last_assistant_message value of the payload; any type.
     #>
@@ -112,18 +119,30 @@ function Get-CodexReviewPolicyAuditPath {
     }
 
     $text = $Message -replace '\\', '/'
-    $tokenPattern = '(?<![^\s`''"()<>|*?,;\[\]])[^\s`''"()<>|*?,;\[\]]*docs/features/active/[^\s`''"()<>|*?,;\[\]]+?\.md(?![^\s`''"()<>|*?,;\[\]])'
+    $tokenPattern = '(?<![^\s`''"()<>|*?,;\[\]])[^\s`''"()<>|*?,;\[\]]*docs/features/active/[^\s`''"()<>|*?,;\[\]]+?\.md(?=[.:]*(?:[\s`''"()<>|*?,;\[\]]|$))'
+    $spanPattern = '`([^`\r\n]*docs/features/active/[^`\r\n]*)`|''([^''\r\n]*docs/features/active/[^''\r\n]*)''|"([^"\r\n]*docs/features/active/[^"\r\n]*)"'
     $shapePattern = '^docs/features/active/[^/]+/(?:(?:[^/]+/)?policy-audit\.[^/]+\.md|audit/[^/]+/policy-audit\.md)$'
-    foreach ($match in [regex]::Matches($text, $tokenPattern)) {
-        $token = $match.Value -replace '^policy-audit-path:', ''
+    $docsPrefix = 'docs/features/active/'
+    $candidates = [System.Collections.Generic.List[string]]::new()
+    foreach ($labelMatch in [regex]::Matches($text, 'policy-audit-path:(?<rest>[^\r\n]*)')) {
+        $candidates.Add(($labelMatch.Groups['rest'].Value.Trim() -replace '^(?<q>[`''"])(?<c>.*)\k<q>$', '${c}'))
+    }
+    foreach ($spanMatch in [regex]::Matches($text, $spanPattern)) {
+        $candidates.Add(($spanMatch.Groups[1].Value + $spanMatch.Groups[2].Value + $spanMatch.Groups[3].Value).Trim())
+    }
+    foreach ($match in [regex]::Matches($text, $tokenPattern)) { $candidates.Add($match.Value) }
+    foreach ($candidateText in $candidates) {
+        $token = $candidateText -replace '^policy-audit-path:', ''
         $token = $token -replace '/{2,}', '/'
-        $index = $token.IndexOf('docs/features/active/', [System.StringComparison]::Ordinal)
-        $prefix = $token.Substring(0, $index)
-        $relative = $token.Substring($index)
-        if ($relative -notmatch $shapePattern) { continue }
+        $token = $token -replace '(?<=\.md)[.,:;]+$', ''
+        $index = $token.IndexOf($docsPrefix, [System.StringComparison]::Ordinal)
+        if ($index -lt 0 -or $token.LastIndexOf($docsPrefix, [System.StringComparison]::Ordinal) -ne $index) { continue }
         if (@($token -split '/') -contains '..') {
             return [pscustomobject]@{ Paths = [string[]]@(); ReasonCode = 'AUDIT_PATH_TRAVERSAL'; Reason = "the policy-audit path '$token' contains a '..' segment; name the audit by a path without '..'." }
         }
+        $prefix = $token.Substring(0, $index)
+        $relative = $token.Substring($index)
+        if ($relative -notmatch $shapePattern) { continue }
         $candidate = if ($prefix -eq '' -or $prefix -eq './') { $relative } elseif ($prefix -match '^(/|[A-Za-z]:/)') { $token } else { $null }
         if ($null -eq $candidate) { continue }
         $known = $false
