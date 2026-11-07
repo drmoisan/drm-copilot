@@ -52,7 +52,7 @@ Terms: `<FEATURE>` is `docs/features/active/2026-11-06-pester-static-leak-scan-1
 
 ### Phase 1 — Branch Guarantees on the Merged Tree
 
-- [ ] [P1-T1] Close every leak-scan finding that the merged tree introduces, in the `tests/scripts/` files and `config/poshqc-leak-allowlist.json` that the rows name, and write `<FEATURE>/evidence/other/leak-scan-merge-classification.<timestamp>.md`.
+- [x] [P1-T1] Close every leak-scan finding that the merged tree introduces, in the `tests/scripts/` files and `config/poshqc-leak-allowlist.json` that the rows name, and write `<FEATURE>/evidence/other/leak-scan-merge-classification.<timestamp>.md`.
   - Input: the `FINDING:` rows of the latest `<FEATURE>/evidence/remediation-baseline/leak-scan.*.md`. Each row is classified under the main plan's `## Finding Classification Rule`: class T is fixed on both sides, C2 to C4 take an allowlist entry with a reason, and a stale entry is removed. With no row, the artifact records `NONE` and no other file changes.
   - Acceptance: the artifact has one row per input row with its class and disposition, and a re-run of `Invoke-PoshQCLeakScan -Root` recorded in it has `EXIT_CODE: 0`.
 - [ ] [P1-T2] Remove the P4-T3 cases that duplicate tests main added, in `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py` and `tests/scripts/dev_tools/atomic_executor/test_plan_discovery.py`, and write `<FEATURE>/evidence/other/duplicate-test-review.<timestamp>.md`.
