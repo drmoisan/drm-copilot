@@ -103,8 +103,10 @@ function Get-CodexReviewPolicyAuditPath {
         double-quote span that holds docs/features/active/ (spaces kept); (3) each whitespace-delimited
         token. Trailing . , : ; after .md are not part of a path. A candidate is examined only when it
         holds docs/features/active/ exactly once, so a source that spans two audit paths is skipped and
-        the token scan extracts both. A '..' segment in an examined candidate is checked before the
-        shape test and yields reason code AUDIT_PATH_TRAVERSAL. A $null or non-string message yields no
+        the token scan extracts both. A '..' segment in an examined policy-audit candidate (final
+        segment policy-audit.md or policy-audit.<timestamp>.md) is checked before the shape test and
+        yields reason code AUDIT_PATH_TRAVERSAL; an examined candidate with any other final segment
+        and a '..' segment fails the shape test and is skipped. A $null or non-string message yields no
         paths. Returns Paths, ReasonCode, and Reason.
     .PARAMETER Message
         The last_assistant_message value of the payload; any type.
@@ -122,6 +124,7 @@ function Get-CodexReviewPolicyAuditPath {
     $tokenPattern = '(?<![^\s`''"()<>|*?,;\[\]])[^\s`''"()<>|*?,;\[\]]*docs/features/active/[^\s`''"()<>|*?,;\[\]]+?\.md(?=[.:]*(?:[\s`''"()<>|*?,;\[\]]|$))'
     $spanPattern = '`([^`\r\n]*docs/features/active/[^`\r\n]*)`|''([^''\r\n]*docs/features/active/[^''\r\n]*)''|"([^"\r\n]*docs/features/active/[^"\r\n]*)"'
     $shapePattern = '^docs/features/active/[^/]+/(?:(?:[^/]+/)?policy-audit\.[^/]+\.md|audit/[^/]+/policy-audit\.md)$'
+    $auditNamePattern = '^policy-audit\.(?:[^/]+\.)?md$'
     $docsPrefix = 'docs/features/active/'
     $candidates = [System.Collections.Generic.List[string]]::new()
     foreach ($labelMatch in [regex]::Matches($text, 'policy-audit-path:(?<rest>[^\r\n]*)')) {
@@ -137,7 +140,8 @@ function Get-CodexReviewPolicyAuditPath {
         $token = $token -replace '(?<=\.md)[.,:;]+$', ''
         $index = $token.IndexOf($docsPrefix, [System.StringComparison]::Ordinal)
         if ($index -lt 0 -or $token.LastIndexOf($docsPrefix, [System.StringComparison]::Ordinal) -ne $index) { continue }
-        if (@($token -split '/') -contains '..') {
+        $segments = @($token -split '/')
+        if ($segments[-1] -match $auditNamePattern -and $segments -contains '..') {
             return [pscustomobject]@{ Paths = [string[]]@(); ReasonCode = 'AUDIT_PATH_TRAVERSAL'; Reason = "the policy-audit path '$token' contains a '..' segment; name the audit by a path without '..'." }
         }
         $prefix = $token.Substring(0, $index)
