@@ -60,17 +60,17 @@ proves the pieces work together on one fixture repository.
 
 ## Acceptance Criteria
 
-- [ ] The template `epic.md` under `extensions/drm-copilot/resources/feature-templates/epic/documentation-estate/` is accepted by `/epic-plan` as a manifest path, verified by a Pester test of conformance to the `epic-orchestrate` manifest schema.
-- [ ] A Pester test proves the template manifest has a cycle-free dependency graph under the epic manifest rules, with foundation children in wave 0, page-family children in wave 1 and the exit-gate child alone in the final wave, and in-memory mutations (cycle, unresolved dependency, duplicate `issue_num`) make it fail.
-- [ ] The template `README.md` tells the maintainer where to place `epic.md`, which fields to change together and how to run `/epic-plan`, and states that no command copies the template.
-- [ ] The onboarding guide under `docs/engineering/documentation-estate/` documents every subcommand and every docs MCP tool by its exact contract name with an example, and a Pester test derives the expected names from the merged dispatch table and the merged MCP tool definitions.
-- [ ] The onboarding guide states the destination-repository prerequisite PowerShell 7.4 (Q8 provisional default).
-- [ ] The onboarding guide states that the optional python pack enables the native Python analyzer (D3) and that without it `inventory` uses the scanner.
-- [ ] The onboarding guide states that linting is optional (D4) and that `check` is the required page gate.
-- [ ] The end-to-end test runs inventory, ledger, generation and `docs-complete` validation; it fails naming the undocumented command and the stale page, and passes after both are fixed.
-- [ ] The end-to-end test records `analysis_method` for every inventory element and ledger entry and asserts the value `scanner`.
-- [ ] No test creates temporary files or starts a process.
-- [ ] No consumer identifier appears in the template or the onboarding pages, and this feature adds no Python or TypeScript file.
+- [x] The template `epic.md` under `extensions/drm-copilot/resources/feature-templates/epic/documentation-estate/` is accepted by `/epic-plan` as a manifest path, verified by a Pester test of conformance to the `epic-orchestrate` manifest schema.
+- [x] A Pester test proves the template manifest has a cycle-free dependency graph under the epic manifest rules, with foundation children in wave 0, page-family children in wave 1 and the exit-gate child alone in the final wave, and in-memory mutations (cycle, unresolved dependency, duplicate `issue_num`) make it fail.
+- [x] The template `README.md` tells the maintainer where to place `epic.md`, which fields to change together and how to run `/epic-plan`, and states that no command copies the template.
+- [x] The onboarding guide under `docs/engineering/documentation-estate/` documents every subcommand and every docs MCP tool by its exact contract name with an example, and a Pester test derives the expected names from the merged dispatch table and the merged MCP tool definitions.
+- [x] The onboarding guide states the destination-repository prerequisite PowerShell 7.4 (Q8 provisional default).
+- [x] The onboarding guide states that the optional python pack enables the native Python analyzer (D3) and that without it `inventory` uses the scanner.
+- [x] The onboarding guide states that linting is optional (D4) and that `check` is the required page gate.
+- [x] The end-to-end test runs inventory, ledger, generation and `docs-complete` validation; it fails naming the undocumented command and the stale page, and passes after both are fixed.
+- [x] The end-to-end test records `analysis_method` for every inventory element and ledger entry and asserts the value `scanner`.
+- [x] No test creates temporary files or starts a process.
+- [x] No consumer identifier appears in the template or the onboarding pages, and this feature adds no Python or TypeScript file.
 
 ## Non-Goals
 

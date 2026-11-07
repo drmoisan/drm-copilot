@@ -146,7 +146,7 @@ link to code, schema and template paths, not to feature folders.
 - `consumer-onboarding.md`:
   - Required prerequisite: PowerShell 7.4 or later on PATH as `pwsh` (epic Q8 provisional default).
     Below 7.4 every subcommand exits 3 with `DOCS_RUNTIME_UNSUPPORTED`.
-  - Optional python pack: installing the python pack, with Python 3.10 or later available, enables
+  - Optional python pack: installing the python pack, with Python 3.11 or later available, enables
     the native Python analyzer for `python-cli`, `python-http`, `python-public-api` and
     `python-architecture` (D3). Without it `inventory` falls back to the PowerShell scanner and
     records `analysis_method: scanner`. `inventory -AnalysisMethod auto|native|scanner` (default
@@ -228,7 +228,7 @@ Scenario:
    `inventory -Revision R2 -AnalysisMethod scanner -Write` and `sync-refs`.
 4. Fail: `validate -Mode docs-complete -Revision R2` exits 1; the error finding codes are
    `DOCS_LEDGER_MISSING_DISPOSITION` (its `related_ids` hold B's element identifier and its message
-   names B's declaration) and `DOCS_PAGE_STALE` (its `related_paths` hold the page path and its
+   names B's declaration) and `DOCS_STALE_PAGE` (its `related_paths` hold the page path and its
    message names A's declaration and the status `digest-changed`); the receipt in `result` has
    `validation_result` `fail`.
 5. Fix: record B (`documented` with a binding, pin and dimensions), re-pin A, run
@@ -321,9 +321,9 @@ the end-to-end suite depends on its `-AnalysisMethod` option.
 | `init` options and `Get-DocsInitTemplate` rows; `init -Write` linter configuration set | 1020, 1021, 1034 | onboarding |
 | `check` options and result `{page_count, profile_path, roots}` | 1021 | command reference |
 | `inventory` options; analyzer identifiers; per-kind `line_range` rules | 1022 | end-to-end suite |
-| `-AnalysisMethod auto|native|scanner`; Python 3.10 floor; fallback rules; OQ-D statement | 1031 | end-to-end suite, onboarding |
+| `-AnalysisMethod auto|native|scanner`; Python 3.11 floor; fallback rules; OQ-D statement | 1031 | end-to-end suite, onboarding |
 | TypeScript and .NET scanners behind `inventory` (`analysis_method: scanner`) | 1033 | architecture page |
-| `coverage`, `update-ledger`, `validate` options; finding codes `DOCS_LEDGER_MISSING_DISPOSITION`, `DOCS_PAGE_STALE`, `DOCS_SNAPSHOT_UNPINNED`; receipt fields | 1023 | end-to-end suite, command reference |
+| `coverage`, `update-ledger`, `validate` options; finding codes `DOCS_LEDGER_MISSING_DISPOSITION`, `DOCS_STALE_PAGE`, `DOCS_SNAPSHOT_UNPINNED`; receipt fields | 1023 | end-to-end suite, command reference |
 | `generate-reference` options, `result` keys `{mode, output_directory, pages, summary, unrendered}`, exit 1 on `REFERENCE_WRITE_CONFLICT`, exit 3 on write failure | 1024 | end-to-end suite, command reference |
 | MCP tool names, inputs, `DOCS_MUTATING_TOOLS`, result shape, tool definitions file | 1036 | command reference, documentation contract suite |
 | `surface-delta` options, `_docs-quality.yml`, hook `enforce-docs-complete-gate.ps1`, gate key and deny prefix | 1034 | onboarding, workflow page |
@@ -361,6 +361,14 @@ where they differ:
 - Dispatch anchors: 1020 uses real issue numbers; the 1024 and 1034 specifications still quote
   earlier placeholder anchors. Children locate anchors by subcommand token (epic), so this child
   depends on subcommand names only.
+- Finding codes (erratum, 2026-11-07): the stale-page and missing-page finding codes are renamed to
+  the merged 1023 names `DOCS_STALE_PAGE` and `DOCS_BOUND_PAGE_MISSING`, per the epic
+  `### Ledger contracts from the PowerShell preparation of 1023 (binding)`, which supersedes the
+  earlier names. Found by plan task P0-T5 on 2026-11-07.
+- Python floor (erratum, 2026-11-07): the native-analyzer floor is Python 3.11, per the 1031 owner
+  decision of 2026-11-04 and the merged `FLOOR = (3, 11)` in
+  `.claude/lib/docs/python/run_docs_python_native.py`, which supersedes 3.10. Found at feature
+  review on 2026-11-07.
 
 ## Owner Questions
 
@@ -375,31 +383,31 @@ Provisional defaults stand; this child does not wait on them.
 
 ## Acceptance Criteria
 
-- [ ] `extensions/drm-copilot/resources/feature-templates/epic/documentation-estate/epic.md` and `README.md` exist, and no `epic-status.md` exists in that folder.
-- [ ] The template is accepted by `/epic-plan` as a manifest path, verified as conformance to the `epic-orchestrate` manifest schema (OQ-B): `DocumentationEstateEpicTemplate.Tests.ps1` asserts that the frontmatter parses, has `epic: documentation-estate`, `integration_branch: epic/documentation-estate-integration`, a valid ISO-8601 `created_at`, an `intent` block meeting the schema rules, unique integer `issue_num` values and unique `feature_folder` values, and that every `depends_on` entry resolves to another `features[]` entry.
-- [ ] `DocumentationEstateEpicTemplate.Tests.ps1` proves the template manifest has a cycle-free dependency graph under the epic manifest rules: no self-edge, no cycle, every foundation child at wave 0, every page-family child at wave 1, and the exit-gate child alone in the final wave depending on every page-family child; the computed waves equal the template's `## Planned Waves` list.
-- [ ] Positive controls in `DocumentationEstateEpicTemplate.Tests.ps1` apply in-memory mutations of the template text (a two-node cycle, an unresolved `depends_on` entry, a duplicate `issue_num`, a construct outside the parsed YAML subset) and each mutation makes the check fail.
-- [ ] The template `README.md` states how to place `epic.md` at `docs/features/epics/<slug>/epic.md`, that `epic` and `integration_branch` change together, and the `/epic-plan` invocation, and states that no command copies the template.
-- [ ] The pages `README.md`, `architecture.md`, `consumer-onboarding.md`, `command-reference.md` and `workflow.md` exist under `docs/engineering/documentation-estate/`.
-- [ ] `command-reference.md` has a heading and a fenced example for each of the subcommands `init`, `validate-profile`, `check`, `inventory`, `coverage`, `update-ledger`, `validate`, `generate-reference` and `surface-delta`, and `DocumentationEstateOnboarding.Tests.ps1` asserts that every row name returned by `Get-DocsCommandTable` of the merged entry script has such a heading and example.
-- [ ] `command-reference.md` has a heading and a fenced example for each docs MCP tool by its exact contract name, and `DocumentationEstateOnboarding.Tests.ps1` asserts that every tool name defined in the merged `extensions/drm-copilot/src/mcp-docs-tool-definitions.ts` has such a heading and example.
-- [ ] `command-reference.md` documents the exit codes 0 to 3 with `DOCS_CLI_ARGUMENTS`, `DOCS_CLI_RUNTIME` and `DOCS_RUNTIME_UNSUPPORTED`, the envelope keys `command`, `exit_code`, `findings`, `ok`, `result` with the schema path `schemas/docs/v1/docs-command-envelope.schema.json`, and states that `init`, `validate-profile` and `surface-delta` have no MCP tool, that `update_docs_ledger` is the only mutating tool, and that `validate_docs_artifacts` never persists a receipt.
-- [ ] Every option spelling in the command-reference examples matches the merged dispatch row of its subcommand or the merged input table of its MCP tool, as recorded in the Phase 0 evidence.
-- [ ] `consumer-onboarding.md` states the destination-repository prerequisite PowerShell 7.4 (Q8 provisional default) and that a lower version exits 3 with `DOCS_RUNTIME_UNSUPPORTED`, and `DocumentationEstateOnboarding.Tests.ps1` asserts the `7.4` statement is present.
-- [ ] `consumer-onboarding.md` states that the optional python pack, with Python 3.10 or later, enables the native Python analyzer (D3), that without it `inventory` falls back to the scanner and records `analysis_method: scanner`, the `-AnalysisMethod` choices, and that a push-down without a pack selection ships the inert helper; the documentation contract suite asserts the python pack statement is present.
-- [ ] `consumer-onboarding.md` states that linting is optional (D4), names the configuration files `init -Write` writes, and states that `check` is the required page gate; the documentation contract suite asserts the optional-lint statement is present.
-- [ ] `workflow.md` names the roles `docs-architect`, `docs-author`, `docs-reconciler`, `docs-coverage-reviewer`, the skills `documentation-workflow`, `docs-init`, `docs-inventory-surface`, `docs-plan-ia`, `docs-author-page`, `docs-reconcile-behavior`, `docs-review-coverage` and `docs-validate`, and the opt-in gate key `completion_gates.integration_pr_gate.enabled`.
-- [ ] A positive control in `DocumentationEstateOnboarding.Tests.ps1` runs the membership check over an in-memory command reference missing one subcommand and the check fails naming that subcommand.
-- [ ] `EndToEndDocumentationEstate.Tests.ps1` runs `inventory`, `update-ledger`, `generate-reference` and `validate -Mode docs-complete` in process through `Invoke-DocsCommandCli` with one stateful in-memory context, and the baseline at revision R1 exits 0.
-- [ ] After the defects are introduced, `validate -Mode docs-complete -Revision R2` exits 1; its error findings are `DOCS_LEDGER_MISSING_DISPOSITION` with the undocumented command's element identifier in `related_ids` and its declaration in the message, and `DOCS_PAGE_STALE` with the stale page path in `related_paths` and the changed command's declaration in the message; the receipt in `result` has `validation_result` `fail`.
-- [ ] After both defects are fixed through `update-ledger` and `generate-reference -Write`, `validate -Mode docs-complete -Revision R2` exits 0 and the receipt has `validation_result` `pass`.
-- [ ] The end-to-end test records `analysis_method`: it asserts that every inventory snapshot element and every ledger entry produced in the scenario carries `analysis_method` with value `scanner` under `-AnalysisMethod scanner`, and that the `InvokeProcess` fake records no call.
-- [ ] `EndToEndDocumentationEstate.Tests.ps1` asserts that `inventory` without `-Revision` followed by `validate -Mode docs-complete` yields `DOCS_SNAPSHOT_UNPINNED` (D5).
-- [ ] No test creates temporary files: a scan of every new test and support file finds no `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and no new test starts a process.
-- [ ] A neutrality scan using the 1020 consumer-identifier digest list reports no match in the template pair or the onboarding pages under `docs/engineering/documentation-estate/`.
-- [ ] No file of this child is Python or TypeScript, and no file under `.claude/`, `extensions/drm-copilot/src/` or `extensions/drm-copilot/resources/claude-customizations/` is created or edited.
-- [ ] The new suites `EndToEndDocumentationEstate.Tests.ps1`, `DocumentationEstateEpicTemplate.Tests.ps1` and `DocumentationEstateOnboarding.Tests.ps1` pass in the CI job `poshqc / PowerShell QC`, three seeded shuffled file-order runs and one fresh single-process run over `tests/scripts` pass with evidence under `evidence/regression-testing/`, and changed-line coverage of `.claude/lib/docs/` does not decrease against the baseline recorded under `evidence/baseline/`.
-- [ ] Every new Pester and support file is below 500 logical lines, and the seven-stage toolchain passes in a single pass.
+- [x] `extensions/drm-copilot/resources/feature-templates/epic/documentation-estate/epic.md` and `README.md` exist, and no `epic-status.md` exists in that folder.
+- [x] The template is accepted by `/epic-plan` as a manifest path, verified as conformance to the `epic-orchestrate` manifest schema (OQ-B): `DocumentationEstateEpicTemplate.Tests.ps1` asserts that the frontmatter parses, has `epic: documentation-estate`, `integration_branch: epic/documentation-estate-integration`, a valid ISO-8601 `created_at`, an `intent` block meeting the schema rules, unique integer `issue_num` values and unique `feature_folder` values, and that every `depends_on` entry resolves to another `features[]` entry.
+- [x] `DocumentationEstateEpicTemplate.Tests.ps1` proves the template manifest has a cycle-free dependency graph under the epic manifest rules: no self-edge, no cycle, every foundation child at wave 0, every page-family child at wave 1, and the exit-gate child alone in the final wave depending on every page-family child; the computed waves equal the template's `## Planned Waves` list.
+- [x] Positive controls in `DocumentationEstateEpicTemplate.Tests.ps1` apply in-memory mutations of the template text (a two-node cycle, an unresolved `depends_on` entry, a duplicate `issue_num`, a construct outside the parsed YAML subset) and each mutation makes the check fail.
+- [x] The template `README.md` states how to place `epic.md` at `docs/features/epics/<slug>/epic.md`, that `epic` and `integration_branch` change together, and the `/epic-plan` invocation, and states that no command copies the template.
+- [x] The pages `README.md`, `architecture.md`, `consumer-onboarding.md`, `command-reference.md` and `workflow.md` exist under `docs/engineering/documentation-estate/`.
+- [x] `command-reference.md` has a heading and a fenced example for each of the subcommands `init`, `validate-profile`, `check`, `inventory`, `coverage`, `update-ledger`, `validate`, `generate-reference` and `surface-delta`, and `DocumentationEstateOnboarding.Tests.ps1` asserts that every row name returned by `Get-DocsCommandTable` of the merged entry script has such a heading and example.
+- [x] `command-reference.md` has a heading and a fenced example for each docs MCP tool by its exact contract name, and `DocumentationEstateOnboarding.Tests.ps1` asserts that every tool name defined in the merged `extensions/drm-copilot/src/mcp-docs-tool-definitions.ts` has such a heading and example.
+- [x] `command-reference.md` documents the exit codes 0 to 3 with `DOCS_CLI_ARGUMENTS`, `DOCS_CLI_RUNTIME` and `DOCS_RUNTIME_UNSUPPORTED`, the envelope keys `command`, `exit_code`, `findings`, `ok`, `result` with the schema path `schemas/docs/v1/docs-command-envelope.schema.json`, and states that `init`, `validate-profile` and `surface-delta` have no MCP tool, that `update_docs_ledger` is the only mutating tool, and that `validate_docs_artifacts` never persists a receipt.
+- [x] Every option spelling in the command-reference examples matches the merged dispatch row of its subcommand or the merged input table of its MCP tool, as recorded in the Phase 0 evidence.
+- [x] `consumer-onboarding.md` states the destination-repository prerequisite PowerShell 7.4 (Q8 provisional default) and that a lower version exits 3 with `DOCS_RUNTIME_UNSUPPORTED`, and `DocumentationEstateOnboarding.Tests.ps1` asserts the `7.4` statement is present.
+- [x] `consumer-onboarding.md` states that the optional python pack, with Python 3.11 or later, enables the native Python analyzer (D3), that without it `inventory` falls back to the scanner and records `analysis_method: scanner`, the `-AnalysisMethod` choices, and that a push-down without a pack selection ships the inert helper; the documentation contract suite asserts the python pack statement is present.
+- [x] `consumer-onboarding.md` states that linting is optional (D4), names the configuration files `init -Write` writes, and states that `check` is the required page gate; the documentation contract suite asserts the optional-lint statement is present.
+- [x] `workflow.md` names the roles `docs-architect`, `docs-author`, `docs-reconciler`, `docs-coverage-reviewer`, the skills `documentation-workflow`, `docs-init`, `docs-inventory-surface`, `docs-plan-ia`, `docs-author-page`, `docs-reconcile-behavior`, `docs-review-coverage` and `docs-validate`, and the opt-in gate key `completion_gates.integration_pr_gate.enabled`.
+- [x] A positive control in `DocumentationEstateOnboarding.Tests.ps1` runs the membership check over an in-memory command reference missing one subcommand and the check fails naming that subcommand.
+- [x] `EndToEndDocumentationEstate.Tests.ps1` runs `inventory`, `update-ledger`, `generate-reference` and `validate -Mode docs-complete` in process through `Invoke-DocsCommandCli` with one stateful in-memory context, and the baseline at revision R1 exits 0.
+- [x] After the defects are introduced, `validate -Mode docs-complete -Revision R2` exits 1; its error findings are `DOCS_LEDGER_MISSING_DISPOSITION` with the undocumented command's element identifier in `related_ids` and its declaration in the message, and `DOCS_STALE_PAGE` with the stale page path in `related_paths` and the changed command's declaration in the message; the receipt in `result` has `validation_result` `fail`.
+- [x] After both defects are fixed through `update-ledger` and `generate-reference -Write`, `validate -Mode docs-complete -Revision R2` exits 0 and the receipt has `validation_result` `pass`.
+- [x] The end-to-end test records `analysis_method`: it asserts that every inventory snapshot element and every ledger entry produced in the scenario carries `analysis_method` with value `scanner` under `-AnalysisMethod scanner`, and that the `InvokeProcess` fake records no call.
+- [x] `EndToEndDocumentationEstate.Tests.ps1` asserts that `inventory` without `-Revision` followed by `validate -Mode docs-complete` yields `DOCS_SNAPSHOT_UNPINNED` (D5).
+- [x] No test creates temporary files: a scan of every new test and support file finds no `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and no new test starts a process.
+- [x] A neutrality scan using the 1020 consumer-identifier digest list reports no match in the template pair or the onboarding pages under `docs/engineering/documentation-estate/`.
+- [x] No file of this child is Python or TypeScript, and no file under `.claude/`, `extensions/drm-copilot/src/` or `extensions/drm-copilot/resources/claude-customizations/` is created or edited.
+- [x] The new suites `EndToEndDocumentationEstate.Tests.ps1`, `DocumentationEstateEpicTemplate.Tests.ps1` and `DocumentationEstateOnboarding.Tests.ps1` pass in the CI job `poshqc / PowerShell QC`, three seeded shuffled file-order runs and one fresh single-process run over `tests/scripts` pass with evidence under `evidence/regression-testing/`, and changed-line coverage of `.claude/lib/docs/` does not decrease against the baseline recorded under `evidence/baseline/`.
+- [x] Every new Pester and support file is below 500 logical lines, and the seven-stage toolchain passes in a single pass.
 
 ## Definition of Done
 
