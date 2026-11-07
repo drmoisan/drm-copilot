@@ -19,6 +19,10 @@
         failures:
           "informational only", "context only", "out of plan scope", "out of scope",
           "not applicable", "N/A", "UNVERIFIED".
+        The record "N/A - no pre-change run" is not narrowing in three positions: after
+        "Baseline:" or "baseline coverage artifact:", as the fifth table cell, and as a
+        backticked quotation not directly after a colon. "Change: N/A" on a line carrying
+        "Baseline: N/A - no pre-change run" is not narrowing either.
       - If the coverage artifact for a language is present, repo-wide line coverage is
         parsed and compared against the governing line floor: the line coverage
         threshold the repository's root CLAUDE.md states, otherwise the 85 percent
@@ -145,6 +149,50 @@ function Get-LanguageRepoCoverage {
     return $null
 }
 
+function Get-CoverageNarrowingLine {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string[]]$Lines,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LabelPattern,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Language
+    )
+
+    # Sanctioned narrowing text is not a scope narrowing by the audit: a line inside a
+    # '## Rejected Scope Narrowing' section (caller text recorded verbatim), and a PowerShell
+    # line naming branch coverage but not line coverage (Pester measures no branch coverage).
+    # The policy-audit template prescribes the no-pre-change-run record in three positions only,
+    # so the record is removed there and stays a narrowing form everywhere else.
+    $narrowingPattern = '(?i)(informational only|context only|out of plan scope|out of scope|not applicable|\bN/A\b|\bUNVERIFIED\b)'
+    $recordPatterns = @(
+        '(?<=(?:\bBaseline|\bbaseline coverage artifact):\s*)N/A - no pre-change run'
+        '(?<=^\s*\|(?:[^|]*\|){4}\s*)N/A - no pre-change run(?=\s*\|)'
+        '(?<!:\s*)`N/A - no pre-change run`'
+    )
+    $insideRejectedSection = $false
+    foreach ($line in $Lines) {
+        if ($line -match '^##\s') { $insideRejectedSection = $line -match '^##\s+Rejected Scope Narrowing\b' }
+        elseif ($insideRejectedSection) { continue }
+        if ($line -notmatch $LabelPattern -or $line -notmatch '(?i)(coverage|lcov|line[s]?\s+hit|pester)') { continue }
+        $reducedLine = $line
+        foreach ($recordPattern in $recordPatterns) { $reducedLine = [regex]::Replace($reducedLine, $recordPattern, '') }
+        # Tested on the original line, because the removals above strip the record it names.
+        if ($line.Contains('Baseline: N/A - no pre-change run')) {
+            $reducedLine = [regex]::Replace($reducedLine, '(?<![\w/-])Change: N/A', '')
+            $reducedLine = $reducedLine.Replace('New/changed-code coverage: N/A - no production file changed', '')
+        }
+        if ($reducedLine -notmatch $narrowingPattern) { continue }
+        if ($Language -eq 'PowerShell' -and $line -match '(?i)\bbranch\b' -and $line -notmatch '(?i)\bline\s+coverage\b') { continue }
+        $line
+    }
+}
+
 function Test-LanguageCoverageRow {
     [OutputType([System.Collections.Hashtable])]
     param(
@@ -158,7 +206,7 @@ function Test-LanguageCoverageRow {
         'TypeScript' = @('TypeScript', 'typescript')
         'Python'     = @('Python', 'python', 'pytest')
         'PowerShell' = @('PowerShell', 'powershell', 'pester')
-        'CSharp'     = @('C#', 'CSharp', 'csharp', '\.NET', 'dotnet')
+        'CSharp'     = @('C#', 'CSharp', 'csharp', '.NET', 'dotnet')
     }
 
     $labels = $languageLabelMap[$Language]
@@ -182,9 +230,8 @@ function Test-LanguageCoverageRow {
         }
     }
 
-    $narrowingPattern = '(?i)(informational only|context only|out of plan scope|out of scope|not applicable|\bN/A\b|\bUNVERIFIED\b)'
-    $narrowing = $coverageLines | Where-Object { $_ -match $narrowingPattern }
-    if ($narrowing -and $narrowing.Count -gt 0) {
+    $narrowing = @(Get-CoverageNarrowingLine -Lines $lines -LabelPattern $labelPattern -Language $Language)
+    if ($narrowing.Count -gt 0) {
         $first = ($narrowing | Select-Object -First 1).ToString().Trim()
         return @{
             Ok     = $false
