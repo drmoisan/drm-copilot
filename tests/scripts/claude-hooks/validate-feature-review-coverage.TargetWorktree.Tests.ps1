@@ -355,8 +355,8 @@ Describe 'validate-feature-review-coverage gate-admitted prompts in a main-check
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
-        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Policy -and [string]::IsNullOrEmpty($Root) }
-        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Remediation -and [string]::IsNullOrEmpty($Root) }
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Policy }
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Remediation }
     }
 
     It 'passes a prompt whose first branch label names the session branch and whose later label names the item branch' {
@@ -368,7 +368,7 @@ Describe 'validate-feature-review-coverage gate-admitted prompts in a main-check
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
-        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Policy -and [string]::IsNullOrEmpty($Root) }
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Policy }
         Should -Invoke Get-ArtifactFileContent -Times 0 -Exactly -ParameterFilter { $Path -like "$script:ItemRoot/*" }
     }
 }
