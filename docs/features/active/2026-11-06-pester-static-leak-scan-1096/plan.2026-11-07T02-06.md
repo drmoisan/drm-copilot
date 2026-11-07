@@ -162,7 +162,7 @@ P4-T1 lands every leak-scan addition. P4-T2 is the only commit that removes a se
 
 ### Phase 5 — Brief and Ledger Replay
 
-- [ ] [P5-T1] Update the remaining brief passages in `.claude/skills/execution-environment/SKILL.md`, copy it to the other five paths of `_BRIEF_COPIES`, and extend `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`.
+- [x] [P5-T1] Update the remaining brief passages in `.claude/skills/execution-environment/SKILL.md`, copy it to the other five paths of `_BRIEF_COPIES`, and extend `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`.
   - `## Test Isolation Checks`: append one bullet naming `Invoke-PoshQCLeakScan` after the last bullet. No existing bullet is reworded, and none is inserted between them, so the entry 0001 `Current` fence stays valid.
   - `## CI Shape and Required Checks`: add the leak scan to the stated contents of `poshqc / PowerShell QC static`, keeping that backticked context. `## CI-Only Failure Classes`: add that `Invoke-PoshQCLeakScan` is the check and that a stale allowlist entry fails the static job, keeping the existing shard sentence. `## PowerShell Route and PoshQC MCP Limits`: state that no MCP tool exposes the scan and that the executor reaches it through the `sh` launcher.
   - The new text uses none of the tokens of `test_brief_copies_carry_no_removed_run_tokens` or `PGW-SWEEP-SURFACES`, including `captured baseline`, `numeric baseline`, `coverage baseline`, `compared to baseline`, `regressed from baseline`, `does not regress`, and `targeted tests`.
