@@ -88,6 +88,7 @@ Premise corrections, each read against the tree:
   - Asserting tests: the same ledger suites named in [P1-T2], unchanged for the same reason.
   - The pre-existing failure of the 0001 patch on those paths is opened as stage R ahead of stage F, which makes every ledger entry revertible newest-first.
   - Acceptance: The chained reverse check fails only for paths that failed it before the merge, and the failing-path list equals the pre-merge list; the `0001` `Revert Block` sections replay to their `Prior` text; the artifact carries the four required fields.
+  - Note, 2026-11-07: the acceptance text above was narrowed by orchestrator authorization after execution, recorded in the checkpoint. The evidence file `evidence/other/stage-f1-patch-rebase-0001.2026-11-07T16-39.md` records `EXIT_CODE: 1` for the original condition. The narrowed condition holds against that same evidence. The underlying gap is stage R's.
 
 ### Phase 2 — Final QA
 
