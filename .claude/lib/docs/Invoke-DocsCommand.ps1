@@ -16,8 +16,9 @@
     load its functions. The body writes the outcome of Invoke-DocsCommandCli and exits.
 
     The real command context reads and writes under RepositoryRoot. Its InvokeProcess member
-    forwards unchanged to the thin seam Invoke-DocsProcess; argument validation and result
-    shaping are the pure functions ConvertTo-DocsProcessRequest and ConvertTo-DocsProcessResult.
+    forwards its four arguments to the thin seam Invoke-DocsProcess with RepositoryRoot as the
+    working directory; argument validation and result shaping are the pure functions
+    ConvertTo-DocsProcessRequest and ConvertTo-DocsProcessResult.
 
 .NOTES
     Issue #1020. Requires PowerShell 7.4 or later. No external module dependencies.
@@ -57,7 +58,7 @@ function Get-DocsCommandTable {
         # --- 1021: check ---
         [pscustomobject]@{ Name = 'check'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsPageCheck.psm1'); Function = 'Invoke-DocsCheckCommand'; Option = @{ Profile = 'value'; Path = 'multi' } }
         # --- 1022: inventory ---
-        [pscustomobject]@{ Name = 'inventory'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsInventory.psm1'); Function = 'Invoke-DocsInventoryCommand'; Option = @{ Profile = 'value'; Analyzer = 'multi'; Revision = 'value'; Write = 'switch' } }
+        [pscustomobject]@{ Name = 'inventory'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsInventory.psm1'); Function = 'Invoke-DocsInventoryCommand'; Option = @{ Profile = 'value'; Analyzer = 'multi'; Revision = 'value'; Write = 'switch'; AnalysisMethod = 'value' } }
         # --- 1023: coverage, update-ledger, validate ---
         [pscustomobject]@{ Name = 'coverage'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsCoverageCommand'; Option = @{ Profile = 'value' } }
         [pscustomobject]@{ Name = 'update-ledger'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsUpdateLedgerCommand'; Option = @{ Profile = 'value'; Operation = 'value'; Element = 'value'; Limit = 'value'; Disposition = 'value'; Page = 'multi'; Rationale = 'value'; Owner = 'value'; Target = 'value'; Dimension = 'value'; State = 'value'; Claim = 'value'; ActorKind = 'value'; ActorId = 'value'; Write = 'switch' } }
@@ -65,6 +66,7 @@ function Get-DocsCommandTable {
         # --- 1024: generate-reference ---
         [pscustomobject]@{ Name = 'generate-reference'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReferenceWriter.psm1'); Function = 'Invoke-DocsGenerateReferenceCommand'; Option = @{ Profile = 'value'; Snapshot = 'value'; OutputDirectory = 'value'; Write = 'switch' } }
         # --- 1034: surface-delta ---
+        [pscustomobject]@{ Name = 'surface-delta'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurfaceDeltaCommands.psm1'); Function = 'Invoke-DocsSurfaceDeltaCommand'; Option = @{ Base = 'value'; Profile = 'value' } }
     )
 }
 
@@ -204,9 +206,9 @@ function Invoke-DocsProcess {
         Thin process seam: starts one child without a shell and returns its shaped result.
     .DESCRIPTION
         Validation is ConvertTo-DocsProcessRequest and shaping is ConvertTo-DocsProcessResult; this
-        function adds neither. The working directory is WorkingDirectory, which defaults to the
-        current location (callers run with the repository root as the current location). No test
-        executes this body.
+        function adds neither. The working directory is WorkingDirectory. Its default, the current
+        location, applies only to a direct caller; the real command context always passes its
+        repository root. No test executes this body.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -335,6 +337,74 @@ function Write-DocsContextText {
     Write-DocsFileText -FullPath (Get-DocsContextFullPath -Root $Root -RelativePath $RelativePath) -Text $Text -Mode $Mode
 }
 
+function Invoke-DocsContextProcess {
+    <#
+    .SYNOPSIS
+        InvokeProcess operation: runs Invoke-DocsProcess in the repository root (private helper).
+    .DESCRIPTION
+        The four arguments stay untyped, so ConvertTo-DocsProcessRequest validates the values it received.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([string] $Root, $FilePath, $ArgumentList, $StdinText, $TimeoutSeconds)
+
+    return Invoke-DocsProcess -FilePath $FilePath -ArgumentList $ArgumentList -StdinText $StdinText -TimeoutSeconds $TimeoutSeconds -WorkingDirectory $Root
+}
+
+function Resolve-DocsContextRevision {
+    <#
+    .SYNOPSIS
+        ResolveRevision operation: resolves a ref to its full commit revision through git (private helper).
+    .DESCRIPTION
+        Makes one call InvokeProcess 'git' (-C Root rev-parse --verify --end-of-options <Ref>^{commit})
+        with empty stdin and a 30-second bounded wait. A $null, empty or blank Ref throws
+        DOCS_CONTEXT_REF_INVALID with no process call. Exit 0 returns the trimmed stdout when it is
+        a full revision and otherwise throws DOCS_CONTEXT_PROCESS_OUTPUT_INVALID; a non-zero exit
+        returns $null; a timeout throws DOCS_CONTEXT_PROCESS_TIMEOUT; a DOCS_PROCESS_START_FAILED
+        error propagates unchanged.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([string] $Root, [AllowNull()] [AllowEmptyString()] [string] $Ref, [scriptblock] $InvokeProcess)
+
+    if ([string]::IsNullOrWhiteSpace($Ref)) { throw 'DOCS_CONTEXT_REF_INVALID: the ref must be a non-blank string.' }
+    $argv = [string[]]@('-C', $Root, 'rev-parse', '--verify', '--end-of-options', "$Ref^{commit}")
+    $result = & $InvokeProcess 'git' $argv '' 30
+    if ($result.TimedOut) { throw "DOCS_CONTEXT_PROCESS_TIMEOUT: the process 'git' did not exit within 30 seconds." }
+    if ($result.ExitCode -ne 0) { return $null }
+    $revision = ([string] $result.Stdout).Trim()
+    if (-not (Test-DocsFullRevision -Revision $revision)) { throw "DOCS_CONTEXT_PROCESS_OUTPUT_INVALID: git rev-parse returned '$revision', which is not a full revision." }
+    return $revision
+}
+
+function Read-DocsContextRevisionText {
+    <#
+    .SYNOPSIS
+        ReadRevisionText operation: returns the text of a path at a full revision through git (private helper).
+    .DESCRIPTION
+        A path that Test-DocsRelativePath rejects throws DOCS_CONTEXT_PATH_INVALID and a revision
+        that Test-DocsFullRevision rejects throws DOCS_CONTEXT_REVISION_INVALID, each with no
+        process call. Otherwise makes one call InvokeProcess 'git' (-C Root show
+        <Revision>:<RelativePath>) with empty stdin and a 30-second bounded wait. Exit 0 returns
+        stdout with one leading U+FEFF removed; a non-zero exit returns $null (the path is absent
+        at that revision); a timeout throws DOCS_CONTEXT_PROCESS_TIMEOUT; a
+        DOCS_PROCESS_START_FAILED error propagates unchanged.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([string] $Root, [AllowNull()] [AllowEmptyString()] [string] $Revision, [AllowNull()] [AllowEmptyString()] [string] $RelativePath, [scriptblock] $InvokeProcess)
+
+    if (-not (Test-DocsRelativePath -Path $RelativePath)) { throw "DOCS_CONTEXT_PATH_INVALID: '$RelativePath' is not a repository-relative path." }
+    if (-not (Test-DocsFullRevision -Revision $Revision)) { throw "DOCS_CONTEXT_REVISION_INVALID: '$Revision' is not a full revision." }
+    $argv = [string[]]@('-C', $Root, 'show', "${Revision}:$RelativePath")
+    $result = & $InvokeProcess 'git' $argv '' 30
+    if ($result.TimedOut) { throw "DOCS_CONTEXT_PROCESS_TIMEOUT: the process 'git' did not exit within 30 seconds." }
+    if ($result.ExitCode -ne 0) { return $null }
+    $text = [string] $result.Stdout
+    if ($text.StartsWith([char]0xFEFF)) { $text = $text.Substring(1) }
+    return $text
+}
+
 function New-DocsCommandContext {
     <#
     .SYNOPSIS
@@ -344,7 +414,12 @@ function New-DocsCommandContext {
         InvokeProcess. Relative paths are checked with Test-DocsRelativePath before any access.
         ReadText decodes through ConvertFrom-DocsUtf8Bytes and throws an item-not-found error for
         an absent file. WriteText forwards the full path, text and mode to Write-DocsFileText;
-        InvokeProcess forwards its four arguments unchanged to Invoke-DocsProcess.
+        InvokeProcess forwards its four arguments to Invoke-DocsProcess with the repository root
+        as the working directory.
+        ResolveRevision and ReadRevisionText (issue #1034) run git through InvokeProcess with a
+        30-second bounded wait: ResolveRevision returns the full commit revision of a ref, or $null
+        when the ref does not resolve; ReadRevisionText returns the text of a repository-relative
+        path at a full revision (one leading BOM removed), or $null when the path is absent there.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds an in-memory context object; the members, not this factory, perform I/O.')]
     [CmdletBinding()]
@@ -352,32 +427,41 @@ function New-DocsCommandContext {
     param([Parameter(Mandatory = $true)] [string] $RepositoryRoot)
 
     $root = [System.IO.Path]::GetFullPath($RepositoryRoot)
-    # Each repository member is a closure over the root whose [scriptblock] Operation parameter
-    # defaults to a script function. A closure resolves no script or module command by name, and
-    # the script function resolves its callees (and any test mock of them) at call time.
+    # Each repository member, InvokeProcess included, is a closure over the root whose [scriptblock]
+    # Operation parameter defaults to a script function. A closure resolves no script or module
+    # command by name, and the script function resolves its callees (and any test mock of them)
+    # at call time.
     $readTextOperation = ${function:Read-DocsContextText}
     $readBytesOperation = ${function:Read-DocsContextByte}
     $testFileOperation = ${function:Test-DocsContextFile}
     $listFileOperation = ${function:Get-DocsContextFileList}
     $writeTextOperation = ${function:Write-DocsContextText}
+    $invokeProcessOperation = ${function:Invoke-DocsContextProcess}
     $readText = { param($RelativePath, [scriptblock] $Operation = $readTextOperation) & $Operation $root $RelativePath }.GetNewClosure()
     $readBytes = { param($RelativePath, [scriptblock] $Operation = $readBytesOperation) & $Operation $root $RelativePath }.GetNewClosure()
     $testFile = { param($RelativePath, [scriptblock] $Operation = $testFileOperation) & $Operation $root $RelativePath }.GetNewClosure()
     $listFile = { param($RelativeRoot, [scriptblock] $Operation = $listFileOperation) & $Operation $root $RelativeRoot }.GetNewClosure()
     $writeText = { param($RelativePath, $Text, $Mode, [scriptblock] $Operation = $writeTextOperation) & $Operation $root $RelativePath $Text $Mode }.GetNewClosure()
-    # Bound (non-closure) member: Invoke-DocsProcess, or a test mock of it, is resolved at call time.
-    $invokeProcess = { param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds) Invoke-DocsProcess -FilePath $FilePath -ArgumentList $ArgumentList -StdinText $StdinText -TimeoutSeconds $TimeoutSeconds }
+    $invokeProcess = { param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds, [scriptblock] $Operation = $invokeProcessOperation) & $Operation $root $FilePath $ArgumentList $StdinText $TimeoutSeconds }.GetNewClosure()
     $utcNow = { [datetime]::UtcNow }
+    # Revision members (issue #1034): closures over the root whose InvokeProcess parameter defaults
+    # to the InvokeProcess member above, so every git call goes through Invoke-DocsProcess.
+    $resolveRevisionOperation = ${function:Resolve-DocsContextRevision}
+    $readRevisionTextOperation = ${function:Read-DocsContextRevisionText}
+    $resolveRevision = { param($Ref, [scriptblock] $Operation = $resolveRevisionOperation, [scriptblock] $InvokeProcess = $invokeProcess) & $Operation $root $Ref $InvokeProcess }.GetNewClosure()
+    $readRevisionText = { param($Revision, $RelativePath, [scriptblock] $Operation = $readRevisionTextOperation, [scriptblock] $InvokeProcess = $invokeProcess) & $Operation $root $Revision $RelativePath $InvokeProcess }.GetNewClosure()
 
     return [pscustomobject]@{
-        RepositoryRoot = $root
-        ReadText       = $readText
-        ReadBytes      = $readBytes
-        TestFile       = $testFile
-        ListFile       = $listFile
-        WriteText      = $writeText
-        UtcNow         = $utcNow
-        InvokeProcess  = $invokeProcess
+        RepositoryRoot   = $root
+        ReadText         = $readText
+        ReadBytes        = $readBytes
+        TestFile         = $testFile
+        ListFile         = $listFile
+        WriteText        = $writeText
+        UtcNow           = $utcNow
+        InvokeProcess    = $invokeProcess
+        ResolveRevision  = $resolveRevision
+        ReadRevisionText = $readRevisionText
     }
 }
 

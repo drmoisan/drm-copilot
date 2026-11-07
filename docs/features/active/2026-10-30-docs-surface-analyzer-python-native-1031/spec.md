@@ -5,9 +5,9 @@
 - **Depends on:** #1022 (PowerShell baseline scanner for Python and configuration surfaces) and, transitively, #1020 (contracts, including its D3/D5 amendment)
 - **Authorization:** owner decision D3 (2026-10-30), the language-native analyzer exception recorded in `docs/features/epics/documentation-estate-tooling/epic.md`
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30
-- **Status:** Draft (preparation; planning only)
-- **Version:** 0.2
+- **Last Updated:** 2026-11-07
+- **Status:** Implemented; in review (CI-dependent criteria pending)
+- **Version:** 0.3
 - **Research (primary design source):** `docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/research/research.2026-10-30T22-48.md`
 
 ## Overview
@@ -31,9 +31,9 @@ This feature delivers two parts:
    response, computes every identifier and digest with the shared 1020/1022 PowerShell functions,
    and falls back to the 1022 scanner whenever native analysis is unavailable or invalid.
 
-The 1022 specification and plan on this branch still describe a withdrawn Python design. No design
-is taken from them. Identifiers, element kinds, the digest rule and fixtures are taken from the epic
-and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the branch)`.
+The 1020 contracts and the 1022 scanner are delivered on the integration branch, and this feature
+conforms to them. Identifiers, element kinds, the digest rule and fixtures are those of the
+delivered contracts and scanner; see `## Upstream Dependencies (assumed, not yet on the branch)`.
 
 ## Behavior
 
@@ -47,8 +47,10 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
   `python-architecture` (`requirements*.txt`, `setup.cfg`, `pyproject.toml`). The scanner's
   console-script entries are passed to the helper as data so the helper can attach a root command to
   its script element as the 1022 rules require.
-- The minimum interpreter version for the helper is Python 3.10 (equal to the repository floor and
-  the lowest CI matrix entry).
+- The minimum interpreter version for the helper is Python 3.11 (equal to the repository floor,
+  `requires-python >=3.11,<4.0` in `pyproject.toml`, and the lowest CI matrix entry). Owner
+  decision 2026-11-04: the floor was raised from 3.10 to 3.11 because the CI matrix is 3.11, 3.12
+  and 3.13; that matrix is the verification of the floor.
 
 ### Analysis method selection (provisional, OQ-C)
 
@@ -63,13 +65,20 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 ### Fallback rules (`auto`)
 
 - Process-level unavailability (python pack absent, no candidate interpreter resolves, version
-  below 3.10, timeout, non-zero exit, start error, invalid or oversized output, any protocol
+  below 3.11, timeout, non-zero exit, start error, invalid or oversized output, any protocol
   violation): the whole native result is discarded; the scanner runs for the four identifiers; every
   element records `analysis_method: scanner`; the exit code is unaffected.
 - Pack absence is silent (the normal state for a destination without the python pack). Every other
-  process-level reason yields exactly one non-blocking diagnostic `DOCS_PYTHON_NATIVE_UNAVAILABLE`
+  process-level reason yields exactly one snapshot diagnostic `PYTHON_NATIVE_UNAVAILABLE` with
+  severity `information`, `analyzer_id` `docs-inventory` and path `null`, built with
+  `New-DocsDiagnostic` directly (the 1022 aggregate helper admits only `error` and `warning`),
   whose message carries one reason token: `interpreter-not-found`, `version-below-floor`,
-  `timeout`, `exit-nonzero`, `start-error` or `output-invalid`.
+  `timeout`, `exit-nonzero`, `start-error` or `output-invalid`. The diagnostic code follows the
+  delivered `New-DocsDiagnostic` code grammar `^[A-Z][A-Z0-9_]*$`.
+- The code `DOCS_PYTHON_NATIVE_UNAVAILABLE` is reserved for the exit-3 error finding under
+  `-AnalysisMethod native` (see `### Analysis method selection (provisional, OQ-C)`); it is never a
+  snapshot diagnostic. Helper exit 4 maps to `version-below-floor` and any other non-zero exit to
+  `exit-nonzero`; under `native`, pack absence reports `pack-absent`.
 - File-level parse failure reported by the helper for one file (syntax error, null byte, recursion
   or memory limit): that file's elements come from the scanner with `analysis_method: scanner`; the
   native result is kept for the other files. Cross-module prefix composition that depended on the
@@ -80,10 +89,13 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 - Native elements carry the scanner analyzer identifier (`python-cli` and so on), not a separate
   native identifier, so registry validation (`analyzer_id` equal to `Id`) and ledger joins are
   unchanged. `analysis_method` (`native` or `scanner`) is recorded on every element.
-- The helper never computes identifiers or digests. The adapter computes `element_id` with
-  `Get-DocsElementId`, `parent_id` from the reported parent `(kind, declaration)` pair and the
-  element path, and the declaration-lines digest with the shared digest function used by the 1022
-  scanner. There is exactly one implementation of the identity rule and one of the digest rule.
+- The helper never computes identifiers or digests. The adapter builds every element with the 1020
+  `New-DocsSurfaceElement -SourceText -LineRange`, the same element constructor the 1022 scanner
+  uses, which computes `element_id` (through `Get-DocsElementId`), `parent_id` from the reported
+  parent `{kind, declaration, path}` and the declaration-lines digest. There is exactly one
+  implementation of the identity rule and one of the digest rule. `architecture-component`
+  elements carry `line_range` `null` (whole-file digest, 1020 OQ-7), so the helper reports `null`
+  line bounds for that kind.
 - Parity rule: for every construct that both methods classify, kind, path, declaration,
   `line_range`, `element_id` and the declaration-lines digest are equal. The native set may add
   elements where the scanner emits a diagnostic.
@@ -92,25 +104,28 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 
 - Pack detection: the context file test for `.claude/lib/docs/python/run_docs_python_native.py`
   (repository-root relative; never derived from `$PSScriptRoot`).
-- Candidates in order: `python3`, `python`, `py` (the last with leading argument `-3`), resolved
-  through the command context. Each resolved candidate is tried in turn; a candidate that fails for
-  any process-level reason moves to the next; when none succeeds the fallback rules apply.
+- Candidates in order: `python3`, `python`, `py` (the last with leading argument `-3`). The command
+  context has no application-resolution member: each candidate is started through
+  `Context.InvokeProcess`, and a start failure carrying the code `DOCS_PROCESS_START_FAILED` means
+  the candidate was not found. A candidate that fails for any process-level reason moves to the
+  next; when none succeeds the fallback rules apply (`interpreter-not-found` when no candidate
+  started, otherwise the last started candidate's reason token).
 - Interpreter arguments: `-I` (isolated mode, so a module planted in the destination cannot shadow
   the helper's imports), `-B` (no bytecode), `-X utf8`, then the helper's repository-relative path.
   The working directory is the repository root. The entry script inserts only its own directory at
   `sys.path[0]`.
 - The adapter strips a leading U+FEFF from each source before sending it.
-- The call is bounded by a timeout and an output-size limit whose values the plan fixes.
-- Interpreter start is confined to one named function in `DocsAnalyzerPythonNative.psm1`, reached
-  only through a `[scriptblock]`-typed parameter supplied from the command context (see
-  `## Owner Questions`, OQ-A). Pester replaces that seam with test-local scriptblocks; no Pester or
-  Pytest test starts a process.
+- Interpreter start is confined to one named function, `Invoke-DocsPythonNativeInterpreter` in
+  `DocsAnalyzerPythonNative.psm1`, reached only through its `[scriptblock]`-typed `-InvokeProcess`
+  parameter, which receives `Context.InvokeProcess` (see `## Owner Questions`, OQ-A). The call is
+  bounded by a 120-second timeout and a stdout bound of 67,108,864 characters. Pester replaces
+  that seam with test-local scriptblocks; no Pester or Pytest test starts a process.
 
 ### Helper behavior
 
 - Reads `sys.stdin.buffer`, decodes UTF-8 explicitly, parses each file with `ast.parse` inside
   `warnings.catch_warnings()` so standard error stays empty, and walks nodes generically
-  (`ast.iter_child_nodes`) without naming node types introduced after 3.10.
+  (`ast.iter_child_nodes`) without naming node types introduced after 3.11.
 - Never imports, executes, compiles to code objects or evaluates analyzed sources.
 - Writes `json.dumps(..., ensure_ascii=True, sort_keys=True, separators=(",", ":"))` to
   `sys.stdout.buffer`; ASCII-only output is independent of the console code page.
@@ -156,10 +171,24 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 
 ### Native-provider function
 
-- `Invoke-DocsAnalyzerPythonNative -CapturedInput <object[]> -Selection <object> -Context <object>
-  -InvokeInterpreter <scriptblock>` returns
-  `@{ Available; Reason; Elements; Diagnostics; ScannerPaths }`. `inventory` runs the scanner rows
-  for `ScannerPaths`, or for every input when `Available` is `$false`.
+- `Get-DocsPythonNativeResult -CapturedInput <object[]> -AnalyzerId <string[]> -SourceRoot
+  <string[]> -AnalysisMethod auto|native|scanner -Context <object>` runs the helper and returns
+  `@{ Available; Reason; Native; Diagnostic; Finding }`: `Native` is the converted output per
+  identifier plus the parse-failed paths, `Diagnostic` the `PYTHON_NATIVE_UNAVAILABLE` snapshot
+  diagnostic and `Finding` the `DOCS_PYTHON_NATIVE_UNAVAILABLE` finding under `native`.
+- `Invoke-DocsPythonNativeInventory -Registration -CapturedInput -Selection -AnalyzerId
+  -SourceRoot -AnalysisMethod -Context [-ImportModule]` is the `inventory` integration: it selects
+  the native rows when the helper is available, invokes each through 1020 `Invoke-DocsAnalyzer`
+  with `Selection.python_native` set, and invokes the identifier's scanner row for the non-`.py`
+  inputs and the parse-failed files; it returns `@{ Rows; Outputs; Diagnostics; Finding }` and
+  throws `DOCS_PYTHON_NATIVE_SCANNER_ROW_MISSING: <identifier>` when the registration holds no
+  scanner row for a native identifier.
+- `Invoke-DocsPythonNativeInterpreter` is the single interpreter-start function (see
+  `### Interpreter discovery and invocation`).
+- The four analyzer functions `Invoke-DocsAnalyzerPythonNativeCli`, `...Http`, `...Api` and
+  `...Architecture`, each `-CapturedInput -Selection`, follow the 1020 analyzer contract and read
+  their output from `Selection.python_native`; one function per identifier exists because
+  `Invoke-DocsAnalyzer` passes no identifier.
 - `Test-DocsPythonNativeResponse` (pure) validates a parsed response: closed key set,
   `protocol_version`, every path present in the request, analyzer identifiers and kinds within the
   four native analyzers, `1 <= line_start <= line_end <= line count` (line splitting on `\r\n`,
@@ -172,12 +201,17 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
   `{protocol_version: 1, analyzers: [...], source_roots: [...], files: [{path, text}],
   console_scripts: [{name, table, path, target}], limits: {...}}`.
 - Response (helper to adapter):
-  `{protocol_version: 1, python_version: "x.y.z", files: [{path, status, elements: [{analyzer_id,
-  kind, declaration, name, parent: {kind, declaration} | null, line_start, line_end, properties:
-  [{name, value}]}], diagnostics: [{analyzer_id, code, line, blocking}]}]}`.
+  `{protocol_version: 1, files: [{path, status, facts: [{analyzer_id, kind, declaration, name,
+  parent: {kind, declaration, path} | null, line_start, line_end, properties: {...}}],
+  diagnostics: [{analyzer_id, code, line, blocking}]}]}`. `parent` carries the parent's path
+  because a parent may sit in another file (a console-script root in `pyproject.toml`). The
+  response file set must equal the request file set; `status` is `ok` or `parse-error`, and a
+  `parse-error` file carries no facts. `line_start` and `line_end` are `null` only for
+  `architecture-component`.
 - Helper exit codes: 0 response written; 2 request invalid (malformed JSON, unknown key, limit
-  exceeded); 3 internal error; 4 interpreter below 3.10. Every non-zero exit writes one protocol
-  error object and is treated by the adapter as `exit-nonzero`.
+  exceeded); 3 internal error; 4 interpreter below 3.11. Every non-zero exit writes one protocol
+  error object. The adapter maps exit 4 to `version-below-floor` and any other non-zero exit to
+  `exit-nonzero`.
 - Entry: `.claude/lib/docs/python/run_docs_python_native.py`, which calls
   `docs_python_native.protocol.main(stdin=..., stdout=...)`. Tests call `main` with `io.BytesIO`
   streams.
@@ -207,8 +241,8 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 - Bytecode: importing the helper package in tests would create `__pycache__` under `.claude/`,
   which `test_push_down_claude_resource_contracts.py` reports as a repository file missing from the
   bundle.
-- Pyright runs with `pythonVersion = "3.12"`; an API newer than 3.10 is caught only by the 3.10 CI
-  job. Branch coverage of version-sensitive paths is the mitigation.
+- Pyright runs with `pythonVersion = "3.12"`; an API newer than 3.11 is caught only by the 3.11 CI
+  matrix job. Branch coverage of version-sensitive paths is the mitigation.
 - File size: the four analyzers cannot share one file below 800 lines; the helper is a package with
   one module per concern, each below 500 lines.
 - Host dependence: with `auto`, hosts with and without the pack and an interpreter inventory
@@ -218,13 +252,17 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
 
 ## Implementation Strategy
 
-- Create the helper package `.claude/lib/docs/python/` (`run_docs_python_native.py`;
-  `docs_python_native/__init__.py`, `protocol.py`, `imports.py`, `cli.py`, `routes.py`,
-  `public_api.py`, `architecture.py`; `routes.py` rather than `http.py` to avoid a standard-library
-  name).
-- Create the adapter `.claude/lib/docs/DocsAnalyzerPythonNative.psm1`; split response validation
-  into `DocsPythonNativeProtocol.psm1` if the adapter approaches 500 lines.
-- Append the native-provider row under the 900011 anchor in `DocsAnalyzerRegistry.psm1`.
+- Create the helper package `.claude/lib/docs/python/`, eighteen files: `run_docs_python_native.py`
+  and `docs_python_native/__init__.py`, `source.py`, `walk.py`, `facts.py`, `module_names.py`,
+  `imports.py`, `call_sites.py`, `cli_argparse.py`, `cli_click.py`, `cli_typer.py`, `cli.py`,
+  `route_model.py`, `route_sites.py`, `routes.py`, `public_api.py`, `architecture.py` and
+  `protocol.py` (`routes.py` rather than `http.py` to avoid a standard-library name). Each module
+  holds one concern and stays below 500 lines.
+- Create the adapter `.claude/lib/docs/DocsAnalyzerPythonNative.psm1` and the pure response
+  validator `DocsPythonNativeProtocol.psm1`.
+- Register four `native` rows in the 1020 row form (`Id`, `Version`, `AnalysisMethod`,
+  `ElementKinds`, `Module`, `Function`), one per identifier, under the anchor
+  `# --- 1031: Python-native analyzers ---` in `DocsAnalyzerRegistry.psm1`.
 - Edit `pack-manifests/python.json` (helper files) and `pack-manifests/core.json` (adapter only);
   mirror every new or edited `.claude/lib/docs/` file byte-identically under
   `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`.
@@ -252,11 +290,13 @@ P = existing packaging or configuration file edited in place.
 | File | Class | Language | Permitting rule |
 |---|---|---|---|
 | `.claude/lib/docs/python/run_docs_python_native.py` | pushed-down helper/lib (native analyzer entry) | Python | D3 exception |
-| `.claude/lib/docs/python/docs_python_native/__init__.py`, `protocol.py`, `imports.py`, `cli.py`, `routes.py`, `public_api.py`, `architecture.py` | pushed-down helper/lib (native analyzer) | Python | D3 exception |
+| `.claude/lib/docs/python/docs_python_native/__init__.py`, `source.py`, `walk.py`, `facts.py`, `module_names.py`, `imports.py`, `call_sites.py`, `cli_argparse.py`, `cli_click.py`, `cli_typer.py`, `cli.py`, `route_model.py`, `route_sites.py`, `routes.py`, `public_api.py`, `architecture.py`, `protocol.py` | pushed-down helper/lib (native analyzer) | Python | D3 exception |
 | `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/python/**` | pushed-down helper/lib (mirror) | Python | D3 exception |
 | `.claude/lib/docs/DocsAnalyzerPythonNative.psm1` and its bundle copy | pushed-down helper/lib (adapter) | PowerShell | R1 |
-| `.claude/lib/docs/DocsPythonNativeProtocol.psm1` and its bundle copy (only if split) | pushed-down helper/lib | PowerShell | R1 |
-| `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (append under the 900011 anchor) and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsPythonNativeProtocol.psm1` and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (four native rows under the 1031 anchor) and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsInventory.psm1` and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/Invoke-DocsCommand.ps1` and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/python.json` (edit) | schema/config/data | JSON | D |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit, adapter only) | schema/config/data | JSON | D |
 | `pyproject.toml` (edit: Pyright `include`/`extraPaths`, pytest `pythonpath`, coverage `source`) | schema/config/data | TOML | D, P |
@@ -266,7 +306,7 @@ P = existing packaging or configuration file edited in place.
 | `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Allowlist.Helpers.ps1` and `enforcement-hooks-no-python-invocation.Tests.ps1` (edit, provisional OQ-A) | test | PowerShell (Pester) | D, OQ-A |
 | `tests/scripts/claude-lib/docs/python/conftest.py`, `test_docs_python_native_*.py` | test | Python (Pytest) | D3 (Python gates) |
 | `tests/scripts/claude-lib/docs/DocsAnalyzerPythonNative.Tests.ps1` | test | PowerShell (Pester) | D |
-| shared parity fixture (path set by 1022; native-only rows added by this feature) | test data | JSON | D |
+| shared parity fixture: `tests/scripts/claude-lib/docs/fixtures/python-surface-corpus.json` (1022, read unchanged) and `tests/scripts/claude-lib/docs/fixtures/python-native-corpus.json` (native-only rows of this feature) | test data | JSON | D |
 | `docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/**` | documentation | Markdown | D |
 
 The Codex python pack manifest is not edited: the docs lib ships in the Claude bundle only (1020
@@ -312,40 +352,47 @@ specification revision.
 
 ## Upstream Dependencies (assumed, not yet on the branch)
 
-`.claude/lib/docs/` does not exist on this branch, and the 1020 specification (v0.3) has not yet
-absorbed the epic `### Amendment of 1020 required by D3 and D5`. This feature assumes the following
-exist before execution. A mismatch between an assumption and the delivered 1020/1022 contract is
-resolved in this feature's remediation loop by conforming to the delivered contract, without editing
-another child's anchor or row.
+This section was written before 1020 and 1022 were delivered. Both are now on the integration
+branch, and every assumption below was resolved by conforming to the delivered contract, without
+editing another child's anchor or row except the `inventory` row and `DocsInventory.psm1` noted in
+the plan (original plan deviation 6). The second column states the contract this feature adopted.
 
-| Item | Owner | Assumed contract |
-|---|---|---|
-| 900011 anchor in `DocsAnalyzerRegistry.psm1` | 1020 amendment | An anchor comment for 900011 below which this feature appends a native-provider row; the registry supports a native-provider table distinct from `$script:DocsAnalyzerRow`, because a second row with the same `Id` is rejected as a duplicate. Proposed row: `[pscustomobject]@{ Language = 'python'; AnalyzerIds = @('python-cli','python-http','python-public-api','python-architecture'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonNative.psm1'); Function = 'Invoke-DocsAnalyzerPythonNative' }`. |
-| `analysis_method` field | 1020 amendment | `native` | `scanner` on inventory elements (and on ledger entries, populated by 1023). |
-| Declaration-lines digest function | 1020 amendment or 1022 | One PowerShell function shared by scanner and adapter (proposed `Get-DocsDeclarationDigest -Text -LineRange` in `DocsSurface.psm1`): split on `\r\n`, `\n` and `\r` only, join the selected lines with LF and no trailing terminator, SHA-256 of the UTF-8 bytes. |
-| Per-kind `line_range` rules | 1022 | Which node bounds each kind (decorator or call node versus `def` line; signature-only versus whole body for `public-symbol`); this feature mirrors them. |
-| Shared parity fixture | 1022 | A committed fixture holding the Python fixture sources and expected `(analyzer_id, kind, path, declaration, line_start, line_end)` rows, at a path 1022 sets; this feature adds a native-only row list. |
-| Diagnostic catalogue | 1022 | The scanner diagnostic codes and the constructs that trigger them. |
-| Command-context process member | 1020 amendment | A context member through which application resolution and the interpreter call are supplied as `[scriptblock]` values (research proposes `ResolveApplication` and `InvokeProcess`); `New-DocsCommandContext` remains the only builder. |
-| `inventory` option | 1022 | `-AnalysisMethod` on the `inventory` row (provisional OQ-C); if absent, this feature adds the option in its remediation loop within the inventory command's documented extension point. |
-| Manifest test amendment | 1020 amendment | `Docs.Manifest.Tests.ps1` accepts files under `.claude/lib/docs/python/` listed in `python.json` and not in `core.json`, and skips `__pycache__`. |
-| Non-blocking diagnostic | 1020 | `New-DocsDiagnostic -Blocking $false` yields `warning` (no `information` constructor exists). |
+| Item | Adopted (delivered) contract |
+|---|---|
+| Native-provider registration | Four `native` rows in the 1020 row form (`Id`, `Version`, `AnalysisMethod`, `ElementKinds`, `Module`, `Function`), one per identifier, under `# --- 1031: Python-native analyzers ---` in `DocsAnalyzerRegistry.psm1`; registration validation is keyed on (`Id`, `AnalysisMethod`) and requires a scanner row for every native row. |
+| `analysis_method` field | `native` or `scanner` on every inventory element (1020 amendment); ledger entries copy it (1023). |
+| Declaration-lines digest | No separate digest function: every element is built by 1020 `New-DocsSurfaceElement -SourceText -LineRange`, which applies the 1020 declaration-lines digest (D5); `architecture-component` uses `line_range` `null` (whole-file digest). |
+| Per-kind `line_range` rules | The 1022 span table; the helper reproduces it and the shared corpus checks it. |
+| Shared parity fixture | `tests/scripts/claude-lib/docs/fixtures/python-surface-corpus.json` (1022, read unchanged) plus `python-native-corpus.json` (1031, native-only rows). |
+| Diagnostic catalogue | The 1022 scanner codes, spelled exactly as the scanner modules spell them; the helper defines no code of its own. |
+| Command-context process member | `Context.InvokeProcess` (`FilePath`, `ArgumentList`, `StdinText`, `TimeoutSeconds`) returning `@{ ExitCode; Stdout; Stderr; TimedOut }`, built by `New-DocsCommandContext`; there is no application-resolution member, and a start failure throws `DOCS_PROCESS_START_FAILED`. |
+| `inventory` option | `-AnalysisMethod` with the values `auto`, `native` and `scanner` on the `inventory` row, added by this feature (provisional OQ-C). |
+| Manifest test amendment | `Docs.Manifest.Tests.ps1` drops the `.claude/lib/docs/python/` subtree; the python pack lists it. |
+| Non-blocking diagnostic | `New-DocsDiagnostic -Severity information` exists; the `PYTHON_NATIVE_UNAVAILABLE` diagnostic is built with it directly, because `Add-DocsDiagnosticOccurrence` admits only `error` and `warning`. |
 
 ## Decisions Later Children Must Honor
 
-- The native helper never computes identifiers or digests; `Get-DocsElementId` and the shared
-  declaration-digest function are the only implementations.
+- The native helper never computes identifiers or digests; every element is built by 1020
+  `New-DocsSurfaceElement -SourceText -LineRange`, so `Get-DocsElementId` and the 1020
+  declaration-lines digest are the only implementations.
 - Native elements use the scanner analyzer identifiers and record `analysis_method: native`; ledger
   entries (1023) copy the method from the snapshot element.
+- Under `-AnalysisMethod auto`, native unavailability is reported as the snapshot diagnostic
+  `PYTHON_NATIVE_UNAVAILABLE` (severity `information`, `analyzer_id` `docs-inventory`, path `null`,
+  message naming the reason token); `DOCS_PYTHON_NATIVE_UNAVAILABLE` is only the exit-3 finding
+  under `native`. A consumer that filters snapshot diagnostics keys on `PYTHON_NATIVE_UNAVAILABLE`.
+- The response `parent` is `{kind, declaration, path}`, and the response file set equals the
+  request file set.
 - `config-files` and all non-`.py` inputs remain scanner-only; console-script entries come from the
   scanner and are passed to the helper as data.
-- Any future language-native analyzer (C#, TypeScript) follows the same shape: a native-provider row
-  under its own registry anchor, a helper in its language under `.claude/lib/docs/<language>/` listed
-  only in that language's pack, process access only through the command context, and the scanner as
-  fallback.
+- Any future language-native analyzer (C#, TypeScript) follows the same shape: native rows in the
+  1020 row form under its own registry anchor, one analyzer function per identifier reading
+  `Selection` output, a helper in its language under `.claude/lib/docs/<language>/` listed only in
+  that language's pack, process access only through `Context.InvokeProcess` from a single
+  interpreter-start function, and the scanner as fallback.
 - 900007 and 900009 pass no method of their own; with the OQ-C default they forward
   `-AnalysisMethod` unchanged.
-- 900010's onboarding states the optional prerequisite: Python 3.10 or later and the python pack for
+- 900010's onboarding states the optional prerequisite: Python 3.11 or later and the python pack for
   native analysis; PowerShell 7.4 remains the only required runtime. It also states the OQ-D
   behavior.
 
@@ -355,28 +402,28 @@ Traceability: E1 to E5 are the five 900011 criteria in the epic, in order (E1 id
 classification of scanner-diagnostic constructs; E2 scanner fallback; E3 `ast.parse` only; E4 python
 pack only; E5 coverage). R marks a criterion the research shows is necessary.
 
-- [ ] (E1) For the shared 1022 Python parity fixture, a Pytest test calling the helper's `main` with in-memory streams asserts that the helper emits exactly the expected rows (shared rows plus native-only rows) as `(analyzer_id, kind, path, declaration, line_start, line_end)`, and a Pester test asserts that the adapter, fed a canned helper response equal to that row set, produces `element_id` and declaration-lines digest values equal to the scanner's for every shared row.
-- [ ] (E1) For every construct in the parity fixture that the 1022 scanner reports as a diagnostic and that `ast` can resolve, the native result contains a classified element and no corresponding diagnostic; dynamic forms that `ast` also cannot resolve yield the diagnostics defined by the 1022 rules (Pytest per analyzer identifier).
-- [ ] (E2) With the python pack absent (context file test false for `.claude/lib/docs/python/run_docs_python_native.py`), `inventory` exits 0, every element of `python-cli`, `python-http`, `python-public-api` and `python-architecture` records `analysis_method: scanner`, no diagnostic or error finding is added, and the interpreter seam is never called (Pester).
-- [ ] (E2) With the pack present and each of: no candidate resolving, version below 3.10 (helper exit 4), timeout, start error, non-zero exit, malformed JSON, unknown key, unknown kind, out-of-range line, invalid declaration, path not in the request, and oversized output, `inventory` with `-AnalysisMethod auto` exits 0 with scanner elements recording `analysis_method: scanner`, no error-severity finding, and exactly one non-blocking `DOCS_PYTHON_NATIVE_UNAVAILABLE` diagnostic carrying the matching reason token; when an earlier candidate fails and a later one succeeds, the later candidate's result is used (Pester).
-- [ ] (E2, R) A helper response marking one file as a parse failure yields scanner elements with `analysis_method: scanner` for that file and native elements with `analysis_method: native` for the other files (Pester).
-- [ ] (E2, R, provisional OQ-C) `-AnalysisMethod native` exits 3 with one error finding `DOCS_PYTHON_NATIVE_UNAVAILABLE` and writes no snapshot when the pack, a usable interpreter or a valid response is absent; `-AnalysisMethod scanner` never calls the interpreter seam; an unknown value exits 2 with `DOCS_CLI_ARGUMENTS` (Pester).
-- [ ] (E3) A Pytest source-inspection test over every file under `.claude/lib/docs/python/` asserts that no call to `exec`, `eval`, `compile`, `__import__`, `importlib`, `runpy` or `subprocess` exists and that `ast.parse` is the only parsing entry; a behavioral Pytest test analyzes a fixture source whose execution would raise an exception or change interpreter state and asserts the analysis succeeds with no such effect.
-- [ ] (E4) Every file under `.claude/lib/docs/python/` is listed in the Claude `pack-manifests/python.json` and in no other Claude manifest; `pack-manifests/core.json` lists no path ending in `.py` and lists `.claude/lib/docs/DocsAnalyzerPythonNative.psm1`; the Codex python pack manifest is unchanged; the amended `Docs.Manifest.Tests.ps1`, `test_push_down_claude_pack_manifest_completeness.py` and `claude-pack-manifest-completeness.test.ts` pass.
-- [ ] (E5) Python line coverage is at least 85% and branch coverage at least 75% for each file of the helper, read from the coverage JSON report produced with the dotted `--cov=` module forms (`docs_python_native`, its submodules and `run_docs_python_native`), with the helper included in `[tool.coverage.run] source`; Pester line coverage is at least 85% for `DocsAnalyzerPythonNative.psm1` (and `DocsPythonNativeProtocol.psm1` if split) and for the edited `DocsAnalyzerRegistry.psm1`, with no production file excluded; figures are recorded under `<FEATURE>/evidence/coverage/`.
-- [ ] (E5, R) Black, Ruff and Pyright (strict, with `.claude/lib/docs/python` in `include` and `extraPaths`) report zero findings for the helper and its tests, and the existing pins `test_pyright_config_alignment.py`, `test_ruff_config_alignment.py` and `tests/discovery_runtime/test_package_contract.py` pass unmodified; the Python tests pass on the 3.10 CI matrix job.
-- [ ] (R) Every element in the inventory snapshot carries `analysis_method` with value `native` or `scanner`; `config-files` elements and elements from non-`.py` inputs always carry `scanner`; the snapshot validates against the amended `surface-inventory-snapshot.schema.json` (Pester).
-- [ ] (R) Identifiers and digests have a single implementation: the helper emits no `element_id`, `parent_id` or digest field and its source contains no `hashlib` import; the adapter obtains every `element_id` from `Get-DocsElementId` and every declaration-lines digest from the shared digest function, and contains no hashing primitive or canonical-JSON serialization of its own (Pester and Pytest source checks).
-- [ ] (R) `DocsAnalyzerRegistry.psm1` carries the native-provider row directly under the 900011 anchor, no other anchor or row is changed, registration validation returns no finding for the committed registry, and the registry test asserts membership of the row rather than set equality (Pester).
-- [ ] (R) Every new or edited file under `.claude/lib/docs/` (including `python/**`) is SHA-256 identical to its copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`, and `test_push_down_claude_resource_contracts.py` and `test_push_down_pack_manifest_dependency_closure.py` (including `test_every_psscriptroot_occurrence_is_recognized`) pass.
-- [ ] (R) No bytecode is written under `.claude/`: after the full Python test run, no `__pycache__` directory or `.pyc` file exists under `.claude/lib/docs/python/` or its bundle copy; `tests/scripts/claude-lib/docs/python/conftest.py` sets `sys.dont_write_bytecode = True`; a Pester test asserts the captured interpreter arguments include `-I`, `-B` and `-X utf8` before the helper path.
-- [ ] (R) Process access goes only through the command-context seam: the adapter reaches the interpreter-start function only through a `[scriptblock]`-typed parameter supplied from the command context; every Pester test supplies test-local scriptblocks for resolution and invocation; no Pester or Pytest test starts a process; Pytest exercises the helper end to end only through `main` with `io.BytesIO` streams.
-- [ ] (R, provisional OQ-A) The Python-invocation guard allowlist contains exactly one entry, for `.claude/lib/docs/DocsAnalyzerPythonNative.psm1` and its single interpreter-start function, with a comment citing D3 and this specification; the test that previously asserted an empty allowlist asserts exactly that entry; the entry is matched by a detected finding; `enforcement-hooks-no-python-invocation.Tests.ps1` passes with no other finding in `.claude/hooks`, `.claude/lib` or `.codex/hooks`.
-- [ ] (R, provisional OQ-B) The VSIX and the npm MCP package include `resources/claude-customizations/.claude/lib/docs/python/**/*.py` and exclude every other `.py` file and all `__pycache__`, `.pyc` and `.pyo` paths; `discovery-resources.test.ts` asserts both the carve-out and the remaining exclusion.
-- [ ] (R) No test creates a temporary file: no file under `tests/scripts/claude-lib/docs/` (including `python/`) contains `tempfile`, `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and the Python and PowerShell test-purity hooks report no violation.
-- [ ] (R) The helper output is deterministic: the same request yields byte-identical stdout, a permutation of the request file order yields identical output, and stdout contains only ASCII bytes (Pytest).
-- [ ] (R) No production file added or edited by this feature exceeds 500 logical lines, and every new `.claude/lib/docs/` PowerShell file passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`; `python -m scripts.dev_tools.check_quality_tiers` exits 0 with no new `quality-tiers.yml` entry.
-- [ ] (CI-dependent) The required check `poshqc / PowerShell QC` and the `quality-checks` Python jobs, including the Python 3.10 matrix entry, pass on the pull request head.
+- [x] (E1) For the shared 1022 Python parity fixture, a Pytest test calling the helper's `main` with in-memory streams asserts that the helper emits exactly the expected rows (shared rows plus native-only rows) as `(analyzer_id, kind, path, declaration, line_start, line_end)`, and a Pester test asserts that the adapter, fed a canned helper response equal to that row set, produces `element_id` and declaration-lines digest values equal to the scanner's for every shared row.
+- [x] (E1) For every construct in the parity fixture that the 1022 scanner reports as a diagnostic and that `ast` can resolve, the native result contains a classified element and no corresponding diagnostic; dynamic forms that `ast` also cannot resolve yield the diagnostics defined by the 1022 rules (Pytest per analyzer identifier).
+- [x] (E2) With the python pack absent (context file test false for `.claude/lib/docs/python/run_docs_python_native.py`), `inventory` exits 0, every element of `python-cli`, `python-http`, `python-public-api` and `python-architecture` records `analysis_method: scanner`, no diagnostic or error finding is added, and the interpreter seam is never called (Pester).
+- [x] (E2) With the pack present and each of: no candidate resolving, version below 3.11 (helper exit 4), timeout, start error, non-zero exit, malformed JSON, unknown key, unknown kind, out-of-range line, invalid declaration, path not in the request, and oversized output, `inventory` with `-AnalysisMethod auto` exits 0 with scanner elements recording `analysis_method: scanner`, no error-severity finding, and exactly one `information`-severity `PYTHON_NATIVE_UNAVAILABLE` snapshot diagnostic with `analyzer_id` `docs-inventory` carrying the matching reason token; when an earlier candidate fails and a later one succeeds, the later candidate's result is used (Pester).
+- [x] (E2, R) A helper response marking one file as a parse failure yields scanner elements with `analysis_method: scanner` for that file and native elements with `analysis_method: native` for the other files (Pester).
+- [x] (E2, R, provisional OQ-C) `-AnalysisMethod native` exits 3 with one error finding `DOCS_PYTHON_NATIVE_UNAVAILABLE` and writes no snapshot when the pack, a usable interpreter or a valid response is absent; `-AnalysisMethod scanner` never calls the interpreter seam; an unknown value exits 2 with `DOCS_CLI_ARGUMENTS` (Pester).
+- [x] (E3) A Pytest source-inspection test over every file under `.claude/lib/docs/python/` asserts that no call to `exec`, `eval`, `compile`, `__import__`, `importlib`, `runpy` or `subprocess` exists and that `ast.parse` is the only parsing entry; a behavioral Pytest test analyzes a fixture source whose execution would raise an exception or change interpreter state and asserts the analysis succeeds with no such effect.
+- [x] (E4) Every file under `.claude/lib/docs/python/` is listed in the Claude `pack-manifests/python.json` and in no other Claude manifest; `pack-manifests/core.json` lists no path ending in `.py` and lists `.claude/lib/docs/DocsAnalyzerPythonNative.psm1`; the Codex python pack manifest is unchanged; the amended `Docs.Manifest.Tests.ps1`, `test_push_down_claude_pack_manifest_completeness.py` and `claude-pack-manifest-completeness.test.ts` pass.
+- [x] (E5) Python line coverage is at least 85% and branch coverage at least 75% for each file of the helper, read from the coverage JSON report produced with the dotted `--cov=` module forms (`docs_python_native`, its submodules and `run_docs_python_native`), with the helper included in `[tool.coverage.run] source`; Pester line coverage is at least 85% for `DocsAnalyzerPythonNative.psm1` (and `DocsPythonNativeProtocol.psm1` if split) and for the edited `DocsAnalyzerRegistry.psm1`, with no production file excluded; figures are recorded under `<FEATURE>/evidence/coverage/`.
+- [x] (E5, R) Black, Ruff and Pyright (strict, with `.claude/lib/docs/python` in `include` and `extraPaths`) report zero findings for the helper and its tests, and the existing pins `test_pyright_config_alignment.py`, `test_ruff_config_alignment.py` and `tests/discovery_runtime/test_package_contract.py` pass unmodified; the Python tests pass on the 3.11 floor, verified by the CI matrix (3.11, 3.12 and 3.13).
+- [x] (R) Every element in the inventory snapshot carries `analysis_method` with value `native` or `scanner`; `config-files` elements and elements from non-`.py` inputs always carry `scanner`; the snapshot validates against the amended `surface-inventory-snapshot.schema.json` (Pester).
+- [x] (R) Identifiers and digests have a single implementation: the helper emits no `element_id`, `parent_id` or digest field and its source contains no `hashlib` import; the adapter obtains every `element_id` from `Get-DocsElementId` and every declaration-lines digest from the shared digest function, and contains no hashing primitive or canonical-JSON serialization of its own (Pester and Pytest source checks).
+- [x] (R) `DocsAnalyzerRegistry.psm1` carries the four 1020-form native rows under the anchor `# --- 1031: Python-native analyzers ---`, no other anchor or row is changed, registration validation returns no finding for the committed registry, and the registry test asserts membership of the rows rather than set equality (Pester).
+- [x] (R) Every new or edited file under `.claude/lib/docs/` (including `python/**`) is SHA-256 identical to its copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`, and `test_push_down_claude_resource_contracts.py` and `test_push_down_pack_manifest_dependency_closure.py` (including `test_every_psscriptroot_occurrence_is_recognized`) pass.
+- [x] (R) No bytecode is written under `.claude/`: after the full Python test run, no `__pycache__` directory or `.pyc` file exists under `.claude/lib/docs/python/` or its bundle copy; `tests/scripts/claude-lib/docs/python/conftest.py` sets `sys.dont_write_bytecode = True`; a Pester test asserts the captured interpreter arguments include `-I`, `-B` and `-X utf8` before the helper path.
+- [x] (R) Process access goes only through the command-context seam: the adapter reaches the interpreter-start function only through a `[scriptblock]`-typed parameter supplied from the command context; every Pester test supplies test-local scriptblocks for resolution and invocation; no Pester or Pytest test starts a process; Pytest exercises the helper end to end only through `main` with `io.BytesIO` streams.
+- [x] (R, provisional OQ-A) The Python-invocation guard allowlist contains exactly one entry, for `.claude/lib/docs/DocsAnalyzerPythonNative.psm1` and its single interpreter-start function, with a comment citing D3 and this specification; the test that previously asserted an empty allowlist asserts exactly that entry; the entry is matched by a detected finding; `enforcement-hooks-no-python-invocation.Tests.ps1` passes with no other finding in `.claude/hooks`, `.claude/lib` or `.codex/hooks`.
+- [x] (R, provisional OQ-B) The VSIX and the npm MCP package include `resources/claude-customizations/.claude/lib/docs/python/**/*.py` and exclude every other `.py` file and all `__pycache__`, `.pyc` and `.pyo` paths; `discovery-resources.test.ts` asserts both the carve-out and the remaining exclusion.
+- [x] (R) No test creates a temporary file: no file under `tests/scripts/claude-lib/docs/` (including `python/`) contains `tempfile`, `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and the Python and PowerShell test-purity hooks report no violation.
+- [x] (R) The helper output is deterministic: the same request yields byte-identical stdout, a permutation of the request file order yields identical output, and stdout contains only ASCII bytes (Pytest).
+- [x] (R) No production file added or edited by this feature exceeds 500 logical lines, and every new `.claude/lib/docs/` PowerShell file passes `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`; `python -m scripts.dev_tools.check_quality_tiers` exits 0 with no new `quality-tiers.yml` entry.
+- [x] (CI-dependent) The required check `poshqc / PowerShell QC` and the `quality-checks` Python jobs, on every matrix entry (3.11, 3.12 and 3.13, where 3.11 is the helper floor), pass on the pull request head.
 
 ## Definition of Done
 

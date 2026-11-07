@@ -206,7 +206,7 @@ Describe 'Invoke-DocsAnalyzerConfigFiles' {
             (Test-DocsAnalyzerRegistration -Registration $registration).Count | Should -Be 0
             $expected = @{ 'config-files' = 'Invoke-DocsAnalyzerConfigFiles'; 'python-architecture' = 'Invoke-DocsAnalyzerPythonArchitecture'; 'python-cli' = 'Invoke-DocsAnalyzerPythonCli'; 'python-http' = 'Invoke-DocsAnalyzerPythonHttp'; 'python-public-api' = 'Invoke-DocsAnalyzerPythonApi' }
             foreach ($id in @($expected.Keys | Sort-Object)) {
-                $rows = @($registration | Where-Object { [string] $_.Id -ceq $id })
+                $rows = @($registration | Where-Object { [string] $_.Id -ceq $id -and [string] $_.AnalysisMethod -ceq 'scanner' })
                 $rows.Count | Should -Be 1 -Because "identifier $id"
                 $rows[0].AnalysisMethod | Should -BeExactly 'scanner' -Because "identifier $id"
                 $rows[0].Version | Should -BeExactly '1.0.0' -Because "identifier $id"

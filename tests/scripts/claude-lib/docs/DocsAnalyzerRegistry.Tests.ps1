@@ -95,6 +95,22 @@ Describe 'Committed provider tables (membership only)' {
     It 'reports no finding for the committed registry' {
         (Test-DocsAnalyzerRegistration -Registration (Get-DocsAnalyzerRegistration)).Count | Should -Be 0
     }
+
+    It 'holds exactly one native row for each of the four Python identifiers, with the scanner row ElementKinds (issue #1031)' {
+        # Get-DocsAnalyzerRegistration returns a comma-wrapped array: assign it first, never pipe it directly.
+        $registration = Get-DocsAnalyzerRegistration
+        $native = @($registration | Where-Object { [string] $_.AnalysisMethod -ceq 'native' })
+        @($native | ForEach-Object { [string] $_.Id }) | Should -Be @('python-architecture', 'python-cli', 'python-http', 'python-public-api')
+        foreach ($row in $native) {
+            $scanner = @($registration | Where-Object { [string] $_.Id -ceq [string] $row.Id -and [string] $_.AnalysisMethod -ceq 'scanner' })
+            $scanner.Count | Should -Be 1 -Because "identifier $($row.Id)"
+            @($row.ElementKinds) | Should -Be @($scanner[0].ElementKinds) -Because "identifier $($row.Id)"
+            $row.Version | Should -BeExactly '1.0.0'
+            [System.IO.Path]::GetFileName([string] $row.Module) | Should -BeExactly 'DocsAnalyzerPythonNative.psm1'
+            [string] $row.Function | Should -Match '^Invoke-DocsAnalyzerPythonNative(Architecture|Cli|Http|Api)$'
+        }
+        (Test-DocsAnalyzerRegistration -Registration $registration).Count | Should -Be 0
+    }
 }
 
 Describe 'Get-DocsAnalyzerRegistration' {

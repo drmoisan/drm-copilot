@@ -48,6 +48,7 @@ function Get-DocsInitTemplate {
         [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'; Destination = '.vale/styles/DocsBase/Placeholders.yml' }
         [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'; Destination = '.vale/styles/config/vocabularies/Project/accept.txt' }
         # --- 1034: docs workflow ---
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/_docs-quality.yml'; Destination = '.github/workflows/_docs-quality.yml' }
     )
     return , [object[]]$rows
 }

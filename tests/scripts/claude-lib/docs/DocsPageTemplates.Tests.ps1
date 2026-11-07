@@ -33,6 +33,8 @@ BeforeAll {
     $script:TemplateFile = @(Get-ChildItem -LiteralPath $script:TemplateRoot -File -Recurse)
     $script:SourceText = @{}
     foreach ($source in $script:Expected.Keys) { $script:SourceText[$source] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath $source)) }
+    # The 1034 docs workflow row makes init -Write read its template source too.
+    $script:SourceText['.claude/lib/docs/templates/_docs-quality.yml'] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath '.claude/lib/docs/templates/_docs-quality.yml'))
 
     function Get-TestAnchorRowSource {
         # Returns the Source literals of the row lines between the 1021 and 1034 anchors of the module text.
