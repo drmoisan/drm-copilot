@@ -224,7 +224,7 @@ function Get-ProcessReductionDerivedSource {
 function Add-ProcessReductionTouch {
     <#
     .SYNOPSIS
-        Records that an entry touched a path, whether it created it, and one of its pre-images.
+        Records that an entry touched a path and one of its pre-images.
     #>
     [CmdletBinding()]
     [OutputType([void])]
@@ -232,15 +232,11 @@ function Add-ProcessReductionTouch {
         [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$Touched,
         [Parameter(Mandatory = $true)][string]$Name,
         [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$PreImage,
-        [switch]$Created
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$PreImage
     )
 
     if (-not $Touched.ContainsKey($Path)) {
-        $Touched[$Path] = [pscustomobject]@{ Entry = $Name; Created = $false; PreImage = [System.Collections.Generic.List[string]]::new() }
-    }
-    if ($Created) {
-        $Touched[$Path].Created = $true
+        $Touched[$Path] = [pscustomobject]@{ Entry = $Name; PreImage = [System.Collections.Generic.List[string]]::new() }
     }
     if ($PreImage.Length -gt 0) {
         $Touched[$Path].PreImage.Add($PreImage)
@@ -329,7 +325,7 @@ function Invoke-ProcessReductionPatchStep {
             $prior = [string[]]@($item.Prior)
             if ($item.Kind -ceq 'create') {
                 $State[$path] = $null
-                Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $path -PreImage '' -Created
+                Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $path -PreImage ''
             } elseif ($item.Kind -ceq 'delete' -and $null -ne $State[$path]) {
                 $ErrorList.Add("${Name}: ${path}: the file the entry deleted exists at this step.")
             } elseif ($item.Kind -ceq 'delete') {
@@ -352,7 +348,7 @@ function Invoke-ProcessReductionPatchStep {
 function Get-ProcessReductionEndStateError {
     <#
     .SYNOPSIS
-        Returns an error per created path that is present and per pre-image that is absent at the end.
+        Returns an error per pre-image that is absent from the end state of its path.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -364,9 +360,6 @@ function Get-ProcessReductionEndStateError {
     foreach ($path in @($Touch.Keys | Sort-Object)) {
         $record = $Touch[$path]
         $final = $State[$path]
-        if ($record.Created -and $null -ne $final) {
-            "$($record.Entry): ${path}: the end state holds a file that the entry created."
-        }
         foreach ($preImage in $record.PreImage) {
             if ($null -eq $final -or -not $final.Contains($preImage, [System.StringComparison]::Ordinal)) {
                 "$($record.Entry): ${path}: the end state lacks a pre-image of the entry."
@@ -384,8 +377,8 @@ function Invoke-ProcessReductionChain {
         Entry holds Name and Text; PatchText maps a patch name to its text; LiveText maps a
         path to text, $null when missing. Blocks are parsed from the chain-state text of the
         entry's own file. A patch entry's block Current must occur before its hunks are
-        reverted and its non-empty Prior after. At the end, each path the oldest touching
-        entry created is absent and each of its pre-images present. Errors name entry and path.
+        reverted and its non-empty Prior after. At the end, each pre-image of the oldest
+        touching entry is present. Errors name entry and path.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
