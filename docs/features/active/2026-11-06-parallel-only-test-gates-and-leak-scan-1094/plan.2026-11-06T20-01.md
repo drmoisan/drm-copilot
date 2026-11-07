@@ -147,7 +147,7 @@ Cheap stages run first, so that a suite is not re-run for a formatting change. A
 - [x] [P2-T2] Run Black in check mode, Ruff, Pyright, and `scripts/dev_tools/generate_codex_agent_variants.py` in `--check` mode, and write `<FEATURE>/evidence/qa-gates/python-black.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/python-ruff.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/python-pyright.<timestamp>.md`, and `<FEATURE>/evidence/qa-gates/codex-generator.<timestamp>.md`.
   - Black, Ruff, and Pyright run over the P0-T3 file set, so each result compares with its static baseline.
   - Acceptance: each `EXIT_CODE:` is 0.
-- [ ] [P2-T3] Run the Pester gate with one background `Invoke-PoshQCParallelTest` run and write `<FEATURE>/evidence/qa-gates/pester-parallel.<timestamp>.md`.
+- [x] [P2-T3] Run the Pester gate with one background `Invoke-PoshQCParallelTest` run and write `<FEATURE>/evidence/qa-gates/pester-parallel.<timestamp>.md`.
   - The launcher exits with `.ExitCode`. Counts come from merged `artifacts/pester/pester-junit.xml`, never from an MCP summary.
   - Acceptance: `EXIT_CODE: 0`, zero failed tests, and the JUnit file holds `PGW-` testcases, including `PGW-SWEEP-SURFACES` and `PGW-SWEEP-HELPER`. The artifact lists the `PGW-` count.
 - [ ] [P2-T4] Run the pytest gate with one background `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov` run, with JSON coverage and JUnit output under `SCRATCH`, and write `<FEATURE>/evidence/qa-gates/pytest-parallel.<timestamp>.md`.
