@@ -1,0 +1,29 @@
+# Acceptance Criteria Verification - issue 1114
+
+Timestamp: 2026-11-07T19-52
+Source: docs/features/active/2026-11-07-codex-review-coverage-hook-reads-stale-or-foreign-artifacts-1114/spec.md (`## Acceptance Criteria`, work mode full-bug)
+
+| # | Criterion (short form) | Status | Evidence artifact | Test or check |
+|---|---|---|---|---|
+| 1 | Foreign-audit selection is fixed | PASS | regression-testing/fail-before.2026-11-07T19-37.md (fails before); qa-gates/pester-parallel.2026-11-07T19-47.md (passes after) | `1114: judges the audit named by the reviewer when another item's audit is newer` |
+| 2 | Recency selection is removed | PASS | qa-gates/pester-parallel.2026-11-07T19-47.md | `git grep -c -e Get-LatestPolicyAudit -- .codex/hooks` returns no match; the hook has no `docs/features/active` text ([P3-T1]); rows `1114: selects the audit named by the reviewer beneath the session root` and `1114: returns AUDIT_NOT_NAMED when the reviewer names no audit` replace the two recency rows |
+| 3 | A stale report in an item worktree blocks | PASS | fail-before.2026-11-07T19-37.md; pester-parallel.2026-11-07T19-47.md | `1114: blocks a report older than the newest item commit for the language in an item worktree` (reason names Python and the item root) |
+| 4 | An absent report in an item worktree blocks | PASS | pester-parallel.2026-11-07T19-47.md | `1114: blocks an absent coverage report for a changed language in an item worktree` (reason names Python, `artifacts/python/lcov.info`, and the item root) |
+| 5 | The integration scenario holds | PASS | pester-parallel.2026-11-07T19-47.md | `1114: with two active items and a stale report the review of the named item is blocked on freshness` |
+| 6 | Missing audit path (D2) | PASS | pester-parallel.2026-11-07T19-47.md | `1114: blocks once asking for the policy-audit path when the reviewer names none`; `1114: stops the continuation when no audit is named and the stop hook is active` |
+| 7 | Ambiguous or invalid audit paths block | PASS | pester-parallel.2026-11-07T19-47.md | `feature-review-coverage-target.Tests.ps1` rows for AUDIT_AMBIGUOUS, TARGET_WORKTREE_AMBIGUOUS, AUDIT_PATH_TRAVERSAL, AUDIT_NOT_FOUND, null and non-string messages (34 of 34 pass); the hook emits one continuation carrying the reason code and reason |
+| 8 | Audit extraction and selection follow the rules | PASS | pester-parallel.2026-11-07T19-47.md | `feature-review-coverage-target.Tests.ps1` extraction rows (both shapes, both separators, labelled and unlabelled, relative, absolute through `Resolve-HookTargetWorktree`, greatest timestamp) |
+| 9 | Freshness scope matches #1105 (D1) | PASS | pester-parallel.2026-11-07T19-47.md | `runs no probe when the resolver source is SessionRoot`, `runs no probe when the resolved root equals the session root`, `runs no probe for a blank root` in codex-hooks `validate-feature-review-coverage-freshness.Tests.ps1` |
+| 10 | Freshness twin parity | PASS | pester-parallel.2026-11-07T19-47.md | `1114: the Codex twin defines the same function names as the Claude file`, `1114: each Codex twin function has the Claude extent text`, `1114: the Codex twin has no statement outside function definitions` |
+| 11 | Single-item fresh behaviour is unchanged | PASS | pester-parallel.2026-11-07T19-47.md | codex `validate-feature-review-coverage.Coverage.Tests.ps1` 40 of 40 (updated rows, `exits 2 for <Case>`, `requests one continuation, then stops ...`); narrowing parity 66 of 66; floor parity 4 of 4 |
+| 12 | Runtime isolation is preserved | PASS | pester-parallel.2026-11-07T19-47.md | `E4-ST7: the Codex hook reads the floor from its own thresholds copy`; `E4-ST3: .codex/hooks/validate-feature-review-coverage.ps1 help states the absent and unreadable CLAUDE.md rules` |
+| 13 | Dependency-load failures are handled | PASS | pester-parallel.2026-11-07T19-47.md | `hook-dependency-failure.Codex.Tests.ps1` 93 of 93, including `B1` rows for `hook-target-worktree.ps1`, `validate-feature-review-coverage-freshness.ps1`, and `feature-review-coverage-target.ps1` |
+| 14 | No Claude production change; no Python in hooks | PASS | qa-gates/scope-check.2026-11-07T19-51.md; pester-parallel.2026-11-07T19-47.md | protected-path diff empty; no `.py` added under `.codex/hooks`; the four Claude suites pass (18, 28, 21, 73); `enforcement-hooks-no-python-invocation.Tests.ps1` 33 of 33 |
+| 15 | Mirror and manifest parity | PASS | pester-parallel.2026-11-07T19-47.md | `legacy-codex-hook-contracts.Tests.ps1` 43 of 43 with both new names in `$script:SharedModuleNames` |
+| 16 | Bundle contract tests pass | PASS | qa-gates/pytest-parallel.2026-11-07T19-50.md; qa-gates/codex-generator-check.2026-11-07T19-50.md | the three bundle tests pass; generator `--check` exit 0 |
+| 17 | Brief parity | PASS | pytest-parallel.2026-11-07T19-50.md | six brief copies hash equal and each names `feature-review-coverage-target.ps1` ([P4-T1]); the four brief tests pass |
+| 18 | Coverage | PASS | pester-parallel.2026-11-07T19-47.md | hook 100.00%, freshness twin 97.96%, target file 98.51% |
+| 19 | Full toolchain pass | PASS | qa-gates/poshqc-format.2026-11-07T19-40.md; qa-gates/poshqc-analyze.2026-11-07T19-40.md; pester-parallel.2026-11-07T19-47.md; pytest-parallel.2026-11-07T19-50.md; codex-generator-check.2026-11-07T19-50.md | [P5-T1] format, [P5-T2] lint, [P5-T3] Pester, [P5-T4] pytest, [P5-T5] generator; type check not applicable to PowerShell; architecture-boundary stage: not applicable, because the repository carries no architecture-boundary suite; no new failures against the baseline/ artifacts |
+| 20 | CI-dependent: `poshqc / PowerShell hook suites (Linux)` passes on the PR head | pending-CI | none yet | checked off by the orchestrator at S9 after the CI green gate |
+
+Summary: 19 criteria checked off in spec.md with evidence named; criterion 20 is pending-CI and stays unchecked. No criterion text was edited.
