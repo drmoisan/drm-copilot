@@ -47,7 +47,7 @@ export { VALID_BLOCKED_REASONS };
  *     - Delegate the optional remediation and human-interaction blocks.
  *     - Under `requireComplete`, enforce completion-safe statuses, the PR/CI
  *       route-aware PR/CI gates, mandatory phases, the preparation terminal
- *       contract, and the routing contract.
+ *       contract, the routing contract, and the concurrent review record.
  *
  * Invariants / Constraints:
  *     - Error-message strings are identical to the Python source.

@@ -297,7 +297,8 @@ function Get-OrchestratorStatePrCreationReadinessError {
     .DESCRIPTION
         Private readiness check mirroring validate_orchestrator_state_pr_creation_readiness in
         _orchestrator_state_pr_creation_readiness.py: steps 5-8 must not be pending, blocked, or
-        blocked_remediation_loop_limit; blocked_reason must be `none` or absent; and the
+        blocked_remediation_loop_limit, except a pending step 7 under review_mode concurrent;
+        blocked_reason must be `none` or absent; and the
         local_execution_overrides / delegation_bypasses lists must be empty when present. It does
         not enforce completion, CI, PR, or routing-contract gates.
     .PARAMETER State

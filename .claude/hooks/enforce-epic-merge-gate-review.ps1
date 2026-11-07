@@ -90,7 +90,7 @@ function Test-EpicMergeGateReviewObjectId {
     [OutputType([bool])]
     param([AllowNull()] $Value)
 
-    return ($Value -is [string]) -and ($Value -cmatch '^[0-9a-f]{40}([0-9a-f]{24})?$')
+    return ($Value -is [string]) -and ($Value -cmatch '\A[0-9a-f]{40}([0-9a-f]{24})?\z')
 }
 
 function Get-EpicMergeGateLastReviewOutcome {

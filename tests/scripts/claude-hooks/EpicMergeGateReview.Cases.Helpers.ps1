@@ -138,6 +138,7 @@ function Get-EpicMergeGateReviewCaseRow {
         @{ Name = 'head-absent'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @([ordered]@{ verdict = 'PASS' })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'head-uppercase'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @([ordered]@{ verdict = 'PASS'; head_sha = $reviewed.ToUpperInvariant() })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'head-short'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @([ordered]@{ verdict = 'PASS'; head_sha = $reviewed.Substring(0, 12) })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
+        @{ Name = 'head-trailing-line-feed'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @([ordered]@{ verdict = 'PASS'; head_sha = "$reviewed`n" })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'gh-failure'; GhResult = @{ ExitCode = 1; Output = '' }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
         @{ Name = 'gh-malformed-head'; GhResult = @{ ExitCode = 0; Output = '{"headRefOid":"not-an-object-id"}' }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
         @{ Name = 'gh-unparseable-output'; GhResult = @{ ExitCode = 0; Output = '{broken' }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }

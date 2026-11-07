@@ -42,6 +42,7 @@ The reduction removes the wait of CI behind review, as research section 6 of `do
 - `extensions/drm-copilot/test/lib/validate/orchestrator-state-concurrent-review.test.ts`, new
 - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, new
 - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`, new
+- `docs/engineering/process-reductions/README.md`, the index row of this entry
 
 ## Prior Text
 
@@ -60,7 +61,7 @@ This section applies to a run whose checkpoint records `review_mode: "concurrent
 6. **Moved conditions.** Conditions 1 and 2 of `## PR Creation Gate` apply at the join, not before the pull request. S9 steps 6 and 7, and DONE, run only after the join. A parallel child still never merges itself.
 7. **Re-entry.** Any code push after a `PASS`, including a CI fix or a merge of `origin/main`, is a stale head and requires a new review and a new S9 pass. Commits inside `feature-folder`, such as review artifacts and stage-timing evidence, do not. Ledger back-fills lie outside `feature-folder`, so they land before the review starts.
 8. **Portable handoff.** The destination projection is a closed key set and drops `review_mode`, so a concurrent run is not handed off between pull-request creation and the join.
-9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <path> --require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`.
+9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with the repository-local Python validator CLI, in its `orchestrator-state` mode with `--require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`.
 10. **Step order.** `completed_steps` stays in canonical order, because `.claude/hooks/enforce-checkpoint-monotonic.ps1` denies a checkpoint Write that lists `S8_create_pr` before `S7_feature_review`. When the review completes, insert `S7_feature_review` before the existing `S8_create_pr` entry; do not append it. A later review adds no second entry. `step8_status` is `in_progress` at pull-request creation, because readiness rejects `pending`, and it stays `in_progress` until the join, because `.claude/hooks/enforce-completion-consistency.ps1` reads `completed` there as a completion claim and denies a checkpoint Write whose `ci_gate.conclusion` is not `success`. A `completed` value would therefore deny the `ci_gate` write of every re-entry.
 
 
@@ -84,7 +85,7 @@ This section applies to a run whose checkpoint records `review_mode: "concurrent
 6. **Moved conditions.** Conditions 1 and 2 of `## PR Creation Gate` apply at the join, not before the pull request. The merge and DONE of `## CI Green Gate` run only after the join. A parallel child still never merges itself.
 7. **Re-entry.** Any code push after a `PASS`, including a CI fix or a merge of `origin/main`, is a stale head and requires a new review and a new `## CI Green Gate` pass. Commits inside `feature-folder`, such as review artifacts and stage-timing evidence, do not. Ledger back-fills lie outside `feature-folder`, so they land before the review starts.
 8. **Portable handoff.** The destination projection is a closed key set and drops `review_mode`, so a concurrent run is not handed off between pull-request creation and the join.
-9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <path> --require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`.
+9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with the repository-local Python validator CLI, in its `orchestrator-state` mode with `--require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`.
 10. **Step order.** `completed_steps` stays in canonical order, because `.codex/hooks/enforce-checkpoint-monotonic.ps1` denies a checkpoint Write that lists `S8_create_pr` before `S7_feature_review`. When the review completes, insert `S7_feature_review` before the existing `S8_create_pr` entry; do not append it. A later review adds no second entry. `step8_status` is `in_progress` at pull-request creation, because readiness rejects `pending`, and it stays `in_progress` until the join, because `.codex/hooks/enforce-completion-consistency.ps1` reads `completed` there as a completion claim and denies a checkpoint Write whose `ci_gate.conclusion` is not `success`. A `completed` value would therefore deny the `ci_gate` write of every re-entry.
 
 
@@ -149,6 +150,30 @@ Honest disclosure (D10): the guard is a policy-level control, not a security con
 ### Revert Block: scripts/dev_tools/_orchestrator_state_pr_creation_readiness.py
 
 ````Current
+    - Under `review_mode: "concurrent"`, a `pending` `step7_status` does not
+      block, because the review runs beside CI after the PR opens.
+
+````
+
+````Prior
+````
+
+### Revert Block: scripts/dev_tools/_orchestrator_state_pr_creation_readiness.py
+
+````Current
+        `gh pr create` of a branch has already succeeded. Under
+        `review_mode: "concurrent"`, a pending `step7_status` is allowed.
+
+````
+
+````Prior
+        `gh pr create` of a branch has already succeeded.
+
+````
+
+### Revert Block: scripts/dev_tools/_orchestrator_state_pr_creation_readiness.py
+
+````Current
         # Under `review_mode: concurrent` the review runs beside CI after the
         # PR opens, so a pending review is expected here; the merge guard holds
         # the merge until it passes. `blocked` and every other step still block.
@@ -184,6 +209,19 @@ from scripts.dev_tools._orchestrator_state_concurrent_review import (
 ````
 
 ````Prior
+````
+
+### Revert Block: .claude/lib/orchestrator-state/OrchestratorState.psm1
+
+````Current
+        blocked_remediation_loop_limit, except a pending step 7 under review_mode concurrent;
+        blocked_reason must be `none` or absent; and the
+
+````
+
+````Prior
+        blocked_remediation_loop_limit; blocked_reason must be `none` or absent; and the
+
 ````
 
 ### Revert Block: .claude/lib/orchestrator-state/OrchestratorState.psm1
@@ -339,6 +377,18 @@ import { validateConcurrentReviewCompletion } from "./orchestrator-state-concurr
 ````
 
 ````Prior
+````
+
+### Revert Block: extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts
+
+````Current
+ *       contract, the routing contract, and the concurrent review record.
+
+````
+
+````Prior
+ *       contract, and the routing contract.
+
 ````
 
 ### Revert Block: extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts
