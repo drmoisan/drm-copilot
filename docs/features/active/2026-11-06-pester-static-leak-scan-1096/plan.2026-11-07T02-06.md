@@ -114,7 +114,7 @@ The kinds and rules are in spec `### 2. Static leak scan` and `## API / CLI Surf
 - [x] [P3-T3] Fix every remaining class T row from the latest `<FEATURE>/evidence/other/leak-scan-classification.*.md`, on both sides, in the files under `tests/scripts/` that those rows name.
   - The file set is derived from the rows, and each changed test keeps its assertions. A row closed by P3-T1 or P3-T2 is marked with that task. When no row remains, the artifact records `NONE`.
   - Acceptance: every class T row in the artifact names its fix and its relying-side result.
-- [ ] [P3-T4] Create `config/poshqc-leak-allowlist.json` from the classification, run `Invoke-PoshQCLeakScan -Root` with it, and write `<FEATURE>/evidence/regression-testing/leak-scan-remediated.<timestamp>.md`.
+- [x] [P3-T4] Create `config/poshqc-leak-allowlist.json` from the classification, run `Invoke-PoshQCLeakScan -Root` with it, and write `<FEATURE>/evidence/regression-testing/leak-scan-remediated.<timestamp>.md`.
   - `version` is 1. `exemptGlobalVariables` holds the one `LASTEXITCODE` entry with the spec Decision 2 reason. `entries` holds one item per C2, C3, or C4 key group, with a reason that names the class route and no line number. A reported finding or stale entry goes back to the class that owns it, and this task repeats.
   - Acceptance: `EXIT_CODE: 0` from the launcher's exit on no throw, the entry count equals the false-positive key-group count, and no entry key belongs to a class T group.
 
