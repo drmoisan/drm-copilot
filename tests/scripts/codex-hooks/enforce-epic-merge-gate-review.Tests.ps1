@@ -241,5 +241,19 @@ Describe 'Codex enforce-epic-merge-gate review guard (issue #1097)' {
             Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
             Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
         }
+
+        It 'RGC-SHAPE-CANDIDATE-CAP-BOUNDS-READS' {
+            # Arrange: an in-memory reader that records each number over a text with six numbers.
+            $reads = [System.Collections.Generic.List[object]]::new()
+            $noKey = $script:NoKeyJson | ConvertFrom-Json
+            $reader = { param($Target) $reads.Add($Target); $noKey }.GetNewClosure()
+
+            # Act
+            $shape = Get-EpicMergeGateReviewShapeDecision -CommandText 'echo pr merge 11 12 13 14 15 16' -KnownCheckpoint $noKey -KnownPrNumber $null -ReadCheckpoint $reader
+
+            # Assert: the shared guard reads exactly the first 4 numbers, in text order.
+            ($reads -join ',') | Should -BeExactly '11,12,13,14'
+            $shape.Denied | Should -BeFalse
+        }
     }
 }
