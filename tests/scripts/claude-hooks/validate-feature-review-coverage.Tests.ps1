@@ -137,7 +137,7 @@ feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
         It 'E4-ST4: <File> defines exactly its assigned functions' -ForEach @(
             @{ File = '.claude/hooks/validate-feature-review-coverage.ps1'; Functions = @('Invoke-FeatureReviewCoverageValidation') }
             @{ File = '.claude/hooks/validate-feature-review-coverage-metrics.ps1'; Functions = @('Get-ArtifactFileContent', 'Get-FeatureReviewClaudeMdText', 'Get-JacocoBranchCoverage', 'Get-JacocoRepoCoverage', 'Get-LanguageBranchCoverage', 'Get-LanguageRepoCoverage', 'Get-LcovBranchCoverage', 'Get-LcovRepoCoverage') }
-            @{ File = '.claude/hooks/validate-feature-review-coverage-rules.ps1'; Functions = @('Get-ChangedLanguageSet', 'Get-ReviewArtifactInfo', 'Get-ReviewArtifactPathFromOutput', 'Test-LanguageCoverageRow') }
+            @{ File = '.claude/hooks/validate-feature-review-coverage-rules.ps1'; Functions = @('Get-ChangedLanguageSet', 'Get-CoverageNarrowingLine', 'Get-ReviewArtifactInfo', 'Get-ReviewArtifactPathFromOutput', 'Test-LanguageCoverageRow') }
         ) {
             # Arrange
             $path = Join-Path $PSScriptRoot "../../../$File"

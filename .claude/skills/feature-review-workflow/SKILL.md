@@ -42,11 +42,20 @@ Always apply:
   - `code-review-template` for `code-review.<timestamp>.md`
   - `feature-audit-template` for `feature-audit.<timestamp>.md`
 - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
+- When an installed template older than this change carries baseline fields, each baseline field is recorded as `N/A - no pre-change run`, and the comparison line reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
 
 ### No silent fixes
 
 - Do not clean up code during review.
 - If checks fail, document the failure and include exact remediation guidance.
+
+### Process-reduction ledger
+
+- This rule applies only when `docs/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
+- A change that reduces evidence, plan tasks, gates, or review process adds its ledger entry in the same commit, in the format of that folder's `README.md`.
+- A branch diff that makes such a reduction with no entry is a Blocking finding.
+- The reviewer confirms from the branch log that each reduction is its own commit, with the `reduction: NNNN` token in its subject.
+- One-off waivers for a single item are not entries.
 
 ### Work-mode acceptance-criteria contract
 
@@ -105,17 +114,17 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      4. tests
      5. coverage (mandatory for every language that has changed files)
         - TypeScript: `npm run test:unit:coverage` → artifact: `coverage/lcov.info`
-        - Python: `poetry run pytest --cov` → artifact: `artifacts/python/lcov.info`
-        - PowerShell: `mcp__drm-copilot__run_poshqc_test` → artifact: `artifacts/pester/powershell-coverage.xml`
+        - Python: `poetry run pytest -n auto --cov-report=term-missing --cov` → artifact: `artifacts/python/lcov.info`
+        - PowerShell: one `Invoke-PoshQCParallelTest` run → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `dotnet test --collect:"XPlat Code Coverage"` → artifact: `artifacts/csharp/coverage.xml`
-        - Coverage thresholds (threshold precedence per `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern; each metric falls back independently, so a root `CLAUDE.md` that states only one of the two thresholds governs only that metric). The branch threshold applies only to branch-capable languages — TypeScript, Python, and C#. PowerShell is a coverage language and is fully subject to the line threshold and the no-regression requirement, but Pester measures command (instruction) coverage and line coverage only, so no branch percentage exists to evaluate and no branch threshold applies to it (see `.claude/rules/powershell.md`). Do not flag a missing PowerShell branch figure as FAIL:
+        - Coverage thresholds (threshold precedence per `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern; each metric falls back independently, so a root `CLAUDE.md` that states only one of the two thresholds governs only that metric). The branch threshold applies only to branch-capable languages — TypeScript, Python, and C#. PowerShell is a coverage language and is fully subject to the line threshold, but Pester measures command (instruction) coverage and line coverage only, so no branch percentage exists to evaluate and no branch threshold applies to it (see `.claude/rules/powershell.md`). Do not flag a missing PowerShell branch figure as FAIL:
           - New code files (added in this feature): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
-          - Modified files (changed but previously existing): line coverage >= 85%, branch coverage >= 75% for branch-capable languages, and no regression on changed lines relative to baseline. Flag as FAIL otherwise.
+          - Modified files (changed but previously existing): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the single gate run, and new behavior is tested. Flag as FAIL otherwise.
           - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
         - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
         - Tier classification findings: report a missing or incomplete `quality-tiers.yml` only when the repository has adopted tiers, that is, when `quality-tiers.yml` exists at the repository root on the resolved base branch or the repository's CI runs a tier-classification check. Otherwise record tier classification as not applicable; it is not a finding.
-   - Run the smallest relevant subset first when the repo policy permits it.
+   - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
 
 6. **Produce the code review**
@@ -146,14 +155,17 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files including any regression on changed lines, or new files)
+     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files, or new files)
      - coverage artifact absent for any language that has changed files
    - Classify each blocking finding before triggering remediation: each receives one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). A published MCP runtime that lags the repository contract is classified `external_dependency`.
    - Trigger the remediation handoff only when at least one blocking finding is `autonomous`. When every blocking finding is non-remediable, write the remediation inputs with the `HALT_NON_REMEDIABLE` or `AWAITING_CI` verdict and create no remediation plan target.
+   - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
+   - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
+   - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.
    - Create `remediation-inputs.<timestamp>.md` first.
-   - Create the target remediation plan file from the canonical plan template.
-   - Hand off plan creation through `remediation-handoff-atomic-planner`.
-   - Do not report completion unless the remediation plan file exists when remediation was triggered.
+   - With `Remediation-Path: full`, create the target remediation plan file from the canonical plan template.
+   - With `Remediation-Path: full`, hand off plan creation through `remediation-handoff-atomic-planner`.
+   - With `Remediation-Path: full`, do not report completion unless the remediation plan file exists when remediation was triggered. With `Remediation-Path: light`, create no remediation plan target: the inputs file is the light cycle's plan.
 
 9. **Finalize the review**
    - Verify every reported artifact exists on disk before reporting completion.

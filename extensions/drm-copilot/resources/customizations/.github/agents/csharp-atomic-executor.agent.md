@@ -85,7 +85,7 @@ During preflight (before [P0-T1]), resolve work mode from feature `issue.md` mar
 
 If the marker is missing or malformed, fail closed to `full-feature`.
 
-When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks. In these cases return:
+When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks. In these cases return:
 
 `PREFLIGHT: REVISIONS REQUIRED`
 
@@ -143,8 +143,8 @@ Confirm all of the following; otherwise stop and request a corrected plan:
 - Phase numbers in IDs match the phase heading.
 - Task numbers are sequential within each phase.
 - Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
-- Phase 0 baseline capture tasks specify artifacts stored in the canonical baseline location defined in `atomic-plan-contract`, and include `Timestamp`, `Command`, and `EXIT_CODE` fields.
+- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- Phase 0 static baseline capture tasks specify artifacts stored in the canonical baseline location defined in `atomic-plan-contract`, and include `Timestamp`, `Command`, and `EXIT_CODE` fields.
 - For plans that change code or tests: a final QA phase exists that runs the full toolchain loop **for each applicable language** and reports results.
 - Any **TDD Red** regression-test task (i.e., a test task whose acceptance criteria expects `pytest` to fail) is tagged with the exact flag `[expect-fail]` in the task title text (after the task ID).
 - No task is a "bucket task" (e.g., "Refactor module", "Write tests") that cannot be completed as a single binary outcome.
@@ -272,18 +272,18 @@ If any step fails in final QA, fix and restart from format.
 - Avoid broad warning suppressions; use the narrowest possible suppression only when unavoidable and documented.
 - Preserve public API compatibility unless the plan explicitly approves a breaking change.
 
-### 7.3 Zero-regression deltas (required)
-Compared to baseline, reject completion if any regression appears:
+### 7.3 Gate requirements (required)
+Compared to the static baseline, and from the single gate run, reject completion if any of these appears:
 - New analyzer warnings/errors
 - New compiler/type/nullable diagnostics
-- New failing tests
-- Coverage drop in touched files (and overall if enforced)
+- Any failure in the single gate run
+- A touched file below the coverage thresholds, read from the single gate run
 
 At completion, report:
 - analyzer delta
 - type-check delta
-- failing test delta
-- per-file coverage delta (and overall if applicable)
+- failures in the single gate run
+- per-file coverage against the thresholds
 - AC Status Summary per `acceptance-criteria-tracking`
 - final updated checklist status
 

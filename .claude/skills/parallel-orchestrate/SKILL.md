@@ -427,6 +427,14 @@ Procedure, per item:
    re-delegate the child once to resume at the CI green gate, by the same re-delegation mechanism as
    `## Per-Item Merge-Conflict Handling`; a CI-failure cycle counts toward `remediation_loop`.
    Record `ci_green` only after that resumed run reports its CI green gate `passed`.
+   **Concurrent review.** When the child checkpoint records `review_mode: "concurrent"`, do not
+   record `merge_status: ci_green` and do not run `gh pr merge` until its last
+   `review_outcomes[]` entry is `PASS` at a current head, as the join in
+   `## Concurrent Review and CI (review_mode)` of `.claude/skills/orchestrate/SKILL.md` defines it;
+   keep `merge_status: pr_open` and treat the item as not done. Issue #1097 amends
+   `.claude/skills/orchestrate/SKILL.md` for every new run and adds no parallel-specific condition
+   to the child's PR Creation Gate. The merge gate reads the child through the item target, so
+   this step is the backstop when that target does not resolve.
 3. Execute `gh pr merge --merge <PR>` for that item's pull request, whose base is `main`.
    Do not pass `--delete-branch` or `--auto`. A zero exit status does not prove a merge: when
    `main` uses a merge queue, `gh pr merge` exits 0 after it enqueues the pull request or enables

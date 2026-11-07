@@ -1,0 +1,18 @@
+{
+  "name": "pass-short-head",
+  "notes": "A short head is malformed.",
+  "checkpoint": {
+    "review_mode": "concurrent",
+    "remediation_loop": {
+      "review_outcomes": [
+        {
+          "verdict": "PASS",
+          "head_sha": "abcdef012345"
+        }
+      ]
+    }
+  },
+  "expected_errors": [
+    "Checkpoint completion validation failed: review_mode concurrent requires head_sha on the last review_outcomes entry."
+  ]
+}

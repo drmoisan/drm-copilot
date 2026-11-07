@@ -23,9 +23,9 @@
 > - Start every task with a **strong verb** (Implement, Create, Update, Verify).
 > - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
 > - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
-> - Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
+> - Include explicit static baseline tasks, final-QA tasks, and a per-file threshold task for every language in scope when policy requires coverage.
 > - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
-> - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+> - If any required static baseline artifact, QA artifact, or per-file coverage figure is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 ### Phase 0: Compliance & Context
 - [ ] [P0-T1] Confirm alignment with repo policies by reading `.github/instructions/general-code-change.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, and `.github/instructions/python-unit-test.instructions.md` before touching code
@@ -57,7 +57,7 @@
 - Unit: ...
 - Integration: ...
 - Manual/CLI: ...
-- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
+- Coverage evidence: list the static baseline artifact paths, the final-QA artifact paths, and the per-file threshold results from the single gate run for each in-scope language
 
 ## Open Questions / Notes
 

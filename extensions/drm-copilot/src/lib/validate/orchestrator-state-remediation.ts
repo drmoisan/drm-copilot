@@ -20,6 +20,9 @@
  *     - R8-R10: `review_outcomes` is a list of objects with a known verdict and
  *       classified findings, and each verdict matches its findings.
  *     - R11: `opened_by_review` indexes a `REMEDIATION_REQUIRED` outcome.
+ *     - Invariant 8 (issue #1097): a `remediation_path` cycle is checked by
+ *       `validateLightCycles`, and an exact `light` cycle is exempt from the
+ *       cleared-preflight invariant.
  *     - Error-message strings are identical to the Python source.
  *
  * Side Effects:
@@ -30,6 +33,11 @@ import {
   REVIEW_OUTCOMES_KEY,
   validateReviewOutcomes,
 } from "./orchestrator-state-remediation-accounting";
+import {
+  LIGHT_REMEDIATION_PATH,
+  REMEDIATION_PATH_KEY,
+  validateLightCycles,
+} from "./orchestrator-state-light-cycle";
 
 export {
   HALT_CLASSES,
@@ -123,9 +131,11 @@ function validateRemediationCycle(
   }
 
   // Invariant 2: an execution status in the blocked set requires that the
-  // cycle's preflight gate reports exactly the cleared status.
+  // cycle's preflight gate reports exactly the cleared status. An exact light
+  // cycle runs no preflight and is checked by invariant 8 instead.
   const executionStatus = cycle["execution_status"];
   if (
+    cycle[REMEDIATION_PATH_KEY] !== LIGHT_REMEDIATION_PATH &&
     typeof executionStatus === "string" &&
     EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT.has(executionStatus)
   ) {
@@ -176,7 +186,8 @@ function opensRemediationReview(
 }
 
 /**
- * Validate the accounting invariants: per cycle R5, R6, R11; then R7a or R7b.
+ * Validate the accounting invariants: per cycle R5, R6, R11; then R7a or R7b;
+ * then invariant 8.
  *
  * @param loop The remediation-loop object.
  * @param cycleList The `cycles` list, or `null` when absent or not a list.
@@ -236,6 +247,9 @@ function validateRemediationAccounting(
     }
   }
 
+  errors.push(
+    ...validateLightCycles(cycleList, outcomes, opensRemediationReview),
+  );
   return errors;
 }
 

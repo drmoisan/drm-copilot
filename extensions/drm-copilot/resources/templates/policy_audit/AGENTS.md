@@ -44,7 +44,6 @@ When asked to perform a Policy Audit for a component, branch, or PR:
 1. **Identify scope**
    - Determine what is being audited (e.g., "fix-all.ps1 unit tests", "Lexile scoring pipeline refactor", "new Python module X").
    - Identify the relevant code files and test files.
-   - **Document baseline coverage BEFORE making changes** (if development has not yet started, or shelve changes temporarily to establish baseline).
 
 2. **Create an audit document**
    - Generate a timestamp in ISO-8601 format `yyyy-MM-ddTHH-mm` (e.g., "2026-01-08T14-30" for Jan 8, 2026 at 2:30 PM).
@@ -57,7 +56,7 @@ When asked to perform a Policy Audit for a component, branch, or PR:
      - Fill in the Coverage Metrics by Language table with one row per language.
      - Complete all applicable language sections (3A, 3B, 3C, 3D for code; 4A, 4B for tests).
      - Delete sections for languages NOT involved in this change.
-   - **Fill in baseline coverage metrics** from pre-development measurement (per language that has coverage).
+   - Record each retained baseline field as `N/A - no pre-change run`.
    - Add one per-language comparison bullet for every in-scope language that has coverage requirements.
 
 3. **Evaluate policy compliance**
@@ -69,17 +68,17 @@ When asked to perform a Policy Audit for a component, branch, or PR:
      - Record **status** (`✅ PASS`, `⚠️ PARTIAL`, `❌ FAIL`, `N/A`) and **evidence** in the appropriate table rows.
    - **For multi-language changes:**
      - Run each language's toolchain separately and document results in its section.
-     - **Python:** Black → Ruff → Pyright → Pytest (with coverage)
-     - **PowerShell:** Invoke-PoshQCFormat → Invoke-PoshQCAnalyze → Invoke-PoshQCTest (with coverage)
+     - **Python:** Black → Ruff → Pyright → `poetry run pytest -n auto` (with coverage)
+     - **PowerShell:** Invoke-PoshQCFormat → Invoke-PoshQCAnalyze → Invoke-PoshQCParallelTest (with coverage)
      - **Bash:** shfmt → shellcheck → bats (coverage N/A)
      - **JSON:** format_json → validate_json (coverage N/A)
    - **For coverage metrics (Python and PowerShell only):**
-     - Compare post-change coverage to baseline to verify no regression (per language).
+     - Read each changed file from the single gate run and compare it with the coverage thresholds (per language).
      - Isolate and measure coverage of new/modified code only (must be ≥90% per language).
-     - Use concrete examples showing calculations: "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅"
+     - Use concrete examples showing calculations: "Post-change: 87.1% against the 85% line threshold ✅"
    - **Fail-closed evidence handling:**
-     - No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
-     - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
+     - No policy audit may report PASS unless it includes numeric post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
+     - If any required QA artifact or post-change coverage metric is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
      - Do not synthesize or backfill missing audit evidence from memory or inference.
      - If evidence is missing, stop and report the exact missing artifact paths.
    - **For scenario testing:**
@@ -105,7 +104,7 @@ When asked to perform a Policy Audit for a component, branch, or PR:
 6. **Summarize and recommend**
    - Complete the summary sections at the end of the template:
      - Policy-by-policy summary
-     - Metrics summary (with deterministic baseline/post-change/new code coverage)
+     - Metrics summary (with deterministic post-change and new code coverage)
      - Recommendation (`Ready for merge`, `Needs revision`, or `Blocked`)
    - Ensure the final audit document is consistent with the underlying evidence and toolchain output.
 

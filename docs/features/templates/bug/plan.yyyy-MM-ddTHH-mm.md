@@ -7,7 +7,7 @@
 - **Status:** <template>
 - **Version:** <version_number>
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Fail-closed evidence rule:** Include explicit static baseline tasks, final-QA tasks, and a per-file threshold task for each in-scope language when policy requires coverage. If any required static baseline artifact, QA artifact, or per-file coverage figure is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
 
@@ -33,15 +33,15 @@
 
 **Phase 2 — Regression Test (must fail first)**
 - [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/<issue>-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+- [ ] [P2-T2] [expect-fail] Run the parallel test gate to confirm the new regression test fails and captures the repro
 
 **Phase 3 — Minimal Fix**
 - [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
 
 **Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
+- [ ] [P4-T1] Re-run the repro to confirm expected behavior
 - [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+- [ ] [P4-T3] Record the static baseline and final-QA artifact paths and the per-file threshold results for each in-scope language where coverage is required
 
 **Phase 5 — Documentation & Status**
 - [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
