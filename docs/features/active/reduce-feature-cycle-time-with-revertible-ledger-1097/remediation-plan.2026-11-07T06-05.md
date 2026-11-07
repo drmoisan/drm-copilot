@@ -42,7 +42,7 @@ Premise checks, each read against the tree:
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell and TypeScript test scope, write `FEATURE/evidence/baseline/phase0-instructions-read.<timestamp>.md`, and from the recorded stage B gates alone, with no suite run, write `FEATURE/evidence/baseline/stage-b-recorded-gates.<timestamp>.md`.
+- [x] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell and TypeScript test scope, write `FEATURE/evidence/baseline/phase0-instructions-read.<timestamp>.md`, and from the recorded stage B gates alone, with no suite run, write `FEATURE/evidence/baseline/stage-b-recorded-gates.<timestamp>.md`.
   - Policy artifact: carries `Timestamp:`, `Policy Order:`, and the list of files read.
   - Baseline sources: the lexicographically greatest `FEATURE/evidence/qa-gates/stage-b-powershell-test.*.md` and `FEATURE/evidence/qa-gates/stage-b-typescript-test.*.md`. `Command:` records that the artifact is a read of those two files, and `EXIT_CODE:` is 0 when both were read.
   - Output Summary: the Pester total and failed counts, the `StageTiming.psm1` line coverage, and the repo-wide PowerShell line percentage, each copied from the first source; the Jest suite count of the second source, stated as a 24-suite subset run with coverage off, so no TypeScript coverage figure exists at baseline.
