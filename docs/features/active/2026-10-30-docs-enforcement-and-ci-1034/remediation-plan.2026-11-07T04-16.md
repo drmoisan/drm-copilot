@@ -212,7 +212,7 @@ A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy with an enabled pro
 
 - [x] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md` and `.claude/rules/tonality.md`, and write `FEATURE/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:` and the six paths in order.
-- [ ] [P0-T2] Fetch `EPIC_REF`, derive `MERGE_BASE`, confirm `artifacts/orchestration/orchestrator-state.json` selects the `large` or `remediation` route and is not terminal, and write `FEATURE/evidence/remediation-baseline/preconditions.<timestamp>.md`.
+- [x] [P0-T2] Fetch `EPIC_REF`, derive `MERGE_BASE`, confirm `artifacts/orchestration/orchestrator-state.json` selects the `large` or `remediation` route and is not terminal, and write `FEATURE/evidence/remediation-baseline/preconditions.<timestamp>.md`.
   - Acceptance: the artifact records the `EPIC_REF` tip, `MERGE_BASE`, the route value, the logical line counts of `HOOK`, `HELPER`, `COMPOUND_SUITE` and `HELPER_SUITE`, and equal SHA-256 values for the `.claude/hooks` and `.codex/hooks` pair of each of the four shared files that has a twin. Any failure stops the run as BLOCKED.
 - [ ] [P0-T3] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `HOOK`, `HELPER`, `CLI`, `COMPOUND_SUITE` and `HELPER_SUITE`, and write `FEATURE/evidence/remediation-baseline/pssa.<timestamp>.md`.
   - Acceptance: the artifact records the finding count per file.
