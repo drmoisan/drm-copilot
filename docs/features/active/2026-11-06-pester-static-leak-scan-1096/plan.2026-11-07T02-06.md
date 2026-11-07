@@ -93,7 +93,7 @@ The kinds and rules are in spec `### 2. Static leak scan` and `## API / CLI Surf
 
 ### Phase 2 — First Repository Scan
 
-- [ ] [P2-T1] Run `Invoke-PoshQCLeakScan` over the repository with `config/poshqc-leak-allowlist.json` absent, write `<FEATURE>/evidence/baseline/leak-scan-raw.<timestamp>.md`, then classify every row under `## Finding Classification Rule` in `<FEATURE>/evidence/other/leak-scan-classification.<timestamp>.md`.
+- [x] [P2-T1] Run `Invoke-PoshQCLeakScan` over the repository with `config/poshqc-leak-allowlist.json` absent, write `<FEATURE>/evidence/baseline/leak-scan-raw.<timestamp>.md`, then classify every row under `## Finding Classification Rule` in `<FEATURE>/evidence/other/leak-scan-classification.<timestamp>.md`.
   - The step script collects logger messages through `-Logger`, catches the expected throw, and writes one `FINDING: <path> | <line> | <kind> | <name>` row per finding and one `PARSE-ERROR:` row per parse error, sorted by path, then line. It exits 1 only when the throw occurred and at least one row was written, and 255 otherwise. The raw artifact declares `ExpectedExitCode: 1`, and its `Output Summary:` states the count per kind and the `LASTEXITCODE` count.
   - The classification holds one row per raw finding, with its class, the matched predicate text, and its disposition, plus the relying-side search for a class T row. Its header states `EXEMPT-COUNT:`, the count reported to the owner under spec Decision 2.
   - Acceptance: `EXIT_CODE: 1`, the classification row count equals the raw `FINDING:` count, and no key group mixes T with another class.
