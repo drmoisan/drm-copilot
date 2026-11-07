@@ -231,6 +231,32 @@ Describe 'Test-ProcessReductionEntry' {
         $result.Errors -join "`n" | Should -BeLike '*needs a non-empty Current fence*'
     }
 
+    It 'PRL-ENTRY-BLOCK-PATH-NOT-RELATIVE rejects the <Case> revert block path' -ForEach @(
+        @{ Case = 'rooted'; BlockPath = '/docs/a.md' },
+        @{ Case = 'drive-prefixed'; BlockPath = 'C:/docs/a.md' },
+        @{ Case = 'leading parent'; BlockPath = '../docs/a.md' },
+        @{ Case = 'inner parent'; BlockPath = 'docs/../a.md' }
+    ) {
+        $section = Get-TestEntrySection
+        $section['Prior Text'] = $section['Prior Text'].Replace('docs/a.md', $BlockPath)
+
+        $result = Test-ProcessReductionEntry -Name $script:EntryName -Text (ConvertTo-TestEntryText -Section $section)
+
+        $result.IsValid | Should -BeFalse
+        $result.Errors -join "`n" | Should -BeLike "*'$BlockPath' must be repository-relative*"
+    }
+
+    It 'PRL-ENTRY-BLOCK-PATH-DOT-PREFIX-ACCEPTED keeps a dot-prefixed or dotted-name path valid' -ForEach @(
+        @{ BlockPath = '.claude/skills/x/SKILL.md' }, @{ BlockPath = 'docs/..foo/a.md' }
+    ) {
+        $section = Get-TestEntrySection
+        $section['Prior Text'] = $section['Prior Text'].Replace('docs/a.md', $BlockPath)
+
+        $result = Test-ProcessReductionEntry -Name $script:EntryName -Text (ConvertTo-TestEntryText -Section $section)
+
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+    }
+
     It 'PRL-ENTRY-BAD-NAME rejects a file name outside the entry format' {
         $result = Test-ProcessReductionEntry -Name 'Sample.md' -Text (ConvertTo-TestEntryText -Section (Get-TestEntrySection))
 
@@ -267,6 +293,21 @@ Describe 'Test-ProcessReductionEntry' {
 
         $result.IsValid | Should -BeFalse
         $null -eq $result.PatchPath | Should -BeTrue
+    }
+
+    It 'PRL-ENTRY-STORED-PATCH-TRAILING-PUNCTUATION accepts one sentence period and rejects a longer name' {
+        $section = Get-TestEntrySection
+        $section.Remove('Prior Text')
+        $section['Stored Patch'] = 'Apply patches/0001-sample-entry.patch.'
+        $accepted = Test-ProcessReductionEntry -Name $script:EntryName -Text (ConvertTo-TestEntryText -Section $section)
+        $section['Stored Patch'] = 'Apply patches/0001-sample-entry.patch.bak in reverse.'
+
+        $rejected = Test-ProcessReductionEntry -Name $script:EntryName -Text (ConvertTo-TestEntryText -Section $section)
+
+        $accepted.IsValid | Should -BeTrue -Because ($accepted.Errors -join '; ')
+        $accepted.PatchPath | Should -BeExactly 'patches/0001-sample-entry.patch'
+        $rejected.IsValid | Should -BeFalse
+        $null -eq $rejected.PatchPath | Should -BeTrue
     }
 
     It 'PRL-ENTRY-TOKEN-MISMATCH rejects a reduction token that differs from the file number' {
@@ -333,6 +374,16 @@ Describe 'Test-ProcessReductionEntry' {
 
         $upperResult.IsValid | Should -BeTrue -Because ($upperResult.Errors -join '; ')
         $result.Errors -join "`n" | Should -BeLike '*out of order*'
+    }
+
+    It 'PRL-ENTRY-REVERT-STEP-FENCED-LABELS-IGNORED does not count labels that sit inside a fence' {
+        $section = Get-TestEntrySection
+        $section['Revert Steps'] = "$($script:Fence)text`n$($section['Revert Steps'])`n$($script:Fence)"
+
+        $result = Test-ProcessReductionEntry -Name $script:EntryName -Text (ConvertTo-TestEntryText -Section $section)
+
+        $result.IsValid | Should -BeFalse
+        $result.Errors -join "`n" | Should -BeLike "*must name 'Apply the blocks'*"
     }
 }
 

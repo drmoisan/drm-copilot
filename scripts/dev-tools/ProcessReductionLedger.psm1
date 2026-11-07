@@ -290,6 +290,9 @@ function Get-ProcessReductionPriorTextError {
     }
 
     foreach ($block in $blocks) {
+        if ($block.Path -cmatch '^[/\\]|^[A-Za-z]:|(?:^|[/\\])\.\.(?:[/\\]|$)') {
+            "Revert block path '$($block.Path)' must be repository-relative, with no leading separator, drive prefix, or '..' segment."
+        }
         if ([string]::IsNullOrEmpty($block.Current)) {
             "Revert block '$($block.Path)' needs a non-empty Current fence."
         }
@@ -319,12 +322,13 @@ function Get-ProcessReductionRevertStepError {
         'Run the contract tests'
     )
     $comparison = [System.StringComparison]::OrdinalIgnoreCase
+    $plainSteps = (@(Get-ProcessReductionPlainLine -Text $RevertSteps)) -join "`n"
     $position = 0
     foreach ($label in $labels) {
-        $found = $RevertSteps.IndexOf($label, $position, $comparison)
+        $found = $plainSteps.IndexOf($label, $position, $comparison)
         if ($found -ge 0) {
             $position = $found + $label.Length
-        } elseif ($RevertSteps.IndexOf($label, $comparison) -ge 0) {
+        } elseif ($plainSteps.IndexOf($label, $comparison) -ge 0) {
             "## Revert Steps names '$label' out of order."
         } else {
             "## Revert Steps must name '$label'."
@@ -387,7 +391,7 @@ function Test-ProcessReductionEntry {
     $patchPath = $null
     if ($null -ne $storedPatch) {
         $expectedPatch = 'patches/{0}.patch' -f [System.IO.Path]::GetFileNameWithoutExtension($Name)
-        if ($storedPatch -cmatch ('(?<![\w./-])' + [regex]::Escape($expectedPatch) + '(?![\w./-])')) {
+        if ($storedPatch -cmatch ('(?<![\w./-])' + [regex]::Escape($expectedPatch) + '(?![\w/-]|\.[\w./-])')) {
             $patchPath = $expectedPatch
         } else {
             $errorList.Add("## Stored Patch must name '$expectedPatch'.")
