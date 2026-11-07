@@ -96,6 +96,7 @@ def _text_with(value: object, *, present: bool) -> str:
         str: The checkpoint as JSON text.
     """
     checkpoint = _base_checkpoint()
+    # Add the key only for the with-key variant; the without-key text is the control.
     if present:
         checkpoint[KEY] = value
     return json.dumps(checkpoint, indent=2)
@@ -121,7 +122,15 @@ def _names_key(lines: list[str]) -> bool:
 def test_python_plain_validation_ignores_stage_timing(
     shape: str, value: object
 ) -> None:
-    """Plain validation returns the same error list with and without the key."""
+    """Plain validation returns the same error list with and without the key.
+
+    Args:
+        shape (str): The shape name, used in the failure message.
+        value (object): The value stored under ``stage_timing``.
+
+    Returns:
+        None: The test passes when the lists are equal.
+    """
     # Arrange: the same checkpoint with and without the key.
     without_key = _text_with(value, present=False)
     with_key = _text_with(value, present=True)
@@ -140,7 +149,16 @@ def test_python_plain_validation_ignores_stage_timing(
 def test_python_completion_and_pr_modes_ignore_stage_timing(
     mode: str, shape: str, value: object
 ) -> None:
-    """The completion and PR modes return the same list with and without the key."""
+    """The completion and PR modes return the same list with and without the key.
+
+    Args:
+        mode (str): The validation mode key from ``MODE_FLAGS``.
+        shape (str): The shape name, used in the failure message.
+        value (object): The value stored under ``stage_timing``.
+
+    Returns:
+        None: The test passes when the lists are equal.
+    """
     # Arrange: the same checkpoint with and without the key.
     without_key = _text_with(value, present=False)
     with_key = _text_with(value, present=True)
@@ -159,7 +177,11 @@ def test_python_completion_and_pr_modes_ignore_stage_timing(
 
 
 def test_control_missing_required_key_is_still_reported() -> None:
-    """Removing a required key is reported, which proves the validator ran."""
+    """Removing a required key is reported, which proves the validator ran.
+
+    Returns:
+        None: The test passes when the missing key is reported.
+    """
     # Arrange: a checkpoint with the key present and ``last_updated`` removed.
     checkpoint = _base_checkpoint()
     checkpoint[KEY] = VALID_LIST
@@ -215,7 +237,14 @@ def _provenance_bound_to(case: FixtureCase, source_bytes: bytes) -> ProviderProv
 def test_archived_source_bytes_carry_stage_timing_and_stay_hash_bound(
     case: FixtureCase,
 ) -> None:
-    """A source checkpoint with the key keeps it in the archive, hash bound."""
+    """A source checkpoint with the key keeps it in the archive, hash bound.
+
+    Args:
+        case (FixtureCase): The handoff direction under test.
+
+    Returns:
+        None: The test passes when the bytes validate against their hash.
+    """
     # Arrange: bind the provenance to source bytes that carry the key.
     archived = _source_with_stage_timing(case)
     provenance = _provenance_bound_to(case, archived)
@@ -230,7 +259,14 @@ def test_archived_source_bytes_carry_stage_timing_and_stay_hash_bound(
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
 def test_archive_without_stage_timing_fails_the_source_hash(case: FixtureCase) -> None:
-    """Dropping the key from the archived bytes breaks the source hash binding."""
+    """Dropping the key from the archived bytes breaks the source hash binding.
+
+    Args:
+        case (FixtureCase): The handoff direction under test.
+
+    Returns:
+        None: The test passes when the hash mismatch is raised.
+    """
     # Arrange: provenance bound to bytes with the key, archive bytes without it.
     fixture = load_fixture(case)
     dropped, _ = fixture_bytes(case, fixture)
@@ -244,7 +280,14 @@ def test_archive_without_stage_timing_fails_the_source_hash(case: FixtureCase) -
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
 def test_destination_projection_omits_stage_timing(case: FixtureCase) -> None:
-    """The destination projection copies no unknown key, so it omits the key."""
+    """The destination projection copies no unknown key, so it omits the key.
+
+    Args:
+        case (FixtureCase): The handoff direction under test.
+
+    Returns:
+        None: The test passes when the projection holds no ``stage_timing``.
+    """
     # Arrange: the projection input is the envelope and its facts only, so the
     # source checkpoint text, with or without the key, never reaches the adapter.
     envelope = build_envelope(case)
