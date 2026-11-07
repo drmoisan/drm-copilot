@@ -139,7 +139,7 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
 
         $lines = @(Get-EpicProgressTldrLine -Summary (Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:0/1')))
 
-        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 9 of 12 steps (75%). None of the 1 features is done yet. #12345 is running (9 of 12 steps).'
+        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 9 of 12 steps (75%). The only feature is not done yet. #12345 is running (9 of 12 steps).'
     }
 
     It 'lists several running features' {
@@ -339,11 +339,80 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
         $full = @(Get-EpicProgressFullLine -Summary $summary)
 
-        $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 2 of 4 steps (50%). None of the 1 features is done yet. #42 is running (2 of 4 steps).'
+        $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 2 of 4 steps (50%). #42 is not done yet. #42 is running (2 of 4 steps).'
         $tldr[3] | Should -Be '**Estimated time remaining:** 0 h 31 min by type (sum); 0 h 31 min wave-parallel.'
         $full[1] | Should -Be '## Item #42: status at 12:00 UTC, Jan 5'
-        # A blank band prints the wave alone.
-        $full | Should -Contain '| Running | #42 (wave 1): 2 of 4 steps (50%). |'
+        # Item mode prints no wave or band label on the Running row.
+        $full | Should -Contain '| Running | #42: 2 of 4 steps (50%). |'
+    }
+
+    It 'prints the one-feature epic golden with one blocked step' {
+        # Feature #12 is blocked with one done review and one blocked review (14-min default):
+        # 1 of 2 steps, nothing remaining, and 14 min of blocked work excluded.
+        $features = @(Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 2 -Done 1 -State 'Blocked' -BlockedReason 'policy_hold')
+        $steps = @(
+            Get-EpicProgressStepRecord -Issue '12' -Type 'review' -Ordinal 1 -Status 'done'
+            Get-EpicProgressStepRecord -Issue '12' -Type 'review' -Ordinal 2 -Status 'blocked'
+        )
+
+        $summary = Get-TestSummary -Feature $features -Step $steps
+        $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
+        $full = @(Get-EpicProgressFullLine -Summary $summary)
+
+        $tldr.Count | Should -Be 4
+        $tldr[0] | Should -Be '**TL;DR:** Epic #42 is at 1 of 2 steps (50%). The only feature is not done yet. #12 is blocked (policy_hold).'
+        $tldr[1] | Should -BeLike '*on the per-type estimate (1 blocked step excluded). *'
+        $full | Should -Contain '**Blocked:** 1 step excluded from the estimate, about 0 h 14 min of work.'
+    }
+
+    It 'prints the item-mode Full golden' {
+        # One running item: review 1 done and 1 remaining (14 min), ci 1 done and 1 remaining (17 min): 31 min.
+        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 4 -Done 2 -State 'Running')
+        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:1/1,ci:1/1' -Issue '42') -Subject 'Item'
+
+        $full = @(Get-EpicProgressFullLine -Summary $summary)
+
+        $expected = @(
+            ''
+            '## Item #42: status at 12:00 UTC, Jan 5'
+            ''
+            '**Elapsed:** 3 h 00 min since 09:00 UTC. **Progress:** 2 of 4 steps complete, **50%**.'
+            ''
+            '| State | Item |'
+            '|---|---|'
+            '| Completed | None yet |'
+            '| Running | #42: 2 of 4 steps (50%). |'
+            '| Blocked | None |'
+            ''
+            '| Wave | Children | Steps | Done |'
+            '|---|---|---|---|'
+            '| 1 | 1 | 4 | 2 |'
+            '| **Total** | **1** | **4** | **2** |'
+            ''
+            '| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |'
+            '|---|---|---|---|---|---|---|---|'
+            '| review | 1 | 0 | 1 | 0 | 0 h 14 min (default) | 0 | 0 h 14 min |'
+            '| ci | 1 | 0 | 1 | 0 | 0 h 17 min (default) | 0 | 0 h 17 min |'
+            '| **Total** | **2** | **0** | **2** | **0** | | **0** | **0 h 31 min** |'
+            ''
+            'review: no measured duration; default 14 min'
+            'ci: no measured duration; default 17 min'
+            '**Unmapped and composite stage time:** none.'
+            "**Weekly quota (active account):** 42.5% used, +42.5 points since the measurement started. This pool also covers the other runs in this session, so it is not this item's cost alone."
+        )
+        ($full -join "`n") | Should -Be ($expected -join "`n")
+        @($full | Where-Object { $_ -like '*(wave *' }).Count | Should -Be 0
+    }
+
+    It 'prints the done sentence about a completed item' {
+        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 2 -Done 2 -State 'Completed')
+        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:2/0' -Issue '42') -Subject 'Item'
+
+        $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
+
+        $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 2 of 2 steps (100%). #42 is done.'
+        ($tldr -join "`n") | Should -Not -Match 'No feature is running'
+        $tldr.Count | Should -Be 4
     }
 
     It 'prints no velocity, SD or range line in either mode' {

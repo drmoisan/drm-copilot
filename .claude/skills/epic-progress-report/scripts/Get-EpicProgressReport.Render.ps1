@@ -103,6 +103,11 @@ function Get-EpicProgressTldrLine {
     <#
     .SYNOPSIS
         Return the four TL;DR lines (TL;DR, Elapsed, Now, estimated time remaining).
+    .DESCRIPTION
+        In item mode (Subject 'Item') the done sentence is about the item ('#<i> is done.' or
+        '#<i> is not done yet.') and no 'No feature is running.' sentence is printed. An epic
+        with one feature says 'The only feature is done.' or 'The only feature is not done
+        yet.'; an epic with more features counts them. A blocked count of one is singular.
     .PARAMETER Summary
         The record from Get-EpicProgressSummary.
     #>
@@ -111,6 +116,8 @@ function Get-EpicProgressTldrLine {
     param([Parameter(Mandatory = $true)] [pscustomobject] $Summary)
 
     $featureCount = $Summary.Feature.Count
+    $isItem = $Summary.Subject -eq 'Item'
+    $isDone = $Summary.Completed.Count -gt 0
     $running = $Summary.Running
     $sentences = [System.Collections.Generic.List[string]]::new()
     if ($running.Count -eq 1) {
@@ -119,9 +126,20 @@ function Get-EpicProgressTldrLine {
         $sentences.Add((($running | ForEach-Object { "#$($_.Issue) ($($_.Done) of $($_.Total))" }) -join ', ') + ' are running.')
     }
     foreach ($record in $Summary.Blocked) { $sentences.Add("#$($record.Issue) is blocked ($($record.BlockedReason)).") }
-    if ($sentences.Count -eq 0) { $sentences.Add('No feature is running.') }
-    $doneSentence = "None of the $featureCount features is done yet."
-    if ($Summary.Completed.Count -gt 0) { $doneSentence = "$($Summary.Completed.Count) of $featureCount features are done." }
+    if ($sentences.Count -eq 0 -and -not $isItem) { $sentences.Add('No feature is running.') }
+    if ($isItem) {
+        $doneSentence = "#$($Summary.EpicIssue) is not done yet."
+        if ($isDone) { $doneSentence = "#$($Summary.EpicIssue) is done." }
+    } elseif ($featureCount -eq 1) {
+        $doneSentence = 'The only feature is not done yet.'
+        if ($isDone) { $doneSentence = 'The only feature is done.' }
+    } else {
+        $doneSentence = "None of the $featureCount features is done yet."
+        if ($isDone) { $doneSentence = "$($Summary.Completed.Count) of $featureCount features are done." }
+    }
+    $sentences.Insert(0, $doneSentence)
+    $blockedText = "$($Summary.Estimate.BlockedCount) blocked steps excluded"
+    if ($Summary.Estimate.BlockedCount -eq 1) { $blockedText = '1 blocked step excluded' }
     $percent = Format-EpicProgressNumber -Value $Summary.Percent -Digits 1
     $estimate = $Summary.Estimate
     $hoursLeft = Format-EpicProgressNumber -Value ($estimate.TotalSeconds / 3600.0) -Digits 1
@@ -136,8 +154,8 @@ function Get-EpicProgressTldrLine {
     }
 
     return [string[]] @(
-        "**TL;DR:** $($Summary.Subject) #$($Summary.EpicIssue) is at $($Summary.Done) of $($Summary.Total) steps ($percent%). $doneSentence $($sentences -join ' ')"
-        "**Elapsed:** $(Format-EpicProgressHour -Hours $Summary.ElapsedHours), with about $hoursLeft hours left on the per-type estimate ($($estimate.BlockedCount) blocked steps excluded). **Weekly** quota is at $weekly."
+        "**TL;DR:** $($Summary.Subject) #$($Summary.EpicIssue) is at $($Summary.Done) of $($Summary.Total) steps ($percent%). $($sentences -join ' ')"
+        "**Elapsed:** $(Format-EpicProgressHour -Hours $Summary.ElapsedHours), with about $hoursLeft hours left on the per-type estimate ($blockedText). **Weekly** quota is at $weekly."
         "**Now:** $now. $($estimate.DefaultCount) of $($estimate.Type.Count) types use defaults."
         "**Estimated time remaining:** $(Format-EpicProgressHour -Hours ($estimate.TotalSeconds / 3600.0)) by type (sum); $(Format-EpicProgressHour -Hours $Summary.WaveParallelHours) wave-parallel."
     )
@@ -153,7 +171,9 @@ function Get-EpicProgressFullLine {
         the per-type table with its Total row, one line per type that uses a default duration,
         the blocked-work line when a step is blocked, the unmapped and composite stage-time
         line, and the weekly-quota line, with invariant-culture times. A median that includes
-        approximate samples is marked '(approx)'.
+        approximate samples is marked '(approx)'. In item mode the State header reads 'Item',
+        the Running and Pending rows carry no wave or band label, and the weekly line speaks of
+        the measurement and of this item; a blocked count of one is singular.
     .PARAMETER Summary
         The record from Get-EpicProgressSummary.
     #>
@@ -162,6 +182,7 @@ function Get-EpicProgressFullLine {
     param([Parameter(Mandatory = $true)] [pscustomobject] $Summary)
 
     $culture = [cultureinfo]::InvariantCulture
+    $isItem = $Summary.Subject -eq 'Item'
     $percent = Format-EpicProgressNumber -Value $Summary.Percent -Digits 1
     $hourText = { param([double] $Seconds) Format-EpicProgressHour -Hours ($Seconds / 3600.0) }
     $lines = [System.Collections.Generic.List[string]]::new()
@@ -172,7 +193,7 @@ function Get-EpicProgressFullLine {
     $lines.Add('')
     $lines.Add("**Elapsed:** $(Format-EpicProgressHour -Hours $Summary.ElapsedHours) since $($Summary.StartUtc.ToString('HH:mm', $culture)) UTC. **Progress:** $($Summary.Done) of $($Summary.Total) steps complete, **$percent%**.")
     $lines.Add('')
-    $lines.Add('| State | Features |')
+    $lines.Add($(if ($isItem) { '| State | Item |' } else { '| State | Features |' }))
     $lines.Add('|---|---|')
     $completedText = 'None yet'
     if ($Summary.Completed.Count -gt 0) { $completedText = ($Summary.Completed | ForEach-Object { "#$($_.Issue)" }) -join ', ' }
@@ -183,16 +204,20 @@ function Get-EpicProgressFullLine {
         $phase = ''
         if ($record.Phase) { $phase = " Now at: $($record.Phase)." }
         $share = Format-EpicProgressNumber -Value (100.0 * $record.Done / [math]::Max(1, $record.Total)) -Digits 0
-        $where = "wave $($record.Wave)"
+        $where = " (wave $($record.Wave)"
         if ($record.Band) { $where = "$where, $($record.Band)" }
-        $lines.Add("| Running | #$($record.Issue) ($where): $($record.Done) of $($record.Total) steps ($share%).$phase$pullRequest |")
+        $where = "$where)"
+        if ($isItem) { $where = '' }
+        $lines.Add("| Running | #$($record.Issue)$($where): $($record.Done) of $($record.Total) steps ($share%).$phase$pullRequest |")
     }
     $blockedText = 'None'
     if ($Summary.Blocked.Count -gt 0) { $blockedText = ($Summary.Blocked | ForEach-Object { "#$($_.Issue) ($($_.BlockedReason))" }) -join ', ' }
     $lines.Add("| Blocked | $blockedText |")
     $pendingGroups = @($Summary.Pending | Group-Object -Property Wave | Sort-Object -Property { [int] $_.Name })
     foreach ($group in $pendingGroups) {
-        $lines.Add("| Pending, wave $($group.Name) | " + (($group.Group | ForEach-Object { "#$($_.Issue) ($($_.Total))" }) -join ', ') + ' |')
+        $label = "Pending, wave $($group.Name)"
+        if ($isItem) { $label = 'Pending' }
+        $lines.Add("| $label | " + (($group.Group | ForEach-Object { "#$($_.Issue) ($($_.Total))" }) -join ', ') + ' |')
     }
     $lines.Add('')
     $lines.Add('| Wave | Children | Steps | Done |')
@@ -227,7 +252,9 @@ function Get-EpicProgressFullLine {
         $lines.Add("$($row.Type): no measured duration; default $(Format-EpicProgressNumber -Value ($row.MedianSeconds / 60.0) -Digits 1) min")
     }
     if ($Summary.Estimate.BlockedCount -gt 0) {
-        $lines.Add("**Blocked:** $($Summary.Estimate.BlockedCount) steps excluded from the estimate, about $(& $hourText $Summary.Estimate.BlockedSubtotalSeconds) of work.")
+        $stepWord = 'steps'
+        if ($Summary.Estimate.BlockedCount -eq 1) { $stepWord = 'step' }
+        $lines.Add("**Blocked:** $($Summary.Estimate.BlockedCount) $stepWord excluded from the estimate, about $(& $hourText $Summary.Estimate.BlockedSubtotalSeconds) of work.")
     }
     $unmappedText = 'none.'
     $unmappedTotal = $Summary.CompositeSeconds + $Summary.UnmappedSeconds
@@ -237,6 +264,8 @@ function Get-EpicProgressFullLine {
     $lines.Add("**Unmapped and composite stage time:** $unmappedText")
     $delta = Format-EpicProgressNumber -Value $Summary.WeeklyDelta
     if ($delta -ne 'n/a' -and $Summary.WeeklyDelta -ge 0) { $delta = "+$delta" }
-    $lines.Add("**Weekly quota (active account):** $(Get-EpicProgressWeeklyText -Value $Summary.WeeklyPct) used, $delta points since the epic started. This pool also covers the other runs in this session, so it is not the epic's cost alone.")
+    $weeklyTail = "points since the epic started. This pool also covers the other runs in this session, so it is not the epic's cost alone."
+    if ($isItem) { $weeklyTail = "points since the measurement started. This pool also covers the other runs in this session, so it is not this item's cost alone." }
+    $lines.Add("**Weekly quota (active account):** $(Get-EpicProgressWeeklyText -Value $Summary.WeeklyPct) used, $delta $weeklyTail")
     return $lines.ToArray()
 }

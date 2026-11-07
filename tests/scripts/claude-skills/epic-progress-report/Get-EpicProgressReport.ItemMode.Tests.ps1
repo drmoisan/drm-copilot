@@ -108,7 +108,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
         $lines = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
 
         $expected = @(
-            '**TL;DR:** Item #1118 is at 8 of 12 steps (66.7%). None of the 1 features is done yet. #1118 is running (8 of 12 steps).'
+            '**TL;DR:** Item #1118 is at 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
             '**Elapsed:** 3 h 00 min, with about 0.5 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at n/a.'
             '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
             '**Estimated time remaining:** 0 h 29 min by type (sum); 0 h 29 min wave-parallel.'
