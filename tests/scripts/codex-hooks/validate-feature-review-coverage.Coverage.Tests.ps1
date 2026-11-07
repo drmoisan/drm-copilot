@@ -13,6 +13,10 @@
 Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
     BeforeAll {
         $script:HookFile = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.codex/hooks/validate-feature-review-coverage.ps1'))
+        # Issue #1114: the target, resolver, and freshness functions are loaded here so their mocks resolve for every row.
+        . ([System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.codex/hooks/hook-target-worktree.ps1')))
+        . ([System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.codex/hooks/feature-review-coverage-target.ps1')))
+        . ([System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.codex/hooks/validate-feature-review-coverage-freshness.ps1')))
         . $script:HookFile
         $script:RealGetChangedLanguageSet = ${function:Get-ChangedLanguageSet}
         $script:RealGetJacocoRepoCoverage = ${function:Get-JacocoRepoCoverage}
@@ -45,6 +49,21 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
 
         $script:ReviewStop = '{"hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false}'
         $script:ReviewStopActive = '{"hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":true}'
+
+        # Issue #1114 fixtures: the session root is this checkout; the reviewed item lives in a synthetic worktree.
+        $script:CodexSessionRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..')) -replace '\\', '/'
+        $script:CodexItemRoot = '/synthetic-worktrees/item-a'
+        $script:CodexAuditA = 'docs/features/active/2026-11-07-item-a-1114/policy-audit.2026-11-07T20-00.md'
+        $script:CodexAuditB = 'docs/features/active/2026-11-07-item-b-1115/policy-audit.2026-11-07T22-00.md'
+        $script:CodexCommitSeconds = 1762525200L
+        $script:CodexCommitTime = [DateTimeOffset]::FromUnixTimeSeconds($script:CodexCommitSeconds).UtcDateTime
+        $script:CodexPorcelain = "worktree $script:CodexSessionRoot`nbranch refs/heads/main`n`nworktree $script:CodexItemRoot`nbranch refs/heads/bug/item-a`n"
+
+        function Get-CodexReviewStopPayload {
+            # Returns a feature-review SubagentStop payload whose final message names the given audit path.
+            param([Parameter(Mandatory)] [string] $AuditPath, [bool] $StopHookActive = $false)
+            return ([ordered]@{ hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $StopHookActive; last_assistant_message = "Review complete.`npolicy-audit-path: $AuditPath" } | ConvertTo-Json -Compress)
+        }
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
@@ -156,6 +175,105 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             Mock Get-ChangedLanguageSet -MockWith $script:RealGetChangedLanguageSet
             Mock Get-JacocoRepoCoverage -MockWith $script:RealGetJacocoRepoCoverage
             Mock Get-LcovRepoCoverage -MockWith $script:RealGetLcovRepoCoverage
+        }
+
+        BeforeEach {
+            # Issue #1114: no entry row may run git; a row that reaches a wrapper mocks that wrapper.
+            Mock Invoke-CodexReviewCoverageGitExe { param([string[]] $GitArgs) throw "unexpected git call: $($GitArgs -join ' ')" }
+        }
+
+        It "1114: judges the audit named by the reviewer when another item's audit is newer" {
+            # Arrange: the reviewer names item A's audit; item B's audit is newer and carries no Python coverage verdict.
+            $sessionRoot = $script:CodexSessionRoot
+            $auditA = $script:CodexAuditA
+            $auditB = $script:CodexAuditB
+            Mock Test-Path { param($Path, $LiteralPath) -not ("$Path$LiteralPath").EndsWith('.xml') }
+            Mock Get-ChildItem { @([pscustomobject]@{ FullName = "$sessionRoot/$auditA"; LastWriteTime = [datetime]'2026-11-07T20:00:00' }, [pscustomobject]@{ FullName = "$sessionRoot/$auditB"; LastWriteTime = [datetime]'2026-11-07T22:00:00' }) }.GetNewClosure()
+            Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:100', 'LH:90') } elseif ($p.EndsWith('CLAUDE.md')) { 'Project notes without coverage figures.' } elseif ($p.Contains('item-b-1115')) { 'Python style notes only' } else { 'Python coverage PASS' } }
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin (Get-CodexReviewStopPayload -AuditPath $auditA)
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            $result.Stdout | Should -BeNullOrEmpty -Because 'the named audit A carries a PASS coverage verdict for Python'
+        }
+
+        It '1114: blocks a report older than the newest item commit for the language in an item worktree' {
+            # Arrange: the audit lives in item worktree A; its Python report predates the newest Python commit.
+            $sessionRoot = $script:CodexSessionRoot
+            $porcelain = $script:CodexPorcelain
+            $commitTime = $script:CodexCommitTime
+            $commitSeconds = $script:CodexCommitSeconds
+            Mock Test-Path { param($Path, $LiteralPath) -not ("$Path$LiteralPath").EndsWith('.xml') }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = "$sessionRoot/docs/features/active/2026-11-07-item-z-1100/policy-audit.2026-11-07T19-00.md"; LastWriteTime = [datetime]'2026-11-07T19:00:00' } }.GetNewClosure()
+            Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:100', 'LH:90') } elseif ($p.EndsWith('CLAUDE.md')) { 'Project notes without coverage figures.' } else { 'Python coverage PASS' } }
+            Mock Get-CodexReviewCoverageWorktreeList { $porcelain }.GetNewClosure()
+            Mock Invoke-CodexReviewCoverageGitLog { [pscustomobject]@{ ExitCode = 0; Output = "$commitSeconds" } }.GetNewClosure()
+            Mock Get-FeatureReviewReportLastWriteUtc { param([string] $Path) if ($Path.EndsWith('pr_context.summary.txt')) { $commitTime } elseif ($Path.EndsWith('lcov.info')) { $commitTime.AddMinutes(-5) } else { $null } }.GetNewClosure()
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin (Get-CodexReviewStopPayload -AuditPath "$script:CodexItemRoot/$script:CodexAuditA")
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            $result.Stdout | Should -Not -BeNullOrEmpty -Because 'a stale Python report in the item worktree must block'
+            $continuation = $result.Stdout | ConvertFrom-Json
+            $continuation.decision | Should -Be 'block'
+            $continuation.reason | Should -BeLike '*Python coverage report*is stale*'
+            $continuation.reason | Should -BeLike "*'$script:CodexItemRoot'*"
+        }
+
+        It '1114: blocks an absent coverage report for a changed language in an item worktree' {
+            # Arrange: the item worktree has its PR context summary but no Python report.
+            $sessionRoot = $script:CodexSessionRoot
+            $porcelain = $script:CodexPorcelain
+            $commitTime = $script:CodexCommitTime
+            Mock Test-Path { param($Path, $LiteralPath) -not ("$Path$LiteralPath").EndsWith('.xml') }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = "$sessionRoot/docs/features/active/2026-11-07-item-z-1100/policy-audit.2026-11-07T19-00.md"; LastWriteTime = [datetime]'2026-11-07T19:00:00' } }.GetNewClosure()
+            Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:100', 'LH:90') } elseif ($p.EndsWith('CLAUDE.md')) { 'Project notes without coverage figures.' } else { 'Python coverage PASS' } }
+            Mock Get-CodexReviewCoverageWorktreeList { $porcelain }.GetNewClosure()
+            Mock Invoke-CodexReviewCoverageGitLog { [pscustomobject]@{ ExitCode = 0; Output = '1762525200' } }
+            Mock Get-FeatureReviewReportLastWriteUtc { param([string] $Path) if ($Path.EndsWith('pr_context.summary.txt')) { $commitTime } else { $null } }.GetNewClosure()
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin (Get-CodexReviewStopPayload -AuditPath "$script:CodexItemRoot/$script:CodexAuditA")
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            $result.Stdout | Should -Not -BeNullOrEmpty -Because 'an absent Python report in the item worktree must block'
+            $continuation = $result.Stdout | ConvertFrom-Json
+            $continuation.decision | Should -Be 'block'
+            $continuation.reason | Should -BeLike '*Python has changed files*'
+            $continuation.reason | Should -BeLike "*'artifacts/python/lcov.info'*"
+            $continuation.reason | Should -BeLike "*'$script:CodexItemRoot'*"
+        }
+
+        It '1114: with two active items and a stale report the review of the named item is blocked on freshness' {
+            # Arrange: items A and B both have audits beneath the session root, B's newer; the reviewer names A in its worktree.
+            $sessionRoot = $script:CodexSessionRoot
+            $auditA = $script:CodexAuditA
+            $auditB = $script:CodexAuditB
+            $porcelain = $script:CodexPorcelain
+            $commitTime = $script:CodexCommitTime
+            $commitSeconds = $script:CodexCommitSeconds
+            Mock Test-Path { param($Path, $LiteralPath) -not ("$Path$LiteralPath").EndsWith('.xml') }
+            Mock Get-ChildItem { @([pscustomobject]@{ FullName = "$sessionRoot/$auditA"; LastWriteTime = [datetime]'2026-11-07T20:00:00' }, [pscustomobject]@{ FullName = "$sessionRoot/$auditB"; LastWriteTime = [datetime]'2026-11-07T22:00:00' }) }.GetNewClosure()
+            Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:100', 'LH:90') } elseif ($p.EndsWith('CLAUDE.md')) { 'Project notes without coverage figures.' } else { 'Python coverage PASS' } }
+            Mock Get-CodexReviewCoverageWorktreeList { $porcelain }.GetNewClosure()
+            Mock Invoke-CodexReviewCoverageGitLog { [pscustomobject]@{ ExitCode = 0; Output = "$commitSeconds" } }.GetNewClosure()
+            Mock Get-FeatureReviewReportLastWriteUtc { param([string] $Path) if ($Path.EndsWith('pr_context.summary.txt')) { $commitTime } elseif ($Path.EndsWith('lcov.info')) { $commitTime.AddSeconds(-1) } else { $null } }.GetNewClosure()
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin (Get-CodexReviewStopPayload -AuditPath "$script:CodexItemRoot/$auditA")
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            $result.Stdout | Should -Not -BeNullOrEmpty -Because 'the named item has a stale Python report'
+            $continuation = $result.Stdout | ConvertFrom-Json
+            $continuation.decision | Should -Be 'block'
+            $continuation.reason | Should -BeLike '*inputs in the item worktree are absent or stale*'
+            $continuation.reason | Should -BeLike '*is stale*'
         }
 
         It 'exits 2 for <Case>' -ForEach @(
