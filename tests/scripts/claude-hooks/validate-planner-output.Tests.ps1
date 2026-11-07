@@ -7,6 +7,8 @@
 BeforeAll {
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1'
     . $hookPath
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     # Issue #964: allowed-plan fixtures carry a valid Pre-Mortem section.
     $script:PreMortemFixture = @('## Pre-Mortem', '- Review checklists: walked.', '- Coverage: measured.', '- Mirror parity: copied.', '- File size: measured.', '- Test isolation: shuffled.', '- CI-only behavior: checked.', '- Evidence: recorded.', '## Phases')
 
@@ -26,6 +28,10 @@ UNRESOLVED-GAPS: NONE
 PREFLIGHT: $Preflight
 "@.Trim()
     }
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'validate-planner-output.ps1' {
