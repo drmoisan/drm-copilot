@@ -72,6 +72,8 @@ R1 = owner directive clause (1): pushed-down skills, helpers, hooks and libs are
 | `.claude/lib/docs/DocsProfileCommands.psm1` (edit: one `Get-DocsInitTemplate` row) | pushed-down helper/lib | PowerShell | R1, D |
 | `.claude/hooks/enforce-docs-complete-gate.ps1` | hook | PowerShell | R1, D |
 | Bundle copies of the seven rows above under `extensions/drm-copilot/resources/claude-customizations/.claude/` | pushed-down helper/lib, hook, data (mirror) | PowerShell, YAML | R1, D |
+| `.claude/hooks/enforce-docs-complete-gate-target.ps1` | hook | PowerShell | R1, D |
+| `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate-target.ps1` | hook mirror | PowerShell | R1, D |
 | `.claude/settings.json` and bundle copy (edit) | schema/config/data | JSON | D |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit) | schema/config/data | JSON | D |
 | `.claude/agents/feature-review.md` and bundle copy (edit) | agent | Markdown | D |
@@ -82,6 +84,8 @@ R1 = owner directive clause (1): pushed-down skills, helpers, hooks and libs are
 | `tests/scripts/claude-lib/docs/Docs.TestSupport.psm1` (edit: in-memory revision members, OQ-1) | test support | PowerShell | D |
 | `tests/scripts/claude-lib/docs/DocsPageTemplates.Tests.ps1` (edit: one in-memory source entry) | test | PowerShell (Pester) | D |
 | `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1` | test | PowerShell (Pester) | D |
+| `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1` | test | PowerShell (Pester) | D |
+| `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1` | test | PowerShell (Pester) | D |
 | `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` (edit: one `$script:ReasonPrefix` row) | test | PowerShell (Pester) | D |
 | Any further suite under `tests/scripts/claude-lib/docs/` that P0-T3 records as enumerating the complete subcommand or init planned-write set (edit only where recorded) | test | PowerShell (Pester) | D |
 | `tests/scripts/claude-hooks/cleanup-merged-worktrees-workflow.EndToEnd.Tests.ps1` (edit: one `$script:ExemptHook` row; executor-marked during Phase 7, see `## Notes`) | test | PowerShell (Pester) | D |
