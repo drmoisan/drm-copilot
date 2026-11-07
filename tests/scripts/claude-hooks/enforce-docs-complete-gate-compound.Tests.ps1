@@ -59,7 +59,7 @@ Describe 'enforce-docs-complete-gate compound commands (issue #1034)' {
 
     Context 'compound merge scope (F3)' {
         BeforeDiscovery {
-            $compoundCommands = @(
+            $script:CompoundCommands = @(
                 'if gh pr checks 12; then gh pr merge 12 --merge; fi'
                 'for n in 12; do gh pr merge "$n" --merge; done'
                 '! gh pr merge 12'
@@ -82,15 +82,11 @@ Describe 'enforce-docs-complete-gate compound commands (issue #1034)' {
                 "! gh api graphql -f query='mutation{mergePullRequest(x)}'"
                 'gh api -X PUT repos/{owner}/{repo}/pulls/12/merge'
             )
-            $enabledRows = @(foreach ($command in $compoundCommands) { @{ Command = $command } })
-            $inactiveRows = @(
-                foreach ($state in @('disabled', 'absent')) {
-                    foreach ($command in $compoundCommands) { @{ State = $state; Command = $command } }
-                }
-            )
         }
 
-        It 'denies PR_UNRESOLVED with no gh call for <Command>' -ForEach $enabledRows {
+        It 'denies PR_UNRESOLVED with no gh call for <Command>' -ForEach @(
+            foreach ($command in $script:CompoundCommands) { @{ Command = $command } }
+        ) {
             # Arrange
             Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText $null
 
@@ -103,7 +99,11 @@ Describe 'enforce-docs-complete-gate compound commands (issue #1034)' {
             Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
         }
 
-        It 'allows <Command> with no gh call when the profile is <State>' -ForEach $inactiveRows {
+        It 'allows <Command> with no gh call when the profile is <State>' -ForEach @(
+            foreach ($state in @('disabled', 'absent')) {
+                foreach ($command in $script:CompoundCommands) { @{ State = $state; Command = $command } }
+            }
+        ) {
             # Arrange
             $profileText = if ($State -eq 'absent') { $null } else { Get-TestProfileText -Enabled $false }
             Set-TestFileSeam -ProfileText $profileText -ReceiptText $null
