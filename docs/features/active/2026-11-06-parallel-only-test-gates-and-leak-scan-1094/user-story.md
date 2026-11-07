@@ -80,7 +80,7 @@ The owner split this item on 2026-11-07. #1094 is the parallel-only test gate ch
 
 These criteria require CI on the PR head. They stay unchecked and pending until CI has run.
 
-- [ ] CI-dependent: `CI Required Gate` reports success on the final PR head.
+- [x] CI-dependent: `CI Required Gate` reports success on the final PR head.
 
 ## Non-Goals
 

@@ -157,7 +157,7 @@ No public function, command, or configuration key is added or changed. The gates
 
 These criteria require CI on the PR head. They stay unchecked and pending until CI has run.
 
-- [ ] CI-dependent: `CI Required Gate` reports success on the final PR head.
+- [x] CI-dependent: `CI Required Gate` reports success on the final PR head.
 
 ## Definition of Done
 
