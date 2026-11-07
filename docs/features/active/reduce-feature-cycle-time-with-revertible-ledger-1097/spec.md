@@ -192,11 +192,11 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [x] [E] The policy-read task, its artifact requirement, and the hook's policy-read check are removed in one commit with its entry; a plan that keeps the task stays valid; and every baseline requirement string named in research section 3 is present before and after.
 - [x] [E] Applying one entry's revert steps to a test copy restores the prior behavior for at least one sample reduction: in memory, the reverted `Get-PlanStructureValidationReport` returns the policy-read error and the live function does not.
 - [x] [E] Wording deferred from stages A to D has landed, with each affected ledger entry updated in the same commit.
-- [ ] [E2] Plans capture a test-suite baseline in Phase 0 with one parallel run (`Invoke-PoshQCParallelTest` and `pytest -n auto`) that records results and coverage.
-- [ ] [E2] The final gate compares coverage and results against the Phase 0 baseline.
-- [ ] [E2] No serial, single-process, seeded-shuffle, reversed-order, or comparison run is restored; the parallel-only change stays.
-- [ ] [E2] The partial revert of ledger entry `0001` is made from its stored prior text and recorded in the ledger, so that the partial revert is itself revertible.
-- [ ] [E2] Older plans and checkpoints still validate.
+- [x] [E2] Plans capture a test-suite baseline in Phase 0 with one parallel run (`Invoke-PoshQCParallelTest` and `pytest -n auto`) that records results and coverage.
+- [x] [E2] The final gate compares coverage and results against the Phase 0 baseline.
+- [x] [E2] No serial, single-process, seeded-shuffle, reversed-order, or comparison run is restored; the parallel-only change stays.
+- [x] [E2] The partial revert of ledger entry `0001` is made from its stored prior text and recorded in the ledger, so that the partial revert is itself revertible.
+- [x] [E2] Older plans and checkpoints still validate.
 - [ ] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
 - [ ] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
 - [ ] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
