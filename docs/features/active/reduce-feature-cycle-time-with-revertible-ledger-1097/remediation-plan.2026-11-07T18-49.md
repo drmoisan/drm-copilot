@@ -74,7 +74,7 @@ Found by searching `tests/` for `Add-ProcessReductionTouch`, `Get-ProcessReducti
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run the PowerShell QA loop and write `FEATURE/evidence/qa-gates/stage-r-cycle2-powershell-format-lint.<timestamp>.md` and `FEATURE/evidence/qa-gates/stage-r-cycle2-powershell-test.<timestamp>.md`.
+- [x] [P2-T1] Run the PowerShell QA loop and write `FEATURE/evidence/qa-gates/stage-r-cycle2-powershell-format-lint.<timestamp>.md` and `FEATURE/evidence/qa-gates/stage-r-cycle2-powershell-test.<timestamp>.md`.
   - Format and lint: PoshQC format in check mode (writer recorded, not applied) and the direct analyzer with the repository settings over `scripts/dev-tools/ProcessReductionChain.psm1`. Observation beyond the exit code: the formatter reports the file already formatted with nothing to write, `git status --porcelain` over the file is empty after it, and the analyzer reports 0 findings. A formatter change is committed and the loop restarts.
   - Test: one `Invoke-PoshQCParallelTest`; counts from `artifacts/pester/pester-junit.xml` (from `artifacts/pester/parallel/shard-<i>/` when `ExitCode` is non-zero), line coverage from `artifacts/pester/powershell-coverage.xml`, compared with the P0-T1 artifact.
   - Output Summary: total, passed, and failed counts; counts of the two `ProcessReductionChain` suites and the three `ProcessReductionLedger` suites; repo-wide line percentage; per-file line percentage of `ProcessReductionChain.psm1` and `ProcessReductionLedger.psm1`; the comparison.
