@@ -221,7 +221,7 @@ Further strings checked because they are in the hold: `static baseline capture (
 
 ### Phase 4 — Final QA
 
-- [ ] [P4-T1] Run format and lint over every `.ps1` and `.psm1` file in the branch diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/stage-e-powershell-format-lint.<timestamp>.md`.
+- [x] [P4-T1] Run format and lint over every `.ps1` and `.psm1` file in the branch diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/stage-e-powershell-format-lint.<timestamp>.md`.
   - Format with `Invoke-PoshQCFormat` check-only, with a no-op `-WriteFile`, and analyze with a direct `Invoke-ScriptAnalyzer` run using `scripts/powershell/PoshQC/settings/pssa.settings.psd1`. Type checking does not apply.
   - Acceptance: the log holds an `Already formatted: ` line and no `Formatted: ` line for each file, and analyzer findings number zero. `EXIT_CODE:` is non-zero when any condition fails. A failure is repaired and this task restarts.
 - [ ] [P4-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-e-powershell-test.<timestamp>.md`.
