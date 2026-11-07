@@ -84,7 +84,7 @@ was observed in one consumer repository.
 - [ ] Mirror and push-down parity tests pass for all new agents, skills and templates, every bundle copy is byte-identical, every Claude and Codex file is listed in its pack manifest, and the existing contract tests and the Codex generator `--check` pass without modification.
 - [x] Each page template carries the front-matter fields `owner`, `last_reviewed`, `audience`, `diataxis_mode` and `surface_refs` with the `diataxis_mode` value of the `spec.md` mode mapping.
 - [x] The SubagentStop and PreToolUse hooks are registered in `.claude/settings.json` and its byte-identical bundle copy, and the `docs_operations` routing block is present in `config/orchestration-routing.json` and its two byte-identical bundle copies (the `extensions/drm-copilot/resources/config/` copy and the `extensions/drm-copilot/resources/claude-customizations/config/` push-down copy).
-- [ ] No Python or TypeScript file is added or modified, `.codex/config.toml` is unchanged, and no test creates a temporary file.
+- [x] No Python or TypeScript file is added or modified, `.codex/config.toml` is unchanged, and no test creates a temporary file.
 - [ ] (CI-dependent) `poshqc / PowerShell QC` and `poshqc / PowerShell hook suites (Linux)` pass on the pull request head.
 
 ## Non-Goals
