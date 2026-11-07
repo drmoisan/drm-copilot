@@ -95,6 +95,15 @@ Describe 'Get-ProcessReductionRevertBlock' {
         $null -eq $blocks[0].Current | Should -BeFalse
         $blocks[0].Current.Length | Should -Be 0
     }
+
+    It 'PRL-BLOCK-IGNORES-UNLABELED-FENCE reads only the Current and Prior fences of a block' {
+        $text = "### Revert Block: docs/a.md`n`n$($script:Fence)text`nan aside`n$($script:Fence)`n`n$($script:Fence)Current`nnew text`n$($script:Fence)`n"
+
+        $blocks = @(Get-ProcessReductionRevertBlock -Text $text)
+
+        $blocks[0].Current | Should -BeExactly 'new text'
+        $null -eq $blocks[0].Prior | Should -BeTrue
+    }
 }
 
 Describe 'Invoke-ProcessReductionRevert' {
@@ -207,6 +216,26 @@ Describe 'Test-ProcessReductionEntry' {
 
         $result.IsValid | Should -BeFalse
         $result.Errors -join "`n" | Should -BeLike '*needs a Prior fence*'
+    }
+
+    It 'PRL-ENTRY-BLOCK-WITHOUT-CURRENT rejects a <Case> Current fence' -ForEach @(
+        @{ Case = 'absent'; CurrentFence = '' },
+        @{ Case = 'empty'; CurrentFence = "$('`' * 4)Current`n$('`' * 4)`n`n" }
+    ) {
+        $section = Get-TestEntrySection
+        $section['Prior Text'] = "### Revert Block: docs/a.md`n`n$CurrentFence$($script:Fence)Prior`nold text`n$($script:Fence)"
+
+        $result = Test-ProcessReductionEntry -Name $script:EntryName -Text (ConvertTo-TestEntryText -Section $section)
+
+        $result.IsValid | Should -BeFalse
+        $result.Errors -join "`n" | Should -BeLike '*needs a non-empty Current fence*'
+    }
+
+    It 'PRL-ENTRY-BAD-NAME rejects a file name outside the entry format' {
+        $result = Test-ProcessReductionEntry -Name 'Sample.md' -Text (ConvertTo-TestEntryText -Section (Get-TestEntrySection))
+
+        $result.IsValid | Should -BeFalse
+        $result.Errors -join "`n" | Should -BeLike "*'Sample.md' is not NNNN*"
     }
 
     It 'PRL-ENTRY-EMPTY-PRIOR-ACCEPTED accepts an empty Prior fence' {
