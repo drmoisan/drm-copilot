@@ -77,6 +77,7 @@
     ".codex/hooks/hook-command-payload-powershell.ps1",
     ".codex/hooks/hook-target-worktree.ps1",
     ".codex/hooks/validate-feature-review-coverage-freshness.ps1",
+    ".codex/hooks/feature-review-coverage-target.ps1",
     ".codex/hooks/record-subagent-routing-attestation.ps1",
     ".codex/hooks/validate-codex-subagent-routing.ps1",
     ".codex/hooks/check-powershell-test-purity.ps1",
