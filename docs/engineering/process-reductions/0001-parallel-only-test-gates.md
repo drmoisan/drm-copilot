@@ -272,7 +272,7 @@ The list covers every path changed from the merge base of `origin/main` and the 
 
 `patches/0001-parallel-only-test-gates.patch` holds the reduction as one diff. It is `git diff --binary --no-renames` from the merge base of `origin/main` and the branch head, limited to the paths in `## Files Changed`.
 
-The check: `git apply -R --check` of the patch succeeds on the working tree. A failed check means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
+The check: `git apply -R --check` of the patch succeeds on the tree after every later entry that touches the patch's paths is reverted, newest-first, as README `## Revert Order` states; it is not run on the live tree. A failed check on that tree means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
 
 ## Prior Text
 
