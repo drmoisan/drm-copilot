@@ -40,7 +40,7 @@ No test suite runs in this phase.
 
 - [x] [P0-T1] Read the policy files in the `policy-compliance-order` order, including `.claude/rules/powershell.md` and `.claude/rules/python.md`, then the inputs and the three audit artifacts, and write `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
-- [ ] [P0-T2] Capture the PowerShell static baseline for `tests/scripts/claude-runtime` in `<FEATURE>/evidence/remediation-baseline/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/remediation-baseline/powershell-analyze.<timestamp>.md`.
+- [x] [P0-T2] Capture the PowerShell static baseline for `tests/scripts/claude-runtime` in `<FEATURE>/evidence/remediation-baseline/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/remediation-baseline/powershell-analyze.<timestamp>.md`.
   - Format runs check-only through the no-op `-WriteFile` seam on the branch-current module. Analyzer findings come from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
   - Acceptance: `Output Summary:` states the would-format count and the finding count as numbers, and `git status --porcelain` shows no tracked file changed by the step.
 
