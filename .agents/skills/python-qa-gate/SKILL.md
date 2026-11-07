@@ -1,6 +1,6 @@
 ---
 name: python-qa-gate
-description: Final QA gate for Python changes. Runs Black, Ruff, Pyright, and Pytest; compares static results to the static baseline, reads tests and coverage from the single gate run, and reports before completion.
+description: Final QA gate for Python changes. Runs Black, Ruff, Pyright, and Pytest; compares static results and the tests and coverage of the single gate run to the Phase A baseline (the `Phase 0 baseline`), enforces zero-regression deltas, and reports before completion.
 ---
 
 # Python QA Gate
@@ -12,14 +12,14 @@ Canonical procedure for the Phase D final quality gate that every Python change 
 Use this skill when:
 
 - `python-typed-engineer` is about to declare a change complete.
-- An executor has finished applying a planned batch and must verify the static tools against the static baseline recorded in Phase A, and the tests in the single gate run.
+- An executor has finished applying a planned batch and must verify zero regressions in the single gate run against the baseline captured in Phase A (the `Phase 0 baseline`).
 - A reviewer needs to confirm the toolchain was actually run and produced a clean pass.
 
 ## Required Inputs
 
 Before invoking this gate, the agent must have:
 
-- a static baseline record produced in Phase A, containing Ruff and Pyright findings for the in-scope files,
+- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing Ruff and Pyright findings for the in-scope files and the Pytest pass/fail status and per-file coverage status of one `poetry run pytest -n auto` run with coverage,
 - the exact list of touched production and test files,
 - a clean working tree (all planned edits committed to the working copy).
 
@@ -34,34 +34,35 @@ Run the full toolchain in this exact order. If any step fails or modifies files,
 
 If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
 
-## Gate Requirements (Hard Gate)
+## Delta Requirements (Zero-Regression Hard Gate)
 
-Compare the final static tool results to the static baseline recorded in Phase A, and read test and coverage results from the single gate run. All of the following must hold:
+Compare the final results to the Phase A baseline (the `Phase 0 baseline`), reading test and coverage results from the single gate run. All of the following must hold:
 
 - **Ruff delta**: 0 new findings across the repository.
 - **Pyright delta**: 0 new diagnostics across the repository.
-- **Pytest gate**: zero failures in the single gate run.
-- **Per-file coverage**: every changed file meets the coverage thresholds, read from the single gate run, and new behavior is tested.
+- **Pytest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+- **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
 - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
 
-If any check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all checks are clean.
+If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
 
 ## Required Reporting Block
 
 Every completion response must include the following sections:
 
 1. **Scope** — exact file list touched in this change.
-2. **Baseline** — Ruff and Pyright findings recorded in Phase A.
+2. **Baseline** — Ruff, Pyright, Pytest, and coverage status recorded in Phase A.
 3. **Plan** — design and test-strategy summary, referencing the approved plan.
 4. **Diffs** — patch-style or full-file replacements for scoped files only.
-5. **QA Gate Results** — Ruff and Pyright deltas, failures in the single gate run, and per-file coverage against the thresholds. If any step could not be run, mark the corresponding line **unverified** and state why.
+5. **QA Gate Results** — Ruff and Pyright deltas, failing-tests delta from the single gate run, per-file coverage delta against the baseline and the thresholds, and overall coverage delta when applicable. If any step could not be run, mark the corresponding line **unverified** and state why.
 
 ## Evidence Storage
 
 Persist toolchain output according to `evidence-and-timestamp-conventions`:
 
-- store static baseline outputs under `<FEATURE>/evidence/baseline/<timestamp>/`,
-- store final gate outputs under `<FEATURE>/evidence/qa-gates/<timestamp>/`,
+- store baseline outputs (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/`,
+- store post-change outputs under `<FEATURE>/evidence/qa-gates/<timestamp>/`,
 - use ISO-8601 UTC timestamps in folder names.
 
 This location is canonical per evidence-and-timestamp-conventions and is not overridable.

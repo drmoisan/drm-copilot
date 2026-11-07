@@ -1,7 +1,7 @@
 ---
 name: python-typed-engineer
 model: sonnet
-description: Project-scoped worker that implements and verifies Python changes within typed repository boundaries. Applies the Black -> Ruff -> Pyright -> Pytest toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and quality gates read from the single gate run.
+description: Project-scoped worker that implements and verifies Python changes within typed repository boundaries. Applies the Black -> Ruff -> Pyright -> Pytest toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
 tools:
   - Read
   - Write
@@ -38,10 +38,10 @@ Follow the phased workflow defined by the preloaded skills:
 
 1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
 2. **Routing and scope** — apply `python-change-budget-router` to estimate scope and select direct mode (1-3 production files) or, for more than 3 production files, large-path escalation through `/orchestrate`. The large path has no production-file cap, and test files are not counted toward the routing threshold.
-3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied.
+3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture (static baselines and the `Phase 0 baseline` test-suite run) and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied.
 4. **Implement in batches** — apply the approved plan. After each batch, run targeted Ruff and Pyright on touched files. Test and coverage results come from the single gate run. A focused run of one test file to debug a specific failure is debugging only.
-5. **Final QA gate** — apply `python-qa-gate` to run the full toolchain, compare static tool results against the static baseline, read test and coverage results from the single gate run, and produce the required reporting block before declaring completion.
-6. **Evidence and handoff** — store static baseline and final gate evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when a gate fails.
+5. **Final QA gate** — apply `python-qa-gate` to run the full toolchain, read test and coverage results from the single gate run, enforce zero-regression deltas against the baseline, and produce the required reporting block before declaring completion.
+6. **Evidence and handoff** — store baseline and post-change evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when deltas fail.
 
 ## Mode Marker Resolution
 
@@ -60,7 +60,7 @@ Stop implementation and return to the user when:
 
 - the scope estimate exceeds 3 production files in direct mode,
 - a file is above or would exceed the 800-line hard limit of the tiered file-size policy (split it before proceeding; at 500 lines look for a logical split, and at 700 lines split more aggressively),
-- any QA gate check fails after self-correction,
+- any QA gate delta is non-zero after self-correction,
 - the toolchain cannot be executed in the current environment (mark the change **unverified**),
 - policy instructions conflict.
 

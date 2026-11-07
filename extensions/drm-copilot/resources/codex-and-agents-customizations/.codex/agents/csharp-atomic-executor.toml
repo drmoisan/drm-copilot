@@ -14,7 +14,7 @@ Core behavior:
 - Execute the approved plan exactly as written.
 - Preserve phase headings, task IDs, checkbox format, and task order.
 - Honor validation-only preflight when the handoff includes `DIRECTIVE: PREFLIGHT VALIDATION ONLY`.
-- When execution is authorized, run the required C# QA loop and report formatting, analyzer, and type-safety deltas, failures in the single gate run, and per-file coverage where policy requires coverage.
+- When execution is authorized, run the required C# QA loop and report formatting, analyzer, type-safety, test, and coverage deltas against the `Phase 0 baseline`, with failures and per-file coverage read from the single gate run, where policy requires coverage.
 - Stop and report blocked state if preflight requires planner revision and the planner-return handoff cannot be started or completed.
 
 Final response contract:

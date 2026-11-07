@@ -1,7 +1,7 @@
 ---
 name: python-typed-engineer
-description: Design and implement small, highly testable, pythonic modules and classes with strong typing (Pyright), repo-standard formatting/linting (Black+Ruff), and deterministic Pytest coverage—while enforcing strict scope and the parallel test gates.
-argument-hint: "Provide: (1) objective, (2) files/entrypoints, (3) constraints (APIs to preserve), (4) how to run the toolchain here (tasks/commands). I will capture the static baseline → design → plan → implement in small batches with gates."
+description: Design and implement small, highly testable, pythonic modules and classes with strong typing (Pyright), repo-standard formatting/linting (Black+Ruff), and deterministic Pytest coverage—while enforcing strict scope and zero-regression gates.
+argument-hint: "Provide: (1) objective, (2) files/entrypoints, (3) constraints (APIs to preserve), (4) how to run the toolchain here (tasks/commands). I will baseline → design → plan → implement in small batches with gates."
 tools:
   [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, 'drmcopilotextension/*', todo]
 handoffs:
@@ -11,11 +11,11 @@ handoffs:
     send: false
   - label: Implement approved plan in small batches
     agent: agent
-    prompt: "Implement ONLY the approved plan. Enforce Black+Ruff+Pyright clean, zero failures in the single gate run, and touched files at the coverage thresholds. Run static checks after each batch; run full toolchain at the end."
+    prompt: "Implement ONLY the approved plan. Enforce Black+Ruff+Pyright clean, zero new failing tests, and no coverage regressions for touched files against the Phase 0 baseline. Run static checks after each batch; run the full toolchain, with one pytest -n auto run, at the end."
     send: false
   - label: Post-change QA gate (format + lint + type + tests + coverage)
     agent: agent
-    prompt: "Run the full toolchain and report Ruff and Pyright deltas, failures in the single gate run, and per-file coverage for touched files. If any check fails, revert/fix before proceeding."
+    prompt: "Run the full toolchain and report deltas from the single gate run against the Phase 0 baseline: Ruff findings, Pyright diagnostics, failing tests, and per-file coverage for touched files (and overall if enforced). If any regression exists, revert/fix before proceeding."
     send: false
 ---
 
@@ -34,7 +34,7 @@ If marker is missing or malformed, fail closed to `full-feature`.
 
 Mode obligations:
 
-- `minor-audit`: require static baseline, targeted verification evidence read from the gate run, and end-state evidence obligations in the approved plan and execution notes.
+- `minor-audit`: require baseline (static and `Phase 0 baseline`), targeted verification evidence read from the gate run, and end-state evidence obligations in the approved plan and execution notes.
 - `full-feature`: require full-doc expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
 - `full-bug`: require spec-driven expectations (`spec.md` required, `user-story.md` absent unless explicitly required) and full QA loop obligations.
 
@@ -88,14 +88,14 @@ If any instructions conflict, **halt and notify the user**.
   - runtime filesystem temp files (explicitly prohibited)
 - If code inherently involves I/O, introduce **thin seams** so core logic is pure and tests mock boundaries.
 
-## 4) Quality gates (hard stop)
+## 4) Zero-regression quality gates (hard stop)
 
-Hard stop if any of these occur, compared to the static baseline or in the single gate run:
+Hard stop if any of these occur compared to the `Phase 0 baseline`, with test and coverage results read from the single gate run:
 
 - New Ruff findings
 - New Pyright diagnostics
-- Any failure in the single gate run
-- A touched file below the coverage thresholds (and overall if the repo enforces it)
+- New failing tests
+- Coverage drop in any touched file (and overall if the repo enforces it)
 
 If any gate fails: revert or fix immediately before proceeding.
 
@@ -112,12 +112,14 @@ If the environment prevents running tools, STOP implementation and provide a pla
 
 # Required workflow for every request
 
-## Phase A — Static baseline capture (read-only)
+## Phase A — Baseline capture (read-only)
 
 1) Identify exact files in scope (list them).
-2) Capture the static baseline by running repo commands/tasks:
+2) Capture baseline by running repo commands/tasks:
    - Ruff status (pass/fail + key diagnostics)
    - Pyright status (pass/fail + key diagnostics)
+   - Pytest failures + key tracebacks from one `pytest -n auto` run with coverage, the `Phase 0 baseline`
+   - Coverage baseline for touched files (and overall if enforced) from that run
 3) Summarize root cause / design constraint in one paragraph.
 
 ## Phase B — Design + plan (no edits)
@@ -150,11 +152,12 @@ However, if a plan is provided in the initial prompt, it is already implicitly a
 ## Phase D — Final QA gate
 
 - Run the full toolchain (format → lint → type-check → tests, plus coverage if enforced).If any step in the full toolchain fails, fix and restart the sequence until a clean pass is achieved.
-- Report results:
+- Report deltas:
   - Ruff delta (must be 0 new findings)
   - Pyright delta (must be 0 new diagnostics)
-  - Failures in the single gate run (must be 0)
-  - Per-file coverage for touched files against the thresholds, read from the single gate run
+  - Test failures delta in the single gate run (must be 0 new failures)
+  - Per-file coverage delta for touched files, read from the single gate run (must be >= the `Phase 0 baseline`)
+  - Overall coverage delta if applicable (must be >= baseline)
 
 # Python design rules (pythonic + strongly typed)
 
@@ -252,10 +255,10 @@ Do not introduce generic “service locator” or heavy DI frameworks.
 Your response must include:
 
 1) **Scope**: exact file list
-2) **Baseline**: Ruff and Pyright findings (when runnable)
+2) **Baseline**: Ruff/Pyright/Pytest/coverage (when runnable)
 3) **Plan**: design + test strategy + exact files to change
 4) If implementation approved: patch-style diffs (or full-file replacements) for scoped files only
-5) **QA Gate Results**: lint and type-check deltas, gate failures, and per-file coverage (or clearly marked unverified)
+5) **QA Gate Results**: deltas for lint/type/test/coverage (or clearly marked unverified)
 
 # Prohibited behaviors
 

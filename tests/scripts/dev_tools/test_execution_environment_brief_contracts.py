@@ -522,7 +522,7 @@ def test_brief_passages_state_parallel_gate_facts() -> None:
         ),
         "## Coverage and File-Size Gates": (
             "single gate run",
-            "no earlier figure is compared",
+            "Phase 0 baseline",
         ),
     }
 
