@@ -197,7 +197,7 @@ A failure, or a step that changes a file, restarts the loop from [P6-T1]; a chan
   - Acceptance: `FEATURE/evidence/qa-gates/r6-ac-status.<timestamp>.md` carries the `### Acceptance Criteria Status` summary per source with the evidence path per re-verified criterion; `git diff HEAD -- docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/user-story.md` prints nothing (the [P5-T1] amendments are in `HEAD` after [P5-T3]).
 - [x] [P6-T21] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from `MERGE_BASE` and every AC, with one row per `PYLIB` file for contract `Raises:` sections, comprehension intent comments, branch decision-logic comments and multi-step meta-what comments, and one row each for F1 to F4 and the two Minor items.
   - Acceptance: `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` has one PASS, FAIL or N/A row per checklist item, per AC and per row named above; a FAIL row is fixed, the loop re-runs from [P6-T1] and the self-review is rewritten; the plan does not complete with a FAIL row.
-- [ ] [P6-T22] Commit the Phase 6 evidence under `FEATURE/evidence/` and any loop fixes, and push.
+- [x] [P6-T22] Commit the Phase 6 evidence under `FEATURE/evidence/` and any loop fixes, and push.
   - Acceptance: `git status --porcelain` prints nothing and `git rev-parse HEAD` equals `git rev-parse @{u}`.
 
 ## Artifact Classification Additions
