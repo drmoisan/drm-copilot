@@ -29,6 +29,23 @@ BeforeAll {
         $lines -join "`n"
     }
 
+    function Get-TestBlock {
+        param([string] $Path, [string] $Current, [string] $Prior)
+        "### Revert Block: $Path`n`n$($script:Fence)Current`n$Current`n$($script:Fence)`n`n$($script:Fence)Prior`n$Prior`n$($script:Fence)`n"
+    }
+
+    function Get-TestEntry {
+        param([string] $Name, [string[]] $Block = @(), [switch] $Patch)
+        $text = "# $Name`n`n## Summary`n`nA sample entry.`n"
+        if ($Patch) {
+            $text += "`n## Stored Patch`n`n``patches/$([System.IO.Path]::GetFileNameWithoutExtension($Name)).patch```n"
+        }
+        if ($Block.Count -gt 0) {
+            $text += "`n## Prior Text`n`n" + ($Block -join "`n")
+        }
+        [pscustomobject]@{ Name = $Name; Text = $text }
+    }
+
     function Get-TestHunk {
         param([string[]] $Current, [string[]] $Prior, [int] $Start = 1)
         [pscustomobject]@{ Path = 'docs/a.md'; Kind = 'modify'; Current = $Current; Prior = $Prior; Start = $Start }
@@ -174,5 +191,160 @@ Describe 'Get-ProcessReductionDerivedSource' {
 
         # Assert
         Should -ActualValue $result -Be $Expected
+    }
+}
+
+Describe 'Invoke-ProcessReductionChain' {
+    It 'PRC-CHAIN-NEWEST-FIRST reverts entries newest-first when they are supplied oldest-first' {
+        $first = Get-TestEntry -Name '0001-a.md' -Block (Get-TestBlock -Path 'docs/a.md' -Current 'two' -Prior 'one')
+        $second = Get-TestEntry -Name '0002-b.md' -Block (Get-TestBlock -Path 'docs/a.md' -Current 'three' -Prior 'two')
+
+        $result = Invoke-ProcessReductionChain -Entry @($first, $second) -PatchText @{} -LiveText @{ 'docs/a.md' = "head`nthree`ntail`n" }
+
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText['docs/a.md'] | Should -BeExactly "head`none`ntail`n"
+    }
+
+    It 'PRC-CHAIN-REPORTS-MISSING-LATER-RECORD names the earlier entry and the path once' {
+        $first = Get-TestEntry -Name '0001-a.md' -Block (Get-TestBlock -Path 'docs/a.md' -Current 'the rule' -Prior 'the old rule')
+
+        $result = Invoke-ProcessReductionChain -Entry @($first) -PatchText @{} -LiveText @{ 'docs/a.md' = "the edited rule`n" }
+
+        $result.IsValid | Should -BeFalse
+        @($result.Errors).Count | Should -Be 1 -Because ($result.Errors -join '; ')
+        $result.Errors[0] | Should -BeLike '0001-a.md: docs/a.md: *'
+    }
+
+    It 'PRC-CHAIN-IGNORES-EDIT-OUTSIDE-REGIONS keeps a later edit that lies outside every region' {
+        $first = Get-TestEntry -Name '0001-a.md' -Block (Get-TestBlock -Path 'docs/a.md' -Current 'the rule' -Prior 'the old rule')
+
+        $result = Invoke-ProcessReductionChain -Entry @($first) -PatchText @{} -LiveText @{ 'docs/a.md' = "a later line`nthe rule`n" }
+
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText['docs/a.md'] | Should -BeExactly "a later line`nthe old rule`n"
+    }
+
+    It 'PRC-CHAIN-CREATED-FILE-ENDS-ABSENT removes a created file edited after creation and restores a deleted one' {
+        # Arrange
+        $patch = @(
+            'diff --git a/docs/new.md b/docs/new.md', 'new file mode 100644', '--- /dev/null', '+++ b/docs/new.md', '@@ -0,0 +1 @@', '+created',
+            'diff --git a/docs/old.md b/docs/old.md', 'deleted file mode 100644', '--- a/docs/old.md', '+++ /dev/null', '@@ -1 +0,0 @@', '-kept'
+        ) -join "`n"
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch
+        $liveText = @{ 'docs/new.md' = "created`nedited later`n"; 'docs/old.md' = $null }
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $patch } -LiveText $liveText
+
+        # Assert
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText['docs/new.md'] | Should -BeNullOrEmpty
+        $result.FinalText.ContainsKey('docs/new.md') | Should -BeTrue
+        $result.FinalText['docs/old.md'] | Should -BeExactly "kept`n"
+    }
+
+    It 'PRC-CHAIN-ENTRY-TEXT-FROM-CHAIN-STATE parses an earlier entry from the text a later patch restored' {
+        # Arrange: entry 0002's patch changed 'new' to 'newer' in docs/a.md and in entry 0001's Current fence
+        $entryPath = 'docs/engineering/process-reductions/0001-a.md'
+        $first = Get-TestEntry -Name '0001-a.md' -Block (Get-TestBlock -Path 'docs/a.md' -Current 'newer' -Prior 'old')
+        $second = Get-TestEntry -Name '0002-b.md' -Patch
+        $fenceStart = @($first.Text.Split("`n")).IndexOf("$($script:Fence)Current") + 1
+        $patch = @(
+            (Get-TestPatchSection -Path 'docs/a.md' -Start 1 -Removed @('new') -Added @('newer')),
+            (Get-TestPatchSection -Path $entryPath -Start $fenceStart -Before @("$($script:Fence)Current") -Removed @('new') -Added @('newer'))
+        ) -join "`n"
+        $liveText = @{ 'docs/a.md' = "newer`n"; $entryPath = $first.Text }
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($first, $second) -PatchText @{ '0002-b.patch' = $patch } -LiveText $liveText
+
+        # Assert
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText['docs/a.md'] | Should -BeExactly "old`n"
+    }
+
+    It 'PRC-CHAIN-PATCH-ENTRY-BLOCKS-CONSISTENT reports a patch entry block whose <Side> text is absent' -ForEach @(
+        @{ Side = 'Current'; Current = 'not in the file'; Prior = '' },
+        @{ Side = 'Prior'; Current = 'new'; Prior = 'never restored' }
+    ) {
+        $patch = Get-TestPatchSection -Path 'docs/a.md' -Start 1 -Removed @('old') -Added @('new')
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch -Block (Get-TestBlock -Path 'docs/a.md' -Current $Current -Prior $Prior)
+
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $patch } -LiveText @{ 'docs/a.md' = "new`n" }
+
+        @($result.Errors).Count | Should -Be 1 -Because ($result.Errors -join '; ')
+        $result.Errors[0] | Should -BeLike "0001-a.md: docs/a.md: the revert block $Side text is absent*"
+    }
+
+    It 'PRC-CHAIN-SKIPS-DERIVED-PATHS leaves a byte-identical mirror and a generated variant to revert steps 2 and 3' {
+        # Arrange: the mirror and variant sections are stale, so reverting them would fail
+        $patch = @(
+            (Get-TestPatchSection -Path '.claude/skills/x/SKILL.md' -Start 1 -Removed @('old') -Added @('new')),
+            (Get-TestPatchSection -Path '.agents/skills/x/SKILL.md' -Start 1 -Removed @('old') -Added @('stale')),
+            (Get-TestPatchSection -Path '.codex/agents/x-c1.toml' -Start 1 -Removed @('old') -Added @('stale'))
+        ) -join "`n"
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch
+        $liveText = @{ '.claude/skills/x/SKILL.md' = "new`n"; '.agents/skills/x/SKILL.md' = "new`n"; '.codex/agents/x-c1.toml' = "new`n" }
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $patch } -LiveText $liveText
+
+        # Assert
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText['.claude/skills/x/SKILL.md'] | Should -BeExactly "old`n"
+        $result.FinalText['.agents/skills/x/SKILL.md'] | Should -BeExactly "new`n"
+        $result.FinalText['.codex/agents/x-c1.toml'] | Should -BeExactly "new`n"
+    }
+
+    It 'PRC-CHAIN-END-STATE-PREIMAGES reports a pre-image of the oldest entry that is missing at the end' {
+        $blocks = @((Get-TestBlock -Path 'docs/a.md' -Current 'b' -Prior 'x'), (Get-TestBlock -Path 'docs/a.md' -Current 'x' -Prior 'y'))
+        $entry = Get-TestEntry -Name '0001-a.md' -Block $blocks
+
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{} -LiveText @{ 'docs/a.md' = "a`nb`n" }
+
+        @($result.Errors).Count | Should -Be 1 -Because ($result.Errors -join '; ')
+        $result.Errors[0] | Should -BeExactly '0001-a.md: docs/a.md: the end state lacks a pre-image of the entry.'
+    }
+
+    It 'PRC-CHAIN-REPORTS-UNLEDGERED-CONTEXT-EDIT reports a line added inside hunk context and accepts the rebased hunk' {
+        # Arrange: a commit with no entry added 'added rule' between the hunk's context lines
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch
+        $live = @{ 'docs/a.md' = "first`nadded rule`nsecond`nnew`nthird`n" }
+        $stale = Get-TestPatchSection -Path 'docs/a.md' -Start 1 -Before @('first', 'second') -Removed @('old') -Added @('new') -After @('third')
+        $rebased = Get-TestPatchSection -Path 'docs/a.md' -Start 1 -Before @('first', 'added rule', 'second') -Removed @('old') -Added @('new') -After @('third')
+
+        # Act
+        $staleResult = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $stale } -LiveText $live
+        $rebasedResult = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $rebased } -LiveText $live
+
+        # Assert
+        @($staleResult.Errors).Count | Should -Be 1 -Because ($staleResult.Errors -join '; ')
+        $staleResult.Errors[0] | Should -BeLike '0001-a.md: docs/a.md: *was not found*'
+        $rebasedResult.IsValid | Should -BeTrue -Because ($rebasedResult.Errors -join '; ')
+        $rebasedResult.FinalText['docs/a.md'] | Should -BeExactly "first`nadded rule`nsecond`nold`nthird`n"
+    }
+
+    It 'PRC-CHAIN-REPORTS-STEP-FAILURES names <Case>' -ForEach @(
+        @{ Case = 'a stored patch that was not supplied'; PatchName = 'other.patch'; PatchBody = ''; Live = "new`n"; Pattern = '0001-a.md: patches/0001-a.patch: the stored patch was not supplied.' },
+        @{ Case = 'a stored patch that does not parse'; PatchName = '0001-a.patch'; PatchBody = "diff --git a/x b/x`nGIT binary patch"; Live = "new`n"; Pattern = '0001-a.md: patches/0001-a.patch: *binary*' },
+        @{ Case = 'a modified file that is absent'; PatchName = '0001-a.patch'; PatchBody = 'MODIFY'; Live = $null; Pattern = '0001-a.md: docs/a.md: the file is absent at this step.' },
+        @{ Case = 'a deleted file that exists'; PatchName = '0001-a.patch'; PatchBody = "diff --git a/docs/a.md b/docs/a.md`ndeleted file mode 100644`n--- a/docs/a.md`n+++ /dev/null`n@@ -1 +0,0 @@`n-old"; Live = "new`n"; Pattern = '0001-a.md: docs/a.md: the file the entry deleted exists at this step.' }
+    ) {
+        $body = if ($PatchBody -ceq 'MODIFY') { Get-TestPatchSection -Path 'docs/a.md' -Start 1 -Removed @('old') -Added @('new') } else { $PatchBody }
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch
+
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ $PatchName = $body } -LiveText @{ 'docs/a.md' = $Live }
+
+        $result.IsValid | Should -BeFalse
+        $result.Errors[0] | Should -BeLike $Pattern
+    }
+
+    It 'PRC-CHAIN-REPORTS-STEP-FAILURES names a block whose file is absent' {
+        $entry = Get-TestEntry -Name '0001-a.md' -Block (Get-TestBlock -Path 'docs/a.md' -Current 'new' -Prior 'old')
+
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{} -LiveText @{}
+
+        @($result.Errors).Count | Should -Be 1 -Because ($result.Errors -join '; ')
+        $result.Errors[0] | Should -BeExactly '0001-a.md: docs/a.md: the file is absent at this step.'
     }
 }

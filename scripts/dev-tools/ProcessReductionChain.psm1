@@ -221,8 +221,228 @@ function Get-ProcessReductionDerivedSource {
     return $source
 }
 
+function Add-ProcessReductionTouch {
+    <#
+    .SYNOPSIS
+        Records that an entry touched a path, whether it created it, and one of its pre-images.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$Touched,
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$PreImage,
+        [switch]$Created
+    )
+
+    if (-not $Touched.ContainsKey($Path)) {
+        $Touched[$Path] = [pscustomobject]@{ Entry = $Name; Created = $false; PreImage = [System.Collections.Generic.List[string]]::new() }
+    }
+    if ($Created) {
+        $Touched[$Path].Created = $true
+    }
+    if ($PreImage.Length -gt 0) {
+        $Touched[$Path].PreImage.Add($PreImage)
+    }
+}
+
+function Invoke-ProcessReductionBlockStep {
+    <#
+    .SYNOPSIS
+        Reverts the blocks of one block entry in the chain state and records each failure.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]]$Block,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$State,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$Touched,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][System.Collections.Generic.List[string]]$ErrorList
+    )
+
+    foreach ($item in $Block) {
+        if ($null -eq $State[$item.Path]) {
+            $ErrorList.Add("${Name}: $($item.Path): the file is absent at this step.")
+            continue
+        }
+        try {
+            $State[$item.Path] = Invoke-ProcessReductionRevert -Text $State[$item.Path] -Block $item
+            Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $item.Path -PreImage (ConvertTo-ProcessReductionChainLf -Text $item.Prior)
+        } catch {
+            $ErrorList.Add("${Name}: $($item.Path): $($_.Exception.Message)")
+        }
+    }
+}
+
+function Test-ProcessReductionBlockText {
+    <#
+    .SYNOPSIS
+        Records an error for each block whose Current (before) or non-empty Prior (after) is absent.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]]$Block,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$State,
+        [Parameter(Mandatory = $true)][ValidateSet('Current', 'Prior')][string]$Side,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][System.Collections.Generic.List[string]]$ErrorList
+    )
+
+    $when = if ($Side -ceq 'Current') { 'before' } else { 'after' }
+    foreach ($item in $Block) {
+        $expected = $item.$Side
+        if ($Side -ceq 'Prior' -and [string]::IsNullOrEmpty($expected)) {
+            continue
+        }
+        $text = $State[$item.Path]
+        if ([string]::IsNullOrEmpty($expected) -or $null -eq $text -or -not $text.Contains((ConvertTo-ProcessReductionChainLf -Text $expected), [System.StringComparison]::Ordinal)) {
+            $ErrorList.Add("${Name}: $($item.Path): the revert block $Side text is absent $when the patch is reverted.")
+        }
+    }
+}
+
+function Invoke-ProcessReductionPatchStep {
+    <#
+    .SYNOPSIS
+        Reverts every hunk of every non-derived path of one stored patch in the chain state.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]]$Hunk,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$LiveText,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$State,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$Touched,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][System.Collections.Generic.List[string]]$ErrorList
+    )
+
+    foreach ($group in @($Hunk | Group-Object -Property Path -CaseSensitive)) {
+        $path = $group.Name
+        if ($null -ne (Get-ProcessReductionDerivedSource -Path $path -LiveText $LiveText)) {
+            continue
+        }
+        foreach ($item in @($group.Group | Sort-Object -Property Start -Descending)) {
+            $prior = [string[]]@($item.Prior)
+            if ($item.Kind -ceq 'create') {
+                $State[$path] = $null
+                Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $path -PreImage '' -Created
+            } elseif ($item.Kind -ceq 'delete' -and $null -ne $State[$path]) {
+                $ErrorList.Add("${Name}: ${path}: the file the entry deleted exists at this step.")
+            } elseif ($item.Kind -ceq 'delete') {
+                $State[$path] = ($prior -join "`n") + "`n"
+                Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $path -PreImage ($prior -join "`n")
+            } elseif ($null -eq $State[$path]) {
+                $ErrorList.Add("${Name}: ${path}: the file is absent at this step.")
+            } else {
+                try {
+                    $State[$path] = Invoke-ProcessReductionHunkRevert -Text $State[$path] -Hunk $item
+                    Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $path -PreImage ($prior -join "`n")
+                } catch {
+                    $ErrorList.Add("${Name}: ${path}: $($_.Exception.Message)")
+                }
+            }
+        }
+    }
+}
+
+function Get-ProcessReductionEndStateError {
+    <#
+    .SYNOPSIS
+        Returns an error per created path that is present and per pre-image that is absent at the end.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$Touch,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$State
+    )
+
+    foreach ($path in @($Touch.Keys | Sort-Object)) {
+        $record = $Touch[$path]
+        $final = $State[$path]
+        if ($record.Created -and $null -ne $final) {
+            "$($record.Entry): ${path}: the end state holds a file that the entry created."
+        }
+        foreach ($preImage in $record.PreImage) {
+            if ($null -eq $final -or -not $final.Contains($preImage, [System.StringComparison]::Ordinal)) {
+                "$($record.Entry): ${path}: the end state lacks a pre-image of the entry."
+            }
+        }
+    }
+}
+
+function Invoke-ProcessReductionChain {
+    <#
+    .SYNOPSIS
+        Reverts every entry newest-first in memory; returns IsValid, Errors, and FinalText.
+
+    .DESCRIPTION
+        Entry holds Name and Text; PatchText maps a patch name to its text; LiveText maps a
+        path to text, $null when missing. Blocks are parsed from the chain-state text of the
+        entry's own file. A patch entry's block Current must occur before its hunks are
+        reverted and its non-empty Prior after. At the end, each path the oldest touching
+        entry created is absent and each of its pre-images present. Errors name entry and path.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]]$Entry,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$PatchText,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$LiveText,
+        [string]$LedgerPath = 'docs/engineering/process-reductions'
+    )
+
+    $state = @{}
+    foreach ($key in $LiveText.Keys) {
+        $state[$key] = if ($null -eq $LiveText[$key]) { $null } else { ConvertTo-ProcessReductionChainLf -Text $LiveText[$key] }
+    }
+    $errorList = [System.Collections.Generic.List[string]]::new()
+    $touch = @{}
+
+    foreach ($item in @($Entry | Sort-Object -Property Name -Descending)) {
+        $name = $item.Name
+        $entryPath = "$LedgerPath/$name"
+        $text = if ($null -ne $state[$entryPath]) { $state[$entryPath] } else { ConvertTo-ProcessReductionChainLf -Text $item.Text }
+        $priorText = Get-ProcessReductionSection -Text $text -Heading 'Prior Text'
+        $blocks = @()
+        if ($null -ne $priorText) {
+            $blocks = @(Get-ProcessReductionRevertBlock -Text $priorText)
+        }
+        $touched = @{}
+        $stepArgs = @{ Name = $name; State = $state; Touched = $touched; ErrorList = $errorList }
+        if ($null -eq (Get-ProcessReductionSection -Text $text -Heading 'Stored Patch')) {
+            Invoke-ProcessReductionBlockStep @stepArgs -Block $blocks
+        } else {
+            $patchName = [System.IO.Path]::GetFileNameWithoutExtension($name) + '.patch'
+            try {
+                if ($null -eq $PatchText[$patchName]) {
+                    throw 'the stored patch was not supplied.'
+                }
+                $hunks = @(Get-ProcessReductionPatchHunk -PatchText $PatchText[$patchName])
+            } catch {
+                $errorList.Add("${name}: patches/${patchName}: $($_.Exception.Message)")
+                continue
+            }
+            Test-ProcessReductionBlockText -Name $name -Block $blocks -State $state -Side Current -ErrorList $errorList
+            Invoke-ProcessReductionPatchStep @stepArgs -Hunk $hunks -LiveText $LiveText
+            Test-ProcessReductionBlockText -Name $name -Block $blocks -State $state -Side Prior -ErrorList $errorList
+        }
+        foreach ($path in $touched.Keys) {
+            $touch[$path] = $touched[$path]
+        }
+    }
+
+    $errorList.AddRange([string[]]@(Get-ProcessReductionEndStateError -Touch $touch -State $state))
+    return [pscustomobject]@{ IsValid = $errorList.Count -eq 0; Errors = $errorList.ToArray(); FinalText = $state }
+}
+
 Export-ModuleMember -Function @(
     'Get-ProcessReductionPatchHunk',
     'Invoke-ProcessReductionHunkRevert',
-    'Get-ProcessReductionDerivedSource'
+    'Get-ProcessReductionDerivedSource',
+    'Invoke-ProcessReductionChain'
 )
