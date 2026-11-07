@@ -1,0 +1,17 @@
+{
+  "issue-num": "9002",
+  "stage_timing": [
+    {
+      "stage": "S4_atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-01-03T01:00:00Z",
+      "ended_at": "2026-01-03T01:16:40Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-01-03T01:16:40Z",
+      "ended_at": "2026-01-03T01:31:40Z"
+    }
+  ]
+}
