@@ -83,7 +83,7 @@ class QCRunner(QCRunnerProcessMixin):
         "run",
         "pytest",
         "--color=no",
-        "--cov=src/lexile_corpus_tuner",
+        "--cov=scripts/dev_tools",
         "--cov-report=xml",
         "--cov-report=term-missing",
     ]
@@ -370,7 +370,6 @@ class QCRunner(QCRunnerProcessMixin):
                 "poetry",
                 "run",
                 "pytest",
-                "--cov=src/lexile_corpus_tuner",
                 "--cov=scripts/dev_tools",
                 "--cov-report=term-missing",
             ],
