@@ -44,7 +44,7 @@ Premise corrections, each read against the tree:
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the recorded stage E gates under `FEATURE/evidence/qa-gates/` alone, with no suite run, and write `FEATURE/evidence/baseline/stage-e-review-recorded-gates.<timestamp>.md` as the baseline.
+- [x] [P0-T1] Read the recorded stage E gates under `FEATURE/evidence/qa-gates/` alone, with no suite run, and write `FEATURE/evidence/baseline/stage-e-review-recorded-gates.<timestamp>.md` as the baseline.
   - Sources: the lexicographically greatest `FEATURE/evidence/qa-gates/stage-e-powershell-test.*.md`, `stage-e-powershell-format-lint.*.md`, and `stage-e-python-typescript-gates.*.md`. `Command:` records that the artifact is a read of those files, and `EXIT_CODE:` is 0 when all three were read.
   - Output Summary: the Pester total and failed counts and the repo-wide PowerShell line percentage; the format and analyzer totals; the pytest passed and failed counts with the line and branch totals; and the Jest suite and test counts with the line and branch totals, each copied from its source.
   - Acceptance: the artifact exists and carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with numeric values. It edits no existing baseline artifact.
