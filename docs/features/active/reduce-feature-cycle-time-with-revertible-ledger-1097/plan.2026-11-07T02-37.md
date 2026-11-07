@@ -187,7 +187,7 @@ Further strings checked because they are in the hold: `static baseline capture (
 
 ### Phase 3 — Replay, Deferred Wording, and Review Items
 
-- [ ] [P3-T1] Create `tests/scripts/dev-tools/ProcessReductionLedger.Replay.Tests.ps1` and commit it.
+- [x] [P3-T1] Create `tests/scripts/dev-tools/ProcessReductionLedger.Replay.Tests.ps1` and commit it.
   - Behavior: the Design's replay. Rows: `PRR-ENTRY-FOUND` (exactly one stem match and at least one hook block); `PRR-REVERTED-RETURNS-POLICY-READ-ERROR` and `PRR-LIVE-RETURNS-NO-POLICY-READ-ERROR`, each on an in-memory plan whose Phase 0 holds only a `Capture baseline` task, asserting `Phase 0 must include a policy-read task.` present and absent; and `PRR-BASELINE-ERROR-SURVIVES-REVERT`, where a plan with no Phase 0 returns `Plan must include Phase 0 with at least one baseline task.` from both.
   - It uses `Get-ProcessReductionRevertBlock` and `Invoke-ProcessReductionRevert` from `scripts/dev-tools/ProcessReductionLedger.psm1`, reads tracked files only, and leaves no function defined after a row. No existing test changes.
   - Acceptance: the file creates no temporary file, and [P4-T2] reports the four rows passing.
