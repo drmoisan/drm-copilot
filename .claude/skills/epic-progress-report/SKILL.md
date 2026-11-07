@@ -79,7 +79,7 @@ Every unit of work is a step with a type. Item types: `research`, `spec`, `plan`
 
 Done rules (primary `stage_timing` source, then the checkpoint fallback):
 
-- research: a closed `research` stage; `completed_steps` prefix `S2_research`.
+- research: a closed `research` stage; `completed_steps` prefix `S2_research` or `S3b_research`.
 - spec: a closed `spec` stage; `S3_promotion` with `spec.md` present.
 - plan: a closed `planning` or `plan` stage; `S4_atomic_planning`.
 - preflight: a closed `preflight` stage; a checked task or `step5_status` past `pending`.
@@ -101,9 +101,14 @@ Derivation per item:
   after a PR existed. Cycles not yet opened are not predicted, so the total grows and the
   percentage can fall when a cycle opens.
 - The in-progress step is the open `stage_timing` entry; without one, the step named by
-  `next_step`.
+  `next_step` (an `S2_research` or `S3b_research` value names the research step).
 - A child without a checkpoint whose plan is already written counts research, spec, and plan as
   done (decision D6); a merged child has every step done.
+- Live stage names map through aliases, compared case-insensitively after trimming:
+  `feature_review` and `S7_feature_review` to `review`; `atomic_execution` and
+  `S5_atomic_execution` to `execution`; `S2_research` to `research`; `S3_spec` to `spec`;
+  `S4_atomic_planning` to `plan`; `S4_preflight` to `preflight`; `S8_create_pr` to `pr`; and
+  `S9_ci_gate` and `S9_ci_green` to `ci`.
 - Stage names `planning` and `plan` map to `plan`; names starting with `remediation` are
   composite remediation time (decision D2); any other unknown name, for example `promotion`, is
   unmapped time. Neither enters a median.
@@ -148,10 +153,14 @@ TL;DR (both modes print these four lines first):
 Variants:
 
 - In item mode the subject reads `Item #<issue>` and the wave-parallel figure equals the sum.
-- done-sentence: `None of the <N> features is done yet.` or `<K> of <N> features are done.`
+- done-sentence: `None of the <N> features is done yet.` or `<K> of <N> features are done.`;
+  an epic with one feature prints `The only feature is not done yet.` or
+  `The only feature is done.`; item mode prints `#<i> is not done yet.` or `#<i> is done.`
 - running-sentence: `No feature is running.`, `#<i> is running (<d> of <t> steps).`, or
   `#<a> (<d> of <t>), #<b> (<d> of <t>) are running.`; each blocked item adds
-  `#<i> is blocked (<reason>).`
+  `#<i> is blocked (<reason>).` Item mode omits `No feature is running.`
+- A blocked count of one prints `(1 blocked step excluded)` and
+  `**Blocked:** 1 step excluded from the estimate`.
 - Now line: `no step is in progress` when nothing runs; a step whose elapsed time exceeds its
   median reads `(<elapsed> of median <m>, over median)`.
 - `<pct>` and `<hours>` are rounded to one decimal with invariant culture and default (to-even)
@@ -203,6 +212,10 @@ Full report contents:
 
 - `<completed>` is `None yet` or the completed issues; `<blocked>` is `None` or each blocked
   issue with its reason. In item mode the heading reads `## Item #<issue>: status at ...`.
+- In item mode the State header reads `| State | Item |`, the Running and Pending rows carry no
+  wave or band label (`| Running | #<i>: ...` and `| Pending | #<i> (<t>) |`), and the weekly
+  line ends `points since the measurement started. This pool also covers the other runs in this
+  session, so it is not this item's cost alone.`
 - One `Running` row per running feature, with ` Now at: <phase>.` and ` PR <state>.` when
   present and `(wave <w>)` when the item has no band; one `Pending, wave <w>` row per wave
   with pending features.

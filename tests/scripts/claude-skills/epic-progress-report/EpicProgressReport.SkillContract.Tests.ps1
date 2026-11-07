@@ -234,6 +234,22 @@ Describe 'epic-progress-report SKILL.md structure and content' {
         $inputs.Contains('| `-StepDefaultMinutes` |') | Should -BeTrue
     }
 
+    It 'lists the live stage-name aliases' {
+        $flat = ConvertTo-TestFlatText $script:body
+
+        foreach ($alias in @('feature_review', 'S7_feature_review', 'atomic_execution', 'S5_atomic_execution', 'S2_research', 'S3_spec', 'S4_atomic_planning', 'S4_preflight', 'S8_create_pr', 'S9_ci_gate', 'S9_ci_green', 'S3b_research')) {
+            $flat.Contains("``$alias``") | Should -BeTrue -Because "SKILL.md must name the stage alias '$alias'"
+        }
+    }
+
+    It 'states the item-mode and singular report wording' {
+        $formats = ConvertTo-TestFlatText (Get-TestSection -Heading 'Report Formats')
+
+        foreach ($fragment in @('#<i> is not done yet.', 'The only feature is not done yet.', '1 blocked step excluded', 'points since the measurement started', "not this item's cost alone", '| State | Item |')) {
+            $formats.Contains($fragment) | Should -BeTrue -Because "the Report Formats section must state '$fragment'"
+        }
+    }
+
     It 'does not state that the report wording does not change' {
         $formats = ConvertTo-TestFlatText (Get-TestSection -Heading 'Report Formats')
 

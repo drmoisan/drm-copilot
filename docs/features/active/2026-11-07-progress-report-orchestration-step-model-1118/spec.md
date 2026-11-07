@@ -22,7 +22,7 @@ This feature replaces the task-velocity model with a typed-step model. Every uni
 
 | Type | Scope | Done when (primary source; fallback) |
 |---|---|---|
-| `research` | item | closed `stage_timing` `research` entry; `completed_steps` prefix `S2_research` |
+| `research` | item | closed `stage_timing` `research` entry; `completed_steps` prefix `S2_research` or `S3b_research` |
 | `spec` | item | closed `stage_timing` `spec` entry; `S3_promotion` present and `spec.md` exists |
 | `plan` | item | closed `stage_timing` `planning` or `plan` entry; `S4_atomic_planning` |
 | `preflight` | item | closed `stage_timing` `preflight` entry; first checked plan task or `step5_status` past `pending` |
@@ -34,7 +34,7 @@ This feature replaces the task-velocity model with a typed-step model. Every uni
 | `main-sync` | epic | sync row in the epic checkpoint with `merge_status` `merged` or `worktree_removed` |
 | `integration-pr` | epic | `epic_merge_pr.merge_commit_sha` present |
 
-Stage-name normalization: `planning` and `plan` map to `plan`. `remediation`, `remediation_cycle_<n>`, and similar names are composite remediation stages (Decision D2). Any other unrecognized stage name (for example `promotion`) maps to no type; its time is reported as unmapped stage time and never enters a median.
+Stage-name normalization: names are compared case-insensitively after trimming. The live stage names map through aliases: `feature_review` and `S7_feature_review` to `review`; `atomic_execution` and `S5_atomic_execution` to `execution`; `S2_research` to `research`; `S3_spec` to `spec`; `S4_atomic_planning` to `plan`; `S4_preflight` to `preflight`; `S8_create_pr` to `pr`; and `S9_ci_gate` and `S9_ci_green` to `ci`. A `next_step` value starting with `S2_research` or `S3b_research` names the research step. `planning` and `plan` map to `plan`. `remediation`, `remediation_cycle_<n>`, and similar names are composite remediation stages (Decision D2). Any other unrecognized stage name (for example `promotion`) maps to no type; its time is reported as unmapped stage time and never enters a median.
 
 ### Step derivation per item
 
