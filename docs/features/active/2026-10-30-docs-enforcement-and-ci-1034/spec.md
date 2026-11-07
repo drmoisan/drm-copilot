@@ -541,7 +541,7 @@ Testable criteria:
 - [x] No new production file exceeds 500 logical lines.
 - [x] No Python or TypeScript file is added or modified (`git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`), and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
 - [x] No test creates a temporary file: no new or edited test file contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`.
-- [ ] (CI-dependent) The hook suite passes in the `poshqc-linux-hooks` job, and the required `poshqc / PowerShell QC` and `quality-checks7 / Code Quality & Tests` checks pass on the pull request head.
+- [x] (CI-dependent) The hook suite passes in the `poshqc-linux-hooks` job, and the required `poshqc / PowerShell QC` and `quality-checks7 / Code Quality & Tests` checks pass on the pull request head.
 
 ## Definition of Done
 
