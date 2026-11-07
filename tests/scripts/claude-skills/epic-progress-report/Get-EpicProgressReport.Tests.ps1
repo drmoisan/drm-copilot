@@ -384,13 +384,18 @@ Describe 'Invoke-EpicProgressReport' {
 
 Describe 'Get-EpicProgressReport.ps1 repository constraints' {
     BeforeAll {
+        # The five canonical files, entry first (issue #1093 split the Logic file into a hub and three files).
+        $canonicalFolder = Split-Path -Path $script:scriptPath -Parent
         $script:productionPaths = @(
             (Resolve-Path -LiteralPath $script:scriptPath).ProviderPath
             (Resolve-Path -LiteralPath $script:logicPath).ProviderPath
+            (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.State.ps1')).ProviderPath
+            (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Metrics.ps1')).ProviderPath
+            (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Render.ps1')).ProviderPath
         )
 
         function Get-TestCommandUse {
-            # Each command invocation in both production files with its enclosing function name.
+            # Each command invocation in the five production files with its enclosing function name.
             $uses = [System.Collections.Generic.List[object]]::new()
             foreach ($path in $script:productionPaths) {
                 $tokens = $null
@@ -415,9 +420,13 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
 
         $writes = @($uses | Where-Object { $writeCommands -contains $_.Name })
 
-        $writes.Count | Should -Be 1
-        $writes[0].Name | Should -Be 'Set-Content'
-        $writes[0].Function | Should -Be 'Write-EpicProgressState'
+        # Set-Content writes the state file and New-Item creates its missing directory (issue #1093).
+        $script:productionPaths.Count | Should -Be 5
+        $writes.Count | Should -Be 2
+        (@($writes.Name | Sort-Object) -join ',') | Should -Be 'New-Item,Set-Content'
+        foreach ($write in $writes) {
+            $write.Function | Should -Be 'Write-EpicProgressState' -Because "$($write.Name) may run only in the state writer"
+        }
     }
 
     It 'confines native commands to their wrappers' {

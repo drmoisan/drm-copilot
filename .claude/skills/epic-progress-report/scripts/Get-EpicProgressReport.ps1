@@ -229,6 +229,9 @@ function Write-EpicProgressState {
     <#
     .SYNOPSIS
         Write the state file content as UTF-8; the only file the report writes.
+    .DESCRIPTION
+        Creates the parent directory (for example .claude/state) when it is missing. Both
+        writes run only inside the ShouldProcess block, so -WhatIf writes nothing.
     .PARAMETER Path
         The state file path.
     .PARAMETER Content
@@ -240,7 +243,13 @@ function Write-EpicProgressState {
         [Parameter(Mandatory = $true)] [string] $Content
     )
 
-    if ($PSCmdlet.ShouldProcess($Path, 'Write epic progress state')) { Set-Content -LiteralPath $Path -Value $Content -Encoding utf8 }
+    if ($PSCmdlet.ShouldProcess($Path, 'Write epic progress state')) {
+        $directory = Split-Path -Path $Path -Parent
+        if ($directory -and -not (Test-Path -LiteralPath $directory -PathType Container)) {
+            $null = New-Item -ItemType Directory -Path $directory -Force
+        }
+        Set-Content -LiteralPath $Path -Value $Content -Encoding utf8
+    }
 }
 
 function Get-EpicProgressUtcNow {
