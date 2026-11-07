@@ -81,7 +81,7 @@ In scope:
 
 - With no consumer profile, or a profile whose `completion_gates.integration_pr_gate.enabled` is
   `false` (the starter value written by `init`), the hook allows every Bash call and performs no `gh`
-  call.
+  call, except that an envelope anomaly or a failed import still denies.
 - With the gate enabled, the hook allows a Bash call whose text it does not read as a `gh` merge or enqueue
   command, and a merge it resolves to a pull request that is not the epic integration-to-`main` merge. For
   an integration-to-`main` merge it reads, it allows when the persisted receipt at
