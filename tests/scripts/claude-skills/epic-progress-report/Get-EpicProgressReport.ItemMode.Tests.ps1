@@ -150,6 +150,46 @@ Describe 'Invoke-EpicProgressReport in item mode' {
         $second[2] | Should -BeLike '**Now:** #1118 review (0 h 15 min of median 0 h 14 min, over median).*'
     }
 
+    Context 'live stage names' {
+        BeforeAll {
+            # The catalog fixture times under the names the orchestrator records, with feature_review open since 11:50.
+            $script:liveTiming = '{"stage":"S2_research","attempt":1,"started_at":"2026-01-05T09:00:00Z","ended_at":"2026-01-05T09:10:00Z"},' +
+            '{"stage":"S3_spec","attempt":1,"started_at":"2026-01-05T09:10:00Z","ended_at":"2026-01-05T09:15:00Z"},' +
+            '{"stage":"S4_atomic_planning","attempt":1,"started_at":"2026-01-05T09:15:00Z","ended_at":"2026-01-05T09:25:00Z"},' +
+            '{"stage":"S4_preflight","attempt":1,"started_at":"2026-01-05T09:25:00Z","ended_at":"2026-01-05T09:35:00Z"},' +
+            '{"stage":"atomic_execution","attempt":1,"started_at":"2026-01-05T09:35:00Z","ended_at":"2026-01-05T10:35:00Z"},' +
+            '{"stage":"feature_review","attempt":1,"started_at":"2026-01-05T11:50:00Z","ended_at":null}'
+            $script:liveCheckpoint = '{"issue-num":"1118","feature-folder":"docs/features/active/x","plan-path":"docs/features/active/x/plan.md","next_step":"S7_feature_review","stage_timing":[' + $script:liveTiming + ']}'
+        }
+
+        BeforeEach {
+            $script:fileText[$script:checkpointPath] = $script:liveCheckpoint
+        }
+
+        It 'prints the same TL;DR golden for the live stage names' {
+            $lines = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
+
+            $expected = @(
+                '**TL;DR:** Item #1118 is at 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
+                '**Elapsed:** 3 h 00 min, with about 0.5 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at n/a.'
+                '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
+                '**Estimated time remaining:** 0 h 29 min by type (sum); 0 h 29 min wave-parallel.'
+            )
+            ($lines -join "`n") | Should -Be ($expected -join "`n")
+        }
+
+        It 'reports a lower remaining estimate with an open feature_review stage' {
+            # At 12:00 the review has run 10 of its 14 min (29 min remain); at 12:05 it is over median (25 min remain).
+            $first = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
+            $script:now = $script:noon.AddMinutes(5)
+            $second = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
+
+            $first[2] | Should -Be '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
+            $first[3] | Should -BeLike '**Estimated time remaining:** 0 h 29 min by type (sum)*'
+            $second[3] | Should -BeLike '**Estimated time remaining:** 0 h 25 min by type (sum)*'
+        }
+    }
+
     It 'does not report a stalled item as blocked on a later run' {
         # The second run, an hour later, sees the same four checked tasks (a zero tick rate).
         $first = Get-TestItemLine
