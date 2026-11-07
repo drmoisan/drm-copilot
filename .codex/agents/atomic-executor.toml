@@ -122,7 +122,7 @@ When the delegation prompt carries the directive `DIRECTIVE: PREFLIGHT VALIDATIO
 
 ## Blocking Protocol
 
-Blocking is permitted only during preflight validation (before `[P0-T1]`), including the preflight that opens a combined preflight-and-execute run of a proportionate remediation cycle. When preflight-blocked:
+Blocking is permitted only during preflight validation (before `[P0-T1]`), including the preflight that opens a combined preflight-and-execute run of a proportionate remediation cycle. A light remediation run has no preflight, and stops the same way before `[P0-T1]` only when a fix task cannot be done at its named location. When preflight-blocked:
 
 1. State: `BLOCKED at preflight (before [P0-T1])`.
 2. Provide a short, concrete explanation of why.

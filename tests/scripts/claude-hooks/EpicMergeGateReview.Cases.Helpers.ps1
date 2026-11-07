@@ -184,6 +184,10 @@ function Get-EpicMergeGateReviewDeniedForm {
         'selector-url'                   = 'gh pr merge https://github.com/o/r/pull/42 --merge'
         'prose-over-match'               = 'git commit -m "document the pr merge step"'
         'prose-in-merge-body'            = 'gh pr merge 42 --merge --body "follows the pr merge step"'
+        'overmatch-trailing-line-feed'   = "gh pr merge 42 --merge`n"
+        'overmatch-trailing-semicolon'   = 'gh pr merge 42 --merge;'
+        'overmatch-prose-pr-paren'       = 'git commit -m "see pr (#12)"'
+        'overmatch-prose-pr-variable'    = 'echo pr $HOME'
     }
     foreach ($name in $forms.Keys) { @{ Name = $name; Command = $forms[$name] } }
 }

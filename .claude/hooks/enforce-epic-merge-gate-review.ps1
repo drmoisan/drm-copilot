@@ -11,19 +11,23 @@
 
     The key is the top-level checkpoint key review_mode. Only the exact string concurrent activates
     the guard, compared ordinally; an absent key, null, sequential, a case variant, a number, and
-    every other non-string value mean sequential, and the guard then starts no process and denies
-    nothing. Test-EpicMergeGateReviewModeConcurrent holds that predicate.
+    every other non-string value mean sequential, and the guard then starts no gh call and denies
+    nothing; only the Claude shape read below can still resolve worktrees, for at most 4 numbers.
+    Test-EpicMergeGateReviewModeConcurrent holds that predicate.
 
     Shape step, before the out-of-scope allow and the order below: text that could be a merge
     (Test-EpicMergeGateReviewMergeText) and is not one plain gh pr merge of one number
     (Get-EpicMergeGateReviewBoundPrNumber) is denied with REVIEW_GATE_HEAD_UNRESOLVED, before any
     process, when a checkpoint the gate can read carries the key. Without the key the decision is
-    unchanged. On Claude an unbound command also reads the session and the item of each number in
-    its text; that read is best-effort, so a failure sees no key and never denies.
+    unchanged. On Claude an unbound command also reads the session and the item of each of the first
+    4 numbers in its text (EpicMergeGateReviewCandidateCap), which can resolve worktrees; that read
+    is best-effort, so a failure sees no key and never denies.
 
     Evaluation order; the first match ends it:
       1. The checkpoint is absent or the key is not exactly concurrent: inert, no process.
       2. The command names no pull request number: REVIEW_GATE_HEAD_UNRESOLVED, before any process.
+         Only a direct call of Get-EpicMergeGateReviewDecision reaches this step, because under
+         both gates the shape step denies a number-less merge text first.
       3. The last remediation_loop.review_outcomes entry is missing, is not an object, or its
          verdict is not exactly PASS: REVIEW_GATE_NOT_PASSED, before any process.
       4. Its head_sha is absent or malformed: REVIEW_GATE_NOT_PASSED, before any process.
@@ -47,18 +51,13 @@
     requires no PR binding.
 
     Limits (issue #1097 decision D10): this guard is a policy-level control, not a security control.
-    A writer in the same session can edit the checkpoint. A merge outside the Bash hook surface is
-    not gated. A merge whose item target does not resolve (NoTarget or Ambiguous), or whose child
-    checkpoint does not parse, sees no key, and the parallel skill step is then the only backstop. A
-    push after the lookup can change the head unless the command passes --match-head-commit. The
-    CI full run requirement of the join is skill-level, because a docs-only head passes CI Required
-    Gate. The authorization path reads no CI result, so the required CI Required Gate context is the
-    control there. A text scan cannot read a script file, encoded or run-time composed text, a gh
-    alias or shell function from an earlier call, or an endpoint held in a variable. The PowerShell
-    tool, mcp__* tools, and the Codex shell_command tool are not gated, because the gates are
-    registered for Bash only. A queued auto-merge fires with no command. A direct push to the base
-    is not a pull-request merge. A number-less merge text sees only the session checkpoint. Under
-    the key the rule is fail-closed, so prose naming pr merge is denied in any command.
+    It gates only Bash merge text it can read against a checkpoint it can read, so a same-session
+    checkpoint edit, a merge through another tool or surface, an item target that does not resolve,
+    and text it cannot read are not gated. The extra read covers at most the first 4 numbers of the
+    text, so a key held only by an item named after them is not found. Under the key the rule is
+    fail-closed and its trigger is wider than pr merge: prose such as pr (#12) or pr $HOME is denied,
+    and so is a plain merge followed by a line feed or ;. D10 in .claude/rules/orchestrator-state.md
+    (## Concurrent-Review Scope and Backward Compatibility) lists every limit.
 
 .NOTES
     Compatible with PowerShell 7+. This file dot-sources nothing and imports no module. It calls, at
@@ -96,6 +95,10 @@ $script:EpicMergeGateReviewShellKeywords = @('do', 'then', 'else', 'elif', 'if',
 # --repo, a redirection, and every unknown token fail by absence.
 $script:EpicMergeGateReviewBoundFlags = @('--merge', '-m', '--squash', '-s', '--rebase', '-r', '--delete-branch', '-d', '--disable-auto')
 $script:EpicMergeGateReviewBoundValueFlags = @('--match-head-commit', '--subject', '-t', '--body', '-b', '--body-file', '-F', '--author-email', '-A')
+
+# The most candidate numbers the Claude shape read resolves, in text order, so an unbound command
+# costs a bounded number of worktree resolutions (issue #1097 decision D10).
+$script:EpicMergeGateReviewCandidateCap = 4
 
 function Test-EpicMergeGateReviewModeConcurrent {
     <#
@@ -594,8 +597,9 @@ function Get-EpicMergeGateReviewShapeDecision {
         denies when a known checkpoint, or any checkpoint the reader returns, carries the key, and
         passes when none does. Without the key the decision is therefore unchanged, and a failed
         read is best-effort: it sees no key and never denies. The reader is called for the session
-        ($null) only when KnownPrNumber is set, because a bare command already read it, and for each
-        candidate number other than KnownPrNumber. The Codex gate passes no reader.
+        ($null) only when KnownPrNumber is set, because a bare command already read it, and for each of
+        the first 4 candidate numbers other than KnownPrNumber, in text order. The Codex gate passes
+        no reader.
     .PARAMETER CommandText
         The raw command text.
     .PARAMETER KnownCheckpoint
@@ -625,9 +629,8 @@ function Get-EpicMergeGateReviewShapeDecision {
 
     $targets = [System.Collections.Generic.List[object]]::new()
     if ($null -ne $KnownPrNumber) { $targets.Add($null) }
-    foreach ($candidate in @(Get-EpicMergeGateReviewCandidatePrNumber -CommandText $CommandText)) {
-        if ($candidate -ne $KnownPrNumber) { $targets.Add($candidate) }
-    }
+    $candidates = @(Get-EpicMergeGateReviewCandidatePrNumber -CommandText $CommandText | Where-Object { $_ -ne $KnownPrNumber })
+    foreach ($candidate in @($candidates | Select-Object -First $script:EpicMergeGateReviewCandidateCap)) { $targets.Add($candidate) }
     foreach ($target in $targets) {
         $checkpoint = $null
         try {

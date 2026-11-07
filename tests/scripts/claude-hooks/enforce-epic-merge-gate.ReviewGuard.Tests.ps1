@@ -268,6 +268,116 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
         }
     }
 
+    Context 'shape rule candidate cap' {
+        BeforeAll {
+            # An unbound text with six distinct numbers, more than the cap of 4.
+            $script:CapCommand = 'echo pr merge 11 12 13 14 15 16'
+            $script:CapKey = ConvertTo-EpicMergeGateReviewCheckpointJson | ConvertFrom-Json
+            $script:CapNoKey = ConvertTo-EpicMergeGateReviewCheckpointJson -Remove 'review_mode', 'remediation_loop' | ConvertFrom-Json
+
+            function Get-CountingReader {
+                <#
+                .SYNOPSIS
+                    Return an in-memory reader that records each target it is called for.
+                .PARAMETER Reads
+                    The list that receives each target, $null for the session.
+                .PARAMETER KeyNumber
+                    The number whose checkpoint carries the key; 0 for none.
+                #>
+                [CmdletBinding()]
+                [OutputType([scriptblock])]
+                param(
+                    [Parameter(Mandatory)][AllowEmptyCollection()][System.Collections.Generic.List[object]] $Reads,
+                    [int] $KeyNumber = 0
+                )
+
+                $readList = $Reads
+                $keyTarget = $KeyNumber
+                $key = $script:CapKey
+                $noKey = $script:CapNoKey
+                return { param($Target) $readList.Add($Target); if ($null -ne $Target -and $Target -eq $keyTarget) { $key } else { $noKey } }.GetNewClosure()
+            }
+        }
+
+        It 'RG-SHAPE-CANDIDATE-CAP-BOUNDS-READS' {
+            # Arrange
+            $reads = [System.Collections.Generic.List[object]]::new()
+
+            # Act
+            $decision = Get-EpicMergeGateReviewShapeDecision -CommandText $script:CapCommand -KnownCheckpoint $script:CapNoKey -KnownPrNumber $null -ReadCheckpoint (Get-CountingReader -Reads $reads)
+
+            # Assert: the reader sees exactly the first 4 numbers, in text order.
+            ($reads -join ',') | Should -BeExactly '11,12,13,14'
+            $decision.Denied | Should -BeFalse
+        }
+
+        It 'RG-SHAPE-CANDIDATE-CAP-SKIPS-KNOWN-NUMBER' {
+            # Arrange
+            $reads = [System.Collections.Generic.List[object]]::new()
+
+            # Act: the gate already read 11, so the session and the next 4 numbers are read.
+            $null = Get-EpicMergeGateReviewShapeDecision -CommandText $script:CapCommand -KnownCheckpoint $script:CapNoKey -KnownPrNumber 11 -ReadCheckpoint (Get-CountingReader -Reads $reads)
+
+            # Assert
+            $reads.Count | Should -Be 5
+            $null -eq $reads[0] | Should -BeTrue
+            ($reads.GetRange(1, 4) -join ',') | Should -BeExactly '12,13,14,15'
+        }
+
+        It 'RG-SHAPE-CANDIDATE-CAP-KEY-WITHIN-CAP-DENIES' {
+            # Arrange: the fourth number names an item that carries the key.
+            $reads = [System.Collections.Generic.List[object]]::new()
+
+            # Act
+            $decision = Get-EpicMergeGateReviewShapeDecision -CommandText $script:CapCommand -KnownCheckpoint $script:CapNoKey -KnownPrNumber $null -ReadCheckpoint (Get-CountingReader -Reads $reads -KeyNumber 14)
+
+            # Assert
+            $decision.Denied | Should -BeTrue
+            $decision.Reason.StartsWith('EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_HEAD_UNRESOLVED: ', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $decision.Reason
+        }
+
+        It 'RG-SHAPE-CANDIDATE-CAP-KEY-PAST-CAP-DISCLOSED' {
+            # Arrange: only the fifth number names an item with the key, which D10 discloses as not found.
+            $reads = [System.Collections.Generic.List[object]]::new()
+
+            # Act
+            $decision = Get-EpicMergeGateReviewShapeDecision -CommandText $script:CapCommand -KnownCheckpoint $script:CapNoKey -KnownPrNumber $null -ReadCheckpoint (Get-CountingReader -Reads $reads -KeyNumber 15)
+
+            # Assert
+            $decision.Denied | Should -BeFalse
+            $reads.Contains(15) | Should -BeFalse
+        }
+
+        It 'RG-SHAPE-CANDIDATE-CAP-NOKEY-KEEPS-DECISION' {
+            # Arrange
+            $reads = [System.Collections.Generic.List[object]]::new()
+
+            # Act: the capped read of keyless checkpoints, and the same text with no reader at all.
+            $withRead = Get-EpicMergeGateReviewShapeDecision -CommandText $script:CapCommand -KnownCheckpoint $script:CapNoKey -KnownPrNumber $null -ReadCheckpoint (Get-CountingReader -Reads $reads)
+            $withoutRead = Get-EpicMergeGateReviewShapeDecision -CommandText $script:CapCommand -KnownCheckpoint $script:CapNoKey -KnownPrNumber $null
+
+            # Assert: a read can only add a denial under a key, so the decision is unchanged.
+            $withRead.Denied | Should -Be $withoutRead.Denied
+            $withRead.Reason | Should -Be $withoutRead.Reason
+            $withRead.Denied | Should -BeFalse
+        }
+    }
+
+    It 'RG-DIRECT-CALL-NO-NUMBER-DENIES' {
+        # Arrange: under both gates the shape step denies a number-less merge first, so only a
+        # direct call reaches step 2 of the header.
+        $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson | ConvertFrom-Json
+
+        # Act
+        $decision = Get-EpicMergeGateReviewDecision -Checkpoint $checkpoint -CommandPrNumber $null -GhRoot $script:SessionRoot -GitRoot $script:ItemRoot
+
+        # Assert
+        $decision.Denied | Should -BeTrue
+        $decision.Reason.StartsWith('EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_HEAD_UNRESOLVED: ', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $decision.Reason
+        Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+    }
+
     It 'RG-TWIN-IS-BYTE-IDENTICAL' {
         # Arrange
         $root = (Resolve-Path "$PSScriptRoot/../../..").Path

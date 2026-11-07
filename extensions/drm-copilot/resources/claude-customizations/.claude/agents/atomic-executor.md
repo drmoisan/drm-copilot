@@ -111,7 +111,7 @@ A run is a preflight run when its delegation prompt carries the directive `DIREC
 
 ## Blocking Protocol
 
-Blocking is permitted only during preflight validation (before `[P0-T1]`). This includes a combined preflight-and-execute run of a proportionate remediation cycle: the run first performs single-pass preflight, fixes trivial defects in place, and stops before `[P0-T1]` only when a substantive defect remains. When preflight-blocked:
+Blocking is permitted only during preflight validation (before `[P0-T1]`). This includes a combined preflight-and-execute run of a proportionate remediation cycle: the run first performs single-pass preflight, fixes trivial defects in place, and stops before `[P0-T1]` only when a substantive defect remains. A light remediation run has no preflight, and stops the same way before `[P0-T1]` only when a fix task cannot be done at its named location. When preflight-blocked:
 
 1. State: `BLOCKED at preflight (before [P0-T1])`.
 2. Provide a short, concrete explanation of why.
