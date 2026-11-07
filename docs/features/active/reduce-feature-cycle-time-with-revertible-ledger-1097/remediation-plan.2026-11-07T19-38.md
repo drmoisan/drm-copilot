@@ -102,7 +102,7 @@ These were found by searching `tests/` for `Invoke-ProcessReductionChain`, `Get-
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run format and lint on the changed PowerShell files and write `FEATURE/evidence/qa-gates/stage-r-cycle3-powershell-format-lint.<timestamp>.md`.
+- [x] [P2-T1] Run format and lint on the changed PowerShell files and write `FEATURE/evidence/qa-gates/stage-r-cycle3-powershell-format-lint.<timestamp>.md`.
   - Scope: `scripts/dev-tools/ProcessReductionChain.psm1`, `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, and `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`. Run PoshQC format in check mode (no-op writer) and the direct analyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
   - Observation beyond the exit code: the formatter reports `Formatted: 0` for each file, `git status --porcelain` over the three files is empty afterwards, and the analyzer reports 0 findings. A needed format change is applied and committed, and the loop restarts here.
   - Acceptance: zero analyzer findings and no format change, compared with the P0-T1 static state.
