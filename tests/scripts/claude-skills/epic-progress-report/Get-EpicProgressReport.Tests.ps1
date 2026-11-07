@@ -359,6 +359,27 @@ Describe 'Invoke-EpicProgressReport' {
         $written.baselineDone | Should -Be 3
         $written.baselineWeeklyPct | Should -Be 12.5
     }
+
+    It 'rewrites the stored samples in pairs with -PairSamples' {
+        # The sample rule adds now to the four stored samples; pairing keeps now, now - 600 and now - 1200.
+        $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
+        $stored = @(1200, 900, 600, 300 | ForEach-Object { "{`"ts`":$($script:fixedNowUnix - $_),`"done`":2}" }) -join ','
+        $script:fileText[$script:statePath] = "{`"version`":1,`"startUnixSeconds`":1767603600,`"baselineDone`":0,`"baselineWeeklyPct`":0,`"samples`":[$stored]}"
+
+        $null = Get-TestReportLine -Extra @{ PairSamples = $true; Mode = 'TLDR' }
+
+        $script:stateWrites.Count | Should -Be 1
+        $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        (@($written.samples.ts) -join ',') | Should -Be "$($script:fixedNowUnix - 1200),$($script:fixedNowUnix - 600),$($script:fixedNowUnix)"
+    }
+
+    It 'throws before any I/O when -ResetBaseline and -PairSamples are combined' {
+        { Get-TestReportLine -Extra @{ ResetBaseline = $true; PairSamples = $true } } | Should -Throw -ExpectedMessage '*-ResetBaseline*-PairSamples*'
+
+        Should -Invoke Read-EpicProgressFile -Times 0 -Exactly
+        Should -Invoke Test-EpicProgressPath -Times 0 -Exactly
+        Should -Invoke Invoke-GitExe -Times 0 -Exactly
+    }
 }
 
 Describe 'Get-EpicProgressReport.ps1 repository constraints' {
@@ -432,7 +453,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
 
         $help = Get-Help -Name $script:productionPaths[0] -Full
 
-        $parameterNames.Count | Should -Be 14
+        $parameterNames.Count | Should -Be 15
         $help.Synopsis | Should -BeLike 'Print the TL;DR block*'
         (($help.description | ForEach-Object { $_.Text }) -join ' ').Trim() | Should -Not -BeNullOrEmpty
         $helpParameters = @($help.parameters.parameter)

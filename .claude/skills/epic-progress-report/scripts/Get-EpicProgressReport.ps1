@@ -79,6 +79,11 @@
     baseline done count to the current done count (unless -BaselineDone is passed), adds
     the first sample, and writes the state file. The weekly baseline is kept.
 
+.PARAMETER PairSamples
+    After the normal sample rule, keeps the newest sample and every second older sample
+    and writes the state file, so the intervals match a doubled cadence. A one-shot
+    command: each run halves the samples again. Cannot be combined with -ResetBaseline.
+
 .EXAMPLE
     pwsh -NoProfile -File scripts/dev-tools/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -Mode TLDR
 
@@ -128,7 +133,9 @@ param(
     [ValidateSet('TLDR', 'Full')]
     [string] $Mode = 'Full',
 
-    [switch] $ResetBaseline
+    [switch] $ResetBaseline,
+
+    [switch] $PairSamples
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Logic.ps1')
@@ -315,8 +322,13 @@ function Invoke-EpicProgressReport {
         [double] $WaveOverheadHours = 1.25,
         [ValidateRange(1, 100000)] [int] $SampleCap = 14,
         [ValidateSet('TLDR', 'Full')] [string] $Mode = 'Full',
-        [switch] $ResetBaseline
+        [switch] $ResetBaseline,
+        [switch] $PairSamples
     )
+
+    if ($ResetBaseline -and $PairSamples) {
+        throw '-ResetBaseline and -PairSamples cannot be combined: a reset discards the samples that -PairSamples would pair. Run them separately.'
+    }
 
     $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -CurrentLocation (Get-Location).ProviderPath
     # The state file is read before the first git call.
@@ -397,13 +409,16 @@ function Invoke-EpicProgressReport {
     $baselineDoneValue = $baseline.BaselineDone
     if ($baseline.UseCurrentDone) { $baselineDoneValue = $done }
     $selection = Select-EpicProgressSample -Sample $priorSamples -NowUnixSeconds $nowUnixSeconds -Done $done -SampleCap $SampleCap
-    if ($selection.Changed -or $ResetBaseline) {
+    $currentSamples = $selection.Sample
+    # Pairing is a one-shot rewrite applied after the sample rule (cadence change).
+    if ($PairSamples) { $currentSamples = [object[]] @(Merge-EpicProgressSamplePair -Sample $currentSamples) }
+    if ($selection.Changed -or $ResetBaseline -or $PairSamples) {
         $startUnixSeconds = [DateTimeOffset]::new($baseline.StartUtc).ToUnixTimeSeconds()
-        $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $selection.Sample
+        $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $currentSamples
         Write-EpicProgressState -Path $setting.StatePath -Content $stateJson
     }
 
-    $summary = Get-EpicProgressSummary -Feature $features.ToArray() -BaselineDone $baselineDoneValue -StartUtc $baseline.StartUtc -NowUtc $nowUtc -Sample $selection.Sample -WaveOverheadHours $WaveOverheadHours -WeeklyPct $weeklyPct -BaselineWeeklyPct $baseline.BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $EpicFolder
+    $summary = Get-EpicProgressSummary -Feature $features.ToArray() -BaselineDone $baselineDoneValue -StartUtc $baseline.StartUtc -NowUtc $nowUtc -Sample $currentSamples -WaveOverheadHours $WaveOverheadHours -WeeklyPct $weeklyPct -BaselineWeeklyPct $baseline.BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $EpicFolder
     $lines = [System.Collections.Generic.List[string]]::new()
     $tldrLines = Get-EpicProgressTldrLine -Summary $summary
     $lines.AddRange([string[]] $tldrLines)
