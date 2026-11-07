@@ -117,6 +117,13 @@ Describe 'Get-CodexReviewPolicyAuditPath (issue #1114)' {
         @($result.Paths).Count | Should -Be 0
     }
 
+    It '1114: ignores a non-audit path with a .. segment cited beside a valid policy audit' {
+        $message = "policy-audit-path: $script:AuditA`ndocs/features/active/2026-11-07-item-a-1114/../other/code-review.2026-11-07T20-00.md"
+        $result = Get-CodexReviewPolicyAuditPath -Message $message
+        @($result.Paths) | Should -Be @($script:AuditA)
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
     It '1114: extracts both paths from one labelled line that carries two audits' {
         $result = Get-CodexReviewPolicyAuditPath -Message "policy-audit-path: $script:AuditA and $script:AuditB"
         @($result.Paths) | Should -Be @($script:AuditA, $script:AuditB)
