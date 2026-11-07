@@ -219,6 +219,48 @@ class TestQCRunnerFullLoop:
         assert pytest_env is not None
         assert pytest_env.get(runner.EXECUTOR_LOCK_BYPASS_ENV) == "1"
 
+    def test_full_loop_full_test_runs_xdist_workers(
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
+    ) -> None:
+        """The full_test command of run_full_loop_with_artifacts() passes -n auto."""
+        pytest_argv: list[str] = []
+
+        def fake_run_and_record(*args: object, **kwargs: object) -> QCToolResult:
+            argv = kwargs.get("argv")
+            if isinstance(argv, list) and "pytest" in argv:
+                pytest_argv.extend(cast("list[str]", argv))
+            return QCToolResult(step="tool", returncode=0, output="")
+
+        def fake_diff_signature(
+            *args: object, **kwargs: object
+        ) -> tuple[tuple[str, str, str], ...]:
+            return ()
+
+        runner = QCRunner(mem_fs_path)
+        monkeypatch.setattr(runner, "_diff_signature", fake_diff_signature)
+        monkeypatch.setattr(runner, "_run_and_record", fake_run_and_record)
+
+        runner.run_full_loop_with_artifacts(
+            artifact_paths={
+                step: mem_fs_path / f"artifacts/{step}.txt"
+                for step in ("black", "ruff", "pyright", "pytest")
+            },
+            max_loops=1,
+        )
+
+        assert pytest_argv[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
+
+    def test_python_toolchain_pytest_command_runs_xdist_workers(self) -> None:
+        """PYTHON_TOOLCHAIN_COMMANDS["pytest"] carries -n auto and no stale flag."""
+        from scripts.dev_tools.atomic_executor.qc_toolchain import (
+            PYTHON_TOOLCHAIN_COMMANDS,
+        )
+
+        command = PYTHON_TOOLCHAIN_COMMANDS["pytest"]
+        assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in command
+
 
 class TestQCRunnerFilterHelpers:
     """Tests for _filter_* helper methods."""
@@ -434,8 +476,9 @@ class TestQCRunnerRunFull:
             "poetry",
             "run",
             "pytest",
+            "-n",
+            "auto",
             "--color=no",
-            "--cov=src/lexile_corpus_tuner",
             "--cov-report=xml",
             "--cov-report=term-missing",
         ]

@@ -365,6 +365,7 @@ class TestPromptBuilderBuild:
         assert "python -m poetry run ruff check" in prompt
         assert "python -m poetry run pyright" in prompt
         assert "python -m poetry run pytest" in prompt
+        assert "python -m poetry run pytest -n auto" in prompt
         # REQ-001: MUST NOT include any `poetry run` forms without `python -m` prefix
         assert (
             "poetry run black" not in prompt or "python -m poetry run black" in prompt

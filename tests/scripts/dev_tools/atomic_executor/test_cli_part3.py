@@ -63,6 +63,7 @@ class TestPreflightQC:
         # Check key elements are present
         assert "Pre-flight QC Fix Required" in prompt
         assert str(mem_fs_path.as_posix()) in prompt
+        assert "poetry run pytest -n auto" in prompt
         assert "Black failed: file.py" in prompt
         assert "poetry run black" in prompt
         assert "poetry run ruff" in prompt
@@ -117,6 +118,35 @@ class TestPreflightQC:
         assert "=== RUFF ===" in result.output
         assert "=== PYRIGHT ===" in result.output
         assert "=== PYTEST ===" in result.output
+
+    def test_preflight_pytest_step_runs_xdist_workers(
+        self,
+        mem_fs_path: Path,
+        monkeypatch: "MonkeyPatch",
+    ) -> None:
+        """The pytest step of _run_preflight_qc_with_capture passes -n auto."""
+        from scripts.dev_tools.atomic_executor.cli import (
+            _run_preflight_qc_with_capture,
+        )
+
+        argvs: list[list[str]] = []
+
+        def mock_run(
+            argv: list[str], **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
+            argvs.append(list(argv))
+            return subprocess.CompletedProcess(
+                args=argv, returncode=0, stdout="OK", stderr=""
+            )
+
+        monkeypatch.setattr("subprocess.run", mock_run)
+
+        _run_preflight_qc_with_capture(mem_fs_path)
+
+        pytest_argv = next(argv for argv in argvs if "pytest" in argv)
+        start = pytest_argv.index("pytest")
+        assert pytest_argv[start : start + 3] == ["pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
 
     def test_run_preflight_qc_with_capture_returns_failure(
         self,

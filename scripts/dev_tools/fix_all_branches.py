@@ -368,10 +368,12 @@ def run_powershell_branch(
     emit_status_transition("powershell", "PoshQC: test")
     if not api.run_simple_step(
         step_number=4,
-        description="Running PowerShell tests (Pester)...",
+        description="Running PowerShell tests (Pester, parallel shards)...",
         step_name="PoshQC: test",
         success_message="PowerShell tests passed",
         failure_message="PowerShell tests failed. Please review errors above.",
+        # The gate is one Invoke-PoshQCParallelTest run; the process exits with
+        # the run's ExitCode so a failed shard fails the step (issue #1096).
         command=[
             "pwsh",
             "-NoLogo",
@@ -380,7 +382,7 @@ def run_powershell_branch(
             "Bypass",
             "-Command",
             "Import-Module './scripts/powershell/PoshQC'; "
-            "Invoke-PoshQCTest -Root '.'",
+            "exit (Invoke-PoshQCParallelTest -Root '.').ExitCode",
         ],
         runner=branch_runner,
         logger=branch_logger,

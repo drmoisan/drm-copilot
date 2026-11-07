@@ -502,3 +502,52 @@ def test_powershell_leak_scan_failure_stops_before_pester() -> None:
         "PoshQC: leak scan",
     ]
     assert "PowerShell leak scan failed" in read_log(logger)
+
+
+def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
+    """PoshQC: test runs Invoke-PoshQCParallelTest and exits with its ExitCode."""
+    # Arrange
+    factory = FakeRunnerFactory(base_success_responses())
+
+    # Act
+    fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+
+    # Assert
+    commands = dict(factory.runners["powershell"].calls)
+    test_command = " ".join(commands["PoshQC: test"])
+    assert "Invoke-PoshQCParallelTest -Root '.'" in test_command
+    assert ".ExitCode" in test_command
+    assert "Invoke-PoshQCTest" not in test_command
+
+
+def _python_pytest_command(*, include_coverage: bool) -> list[str]:
+    """Run the pipeline and return the argv of the python branch pytest step."""
+    factory = FakeRunnerFactory(
+        base_success_responses(include_coverage=include_coverage)
+    )
+    fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=include_coverage,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+    step_name = "Pytest: test with coverage" if include_coverage else "Pytest: test"
+    return dict(factory.runners["python"].calls)[step_name]
+
+
+def test_python_branch_pytest_runs_xdist_workers_with_coverage() -> None:
+    """run_python_branch passes -n auto when coverage is requested."""
+    command = _python_pytest_command(include_coverage=True)
+    assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+    assert "--cov=src/lexile_corpus_tuner" not in command
+
+
+def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
+    """run_python_branch passes -n auto when coverage is not requested."""
+    command = _python_pytest_command(include_coverage=False)
+    assert command == ["poetry", "run", "pytest", "-n", "auto"]
