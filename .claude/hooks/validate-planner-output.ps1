@@ -42,6 +42,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 Set-StrictMode -Version Latest
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'premortem-section.ps1') } catch { Add-HookDependencyFailure -Name 'premortem-section.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
 $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
@@ -378,7 +379,7 @@ function Invoke-PlannerOutputValidation {
     if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'atomic-planner hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
     else {
         $agentOutput = $envelope.AssistantText
-        $decision = Get-PlannerOutputBlockDecision -AgentOutput ([string]$agentOutput)
+        $decision = Get-PlannerOutputBlockDecision -AgentOutput ([string]$agentOutput) -Envelope $envelope.Envelope
     }
     if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
     if (-not $decision.Repairable) {
@@ -395,13 +396,21 @@ function Get-PlannerOutputBlockDecision {
     .DESCRIPTION
         Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
         Repairable boolean, and Message. Every planner content check is repairable by the subagent.
+        plan-path is resolved against the item worktree that produced it
+        (Resolve-SubagentStopTargetWorktree, issue #1105) and only the item copy is read. Envelope,
+        SessionRoot, ReadTranscriptHead, and WorktreeListInvoker feed that resolution; without an
+        envelope or an absolute path the session root applies and nothing changes.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string] $AgentOutput
+        [string] $AgentOutput,
+        [AllowNull()] [object] $Envelope,
+        [AllowNull()] [AllowEmptyString()] [string] $SessionRoot,
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker
     )
 
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
@@ -417,9 +426,15 @@ function Get-PlannerOutputBlockDecision {
         return @{ Ok = $false; Repairable = $true; Message = 'atomic-planner hook: agent output does not advertise a plan-path. Planner must report `plan-path: <path>` per atomic-plan-contract.' }
     }
 
-    $file = Get-PlanFileContent -Path $planPath
+    $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
+    $targetArguments = @{ Envelope = $Envelope; AdvertisedPath = @($planPath); SessionRoot = $root }
+    if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $target = Resolve-SubagentStopTargetWorktree @targetArguments
+    $probePath = (Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root).ProbePath
+    $file = Get-PlanFileContent -Path $probePath
     if (-not $file.Exists) {
-        return @{ Ok = $false; Repairable = $true; Message = "atomic-planner hook: planner advertised plan-path '$planPath' but no file exists at that location." }
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-planner hook: planner advertised plan-path '$planPath' but no file exists at that location.$(Get-SubagentStopTargetNote -Target $target -ProbePath $probePath -SessionRoot $root)" }
     }
 
     $errors = @(Get-PlanStructureValidationReport -Lines $file.Lines)
