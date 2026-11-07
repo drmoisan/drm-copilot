@@ -28,7 +28,7 @@ Finding-Scope: contained
 
 ## Light Fix Tasks
 
-- [ ] [P0-T1] `tests/scripts/claude-hooks/validate-feature-review-coverage.TargetWorktree.Tests.ps1` lines 216-218 (F4): read the bound value as `$PesterBoundParameters['Root']` instead of `$Root` in the three `ParameterFilter` expressions, run the PowerShell toolchain and one parallel gate run, and re-check spec criterion 8.
+- [x] [P0-T1] `tests/scripts/claude-hooks/validate-feature-review-coverage.TargetWorktree.Tests.ps1` lines 216-218 (F4): read the bound value as `$PesterBoundParameters['Root']` instead of `$Root` in the three `ParameterFilter` expressions, run the PowerShell toolchain and one parallel gate run, and re-check spec criterion 8.
 
 ## Non-remediation items (record only)
 

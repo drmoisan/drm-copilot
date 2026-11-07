@@ -213,9 +213,9 @@ Describe 'validate-feature-review-coverage summary, CLAUDE.md, and reports targe
 
         # Assert
         $result.Ok | Should -BeTrue
-        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq 'artifacts/pr_context.summary.txt' -and $Root -eq $script:ItemRoot }
-        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq 'CLAUDE.md' -and $Root -eq $script:ItemRoot }
-        Should -Invoke Get-ArtifactFileContent -Times 0 -Exactly -ParameterFilter { [string]::IsNullOrEmpty($Root) -and $Path -in @('artifacts/pr_context.summary.txt', 'CLAUDE.md') }
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq 'artifacts/pr_context.summary.txt' -and $PesterBoundParameters['Root'] -eq $script:ItemRoot }
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq 'CLAUDE.md' -and $PesterBoundParameters['Root'] -eq $script:ItemRoot }
+        Should -Invoke Get-ArtifactFileContent -Times 0 -Exactly -ParameterFilter { [string]::IsNullOrEmpty($PesterBoundParameters['Root']) -and $Path -in @('artifacts/pr_context.summary.txt', 'CLAUDE.md') }
         Should -Invoke Get-JacocoRepoCoverage -Times 1 -Exactly -ParameterFilter { $Path -eq "$script:ItemRoot/$script:Report" }
     }
 
