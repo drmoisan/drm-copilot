@@ -121,7 +121,7 @@ Describe 'validate-executor-output plan-path target worktree (issue #1105)' {
         Mock Get-PlanFileContent { @{ Exists = $false; Lines = @() } }
 
         # Act
-        $result = Get-ExecutorCase -Output "plan-path: $script:PlanRelative" -Prompt "branch: bug/sample-1105`nbranch: main"
+        $result = Get-ExecutorCase -Output "plan-path: $script:PlanRelative" -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
@@ -212,12 +212,12 @@ Describe 'validate-executor-output preflight-fix-record target worktree (issue #
         Should -Invoke Test-PreflightFixRecord -Times 1 -Exactly -ParameterFilter { $Path -eq $script:RecordRelative }
     }
 
-    It 'probes the session-root fix record and names TARGET_WORKTREE_AMBIGUOUS when the prompt names two branches' {
+    It 'probes the session-root fix record and names TARGET_WORKTREE_AMBIGUOUS when the prompt names two issue numbers' {
         # Arrange
         Mock Test-PreflightFixRecord { $false }
 
         # Act
-        $result = Get-ExecutorCase -Output $script:PreflightOutput -Prompt "DIRECTIVE: PREFLIGHT VALIDATION ONLY`nbranch: bug/sample-1105`nbranch: main"
+        $result = Get-ExecutorCase -Output $script:PreflightOutput -Prompt "DIRECTIVE: PREFLIGHT VALIDATION ONLY`nCanonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'

@@ -129,10 +129,23 @@ Describe 'validate-planner-output plan-path target worktree (issue #1105)' {
         Mock Get-PlanFileContent { @{ Exists = $false; Lines = @() } }
 
         # Act
-        $result = Get-PlannerCase -PlanPath $script:Relative -Prompt "branch: bug/sample-1105`nbranch: main"
+        $result = Get-PlannerCase -PlanPath $script:Relative -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
         Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
+    }
+
+    It 'reads only the item copy when a later label names the base branch' {
+        # Arrange
+        Mock Get-PlanFileContent { param([string] $Path) if ($Path -eq $script:ItemPath) { @{ Exists = $true; Lines = $script:ItemLines } } else { @{ Exists = $true; Lines = @('main plan') } } }
+
+        # Act
+        $result = Get-PlannerCase -PlanPath $script:Relative -Prompt "branch: bug/sample-1105`nbase branch: main"
+
+        # Assert
+        $result.Ok | Should -BeTrue
+        Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:ItemPath }
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly -ParameterFilter { $Path -eq $script:Relative }
     }
 }

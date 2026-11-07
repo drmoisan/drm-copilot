@@ -12,7 +12,11 @@
     Resolution reuses Resolve-HookTargetWorktree (HookTargetWorktree.psm1) and adds no resolver of
     its own: an absolute advertised path decides through the FilePath source; otherwise the
     delegation prompt, read from the transcript named by agent_transcript_path, decides through its
-    branch: label and canonical issue line; with neither, the session root applies.
+    identity; with neither, the session root applies. The identity is reduced to the shapes the
+    model-routing gate admits: the first branch label, read by Find-WorktreeResolutionBranchSignal
+    (WorktreeTargetResolution.psm1), and the canonical issue lines, read by
+    Find-WorktreeItemIssueSignal (WorktreeItemResolution.psm1). An identity with no branch label is
+    placed through the worktree checkpoints by Get-WorktreeItemCheckpointIssue, as at the gate.
 
     The transcript readers Get-TranscriptPathFromEnvelope, Read-TranscriptHead, and
     Get-TranscriptFirstUserText, with their property reader Get-JsonPropertyValue, moved here from
@@ -20,12 +24,16 @@
 
 .NOTES
     PowerShell 7+. Holds no script-scope state, invokes no Python, and dot-sources no other hook.
-    The only file read is Read-TranscriptHead; the worktree list and the transcript reader are
-    injectable script-block parameters, so tests supply in-memory content. Mirrored byte-identically
-    under extensions/drm-copilot/resources/claude-customizations/.
+    Imports HookTargetWorktree.psm1, WorktreeTargetResolution.psm1, and WorktreeItemResolution.psm1
+    under the guarded single-statement pattern. The file reads are Read-TranscriptHead and the
+    default CheckpointIssueReader; the worktree list, the transcript reader, and the checkpoint
+    issue reader are injectable script-block parameters, so tests supply in-memory content.
+    Mirrored byte-identically under extensions/drm-copilot/resources/claude-customizations/.
 #>
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/HookTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookTargetWorktree.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeTargetResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 
 function Get-JsonPropertyValue {
     # Returns a named property of a parsed JSON object, or $null; safe under StrictMode.
@@ -131,6 +139,34 @@ function Test-SubagentStopSessionRoot {
     return [string]::Equals($root, (ConvertTo-HookTargetWorktreeNormalizedPath -Path $SessionRoot), [System.StringComparison]::OrdinalIgnoreCase)
 }
 
+function Get-SubagentStopIdentityPrompt {
+    <#
+    .SYNOPSIS
+        Reduces a delegation prompt to the identity the model-routing gate reads, or $null.
+    .DESCRIPTION
+        Pure. Returns $null when the prompt carries no branch signal and no canonical issue line.
+        Otherwise returns text holding 'branch: <first branch>' when a branch is present, followed
+        by one canonical issue line per distinct issue number. Later branch labels, such as a
+        'base branch: main' line, are dropped, because the gate reads only the first.
+    .PARAMETER Prompt
+        The delegation prompt text, or $null.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([AllowNull()] [AllowEmptyString()] [string] $Prompt)
+
+    $branch = Find-WorktreeResolutionBranchSignal -Text $Prompt
+    # Assigned before wrapping, because the reader returns its array as one object.
+    $issueSignal = Find-WorktreeItemIssueSignal -Text $Prompt
+    $issues = @($issueSignal)
+    $hasBranch = -not [string]::IsNullOrWhiteSpace($branch)
+    if (-not $hasBranch -and $issues.Count -eq 0) { return $null }
+    $lines = [System.Collections.Generic.List[string]]::new()
+    if ($hasBranch) { $lines.Add("branch: $branch") }
+    foreach ($number in $issues) { $lines.Add("Canonical issue number for this feature is $number.") }
+    return ($lines -join "`n")
+}
+
 function Resolve-SubagentStopTargetWorktree {
     <#
     .SYNOPSIS
@@ -138,9 +174,12 @@ function Resolve-SubagentStopTargetWorktree {
     .DESCRIPTION
         When any advertised path is absolute, Resolve-HookTargetWorktree decides from the absolute
         paths (source FilePath). Otherwise the first user entry of the transcript named by the
-        envelope's agent_transcript_path is read, and a prompt carrying a branch: label or a
-        canonical issue line decides (source DelegationPrompt; the resolver reports it as
-        DelegationIdentity). With neither, the session root applies (source SessionRoot).
+        envelope's agent_transcript_path is read and reduced by Get-SubagentStopIdentityPrompt; a
+        reduced identity decides (source DelegationPrompt; the resolver reports it as
+        DelegationIdentity). An identity without a branch label is passed with
+        CheckpointIssueReader, so an issue-line-only prompt is placed through the worktree
+        checkpoints; a branch-bearing identity reads no checkpoint. With no identity, the session
+        root applies (source SessionRoot).
         Returns WorktreeRoot, Source, ReasonCode, and Detail. A TARGET_WORKTREE_NOT_DERIVABLE or
         TARGET_WORKTREE_AMBIGUOUS result carries a $null WorktreeRoot, so callers fall back to the
         session root. No exception escapes: a resolver failure yields the session root.
@@ -154,6 +193,9 @@ function Resolve-SubagentStopTargetWorktree {
         { param($Path) <JSONL lines or $null> }; defaults to Read-TranscriptHead.
     .PARAMETER WorktreeListInvoker
         Optional { param($SessionRoot) <porcelain text> } passed to Resolve-HookTargetWorktree.
+    .PARAMETER CheckpointIssueReader
+        { param($WorktreeRoot) <issue number or $null> } passed to Resolve-HookTargetWorktree for an
+        identity without a branch label; defaults to Get-WorktreeItemCheckpointIssue.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -162,7 +204,8 @@ function Resolve-SubagentStopTargetWorktree {
         [AllowNull()] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $AdvertisedPath,
         [Parameter(Mandatory = $true)] [string] $SessionRoot,
         [scriptblock] $ReadTranscriptHead = ${function:Read-TranscriptHead},
-        [scriptblock] $WorktreeListInvoker
+        [scriptblock] $WorktreeListInvoker,
+        [scriptblock] $CheckpointIssueReader = { param($WorktreeRoot) Get-WorktreeItemCheckpointIssue -WorktreeRoot $WorktreeRoot }
     )
 
     try {
@@ -180,8 +223,12 @@ function Resolve-SubagentStopTargetWorktree {
                 try { $head = & $ReadTranscriptHead $transcriptPath } catch { $head = $null }
                 if ($null -ne $head) { $prompt = Get-TranscriptFirstUserText -Lines ([string[]]@($head)) }
             }
-            $hasIdentity = $null -ne $prompt -and ($prompt -match '(?i)\bbranch:\s*[A-Za-z0-9]' -or $prompt -match 'Canonical issue number for this feature is #?\d+')
-            if ($hasIdentity) { $resolverArguments['DelegationPrompt'] = $prompt }
+            $identity = Get-SubagentStopIdentityPrompt -Prompt $prompt
+            if ($null -ne $identity) {
+                $resolverArguments['DelegationPrompt'] = $identity
+                # Only an identity with no branch label is placed through the worktree checkpoints.
+                if ($null -eq (Find-WorktreeResolutionBranchSignal -Text $identity)) { $resolverArguments['CheckpointIssueReader'] = $CheckpointIssueReader }
+            }
         }
         $result = Resolve-HookTargetWorktree @resolverArguments
         $source = if ($result.Source -eq 'DelegationIdentity') { 'DelegationPrompt' } else { [string]$result.Source }

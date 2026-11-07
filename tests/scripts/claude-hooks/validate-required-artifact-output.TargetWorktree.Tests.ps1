@@ -121,7 +121,7 @@ Describe 'validate-required-artifact-output prd-feature spec-path target worktre
         Mock Test-ArtifactFile { $false }
 
         # Act
-        $result = Get-RequiredArtifactCase -SpecPath $script:Relative -Prompt "branch: bug/sample-1105`nbranch: main"
+        $result = Get-RequiredArtifactCase -SpecPath $script:Relative -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed'

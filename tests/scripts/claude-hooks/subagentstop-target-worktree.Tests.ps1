@@ -100,9 +100,9 @@ Describe 'Resolve-SubagentStopTargetWorktree (issue #1105)' {
         $result.WorktreeRoot | Should -BeNullOrEmpty
     }
 
-    It 'returns TARGET_WORKTREE_AMBIGUOUS when the prompt names two different branches' {
+    It 'returns TARGET_WORKTREE_AMBIGUOUS when the prompt names two different issue numbers' {
         # Arrange
-        $reader = Get-TranscriptReader -Prompt "branch: bug/sample-1105`nbranch: main"
+        $reader = Get-TranscriptReader -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Act
         $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker
@@ -110,7 +110,76 @@ Describe 'Resolve-SubagentStopTargetWorktree (issue #1105)' {
         # Assert
         $result.ReasonCode | Should -Be 'TARGET_WORKTREE_AMBIGUOUS'
         $result.WorktreeRoot | Should -BeNullOrEmpty
-        $result.Detail | Should -Match 'different branches'
+        $result.Detail | Should -Match 'different issue numbers'
+    }
+
+    It 'resolves an issue-line-only prompt to the item root through the injected checkpoint issue reader' {
+        # Arrange
+        $reader = Get-TranscriptReader -Prompt 'Canonical issue number for this feature is 1105.'
+        $itemRoot = $script:ItemRoot
+        $issueReader = { param($WorktreeRoot) if ($WorktreeRoot -eq $itemRoot) { '1105' } else { $null } }.GetNewClosure()
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker -CheckpointIssueReader $issueReader
+
+        # Assert
+        $result.WorktreeRoot | Should -Be $script:ItemRoot
+        $result.Source | Should -Be 'DelegationPrompt'
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It 'returns TARGET_WORKTREE_NOT_DERIVABLE for an issue-line-only prompt when no worktree records the issue' {
+        # Arrange
+        $reader = Get-TranscriptReader -Prompt 'Canonical issue number for this feature is 1105.'
+        $issueReader = { param($WorktreeRoot) $null = $WorktreeRoot; $null }
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker -CheckpointIssueReader $issueReader
+
+        # Assert
+        $result.ReasonCode | Should -Be 'TARGET_WORKTREE_NOT_DERIVABLE'
+        $result.WorktreeRoot | Should -BeNullOrEmpty
+    }
+
+    It 'resolves to the item root from the first branch label when a later label names the base branch' {
+        # Arrange
+        $reader = Get-TranscriptReader -Prompt "branch: bug/sample-1105`nbase branch: main"
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker
+
+        # Assert
+        $result.WorktreeRoot | Should -Be $script:ItemRoot
+        $result.Source | Should -Be 'DelegationPrompt'
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It 'never invokes the checkpoint issue reader for a prompt carrying a branch label and the canonical issue line' {
+        # Arrange
+        $reader = Get-TranscriptReader -Prompt "Canonical issue number for this feature is 1105.`nbranch: bug/sample-1105"
+        $readerCalls = [System.Collections.Generic.List[string]]::new()
+        $countingReader = { param($WorktreeRoot) $readerCalls.Add($WorktreeRoot); '1105' }.GetNewClosure()
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker -CheckpointIssueReader $countingReader
+
+        # Assert
+        $result.WorktreeRoot | Should -Be $script:ItemRoot
+        $readerCalls.Count | Should -Be 0 -Because 'a branch-bearing identity resolves without a checkpoint read'
+    }
+
+    It 'returns the session root and leaves the value unchanged when the first branch label names the session branch' {
+        # Arrange
+        $reader = Get-TranscriptReader -Prompt "branch: main`nbase branch: bug/sample-1105"
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker
+        $converted = Resolve-SubagentStopArtifactPath -Path 'docs/features/active/sample/plan.md' -WorktreeRoot $result.WorktreeRoot -SessionRoot $script:SessionRoot
+
+        # Assert
+        $result.WorktreeRoot | Should -Be $script:SessionRoot
+        $result.ReasonCode | Should -BeNullOrEmpty
+        $converted | Should -Be 'docs/features/active/sample/plan.md'
     }
 
     It 'falls back to the session root when the transcript reader throws' {
@@ -148,6 +217,23 @@ Describe 'Resolve-SubagentStopTargetWorktree (issue #1105)' {
         $result.Source | Should -Be 'SessionRoot'
         $result.WorktreeRoot | Should -Be $script:SessionRoot
         $result.Detail | Should -Match 'resolver unavailable'
+    }
+}
+
+Describe 'Get-SubagentStopIdentityPrompt (issue #1105)' {
+    It 'returns null for a prompt with no branch label and no canonical issue line' {
+        Get-SubagentStopIdentityPrompt -Prompt 'Execute the plan.' | Should -BeNullOrEmpty
+    }
+
+    It 'returns the first branch label and one line per distinct issue number for a mixed prompt' {
+        # Arrange
+        $prompt = "Canonical issue number for this feature is 1105.`nbranch: bug/sample-1105`nbase branch: main`nCanonical issue number for this feature is #1105."
+
+        # Act
+        $identity = Get-SubagentStopIdentityPrompt -Prompt $prompt
+
+        # Assert
+        $identity | Should -Be "branch: bug/sample-1105`nCanonical issue number for this feature is 1105."
     }
 }
 

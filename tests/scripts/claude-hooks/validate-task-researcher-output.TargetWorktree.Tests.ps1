@@ -146,7 +146,7 @@ Describe 'validate-task-researcher-output research-path target worktree (issue #
         Mock Test-ResearchFile { $false }
 
         # Act
-        $result = Invoke-ResearcherCase -ResearchPath $script:Relative -Prompt "branch: bug/sample-1105`nbranch: main"
+        $result = Invoke-ResearcherCase -ResearchPath $script:Relative -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Ok | Should -BeFalse

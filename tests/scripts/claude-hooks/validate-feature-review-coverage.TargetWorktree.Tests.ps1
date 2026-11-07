@@ -282,7 +282,7 @@ Describe 'validate-feature-review-coverage unresolved target worktree (issue #11
         Mock Get-JacocoRepoCoverage { 95.0 }
 
         # Act
-        $result = Invoke-CoverageCase -Prompt "branch: bug/sample-1105`nbranch: main"
+        $result = Invoke-CoverageCase -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Ok | Should -BeFalse

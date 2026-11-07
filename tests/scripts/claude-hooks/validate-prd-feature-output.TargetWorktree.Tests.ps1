@@ -151,7 +151,7 @@ Describe 'validate-prd-feature-output spec-path and research-path target worktre
         Mock Test-PrdFeatureArtifactFile { $false }
 
         # Act
-        $result = Invoke-PrdFeatureCase -Output "spec-path: $script:SpecRelative" -Prompt "branch: bug/sample-1105`nbranch: main"
+        $result = Invoke-PrdFeatureCase -Output "spec-path: $script:SpecRelative" -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
