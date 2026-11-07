@@ -196,7 +196,7 @@ Python and TypeScript hold this in new pure modules, `validate_light_cycles(cycl
 
 ### Phase 3 — Final QA
 
-- [ ] [P3-T1] Run the format, lint, and type stages for each language touched and write `FEATURE/evidence/qa-gates/stage-d-powershell-format-lint.<timestamp>.md`, `FEATURE/evidence/qa-gates/stage-d-python-format-lint-type.<timestamp>.md`, and `FEATURE/evidence/qa-gates/stage-d-typescript-format-lint-type.<timestamp>.md`.
+- [x] [P3-T1] Run the format, lint, and type stages for each language touched and write `FEATURE/evidence/qa-gates/stage-d-powershell-format-lint.<timestamp>.md`, `FEATURE/evidence/qa-gates/stage-d-python-format-lint-type.<timestamp>.md`, and `FEATURE/evidence/qa-gates/stage-d-typescript-format-lint-type.<timestamp>.md`.
   - PowerShell: `Invoke-PoshQCFormat` check-only, with a no-op `-WriteFile`, and `Invoke-ScriptAnalyzer` directly with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, over every changed `.ps1` and `.psm1` file, including the four guard copies. Type checking does not apply.
   - Python: Black in check mode, Ruff without fixing, and Pyright. TypeScript: Prettier in check mode, ESLint without fixing, and the compiler type check, in `extensions/drm-copilot/`.
   - Acceptance: the PowerShell log holds an `Already formatted: ` line and no `Formatted: ` line for each formatted file, and analyzer findings number zero; every read-only tool exits 0. `EXIT_CODE:` is non-zero when any condition fails. A failure is repaired and this task restarts.

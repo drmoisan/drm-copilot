@@ -59,8 +59,8 @@ BeforeAll {
         )
 
         return '{"review_outcomes":[{"verdict":"REMEDIATION_REQUIRED","findings":' + $Findings + '}],' +
-            '"cycles":[{"plan_path":"docs/features/active/x/remediation-inputs.md","remediation_path":' + $Path +
-            ',"opened_by_review":0,"execution_status":"complete"}]}'
+        '"cycles":[{"plan_path":"docs/features/active/x/remediation-inputs.md","remediation_path":' + $Path +
+        ',"opened_by_review":0,"execution_status":"complete"}]}'
     }
 }
 
@@ -130,7 +130,7 @@ Describe 'Get-RemediationLightCycleError through Get-OrchestratorStateRemediatio
     It 'OLC-NON-OBJECT-PRIOR-CYCLE-IGNORED' {
         # Arrange: a string cycle before a light cycle opened by review 0.
         $json = '{"review_outcomes":[{"verdict":"REMEDIATION_REQUIRED","findings":[{"remediability":"autonomous","scope":"contained"}]}],' +
-            '"cycles":["light",{"plan_path":"p","remediation_path":"light","opened_by_review":0}]}'
+        '"cycles":["light",{"plan_path":"p","remediation_path":"light","opened_by_review":0}]}'
 
         # Act
         $errors = @(Get-LoopError -Json $json -Invariant8Only)

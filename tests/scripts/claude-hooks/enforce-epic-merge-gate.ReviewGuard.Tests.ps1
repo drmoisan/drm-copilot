@@ -291,9 +291,11 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
                     [int] $KeyNumber = 0
                 )
 
+                $readList = $Reads
+                $keyTarget = $KeyNumber
                 $key = $script:CapKey
                 $noKey = $script:CapNoKey
-                return { param($Target) $Reads.Add($Target); if ($null -ne $Target -and $Target -eq $KeyNumber) { $key } else { $noKey } }.GetNewClosure()
+                return { param($Target) $readList.Add($Target); if ($null -ne $Target -and $Target -eq $keyTarget) { $key } else { $noKey } }.GetNewClosure()
             }
         }
 
