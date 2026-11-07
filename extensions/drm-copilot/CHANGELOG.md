@@ -19,6 +19,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Claude core pack skill `/epic-progress-report` (issue #1118): the report measures progress
+  in typed steps (research, spec, plan, preflight, one execution step per plan task, review,
+  pr, ci, merge, main-sync, and integration-pr) instead of checked plan tasks, counts the steps
+  each opened remediation cycle adds, and estimates the time remaining as the sum over step
+  types of remaining steps times the median measured duration, with stated default durations
+  for types that have no sample (`-StepDefaultMinutes` overrides them). Blocked items are
+  excluded by recorded checkpoint state. The TL;DR keeps four lines; the velocity, standard
+  deviation, and range lines are replaced by a Now line and a per-type table. A new `Item`
+  parameter set (`-Issue <n>`) reports a standalone item. The state file is version 2 with a
+  duration ledger and per-item tick anchors; version 1 files are migrated. The core pack adds
+  four scripts under `.claude/skills/epic-progress-report/scripts/` (Stages, Steps, Durations,
+  and Gather).
 - PoshQC code-coverage population (issue #527): `Invoke-PoshQCTest` derives the measured
   file set from the workspace. Declare coverage roots in `config/poshqc-coverage.json` at
   the workspace root (`{"version": 1, "roots": [...]}`). A `CodeCoverage.Path` list in the
