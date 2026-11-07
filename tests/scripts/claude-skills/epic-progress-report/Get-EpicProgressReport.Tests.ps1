@@ -318,6 +318,27 @@ Describe 'Invoke-EpicProgressReport' {
         Should -Invoke Write-EpicProgressState -Times 0 -Exactly
         $script:stateWrites.Count | Should -Be 0
     }
+
+    It 'throws before any git call without a passed or stored start' {
+        $arguments = $script:reportParameter.Clone()
+        $arguments.Remove('StartUtc')
+
+        { Invoke-EpicProgressReport @arguments } | Should -Throw -ExpectedMessage '*-StartUtc*-ResetBaseline*'
+        Should -Invoke Invoke-GitExe -Times 0 -Exactly
+    }
+
+    It 'uses the stored start when -StartUtc is absent' {
+        # 1767603600 is the fixture start, 2026-01-05T09:00:00Z.
+        $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
+        $script:fileText[$script:statePath] = '{"version":1,"startUnixSeconds":1767603600,"samples":[]}'
+        $arguments = $script:reportParameter.Clone()
+        $arguments.Remove('StartUtc')
+        $arguments['Mode'] = 'TLDR'
+
+        $lines = @(Invoke-EpicProgressReport @arguments)
+
+        ($lines -join "`n") | Should -Be ($script:expectedTldr -join "`n")
+    }
 }
 
 Describe 'Get-EpicProgressReport.ps1 repository constraints' {
