@@ -4,6 +4,7 @@
 # command, absent path, a read of the script itself, a -WhatIf write) or mocked with a
 # matching parameter signature; no test starts git, gh, or cswap, writes a file, or reads
 # the clock.
+# Issue #1093 added the -PairSamples write case for a run within 90 seconds of the last sample.
 
 BeforeAll {
     $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1'
