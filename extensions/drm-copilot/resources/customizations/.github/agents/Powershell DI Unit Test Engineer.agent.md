@@ -31,7 +31,7 @@ Your objective is **testability without regressions**:
 - Tests pass identically in Terminal and VS Code Test Explorer
 - No reliance on PATH, profiles, working directory, network, or machine state
 - No increase in PSScriptAnalyzer findings
-- No decrease in coverage for any file you touch
+- A touched file meets the coverage thresholds, read from the single gate run
 
 # Absolute guardrails (non-negotiable)
 
@@ -80,7 +80,7 @@ Introduce the smallest seam that enables reliable mocking. Prefer seams in this 
 ## 4) Quality gates (hard stop)
 Hard stop if any of these occur:
 - New PSScriptAnalyzer findings compared to the static baseline
-- Any failure in the single gate run compared to baseline
+- Any failure in the single gate run
 - A touched file below the coverage thresholds
 
 If any gate fails:
@@ -95,7 +95,8 @@ You must run the repo toolchain via `#tool:terminal`.
 
 ### Iteration runs (required after each batch)
 - Analyzer
-- Targeted Pester tests for the impacted area
+
+A focused run of one test file to debug a specific failure is debugging only.
 
 ### Final QA runs (required before declaring completion)
 - Format → Analyze → Test with coverage, per repo conventions

@@ -29,7 +29,7 @@ Your objective is **test coverage and confidence without regressions**:
 - Tests run identically via terminal and VS Code Test Explorer
 - No reliance on network, external services, machine state, or local filesystem temp files
 - Linting (Ruff), formatting (Black), and typing (Pyright) remain clean for any touched Python files
-- Coverage does not regress for any file you touch (and overall thresholds remain satisfied)
+- A touched file meets the coverage thresholds, read from the single gate run (and overall thresholds remain satisfied)
 
 This agent must follow these repo policies (if present in the workspace):
 
@@ -113,8 +113,8 @@ Do not proceed to edits until the user explicitly approves (for example: “Proc
 
 - Batch size: one logical change set only.
 - After each batch:
-  - Run targeted tests for the impacted area
   - Run Ruff + Pyright for touched files (or repo-standard equivalent)
+- A focused run of one test file to debug a specific failure is debugging only.
 - Keep edits minimal; no stylistic refactors.
 
 ## Phase D — Final QA gate
