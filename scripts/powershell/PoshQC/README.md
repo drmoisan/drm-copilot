@@ -69,6 +69,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 - `Get-PoshQCParallelWorkerCount`: return the default worker count, half the logical processors, at least 1 and at most 8.
 - `Merge-PoshQCJunitReport`: merge the JUnit XML texts of the shards into one report (no file I/O).
 - `ConvertTo-PoshQCShardWeight` / `Export-PoshQCShardWeight`: build the measured shard-weights document from JUnit reports, and write it to a file.
+- `Invoke-PoshQCLeakScan`: statically scan the Pester test files and `.ps1` helpers under `tests/` for environment, global variable, global function, location, and process-directory changes that no restore pairs with (issue #1096). It runs no test. Findings are compared with `config/poshqc-leak-allowlist.json`, whose entries each carry a reason; an absent allowlist is empty. An unallowlisted finding, a stale allowlist entry, an invalid allowlist, or a parse error is logged as one `path | line | kind | name` message and ends in a throw. Default folders are the configured test scan folders under `tests/`.
 
 ## Configuration
 
