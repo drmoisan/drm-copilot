@@ -59,4 +59,19 @@ Describe 'Planning contract wording' {
         $text.Contains('## Process-Reduction Ledger') | Should -BeTrue -Because "$Path must carry the standing-rule section"
         $missing | Should -BeNullOrEmpty -Because "$Path must state the planning-side ledger rule"
     }
+
+    It 'PCW-TASK-TARGET-<Copy> states the task target after the size guideline' -ForEach $script:ContractCopy {
+        # Arrange
+        $text = Get-PcwSurfaceText -RelativePath $Path
+
+        # Act
+        $guideline = $text.IndexOf('**Size guideline.**', [System.StringComparison]::Ordinal)
+        $target = $text.IndexOf('**Task target.**', [System.StringComparison]::Ordinal)
+        $range = $text.IndexOf('15 to 20', [System.StringComparison]::Ordinal)
+
+        # Assert
+        $guideline | Should -BeGreaterOrEqual 0 -Because "$Path must keep the size guideline bullet"
+        $target | Should -BeGreaterThan $guideline -Because "$Path must place the task target after the size guideline"
+        $range | Should -BeGreaterThan $target -Because "$Path must state the 15 to 20 task target in that bullet"
+    }
 }
