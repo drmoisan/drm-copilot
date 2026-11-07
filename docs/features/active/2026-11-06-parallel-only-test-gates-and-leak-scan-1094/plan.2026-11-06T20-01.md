@@ -43,7 +43,7 @@ Phase 0 reads policy and captures static tool baselines for what the branch touc
 
 - [x] [P0-T1] Read the policy files in the `policy-compliance-order` order, including `.claude/rules/powershell.md` and `.claude/rules/python.md`, then read `<FEATURE>/spec.md`, and write `<FEATURE>/evidence/baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
-- [ ] [P0-T2] Capture the PowerShell static baseline for `tests/scripts/claude-runtime` in `<FEATURE>/evidence/baseline/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/baseline/powershell-analyze.<timestamp>.md`.
+- [x] [P0-T2] Capture the PowerShell static baseline for `tests/scripts/claude-runtime` in `<FEATURE>/evidence/baseline/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/baseline/powershell-analyze.<timestamp>.md`.
   - The folder is passed through `-ScanFolders`. Format runs check-only through a no-op `-WriteFile` seam on the branch-current module, so no tracked file changes. Analyzer findings come from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the file set that `Get-PoshQCFileList -Root -ScanFolders` returns for that folder.
   - Acceptance: `Output Summary:` states the would-format count and the analyzer finding count as numbers, and `git status --porcelain` shows no tracked file changed by the step.
 - [ ] [P0-T3] Capture the Python static baseline in `<FEATURE>/evidence/baseline/python-black.<timestamp>.md`, `<FEATURE>/evidence/baseline/python-ruff.<timestamp>.md`, and `<FEATURE>/evidence/baseline/python-pyright.<timestamp>.md`.
