@@ -113,7 +113,7 @@ The second is reported only when the first does not apply. Validators do no git 
 - [x] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell, Python, and TypeScript scope, and write `FEATURE/evidence/baseline/stage-c-phase0-instructions-read.<timestamp>.md`.
   - This task stays only because the planner stop hook requires it; stage E removes it.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
-- [ ] [P0-T2] Capture the PowerShell baseline with one `Invoke-PoshQCParallelTest` run and write `FEATURE/evidence/baseline/stage-c-powershell-test.<timestamp>.md`.
+- [x] [P0-T2] Capture the PowerShell baseline with one `Invoke-PoshQCParallelTest` run and write `FEATURE/evidence/baseline/stage-c-powershell-test.<timestamp>.md`.
   - Output Summary: total and failed counts from `artifacts/pester/pester-junit.xml`; the repo-wide percentage from `Get-PoshQCCoverageLineSummary`; and the `LINE` counter of the `sourcefile` elements for `.claude/hooks/enforce-epic-merge-gate.ps1`, `.codex/hooks/enforce-epic-merge-gate.ps1`, `OrchestratorState.psm1`, `OrchestratorStateCompletion.psm1`, and `OrchestratorStateCompletionChecks.psm1`.
   - When `ExitCode` is non-zero: read counts from `artifacts/pester/parallel/shard-<i>/pester-junit.xml`, or that directory's `shard.log`; take figures from `Merge-PoshQCCoverageReport` over the shard coverage files; name each failing test. The run is not repeated.
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with numeric values read from files, not from MCP output.
