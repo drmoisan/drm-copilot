@@ -286,7 +286,7 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
 
 - [x] [P4-T1] Run the PoshQC formatter over `.claude/hooks/enforce-docs-complete-gate.ps1`, `.claude/hooks/enforce-docs-complete-gate-target.ps1`, `HOOK_SUITE`, `COMPOUND_SUITE` and `HELPER_SUITE`, and write `FEATURE/evidence/qa-gates/format.<timestamp>.md`.
   - Acceptance: the SHA-256 of each target and the `git status --porcelain` output captured before and after the run are identical, and both comparisons are recorded.
-- [ ] [P4-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the P4-T1 files and write `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
+- [x] [P4-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the P4-T1 files and write `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
   - Acceptance: zero findings for each file, compared against P0-T3.
 - [ ] [P4-T3] Run one `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1` with `-Root` at the worktree root and the default `-WorkerCount`, and write `FEATURE/evidence/regression-testing/pester-parallel.<timestamp>.md`.
   - Acceptance: the artifact records `ExitCode`, `WorkerCount`, per-shard exit codes and the test counts of `HOOK_SUITE`, `COMPOUND_SUITE` and `HELPER_SUITE`; every file in `TOUCHED_SUITES` reports 0 failed and 0 errored; the baseline-relative rule holds for any other failure. A merged `artifacts/pester/pester-junit.xml` reporting zero failures is the expected result. When a shard fails and no merged file exists, counts follow the Pester count source definition.
