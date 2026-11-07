@@ -1,6 +1,6 @@
 ---
 name: invoke-csharp-engineer
-description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates.
+description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
 ---
 
 # Implement C# Skill
@@ -28,7 +28,7 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 ## Output Paths
 
 - C# source and test files within the approved scope.
-- Baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Static baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and final gate evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
 - This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
@@ -37,10 +37,10 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 The worker must return the following reporting block:
 
 1. Scope (exact file list).
-2. Baseline (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, coverage status).
+2. Baseline (CSharpier, .NET Analyzers, and Nullable Analysis findings).
 3. Plan (design and test strategy).
 4. Diffs (patch-style or full-file replacements).
-5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, and coverage deltas, or clearly marked **unverified**).
+5. QA Gate Results (CSharpier, .NET Analyzers, and Nullable Analysis deltas, failures in the single gate run, and per-file coverage against the thresholds, or clearly marked **unverified**).
 
 ## Worker Routing
 
