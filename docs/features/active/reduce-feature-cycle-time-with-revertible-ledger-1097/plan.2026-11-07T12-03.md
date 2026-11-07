@@ -27,7 +27,7 @@ Out of scope: `.claude/rules/`, `.github/instructions/`, every skill, agent, mir
 - `FEATURE` is `docs/features/active/reduce-feature-cycle-time-with-revertible-ledger-1097`. `SCRATCH` resolves to `<session scratchpad>/issue-1097/r/`; artifacts record the token, never a host path. Evidence names carry the prefix `stage-r-`; a consumer selects the greatest `stage-r-<name>.*.md`.
 - Tool routes, launchers, command-text restrictions, the batch budget, hook context, and CI shape come from the `execution-environment` skill and are not restated. One new production PowerShell file is created, so direct mode applies.
 - Testing (owner's standing instruction, overriding any contract text): one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run per gate, each re-run only after a fix. No single-process, seeded-shuffle, reversed-order, or comparison run. TypeScript is out of scope, so no Jest run is made. No unqualified `poetry install` from the worktree; if a gate cannot run, stop and report.
-- Commits: commit and push after each task. No tag, no history rewrite. Only [P1-T7] and [P1-T8] edit entries, each entry edit in its own commit whose subject carries that entry's token.
+- Commits: commit and push after each task. No tag, no history rewrite. Only [P0-T4], [P1-T7] and [P1-T8] edit entries, each entry edit in its own commit whose subject carries that entry's token.
 - Failure outside the branch: a failing test whose file and subject are both absent from the diff from the merge base of `origin/main` and `HEAD`. The artifact names the test, file, and subject; `EXIT_CODE:` stays non-zero, the test is not edited, and the executor returns these facts. Any other failure is fixed and the loop restarts from [P2-T1].
 
 ## Design
@@ -62,12 +62,13 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
 | Test | Disposition |
 | --- | --- |
 | `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1` (all `PRL-*`) | Unchanged: `ProcessReductionLedger.psm1` is not edited |
-| `ProcessReductionLedger.Index.Tests.ps1` `PRL-REAL-LEDGER-AGREES` | Unchanged; it re-validates every entry edited by [P1-T7] and [P1-T8], whose `## Stored Patch` sections keep naming their patch path |
+| `ProcessReductionLedger.Index.Tests.ps1` `PRL-REAL-LEDGER-AGREES` | Unchanged; it re-validates every entry edited by [P0-T4], [P1-T7] and [P1-T8] (the three `Merge commit:` back-fills accept the merged form; `pending (PR #N)` was also accepted), whose `## Stored Patch` sections keep naming their patch path |
 | same file, `PRL-PARTIAL-REVERT-LINKED` | Unchanged: the `0001` index row, the `0001` `## Partial Revert` section, and the `0006` `## Summary` are not edited; a gap fix in [P1-T8] may not edit them |
 | same file, `PRL-README-EXAMPLE-IS-VALID` | Unchanged: `## Revert Order` is inserted before `## Worked Example`, whose text is not edited |
 | `ProcessReductionLedger.Replay.Tests.ps1` (the `PRR-*` replay sample) | Unchanged: it reverts the `0005` hook blocks alone on the live hook, which the new rule permits because no later entry names `.claude/hooks/validate-planner-output.ps1`; [P1-T8] may not add a later block on that hook |
 | `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1` | Unchanged: no skill is edited |
 | `FEATURE/evidence/other/stage-*-ledger-replay.*.md` replay records | Unchanged: historical evidence |
+| Commits of [P0-T4] for entries `0004`, `0005`, `0006` | Each edits only its `Merge commit:` line, outside every block and patch region; `PRC-LEDGER-CHAIN-HOLDS` and `PRL-REAL-LEDGER-AGREES` are unaffected and are proven in [P2-T2] |
 | `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, `ProcessReductionChain.Ledger.Tests.ps1` | New |
 
 ## Implementation Plan (Atomic Tasks)
@@ -83,12 +84,15 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
 - [ ] [P0-T3] Run one `poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` from the worktree root with `PYTHONPATH` set to this worktree's `packages/discovery-runtime/src`, and write `FEATURE/evidence/baseline/stage-r-python-test-baseline.<timestamp>.md`.
   - Output Summary: passed and failed counts, each failing test named, the total line percentage computed from the `Stmts` and `Miss` columns of the terminal table's `TOTAL` row (its `Cover` column combines lines and branches under `--cov-branch`), and the total branch percentage from the summed `BRF`/`BRH` records of `artifacts/python/lcov.info`.
   - Acceptance: every field and figure is present.
+- [ ] [P0-T4] Back-fill the `Merge commit:` line of `docs/engineering/process-reductions/0004-smaller-plans.md`, `docs/engineering/process-reductions/0005-policy-read-removal.md`, and `docs/engineering/process-reductions/0006-test-suite-baseline-restored.md` with the merge commit of PR #1110, read through `gh pr view` of that pull request (the identifier is read at run time and not written in this plan).
+  - Each entry is edited in its own commit whose subject carries that entry's `reduction:` token (`reduction: 0004`, `reduction: 0005`, `reduction: 0006`), and no other line of the entry changes. The `pending (PR #1110)` form is replaced by the form the structure test accepts for a merged entry.
+  - Acceptance: no entry reads `pending (PR #1110)` (search of the three files returns no match); `git log` shows three commits carrying the three tokens; `PRL-REAL-LEDGER-AGREES` passes in [P2-T2].
 
 ### Phase 1 — Chain Mechanism, Rule, and Records
 
 - [ ] [P1-T1] Record stage R in `FEATURE/spec.md`: a `## Delivery Stages` row `R` (content: revert order, chain test, patch-as-blocks reading; depends on E2; PR R), the final-order paragraph naming R between E2 and F, and five `## Acceptance Criteria` items tagged `[R]` stating R1 to R5 of this plan's `## Design`.
-  - No other spec text changes; `- [x]` states of earlier criteria are unchanged.
-  - Acceptance: `spec.md` holds exactly five lines beginning `- [ ] [R]` and one table row beginning `| R |`.
+  - The same five `- [ ] [R]` items are added to `## Acceptance Criteria` of `FEATURE/user-story.md`, because in full-feature mode both files are criteria sources and currently match item for item. No other text of either file changes; `- [x]` states of earlier criteria are unchanged.
+  - Acceptance: `spec.md` and `user-story.md` each hold exactly five lines beginning `- [ ] [R]`, and `spec.md` holds one row beginning `| R |`.
 - [ ] [P1-T2] Create `scripts/dev-tools/ProcessReductionChain.psm1` with `Get-ProcessReductionPatchHunk` and `Invoke-ProcessReductionHunkRevert` (R3), and `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1` with in-memory fixtures.
   - Tests: `PRC-HUNK-PARSES-SECTIONS` (two hunks, a path with spaces whose `---` and `+++` lines end in a tab, a create, a delete, the no-newline marker), `PRC-HUNK-REJECTS-UNSUPPORTED` (binary section, quoted path), `PRC-HUNK-REVERT-RESTORES-PREIMAGE`, `PRC-HUNK-REVERT-LINE-ALIGNED` (a match inside a longer line is not a match), `PRC-HUNK-REVERT-NEAREST-OCCURRENCE` (nearest of two wins; an equal tie throws), `PRC-HUNK-REVERT-THROWS-WHEN-ABSENT`.
   - Acceptance: both files exist; the module exports both functions with `CmdletBinding` and mandatory parameters; the six tests are present. [P2-T2] proves them.
@@ -132,7 +136,7 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
   - Output Summary: passed and failed counts, total line and branch percentages read from the same sources as [P0-T3], and the comparison.
   - Acceptance: zero failures and no total line or branch drop against the baseline.
 - [ ] [P2-T4] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
-  - Rows include: each entry-editing commit carries its token; no Epic #1019 folder or admitted plan is in the diff; no skill, mirror, or brief is in the diff; `## Test Dispositions` holds.
+  - Rows include: each entry-editing commit carries its token, including the three [P0-T4] commits for `reduction: 0004`, `reduction: 0005`, and `reduction: 0006`; no Epic #1019 folder or admitted plan is in the diff; no skill, mirror, or brief is in the diff; `## Test Dispositions` holds.
   - Acceptance: no FAIL row; a FAIL is fixed and the loop restarts from [P2-T1].
 
 ## Pre-Mortem
