@@ -119,7 +119,7 @@ Python and TypeScript hold this in new pure modules, `validate_light_cycles(cycl
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell, Python, and TypeScript scope, and write `FEATURE/evidence/baseline/stage-d-phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell, Python, and TypeScript scope, and write `FEATURE/evidence/baseline/stage-d-phase0-instructions-read.<timestamp>.md`.
   - This task stays only because the planner stop hook requires it; stage E removes it.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
 - [ ] [P0-T2] Capture the baselines and write `FEATURE/evidence/baseline/stage-d-powershell-test.<timestamp>.md`, `FEATURE/evidence/baseline/stage-d-python-test.<timestamp>.md`, and `FEATURE/evidence/baseline/stage-d-typescript-test.<timestamp>.md`.
