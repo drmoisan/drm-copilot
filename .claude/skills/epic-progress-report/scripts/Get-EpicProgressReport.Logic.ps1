@@ -5,8 +5,9 @@
 .DESCRIPTION
     The hub of the epic progress report logic. It holds the parsing and counting functions
     and dot-sources the Stages (step-type catalog, stage-name normalization, stage_timing
-    records, blockage), Steps (item, remediation-cycle, and epic-level steps), State
-    (settings, state file, baseline, samples), Metrics (velocity, deviation, estimates,
+    records, blockage), Steps (item, remediation-cycle, and epic-level steps), Durations
+    (median, defaults, duration samples, ledger merge), State (settings, state file,
+    baseline, samples), Metrics (velocity, deviation, estimates,
     formatting), and Render (summary and line composition) files, so a consumer that
     dot-sources this file receives every logic function. Every function takes
     data in and returns data: none reads a file, starts a process, calls the network, or
@@ -17,6 +18,7 @@
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Stages.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Steps.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Durations.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.State.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Metrics.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Render.ps1')
