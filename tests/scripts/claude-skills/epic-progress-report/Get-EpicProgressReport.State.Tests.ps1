@@ -430,22 +430,15 @@ Describe 'Merge-EpicProgressSamplePair' {
         $recorded = [System.Collections.Generic.List[object]]::new()
         for ($index = 0; $index -lt $offsets.Count; $index++) { $recorded.Add([pscustomobject]@{ ts = $baseEpoch + $offsets[$index]; done = $doneCounts[$index] }) }
 
-        [double[]] $before = @(Get-EpicProgressRecentVelocityInterval -Sample $recorded.ToArray())
-        [double[]] $after = @(Get-EpicProgressRecentVelocityInterval -Sample @(Merge-EpicProgressSamplePair -Sample $recorded.ToArray()))
-        $meanBefore = ($before | Measure-Object -Average).Average
-        $meanAfter = ($after | Measure-Object -Average).Average
-        $deviationBefore = Get-EpicProgressStandardDeviation -Interval $before
-        $deviationAfter = Get-EpicProgressStandardDeviation -Interval $after
+        $paired = @(Merge-EpicProgressSamplePair -Sample $recorded.ToArray())
 
-        $before.Count | Should -Be 13
-        $after.Count | Should -Be 6
-        [math]::Abs($meanBefore - 26.1875) | Should -BeLessThan 0.001
-        [math]::Abs($deviationBefore - 31.4495) | Should -BeLessThan 0.001
-        [math]::Abs($meanAfter - 27.3430) | Should -BeLessThan 0.001
-        [math]::Abs($deviationAfter - 23.2316) | Should -BeLessThan 0.001
-        Format-EpicProgressNumber -Value $meanBefore -Digits 1 | Should -Be '26.2'
-        Format-EpicProgressNumber -Value $deviationBefore -Digits 1 | Should -Be '31.4'
-        Format-EpicProgressNumber -Value $meanAfter -Digits 1 | Should -Be '27.3'
-        Format-EpicProgressNumber -Value $deviationAfter -Digits 1 | Should -Be '23.2'
+        # Pairing keeps indices 1, 3, ..., 13: offsets 286, 856, 1428, 1999, 2568, 3139, 3716.
+        $paired.Count | Should -Be 7
+        (@($paired | ForEach-Object { $_.ts - $baseEpoch }) -join ',') | Should -Be '286,856,1428,1999,2568,3139,3716'
+        # Each kept interval spans two recorded intervals (doubled spacing).
+        for ($index = 1; $index -lt $paired.Count; $index++) {
+            $source = 2 * $index + 1
+            ($paired[$index].ts - $paired[$index - 1].ts) | Should -Be (($recorded[$source].ts - $recorded[$source - 1].ts) + ($recorded[$source - 1].ts - $recorded[$source - 2].ts))
+        }
     }
 }

@@ -7,9 +7,9 @@
     and dot-sources the Stages (step-type catalog, stage-name normalization, stage_timing
     records, blockage), Steps (item, remediation-cycle, and epic-level steps), Durations
     (median, defaults, duration samples, ledger merge), State (settings, state file,
-    baseline, samples), Metrics (velocity, deviation, estimates,
-    formatting), and Render (summary and line composition) files, so a consumer that
-    dot-sources this file receives every logic function. Every function takes
+    baseline, samples), Metrics (per-type estimate, wave-parallel figure, formatting), and
+    Render (summary and line composition) files, so a consumer that dot-sources this file
+    receives every logic function. Every function takes
     data in and returns data: none reads a file, starts a process, calls the network, or
     reads the clock. The main script dot-sources this file and supplies the data through its
     I/O wrapper seams. Numeric and date text uses the invariant culture so the printed lines
