@@ -2,7 +2,7 @@
 
 - **Issue:** #1034
 - **Branch:** `feature/docs-enforcement-and-ci-1034-r2`
-- **Status:** Authored; `## Open Questions` resolved by the orchestrator (Option A). Executor preflight has not run.
+- **Status:** Reduced by owner directive to F1 and F2. Unchecked tasks are waived, not done; see `FEATURE/evidence/other/owner-waiver.2026-11-07T01-53.md`.
 - **Inputs:** `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/remediation-inputs.2026-11-07T01-25.md`, and `policy-audit`, `code-review` and `feature-audit` artifacts of the same stamp.
 - **Scope:** F1, F2 and notes N1 to N6. N7 is outside this cycle.
 
@@ -183,7 +183,7 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
   - Acceptance: exit code 0.
 - [ ] [P4-T8] Run the seeded shuffled file-order check of `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1` and the rest of `TOUCHED_SUITES` with three distinct seeds, one process each, and write `FEATURE/evidence/regression-testing/pester-isolation-shuffled.<timestamp>.md`.
   - Acceptance: each order derives from `[System.Random]::new($seed)`; the artifact records each seed, file order and counts; every run reports 0 failed and 0 errored. An order dependence is fixed on both sides and every seed re-run.
-- [ ] [P4-T9] Run `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1` with `-Root` at the worktree root and the default `-WorkerCount`, and write `FEATURE/evidence/regression-testing/pester-parallel.<timestamp>.md`.
+- [x] [P4-T9] Run `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1` with `-Root` at the worktree root and the default `-WorkerCount`, and write `FEATURE/evidence/regression-testing/pester-parallel.<timestamp>.md`.
   - Acceptance: the artifact records `ExitCode`, `WorkerCount` and per-shard exit codes, and the baseline-relative rule holds; a merged `artifacts/pester/pester-junit.xml` reporting zero failures is the expected result.
 - [ ] [P4-T10] Run a fresh single-process `Invoke-PoshQCTest` with `-ScanFolders` `tests/scripts` in a new PowerShell process at the worktree root, and write `FEATURE/evidence/regression-testing/pester-single-process.<timestamp>.md`.
   - Reason this run is present: `## Test Isolation Checks` of the brief requires it. The run took about 18 minutes on the last pass, so the executor starts it as a background command.
