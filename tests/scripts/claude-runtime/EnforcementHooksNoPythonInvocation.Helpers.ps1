@@ -26,6 +26,13 @@
          fail-closed, subject to the two carve-outs below.
       4. Any `Invoke-Expression`, including its built-in alias `iex`; recognizing
          only the long form would leave the check trivially bypassable.
+      5. `SeamInterpreterTarget` (issue #1031): an `&` call of a `[scriptblock]`
+         parameter (carve-out (a) below) whose target argument, found as by
+         `Get-StartProcessTargetName` (`-FilePath`, else the first positional
+         argument), is one of the interpreter constants. The carve-out keeps an
+         ordinary seam call clean, while a seam that is handed an interpreter name
+         is reported, so an interpreter start through a process seam cannot pass
+         unseen.
 
     CARVE-OUTS FOR CLASS 3 (both deliberate, both documented).
       (a) A command-position variable whose name matches a `[scriptblock]`-typed
@@ -182,7 +189,7 @@ function ConvertTo-PythonInvocationFinding {
         [System.Management.Automation.Language.CommandAst]$Command,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('ConstantCommand', 'StartProcess', 'DynamicInvocation', 'InvokeExpression')]
+        [ValidateSet('ConstantCommand', 'StartProcess', 'DynamicInvocation', 'InvokeExpression', 'SeamInterpreterTarget')]
         [string]$Kind,
 
         [Parameter(Mandatory = $true)]
@@ -308,7 +315,7 @@ function Get-PythonInvocationFinding {
     .SYNOPSIS
         Detects Python-interpreter invocations in PowerShell source text by parsing
         it with the AST and classifying every `CommandAst` against detection classes
-        1-4, applying carve-outs (a) and (b). This is the single code path exercised
+        1-5, applying carve-outs (a) and (b). This is the single code path exercised
         by both the in-memory fixtures and the repository scan. Returns the finding
         records, empty when the source is clean.
     #>
@@ -349,6 +356,12 @@ function Get-PythonInvocationFinding {
 
             # Carve-out (a): approved injectable [scriptblock] parameter seam.
             if ($scriptBlockParameters.Contains($variableName)) {
+                # Class 5: the seam is handed a constant interpreter name as its target.
+                $seamTarget = Get-StartProcessTargetName -Command $command
+                if ($null -ne $seamTarget -and ($script:PythonInterpreterCommandName -contains $seamTarget)) {
+                    $detail = "passes the '$seamTarget' interpreter to the [scriptblock] seam `$$variableName, which starts a process a destination repository is not guaranteed to support"
+                    $findings.Add((ConvertTo-PythonInvocationFinding -SourceLabel $SourceLabel -Command $command -Kind 'SeamInterpreterTarget' -Detail $detail))
+                }
                 continue
             }
             # Carve-out (b): dot-sourcing a path variable (sibling helper load).

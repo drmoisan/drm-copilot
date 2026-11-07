@@ -1,10 +1,13 @@
 <#
     Allowlist helpers for the enforcement-hook Python-invocation guard (issue #475).
 
-    ALLOWLIST POLICY - THE TABLE IS EMPTY AND MUST REMAIN EMPTY.
-    `$script:PythonInvocationAllowlist` is authored with ZERO entries: every Python
-    invocation site in the guarded tree is removed within issue #475. Entries may be
-    added ONLY by an explicit owner decision recorded in the feature specification; an
+    ALLOWLIST POLICY - ONE OWNER-DECIDED ENTRY, NO OTHER ENTRY.
+    `$script:PythonInvocationAllowlist` holds exactly one entry: the issue #1031
+    Python-native docs analyzer, permitted by owner decision D3 (a language-native
+    analyzer for the same language, shipped only in that language's pack) and recorded
+    in the epic Q11 default and the 1031 feature specification. Every other Python
+    invocation site in the guarded tree stays removed (issue #475). A further entry may
+    be added ONLY by an explicit owner decision recorded in a feature specification; an
     implementer failing this guard must remove the invocation and must NEVER add an
     entry to work around it. Assertion B fails any stale entry.
 
@@ -12,14 +15,17 @@
     (issue #935, I-3); its declaration and functions moved there unchanged.
 #>
 
-# ALLOWLIST - INTENTIONALLY EMPTY. Read "ALLOWLIST POLICY" above before touching it.
-# A would-be entry: @{ Path = '.claude/hooks/example.ps1'; Function = 'Invoke-Example' }
-$script:PythonInvocationAllowlist = @()
+# ALLOWLIST - ONE ENTRY. Read "ALLOWLIST POLICY" above before touching it.
+$script:PythonInvocationAllowlist = @(
+    # Owner decision D3, epic Q11 and docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/spec.md:
+    # the only interpreter-start function of the Python-native docs analyzers (three seam calls).
+    @{ Path = '.claude/lib/docs/DocsAnalyzerPythonNative.psm1'; Function = 'Invoke-DocsPythonNativeInterpreter' }
+)
 
 function Get-PythonInvocationAllowlist {
     <#
     .SYNOPSIS
-        Returns the (empty by design) allowlist. A would-be entry is a hashtable
+        Returns the allowlist (one owner-decided entry). An entry is a hashtable
         with `Path` (repo-root-relative) and `Function` ('<script>' at file scope).
     .OUTPUTS
         [object[]] The allowlist entries.

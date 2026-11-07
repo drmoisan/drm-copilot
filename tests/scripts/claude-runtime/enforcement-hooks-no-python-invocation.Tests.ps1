@@ -59,13 +59,15 @@ BeforeAll {
 Describe 'enforcement hooks must not invoke Python' {
 
     Context 'allowlist policy' {
-        It 'ships an empty allowlist' {
+        It 'ships exactly the D3 allowlist entry' {
             # Arrange / Act
             $allowlist = Get-PythonInvocationAllowlist
 
-            # Assert: issue #475 removes every site, so none needs an exemption. An
-            # entry may only be added by an owner decision, never to pass a failure.
-            @($allowlist).Count | Should -Be 0
+            # Assert: issue #475 removes every site; the one entry is owner decision D3
+            # (issue #1031). An entry is added only by an owner decision, never to pass a failure.
+            @($allowlist).Count | Should -Be 1
+            $allowlist[0]['Path'] | Should -BeExactly '.claude/lib/docs/DocsAnalyzerPythonNative.psm1'
+            $allowlist[0]['Function'] | Should -BeExactly 'Invoke-DocsPythonNativeInterpreter'
         }
     }
 
@@ -370,6 +372,42 @@ $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-help
         }
     }
 
+    Context 'detection class 5 - interpreter target handed to a scriptblock seam' {
+        It 'reports a seam call whose target is a constant interpreter name' {
+            # Arrange
+            $fixture = @'
+function Invoke-Seam {
+    param([scriptblock] $InvokeProcess)
+    return & $InvokeProcess 'python3' @('-I') '' 120
+}
+'@
+            # Act
+            $findings = Get-PythonInvocationFinding -ScriptText $fixture -SourceLabel 'seam-interpreter-fixture'
+
+            # Assert
+            @($findings).Count | Should -Be 1
+            $findings[0].Kind | Should -Be 'SeamInterpreterTarget'
+            $findings[0].Function | Should -Be 'Invoke-Seam'
+        }
+
+        It 'reports no finding for a seam call whose target is another constant or a variable' {
+            # Arrange
+            $fixture = @'
+function Invoke-Seam {
+    param([scriptblock] $InvokeProcess, [string] $Tool)
+    $first = & $InvokeProcess 'git' @('status') '' 30
+    $second = & $InvokeProcess $Tool @() '' 30
+    return @($first, $second)
+}
+'@
+            # Act
+            $findings = Get-PythonInvocationFinding -ScriptText $fixture -SourceLabel 'seam-other-fixture'
+
+            # Assert
+            @($findings).Count | Should -Be 0
+        }
+    }
+
     Context 'carve-out boundaries - the inline sibling-load exemption stays tight' {
         It 'still reports a dot-sourced expression that is not a Join-Path call' {
             # Arrange: an arbitrary dot-sourced expression is not the sibling pattern.
@@ -444,8 +482,8 @@ $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-help
         }
 
         It 'carries no stale allowlist entry' {
-            # Assertion B. Vacuously green while the allowlist is empty; retained so
-            # any future entry that goes stale fails the suite. Arrange:
+            # Assertion B. The D3 entry is matched by the three class-5 findings of
+            # Invoke-DocsPythonNativeInterpreter; a stale entry fails the suite. Arrange:
             $findings = Get-RepositoryPythonInvocationFinding
             $allowlist = Get-PythonInvocationAllowlist
 

@@ -381,7 +381,7 @@ Describe 'Guarded top-level body' {
 }
 
 Describe 'InvokeProcess member and process functions' {
-    It 'exposes the same member names as the in-memory context and the four InvokeProcess parameters' {
+    It 'exposes the same member names as the in-memory context, the four InvokeProcess parameters and the Operation seam' {
         # Arrange
         $real = New-DocsCommandContext -RepositoryRoot $script:RepositoryRootPath
         $fake = (New-DocsTestContext).Context
@@ -394,7 +394,7 @@ Describe 'InvokeProcess member and process functions' {
         # Assert
         $realNames | Should -Be $fakeNames
         $real.InvokeProcess | Should -BeOfType ([scriptblock])
-        $parameterNames | Should -Be @('FilePath', 'ArgumentList', 'StdinText', 'TimeoutSeconds')
+        $parameterNames | Should -Be @('FilePath', 'ArgumentList', 'StdinText', 'TimeoutSeconds', 'Operation')
     }
 
     It 'forwards the four arguments unchanged to Invoke-DocsProcess and returns its result' {
@@ -413,6 +413,24 @@ Describe 'InvokeProcess member and process functions' {
         Should -Invoke -CommandName Invoke-DocsProcess -Times 1 -Exactly -ParameterFilter {
             $FilePath -ceq 'issue-1020-tool' -and (@($ArgumentList) -join '|') -ceq 'first|second' -and $StdinText -ceq 'stdin text' -and $TimeoutSeconds -eq 5
         }
+    }
+
+    It 'runs Invoke-DocsProcess with the context repository root as the working directory' {
+        # Arrange: two real contexts with distinct roots, so at least one differs from the current location.
+        Mock -CommandName Invoke-DocsProcess -MockWith { @{ ExitCode = 0; Stdout = ''; Stderr = ''; TimedOut = $false } }
+        $first = New-DocsCommandContext -RepositoryRoot (Join-Path -Path $script:RepositoryRootPath -ChildPath 'examples')
+        $second = New-DocsCommandContext -RepositoryRoot (Join-Path -Path $script:RepositoryRootPath -ChildPath 'tests')
+        $firstRoot = $first.RepositoryRoot
+        $secondRoot = $second.RepositoryRoot
+
+        # Act
+        [void](& $first.InvokeProcess 'issue-1031-tool' @('first') 'stdin text' 5)
+        [void](& $second.InvokeProcess 'issue-1031-tool' @('second') 'stdin text' 5)
+
+        # Assert
+        $firstRoot | Should -Not -BeExactly $secondRoot
+        Should -Invoke -CommandName Invoke-DocsProcess -Times 1 -Exactly -ParameterFilter { $WorkingDirectory -ceq $firstRoot }
+        Should -Invoke -CommandName Invoke-DocsProcess -Times 1 -Exactly -ParameterFilter { $WorkingDirectory -ceq $secondRoot }
     }
 
     It 'throws DOCS_PROCESS_ARGUMENT_INVALID naming <Name> for <Case>' -ForEach @(

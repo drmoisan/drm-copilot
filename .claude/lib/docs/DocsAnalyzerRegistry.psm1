@@ -51,6 +51,10 @@ $script:DocsAnalyzerRow = @(
 
 $script:DocsAnalyzerNativeRow = @(
     # --- 1031: Python-native analyzers ---
+    [pscustomobject]@{ Id = 'python-architecture'; Version = '1.0.0'; AnalysisMethod = 'native'; ElementKinds = @('architecture-component'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonNative.psm1'); Function = 'Invoke-DocsAnalyzerPythonNativeArchitecture' }
+    [pscustomobject]@{ Id = 'python-cli'; Version = '1.0.0'; AnalysisMethod = 'native'; ElementKinds = @('cli-command', 'cli-option'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonNative.psm1'); Function = 'Invoke-DocsAnalyzerPythonNativeCli' }
+    [pscustomobject]@{ Id = 'python-http'; Version = '1.0.0'; AnalysisMethod = 'native'; ElementKinds = @('http-route'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonNative.psm1'); Function = 'Invoke-DocsAnalyzerPythonNativeHttp' }
+    [pscustomobject]@{ Id = 'python-public-api'; Version = '1.0.0'; AnalysisMethod = 'native'; ElementKinds = @('public-symbol'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonNative.psm1'); Function = 'Invoke-DocsAnalyzerPythonNativeApi' }
 )
 
 $script:DocsAnalyzerIdentifierPattern = '^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$(?![\s\S])'

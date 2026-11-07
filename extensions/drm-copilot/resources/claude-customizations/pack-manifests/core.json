@@ -365,6 +365,8 @@
     ".claude/lib/docs/DocsCSharpMember.psm1",
     ".claude/lib/docs/DocsAnalyzerDotnetApi.psm1",
     ".claude/lib/docs/DocsExtensionShape.psm1",
-    ".claude/lib/docs/DocsAnalyzerExtensionImport.psm1"
+    ".claude/lib/docs/DocsAnalyzerExtensionImport.psm1",
+    ".claude/lib/docs/DocsPythonNativeProtocol.psm1",
+    ".claude/lib/docs/DocsAnalyzerPythonNative.psm1"
   ]
 }
