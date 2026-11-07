@@ -228,7 +228,7 @@ Scenario:
    `inventory -Revision R2 -AnalysisMethod scanner -Write` and `sync-refs`.
 4. Fail: `validate -Mode docs-complete -Revision R2` exits 1; the error finding codes are
    `DOCS_LEDGER_MISSING_DISPOSITION` (its `related_ids` hold B's element identifier and its message
-   names B's declaration) and `DOCS_PAGE_STALE` (its `related_paths` hold the page path and its
+   names B's declaration) and `DOCS_STALE_PAGE` (its `related_paths` hold the page path and its
    message names A's declaration and the status `digest-changed`); the receipt in `result` has
    `validation_result` `fail`.
 5. Fix: record B (`documented` with a binding, pin and dimensions), re-pin A, run
@@ -323,7 +323,7 @@ the end-to-end suite depends on its `-AnalysisMethod` option.
 | `inventory` options; analyzer identifiers; per-kind `line_range` rules | 1022 | end-to-end suite |
 | `-AnalysisMethod auto|native|scanner`; Python 3.10 floor; fallback rules; OQ-D statement | 1031 | end-to-end suite, onboarding |
 | TypeScript and .NET scanners behind `inventory` (`analysis_method: scanner`) | 1033 | architecture page |
-| `coverage`, `update-ledger`, `validate` options; finding codes `DOCS_LEDGER_MISSING_DISPOSITION`, `DOCS_PAGE_STALE`, `DOCS_SNAPSHOT_UNPINNED`; receipt fields | 1023 | end-to-end suite, command reference |
+| `coverage`, `update-ledger`, `validate` options; finding codes `DOCS_LEDGER_MISSING_DISPOSITION`, `DOCS_STALE_PAGE`, `DOCS_SNAPSHOT_UNPINNED`; receipt fields | 1023 | end-to-end suite, command reference |
 | `generate-reference` options, `result` keys `{mode, output_directory, pages, summary, unrendered}`, exit 1 on `REFERENCE_WRITE_CONFLICT`, exit 3 on write failure | 1024 | end-to-end suite, command reference |
 | MCP tool names, inputs, `DOCS_MUTATING_TOOLS`, result shape, tool definitions file | 1036 | command reference, documentation contract suite |
 | `surface-delta` options, `_docs-quality.yml`, hook `enforce-docs-complete-gate.ps1`, gate key and deny prefix | 1034 | onboarding, workflow page |
@@ -361,6 +361,10 @@ where they differ:
 - Dispatch anchors: 1020 uses real issue numbers; the 1024 and 1034 specifications still quote
   earlier placeholder anchors. Children locate anchors by subcommand token (epic), so this child
   depends on subcommand names only.
+- Finding codes (erratum, 2026-11-07): the stale-page and missing-page finding codes are renamed to
+  the merged 1023 names `DOCS_STALE_PAGE` and `DOCS_BOUND_PAGE_MISSING`, per the epic
+  `### Ledger contracts from the PowerShell preparation of 1023 (binding)`, which supersedes the
+  earlier names. Found by plan task P0-T5 on 2026-11-07.
 
 ## Owner Questions
 
@@ -391,7 +395,7 @@ Provisional defaults stand; this child does not wait on them.
 - [ ] `workflow.md` names the roles `docs-architect`, `docs-author`, `docs-reconciler`, `docs-coverage-reviewer`, the skills `documentation-workflow`, `docs-init`, `docs-inventory-surface`, `docs-plan-ia`, `docs-author-page`, `docs-reconcile-behavior`, `docs-review-coverage` and `docs-validate`, and the opt-in gate key `completion_gates.integration_pr_gate.enabled`.
 - [ ] A positive control in `DocumentationEstateOnboarding.Tests.ps1` runs the membership check over an in-memory command reference missing one subcommand and the check fails naming that subcommand.
 - [ ] `EndToEndDocumentationEstate.Tests.ps1` runs `inventory`, `update-ledger`, `generate-reference` and `validate -Mode docs-complete` in process through `Invoke-DocsCommandCli` with one stateful in-memory context, and the baseline at revision R1 exits 0.
-- [ ] After the defects are introduced, `validate -Mode docs-complete -Revision R2` exits 1; its error findings are `DOCS_LEDGER_MISSING_DISPOSITION` with the undocumented command's element identifier in `related_ids` and its declaration in the message, and `DOCS_PAGE_STALE` with the stale page path in `related_paths` and the changed command's declaration in the message; the receipt in `result` has `validation_result` `fail`.
+- [ ] After the defects are introduced, `validate -Mode docs-complete -Revision R2` exits 1; its error findings are `DOCS_LEDGER_MISSING_DISPOSITION` with the undocumented command's element identifier in `related_ids` and its declaration in the message, and `DOCS_STALE_PAGE` with the stale page path in `related_paths` and the changed command's declaration in the message; the receipt in `result` has `validation_result` `fail`.
 - [ ] After both defects are fixed through `update-ledger` and `generate-reference -Write`, `validate -Mode docs-complete -Revision R2` exits 0 and the receipt has `validation_result` `pass`.
 - [ ] The end-to-end test records `analysis_method`: it asserts that every inventory snapshot element and every ledger entry produced in the scenario carries `analysis_method` with value `scanner` under `-AnalysisMethod scanner`, and that the `InvokeProcess` fake records no call.
 - [ ] `EndToEndDocumentationEstate.Tests.ps1` asserts that `inventory` without `-Revision` followed by `validate -Mode docs-complete` yields `DOCS_SNAPSHOT_UNPINNED` (D5).
