@@ -216,7 +216,7 @@ A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy with an enabled pro
   - Acceptance: the artifact records the `EPIC_REF` tip, `MERGE_BASE`, the route value, the logical line counts of `HOOK`, `HELPER`, `COMPOUND_SUITE` and `HELPER_SUITE`, and equal SHA-256 values for the `.claude/hooks` and `.codex/hooks` pair of each of the four shared files that has a twin. Any failure stops the run as BLOCKED.
 - [x] [P0-T3] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `HOOK`, `HELPER`, `CLI`, `COMPOUND_SUITE` and `HELPER_SUITE`, and write `FEATURE/evidence/remediation-baseline/pssa.<timestamp>.md`.
   - Acceptance: the artifact records the finding count per file.
-- [ ] [P0-T4] Record the coverage baseline of `HOOK`, `HELPER` and `CLI` in `FEATURE/evidence/remediation-baseline/pester-coverage.<timestamp>.md`.
+- [x] [P0-T4] Record the coverage baseline of `HOOK`, `HELPER` and `CLI` in `FEATURE/evidence/remediation-baseline/pester-coverage.<timestamp>.md`.
   - The figures of `HOOK` and `HELPER` are those of `FEATURE/evidence/qa-gates/coverage-delta.2026-11-07T03-57.md`, and the figure of `CLI` is the post-change value of `FEATURE/evidence/qa-gates/coverage-delta.2026-11-06T12-22.md`. The task confirms each file shows no diff between the commit that added its artifact and `HEAD`. Only when a diff is not empty, it runs one `Invoke-PoshQCParallelTest` and reads the figure from the merged coverage XML instead.
   - Acceptance: `Output Summary:` records the numeric line coverage, covered and missed counts of each file, and each diff result.
 
