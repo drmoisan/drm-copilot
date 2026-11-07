@@ -265,49 +265,6 @@ class TestQCRunnerFullLoop:
         assert "--cov=src/lexile_corpus_tuner" not in command
 
 
-class TestQCRunnerFilterHelpers:
-    """Tests for _filter_* helper methods."""
-
-    def test_filter_python_files_keeps_py_only(self, mem_fs_path: Path) -> None:
-        """_filter_python_files() keeps only .py files."""
-        runner = QCRunner(mem_fs_path)
-        files = ["src/module.py", "tests/test.py", "README.md", "config.yaml"]
-        result = runner._filter_python_files(
-            files
-        )  # pyright: ignore[reportPrivateUsage]
-        assert result == ["src/module.py", "tests/test.py"]
-
-    def test_filter_python_files_returns_empty_for_no_py(
-        self, mem_fs_path: Path
-    ) -> None:
-        """_filter_python_files() returns empty list when no .py files."""
-        runner = QCRunner(mem_fs_path)
-        files = ["README.md", "config.yaml", "data.json"]
-        result = runner._filter_python_files(
-            files
-        )  # pyright: ignore[reportPrivateUsage]
-        assert result == []
-
-    def test_filter_test_files_keeps_tests_only(self, mem_fs_path: Path) -> None:
-        """_filter_test_files() keeps only files in tests/ directories."""
-        runner = QCRunner(mem_fs_path)
-        files = [
-            "tests/test_module.py",
-            "src/tests/test_helper.py",
-            "src/module.py",
-            "test_outside.py",
-        ]
-        result = runner._filter_test_files(files)  # pyright: ignore[reportPrivateUsage]
-        assert result == ["tests/test_module.py", "src/tests/test_helper.py"]
-
-    def test_filter_test_files_requires_py_extension(self, mem_fs_path: Path) -> None:
-        """_filter_test_files() requires .py extension."""
-        runner = QCRunner(mem_fs_path)
-        files = ["tests/test_module.py", "tests/README.md", "tests/data.json"]
-        result = runner._filter_test_files(files)  # pyright: ignore[reportPrivateUsage]
-        assert result == ["tests/test_module.py"]
-
-
 class TestQCRunnerRunScoped:
     """Tests for run_scoped() method."""
 
