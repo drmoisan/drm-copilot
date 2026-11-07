@@ -15,13 +15,15 @@
       2. No command, or a command outside the merge and enqueue scope of
          Test-EpicMergeGateCommandInScope, allows with no I/O.
       3. The profile is read through Get-DocsCompleteGateFileText under the root from
-         Get-DocsCompleteGateRepositoryRoot. Absent or disabled allows; PROFILE_UNREADABLE denies.
+         Get-DocsCompleteGateRepositoryRoot. Absent or disabled allows; a profile that cannot be
+         read or parsed denies PROFILE_UNREADABLE.
       4. One bounded gh pr view [<N>] --json baseRefName,headRefName,headRefOid through
-         Invoke-DocsOnlyGhExe. A failed or unreadable lookup denies PR_UNRESOLVED; a
+         Invoke-DocsOnlyGhExe. A failed, throwing or unreadable lookup denies PR_UNRESOLVED; a
          --match-head-commit value other than headRefOid denies MATCH_HEAD_MISMATCH.
       5. A pull request that is not an epic integration branch merging into main allows.
       6. The receipt path (RECEIPT_PATH_INVALID) and the receipt at that path are checked
-         against headRefOid with Test-DocsCompleteGateReceipt; a failing reason denies.
+         against headRefOid with Test-DocsCompleteGateReceipt; a failing reason denies. A receipt
+         that exists but cannot be read denies RECEIPT_UNREADABLE.
 
     Every deny reason reads DOCS_COMPLETE_GATE_BLOCKED: <REASON_CODE>: <reason and remediation>.
     The head revision is always the pull request headRefOid and never the local HEAD, because
@@ -123,6 +125,10 @@ function Get-DocsCompleteGateFileText {
     <#
     .SYNOPSIS
         File seam: returns the UTF-8 text of a file, or $null when the file does not exist.
+    .DESCRIPTION
+        Only a missing file or a missing parent directory means absent. Every other failure, such
+        as a locked file or a directory at the path, propagates so the caller can deny: an
+        existing file that cannot be read is never reported as absent.
     .PARAMETER Path
         The full path of the file.
     .OUTPUTS
@@ -132,8 +138,13 @@ function Get-DocsCompleteGateFileText {
     [OutputType([string])]
     param([Parameter(Mandatory)] [string] $Path)
 
-    if (-not [System.IO.File]::Exists($Path)) { return $null }
-    return [System.IO.File]::ReadAllText($Path, [System.Text.UTF8Encoding]::new($false))
+    try {
+        return [System.IO.File]::ReadAllText($Path, [System.Text.UTF8Encoding]::new($false))
+    } catch [System.IO.FileNotFoundException] {
+        return $null
+    } catch [System.IO.DirectoryNotFoundException] {
+        return $null
+    }
 }
 
 function Get-DocsCompleteGatePullRequest {
@@ -164,12 +175,12 @@ function Get-DocsCompleteGatePullRequest {
     $ghArgs.AddRange([string[]]@('pr', 'view'))
     if ($null -ne $prNumber) { $ghArgs.Add([string] $prNumber) }
     $ghArgs.AddRange([string[]]@('--json', 'baseRefName,headRefName,headRefOid'))
-    $lookup = Invoke-DocsOnlyGhExe -WorkingRoot $RepositoryRoot -GhArgs $ghArgs.ToArray()
+    $unresolved = @{ Reason = 'PR_UNRESOLVED'; Message = 'gh pr view did not return a readable pull request with a full head revision; the gate fails closed. Check gh authentication and the pull request selector.'; BaseRefName = $null; HeadRefName = $null; HeadRefOid = $null }
+    try { $lookup = Invoke-DocsOnlyGhExe -WorkingRoot $RepositoryRoot -GhArgs $ghArgs.ToArray() } catch { return $unresolved }
     $pr = $null
     if ($null -ne $lookup -and $lookup.ExitCode -eq 0) {
         try { $pr = ConvertFrom-Json -InputObject ([string] $lookup.Output) -ErrorAction Stop } catch { $pr = $null }
     }
-    $unresolved = @{ Reason = 'PR_UNRESOLVED'; Message = 'gh pr view did not return a readable pull request with a full head revision; the gate fails closed. Check gh authentication and the pull request selector.'; BaseRefName = $null; HeadRefName = $null; HeadRefOid = $null }
     if ($pr -isnot [System.Management.Automation.PSCustomObject]) { return $unresolved }
     $names = @($pr.PSObject.Properties.Name)
     if ($names -notcontains 'headRefOid' -or $names -notcontains 'baseRefName' -or $names -notcontains 'headRefName') { return $unresolved }
@@ -219,7 +230,11 @@ function Invoke-DocsCompleteGateDecision {
     if (-not (Test-EpicMergeGateCommandInScope -CommandText $commandText)) { return Get-DocsCompleteGateAllowDecision }
 
     $root = Get-DocsCompleteGateRepositoryRoot
-    $profileText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $root -ChildPath $script:DocsCompleteGateProfilePath)
+    try {
+        $profileText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $root -ChildPath $script:DocsCompleteGateProfilePath)
+    } catch {
+        return Get-DocsCompleteGateBlockDecision -Code 'PROFILE_UNREADABLE' -Message "The documentation profile exists but could not be read ($($_.Exception.GetBaseException().GetType().Name)); the gate fails closed. Make the file readable and retry."
+    }
     $enabled = Get-DocsCompleteGateEnabled -ProfileText $profileText
     if ($null -ne $enabled.Reason) { return Get-DocsCompleteGateBlockDecision -Code $enabled.Reason -Message $enabled.Message }
     if (-not $enabled.Enabled) { return Get-DocsCompleteGateAllowDecision }
@@ -230,7 +245,11 @@ function Invoke-DocsCompleteGateDecision {
 
     $receiptPath = Get-DocsCompleteGateReceiptPath -ProfileText $profileText
     if ($null -ne $receiptPath.Reason) { return Get-DocsCompleteGateBlockDecision -Code $receiptPath.Reason -Message $receiptPath.Message }
-    $receiptText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $root -ChildPath $receiptPath.Path)
+    try {
+        $receiptText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $root -ChildPath $receiptPath.Path)
+    } catch {
+        return Get-DocsCompleteGateBlockDecision -Code 'RECEIPT_UNREADABLE' -Message "The validation receipt exists but could not be read ($($_.Exception.GetBaseException().GetType().Name)); the gate fails closed. Make the file readable and retry."
+    }
     $receipt = Test-DocsCompleteGateReceipt -ReceiptText $receiptText -HeadRevision $pr.HeadRefOid
     if (-not $receipt.Allow) { return Get-DocsCompleteGateBlockDecision -Code $receipt.Reason -Message $receipt.Message }
     return Get-DocsCompleteGateAllowDecision
@@ -262,7 +281,8 @@ function Invoke-DocsCompleteGateEntryPoint {
     )
 
     if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
-        $ToolInputRaw = [string](& $ReadPayload)
+        # A failed read leaves an empty payload, which the decision denies as PAYLOAD_ANOMALY.
+        try { $ToolInputRaw = [string](& $ReadPayload) } catch { $ToolInputRaw = '' }
     }
 
     $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw $ToolInputRaw

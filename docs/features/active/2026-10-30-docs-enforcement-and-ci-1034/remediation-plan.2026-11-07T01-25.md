@@ -120,7 +120,7 @@ Found by searching `tests/` for `Get-DocsCompleteGateFileText`, `Get-DocsComplet
 
 ### Phase 2 — Hook Correction
 
-- [ ] [P2-T1] Correct the read seams of `.claude/hooks/enforce-docs-complete-gate.ps1` as `## F2 Read Seam Sweep` states, and copy the file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
+- [x] [P2-T1] Correct the read seams of `.claude/hooks/enforce-docs-complete-gate.ps1` as `## F2 Read Seam Sweep` states, and copy the file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
   - `Get-DocsCompleteGateFileText` keeps its return type, removes the `Exists` pre-check, returns `$null` for `FileNotFoundException` and `DirectoryNotFoundException`, and lets every other failure propagate. `Invoke-DocsCompleteGateDecision` wraps each of its two reads and maps the failure to the deny of the sweep table. `.SYNOPSIS` and `.DESCRIPTION` text of the seam and the decision order in the header are updated.
   - Acceptance: `read failures (F2)` and `Describe 'enforce-docs-complete-gate seams (issue #1034)'` report zero failures in a branch-current Pester run; the SHA-256 of the two copies is equal.
 - [ ] [P2-T2] Bind the lookup to the merged pull request in `.claude/hooks/enforce-docs-complete-gate.ps1` as `## F1 Target Form Sweep` states, and copy the file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
