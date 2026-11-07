@@ -247,7 +247,7 @@ The list covers every path of the stored patch, with rename detection off.
 
 Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed the C# test framework to MSTest and the Pester version to Pester v6 in twelve of these paths, the patch was regenerated so that it diffs from the 0001-state text carrying PR #1108's wording to the current text. The hunks are unchanged apart from those renames.
 
-The check: `git apply -R --check` of the patch succeeds on the tree after every later entry that touches the patch's paths is reverted, newest-first, as README `## Revert Order` states; it is not run on the live tree. A failed check on that tree means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
+The check: `git apply -R --check` of the patch succeeds on the tree after every later entry that touches the patch's paths is reverted, newest-first, as README `## Revert Order` states; while no later entry touches those paths, that tree is the live tree. A failed check on that tree means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
 
 ## Prior Text
 
