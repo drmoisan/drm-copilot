@@ -144,8 +144,10 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
                     [Parameter(Mandatory)][string] $ItemCheckpoint
                 )
 
-                Mock Get-ChildOrchestratorCheckpointContent -ParameterFilter { $Path -like '*session-1097*' } -MockWith ({ $SessionCheckpoint }.GetNewClosure())
-                Mock Get-ChildOrchestratorCheckpointContent -ParameterFilter { $Path -like '*item-1097*' } -MockWith ({ $ItemCheckpoint }.GetNewClosure())
+                $sessionValue = $SessionCheckpoint
+                $itemValue = $ItemCheckpoint
+                Mock Get-ChildOrchestratorCheckpointContent -ParameterFilter { $Path -like '*session-1097*' } -MockWith ({ $sessionValue }.GetNewClosure())
+                Mock Get-ChildOrchestratorCheckpointContent -ParameterFilter { $Path -like '*item-1097*' } -MockWith ({ $itemValue }.GetNewClosure())
                 $envelope = @{ session_id = 'session-1097'; tool_name = 'Bash'; tool_input = @{ command = $Command } } | ConvertTo-Json -Depth 5 -Compress
                 $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
                 return [pscustomobject]@{ Decision = [string]$decision.hookSpecificOutput.permissionDecision; Reason = [string]$decision.hookSpecificOutput.permissionDecisionReason }

@@ -124,7 +124,7 @@ Must stay allowed, with a row each and no process: `allow-pr-view`, `allow-pr-vi
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run the PowerShell format and lint stages over the changed files, compare every mirror, replay the ledger, and write `FEATURE/evidence/qa-gates/stage-c-review-powershell-format-lint.<timestamp>.md` and `FEATURE/evidence/other/stage-c-review-ledger-replay.<timestamp>.md`.
+- [x] [P2-T1] Run the PowerShell format and lint stages over the changed files, compare every mirror, replay the ledger, and write `FEATURE/evidence/qa-gates/stage-c-review-powershell-format-lint.<timestamp>.md` and `FEATURE/evidence/other/stage-c-review-ledger-replay.<timestamp>.md`.
   - Files: the two gates and two guard source copies under `.claude/hooks` and `.codex/hooks`, `OrchestratorState.psm1`, `OrchestratorStateCompletionChecks.psm1`, `EpicMergeGateReview.Cases.Helpers.ps1`, `enforce-epic-merge-gate.ReviewGuard.Tests.ps1`, `OrchestratorStateConcurrentReview.Tests.ps1`, and `concurrent-review-skill-contract.Tests.ps1`.
   - Format runs `Invoke-PoshQCFormat` check-only, with a no-op `-WriteFile`. Lint runs `Invoke-ScriptAnalyzer` directly on the same files with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`. Acceptance: the log holds an `Already formatted: ` line and no `Formatted: ` line for each file, and findings number zero.
   - Mirror comparison: one value across the four guard copies, and equal values for each gate, `OrchestratorState.psm1`, `OrchestratorStateCompletionChecks.psm1`, the rule, both orchestrate skills, and `.agents/skills/orchestrator-state/SKILL.md` with its bundle. The contract tests in `tests/scripts/dev_tools/` compare these pairs and run in CI, because no Python gate runs here.
