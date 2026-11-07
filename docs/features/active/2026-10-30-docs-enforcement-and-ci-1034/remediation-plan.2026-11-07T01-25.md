@@ -115,7 +115,7 @@ Found by searching `tests/` for `Get-DocsCompleteGateFileText`, `Get-DocsComplet
   - `read failures (F2)` rows: a throwing profile read denies `PROFILE_UNREADABLE` with zero `gh` calls; a throwing receipt read denies `RECEIPT_UNREADABLE` and the reason does not contain `RECEIPT_ABSENT`; a throwing `Invoke-DocsOnlyGhExe` denies `PR_UNRESOLVED`; `Invoke-DocsCompleteGateEntryPoint -ReadPayload { throw 'read failed' }` returns 0 and emits a `PAYLOAD_ANOMALY` deny. Each deny asserts the reason contains no path separator.
   - Seam rows in `Describe 'enforce-docs-complete-gate seams (issue #1034)'`: 'throws for an existing path that cannot be read as a file' reads the hook directory; 'returns $null when a parent directory does not exist' is a control.
   - Acceptance: the file parses and the control row passes; P1-T3 records the failing rows.
-- [ ] [P1-T3] [expect-fail] Run branch-current Pester over `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1` and write `FEATURE/evidence/regression-testing/fail-before.<timestamp>.md` with `ExpectedExitCode: 1`.
+- [x] [P1-T3] [expect-fail] Run branch-current Pester over `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1` and write `FEATURE/evidence/regression-testing/fail-before.<timestamp>.md` with `ExpectedExitCode: 1`.
   - Acceptance: the step script exits 1 only when every row of `merge target binding (F1)`, every row of `read failures (F2)` and the row 'throws for an existing path that cannot be read as a file' fail while every other row passes, and exits 255 otherwise. The artifact lists each failing row name. A row that passes against the current code is a task failure, because it proves nothing.
 
 ### Phase 2 — Hook Correction
