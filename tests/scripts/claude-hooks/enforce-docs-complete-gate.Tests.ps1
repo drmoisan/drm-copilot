@@ -8,8 +8,9 @@
 .DESCRIPTION
     Dot-sources the hook and drives Invoke-DocsCompleteGateDecision with mocked root, file and
     gh seams. Envelopes are built with ConvertTo-Json. No row starts a process, runs gh or git,
-    or writes a file; the seam rows read only the hook's own committed file. Paths are
-    forward-slash relative with exact case.
+    or writes a file; the seam rows read only the hook's own committed file and the hook
+    directory, which forces a real read failure with no temporary file. Paths are forward-slash
+    relative with exact case.
 #>
 
 Describe 'enforce-docs-complete-gate (issue #1034)' {
@@ -70,6 +71,33 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
 
             $output = [ordered]@{ baseRefName = $Base; headRefName = $HeadRef; headRefOid = $HeadOid } | ConvertTo-Json -Compress
             Mock Invoke-DocsOnlyGhExe -MockWith ({ [pscustomobject]@{ ExitCode = 0; Output = $output } }.GetNewClosure())
+        }
+
+        # Answers by selector as gh does: no selector is the current branch, 99 is an unrelated pull
+        # request, and every spelling of the integration pull request resolves it. Anything else
+        # exits 1, so a lookup that loses the selector or the repository cannot pass by accident.
+        $script:JsonSuffix = ' --json baseRefName,headRefName,headRefOid'
+        $integrationPr = [ordered]@{ baseRefName = 'main'; headRefName = 'epic/x-integration'; headRefOid = $script:Head } | ConvertTo-Json -Compress
+        $script:LookupAnswers = @{
+            "pr view$($script:JsonSuffix)"                                = [ordered]@{ baseRefName = 'development'; headRefName = 'feature/current-branch'; headRefOid = $script:Head } | ConvertTo-Json -Compress
+            "pr view 99$($script:JsonSuffix)"                             = [ordered]@{ baseRefName = 'main'; headRefName = 'feature/other'; headRefOid = $script:Head } | ConvertTo-Json -Compress
+            "pr view 12$($script:JsonSuffix)"                             = $integrationPr
+            "pr view epic/x-integration$($script:JsonSuffix)"             = $integrationPr
+            "pr view https://github.com/o/r/pull/12$($script:JsonSuffix)" = $integrationPr
+            "pr view 12 --repo other/repo$($script:JsonSuffix)"           = $integrationPr
+        }
+
+        function Set-TestTargetSeam {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
+            [CmdletBinding()]
+            param()
+
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText $null
+            Mock Invoke-DocsOnlyGhExe -MockWith {
+                $key = $GhArgs -join ' '
+                if ($script:LookupAnswers.ContainsKey($key)) { return [pscustomobject]@{ ExitCode = 0; Output = $script:LookupAnswers[$key] } }
+                return [pscustomobject]@{ ExitCode = 1; Output = '' }
+            }
         }
     }
 
@@ -268,6 +296,210 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         }
     }
 
+    Context 'merge target binding (F1)' {
+        It 'looks up <Lookup> and denies RECEIPT_ABSENT for <Command>' -ForEach @(
+            @{ Command = 'gh pr merge https://github.com/o/r/pull/12 --merge'; Lookup = 'https://github.com/o/r/pull/12' }
+            @{ Command = 'gh pr merge epic/x-integration --merge'; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge --merge -- epic/x-integration'; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge --subject title epic/x-integration'; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge -sd epic/x-integration'; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge -sb 99 epic/x-integration'; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge 12 -R other/repo'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh pr merge 12 --repo other/repo'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh pr merge 12 --repo=other/repo'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh pr merge 12 -Rother/repo'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh pr merge 12 -R=other/repo'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh --repo other/repo pr merge 12'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh pr -R other/repo merge 12'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh --repo other/repo pr merge 12 -R other/repo'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh api -X PUT repos/other/repo/pulls/12/merge'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'gh api -X PUT /repos/other/repo/pulls/12/merge'; Lookup = '12 --repo other/repo' }
+            @{ Command = 'timeout 30 gh pr merge epic/x-integration'; Lookup = 'epic/x-integration' }
+            @{ Command = "sh -c 'gh pr merge epic/x-integration'"; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge epic/x-integration > log'; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge epic/x-integration >log'; Lookup = 'epic/x-integration' }
+            @{ Command = 'gh pr merge 99 --disable-auto; gh pr merge epic/x-integration --merge'; Lookup = 'epic/x-integration' }
+            @{ Command = 'cd ../other && gh pr merge https://github.com/o/r/pull/12 --merge'; Lookup = 'https://github.com/o/r/pull/12' }
+        ) {
+            # Arrange
+            Set-TestTargetSeam
+            $expected = "pr view $Lookup$($script:JsonSuffix)"
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_ABSENT: *'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 1 -Exactly
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 1 -Exactly -ParameterFilter { ($GhArgs -join ' ') -ceq $expected }
+        }
+
+        It 'denies PR_UNRESOLVED with no gh call for <Command>' -ForEach @(
+            @{ Command = "gh api graphql -f query='mutation{mergePullRequest(input:{pullRequestId:`"PR_kw`"}){clientMutationId}}'" }
+            @{ Command = "gh api graphql -f query='mutation{enqueuePullRequest(input:{pullRequestId:`"PR_kw`"}){clientMutationId}}'" }
+            @{ Command = "gh api graphql -f query='mutation{enablePullRequestAutoMerge(input:{pullRequestId:`"PR_kw`"}){clientMutationId}}'" }
+            @{ Command = "gh api graphql -f query='mutation{mergePullRequest(x)}' repos/o/r/pulls/12/merge" }
+            @{ Command = 'gh pr merge 99 --merge; gh pr merge 12 --merge' }
+            @{ Command = 'gh pr merge 99 --merge; gh api -X PUT repos/o/r/pulls/12/merge' }
+            @{ Command = 'gh --unknown pr merge 12' }
+            @{ Command = "gh pr merge 12 'unbalanced" }
+            @{ Command = 'echo 12 | xargs gh pr merge --merge' }
+            @{ Command = 'gh pr merge $PR' }
+            @{ Command = 'gh pr merge 12 -R $REPO' }
+            @{ Command = 'gh pr merge 12 --unknown' }
+            @{ Command = 'gh pr merge 12 -z' }
+            @{ Command = 'gh pr merge 12 13' }
+            @{ Command = 'gh pr merge -- -x' }
+            @{ Command = 'gh pr merge 12 --repo bad' }
+            @{ Command = 'gh pr merge 12 --repo' }
+            @{ Command = 'gh --repo a/b pr merge 12 -R c/d' }
+            @{ Command = 'gh api -X PUT https://api.github.com/repos/o/r/pulls/12/merge' }
+            @{ Command = 'gh api --hostname ghe.example.com -X PUT repos/o/r/pulls/12/merge' }
+            @{ Command = 'gh api -X PUT repos/o/r/pulls/12/merge repos/o/r/pulls/13/merge' }
+            @{ Command = 'gh api -X PUT repos/$OWNER/r/pulls/12/merge' }
+            @{ Command = 'cd ../other && gh pr merge 12 --merge' }
+            @{ Command = 'pushd ../other; gh pr merge 12' }
+            @{ Command = 'chdir ../other; gh pr merge 12' }
+            @{ Command = 'Set-Location ../other; gh pr merge 12' }
+            @{ Command = 'Push-Location ../other; gh pr merge 12' }
+            @{ Command = 'sl ../other; gh pr merge 12' }
+            @{ Command = 'GH_REPO=other/repo gh pr merge 12' }
+            @{ Command = 'GH_HOST=ghe.example.com gh pr merge 12' }
+            @{ Command = 'export GH_REPO=other/repo; gh pr merge 12' }
+        ) {
+            # Arrange
+            Set-TestTargetSeam
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: PR_UNRESOLVED: *'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        }
+    }
+
+    Context 'merge target controls' {
+        It 'looks up number 12 and denies RECEIPT_ABSENT for <Command>' -ForEach @(
+            @{ Command = 'gh pr merge 12 --merge' }
+            @{ Command = 'gh pr merge --merge=12' }
+            @{ Command = 'gh pr merge 12 --merge 2>&1' }
+            @{ Command = 'gh pr merge 12 --merge; echo done' }
+            @{ Command = 'gh pr view 12; gh pr merge 12 --merge' }
+            @{ Command = "gh api -X PUT 'repos/{owner}/{repo}/pulls/12/merge'" }
+        ) {
+            # Arrange
+            Set-TestTargetSeam
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_ABSENT: *'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 1 -Exactly -ParameterFilter { ($GhArgs -join ' ') -ceq 'pr view 12 --json baseRefName,headRefName,headRefOid' }
+        }
+
+        It 'looks up the current branch and allows <Command>' -ForEach @(
+            @{ Command = 'gh pr merge --squash' }
+            @{ Command = 'gh pr merge --help' }
+        ) {
+            # Arrange
+            Set-TestTargetSeam
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 1 -Exactly -ParameterFilter { ($GhArgs -join ' ') -ceq 'pr view --json baseRefName,headRefName,headRefOid' }
+        }
+
+        It 'allows <Command> with no gh call' -ForEach @(
+            @{ Command = 'gh pr merge 12 --disable-auto' }
+            @{ Command = "gh api graphql -f query='query{viewer{login}}'" }
+        ) {
+            # Arrange
+            Set-TestTargetSeam
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        }
+
+        It 'denies PR_UNRESOLVED for a full-length uppercase headRefOid' {
+            # Arrange
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText (Get-TestReceiptText)
+            Set-TestPullRequestSeam -HeadOid $script:Head.ToUpperInvariant()
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command 'gh pr merge 7 --merge')
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: PR_UNRESOLVED: *'
+        }
+    }
+
+    Context 'read failures (F2)' {
+        It 'denies PROFILE_UNREADABLE with no gh call when the profile read throws' {
+            # Arrange
+            Mock Get-DocsCompleteGateFileText -MockWith { throw [System.IO.IOException]::new('locked: repo-root/docs/docs-profile.json') }
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command 'gh pr merge 7 --merge')
+
+            # Assert
+            $reason = $decision.hookSpecificOutput.permissionDecisionReason
+            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: PROFILE_UNREADABLE: *'
+            $reason | Should -Not -Match '[\\/]'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        }
+
+        It 'denies RECEIPT_UNREADABLE without claiming an absent file when the receipt read throws' {
+            # Arrange
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText $null
+            Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -like '*docs-validation-receipt.json' } -MockWith { throw [System.IO.IOException]::new('locked: repo-root/docs/receipt.json') }
+            Set-TestPullRequestSeam
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command 'gh pr merge 7 --merge')
+
+            # Assert
+            $reason = $decision.hookSpecificOutput.permissionDecisionReason
+            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_UNREADABLE: *'
+            $reason | Should -Not -Match 'RECEIPT_ABSENT'
+            $reason | Should -Not -Match '[\\/]'
+        }
+
+        It 'denies PR_UNRESOLVED when Invoke-DocsOnlyGhExe throws' {
+            # Arrange
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText (Get-TestReceiptText)
+            Mock Invoke-DocsOnlyGhExe -MockWith { throw [System.InvalidOperationException]::new('gh failed at repo-root/bin/gh') }
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command 'gh pr merge 7 --merge')
+
+            # Assert
+            $reason = $decision.hookSpecificOutput.permissionDecisionReason
+            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: PR_UNRESOLVED: *'
+            $reason | Should -Not -Match '[\\/]'
+        }
+
+        It 'returns 0 and emits a PAYLOAD_ANOMALY deny when ReadPayload throws' {
+            # Act
+            $output = @(Invoke-DocsCompleteGateEntryPoint -ReadPayload { throw 'read failed' })
+
+            # Assert
+            $output[-1] | Should -Be 0
+            $reason = ($output[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason
+            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: PAYLOAD_ANOMALY: *'
+            $reason | Should -Not -Match '[\\/]'
+        }
+    }
+
     Context 'payload anomaly' {
         It 'denies an envelope it cannot read (<Case>)' -ForEach @(
             @{ Case = 'empty payload'; Raw = '' }
@@ -329,6 +561,22 @@ Describe 'enforce-docs-complete-gate seams (issue #1034)' {
 
         # Assert
         $text | Should -BeNullOrEmpty
+    }
+
+    It 'returns $null when a parent directory does not exist' {
+        # Act
+        $text = Get-DocsCompleteGateFileText -Path (Join-Path -Path (Split-Path -Parent $script:HookPath) -ChildPath 'absent-directory/enforce-docs-complete-gate.absent.json')
+
+        # Assert
+        $text | Should -BeNullOrEmpty
+    }
+
+    It 'throws for an existing path that cannot be read as a file' {
+        # Arrange
+        $hookDirectory = Split-Path -Parent $script:HookPath
+
+        # Act and Assert
+        { Get-DocsCompleteGateFileText -Path $hookDirectory } | Should -Throw
     }
 
     It 'returns the text of an existing file (the hook itself, read only)' {
