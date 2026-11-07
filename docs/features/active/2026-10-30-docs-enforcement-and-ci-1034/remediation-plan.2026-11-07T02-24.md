@@ -307,7 +307,7 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
   - Acceptance: the step script exits 0 only when every check passes.
 - [x] [P4-T11] Re-evaluate the criteria at spec:516, story:65 and story:73 of `FEATURE/spec.md` and `FEATURE/user-story.md` against the evidence of this cycle, and write `FEATURE/evidence/other/criteria-reevaluation.<timestamp>.md`.
   - Acceptance: one PASS or FAIL row per criterion names its evidence file, among `fail-before`, `gate-rows`, `bash-exact-after` and `f3-hook-process-after`. Checkboxes are not edited; the next review owns them. A FAIL row returns to the owning Phase 2 task.
-- [ ] [P4-T12] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the whole branch diff from `MERGE_BASE` and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md`.
+- [x] [P4-T12] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the whole branch diff from `MERGE_BASE` and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md`.
   - The artifact replaces `FEATURE/evidence/qa-gates/self-review.2026-11-07T01-03.md` under the newest-file selection rule, and its `Output Summary:` says so. It covers the whole branch, not only this cycle, and records that N1 to N5 stay deferred.
   - Acceptance: one PASS, FAIL or N/A row per checklist item and no FAIL row; a FAIL is fixed, the loop re-run from P4-T1, and the self-review rewritten.
 
