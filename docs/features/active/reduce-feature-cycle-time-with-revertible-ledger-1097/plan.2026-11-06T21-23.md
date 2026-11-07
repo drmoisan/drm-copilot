@@ -83,7 +83,7 @@ Out of scope: `execution-environment` and `atomic-plan-contract` (they wait on #
   - `PRL-README-EXAMPLE-IS-VALID` takes `## Worked Example` from the real README, removes the outer fence, passes the text to `Test-ProcessReductionEntry` as `0000-example-reduction.md`, and replays its first revert block through `Invoke-ProcessReductionRevert` on an in-memory string holding `Current`.
   - In-memory fixtures only: no test creates a file. Repository paths use `Join-Path` with forward-slash relative segments.
   - Acceptance: the module exports all seven functions, the test file holds the fifteen `It` names, and [P3-T2] reports them passing.
-- [ ] [P1-T5] Change the copy filter of `test_execution_environment_fact_is_unchanged_across_copies` in `tests/scripts/dev_tools/test_discovery_documentation_contracts.py` to test `path.relative_to(REPO_ROOT).parts` in place of `path.parts`.
+- [x] [P1-T5] Change the copy filter of `test_execution_environment_fact_is_unchanged_across_copies` in `tests/scripts/dev_tools/test_discovery_documentation_contracts.py` to test `path.relative_to(REPO_ROOT).parts` in place of `path.parts`.
   - Behavior: the excluded names apply only below the repository root, so a checkout under a `worktrees` folder keeps its six copies, while a worktree nested inside a checkout stays excluded. The excluded name set, the existing comment, and both assertions stay as they are.
   - The longer expression exceeds the 88-column limit, so the edit is written in Black's wrapped form.
   - This is the only test that asserts the filter, and no other test file reads it. No other Python test in `tests/` filters absolute path parts on `worktrees`.
