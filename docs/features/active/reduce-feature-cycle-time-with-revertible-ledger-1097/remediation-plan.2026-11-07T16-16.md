@@ -82,11 +82,12 @@ Premise corrections, each read against the tree:
   - Entry: edit `## Stored Patch` to say the patch diffs from the 0001-state text with #1108's wording to the current text and that the entry was rebased over #1108 (PR #1108, issue #1106); add the same sentence to `## Reason and Evidence`. Re-check every `Revert Block` by replay; a block whose `Current` no longer matches the merged text is edited so it replays to its `Prior` text, and the artifact names it (expected: none, by the premise correction). `Prior` text of unaffected blocks is untouched.
   - Asserting tests, found by searching `tests` for `0006-test-suite-baseline-restored`: `ProcessReductionLedger.Index.Tests.ps1` and the ledger suites read the entry structure only and are unchanged because the heading set is unchanged.
   - Acceptance: `git apply -R --check` of the new patch exits 0 against the working tree; `Test-ProcessReductionLedger` over `Read-ProcessReductionLedger` is valid; the entry text records the rebase over #1108; the artifact carries the four required fields.
-- [ ] [P1-T3] Check the `0001` patch against the merged tree through the chained reverse application, rebase it only if the check fails, and write `FEATURE/evidence/other/stage-f1-patch-rebase-0001.<timestamp>.md`.
+- [x] [P1-T3] Check the `0001` patch against the merged tree through the chained reverse application, rebase it only if the check fails, and write `FEATURE/evidence/other/stage-f1-patch-rebase-0001.<timestamp>.md`.
   - Check: in a fresh scratch index under `SCRATCH` seeded from `HEAD`, run `git apply -R --cached` of the committed `0006` patch, then `git apply -R --cached --check` of `docs/engineering/process-reductions/patches/0001-parallel-only-test-gates.patch`. The artifact records both exit codes.
   - Rebase (only for paths the check rejects): build the pre-0001 pre-image per path as in [P1-T2], regenerate the `0001` patch over the `## Files Changed` set of `docs/engineering/process-reductions/0001-parallel-only-test-gates.md`, add the sentence recording the rebase over #1108 to its `## Summary`, and commit with `reduction: 0001` in the subject. When the first check passes, entry `0001` and its patch are unchanged, no commit is made, and the artifact states that.
   - Asserting tests: the same ledger suites named in [P1-T2], unchanged for the same reason.
-  - Acceptance: the chained `--check` exits 0 after the task; the `0001` `Revert Block` sections replay to their `Prior` text; the artifact carries the four required fields.
+  - The pre-existing failure of the 0001 patch on those paths is opened as stage R ahead of stage F, which makes every ledger entry revertible newest-first.
+  - Acceptance: The chained reverse check fails only for paths that failed it before the merge, and the failing-path list equals the pre-merge list; the `0001` `Revert Block` sections replay to their `Prior` text; the artifact carries the four required fields.
 
 ### Phase 2 — Final QA
 
