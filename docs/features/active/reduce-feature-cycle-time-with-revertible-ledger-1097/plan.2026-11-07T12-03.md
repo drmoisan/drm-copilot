@@ -126,7 +126,7 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Format and analyze `scripts/dev-tools/ProcessReductionChain.psm1`, `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, and `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, writing `FEATURE/evidence/qa-gates/stage-r-powershell-format-lint.<timestamp>.md`.
+- [x] [P2-T1] Format and analyze `scripts/dev-tools/ProcessReductionChain.psm1`, `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, and `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, writing `FEATURE/evidence/qa-gates/stage-r-powershell-format-lint.<timestamp>.md`.
   - PoshQC format then a direct analyzer run with the repository settings. A clean pass is observed as `git status --porcelain` empty after the formatter and zero analyzer findings; a formatter change is committed and the loop restarts.
   - Acceptance: zero findings and no formatter change in the recorded pass.
 - [ ] [P2-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-r-powershell-test.<timestamp>.md`, compared with the greatest `stage-r-powershell-test-baseline.*.md`.
