@@ -13,18 +13,18 @@ A data row's ID cell is a link such as `[0001](0001-short-name.md)`, and its lab
 
 An entry is a file named `NNNN-<short-name>.md`, where `NNNN` is the next free four-digit number. It holds these level-two sections, each non-blank:
 
-- `## Summary`: what was reduced, with two lines of their own: `reduction: NNNN`, which is also the token in the subject of the reduction's commit, and `Merge commit: pending (PR #N)`, where `N` is the pull request number. A commit cannot name itself or its later merge, so the next stage or a final records commit back-fills this line with the 7-to-40-character lowercase hexadecimal identifier of the merge commit, in the form `Merge commit: <identifier>`.
+- `## Summary`: what was reduced, with four lines of their own: `reduction: NNNN`, which is also the token in the subject of the reduction's commit, `Date: yyyy-MM-dd` (UTC), `Issue: #N` for the issue that made the reduction, and `Merge commit: pending (PR #N)`, where `N` is the pull request number. The checker requires only the `reduction:` and `Merge commit:` lines; the `Date:` and `Issue:` lines are format guidance and are not enforced. A commit cannot name itself or its later merge, so the next stage or a final records commit back-fills this line with the 7-to-40-character lowercase hexadecimal identifier of the merge commit, in the form `Merge commit: <identifier>`.
 - `## Reason and Evidence`: why the reduction was made and what it was measured against.
 - `## Files Changed`: every file the reduction changed, including mirrors, bundled copies, pinned hashes, and contract tests.
 - `## Prior Text` or `## Stored Patch`: what a revert restores. An entry carries at least one of the two.
 - `## Revert Steps`: the ordered steps of the revert.
 - `## Revert Signals`: what the owner watches for, such as more remediation cycles after the reduction, that would justify a revert.
 
-`## Prior Text` holds one `### Revert Block: <repository-relative path>` subsection per canonical file and one per non-identical copy. A byte-identical mirror takes no block, because it is re-copied from its canonical file instead.
+`## Prior Text` holds one `### Revert Block: <repository-relative path>` subsection per canonical file and one per non-identical copy. The path has no leading `/` or `\`, no drive prefix, and no `..` segment. A byte-identical mirror takes no block, because it is re-copied from its canonical file instead.
 
 Each block holds a `Current` fence, with the text as it stands after the reduction, and a `Prior` fence, with the text it replaces. The fence info string is the label. Each fence uses more backticks than any backtick run in its text, so verbatim Markdown stays inside it. `Current` must be non-empty and must occur exactly once in the target file. `Prior` may be empty, because a reduction may add text.
 
-`## Stored Patch` names `patches/NNNN-<short-name>.patch`, a file in the `patches/` folder of this ledger with the same stem as the entry.
+`## Stored Patch` names `patches/NNNN-<short-name>.patch`, a file in the `patches/` folder of this ledger with the same stem as the entry. Write the path in backticks, or end a sentence with at most one period after it.
 
 `## Revert Steps` names these six labels, in this order:
 
@@ -53,6 +53,8 @@ This sample shows a complete entry for a hypothetical `0000-example-reduction.md
 ## Summary
 
 reduction: 0000
+Date: 2026-01-15
+Issue: #1200
 Merge commit: pending (PR #1234)
 
 Removes the routine sample sentence from the example skill.
