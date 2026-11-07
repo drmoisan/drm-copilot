@@ -308,4 +308,31 @@ Describe 'Merge-EpicProgressSamplePair' {
         $twice.Count | Should -Be 4
         ($twice.done -join ',') | Should -Be '1,5,9,13'
     }
+
+    It 'reproduces the recorded 5-minute to 10-minute example' {
+        # The 14 recorded samples of the research (offsets in seconds from a fixed base epoch, done counts).
+        $baseEpoch = 1767571200
+        $offsets = @(0, 286, 572, 856, 1144, 1428, 1714, 1999, 2282, 2568, 2854, 3139, 3424, 3716)
+        $doneCounts = @(131, 132, 140, 141, 142, 144, 145, 145, 147, 154, 155, 156, 158, 158)
+        $recorded = [System.Collections.Generic.List[object]]::new()
+        for ($index = 0; $index -lt $offsets.Count; $index++) { $recorded.Add([pscustomobject]@{ ts = $baseEpoch + $offsets[$index]; done = $doneCounts[$index] }) }
+
+        [double[]] $before = @(Get-EpicProgressRecentVelocityInterval -Sample $recorded.ToArray())
+        [double[]] $after = @(Get-EpicProgressRecentVelocityInterval -Sample @(Merge-EpicProgressSamplePair -Sample $recorded.ToArray()))
+        $meanBefore = ($before | Measure-Object -Average).Average
+        $meanAfter = ($after | Measure-Object -Average).Average
+        $deviationBefore = Get-EpicProgressStandardDeviation -Interval $before
+        $deviationAfter = Get-EpicProgressStandardDeviation -Interval $after
+
+        $before.Count | Should -Be 13
+        $after.Count | Should -Be 6
+        [math]::Abs($meanBefore - 26.1875) | Should -BeLessThan 0.001
+        [math]::Abs($deviationBefore - 31.4495) | Should -BeLessThan 0.001
+        [math]::Abs($meanAfter - 27.3430) | Should -BeLessThan 0.001
+        [math]::Abs($deviationAfter - 23.2316) | Should -BeLessThan 0.001
+        Format-EpicProgressNumber -Value $meanBefore -Digits 1 | Should -Be '26.2'
+        Format-EpicProgressNumber -Value $deviationBefore -Digits 1 | Should -Be '31.4'
+        Format-EpicProgressNumber -Value $meanAfter -Digits 1 | Should -Be '27.3'
+        Format-EpicProgressNumber -Value $deviationAfter -Digits 1 | Should -Be '23.2'
+    }
 }
