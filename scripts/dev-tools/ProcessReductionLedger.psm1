@@ -227,7 +227,7 @@ function Get-ProcessReductionPlainLine {
     )
 
     $rows = @(Get-ProcessReductionLine -Text $Text)
-    return @($rows | Where-Object { $_.Role -ceq 'Text' } | ForEach-Object { $_.Text })
+    $rows | Where-Object { $_.Role -ceq 'Text' } | ForEach-Object { $_.Text }
 }
 
 function Get-ProcessReductionEntryNumber {
