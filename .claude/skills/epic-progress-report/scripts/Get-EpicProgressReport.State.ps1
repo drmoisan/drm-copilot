@@ -47,3 +47,67 @@ function Select-EpicProgressSample {
     $retained = [object[]] @($kept | Select-Object -Skip ([math]::Max(0, $kept.Count - $SampleCap)))
     return [pscustomobject]@{ Sample = $retained; Changed = $true }
 }
+
+function Resolve-EpicProgressSetting {
+    <#
+    .SYNOPSIS
+        Apply the parameter defaults of the report; pure, with the current location passed in.
+    .DESCRIPTION
+        A blank value takes its default and an explicit value is kept. The kickoff path is a
+        git object path with '/' separators; filesystem paths are built with Join-Path. The
+        default state file is .claude/state/epic-progress-<EpicFolder>.json under the
+        repository root, which is gitignored and survives a container stop with the checkout.
+    .PARAMETER EpicFolder
+        The epic folder name.
+    .PARAMETER EpicIssue
+        The explicit epic issue number, or blank.
+    .PARAMETER IntegrationBranch
+        The explicit integration branch, or blank.
+    .PARAMETER KickoffPath
+        The explicit kickoff path, or blank.
+    .PARAMETER RepositoryRoot
+        The explicit repository root, or blank.
+    .PARAMETER CheckpointPath
+        The explicit checkpoint path, or blank.
+    .PARAMETER StatePath
+        The explicit state file path, or blank.
+    .PARAMETER CurrentLocation
+        The current location.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $EpicFolder,
+        [AllowEmptyString()] [string] $EpicIssue = '',
+        [AllowEmptyString()] [string] $IntegrationBranch = '',
+        [AllowEmptyString()] [string] $KickoffPath = '',
+        [AllowEmptyString()] [string] $RepositoryRoot = '',
+        [AllowEmptyString()] [string] $CheckpointPath = '',
+        [AllowEmptyString()] [string] $StatePath = '',
+        [Parameter(Mandatory = $true)] [string] $CurrentLocation
+    )
+
+    $root = $RepositoryRoot
+    if ([string]::IsNullOrWhiteSpace($root)) { $root = $CurrentLocation }
+    $branch = $IntegrationBranch
+    if ([string]::IsNullOrWhiteSpace($branch)) { $branch = "origin/epic/$EpicFolder-integration" }
+    $kickoff = $KickoffPath
+    if ([string]::IsNullOrWhiteSpace($kickoff)) { $kickoff = "docs/features/epics/$EpicFolder/epic-kickoff.md" }
+    $checkpoint = $CheckpointPath
+    if ([string]::IsNullOrWhiteSpace($checkpoint)) {
+        $checkpoint = Join-Path -Path $root -ChildPath 'artifacts' -AdditionalChildPath 'orchestration', 'epic-orchestrator-state.json'
+    }
+    $state = $StatePath
+    if ([string]::IsNullOrWhiteSpace($state)) {
+        $state = Join-Path -Path $root -ChildPath '.claude' -AdditionalChildPath 'state', "epic-progress-$EpicFolder.json"
+    }
+
+    return [pscustomobject]@{
+        EpicIssue         = $EpicIssue
+        IntegrationBranch = $branch
+        KickoffPath       = $kickoff.Replace('\', '/')
+        RepositoryRoot    = $root
+        CheckpointPath    = $checkpoint
+        StatePath         = $state
+    }
+}

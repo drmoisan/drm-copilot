@@ -127,69 +127,6 @@ param(
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Logic.ps1')
 
-function Resolve-EpicProgressSetting {
-    <#
-    .SYNOPSIS
-        Apply the parameter defaults of the report; pure, with the temporary root and the current location passed in.
-    .DESCRIPTION
-        A blank value takes its default and an explicit value is kept. The kickoff path is a
-        git object path with '/' separators; filesystem paths are built with Join-Path.
-    .PARAMETER EpicFolder
-        The epic folder name.
-    .PARAMETER EpicIssue
-        The explicit epic issue number, or blank.
-    .PARAMETER IntegrationBranch
-        The explicit integration branch, or blank.
-    .PARAMETER KickoffPath
-        The explicit kickoff path, or blank.
-    .PARAMETER RepositoryRoot
-        The explicit repository root, or blank.
-    .PARAMETER CheckpointPath
-        The explicit checkpoint path, or blank.
-    .PARAMETER StatePath
-        The explicit state file path, or blank.
-    .PARAMETER TempRoot
-        The system temporary directory.
-    .PARAMETER CurrentLocation
-        The current location.
-    #>
-    [CmdletBinding()]
-    [OutputType([pscustomobject])]
-    param(
-        [Parameter(Mandatory = $true)] [string] $EpicFolder,
-        [AllowEmptyString()] [string] $EpicIssue = '',
-        [AllowEmptyString()] [string] $IntegrationBranch = '',
-        [AllowEmptyString()] [string] $KickoffPath = '',
-        [AllowEmptyString()] [string] $RepositoryRoot = '',
-        [AllowEmptyString()] [string] $CheckpointPath = '',
-        [AllowEmptyString()] [string] $StatePath = '',
-        [Parameter(Mandatory = $true)] [string] $TempRoot,
-        [Parameter(Mandatory = $true)] [string] $CurrentLocation
-    )
-
-    $root = $RepositoryRoot
-    if ([string]::IsNullOrWhiteSpace($root)) { $root = $CurrentLocation }
-    $branch = $IntegrationBranch
-    if ([string]::IsNullOrWhiteSpace($branch)) { $branch = "origin/epic/$EpicFolder-integration" }
-    $kickoff = $KickoffPath
-    if ([string]::IsNullOrWhiteSpace($kickoff)) { $kickoff = "docs/features/epics/$EpicFolder/epic-kickoff.md" }
-    $checkpoint = $CheckpointPath
-    if ([string]::IsNullOrWhiteSpace($checkpoint)) {
-        $checkpoint = Join-Path -Path $root -ChildPath 'artifacts' -AdditionalChildPath 'orchestration', 'epic-orchestrator-state.json'
-    }
-    $state = $StatePath
-    if ([string]::IsNullOrWhiteSpace($state)) { $state = Join-Path -Path $TempRoot -ChildPath "epic-progress-$EpicFolder.json" }
-
-    return [pscustomobject]@{
-        EpicIssue         = $EpicIssue
-        IntegrationBranch = $branch
-        KickoffPath       = $kickoff.Replace('\', '/')
-        RepositoryRoot    = $root
-        CheckpointPath    = $checkpoint
-        StatePath         = $state
-    }
-}
-
 function Invoke-GitExe {
     <#
     .SYNOPSIS
@@ -344,7 +281,7 @@ function Invoke-EpicProgressReport {
     .PARAMETER CheckpointPath
         The epic orchestrator checkpoint path; blank for the default.
     .PARAMETER StatePath
-        The state file path; blank for the default under the temporary directory.
+        The state file path; blank for the default under .claude/state of the repository root.
     .PARAMETER BaselineDone
         The tasks already complete at StartUtc.
     .PARAMETER BaselineWeeklyPct
@@ -374,7 +311,7 @@ function Invoke-EpicProgressReport {
         [ValidateSet('TLDR', 'Full')] [string] $Mode = 'Full'
     )
 
-    $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -TempRoot ([System.IO.Path]::GetTempPath()) -CurrentLocation (Get-Location).ProviderPath
+    $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -CurrentLocation (Get-Location).ProviderPath
     $null = Invoke-GitExe -GitArgs @('fetch', '-q', 'origin')
     $fetchExitCode = Get-EpicProgressLastExitCode
     if ($fetchExitCode -ne 0) {
