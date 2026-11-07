@@ -114,7 +114,7 @@ These were found by searching `tests/` for `Invoke-ProcessReductionChain`, `Get-
     - The seven new `PRC-` tests, `PRC-LEDGER-SUBCHAIN-HOLDS`, `PRC-LEDGER-CHAIN-HOLDS`, `PRL-REAL-LEDGER-AGREES`, and `PRL-PARTIAL-REVERT-LINKED` passed.
     - `ProcessReductionChain.psm1` is at or above its 99.5% baseline, and every new line is at least 85% covered; `ProcessReductionLedger.psm1` stays at 100%.
     - Repo-wide coverage is not below 94.01%. A drop is attributed per file, and a drop in a file in the diff from the merge base fails the task.
-- [ ] [P2-T3] Run `PYTHONPATH=<worktree>/packages/discovery-runtime/src poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` once from the worktree root and write `FEATURE/evidence/qa-gates/stage-r-cycle3-python-test.<timestamp>.md`.
+- [x] [P2-T3] Run `PYTHONPATH=<worktree>/packages/discovery-runtime/src poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` once from the worktree root and write `FEATURE/evidence/qa-gates/stage-r-cycle3-python-test.<timestamp>.md`.
   - Read total line coverage from the Stmts and Miss columns of the `TOTAL` row, and branch coverage from the summed BRF and BRH records of `artifacts/python/lcov.info`, as the baseline did.
   - Output Summary: passed, failed, and skipped counts; total line and branch percentages; the comparison with P0-T1 (16204 passed, 96.99%, 94.17%).
   - Acceptance: zero failures; line coverage at or above 85% and branch coverage at or above 75%; totals not below the baseline, or each drop attributed per file from the term-missing table to files that only `main` changed. Such a drop is returned as a finding, and a drop in a file in the diff from the merge base fails the task.
