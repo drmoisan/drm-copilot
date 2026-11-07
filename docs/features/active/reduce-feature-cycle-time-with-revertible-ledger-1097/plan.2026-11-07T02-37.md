@@ -128,7 +128,7 @@ Further strings checked because they are in the hold: `static baseline capture (
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell scope, and write `FEATURE/evidence/baseline/stage-e-phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell scope, and write `FEATURE/evidence/baseline/stage-e-phase0-instructions-read.<timestamp>.md`.
   - This task stays because the planner stop hook on `main` requires it until the [P2-T4] reduction merges.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
 - [ ] [P0-T2] Capture the static PowerShell baseline and the baseline-string inventory, and write `FEATURE/evidence/baseline/stage-e-powershell-static.<timestamp>.md` and `FEATURE/evidence/baseline/stage-e-baseline-strings.<timestamp>.md`.
