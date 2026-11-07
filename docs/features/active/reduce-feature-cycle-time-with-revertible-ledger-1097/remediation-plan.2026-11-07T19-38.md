@@ -54,7 +54,7 @@ These were found by searching `tests/` for `Invoke-ProcessReductionChain`, `Get-
 
 ### Phase 0 — Baseline
 
-- [ ] [P0-T1] Write `FEATURE/evidence/baseline/stage-r-cycle3-baseline-reference.<timestamp>.md`, recording the Phase 0 baseline read from the stage R Phase 0 artifacts. No suite is run.
+- [x] [P0-T1] Write `FEATURE/evidence/baseline/stage-r-cycle3-baseline-reference.<timestamp>.md`, recording the Phase 0 baseline read from the stage R Phase 0 artifacts. No suite is run.
   - Sources: the greatest `stage-r-powershell-test-baseline.*.md` (15675 tests, 0 failed, repo-wide line coverage 94.01%); the greatest `stage-r-python-test-baseline.*.md` (16204 passed, 0 failed, total line coverage 96.99%, total branch coverage 94.17%); the greatest `stage-r-powershell-static.*.md`; and the greatest `stage-r-cycle2-baseline-reference.*.md`, all under `FEATURE/evidence/baseline/`. The last one supplies the static state of `scripts/dev-tools/ProcessReductionChain.psm1` and its two test files, the coverage of `ProcessReductionChain.psm1` (99.5%, 201 of 202 lines), and the git-level chain gate counts (equal 119, attributed 18, unattributed 0).
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Every figure is numeric and traced to a named artifact, and `Command:` states that no suite was run.
 
