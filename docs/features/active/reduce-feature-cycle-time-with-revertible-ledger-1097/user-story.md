@@ -57,17 +57,17 @@ The tag on each criterion names the delivery stage that owes it, as defined in `
 - [x] [A] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures, under the Testing Rule, at each stage.
 - [x] [B] Stage timing is recorded in the checkpoint and in committed evidence, and is reported per stage by `Get-StageTimingReport.ps1`, which labels figures as wall-clock and states that the merge stage is not captured.
 - [x] [B] A test proves that `stage_timing` passes each validator and survives portable handoff.
-- [ ] [C] The merge guard commit precedes the readiness relaxation commit on the branch.
-- [ ] [C] Under `review_mode: "concurrent"`, merge is denied with review passed and CI pending, and with CI green and review pending, on each guarded path. On the authorization path, which reads no CI result, the required `CI Required Gate` context is the control, and the spec limit in D10 applies.
-- [ ] [C] The guard denies a stale head after a code change, including a merge of `origin/main`; a git failure; an unresolved head; and a bare command under the key. It allows a predecessor head whose later changes are only feature-folder paths.
-- [ ] [C] The Claude guard and its Codex twin behave the same on these cases.
-- [ ] [C] A test proves that a checkpoint without the key makes no `gh` call, receives no new denial, and receives no readiness relaxation.
-- [ ] [C] `step7_status: pending` stops blocking PR readiness only under the key, and `require_complete` under the key requires the same `PASS` record in the Python, TypeScript, and PowerShell validators.
-- [ ] [C] The orchestrate skill defaults new runs to concurrent and requires a `CI full run` at the join, the parallel merge-on-green step does not record `ci_green` while the child's review is unresolved, and the concurrent reduction lands as its own commit with its entry.
-- [ ] [D] A light remediation cycle validates truthfully in the Python, TypeScript, and PowerShell validators with byte-identical strings, and all three land in one commit.
-- [ ] [D] A cycle with a design-level finding or no `scope` fails on the light path and still requires the full chain, and a full-path cycle with no preflight fails invariant 2.
-- [ ] [D] Invariant 8 also rejects a light cycle with findings above the threshold, a consecutive light cycle, and a light cycle carrying a `preflight` object.
-- [ ] [D] The reviewer's `Remediation-Path` choice can be moved only heavier, the skills state the threshold and the Python CLI route of D9, and the light reduction lands as its own commit with its entry.
+- [x] [C] The merge guard commit precedes the readiness relaxation commit on the branch.
+- [x] [C] Under `review_mode: "concurrent"`, merge is denied with review passed and CI pending, and with CI green and review pending, on each guarded path. On the authorization path, which reads no CI result, the required `CI Required Gate` context is the control, and the spec limit in D10 applies.
+- [x] [C] The guard denies a stale head after a code change, including a merge of `origin/main`; a git failure; an unresolved head; and a bare command under the key. It allows a predecessor head whose later changes are only feature-folder paths.
+- [x] [C] The Claude guard and its Codex twin behave the same on these cases.
+- [x] [C] A test proves that a checkpoint without the key makes no `gh` call, receives no new denial, and receives no readiness relaxation.
+- [x] [C] `step7_status: pending` stops blocking PR readiness only under the key, and `require_complete` under the key requires the same `PASS` record in the Python, TypeScript, and PowerShell validators.
+- [x] [C] The orchestrate skill defaults new runs to concurrent and requires a `CI full run` at the join, the parallel merge-on-green step does not record `ci_green` while the child's review is unresolved, and the concurrent reduction lands as its own commit with its entry.
+- [x] [D] A light remediation cycle validates truthfully in the Python, TypeScript, and PowerShell validators with byte-identical strings, and all three land in one commit.
+- [x] [D] A cycle with a design-level finding or no `scope` fails on the light path and still requires the full chain, and a full-path cycle with no preflight fails invariant 2.
+- [x] [D] Invariant 8 also rejects a light cycle with findings above the threshold, a consecutive light cycle, and a light cycle carrying a `preflight` object.
+- [x] [D] The reviewer's `Remediation-Path` choice can be moved only heavier, the skills state the threshold and the Python CLI route of D9, and the light reduction lands as its own commit with its entry.
 - [ ] [E] An entry for #1094, the parallel-only test gates, exists with the prior text from its pre-merge state.
 - [ ] [E] The planning skill and all its mirrored copies state the standing rule.
 - [ ] [E] The smaller-plans text states the design-level target of 15 to 20 tasks and lands as its own commit with its entry.

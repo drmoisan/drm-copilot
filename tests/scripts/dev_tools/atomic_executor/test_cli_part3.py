@@ -14,8 +14,18 @@ from unittest.mock import Mock
 
 import pytest
 
+from scripts.dev_tools.atomic_executor import cli_preflight
 from scripts.dev_tools.atomic_executor.cli import (
     parse_args,
+)
+from scripts.dev_tools.atomic_executor.pytest_expectations import (
+    JestFailureSummary,
+    PytestFailureSummary,
+    ResolvedTestExpectations,
+)
+from scripts.dev_tools.atomic_executor.qc_toolchain import (
+    TOOLCHAIN_COMMANDS,
+    QCToolchain,
 )
 
 if TYPE_CHECKING:
@@ -498,3 +508,207 @@ class TestPhaseEndQC:
         assert result.success is False
         assert result.failed_step == "pytest-collect"
         assert "missing test reference" in result.output.lower()
+
+
+def _expectations(
+    *,
+    fail: set[str] | None = None,
+    passing: set[str] | None = None,
+    jest_fail: set[str] | None = None,
+    jest_pass: set[str] | None = None,
+) -> ResolvedTestExpectations:
+    """
+    Build a ResolvedTestExpectations value with empty defaults.
+
+    Args:
+        fail: Pytest refs allowed to fail.
+        passing: Pytest refs required to pass.
+        jest_fail: Jest refs allowed to fail.
+        jest_pass: Jest refs required to pass.
+
+    Returns:
+        ResolvedTestExpectations: The expectation sets with no missing refs.
+    """
+    return ResolvedTestExpectations(
+        expected_fail_refs=fail or set(),
+        expected_pass_refs=passing or set(),
+        expected_fail_jest_refs=jest_fail or set(),
+        expected_pass_jest_refs=jest_pass or set(),
+        missing_test_refs=[],
+    )
+
+
+def _patch_qc_run(
+    monkeypatch: "MonkeyPatch", *, failing_step: list[str], collect_code: int = 0
+) -> None:
+    """
+    Replace PATH lookup and subprocess.run for the preflight QC steps.
+
+    Args:
+        monkeypatch: The pytest monkeypatch fixture.
+        failing_step: The argv of the test step, which exits 1.
+        collect_code: The exit code of the pytest collect-only step.
+
+    Returns:
+        None. Side effect: shutil.which returns its argument and subprocess.run
+        returns a completed process without starting one.
+    """
+    monkeypatch.setattr("shutil.which", lambda cmd: cmd)
+
+    def fake_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        """Return exit 1 for the test step, collect_code for collection, else 0."""
+        cmd = args[0]
+        # Route by argv: collection, the test step under test, then every other step.
+        if isinstance(cmd, list) and "--collect-only" in cmd:
+            return subprocess.CompletedProcess(cmd, collect_code, "collected", "")
+        if cmd == failing_step:
+            return subprocess.CompletedProcess(cmd, 1, "failed", "")
+        return subprocess.CompletedProcess(cmd, 0, "OK", "")
+
+    monkeypatch.setattr("subprocess.run", fake_run)
+
+
+_PYTEST_STEP = [
+    "poetry",
+    "run",
+    "pytest",
+    "--color=no",
+    "--cov=scripts/dev_tools",
+    "--cov-report=term-missing",
+]
+_JEST_STEP = TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["test-unit"]
+
+
+class TestPreflightQCBranches:
+    """Tests for the preflight toolchain resolution and failure-gating branches."""
+
+    @pytest.mark.parametrize(
+        ("detected", "expected"),
+        [
+            ("not callable", [QCToolchain.PYTHON]),
+            (lambda: ["python"], [QCToolchain.PYTHON]),
+            (set, [QCToolchain.PYTHON]),
+            (
+                lambda: {QCToolchain.TYPESCRIPT, QCToolchain.PYTHON},
+                [QCToolchain.PYTHON, QCToolchain.TYPESCRIPT],
+            ),
+        ],
+    )
+    def test_resolve_preflight_toolchains_defaults_and_orders(
+        self, detected: object, expected: list[QCToolchain]
+    ) -> None:
+        """A non-callable, non-set, or empty detection gives Python; sets sort."""
+        parser = Mock(detected_qc_toolchains=detected)
+
+        assert cli_preflight.resolve_preflight_toolchains(parser) == expected
+
+    def test_resolve_executable_rejects_empty_argv(self) -> None:
+        """An empty argv raises ValueError before any PATH lookup."""
+        with pytest.raises(ValueError, match="must not be empty"):
+            cli_preflight._resolve_executable([])
+
+    def test_unsupported_toolchain_raises(self) -> None:
+        """Both the QC run and the fix prompt reject an unknown toolchain."""
+        with pytest.raises(RuntimeError, match="Unsupported QC toolchain"):
+            cli_preflight.run_preflight_qc_with_capture(Path.cwd(), toolchain="x")
+        with pytest.raises(RuntimeError, match="Unsupported QC toolchain"):
+            cli_preflight.build_preflight_qc_fix_prompt(Path.cwd(), "", toolchain="x")
+
+    def test_collect_step_missing_executable_fails(
+        self, monkeypatch: "MonkeyPatch"
+    ) -> None:
+        """A missing executable for the collect-only step fails pytest-collect."""
+        _patch_qc_run(monkeypatch, failing_step=_PYTEST_STEP)
+        lookups: list[str] = []
+
+        def which(cmd: str) -> str | None:
+            """Resolve the three static steps, then report the collector missing."""
+            lookups.append(cmd)
+            return cmd if len(lookups) <= 3 else None
+
+        monkeypatch.setattr("shutil.which", which)
+
+        result = cli_preflight.run_preflight_qc_with_capture(
+            Path.cwd(), expectations=_expectations(fail={"tests/a.py::t"})
+        )
+
+        assert (result.success, result.failed_step) == (False, "pytest-collect")
+        assert cli_preflight.MISSING_EXECUTABLE_PREFIX in result.output
+
+    def test_collect_step_nonzero_exit_fails(self, monkeypatch: "MonkeyPatch") -> None:
+        """A failing collect-only step stops QC before the pytest step runs."""
+        _patch_qc_run(monkeypatch, failing_step=_PYTEST_STEP, collect_code=4)
+
+        result = cli_preflight.run_preflight_qc_with_capture(
+            Path.cwd(), expectations=_expectations(fail={"tests/a.py::t"})
+        )
+
+        assert (result.success, result.failed_step) == (False, "pytest-collect")
+
+    @pytest.mark.parametrize(
+        ("summary", "message"),
+        [
+            (PytestFailureSummary(set(), True), "collection/import errors"),
+            (
+                PytestFailureSummary({"tests/b.py::t"}, False),
+                "Unexpected pytest failures",
+            ),
+        ],
+    )
+    def test_pytest_failures_outside_expectations_fail(
+        self,
+        monkeypatch: "MonkeyPatch",
+        summary: PytestFailureSummary,
+        message: str,
+    ) -> None:
+        """Collection errors and unlisted failing nodeids fail the pytest step."""
+        _patch_qc_run(monkeypatch, failing_step=_PYTEST_STEP)
+        monkeypatch.setattr(
+            cli_preflight, "parse_pytest_failure_output", lambda _out: summary
+        )
+
+        result = cli_preflight.run_preflight_qc_with_capture(
+            Path.cwd(), expectations=_expectations(fail={"tests/a.py::t"})
+        )
+
+        assert (result.success, result.failed_step) == (False, "pytest")
+        assert message in result.output
+        assert "Expected-pass override" not in result.output
+
+    @pytest.mark.parametrize(
+        ("tests", "files", "runtime", "success", "message"),
+        [
+            (set[str](), set[str](), True, False, "Jest runtime errors"),
+            (set[str](), set[str](), False, False, "could not be parsed"),
+            ({"alpha", "beta", "gamma"}, set[str](), False, False, "override"),
+            ({"beta"}, set[str](), False, True, "Expected Jest failures allowed"),
+            (set[str](), {"a.ts", "b.ts", "c.ts"}, False, False, "override"),
+            (set[str](), {"b.ts"}, False, True, "Expected Jest failures allowed"),
+            (set[str](), {"c.ts"}, False, False, "Unexpected Jest failures"),
+        ],
+    )
+    def test_jest_failures_are_gated_by_expectations(
+        self,
+        monkeypatch: "MonkeyPatch",
+        tests: set[str],
+        files: set[str],
+        runtime: bool,
+        success: bool,
+        message: str,
+    ) -> None:
+        """Jest failures pass only when every failing test or file is expected."""
+        _patch_qc_run(monkeypatch, failing_step=_JEST_STEP)
+        summary = JestFailureSummary(files, tests, runtime, 0, "")
+        monkeypatch.setattr(
+            cli_preflight, "parse_jest_failure_output", lambda _out: summary
+        )
+        expectations = _expectations(
+            jest_fail={"b.ts::beta"}, jest_pass={"a.ts::alpha"}
+        )
+
+        result = cli_preflight.run_preflight_qc_with_capture(
+            Path.cwd(), expectations=expectations, toolchain=QCToolchain.TYPESCRIPT
+        )
+
+        assert result.success is success
+        assert message in result.output

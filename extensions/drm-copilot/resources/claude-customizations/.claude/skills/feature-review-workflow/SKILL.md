@@ -159,10 +159,13 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - coverage artifact absent for any language that has changed files
    - Classify each blocking finding before triggering remediation: each receives one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). A published MCP runtime that lags the repository contract is classified `external_dependency`.
    - Trigger the remediation handoff only when at least one blocking finding is `autonomous`. When every blocking finding is non-remediable, write the remediation inputs with the `HALT_NON_REMEDIABLE` or `AWAITING_CI` verdict and create no remediation plan target.
+   - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
+   - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
+   - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.
    - Create `remediation-inputs.<timestamp>.md` first.
-   - Create the target remediation plan file from the canonical plan template.
-   - Hand off plan creation through `remediation-handoff-atomic-planner`.
-   - Do not report completion unless the remediation plan file exists when remediation was triggered.
+   - With `Remediation-Path: full`, create the target remediation plan file from the canonical plan template.
+   - With `Remediation-Path: full`, hand off plan creation through `remediation-handoff-atomic-planner`.
+   - With `Remediation-Path: full`, do not report completion unless the remediation plan file exists when remediation was triggered. With `Remediation-Path: light`, create no remediation plan target: the inputs file is the light cycle's plan.
 
 9. **Finalize the review**
    - Verify every reported artifact exists on disk before reporting completion.

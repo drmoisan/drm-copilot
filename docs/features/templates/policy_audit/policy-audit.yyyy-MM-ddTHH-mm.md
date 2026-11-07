@@ -352,7 +352,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Use Pester v5.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v5 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
+| **Use Pester v6.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v6 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
 | **Use PoshQC Configuration** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCParallelTest -Root .`<br>**Config:** `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`<br>[Describe configuration updates if any.] |
 | **PowerShell 5.1 & 7.6+ Compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
 

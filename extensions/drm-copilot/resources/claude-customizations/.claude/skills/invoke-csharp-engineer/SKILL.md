@@ -1,6 +1,6 @@
 ---
 name: invoke-csharp-engineer
-description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
+description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
 ---
 
 # Implement C# Skill
@@ -13,7 +13,7 @@ Use this skill when:
 
 - The user requests a C# code change, bug fix, refactor, or test addition.
 - Estimated scope fits the small path (1-3 production files plus corresponding tests).
-- The toolchain (CSharpier, .NET Analyzers, Nullable Analysis, xUnit) can be run in the current environment, or the user has explicitly authorized an unverified plan-only response.
+- The toolchain (CSharpier, .NET Analyzers, Nullable Analysis, MSTest) can be run in the current environment, or the user has explicitly authorized an unverified plan-only response.
 
 If the estimated scope exceeds the small-path budget, this skill defers to the orchestrated flow via `csharp-change-budget-router` instead of proceeding directly.
 

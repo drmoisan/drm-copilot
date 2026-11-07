@@ -76,7 +76,7 @@ When helpful, include a **domain‑specific scope** immediately after the type:
 Examples:
 
 * `(docs(promote-potential-bug))`
-* `(feat(lexile-scoring-model))`
+* `(feat(scoring-model))`
 * `(test(poshqc))`
 
 Rules:

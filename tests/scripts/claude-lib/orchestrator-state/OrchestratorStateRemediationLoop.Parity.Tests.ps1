@@ -36,7 +36,7 @@ BeforeAll {
 
     # Floor on corpus size, equal to MINIMUM_CORPUS_COUNT in the Python and
     # TypeScript parity suites. Published at script scope for the It below.
-    $MinimumCorpusCount = 41
+    $MinimumCorpusCount = 55
     $script:MinimumCorpusFloor = $MinimumCorpusCount
 
     # Read one committed corpus case. The corpus is read-only for this suite.

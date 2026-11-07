@@ -99,12 +99,14 @@ When the orchestrator runs the remediation loop, it records a top-level `remedia
 
 - `current_cycle` — integer index of the active cycle's record in `cycles[]`; a record position, not an attempt count.
 - `completed_attempts` — non-negative integer equal to the number of cycles whose `candidate_applied` is `true`. This is the shared attempt count for local, CI-failure, merge-conflict, and parallel-drift cycles; the guard halts after three completed attempts.
-- `review_outcomes[]` — one entry per review, including `PASS`, appended in order. Each entry is an object with `verdict` (one of `PASS`, `REMEDIATION_REQUIRED`, `HALT_NON_REMEDIABLE`, `AWAITING_CI`) and `findings[]`, the review's blocking findings only, each an object with `remediability` (one of `autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, `human_decision_required`). An optional `inputs_path` names the `remediation-inputs` file.
+- `review_outcomes[]` — one entry per review, including `PASS`, appended in order. Each entry is an object with `verdict` (one of `PASS`, `REMEDIATION_REQUIRED`, `HALT_NON_REMEDIABLE`, `AWAITING_CI`) and `findings[]`, the review's blocking findings only, each an object with `remediability` (one of `autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, `human_decision_required`). An optional `inputs_path` names the `remediation-inputs` file. Under top-level `review_mode: "concurrent"`, each entry also carries `head_sha`, the head the review ran against; see `## Concurrent Review and CI (review_mode)` in `.claude/skills/orchestrate/SKILL.md`.
+- `review_outcomes[].findings[].scope` — optional `contained` or `design`, recorded from the finding's `Finding-Scope:` line when that line is present. Only invariant 8 (light remediation) reads it.
 - `cycles[]` — an ordered array of cycle records. Each cycle is an object with:
   - `entry_timestamp` — ISO-8601 timestamp when the cycle was entered.
   - `inputs_path` — path to the `remediation-inputs.<entry-ts>.md` that opened the cycle.
-  - `plan_path` — path to the `remediation-plan.<entry-ts>.md` for the cycle.
-  - `preflight` — an object `{iterations, final_status}` where `iterations` counts preflight passes and `final_status` is one of `clear`, `changes_requested`, or `pending`.
+  - `plan_path` — path to the `remediation-plan.<entry-ts>.md` for the cycle; for a light cycle, the `remediation-inputs.<entry-ts>.md` that holds its `## Light Fix Tasks`.
+  - `remediation_path` — `light` or `full`, recorded on every new cycle. A light cycle runs no planner and no preflight; invariant 8 in `.claude/rules/orchestrator-state.md` governs it.
+  - `preflight` — an object `{iterations, final_status}` where `iterations` counts preflight passes and `final_status` is one of `clear`, `changes_requested`, or `pending`. A light cycle carries no `preflight` key.
   - `execution_status` — one of `in_progress`, `complete`, or `failed`.
   - `audit_paths` — the reaudit artifact paths produced at cycle exit (`code-review`, `feature-audit`, `policy-audit`).
   - `blocking_count` — the total number of blocking findings across the reaudit artifacts.
@@ -117,7 +119,7 @@ These four fields are recorded by producers. Verdicts follow from the classes of
 Malformed-cycle rules:
 
 - `plan_path` must be a non-empty string.
-- `execution_status` may be in `{in_progress, complete, failed}` only when `preflight.final_status == 'clear'`; any other preflight status with one of those execution statuses is malformed (execution recorded before preflight cleared).
+- `execution_status` may be in `{in_progress, complete, failed}` only when `preflight.final_status == 'clear'`; any other preflight status with one of those execution statuses is malformed (execution recorded before preflight cleared). A cycle whose `remediation_path` is exactly `light` is exempt, because it runs no preflight.
 - `exit_condition_met == true` requires `blocking_count == 0`; a non-zero `blocking_count` with `exit_condition_met == true` is malformed.
 - R5: `candidate_applied`, when present, must be a boolean.
 - R6: `candidate_applied == true` requires `execution_status == "complete"`.
@@ -126,8 +128,9 @@ Malformed-cycle rules:
 - R9: each outcome's `verdict` must be one of the four verdicts, its `findings` must be a list, and each finding must be an object whose `remediability` is one of the five classes (case-sensitive).
 - R10: each well-formed outcome's `verdict` must equal the verdict derived from its findings' classes.
 - R11: `opened_by_review`, when present, must be a non-negative integer that indexes an object entry of `review_outcomes` whose `verdict` is `REMEDIATION_REQUIRED`.
+- Invariant 8: `remediation_path`, when present, is `light` or `full`; a `light` cycle carries no `preflight`, names its opening review in `opened_by_review`, has at most 3 findings in that review, each `autonomous` with `scope` exactly `contained`, and does not follow a light cycle.
 
-Remediation mode lives in the inputs file, not in the checkpoint: each `remediation-inputs.<entry-ts>.md` carries exactly one line `Remediation-Mode: proportionate` or `Remediation-Mode: design`, so no checkpoint field is added. A cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; CI-failure findings are normally proportionate. A proportionate cycle runs one `atomic-planner` delegation and one `atomic-executor` delegation that performs single-pass preflight with in-place trivial fixes and then executes; the orchestrator records `preflight: {iterations: 1, final_status: "clear"}` before `execution_status`, which satisfies the malformed-cycle rule above. When that preflight finds a substantive defect, the executor stops with `BLOCKED at preflight (before [P0-T1])` and no checked task, and the cycle converts to design mode for one planner revision.
+Remediation mode lives in the inputs file: each `remediation-inputs.<entry-ts>.md` carries exactly one line `Remediation-Mode: light`, `Remediation-Mode: proportionate`, or `Remediation-Mode: design`, and the checkpoint records only the cycle's `remediation_path`. A cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; CI-failure findings are normally proportionate. A proportionate cycle runs one `atomic-planner` delegation and one `atomic-executor` delegation that performs single-pass preflight with in-place trivial fixes and then executes; the orchestrator records `preflight: {iterations: 1, final_status: "clear"}` before `execution_status`, which satisfies the malformed-cycle rule above. When that preflight finds a substantive defect, the executor stops with `BLOCKED at preflight (before [P0-T1])` and no checked task, and the cycle converts to design mode for one planner revision. A light cycle runs no planner and no preflight: its one `atomic-executor` delegation executes the `## Light Fix Tasks` of the inputs file, and the full rule is the **Light cycle.** bullet of `## Remediation Loop (R1–R5)` in `.claude/skills/orchestrate/SKILL.md`.
 
 Cycle-aware `next_step` uses the form `remediation.cycle_N.{plan,preflight,execute,reaudit,exit_check}`, where `N` is `completed_attempts + 1` (the active cycle number) and the sub-step names the current position in the loop; `current_cycle` remains a record position in `cycles[]`.
 
@@ -147,7 +150,7 @@ During a remediation cycle, the orchestrator delegates only to `atomic-planner`,
 
 ### Required Artifacts Per Cycle
 
-Each cycle produces exactly five artifacts:
+Each full cycle produces exactly five artifacts; a light cycle produces the four other than the remediation plan, because its inputs file is its plan:
 
 1. `remediation-inputs.<entry-ts>.md` — the cycle's input findings.
 2. `remediation-plan.<entry-ts>.md` — the cycle's remediation plan.
@@ -157,7 +160,7 @@ Each cycle produces exactly five artifacts:
 
 ### Preflight Sub-State Semantics
 
-`preflight.final_status` is one of `{clear, changes_requested, pending}`, extended by `blocked_preflight_iteration_limit` as defined in the remediation-handoff skill. A `changes_requested` status routes back to `atomic-planner` for plan revision at most once per cycle, carrying the full `PREFLIGHT-DEFECT:` list; when the confirming preflight still reports a substantive defect, the orchestrator records `blocked_preflight_iteration_limit` and halts the cycle. An `execution_status` in `{in_progress, complete, failed}` recorded while `final_status != clear` is malformed. `preflight.iterations` counts the number of preflight passes performed in the cycle; trivial defects fixed in place by the preflight executor do not add a pass.
+`preflight.final_status` is one of `{clear, changes_requested, pending}`, extended by `blocked_preflight_iteration_limit` as defined in the remediation-handoff skill. A `changes_requested` status routes back to `atomic-planner` for plan revision at most once per cycle, carrying the full `PREFLIGHT-DEFECT:` list; when the confirming preflight still reports a substantive defect, the orchestrator records `blocked_preflight_iteration_limit` and halts the cycle. An `execution_status` in `{in_progress, complete, failed}` recorded while `final_status != clear` is malformed, except on a light cycle, which carries no `preflight`. `preflight.iterations` counts the number of preflight passes performed in the cycle; trivial defects fixed in place by the preflight executor do not add a pass.
 
 ### Scope-change Rule
 

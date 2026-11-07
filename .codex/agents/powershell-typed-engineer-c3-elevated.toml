@@ -53,7 +53,7 @@ memory: project
 
 # PowerShell Typed Engineer Agent
 
-Senior PowerShell engineer specialized in small cohesive scripts and modules, advanced functions with explicit parameter contracts, minimal DI seams (wrapper > delegate > adapter), and deterministic Pester v5 coverage. Implement PowerShell changes within the approved scope, preserve typed boundaries, and verify results with the repository PowerShell toolchain (PoshQC format, PSScriptAnalyzer, Pester).
+Senior PowerShell engineer specialized in small cohesive scripts and modules, advanced functions with explicit parameter contracts, minimal DI seams (wrapper > delegate > adapter), and deterministic Pester v6 coverage. Implement PowerShell changes within the approved scope, preserve typed boundaries, and verify results with the repository PowerShell toolchain (PoshQC format, PSScriptAnalyzer, Pester).
 
 ## Standing Rules
 

@@ -110,11 +110,11 @@ This section refines the general “classes vs functions” rules for Python. :c
 Use classes for:
 
 - **Domain concepts** with data + behavior  
-  - e.g. `QifTransaction`, `LexileCorpus`, `ContactMatcher`, `CorpusPipeline`.
+  - e.g. `QifTransaction`, `TextCorpus`, `ContactMatcher`, `CorpusPipeline`.
 - **State + invariants** that must stay consistent  
-  - e.g. a `LexileModel` that must keep weights, vocabulary, and metadata in sync.
+  - e.g. a `ScoringModel` that must keep weights, vocabulary, and metadata in sync.
 - **Multiple implementations behind a shared contract**  
-  - e.g. `ITextSource` / `TextSourceProtocol` with `EpubTextSource`, `GutenbergTextSource`, etc.
+  - e.g. `ITextSource` / `TextSourceProtocol` with `EpubTextSource`, `HttpTextSource`, etc.
 - **Multi-step workflows** that share context  
   - e.g. a pipeline with `.download()`, `.normalize()`, `.index()`, `.export()`.
 
@@ -137,7 +137,7 @@ Use standalone functions when:
 Rules for Python helper functions:
 
 - Fully annotate parameters and return types.
-- Name functions by what they do (`parse_qif_file`, `compute_lexile_score`).
+- Name functions by what they do (`parse_qif_file`, `compute_readability_score`).
 - Keep functions short, readable, and low in branching; factor complex logic into smaller helpers.
 
 ---
@@ -173,7 +173,7 @@ The general policy covers cohesion and file size; this section adds Python-speci
 
 1. **Cohesive modules**
 
-   - A module should have a clear purpose (e.g. “QIF parsing”, “Lexile model”, “corpus download”).
+   - A module should have a clear purpose (e.g. “QIF parsing”, “scoring model”, “corpus download”).
    - Avoid “grab-bag” modules like `utils.py` that mix many unrelated concerns.
 
 2. **Public vs internal**

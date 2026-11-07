@@ -85,6 +85,7 @@ class QCRunner(QCRunnerProcessMixin):
         "-n",
         "auto",
         "--color=no",
+        "--cov=scripts/dev_tools",
         "--cov-report=xml",
         "--cov-report=term-missing",
     ]

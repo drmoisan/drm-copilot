@@ -102,6 +102,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1097: the completion rule under review_mode concurrent.
+    "./src/lib/validate/orchestrator-state-concurrent-review.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #980: the fixed discovery-routing helper beside the topology resolver.
     "./src/lib/validate/codex-discovery-routing.ts": {
       lines: 90,
@@ -143,6 +148,10 @@ module.exports = {
     },
     // Issue #484: gate the review-outcome module split from the validator above.
     "./src/lib/validate/orchestrator-state-remediation-accounting.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestrator-state-light-cycle.ts": {
       lines: 85,
       branches: 75,
     },

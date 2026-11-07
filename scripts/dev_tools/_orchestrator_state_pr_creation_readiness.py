@@ -18,6 +18,8 @@ Usage:
 Invariants / Constraints:
     - The readiness check covers only steps 5-8 (`step5_status`-
       `step8_status`), `blocked_reason`, and the two override list fields.
+    - Under `review_mode: "concurrent"`, a `pending` `step7_status` does not
+      block, because the review runs beside CI after the PR opens.
     - The readiness check never calls `validate_completion_pr_gate`,
       `_validate_completion_ci_gate`, `validate_phase_completeness`, or
       `validate_routing_contract` — those remain exclusive to
@@ -78,7 +80,8 @@ def validate_orchestrator_state_pr_creation_readiness(
         are not pending/blocked, `blocked_reason` is clear, and the override
         lists are empty, without requiring `ci_gate`, `pr_gate`, or routing-
         contract delegation receipts, none of which can exist before the first
-        `gh pr create` of a branch has already succeeded.
+        `gh pr create` of a branch has already succeeded. Under
+        `review_mode: "concurrent"`, a pending `step7_status` is allowed.
 
     Args:
         state (dict[str, Any]): Parsed checkpoint state.
@@ -104,6 +107,15 @@ def validate_orchestrator_state_pr_creation_readiness(
     # created.
     for key in PR_CREATION_READY_STEP_KEYS:
         value = state.get(key)
+        # Under `review_mode: concurrent` the review runs beside CI after the
+        # PR opens, so a pending review is expected here; the merge guard holds
+        # the merge until it passes. `blocked` and every other step still block.
+        if (
+            key == "step7_status"
+            and value == "pending"
+            and state.get("review_mode") == "concurrent"
+        ):
+            continue
         if value in PR_CREATION_BLOCKING_STEP_STATUS:
             errors.append(
                 f"Checkpoint PR-creation readiness validation failed: {key} is {value}."

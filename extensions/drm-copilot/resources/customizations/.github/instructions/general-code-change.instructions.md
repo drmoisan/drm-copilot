@@ -141,7 +141,7 @@ Rules for functions:
 
 1. Keep modules **cohesive**:
 
-   - A module/file should have a clear purpose (e.g. “QIF parsing,” “Lexile model,” “corpus download”).
+   - A module/file should have a clear purpose (e.g. “QIF parsing,” “scoring model,” “corpus download”).
    - Avoid dumping unrelated classes/functions into the same file.
    - File size follows a tiered policy that applies to production code, test code, and reusable scripts:
      - **500 lines (guidance):** look for logical ways to divide the file into multiple files, provided the parts can be separated logically. No gate fails at this tier.
