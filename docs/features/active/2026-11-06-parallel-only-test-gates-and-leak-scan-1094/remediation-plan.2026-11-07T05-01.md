@@ -125,7 +125,7 @@ Static stages and the hook proof run first, so that a suite is not re-run for a 
   - The retained record lines stay as the template wrote them.
   - Validation is the branch-current `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit <path>`, with `PYTHONPATH` set as in P2-T5, and the `mcp__drm-copilot__validate_orchestration_artifacts` tool with `artifact_type` `policy-audit` for the TypeScript twin. The artifact records the tool result in `MCP-Validator:`.
   - Acceptance: the filled file holds `N/A - no pre-change run` and no `[N]`, the Python command exits 0, the MCP tool reports no error, and `EXIT_CODE: 0` carries both.
-- [ ] [P2-T3] Run the real Claude hook and the real Codex hook from the item worktree on three fixed cases, and write `<FEATURE>/evidence/qa-gates/hook-proof.<timestamp>.md`.
+- [x] [P2-T3] Run the real Claude hook and the real Codex hook from the item worktree on three fixed cases, and write `<FEATURE>/evidence/qa-gates/hook-proof.<timestamp>.md`.
   - Run each hook as its own PowerShell 7 process with the registered form, `pwsh -NoProfile -File <repository-relative hook path>`, and the payload on standard input.
   - The step script saves `artifacts/pr_context.summary.txt` under `SCRATCH`, replaces it, and restores it in a `finally` block, so both hooks evaluate all three languages. Without this file each hook exits 0 before reading a coverage row. The content is:
     - `- .claude/hooks/validate-feature-review-coverage-rules.ps1 (+1/-0)`
