@@ -37,6 +37,36 @@ Describe 'I/O seams without side effects' {
         Test-Path -LiteralPath $target | Should -BeFalse
     }
 
+    Context 'state write without WhatIf (file cmdlets mocked)' {
+        BeforeEach {
+            # New-Item and Set-Content are mocked, so nothing is written; the directory test is
+            # mocked only for container checks so each case controls whether the folder exists.
+            $script:stateTarget = Join-Path -Path $PSScriptRoot -ChildPath 'absent-epic-progress-state-folder/epic-progress-example-epic.json'
+            $script:stateFolder = Split-Path -Path $script:stateTarget -Parent
+            $script:folderExists = $false
+            Mock Test-Path { return $folderExists } -ParameterFilter { $PathType -eq 'Container' }
+            Mock New-Item { }
+            Mock Set-Content { }
+        }
+
+        It 'creates the missing state directory before writing the state' {
+            Write-EpicProgressState -Path $script:stateTarget -Content '{"version":1}'
+
+            Should -Invoke New-Item -Times 1 -Exactly -ParameterFilter { $ItemType -eq 'Directory' -and $Path -eq $script:stateFolder }
+            Should -Invoke Set-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $script:stateTarget -and $Value -eq '{"version":1}' }
+            [System.IO.Directory]::Exists($script:stateFolder) | Should -BeFalse
+        }
+
+        It 'writes the state without creating an existing directory' {
+            $script:folderExists = $true
+
+            Write-EpicProgressState -Path $script:stateTarget -Content '{"version":1}'
+
+            Should -Invoke New-Item -Times 0 -Exactly
+            Should -Invoke Set-Content -Times 1 -Exactly
+        }
+    }
+
     It 'returns the last native exit code' {
         # Reads $LASTEXITCODE without assigning it, so no global state changes.
         Get-EpicProgressLastExitCode | Should -Be $LASTEXITCODE
