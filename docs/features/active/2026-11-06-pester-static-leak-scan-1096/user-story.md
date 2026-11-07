@@ -107,8 +107,8 @@ Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytes
 
 These criteria require CI on the PR head. They stay unchecked and pending until CI has run. The failure path of the CI step is proven locally by the unit test and the workflow test in the criteria above, because the PR head itself carries no unallowlisted finding.
 
-- [ ] CI-dependent: the scan runs in CI and fails on an unallowlisted finding: the step `Scan Pester tests for leaked state` ran in `poshqc / PowerShell QC static` on the PR head and passed.
-- [ ] CI-dependent: `CI Required Gate` reports success on the final PR head, which also serves as the green run for the modified workflow.
+- [x] CI-dependent: the scan runs in CI and fails on an unallowlisted finding: the step `Scan Pester tests for leaked state` ran in `poshqc / PowerShell QC static` on the PR head and passed.
+- [x] CI-dependent: `CI Required Gate` reports success on the final PR head, which also serves as the green run for the modified workflow.
 
 ## Non-Goals
 
