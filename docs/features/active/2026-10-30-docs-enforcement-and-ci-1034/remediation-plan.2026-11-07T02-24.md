@@ -225,7 +225,7 @@ Other suites:
 
 ### Phase 1 — Failing Rows
 
-- [ ] [P1-T1] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, add the rows of Group A, Group B and Group C, move the nine Group U rows as `## Existing Asserting Tests and Dispositions` states, add `Set-TestIntegrationCheckoutSeam`, and add the `$script:LookupAnswers` keys `pr view #12`, the unrelated `pr view #99` and the unrelated `pr view 1`; and create `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1` with the rows of Group D and Group E.
+- [x] [P1-T1] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, add the rows of Group A, Group B and Group C, move the nine Group U rows as `## Existing Asserting Tests and Dispositions` states, add `Set-TestIntegrationCheckoutSeam`, and add the `$script:LookupAnswers` keys `pr view #12`, the unrelated `pr view #99` and the unrelated `pr view 1`; and create `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1` with the rows of Group D and Group E.
   - `Set-TestIntegrationCheckoutSeam` follows `Set-TestTargetSeam`, and the disabled rows of Group D and Group E use `Set-TestFileSeam` with a disabled and an absent profile. No row starts a process or writes a file.
   - `COMPOUND_SUITE` dot-sources `HOOK`, and its `BeforeAll` and `AfterAll` follow the first `Describe` of `HOOK_SUITE`, with only `ConvertTo-TestEnvelope`, `Get-TestProfileText`, `Set-TestFileSeam` and the mocks of `Get-DocsCompleteGateRepositoryRoot` and `Invoke-DocsOnlyGhExe`.
   - Acceptance: both files parse; the row count of `HOOK_SUITE` equals 111 plus the rows of Group A, Group B and Group C; `COMPOUND_SUITE` holds only the rows of Group D and Group E. P1-T2 records the failing rows.

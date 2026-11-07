@@ -78,10 +78,14 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         # exits 1, so a lookup that loses the selector or the repository cannot pass by accident.
         $script:JsonSuffix = ' --json baseRefName,headRefName,headRefOid'
         $integrationPr = [ordered]@{ baseRefName = 'main'; headRefName = 'epic/x-integration'; headRefOid = $script:Head } | ConvertTo-Json -Compress
+        $unrelatedPr = [ordered]@{ baseRefName = 'main'; headRefName = 'feature/other'; headRefOid = $script:Head } | ConvertTo-Json -Compress
         $script:LookupAnswers = @{
             "pr view$($script:JsonSuffix)"                                = [ordered]@{ baseRefName = 'development'; headRefName = 'feature/current-branch'; headRefOid = $script:Head } | ConvertTo-Json -Compress
-            "pr view 99$($script:JsonSuffix)"                             = [ordered]@{ baseRefName = 'main'; headRefName = 'feature/other'; headRefOid = $script:Head } | ConvertTo-Json -Compress
+            "pr view 99$($script:JsonSuffix)"                             = $unrelatedPr
+            "pr view #99$($script:JsonSuffix)"                            = $unrelatedPr
+            "pr view 1$($script:JsonSuffix)"                              = $unrelatedPr
             "pr view 12$($script:JsonSuffix)"                             = $integrationPr
+            "pr view #12$($script:JsonSuffix)"                            = $integrationPr
             "pr view epic/x-integration$($script:JsonSuffix)"             = $integrationPr
             "pr view https://github.com/o/r/pull/12$($script:JsonSuffix)" = $integrationPr
             "pr view 12 --repo other/repo$($script:JsonSuffix)"           = $integrationPr
@@ -96,6 +100,28 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             Mock Invoke-DocsOnlyGhExe -MockWith {
                 $key = $GhArgs -join ' '
                 if ($script:LookupAnswers.ContainsKey($key)) { return [pscustomobject]@{ ExitCode = 0; Output = $script:LookupAnswers[$key] } }
+                return [pscustomobject]@{ ExitCode = 1; Output = '' }
+            }
+        }
+
+        # A checkout of the integration branch: no selector resolves the integration pull request,
+        # and #99 and 1 each resolve an unrelated one, so a lookup that reads a comment or a boolean
+        # flag value as a selector finds a pull request the gate allows.
+        $script:CheckoutAnswers = @{
+            "pr view$($script:JsonSuffix)"     = $integrationPr
+            "pr view #99$($script:JsonSuffix)" = $unrelatedPr
+            "pr view 1$($script:JsonSuffix)"   = $unrelatedPr
+        }
+
+        function Set-TestIntegrationCheckoutSeam {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
+            [CmdletBinding()]
+            param()
+
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText $null
+            Mock Invoke-DocsOnlyGhExe -MockWith {
+                $key = $GhArgs -join ' '
+                if ($script:CheckoutAnswers.ContainsKey($key)) { return [pscustomobject]@{ ExitCode = 0; Output = $script:CheckoutAnswers[$key] } }
                 return [pscustomobject]@{ ExitCode = 1; Output = '' }
             }
         }
@@ -312,14 +338,21 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             @{ Command = 'gh --repo other/repo pr merge 12'; Lookup = '12 --repo other/repo' }
             @{ Command = 'gh pr -R other/repo merge 12'; Lookup = '12 --repo other/repo' }
             @{ Command = 'gh --repo other/repo pr merge 12 -R other/repo'; Lookup = '12 --repo other/repo' }
-            @{ Command = 'gh api -X PUT repos/other/repo/pulls/12/merge'; Lookup = '12 --repo other/repo' }
-            @{ Command = 'gh api -X PUT /repos/other/repo/pulls/12/merge'; Lookup = '12 --repo other/repo' }
-            @{ Command = 'timeout 30 gh pr merge epic/x-integration'; Lookup = 'epic/x-integration' }
-            @{ Command = "sh -c 'gh pr merge epic/x-integration'"; Lookup = 'epic/x-integration' }
             @{ Command = 'gh pr merge epic/x-integration > log'; Lookup = 'epic/x-integration' }
             @{ Command = 'gh pr merge epic/x-integration >log'; Lookup = 'epic/x-integration' }
-            @{ Command = 'gh pr merge 99 --disable-auto; gh pr merge epic/x-integration --merge'; Lookup = 'epic/x-integration' }
-            @{ Command = 'cd ../other && gh pr merge https://github.com/o/r/pull/12 --merge'; Lookup = 'https://github.com/o/r/pull/12' }
+            @{ Command = 'gh pr merge 12 #99'; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 # note; echo done'; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 # --disable-auto'; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 --subject --disable-auto'; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 --disable-auto=false'; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 --disable-auto=true'; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 --disable-auto --disable-auto=false'; Lookup = '12' }
+            @{ Command = 'gh pr merge --merge=1 12'; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 >/dev/null 2>&1'; Lookup = '12' }
+            @{ Command = 'gh pr merge "12"'; Lookup = '12' }
+            @{ Command = "gh pr merge --subject 'a; b' 12"; Lookup = '12' }
+            @{ Command = 'gh pr merge 12 --disable-auto --auto=false'; Lookup = '12' }
+            @{ Command = 'gh pr merge "#12"'; Lookup = '#12' }
         ) {
             # Arrange
             Set-TestTargetSeam
@@ -366,6 +399,32 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             @{ Command = 'GH_REPO=other/repo gh pr merge 12' }
             @{ Command = 'GH_HOST=ghe.example.com gh pr merge 12' }
             @{ Command = 'export GH_REPO=other/repo; gh pr merge 12' }
+            @{ Command = 'gh pr merge 2>&1 12' }
+            @{ Command = 'gh pr merge --merge 2>&1 epic/x-integration' }
+            @{ Command = 'gh pr merge >log 2>&1 12' }
+            @{ Command = 'gh pr merge &>log 12' }
+            @{ Command = 'gh pr merge >&2 12' }
+            @{ Command = 'gh pr merge {12..12}' }
+            @{ Command = 'gh pr merge 1{2..2}' }
+            @{ Command = 'gh pr merge 2>/dev/null 12' }
+            @{ Command = 'gh pr merge > 99 12' }
+            @{ Command = 'gh pr merge 12 &' }
+            @{ Command = 'gh pr merge 12;' }
+            @{ Command = 'env --chdir=../other gh pr merge 12' }
+            @{ Command = 'builtin cd ../other; gh pr merge 12' }
+            @{ Command = 'GIT_DIR=../other gh pr merge 12' }
+            @{ Command = 'read GH_REPO; gh pr merge 12' }
+            @{ Command = 'export GH_REPO; gh pr merge 12' }
+            @{ Command = 'gh api -X PUT repos/other/repo/pulls/12/merge' }
+            @{ Command = 'gh api -X PUT /repos/other/repo/pulls/12/merge' }
+            @{ Command = 'timeout 30 gh pr merge epic/x-integration' }
+            @{ Command = "sh -c 'gh pr merge epic/x-integration'" }
+            @{ Command = 'gh pr merge 99 --disable-auto; gh pr merge epic/x-integration --merge' }
+            @{ Command = 'cd ../other && gh pr merge https://github.com/o/r/pull/12 --merge' }
+            @{ Command = 'gh pr merge 12 --merge; echo done' }
+            @{ Command = 'gh pr view 12; gh pr merge 12 --merge' }
+            @{ Command = "gh api -X PUT 'repos/{owner}/{repo}/pulls/12/merge'" }
+            @{ Command = 'gh pr merge 12 --unknown x' }
         ) {
             # Arrange
             Set-TestTargetSeam
@@ -380,14 +439,30 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         }
     }
 
+    Context 'integration checkout (F1)' {
+        It 'looks up the current branch and denies RECEIPT_ABSENT for <Command>' -ForEach @(
+            @{ Command = 'gh pr merge #99' }
+            @{ Command = 'gh pr merge --merge=1' }
+            @{ Command = 'gh pr merge --merge' }
+        ) {
+            # Arrange
+            Set-TestIntegrationCheckoutSeam
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_ABSENT: *'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 1 -Exactly
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 1 -Exactly -ParameterFilter { ($GhArgs -join ' ') -ceq 'pr view --json baseRefName,headRefName,headRefOid' }
+        }
+    }
+
     Context 'merge target controls' {
         It 'looks up number 12 and denies RECEIPT_ABSENT for <Command>' -ForEach @(
             @{ Command = 'gh pr merge 12 --merge' }
             @{ Command = 'gh pr merge --merge=12' }
             @{ Command = 'gh pr merge 12 --merge 2>&1' }
-            @{ Command = 'gh pr merge 12 --merge; echo done' }
-            @{ Command = 'gh pr view 12; gh pr merge 12 --merge' }
-            @{ Command = "gh api -X PUT 'repos/{owner}/{repo}/pulls/12/merge'" }
         ) {
             # Arrange
             Set-TestTargetSeam
@@ -403,6 +478,8 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         It 'looks up the current branch and allows <Command>' -ForEach @(
             @{ Command = 'gh pr merge --squash' }
             @{ Command = 'gh pr merge --help' }
+            @{ Command = 'gh pr merge --squash 2>&1' }
+            @{ Command = 'gh pr merge 12>x' }
         ) {
             # Arrange
             Set-TestTargetSeam
@@ -418,6 +495,9 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         It 'allows <Command> with no gh call' -ForEach @(
             @{ Command = 'gh pr merge 12 --disable-auto' }
             @{ Command = "gh api graphql -f query='query{viewer{login}}'" }
+            @{ Command = 'gh pr merge 12 --disable-auto # note' }
+            @{ Command = 'gh pr view feature/merge' }
+            @{ Command = 'gh --help pr merge' }
         ) {
             # Arrange
             Set-TestTargetSeam
