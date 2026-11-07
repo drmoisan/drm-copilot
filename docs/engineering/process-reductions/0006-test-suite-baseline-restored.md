@@ -5,7 +5,7 @@
 reduction: 0006
 Date: 2026-11-07
 Issue: #1097
-Merge commit: pending (PR #1110)
+Merge commit: 81b6a1be385666e5025936a85e487e43e7ac6187
 
 Partially reverts entry `0001`: the Phase 0 test-suite baseline returns as one run of each parallel gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope), the `Phase 0 baseline`, and the final gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. Every parallel-only rule of `0001` stays. A plan written before this rule that captures static baselines only stays valid, and its audit records `N/A - no pre-change run`. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
 
