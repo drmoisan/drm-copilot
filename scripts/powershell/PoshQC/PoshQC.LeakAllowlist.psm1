@@ -59,7 +59,8 @@ function ConvertFrom-PoshQCLeakAllowlist {
         throw "Invalid JSON in leak allowlist '$SourceName': $($_.Exception.Message)"
     }
     $version = if ($document -is [System.Management.Automation.PSCustomObject]) { $document.PSObject.Properties['version'] } else { $null }
-    if ($null -eq $version -or $version.Value -isnot [long] -or $version.Value -ne 1) {
+    # ConvertFrom-Json yields Int32 on Windows PowerShell 5.1 and Int64 on PowerShell 7; both are accepted.
+    if ($null -eq $version -or ($version.Value -isnot [int] -and $version.Value -isnot [long]) -or $version.Value -ne 1) {
         throw "Leak allowlist '$SourceName' must declare 'version' equal to 1."
     }
     # Each exemption names an allowed global variable and states why it is exempt.
