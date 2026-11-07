@@ -1,0 +1,8 @@
+# Stage C Python Test Gate
+
+Timestamp: 2026-11-07T07-25
+Command: poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1097-final-coverage.json, run from the worktree root with PYTHONPATH set to the worktree's packages/discovery-runtime/src
+EXIT_CODE: 0
+Output Summary: 16138 passed, 6 skipped, 0 failed in 177.39 seconds; the process exit is 0. Passed exceeds the baseline by 23, which equals the 23 collected cases of `tests/scripts/dev_tools/test_orchestrator_state_concurrent_review.py`, so every named [P2-T1] test is in the passed set. The contract modules of [P1-T4], [P2-T4], and [P2-T5] were collected and no test failed. `artifacts/python/lcov.info` exists afterwards (gitignored). Repo-wide from that file: lines 96.72% (32304 of 33401) against baseline 96.71%, branches 93.66% (11736 of 12530) against baseline 93.66%, thresholds 85% and 75%.
+Per file from the JSON report, beside baseline: `scripts/dev_tools/_orchestrator_state_concurrent_review.py`, new, lines 30 of 30 (100.00%), branches 12 of 12 (100.00%). `scripts/dev_tools/_orchestrator_state_pr_creation_readiness.py` lines 21 of 21 (100.00%), branches 12 of 12 (100.00%), baseline 19 of 19 and 10 of 10. `scripts/dev_tools/validate_orchestrator_state.py` lines 170 of 172 (98.84%), branches 80 of 82 (97.56%), baseline 168 of 170 and 80 of 82.
+Earlier pass: the first run of this gate exited 1 with 1 failed, 16137 passed. The failure was `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py::test_every_skill_script_reference_is_bundled`, a failure on the branch: the new skill section named a `python -m` command for a script outside the published bundle. The skill now names the repository-local validator CLI. No test was changed for this.
