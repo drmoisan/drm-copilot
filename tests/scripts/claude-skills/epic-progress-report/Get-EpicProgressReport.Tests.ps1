@@ -269,7 +269,7 @@ Describe 'Invoke-EpicProgressReport' {
 
         ($lines -join "`n") | Should -Be ($script:expectedTldr -join "`n")
         $script:stateWrites.Count | Should -Be 1
-        @(ConvertFrom-Json -InputObject $script:stateWrites[0].Content).Count | Should -Be 1
+        @((ConvertFrom-Json -InputObject $script:stateWrites[0].Content).samples).Count | Should -Be 1
     }
 
     It 'passes only fetch, show and worktree list to git' {
@@ -300,10 +300,13 @@ Describe 'Invoke-EpicProgressReport' {
 
         $script:stateWrites.Count | Should -Be 1
         $script:stateWrites[0].Path | Should -Be $script:statePath
-        $written = @(ConvertFrom-Json -InputObject $script:stateWrites[0].Content)
-        $written.Count | Should -Be 1
-        $written[0].ts | Should -Be $script:fixedNowUnix
-        $written[0].done | Should -Be 3
+        $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        @($written.samples).Count | Should -Be 1
+        $written.samples[0].ts | Should -Be $script:fixedNowUnix
+        $written.samples[0].done | Should -Be 3
+        # 1767603600 is the fixture start, 2026-01-05T09:00:00Z.
+        $written.startUnixSeconds | Should -Be 1767603600
+        $written.baselineDone | Should -Be 0
     }
 
     It 'does not write the state file within 90 seconds of the last sample' {

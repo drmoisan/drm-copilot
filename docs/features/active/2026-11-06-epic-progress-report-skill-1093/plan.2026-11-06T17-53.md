@@ -88,7 +88,7 @@
 
 ### Phase 3 — Entry Wiring of State, Reset and Pairing
 
-- [ ] [P3-T1] In `Invoke-EpicProgressReport`, read and parse the state file through `Read-EpicProgressFile` and `ConvertFrom-EpicProgressStateText` before the first git call, and write the version-1 document through `ConvertTo-EpicProgressStateJson` and `Write-EpicProgressState`, persisting the resolved start, baseline done, baseline weekly percentage and samples.
+- [x] [P3-T1] In `Invoke-EpicProgressReport`, read and parse the state file through `Read-EpicProgressFile` and `ConvertFrom-EpicProgressStateText` before the first git call, and write the version-1 document through `ConvertTo-EpicProgressStateJson` and `Write-EpicProgressState`, persisting the resolved start, baseline done, baseline weekly percentage and samples.
   - Tests updated (entry suite): `treats an unparseable state file as empty` asserts `samples.Count` of the written object is 1; `writes only the state file at -StatePath` reads `samples[0].ts` and `samples[0].done` and asserts `startUnixSeconds` and `baselineDone` are persisted. Unaffected: `does not write the state file within 90 seconds of the last sample` (legacy array still read), the git and gh argument cases, the golden mode cases.
   - Acceptance: the full entry suite passes.
 - [ ] [P3-T2] Make `-StartUtc` optional in the canonical `param()` block and in `Invoke-EpicProgressReport`; resolve the start through `Resolve-EpicProgressBaseline` before the first git call; use the resolved baseline values in `Get-EpicProgressSummary`.

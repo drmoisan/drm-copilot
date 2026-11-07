@@ -312,6 +312,11 @@ function Invoke-EpicProgressReport {
     )
 
     $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -CurrentLocation (Get-Location).ProviderPath
+    # The state file is read before the first git call.
+    $stateText = ''
+    if (Test-EpicProgressPath -Path $setting.StatePath) { $stateText = Read-EpicProgressFile -Path $setting.StatePath }
+    $storedState = ConvertFrom-EpicProgressStateText -Text $stateText
+    $startUtcValue = $StartUtc.ToUniversalTime()
     $null = Invoke-GitExe -GitArgs @('fetch', '-q', 'origin')
     $fetchExitCode = Get-EpicProgressLastExitCode
     if ($fetchExitCode -ne 0) {
@@ -375,21 +380,18 @@ function Invoke-EpicProgressReport {
         $weeklyPct = Get-EpicProgressWeeklyQuota -Json $quotaJson
     }
 
-    $samples = @()
-    if (Test-EpicProgressPath -Path $setting.StatePath) {
-        $stateText = Read-EpicProgressFile -Path $setting.StatePath
-        if (Test-EpicProgressJsonText -Json $stateText) { $samples = @(ConvertFrom-Json -InputObject $stateText) }
-    }
     $nowUtc = (Get-EpicProgressUtcNow).ToUniversalTime()
     $nowUnixSeconds = [DateTimeOffset]::new($nowUtc).ToUnixTimeSeconds()
     $done = 0
     foreach ($record in $features) { $done += $record.Done }
-    $selection = Select-EpicProgressSample -Sample $samples -NowUnixSeconds $nowUnixSeconds -Done $done -SampleCap $SampleCap
+    $selection = Select-EpicProgressSample -Sample $storedState.Samples -NowUnixSeconds $nowUnixSeconds -Done $done -SampleCap $SampleCap
     if ($selection.Changed) {
-        Write-EpicProgressState -Path $setting.StatePath -Content (ConvertTo-Json -InputObject $selection.Sample -Depth 3)
+        $startUnixSeconds = [DateTimeOffset]::new($startUtcValue).ToUnixTimeSeconds()
+        $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $BaselineDone -BaselineWeeklyPct $BaselineWeeklyPct -Sample $selection.Sample
+        Write-EpicProgressState -Path $setting.StatePath -Content $stateJson
     }
 
-    $summary = Get-EpicProgressSummary -Feature $features.ToArray() -BaselineDone $BaselineDone -StartUtc $StartUtc.ToUniversalTime() -NowUtc $nowUtc -Sample $selection.Sample -WaveOverheadHours $WaveOverheadHours -WeeklyPct $weeklyPct -BaselineWeeklyPct $BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $EpicFolder
+    $summary = Get-EpicProgressSummary -Feature $features.ToArray() -BaselineDone $BaselineDone -StartUtc $startUtcValue -NowUtc $nowUtc -Sample $selection.Sample -WaveOverheadHours $WaveOverheadHours -WeeklyPct $weeklyPct -BaselineWeeklyPct $BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $EpicFolder
     $lines = [System.Collections.Generic.List[string]]::new()
     $tldrLines = Get-EpicProgressTldrLine -Summary $summary
     $lines.AddRange([string[]] $tldrLines)
