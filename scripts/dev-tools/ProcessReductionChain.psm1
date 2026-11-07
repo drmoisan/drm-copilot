@@ -368,6 +368,71 @@ function Get-ProcessReductionEndStateError {
     }
 }
 
+function Get-ProcessReductionLanding {
+    <#
+    .SYNOPSIS
+        Splits an entry's Prior Text into its landings and returns them in revert order.
+
+    .DESCRIPTION
+        A heading '### Later Landing: <label>' outside a fence starts a later landing. One
+        object per landing carries Label and Block: the later landings last heading first,
+        then the first landing, labeled 'first', with the blocks above the first heading. An
+        entry with no Prior Text returns only the first landing, with no blocks. Throws,
+        naming the label, for a later landing that holds no revert block.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text
+    )
+
+    $priorText = Get-ProcessReductionSection -Text (ConvertTo-ProcessReductionChainLf -Text $Text) -Heading 'Prior Text'
+    $labels = [System.Collections.Generic.List[string]]::new()
+    $parts = [System.Collections.Generic.List[object]]::new()
+    $labels.Add('first')
+    $parts.Add([System.Collections.Generic.List[string]]::new())
+    $openLength = 0
+    $lines = if ($null -eq $priorText) { [string[]]@() } else { $priorText.Split("`n") }
+    foreach ($line in $lines) {
+        $fence = [regex]::Match($line, '^ {0,3}(`{3,})[ \t]*([^`]*?)[ \t]*$')
+        if ($openLength -eq 0 -and $fence.Success) {
+            $openLength = $fence.Groups[1].Length
+        } elseif ($openLength -gt 0 -and $fence.Success -and $fence.Groups[2].Value -ceq '' -and $fence.Groups[1].Length -ge $openLength) {
+            $openLength = 0
+        } elseif ($openLength -eq 0 -and $line -cmatch '^### Later Landing:[ \t]*(?<label>\S.*?)[ \t]*$') {
+            $labels.Add($Matches['label'])
+            $parts.Add([System.Collections.Generic.List[string]]::new())
+            continue
+        }
+        $parts[$parts.Count - 1].Add($line)
+    }
+
+    for ($index = $parts.Count - 1; $index -ge 0; $index--) {
+        $block = @(Get-ProcessReductionRevertBlock -Text ($parts[$index] -join "`n"))
+        if ($index -gt 0 -and $block.Count -eq 0) {
+            throw "Later landing '$($labels[$index])' holds no revert block."
+        }
+        [pscustomobject]@{ Label = $labels[$index]; Block = $block }
+    }
+}
+
+function Merge-ProcessReductionTouch {
+    <#
+    .SYNOPSIS
+        Copies one landing's touched records into the chain's map; a later call wins a path.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$Touch,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$Touched
+    )
+
+    foreach ($path in $Touched.Keys) {
+        $Touch[$path] = $Touched[$path]
+    }
+}
+
 function Invoke-ProcessReductionChain {
     <#
     .SYNOPSIS
@@ -375,10 +440,14 @@ function Invoke-ProcessReductionChain {
 
     .DESCRIPTION
         Entry holds Name and Text; PatchText maps a patch name to its text; LiveText maps a
-        path to text, $null when missing. Blocks are parsed from the chain-state text of the
-        entry's own file. A patch entry's block Current must occur before its hunks are
-        reverted and its non-empty Prior after. At the end, each pre-image of the oldest
-        touching entry is present. Errors name entry and path.
+        path to text, $null when missing. Landings are parsed from the chain-state text of
+        the entry's own file. In each entry's turn its later landings are reverted first,
+        last heading first, each error prefixed '<entry> (later landing <label>)'; then its
+        first landing. A patch entry's first-landing block Current must occur before its
+        hunks are reverted and its non-empty Prior after. StopBefore names an entry: the
+        chain stops after that entry's later landings and before its first landing. At the
+        end, each pre-image of the oldest touching landing is present. Errors name entry
+        and path.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -386,9 +455,13 @@ function Invoke-ProcessReductionChain {
         [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]]$Entry,
         [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$PatchText,
         [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$LiveText,
-        [string]$LedgerPath = 'docs/engineering/process-reductions'
+        [string]$LedgerPath = 'docs/engineering/process-reductions',
+        [string]$StopBefore = ''
     )
 
+    if ($StopBefore.Length -gt 0 -and @($Entry | Where-Object { $_.Name -ceq $StopBefore }).Count -eq 0) {
+        throw "StopBefore '$StopBefore' names no supplied entry."
+    }
     $state = @{}
     foreach ($key in $LiveText.Keys) {
         $state[$key] = if ($null -eq $LiveText[$key]) { $null } else { ConvertTo-ProcessReductionChainLf -Text $LiveText[$key] }
@@ -400,11 +473,21 @@ function Invoke-ProcessReductionChain {
         $name = $item.Name
         $entryPath = "$LedgerPath/$name"
         $text = if ($null -ne $state[$entryPath]) { $state[$entryPath] } else { ConvertTo-ProcessReductionChainLf -Text $item.Text }
-        $priorText = Get-ProcessReductionSection -Text $text -Heading 'Prior Text'
-        $blocks = @()
-        if ($null -ne $priorText) {
-            $blocks = @(Get-ProcessReductionRevertBlock -Text $priorText)
+        try {
+            $landings = @(Get-ProcessReductionLanding -Text $text)
+        } catch {
+            $errorList.Add("${name}: $($_.Exception.Message)")
+            continue
         }
+        for ($index = 0; $index -lt $landings.Count - 1; $index++) {
+            $landingTouched = @{}
+            Invoke-ProcessReductionBlockStep -Name "$name (later landing $($landings[$index].Label))" -Block @($landings[$index].Block) -State $state -Touched $landingTouched -ErrorList $errorList
+            Merge-ProcessReductionTouch -Touch $touch -Touched $landingTouched
+        }
+        if ($name -ceq $StopBefore) {
+            break
+        }
+        $blocks = @($landings[$landings.Count - 1].Block)
         $touched = @{}
         $stepArgs = @{ Name = $name; State = $state; Touched = $touched; ErrorList = $errorList }
         if ($null -eq (Get-ProcessReductionSection -Text $text -Heading 'Stored Patch')) {
@@ -424,9 +507,7 @@ function Invoke-ProcessReductionChain {
             Invoke-ProcessReductionPatchStep @stepArgs -Hunk $hunks -LiveText $LiveText
             Test-ProcessReductionBlockText -Name $name -Block $blocks -State $state -Side Prior -ErrorList $errorList
         }
-        foreach ($path in $touched.Keys) {
-            $touch[$path] = $touched[$path]
-        }
+        Merge-ProcessReductionTouch -Touch $touch -Touched $touched
     }
 
     $errorList.AddRange([string[]]@(Get-ProcessReductionEndStateError -Touch $touch -State $state))
@@ -485,6 +566,7 @@ Export-ModuleMember -Function @(
     'Get-ProcessReductionPatchHunk',
     'Invoke-ProcessReductionHunkRevert',
     'Get-ProcessReductionDerivedSource',
+    'Get-ProcessReductionLanding',
     'Invoke-ProcessReductionChain',
     'Read-ProcessReductionChainInput'
 )

@@ -382,3 +382,116 @@ Describe 'Read-ProcessReductionChainInput' {
         }
     }
 }
+
+Describe 'Later landings' {
+    It 'PRC-LANDING-SPLITS-PRIOR-TEXT returns two later landings last heading first, then first, and ignores a fenced heading' {
+        # Arrange: the #3 block's Current holds a heading line inside its fence
+        $blocks = @((Get-TestBlock -Path 'docs/a.md' -Current 'a1' -Prior 'a0'), '### Later Landing: #2', '', (Get-TestBlock -Path 'docs/b.md' -Current 'b1' -Prior 'b0'), '### Later Landing: #3', '', (Get-TestBlock -Path 'docs/c.md' -Current '### Later Landing: #4' -Prior 'c0'))
+        $entry = Get-TestEntry -Name '0001-a.md' -Block $blocks
+
+        # Act
+        $landings = @(Get-ProcessReductionLanding -Text $entry.Text)
+        $bare = @(Get-ProcessReductionLanding -Text (Get-TestEntry -Name '0002-b.md' -Patch).Text)
+
+        # Assert
+        @($landings | ForEach-Object { $_.Label }) | Should -Be @('#3', '#2', 'first')
+        @($landings[0].Block).Count | Should -Be 1
+        $landings[0].Block[0].Current | Should -BeExactly '### Later Landing: #4'
+        $landings[1].Block[0].Path | Should -BeExactly 'docs/b.md'
+        $landings[2].Block[0].Path | Should -BeExactly 'docs/a.md'
+        $bare.Count | Should -Be 1 -Because 'an entry with no Prior Text has only its first landing'
+        $bare[0].Label | Should -BeExactly 'first'
+        @($bare[0].Block).Count | Should -Be 0
+    }
+
+    It 'PRC-LANDING-EMPTY-THROWS throws naming a later landing with no block, and the chain reports it' {
+        # Arrange
+        $entry = Get-TestEntry -Name '0001-a.md' -Block @((Get-TestBlock -Path 'docs/a.md' -Current 'a1' -Prior 'a0'), '### Later Landing: #2', '', 'Prose only.')
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{} -LiveText @{ 'docs/a.md' = "a1`n" }
+
+        # Assert
+        { Get-ProcessReductionLanding -Text $entry.Text } | Should -Throw "*Later landing '#2' holds no revert block*"
+        @($result.Errors).Count | Should -Be 1 -Because ($result.Errors -join '; ')
+        $result.Errors[0] | Should -BeExactly "0001-a.md: Later landing '#2' holds no revert block."
+    }
+
+    It 'PRC-CHAIN-LATER-LANDING-OVERLAPS-OWN-PATCH reverts a later landing over its own patch hunk before the patch' {
+        # Arrange: the patch changed 'old' to 'new', and the later landing changed 'new' to 'newer'
+        $patch = @{ '0001-a.patch' = (Get-TestPatchSection -Path 'docs/a.md' -Start 1 -Removed @('old') -Added @('new')) }
+        $block = Get-TestBlock -Path 'docs/a.md' -Current 'newer' -Prior 'new'
+        $withHeading = Get-TestEntry -Name '0001-a.md' -Patch -Block @('### Later Landing: #2', '', $block)
+        $withoutHeading = Get-TestEntry -Name '0001-a.md' -Patch -Block @($block)
+        $live = @{ 'docs/a.md' = "newer`n" }
+
+        # Act
+        $headed = Invoke-ProcessReductionChain -Entry @($withHeading) -PatchText $patch -LiveText $live
+        $unheaded = Invoke-ProcessReductionChain -Entry @($withoutHeading) -PatchText $patch -LiveText $live
+
+        # Assert
+        $headed.IsValid | Should -BeTrue -Because ($headed.Errors -join '; ')
+        $headed.FinalText['docs/a.md'] | Should -BeExactly "old`n"
+        $unheaded.IsValid | Should -BeFalse
+        @($unheaded.Errors | Where-Object { $_ -like '0001-a.md: docs/a.md: *' }).Count | Should -BeGreaterThan 0 -Because ($unheaded.Errors -join '; ')
+    }
+
+    It 'PRC-CHAIN-LATER-LANDINGS-NEWEST-FIRST reverts the last later landing first, then the earlier one, then the first landing' {
+        # Arrange: v0 to v1 first, v1 to v2 in #2, v2 to v3 in #3
+        $blocks = @((Get-TestBlock -Path 'docs/a.md' -Current 'v1' -Prior 'v0'), '### Later Landing: #2', '', (Get-TestBlock -Path 'docs/a.md' -Current 'v2' -Prior 'v1'), '### Later Landing: #3', '', (Get-TestBlock -Path 'docs/a.md' -Current 'v3' -Prior 'v2'))
+        $entry = Get-TestEntry -Name '0001-a.md' -Block $blocks
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{} -LiveText @{ 'docs/a.md' = "v3`n" }
+
+        # Assert
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText['docs/a.md'] | Should -BeExactly "v0`n"
+    }
+
+    It 'PRC-CHAIN-LATER-LANDING-ON-BLOCK-ENTRY reverts a block entry later landing and prefixes its errors with the label' {
+        # Arrange
+        $entry = Get-TestEntry -Name '0001-a.md' -Block @((Get-TestBlock -Path 'docs/a.md' -Current 'a1' -Prior 'a0'), '### Later Landing: #2', '', (Get-TestBlock -Path 'docs/b.md' -Current 'b1' -Prior 'b0'))
+
+        # Act
+        $valid = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{} -LiveText @{ 'docs/a.md' = "a1`n"; 'docs/b.md' = "b1`n" }
+        $broken = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{} -LiveText @{ 'docs/a.md' = "a1`n"; 'docs/b.md' = "moved`n" }
+
+        # Assert
+        $valid.IsValid | Should -BeTrue -Because ($valid.Errors -join '; ')
+        $valid.FinalText['docs/a.md'] | Should -BeExactly "a0`n"
+        $valid.FinalText['docs/b.md'] | Should -BeExactly "b0`n"
+        @($broken.Errors).Count | Should -Be 1 -Because ($broken.Errors -join '; ')
+        $broken.Errors[0] | Should -BeExactly "0001-a.md (later landing #2): docs/b.md: Current text of revert block 'docs/b.md' was not found."
+    }
+
+    It 'PRC-CHAIN-LATER-LANDING-OVER-HIGHER-ENTRY-FAILS reports a later landing that edited a region a higher entry records' {
+        # Arrange: 0001 x0 to x1, 0002 x1 to x2, then a later landing of 0001 x2 to x3
+        $first = Get-TestEntry -Name '0001-a.md' -Block @((Get-TestBlock -Path 'docs/a.md' -Current 'x1' -Prior 'x0'), '### Later Landing: #3', '', (Get-TestBlock -Path 'docs/a.md' -Current 'x3' -Prior 'x2'))
+        $second = Get-TestEntry -Name '0002-b.md' -Block (Get-TestBlock -Path 'docs/a.md' -Current 'x2' -Prior 'x1')
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($first, $second) -PatchText @{} -LiveText @{ 'docs/a.md' = "x3`n" }
+
+        # Assert
+        $result.IsValid | Should -BeFalse
+        @($result.Errors | Where-Object { $_ -like '0002-b.md: docs/a.md: *' }).Count | Should -Be 1 -Because ($result.Errors -join '; ')
+    }
+
+    It 'PRC-CHAIN-STOP-BEFORE stops after the named entry later landings and before its patch, and rejects an unknown name' {
+        # Arrange
+        $patch = @{ '0001-a.patch' = (Get-TestPatchSection -Path 'docs/a.md' -Start 1 -Removed @('old') -Added @('new')) }
+        $first = Get-TestEntry -Name '0001-a.md' -Patch -Block @('### Later Landing: #2', '', (Get-TestBlock -Path 'docs/a.md' -Current 'newer' -Prior 'new'))
+        $second = Get-TestEntry -Name '0002-b.md' -Block (Get-TestBlock -Path 'docs/c.md' -Current 'c1' -Prior 'c0')
+        $live = @{ 'docs/a.md' = "newer`n"; 'docs/c.md' = "c1`n" }
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($first, $second) -PatchText $patch -LiveText $live -StopBefore '0001-a.md'
+
+        # Assert
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText['docs/a.md'] | Should -BeExactly "new`n" -Because 'the later landing is reverted and the patch is not'
+        $result.FinalText['docs/c.md'] | Should -BeExactly "c0`n"
+        { Invoke-ProcessReductionChain -Entry @($first, $second) -PatchText $patch -LiveText $live -StopBefore '0009-z.md' } | Should -Throw "*StopBefore '0009-z.md' names no supplied entry*"
+    }
+}

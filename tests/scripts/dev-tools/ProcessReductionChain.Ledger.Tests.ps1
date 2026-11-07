@@ -59,6 +59,27 @@ Describe 'Committed process-reduction ledger chain' {
         $section | Should -Not -BeNullOrEmpty -Because 'the README has a Revert Order section'
         $section | Should -BeLike '*newest-first*'
         $section | Should -BeLike '*ProcessReductionChain.Ledger.Tests.ps1*'
+        $section | Should -BeLike '*Later Landing*' -Because 'the README states the later-landing order'
+    }
+
+    It 'PRC-LEDGER-SUBCHAIN-HOLDS reverts the newer entries and later landings before each stored patch with no error' {
+        # Arrange
+        $patchEntries = @($script:ChainInput.Entries | Where-Object { $null -ne (Get-ProcessReductionSection -Text $_.Text -Heading 'Stored Patch') })
+
+        # Act
+        $subResults = @(
+            foreach ($entry in $patchEntries) {
+                Invoke-ProcessReductionChain -Entry $script:ChainInput.Entries -PatchText $script:ChainInput.PatchText -LiveText $script:ChainInput.LiveText -StopBefore $entry.Name
+            }
+        )
+
+        # Assert
+        $patchEntries.Count | Should -BeGreaterThan 0 -Because 'the ledger holds at least one stored patch'
+        $subResults.Count | Should -Be $patchEntries.Count
+        foreach ($subResult in $subResults) {
+            $subResult.IsValid | Should -BeTrue -Because ($subResult.Errors -join '; ')
+            @($subResult.Errors).Count | Should -Be 0 -Because ($subResult.Errors -join '; ')
+        }
     }
 
     It 'PRC-LEDGER-NO-EXCEPTIONS holds for the brief and carries no skip or allowed-error list' {
