@@ -33,6 +33,15 @@ BeforeAll {
         param([System.Collections.Specialized.OrderedDictionary] $Section)
         @($Section.GetEnumerator() | ForEach-Object { "## $($_.Key)`n`n$($_.Value)`n" }) -join "`n"
     }
+
+    function Get-TestLedger {
+        param([System.Collections.Specialized.OrderedDictionary] $Section, [string[]] $PatchName = @())
+        [pscustomobject]@{
+            IndexText  = "## Index`n`n| ID | Title | Date | Issue | Status |`n| --- | --- | --- | --- | --- |`n| [0001]($($script:EntryName)) | Title | 2026-11-06 | #1097 | Active |"
+            Entries    = @([pscustomobject]@{ Name = $script:EntryName; Text = ConvertTo-TestEntryText -Section $Section })
+            PatchNames = $PatchName
+        }
+    }
 }
 
 AfterAll {
@@ -297,3 +306,38 @@ Describe 'Test-ProcessReductionEntry' {
         $result.Errors -join "`n" | Should -BeLike '*out of order*'
     }
 }
+
+Describe 'Test-ProcessReductionLedger' {
+    It 'PRL-LEDGER-INCOMPLETE-ENTRY-FAILS reports an entry that lacks a required section' {
+        $section = Get-TestEntrySection
+        $section.Remove('Revert Signals')
+
+        $result = Test-ProcessReductionLedger -Ledger (Get-TestLedger -Section $section)
+
+        $result.IsValid | Should -BeFalse
+        $result.Errors -join "`n" | Should -BeLike "*$($script:EntryName): Required section '## Revert Signals'*"
+    }
+
+    It 'PRL-LEDGER-MISSING-PATCH-FAILS reports a Stored Patch with no patch file' {
+        $section = Get-TestEntrySection
+        $section.Remove('Prior Text')
+        $section['Stored Patch'] = 'patches/0001-sample-entry.patch'
+
+        $result = Test-ProcessReductionLedger -Ledger (Get-TestLedger -Section $section -PatchName @('0002-other.patch'))
+
+        $result.IsValid | Should -BeFalse
+        $result.Errors -join "`n" | Should -BeLike '*does not exist*'
+    }
+
+    It 'PRL-LEDGER-COMPLETE-PASSES accepts an entry with its index row and patch file' {
+        $section = Get-TestEntrySection
+        $section.Remove('Prior Text')
+        $section['Stored Patch'] = 'patches/0001-sample-entry.patch'
+
+        $result = Test-ProcessReductionLedger -Ledger (Get-TestLedger -Section $section -PatchName @('0001-sample-entry.patch'))
+
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.RowCount | Should -Be 1
+    }
+}
+

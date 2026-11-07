@@ -5,7 +5,8 @@
 .DESCRIPTION
     The ledger under docs/engineering/process-reductions/ records every reduction of
     evidence, plan tasks, gates, or review process so that it can be reverted months
-    later without git revert. Every function here is pure and takes text. Markdown
+    later without git revert. Every function here is pure and takes text, except
+    Read-ProcessReductionLedger, which is the one read seam and writes nothing. Markdown
     parsing is fence-aware: an entry stores prior text verbatim, so a heading inside a
     fence never ends a section.
 #>
@@ -396,9 +397,151 @@ function Test-ProcessReductionEntry {
     return [pscustomobject]@{ IsValid = $errorList.Count -eq 0; Errors = $errorList.ToArray(); PatchPath = $patchPath }
 }
 
+function Test-ProcessReductionIndex {
+    <#
+    .SYNOPSIS
+        Checks the Index table against the entry file names; returns IsValid, Errors, RowCount.
+
+    .DESCRIPTION
+        IndexText is the README text; only its Index section is read. A data row's ID cell
+        is a link such as [0001](0001-short-name.md). EntryName may be empty.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$IndexText,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]]$EntryName
+    )
+
+    $errorList = [System.Collections.Generic.List[string]]::new()
+    $section = Get-ProcessReductionSection -Text $IndexText -Heading 'Index'
+    if ($null -eq $section) {
+        return [pscustomobject]@{ IsValid = $false; Errors = @("The README has no '## Index' section."); RowCount = 0 }
+    }
+
+    $tableLines = @(Get-ProcessReductionPlainLine -Text $section | Where-Object { $_ -cmatch '^\s*\|' } | ForEach-Object { $_.Trim() })
+    if ($tableLines.Count -lt 2 -or $tableLines[0] -cne '| ID | Title | Date | Issue | Status |' -or $tableLines[1] -cnotmatch '^\|(?: *:?-+:? *\|){5}$') {
+        return [pscustomobject]@{ IsValid = $false; Errors = @("'## Index' has no table with the header row and separator row."); RowCount = 0 }
+    }
+
+    $rows = @($tableLines | Select-Object -Skip 2)
+    $seenNumbers = [System.Collections.Generic.HashSet[string]]::new()
+    $linkedFiles = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($row in $rows) {
+        if ($row -cnotmatch '^\| *\[(?<label>[0-9]{4})\]\((?<file>[^()\s]+)\) *\|(?:[^|]*[^|\s][^|]*\|){4}$') {
+            $errorList.Add("Index row '$row' is malformed.")
+            continue
+        }
+
+        $label = $Matches['label']
+        $file = $Matches['file']
+        [void]$linkedFiles.Add($file)
+        if (-not $seenNumbers.Add($label)) {
+            $errorList.Add("Index number '$label' is repeated.")
+        }
+        if ($file -cnotin $EntryName) {
+            $errorList.Add("Index row '$label' links '$file', which has no entry file.")
+        }
+        if ((Get-ProcessReductionEntryNumber -Name $file) -cne $label) {
+            $errorList.Add("Index label '$label' differs from the number of '$file'.")
+        }
+    }
+
+    foreach ($entry in $EntryName) {
+        if ($null -eq (Get-ProcessReductionEntryNumber -Name $entry)) {
+            $errorList.Add("Entry name '$entry' is not NNNN-<short-name>.md.")
+        }
+        if (-not $linkedFiles.Contains($entry)) {
+            $errorList.Add("Entry file '$entry' has no index row.")
+        }
+    }
+
+    return [pscustomobject]@{ IsValid = $errorList.Count -eq 0; Errors = $errorList.ToArray(); RowCount = $rows.Count }
+}
+
+function Read-ProcessReductionLedger {
+    <#
+    .SYNOPSIS
+        Reads the ledger folder and returns IndexText, Entries, and PatchNames.
+
+    .DESCRIPTION
+        The one read seam of this module; it writes nothing. Entries holds Name and Text
+        for every top-level *.md file except README.md, ordered by name. PatchNames holds
+        the file names under patches/, and is empty when that folder is absent.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][string]$LedgerPath
+    )
+
+    if (-not (Test-Path -LiteralPath $LedgerPath -PathType Container)) {
+        throw "Ledger folder '$LedgerPath' does not exist."
+    }
+    $readmePath = Join-Path -Path $LedgerPath -ChildPath 'README.md'
+    if (-not (Test-Path -LiteralPath $readmePath -PathType Leaf)) {
+        throw "Ledger folder '$LedgerPath' has no README.md."
+    }
+
+    $entryFiles = @(Get-ChildItem -LiteralPath $LedgerPath -File | Where-Object { $_.Extension -eq '.md' -and $_.Name -ne 'README.md' } | Sort-Object -Property Name)
+    $entries = @($entryFiles | ForEach-Object {
+            [pscustomobject]@{ Name = $_.Name; Text = [string](Get-Content -LiteralPath $_.FullName -Raw) }
+        })
+
+    $patchNames = @()
+    $patchFolder = Join-Path -Path $LedgerPath -ChildPath 'patches'
+    if (Test-Path -LiteralPath $patchFolder -PathType Container) {
+        $patchNames = @(Get-ChildItem -LiteralPath $patchFolder -File | ForEach-Object { $_.Name })
+    }
+
+    return [pscustomobject]@{
+        IndexText  = [string](Get-Content -LiteralPath $readmePath -Raw)
+        Entries    = $entries
+        PatchNames = $patchNames
+    }
+}
+
+function Test-ProcessReductionLedger {
+    <#
+    .SYNOPSIS
+        Checks a ledger object from Read-ProcessReductionLedger; returns IsValid, Errors, RowCount.
+
+    .DESCRIPTION
+        Runs the index check, runs the entry check on every entry, and reports a PatchPath
+        that is absent from PatchNames. Pure, so a real ledger and an in-memory ledger go
+        through the same code.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][psobject]$Ledger
+    )
+
+    $entries = @($Ledger.Entries)
+    $patchNames = @($Ledger.PatchNames)
+    $index = Test-ProcessReductionIndex -IndexText $Ledger.IndexText -EntryName ([string[]]@($entries | ForEach-Object { $_.Name }))
+    $errorList = [System.Collections.Generic.List[string]]::new()
+    $errorList.AddRange([string[]]@($index.Errors))
+
+    foreach ($entry in $entries) {
+        $result = Test-ProcessReductionEntry -Name $entry.Name -Text $entry.Text
+        foreach ($entryError in $result.Errors) {
+            $errorList.Add("$($entry.Name): $entryError")
+        }
+        if ($null -ne $result.PatchPath -and ($result.PatchPath -replace '^patches/', '') -cnotin $patchNames) {
+            $errorList.Add("$($entry.Name): stored patch '$($result.PatchPath)' does not exist.")
+        }
+    }
+
+    return [pscustomobject]@{ IsValid = $errorList.Count -eq 0; Errors = $errorList.ToArray(); RowCount = $index.RowCount }
+}
+
 Export-ModuleMember -Function @(
     'Get-ProcessReductionSection',
     'Get-ProcessReductionRevertBlock',
     'Invoke-ProcessReductionRevert',
-    'Test-ProcessReductionEntry'
+    'Test-ProcessReductionEntry',
+    'Test-ProcessReductionIndex',
+    'Read-ProcessReductionLedger',
+    'Test-ProcessReductionLedger'
 )
