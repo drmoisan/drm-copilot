@@ -56,7 +56,7 @@
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md` records one `Already formatted:` line for `ENTRY_SUITE`, zero `Formatted:` lines, and `git status --porcelain` empty after the run.
 - [x] [P3-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `ENTRY_SUITE`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md` records 0 findings; any finding is fixed and the phase restarts at P3-T1.
-- [ ] [P3-T3] Run the branch-current Pester route with coverage over `tests/scripts/claude-skills/epic-progress-report` and `tests/scripts/dev-tools`.
+- [x] [P3-T3] Run the branch-current Pester route with coverage over `tests/scripts/claude-skills/epic-progress-report` and `tests/scripts/dev-tools`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/pester-coverage.<timestamp>.md` records total, passed and failed counts (failed 0), per-container counts for the seven touched suites totalling 164 passed and 0 failed with 36 passed in `ENTRY_SUITE`, and per-file line coverage of at least 85 percent for each of the five `CANON` files and `scripts/dev-tools/Get-EpicProgressReport.ps1` from `artifacts/pester/powershell-coverage.xml`.
 - [ ] [P3-T4] Write the coverage comparison of P0-T2 and P3-T3.
   - Acceptance: `<FEATURE>/evidence/qa-gates/coverage-delta.<timestamp>.md` lists, for the five `CANON` files and the forwarder, the P0-T2 baseline value and the P3-T3 value, notes that no production line changed, and gives PASS only when every value is at or above 85 percent and none is below its baseline.
