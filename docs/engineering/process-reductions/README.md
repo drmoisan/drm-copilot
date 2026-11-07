@@ -43,7 +43,7 @@ Each block holds a `Current` fence, with the text as it stands after the reducti
 
 A label that does not apply stays in the list and states "not applicable".
 
-A partial revert of an earlier entry is a new entry whose `Current` fences hold the restored text and whose `Prior` fences hold the earlier entry's text, so that reverting the new entry re-applies the reduction. The earlier entry gains a `## Partial Revert` section that names the new entry and lists what it restores, step 1 of its `## Revert Steps` states that the new entry is reverted first, and its index Status reads `Partially reverted by NNNN`, where `NNNN` is the new entry.
+A partial revert of an earlier entry is a new entry whose `Current` fences hold the restored text and whose `Prior` fences hold the earlier entry's text, so that reverting the new entry re-applies the reduction. The earlier entry gains a `## Partial Revert` section that names the new entry and lists what it restores, step 1 of its `## Revert Steps` defers to `## Revert Order`, which reverts the new entry first, and its index Status reads `Partially reverted by NNNN`, where `NNNN` is the new entry.
 
 Three further rules apply:
 
@@ -54,6 +54,8 @@ Three further rules apply:
 ## Revert Order
 
 Entries are reverted newest-first: the highest-numbered entry first, then each lower number in turn. An entry may be reverted alone only when no later entry names any of its paths. To find the later entries that touch a path, search the `## Files Changed` sections of the higher-numbered entries for that path; every entry lists every path it changed. Revert those entries first, newest-first. An entry's `## Revert Steps` does not list the later entries that depend on it, because this rule derives them at revert time.
+
+To revert an older reduction while keeping the later ones, write a new entry that restores the older entry's stored prior text over the current tree, as entry `0006` did for entry `0001`; this is a route, not a requirement, and the new entry is itself revertible.
 
 A stored patch is read hunk by hunk as a revert block: a hunk's context and `+` lines are its `Current`, and its context and `-` lines are its `Prior`. After the later entries are reverted, run `git apply -R` of the patch. A hunk that does not apply is applied by hand: replace its `Current` lines with its `Prior` lines, at the occurrence nearest the hunk's recorded line.
 
