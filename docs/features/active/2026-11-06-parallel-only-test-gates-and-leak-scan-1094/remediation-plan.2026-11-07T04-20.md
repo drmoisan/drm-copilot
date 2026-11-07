@@ -91,7 +91,7 @@ Static stages run first, so that a suite is not re-run for a formatting change. 
   - Text: a case-insensitive search of the `$script:SweepRoot` folders for the five P1-T4 tokens finds no hit. The test file sits outside those folders.
   - Evidence: a case-insensitive scan of `<FEATURE>/evidence/baseline/`, `<FEATURE>/evidence/remediation-baseline/`, `<FEATURE>/evidence/regression-testing/`, and `<FEATURE>/evidence/qa-gates/`, with tokens assembled at run time so the artifact cannot match itself, finds no host path and none of `single-process`, `seeded`, `shuffled`, `reversed-order`, `comparison run`, and `focused run`. `<FEATURE>/evidence/regression-testing/` does not exist on this branch, so the step skips a folder that is absent and scans every file in the others.
   - Acceptance: `EXIT_CODE: 0`, from a step that exits non-zero on any match or inequality.
-- [ ] [P2-T5] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base, and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`.
+- [x] [P2-T5] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base, and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`.
   - The walk includes this plan's own text under `.claude/rules/tonality.md`, and the items in `## Open Questions / Notes`.
   - The artifact has one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed, the QA loop re-runs from P2-T1, and the self-review is rewritten.
   - Acceptance: the artifact holds no FAIL row.
