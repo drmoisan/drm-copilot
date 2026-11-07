@@ -66,21 +66,25 @@ function Get-EpicProgressStepRecord {
 function Test-EpicProgressCompletedStep {
     <#
     .SYNOPSIS
-        Return whether a checkpoint's completed_steps holds an entry that starts with the given canonical prefix.
+        Return whether a checkpoint's completed_steps holds an entry that starts with any of the given canonical prefixes.
     .PARAMETER Checkpoint
         The parsed item checkpoint; null returns $false.
     .PARAMETER Prefix
-        The canonical step prefix, for example S2_research.
+        The canonical step prefixes, for example S2_research and S3b_research; any match counts.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
     param(
         [Parameter(Mandatory = $true)] [AllowNull()] [object] $Checkpoint,
-        [Parameter(Mandatory = $true)] [string] $Prefix
+        [Parameter(Mandatory = $true)] [string[]] $Prefix
     )
 
     if ($null -eq $Checkpoint) { return $false }
-    return [bool] @(@($Checkpoint.completed_steps) | Where-Object { "$_" -like "$Prefix*" }).Count
+    $entries = @(@($Checkpoint.completed_steps) | ForEach-Object { "$_" })
+    foreach ($candidate in $Prefix) {
+        if (@($entries | Where-Object { $_ -like "$candidate*" }).Count -gt 0) { return $true }
+    }
+    return $false
 }
 
 function Get-EpicProgressCycleStep {
@@ -161,7 +165,7 @@ function Get-EpicProgressItemStep {
         A type with recorded stage_timing attempts counts one step per attempt (decision D4),
         less the steps of that type that the remediation cycles add; a closed attempt is done
         and the open attempt is in progress. A type without attempts falls back to the
-        checkpoint: research on S2_research, spec on S3_promotion with spec.md present, plan on
+        checkpoint: research on S2_research or S3b_research, spec on S3_promotion with spec.md present, plan on
         S4_atomic_planning, preflight on a checked task or a step5_status past pending, review
         on S7_feature_review or a review outcome, pr on S8_create_pr, pr_gate.pr_number, or a
         pull request, and ci on step9_status 'passed'. Merge is done when the item is merged.
@@ -188,7 +192,7 @@ function Get-EpicProgressItemStep {
     $prepared = ($null -eq $checkpoint) -and [bool] $Item.PreparedPlan
     $step5 = [string] $checkpoint.step5_status
     $fallback = @{
-        research  = $prepared -or (Test-EpicProgressCompletedStep -Checkpoint $checkpoint -Prefix 'S2_research')
+        research  = $prepared -or (Test-EpicProgressCompletedStep -Checkpoint $checkpoint -Prefix @('S2_research', 'S3b_research'))
         spec      = $prepared -or ((Test-EpicProgressCompletedStep -Checkpoint $checkpoint -Prefix 'S3_promotion') -and [bool] $Item.SpecExists)
         plan      = $prepared -or (Test-EpicProgressCompletedStep -Checkpoint $checkpoint -Prefix 'S4_atomic_planning')
         preflight = ($taskDone -gt 0) -or ($step5 -in @('delegated', 'verified', 'in_progress', 'completed'))
@@ -249,7 +253,7 @@ function Get-EpicProgressItemStep {
             $nextCycle = [int] $remediation.Groups[1].Value
             $nextType = @{ plan = 'plan'; preflight = 'preflight'; execute = 'execution'; reaudit = 'review' }[$remediation.Groups[2].Value]
         } else {
-            $prefixType = [ordered]@{ S2_research = 'research'; S3_promotion = 'spec'; S4_atomic_planning = 'plan'; S5_atomic_execution = 'execution'; S7_feature_review = 'review'; S8_create_pr = 'pr'; S9 = 'ci' }
+            $prefixType = [ordered]@{ S2_research = 'research'; S3b_research = 'research'; S3_promotion = 'spec'; S4_atomic_planning = 'plan'; S5_atomic_execution = 'execution'; S7_feature_review = 'review'; S8_create_pr = 'pr'; S9 = 'ci' }
             foreach ($prefix in $prefixType.Keys) { if ($nextStep -like "$prefix*") { $nextType = $prefixType[$prefix]; break } }
         }
         $target = @($steps | Where-Object { $_.Type -eq $nextType -and $_.Status -eq 'remaining' -and ($nextCycle -lt 0 -or $_.Cycle -eq $nextCycle) }) | Select-Object -First 1

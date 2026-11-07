@@ -33,7 +33,11 @@ function ConvertTo-EpicProgressStepType {
     .DESCRIPTION
         'planning' and 'plan' map to 'plan'; a name that starts with 'remediation' (for example
         'remediation' or 'remediation_cycle_2') is a composite remediation stage and maps to
-        'composite'; a catalog type name maps to itself; any other name (for example
+        'composite'; a catalog type name maps to itself. The live stage names map through
+        aliases: 'feature_review' and 'S7_feature_review' to 'review'; 'atomic_execution' and
+        'S5_atomic_execution' to 'execution'; 'S2_research' to 'research'; 'S3_spec' to
+        'spec'; 'S4_atomic_planning' to 'plan'; 'S4_preflight' to 'preflight'; 'S8_create_pr'
+        to 'pr'; and 'S9_ci_gate' and 'S9_ci_green' to 'ci'. Any other name (for example
         'promotion') maps to 'unmapped'. The comparison ignores case and surrounding blanks.
     .PARAMETER StageName
         The stage name recorded in stage_timing.
@@ -42,7 +46,13 @@ function ConvertTo-EpicProgressStepType {
     [OutputType([string])]
     param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $StageName)
 
+    $aliases = @{
+        feature_review = 'review'; s7_feature_review = 'review'; atomic_execution = 'execution'; s5_atomic_execution = 'execution'
+        s2_research = 'research'; s3_spec = 'spec'; s4_atomic_planning = 'plan'; s4_preflight = 'preflight'
+        s8_create_pr = 'pr'; s9_ci_gate = 'ci'; s9_ci_green = 'ci'
+    }
     $name = $StageName.Trim().ToLowerInvariant()
+    if ($aliases.ContainsKey($name)) { return $aliases[$name] }
     if ($name -eq 'planning' -or $name -eq 'plan') { return 'plan' }
     if ($name.StartsWith('remediation')) { return 'composite' }
     $catalog = @(Get-EpicProgressStepTypeCatalog | ForEach-Object { $_.Type })

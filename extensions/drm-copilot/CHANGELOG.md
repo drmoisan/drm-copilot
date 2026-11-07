@@ -30,7 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parameter set (`-Issue <n>`) reports a standalone item. The state file is version 2 with a
   duration ledger and per-item tick anchors; version 1 files are migrated. The core pack adds
   four scripts under `.claude/skills/epic-progress-report/scripts/` (Stages, Steps, Durations,
-  and Gather).
+  and Gather). The live stage names the orchestrator records (for example `feature_review`,
+  `atomic_execution`, and `S8_create_pr`) map to their step types, a running execution task is
+  timed from the later of the stage start and the last plan tick, and item-mode and
+  single-feature reports use item and singular wording.
 - PoshQC code-coverage population (issue #527): `Invoke-PoshQCTest` derives the measured
   file set from the workspace. Declare coverage roots in `config/poshqc-coverage.json` at
   the workspace root (`{"version": 1, "roots": [...]}`). A `CodeCoverage.Path` list in the
