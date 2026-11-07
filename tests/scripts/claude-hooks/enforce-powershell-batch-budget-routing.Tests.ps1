@@ -89,13 +89,17 @@ Describe 'enforce-powershell-batch-budget.ps1 large-path routing' {
         }
     }
 
+    # Snapshot each environment value this suite assigns and restore it, rather than clearing it, so the
+    # suite leaves the process environment as it found it (issue #1096).
     BeforeEach {
         Initialize-RoutingStore
+        $script:PriorProdBudget = $env:CLAUDE_POWERSHELL_BUDGET_PROD
+        $script:PriorTestBudget = $env:CLAUDE_POWERSHELL_BUDGET_TEST
     }
 
     AfterEach {
-        $env:CLAUDE_POWERSHELL_BUDGET_PROD = $null
-        $env:CLAUDE_POWERSHELL_BUDGET_TEST = $null
+        $env:CLAUDE_POWERSHELL_BUDGET_PROD = $script:PriorProdBudget
+        $env:CLAUDE_POWERSHELL_BUDGET_TEST = $script:PriorTestBudget
     }
 
     Context 'large-path route predicate' {

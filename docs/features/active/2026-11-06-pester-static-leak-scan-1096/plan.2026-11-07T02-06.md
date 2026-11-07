@@ -100,7 +100,7 @@ The kinds and rules are in spec `### 2. Static leak scan` and `## API / CLI Surf
 
 ### Phase 3 — Remediation
 
-- [ ] [P3-T1] Apply the known leak fixes in `tests/scripts/powershell/Support/TestHelpers.ps1`, `tests/scripts/dev-tools/tree.Tests.ps1`, `tests/scripts/dev-tools/run-actionlint.Tests.ps1`, `tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1`, `tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1`, and `tests/scripts/claude-hooks/enforce-powershell-batch-budget-routing.Tests.ps1`.
+- [x] [P3-T1] Apply the known leak fixes in `tests/scripts/powershell/Support/TestHelpers.ps1`, `tests/scripts/dev-tools/tree.Tests.ps1`, `tests/scripts/dev-tools/run-actionlint.Tests.ps1`, `tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1`, `tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1`, and `tests/scripts/claude-hooks/enforce-powershell-batch-budget-routing.Tests.ps1`.
   - `TestHelpers.ps1` defines `Import-ScriptFunction` without `global:`. `tree.Tests.ps1` runs that dot-source at file scope, during discovery, and reaches its `BeforeAll` only through the global definition, so the `$scriptRoot` assignment and the dot-source move into `BeforeAll`, ahead of the first call.
   - `run-actionlint.Tests.ps1` drops `$script:describeHadImportScriptFunction`, the removal in its `AfterAll`, and the comment text about that helper. Its Archive module cleanup stays.
   - Disposition of the other files that load the helper: `new-potential-entry.Tests.ps1` and `post-codex-worktree-session.Tests.ps1` dot-source it inside `BeforeAll`, so they are unaffected and unchanged. These four are the only files that load it, and only three call `Import-ScriptFunction`.
