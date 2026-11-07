@@ -27,7 +27,8 @@
         'Merge-PoshQCJunitReport',
         'ConvertTo-PoshQCShardWeight',
         'Export-PoshQCShardWeight',
-        'Invoke-PoshQCParallelTest'
+        'Invoke-PoshQCParallelTest',
+        'Invoke-PoshQCLeakScan'
     )
     CmdletsToExport      = @()
     VariablesToExport    = @()

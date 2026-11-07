@@ -27,7 +27,7 @@ Removing the repeated runs removes the current means of detecting leaks. #1096 a
 
 ## Files Changed
 
-The list covers every path changed from the merge base of `origin/main` and the branch head, excluding the feature folder, `docs/features/potential/`, and this ledger, with rename detection off.
+The reduction landed in two parts. The first list covers every path the #1094 branch changed from its merge base with `origin/main`, excluding the feature folder, `docs/features/potential/`, and this ledger, with rename detection off. The second list covers the paths of the later landing for #1096, which moved the serial test commands that #1094 deferred to the parallel gates in one commit whose subject carries `reduction: 0001`.
 
 - `.agents/skills/atomic-plan-contract/SKILL.md`: mirror, a non-identical copy with its own revert block
 - `.agents/skills/atomic-planner/SKILL.md`: canonical
@@ -268,15 +268,35 @@ The list covers every path changed from the merge base of `origin/main` and the 
 - `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py`: contract test
 - `tests/scripts/dev_tools/test_validate_policy_audit_artifact.py`: contract test
 
+Paths of the #1096 landing. The six `execution-environment` copies listed above also changed in it, in the `## Test Runtime` pytest bullet.
+
+- `.vscode/tasks.json`: canonical, with Revert Blocks
+- `scripts/dev_tools/atomic_executor/cli_preflight.py`: canonical, with Revert Blocks
+- `scripts/dev_tools/atomic_executor/prompt_builder.py`: canonical, with a Revert Block
+- `scripts/dev_tools/atomic_executor/qc_runner.py`: canonical, with Revert Blocks
+- `scripts/dev_tools/atomic_executor/qc_toolchain.py`: canonical, with a Revert Block
+- `scripts/dev_tools/fix_all_branches.py`: canonical, with Revert Blocks
+- `scripts/dev_tools/fix_all_branches_extra.py`: canonical, with a Revert Block
+- `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py`: contract test, with a Revert Block
+- `tests/scripts/dev_tools/atomic_executor/test_cli_part3.py`: contract test, with Revert Blocks
+- `tests/scripts/dev_tools/atomic_executor/test_prompt_builder.py`: contract test, with a Revert Block
+- `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py`: contract test, with Revert Blocks
+- `tests/scripts/dev_tools/test_fix_all_branches.py`: contract test, with a Revert Block
+- `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`: contract test, with a Revert Block
+
 ## Stored Patch
 
 `patches/0001-parallel-only-test-gates.patch` holds the reduction as one diff. It is `git diff --binary --no-renames` from the merge base of `origin/main` and the branch head, limited to the paths in `## Files Changed`.
 
 The check: `git apply -R --check` of the patch succeeds on the working tree. A failed check means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
 
+The patch does not hold the edits of the #1096 landing. Those edits are carried only by their Revert Blocks in `## Prior Text`.
+
 ## Prior Text
 
 The two rules that carry the reduction each have blocks. `.claude/skills/execution-environment/SKILL.md` takes one block for the body of `## Test Isolation Checks`, because its five mirrors are byte-identical. The three `atomic-plan-contract` sources differ from one another, so each takes a block for its `Test isolation` sentence of the Pre-Mortem rule.
+
+The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionRevertBlock` reads only the first fence of each label in a block, so a file whose landing has separate hunks takes one block per hunk under the same path. A block whose `Prior` fence is empty removes test text that the landing added. Each `Prior` fence holds the text of `main` after PR #1108 (issue #1106), which removed the stale package coverage flag from the same commands, so a revert restores `--cov=scripts/dev_tools` as the only coverage source. The coverage-flag hunks of `.vscode/tasks.json` and `scripts/dev_tools/fix_all_branches_extra.py` match `main` after that change and take no block. The brief copies other than `.claude/skills/execution-environment/SKILL.md` take no block, because step 2 re-copies them.
 
 ### Revert Block: .claude/skills/execution-environment/SKILL.md
 
@@ -334,18 +354,573 @@ The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-
 The `Test isolation` bullet names the isolation runs the plan performs: a seeded shuffled Jest run with the seed recorded, a reversed-order run of the new or changed Python test modules, and a seeded shuffled file-order run of the touched Pester suites with at least three seeds, each seed recorded.
 ````
 
+### Revert Block: .claude/skills/execution-environment/SKILL.md
+
+````Current
+- Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
+- Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
+- pytest: pass `-n auto` (pytest-xdist) on the command line of the CI step `Run tests with Pytest`, of the parallel VS Code tasks, of the `fix_all` pytest step, and of the full-suite pytest commands of the atomic executor tool (its preflight QC, its full QC loop, and the commands its prompts state), never in `addopts`, because the VS Code Test Explorer keys results to the wrong file when `addopts` carries it. `-n auto` counts physical cores, so a runner can start fewer workers than it has vCPUs; measure it against an explicit count such as `-n 4` before keeping it. pytest-cov combines the worker coverage into one report.
+- Pester: parallel validation uses separate Pester 6 processes: `Invoke-PoshQCTest -ShardIndex -ShardCount` on the CI runners and `Invoke-PoshQCParallelTest` locally. Read the per-file `time` of the JUnit `testsuite` elements before changing the shard count or the weights in `config/poshqc-shard-weights.json`.
+- A candidate fix can be measured before the tree is edited by loading a pytest plugin module from `SCRATCH` with `-p <module>` and `PYTHONPATH`.
+````
+
+````Prior
+- Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
+- Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
+- pytest: pass `-n auto` (pytest-xdist) on the command line of the CI step `Run tests with Pytest` and of the parallel VS Code tasks, never in `addopts`, because the VS Code Test Explorer keys results to the wrong file when `addopts` carries it. `-n auto` counts physical cores, so a runner can start fewer workers than it has vCPUs; measure it against an explicit count such as `-n 4` before keeping it. pytest-cov combines the worker coverage into one report.
+- Pester: parallel validation uses separate Pester 6 processes: `Invoke-PoshQCTest -ShardIndex -ShardCount` on the CI runners and `Invoke-PoshQCParallelTest` locally. Read the per-file `time` of the JUnit `testsuite` elements before changing the shard count or the weights in `config/poshqc-shard-weights.json`.
+- A candidate fix can be measured before the tree is edited by loading a pytest plugin module from `SCRATCH` with `-p <module>` and `PYTHONPATH`.
+````
+
+### Revert Block: .vscode/tasks.json
+
+````Current
+			],
+			"command": "poetry",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests",
+````
+
+````Prior
+			],
+			"command": "poetry",
+			"group": {
+				"isDefault": true,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests",
+````
+
+### Revert Block: .vscode/tasks.json
+
+````Current
+			"command": "poetry",
+			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
+			"group": {
+				"isDefault": true,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests (parallel)",
+````
+
+````Prior
+			"command": "poetry",
+			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests (parallel)",
+````
+
+### Revert Block: .vscode/tasks.json
+
+````Current
+		{
+			"dependsOn": [
+				"TS: 4 Jest: unit tests with coverage",
+				"QC: 4 Pytest: run tests with coverage (parallel)",
+				"PoshQC: 4 test (Pester, parallel)"
+			],
+			"dependsOrder": "sequence",
+			"detail": "Runs Jest, Python, and PowerShell tests with coverage to refresh all Koverage sources.",
+````
+
+````Prior
+		{
+			"dependsOn": [
+				"TS: 4 Jest: unit tests with coverage",
+				"QC: 4 Pytest: run tests with coverage",
+				"PoshQC: 4 test (Pester)"
+			],
+			"dependsOrder": "sequence",
+			"detail": "Runs Jest, Python, and PowerShell tests with coverage to refresh all Koverage sources.",
+````
+
+### Revert Block: .vscode/tasks.json
+
+````Current
+				"QC: 1 Black: format",
+				"QC: 2 Ruff: lint",
+				"QC: 3 Pyright: type-check",
+				"QC: 4 Pytest: run tests with coverage (parallel)",
+				"PoshQC: 1 format",
+				"PoshQC: 2 analyze",
+				"PoshQC: 2c leak scan",
+				"PoshQC: 4 test (Pester, parallel)"
+			],
+			"dependsOrder": "sequence",
+			"group": {
+````
+
+````Prior
+				"QC: 1 Black: format",
+				"QC: 2 Ruff: lint",
+				"QC: 3 Pyright: type-check",
+				"QC: Pytest: run tests with coverage",
+				"PoshQC: 1 format",
+				"PoshQC: 2 analyze",
+				"PoshQC: 2c leak scan",
+				"PoshQC: 4 test (Pester)"
+			],
+			"dependsOrder": "sequence",
+			"group": {
+````
+
+### Revert Block: scripts/dev_tools/fix_all_branches.py
+
+````Current
+    if not api.run_simple_step(
+        step_number=4,
+        description="Running PowerShell tests (Pester, parallel shards)...",
+        step_name="PoshQC: test",
+        success_message="PowerShell tests passed",
+        failure_message="PowerShell tests failed. Please review errors above.",
+        # The gate is one Invoke-PoshQCParallelTest run; the process exits with
+        # the run's ExitCode so a failed shard fails the step (issue #1096).
+        command=[
+            "pwsh",
+````
+
+````Prior
+    if not api.run_simple_step(
+        step_number=4,
+        description="Running PowerShell tests (Pester)...",
+        step_name="PoshQC: test",
+        success_message="PowerShell tests passed",
+        failure_message="PowerShell tests failed. Please review errors above.",
+        command=[
+            "pwsh",
+````
+
+### Revert Block: scripts/dev_tools/fix_all_branches.py
+
+````Current
+            "-Command",
+            "Import-Module './scripts/powershell/PoshQC'; "
+            "exit (Invoke-PoshQCParallelTest -Root '.').ExitCode",
+        ],
+        runner=branch_runner,
+````
+
+````Prior
+            "-Command",
+            "Import-Module './scripts/powershell/PoshQC'; "
+            "Invoke-PoshQCTest -Root '.'",
+        ],
+        runner=branch_runner,
+````
+
+### Revert Block: scripts/dev_tools/fix_all_branches_extra.py
+
+````Current
+        )
+
+    # The suite runs on parallel workers with and without coverage (issue #1096).
+    pytest_command: list[str] = ["poetry", "run", "pytest", "-n", "auto"]
+    pytest_step_name = (
+        "Pytest: test with coverage" if include_coverage else "Pytest: test"
+````
+
+````Prior
+        )
+
+    pytest_command: list[str] = ["poetry", "run", "pytest"]
+    pytest_step_name = (
+        "Pytest: test with coverage" if include_coverage else "Pytest: test"
+````
+
+### Revert Block: scripts/dev_tools/atomic_executor/cli_preflight.py
+
+````Current
+                    "run",
+                    "pytest",
+                    "-n",
+                    "auto",
+                    "--color=no",
+                    "--cov=scripts/dev_tools",
+                    "--cov-report=term-missing",
+````
+
+````Prior
+                    "run",
+                    "pytest",
+                    "--color=no",
+                    "--cov=scripts/dev_tools",
+                    "--cov-report=term-missing",
+````
+
+### Revert Block: scripts/dev_tools/atomic_executor/cli_preflight.py
+
+````Current
+                "   - `poetry run ruff check`",
+                "   - `poetry run pyright`",
+                "   - `poetry run pytest -n auto "
+                "--cov=scripts/dev_tools --cov-report=term-missing`",
+            ]
+````
+
+````Prior
+                "   - `poetry run ruff check`",
+                "   - `poetry run pyright`",
+                "   - `poetry run pytest "
+                "--cov=scripts/dev_tools --cov-report=term-missing`",
+            ]
+````
+
+### Revert Block: scripts/dev_tools/atomic_executor/prompt_builder.py
+
+````Current
+  - python -m poetry run ruff check
+  - python -m poetry run pyright
+  - python -m poetry run pytest -n auto \\
+      --cov=scripts/dev_tools \\
+      --cov-report=term-missing
+
+````
+
+````Prior
+  - python -m poetry run ruff check
+  - python -m poetry run pyright
+  - python -m poetry run pytest \\
+      --cov=scripts/dev_tools \\
+      --cov-report=term-missing
+
+````
+
+### Revert Block: scripts/dev_tools/atomic_executor/qc_runner.py
+
+````Current
+        "run",
+        "pytest",
+        "-n",
+        "auto",
+        "--color=no",
+        "--cov=scripts/dev_tools",
+        "--cov-report=xml",
+        "--cov-report=term-missing",
+````
+
+````Prior
+        "run",
+        "pytest",
+        "--color=no",
+        "--cov=scripts/dev_tools",
+        "--cov-report=xml",
+        "--cov-report=term-missing",
+````
+
+### Revert Block: scripts/dev_tools/atomic_executor/qc_runner.py
+
+````Current
+                "run",
+                "pytest",
+                "-n",
+                "auto",
+                "--cov=scripts/dev_tools",
+                "--cov-report=term-missing",
+````
+
+````Prior
+                "run",
+                "pytest",
+                "--cov=scripts/dev_tools",
+                "--cov-report=term-missing",
+````
+
+### Revert Block: scripts/dev_tools/atomic_executor/qc_toolchain.py
+
+````Current
+        "run",
+        "pytest",
+        "-n",
+        "auto",
+        "--color=no",
+        "--cov=scripts/dev_tools",
+        "--cov-report=term-missing",
+````
+
+````Prior
+        "run",
+        "pytest",
+        "--color=no",
+        "--cov=scripts/dev_tools",
+        "--cov-report=term-missing",
+````
+
+### Revert Block: tests/scripts/dev_tools/atomic_executor/test_cli_part3.py
+
+````Current
+        assert "poetry run pytest -n auto" in prompt
+````
+
+````Prior
+````
+
+### Revert Block: tests/scripts/dev_tools/atomic_executor/test_cli_part3.py
+
+````Current
+_PYTEST_STEP = [
+    "poetry",
+    "run",
+    "pytest",
+    "-n",
+    "auto",
+    "--color=no",
+````
+
+````Prior
+_PYTEST_STEP = [
+    "poetry",
+    "run",
+    "pytest",
+    "--color=no",
+````
+
+### Revert Block: tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py
+
+````Current
+        assert len(copilot_calls) == 1
+
+
+class TestPreflightParallelCommand:
+    """Tests that the preflight QC pytest step runs on pytest-xdist workers."""
+
+    def test_preflight_pytest_step_runs_xdist_workers(
+        self,
+        mem_fs_path: Path,
+        monkeypatch: "MonkeyPatch",
+    ) -> None:
+        """The pytest step of _run_preflight_qc_with_capture passes -n auto."""
+        from scripts.dev_tools.atomic_executor.cli import _run_preflight_qc_with_capture
+
+        argvs: list[list[str]] = []
+
+        def mock_run(
+            argv: list[str], **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
+            """Record each argv and report success for every step."""
+            argvs.append(list(argv))
+            return subprocess.CompletedProcess(
+                args=argv, returncode=0, stdout="OK", stderr=""
+            )
+
+        monkeypatch.setattr("subprocess.run", mock_run)
+
+        _run_preflight_qc_with_capture(mem_fs_path)
+
+        # The first recorded argv that names pytest is the pytest step.
+        pytest_argv = next(argv for argv in argvs if "pytest" in argv)
+        start = pytest_argv.index("pytest")
+        assert pytest_argv[start : start + 3] == ["pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
+````
+
+````Prior
+        assert len(copilot_calls) == 1
+````
+
+### Revert Block: tests/scripts/dev_tools/atomic_executor/test_prompt_builder.py
+
+````Current
+        assert "python -m poetry run pytest -n auto" in prompt
+````
+
+````Prior
+````
+
+### Revert Block: tests/scripts/dev_tools/atomic_executor/test_qc_runner.py
+
+````Current
+    def test_full_loop_full_test_runs_xdist_workers(
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
+    ) -> None:
+        """The full_test command of run_full_loop_with_artifacts() passes -n auto."""
+        pytest_argv: list[str] = []
+
+        def fake_run_and_record(*args: object, **kwargs: object) -> QCToolResult:
+            """Record the pytest argv and report success for every step."""
+            argv = kwargs.get("argv")
+            if isinstance(argv, list) and "pytest" in argv:
+                pytest_argv.extend(cast("list[str]", argv))
+            return QCToolResult(step="tool", returncode=0, output="")
+
+        def fake_diff_signature(
+            *args: object, **kwargs: object
+        ) -> tuple[tuple[str, str, str], ...]:
+            """Report an unchanged tree so the loop ends after one pass."""
+            return ()
+
+        runner = QCRunner(mem_fs_path)
+        monkeypatch.setattr(runner, "_diff_signature", fake_diff_signature)
+        monkeypatch.setattr(runner, "_run_and_record", fake_run_and_record)
+
+        # Map each toolchain step to an in-memory artifact path.
+        runner.run_full_loop_with_artifacts(
+            artifact_paths={
+                step: mem_fs_path / f"artifacts/{step}.txt"
+                for step in ("black", "ruff", "pyright", "pytest")
+            },
+            max_loops=1,
+        )
+
+        assert pytest_argv[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
+
+    def test_python_toolchain_pytest_command_runs_xdist_workers(self) -> None:
+        """PYTHON_TOOLCHAIN_COMMANDS["pytest"] carries -n auto and no stale flag."""
+        from scripts.dev_tools.atomic_executor.qc_toolchain import (
+            PYTHON_TOOLCHAIN_COMMANDS,
+        )
+
+        command = PYTHON_TOOLCHAIN_COMMANDS["pytest"]
+        assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in command
+
+````
+
+````Prior
+````
+
+### Revert Block: tests/scripts/dev_tools/atomic_executor/test_qc_runner.py
+
+````Current
+            "run",
+            "pytest",
+            "-n",
+            "auto",
+            "--color=no",
+            "--cov=scripts/dev_tools",
+            "--cov-report=xml",
+            "--cov-report=term-missing",
+````
+
+````Prior
+            "run",
+            "pytest",
+            "--color=no",
+            "--cov=scripts/dev_tools",
+            "--cov-report=xml",
+            "--cov-report=term-missing",
+````
+
+### Revert Block: tests/scripts/dev_tools/test_fix_all_branches.py
+
+````Current
+
+
+def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
+    """PoshQC: test runs Invoke-PoshQCParallelTest and exits with its ExitCode."""
+    # Arrange
+    factory = FakeRunnerFactory(base_success_responses())
+
+    # Act
+    fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+
+    # Assert
+    commands = dict(factory.runners["powershell"].calls)
+    test_command = " ".join(commands["PoshQC: test"])
+    assert "Invoke-PoshQCParallelTest -Root '.'" in test_command
+    assert ".ExitCode" in test_command
+    assert "Invoke-PoshQCTest" not in test_command
+
+
+def _python_pytest_command(*, include_coverage: bool) -> list[str]:
+    """Run the pipeline and return the argv of the python branch pytest step."""
+    factory = FakeRunnerFactory(
+        base_success_responses(include_coverage=include_coverage)
+    )
+    fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=include_coverage,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+    step_name = "Pytest: test with coverage" if include_coverage else "Pytest: test"
+    return dict(factory.runners["python"].calls)[step_name]
+
+
+def test_python_branch_pytest_runs_xdist_workers_with_coverage() -> None:
+    """run_python_branch passes -n auto when coverage is requested."""
+    command = _python_pytest_command(include_coverage=True)
+    assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+    assert "--cov=src/lexile_corpus_tuner" not in command
+
+
+def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
+    """run_python_branch passes -n auto when coverage is not requested."""
+    command = _python_pytest_command(include_coverage=False)
+    assert command == ["poetry", "run", "pytest", "-n", "auto"]
+````
+
+````Prior
+````
+
+### Revert Block: tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1
+
+````Current
+
+    It 'VT-AGGREGATES-PARALLEL-ONLY makes <Label> depend on the parallel test tasks and on no serial test task' -ForEach @(
+        @{ Label = 'QC: Coverage: All Providers' }
+        @{ Label = 'QC: 5 Run All Checks' }
+    ) {
+        $dependsOn = @($script:TaskByLabel[$Label].dependsOn)
+        $dependsOn | Should -Contain 'QC: 4 Pytest: run tests with coverage (parallel)'
+        $dependsOn | Should -Contain 'PoshQC: 4 test (Pester, parallel)'
+        foreach ($serial in @('QC: 4 Pytest: run tests', 'QC: 4 Pytest: run tests with coverage', 'QC: Pytest: run tests with coverage', 'PoshQC: 4 test (Pester)')) {
+            $dependsOn | Should -Not -Contain $serial -Because "'$Label' is a gate aggregate and runs no serial test task"
+        }
+    }
+
+    It 'VT-DEPENDS-ON-RESOLVES resolves every dependsOn name to a task label' {
+        $unresolved = foreach ($task in $script:Tasks) {
+            $property = $task.PSObject.Properties['dependsOn']
+            if ($null -eq $property) { continue }
+            foreach ($name in @($property.Value)) {
+                if (-not $script:TaskByLabel.ContainsKey([string] $name)) { "$($task.label) -> $name" }
+            }
+        }
+        @($unresolved) | Should -BeNullOrEmpty
+    }
+
+    It 'VT-DEFAULT-TEST-TASK makes QC: 4 Pytest: run tests (parallel) the only default of the test group' {
+        $defaults = @($script:Tasks | Where-Object {
+                $group = $_.PSObject.Properties['group']
+                $null -ne $group -and $group.Value -isnot [string] -and $group.Value.kind -eq 'test' -and $group.Value.isDefault -eq $true
+            } | ForEach-Object label)
+        $defaults | Should -Be @('QC: 4 Pytest: run tests (parallel)')
+    }
+
+    It 'VT-SERIAL-TASKS-REMAIN keeps the serial test tasks available for debugging' {
+        foreach ($serial in @('QC: 4 Pytest: run tests', 'QC: 4 Pytest: run tests with coverage', 'PoshQC: 4 test (Pester)')) {
+            $script:TaskByLabel.ContainsKey($serial) | Should -BeTrue -Because "'$serial' stays for debugging one failure"
+        }
+    }
+````
+
+````Prior
+````
+
 ## Revert Steps
 
-1. Apply the blocks: revert entry `0006` (`0006-test-suite-baseline-restored.md`) first, because it restores baseline text inside hunks of this entry's patch, so this patch does not reverse-apply while `0006` is in place. Then run `git apply -R` of the patch when its check passes. Otherwise replace each `Current` with its `Prior`, which restores the core rule, and restore the other paths from the patch text.
+1. Apply the blocks: revert entry `0006` (`0006-test-suite-baseline-restored.md`) first, because it restores baseline text inside hunks of this entry's patch, so this patch does not reverse-apply while `0006` is in place. Then run `git apply -R` of the patch when its check passes. Otherwise replace each `Current` with its `Prior`, which restores the core rule, and restore the other paths from the patch text. The blocks of the #1096 landing apply whether or not the patch check passes, because the patch does not hold them: replace each of their `Current` texts with its `Prior`.
 2. Re-copy mirrors and bundles: copy `.claude/skills/execution-environment/SKILL.md` to its five copies, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md`. Copy each `atomic-plan-contract` source to its bundle copy: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md`.
 3. Regenerate Codex variants: run `scripts/dev_tools/generate_codex_agent_variants.py` in module form, then run it with `--check`.
 4. Restore pinned hashes: not applicable, because `parallel_orchestrator_surface_expectations.py` is outside the reduction path set.
-5. Restore contract-test literals: restore the merge-base tests `test_brief_test_isolation_requires_seeded_pester_shuffle` and `test_contract_premortem_test_isolation_requires_seeded_pester_shuffle` in place of `test_brief_test_isolation_states_parallel_gates`, `test_brief_copies_carry_no_removed_run_tokens`, and `test_contract_premortem_test_isolation_states_parallel_gates`. Remove `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, which the reduction added.
-6. Run the contract tests: run `test_execution_environment_brief_contracts.py`, `test_single_pass_preflight_contracts.py`, `test_push_down_claude_resource_contracts.py`, and `test_push_down_codex_and_agents_resource_contracts.py`.
+5. Restore contract-test literals: restore the merge-base tests `test_brief_test_isolation_requires_seeded_pester_shuffle` and `test_contract_premortem_test_isolation_requires_seeded_pester_shuffle` in place of `test_brief_test_isolation_states_parallel_gates`, `test_brief_copies_carry_no_removed_run_tokens`, and `test_contract_premortem_test_isolation_states_parallel_gates`. Remove `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, which the reduction added. For the #1096 landing, the blocks of step 1 restore `test_run_full_runs_all_tools_on_entire_codebase` in `test_qc_runner.py`, `test_build_includes_toolchain_instructions` in `test_prompt_builder.py`, and `test_build_preflight_qc_fix_prompt_includes_workspace` and the module constant `_PYTEST_STEP` in `test_cli_part3.py`, and they remove the tests that landing added: `test_full_loop_full_test_runs_xdist_workers` and `test_python_toolchain_pytest_command_runs_xdist_workers` in `test_qc_runner.py`, `test_preflight_pytest_step_runs_xdist_workers` with its class `TestPreflightParallelCommand` in `test_cli_part2_part2.py`, `test_powershell_test_step_runs_invoke_poshqc_parallel_test`, `test_python_branch_pytest_runs_xdist_workers_with_coverage`, and `test_python_branch_pytest_runs_xdist_workers_without_coverage` in `test_fix_all_branches.py`, and `VT-AGGREGATES-PARALLEL-ONLY`, `VT-DEPENDS-ON-RESOLVES`, `VT-DEFAULT-TEST-TASK`, and `VT-SERIAL-TASKS-REMAIN` in `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`. Also remove the `## Test Runtime` entry of `test_brief_passages_state_parallel_gate_facts` in `test_execution_environment_brief_contracts.py`, which asserts the `fix_all` wording of the pytest bullet that step 1 reverts.
+6. Run the contract tests: run `test_execution_environment_brief_contracts.py`, `test_single_pass_preflight_contracts.py`, `test_push_down_claude_resource_contracts.py`, and `test_push_down_codex_and_agents_resource_contracts.py`. For the #1096 landing, also run `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py`, `test_prompt_builder.py`, `test_cli_part3.py`, `test_cli_part2_part2.py`, `tests/scripts/dev_tools/test_fix_all_branches.py`, and `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`.
 
 ## Revert Signals
 
-- Before #1096 lands, a leak surfaces as a shard-dependent failure.
+- A leak that `Invoke-PoshQCLeakScan` misses surfaces as a shard-dependent failure.
 - Remediation cycles cite order dependence.
 
 ## Partial Revert

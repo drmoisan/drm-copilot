@@ -146,7 +146,8 @@ def run_python_branch(
             failed_step="Pyright: type-check",
         )
 
-    pytest_command: list[str] = ["poetry", "run", "pytest"]
+    # The suite runs on parallel workers with and without coverage (issue #1096).
+    pytest_command: list[str] = ["poetry", "run", "pytest", "-n", "auto"]
     pytest_step_name = (
         "Pytest: test with coverage" if include_coverage else "Pytest: test"
     )

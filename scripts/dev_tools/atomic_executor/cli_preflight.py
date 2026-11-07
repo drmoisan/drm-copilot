@@ -124,6 +124,8 @@ def run_preflight_qc_with_capture(
                     "poetry",
                     "run",
                     "pytest",
+                    "-n",
+                    "auto",
                     "--color=no",
                     "--cov=scripts/dev_tools",
                     "--cov-report=term-missing",
@@ -374,7 +376,7 @@ def build_preflight_qc_fix_prompt(
                 "   - `poetry run black .`",
                 "   - `poetry run ruff check`",
                 "   - `poetry run pyright`",
-                "   - `poetry run pytest "
+                "   - `poetry run pytest -n auto "
                 "--cov=scripts/dev_tools --cov-report=term-missing`",
             ]
         )

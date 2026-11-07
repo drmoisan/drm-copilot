@@ -244,6 +244,7 @@ def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
         (
             "`poshqc / PowerShell hook suites (Linux)`",
             "`poshqc / PowerShell QC static`",
+            "the `Invoke-PoshQCLeakScan` leak scan",
             "`poshqc / PowerShell QC shard 1`",
             "the aggregator `poshqc / PowerShell QC`",
             "`Change scope`",
@@ -457,6 +458,7 @@ def test_brief_test_isolation_states_parallel_gates() -> None:
             "debugging only",
             "never a gate or evidence",
             "parallel gates govern",
+            "Invoke-PoshQCLeakScan",
         ),
     )
 
@@ -505,13 +507,16 @@ def test_brief_passages_state_parallel_gate_facts() -> None:
         "## CI-Only Failure Classes": (
             "Files in one shard share a process",
             "a leak surfaces when shard contents change",
+            "`Invoke-PoshQCLeakScan` is the check for such leaks",
         ),
         "## PowerShell Route and PoshQC MCP Limits": (
             "`Invoke-PoshQCParallelTest`",
             "`ExitCode`",
             "only after a fully green run",
             "`artifacts/pester/parallel/shard-<i>/`",
+            "No MCP tool exposes `Invoke-PoshQCLeakScan`",
         ),
+        "## Test Runtime": ("of the `fix_all` pytest step",),
         "## Contract Tests That Pin Mirrored Files": (
             "`tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`",
         ),

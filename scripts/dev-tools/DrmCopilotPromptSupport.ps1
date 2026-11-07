@@ -6,11 +6,14 @@ function global:Get-DrmCopilotNormalizedPath {
     [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Path
+        [string]$Path,
+
+        [Parameter()]
+        [scriptblock]$GetLocationPath = { $PWD.ProviderPath }
     )
 
     # Resolve relative input against the PowerShell location, not the process directory.
-    return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PWD.ProviderPath, $Path)).TrimEnd('\', '/')
+    return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine((& $GetLocationPath), $Path)).TrimEnd('\', '/')
 }
 
 function global:Test-DrmCopilotPathWithinRepo {
@@ -115,7 +118,10 @@ function global:Resolve-DrmCopilotActivationScriptPath {
         [string]$RepoRootPath,
 
         [Parameter()]
-        [string]$VirtualEnvironmentPath = (Join-Path -Path $RepoRootPath -ChildPath ".venv")
+        [string]$VirtualEnvironmentPath = (Join-Path -Path $RepoRootPath -ChildPath ".venv"),
+
+        [Parameter()]
+        [scriptblock]$GetLocationPath = { $PWD.ProviderPath }
     )
 
     $activationScriptPath = Join-Path -Path $VirtualEnvironmentPath -ChildPath "Scripts\Activate.ps1"
@@ -124,7 +130,7 @@ function global:Resolve-DrmCopilotActivationScriptPath {
     }
 
     # Test-Path above resolves against the PowerShell location; resolve the returned path the same way.
-    return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PWD.ProviderPath, $activationScriptPath))
+    return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine((& $GetLocationPath), $activationScriptPath))
 }
 
 function global:Start-DrmCopilotPromptSession {
