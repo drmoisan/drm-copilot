@@ -150,7 +150,7 @@ A failure, or a step that changes a file, restarts the loop from [P3-T1]; a chan
   - Acceptance: `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` has one PASS, FAIL or N/A row per checklist item, per AC and per row named above; a FAIL row is fixed, the loop re-runs from [P3-T1] and the self-review is rewritten; the plan does not complete with a FAIL row.
 - [x] [P3-T22] Confirm the final state of the canonical files after the self-review: `artifacts/pester/powershell-coverage.xml` is the [P3-T7] write and `artifacts/python/lcov.info` is the [P3-T13] write.
   - Acceptance: both modification times are unchanged from those recorded in [P3-T7] and [P3-T14]; the result is appended as a row of the [P3-T21] self-review file.
-- [ ] [P3-T23] Commit the Phase 3 evidence under `FEATURE/evidence/` and any loop fixes, and push.
+- [x] [P3-T23] Commit the Phase 3 evidence under `FEATURE/evidence/` and any loop fixes, and push.
   - Acceptance: `git status --porcelain` prints nothing and `git rev-parse HEAD` equals `git rev-parse @{u}`.
 
 ## Acceptance Criteria Traceability (items this cycle touches)
