@@ -14,7 +14,7 @@ handoffs:
     send: true
   - label: Small-scope implementation path
     agent: csharp-typed-engineer
-    prompt: "Estimate and confirm scope (1-3 production C# files + corresponding tests). If confirmed, execute the constrained short-path implementation phase from the approved minimal-audit plan and return analyzer and type deltas, gate failures, and per-file coverage."
+    prompt: "Estimate and confirm scope (1-3 production C# files + corresponding tests). If confirmed, execute the constrained short-path implementation phase from the approved minimal-audit plan and return analyzer/type/test/coverage deltas."
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
@@ -42,7 +42,7 @@ handoffs:
     send: true
   - label: Execute approved C# atomic plan
     agent: csharp-atomic-executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce C# quality gates from agent policy.\n4) Complete final QA loop (format → analyze/lint → type-check → test) and report analyzer and type deltas, gate failures, and per-file coverage.\n5) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer and type deltas, gate failures, and per-file coverage\n- AC Status Summary\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce C# quality gates from agent policy.\n4) Complete final QA loop (format → analyze/lint → type-check → test) and report analyzer/type/test/coverage deltas.\n5) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer/type/test/coverage deltas\n- AC Status Summary\n- updated plan checklist state"
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
@@ -198,7 +198,7 @@ S4.1 Delegate handoff **Execute Phase 0 only** using approved `plan-path`.
 Hard enforcement for S4:
 - Execute only Phase 0.
 - Persist checkpoint with Phase 0 completion evidence.
-- Do not mark S4 complete unless `phase0-instructions-read.md` and the baseline command-step artifacts referenced by the plan exist on disk, and the corresponding Phase 0 checklist items are checked from execution evidence rather than inferred summary text.
+- Do not mark S4 complete unless the baseline command-step artifacts referenced by the plan exist on disk, and the corresponding Phase 0 checklist items are checked from execution evidence rather than inferred summary text.
 
 ### Step S5 — Branch by bootstrap mode
 
@@ -216,7 +216,7 @@ Delegate to `csharp-typed-engineer` using handoff **Small-scope implementation p
 Required delegation expectations:
 - implement only Phase 1 placeholder scope,
 - strict QA gates,
-- final analyzer and type deltas, gate failures, and per-file coverage,
+- final analyzer/type/test/coverage deltas,
 - completion report referencing `${feature-folder}` and approved `plan-path`.
 
 ### Step S7 — Validate delivery and post-QC documentation
@@ -316,7 +316,7 @@ Hard enforcement for Step 4:
 Delegate to `csharp-atomic-executor` via handoff **Execute approved C# atomic plan** using the Step 4 approved `plan-path`.
 
 Hard enforcement for Step 5:
-- Do not mark Step 5 complete until execution output includes execution summary, QA summary, and analyzer and type deltas, gate failures, and per-file coverage.
+- Do not mark Step 5 complete until execution output includes execution summary, QA summary, and analyzer/type/test/coverage deltas.
 
 ### Step 6 — Post-implementation review
 
@@ -350,7 +350,7 @@ Checkpoint writes are mandatory after each completed sub-step in the large and s
 Artifact verification gate before mission completion (small path):
 - At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
 - At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
-- `phase0-instructions-read.md` and baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
+- baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
 - If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist and the latest re-audit must pass.
 
 Artifact verification gate before mission completion (large path):

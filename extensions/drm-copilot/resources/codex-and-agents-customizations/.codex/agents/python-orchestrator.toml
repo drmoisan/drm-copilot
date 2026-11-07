@@ -39,7 +39,7 @@ Routing and lifecycle rules:
 - Do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until lifecycle setup succeeds.
 - Do not persist placeholder lifecycle values such as `NONE`, `TBD`, or empty strings once lifecycle setup begins.
 - Do not treat delegated planning as complete until the returned `plan-path` is concrete and preflight returns `PREFLIGHT: ALL CLEAR`.
-- Do not treat delegated execution as complete until QA output includes Ruff and Pyright deltas, failures in the single gate run, and per-file coverage where policy requires coverage.
+- Do not treat delegated execution as complete until QA output includes Ruff, Pyright, pytest, and coverage deltas against the `Phase 0 baseline`, with failures and per-file coverage read from the single gate run, where policy requires coverage.
 - Do not treat delegated review as complete until the required review artifacts exist on disk and validator-backed checks pass.
 
 Language-specific large-path chain:

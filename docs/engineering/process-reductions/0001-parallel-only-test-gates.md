@@ -11,6 +11,8 @@ Removes the repeated test runs that each item performed before review. The Peste
 
 The reduction landed across this branch's commits, before the ledger rule reached the branch, so no single commit holds it. This entry's own commit carries the `reduction: 0001` token in its subject.
 
+Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed the C# test framework to MSTest and the Pester version to Pester v6 and removed another project's example word from the policy-audit instructions, the stored patch sections of the sixteen paths whose reverse check that merge broke were regenerated so that they carry PR #1108's wording; their hunks are unchanged apart from that wording, and every other section is unchanged.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
@@ -334,7 +336,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 
 ## Revert Steps
 
-1. Apply the blocks: run `git apply -R` of the patch when its check passes. Otherwise replace each `Current` with its `Prior`, which restores the core rule, and restore the other paths from the patch text.
+1. Apply the blocks: revert entry `0006` (`0006-test-suite-baseline-restored.md`) first, because it restores baseline text inside hunks of this entry's patch, so this patch does not reverse-apply while `0006` is in place. Then run `git apply -R` of the patch when its check passes. Otherwise replace each `Current` with its `Prior`, which restores the core rule, and restore the other paths from the patch text.
 2. Re-copy mirrors and bundles: copy `.claude/skills/execution-environment/SKILL.md` to its five copies, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md`. Copy each `atomic-plan-contract` source to its bundle copy: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md`.
 3. Regenerate Codex variants: run `scripts/dev_tools/generate_codex_agent_variants.py` in module form, then run it with `--check`.
 4. Restore pinned hashes: not applicable, because `parallel_orchestrator_surface_expectations.py` is outside the reduction path set.
@@ -345,3 +347,21 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 
 - Before #1096 lands, a leak surfaces as a shard-dependent failure.
 - Remediation cycles cite order dependence.
+
+## Partial Revert
+
+The owner decided on 2026-11-07 to restore the test-suite baseline and to keep every parallel-only rule of this entry. Entry `0006` (`0006-test-suite-baseline-restored.md`) records that partial revert, so reverting `0006` re-applies this entry's baseline removal. `0006` restores these parts of this entry, each as one run of the parallel gate, the `Phase 0 baseline`:
+
+- B1: the Phase 0 test-suite baseline of `## Phase 0 Requirements`, the short-path baseline capture bullet and its baseline test-step artifact bullet, and the final-QC post-change coverage wording in the three `atomic-plan-contract` sources and their bundles.
+- B2: the baseline half of `## Coverage Evidence Contract (Mandatory when policy requires coverage)`.
+- B3: the minor-audit baseline evidence of `## Mode-Specific Mandatory Plan Gates`.
+- B4: the brief's coverage bullet in `## Coverage and File-Size Gates` and the `parallel-gate-wording.Tests.ps1` description, in all six copies.
+- B5: the policy-audit template's numeric baseline cells, baseline artifact lines, verdict and fail-closed rules, the `Baseline Coverage Documented` and `No Coverage Regression` rows, the comparison bullet, and the fail-closed reminder.
+- B6: the audit instructions' baseline coverage, the comparison with the baseline, the worked example, the verdict and fail-closed lines, and the metrics summary.
+- B7: the review rules for modified files (no regression on changed lines), the PowerShell no-regression clause, the blocking clause, and the scope of the `N/A - no pre-change run` record.
+- B8: the QA gates' Phase A baseline record and `Delta Requirements`, reporting, and evidence storage.
+- B9: the planner, executor, typed engineers, `invoke-*-engineer` skills, remediation handoff, and `orchestrator-workflow` baseline wording, with their Codex bases and generated variants.
+- B10: the Copilot executors, planners, orchestrators, typed and test engineers, `execute-hard-lock` prompts, and their Codex counterparts.
+- B11: the plan templates' fail-closed rule and coverage-evidence lines.
+
+Not restored: every serial, single-process, seeded-shuffle, reversed-order, targeted, per-batch, or comparison run, the `Invoke-PoshQCTest` and bare `poetry run pytest` commands, and `## Test Isolation Checks`. This entry's `## Prior Text` blocks are unchanged by `0006`.

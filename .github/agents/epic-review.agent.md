@@ -351,7 +351,7 @@ Required contents (must be machine-checkable and stored as an evidence artifact 
 - `EXIT_CODE: <int>` (for each command)
 - Command output proving absence (e.g., `git grep <test_name>` returning no matches)
 - `WhyFailingRunImpossible: <1–3 sentences>`
-- `AlternativeProof: <gate coverage | absence-of-test proof | other>`
+- `AlternativeProof: <coverage delta | absence-of-test proof | other>`
 
 When this dossier exists, the criterion may be marked:
 

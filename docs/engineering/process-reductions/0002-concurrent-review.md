@@ -7,7 +7,7 @@ Date: 2026-11-07
 Issue: #1097
 Merge commit: 72e57cc7dfd4ba78579a2c86887aa0c77d5d9cef
 
-Moves the feature review from before pull-request creation to beside CI. A new run records `review_mode: "concurrent"`, opens its pull request after the local test run passes, and runs the review and CI at the same time. The merge waits for both. The `Merge commit:` line held the canonical issue number as a stand-in until the pull request existed, then the pull request number, and now holds the merge commit.
+Moves the feature review from before pull-request creation to beside CI. A new run records `review_mode: "concurrent"`, opens its pull request after the local test run passes, and runs the review and CI at the same time. The merge waits for both. The `Merge commit:` line held the canonical issue number as a stand-in until the pull request existed, then the pull request number, and now holds the merge commit. The deferred `execution-environment` brief wording of this reduction landed in a later commit under K3, which updated this entry.
 
 Renumbered from 0001, because PR #1102 took that number on `main` first. The reduction commit's subject carries the token `reduction: 0001` and cannot be rewritten without a forced push; the renumbering commit's subject carries `reduction: 0002`. Find the reduction by its commit subject, `feat(orchestrate): run the feature review beside CI`, or by `reduction: 0002`.
 
@@ -46,6 +46,9 @@ The reduction removes the wait of CI behind review, as research section 6 of `do
 - `extensions/drm-copilot/test/lib/validate/orchestrator-state-concurrent-review.test.ts`, new
 - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, new
 - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`, new
+- `.claude/skills/execution-environment/SKILL.md`, the deferred brief wording (K3): the merge guard, the merge-text rule, the join, the checkpoint route, and the contract suite
+- `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md`, byte-identical copies of the brief
+- `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`, the `PCW-BRIEF-` rows of the deferred brief wording
 - `docs/engineering/process-reductions/README.md`, the index row of this entry
 
 ## Prior Text
@@ -434,14 +437,64 @@ The top-level checkpoint key `review_mode` selects the concurrent run sequence. 
 ````Prior
 ````
 
+### Revert Block: .claude/skills/execution-environment/SKILL.md
+
+````Current
+- Merge guard (#1097): `.claude/hooks/enforce-epic-merge-gate-review.ps1`, byte-identical to its `.codex/hooks/` twin, is dot-sourced by both `enforce-epic-merge-gate.ps1` gates and is inert unless the checkpoint it reads records `review_mode: "concurrent"`. Under that key it denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`. It reads the checkpoint of the item target that its gate resolves; on Claude, merge text that names no single pull request also reads the items of at most the first 4 numbers in the text (the shape rule). It is a policy-level control, not a security control (decision D10 in `.claude/rules/orchestrator-state.md`).
+
+````
+
+````Prior
+````
+
+### Revert Block: .claude/skills/execution-environment/SKILL.md
+
+````Current
+- Merge text under the concurrent-review key (#1097): when a checkpoint the merge gate reads records `review_mode: "concurrent"`, Bash text that could be a merge and cannot be bound to one pull request is denied with `REVIEW_GATE_HEAD_UNRESOLVED`. That includes prose holding `pr merge`, `pr (`, or `pr $`, and a merge followed by a line feed or `;`. Issue a merge as one plain `gh pr merge` of one number in its own Bash call, and pass commit messages through `git commit -F` with a file.
+
+````
+
+````Prior
+````
+
+### Revert Block: .claude/skills/execution-environment/SKILL.md
+
+````Current
+- Concurrent-review join (#1097): under `review_mode: "concurrent"` a green `CI Required Gate` alone does not permit a merge. The join in `## Concurrent Review and CI (review_mode)` of `.claude/skills/orchestrate/SKILL.md` also needs the last `review_outcomes[]` entry to be `PASS` at a current head, and a `CI full run` check with conclusion `success` at the reviewed head or at an ancestor of it whose diff to the reviewed head lists only `feature-folder` paths. The parallel parent withholds `merge_status: ci_green` and the merge until then.
+
+````
+
+````Prior
+````
+
+### Revert Block: .claude/skills/execution-environment/SKILL.md
+
+````Current
+- Concurrent checkpoints (#1097): until the extension release that carries the concurrent-review rule is installed, installed MCP accepts a `review_mode: "concurrent"` checkpoint that the PowerShell stop hook and the Python CLI reject, so such a checkpoint is checked with `scripts/dev_tools/validate_orchestration_artifacts.py` in its `orchestrator-state` subcommand with `--require-complete`.
+
+````
+
+````Prior
+````
+
+### Revert Block: .claude/skills/execution-environment/SKILL.md
+
+````Current
+- `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
+
+````
+
+````Prior
+````
+
 ## Revert Steps
 
 1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, in the order of this entry. Then delete `scripts/dev_tools/_orchestrator_state_concurrent_review.py`, `tests/scripts/dev_tools/test_orchestrator_state_concurrent_review.py`, `extensions/drm-copilot/src/lib/validate/orchestrator-state-concurrent-review.ts`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-concurrent-review.test.ts`, the folder `tests/fixtures/orchestrator_state_concurrent_review/`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, and `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`. Leave the merge guard in place, because it is inert without the key.
-2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/skills/orchestrate/SKILL.md`, `.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/rules/orchestrator-state.md`, `.claude/agents/orchestrator.md`, and the three modules `OrchestratorState.psm1`, `OrchestratorStateCompletionChecks.psm1`, and `OrchestratorStateCompletion.psm1` under `claude-customizations/`, and `.agents/skills/orchestrate/SKILL.md` and `.agents/skills/orchestrator-state/SKILL.md` under `codex-and-agents-customizations/`.
+2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/skills/orchestrate/SKILL.md`, `.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/rules/orchestrator-state.md`, `.claude/agents/orchestrator.md`, and the three modules `OrchestratorState.psm1`, `OrchestratorStateCompletionChecks.psm1`, and `OrchestratorStateCompletion.psm1` under `claude-customizations/`, and `.agents/skills/orchestrate/SKILL.md` and `.agents/skills/orchestrator-state/SKILL.md` under `codex-and-agents-customizations/`. Then copy `.claude/skills/execution-environment/SKILL.md` to its five byte-identical copies: `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, and the three bundle copies under `claude-customizations/`, `codex-and-agents-customizations/`, and `customizations/`.
 3. Regenerate Codex variants: not applicable, because no base agent variant changed; still run the generator `--check`.
 4. Restore pinned hashes: not applicable, because no pinned surface moved.
-5. Restore contract-test literals: not applicable, because no contract-test pin changed.
-6. Run the contract tests: run `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_ci_gate_all_checks_contracts.py`, `test_parallel_orchestrator_surface_contracts.py`, `test_orchestration_guardrail_contracts.py`, `test_claude_rules_frontmatter.py`, `checkpoint-hygiene-skill-contract.Tests.ps1`, and `StageTimingDocumentation.Tests.ps1`.
+5. Restore contract-test literals: remove the five `PCW-BRIEF-` row groups of the deferred brief wording (`MERGE-GUARD`, `MERGE-TEXT`, `JOIN`, `CHECKPOINT-ROUTE`, and `CONCURRENT-CONTRACT-TEST`) from `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`.
+6. Run the contract tests: run `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_ci_gate_all_checks_contracts.py`, `test_parallel_orchestrator_surface_contracts.py`, `test_orchestration_guardrail_contracts.py`, `test_claude_rules_frontmatter.py`, `checkpoint-hygiene-skill-contract.Tests.ps1`, `StageTimingDocumentation.Tests.ps1`, `test_execution_environment_brief_contracts.py`, and `planning-contract-wording.Tests.ps1`.
 
 ## Revert Signals
 

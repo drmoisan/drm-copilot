@@ -6,9 +6,12 @@ This ledger records every reduction of evidence, plan tasks, gates, or review pr
 
 | ID | Title | Date | Issue | Status |
 | --- | --- | --- | --- | --- |
-| [0001](0001-parallel-only-test-gates.md) | Parallel-only test gates | 2026-11-07 | #1094 | Active |
+| [0001](0001-parallel-only-test-gates.md) | Parallel-only test gates | 2026-11-07 | #1094 | Partially reverted by 0006 |
 | [0002](0002-concurrent-review.md) | Concurrent review | 2026-11-07 | #1097 | Active |
 | [0003](0003-light-remediation.md) | Light remediation | 2026-11-07 | #1097 | Active |
+| [0004](0004-smaller-plans.md) | Smaller plans | 2026-11-07 | #1097 | Active |
+| [0005](0005-policy-read-removal.md) | Policy-read removal | 2026-11-07 | #1097 | Active |
+| [0006](0006-test-suite-baseline-restored.md) | Test-suite baseline restored | 2026-11-07 | #1097 | Active |
 
 A data row's ID cell is a link such as `[0001](0001-short-name.md)`, and its label equals the number of the linked file. Every entry file has one row, and every row has one entry file.
 
@@ -39,6 +42,8 @@ Each block holds a `Current` fence, with the text as it stands after the reducti
 6. `Run the contract tests`
 
 A label that does not apply stays in the list and states "not applicable".
+
+A partial revert of an earlier entry is a new entry whose `Current` fences hold the restored text and whose `Prior` fences hold the earlier entry's text, so that reverting the new entry re-applies the reduction. The earlier entry gains a `## Partial Revert` section that names the new entry and lists what it restores, step 1 of its `## Revert Steps` states that the new entry is reverted first, and its index Status reads `Partially reverted by NNNN`, where `NNNN` is the new entry.
 
 Three further rules apply:
 
