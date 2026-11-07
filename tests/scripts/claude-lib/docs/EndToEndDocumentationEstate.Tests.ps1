@@ -9,9 +9,10 @@
 .DESCRIPTION
     Dot-sources .claude/lib/docs/Invoke-DocsCommand.ps1 and runs inventory, update-ledger,
     generate-reference and validate -Mode docs-complete in process through Invoke-DocsCommandCli,
-    with one stateful in-memory context from DocumentationEstateFixture.TestSupport.psm1 per test.
-    Invoke-EstateScenario replays the scenario up to a named step for each test (D-3), so no state
-    is shared between tests:
+    with one stateful in-memory context from DocumentationEstateFixture.TestSupport.psm1 per Context.
+    Each Context replays the scenario once, in its BeforeAll, through Invoke-EstateScenario up to a
+    named step (D-3a); its It blocks only read that result, so no state is shared between Context
+    blocks:
     - Baseline: at revision R1 every element is documented, bound to the CLI reference page,
       generated, pinned and assessed, and docs-complete passes.
     - Defects: a line inside command A's declaration lines changes and command B is added at R2;
@@ -22,6 +23,9 @@
     Every inventory runs with -AnalysisMethod scanner, so the InvokeProcess fake records no call.
     No file is written and no process starts.
 #>
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Each Context BeforeAll assigns the scenario result that its It blocks read')]
+param()
 
 BeforeAll {
     $script:RepositoryRootPath = [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath '../../../..'))
@@ -84,15 +88,22 @@ BeforeAll {
     }
 
     function Invoke-EstateDocumentElement {
-        # Records one element as documented on the page, pins it and assesses the required dimension.
-        param([Parameter(Mandatory = $true)] [hashtable] $Test, [Parameter(Mandatory = $true)] [string] $ElementId, [switch] $DispositionOnly, [switch] $PinOnly)
-        if (-not $PinOnly) {
+        # Runs the named update-ledger operations for one element in the order disposition, pin,
+        # dimension: records it as documented on the page, pins it, assesses the required dimension.
+        param(
+            [Parameter(Mandatory = $true)] [hashtable] $Test,
+            [Parameter(Mandatory = $true)] [string] $ElementId,
+            [Parameter(Mandatory = $true)] [ValidateSet('Disposition', 'Pin', 'Dimension')] [string[]] $LedgerOperation
+        )
+        if ($LedgerOperation -contains 'Disposition') {
             $null = Invoke-EstateCommand -Test $Test -Command 'update-ledger' -Argument (@('-Operation', 'set-disposition', '-Element', $ElementId, '-Disposition', 'documented', '-Page', $script:Page, '-Write') + $script:Actor) -ExpectedExitCode 0
         }
-        if ($DispositionOnly) { return }
-        $null = Invoke-EstateCommand -Test $Test -Command 'update-ledger' -Argument (@('-Operation', 'pin', '-Element', $ElementId, '-Page', $script:Page, '-Write') + $script:Actor) -ExpectedExitCode 0
-        if ($PinOnly) { return }
-        $null = Invoke-EstateCommand -Test $Test -Command 'update-ledger' -Argument (@('-Operation', 'set-dimension', '-Element', $ElementId, '-Page', $script:Page, '-Dimension', 'exists', '-State', 'pass', '-Write') + $script:Actor) -ExpectedExitCode 0
+        if ($LedgerOperation -contains 'Pin') {
+            $null = Invoke-EstateCommand -Test $Test -Command 'update-ledger' -Argument (@('-Operation', 'pin', '-Element', $ElementId, '-Page', $script:Page, '-Write') + $script:Actor) -ExpectedExitCode 0
+        }
+        if ($LedgerOperation -contains 'Dimension') {
+            $null = Invoke-EstateCommand -Test $Test -Command 'update-ledger' -Argument (@('-Operation', 'set-dimension', '-Element', $ElementId, '-Page', $script:Page, '-Dimension', 'exists', '-State', 'pass', '-Write') + $script:Actor) -ExpectedExitCode 0
+        }
     }
 
     function Invoke-EstateScenario {
@@ -107,12 +118,9 @@ BeforeAll {
         # Baseline at R1: inventory, dispositions, generation, pins, dimensions, sync-refs, validate.
         $null = Invoke-EstateCommand -Test $test -Command 'inventory' -Argument @('-Revision', $DocumentationEstateRevision1, '-AnalysisMethod', 'scanner', '-Write') -ExpectedExitCode 0
         $ids = @((Get-EstateDocument -Test $test -Path $script:SnapshotPath)['elements'] | ForEach-Object { [string] $_['element_id'] })
-        foreach ($id in $ids) { Invoke-EstateDocumentElement -Test $test -ElementId $id -DispositionOnly }
+        foreach ($id in $ids) { Invoke-EstateDocumentElement -Test $test -ElementId $id -LedgerOperation 'Disposition' }
         $null = Invoke-EstateCommand -Test $test -Command 'generate-reference' -Argument @('-Write') -ExpectedExitCode 0
-        foreach ($id in $ids) {
-            $null = Invoke-EstateCommand -Test $test -Command 'update-ledger' -Argument (@('-Operation', 'pin', '-Element', $id, '-Page', $script:Page, '-Write') + $script:Actor) -ExpectedExitCode 0
-            $null = Invoke-EstateCommand -Test $test -Command 'update-ledger' -Argument (@('-Operation', 'set-dimension', '-Element', $id, '-Page', $script:Page, '-Dimension', 'exists', '-State', 'pass', '-Write') + $script:Actor) -ExpectedExitCode 0
-        }
+        foreach ($id in $ids) { Invoke-EstateDocumentElement -Test $test -ElementId $id -LedgerOperation 'Pin', 'Dimension' }
         $null = Invoke-EstateCommand -Test $test -Command 'update-ledger' -Argument (@('-Operation', 'sync-refs', '-Write') + $script:Actor) -ExpectedExitCode 0
         $runs['Baseline'] = Invoke-EstateCommand -Test $test -Command 'validate' -Argument @('-Mode', 'docs-complete', '-Revision', $DocumentationEstateRevision1)
         Add-EstateCapture -Test $test -Capture $capture -Step 'Baseline'
@@ -138,11 +146,10 @@ BeforeAll {
         # Fixed: B recorded and assessed, the page regenerated, A re-pinned.
         $idA = Get-EstateElementId -Test $test -Declaration $script:DeclarationA
         $idB = Get-EstateElementId -Test $test -Declaration $script:DeclarationB
-        Invoke-EstateDocumentElement -Test $test -ElementId $idB -DispositionOnly
+        Invoke-EstateDocumentElement -Test $test -ElementId $idB -LedgerOperation 'Disposition'
         $null = Invoke-EstateCommand -Test $test -Command 'generate-reference' -Argument @('-Write') -ExpectedExitCode 0
-        Invoke-EstateDocumentElement -Test $test -ElementId $idB -PinOnly
-        $null = Invoke-EstateCommand -Test $test -Command 'update-ledger' -Argument (@('-Operation', 'set-dimension', '-Element', $idB, '-Page', $script:Page, '-Dimension', 'exists', '-State', 'pass', '-Write') + $script:Actor) -ExpectedExitCode 0
-        Invoke-EstateDocumentElement -Test $test -ElementId $idA -PinOnly
+        Invoke-EstateDocumentElement -Test $test -ElementId $idB -LedgerOperation 'Pin', 'Dimension'
+        Invoke-EstateDocumentElement -Test $test -ElementId $idA -LedgerOperation 'Pin'
         $null = Invoke-EstateCommand -Test $test -Command 'update-ledger' -Argument (@('-Operation', 'sync-refs', '-Write') + $script:Actor) -ExpectedExitCode 0
         $runs['Fixed'] = Invoke-EstateCommand -Test $test -Command 'validate' -Argument @('-Mode', 'docs-complete', '-Revision', $DocumentationEstateRevision2)
         Add-EstateCapture -Test $test -Capture $capture -Step 'Fixed'
@@ -161,111 +168,131 @@ AfterAll {
 }
 
 Describe 'documentation estate end to end' {
-    It 'passes docs-complete at revision R1 after inventory, ledger and generation' {
-        # Act
-        $scenario = Invoke-EstateScenario -Through 'Baseline'
-        $run = $scenario.Run['Baseline']
+    Context 'baseline at revision R1' {
+        BeforeAll {
+            $scenario = Invoke-EstateScenario -Through 'Baseline'
+        }
 
-        # Assert
-        $run.ExitCode | Should -Be 0 -Because (@($run.Envelope['findings'] | ForEach-Object { $_['code'] }) -join ', ')
-        $run.Envelope['result']['validation_result'] | Should -BeExactly 'pass'
-        $run.Envelope['result']['revision'] | Should -BeExactly $DocumentationEstateRevision1
-        $scenario.Test.Files.ContainsKey($script:Page) | Should -BeTrue -Because 'generate-reference -Write created the bound page'
-    }
+        It 'passes docs-complete at revision R1 after inventory, ledger and generation' {
+            # Act
+            $run = $scenario.Run['Baseline']
 
-    It 'fails docs-complete at revision R2 with exit code 1' {
-        # Act
-        $run = (Invoke-EstateScenario -Through 'Defects').Run['Defects']
-
-        # Assert
-        $run.ExitCode | Should -Be 1
-        @($run.Envelope['findings'] | Where-Object { $_['severity'] -ceq 'error' } | ForEach-Object { $_['code'] } | Sort-Object -Unique) | Should -Be @('DOCS_LEDGER_MISSING_DISPOSITION', 'DOCS_STALE_PAGE')
-    }
-
-    It "reports DOCS_LEDGER_MISSING_DISPOSITION with the new command's element identifier and declaration" {
-        # Arrange
-        $scenario = Invoke-EstateScenario -Through 'Defects'
-        $idB = Get-EstateElementId -Test $scenario.Test -Declaration $script:DeclarationB
-
-        # Act
-        $missing = @(Get-EstateErrorFinding -Envelope $scenario.Run['Defects'].Envelope -Code 'DOCS_LEDGER_MISSING_DISPOSITION')
-
-        # Assert
-        $missing.Count | Should -Be 1
-        @($missing[0]['related_ids']) | Should -Contain $idB
-        $missing[0]['message'].Contains($script:DeclarationB, [System.StringComparison]::Ordinal) | Should -BeTrue -Because 'the finding names the declaration of B'
-    }
-
-    It "reports DOCS_STALE_PAGE with the stale page path and the changed command's declaration" {
-        # Act
-        $stale = @(Get-EstateErrorFinding -Envelope (Invoke-EstateScenario -Through 'Defects').Run['Defects'].Envelope -Code 'DOCS_STALE_PAGE')
-
-        # Assert
-        $stale.Count | Should -Be 1
-        @($stale[0]['related_paths']) | Should -Contain $script:Page
-        $stale[0]['message'].Contains($script:DeclarationA, [System.StringComparison]::Ordinal) | Should -BeTrue -Because 'the finding names the declaration of A'
-        $stale[0]['message'].Contains('digest-changed', [System.StringComparison]::Ordinal) | Should -BeTrue
-    }
-
-    It 'returns a receipt whose validation_result is fail' {
-        # Act
-        $run = (Invoke-EstateScenario -Through 'Defects').Run['Defects']
-
-        # Assert
-        $run.Envelope['result']['validation_result'] | Should -BeExactly 'fail'
-        $run.Envelope['result']['revision'] | Should -BeExactly $DocumentationEstateRevision2
-    }
-
-    It 'passes docs-complete at revision R2 after the ledger and page are fixed' {
-        # Act
-        $run = (Invoke-EstateScenario -Through 'Fixed').Run['Fixed']
-
-        # Assert
-        $run.ExitCode | Should -Be 0 -Because (@($run.Envelope['findings'] | ForEach-Object { $_['code'] }) -join ', ')
-        $run.Envelope['result']['validation_result'] | Should -BeExactly 'pass'
-    }
-
-    It 'records analysis_method scanner on every inventory snapshot element in every step' {
-        # Act
-        $capture = (Invoke-EstateScenario -Through 'Fixed').Capture
-
-        # Assert
-        foreach ($step in 'Baseline', 'Defects', 'Fixed') {
-            $elements = @($capture[$step].Snapshot['elements'])
-            $elements.Count | Should -BeGreaterThan 0 -Because "the $step snapshot holds elements"
-            foreach ($element in $elements) { $element['analysis_method'] | Should -BeExactly 'scanner' -Because "$step element $($element['declaration'])" }
+            # Assert
+            $run.ExitCode | Should -Be 0 -Because (@($run.Envelope['findings'] | ForEach-Object { $_['code'] }) -join ', ')
+            $run.Envelope['result']['validation_result'] | Should -BeExactly 'pass'
+            $run.Envelope['result']['revision'] | Should -BeExactly $DocumentationEstateRevision1
+            $scenario.Test.Files.ContainsKey($script:Page) | Should -BeTrue -Because 'generate-reference -Write created the bound page'
         }
     }
 
-    It 'records analysis_method scanner on every ledger entry in every step' {
-        # Act
-        $capture = (Invoke-EstateScenario -Through 'Fixed').Capture
+    Context 'defects at revision R2' {
+        BeforeAll {
+            $scenario = Invoke-EstateScenario -Through 'Defects'
+        }
 
-        # Assert
-        foreach ($step in 'Baseline', 'Defects', 'Fixed') {
-            $entries = @($capture[$step].Ledger['entries'])
-            $entries.Count | Should -BeGreaterThan 0 -Because "the $step ledger holds entries"
-            foreach ($entry in $entries) { $entry['analysis_method'] | Should -BeExactly 'scanner' -Because "$step entry $($entry['element_id'])" }
+        It 'fails docs-complete at revision R2 with exit code 1' {
+            # Act
+            $run = $scenario.Run['Defects']
+
+            # Assert
+            $run.ExitCode | Should -Be 1
+            @($run.Envelope['findings'] | Where-Object { $_['severity'] -ceq 'error' } | ForEach-Object { $_['code'] } | Sort-Object -Unique) | Should -Be @('DOCS_LEDGER_MISSING_DISPOSITION', 'DOCS_STALE_PAGE')
+        }
+
+        It "reports DOCS_LEDGER_MISSING_DISPOSITION with the new command's element identifier and declaration" {
+            # Arrange
+            $idB = Get-EstateElementId -Test $scenario.Test -Declaration $script:DeclarationB
+
+            # Act
+            $missing = @(Get-EstateErrorFinding -Envelope $scenario.Run['Defects'].Envelope -Code 'DOCS_LEDGER_MISSING_DISPOSITION')
+
+            # Assert
+            $missing.Count | Should -Be 1
+            @($missing[0]['related_ids']) | Should -Contain $idB
+            $missing[0]['message'].Contains($script:DeclarationB, [System.StringComparison]::Ordinal) | Should -BeTrue -Because 'the finding names the declaration of B'
+        }
+
+        It "reports DOCS_STALE_PAGE with the stale page path and the changed command's declaration" {
+            # Act
+            $stale = @(Get-EstateErrorFinding -Envelope $scenario.Run['Defects'].Envelope -Code 'DOCS_STALE_PAGE')
+
+            # Assert
+            $stale.Count | Should -Be 1
+            @($stale[0]['related_paths']) | Should -Contain $script:Page
+            $stale[0]['message'].Contains($script:DeclarationA, [System.StringComparison]::Ordinal) | Should -BeTrue -Because 'the finding names the declaration of A'
+            $stale[0]['message'].Contains('digest-changed', [System.StringComparison]::Ordinal) | Should -BeTrue
+        }
+
+        It 'returns a receipt whose validation_result is fail' {
+            # Act
+            $run = $scenario.Run['Defects']
+
+            # Assert
+            $run.Envelope['result']['validation_result'] | Should -BeExactly 'fail'
+            $run.Envelope['result']['revision'] | Should -BeExactly $DocumentationEstateRevision2
         }
     }
 
-    It 'records no InvokeProcess call under -AnalysisMethod scanner' {
-        # Act
-        $scenario = Invoke-EstateScenario -Through 'Fixed'
+    Context 'fixes at revision R2' {
+        BeforeAll {
+            $scenario = Invoke-EstateScenario -Through 'Fixed'
+        }
 
-        # Assert
-        $scenario.Test.ProcessCallLog.Count | Should -Be 0
+        It 'passes docs-complete at revision R2 after the ledger and page are fixed' {
+            # Act
+            $run = $scenario.Run['Fixed']
+
+            # Assert
+            $run.ExitCode | Should -Be 0 -Because (@($run.Envelope['findings'] | ForEach-Object { $_['code'] }) -join ', ')
+            $run.Envelope['result']['validation_result'] | Should -BeExactly 'pass'
+        }
+
+        It 'records analysis_method scanner on every inventory snapshot element in every step' {
+            # Act
+            $capture = $scenario.Capture
+
+            # Assert
+            foreach ($step in 'Baseline', 'Defects', 'Fixed') {
+                $elements = @($capture[$step].Snapshot['elements'])
+                $elements.Count | Should -BeGreaterThan 0 -Because "the $step snapshot holds elements"
+                foreach ($element in $elements) { $element['analysis_method'] | Should -BeExactly 'scanner' -Because "$step element $($element['declaration'])" }
+            }
+        }
+
+        It 'records analysis_method scanner on every ledger entry in every step' {
+            # Act
+            $capture = $scenario.Capture
+
+            # Assert
+            foreach ($step in 'Baseline', 'Defects', 'Fixed') {
+                $entries = @($capture[$step].Ledger['entries'])
+                $entries.Count | Should -BeGreaterThan 0 -Because "the $step ledger holds entries"
+                foreach ($entry in $entries) { $entry['analysis_method'] | Should -BeExactly 'scanner' -Because "$step entry $($entry['element_id'])" }
+            }
+        }
+
+        It 'records no InvokeProcess call under -AnalysisMethod scanner' {
+            # Act: the Context BeforeAll replays the scenario through the Fixed step.
+
+            # Assert
+            $scenario.Test.ProcessCallLog.Count | Should -Be 0
+        }
     }
 
-    It 'fails closed with DOCS_SNAPSHOT_UNPINNED when inventory ran without a revision' {
-        # Act
-        $scenario = Invoke-EstateScenario -Through 'Unpinned'
-        $run = $scenario.Run['Unpinned']
+    Context 'inventory without a revision' {
+        BeforeAll {
+            $scenario = Invoke-EstateScenario -Through 'Unpinned'
+        }
 
-        # Assert
-        $codes = @($run.Envelope['findings'] | ForEach-Object { $_['code'] }) -join ', '
-        $run.ExitCode | Should -Be 1 -Because $codes
-        @(Get-EstateErrorFinding -Envelope $run.Envelope -Code 'DOCS_SNAPSHOT_UNPINNED').Count | Should -Be 1 -Because $codes
-        $scenario.Test.ProcessCallLog.Count | Should -Be 0
+        It 'fails closed with DOCS_SNAPSHOT_UNPINNED when inventory ran without a revision' {
+            # Act
+            $run = $scenario.Run['Unpinned']
+
+            # Assert
+            $codes = @($run.Envelope['findings'] | ForEach-Object { $_['code'] }) -join ', '
+            $run.ExitCode | Should -Be 1 -Because $codes
+            @(Get-EstateErrorFinding -Envelope $run.Envelope -Code 'DOCS_SNAPSHOT_UNPINNED').Count | Should -Be 1 -Because $codes
+            $scenario.Test.ProcessCallLog.Count | Should -Be 0
+        }
     }
 }
