@@ -92,6 +92,7 @@ BeforeAll {
         'enforce-epic-invocation-origin.ps1'     = 'gates epic-planner and epic-orchestrator invocations; the workflow invokes neither'
         'enforce-parallel-cohort-barrier.ps1'    = 'gates parallel cohort delegations; the workflow is not a parallel run'
         'enforce-parallel-drift-gate.ps1'        = 'gates parallel delegations; the workflow is not a parallel run'
+        'enforce-docs-role-write-scope.ps1'      = 'acts only for the four documentation roles; the workflow runs in the main session, which carries no agent_type'
     }
 
     function ConvertTo-WorkflowPayload {
