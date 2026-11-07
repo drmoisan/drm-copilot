@@ -429,7 +429,8 @@ function Get-OrchestratorStateCompletionConcurrentReviewError {
         [psobject] $State
     )
 
-    $mode = (Get-CheckpointObjectMember -Owner $State -Name 'review_mode').Value
+    $mode = $null
+    if ((Get-CheckpointObjectMemberName -Owner $State) -ccontains 'review_mode') { $mode = (Get-CheckpointObjectMember -Owner $State -Name 'review_mode').Value }
     if (-not (($mode -is [string]) -and ($mode -ceq 'concurrent'))) {
         return [string[]]@()
     }

@@ -314,7 +314,8 @@ function Get-OrchestratorStatePrCreationReadinessError {
     )
 
     $errors = [System.Collections.Generic.List[string]]::new()
-    $reviewMode = (Get-OrchestratorStateField -State $State -Name 'review_mode').Value
+    $stateNames = @($State.PSObject.Properties | ForEach-Object { $_.Name })
+    $reviewMode = if ($stateNames -ccontains 'review_mode') { (Get-OrchestratorStateField -State $State -Name 'review_mode').Value } else { $null }
 
     # Reject an upstream step recorded as pending, blocked, or blocked_remediation_loop_limit; steps
     # 5-8 must have finished before the first PR of a branch is created.

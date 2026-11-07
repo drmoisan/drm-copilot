@@ -152,6 +152,15 @@ Describe 'review_mode concurrent readiness (issue #1097)' {
         $result.Output | Should -Match 'step7_status is pending'
     }
 
+    It 'OCR-READINESS-BLOCKS-KEY-NAME-CASE-VARIANT' {
+        Register-ReviewCheckpointFixture -Json (Get-ReviewCheckpointJson -Change @{ step7_status = 'pending'; Review_Mode = 'concurrent' })
+
+        $result = Test-OrchestratorStatePrCreationReadiness -CheckpointPath 'x.json'
+
+        $result.ExitCode | Should -Be 1
+        $result.Output | Should -Match 'step7_status is pending'
+    }
+
     It 'OCR-READINESS-BLOCKS-BLOCKED-STEP7-UNDER-KEY' {
         Register-ReviewCheckpointFixture -Json (Get-ReviewCheckpointJson -Change @{ step7_status = 'blocked'; review_mode = 'concurrent' })
 
@@ -212,5 +221,16 @@ Describe 'review_mode concurrent completion (issue #1097)' {
 
         # Assert
         ($sequential -join "`n") | Should -BeExactly ($without -join "`n")
+    }
+
+    It 'OCR-COMPLETION-UNCHANGED-FOR-KEY-NAME-CASE-VARIANT' {
+        # Arrange
+        $without = Get-ReviewCompletionLine -Json (Get-ReviewCheckpointJson)
+
+        # Act
+        $variant = Get-ReviewCompletionLine -Json (Get-ReviewCheckpointJson -Change @{ Review_Mode = 'concurrent' })
+
+        # Assert: only the exact key name activates the check.
+        ($variant -join "`n") | Should -BeExactly ($without -join "`n")
     }
 }

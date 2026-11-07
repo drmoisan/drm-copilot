@@ -30,6 +30,10 @@ BeforeDiscovery {
         @{ Copy = '.claude/rules/orchestrator-state.md' }
         @{ Copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md' }
     )
+    $script:AgentsStateCopy = @(
+        @{ Copy = '.agents/skills/orchestrator-state/SKILL.md' }
+        @{ Copy = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrator-state/SKILL.md' }
+    )
     $script:AgentCopy = @(
         @{ Copy = '.claude/agents/orchestrator.md' }
         @{ Copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/orchestrator.md' }
@@ -122,6 +126,16 @@ Describe 'orchestrate skill concurrent review section (issue #1097)' {
         Assert-ConcurrentReviewToken -Text $section -Token 'REVIEW_GATE_NOT_PASSED', 'REVIEW_GATE_HEAD_STALE', 'REVIEW_GATE_HEAD_UNRESOLVED'
     }
 
+    It 'CRS-SKILL-COMMITS-ENTRY-NUMBER-BEFORE-HEAD-READ (<Copy>)' -ForEach $script:OrchestrateCopy {
+        $section = Get-ConcurrentReviewSection -Copy $Copy -Heading $script:SectionHeading
+        Assert-ConcurrentReviewToken -Text $section -Token 'open the pull request; a run with a ledger entry commits the entry''s pull-request number next, before reading `head_sha`'
+    }
+
+    It 'CRS-SKILL-STATES-OWN-CALL-MERGE (<Copy>)' -ForEach $script:OrchestrateCopy {
+        $section = Get-ConcurrentReviewSection -Copy $Copy -Heading $script:SectionHeading
+        Assert-ConcurrentReviewToken -Text $section -Token 'The merge is issued as its own Bash call', 'any other form is denied with `REVIEW_GATE_HEAD_UNRESOLVED`'
+    }
+
     It 'CRS-SKILL-KEEPS-COMPLETED-STEPS-CANONICAL (<Copy>)' -ForEach $script:OrchestrateCopy {
         $section = Get-ConcurrentReviewSection -Copy $Copy -Heading $script:SectionHeading
         Assert-ConcurrentReviewToken -Text $section -Token '`completed_steps` stays in canonical order', 'insert `S7_feature_review` before the existing `S8_create_pr` entry'
@@ -162,6 +176,11 @@ Describe 'parallel skill, rule, and agent concurrent review text (issue #1097)' 
     It 'CRS-RULE-DISCLOSES-UNREAD-MERGE-FORMS (<Copy>)' -ForEach $script:RuleCopy {
         $section = Get-ConcurrentReviewSection -Copy $Copy -Heading '## Concurrent-Review Scope and Backward Compatibility'
         Assert-ConcurrentReviewToken -Text $section -Token 'a script file performing the merge cannot be read', 'the Claude PowerShell tool', '`shell_command`', 'An already-queued auto-merge fires with no command', '`gh pr merge <PR> --disable-auto`', 'prose containing `pr merge` is denied in any command', 'a failed read sees no key'
+    }
+
+    It 'CRS-AGENTS-STATE-SKILL-DOCUMENTS-KEY (<Copy>)' -ForEach $script:AgentsStateCopy {
+        $section = Get-ConcurrentReviewSection -Copy $Copy -Heading '## Concurrent-Review Key (review_mode)'
+        Assert-ConcurrentReviewToken -Text $section -Token '`review_mode`', 'the exact string `concurrent`', '`head_sha`', '`## Concurrent Review and CI (review_mode)` in `.agents/skills/orchestrate/SKILL.md`'
     }
 
     It 'CRS-AGENT-DOCUMENTS-HEAD-SHA (<Copy>)' -ForEach $script:AgentCopy {

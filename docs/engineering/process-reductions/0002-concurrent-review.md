@@ -22,6 +22,7 @@ The reduction removes the wait of CI behind review, as research section 6 of `do
 - `.claude/skills/parallel-orchestrate/SKILL.md`
 - `.claude/rules/orchestrator-state.md`
 - `.claude/agents/orchestrator.md`
+- `.agents/skills/orchestrator-state/SKILL.md`
 - `scripts/dev_tools/_orchestrator_state_pr_creation_readiness.py`
 - `scripts/dev_tools/validate_orchestrator_state.py`
 - `.claude/lib/orchestrator-state/OrchestratorState.psm1`
@@ -31,6 +32,7 @@ The reduction removes the wait of CI behind review, as research section 6 of `do
 - `extensions/drm-copilot/jest.config.cjs`
 - `extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md`, a byte-identical bundle copy
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md`, a byte-identical bundle copy
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrator-state/SKILL.md`, a byte-identical bundle copy
 - `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md`, a byte-identical bundle copy
 - `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md`, a byte-identical bundle copy
 - `extensions/drm-copilot/resources/claude-customizations/.claude/agents/orchestrator.md`, a byte-identical bundle copy
@@ -57,13 +59,13 @@ This section applies to a run whose checkpoint records `review_mode: "concurrent
 
 1. **New-run default.** The first checkpoint write of a new run records `review_mode: "concurrent"` when the route opens a pull request and the target worktree holds the guard file `.claude/hooks/enforce-epic-merge-gate-review.ps1`. Without that file the run stays sequential, because a skill newer than its hooks would otherwise stop at readiness.
 2. **Resume.** A run that resumes a checkpoint without the key stays sequential, and the key is never added on resume. A sequential run follows every other section unchanged.
-3. **Sequence.** The local parallel test run passes; commit, with the steps of `## Pre-Feature-Review Commit` running here, before the pull request; open the pull request; run the `feature-review` delegation and CI together; join; merge.
+3. **Sequence.** The local parallel test run passes; commit, with the steps of `## Pre-Feature-Review Commit` running here, before the pull request; open the pull request; a run with a ledger entry commits the entry's pull-request number next, before reading `head_sha`; run the `feature-review` delegation and CI together; join; merge.
 4. **Recording.** Every `remediation_loop.review_outcomes[]` entry carries `head_sha`: the full lowercase head of the pushed branch, read before the review delegation.
 5. **Join.** The merge proceeds only when all of these hold: the last `review_outcomes[]` entry has verdict `PASS` at a current head; `ci_gate.conclusion` is `success` at the live head; and a `CI full run` check with conclusion `success` exists at the reviewed head, or at an ancestor of it whose diff to the reviewed head lists only `feature-folder` paths. A reviewed head is current when it equals the live head, or when it is an ancestor of the live head and the diff between them lists only `feature-folder` paths; this is the rule of the merge guard. The `CI full run` check is required because a docs-only head reports success without the heavy suites.
 6. **Moved conditions.** Conditions 1 and 2 of `## PR Creation Gate` apply at the join, not before the pull request. S9 steps 6 and 7, and DONE, run only after the join. A parallel child still never merges itself.
 7. **Re-entry.** Any code push after a `PASS`, including a CI fix or a merge of `origin/main`, is a stale head and requires a new review and a new S9 pass. Commits inside `feature-folder`, such as review artifacts and stage-timing evidence, do not. Ledger back-fills lie outside `feature-folder`, so they land before the review starts.
 8. **Portable handoff.** The destination projection is a closed key set and drops `review_mode`, so a concurrent run is not handed off between pull-request creation and the join.
-9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with the repository-local Python validator CLI, in its `orchestrator-state` mode with `--require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`.
+9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with the repository-local Python validator CLI, in its `orchestrator-state` mode with `--require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`. The merge is issued as its own Bash call, and any other form is denied with `REVIEW_GATE_HEAD_UNRESOLVED`.
 10. **Step order.** `completed_steps` stays in canonical order, because `.claude/hooks/enforce-checkpoint-monotonic.ps1` denies a checkpoint Write that lists `S8_create_pr` before `S7_feature_review`. When the review completes, insert `S7_feature_review` before the existing `S8_create_pr` entry; do not append it. A later review adds no second entry. `step8_status` is `in_progress` at pull-request creation, because readiness rejects `pending`, and it stays `in_progress` until the join, because `.claude/hooks/enforce-completion-consistency.ps1` reads `completed` there as a completion claim and denies a checkpoint Write whose `ci_gate.conclusion` is not `success`. A `completed` value would therefore deny the `ci_gate` write of every re-entry.
 
 
@@ -81,13 +83,13 @@ This section applies to a run whose checkpoint records `review_mode: "concurrent
 
 1. **New-run default.** The first checkpoint write of a new run records `review_mode: "concurrent"` when the route opens a pull request and the target worktree holds the guard file `.codex/hooks/enforce-epic-merge-gate-review.ps1`. Without that file the run stays sequential, because a skill newer than its hooks would otherwise stop at readiness.
 2. **Resume.** A run that resumes a checkpoint without the key stays sequential, and the key is never added on resume. A sequential run follows every other section unchanged.
-3. **Sequence.** The local parallel test run passes; commit, with the steps of `## Pre-Review Commit` running here, before the pull request; open the pull request; run the `feature-reviewer` delegation and CI together; join; merge.
+3. **Sequence.** The local parallel test run passes; commit, with the steps of `## Pre-Review Commit` running here, before the pull request; open the pull request; a run with a ledger entry commits the entry's pull-request number next, before reading `head_sha`; run the `feature-reviewer` delegation and CI together; join; merge.
 4. **Recording.** Every `remediation_loop.review_outcomes[]` entry carries `head_sha`: the full lowercase head of the pushed branch, read before the review delegation.
 5. **Join.** The merge proceeds only when all of these hold: the last `review_outcomes[]` entry has verdict `PASS` at a current head; `ci_gate.conclusion` is `success` at the live head; and a `CI full run` check with conclusion `success` exists at the reviewed head, or at an ancestor of it whose diff to the reviewed head lists only `feature-folder` paths. A reviewed head is current when it equals the live head, or when it is an ancestor of the live head and the diff between them lists only `feature-folder` paths; this is the rule of the merge guard. The `CI full run` check is required because a docs-only head reports success without the heavy suites.
 6. **Moved conditions.** Conditions 1 and 2 of `## PR Creation Gate` apply at the join, not before the pull request. The merge and DONE of `## CI Green Gate` run only after the join. A parallel child still never merges itself.
 7. **Re-entry.** Any code push after a `PASS`, including a CI fix or a merge of `origin/main`, is a stale head and requires a new review and a new `## CI Green Gate` pass. Commits inside `feature-folder`, such as review artifacts and stage-timing evidence, do not. Ledger back-fills lie outside `feature-folder`, so they land before the review starts.
 8. **Portable handoff.** The destination projection is a closed key set and drops `review_mode`, so a concurrent run is not handed off between pull-request creation and the join.
-9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with the repository-local Python validator CLI, in its `orchestrator-state` mode with `--require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`.
+9. **Validators and deny codes.** Readiness stops rejecting `step7_status: pending` only under the key, and `require_complete` then requires the last `PASS` entry with `head_sha`. The TypeScript rule reaches the MCP validator only after an extension release. Until then installed MCP accepts a checkpoint that the PowerShell stop hook and the Python CLI reject, so check a concurrent checkpoint with the repository-local Python validator CLI, in its `orchestrator-state` mode with `--require-complete`. The merge guard denies with `REVIEW_GATE_NOT_PASSED`, `REVIEW_GATE_HEAD_STALE`, or `REVIEW_GATE_HEAD_UNRESOLVED`, each after the token `EPIC_MERGE_GATE_BLOCKED`. The merge is issued as its own Bash call, and any other form is denied with `REVIEW_GATE_HEAD_UNRESOLVED`.
 10. **Step order.** `completed_steps` stays in canonical order, because `.codex/hooks/enforce-checkpoint-monotonic.ps1` denies a checkpoint Write that lists `S8_create_pr` before `S7_feature_review`. When the review completes, insert `S7_feature_review` before the existing `S8_create_pr` entry; do not append it. A later review adds no second entry. `step8_status` is `in_progress` at pull-request creation, because readiness rejects `pending`, and it stays `in_progress` until the join, because `.codex/hooks/enforce-completion-consistency.ps1` reads `completed` there as a completion claim and denies a checkpoint Write whose `ci_gate.conclusion` is not `success`. A `completed` value would therefore deny the `ci_gate` write of every re-entry.
 
 
@@ -229,7 +231,8 @@ from scripts.dev_tools._orchestrator_state_concurrent_review import (
 ### Revert Block: .claude/lib/orchestrator-state/OrchestratorState.psm1
 
 ````Current
-    $reviewMode = (Get-OrchestratorStateField -State $State -Name 'review_mode').Value
+    $stateNames = @($State.PSObject.Properties | ForEach-Object { $_.Name })
+    $reviewMode = if ($stateNames -ccontains 'review_mode') { (Get-OrchestratorStateField -State $State -Name 'review_mode').Value } else { $null }
 
 ````
 
@@ -293,7 +296,8 @@ function Get-OrchestratorStateCompletionConcurrentReviewError {
         [psobject] $State
     )
 
-    $mode = (Get-CheckpointObjectMember -Owner $State -Name 'review_mode').Value
+    $mode = $null
+    if ((Get-CheckpointObjectMemberName -Owner $State) -ccontains 'review_mode') { $mode = (Get-CheckpointObjectMember -Owner $State -Name 'review_mode').Value }
     if (-not (($mode -is [string]) -and ($mode -ceq 'concurrent'))) {
         return [string[]]@()
     }
@@ -417,10 +421,23 @@ import { validateConcurrentReviewCompletion } from "./orchestrator-state-concurr
 ````Prior
 ````
 
+### Revert Block: .agents/skills/orchestrator-state/SKILL.md
+
+````Current
+## Concurrent-Review Key (review_mode)
+
+The top-level checkpoint key `review_mode` selects the concurrent run sequence. Only the exact string `concurrent`, compared ordinally, activates it; an absent key, `null`, `sequential`, a case variant, a number, and every other value mean sequential. Under the key, each `remediation_loop.review_outcomes[]` entry carries `head_sha`, the full lowercase head the review ran against. `## Concurrent Review and CI (review_mode)` in `.agents/skills/orchestrate/SKILL.md` defines the run sequence.
+
+
+````
+
+````Prior
+````
+
 ## Revert Steps
 
 1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, in the order of this entry. Then delete `scripts/dev_tools/_orchestrator_state_concurrent_review.py`, `tests/scripts/dev_tools/test_orchestrator_state_concurrent_review.py`, `extensions/drm-copilot/src/lib/validate/orchestrator-state-concurrent-review.ts`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-concurrent-review.test.ts`, the folder `tests/fixtures/orchestrator_state_concurrent_review/`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, and `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`. Leave the merge guard in place, because it is inert without the key.
-2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/skills/orchestrate/SKILL.md`, `.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/rules/orchestrator-state.md`, `.claude/agents/orchestrator.md`, and the three modules `OrchestratorState.psm1`, `OrchestratorStateCompletionChecks.psm1`, and `OrchestratorStateCompletion.psm1` under `claude-customizations/`, and `.agents/skills/orchestrate/SKILL.md` under `codex-and-agents-customizations/`.
+2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/skills/orchestrate/SKILL.md`, `.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/rules/orchestrator-state.md`, `.claude/agents/orchestrator.md`, and the three modules `OrchestratorState.psm1`, `OrchestratorStateCompletionChecks.psm1`, and `OrchestratorStateCompletion.psm1` under `claude-customizations/`, and `.agents/skills/orchestrate/SKILL.md` and `.agents/skills/orchestrator-state/SKILL.md` under `codex-and-agents-customizations/`.
 3. Regenerate Codex variants: not applicable, because no base agent variant changed; still run the generator `--check`.
 4. Restore pinned hashes: not applicable, because no pinned surface moved.
 5. Restore contract-test literals: not applicable, because no contract-test pin changed.
