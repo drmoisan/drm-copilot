@@ -134,6 +134,19 @@ Describe 'Resolve-SubagentStopTargetWorktree (issue #1105)' {
         $result.ReasonCode | Should -BeNullOrEmpty
     }
 
+    It 'places an issue-line-only prompt through Get-WorktreeItemCheckpointIssue when no reader is injected' {
+        # Arrange
+        $reader = Get-TranscriptReader -Prompt 'Canonical issue number for this feature is 1105.'
+        Mock Get-WorktreeItemCheckpointIssue { param([string] $WorktreeRoot) if ($WorktreeRoot -eq $script:ItemRoot) { '1105' } else { $null } }
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker
+
+        # Assert
+        $result.WorktreeRoot | Should -Be $script:ItemRoot
+        Should -Invoke Get-WorktreeItemCheckpointIssue -Times 1 -Exactly -ParameterFilter { $WorktreeRoot -eq $script:ItemRoot }
+    }
+
     It 'returns TARGET_WORKTREE_NOT_DERIVABLE for an issue-line-only prompt when no worktree records the issue' {
         # Arrange
         $reader = Get-TranscriptReader -Prompt 'Canonical issue number for this feature is 1105.'
