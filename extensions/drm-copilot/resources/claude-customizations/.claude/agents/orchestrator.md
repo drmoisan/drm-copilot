@@ -186,6 +186,7 @@ Update `artifacts/orchestration/orchestrator-state.json` after every completed s
   - `delegation_receipts.promotion.issue`
   - `delegation_receipts.promotion.feature_folder`
 - Each `delegation_receipts.promotion.*` field stores the raw MCP receipt payload from the matching promotion operation.
+- `stage_timing` (issue #1097): a top-level list of `{ stage, attempt, started_at, ended_at }` entries (ISO-8601 UTC strings; `ended_at` is null while a stage is open), written at every transition where `last_updated` is rewritten and committed before the merge as `FEATURE/evidence/other/stage-timing.<timestamp>.json`. Figures are wall-clock time and include queueing. The merge stage is not captured. The writer protocol is in the orchestrate skill under `## Checkpoint Handling`.
 
 ## Completion Requirements
 
