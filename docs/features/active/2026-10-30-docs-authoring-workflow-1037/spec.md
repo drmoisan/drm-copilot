@@ -351,7 +351,7 @@ Test rules:
 - [x] No test creates a temporary file: no new suite contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`.
 - [x] Pester line coverage is at least 85% for each new production file under `.claude/hooks/`, read from `artifacts/pester/powershell-coverage.xml`, with no production file excluded; figures are recorded under `<FEATURE>/evidence/qa-gates/`.
 - [ ] The new suites pass in seeded shuffled file-order runs in one process, with the seed count and recording rules of the execution-environment brief `## Test Isolation Checks`, and in a fresh single-process run over `tests/scripts`, recorded under `<FEATURE>/evidence/regression-testing/`.
-- [ ] (CI-dependent) `poshqc / PowerShell QC`, `poshqc / PowerShell hook suites (Linux)` and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
+- [x] (CI-dependent) `poshqc / PowerShell QC`, `poshqc / PowerShell hook suites (Linux)` and the `quality-checks7 / Code Quality & Tests` jobs pass on the pull request head.
 
 ## Decisions Later Children Must Honor
 
