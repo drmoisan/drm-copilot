@@ -181,6 +181,42 @@ Describe 'Get-EpicProgressItemStep' {
         @($steps | Where-Object { $_.Status -eq 'blocked' }).Count | Should -Be 8
         @($steps | Where-Object { $_.Status -in @('remaining', 'in_progress') }).Count | Should -Be 0
     }
+
+    It 'counts research done for an S3b_research completed step' {
+        $steps = @(Get-EpicProgressItemStep -Item (Get-TestItem -CheckpointJson '{"completed_steps":["S3b_research"]}'))
+
+        @($steps | Where-Object { $_.Type -eq 'research' }).Status | Should -Be 'done'
+    }
+
+    It 'maps an S3b_research next_step to the research step' {
+        $steps = @(Get-EpicProgressItemStep -Item (Get-TestItem -CheckpointJson '{"next_step":"S3b_research"}'))
+
+        $running = @($steps | Where-Object { $_.Status -eq 'in_progress' })
+        ($running.Type -join ',') | Should -Be 'research'
+    }
+
+    It 'adds a ci step to a cycle opened after an S8_create_pr stage' {
+        # The live S8_create_pr stage started at 10:00, before the cycle entry at 11:00.
+        $json = '{"stage_timing":[{"stage":"S8_create_pr","attempt":1,"started_at":"2026-01-05T10:00:00Z","ended_at":"2026-01-05T10:03:00Z"}],' +
+        '"remediation_loop":{"cycles":[{"entry_timestamp":"2026-01-05T11:00:00Z","plan_path":"docs/x/remediation-plan.md","remediation_path":"full"}]}}'
+
+        $steps = @(Get-EpicProgressItemStep -Item (Get-TestItem -CheckpointJson $json -CycleText @{ 'docs/x/remediation-plan.md' = $script:cyclePlan }))
+
+        Get-TestTypeCount -Step @($steps | Where-Object { $_.Cycle -eq 1 }) | Should -Be 'plan:1,preflight:1,execution:2,review:1,ci:1'
+        @($steps | Where-Object { $_.Type -eq 'pr' -and $_.Cycle -eq 0 }).Status | Should -Be 'done'
+    }
+
+    It 'marks an open atomic_execution stage in progress on the first unchecked task' {
+        # The live atomic_execution stage is open since 11:00 (1767610800); P0-T1 is checked.
+        $json = '{"stage_timing":[{"stage":"atomic_execution","attempt":1,"started_at":"2026-01-05T11:00:00Z","ended_at":null}]}'
+
+        $steps = @(Get-EpicProgressItemStep -Item (Get-TestItem -CheckpointJson $json))
+
+        $running = @($steps | Where-Object { $_.Status -eq 'in_progress' })
+        $running.Count | Should -Be 1
+        $running[0].Key | Should -Be '12|exec|plan.md|P1-T1'
+        $running[0].StartedUnixSeconds | Should -Be 1767610800
+    }
 }
 
 Describe 'Get-EpicProgressEpicStep' {
