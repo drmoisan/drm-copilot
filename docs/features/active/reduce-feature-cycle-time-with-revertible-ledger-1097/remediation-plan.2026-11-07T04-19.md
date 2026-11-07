@@ -38,7 +38,7 @@ Premise check: the review's Python finding is test-only (`test_discovery_documen
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell and Python test scope, and write `FEATURE/evidence/baseline/phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell and Python test scope, and write `FEATURE/evidence/baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
 - [ ] [P0-T2] Record the stage A final-gate results from the existing artifacts, with no suite run, in `FEATURE/evidence/baseline/stage-a-final-gate.<timestamp>.md`.
   - Sources: the lexicographically greatest `FEATURE/evidence/qa-gates/powershell-test.*.md` and `FEATURE/evidence/qa-gates/python-test.*.md`. `Command:` records that the artifact is a read of those two files. `EXIT_CODE:` is 0 when both were read.
