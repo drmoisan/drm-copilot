@@ -37,7 +37,7 @@ Terms: `<FEATURE>` is `docs/features/active/2026-11-06-parallel-only-test-gates-
 
 No test suite runs in this phase.
 
-- [ ] [P0-T1] Read the policy files in the `policy-compliance-order` order, including `.claude/rules/powershell.md`, `.claude/rules/typescript.md`, and `.claude/rules/python.md`, then the inputs and the three audit artifacts, and write `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read the policy files in the `policy-compliance-order` order, including `.claude/rules/powershell.md`, `.claude/rules/typescript.md`, and `.claude/rules/python.md`, then the inputs and the three audit artifacts, and write `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
 - [ ] [P0-T2] Capture the PowerShell static baseline for `tests/scripts/claude-runtime` in `<FEATURE>/evidence/remediation-baseline/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/remediation-baseline/powershell-analyze.<timestamp>.md`.
   - Format runs check-only through the no-op `-WriteFile` seam on the branch-current module. Analyzer findings come from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
