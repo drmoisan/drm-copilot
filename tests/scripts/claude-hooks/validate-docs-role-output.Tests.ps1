@@ -46,7 +46,7 @@ BeforeAll {
         'Get-SubagentStopEnvelopeAnomalyReason', 'Read-SubagentStopEnvelope', 'Exit-SubagentStopBlock',
         'Get-DocsRoleName', 'Get-DocsRoleRequiredToken', 'ConvertFrom-DocsRoleOutput', 'Test-DocsRoleRelativePath',
         'Get-DocsRoleIntegerFinding', 'Get-DocsRolePathFinding', 'Get-DocsRoleSpecificFinding', 'Test-DocsRoleOutput',
-        'Test-DocsRoleOutputFile', 'Invoke-DocsRoleOutputValidation', 'ConvertTo-DocsRoleEnvelope', 'Remove-DocsRoleToken', 'Invoke-DocsRoleHookTail'
+        'Test-DocsRoleOutputFile', 'Invoke-DocsRoleOutputValidation', 'ConvertTo-DocsRoleEnvelope', 'Get-DocsRoleOutputWithoutToken', 'Invoke-DocsRoleHookTail'
     )
     $script:ValidOutput = @{
         'docs-architect'         = "docs-role: docs-architect`ndocs-result: PASS`ndocs-findings: 0`ndocs-profile: docs/documentation-estate/docs-profile.json`ndocs-snapshot: docs/documentation-estate/inventory.json`ndocs-pages-planned: 3`n`n## Information Architecture`n`n- docs/guide/index.md"
@@ -63,7 +63,7 @@ BeforeAll {
         return ($envelope | ConvertTo-Json -Compress)
     }
 
-    function Remove-DocsRoleToken {
+    function Get-DocsRoleOutputWithoutToken {
         # Returns the valid output of a role without the line that carries the given token.
         param([string] $Role, [string] $Token)
         return ((@($script:ValidOutput[$Role] -split "`n") | Where-Object { -not $_.StartsWith("${Token}:") }) -join "`n")
@@ -185,7 +185,7 @@ Describe 'Invoke-DocsRoleOutputValidation' {
     It 'still blocks a missing token when stop_hook_active is set' {
         # Arrange
         Mock Test-DocsRoleOutputFile { $true }
-        $text = Remove-DocsRoleToken -Role 'docs-author' -Token 'docs-check-exit-code'
+        $text = Get-DocsRoleOutputWithoutToken -Role 'docs-author' -Token 'docs-check-exit-code'
 
         # Act
         $result = Invoke-DocsRoleOutputValidation -InputText (ConvertTo-DocsRoleEnvelope -AgentType 'docs-author' -Text $text -StopHookActive)
@@ -249,7 +249,7 @@ Describe 'validate-docs-role-output.ps1 entry tail' {
         Mock Test-DocsRoleOutputFile { $true }
 
         # Act
-        $result = Invoke-DocsRoleHookTail -StdinText (ConvertTo-DocsRoleEnvelope -AgentType $Role -Text (Remove-DocsRoleToken -Role $Role -Token $Token))
+        $result = Invoke-DocsRoleHookTail -StdinText (ConvertTo-DocsRoleEnvelope -AgentType $Role -Text (Get-DocsRoleOutputWithoutToken -Role $Role -Token $Token))
 
         # Assert
         $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"

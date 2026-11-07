@@ -180,14 +180,14 @@ Execution runs in the item worktree under a non-terminal exempt-route checkpoint
   - Acceptance: zero new failures relative to [P0-T6]; generator exit 0; Jest suite passes.
 - [x] [P6-T7] Repeat the hygiene scan of [P2-T8] into a new `hygiene-scan.<timestamp>.md`.
   - Acceptance: zero matches.
-- [ ] [P6-T8] Commit the Phase 3 to Phase 6 files.
+- [x] [P6-T8] Commit the Phase 3 to Phase 6 files.
   - Acceptance: `git status --porcelain` is empty for the committed paths.
 
 ### Phase 7 — Final QA Loop and Closure
 
-- [ ] [P7-T1] Run the PoshQC formatter over the changed `.ps1` files; record in `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md`.
+- [x] [P7-T1] Run the PoshQC formatter over the changed `.ps1` files; record in `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md`.
   - Acceptance: `git status --porcelain` is identical before and after; a change restarts the loop from this task.
-- [ ] [P7-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the three hooks, the nine new test files and the two edited test files; record in `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
+- [x] [P7-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the three hooks, the nine new test files and the two edited test files; record in `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
   - Acceptance: zero findings; a finding is fixed and the loop restarts at [P7-T1].
 - [ ] [P7-T3] Run a fresh single-process `Invoke-PoshQCTest` over `tests/scripts` with coverage; record in `<FEATURE>/evidence/qa-gates/pester-coverage.<timestamp>.md` the JUnit counts and the per-file line coverage of the three new `.claude/hooks/` files and overall line coverage, compared with [P0-T5].
   - Acceptance: zero failed tests other than baseline failures listed in [P0-T5]; each new hook file at least 85%; overall line coverage not below the baseline value; no production file excluded from `config/poshqc-coverage.json`.

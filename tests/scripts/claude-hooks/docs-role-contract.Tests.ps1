@@ -49,14 +49,14 @@ BeforeAll {
     }
     $script:AllExist = { param([string] $Path) $null -ne $Path }
 
-    function Set-DocsRoleTokenValue {
+    function Get-DocsRoleOutputWithValue {
         # Returns the valid output of a role with one token line replaced by the given value.
         param([string] $Role, [string] $Token, [AllowEmptyString()] [string] $Value)
         $lines = foreach ($line in ($script:ValidOutput[$Role] -split "`n")) { if ($line.StartsWith("${Token}:")) { "${Token}: $Value" } else { $line } }
         return ($lines -join "`n")
     }
 
-    function Remove-DocsRoleToken {
+    function Get-DocsRoleOutputWithoutToken {
         # Returns the valid output of a role without the line that carries the given token.
         param([string] $Role, [string] $Token)
         return ((@($script:ValidOutput[$Role] -split "`n") | Where-Object { -not $_.StartsWith("${Token}:") }) -join "`n")
@@ -64,7 +64,7 @@ BeforeAll {
 }
 
 AfterAll {
-    foreach ($name in $script:ContractFunctions + 'Set-DocsRoleTokenValue', 'Remove-DocsRoleToken') { Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue }
+    foreach ($name in $script:ContractFunctions + 'Get-DocsRoleOutputWithValue', 'Get-DocsRoleOutputWithoutToken') { Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue }
 }
 
 Describe 'docs-role-contract.ps1 role names and tokens' {
@@ -158,7 +158,7 @@ Describe 'Test-DocsRoleOutput' {
 
     It 'blocks <Role> output missing <Token> with a repairable reason naming it' -ForEach $script:TokenRows {
         # Act
-        $result = Test-DocsRoleOutput -Role $Role -Text (Remove-DocsRoleToken -Role $Role -Token $Token) -TestFile $script:AllExist
+        $result = Test-DocsRoleOutput -Role $Role -Text (Get-DocsRoleOutputWithoutToken -Role $Role -Token $Token) -TestFile $script:AllExist
 
         # Assert
         $result.Ok | Should -BeFalse
@@ -191,7 +191,7 @@ Describe 'Test-DocsRoleOutput' {
         @{ Role = 'docs-coverage-reviewer'; Token = 'docs-validate-exit-code'; Value = '1'; Expect = 'docs-result PASS requires docs-validate-exit-code 0' }
     ) {
         # Act
-        $result = Test-DocsRoleOutput -Role $Role -Text (Set-DocsRoleTokenValue -Role $Role -Token $Token -Value $Value) -TestFile $script:AllExist
+        $result = Test-DocsRoleOutput -Role $Role -Text (Get-DocsRoleOutputWithValue -Role $Role -Token $Token -Value $Value) -TestFile $script:AllExist
 
         # Assert
         $result.Ok | Should -BeFalse
@@ -244,7 +244,7 @@ Describe 'Test-DocsRoleOutput' {
 
     It 'accepts an architect FAIL without the Information Architecture section' {
         # Arrange
-        $text = (Set-DocsRoleTokenValue -Role 'docs-architect' -Token 'docs-result' -Value 'FAIL').Replace('## Information Architecture', '## Plan')
+        $text = (Get-DocsRoleOutputWithValue -Role 'docs-architect' -Token 'docs-result' -Value 'FAIL').Replace('## Information Architecture', '## Plan')
 
         # Act
         $result = Test-DocsRoleOutput -Role 'docs-architect' -Text $text -TestFile $script:AllExist
@@ -255,7 +255,7 @@ Describe 'Test-DocsRoleOutput' {
 
     It 'accepts an author BLOCKED report with docs-pages-written none and a non-zero check exit code' {
         # Arrange
-        $text = (Set-DocsRoleTokenValue -Role 'docs-author' -Token 'docs-result' -Value 'BLOCKED') -replace 'docs-pages-written: .*', 'docs-pages-written: none' -replace 'docs-check-exit-code: 0', 'docs-check-exit-code: 3'
+        $text = (Get-DocsRoleOutputWithValue -Role 'docs-author' -Token 'docs-result' -Value 'BLOCKED') -replace 'docs-pages-written: .*', 'docs-pages-written: none' -replace 'docs-check-exit-code: 0', 'docs-check-exit-code: 3'
 
         # Act
         $result = Test-DocsRoleOutput -Role 'docs-author' -Text $text -TestFile $script:AllExist
@@ -266,7 +266,7 @@ Describe 'Test-DocsRoleOutput' {
 
     It 'accepts a reviewer FAIL report with validate exit code 1 and a receipt id' {
         # Arrange
-        $text = (Set-DocsRoleTokenValue -Role 'docs-coverage-reviewer' -Token 'docs-result' -Value 'FAIL') -replace 'docs-validate-exit-code: 0', 'docs-validate-exit-code: 1' -replace 'docs-receipt-id: none', 'docs-receipt-id: receipt-20261107'
+        $text = (Get-DocsRoleOutputWithValue -Role 'docs-coverage-reviewer' -Token 'docs-result' -Value 'FAIL') -replace 'docs-validate-exit-code: 0', 'docs-validate-exit-code: 1' -replace 'docs-receipt-id: none', 'docs-receipt-id: receipt-20261107'
 
         # Act
         $result = Test-DocsRoleOutput -Role 'docs-coverage-reviewer' -Text $text -TestFile $script:AllExist
@@ -277,8 +277,8 @@ Describe 'Test-DocsRoleOutput' {
 
     It 'accepts a reconciler report with docs-elements-reconciled none and a 64-character revision reviewer report' {
         # Arrange
-        $reconciler = Set-DocsRoleTokenValue -Role 'docs-reconciler' -Token 'docs-elements-reconciled' -Value 'none'
-        $reviewer = Set-DocsRoleTokenValue -Role 'docs-coverage-reviewer' -Token 'docs-revision' -Value ('b' * 64)
+        $reconciler = Get-DocsRoleOutputWithValue -Role 'docs-reconciler' -Token 'docs-elements-reconciled' -Value 'none'
+        $reviewer = Get-DocsRoleOutputWithValue -Role 'docs-coverage-reviewer' -Token 'docs-revision' -Value ('b' * 64)
 
         # Act
         $first = Test-DocsRoleOutput -Role 'docs-reconciler' -Text $reconciler -TestFile $script:AllExist

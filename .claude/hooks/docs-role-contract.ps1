@@ -29,7 +29,7 @@ function Get-DocsRoleName {
     [OutputType([string[]])]
     param()
 
-    return @('docs-architect', 'docs-author', 'docs-reconciler', 'docs-coverage-reviewer')
+    return [string[]]@('docs-architect', 'docs-author', 'docs-reconciler', 'docs-coverage-reviewer')
 }
 
 function Get-DocsRoleRequiredToken {
@@ -148,10 +148,10 @@ function Get-DocsRolePathFinding {
         [switch] $RequireMarkdown
     )
 
-    if (-not (Test-DocsRoleRelativePath -Value $Path)) { return @("$Token path '$Path' must be repository-relative with forward slashes") }
-    if ($RequireMarkdown -and -not $Path.EndsWith('.md', [System.StringComparison]::Ordinal)) { return @("$Token path '$Path' must end with .md") }
-    if (-not [bool](& $TestFile $Path)) { return @("$Token path '$Path' does not exist") }
-    return @()
+    if (-not (Test-DocsRoleRelativePath -Value $Path)) { return [string[]]@("$Token path '$Path' must be repository-relative with forward slashes") }
+    if ($RequireMarkdown -and -not $Path.EndsWith('.md', [System.StringComparison]::Ordinal)) { return [string[]]@("$Token path '$Path' must end with .md") }
+    if (-not [bool](& $TestFile $Path)) { return [string[]]@("$Token path '$Path' does not exist") }
+    return [string[]]@()
 }
 
 function Get-DocsRoleSpecificFinding {

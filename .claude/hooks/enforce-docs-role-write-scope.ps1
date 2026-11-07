@@ -110,10 +110,10 @@ function Get-DocsWriteScopeProtectedArtifactPath {
     [OutputType([string[]])]
     param([AllowNull()] [AllowEmptyString()] [string] $ProfileText)
 
-    if ([string]::IsNullOrWhiteSpace($ProfileText)) { return @() }
+    if ([string]::IsNullOrWhiteSpace($ProfileText)) { return [string[]]@() }
     try { $docsProfile = ConvertFrom-Json -InputObject $ProfileText -AsHashtable -ErrorAction Stop }
-    catch { return @() }
-    if ($docsProfile -isnot [System.Collections.IDictionary]) { return @() }
+    catch { return [string[]]@() }
+    if ($docsProfile -isnot [System.Collections.IDictionary]) { return [string[]]@() }
 
     $paths = [System.Collections.Generic.List[string]]::new()
     $paths.Add($script:DocsWriteScopeProfilePath)
