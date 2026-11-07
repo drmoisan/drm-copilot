@@ -49,6 +49,14 @@ Always apply:
 - Do not clean up code during review.
 - If checks fail, document the failure and include exact remediation guidance.
 
+### Process-reduction ledger
+
+- This rule applies only when `docs/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
+- A change that reduces evidence, plan tasks, gates, or review process adds its ledger entry in the same commit, in the format of that folder's `README.md`.
+- A branch diff that makes such a reduction with no entry is a Blocking finding.
+- The reviewer confirms from the branch log that each reduction is its own commit, with the `reduction: NNNN` token in its subject.
+- One-off waivers for a single item are not entries.
+
 ### Work-mode acceptance-criteria contract
 
 - Read the persisted marker from `issue.md` using one of:
