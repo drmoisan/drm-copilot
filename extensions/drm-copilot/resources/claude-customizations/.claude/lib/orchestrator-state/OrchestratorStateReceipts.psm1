@@ -264,9 +264,12 @@ function Get-RemediationCycleError {
 
     # Invariant 2: an execution status in the blocked set requires the nested
     # preflight to report exactly the cleared status; a missing or non-object
-    # preflight cannot satisfy it.
+    # preflight cannot satisfy it. An exact light cycle runs no preflight and is
+    # checked by invariant 8 instead.
     $executionStatus = (Get-CheckpointObjectMember -Owner $Cycle -Name 'execution_status').Value
-    if ($executionStatus -is [string] -and
+    $remediationPath = (Get-CheckpointObjectMember -Owner $Cycle -Name 'remediation_path').Value
+    $isLightCycle = ($remediationPath -is [string]) -and ([string]$remediationPath -ceq 'light')
+    if (-not $isLightCycle -and $executionStatus -is [string] -and
         ($script:EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT -contains [string]$executionStatus)) {
         $preflight = (Get-CheckpointObjectMember -Owner $Cycle -Name 'preflight').Value
         $preflightStatus = (Get-CheckpointObjectMember -Owner $preflight -Name 'final_status').Value

@@ -151,6 +151,10 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/orchestrator-state-light-cycle.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/validate-orchestration-service-call.ts": {
       lines: 85,
       branches: 75,

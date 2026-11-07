@@ -6,8 +6,10 @@
     Destination-runtime PowerShell port of the issue #484 invariants the
     authoritative Python validator applies to a checkpoint's remediation_loop:
     the review-outcome rules R8a, R8b, R9a-R9d, and R10, and the accounting
-    rules R5, R6, R7a, R7b, and R11, matching the error-string templates in
-    `scripts/dev_tools/_orchestrator_state_remediation_loop.py` and the rules
+    rules R5, R6, R7a, R7b, and R11, and the light-remediation invariant 8
+    (issue #1097), matching the error-string templates in
+    `scripts/dev_tools/_orchestrator_state_remediation_loop.py`,
+    `scripts/dev_tools/_orchestrator_state_light_cycle.py`, and the rules
     document `.claude/rules/orchestrator-state.md`.
 
     The receipts module calls the exported entry point after its unchanged
@@ -39,6 +41,14 @@ $script:COMPLETED_ATTEMPTS_KEY = 'completed_attempts'
 $script:CANDIDATE_APPLIED_KEY = 'candidate_applied'
 $script:OPENED_BY_REVIEW_KEY = 'opened_by_review'
 $script:COMPLETED_EXECUTION_STATUS = 'complete'
+
+# Invariant 8 (light remediation) keys and limits. Pinned to the Python constants
+# in _orchestrator_state_light_cycle.py.
+$script:REMEDIATION_PATH_KEY = 'remediation_path'
+$script:LIGHT_REMEDIATION_PATH = 'light'
+$script:FULL_REMEDIATION_PATH = 'full'
+$script:LIGHT_FINDING_LIMIT = 3
+$script:CONTAINED_SCOPE = 'contained'
 
 # Review verdicts and remediability classes in spec table order, and the two
 # derived class partitions. Pinned to the Python constants of the same names.
@@ -260,6 +270,106 @@ function Test-RemediationOpenedByReview {
     return ($verdict -is [string]) -and ([string]$verdict -ceq $script:REMEDIATION_REQUIRED_VERDICT)
 }
 
+function Get-RemediationLightCycleError {
+    <#
+    .SYNOPSIS
+        Return the invariant 8 errors of every cycle that carries remediation_path.
+    .DESCRIPTION
+        Private helper mirroring validate_light_cycles (issue #1097). Per object cycle
+        whose key is present, in order: a value other than the exact string light or
+        full yields rule 1 alone; full yields nothing; light yields rule 2 (a preflight
+        key is present), rule 3 (opened_by_review is absent or fails the R11 predicate,
+        which skips rules 4 to 6), rule 4 (more than 3 findings; a non-list findings
+        value counts as empty), rule 5 per finding whose remediability is not exactly
+        autonomous, rule 6 per finding whose scope is not exactly contained, and rule 7
+        (the immediately prior element is an object whose remediation_path is exactly
+        light). Every string value is tested with -is [string] before -ceq, because
+        -ceq on an array filters rather than compares.
+    .PARAMETER Cycle
+        The loop's cycles list, or $null when cycles is absent or not a list.
+    .PARAMETER Outcomes
+        The raw review_outcomes value. May be $null.
+    .OUTPUTS
+        System.String[] - zero or more error strings.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [object] $Cycle,
+
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Outcomes
+    )
+
+    $errors = [System.Collections.Generic.List[string]]::new()
+    $cycleItems = @()
+    if ($null -ne $Cycle) { $cycleItems = @($Cycle) }
+
+    # Walk the cycles in order so each light cycle can see its immediate prior.
+    for ($index = 0; $index -lt $cycleItems.Count; $index++) {
+        $item = $cycleItems[$index]
+        if (-not (Test-CheckpointObjectValue -Value $item)) { continue }
+        $member = Get-CheckpointObjectMember -Owner $item -Name $script:REMEDIATION_PATH_KEY
+        if (-not $member.Present) { continue }
+
+        # Rule 1 routes by exact value: full has no further rule, and anything other
+        # than light is reported once and stops there.
+        $path = $member.Value
+        $isString = $path -is [string]
+        if ($isString -and ([string]$path -ceq $script:FULL_REMEDIATION_PATH)) { continue }
+        if (-not ($isString -and ([string]$path -ceq $script:LIGHT_REMEDIATION_PATH))) {
+            $errors.Add("Checkpoint remediation cycle #$index remediation_path must be light or full.")
+            continue
+        }
+
+        $prefix = "Checkpoint remediation cycle #$index remediation_path is light but"
+        if ((Get-CheckpointObjectMember -Owner $item -Name 'preflight').Present) {
+            $errors.Add("$prefix the cycle carries preflight.")
+        }
+
+        $opened = Get-CheckpointObjectMember -Owner $item -Name $script:OPENED_BY_REVIEW_KEY
+        if (-not $opened.Present -or -not (Test-RemediationOpenedByReview -OpenedByReview $opened.Value -Outcomes $Outcomes)) {
+            $errors.Add("$prefix opened_by_review does not name its opening review.")
+        } else {
+            $outcome = @($Outcomes)[[int]$opened.Value]
+            $findings = (Get-CheckpointObjectMember -Owner $outcome -Name 'findings').Value
+            $findingList = @()
+            if (Test-CheckpointListValue -Value $findings) { $findingList = @($findings) }
+            if ($findingList.Count -gt $script:LIGHT_FINDING_LIMIT) {
+                $errors.Add("$prefix its opening review has $($findingList.Count) findings; the limit is $($script:LIGHT_FINDING_LIMIT).")
+            }
+            # Report every finding a light cycle may not fix autonomously, then every
+            # finding whose fix is not contained; a non-object finding fails both.
+            foreach ($key in @('remediability', 'scope')) {
+                $required = if ($key -ceq 'remediability') { $script:REMEDIABLE_CLASS } else { $script:CONTAINED_SCOPE }
+                for ($findingIndex = 0; $findingIndex -lt $findingList.Count; $findingIndex++) {
+                    $finding = $findingList[$findingIndex]
+                    $value = $null
+                    if (Test-CheckpointObjectValue -Value $finding) { $value = (Get-CheckpointObjectMember -Owner $finding -Name $key).Value }
+                    if (-not (($value -is [string]) -and ([string]$value -ceq $required))) {
+                        $suffix = if ($key -ceq 'remediability') { 'is not autonomous.' } else { 'scope is not contained.' }
+                        $errors.Add("$prefix finding #$findingIndex $suffix")
+                    }
+                }
+            }
+        }
+
+        # Rule 7: two light cycles may not run back to back.
+        if ($index -gt 0 -and (Test-CheckpointObjectValue -Value $cycleItems[$index - 1])) {
+            $priorPath = (Get-CheckpointObjectMember -Owner $cycleItems[$index - 1] -Name $script:REMEDIATION_PATH_KEY).Value
+            if (($priorPath -is [string]) -and ([string]$priorPath -ceq $script:LIGHT_REMEDIATION_PATH)) {
+                $errors.Add("$prefix the prior cycle is light.")
+            }
+        }
+    }
+
+    return $errors.ToArray()
+}
+
 function Get-OrchestratorStateRemediationAccountingError {
     <#
     .SYNOPSIS
@@ -268,8 +378,9 @@ function Get-OrchestratorStateRemediationAccountingError {
         Public entry mirroring the issue #484 tail of _validate_remediation_loop.
         Returns, in order: the review-outcome errors (R8a; otherwise per outcome
         R8b, R9a, R9b, R9c or R9d per finding, then R10); then, for each object
-        cycle in order, R5, R6, and R11; then R7a, otherwise R7b. With none of the
-        new keys present it returns nothing.
+        cycle in order, R5, R6, and R11; then R7a, otherwise R7b; then invariant 8
+        through Get-RemediationLightCycleError. With none of the new keys present it
+        returns nothing.
     .PARAMETER RemediationLoop
         The deserialized remediation_loop object.
     .PARAMETER Cycle
@@ -329,6 +440,7 @@ function Get-OrchestratorStateRemediationAccountingError {
         }
     }
 
+    $errors.AddRange([string[]]@(Get-RemediationLightCycleError -Cycle $Cycle -Outcomes $outcomes))
     return $errors.ToArray()
 }
 

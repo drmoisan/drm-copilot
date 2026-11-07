@@ -37,6 +37,9 @@ When the active review scope is a selected version folder such as `docs/features
    - one line `Review-Verdict: <VERDICT>`, where the verdict is `PASS`, `REMEDIATION_REQUIRED`, `HALT_NON_REMEDIABLE`, or `AWAITING_CI`,
    - inside each blocking finding block, one line `Remediability: <class>`, where the class is `autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required` (`autonomous` when the line is absent),
    - inside each blocking finding block, one line `Remediability-Evidence: <text>` stating why the class applies.
+   - one line `Remediation-Path: light` or `Remediation-Path: full` (`full` when the line is absent). `light` is allowed only when there are at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`, the fix changes no spec acceptance criterion, public interface, validator contract, hook decision, or file inventory beyond the branch diff plus tests and mirrors, the cycle is opened by a review, and the prior cycle was not light.
+   - inside each blocking finding block, one line `Finding-Scope: contained` or `Finding-Scope: design` (`design` when the line is absent).
+   - with `Remediation-Path: light`, a `## Light Fix Tasks` section holding one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order and naming the file and the finding, and no checkbox line anywhere else in the file. A light review creates no remediation plan target.
 
    These lines, including the evidence text, never contain the substrings the orchestrator counts when it counts blocking findings, so their presence does not change the blocking count. The verdict follows from the classes: no blocking finding is `PASS`; any `autonomous` finding is `REMEDIATION_REQUIRED`; otherwise any `external_dependency`, `policy_hold`, or `human_decision_required` finding is `HALT_NON_REMEDIABLE`; otherwise `AWAITING_CI`.
 
