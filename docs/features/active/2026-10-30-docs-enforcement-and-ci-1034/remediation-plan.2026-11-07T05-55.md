@@ -101,7 +101,7 @@ The `.DESCRIPTION` of `Get-DocsCompleteGateUnquotedView` in `HELPER` reads "Retu
 
 No tracked file outside `FEATURE/evidence/` changes in this phase.
 
-- [ ] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md` and `.claude/rules/tonality.md`, and write `FEATURE/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md` and `.claude/rules/tonality.md`, and write `FEATURE/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:` and the six paths in order.
 - [ ] [P0-T2] Capture `CYCLE_START`, fetch `EPIC_REF`, derive `MERGE_BASE`, confirm `artifacts/orchestration/orchestrator-state.json` selects the `large` or `remediation` route and is not terminal, and write `FEATURE/evidence/remediation-baseline/preconditions.<timestamp>.md`.
   - The artifact records `CYCLE_START`, the `EPIC_REF` tip, `MERGE_BASE`, the route value, the logical line count of `HOOK`, the physical line count of `SPEC`, the physical line number of the `## Acceptance Criteria` heading of `SPEC`, the SHA-256 of `HOOK` and `HOOK_BUNDLE`, the result of a search of `extensions/drm-copilot/resources/` for the feature folder name, and the result of the test search of `## Existing Asserting Tests and Dispositions`.
