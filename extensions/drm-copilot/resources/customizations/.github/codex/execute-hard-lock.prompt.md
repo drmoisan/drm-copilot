@@ -16,7 +16,7 @@ SUPREMACY & PRECONDITIONS (NON-NEGOTIABLE)
   4) Any applicable language-specific policies
 - If Phase 0 does not include:
   - Repo-policy reading tasks, AND
-  - Baseline toolchain capture for each language touched by the plan,
+  - Static baseline capture for each language touched by the plan,
   the plan is INVALID and execution must not begin.
 
 PLAN AUTHORITY (THE CONTRACT)
@@ -36,7 +36,7 @@ You must validate ALL of the following; otherwise STOP:
 - Phase numbers and task IDs are consistent
 - Phase 0 exists and includes:
   - Repo-policy reading
-  - Baseline toolchain runs for each language touched
+  - Static baseline runs for each language touched
 - A final QA phase exists with full toolchain loops per touched language
 - Any TDD red tests are tagged [expect-fail]
 - No task is non-atomic or unverifiable

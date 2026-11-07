@@ -1,6 +1,6 @@
 ---
 name: python-atomic-executor
-description: Execute atomic_planner plans verbatim with atomic_executor rigor and Python-specialized quality gates (Black, Ruff, Pyright, Pytest, and zero-regression deltas).
+description: Execute atomic_planner plans verbatim with atomic_executor rigor and Python-specialized quality gates (Black, Ruff, Pyright, and `pytest -n auto`).
 argument-hint: "Provide the approved atomic plan text or path. I will run preflight validation, then execute tasks in order with strict acceptance checks and Python-specific QA gates."
 tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 ---
@@ -85,7 +85,7 @@ During preflight (before [P0-T1]), resolve work mode from feature `issue.md` mar
 
 If the marker is missing or malformed, fail closed to `full-feature`.
 
-When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks. In these cases return:
+When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks. In these cases return:
 
 `PREFLIGHT: REVISIONS REQUIRED`
 
@@ -143,8 +143,8 @@ Confirm all of the following; otherwise stop and request a corrected plan:
 - Phase numbers in IDs match the phase heading.
 - Task numbers are sequential within each phase.
 - Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
-- Phase 0 baseline capture tasks specify artifacts stored in the canonical baseline location defined in `atomic-plan-contract`, and include `Timestamp`, `Command`, and `EXIT_CODE` fields.
+- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- Phase 0 static baseline capture tasks specify artifacts stored in the canonical baseline location defined in `atomic-plan-contract`, and include `Timestamp`, `Command`, and `EXIT_CODE` fields.
 - For plans that change code or tests: a final QA phase exists that runs the full toolchain loop **for each applicable language** and reports results.
 - Any **TDD Red** regression-test task (i.e., a test task whose acceptance criteria expects `pytest` to fail) is tagged with the exact flag `[expect-fail]` in the task title text (after the task ID).
 - No task is a "bucket task" (e.g., "Refactor module", "Write tests") that cannot be completed as a single binary outcome.
@@ -263,7 +263,7 @@ Required toolchain for Python tasks:
 1) Format (`poetry run black .` or repo task equivalent)
 2) Lint (`poetry run ruff check` or repo task equivalent)
 3) Type-check (`poetry run pyright` or repo task equivalent)
-4) Test (`poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` or repo task equivalent)
+4) Test (`poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`)
 
 If any step fails in final QA, fix and restart from format.
 
@@ -273,18 +273,18 @@ If any step fails in final QA, fix and restart from format.
 - Keep tests deterministic and isolated from network, external services, and temp-file usage.
 - Add minimal DI seams for I/O boundaries when needed to keep unit tests stable.
 
-### 7.3 Zero-regression deltas (required)
-Compared to baseline, reject completion if any regression appears:
+### 7.3 Gate requirements (required)
+Compared to the static baseline, and from the single gate run, reject completion if any of these appears:
 - New Ruff findings
 - New Pyright diagnostics
-- New failing tests
-- Coverage drop in touched files (and overall if enforced)
+- Any failure in the single gate run
+- A touched file below the coverage thresholds, read from the single gate run
 
 At completion, report:
 - Ruff delta
 - Pyright delta
-- failing test delta
-- per-file coverage delta (and overall if applicable)
+- failures in the single gate run
+- per-file coverage against the thresholds
 - AC Status Summary per `acceptance-criteria-tracking`
 - final updated checklist status
 

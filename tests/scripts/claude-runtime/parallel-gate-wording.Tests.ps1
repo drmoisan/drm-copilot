@@ -15,6 +15,8 @@ BeforeDiscovery {
     $script:ReviewForbidden = @('smallest relevant subset', 'regression on changed lines')
     $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
     $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
+    $script:CopilotPesterForbidden = @('mcp_drmcopilotext_run_poshqc_test')
+    $script:CopilotFocusedForbidden = @('-k slug_extraction')
 }
 
 Describe 'Parallel gate wording' {
@@ -96,6 +98,22 @@ Describe 'Parallel gate wording' {
         @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
         @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
         @{ Id = 'EXEC-CODEX-POWERSHELL'; Path = '.codex/agents/powershell-atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = @('run_poshqc_test') }
+        @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
+        @{ Id = 'COPILOT-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
+        @{ Id = 'COPILOT-PS-EXEC'; Path = '.github/agents/powershell-atomic-executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
+        @{ Id = 'COPILOT-PS-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
+        @{ Id = 'COPILOT-PS-TYPED'; Path = '.github/agents/powershell-typed-engineer.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
+        @{ Id = 'COPILOT-PS-TYPED-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/powershell-typed-engineer.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
+        @{ Id = 'COPILOT-PY-EXEC'; Path = '.github/agents/python-atomic-executor.agent.md'; Required = @('poetry run pytest -n auto'); Forbidden = @() }
+        @{ Id = 'COPILOT-PY-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-executor.agent.md'; Required = @('poetry run pytest -n auto'); Forbidden = @() }
+        @{ Id = 'COPILOT-COMMENTARY'; Path = '.github/agents/commentary-remediation.agent.md'; Required = @('poetry run pytest -n auto'); Forbidden = @() }
+        @{ Id = 'COPILOT-COMMENTARY-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/commentary-remediation.agent.md'; Required = @('poetry run pytest -n auto'); Forbidden = @() }
+        @{ Id = 'COPILOT-REMEDIATE-PROMPT'; Path = '.github/prompts/remediate-comments.prompt.md'; Required = @('poetry run pytest -n auto'); Forbidden = @() }
+        @{ Id = 'COPILOT-REMEDIATE-PROMPT-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/prompts/remediate-comments.prompt.md'; Required = @('poetry run pytest -n auto'); Forbidden = @() }
+        @{ Id = 'COPILOT-PLANNING'; Path = '.github/agents/atomic_planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
+        @{ Id = 'COPILOT-PLANNING-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
+        @{ Id = 'COPILOT-PS-PLANNING'; Path = '.github/agents/powershell-atomic-planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
+        @{ Id = 'COPILOT-PS-PLANNING-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
     ) {
         # Arrange
         $text = Get-PgwSurfaceText -RelativePath $Path

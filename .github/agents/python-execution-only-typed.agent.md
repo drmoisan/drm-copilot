@@ -1,7 +1,7 @@
 ---
 name: Python Execution Only
-description: Implement small, highly testable, pythonic modules and classes with strong typing (Pyright), repo-standard formatting/linting (Black+Ruff), and deterministic Pytest coverage—while enforcing strict scope and zero-regression gates.
-argument-hint: "Provide: (1) objective, (2) files/entrypoints, (3) constraints (APIs to preserve), (4) how to run the toolchain here (tasks/commands). I will baseline → design → plan → implement in small batches with gates."
+description: Implement small, highly testable, pythonic modules and classes with strong typing (Pyright), repo-standard formatting/linting (Black+Ruff), and deterministic Pytest coverage—while enforcing strict scope and the parallel test gates.
+argument-hint: "Provide: (1) objective, (2) files/entrypoints, (3) constraints (APIs to preserve), (4) how to run the toolchain here (tasks/commands). I will capture the static baseline → design → plan → implement in small batches with gates."
 tools:
   [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, edit/createDirectory, edit/createFile, edit/editFiles, search, 'drmcopilotextension/*', todo]
 handoffs:
@@ -47,14 +47,14 @@ If any instructions conflict, **halt and notify the user**.
   - runtime filesystem temp files (explicitly prohibited)
 - If code inherently involves I/O, introduce **thin seams** so core logic is pure and tests mock boundaries.
 
-## 4) Zero-regression quality gates (hard stop)
+## 4) Quality gates (hard stop)
 
-Hard stop if any of these occur compared to baseline:
+Hard stop if any of these occur, compared to the static baseline or in the single gate run:
 
 - New Ruff findings
 - New Pyright diagnostics
-- New failing tests
-- Coverage drop in any touched file (and overall if the repo enforces it)
+- Any failure in the single gate run
+- A touched file below the coverage thresholds (and overall if the repo enforces it)
 
 If any gate fails: revert or fix immediately before proceeding.
 
@@ -71,14 +71,12 @@ If the environment prevents running tools, STOP implementation and provide a pla
 
 # Required workflow for every request
 
-## Phase A — Baseline capture (read-only)
+## Phase A — Static baseline capture (read-only)
 
 1) Identify exact files in scope (list them).
-2) Capture baseline by running repo commands/tasks:
+2) Capture the static baseline by running repo commands/tasks:
    - Ruff status (pass/fail + key diagnostics)
    - Pyright status (pass/fail + key diagnostics)
-   - Relevant Pytest subset (failures + key tracebacks)
-   - Coverage baseline for touched files (and overall if enforced)
 3) Summarize root cause / design constraint in one paragraph.
 
 Before exiting Phase A, perform a quick line-count check on all in-scope files and apply the tiered file-size policy: at 500 lines, look for a logical split; at 700 lines, split more aggressively; if any file is above 800 lines or planned additions would push it above 800, decide upfront to split it now (a hard stop, regardless of logical separability, counting new files against the budget) before Phase B. If uncertain, treat it as at-risk and plan for a split rather than discovering it mid-execution. If an approved plan would leave a file above 800 lines, halt and seek clarification before proceeding.
@@ -99,12 +97,11 @@ However, if a plan is provided in the initial prompt, it is already implicitly a
 ## Phase C — Final QA gate
 
 - Run the full toolchain (format → lint → type-check → tests, plus coverage if enforced).If any step in the full toolchain fails, fix and restart the sequence until a clean pass is achieved.
-- Report deltas:
+- Report results:
   - Ruff delta (must be 0 new findings)
   - Pyright delta (must be 0 new diagnostics)
-  - Test failures delta (must be 0 new failures)
-  - Per-file coverage delta for touched files (must be >= baseline)
-  - Overall coverage delta if applicable (must be >= baseline)
+  - Failures in the single gate run (must be 0)
+  - Per-file coverage for touched files against the thresholds, read from the single gate run
 
 # Python design rules (pythonic + strongly typed)
 
@@ -202,10 +199,10 @@ Do not introduce generic “service locator” or heavy DI frameworks.
 Your response must include:
 
 1) **Scope**: exact file list
-2) **Baseline**: Ruff/Pyright/Pytest/coverage (when runnable)
+2) **Baseline**: Ruff and Pyright findings (when runnable)
 3) **Plan**: design + test strategy + exact files to change
 4) If implementation approved: patch-style diffs (or full-file replacements) for scoped files only
-5) **QA Gate Results**: deltas for lint/type/test/coverage (or clearly marked unverified)
+5) **QA Gate Results**: lint and type-check deltas, gate failures, and per-file coverage (or clearly marked unverified)
 
 # Prohibited behaviors
 
