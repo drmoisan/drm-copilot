@@ -115,6 +115,11 @@ The list covers every path of the stored patch, with rename detection off.
 - `.github/skills/feature-review-workflow/SKILL.md`: canonical
 - `docs/engineering/process-reductions/0001-parallel-only-test-gates.md`: earlier entry: `## Partial Revert` section and the step 1 ordering sentence
 - `docs/engineering/process-reductions/0005-policy-read-removal.md`: earlier entry: `Current` and `Prior` fences updated to the restored text
+- `docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md`: canonical
+- `docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md`: canonical
+- `docs/features/templates/policy_audit/AGENTS.md`: canonical
+- `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`: canonical, with revert blocks below
+- `docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md`: canonical
 - `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md`: hand-edited `csharp-legacy` bundle variant
 - `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md`: hand-edited `csharp-legacy` bundle variant
 - `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/invoke-csharp-engineer/SKILL.md`: hand-edited `csharp-legacy` bundle variant
@@ -224,7 +229,7 @@ The list covers every path of the stored patch, with rename detection off.
 
 ## Stored Patch
 
-`patches/0006-test-suite-baseline-restored.patch` holds the partial revert as one diff. It is `git diff --binary --no-renames HEAD` over the paths in `## Files Changed`, taken before the commit that carries this entry.
+`patches/0006-test-suite-baseline-restored.patch` holds the partial revert as one diff. It is `git diff --binary --no-renames` from the first parent of the partial-revert commit (the commit whose subject carries `reduction: 0006` and adds this entry) over the paths in `## Files Changed`.
 
 The check: `git apply -R --check` of the patch succeeds on the working tree. A failed check means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
 

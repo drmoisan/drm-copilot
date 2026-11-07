@@ -3707,6 +3707,177 @@ index e45ecfa25..e8e9e16ff 100644
  
  ````
  
+diff --git a/docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md b/docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md
+index 22f12cb63..b8ad83acb 100644
+--- a/docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md
++++ b/docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md
+@@ -7,7 +7,7 @@
+ - **Status:** <template>
+ - **Version:** <version_number>
+ 
+-**Fail-closed evidence rule:** Include explicit static baseline tasks, final-QA tasks, and a per-file threshold task for each in-scope language when policy requires coverage. If any required static baseline artifact, QA artifact, or per-file coverage figure is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
++**Fail-closed evidence rule:** Include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+ 
+ **Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+ 
+@@ -41,7 +41,7 @@
+ **Phase 4 — Verification Loop**
+ - [ ] [P4-T1] Re-run the repro to confirm expected behavior
+ - [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
+-- [ ] [P4-T3] Record the static baseline and final-QA artifact paths and the per-file threshold results for each in-scope language where coverage is required
++- [ ] [P4-T3] Record the baseline (static and `Phase 0 baseline`), post-change, and comparison artifact paths and the per-file threshold results for each in-scope language where coverage is required
+ 
+ **Phase 5 — Documentation & Status**
+ - [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+diff --git a/docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md b/docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md
+index 7f9c8ddd4..e9acf8916 100644
+--- a/docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md
++++ b/docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md
+@@ -23,9 +23,9 @@
+ > - Start every task with a **strong verb** (Implement, Create, Update, Verify).
+ > - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
+ > - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
+-> - Include explicit static baseline tasks, final-QA tasks, and a per-file threshold task for every language in scope when policy requires coverage.
++> - Include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
+ > - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
+-> - If any required static baseline artifact, QA artifact, or per-file coverage figure is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
++> - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+ 
+ ### Phase 0: Context & Inputs
+ - [ ] [P0-T1] <Atomic task>
+@@ -56,7 +56,7 @@
+ - Unit: ...
+ - Integration: ...
+ - Manual/CLI: ...
+-- Coverage evidence: list the static baseline artifact paths, the final-QA artifact paths, and the per-file threshold results from the single gate run for each in-scope language
++- Coverage evidence: list baseline artifact paths (static and `Phase 0 baseline`), post-change artifact paths, and comparison artifact paths, with the per-file threshold results from the single gate run, for each in-scope language
+ 
+ ## Open Questions / Notes
+ 
+diff --git a/docs/features/templates/policy_audit/AGENTS.md b/docs/features/templates/policy_audit/AGENTS.md
+index efdf84935..f6f56fdc9 100644
+--- a/docs/features/templates/policy_audit/AGENTS.md
++++ b/docs/features/templates/policy_audit/AGENTS.md
+@@ -56,7 +56,7 @@ When asked to perform a Policy Audit for a component, branch, or PR:
+      - Fill in the Coverage Metrics by Language table with one row per language.
+      - Complete all applicable language sections (3A, 3B, 3C, 3D for code; 4A, 4B for tests).
+      - Delete sections for languages NOT involved in this change.
+-   - Record each retained baseline field as `N/A - no pre-change run`.
++   - **Fill in baseline coverage metrics** from the plan's `Phase 0 baseline` artifact (per language that has coverage). Record a baseline field as `N/A - no pre-change run` only for a new file or for a plan written before the `Phase 0 baseline` rule that captured static baselines only.
+    - Add one per-language comparison bullet for every in-scope language that has coverage requirements.
+ 
+ 3. **Evaluate policy compliance**
+@@ -74,11 +74,12 @@ When asked to perform a Policy Audit for a component, branch, or PR:
+      - **JSON:** format_json → validate_json (coverage N/A)
+    - **For coverage metrics (Python and PowerShell only):**
+      - Read each changed file from the single gate run and compare it with the coverage thresholds (per language).
++     - Compare post-change coverage with the `Phase 0 baseline` to verify no regression (per language).
+      - Isolate and measure coverage of new/modified code only (must be ≥90% per language).
+-     - Use concrete examples showing calculations: "Post-change: 87.1% against the 85% line threshold ✅"
++     - Use concrete examples showing calculations: "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅"
+    - **Fail-closed evidence handling:**
+-     - No policy audit may report PASS unless it includes numeric post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
+-     - If any required QA artifact or post-change coverage metric is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
++     - No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
++     - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
+      - Do not synthesize or backfill missing audit evidence from memory or inference.
+      - If evidence is missing, stop and report the exact missing artifact paths.
+    - **For scenario testing:**
+@@ -104,7 +105,7 @@ When asked to perform a Policy Audit for a component, branch, or PR:
+ 6. **Summarize and recommend**
+    - Complete the summary sections at the end of the template:
+      - Policy-by-policy summary
+-     - Metrics summary (with deterministic post-change and new code coverage)
++     - Metrics summary (with deterministic baseline/post-change/new code coverage)
+      - Recommendation (`Ready for merge`, `Needs revision`, or `Blocked`)
+    - Ensure the final audit document is consistent with the underlying evidence and toolchain output.
+ 
+diff --git a/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md b/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
+index 66953550e..1dd44bb1a 100644
+--- a/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
++++ b/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
+@@ -30,8 +30,8 @@
+ 
+ | Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
+ |----------|--------------|-------|-------------|-------------------|---------------------|-------------------|
+-| Python | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | N/A - no pre-change run | [N]% lines, [N]% funcs | [N]% |
+-| PowerShell | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | N/A - no pre-change run | [N]% cmds, [N]% funcs | [N]% |
++| Python | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | [N]% lines, [N]% funcs | [N]% lines, [N]% funcs | [N]% |
++| PowerShell | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | [N]% cmds, [N]% funcs | [N]% cmds, [N]% funcs | [N]% |
+ | Bash | [N] files | [N/A] tests | [✅/❌/N/A] | N/A (no coverage) | N/A (no coverage) | N/A |
+ | JSON | [N] files | N/A | [✅/❌] validation | N/A (config files) | N/A (config files) | N/A |
+ 
+@@ -39,15 +39,17 @@
+ 
+ ### Coverage Evidence Checklist
+ 
+-- TypeScript baseline coverage artifact: N/A - no pre-change run
++- TypeScript baseline coverage artifact: [path or `N/A - out of scope`]
+ - TypeScript post-change coverage artifact: [path or `N/A - out of scope`]
+-- PowerShell baseline coverage artifact: N/A - no pre-change run
++- PowerShell baseline coverage artifact: [path or `N/A - out of scope`]
+ - PowerShell post-change coverage artifact: [path or `N/A - out of scope`]
+ - Per-language comparison summary: [section reference or artifact path]
+ 
+-**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
++Baseline coverage is read from the plan's `Phase 0 baseline` artifact, one run of the language's gate. A baseline cell or field records `N/A - no pre-change run` only for a new file or for a plan written before the `Phase 0 baseline` rule that captured static baselines only.
+ 
+-**Fail-closed rule:** If any required QA artifact or post-change coverage metric is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
++**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope (or `N/A - no pre-change run` where that record applies), plus changed/new-code coverage when required.
++
++**Fail-closed rule:** If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
+ 
+ **Evidence rule:** Do not synthesize or backfill missing audit evidence from memory or inference. If evidence is missing, stop and list the exact missing artifact paths.
+ 
+@@ -94,6 +96,8 @@
+ 
+ | Requirement | Status | Evidence |
+ |------------|--------|----------|
++| **Baseline Coverage Documented** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Baseline:** [N]% lines, [N]% functions, read from the `Phase 0 baseline` artifact (or `N/A - no pre-change run`)<br>**Command:** `Invoke-PoshQCParallelTest` or `poetry run pytest -n auto` (one run of the gate)<br>**Artifact:** [path]<br>**Timestamp:** [YYYY-MM-DD HH:MM] |
++| **No Coverage Regression** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions, read from the single gate run<br>**Change:** [+/-N]% lines, [+/-N]% functions against the `Phase 0 baseline`<br>**Status:** [No regression / Regression detected: justification]<br>**Example:** "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅ PASS" |
+ | **Changed Files Meet Thresholds** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions, read from the single gate run<br>**Thresholds:** [line and branch thresholds that apply]<br>**Status:** [All changed files meet the thresholds / Files below a threshold: list]<br>**Example:** "Post-change: 87.1% against the 85% line threshold ✅ PASS" |
+ | **New Code Coverage ≥90%** | [✅/❌/N/A] [PASS/FAIL/N/A] | **New/modified files:** [list files]<br>**New code coverage:** [N]% (must be ≥90%)<br>**Calculation method:** [describe how new code was isolated for measurement]<br>**Example:** "New module `foo.py`: 127/135 lines covered = 94.1% ✅ PASS" |
+ | **Comprehensive Coverage** | [✅/❌/N/A] [PASS/FAIL/N/A] | **All functions/classes tested:**<br>- `function_name()` (lines X-Y): [N] tests<br>- `ClassName` (lines A-B): [N] tests<br>**Untested code:** [list with justification]<br>**Example:**<br>- `parse_config()` (lines 45-67): 3 tests<br>- `ConfigLoader` (lines 100-150): 5 tests<br>- Untested: `__repr__()` (trivial representation, no business logic) |
+@@ -108,7 +112,7 @@
+ 
+ Repeat one bullet per in-scope language that has coverage requirements. Keep the checklist above even when a language is out of scope, but use `N/A - out of scope` for the artifact path.
+ 
+-- [Language]: Baseline: N/A - no pre-change run -> Post-change: [N]% [unit]. Change: N/A. New/changed-code coverage: [N]% or `N/A - out of scope`. Disposition: [PASS/FAIL/N/A]. Evidence: [artifact path(s)].
++- [Language]: Baseline: [N]% [unit] (from the `Phase 0 baseline` artifact, or `N/A - no pre-change run`) -> Post-change: [N]% [unit]. Change: [+/-N]% [unit delta] (or N/A). New/changed-code coverage: [N]% or `N/A - out of scope`. Disposition: [PASS/FAIL/N/A]. Evidence: [artifact path(s)].
+ 
+ ### 1.3 Test Structure and Diagnostics
+ 
+@@ -514,7 +518,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
+ 
+ [Provide a brief summary of overall compliance status and any major findings.]
+ 
+-**Fail-closed reminder:** Do not mark the audit PASS, fully compliant, or ready for merge when any required QA artifact or post-change coverage metric is missing.
++**Fail-closed reminder:** Do not mark the audit PASS, fully compliant, or ready for merge when any required baseline artifact, QA artifact, coverage metric, or coverage-comparison artifact is missing.
+ 
+ ---
+ 
+diff --git a/docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md b/docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md
+index 5d3451ef2..044fdd0d8 100644
+--- a/docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md
++++ b/docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md
+@@ -16,7 +16,7 @@
+ 
+ Brief approach to reach the target structure while keeping behavior stable.
+ 
+-Fail-closed evidence rule: include explicit static baseline tasks, final-QA tasks, and a per-file threshold task for each in-scope language when policy requires coverage. If any required static baseline artifact, QA artifact, or per-file coverage figure is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
++Fail-closed evidence rule: include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+ 
+ Evidence accounting rule: record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+ 
+@@ -52,7 +52,7 @@ Evidence accounting rule: record the expected artifact path or location in each
+ - Unit/Integration: impacted modules and any regression tests for invariants
+ - CLI/Workflow: end-to-end commands/tasks expected to remain stable
+ - Tooling: lint/type checks after path updates
+-- Coverage evidence: list the static baseline artifact paths, the final-QA artifact paths, and the per-file threshold results from the single gate run for each in-scope language
++- Coverage evidence: list baseline artifact paths (static and `Phase 0 baseline`), post-change artifact paths, and comparison artifact paths, with the per-file threshold results from the single gate run, for each in-scope language
+ 
+ ## Rollback / Contingency
+ 
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md b/extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md
 index eeb06abc0..1f7cecceb 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md
