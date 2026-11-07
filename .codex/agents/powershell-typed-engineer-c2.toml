@@ -66,7 +66,7 @@ Follow the phased workflow defined by the preloaded skills:
 1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
 2. **Routing and scope** — apply `powershell-change-budget-router` to estimate scope and select direct mode (1-2 production files) vs `powershell-orchestrator` escalation. The large path has no production-file cap.
 3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed script or module structure, minimal DI seams (wrapper > delegate > adapter), Pester scenario-level test strategy, and the external executable wrapper mock strategy.
-4. **Implement in batches** — apply the approved plan. After each batch, run targeted PSScriptAnalyzer on touched files plus targeted Pester, and confirm per-file coverage.
+4. **Implement in batches** — apply the approved plan. After each batch, run targeted PSScriptAnalyzer on touched files. Test and coverage results come from the single gate run. A focused run of one test file to debug a specific failure is debugging only.
 5. **Final QA gate** — apply `powershell-qa-gate` to run the full toolchain, compare static tool results against the static baseline, read test and coverage results from the single gate run, and produce the required reporting block before declaring completion.
 6. **Evidence and handoff** — store static baseline and final gate evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when a gate fails.
 

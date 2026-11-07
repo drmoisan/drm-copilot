@@ -67,7 +67,7 @@ Follow the phased workflow defined by the preloaded skills:
 1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
 2. **Routing and scope** — apply `python-change-budget-router` to estimate scope and select direct mode (1-3 production files) or, for more than 3 production files, large-path escalation through `.codex/prompts/orchestrate-work.md`. The large path has no production-file cap, and test files are not counted toward the routing threshold.
 3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied.
-4. **Implement in batches** — apply the approved plan. After each batch, run targeted Ruff and Pyright on touched files plus targeted Pytest, and confirm per-file coverage.
+4. **Implement in batches** — apply the approved plan. After each batch, run targeted Ruff and Pyright on touched files. Test and coverage results come from the single gate run. A focused run of one test file to debug a specific failure is debugging only.
 5. **Final QA gate** — apply `python-qa-gate` to run the full toolchain, compare static tool results against the static baseline, read test and coverage results from the single gate run, and produce the required reporting block before declaring completion.
 6. **Evidence and handoff** — store static baseline and final gate evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when a gate fails.
 
