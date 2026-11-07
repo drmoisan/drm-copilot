@@ -118,7 +118,7 @@
 
 - [x] [P7-T1] Run `Invoke-PoshQCFormat` in write mode over `SKILLDIR`, `TESTDIR`, and the bundle copy of `SKILLDIR` (`BUNDLE/.claude/skills/epic-progress-report/scripts`; test files have no bundle copy); write `FEATURE/evidence/qa-gates/format-final.<timestamp>.md`.
   - Acceptance: the summary records zero `Formatted: ` lines and a non-zero `Already formatted: ` count; on any rewrite, re-copy the bundle (P6-T2 mechanism) and restart from this task.
-- [ ] [P7-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the nine `SKILLDIR` scripts and every `TESTDIR` test file; write `FEATURE/evidence/qa-gates/pssa-final.<timestamp>.md`.
+- [x] [P7-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the nine `SKILLDIR` scripts and every `TESTDIR` test file; write `FEATURE/evidence/qa-gates/pssa-final.<timestamp>.md`.
   - Acceptance: VERDICT(zero findings, or only findings listed in the P0-T2 baseline for an unchanged file); any fix restarts from P7-T1.
 - [ ] [P7-T3] Run the final Pester gate: one `Invoke-PoshQCParallelTest` from the item worktree (launcher route of `execution-environment`); write `FEATURE/evidence/qa-gates/pester-parallel-final.<timestamp>.md`.
   - Acceptance: returned `ExitCode` 0 and zero failed tests read from `artifacts/pester/pester-junit.xml`, or only failures outside the branch as defined in `## Execution Terms`; the summary records totals, the failing-container comparison with the P0-T3 artifact (no new failing test), and line coverage of each of the nine `SKILLDIR` scripts from `artifacts/pester/powershell-coverage.xml`.
