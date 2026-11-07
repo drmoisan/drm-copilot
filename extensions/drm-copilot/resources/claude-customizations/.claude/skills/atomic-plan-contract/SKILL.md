@@ -207,6 +207,8 @@ Output format. After the `PREFLIGHT:` signal and the `CONVERGENCE:` line, the pr
 
 At most one return. A plan returns to the planner at most once. On `PREFLIGHT: REVISIONS REQUIRED`, the orchestrator delegates one planner revision carrying the full `PREFLIGHT-DEFECT:` list, then runs one more preflight. If that second preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"` during planning, or records `final_status: "blocked_preflight_iteration_limit"` in a remediation cycle. In a proportionate remediation cycle, where preflight and execution run in one executor delegation, a substantive defect stops the run with `BLOCKED at preflight (before [P0-T1])` before any task is checked.
 
+Light cycles. A remediation cycle recorded with `Remediation-Mode: light` has no remediation plan and no preflight; its executor runs the inputs file directly. When that executor stops with `BLOCKED at preflight (before [P0-T1])` before the first task, the cycle converts to the design chain, and the remediation plan it then receives follows this section.
+
 Convergence signal. Every preflight return, whether it carries `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`, MUST additionally carry exactly one of these two forward-looking lines:
 
 - `CONVERGENCE: NO FURTHER ROUNDS EXPECTED` — the reviewer expects the plan to clear without a further round.

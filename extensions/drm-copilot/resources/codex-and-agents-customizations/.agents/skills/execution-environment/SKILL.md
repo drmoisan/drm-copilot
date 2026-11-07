@@ -71,6 +71,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 - Branch-current plan validation runs the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` with its `plan` subcommand, through Poetry in module form.
 - A push-down served by the MCP tools writes the installed extension's bundled payload; a repository-side edit under `extensions/drm-copilot/resources/` changes that payload only after a rebuild and reinstall.
 - Concurrent checkpoints (#1097): until the extension release that carries the concurrent-review rule is installed, installed MCP accepts a `review_mode: "concurrent"` checkpoint that the PowerShell stop hook and the Python CLI reject, so such a checkpoint is checked with `scripts/dev_tools/validate_orchestration_artifacts.py` in its `orchestrator-state` subcommand with `--require-complete`.
+- Light remediation checkpoints (#1097): installed MCP applies invariant 8 only after the extension release that carries it is installed. Until then a Claude run validates a light checkpoint through `scripts/dev_tools/validate_orchestration_artifacts.py` in its `orchestrator-state` subcommand, and on Codex, whose orchestrator requires the installed MCP validator with no fallback, the light path is unavailable.
 
 ## CI Shape and Required Checks
 
@@ -113,6 +114,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 - `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
 - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
 - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
+- `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
 
 ## Preflight Defect Classes the Validator Cannot See
 

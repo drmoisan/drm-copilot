@@ -31,6 +31,14 @@ BeforeDiscovery {
         @{ Check = 'JOIN'; Section = 'CI Shape and Required Checks'; Required = @('review_mode', 'merge_status: ci_green') }
         @{ Check = 'CHECKPOINT-ROUTE'; Section = 'MCP Surfaces Run the Installed Extension'; Required = @('--require-complete') }
         @{ Check = 'CONCURRENT-CONTRACT-TEST'; Section = 'Contract Tests That Pin Mirrored Files'; Required = @('concurrent-review-skill-contract.Tests.ps1') }
+        @{ Check = 'LIGHT-ROUTE'; Section = 'MCP Surfaces Run the Installed Extension'; Required = @('invariant 8') }
+        @{ Check = 'LIGHT-CONTRACT-TEST'; Section = 'Contract Tests That Pin Mirrored Files'; Required = @('light-remediation-skill-contract.Tests.ps1') }
+    )
+    $script:ModeSurface = @(
+        @{ Id = 'HANDOFF-CLAUDE'; Path = '.claude/skills/remediation-handoff-atomic-planner/SKILL.md' }
+        @{ Id = 'HANDOFF-AGENTS'; Path = '.agents/skills/remediation-handoff-atomic-planner/SKILL.md' }
+        @{ Id = 'HANDOFF-GITHUB'; Path = '.github/skills/remediation-handoff-atomic-planner/SKILL.md' }
+        @{ Id = 'COPILOT-ORCH'; Path = '.github/agents/orchestrator.agent.md' }
     )
     $script:BriefRow = @(foreach ($check in $briefCheck) {
             foreach ($copy in $briefCopy) {
@@ -92,11 +100,13 @@ Describe 'Planning contract wording' {
 
         <#
         .SYNOPSIS
-            Returns one level-two section of a repository file with whitespace runs collapsed.
+            Returns one section of a repository file with whitespace runs collapsed.
         .PARAMETER RelativePath
             The repository-relative path of the file.
         .PARAMETER Heading
-            The section heading text, without the leading `## `.
+            The section heading text, without the leading hashes.
+        .PARAMETER Level
+            The heading level; the section ends at the next heading of this level or higher.
         .OUTPUTS
             [string] The collapsed section text, or an empty string when the heading is absent.
         #>
@@ -108,19 +118,20 @@ Describe 'Planning contract wording' {
                 [string] $RelativePath,
 
                 [Parameter(Mandatory = $true)]
-                [string] $Heading
+                [string] $Heading,
+
+                [ValidateRange(1, 6)]
+                [int] $Level = 2
             )
 
             $path = Join-Path -Path $script:RepoRoot -ChildPath $RelativePath
             $text = [System.IO.File]::ReadAllText($path).Replace("`r`n", "`n")
-            $start = $text.IndexOf("`n## $Heading`n", [System.StringComparison]::Ordinal)
+            $start = $text.IndexOf("`n$('#' * $Level) $Heading`n", [System.StringComparison]::Ordinal)
             if ($start -lt 0) {
                 return ''
             }
-            $end = $text.IndexOf("`n## ", $start + 1, [System.StringComparison]::Ordinal)
-            if ($end -lt 0) {
-                $end = $text.Length
-            }
+            $next = [regex]::Match($text.Substring($start + 1), "\n#{1,$Level} ")
+            $end = if ($next.Success) { $start + 1 + $next.Index } else { $text.Length }
             return ($text.Substring($start, $end - $start) -replace '\s+', ' ')
         }
     }
@@ -197,5 +208,28 @@ Describe 'Planning contract wording' {
         # Assert
         $sectionText | Should -Not -BeNullOrEmpty -Because "$Path must keep the section '$Section'"
         $missing | Should -BeNullOrEmpty -Because "$Path must state the fact in '$Section'"
+    }
+
+    It 'PCW-LIGHT-WORDING-<Copy> names the light cycle in the single-pass preflight section' -ForEach $script:ContractCopy {
+        # Arrange
+        $sectionText = Get-PcwSectionText -RelativePath $Path -Heading 'Single-Pass Preflight' -Level 3
+
+        # Act
+        $named = $sectionText.Contains('`Remediation-Mode: light`')
+
+        # Assert
+        $sectionText | Should -Not -BeNullOrEmpty -Because "$Path must keep the single-pass preflight section"
+        $named | Should -BeTrue -Because "$Path must state how a light cycle relates to preflight"
+    }
+
+    It 'PCW-MODE-LIGHT-<Id> names the third remediation mode' -ForEach $script:ModeSurface {
+        # Arrange
+        $text = Get-PcwSurfaceText -RelativePath $Path
+
+        # Act
+        $named = $text.Contains('`Remediation-Mode: light`')
+
+        # Assert
+        $named | Should -BeTrue -Because "$Path must name the light mode that the orchestrate skill defines"
     }
 }
