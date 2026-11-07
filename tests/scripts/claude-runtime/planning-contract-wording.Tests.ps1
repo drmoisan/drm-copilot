@@ -16,6 +16,28 @@ BeforeDiscovery {
         @{ Copy = 'GITHUB-BUNDLE'; Path = "$resources/customizations/.github/skills/atomic-plan-contract/SKILL.md" }
     )
 
+    $briefCopy = @(
+        @{ Copy = 'CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md' }
+        @{ Copy = 'AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md' }
+        @{ Copy = 'GITHUB'; Path = '.github/skills/execution-environment/SKILL.md' }
+        @{ Copy = 'CLAUDE-BUNDLE'; Path = "$resources/claude-customizations/.claude/skills/execution-environment/SKILL.md" }
+        @{ Copy = 'AGENTS-BUNDLE'; Path = "$resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md" }
+        @{ Copy = 'GITHUB-BUNDLE'; Path = "$resources/customizations/.github/skills/execution-environment/SKILL.md" }
+    )
+    # Deferred brief facts of stages C and D; each is read from its own section only.
+    $briefCheck = @(
+        @{ Check = 'MERGE-GUARD'; Section = 'Hook Execution Context'; Required = @('enforce-epic-merge-gate-review.ps1', 'REVIEW_GATE_NOT_PASSED') }
+        @{ Check = 'MERGE-TEXT'; Section = 'Command-Text Restrictions'; Required = @('REVIEW_GATE_HEAD_UNRESOLVED', 'git commit -F') }
+        @{ Check = 'JOIN'; Section = 'CI Shape and Required Checks'; Required = @('review_mode', 'merge_status: ci_green') }
+        @{ Check = 'CHECKPOINT-ROUTE'; Section = 'MCP Surfaces Run the Installed Extension'; Required = @('--require-complete') }
+        @{ Check = 'CONCURRENT-CONTRACT-TEST'; Section = 'Contract Tests That Pin Mirrored Files'; Required = @('concurrent-review-skill-contract.Tests.ps1') }
+    )
+    $script:BriefRow = @(foreach ($check in $briefCheck) {
+            foreach ($copy in $briefCopy) {
+                @{ Check = $check.Check; Section = $check.Section; Required = $check.Required; Copy = $copy.Copy; Path = $copy.Path }
+            }
+        })
+
     # Every policy-read surface outside the contract; the Copilot review prompt is held
     # by the coordinator and is deliberately absent.
     $surfaceForbidden = @(
@@ -66,6 +88,40 @@ Describe 'Planning contract wording' {
 
             $path = Join-Path -Path $script:RepoRoot -ChildPath $RelativePath
             return ([System.IO.File]::ReadAllText($path) -replace '\s+', ' ')
+        }
+
+        <#
+        .SYNOPSIS
+            Returns one level-two section of a repository file with whitespace runs collapsed.
+        .PARAMETER RelativePath
+            The repository-relative path of the file.
+        .PARAMETER Heading
+            The section heading text, without the leading `## `.
+        .OUTPUTS
+            [string] The collapsed section text, or an empty string when the heading is absent.
+        #>
+        function Get-PcwSectionText {
+            [CmdletBinding()]
+            [OutputType([string])]
+            param(
+                [Parameter(Mandatory = $true)]
+                [string] $RelativePath,
+
+                [Parameter(Mandatory = $true)]
+                [string] $Heading
+            )
+
+            $path = Join-Path -Path $script:RepoRoot -ChildPath $RelativePath
+            $text = [System.IO.File]::ReadAllText($path).Replace("`r`n", "`n")
+            $start = $text.IndexOf("`n## $Heading`n", [System.StringComparison]::Ordinal)
+            if ($start -lt 0) {
+                return ''
+            }
+            $end = $text.IndexOf("`n## ", $start + 1, [System.StringComparison]::Ordinal)
+            if ($end -lt 0) {
+                $end = $text.Length
+            }
+            return ($text.Substring($start, $end - $start) -replace '\s+', ' ')
         }
     }
 
@@ -129,5 +185,17 @@ Describe 'Planning contract wording' {
 
         # Assert
         $held | Should -BeNullOrEmpty -Because "$Path must not require the routine policy-read task or its artifact"
+    }
+
+    It 'PCW-BRIEF-<Check>-<Copy> states the deferred fact in its section' -ForEach $script:BriefRow {
+        # Arrange
+        $sectionText = Get-PcwSectionText -RelativePath $Path -Heading $Section
+
+        # Act
+        $missing = @($Required | Where-Object { -not $sectionText.Contains($_) })
+
+        # Assert
+        $sectionText | Should -Not -BeNullOrEmpty -Because "$Path must keep the section '$Section'"
+        $missing | Should -BeNullOrEmpty -Because "$Path must state the fact in '$Section'"
     }
 }
