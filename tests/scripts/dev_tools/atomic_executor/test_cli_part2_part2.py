@@ -166,6 +166,7 @@ def _install_preflight_stubs(
     calls: list[list[str]] = []
 
     def fake_run(argv: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        """Record the argv and return the configured result for its step."""
         calls.append(list(argv))
         # Route the collect step, the unit-test step of either toolchain, and
         # every static step to their configured results.
@@ -268,6 +269,7 @@ class TestPreflightBranches:
         from scripts.dev_tools.atomic_executor import cli_preflight
 
         def fake_resolve(argv: list[str]) -> list[str]:
+            """Fail PATH resolution for the collect command only."""
             if "--collect-only" in argv:
                 raise FileNotFoundError("Required executable not found on PATH: x")
             return argv
@@ -300,6 +302,7 @@ class TestPreflightBranches:
         )
 
         assert result.failed_step == "pytest-collect"
+        # Only the pytest step carries -n, so no recorded argv may hold it.
         assert not any("-n" in argv for argv in calls)
 
     def test_pytest_collection_error_fails_step(

@@ -254,6 +254,7 @@ class TestPromptBuilderContext:
 
         section = _section(prompt, "PHASE 0 READ TASKS", "Before starting")
         assert "- [P0-T3] Read the spec" in section
+        # The checked read, the non-read task, and the later-phase read stay out.
         for excluded in ("P0-T1", "P0-T2", "P1-T1"):
             assert excluded not in section
         assert "Phase 0 read tasks above and the current task" in prompt
