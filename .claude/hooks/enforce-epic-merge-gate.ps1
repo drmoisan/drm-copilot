@@ -354,6 +354,9 @@ function Invoke-EpicMergeGateDecision {
     # Scope (issue #952): every gh pr merge invocation except a pure --disable-auto, and every gh api
     # merge or enqueue mutation, is gated; Test-EpicMergeGateCommandInScope holds the predicate.
     if (-not (Test-EpicMergeGateCommandInScope -CommandText $commandText)) {
+        if (-not (Test-EpicMergeGateReviewMergeText -CommandText $commandText)) { return Get-EpicMergeGateAllowDecision }
+        $unscopedDecision = Get-EpicMergeGateReviewUnscopedDecision -CommandText $commandText
+        if ($unscopedDecision.Denied) { return Get-EpicMergeGateBlockDecision -Reason $unscopedDecision.Reason }
         return Get-EpicMergeGateAllowDecision
     }
 
@@ -373,7 +376,8 @@ function Invoke-EpicMergeGateDecision {
     $childCheckpoint = if ($childRoot) { ConvertFrom-EpicMergeGateJson -Raw (Get-ChildOrchestratorCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind item -WorktreeRoot $childRoot)) } else { $null }
 
     # Review guard (issue #1097): inert without review_mode concurrent, so it precedes every allow branch.
-    $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot -GitRoot $childRoot
+    $reviewDecision = Get-EpicMergeGateReviewShapeDecision -CommandText $commandText -KnownCheckpoint $childCheckpoint -KnownPrNumber $commandPrNumber -ReadCheckpoint ${function:Read-EpicMergeGateReviewItemCheckpoint}
+    if (-not $reviewDecision.Denied) { $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot -GitRoot $childRoot }
     if ($reviewDecision.Denied) { return Get-EpicMergeGateBlockDecision -Reason $reviewDecision.Reason }
 
     if ((Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) -and

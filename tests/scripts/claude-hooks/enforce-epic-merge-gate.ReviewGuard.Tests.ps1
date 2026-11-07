@@ -126,6 +126,146 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
         $result.Reason.StartsWith('EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Reason
     }
 
+    Context 'shape rule checkpoint reads' {
+        BeforeAll {
+            $script:Wrapper = 'if gh pr checks 42; then gh pr merge 42 --merge; fi'
+            $script:KeyJson = ConvertTo-EpicMergeGateReviewCheckpointJson
+            $script:NoKeyJson = ConvertTo-EpicMergeGateReviewCheckpointJson -Remove 'review_mode', 'remediation_loop'
+
+            function Invoke-ShapeRead {
+                <#
+                .SYNOPSIS
+                    Run one command through the gate with separate session and item checkpoints.
+                #>
+                [CmdletBinding()]
+                param(
+                    [Parameter(Mandatory)][string] $Command,
+                    [Parameter(Mandatory)][string] $SessionCheckpoint,
+                    [Parameter(Mandatory)][string] $ItemCheckpoint
+                )
+
+                Mock Get-ChildOrchestratorCheckpointContent -ParameterFilter { $Path -like '*session-1097*' } -MockWith ({ $SessionCheckpoint }.GetNewClosure())
+                Mock Get-ChildOrchestratorCheckpointContent -ParameterFilter { $Path -like '*item-1097*' } -MockWith ({ $ItemCheckpoint }.GetNewClosure())
+                $envelope = @{ session_id = 'session-1097'; tool_name = 'Bash'; tool_input = @{ command = $Command } } | ConvertTo-Json -Depth 5 -Compress
+                $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
+                return [pscustomobject]@{ Decision = [string]$decision.hookSpecificOutput.permissionDecision; Reason = [string]$decision.hookSpecificOutput.permissionDecisionReason }
+            }
+
+            function Assert-ShapeDenied {
+                <#
+                .SYNOPSIS
+                    Assert the shape rule's denial, with no live-head read.
+                #>
+                [CmdletBinding()]
+                param([Parameter(Mandatory)] $Result)
+
+                $Result.Decision | Should -Be 'deny'
+                $Result.Reason.StartsWith('EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_HEAD_UNRESOLVED: ', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $Result.Reason
+                Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+            }
+        }
+
+        It 'RG-SHAPE-KEY-IN-ITEM-WORKTREE-ONLY' {
+            # Act: the session carries no key, and the unread merge names an item that does.
+            $result = Invoke-ShapeRead -Command $script:Wrapper -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:KeyJson
+
+            # Assert
+            Assert-ShapeDenied -Result $result
+        }
+
+        It 'RG-SHAPE-SECOND-NUMBER-ITEM-CARRIES-KEY' {
+            # Arrange: pull request 42 resolves to a keyless item, and 41 to an item with the key.
+            $secondRoot = Join-Path '/synthetic-worktrees' 'second-1097'
+            $keyJson = $script:KeyJson
+            Mock Resolve-EpicMergeGateItemTarget -ParameterFilter { $PrNumber -eq 41 } -MockWith ({ [pscustomobject]@{ Status = 'OtherWorktree'; WorktreeRoot = $secondRoot; ReasonCode = $null; Detail = 'second item (issue #1097)' } }.GetNewClosure())
+            Mock Get-ChildOrchestratorCheckpointContent -ParameterFilter { $Path -like '*second-1097*' } -MockWith ({ $keyJson }.GetNewClosure())
+
+            # Act
+            $result = Invoke-ShapeRead -Command 'gh pr merge 42 --merge && gh pr merge 41 --merge' -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert
+            Assert-ShapeDenied -Result $result
+        }
+
+        It 'RG-SHAPE-SESSION-KEY-WITH-FIRST-ITEM-KEYLESS' {
+            # Act
+            $result = Invoke-ShapeRead -Command 'gh pr merge 42 --merge && git push' -SessionCheckpoint $script:KeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert
+            Assert-ShapeDenied -Result $result
+        }
+
+        It 'RG-SHAPE-NUMBERLESS-WRAPPER-SESSION-KEY' {
+            # Act
+            $result = Invoke-ShapeRead -Command 'if true; then gh pr merge --merge; fi' -SessionCheckpoint $script:KeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert
+            Assert-ShapeDenied -Result $result
+        }
+
+        It 'RG-SHAPE-BOUND-COMMAND-READS-NO-EXTRA-CHECKPOINT' {
+            # Act
+            $result = Invoke-ShapeRead -Command 'gh pr merge 42 --merge' -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert: only the gate's own item read ran.
+            $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
+            Should -Invoke Get-ChildOrchestratorCheckpointContent -Times 1 -Exactly
+            Should -Invoke Resolve-EpicMergeGateItemTarget -Times 1 -Exactly
+        }
+
+        It 'RG-SHAPE-NOKEY-RESOLUTION-FAILURE-KEEPS-DECISION (<Case>)' -ForEach @(
+            @{ Case = 'git failure'; Fail = { throw 'git worktree list failed' } }
+            @{ Case = 'timeout'; Fail = { throw [System.TimeoutException]::new('git worktree list timed out') } }
+            @{ Case = 'no target'; Fail = { [pscustomobject]@{ Status = 'NoTarget'; WorktreeRoot = $null; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; Detail = 'no target (issue #1097)' } } }
+            @{ Case = 'ambiguous target'; Fail = { [pscustomobject]@{ Status = 'Ambiguous'; WorktreeRoot = $null; ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'; Detail = 'ambiguous (issue #1097)' } } }
+        ) {
+            # Arrange
+            Mock Resolve-EpicMergeGateItemTarget -MockWith $Fail
+
+            # Act
+            $result = Invoke-ShapeRead -Command $script:Wrapper -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert: today's out-of-scope allow, with the failed read attempted and no process.
+            $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
+            Should -Invoke Resolve-EpicMergeGateItemTarget -Times 1 -Exactly
+            Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        }
+
+        It 'RG-SHAPE-NOKEY-RESOLUTION-FAILURE-KEEPS-DECISION (session root failure)' {
+            # Arrange
+            Mock Get-EpicMergeGateSessionWorktreeRoot { throw 'git rev-parse failed' }
+
+            # Act
+            $result = Invoke-ShapeRead -Command 'if true; then gh pr merge --merge; fi' -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert
+            $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
+        }
+
+        It 'RG-SHAPE-NOKEY-RESOLUTION-FAILURE-KEEPS-DECISION (in-scope candidate failure)' {
+            # Arrange: the gate's own read of 42 succeeds, and only the extra read of 41 fails.
+            Mock Resolve-EpicMergeGateItemTarget -ParameterFilter { $PrNumber -eq 41 } -MockWith { throw 'git worktree list failed' }
+
+            # Act
+            $result = Invoke-ShapeRead -Command 'gh pr merge 42 --merge && echo 41' -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert: the ready child keeps today's allow.
+            $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
+        }
+
+        It 'RG-SHAPE-RESOLUTION-FAILURE-KEEPS-SESSION-KEY-DENY' {
+            # Arrange
+            Mock Resolve-EpicMergeGateItemTarget { throw 'git worktree list failed' }
+
+            # Act
+            $result = Invoke-ShapeRead -Command $script:Wrapper -SessionCheckpoint $script:KeyJson -ItemCheckpoint $script:NoKeyJson
+
+            # Assert: a key that was read still denies, so the best-effort read weakens nothing.
+            Assert-ShapeDenied -Result $result
+        }
+    }
+
     It 'RG-TWIN-IS-BYTE-IDENTICAL' {
         # Arrange
         $root = (Resolve-Path "$PSScriptRoot/../../..").Path

@@ -154,7 +154,8 @@ function Invoke-CodexEpicMergeDecision {
     $command = [string]$payload.tool_input.command
     # Scope (issue #952): every gh pr merge invocation except a pure --disable-auto, and every gh api
     # merge or enqueue mutation, is gated; Test-EpicMergeGateCommandInScope holds the predicate.
-    if (-not (Test-EpicMergeGateCommandInScope -CommandText $command)) {
+    $inScope = Test-EpicMergeGateCommandInScope -CommandText $command
+    if (-not $inScope -and -not (Test-EpicMergeGateReviewMergeText -CommandText $command)) {
         return $null
     }
 
@@ -162,7 +163,13 @@ function Invoke-CodexEpicMergeDecision {
     $child = ConvertFrom-CodexMergeJson -Raw $ChildCheckpointRaw -Name 'child checkpoint' -Optional
 
     # Review guard (issue #1097): inert without review_mode concurrent, so it precedes every allow branch.
-    $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $child -CommandPrNumber $prNumber -GhRoot $RepositoryRoot -GitRoot $RepositoryRoot
+    $reviewDecision = Get-EpicMergeGateReviewShapeDecision -CommandText $command -KnownCheckpoint $child -KnownPrNumber $prNumber
+    if (-not $reviewDecision.Denied) {
+        if (-not $inScope) {
+            return $null
+        }
+        $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $child -CommandPrNumber $prNumber -GhRoot $RepositoryRoot -GitRoot $RepositoryRoot
+    }
     if ($reviewDecision.Denied) {
         return [ordered]@{
             hookSpecificOutput = [ordered]@{

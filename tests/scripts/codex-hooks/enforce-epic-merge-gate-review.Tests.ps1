@@ -214,4 +214,32 @@ Describe 'Codex enforce-epic-merge-gate review guard (issue #1097)' {
             Assert-CodexNoGuardProcess -GhCount 1 -Result (Invoke-CodexReviewDecision -Root $PSScriptRoot)
         }
     }
+
+    Context 'shape rule without the key' {
+        BeforeAll {
+            $script:Wrapper = 'if gh pr checks 42; then gh pr merge 42 --merge; fi'
+            $script:NoKeyJson = ConvertTo-EpicMergeGateReviewCheckpointJson -Remove 'review_mode', 'remediation_loop'
+        }
+
+        It 'RGC-SHAPE-NOKEY-READ-FAILURE-KEEPS-DECISION (<Case>)' -ForEach @(
+            @{ Case = 'git failure'; Child = 'nokey'; Reader = { throw 'git worktree list failed' } }
+            @{ Case = 'timeout'; Child = 'nokey'; Reader = { throw [System.TimeoutException]::new('git worktree list timed out') } }
+            @{ Case = 'unresolved target'; Child = 'nokey'; Reader = { $null } }
+            @{ Case = 'unreadable child checkpoint'; Child = '{broken'; Reader = { $null } }
+        ) {
+            # Arrange: the Codex gate passes no reader, so the shared decision proves a failed read.
+            $childText = if ($Child -ceq 'nokey') { $script:NoKeyJson } else { $Child }
+            $known = $script:NoKeyJson | ConvertFrom-Json
+
+            # Act
+            $shape = Get-EpicMergeGateReviewShapeDecision -CommandText $script:Wrapper -KnownCheckpoint $known -KnownPrNumber 41 -ReadCheckpoint $Reader
+            $result = Invoke-CodexReviewDecision -Child $childText -Command $script:Wrapper
+
+            # Assert: today's out-of-scope allow, and no process.
+            $shape.Denied | Should -BeFalse
+            $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
+            Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        }
+    }
 }
