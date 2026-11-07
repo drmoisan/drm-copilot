@@ -147,7 +147,7 @@
   - Acceptance: `<FEATURE>/evidence/qa-gates/coverage-delta.<timestamp>.md` lists the baseline values from P0-T6, the post-change per-file values from P6-T3, and the new or changed file values, with a PASS verdict only when every listed file is at or above 85 percent.
 - [x] [P6-T5] Run the seven touched Pester suites (`SUITES/*.Tests.ps1` and `tests/scripts/dev-tools/Get-EpicProgressReport.Tests.ps1`) in one process in seeded shuffled file order with seeds 7, 41 and 1093.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-shuffled-order.<timestamp>.md` records each seed, its file order and its passed and failed counts; failed is 0 for every seed.
-- [ ] [P6-T6] Run a fresh single-process Pester run over `tests/scripts`.
+- [x] [P6-T6] Run a fresh single-process Pester run over `tests/scripts`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-single-process.<timestamp>.md` records total, passed and failed counts from the JUnit file, with 0 failures in the seven touched suites and any other failure compared against the merge base and recorded as pre-existing or fixed.
 - [ ] [P6-T7] Run a concurrent-shard Pester run through `Invoke-PoshQCParallelTest` over `tests/scripts`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-parallel-shards.<timestamp>.md` records the shard count and per-container results of the seven touched suites with 0 failures.
