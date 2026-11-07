@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Status:** Draft
 - **Work Mode:** full-feature
-- **Remediation-Mode:** proportionate
+- **Remediation-Mode:** design
 - **Branch:** feature/parallel-only-test-gates-and-leak-scan-1094
 - **Inputs:** `remediation-inputs.2026-11-07T03-22.md` in this folder (RF-1 to RF-4)
 
@@ -19,6 +19,7 @@
 
 Terms: `<FEATURE>` is `docs/features/active/2026-11-06-parallel-only-test-gates-and-leak-scan-1094`. `SCRATCH` resolves to `<session scratchpad>/issue-1094/`, and every helper, JUnit file, JSON report, and log lives under it. Evidence records the token, never a host path. The merge base is the merge base of `origin/main` and `HEAD`. The debugging statement is the sentence `A focused run of one test file to debug a specific failure is debugging only.`
 
+- **Working directory.** Every `npm`, `npx`, `poetry`, and `git` command, and every PoshQC call, runs from the item worktree root or the subfolder its task names. A launcher changes into that folder before its first command, because the Bash working directory resets to the main checkout. Run from the main checkout, `npm ci` replaces that checkout's `node_modules` and the generator writes that checkout's files.
 - **Commit and push.** Each task ends with one commit and one push to `feature/parallel-only-test-gates-and-leak-scan-1094`. The executor stages only the paths the task names, plus the evidence it writes. `.claude/agent-memory` is never staged.
 - **`testResults.xml`.** Pester runs rewrite this tracked file. Restore it with `git checkout -- testResults.xml` before staging.
 - **Poetry.** Do not run an unqualified `poetry install` from the item worktree.
@@ -42,7 +43,7 @@ No test suite runs in this phase.
   - Format runs check-only through the no-op `-WriteFile` seam on the branch-current module. Analyzer findings come from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
   - Acceptance: `Output Summary:` states the would-format count and the finding count as numbers, and `git status --porcelain` shows no tracked file changed by the step.
 - [ ] [P0-T3] Install the Node dependencies the item worktree lacks, confirm `node_modules/jest/package.json` and `extensions/drm-copilot/node_modules/jest/package.json`, and write `<FEATURE>/evidence/remediation-baseline/node-dependencies.<timestamp>.md`.
-  - Neither `node_modules` folder exists in the item worktree. Install from the lockfiles, as `_root-typescript-tests.yml` and `_drm-copilot-extension-tests.yml` do: `npm ci` and `npm --prefix extensions/drm-copilot ci`. Both targets are gitignored.
+  - Neither `node_modules` folder exists in the item worktree. Install from the lockfiles, as `_root-typescript-tests.yml` and `_drm-copilot-extension-tests.yml` do: `npm ci` and `npm --prefix extensions/drm-copilot ci`, both from the item worktree root under **Working directory**. The step stops before the first `npm` command if the current folder is not the item worktree root. Both targets are gitignored.
   - If the runner denies the install, stop and return to the orchestrator, naming the missing paths.
   - Acceptance: both files exist, and `git status --porcelain` shows no tracked file changed, including either `package-lock.json`.
 - [ ] [P0-T4] Capture the TypeScript static baseline for `extensions/drm-copilot/test/lib/validate/policy-audit-artifact.test.ts` in `<FEATURE>/evidence/remediation-baseline/typescript-format.<timestamp>.md`, `<FEATURE>/evidence/remediation-baseline/typescript-lint.<timestamp>.md`, and `<FEATURE>/evidence/remediation-baseline/typescript-typecheck.<timestamp>.md`.
@@ -53,7 +54,7 @@ No test suite runs in this phase.
 
 **Target wording.** A per-batch step keeps its static tools. Test and coverage figures are read from the single gate run, and a touched file meets the thresholds. The debugging statement appears wherever a required targeted test run is removed. Static analyzer deltas and the word `regressions` in each agent's objective heading stay.
 
-- [ ] [P1-T1] Fix RF-2 in step 4 `Implement in batches` of `.claude/agents/powershell-typed-engineer.md`, `.claude/agents/python-typed-engineer.md`, `.claude/agents/csharp-typed-engineer.md`, and `.codex/agents/powershell-typed-engineer.toml`, `.codex/agents/python-typed-engineer.toml`, `.codex/agents/csharp-typed-engineer.toml`, with their mirrors, then run `scripts/dev_tools/generate_codex_agent_variants.py` in write mode.
+- [ ] [P1-T1] Fix RF-2 in step 4 `Implement in batches` of `.claude/agents/powershell-typed-engineer.md`, `.claude/agents/python-typed-engineer.md`, `.claude/agents/csharp-typed-engineer.md`, and `.codex/agents/powershell-typed-engineer.toml`, `.codex/agents/python-typed-engineer.toml`, `.codex/agents/csharp-typed-engineer.toml`, with their mirrors, then run `poetry run python -m scripts.dev_tools.generate_codex_agent_variants` in write mode.
   - Each step keeps its targeted static tool, drops the targeted test run and `confirm per-file coverage`, states that test and coverage results come from the single gate run, and carries the debugging statement.
   - Copy the three `.claude/agents` files to `extensions/drm-copilot/resources/claude-customizations/.claude/agents/`. Edit by hand `.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md` in that bundle and `.codex-variants/csharp-legacy/agents/csharp-typed-engineer.toml` in `codex-and-agents-customizations`; both name MSTest. The generator writes the `-c1` to `-c4` and `-c3-elevated` variants and the Codex bundle copies.
   - No test pins the removed text: searches of `tests/` for the step text returned nothing.
@@ -79,7 +80,7 @@ No test suite runs in this phase.
 - [ ] [P1-T6] Add the two RF-3 cases to `describe("validatePolicyAuditSubstantiveRequirements")` in `extensions/drm-copilot/test/lib/validate/policy-audit-artifact.test.ts`.
   - Add a file constant holding `N/A - no pre-change run`. `extensions/drm-copilot/src/lib/validate/policy-audit-artifact.ts` is not edited.
   - Case `accepts an audit that records no pre-change run`: start from `buildValidPolicyAuditText()`, set both coverage rows' `Baseline Coverage` cells, the `TypeScript baseline coverage artifact:` and `PowerShell baseline coverage artifact:` lines, and both comparison lines' `Baseline:` and `Change:` parts to the no-pre-change form, as `test_validate_policy_audit_text_accepts_no_pre_change_run_record` does, and assert `toEqual([])`.
-  - Case `accepts the no-pre-change-run comparison line only through the later Post-change percentage`: `comparisonLineHasLabelledPercentage` is not exported, so the case asserts through the validator on the PowerShell line. With the numeric `Post-change:` value, the errors omit `Policy audit comparison line missing numeric baseline for PowerShell.` With `Post-change: N/A.`, the errors contain it. The PowerShell line is required: the TypeScript line carries `New/changed-code coverage: 95%`, which the `Baseline:` pattern would also reach, so that line cannot show the rejection.
+  - Case `accepts the no-pre-change-run comparison line only through the later Post-change percentage`: `comparisonLineHasLabelledPercentage` is not exported, so the case asserts through the validator on the PowerShell line. Both variants start from the first case's text, so that line's `Baseline:` and `Change:` parts already hold the no-pre-change form and no other percentage follows `Baseline:`. A retained `Change: +2%` would satisfy the pattern and hide the rejection. With the numeric `Post-change:` value, the errors omit `Policy audit comparison line missing numeric baseline for PowerShell.` With `Post-change: N/A.`, the errors contain it. The PowerShell line is required: the TypeScript line carries `New/changed-code coverage: 95%`, which the `Baseline:` pattern would also reach, so that line cannot show the rejection.
   - Acceptance: both named cases exist, and `extensions/drm-copilot/src/lib/validate/policy-audit-artifact.ts` is unchanged in a diff against the merge base.
 
 ### Phase 2 — Final QA Toolchain and Self-Review
@@ -101,7 +102,7 @@ Static stages run first, so that a suite is not re-run for a formatting change. 
   - Acceptance: `EXIT_CODE: 0`, zero failed tests, and the JUnit file holds `PGW-SWEEP-SURFACES` and `PGW-SWEEP-HELPER`, both passed. The artifact lists the `PGW-` count.
 - [ ] [P2-T5] Run the Jest gate with one background `npm run test:unit:coverage` run at the repository root, with `--json` and `--outputFile` under `SCRATCH`, and write `<FEATURE>/evidence/qa-gates/jest-coverage.<timestamp>.md`.
   - The root `testMatch` includes `extensions/drm-copilot/test/`, so this run executes the RF-3 cases and writes `coverage/lcov.info`. No `--randomize`, `--runInBand`, or path filter is passed.
-  - A PowerShell step script under `SCRATCH` sums `LH`/`LF` and `BRH`/`BRF` from `coverage/lcov.info`, overall and by top-level source root, and reads the record for `extensions/drm-copilot/src/lib/validate/policy-audit-artifact.ts`. The file's write time must not precede the run start.
+  - A PowerShell step script under `SCRATCH` sums `LH`/`LF` and `BRH`/`BRF` from `coverage/lcov.info`, overall and by top-level source root, and reads the record for `extensions/drm-copilot/src/lib/validate/policy-audit-artifact.ts`, after normalizing path separators, because `SF` records use backslashes on Windows. The file's write time must not precede the run start.
   - Acceptance: `EXIT_CODE: 0`, zero failures, both P1-T6 cases passed in the JSON report, and the totals are at or above 85% line and 75% branch. If the totals are below, the step exits non-zero, the artifact lists the per-root figures, and the executor stops and returns to the orchestrator. Nothing is excluded.
 - [ ] [P2-T6] Run the pytest gate with one background `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov` run, with `PYTHONPATH` set for that run to the worktree `packages/discovery-runtime/src`, JSON coverage and JUnit output under `SCRATCH`, and write `<FEATURE>/evidence/qa-gates/pytest-parallel.<timestamp>.md`.
   - The launcher computes the worktree path at run time in the host's native absolute form, sets `PYTHONPATH` for this one command, and records the value as `<worktree>/packages/discovery-runtime/src`.
