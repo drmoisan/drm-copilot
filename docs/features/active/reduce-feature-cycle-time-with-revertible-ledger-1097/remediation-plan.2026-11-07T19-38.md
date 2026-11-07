@@ -118,7 +118,7 @@ These were found by searching `tests/` for `Invoke-ProcessReductionChain`, `Get-
   - Read total line coverage from the Stmts and Miss columns of the `TOTAL` row, and branch coverage from the summed BRF and BRH records of `artifacts/python/lcov.info`, as the baseline did.
   - Output Summary: passed, failed, and skipped counts; total line and branch percentages; the comparison with P0-T1 (16204 passed, 96.99%, 94.17%).
   - Acceptance: zero failures; line coverage at or above 85% and branch coverage at or above 75%; totals not below the baseline, or each drop attributed per file from the term-missing table to files that only `main` changed. Such a drop is returned as a finding, and a drop in a file in the diff from the merge base fails the task.
-- [ ] [P2-T4] Run the ledger gates from scripts under `SCRATCH` and write `FEATURE/evidence/other/stage-r-cycle3-ledger-gates.<timestamp>.md`.
+- [x] [P2-T4] Run the ledger gates from scripts under `SCRATCH` and write `FEATURE/evidence/other/stage-r-cycle3-ledger-gates.<timestamp>.md`.
   - Gates:
     - (a) `Test-ProcessReductionLedger` is valid, and `Invoke-ProcessReductionChain` over `Read-ProcessReductionChainInput` reports `IsValid` true with 0 errors.
     - (b) `git apply -R --check` of the `0006` patch on the live tree exits 0.
