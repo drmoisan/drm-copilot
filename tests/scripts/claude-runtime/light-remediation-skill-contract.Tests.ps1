@@ -165,7 +165,7 @@ Describe 'orchestrator contract for the light remediation path (issue #1097)' {
     }
 
     It 'LRS-CLAUDE-NAMES-PYTHON-CLI-ROUTE (<Copy>)' -ForEach $script:ClaudeOrchestrateCopy {
-        Assert-LightRemediationToken -Text (Get-LightRemediationText -Copy $Copy -Heading $script:LoopHeading) -Token '`poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <path>`', 'records no receipt', 'not repaired by editing the cycle'
+        Assert-LightRemediationToken -Text (Get-LightRemediationText -Copy $Copy -Heading $script:LoopHeading) -Token '`scripts.dev_tools.validate_orchestration_artifacts` with its `orchestrator-state` subcommand', 'records no receipt', 'not repaired by editing the cycle'
     }
 
     It 'LRS-CODEX-STATES-UNAVAILABLE-UNTIL-RELEASE (<Copy>)' -ForEach $script:AgentsOrchestrateCopy {
