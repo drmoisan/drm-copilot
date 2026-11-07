@@ -63,7 +63,7 @@ Premise checks, each read against the tree:
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run the PowerShell format and lint stages over `scripts/dev-tools/StageTiming.psm1` and `tests/scripts/dev-tools/StageTiming.Tests.ps1`, once, and write `FEATURE/evidence/qa-gates/powershell-format-lint.<timestamp>.md`.
+- [x] [P2-T1] Run the PowerShell format and lint stages over `scripts/dev-tools/StageTiming.psm1` and `tests/scripts/dev-tools/StageTiming.Tests.ps1`, once, and write `FEATURE/evidence/qa-gates/powershell-format-lint.<timestamp>.md`.
   - Format runs `Invoke-PoshQCFormat` check-only, with a no-op `-WriteFile`, over `scripts/dev-tools` and `tests/scripts/dev-tools`. Lint runs `Invoke-ScriptAnalyzer` directly on the two files with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
   - Acceptance: the log holds an `Already formatted: ` line and no `Formatted: ` line for each file, and analyzer findings number zero. `EXIT_CODE:` is non-zero when either condition fails. A failure is repaired and this task restarts. No Python or TypeScript file changes, so no Python or TypeScript format stage runs.
 - [ ] [P2-T2] Run the two test gates, once each, from the worktree root and then the extension: one `Invoke-PoshQCParallelTest`, writing `FEATURE/evidence/qa-gates/powershell-test.<timestamp>.md`; then the Jest coverage run, writing `FEATURE/evidence/qa-gates/stage-b-typescript-coverage.<timestamp>.md`. Neither run is repeated unless a fix follows a failure.
