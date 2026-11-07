@@ -263,3 +263,24 @@ function Resolve-EpicProgressBaseline {
 
     return [pscustomobject]@{ StartUtc = $start; BaselineDone = $done; BaselineWeeklyPct = $weekly; UseCurrentDone = $useCurrentDone }
 }
+
+function Merge-EpicProgressSamplePair {
+    <#
+    .SYNOPSIS
+        Keep the newest sample and every second older sample (indices n-1, n-3, ...), in chronological order.
+    .DESCRIPTION
+        With k intervals the result has floor(k/2) intervals, each spanning two original
+        intervals; when k is odd the oldest interval is discarded. 14 samples become 7, 13
+        become 7, 2 become 1, and 1 or 0 samples are returned unchanged. Each application
+        doubles the spacing again, so the function is not idempotent.
+    .PARAMETER Sample
+        The samples in chronological order.
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Sample)
+
+    $kept = [System.Collections.Generic.List[object]]::new()
+    for ($index = $Sample.Count - 1; $index -ge 0; $index -= 2) { $kept.Insert(0, $Sample[$index]) }
+    return [object[]] $kept.ToArray()
+}

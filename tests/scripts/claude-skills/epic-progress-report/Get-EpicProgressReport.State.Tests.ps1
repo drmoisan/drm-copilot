@@ -259,3 +259,53 @@ Describe 'Resolve-EpicProgressBaseline' {
         $result.UseCurrentDone | Should -BeFalse
     }
 }
+
+Describe 'Merge-EpicProgressSamplePair' {
+    BeforeAll {
+        function Get-TestSampleSet {
+            # Samples s0..s(n-1) with ts = 300 * index and done = index, in chronological order.
+            param([int] $Count)
+            $set = [System.Collections.Generic.List[object]]::new()
+            for ($index = 0; $index -lt $Count; $index++) { $set.Add([pscustomobject]@{ ts = 300 * $index; done = $index }) }
+            , [object[]] $set.ToArray()
+        }
+    }
+
+    It 'keeps s13, s11, s9, s7, s5, s3 and s1 of 14 samples' {
+        $merged = @(Merge-EpicProgressSamplePair -Sample (Get-TestSampleSet -Count 14))
+
+        $merged.Count | Should -Be 7
+        ($merged.done -join ',') | Should -Be '1,3,5,7,9,11,13'
+    }
+
+    It 'reduces 13 samples to 7' {
+        $merged = @(Merge-EpicProgressSamplePair -Sample (Get-TestSampleSet -Count 13))
+
+        $merged.Count | Should -Be 7
+        ($merged.done -join ',') | Should -Be '0,2,4,6,8,10,12'
+    }
+
+    It 'reduces 2 samples to 1' {
+        $merged = @(Merge-EpicProgressSamplePair -Sample (Get-TestSampleSet -Count 2))
+
+        $merged.Count | Should -Be 1
+        $merged[0].done | Should -Be 1
+    }
+
+    It 'leaves 1 and 0 samples unchanged' {
+        $one = @(Merge-EpicProgressSamplePair -Sample (Get-TestSampleSet -Count 1))
+        $none = @(Merge-EpicProgressSamplePair -Sample @())
+
+        $one.Count | Should -Be 1
+        $one[0].done | Should -Be 0
+        $none.Count | Should -Be 0
+    }
+
+    It 'leaves 4 samples after two applications to 14' {
+        $once = @(Merge-EpicProgressSamplePair -Sample (Get-TestSampleSet -Count 14))
+        $twice = @(Merge-EpicProgressSamplePair -Sample $once)
+
+        $twice.Count | Should -Be 4
+        ($twice.done -join ',') | Should -Be '1,5,9,13'
+    }
+}
