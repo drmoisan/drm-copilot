@@ -42,6 +42,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 Set-StrictMode -Version Latest
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
 $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
@@ -85,86 +86,6 @@ function Test-IsPreflightPlan {
     param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Lines)
 
     return @($Lines | Where-Object { $_ -match '(?i)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$' }).Count -gt 0
-}
-
-function Get-JsonPropertyValue {
-    # Returns a named property of a parsed JSON object, or $null; safe under StrictMode.
-    [CmdletBinding()]
-    [OutputType([object])]
-    param([AllowNull()] [object] $Object, [Parameter(Mandatory = $true)] [string] $Name)
-
-    if ($null -eq $Object -or -not ($Object -is [System.Management.Automation.PSCustomObject])) {
-        return $null
-    }
-    $property = @($Object.PSObject.Properties | Where-Object { $_.Name -ceq $Name })
-    if ($property.Count -eq 0) {
-        return $null
-    }
-    return $property[0].Value
-}
-
-function Get-TranscriptPathFromEnvelope {
-    # Returns agent_transcript_path from the SubagentStop envelope with a leading ~ expanded, or $null.
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([AllowNull()] [object] $Envelope)
-
-    $path = Get-JsonPropertyValue -Object $Envelope -Name 'agent_transcript_path'
-    if (-not ($path -is [string]) -or [string]::IsNullOrWhiteSpace($path)) {
-        return $null
-    }
-    if ($path.StartsWith('~')) {
-        $path = $HOME + $path.Substring(1)
-    }
-    return $path
-}
-
-function Get-TranscriptFirstUserText {
-    # Returns the text of the first `user` entry of transcript JSONL lines, or $null when none parses.
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([AllowEmptyString()] [string[]] $Lines = @())
-
-    foreach ($line in $Lines) {
-        if ([string]::IsNullOrWhiteSpace($line)) {
-            continue
-        }
-        try {
-            $entry = ConvertFrom-Json -InputObject $line -ErrorAction Stop
-        }
-        catch {
-            continue
-        }
-        if ((Get-JsonPropertyValue -Object $entry -Name 'type') -ne 'user') {
-            continue
-        }
-        $container = Get-JsonPropertyValue -Object $entry -Name 'message'
-        if ($null -eq $container) {
-            $container = $entry
-        }
-        $content = Get-JsonPropertyValue -Object $container -Name 'content'
-        if ($content -is [string]) {
-            return $content
-        }
-        $textBlocks = @(@($content) | Where-Object { (Get-JsonPropertyValue -Object $_ -Name 'type') -eq 'text' })
-        $texts = @($textBlocks | ForEach-Object { [string](Get-JsonPropertyValue -Object $_ -Name 'text') })
-        if ($texts.Count -gt 0) {
-            return ($texts -join "`n")
-        }
-    }
-    return $null
-}
-
-function Read-TranscriptHead {
-    # File seam: returns the first 50 lines of the transcript at Path, or $null when no file exists.
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param([Parameter(Mandatory = $true)] [string] $Path)
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        return $null
-    }
-    return [string[]]@(Get-Content -LiteralPath $Path -TotalCount 50 -ErrorAction Stop)
 }
 
 function Test-IsPreflightRun {
