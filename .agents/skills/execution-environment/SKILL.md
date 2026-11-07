@@ -39,7 +39,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 
 - PoshQC MCP results carry no output. The summary string is composed from a fixed template before the child process runs (`runPoshQcWorkflow` in `extensions/drm-copilot/src/repo-automation-service.ts`), and `RepoAutomationExecutionResult` has no exit-code or output field. An `ok: true` result proves only that the tool was invoked.
 - Counts, percentages, and findings therefore come from files or direct runs: pass and fail counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, and analyzer findings from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
-- The MCP test tool reads the installed extension's settings. Branch-current Pester runs import `scripts/powershell/PoshQC/PoshQC.psd1` and call `Invoke-PoshQCTest` from a `sh`-launched PowerShell 7. The coverage population is derived by `Invoke-PoshQCTest` from `config/poshqc-coverage.json`; there is no hand-maintained coverage path list.
+- The MCP test tool reads the installed extension's settings. Branch-current Pester runs import `scripts/powershell/PoshQC/PoshQC.psd1` and call `Invoke-PoshQCParallelTest` from a `sh`-launched PowerShell 7. The coverage population is derived by `Invoke-PoshQCTest`, which each shard runs, from `config/poshqc-coverage.json`; there is no hand-maintained coverage path list.
+- `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
 - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
 
 ## Batch Budget
@@ -89,7 +90,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 - `_shell-coverage.yml` checks out at depth one, so `origin/main` does not exist in that job; no test may diff against it.
 - The Linux hook-suite job runs `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` on a case-sensitive file system: use `Join-Path`, forward-slash relative paths, exact file-name case, and no drive letters or backslash literals.
 - The `.gitattributes` rule `* text=auto eol=lf` normalizes line endings on checkout, so a CRLF fixture committed as text is not CRLF in CI.
-- Shard and single-process Pester runs expose module-scope import visibility and leaked state that per-suite local runs hide.
+- Files in one shard share a process, so a leak surfaces when shard contents change.
 
 ## Contract Tests That Pin Mirrored Files
 
@@ -106,6 +107,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 - `test_push_down_issue_824_follow_ups.py`: pushed rules and skills name no consuming product.
 - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
 - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
+- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
 
 ## Preflight Defect Classes the Validator Cannot See
 
@@ -136,6 +138,7 @@ These pass every validator rule and are found only by reading the plan against t
 - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
 - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
 - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
+- Per-file figures are read from the single gate run, and no earlier figure is compared.
 - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
 
 ## Test Runtime
@@ -145,17 +148,19 @@ These pass every validator rule and are found only by reading the plan against t
 - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
 - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
 - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
-- pytest: pass `-n auto` (pytest-xdist) on the command line of the CI step `Run tests with Pytest` and of the parallel VS Code tasks, never in `addopts`, because the VS Code Test Explorer keys results to the wrong file when `addopts` carries it. `-n auto` counts physical cores, so a runner can start fewer workers than it has vCPUs; measure it against an explicit count such as `-n 4` before keeping it. pytest-cov combines the worker coverage into one report, and the serial `poetry run pytest` command remains the isolation reference.
+- pytest: pass `-n auto` (pytest-xdist) on the command line of the CI step `Run tests with Pytest` and of the parallel VS Code tasks, never in `addopts`, because the VS Code Test Explorer keys results to the wrong file when `addopts` carries it. `-n auto` counts physical cores, so a runner can start fewer workers than it has vCPUs; measure it against an explicit count such as `-n 4` before keeping it. pytest-cov combines the worker coverage into one report.
 - Pester: parallel validation uses separate Pester 6 processes: `Invoke-PoshQCTest -ShardIndex -ShardCount` on the CI runners and `Invoke-PoshQCParallelTest` locally. Read the per-file `time` of the JUnit `testsuite` elements before changing the shard count or the weights in `config/poshqc-shard-weights.json`.
 - A candidate fix can be measured before the tree is edited by loading a pytest plugin module from `SCRATCH` with `-p <module>` and `PYTHONPATH`.
 
 ## Test Isolation Checks
 
 - Tests create no temporary files; file and transcript reads go through injected seams with in-memory content.
-- Before review, run each isolation check and record it under `<FEATURE>/evidence/regression-testing/`:
-  - a seeded shuffled Jest run (`node run-jest.cjs --randomize --seed=<n>` in `extensions/drm-copilot/`) with the seed recorded;
-  - a reversed-order run of the new or changed Python test modules in one process;
-  - a seeded shuffled file-order run of the touched Pester suites in one process, with at least three seeds and each seed and its file order recorded;
-  - a fresh single-process Pester run over `tests/scripts`, which is the CI shape;
-  - in addition to the serial runs, a concurrent-shard Pester run through `Invoke-PoshQCParallelTest` and a `pytest -n auto` run, both with zero failures.
-- An order dependence found by any run is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state. Every seed is then re-run.
+- The test gates are parallel:
+  - the Pester gate is one `Invoke-PoshQCParallelTest` run;
+  - the pytest gate is one `pytest -n auto` run;
+  - Jest runs through its normal parallel workers.
+- Each gate reaches zero failures and is re-run only after a fix.
+- A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence.
+- Serial tasks remain for debugging one failure and are not gates.
+- A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
+- The parallel gates govern where a policy file names a toolchain test command.

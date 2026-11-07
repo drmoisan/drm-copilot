@@ -1,0 +1,6 @@
+# PowerShell Test Gate (Remediation Cycle 1)
+
+Timestamp: 2026-11-07T04-36
+Command: Invoke-PoshQCParallelTest -Root <worktree root>, run once from a `sh` launcher under SCRATCH that imports `scripts/powershell/PoshQC/PoshQC.psd1`
+EXIT_CODE: 0
+Output Summary: returned `ExitCode` 0 with 8 shards (all shard exit codes 0), wall-clock 304.12 seconds. `artifacts/pester/pester-junit.xml` reports 14548 tests, 0 failures, 0 errors, 10 disabled, which is 11 more than the stage A figure of 14537. `ProcessReductionLedger.Tests.ps1` holds 72 tests with 0 failures. Added tests present and passing: PRL-ENTRY-BLOCK-PATH-NOT-RELATIVE (4 cases), PRL-ENTRY-BLOCK-PATH-DOT-PREFIX-ACCEPTED (2 cases), PRL-ENTRY-REVERT-STEP-FENCED-LABELS-IGNORED, PRL-ENTRY-STORED-PATCH-TRAILING-PUNCTUATION, PRL-FENCE-INFO-LINE-DOES-NOT-CLOSE, PRL-BLOCK-FIRST-REPEATED-LABEL-WINS, and PRL-SECTION-ENDS-AT-LEVEL-ONE-HEADING. PRL-README-EXAMPLE-IS-VALID passes against the updated README example. The `LINE` counter of the `sourcefile` element `ProcessReductionLedger.psm1` in `artifacts/pester/powershell-coverage.xml` reports 195 covered and 0 missed (100%). Repo-wide line coverage from `Get-PoshQCCoverageLineSummary` is 93.91% (23443 covered, 1519 missed, 24962 lines) beside the stage A figure of 93.91% (23440 covered of 24959). Figures were read from those files and not from MCP output.

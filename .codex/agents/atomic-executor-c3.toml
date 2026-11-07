@@ -89,9 +89,9 @@ For each task:
 
 Use the scoped tool patterns for quality gates:
 
-- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
 - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
-- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
 - **Git**: `git diff`, `git status`, `git log`
 
 Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -122,7 +122,7 @@ When the delegation prompt carries the directive `DIRECTIVE: PREFLIGHT VALIDATIO
 
 ## Blocking Protocol
 
-Blocking is permitted only during preflight validation (before `[P0-T1]`), including the preflight that opens a combined preflight-and-execute run of a proportionate remediation cycle. When preflight-blocked:
+Blocking is permitted only during preflight validation (before `[P0-T1]`), including the preflight that opens a combined preflight-and-execute run of a proportionate remediation cycle. A light remediation run has no preflight, and stops the same way before `[P0-T1]` only when a fix task cannot be done at its named location. When preflight-blocked:
 
 1. State: `BLOCKED at preflight (before [P0-T1])`.
 2. Provide a short, concrete explanation of why.

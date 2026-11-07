@@ -1,6 +1,6 @@
 ---
 name: invoke-powershell-engineer
-description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC format -> analyze -> test toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates.
+description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC format -> analyze -> test toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and quality gates read from the single gate run.
 ---
 
 # Implement PowerShell Skill
@@ -27,7 +27,7 @@ If the estimated scope exceeds the direct-mode budget, this skill defers to the 
 ## Output Paths
 
 - PowerShell source (`*.ps1`, `*.psm1`, `*.psd1`) and Pester test (`*.Tests.ps1`) files within the approved scope.
-- Baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Static baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and final gate evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
 - This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
@@ -36,10 +36,10 @@ If the estimated scope exceeds the direct-mode budget, this skill defers to the 
 The worker must return the `powershell-qa-gate` reporting block:
 
 1. Scope (exact file list).
-2. Baseline (PSScriptAnalyzer, Pester, coverage status).
+2. Baseline (PSScriptAnalyzer findings).
 3. Plan (design and test strategy, including minimal DI seams and external executable wrapper mock strategy).
 4. Diffs (patch-style or full-file replacements).
-5. QA Gate Results (PSScriptAnalyzer, Pester, and coverage deltas, or clearly marked **unverified**).
+5. QA Gate Results (PSScriptAnalyzer delta, failures in the single gate run, and per-file coverage against the thresholds, or clearly marked **unverified**).
 
 ## Delegation Identity Lines
 

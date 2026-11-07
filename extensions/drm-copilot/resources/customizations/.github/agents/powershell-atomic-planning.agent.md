@@ -65,7 +65,7 @@ Whenever the user asks you to plan or break down work, you must output:
 
 The plan must be executable by the `powershell_atomic_executor` agent without replanning. In particular:
 
-- If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**.
+- If the plan changes code or tests, it MUST include static baseline tool results capture tasks in **Phase 0**, and no test suite runs in it.
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
 
 ### 2.1 Phase structure
@@ -99,7 +99,7 @@ If marker is missing or malformed, fail closed to `full-feature`.
 
 Branch-specific required task sets:
 
-- `minor-audit`: include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
+- `minor-audit`: include static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
 - `full-feature`: retain full-document expectations and full QA obligations.
 - `full-bug`: require spec-driven expectations and full QA obligations.
 
@@ -396,7 +396,7 @@ Examples:
 
 * Good:
   `- [ ] [P1-T1] [expect-fail] Add parameterized test for slug extraction in tests/.../test_ck12_catalog.py`
-  - Acceptance: `poetry run pytest tests/... -k slug_extraction` fails with a tuple/type mismatch.
+  - Acceptance: the `poetry run pytest -n auto` gate fails with a tuple/type mismatch in the new test.
 
 * Bad (missing tag):
   `- [ ] [P1-T1] Add failing regression test for slug extraction ...`
@@ -627,7 +627,7 @@ Before sending any response that includes a plan, you must quickly self-check:
 * Are phases present, and does each phase contain at least one atomic task?
 * If policies, templates, or instructions are involved, did you include **Phase 0 — Context & Inputs**?
 * If the plan changes code or tests:
-  * Did Phase 0 include baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in §2.3)?
+  * Did Phase 0 include static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in §2.3)?
   * Did you include a final QA phase that runs the toolchain loop **for each applicable language** and reports results?
 * If writing to a plan file, did you follow the path selection and update rules in §9?
 * Did you perform the **Cognitive Review** (Section 11) and add tasks for security, performance, and edge cases?

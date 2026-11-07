@@ -1,6 +1,6 @@
 ---
 name: csharp-typed-engineer
-description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates.
+description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
 tools:
   - Read
   - Grep
@@ -33,10 +33,10 @@ Follow the phased workflow defined by the preloaded skills:
 
 1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
 2. **Routing and scope** — apply `csharp-change-budget-router` to estimate scope, select direct vs orchestrator handoff mode, and enforce the 3 production + 3 test per-batch cap.
-3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, MSTest scenario-level test strategy, and Moq mock strategy.
-4. **Implement in batches** — apply the approved plan. After each batch, run targeted analyzer and nullable builds on touched projects plus targeted MSTest, and confirm per-file coverage.
-5. **Final QA gate** — apply `csharp-qa-gate` to run the full toolchain, enforce zero-regression deltas against the baseline, and produce the required reporting block before declaring completion.
-6. **Evidence and handoff** — store baseline and post-change evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when deltas fail.
+3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, MSTest scenario-level test strategy, and Moq mock strategy.
+4. **Implement in batches** — apply the approved plan. After each batch, run targeted analyzer and nullable builds on touched projects. Test and coverage results come from the single gate run. A focused run of one test file to debug a specific failure is debugging only.
+5. **Final QA gate** — apply `csharp-qa-gate` to run the full toolchain, compare static tool results against the static baseline, read test and coverage results from the single gate run, and produce the required reporting block before declaring completion.
+6. **Evidence and handoff** — store static baseline and final gate evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when a gate fails.
 
 ## Mode Marker Resolution
 
@@ -55,7 +55,7 @@ Stop implementation and return to the user when:
 
 - the scope estimate or an in-flight batch would exceed the 3-production-file cap in direct mode,
 - a file is above or would exceed the 800-line hard limit of the tiered file-size policy (split it before proceeding; at 500 lines look for a logical split, and at 700 lines split more aggressively),
-- any QA gate delta is non-zero after self-correction,
+- any QA gate check fails after self-correction,
 - the toolchain cannot be executed in the current environment (mark the change **unverified**),
 - orchestrator handoff mode is requested but the required context package is incomplete,
 - policy instructions conflict.
