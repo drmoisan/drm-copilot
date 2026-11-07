@@ -33,7 +33,7 @@ Terms: `<FEATURE>` is `docs/features/active/2026-11-06-parallel-only-test-gates-
 
 No test suite and no language baseline runs in this phase, because no code changes.
 
-- [ ] [P0-T1] Read the policy files in the `policy-compliance-order` order, then the ledger `README.md`, `scripts/dev-tools/ProcessReductionLedger.psm1`, and `.claude/skills/feature-review-workflow/SKILL.md` `### Process-reduction ledger`, and write `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read the policy files in the `policy-compliance-order` order, then the ledger `README.md`, `scripts/dev-tools/ProcessReductionLedger.psm1`, and `.claude/skills/feature-review-workflow/SKILL.md` `### Process-reduction ledger`, and write `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read, and the ledger holds no entry file, so `0001` is the next free number.
 
 ### Phase 1 — Ledger Entry
