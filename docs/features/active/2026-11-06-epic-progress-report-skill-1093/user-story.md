@@ -53,35 +53,35 @@ While epic 1019 ran, the coordinator posted a four-line TL;DR every few minutes 
 
 Coordinator: start and read the reports
 
-- [ ] US-AC-01: `/epic-progress-report` is available and its frontmatter grants the canonical script invocation, `CronCreate`, `CronList`, `CronDelete` and `PushNotification` (spec AC-01, AC-02).
-- [ ] US-AC-02: The skill carries the TL;DR template and its variants, the Full report contents and every calculation rule in the merged tool's wording, including the range as average velocity plus and minus 2.05 SD (spec AC-03, AC-04).
-- [ ] US-AC-03: The skill carries both scheduling prompts with their cron expressions, parameterized by `<epic-folder>`, invoking only the canonical script, with no baseline or pairing arguments, and states the push-notification text rule (spec AC-05).
-- [ ] US-AC-04: After the first run, scheduled runs need no `-StartUtc` because the start is read from the state file; a run with no passed and no stored start stops with an error naming `-StartUtc` and `-ResetBaseline` before any git call (spec AC-16).
-- [ ] US-AC-05: The TL;DR and Full outputs are byte-for-byte unchanged from the merged tool for the same inputs, and no report prints `NaN` or `Infinity` (spec AC-21, AC-22, AC-23).
-- [ ] US-AC-06: The skill documents the known behaviors and measured rates, including bursty interval velocity, unreliable estimates for about two hours after a baseline, total drift, normal flat stretches, and the extra shorter interval from the hourly run (spec AC-07).
+- [x] US-AC-01: `/epic-progress-report` is available and its frontmatter grants the canonical script invocation, `CronCreate`, `CronList`, `CronDelete` and `PushNotification` (spec AC-01, AC-02).
+- [x] US-AC-02: The skill carries the TL;DR template and its variants, the Full report contents and every calculation rule in the merged tool's wording, including the range as average velocity plus and minus 2.05 SD (spec AC-03, AC-04).
+- [x] US-AC-03: The skill carries both scheduling prompts with their cron expressions, parameterized by `<epic-folder>`, invoking only the canonical script, with no baseline or pairing arguments, and states the push-notification text rule (spec AC-05).
+- [x] US-AC-04: After the first run, scheduled runs need no `-StartUtc` because the start is read from the state file; a run with no passed and no stored start stops with an error naming `-StartUtc` and `-ResetBaseline` before any git call (spec AC-16).
+- [x] US-AC-05: The TL;DR and Full outputs are byte-for-byte unchanged from the merged tool for the same inputs, and no report prints `NaN` or `Infinity` (spec AC-21, AC-22, AC-23).
+- [x] US-AC-06: The skill documents the known behaviors and measured rates, including bursty interval velocity, unreliable estimates for about two hours after a baseline, total drift, normal flat stretches, and the extra shorter interval from the hourly run (spec AC-07).
 
 Coordinator: reset after a pause
 
-- [ ] US-AC-07: `-ResetBaseline` discards earlier samples, records the resume start and baseline done, and leaves the weekly-quota baseline unchanged; the skill tells the coordinator to reset whenever work resumes after a pause and not to change the scheduled prompts (spec AC-06, AC-14).
+- [x] US-AC-07: `-ResetBaseline` discards earlier samples, records the resume start and baseline done, and leaves the weekly-quota baseline unchanged; the skill tells the coordinator to reset whenever work resumes after a pause and not to change the scheduled prompts (spec AC-06, AC-14).
 
 Coordinator: change cadence
 
-- [ ] US-AC-08: `-PairSamples` combines the stored samples in pairs, newest first, so that the recorded 5-minute example (mean 26.2, SD 31.4) becomes mean 27.3 and SD 23.2; the skill presents it as a one-shot command followed by recreating the TL;DR job, and notes that the conversation quoted 31.5 (spec AC-06, AC-15).
+- [x] US-AC-08: `-PairSamples` combines the stored samples in pairs, newest first, so that the recorded 5-minute example (mean 26.2, SD 31.4) becomes mean 27.3 and SD 23.2; the skill presents it as a one-shot command followed by recreating the TL;DR job, and notes that the conversation quoted 31.5 (spec AC-06, AC-15).
 
 Coordinator: stop and recreate jobs
 
-- [ ] US-AC-09: The skill explains stopping the reports with `CronList` and `CronDelete`, that `CronCreate` jobs are session-only, that `claude --resume` or `--continue` restores unexpired jobs, that recurring jobs expire 7 days after creation, and how to recreate missing jobs (spec AC-06).
-- [ ] US-AC-10: The default state file `<repository root>/.claude/state/epic-progress-<EpicFolder>.json` persists the samples and baseline across a container stop where the checkout persists, is never committed, can be overridden with `-StatePath`, and still reads the merged tool's array format (spec AC-17, AC-18).
+- [x] US-AC-09: The skill explains stopping the reports with `CronList` and `CronDelete`, that `CronCreate` jobs are session-only, that `claude --resume` or `--continue` restores unexpired jobs, that recurring jobs expire 7 days after creation, and how to recreate missing jobs (spec AC-06).
+- [x] US-AC-10: The default state file `<repository root>/.claude/state/epic-progress-<EpicFolder>.json` persists the samples and baseline across a container stop where the checkout persists, is never committed, can be overridden with `-StatePath`, and still reads the merged tool's array format (spec AC-17, AC-18).
 
 Destination-repository user
 
 - [ ] US-AC-11 (CI-dependent): The skill folder, including its scripts, is mirrored byte-identically in the Claude bundle and listed in the `core` pack manifest, so a push-down delivers it once the extension is rebuilt and reinstalled; the skill states the rebuild-and-reinstall requirement; the push-down contract tests pass on the PR head, verified by the `CI Required Gate` and the full-run jobs (spec AC-07, AC-11, AC-12).
-- [ ] US-AC-12: The skill and scripts contain no epic number, epic folder name, host path, drive letter, account name or token, and the script remains read-only toward git and GitHub (spec AC-08, AC-26).
-- [ ] US-AC-13: The skill lists its prerequisites (PowerShell 7, `git`, optional `gh` and `cswap`, the kickoff and checkpoint locations) and works in a destination where `scripts/dev-tools` does not exist (spec AC-09, AC-11).
+- [x] US-AC-12: The skill and scripts contain no epic number, epic folder name, host path, drive letter, account name or token, and the script remains read-only toward git and GitHub (spec AC-08, AC-26).
+- [x] US-AC-13: The skill lists its prerequisites (PowerShell 7, `git`, optional `gh` and `cswap`, the kickoff and checkpoint locations) and works in a destination where `scripts/dev-tools` does not exist (spec AC-09, AC-11).
 
 Repository maintainer
 
-- [ ] US-AC-14: `scripts/dev-tools/Get-EpicProgressReport.ps1` forwards every argument to the canonical script and propagates a non-zero exit status (spec AC-10).
+- [x] US-AC-14: `scripts/dev-tools/Get-EpicProgressReport.ps1` forwards every argument to the canonical script and propagates a non-zero exit status (spec AC-10).
 - [ ] US-AC-15 (CI-dependent): The #1080 test cases are preserved in the relocated suites, the new and changed PowerShell reaches at least 85 percent line coverage, every file stays below 700 lines, and the full toolchain passes on the PR head, verified by the `CI Required Gate` and the full-run jobs (spec AC-24, AC-27, AC-30, AC-31).
 
 ## Non-Goals
