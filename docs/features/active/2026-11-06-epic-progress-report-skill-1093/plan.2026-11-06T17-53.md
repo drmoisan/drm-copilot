@@ -132,7 +132,7 @@
   - Acceptance: the updated case passes and its scan list holds seven paths.
 - [x] [P5-T6] Add `.claude/skills` to the `roots` array of `config/poshqc-coverage.json`, keeping the six existing roots.
   - Acceptance: the file parses as JSON and `roots` holds seven entries including `.claude/skills`.
-- [ ] [P5-T7] Add an `### Added` subsection under `## [Unreleased]` in `extensions/drm-copilot/CHANGELOG.md` (before `### Changed`) recording the `/epic-progress-report` skill in the Claude core pack with its bundled scripts, and that delivery needs a rebuild and reinstall of the extension (spec DEC-10: core pack content changes are recorded there, as issue #984 shows).
+- [x] [P5-T7] Add an `### Added` subsection under `## [Unreleased]` in `extensions/drm-copilot/CHANGELOG.md` (before `### Changed`) recording the `/epic-progress-report` skill in the Claude core pack with its bundled scripts, and that delivery needs a rebuild and reinstall of the extension (spec DEC-10: core pack content changes are recorded there, as issue #984 shows).
   - Acceptance: the `## [Unreleased]` section contains `### Added` and the token `epic-progress-report`.
 
 ### Phase 6 — Final QA, Verification and Self-Review
