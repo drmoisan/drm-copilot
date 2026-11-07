@@ -49,7 +49,7 @@ Phase 0 reads policy and captures static tool baselines for what the branch touc
 - [x] [P0-T3] Capture the Python static baseline in `<FEATURE>/evidence/baseline/python-black.<timestamp>.md`, `<FEATURE>/evidence/baseline/python-ruff.<timestamp>.md`, and `<FEATURE>/evidence/baseline/python-pyright.<timestamp>.md`.
   - The file set is `test_discovery_documentation_contracts.py`, `test_execution_environment_brief_contracts.py`, `test_single_pass_preflight_contracts.py`, `test_codex_orchestration_contracts.py`, and `test_validate_policy_audit_artifact.py` under `tests/scripts/dev_tools/`. Black runs in check mode.
   - Acceptance: each artifact records the tool's real exit code and a numeric finding count.
-- [ ] [P0-T4] Write `<FEATURE>/evidence/baseline/pester-baseline-waiver.<timestamp>.md` and `<FEATURE>/evidence/baseline/pytest-baseline-waiver.<timestamp>.md`, recording that no suite baseline run is performed, by owner directive. No suite runs in this task.
+- [x] [P0-T4] Write `<FEATURE>/evidence/baseline/pester-baseline-waiver.<timestamp>.md` and `<FEATURE>/evidence/baseline/pytest-baseline-waiver.<timestamp>.md`, recording that no suite baseline run is performed, by owner directive. No suite runs in this task.
   - Acceptance: each artifact carries `Timestamp:`, `Command: none`, `EXIT_CODE: 0`, and an `Output Summary:` that states the waiver and that the branch changes no production code, so no per-file coverage gate applies.
 
 ### Phase 1 — Contract Text and Contract Tests
