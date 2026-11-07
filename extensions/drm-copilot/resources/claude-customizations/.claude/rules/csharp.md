@@ -2,19 +2,19 @@
 paths:
   - "**/*.cs"
   - "**/*.csproj"
-description: C#-specific toolchain and coding standards (xUnit).
+description: C#-specific toolchain and coding standards (MSTest).
 ---
 
 # C# Code Standards
 
-This rule file summarizes the C#-specific policies for this repository. It targets a host-neutral .NET foundation: xUnit, NSubstitute, FluentAssertions, `dotnet build`, the analyzer stack, `TimeProvider`, and uniform coverage thresholds.
+This rule file summarizes the C#-specific policies for this repository. It targets a host-neutral .NET foundation: MSTest, NSubstitute, FluentAssertions, `dotnet build`, the analyzer stack, `TimeProvider`, and uniform coverage thresholds.
 
 ## Toolchain
 
 1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Command: `dotnet tool restore` followed by `dotnet csharpier check .` (or `dotnet csharpier .` to auto-format).
 2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Analyzer enforcement is centralized in `Directory.Build.props` (`AnalysisLevel=latest-all`, `AnalysisMode=All`, `TreatWarningsAsErrors=true`). Command: `dotnet build` runs analyzers as part of the build.
 3. **Type Checking — Nullable Analysis**: Nullable reference types are enabled solution-wide via `Directory.Build.props` (`Nullable=enable`, `TreatWarningsAsErrors=true`). Command: `dotnet build` enforces nullable warnings as errors.
-4. **Testing — xUnit + NSubstitute + FluentAssertions**: Run tests with: `dotnet test --collect:"XPlat Code Coverage"`.
+4. **Testing — MSTest + NSubstitute + FluentAssertions**: Run tests with: `dotnet test --collect:"XPlat Code Coverage"`.
 
 Run the toolchain in order: format → lint → type-check → architecture → test. Restart from step 1 if any step fails or changes files.
 
@@ -31,11 +31,11 @@ Run the toolchain in order: format → lint → type-check → architecture → 
 
 ## Testing Standards
 
-- Use **xUnit** as the test framework with `[Fact]` and `[Theory]` attributes.
-- Use **`[Theory]` + `[InlineData]`** for parameterized tests.
-- Use **`IClassFixture<T>`** to share expensive setup across tests within a class.
+- Use **MSTest** (`Microsoft.VisualStudio.TestTools.UnitTesting`) as the test framework with `[TestClass]` and `[TestMethod]` attributes, on the VSTest runner (the `MSTest` package with `Microsoft.NET.Test.Sdk` and `coverlet.collector`).
+- Use **`[TestMethod]` + `[DataRow]`** for parameterized tests.
+- Use **`[ClassInitialize]`** to share expensive setup across tests within a class.
 - Use **NSubstitute** for test doubles. Example: `var sut = Substitute.For<IService>(); sut.Get().Returns(value);`.
-- Prefer **FluentAssertions** for assertions; use xUnit `Assert` only when FluentAssertions is not practical.
+- Prefer **FluentAssertions** for assertions; use MSTest `Assert` only when FluentAssertions is not practical.
 - Follow Arrange–Act–Assert structure.
 - No external dependencies in unit tests.
 
@@ -53,7 +53,7 @@ Run the toolchain in order: format → lint → type-check → architecture → 
 
 ### Golden Tests
 
-- **Verify.Xunit**: required for T1 classifier-output modules, tested against a versioned corpus.
+- **Verify.MSTest**: required for T1 classifier-output modules, tested against a versioned corpus.
 
 ## Analyzer Stack
 
