@@ -3,6 +3,7 @@
   "roots": [
     ".claude/hooks",
     ".claude/lib",
+    ".claude/skills",
     ".codex/hooks",
     ".github/hooks",
     ".codex/scripts",
