@@ -54,7 +54,7 @@ Out of scope: `execution-environment` and `atomic-plan-contract` (they wait on #
 - [x] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell, Python test, and TypeScript test scope, and write `FEATURE/evidence/baseline/stage-b-phase0-instructions-read.<timestamp>.md`.
   - This task stays only because the planner stop hook requires it; stage E removes it.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
-- [ ] [P0-T2] Capture the PowerShell baseline with one `Invoke-PoshQCParallelTest` run and write `FEATURE/evidence/baseline/stage-b-powershell-test.<timestamp>.md`.
+- [x] [P0-T2] Capture the PowerShell baseline with one `Invoke-PoshQCParallelTest` run and write `FEATURE/evidence/baseline/stage-b-powershell-test.<timestamp>.md`.
   - Output Summary: total and failed test counts from `artifacts/pester/pester-junit.xml`, and the repo-wide line percentage from `Get-PoshQCCoverageLineSummary` over `artifacts/pester/powershell-coverage.xml`.
   - When `ExitCode` is non-zero: read counts from `artifacts/pester/parallel/shard-<i>/pester-junit.xml`, or that directory's `shard.log` when a JUnit file is absent or truncated, take the percentage from `Merge-PoshQCCoverageReport` over the shard coverage files, and name each failing test in the artifact. The run is not repeated.
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with numeric counts and a numeric percentage, read from files and not from MCP output.
