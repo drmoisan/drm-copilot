@@ -14,6 +14,7 @@ BeforeDiscovery {
     $script:ReviewRequired = @('debugging only', 'N/A - no pre-change run')
     $script:ReviewForbidden = @('smallest relevant subset', 'regression on changed lines')
     $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
+    $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
 }
 
 Describe 'Parallel gate wording' {
@@ -91,6 +92,10 @@ Describe 'Parallel gate wording' {
         @{ Id = 'REVIEW-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
         @{ Id = 'ADAPTER-AGENTS'; Path = '.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
         @{ Id = 'ADAPTER-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
+        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
+        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
+        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
+        @{ Id = 'EXEC-CODEX-POWERSHELL'; Path = '.codex/agents/powershell-atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = @('run_poshqc_test') }
     ) {
         # Arrange
         $text = Get-PgwSurfaceText -RelativePath $Path
