@@ -272,6 +272,8 @@ The list covers every path changed from the merge base of `origin/main` and the 
 
 `patches/0001-parallel-only-test-gates.patch` holds the reduction as one diff. It is `git diff --binary --no-renames` from the merge base of `origin/main` and the branch head, limited to the paths in `## Files Changed`.
 
+Rebased for stage R (issue #1097): the sections of `.claude/skills/execution-environment/SKILL.md` and its five copies were regenerated so that both images carry the `planning-contract-wording.Tests.ps1` line, which a stage E commit with no entry of its own added to the brief's contract-test list inside the context of the hunk that adds the `parallel-gate-wording.Tests.ps1` line. Their other hunks are unchanged apart from line numbers.
+
 The check: `git apply -R --check` of the patch succeeds on the tree after every later entry that touches the patch's paths is reverted, newest-first, as README `## Revert Order` states; it is not run on the live tree. A failed check on that tree means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
 
 ## Prior Text
