@@ -41,25 +41,25 @@ const BASE_CHECKPOINT_PATH = path.resolve(
 /** The tolerated checkpoint key under test. */
 const KEY = "stage_timing";
 
+/** A valid `stage_timing` list: one closed entry and one open entry. */
+const VALID_LIST: readonly unknown[] = [
+  {
+    stage: "S4_atomic_planning",
+    attempt: 1,
+    started_at: "2026-01-02T01:00:00Z",
+    ended_at: "2026-01-02T01:10:00Z",
+  },
+  {
+    stage: "S5_atomic_execution",
+    attempt: 1,
+    started_at: "2026-01-02T01:10:00Z",
+    ended_at: null,
+  },
+];
+
 /** Three shapes that a later validator must not start rejecting silently. */
 const SHAPES: readonly (readonly [string, unknown])[] = [
-  [
-    "valid list",
-    [
-      {
-        stage: "S4_atomic_planning",
-        attempt: 1,
-        started_at: "2026-01-02T01:00:00Z",
-        ended_at: "2026-01-02T01:10:00Z",
-      },
-      {
-        stage: "S5_atomic_execution",
-        attempt: 1,
-        started_at: "2026-01-02T01:10:00Z",
-        ended_at: null,
-      },
-    ],
-  ],
+  ["valid list", VALID_LIST],
   ["null", null],
   ["string", "not-a-list"],
 ];
@@ -152,7 +152,7 @@ describe("orchestrator-state stage_timing tolerated key", () => {
   it("still reports a missing required key as a control", () => {
     // Arrange: the key is present and a required key is removed.
     const checkpoint = loadBaseCheckpoint();
-    checkpoint[KEY] = SHAPES[0][1];
+    checkpoint[KEY] = VALID_LIST;
     delete checkpoint["last_updated"];
 
     // Act

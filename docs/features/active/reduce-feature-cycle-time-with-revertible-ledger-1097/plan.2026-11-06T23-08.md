@@ -99,7 +99,7 @@ Out of scope: `execution-environment` and `atomic-plan-contract` (they wait on #
 
 ### Phase 3 — Final QA
 
-- [ ] [P3-T1] Run the format, lint, and type stages for each language touched and write `FEATURE/evidence/qa-gates/stage-b-powershell-format-lint.<timestamp>.md`, `FEATURE/evidence/qa-gates/stage-b-python-format-lint-type.<timestamp>.md`, and `FEATURE/evidence/qa-gates/stage-b-typescript-format-lint-type.<timestamp>.md`.
+- [x] [P3-T1] Run the format, lint, and type stages for each language touched and write `FEATURE/evidence/qa-gates/stage-b-powershell-format-lint.<timestamp>.md`, `FEATURE/evidence/qa-gates/stage-b-python-format-lint-type.<timestamp>.md`, and `FEATURE/evidence/qa-gates/stage-b-typescript-format-lint-type.<timestamp>.md`.
   - PowerShell: `Invoke-PoshQCFormat` check-only, with a no-op `-WriteFile`, over `scripts/dev-tools`, `tests/scripts/dev-tools`, and `tests/scripts/claude-lib/orchestrator-state`; `Invoke-ScriptAnalyzer` directly on the module, the entry, and the four new Pester files with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`. Type checking does not apply.
   - Python: Black in check mode, Ruff without fixing, and Pyright on `tests/scripts/dev_tools/test_stage_timing_checkpoint_key.py`.
   - TypeScript: Prettier in check mode, ESLint without fixing, and the compiler type check, on the new Jest file.

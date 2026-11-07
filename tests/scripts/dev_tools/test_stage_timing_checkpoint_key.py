@@ -1,14 +1,15 @@
-"""Pin the tolerated, unvalidated ``stage_timing`` checkpoint key (issue #1097, stage B).
+"""Pin the tolerated, unvalidated ``stage_timing`` checkpoint key (issue #1097).
 
-The orchestrator main session writes ``stage_timing`` into the checkpoint as a list of timing
-entries. No validator reads the key, so these tests drive three shapes (a valid list, JSON null,
-and a string) through the Python validator in each mode and require the error list to equal the
-list for the same checkpoint without the key. A control removes a required key, which proves the
-validator ran. The portable-handoff tests pin that the archived source bytes keep the key and stay
-bound by their SHA-256, and that the destination projection starts without it.
+The orchestrator main session writes ``stage_timing`` into the checkpoint as a list
+of timing entries. No validator reads the key, so these tests drive three shapes (a
+valid list, JSON null, and a string) through the Python validator in each mode and
+require the error list to equal the list for the same checkpoint without the key. A
+control removes a required key, which proves the validator ran. The portable-handoff
+tests pin that the archived source bytes keep the key and stay bound by their
+SHA-256, and that the destination projection starts without it.
 
-The base checkpoint is a committed back-compat fixture read in place; the key is added in memory.
-No temporary file is created and no external process is started.
+The base checkpoint is a committed back-compat fixture read in place; the key is
+added in memory. No temporary file is created and no external process is started.
 """
 
 from __future__ import annotations
@@ -38,7 +39,11 @@ from tests.scripts.dev_tools.orchestration_handoff_taskmaster_469_test_support i
 # This file lives at tests/scripts/dev_tools/, three parents below the repo root.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BASE_CHECKPOINT = (
-    REPO_ROOT / "tests" / "fixtures" / "orchestrator_state_blocked_reason_backcompat" / "none.json"
+    REPO_ROOT
+    / "tests"
+    / "fixtures"
+    / "orchestrator_state_blocked_reason_backcompat"
+    / "none.json"
 )
 KEY = "stage_timing"
 
@@ -112,7 +117,9 @@ def _names_key(lines: list[str]) -> bool:
 
 
 @pytest.mark.parametrize(("shape", "value"), SHAPES, ids=SHAPE_IDS)
-def test_python_plain_validation_ignores_stage_timing(shape: str, value: object) -> None:
+def test_python_plain_validation_ignores_stage_timing(
+    shape: str, value: object
+) -> None:
     """Plain validation returns the same error list with and without the key."""
     # Arrange: the same checkpoint with and without the key.
     without_key = _text_with(value, present=False)
@@ -132,7 +139,7 @@ def test_python_plain_validation_ignores_stage_timing(shape: str, value: object)
 def test_python_completion_and_pr_modes_ignore_stage_timing(
     mode: str, shape: str, value: object
 ) -> None:
-    """The completion and PR-readiness modes return the same list with and without the key."""
+    """The completion and PR modes return the same list with and without the key."""
     # Arrange: the same checkpoint with and without the key.
     without_key = _text_with(value, present=False)
     with_key = _text_with(value, present=True)
@@ -187,7 +194,7 @@ def _source_with_stage_timing(case: FixtureCase) -> bytes:
 def test_archived_source_bytes_carry_stage_timing_and_stay_hash_bound(
     case: FixtureCase,
 ) -> None:
-    """A source checkpoint that carries the key keeps it in the archive and stays hash bound."""
+    """A source checkpoint with the key keeps it in the archive, hash bound."""
     # Arrange: bind the provenance to source bytes that carry the key.
     archived = _source_with_stage_timing(case)
     provenance = replace(
@@ -224,7 +231,7 @@ def test_archive_without_stage_timing_fails_the_source_hash(case: FixtureCase) -
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
 def test_destination_projection_omits_stage_timing(case: FixtureCase) -> None:
-    """The destination projection copies no unknown key, so it starts without stage_timing."""
+    """The destination projection copies no unknown key, so it omits the key."""
     # Arrange: an envelope whose source checkpoint carries the key.
     envelope = build_envelope(case)
     envelope = replace(
