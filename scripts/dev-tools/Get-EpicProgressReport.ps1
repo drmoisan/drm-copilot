@@ -9,6 +9,12 @@
     file declares no parameters, so it cannot drift from the canonical parameter surface.
     Run 'Get-Help' on the canonical script for the parameters. To load the functions for a
     test or a probe, dot-source the canonical file, not this forwarder.
+
+.NOTES
+    Exit status (issue #1093): a parameter-validation or other terminating failure of the
+    canonical script exits 1; an explicit non-zero exit code of the canonical script is
+    propagated; after a successful run the exit code is 0, and a native exit code left over
+    from git, gh, or cswap is ignored.
 #>
 
 $ErrorActionPreference = 'Stop'
