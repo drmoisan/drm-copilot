@@ -1,0 +1,84 @@
+Set-StrictMode -Version Latest
+
+# Contract guard for issue #1094: the mirrored skills, agents, prompts, and
+# templates name only the parallel test gates and read coverage from the single
+# gate run. Each `PGW-` row holds one file with its required and forbidden
+# tokens, so a removed requirement that returns to any mirrored copy fails that
+# copy's row. Files are read in place; the suite writes nothing.
+
+BeforeDiscovery {
+    $script:ContractForbidden = @('baseline test-step', 'baseline and final-QC coverage', 'delta/threshold verification', 'baseline coverage')
+}
+
+Describe 'Parallel gate wording' {
+    BeforeAll {
+        # Walk up from this file so the suite does not depend on the working directory.
+        $script:RepoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+
+        <#
+        .SYNOPSIS
+            Returns the text of a repository file with whitespace runs collapsed.
+        .PARAMETER RelativePath
+            The repository-relative path of the file.
+        .OUTPUTS
+            [string] The collapsed file text.
+        #>
+        function Get-PgwSurfaceText {
+            [CmdletBinding()]
+            [OutputType([string])]
+            param(
+                [Parameter(Mandatory = $true)]
+                [string] $RelativePath
+            )
+
+            $path = Join-Path -Path $script:RepoRoot -ChildPath $RelativePath
+            return ([System.IO.File]::ReadAllText($path) -replace '\s+', ' ')
+        }
+
+        <#
+        .SYNOPSIS
+            Returns the tokens that a text holds, ignoring case.
+        .PARAMETER Content
+            The text to search.
+        .PARAMETER SearchToken
+            The tokens to look for.
+        .OUTPUTS
+            [string[]] The tokens found in the text.
+        #>
+        function Get-PgwTokenHit {
+            [CmdletBinding()]
+            [OutputType([string[]])]
+            param(
+                [Parameter(Mandatory = $true)]
+                [AllowEmptyString()]
+                [string] $Content,
+
+                [Parameter(Mandatory = $true)]
+                [AllowEmptyCollection()]
+                [string[]] $SearchToken
+            )
+
+            return @($SearchToken | Where-Object { $Content.IndexOf($_, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 })
+        }
+    }
+
+    It 'PGW-<Id> carries the required wording and no forbidden wording' -ForEach @(
+        @{ Id = 'PLAN-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
+    ) {
+        # Arrange
+        $text = Get-PgwSurfaceText -RelativePath $Path
+
+        # Act
+        $missing = @($Required | Where-Object { -not $text.Contains($_) })
+        $held = @(Get-PgwTokenHit -Content $text -SearchToken $Forbidden)
+
+        # Assert
+        $missing | Should -BeNullOrEmpty -Because "$Path must state the parallel gates"
+        $held | Should -BeNullOrEmpty -Because "$Path must not name a removed run"
+    }
+}
