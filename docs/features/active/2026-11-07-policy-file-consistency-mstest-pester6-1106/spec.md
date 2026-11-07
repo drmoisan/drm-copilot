@@ -117,20 +117,34 @@ One runner for every C# surface was not chosen. The modern profile is host-neutr
 
 ## Acceptance Criteria
 
-- [ ] No rule, instruction, agent, skill, prompt, template, README, or bundle copy names xUnit as this repository's C# test framework; the `Do not introduce xUnit or NUnit` prohibition and the generic multi-language CI list keep the word.
-- [ ] Every C# surface names MSTest as the framework and uses MSTest idioms (`[TestClass]`/`[TestMethod]`, `[DataRow]`, `[ClassInitialize]`, `Verify.MSTest`).
-- [ ] Each C# profile names one runner and command set: the modern Claude pack names `dotnet test --collect:"XPlat Code Coverage"` on the VSTest runner with the `MSTest`, `Microsoft.NET.Test.Sdk`, and `coverlet.collector` package set; the Copilot, Codex default, legacy, and `csharp-atomic-executor` surfaces name `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`.
-- [ ] The spec records why one runner for every C# surface was not chosen.
-- [ ] No surface states Pester v5 or v5.x as the supported version; each supported-version statement names Pester (v6.x) or Pester v6, and historical, CHANGELOG, test-comment, and fixture references are unchanged.
-- [ ] No approved or emitted command, task, or argv list carries `--cov=src/lexile_corpus_tuner`; each former site targets `--cov=scripts/dev_tools`, the dead `pyproject.toml` per-file-ignore is removed, and `test_qc_runner.py` asserts the new argv.
+- [x] No rule, instruction, agent, skill, prompt, template, README, or bundle copy names xUnit as this repository's C# test framework; the `Do not introduce xUnit or NUnit` prohibition and the generic multi-language CI list keep the word.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows pass, PTN-HELPER-EXEMPT keeps the prohibition and the generic list)
+- [x] Every C# surface names MSTest as the framework and uses MSTest idioms (`[TestClass]`/`[TestMethod]`, `[DataRow]`, `[ClassInitialize]`, `Verify.MSTest`).
+  - Evidence: `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md` (word diffs) and `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows)
+- [x] Each C# profile names one runner and command set: the modern Claude pack names `dotnet test --collect:"XPlat Code Coverage"` on the VSTest runner with the `MSTest`, `Microsoft.NET.Test.Sdk`, and `coverlet.collector` package set; the Copilot, Codex default, legacy, and `csharp-atomic-executor` surfaces name `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`.
+  - Evidence: `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md` (test_claude_modern_csharp_profile_retains_modern_gate_commands passes); P1-T3 commit check (`/EnableCodeCoverage` count 1, no dotnet test/build in csharp-atomic-executor)
+- [x] The spec records why one runner for every C# surface was not chosen.
+  - Evidence: `spec.md` section `### Decision record: one runner per profile (D1)`
+- [x] No surface states Pester v5 or v5.x as the supported version; each supported-version statement names Pester (v6.x) or Pester v6, and historical, CHANGELOG, test-comment, and fixture references are unchanged.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows), `evidence/qa-gates/codex-generator-check.2026-11-07T15-01.md`, `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`
+- [x] No approved or emitted command, task, or argv list carries `--cov=src/lexile_corpus_tuner`; each former site targets `--cov=scripts/dev_tools`, the dead `pyproject.toml` per-file-ignore is removed, and `test_qc_runner.py` asserts the new argv.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN-CODE), `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md` (test_qc_runner.py 24 passed)
 - [ ] The PR description states the D3 Python behavior change (coverage now targets an existing package).
-- [ ] Other-project example text (`lexile`, `gutenberg`) is replaced with neutral generic names in the D4 policy surfaces and their bundle copies; `clean_devcontainer.py` names and `LEXILE_TK_SCALE` are unchanged.
-- [ ] Every changed mirror and bundle copy is byte-identical with its canonical source, the generated Codex variants are produced by `generate_codex_agent_variants.py` with `--check` clean, and the parity and contract tests in research Q4 pass.
-- [ ] The `>= 90%` new-code coverage rule, the 85% line / 75% branch thresholds, and all parallel-only test command wording are byte-unchanged; same-line edits change only the named token.
+  - pending pr-author (text prepared in `evidence/other/pr-body-notes.2026-11-07T15-26.md`)
+- [x] Other-project example text (`lexile`, `gutenberg`) is replaced with neutral generic names in the D4 policy surfaces and their bundle copies; `clean_devcontainer.py` names and `LEXILE_TK_SCALE` are unchanged.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows over lexile and gutenberg), `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`
+- [x] Every changed mirror and bundle copy is byte-identical with its canonical source, the generated Codex variants are produced by `generate_codex_agent_variants.py` with `--check` clean, and the parity and contract tests in research Q4 pass.
+  - Evidence: `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md` (29 pairs EQUAL, generator --check exit 0), `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md` (Q4 contract suites pass)
+- [x] The `>= 90%` new-code coverage rule, the 85% line / 75% branch thresholds, and all parallel-only test command wording are byte-unchanged; same-line edits change only the named token.
+  - Evidence: `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md` (protected-token counts equal at MB and HEAD; same-line word diffs)
 - [ ] The owner authorization for editing canonical policy files is recorded in the orchestrator checkpoint and the PR body.
-- [ ] `tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1` exists, passes, and its in-memory helper test fails on reintroduced forbidden text.
-- [ ] `Invoke-PoshQCParallelTest` and `poetry run pytest -n auto` pass with zero failures and no coverage drop on changed lines versus the Phase 0 baseline.
-- [ ] Each changed Python file meets 85% line and 75% branch coverage, read from the gate run.
+  - pending pr-author (checkpoint record confirmed; PR-body text prepared in `evidence/other/pr-body-notes.2026-11-07T15-26.md`)
+- [x] `tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1` exists, passes, and its in-memory helper test fails on reintroduced forbidden text.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (18 PTN- rows pass, including PTN-HELPER)
+- [x] `Invoke-PoshQCParallelTest` and `poetry run pytest -n auto` pass with zero failures and no coverage drop on changed lines versus the Phase 0 baseline.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md`, `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md`, `evidence/qa-gates/coverage-threshold.2026-11-07T15-25.md`
+- [x] Each changed Python file meets 85% line and 75% branch coverage, read from the gate run.
+  - Evidence: `evidence/qa-gates/coverage-threshold.2026-11-07T15-25.md`
 
 ## Definition of Done
 

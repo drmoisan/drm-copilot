@@ -33,12 +33,21 @@ so that agents following any surface produce tests and commands that match my pr
 
 ## Acceptance Criteria
 
-- [ ] An agent reading any C# surface is told to use MSTest; no surface names xUnit as this repository's C# test framework.
-- [ ] An agent reading a C# surface finds one runner and command set for that surface's profile (modern Claude pack: `dotnet test --collect:"XPlat Code Coverage"`; Copilot, Codex default, legacy, and `csharp-atomic-executor`: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`).
-- [ ] An agent reading any PowerShell surface is told Pester v6 is the supported version.
-- [ ] No approved or emitted Python coverage command, VS Code task, or atomic-executor argv list carries `--cov=src/lexile_corpus_tuner`.
-- [ ] Policy surfaces and their bundle copies use neutral example names instead of other-project (`lexile`, `gutenberg`) text.
-- [ ] A consumer receiving the bundles gets text identical to the canonical sources, and the generator `--check`, parity, and contract tests pass.
-- [ ] The `>= 90%` new-code rule, the 85% line / 75% branch thresholds, and the parallel-only test command wording are byte-unchanged.
-- [ ] Reintroducing a forbidden phrase makes `tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1` fail; with the change applied it passes.
-- [ ] `Invoke-PoshQCParallelTest` and `poetry run pytest -n auto` pass with zero failures, no coverage drop on changed lines versus the Phase 0 baseline, and each changed Python file at 85% line / 75% branch or higher.
+- [x] An agent reading any C# surface is told to use MSTest; no surface names xUnit as this repository's C# test framework.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows), `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`
+- [x] An agent reading a C# surface finds one runner and command set for that surface's profile (modern Claude pack: `dotnet test --collect:"XPlat Code Coverage"`; Copilot, Codex default, legacy, and `csharp-atomic-executor`: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`).
+  - Evidence: `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md` (modern profile contract test passes); P1-T3 commit check
+- [x] An agent reading any PowerShell surface is told Pester v6 is the supported version.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows), `evidence/qa-gates/codex-generator-check.2026-11-07T15-01.md`
+- [x] No approved or emitted Python coverage command, VS Code task, or atomic-executor argv list carries `--cov=src/lexile_corpus_tuner`.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN-CODE), `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md`
+- [x] Policy surfaces and their bundle copies use neutral example names instead of other-project (`lexile`, `gutenberg`) text.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md`, `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`
+- [x] A consumer receiving the bundles gets text identical to the canonical sources, and the generator `--check`, parity, and contract tests pass.
+  - Evidence: `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`, `evidence/qa-gates/codex-generator-check.2026-11-07T15-01.md`, `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md`
+- [x] The `>= 90%` new-code rule, the 85% line / 75% branch thresholds, and the parallel-only test command wording are byte-unchanged.
+  - Evidence: `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`
+- [x] Reintroducing a forbidden phrase makes `tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1` fail; with the change applied it passes.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN-HELPER passes; all PTN- rows pass)
+- [x] `Invoke-PoshQCParallelTest` and `poetry run pytest -n auto` pass with zero failures, no coverage drop on changed lines versus the Phase 0 baseline, and each changed Python file at 85% line / 75% branch or higher.
+  - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md`, `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md`, `evidence/qa-gates/coverage-threshold.2026-11-07T15-25.md`
