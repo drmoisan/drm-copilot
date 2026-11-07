@@ -8,10 +8,11 @@
 
 .DESCRIPTION
     Dot-sources the hook and drives Invoke-DocsCompleteGateDecision with mocked root, file and gh
-    seams. With the gate enabled, every merge that is not one plain gh pr merge denies
+    seams. With the gate enabled, a merge the hook reads that is not one plain gh pr merge denies
     PR_UNRESOLVED before any lookup; with the gate disabled or the profile absent the same command
-    allows with no gh call. Text that only quotes a merge allows in both states. No row starts a
-    process, runs gh or git, or writes a file.
+    allows with no gh call. Text that only quotes a merge allows in both states. Context
+    'residual limits' pins forms outside what the hook observes, which allow with the gate
+    enabled. No row starts a process, runs gh or git, or writes a file.
 #>
 
 Describe 'enforce-docs-complete-gate compound commands (issue #1034)' {
@@ -81,6 +82,50 @@ Describe 'enforce-docs-complete-gate compound commands (issue #1034)' {
                 'if true; then gh api -X PUT repos/o/r/pulls/12/merge; fi'
                 "! gh api graphql -f query='mutation{mergePullRequest(x)}'"
                 'gh api -X PUT repos/{owner}/{repo}/pulls/12/merge'
+                # F4: a comment joined to a later command by a backslash-newline. Bash ends a
+                # comment at the newline, so the later command runs.
+                "gh pr merge 34 # x\`ngh pr merge 12"
+                "gh pr merge 34 # first line \`ngh pr merge 12 # second"
+                "gh pr merge 34 \`n# x\`ngh pr merge 12"
+                "gh pr view 34 # x\`ngh pr merge 12"
+                "gh pr merge --disable-auto # x\`ngh pr merge 12"
+                "gh pr view 34 --json title # x\`ngh api -X PUT repos/o/r/pulls/12/merge"
+                "gh pr merge 34 # x\`r`ngh pr merge 12"
+                "gh pr merge \`n12 # note"
+                # W: a word split by a backslash-newline, which bash joins.
+                "gh pr mer\`nge 12"
+                "g\`nh pr merge 12"
+                "gh p\`nr merge 12"
+                "gh pr mer\`r`nge 12"
+                "true; gh pr mer\`nge 12"
+                # F5: a quoted payload beside an evaluator word, and a backslash in a word.
+                "if true; then sh -c 'gh pr merge 12'; fi"
+                'if true; then bash -c "gh pr merge 12"; fi'
+                "! sh -c 'gh pr merge 12'"
+                "exec sh -c 'gh pr merge 12'"
+                'for n in 12; do sh -c "gh pr merge $n"; done'
+                "if true; then eval 'gh pr merge 12'; fi"
+                "! eval 'gh pr merge 12'"
+                "nice sh -c 'gh pr merge 12'"
+                "find . -maxdepth 0 -exec sh -c 'gh pr merge 12' \;"
+                "sudo sh -c 'gh pr merge 12'"
+                "if true; then bash <<EOF`ngh pr merge 12`nEOF`nfi"
+                "echo 'gh pr merge 12' | sh"
+                "printf 'gh pr merge 12' | bash"
+                'g\h pr merge 12'
+                'gh pr mer\ge 12'
+                'gh p\r merge 12'
+                'true; g\h pr merge 12'
+                'g\h api -X PUT repos/o/r/pulls/12/merge'
+                "if true; then sh -c 'gh api -X PUT repos/o/r/pulls/12/merge'; fi"
+                "echo 'gh api -X PUT repos/o/r/pulls/12/merge' | bash"
+                "if true; then ksh -c 'gh pr merge 12'; fi"
+                "if true; then pwsh -Command 'gh pr merge 12'; fi"
+                "source <(echo 'gh pr merge 12')"
+                "echo bash 'gh pr merge 12'"
+                "./run.sh 'gh pr merge 12'"
+                # D: an accepted false deny the limit statement names.
+                'gh api -X GET repos/o/r/pulls/12/merge'
             )
         }
 
@@ -120,7 +165,7 @@ Describe 'enforce-docs-complete-gate compound commands (issue #1034)' {
     Context 'merge mentions' {
         It 'allows the quoted mention <Command> with no gh call when the gate is <State>' -ForEach @(
             foreach ($state in @('enabled', 'disabled')) {
-                foreach ($command in @("git commit -m 'gh pr merge 12'", 'echo "gh pr merge 12"')) {
+                foreach ($command in @("git commit -m 'gh pr merge 12'", 'echo "gh pr merge 12"', "git log --grep='gh pr merge'", "git commit -m 'gh api -X PUT repos/o/r/pulls/12/merge'")) {
                     @{ State = $state; Command = $command }
                 }
             }
@@ -158,6 +203,40 @@ Describe 'enforce-docs-complete-gate compound commands (issue #1034)' {
         ) {
             # Arrange
             Set-TestFileSeam -ProfileText (Get-TestProfileText -Enabled $false) -ReceiptText $null
+
+            # Act
+            $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        }
+    }
+
+    Context 'residual limits' {
+        # These rows pin the limit statement of the hook header. A later change that makes one of
+        # them deny is a stated change of that limit.
+        It 'allows <Command> with no gh call with the gate enabled because it is outside what the hook observes' -ForEach @(
+            @{ Command = 'python -c "import os; os.system(''gh pr merge 12'')"' }
+            @{ Command = 'node -e "require(''child_process'').execSync(''gh pr merge 12'')"' }
+            @{ Command = 'curl -X PUT https://api.github.com/repos/o/r/pulls/12/merge' }
+            @{ Command = './merge.sh' }
+            @{ Command = 'sh merge.sh' }
+            @{ Command = 'a=g; b=h; $a$b pr merge 12' }
+            @{ Command = '$(echo ''gh pr merge 12'')' }
+            @{ Command = 'if true; then "gh" pr merge 12; fi' }
+            @{ Command = '! gh pr ''merge'' 12' }
+            @{ Command = 'exec gh ''pr'' merge 12' }
+            @{ Command = 'gh pr me${x}rge 12' }
+            @{ Command = 'trap ''gh pr merge 12'' EXIT' }
+            @{ Command = 'gh alias set m ''pr merge 12''; gh m' }
+            @{ Command = 'gh api graphql -F query=@f.graphql' }
+            @{ Command = 'gh api graphql --input f' }
+            @{ Command = 'gh api -X PUT repos/o/r/pulls/$n/merge' }
+            @{ Command = 'git push origin HEAD:main' }
+        ) {
+            # Arrange
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText $null
 
             # Act
             $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command $Command)

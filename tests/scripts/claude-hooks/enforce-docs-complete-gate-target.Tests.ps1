@@ -7,7 +7,7 @@
 
 .DESCRIPTION
     Dot-sources the hook, which loads the helper and the shared functions it calls, and tests the
-    five helper functions directly with in-memory strings. No row starts a process, runs gh or
+    six helper functions directly with in-memory strings. No row starts a process, runs gh or
     git, or writes a file.
 #>
 
@@ -46,6 +46,8 @@ Describe 'enforce-docs-complete-gate-target (issue #1034)' {
             @{ Case = 'a comment holding operators'; Text = 'gh pr merge 12 # note; echo done'; Words = 'gh|pr|merge|12' }
             @{ Case = '# inside a word'; Text = 'gh pr merge a#b'; Words = 'gh|pr|merge|a#b' }
             @{ Case = '# inside quotes'; Text = 'gh pr merge "#12"'; Words = 'gh|pr|merge|#12' }
+            @{ Case = 'a continuation with a blank before it, before the subcommand'; Text = "gh pr \`nmerge 12"; Words = 'gh|pr|merge|12' }
+            @{ Case = 'a continuation with a blank after it'; Text = "gh pr merge\`n 12"; Words = 'gh|pr|merge|12' }
         ) {
             # Act
             $result = Read-DocsCompleteGatePlainCommand -CommandText $Text
@@ -83,6 +85,11 @@ Describe 'enforce-docs-complete-gate-target (issue #1034)' {
             @{ Case = 'a comment followed by a newline'; Text = "gh pr merge 12 # note`ngh pr merge 99" }
             @{ Case = 'an unbalanced single quote'; Text = "gh pr merge 'unbalanced" }
             @{ Case = 'an unbalanced double quote'; Text = 'gh pr merge "unbalanced' }
+            @{ Case = 'a comment ending in a backslash-newline'; Text = "gh pr merge 34 # x\`ngh pr merge 12" }
+            @{ Case = 'a backslash-newline before a comment'; Text = "gh pr merge \`n12 # note" }
+            @{ Case = 'a comment with a CRLF continuation'; Text = "gh pr merge 34 # x\`r`ngh pr merge 12" }
+            @{ Case = 'a word split by a backslash-newline'; Text = "gh pr mer\`nge 12" }
+            @{ Case = 'a word split by a CRLF continuation'; Text = "gh pr mer\`r`nge 12" }
         ) {
             # Act
             $result = Read-DocsCompleteGatePlainCommand -CommandText $Text
@@ -132,6 +139,29 @@ Describe 'enforce-docs-complete-gate-target (issue #1034)' {
             $view | Should -Match 'gh pr merge'
             $view | Should -Match '12'
         }
+
+        It 'removes a backslash from an unquoted word' {
+            # Act
+            $view = Get-DocsCompleteGateUnquotedView -CommandText 'g\h pr merge 12'
+
+            # Assert
+            $view | Should -Match 'gh pr merge 12'
+        }
+    }
+
+    Context 'Test-DocsCompleteGateMergeText' {
+        It 'returns <Expected> for <Case>' -ForEach @(
+            @{ Case = 'the gh pr merge words'; Text = 'gh pr merge 12'; MutationText = ''; Expected = $true }
+            @{ Case = 'gh api with a mutation'; Text = 'gh api x'; MutationText = 'gh api -X PUT repos/o/r/pulls/12/merge'; Expected = $true }
+            @{ Case = 'gh api with no mutation'; Text = 'gh api x'; MutationText = 'gh api user'; Expected = $false }
+            @{ Case = 'no words'; Text = 'git status'; MutationText = 'git status'; Expected = $false }
+        ) {
+            # Act
+            $result = Test-DocsCompleteGateMergeText -Text $Text -MutationText $MutationText
+
+            # Assert
+            $result | Should -Be $Expected
+        }
     }
 
     Context 'Test-DocsCompleteGateMergeCandidate' {
@@ -155,6 +185,13 @@ Describe 'enforce-docs-complete-gate-target (issue #1034)' {
             @{ Case = 'step 3, a word that only contains gh'; Text = 'echo through pr merge'; Expected = $false }
             @{ Case = 'step 3, an unrelated command'; Text = 'git status'; Expected = $false }
             @{ Case = 'step 3, blank text'; Text = ''; Expected = $false }
+            @{ Case = 'step 3, a backslash in a word'; Text = 'g\h pr merge 12'; Expected = $true }
+            @{ Case = 'step 3, a word split by a backslash-newline'; Text = "gh pr mer\`nge 12"; Expected = $true }
+            @{ Case = 'step 3, a quoted merge beside an evaluator word'; Text = "if true; then sh -c 'gh pr merge 12'; fi"; Expected = $true }
+            @{ Case = 'step 3, a quoted gh api merge beside an evaluator word'; Text = "if true; then sh -c 'gh api -X PUT repos/o/r/pulls/12/merge'; fi"; Expected = $true }
+            @{ Case = 'step 3, a quoted merge with no evaluator word'; Text = "git commit -m 'gh pr merge 12'"; Expected = $false }
+            @{ Case = 'step 3, an evaluator word with no merge words'; Text = "if true; then sh -c 'echo hi'; fi"; Expected = $false }
+            @{ Case = 'step 3, an evaluator word with words out of order'; Text = "if true; then sh -c 'merge pr gh'; fi"; Expected = $false }
         ) {
             # Act
             $result = Test-DocsCompleteGateMergeCandidate -CommandText $Text
@@ -253,6 +290,20 @@ Describe 'enforce-docs-complete-gate-target (issue #1034)' {
             $target.Reason | Should -BeNullOrEmpty
             $target.Selector | Should -BeNullOrEmpty
             $target.Repository | Should -BeNullOrEmpty
+        }
+
+        It 'keeps the selector of <Case>' -ForEach @(
+            @{ Case = 'a comment holding operators'; Text = 'gh pr merge 12 # note; echo done' }
+            @{ Case = 'a comment with a number'; Text = 'gh pr merge 12 #99' }
+            @{ Case = 'a continuation before the selector'; Text = "gh pr merge \`n12" }
+            @{ Case = 'a continuation before the subcommand'; Text = "gh pr \`nmerge 12" }
+        ) {
+            # Act
+            $target = Get-DocsCompleteGateMergeTarget -CommandText $Text
+
+            # Assert
+            $target.Reason | Should -BeNullOrEmpty
+            $target.Selector | Should -BeExactly '12'
         }
 
         It 'returns PR_UNRESOLVED for <Case>' -ForEach @(

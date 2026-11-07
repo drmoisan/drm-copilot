@@ -232,7 +232,7 @@ A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy with an enabled pro
 
 ### Phase 2 — Failing Rows
 
-- [ ] [P2-T1] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1`, add the rows of Groups F4, W, F5, D, C and R, and in `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1`, add the rows of Group H, and correct both headers as `## Design: Limit Statement` states.
+- [x] [P2-T1] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1`, add the rows of Groups F4, W, F5, D, C and R, and in `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1`, add the rows of Group H, and correct both headers as `## Design: Limit Statement` states.
   - No row starts a process or writes a file. `HOOK_SUITE` is not edited.
   - Acceptance: both files parse; each stays below 700 lines. P2-T2 records the failing rows.
 - [ ] [P2-T2] [expect-fail] Run branch-current Pester over `COMPOUND_SUITE` and `HELPER_SUITE` at the merged head and write `FEATURE/evidence/regression-testing/fail-before.<timestamp>.md` with `ExpectedExitCode: 1`.
