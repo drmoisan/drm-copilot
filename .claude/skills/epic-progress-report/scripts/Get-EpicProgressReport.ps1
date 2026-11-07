@@ -74,6 +74,11 @@
     TLDR prints the four-line TL;DR block only; Full prints the TL;DR block followed by
     the full report. Default: Full.
 
+.PARAMETER ResetBaseline
+    Discards every stored sample, sets the start to now (unless -StartUtc is passed) and the
+    baseline done count to the current done count (unless -BaselineDone is passed), adds
+    the first sample, and writes the state file. The weekly baseline is kept.
+
 .EXAMPLE
     pwsh -NoProfile -File scripts/dev-tools/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -Mode TLDR
 
@@ -121,7 +126,9 @@ param(
     [int] $SampleCap = 14,
 
     [ValidateSet('TLDR', 'Full')]
-    [string] $Mode = 'Full'
+    [string] $Mode = 'Full',
+
+    [switch] $ResetBaseline
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Logic.ps1')
@@ -307,7 +314,8 @@ function Invoke-EpicProgressReport {
         [double] $BaselineWeeklyPct = 0,
         [double] $WaveOverheadHours = 1.25,
         [ValidateRange(1, 100000)] [int] $SampleCap = 14,
-        [ValidateSet('TLDR', 'Full')] [string] $Mode = 'Full'
+        [ValidateSet('TLDR', 'Full')] [string] $Mode = 'Full',
+        [switch] $ResetBaseline
     )
 
     $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -CurrentLocation (Get-Location).ProviderPath
@@ -316,7 +324,10 @@ function Invoke-EpicProgressReport {
     if (Test-EpicProgressPath -Path $setting.StatePath) { $stateText = Read-EpicProgressFile -Path $setting.StatePath }
     $storedState = ConvertFrom-EpicProgressStateText -Text $stateText
     $nowUtc = (Get-EpicProgressUtcNow).ToUniversalTime()
-    $baseline = Resolve-EpicProgressBaseline -StartUtc $StartUtc -StartUtcPassed:($PSBoundParameters.ContainsKey('StartUtc')) -BaselineDone $BaselineDone -BaselineDonePassed:($PSBoundParameters.ContainsKey('BaselineDone')) -BaselineWeeklyPct $BaselineWeeklyPct -BaselineWeeklyPctPassed:($PSBoundParameters.ContainsKey('BaselineWeeklyPct')) -State $storedState -NowUtc $nowUtc
+    $baseline = Resolve-EpicProgressBaseline -StartUtc $StartUtc -StartUtcPassed:($PSBoundParameters.ContainsKey('StartUtc')) -BaselineDone $BaselineDone -BaselineDonePassed:($PSBoundParameters.ContainsKey('BaselineDone')) -BaselineWeeklyPct $BaselineWeeklyPct -BaselineWeeklyPctPassed:($PSBoundParameters.ContainsKey('BaselineWeeklyPct')) -State $storedState -ResetBaseline:$ResetBaseline -NowUtc $nowUtc
+    # A reset discards every stored sample; the sample rule then adds the first sample (now, done).
+    $priorSamples = $storedState.Samples
+    if ($ResetBaseline) { $priorSamples = [object[]] @() }
     $null = Invoke-GitExe -GitArgs @('fetch', '-q', 'origin')
     $fetchExitCode = Get-EpicProgressLastExitCode
     if ($fetchExitCode -ne 0) {
@@ -385,8 +396,8 @@ function Invoke-EpicProgressReport {
     foreach ($record in $features) { $done += $record.Done }
     $baselineDoneValue = $baseline.BaselineDone
     if ($baseline.UseCurrentDone) { $baselineDoneValue = $done }
-    $selection = Select-EpicProgressSample -Sample $storedState.Samples -NowUnixSeconds $nowUnixSeconds -Done $done -SampleCap $SampleCap
-    if ($selection.Changed) {
+    $selection = Select-EpicProgressSample -Sample $priorSamples -NowUnixSeconds $nowUnixSeconds -Done $done -SampleCap $SampleCap
+    if ($selection.Changed -or $ResetBaseline) {
         $startUnixSeconds = [DateTimeOffset]::new($baseline.StartUtc).ToUnixTimeSeconds()
         $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $selection.Sample
         Write-EpicProgressState -Path $setting.StatePath -Content $stateJson

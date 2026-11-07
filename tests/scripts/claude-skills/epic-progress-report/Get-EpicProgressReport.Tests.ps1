@@ -339,6 +339,26 @@ Describe 'Invoke-EpicProgressReport' {
 
         ($lines -join "`n") | Should -Be ($script:expectedTldr -join "`n")
     }
+
+    It 'clears stored samples and writes the resolved baseline with -ResetBaseline' {
+        # The stored start (08:00 UTC), baseline done, and samples are discarded; the weekly baseline is kept.
+        $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
+        $script:fileText[$script:statePath] = "{`"version`":1,`"startUnixSeconds`":1767600000,`"baselineDone`":1,`"baselineWeeklyPct`":12.5,`"samples`":[{`"ts`":$($script:fixedNowUnix - 600),`"done`":2},{`"ts`":$($script:fixedNowUnix - 30),`"done`":3}]}"
+        $arguments = $script:reportParameter.Clone()
+        $arguments.Remove('StartUtc')
+        $arguments['ResetBaseline'] = $true
+
+        $null = Invoke-EpicProgressReport @arguments
+
+        $script:stateWrites.Count | Should -Be 1
+        $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        @($written.samples).Count | Should -Be 1
+        $written.samples[0].ts | Should -Be $script:fixedNowUnix
+        $written.samples[0].done | Should -Be 3
+        $written.startUnixSeconds | Should -Be $script:fixedNowUnix
+        $written.baselineDone | Should -Be 3
+        $written.baselineWeeklyPct | Should -Be 12.5
+    }
 }
 
 Describe 'Get-EpicProgressReport.ps1 repository constraints' {
@@ -412,7 +432,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
 
         $help = Get-Help -Name $script:productionPaths[0] -Full
 
-        $parameterNames.Count | Should -Be 13
+        $parameterNames.Count | Should -Be 14
         $help.Synopsis | Should -BeLike 'Print the TL;DR block*'
         (($help.description | ForEach-Object { $_.Text }) -join ' ').Trim() | Should -Not -BeNullOrEmpty
         $helpParameters = @($help.parameters.parameter)
