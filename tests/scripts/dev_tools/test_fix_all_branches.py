@@ -88,6 +88,7 @@ def base_success_responses(
         "powershell": {
             "PoshQC: format": [make_result(0)],
             "PoshQC: analyze": [make_result(0)],
+            "PoshQC: leak scan": [make_result(0)],
             "PoshQC: test": [make_result(0)],
         },
         "typescript": {
@@ -453,3 +454,51 @@ def test_subprocess_runner_runs_normally_with_cancel_event_not_set(
 
     assert result.returncode == 0
     assert "success output" in result.output
+
+
+def test_powershell_leak_scan_step_calls_invoke_poshqc_leak_scan() -> None:
+    """The PoshQC leak-scan step runs Invoke-PoshQCLeakScan on the repository root."""
+    # Arrange
+    factory = FakeRunnerFactory(base_success_responses())
+
+    # Act
+    exit_code = fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+
+    # Assert
+    assert exit_code == 0
+    commands = dict(factory.runners["powershell"].calls)
+    leak_scan_command = " ".join(commands["PoshQC: leak scan"])
+    assert "Invoke-PoshQCLeakScan -Root '.'" in leak_scan_command
+
+
+def test_powershell_leak_scan_failure_stops_before_pester() -> None:
+    """A failing leak scan stops the powershell branch before PoshQC: test runs."""
+    # Arrange
+    responses = base_success_responses()
+    responses["powershell"]["PoshQC: leak scan"] = [make_result(1, "leak finding")]
+    factory = FakeRunnerFactory(responses)
+    logger = build_logger()
+
+    # Act
+    exit_code = fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=logger,
+        complete_all=True,
+    )
+
+    # Assert
+    assert exit_code == 1
+    powershell_calls = [call[0] for call in factory.runners["powershell"].calls]
+    assert powershell_calls == [
+        "PoshQC: format",
+        "PoshQC: analyze",
+        "PoshQC: leak scan",
+    ]
+    assert "PowerShell leak scan failed" in read_log(logger)
