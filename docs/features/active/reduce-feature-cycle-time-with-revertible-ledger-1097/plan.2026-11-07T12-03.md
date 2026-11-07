@@ -90,7 +90,7 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
 
 ### Phase 1 — Chain Mechanism, Rule, and Records
 
-- [ ] [P1-T1] Record stage R in `FEATURE/spec.md`: a `## Delivery Stages` row `R` (content: revert order, chain test, patch-as-blocks reading; depends on E2; PR R), the final-order paragraph naming R between E2 and F, and five `## Acceptance Criteria` items tagged `[R]` stating R1 to R5 of this plan's `## Design`.
+- [x] [P1-T1] Record stage R in `FEATURE/spec.md`: a `## Delivery Stages` row `R` (content: revert order, chain test, patch-as-blocks reading; depends on E2; PR R), the final-order paragraph naming R between E2 and F, and five `## Acceptance Criteria` items tagged `[R]` stating R1 to R5 of this plan's `## Design`.
   - The same five `- [ ] [R]` items are added to `## Acceptance Criteria` of `FEATURE/user-story.md`, because in full-feature mode both files are criteria sources and currently match item for item. No other text of either file changes; `- [x]` states of earlier criteria are unchanged.
   - Acceptance: `spec.md` and `user-story.md` each hold exactly five lines beginning `- [ ] [R]`, and `spec.md` holds one row beginning `| R |`.
 - [ ] [P1-T2] Create `scripts/dev-tools/ProcessReductionChain.psm1` with `Get-ProcessReductionPatchHunk` and `Invoke-ProcessReductionHunkRevert` (R3), and `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1` with in-memory fixtures.

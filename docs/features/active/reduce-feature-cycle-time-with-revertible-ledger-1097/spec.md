@@ -151,6 +151,7 @@ Each stage is one small PR into main from `feature/reduce-feature-cycle-time`, o
 | D | Light remediation reduction commit with entry | A | PR D |
 | E | #1094 back-fill entry, planning-side standing rule, smaller-plans text, policy-read removal with its hook edit (own commit and entry), and wording deferred from earlier stages | A, #1094 merged | PR E |
 | E2 | Test baseline restored (D12): Phase 0 test-suite baseline with one parallel run, final-gate comparison, partial revert of ledger entry `0001` recorded in the ledger | E | PR E (same PR as stage E) |
+| R | Revert order, chain test, patch-as-blocks reading | E2 | PR R |
 | F | G13 and the cutoff (own commit and entry) | A, #1094 merged | PR F |
 | G | Less evidence and the CI cross-check (own commit and entry) | C, E | PR G |
 | H | Design check. Adds a check, so no ledger entry | #1094 merged | PR H |
@@ -159,7 +160,7 @@ Each stage is one small PR into main from `feature/reduce-feature-cycle-time`, o
 
 The column lists content dependencies. PRs still merge in letter order, one after the other.
 
-The final stage order is E with E2, then F, G, H, I, J. Stage E2 ships in the same PR as stage E, because stage E's commits were already on the branch. J is now the final stage, so the whole-item closing checks (the closing criteria tagged `[I]`) are verified at J. The `[I]` closing criteria themselves are unchanged.
+The final stage order is E with E2, then R, F, G, H, I, J. Stage E2 ships in the same PR as stage E, because stage E's commits were already on the branch. Stage R ships in its own PR after that PR merges and before stage F. J is now the final stage, so the whole-item closing checks (the closing criteria tagged `[I]`) are verified at J. The `[I]` closing criteria themselves are unchanged.
 
 Stages A to D and I do not touch `execution-environment` or `atomic-plan-contract`, except as named. Any wording in those two skills moves to stage E or later. If a stage alters a fact the `execution-environment` brief states, that brief edit waits for #1094 too (K6).
 
@@ -197,6 +198,11 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [x] [E2] No serial, single-process, seeded-shuffle, reversed-order, or comparison run is restored; the parallel-only change stays.
 - [x] [E2] The partial revert of ledger entry `0001` is made from its stored prior text and recorded in the ledger, so that the partial revert is itself revertible.
 - [x] [E2] Older plans and checkpoints still validate.
+- [ ] [R] The ledger README states the revert order: entries are reverted newest-first, an entry may be reverted alone only when no later entry names any of its paths, and a reader finds those later entries by searching the `## Files Changed` sections of the higher-numbered entries; no entry lists its dependants.
+- [ ] [R] Each stored patch stays in place and is read hunk by hunk as a revert block (context and added lines as `Current`, context and removed lines as `Prior`); the `## Stored Patch` check runs after every later entry that touches the patch's paths is reverted, and byte-identical mirrors, bundle copies, and generated Codex variants are left to the re-copy and regeneration steps.
+- [ ] [R] `ProcessReductionChain.Ledger.Tests.ps1` reverts every committed entry newest-first in memory with no exception, skip list, or allowed-error list, and its end-state check finds each created path absent and each pre-image of the oldest entry present.
+- [ ] [R] No new structure-checker rule is added; the chain test is the check, and it runs on every full CI run in the PowerShell shards.
+- [ ] [R] The chain compares only revert-block and hunk regions, so an edit outside every region keeps it green and an edit inside a region fails it until the same commit updates the entry's record, as the stage R rebase of the `0001` brief hunk shows.
 - [ ] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
 - [ ] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
 - [ ] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
