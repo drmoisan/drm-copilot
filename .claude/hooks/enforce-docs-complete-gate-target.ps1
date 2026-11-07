@@ -103,11 +103,6 @@ function Read-DocsCompleteGatePlainCommand {
         }
         if ($sawRedirection) { return $notPlain }
         $words.Add($word.ToString())
-        if ($index -lt $text.Length) {
-            $after = $text[$index]
-            $endsWord = $after -eq ' ' -or $after -eq "`t" -or $after -eq '>' -or $after -eq '<'
-            if (-not $endsWord -and -not ($after -eq '&' -and $index + 1 -lt $text.Length -and $text[$index + 1] -eq '>')) { return $notPlain }
-        }
     }
 
     if ($awaitingTarget) { return $notPlain }
