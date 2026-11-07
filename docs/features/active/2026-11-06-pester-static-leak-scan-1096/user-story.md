@@ -63,7 +63,7 @@ Two tests in `tests/scripts/dev-tools/Enter-DrmCopilotShell.Tests.ps1` were repo
 
 ## Acceptance Criteria
 
-Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run per gate, re-run only after a fix.
+Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run per gate, re-run only after a fix. The baseline run before any change is the one run of each gate for that state.
 
 ### Locally verifiable criteria
 
@@ -100,6 +100,8 @@ Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytes
 - [ ] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures.
 - [ ] Jest passes with zero failures through `node run-jest.cjs` in `extensions/drm-copilot/`, because the bundled resources change.
 - [ ] The validation evidence for this item comes from the parallel gates and the leak scan, and cites no single-process, seeded-shuffle, reversed-order, or focused run.
+- [ ] Before any change outside `<FEATURE>/`, one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run are recorded under `<FEATURE>/evidence/baseline/`, each with its exit code, each failing test, and the line coverage of each existing production file the plan names for coverage, with branch coverage for a Python file, and the commit that adds that record precedes every branch commit that changes a path outside `<FEATURE>/`.
+- [ ] Against that record, every test that fails in the final `Invoke-PoshQCParallelTest` or `pytest -n auto` run also failed in the baseline run, and every production file that the branch changes and that existed before the change has final line coverage, and for a Python file final branch coverage, at or above its baseline figure, as recorded per file in evidence.
 
 ### CI-dependent criteria
 

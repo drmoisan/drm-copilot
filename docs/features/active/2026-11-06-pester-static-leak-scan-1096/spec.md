@@ -198,7 +198,7 @@ VS Code task: `PoshQC: 2c leak scan`. `fix_all` step: `PoshQC: leak scan`. No MC
 ## Data & State
 
 - Data transformations and invariants: script text becomes an AST, the AST becomes raw findings, exempt names are removed, and the remainder is compared with `entries`. The scan reads only and changes no test or repository state.
-- Caching or persistence details: `config/poshqc-leak-allowlist.json` is the only new committed state. The first scan's raw findings are kept under `<FEATURE>/evidence/baseline/`, so that each fix or allowlist entry can be traced. The scan is a static tool and runs no suite.
+- Caching or persistence details: `config/poshqc-leak-allowlist.json` is the only new committed state. The first scan's raw findings are kept under `<FEATURE>/evidence/baseline/`, so that each fix or allowlist entry can be traced. The scan is a static tool and runs no suite. The baseline gate results and per-file coverage of Decision 9 are kept in the same folder.
 - Migration or backfill requirements: none for data. Ledger entry 0001 is back-filled as stated in `### 5. Process-reduction ledger`.
 
 ## Constraints & Risks
@@ -226,7 +226,7 @@ VS Code task: `PoshQC: 2c leak scan`. `fix_all` step: `PoshQC: leak scan`. No MC
 
 ## Decisions
 
-Decisions 1 to 3 keep the numbering of the full-scope specification. Decisions 4 to 8 record the scope added after #1094 merged. The scan attachment and the default-folder rule are settled and stated in `### 2. Static leak scan`.
+Decisions 1 to 3 keep the numbering of the full-scope specification. Decisions 4 to 8 record the scope added after #1094 merged. Decision 9 records the owner's baseline decision of 2026-11-07. The scan attachment and the default-folder rule are settled and stated in `### 2. Static leak scan`.
 
 ### Decision 1: Policy files are not edited
 
@@ -275,8 +275,15 @@ Decisions 1 to 3 keep the numbering of the full-scope specification. Decisions 4
 
 ### Decision 8: Linux hook suites stay single-process
 
-- **Status:** Settled. Reported to the owner under `## Open Questions`.
+- **Status:** Settled. Confirmed by the owner on 2026-11-07.
 - **Decision:** `poshqc / PowerShell hook suites (Linux)` stays unchanged. It is a single-process CI job with a Linux purpose.
+
+### Decision 9: Baseline test runs
+
+- **Status:** Settled. Owner decision, 2026-11-07.
+- **Decision:** before any production or test change, the plan runs one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run and records their results and per-file coverage under `<FEATURE>/evidence/baseline/`. The final gates are compared with that record. A new failure is a test that fails at the final gate and did not fail in the baseline run. A coverage drop is a production file that the branch changes and that existed before the change, whose final line coverage, or branch coverage for a Python file, is below its baseline figure.
+- **Interplay:** the baseline run is the one run of each gate for the state before the change, and a gate is re-run only after a fix. The criterion that both gates pass with zero failures still holds. Before any change, every baseline failure lies outside the branch, so the plan's existing rule for such failures applies: the failure is recorded, not waived, and execution stops for the orchestrator. Merged Pester results exist only after a fully green run, so a baseline run that is not green takes its figures from the per-shard results under `artifacts/pester/parallel/shard-<i>/`.
+- **Scope:** issue #1097 is restoring the baseline comparison as the general rule. This item applies it to its own plan only and edits neither `atomic-plan-contract` nor the `execution-environment` brief.
 
 ## Implementation Strategy
 
@@ -302,12 +309,14 @@ Decisions 1 to 3 keep the numbering of the full-scope specification. Decisions 4
 
 ## Open Questions
 
-- **Baselines (decision pending).** The owner is deciding a question about baselines, because #1102 removed the test-suite baseline. The decision is pending and may add a baseline task. This specification does not decide it, and no acceptance criterion assumes either answer.
-- **Linux hook suites (reported to the owner).** `poshqc / PowerShell hook suites (Linux)` remains a single `Invoke-Pester` process over `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks`. It is a serial run acting as a gate, and it supplies Linux coverage that repeats no local work. It stays unchanged under Decision 8, and this entry records the point for the owner.
+No question remains open.
+
+- **Baselines (settled 2026-11-07).** The owner decided the question that #1102 raised by removing the test-suite baseline. Decision 9 records the decision, and the last two locally verifiable acceptance criteria cover it.
+- **Linux hook suites (confirmed by the owner 2026-11-07).** `poshqc / PowerShell hook suites (Linux)` remains a single `Invoke-Pester` process over `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks`. It is a serial run acting as a gate, and it supplies Linux coverage that repeats no local work. It stays unchanged under Decision 8, which the owner confirmed.
 
 ## Acceptance Criteria
 
-Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run per gate, re-run only after a fix.
+Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run per gate, re-run only after a fix. The baseline run before any change is the one run of each gate for that state.
 
 ### Locally verifiable criteria
 
@@ -344,6 +353,8 @@ Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytes
 - [ ] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures.
 - [ ] Jest passes with zero failures through `node run-jest.cjs` in `extensions/drm-copilot/`, because the bundled resources change.
 - [ ] The validation evidence for this item comes from the parallel gates and the leak scan, and cites no single-process, seeded-shuffle, reversed-order, or focused run.
+- [ ] Before any change outside `<FEATURE>/`, one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run are recorded under `<FEATURE>/evidence/baseline/`, each with its exit code, each failing test, and the line coverage of each existing production file the plan names for coverage, with branch coverage for a Python file, and the commit that adds that record precedes every branch commit that changes a path outside `<FEATURE>/`.
+- [ ] Against that record, every test that fails in the final `Invoke-PoshQCParallelTest` or `pytest -n auto` run also failed in the baseline run, and every production file that the branch changes and that existed before the change has final line coverage, and for a Python file final branch coverage, at or above its baseline figure, as recorded per file in evidence.
 
 ### CI-dependent criteria
 
