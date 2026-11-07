@@ -117,6 +117,7 @@ if (-not $subModuleCache) {
 foreach ($subModuleName in @(
         'PoshQC.FileDiscovery.psm1',
         'PoshQC.ScanConfig.psm1',
+        'PoshQC.LeakScan.psm1',
         'PoshQC.Coverage.psm1',
         'PoshQC.Analyzer.psm1',
         'PoshQC.Shard.psm1',
