@@ -158,3 +158,31 @@ Describe 'Get-EpicProgressRangeText' {
         $text | Should -Be '22:30 hrs to no upper bound (average velocity minus 2.05 SD is at or below 0.5 tasks / hr)'
     }
 }
+
+Describe 'Zero-rate and interval-count boundaries (issue #1093)' {
+    It 'prints n/a hrs to no upper bound for zero-rate intervals' {
+        # Four samples with no task done give three zero-rate intervals: average 0 and SD 0 (spec DEC-6).
+        $samples = @(0, 600, 1200, 1800 | ForEach-Object { [pscustomobject]@{ ts = $_; done = 5 } })
+        [double[]] $intervals = @(Get-EpicProgressRecentVelocityInterval -Sample $samples)
+        $deviation = Get-EpicProgressStandardDeviation -Interval $intervals
+        $path = Get-EpicProgressCriticalPath -Feature @([pscustomobject]@{ Wave = 1; Total = 10; Done = 0; State = 'Running' }) -Velocity 0 -WaveOverheadHours 1.25
+
+        $text = Get-EpicProgressRangeText -AverageVelocity 0 -StandardDeviation $deviation -IntervalCount $intervals.Count -CriticalPath $path -WaveOverheadHours 1.25
+
+        $intervals.Count | Should -Be 3
+        $deviation | Should -Be 0
+        $text | Should -Be 'n/a hrs to no upper bound (average velocity minus 2.05 SD is at or below 0.5 tasks / hr)'
+    }
+
+    It 'returns NaN for exactly 2 intervals and a finite value for 3 or more' {
+        $twoIntervals = @(Get-EpicProgressRecentVelocityInterval -Sample @(0, 600, 1200 | ForEach-Object { [pscustomobject]@{ ts = $_; done = $_ / 600 } }))
+        $threeIntervals = @(Get-EpicProgressRecentVelocityInterval -Sample @(0, 600, 1200, 1800 | ForEach-Object { [pscustomobject]@{ ts = $_; done = $_ / 300 } }))
+
+        $twoIntervals.Count | Should -Be 2
+        [double]::IsNaN((Get-EpicProgressStandardDeviation -Interval $twoIntervals)) | Should -BeTrue
+        $threeIntervals.Count | Should -Be 3
+        $finite = Get-EpicProgressStandardDeviation -Interval $threeIntervals
+        ([double]::IsNaN($finite) -or [double]::IsInfinity($finite)) | Should -BeFalse
+        Format-EpicProgressNumber -Value (Get-EpicProgressStandardDeviation -Interval @(6.0, 12.0, 6.0, 12.0)) -Digits 1 | Should -Be '3.5'
+    }
+}

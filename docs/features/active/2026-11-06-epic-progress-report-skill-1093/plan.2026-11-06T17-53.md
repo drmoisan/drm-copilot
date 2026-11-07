@@ -81,7 +81,7 @@
   - Acceptance: the five named cases pass.
 - [x] [P2-T4] Add the State-suite case `reproduces the recorded 5-minute to 10-minute example` using the 14-sample fixture of `research/research.2026-11-06.md` (`#### Reproduction of the pairing example from recorded samples (hand-computed)`, offsets from a fixed base epoch): the interval mean and SD from `Get-EpicProgressRecentVelocityInterval` and `Get-EpicProgressStandardDeviation` are within 0.001 of 26.1875 and 31.4495 before pairing and of 27.3430 and 23.2316 after `Merge-EpicProgressSamplePair`, and `Format-EpicProgressNumber -Digits 1` prints `26.2`, `31.4`, `27.3` and `23.2`.
   - Acceptance: the named case passes.
-- [ ] [P2-T5] Add Metrics-suite cases `prints n/a hrs to no upper bound for zero-rate intervals` (three or more zero-rate intervals, average 0, SD 0, asserting the exact text `n/a hrs to no upper bound (average velocity minus 2.05 SD is at or below 0.5 tasks / hr)`) and `returns NaN for exactly 2 intervals and a finite value for 3 or more`.
+- [x] [P2-T5] Add Metrics-suite cases `prints n/a hrs to no upper bound for zero-rate intervals` (three or more zero-rate intervals, average 0, SD 0, asserting the exact text `n/a hrs to no upper bound (average velocity minus 2.05 SD is at or below 0.5 tasks / hr)`) and `returns NaN for exactly 2 intervals and a finite value for 3 or more`.
   - Acceptance: both named cases pass with no production change (spec DEC-6).
 - [ ] [P2-T6] Add the Render-suite case `prints no NaN or Infinity before the first task completes`: done equals baseline, elapsed above 0, zero-rate samples; neither the TL;DR nor the Full lines contain `NaN` or `Infinity`, and the estimate values print `n/a`.
   - Acceptance: the named case passes with no production change.
