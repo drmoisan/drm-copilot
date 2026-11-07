@@ -162,7 +162,7 @@ index b65ac6d69..fe1242680 100644
 -- Do not report success based on partial or targeted runs alone. Targeted runs are allowed mid-batch, but the final gate requires a full-solution pass.
 +- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
 diff --git a/.agents/skills/execution-environment/SKILL.md b/.agents/skills/execution-environment/SKILL.md
-index 6f8b89bd3..ccf978679 100644
+index 0fa8f1e0f..19796ee54 100644
 --- a/.agents/skills/execution-environment/SKILL.md
 +++ b/.agents/skills/execution-environment/SKILL.md
 @@ -39,7 +39,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -189,10 +189,10 @@ index 6f8b89bd3..ccf978679 100644
  - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
  
  ## Preflight Defect Classes the Validator Cannot See
- 
-@@ -135,6 +137,7 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -136,6 +138,7 @@ These pass every validator rule and are found only by reading the plan against t
  - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
  - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
  - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
@@ -200,7 +200,7 @@ index 6f8b89bd3..ccf978679 100644
  - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
  
  ## Test Runtime
-@@ -144,17 +147,19 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -145,17 +148,19 @@ These pass every validator rule and are found only by reading the plan against t
  - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
  - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
  - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
@@ -1002,7 +1002,7 @@ index 85b709b49..452b72ab4 100644
 -- Do not report success based on partial or targeted runs alone. Targeted runs are allowed mid-batch, but the final gate requires a full-solution pass.
 +- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
 diff --git a/.claude/skills/execution-environment/SKILL.md b/.claude/skills/execution-environment/SKILL.md
-index 6f8b89bd3..ccf978679 100644
+index 0fa8f1e0f..19796ee54 100644
 --- a/.claude/skills/execution-environment/SKILL.md
 +++ b/.claude/skills/execution-environment/SKILL.md
 @@ -39,7 +39,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -1029,10 +1029,10 @@ index 6f8b89bd3..ccf978679 100644
  - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
  
  ## Preflight Defect Classes the Validator Cannot See
- 
-@@ -135,6 +137,7 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -136,6 +138,7 @@ These pass every validator rule and are found only by reading the plan against t
  - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
  - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
  - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
@@ -1040,7 +1040,7 @@ index 6f8b89bd3..ccf978679 100644
  - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
  
  ## Test Runtime
-@@ -144,17 +147,19 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -145,17 +148,19 @@ These pass every validator rule and are found only by reading the plan against t
  - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
  - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
  - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
@@ -4065,7 +4065,7 @@ index e58c18a47..1b935e030 100644
  - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
  - `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
 diff --git a/.github/skills/execution-environment/SKILL.md b/.github/skills/execution-environment/SKILL.md
-index 6f8b89bd3..ccf978679 100644
+index 0fa8f1e0f..19796ee54 100644
 --- a/.github/skills/execution-environment/SKILL.md
 +++ b/.github/skills/execution-environment/SKILL.md
 @@ -39,7 +39,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -4092,10 +4092,10 @@ index 6f8b89bd3..ccf978679 100644
  - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
  
  ## Preflight Defect Classes the Validator Cannot See
- 
-@@ -135,6 +137,7 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -136,6 +138,7 @@ These pass every validator rule and are found only by reading the plan against t
  - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
  - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
  - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
@@ -4103,7 +4103,7 @@ index 6f8b89bd3..ccf978679 100644
  - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
  
  ## Test Runtime
-@@ -144,17 +147,19 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -145,17 +148,19 @@ These pass every validator rule and are found only by reading the plan against t
  - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
  - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
  - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
@@ -5007,7 +5007,7 @@ index 85b709b49..452b72ab4 100644
 -- Do not report success based on partial or targeted runs alone. Targeted runs are allowed mid-batch, but the final gate requires a full-solution pass.
 +- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md
-index 6f8b89bd3..ccf978679 100644
+index 0fa8f1e0f..19796ee54 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md
 @@ -39,7 +39,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -5034,10 +5034,10 @@ index 6f8b89bd3..ccf978679 100644
  - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
  
  ## Preflight Defect Classes the Validator Cannot See
- 
-@@ -135,6 +137,7 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -136,6 +138,7 @@ These pass every validator rule and are found only by reading the plan against t
  - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
  - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
  - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
@@ -5045,7 +5045,7 @@ index 6f8b89bd3..ccf978679 100644
  - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
  
  ## Test Runtime
-@@ -144,17 +147,19 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -145,17 +148,19 @@ These pass every validator rule and are found only by reading the plan against t
  - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
  - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
  - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
@@ -5684,7 +5684,7 @@ index b65ac6d69..fe1242680 100644
 -- Do not report success based on partial or targeted runs alone. Targeted runs are allowed mid-batch, but the final gate requires a full-solution pass.
 +- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md
-index 6f8b89bd3..ccf978679 100644
+index 0fa8f1e0f..19796ee54 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md
 @@ -39,7 +39,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -5711,10 +5711,10 @@ index 6f8b89bd3..ccf978679 100644
  - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
  
  ## Preflight Defect Classes the Validator Cannot See
- 
-@@ -135,6 +137,7 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -136,6 +138,7 @@ These pass every validator rule and are found only by reading the plan against t
  - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
  - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
  - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
@@ -5722,7 +5722,7 @@ index 6f8b89bd3..ccf978679 100644
  - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
  
  ## Test Runtime
-@@ -144,17 +147,19 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -145,17 +148,19 @@ These pass every validator rule and are found only by reading the plan against t
  - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
  - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
  - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
@@ -8806,7 +8806,7 @@ index e58c18a47..1b935e030 100644
  - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
  - `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
 diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
-index 6f8b89bd3..ccf978679 100644
+index 0fa8f1e0f..19796ee54 100644
 --- a/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
 +++ b/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
 @@ -39,7 +39,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -8833,10 +8833,10 @@ index 6f8b89bd3..ccf978679 100644
  - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
  
  ## Preflight Defect Classes the Validator Cannot See
- 
-@@ -135,6 +137,7 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -136,6 +138,7 @@ These pass every validator rule and are found only by reading the plan against t
  - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
  - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
  - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
@@ -8844,7 +8844,7 @@ index 6f8b89bd3..ccf978679 100644
  - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
  
  ## Test Runtime
-@@ -144,17 +147,19 @@ These pass every validator rule and are found only by reading the plan against t
+@@ -145,17 +148,19 @@ These pass every validator rule and are found only by reading the plan against t
  - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
  - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
  - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
