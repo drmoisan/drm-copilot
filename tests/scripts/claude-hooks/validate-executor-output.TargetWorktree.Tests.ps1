@@ -261,4 +261,35 @@ Describe 'validate-executor-output preflight-fix-record target worktree (issue #
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
         Should -Invoke Test-PreflightFixRecord -Times 1 -Exactly -ParameterFilter { $Path -eq $script:RecordRelative }
     }
+
+    It 'blocks repairably on a fix-record value with a parent segment beneath the item root without probing it' {
+        # Arrange
+        Mock Test-PreflightFixRecord { $true }
+        $output = $script:PreflightOutput.Replace("preflight-fix-record: $script:RecordRelative", 'preflight-fix-record: docs/features/active/../../x/preflight-fixes.md')
+
+        # Act
+        $result = Get-ExecutorCase -Output $output -Prompt $script:PreflightPrompt
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Repairable | Should -BeTrue
+        $result.Message | Should -BeLike "*preflight-fix-record 'docs/features/active/../../x/preflight-fixes.md'*'..' segment*"
+        Should -Invoke Test-PreflightFixRecord -Times 0 -Exactly
+    }
+}
+
+Describe 'validate-executor-output plan-path parent segment (issue #1105)' {
+    It 'blocks repairably on a plan-path value with a parent segment beneath the item root without reading it' {
+        # Arrange
+        Mock Get-PlanFileContent { @{ Exists = $true; Lines = $script:CheckedPlan } }
+
+        # Act
+        $result = Get-ExecutorCase -Output "plan-path: docs/features/active/../../x/plan.md`n$script:CompleteOutput"
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Repairable | Should -BeTrue
+        $result.Message | Should -BeLike "*plan-path 'docs/features/active/../../x/plan.md'*'..' segment*"
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
+    }
 }

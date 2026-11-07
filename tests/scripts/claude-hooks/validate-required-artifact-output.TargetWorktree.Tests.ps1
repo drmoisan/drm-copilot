@@ -47,6 +47,20 @@ Describe 'epic-state baseline isolation (issue #1105)' {
 }
 
 Describe 'validate-required-artifact-output prd-feature spec-path target worktree (issue #1105)' {
+    It 'blocks repairably on a spec-path value with a parent segment beneath the item root without probing it' {
+        # Arrange
+        Mock Test-ArtifactFile { $true }
+
+        # Act
+        $result = Get-RequiredArtifactCase -SpecPath 'docs/features/active/../../x/spec.md'
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Repairable | Should -BeTrue
+        $result.Message | Should -BeLike "prd-feature hook:*spec-path 'docs/features/active/../../x/spec.md' is rejected*'..' segment*"
+        Should -Invoke Test-ArtifactFile -Times 0 -Exactly
+    }
+
     It 'finds an item-only spec file through the item root' {
         # Arrange
         Mock Test-ArtifactFile { param([string] $Path) $Path -eq $script:ItemPath }

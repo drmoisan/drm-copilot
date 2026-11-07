@@ -283,7 +283,10 @@ function Resolve-SubagentStopArtifactLocation {
         RelativePath is the value the unchanged shape rules read: an absolute value inside the item
         root becomes repository-relative, and every other value is unchanged. ProbePath is the
         location the hook reads: RelativePath joined beneath the item root, or the unchanged value
-        for the session root and for an absolute value outside the root.
+        for the session root and for an absolute value outside the root. Beneath an item root, a
+        relative RelativePath with a '..' segment is rejected before any join: Rejected is $true,
+        ProbePath is $null, and RejectionDetail names the segment, so the caller blocks without a
+        probe. Otherwise Rejected is $false and RejectionDetail is $null.
     .PARAMETER Path
         The advertised value.
     .PARAMETER WorktreeRoot
@@ -303,8 +306,15 @@ function Resolve-SubagentStopArtifactLocation {
     if ((ConvertTo-HookTargetWorktreeNormalizedPath -Path $Path) -match '^(/|[A-Za-z]:/)') {
         $relativePath = Resolve-SubagentStopArtifactPath -Path $Path -WorktreeRoot $WorktreeRoot -SessionRoot $SessionRoot
     }
+    if (-not (Test-SubagentStopSessionRoot -WorktreeRoot $WorktreeRoot -SessionRoot $SessionRoot)) {
+        $normalized = ConvertTo-HookTargetWorktreeNormalizedPath -Path $relativePath
+        if ($normalized -notmatch '^(/|[A-Za-z]:/)' -and @($normalized -split '/') -contains '..') {
+            $detail = "the value contains a '..' segment, which could leave the item worktree '$(ConvertTo-HookTargetWorktreeNormalizedPath -Path $WorktreeRoot)'"
+            return @{ RelativePath = $relativePath; ProbePath = $null; Rejected = $true; RejectionDetail = $detail }
+        }
+    }
     $probePath = Resolve-SubagentStopArtifactPath -Path $relativePath -WorktreeRoot $WorktreeRoot -SessionRoot $SessionRoot
-    return @{ RelativePath = $relativePath; ProbePath = $probePath }
+    return @{ RelativePath = $relativePath; ProbePath = $probePath; Rejected = $false; RejectionDetail = $null }
 }
 
 function Get-SubagentStopTargetNote {

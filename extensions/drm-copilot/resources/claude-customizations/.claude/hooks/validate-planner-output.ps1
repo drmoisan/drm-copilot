@@ -431,7 +431,11 @@ function Get-PlannerOutputBlockDecision {
     if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
     if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
     $target = Resolve-SubagentStopTargetWorktree @targetArguments
-    $probePath = (Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root).ProbePath
+    $location = Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+    if ($location.Rejected) {
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-planner hook: planner advertised plan-path '$planPath', which is rejected: $($location.RejectionDetail)." }
+    }
+    $probePath = $location.ProbePath
     $file = Get-PlanFileContent -Path $probePath
     if (-not $file.Exists) {
         return @{ Ok = $false; Repairable = $true; Message = "atomic-planner hook: planner advertised plan-path '$planPath' but no file exists at that location.$(Get-SubagentStopTargetNote -Target $target -ProbePath $probePath -SessionRoot $root)" }

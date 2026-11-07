@@ -142,6 +142,20 @@ Describe 'validate-planner-output plan-path target worktree (issue #1105)' {
         Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
     }
 
+    It 'blocks repairably on a plan-path value with a parent segment beneath the item root without reading it' {
+        # Arrange
+        Mock Get-PlanFileContent { @{ Exists = $true; Lines = $script:ItemLines } }
+
+        # Act
+        $result = Get-PlannerCase -PlanPath 'docs/features/active/../../x/plan.md'
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Repairable | Should -BeTrue
+        $result.Message | Should -BeLike "*plan-path 'docs/features/active/../../x/plan.md'*'..' segment*"
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
+    }
+
     It 'reads only the item copy when a later label names the base branch' {
         # Arrange
         Mock Get-PlanFileContent { param([string] $Path) if ($Path -eq $script:ItemPath) { @{ Exists = $true; Lines = $script:ItemLines } } else { @{ Exists = $true; Lines = @('main plan') } } }

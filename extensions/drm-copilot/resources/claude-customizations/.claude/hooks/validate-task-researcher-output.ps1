@@ -286,6 +286,9 @@ function Invoke-TaskResearcherOutputValidation {
     if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
     $target = Resolve-SubagentStopTargetWorktree @targetArguments
     $location = Resolve-SubagentStopArtifactLocation -Path $researchPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+    if ($location.Rejected) {
+        return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' is rejected: $($location.RejectionDetail)." }
+    }
     $shapePath = $location.RelativePath
     $probePath = $location.ProbePath
 

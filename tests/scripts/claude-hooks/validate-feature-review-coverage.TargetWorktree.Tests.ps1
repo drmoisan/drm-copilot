@@ -76,8 +76,8 @@ BeforeAll {
 
     function Invoke-CoverageCase {
         # Runs the hook entry function with an envelope advertising the given review paths.
-        param([string] $Prefix = '', [string] $Prompt = $script:Identity, [switch] $StopHookActive, [scriptblock] $CheckpointIssueReader)
-        $output = "Review complete.`npolicy-audit-path: $Prefix$script:Policy`ncode-review-path: $Prefix$script:Code`nfeature-audit-path: $Prefix$script:Feature`nremediation-inputs-path: $Prefix$script:Remediation"
+        param([string] $Prefix = '', [string] $Prompt = $script:Identity, [switch] $StopHookActive, [scriptblock] $CheckpointIssueReader, [string] $RemediationPath = "$Prefix$script:Remediation")
+        $output = "Review complete.`npolicy-audit-path: $Prefix$script:Policy`ncode-review-path: $Prefix$script:Code`nfeature-audit-path: $Prefix$script:Feature`nremediation-inputs-path: $RemediationPath"
         $raw = [ordered]@{
             session_id = 'tw-1105'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = [bool] $StopHookActive
             agent_transcript_path = 'transcripts/subagents/agent-1105.jsonl'; last_assistant_message = $output
@@ -309,6 +309,37 @@ Describe 'validate-feature-review-coverage unresolved target worktree (issue #11
         # Assert
         $result.Message | Should -BeLike 'validate-feature-review-coverage:*TARGET_WORKTREE_NOT_DERIVABLE*'
         $result.Message | Should -Not -BeLike '*absolute*'
+    }
+}
+
+Describe 'validate-feature-review-coverage parent segments beneath the item root (issue #1105)' {
+    It 'blocks repairably on review artifact values with a parent segment without reading them' {
+        # Arrange
+        Set-ArtifactTable -File (Get-ReviewTable -Prefix "$script:ItemRoot/docs/../")
+
+        # Act
+        $result = Invoke-CoverageCase -Prefix 'docs/../'
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "validate-feature-review-coverage:*policy-audit-path 'docs/../$script:Policy' is rejected*'..' segment*"
+        $result.Message | Should -Not -BeLike '*cannot repair*'
+        Should -Invoke Get-ArtifactFileContent -Times 0 -Exactly -ParameterFilter { $Path -like '*/../*' }
+    }
+
+    It 'blocks repairably on a remediation-inputs value with a parent segment without reading it' {
+        # Arrange
+        $remediationValue = "docs/features/active/sample/../sample/remediation-inputs.$script:Stamp.md"
+        Set-ArtifactTable -File (Get-ReviewTable -Prefix "$script:ItemRoot/")
+
+        # Act
+        $result = Invoke-CoverageCase -RemediationPath $remediationValue
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "validate-feature-review-coverage:*remediation-inputs-path '$remediationValue' is rejected*'..' segment*"
+        $result.Message | Should -Not -BeLike '*cannot repair*'
+        Should -Invoke Get-ArtifactFileContent -Times 0 -Exactly -ParameterFilter { $Path -like '*/../*' }
     }
 }
 

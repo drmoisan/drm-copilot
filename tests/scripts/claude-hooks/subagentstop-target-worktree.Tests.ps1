@@ -287,6 +287,37 @@ Describe 'Resolve-SubagentStopArtifactLocation (issue #1105)' {
         $location.RelativePath | Should -Be "$script:SessionRoot/docs/plan.md"
         $location.ProbePath | Should -Be "$script:SessionRoot/docs/plan.md"
     }
+
+    It 'rejects a relative value with a parent segment beneath the item root before any join' {
+        # Act
+        $location = Resolve-SubagentStopArtifactLocation -Path 'docs/features/active/../../x/spec.md' -WorktreeRoot $script:ItemRoot -SessionRoot $script:SessionRoot
+
+        # Assert
+        $location.Rejected | Should -BeTrue
+        $location.RelativePath | Should -Be 'docs/features/active/../../x/spec.md'
+        $location.ProbePath | Should -BeNullOrEmpty
+        $location.RejectionDetail | Should -BeLike "*'..' segment*"
+    }
+
+    It 'does not reject a relative value without a parent segment beneath the item root' {
+        # Act
+        $location = Resolve-SubagentStopArtifactLocation -Path 'docs/features/active/sample/spec.md' -WorktreeRoot $script:ItemRoot -SessionRoot $script:SessionRoot
+
+        # Assert
+        $location.Rejected | Should -BeFalse
+        $location.RejectionDetail | Should -BeNullOrEmpty
+        $location.ProbePath | Should -Be "$script:ItemRoot/docs/features/active/sample/spec.md"
+    }
+
+    It 'leaves a value with a parent segment unchanged and unrejected for the session root' {
+        # Act
+        $location = Resolve-SubagentStopArtifactLocation -Path 'docs/features/active/../../x/spec.md' -WorktreeRoot $script:SessionRoot -SessionRoot $script:SessionRoot
+
+        # Assert
+        $location.Rejected | Should -BeFalse
+        $location.RelativePath | Should -Be 'docs/features/active/../../x/spec.md'
+        $location.ProbePath | Should -Be 'docs/features/active/../../x/spec.md'
+    }
 }
 
 Describe 'Get-SubagentStopTargetNote (issue #1105)' {

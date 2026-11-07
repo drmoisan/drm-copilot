@@ -138,6 +138,10 @@ function Invoke-FeatureReviewCoverageValidation {
                 }
 
                 $location = Resolve-SubagentStopArtifactLocation -Path $path -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+                if ($location.Rejected) {
+                    $errors.Add("$($artifact.Token) '$path' is rejected: $($location.RejectionDetail)")
+                    continue
+                }
                 $metadata = Get-ReviewArtifactInfo -Path $location.RelativePath -Stem $artifact.Stem
                 if ($null -eq $metadata) {
                     $errors.Add("$($artifact.Token) '$path' is outside the required docs/features/active/.../$($artifact.Stem).<timestamp>.md location")
@@ -171,7 +175,10 @@ function Invoke-FeatureReviewCoverageValidation {
                 if ($null -ne $remediationPath) {
                     $remediationLocation = Resolve-SubagentStopArtifactLocation -Path $remediationPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
                     $remediation = Get-ReviewArtifactInfo -Path $remediationLocation.RelativePath -Stem 'remediation-inputs'
-                    if ($null -eq $remediation) {
+                    if ($remediationLocation.Rejected) {
+                        $errors.Add("remediation-inputs-path '$remediationPath' is rejected: $($remediationLocation.RejectionDetail)")
+                    }
+                    elseif ($null -eq $remediation) {
                         $errors.Add("remediation-inputs-path '$remediationPath' is outside the required docs/features/active/.../remediation-inputs.<timestamp>.md location")
                     }
                     elseif ($remediation.Folder -ne $reference.Folder -or $remediation.Timestamp -ne $reference.Timestamp) {

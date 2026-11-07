@@ -64,6 +64,20 @@ Describe 'validate-task-researcher-output research-path target worktree (issue #
         Mock Test-PreMortemSection { @{ Ok = $true; Message = $null } }
     }
 
+    It 'blocks repairably on a research-path value with a parent segment beneath the item root without probing it' {
+        # Arrange
+        Mock Test-ResearchFile { $true }
+
+        # Act
+        $result = Invoke-ResearcherCase -ResearchPath 'docs/research/../../x/2026-11-07T13-55-sample-research.md'
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "task-researcher hook: research-path 'docs/research/../../x/2026-11-07T13-55-sample-research.md'*'..' segment*"
+        $result.Message | Should -Not -BeLike '*not repairable*'
+        Should -Invoke Test-ResearchFile -Times 0 -Exactly
+    }
+
     It 'finds an item-only research file and runs the feasibility, numeric-evidence, and Pre-Mortem checks on item content' {
         # Arrange
         Mock Test-ResearchFile { param([string] $Path) $Path -eq $script:ItemPath }

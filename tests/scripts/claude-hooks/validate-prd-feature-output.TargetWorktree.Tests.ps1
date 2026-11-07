@@ -56,6 +56,37 @@ Describe 'validate-prd-feature-output spec-path and research-path target worktre
         Mock Test-NumericDerivationEvidence { @{ Ok = $true; Message = $null } }
     }
 
+    It 'blocks repairably on a spec-path value with a parent segment beneath the item root without probing it' {
+        # Arrange
+        Mock Test-PrdFeatureArtifactFile { $true }
+
+        # Act
+        $result = Invoke-PrdFeatureCase -Output 'spec-path: docs/features/active/../../x/spec.md'
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "prd-feature hook: spec-path 'docs/features/active/../../x/spec.md'*'..' segment*"
+        $result.Message | Should -Not -BeLike '*not repairable*'
+        Should -Invoke Test-PrdFeatureArtifactFile -Times 0 -Exactly
+    }
+
+    It 'blocks repairably on a research-path value with a parent segment beneath the item root without probing it' {
+        # Arrange
+        Mock Test-PrdFeatureArtifactFile { param([string] $Path) $Path -eq $script:SpecItem }
+        Mock Get-PrdFeatureArtifactContent { $script:NumericSpec }
+        Mock Test-SpecNumericCriterion { $true }
+
+        # Act
+        $result = Invoke-PrdFeatureCase -Output "spec-path: $script:SpecRelative`nresearch-path: docs/features/active/../../x/research.md"
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "prd-feature hook: research-path 'docs/features/active/../../x/research.md'*'..' segment*"
+        $result.Message | Should -Not -BeLike '*not repairable*'
+        Should -Invoke Test-PrdFeatureArtifactFile -Times 1 -Exactly
+        Should -Invoke Test-PrdFeatureArtifactFile -Times 1 -Exactly -ParameterFilter { $Path -eq $script:SpecItem }
+    }
+
     It 'finds item-only spec and research files and runs the numeric-criterion check on item content' {
         # Arrange
         Mock Test-PrdFeatureArtifactFile { param([string] $Path) $Path -in @($script:SpecItem, $script:ResearchItem) }

@@ -176,6 +176,9 @@ function Get-PreflightRunBlockDecision {
         $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
         $targetRoot = if ($null -eq $Target) { $null } else { [string]$Target.WorktreeRoot }
         $location = Resolve-SubagentStopArtifactLocation -Path $recordPath -WorktreeRoot $targetRoot -SessionRoot $root
+        if ($location.Rejected) {
+            return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: preflight-fix-record '$recordPath' is rejected: $($location.RejectionDetail)." }
+        }
         if (-not ([string]$location.RelativePath).StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase) -or -not (Test-PreflightFixRecord -Path $location.ProbePath)) {
             return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: a `PREFLIGHT-FIX:` line requires a `preflight-fix-record: <path>` line naming an existing record under docs/features/.' + (Get-SubagentStopTargetNote -Target $Target -ProbePath $location.ProbePath -SessionRoot $root) }
         }
@@ -332,7 +335,11 @@ function Get-ExecutorOutputBlockDecision {
     if ($null -ne $headReader) { $targetArguments['ReadTranscriptHead'] = $headReader }
     if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
     $target = Resolve-SubagentStopTargetWorktree @targetArguments
-    $probePath = (Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root).ProbePath
+    $location = Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+    if ($location.Rejected) {
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: executor advertised plan-path '$planPath', which is rejected: $($location.RejectionDetail)." }
+    }
+    $probePath = $location.ProbePath
 
     $file = Get-PlanFileContent -Path $probePath
     if (-not $file.Exists) {
