@@ -5,9 +5,9 @@
 reduction: 0002
 Date: 2026-11-07
 Issue: #1097
-Merge commit: pending (PR #1103)
+Merge commit: 72e57cc7dfd4ba78579a2c86887aa0c77d5d9cef
 
-Moves the feature review from before pull-request creation to beside CI. A new run records `review_mode: "concurrent"`, opens its pull request after the local test run passes, and runs the review and CI at the same time. The merge waits for both. The number in the `Merge commit:` line is the canonical issue number, which stands in until the pull request exists. The orchestrator replaces it with the real pull request number right after PR creation.
+Moves the feature review from before pull-request creation to beside CI. A new run records `review_mode: "concurrent"`, opens its pull request after the local test run passes, and runs the review and CI at the same time. The merge waits for both. The `Merge commit:` line held the canonical issue number as a stand-in until the pull request existed, then the pull request number, and now holds the merge commit.
 
 Renumbered from 0001, because PR #1102 took that number on `main` first. The reduction commit's subject carries the token `reduction: 0001` and cannot be rewritten without a forced push; the renumbering commit's subject carries `reduction: 0002`. Find the reduction by its commit subject, `feat(orchestrate): run the feature review beside CI`, or by `reduction: 0002`.
 
