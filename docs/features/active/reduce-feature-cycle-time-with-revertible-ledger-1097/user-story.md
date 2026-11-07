@@ -71,7 +71,7 @@ The tag on each criterion names the delivery stage that owes it, as defined in `
 - [x] [E] An entry for #1094, the parallel-only test gates, exists with the prior text from its pre-merge state.
 - [x] [E] The planning skill and all its mirrored copies state the standing rule.
 - [x] [E] The smaller-plans text states the design-level target of 15 to 20 tasks and lands as its own commit with its entry.
-- [ ] [E] The policy-read task, its artifact requirement, and the hook's policy-read check are removed in one commit with its entry; a plan that keeps the task stays valid; and every baseline requirement string named in research section 3 is present before and after.
+- [x] [E] The policy-read task, its artifact requirement, and the hook's policy-read check are removed in one commit with its entry; a plan that keeps the task stays valid; and every baseline requirement string named in research section 3 is present before and after.
 - [x] [E] Applying one entry's revert steps to a test copy restores the prior behavior for at least one sample reduction: in memory, the reverted `Get-PlanStructureValidationReport` returns the policy-read error and the live function does not.
 - [x] [E] Wording deferred from stages A to D has landed, with each affected ledger entry updated in the same commit.
 - [ ] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
