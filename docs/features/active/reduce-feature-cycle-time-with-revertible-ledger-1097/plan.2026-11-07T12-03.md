@@ -75,7 +75,7 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Capture the PowerShell static baseline for `scripts/dev-tools/ProcessReductionLedger.psm1` and `tests/scripts/dev-tools/ProcessReductionLedger*.Tests.ps1`, writing `FEATURE/evidence/baseline/stage-r-powershell-static.<timestamp>.md`.
+- [x] [P0-T1] Capture the PowerShell static baseline for `scripts/dev-tools/ProcessReductionLedger.psm1` and `tests/scripts/dev-tools/ProcessReductionLedger*.Tests.ps1`, writing `FEATURE/evidence/baseline/stage-r-powershell-static.<timestamp>.md`.
   - PoshQC format in check mode (no file written) and a direct analyzer run with the repository settings.
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the files needing format and the analyzer finding count.
 - [ ] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the `Phase 0 baseline` and write `FEATURE/evidence/baseline/stage-r-powershell-test-baseline.<timestamp>.md` with the figures read from the Pester reports.
