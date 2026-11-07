@@ -143,7 +143,7 @@
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md` records 0 findings; any finding is fixed and the phase restarts at P6-T1.
 - [x] [P6-T3] Run the branch-current Pester route with coverage over `tests/scripts/claude-skills/epic-progress-report` and `tests/scripts/dev-tools`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/pester-coverage.<timestamp>.md` records total, passed and failed counts (failed 0) with per-container counts for the seven touched suites, and per-file line coverage of at least 85 percent for each of the five `CANON` files and `scripts/dev-tools/Get-EpicProgressReport.ps1`.
-- [ ] [P6-T4] Write the coverage comparison.
+- [x] [P6-T4] Write the coverage comparison.
   - Acceptance: `<FEATURE>/evidence/qa-gates/coverage-delta.<timestamp>.md` lists the baseline values from P0-T6, the post-change per-file values from P6-T3, and the new or changed file values, with a PASS verdict only when every listed file is at or above 85 percent.
 - [ ] [P6-T5] Run the seven touched Pester suites (`SUITES/*.Tests.ps1` and `tests/scripts/dev-tools/Get-EpicProgressReport.Tests.ps1`) in one process in seeded shuffled file order with seeds 7, 41 and 1093.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-shuffled-order.<timestamp>.md` records each seed, its file order and its passed and failed counts; failed is 0 for every seed.
