@@ -14,7 +14,10 @@ import pytest
 
 from scripts.dev_tools.atomic_executor.plan_discovery import ResolvedPlan
 from scripts.dev_tools.atomic_executor.plan_parser import PlanTask
-from scripts.dev_tools.atomic_executor.prompt_builder import PromptBuilder
+from scripts.dev_tools.atomic_executor.prompt_builder import (
+    PromptBuilder,
+    RealPromptBuilderFileSystem,
+)
 
 
 def make_default_plan_resolver(
@@ -693,3 +696,73 @@ class TestPromptBuilderEdgeCases:
         assert "émojis 🎉" in prompt
         assert "émoji 📝" in prompt
         assert "émoji ✅" not in prompt
+
+
+class TestPromptBuilderOptionalSections:
+    """Tests for retry, Phase 0, fallback-name, and size-warning prompt sections."""
+
+    def test_build_renders_optional_sections_and_task_block(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """build() adds retry and Phase 0 sections and keeps indented task lines."""
+        workspace = Path("/workspace")
+        template_path = Path("/workspace/template.md")
+        feature_dir = Path("/elsewhere/my-feature")
+        plan_text = "\n".join(
+            [
+                "# Plan",
+                "- [x] [P0-T1] Read the finished policy",
+                "- [ ] [P0-T2] Read CLAUDE.md",
+                "- [ ] [P0-T3] Capture baselines",
+                "- [ ] [P1-T1] Implement change",
+                "  - Detail line",
+                "",
+                "  - Second detail",
+                "- [ ] [P1-T2] Next task",
+                "- [ ] [P2-T1] Read later notes",
+            ]
+        )
+        fs = InMemoryPromptBuilderFileSystem(
+            files={
+                template_path.as_posix(): "T" * 16_000,
+                (feature_dir / "plan.md").as_posix(): plan_text,
+                (feature_dir / "spec.md").as_posix(): "# Spec\n",
+            },
+        )
+        task = PlanTask(
+            task_id="P1-T1",
+            phase=1,
+            task_num=1,
+            title="Implement change",
+            checked=False,
+            line_index=4,
+        )
+        builder = PromptBuilder(
+            workspace,
+            template_path,
+            fs=fs,
+            plan_resolver=make_default_plan_resolver(),
+        )
+
+        prompt = builder.build(
+            feature_dir, task, retry_context="ruff failed", include_phase0_reads=True
+        )
+
+        assert "!!! RETRY ATTEMPT !!!" in prompt and "ruff failed" in prompt
+        assert "PHASE 0 READ TASKS" in prompt
+        assert "- [P0-T2] Read CLAUDE.md" in prompt
+        assert "P0-T1] Read the finished" not in prompt.split("Constraints:")[0]
+        assert "P0-T3" not in prompt and "P2-T1" not in prompt
+        assert "checking the\nPhase 0 read tasks" in prompt
+        block = prompt.split("---- BEGIN plan task ----")[1]
+        assert "  - Detail line\n\n  - Second detail" in block
+        assert "P1-T2" not in block
+        assert "Prompt exceeds target threshold" in caplog.text
+
+    def test_real_filesystem_reports_missing_directory(self) -> None:
+        """RealPromptBuilderFileSystem reports a missing directory as empty."""
+        missing = Path("/issue-1106-missing-directory")
+        real_fs = RealPromptBuilderFileSystem()
+
+        assert real_fs.is_dir(missing) is False
+        assert real_fs.glob(missing, "*.md") == []

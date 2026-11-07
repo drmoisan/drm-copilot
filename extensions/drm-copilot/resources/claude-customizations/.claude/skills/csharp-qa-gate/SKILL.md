@@ -1,6 +1,6 @@
 ---
 name: csharp-qa-gate
-description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain (with architecture tests), compares static tool results against the static baseline, reads test and coverage results from the single gate run, and produces the required reporting block before the agent declares the change complete.
+description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain (with architecture tests), compares static tool results against the static baseline, reads test and coverage results from the single gate run, and produces the required reporting block before the agent declares the change complete.
 ---
 
 # C# QA Gate
@@ -54,7 +54,7 @@ Compare the final static tool results to the static baseline recorded in Phase A
 
 - **Analyzer delta**: 0 new findings across the repository.
 - **Compiler / nullable delta**: 0 new diagnostics across the repository.
-- **xUnit gate**: zero failures in the single gate run.
+- **MSTest gate**: zero failures in the single gate run.
 - **Architecture tests**: zero failures in the `*.ArchitectureTests` project.
 - **Per-file coverage**: every changed file meets the coverage thresholds, read from the single gate run, and new behavior is tested.
 - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.

@@ -41,9 +41,9 @@ Focus on writing clear, specific failing tests that describe the desired behavio
 
 ### C# Test Patterns
 
-- Use **xUnit** with **FluentAssertions** for readable assertions
+- Use **MSTest** with **FluentAssertions** for readable assertions
 - Apply **AutoFixture** for test data generation
-- Implement **Theory tests** for multiple input scenarios from issue examples
+- Implement **data-driven tests** (`[DataRow]`) for multiple input scenarios from issue examples
 - Create **custom assertions** for domain-specific validations outlined in issue
 
 ## Execution Guidelines

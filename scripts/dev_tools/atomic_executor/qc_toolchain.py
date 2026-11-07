@@ -49,7 +49,6 @@ PYTHON_TOOLCHAIN_COMMANDS: dict[str, list[str]] = {
         "run",
         "pytest",
         "--color=no",
-        "--cov=src/lexile_corpus_tuner",
         "--cov=scripts/dev_tools",
         "--cov-report=term-missing",
     ],

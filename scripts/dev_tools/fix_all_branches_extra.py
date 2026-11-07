@@ -155,7 +155,6 @@ def run_python_branch(
     if include_coverage:
         pytest_command.extend(
             [
-                "--cov=src/lexile_corpus_tuner",
                 "--cov=scripts/dev_tools",
                 "--cov-report=term-missing",
             ]

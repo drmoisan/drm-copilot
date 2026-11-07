@@ -1,5 +1,5 @@
 name = "powershell-di-unit-test-engineer"
-description = "Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates."
+description = "Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates."
 
 developer_instructions = """
 You are the Codex migration wrapper for the legacy GitHub Copilot agent Powershell DI Unit Test Engineer.agent.md.

@@ -10,7 +10,7 @@ Use this prompt to launch `comment_remediator` on any scope (single file, folder
 
 ## Inputs
 
-- **Scope** (required): Path or glob to remediate (e.g., `src/lexile_corpus_tuner/.../enrich_original_pub_year/**`).
+- **Scope** (required): Path or glob to remediate (e.g., `src/my_package/.../feature_module/**`).
 
 ## Policy Order
 
