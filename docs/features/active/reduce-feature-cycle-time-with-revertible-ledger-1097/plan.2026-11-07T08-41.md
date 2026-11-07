@@ -72,7 +72,7 @@ Found by searching `tests/` and `extensions/drm-copilot/test/` for `no test suit
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Capture static baselines for `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`, `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`, and `tests/scripts/dev_tools/test_codex_orchestration_contracts.py`, writing `FEATURE/evidence/baseline/stage-e2-powershell-static.<timestamp>.md` and `stage-e2-python-static.<timestamp>.md`.
+- [x] [P0-T1] Capture static baselines for `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`, `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`, and `tests/scripts/dev_tools/test_codex_orchestration_contracts.py`, writing `FEATURE/evidence/baseline/stage-e2-powershell-static.<timestamp>.md` and `stage-e2-python-static.<timestamp>.md`.
   - PowerShell: PoshQC format in check mode and a direct analyzer run with the repository settings. Python: Black in check mode, Ruff, Pyright. Also the Codex generator `--check`.
   - Acceptance: each artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with each tool's finding count.
 - [ ] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the Pester baseline and write `FEATURE/evidence/baseline/stage-e2-powershell-test-baseline.<timestamp>.md`.
