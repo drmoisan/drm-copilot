@@ -361,6 +361,21 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
         }
     }
 
+    It 'RG-DIRECT-CALL-NO-NUMBER-DENIES' {
+        # Arrange: under both gates the shape step denies a number-less merge first, so only a
+        # direct call reaches step 2 of the header.
+        $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson | ConvertFrom-Json
+
+        # Act
+        $decision = Get-EpicMergeGateReviewDecision -Checkpoint $checkpoint -CommandPrNumber $null -GhRoot $script:SessionRoot -GitRoot $script:ItemRoot
+
+        # Assert
+        $decision.Denied | Should -BeTrue
+        $decision.Reason.StartsWith('EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_HEAD_UNRESOLVED: ', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $decision.Reason
+        Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+    }
+
     It 'RG-TWIN-IS-BYTE-IDENTICAL' {
         # Arrange
         $root = (Resolve-Path "$PSScriptRoot/../../..").Path

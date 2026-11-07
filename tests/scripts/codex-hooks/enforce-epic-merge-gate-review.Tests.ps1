@@ -242,6 +242,21 @@ Describe 'Codex enforce-epic-merge-gate review guard (issue #1097)' {
             Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
         }
 
+        It 'RGC-DIRECT-CALL-NO-NUMBER-DENIES' {
+            # Arrange: the Codex shape step denies a number-less merge first, so only a direct call
+            # reaches step 2 of the header.
+            $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson | ConvertFrom-Json
+
+            # Act
+            $decision = Get-EpicMergeGateReviewDecision -Checkpoint $checkpoint -CommandPrNumber $null -GhRoot $script:SyntheticRoot -GitRoot $script:SyntheticRoot
+
+            # Assert
+            $decision.Denied | Should -BeTrue
+            $decision.Reason.StartsWith('EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_HEAD_UNRESOLVED: ', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $decision.Reason
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+            Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+        }
+
         It 'RGC-SHAPE-CANDIDATE-CAP-BOUNDS-READS' {
             # Arrange: an in-memory reader that records each number over a text with six numbers.
             $reads = [System.Collections.Generic.List[object]]::new()

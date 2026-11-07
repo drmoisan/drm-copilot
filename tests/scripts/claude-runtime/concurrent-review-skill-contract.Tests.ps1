@@ -183,6 +183,11 @@ Describe 'parallel skill, rule, and agent concurrent review text (issue #1097)' 
         Assert-ConcurrentReviewToken -Text $section -Token 'at most the first 4 numbers'
     }
 
+    It 'CRS-RULE-DISCLOSES-TRIGGER-OVER-MATCH (<Copy>)' -ForEach $script:RuleCopy {
+        $section = Get-ConcurrentReviewSection -Copy $Copy -Heading '## Concurrent-Review Scope and Backward Compatibility'
+        Assert-ConcurrentReviewToken -Text $section -Token 'pr (#12)', 'a line feed or'
+    }
+
     It 'CRS-AGENTS-STATE-SKILL-DOCUMENTS-KEY (<Copy>)' -ForEach $script:AgentsStateCopy {
         $section = Get-ConcurrentReviewSection -Copy $Copy -Heading '## Concurrent-Review Key (review_mode)'
         Assert-ConcurrentReviewToken -Text $section -Token '`review_mode`', 'the exact string `concurrent`', '`head_sha`', '`## Concurrent Review and CI (review_mode)` in `.agents/skills/orchestrate/SKILL.md`'

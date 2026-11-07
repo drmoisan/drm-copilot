@@ -26,6 +26,8 @@
     Evaluation order; the first match ends it:
       1. The checkpoint is absent or the key is not exactly concurrent: inert, no process.
       2. The command names no pull request number: REVIEW_GATE_HEAD_UNRESOLVED, before any process.
+         Only a direct call of Get-EpicMergeGateReviewDecision reaches this step, because under
+         both gates the shape step denies a number-less merge text first.
       3. The last remediation_loop.review_outcomes entry is missing, is not an object, or its
          verdict is not exactly PASS: REVIEW_GATE_NOT_PASSED, before any process.
       4. Its head_sha is absent or malformed: REVIEW_GATE_NOT_PASSED, before any process.
@@ -53,9 +55,9 @@
     checkpoint edit, a merge through another tool or surface, an item target that does not resolve,
     and text it cannot read are not gated. The extra read covers at most the first 4 numbers of the
     text, so a key held only by an item named after them is not found. Under the key the rule is
-    fail-closed, so prose naming pr merge is denied in any command. D10 in
-    .claude/rules/orchestrator-state.md (## Concurrent-Review Scope and Backward Compatibility)
-    lists every limit.
+    fail-closed and its trigger is wider than pr merge: prose such as pr (#12) or pr $HOME is denied,
+    and so is a plain merge followed by a line feed or ;. D10 in .claude/rules/orchestrator-state.md
+    (## Concurrent-Review Scope and Backward Compatibility) lists every limit.
 
 .NOTES
     Compatible with PowerShell 7+. This file dot-sources nothing and imports no module. It calls, at
