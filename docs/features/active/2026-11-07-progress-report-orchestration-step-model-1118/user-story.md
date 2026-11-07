@@ -2,54 +2,70 @@
 
 - Issue: #1118
 - Owner: drmoisan
-- Status: Draft
-- Last Updated: 2026-11-07T15-48
+- Status: Approved for planning
+- Last Updated: 2026-11-07
+- Spec: `spec.md` (design, decisions, and formats)
 
 ## Story Statement
 
-- As a ..., I want ..., so that ...
-- As a ..., I want ..., so that ...
+- As the repository owner running an epic, I want the progress report to count review, PR, CI, merge, main-sync, and remediation work as typed steps, so that the report shows progress while that work runs instead of appearing stalled.
+- As the repository owner, I want the remaining-time estimate to be the per-type median duration multiplied by the remaining steps of each type, with the breakdown visible, so that I can judge the estimate and see which step types drive it.
+- As the repository owner, I want blocked work excluded only when the checkpoint records it, so that the estimate does not change because executors tick tasks in batches.
+- As the repository owner running a single item outside an epic, I want the same report for that item, so that I do not need an epic folder to track it.
 
 ## Problem / Why
 
-`.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1` measures only plan checkboxes (`- [x] [P#-T#]`) in each feature's original plan. On Epic #1019 on 2026-11-07 this caused three problems:
-
-- Review, PR, CI, merge, and main-sync time showed as zero progress, so the report looked stalled while work was running. For example, 18:09Z to 20:20Z showed nine zero intervals while #1037 was in review and CI and the fourth main sync ran.
-- Remediation cycles were invisible: #1034's four cycles added work the report never counted.
-- Executors tick tasks in batches, so 10-minute intervals swing between 0 and 161 tasks per hour, and the time estimates ranged from 3 to 296 hours.
-
-The owner defined the replacement model on 2026-11-07.
-
+`.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1` measures only checked plan tasks in each feature's original plan. On Epic #1019 on 2026-11-07, review, PR, CI, merge, and main-sync time read as zero progress (for example, nine zero intervals from 18:09Z to 20:20Z while #1037 was in review and CI and a main sync ran); #1034's four remediation cycles were never counted; and batched ticks made ten-minute rates swing between 0 and 161 tasks per hour, with estimates from 3 to 296 hours.
 
 ## Personas & Scenarios
 
-- Persona: ...
-  - who the user is
-  - what they care about
-  - their constraints
-  - their goals and frustrations
-  - their context and motivations
-- Scenario: ...
-  - A concrete, step-by-step narrative that describes how a user accomplishes a goal in a real-world context using the system.
-  - who is acting?
-  - what triggered the action?
-  - what steps do they take?
-  - what obstacles or decisions occur?
-  - what outcome do they expect?
-
+- Persona: repository owner and epic operator.
+  - Runs several orchestrated children in parallel and receives the TL;DR on a schedule as a push notification.
+  - Cares about an estimate that moves in the right direction and about seeing when work is blocked on a decision.
+  - Constraint: the report must keep working with the existing scheduling prompts (`-EpicFolder <folder> -Mode TLDR`) and the existing state file.
+- Scenario: review and CI in progress.
+  - Child #A has finished execution and is in review, then CI. No plan task changes for two hours.
+  - The scheduled TL;DR shows `#A review (12 min of median 14 min)`, then `#A ci (...)`, and the remaining estimate falls between runs.
+  - Outcome: the owner sees the epic advancing without opening the checkpoint.
+- Scenario: a remediation cycle opens.
+  - The review on child #B returns blocking findings and a full remediation cycle opens with an eleven-task remediation plan.
+  - The next report adds the cycle's plan, preflight, execution, review, and CI steps; the step total grows and the percentage falls.
+  - Outcome: the owner sees the added work and its estimated time.
+- Scenario: a blocked item.
+  - Child #C records `blocked_reason: human_decision_required`.
+  - The report lists #C as blocked with its reason, excludes its remaining steps from the headline, and shows their would-be subtotal.
+  - Outcome: the owner knows a decision is pending and the estimate does not include time that cannot proceed.
+- Scenario: a standalone item.
+  - The owner runs the report with `-Issue <n>` for an item outside any epic.
+  - The report reads that item's worktree checkpoint and prints the same TL;DR and Full formats with no epic-level steps.
 
 ## Acceptance Criteria
 
-- [ ] Every counted step has a type, and remediation steps and tasks add to the total.
-- [ ] The estimate is the sum of remaining steps by type multiplied by the median duration of that type, and the report shows the per-type breakdown.
-- [ ] A type with no measured duration is reported as such, with the default stated.
-- [ ] Blocked time is excluded by recorded state.
-- [ ] Review, CI, and main-sync periods show as progress on their steps, not as zero velocity.
-- [ ] Durations persist across runs beyond the sample cap.
-- [ ] Unit tests use in-memory fixtures, with no temporary files.
-- [ ] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures.
-
+- [ ] Every counted step carries a type from the `spec.md` `## Step Model` catalog; each plan task is one `execution` step; each opened remediation cycle adds its `plan` and `preflight` steps (full cycles only), one `execution` step per task in its `plan_path` file, a `review` step, and a `ci` step when opened after a PR existed. A unit test shows the total growing and the completion percentage falling when a cycle opens, and a light cycle adding no `plan` or `preflight` step.
+- [ ] The headline estimate equals the sum over types of remaining steps multiplied by that type's median (with in-progress credit as specified in `spec.md`), and the Full report shows a per-type table with done, in-progress, remaining, blocked, median, sample count, and subtotal columns. Verified by unit tests with known samples and by the Full golden.
+- [ ] A type with no retained sample is reported as `<type>: no measured duration; default <n> min` and marked `default` in the per-type table; the value comes from the default table or `-StepDefaultMinutes`, never a silent zero. Verified by unit tests for both the built-in default and an override.
+- [ ] Blocked time is excluded by recorded state only: a unit test per recorded field in `spec.md` Decision D1 shows the item's remaining steps excluded from the headline sum and listed as blocked, the blocked span subtracted from the tick split, and no elapsed accrual while blocked; `awaiting_ci` and a zero tick rate do not mark an item blocked.
+- [ ] An in-progress `review`, `ci`, or `main-sync` step appears on the TL;DR `**Now:**` line with its elapsed time against its median, and two runs at different times with no new checked tasks produce a lower remaining estimate on the later run. Verified by unit tests.
+- [ ] Batched ticks are split: tasks newly checked between two runs each receive the interval (less blocked seconds) divided by the number of tasks checked, and a closed `execution` stage replaces those tick samples with stage-duration-per-task samples. Verified by unit tests.
+- [ ] Durations persist across runs beyond the sample cap: the version 2 `durations` ledger retains more samples per type than `-SampleCap`, de-duplicates by sample key across runs, and is kept by `-ResetBaseline`. Verified by unit tests.
+- [ ] A version 1 state document and the legacy bare sample array are read and migrated to version 2: task-count samples are discarded, `baselineDone` resolves to the current step count, `startUnixSeconds` and `baselineWeeklyPct` are kept, and the next write is version 2 with `unit: "steps"`. Version 3 or higher, blank, and unparseable text give empty state. Verified by unit tests.
+- [ ] CLI backward compatibility: `-EpicFolder documentation-estate-tooling -Mode TLDR` and `-EpicFolder <folder>` (Full) bind and run; every existing parameter keeps its name, type, default, mandatory status, and validation attribute; `-ResetBaseline` with `-PairSamples` still throws before I/O; the forwarder tests in `tests/scripts/dev-tools/Get-EpicProgressReport.Tests.ps1` pass unchanged.
+- [ ] Standalone item mode: the `Item` parameter set with mandatory `-Issue <n>` reports one item from its worktree checkpoint without reading a kickoff or epic checkpoint, includes no epic-level steps, uses `.claude/state/progress-item-<n>.json` by default, and rejects a combination with `-EpicFolder`. Verified by unit tests with mocked seams.
+- [ ] The TL;DR output stays four lines in epic and item mode, verified by the TL;DR goldens, and the velocity, SD, and range lines no longer appear in either format.
+- [ ] Composite remediation stage time and unrecognized stage names are reported as unmapped time in the Full report and contribute no samples; approximate samples (`spec.md` Decision D3) are marked approximate. Verified by unit tests.
+- [ ] The git call set stays `fetch`, `worktree list`, and `show`; write commands remain only in `Write-EpicProgressState`; native calls remain only in `Invoke-GitExe`, `Invoke-GhExe`, and `Invoke-CswapExe`. Verified by the repository-constraints tests.
+- [ ] `.claude/skills/epic-progress-report/SKILL.md` describes the step model, the default durations and their basis, the decisions, the new parameters, the new report formats, and the version 2 state file, no longer states that the report wording does not change, and stays under 500 lines; its bundle copy under `extensions/drm-copilot/resources/claude-customizations/` is byte-identical; `EpicProgressReport.SkillContract.Tests.ps1` is updated to match.
+- [ ] Every new script file is listed once in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, has a byte-identical bundle copy, and is included in the repository-constraints `productionPaths` and forbidden-token scan list; the push-down contract tests pass.
+- [ ] No production file added or changed by this feature exceeds 500 logical lines where a logical split exists, and none exceeds 800 logical lines, measured with `@(Get-Content -LiteralPath <path>).Count` and recorded under `evidence/`.
+- [ ] Unit tests use in-memory fixtures with no temporary files, and `Invoke-PoshQCLeakScan` reports no leak for the skill's test files.
+- [ ] One `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run pass with zero failures, and each new or changed production file under the skill meets 85% line coverage.
 
 ## Non-Goals
 
-Call out what is explicitly excluded from this feature.
+- No change to the orchestrate skill or to the `stage_timing` format (typed remediation sub-stages are not added).
+- No `git log` or `git ls-tree` call; no commit-time duration derivation.
+- No detection of missed handoffs beyond recorded checkpoint fields.
+- No prediction of future remediation cycles or main syncs.
+- No shared duration ledger across epics and standalone items.
+- No import of `scripts/dev-tools/StageTiming.psm1` into the skill.
+- No Python in the skill.
