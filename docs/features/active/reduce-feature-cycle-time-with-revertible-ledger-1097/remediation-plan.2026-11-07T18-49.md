@@ -51,7 +51,7 @@ Found by searching `tests/` for `Add-ProcessReductionTouch`, `Get-ProcessReducti
 
 ### Phase 0 — Baseline
 
-- [ ] [P0-T1] Write `FEATURE/evidence/baseline/stage-r-cycle2-baseline-reference.<timestamp>.md`, recording the Phase 0 baseline figures read from the stage R artifacts under `FEATURE/evidence/baseline/` and `FEATURE/evidence/qa-gates/`. No suite is run.
+- [x] [P0-T1] Write `FEATURE/evidence/baseline/stage-r-cycle2-baseline-reference.<timestamp>.md`, recording the Phase 0 baseline figures read from the stage R artifacts under `FEATURE/evidence/baseline/` and `FEATURE/evidence/qa-gates/`. No suite is run.
   - Sources: the greatest `stage-r-powershell-test-baseline.*.md` (pass and fail counts, repo-wide line coverage, `scripts/dev-tools/ProcessReductionLedger.psm1` coverage); the greatest `stage-r-powershell-static.*.md` (static state of the ledger files); the greatest `stage-r-powershell-format-lint.*.md` and `stage-r-powershell-test.*.md` under `qa-gates/` (static state and coverage of `scripts/dev-tools/ProcessReductionChain.psm1` and its two test files, the file this cycle edits, which has no earlier baseline run); the greatest `stage-r-patch-chain-gate.*.md` under `evidence/other/` (the git-level chain gate result). The python baseline is cited as not owed because no Python file changes.
   - Output Summary: each figure with its source artifact name; the chain gate result (both checks exit 0, equal and attributed path counts, unattributed 0).
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and every figure is numeric and traced to a named artifact.
