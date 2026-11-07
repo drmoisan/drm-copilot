@@ -217,7 +217,7 @@ Other suites:
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:` and the six paths in order.
 - [x] [P0-T2] Fetch `origin/epic/documentation-estate-tooling-integration`, derive `MERGE_BASE`, confirm `artifacts/orchestration/orchestrator-state.json` selects the `large` or `remediation` route and is not terminal, and write `FEATURE/evidence/remediation-baseline/preconditions.<timestamp>.md`.
   - Acceptance: the artifact records `MERGE_BASE`, the route value, the logical line count of `HOOK`, and equal SHA-256 values for the `.claude/hooks` and `.codex/hooks` pair of `enforce-epic-merge-gate-command.ps1`. Any failure stops the run as BLOCKED.
-- [ ] [P0-T3] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `HOOK` and `HOOK_SUITE`, and write `FEATURE/evidence/remediation-baseline/pssa.<timestamp>.md`.
+- [x] [P0-T3] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `HOOK` and `HOOK_SUITE`, and write `FEATURE/evidence/remediation-baseline/pssa.<timestamp>.md`.
   - Acceptance: the artifact records the finding count per file.
 - [ ] [P0-T4] Record the Pester coverage baseline of `HOOK` in `FEATURE/evidence/remediation-baseline/pester-coverage.<timestamp>.md`.
   - The baseline is the line coverage recorded in `FEATURE/evidence/regression-testing/pester-parallel.2026-11-07T02-05.md`. The task confirms that `HOOK` shows no diff between the commit that added that artifact and `HEAD`. Only when that diff is not empty, this task runs one `Invoke-PoshQCParallelTest` and reads the figure from its merged coverage XML instead.
