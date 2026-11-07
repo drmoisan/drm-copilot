@@ -90,7 +90,7 @@ Premise corrections, each read against the tree:
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run format and lint over the changed PowerShell, Python, and TypeScript files, the mirror and generator checks, and the ledger replay, and write `FEATURE/evidence/qa-gates/stage-f1-format-lint-ledger.<timestamp>.md`.
+- [x] [P2-T1] Run format and lint over the changed PowerShell, Python, and TypeScript files, the mirror and generator checks, and the ledger replay, and write `FEATURE/evidence/qa-gates/stage-f1-format-lint-ledger.<timestamp>.md`.
   - Changed files: every `.ps1`, `.psm1`, `.py`, and `.ts` path in the diff from the merge base of `origin/main` and `HEAD` (after the merge this is the branch's own change set), plus those paths in the working tree status.
   - PowerShell: `Invoke-PoshQCFormat` check-only with a no-op `-WriteFile`, then `Invoke-ScriptAnalyzer` directly with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`. Acceptance: an `Already formatted: ` line and no `Formatted: ` line per file, and findings number zero.
   - Python and TypeScript: Black check, Ruff check without fixing, and Pyright; Prettier check, ESLint, and `tsc` with the test project. Acceptance: Black reports each file unchanged and every other exit is 0.
