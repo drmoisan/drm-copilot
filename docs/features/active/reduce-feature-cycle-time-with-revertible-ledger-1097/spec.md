@@ -174,11 +174,11 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [x] [D] Invariant 8 also rejects a light cycle with findings above the threshold, a consecutive light cycle, and a light cycle carrying a `preflight` object.
 - [x] [D] The reviewer's `Remediation-Path` choice can be moved only heavier, the skills state the threshold and the Python CLI route of D9, and the light reduction lands as its own commit with its entry.
 - [x] [E] An entry for #1094, the parallel-only test gates, exists with the prior text from its pre-merge state.
-- [ ] [E] The planning skill and all its mirrored copies state the standing rule.
-- [ ] [E] The smaller-plans text states the design-level target of 15 to 20 tasks and lands as its own commit with its entry.
+- [x] [E] The planning skill and all its mirrored copies state the standing rule.
+- [x] [E] The smaller-plans text states the design-level target of 15 to 20 tasks and lands as its own commit with its entry.
 - [ ] [E] The policy-read task, its artifact requirement, and the hook's policy-read check are removed in one commit with its entry; a plan that keeps the task stays valid; and every baseline requirement string named in research section 3 is present before and after.
-- [ ] [E] Applying one entry's revert steps to a test copy restores the prior behavior for at least one sample reduction: in memory, the reverted `Get-PlanStructureValidationReport` returns the policy-read error and the live function does not.
-- [ ] [E] Wording deferred from stages A to D has landed, with each affected ledger entry updated in the same commit.
+- [x] [E] Applying one entry's revert steps to a test copy restores the prior behavior for at least one sample reduction: in memory, the reverted `Get-PlanStructureValidationReport` returns the policy-read error and the live function does not.
+- [x] [E] Wording deferred from stages A to D has landed, with each affected ledger entry updated in the same commit.
 - [ ] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
 - [ ] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
 - [ ] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
