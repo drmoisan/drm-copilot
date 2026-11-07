@@ -81,7 +81,7 @@ criteria, R to criteria the research shows are necessary.
 - [x] (E2, provisional OQ-C) `-AnalysisMethod native` fails closed with exit 3 when native analysis is unavailable; `-AnalysisMethod scanner` never invokes the interpreter.
 - [x] (E3) The helper never imports, executes, compiles or evaluates analyzed code; `ast.parse` is its only parsing entry, verified by a source-inspection test and a behavioral test.
 - [x] (E4) The Python helper is listed only in the Claude python pack manifest; the core pack lists no `.py` file and lists the PowerShell adapter.
-- [ ] (E5) Python line coverage >= 85% and branch coverage >= 75% per helper file; Pester line coverage >= 85% per PowerShell production file this feature adds or edits.
+- [x] (E5) Python line coverage >= 85% and branch coverage >= 75% per helper file; Pester line coverage >= 85% per PowerShell production file this feature adds or edits.
 - [ ] (E5) Black, Ruff and Pyright (strict) report no findings for the helper and its tests, and the Python tests pass on the Python 3.11 floor, verified by the CI matrix (3.11, 3.12 and 3.13).
 - [x] (R) Every inventory element records `analysis_method` (`native` or `scanner`); `config-files` and non-`.py` elements always record `scanner`.
 - [x] (R) Element identifiers and digests have a single implementation in PowerShell (`Get-DocsElementId` and the shared declaration-digest function); the helper computes neither.
