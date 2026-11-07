@@ -16,8 +16,9 @@
     load its functions. The body writes the outcome of Invoke-DocsCommandCli and exits.
 
     The real command context reads and writes under RepositoryRoot. Its InvokeProcess member
-    forwards unchanged to the thin seam Invoke-DocsProcess; argument validation and result
-    shaping are the pure functions ConvertTo-DocsProcessRequest and ConvertTo-DocsProcessResult.
+    forwards its four arguments to the thin seam Invoke-DocsProcess with RepositoryRoot as the
+    working directory; argument validation and result shaping are the pure functions
+    ConvertTo-DocsProcessRequest and ConvertTo-DocsProcessResult.
 
 .NOTES
     Issue #1020. Requires PowerShell 7.4 or later. No external module dependencies.
@@ -204,9 +205,9 @@ function Invoke-DocsProcess {
         Thin process seam: starts one child without a shell and returns its shaped result.
     .DESCRIPTION
         Validation is ConvertTo-DocsProcessRequest and shaping is ConvertTo-DocsProcessResult; this
-        function adds neither. The working directory is WorkingDirectory, which defaults to the
-        current location (callers run with the repository root as the current location). No test
-        executes this body.
+        function adds neither. The working directory is WorkingDirectory. Its default, the current
+        location, applies only to a direct caller; the real command context always passes its
+        repository root. No test executes this body.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -335,6 +336,20 @@ function Write-DocsContextText {
     Write-DocsFileText -FullPath (Get-DocsContextFullPath -Root $Root -RelativePath $RelativePath) -Text $Text -Mode $Mode
 }
 
+function Invoke-DocsContextProcess {
+    <#
+    .SYNOPSIS
+        InvokeProcess operation: runs Invoke-DocsProcess in the repository root (private helper).
+    .DESCRIPTION
+        The four arguments stay untyped, so ConvertTo-DocsProcessRequest validates the values it received.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([string] $Root, $FilePath, $ArgumentList, $StdinText, $TimeoutSeconds)
+
+    return Invoke-DocsProcess -FilePath $FilePath -ArgumentList $ArgumentList -StdinText $StdinText -TimeoutSeconds $TimeoutSeconds -WorkingDirectory $Root
+}
+
 function New-DocsCommandContext {
     <#
     .SYNOPSIS
@@ -344,7 +359,8 @@ function New-DocsCommandContext {
         InvokeProcess. Relative paths are checked with Test-DocsRelativePath before any access.
         ReadText decodes through ConvertFrom-DocsUtf8Bytes and throws an item-not-found error for
         an absent file. WriteText forwards the full path, text and mode to Write-DocsFileText;
-        InvokeProcess forwards its four arguments unchanged to Invoke-DocsProcess.
+        InvokeProcess forwards its four arguments to Invoke-DocsProcess with the repository root
+        as the working directory.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds an in-memory context object; the members, not this factory, perform I/O.')]
     [CmdletBinding()]
@@ -352,21 +368,22 @@ function New-DocsCommandContext {
     param([Parameter(Mandatory = $true)] [string] $RepositoryRoot)
 
     $root = [System.IO.Path]::GetFullPath($RepositoryRoot)
-    # Each repository member is a closure over the root whose [scriptblock] Operation parameter
-    # defaults to a script function. A closure resolves no script or module command by name, and
-    # the script function resolves its callees (and any test mock of them) at call time.
+    # Each repository member, InvokeProcess included, is a closure over the root whose [scriptblock]
+    # Operation parameter defaults to a script function. A closure resolves no script or module
+    # command by name, and the script function resolves its callees (and any test mock of them)
+    # at call time.
     $readTextOperation = ${function:Read-DocsContextText}
     $readBytesOperation = ${function:Read-DocsContextByte}
     $testFileOperation = ${function:Test-DocsContextFile}
     $listFileOperation = ${function:Get-DocsContextFileList}
     $writeTextOperation = ${function:Write-DocsContextText}
+    $invokeProcessOperation = ${function:Invoke-DocsContextProcess}
     $readText = { param($RelativePath, [scriptblock] $Operation = $readTextOperation) & $Operation $root $RelativePath }.GetNewClosure()
     $readBytes = { param($RelativePath, [scriptblock] $Operation = $readBytesOperation) & $Operation $root $RelativePath }.GetNewClosure()
     $testFile = { param($RelativePath, [scriptblock] $Operation = $testFileOperation) & $Operation $root $RelativePath }.GetNewClosure()
     $listFile = { param($RelativeRoot, [scriptblock] $Operation = $listFileOperation) & $Operation $root $RelativeRoot }.GetNewClosure()
     $writeText = { param($RelativePath, $Text, $Mode, [scriptblock] $Operation = $writeTextOperation) & $Operation $root $RelativePath $Text $Mode }.GetNewClosure()
-    # Bound (non-closure) member: Invoke-DocsProcess, or a test mock of it, is resolved at call time.
-    $invokeProcess = { param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds) Invoke-DocsProcess -FilePath $FilePath -ArgumentList $ArgumentList -StdinText $StdinText -TimeoutSeconds $TimeoutSeconds }
+    $invokeProcess = { param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds, [scriptblock] $Operation = $invokeProcessOperation) & $Operation $root $FilePath $ArgumentList $StdinText $TimeoutSeconds }.GetNewClosure()
     $utcNow = { [datetime]::UtcNow }
 
     return [pscustomobject]@{
