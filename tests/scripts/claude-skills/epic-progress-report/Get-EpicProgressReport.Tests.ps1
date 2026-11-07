@@ -5,6 +5,8 @@
 # matching parameter signature; no test starts git, gh, or cswap, writes a file, or reads
 # the clock.
 # Issue #1093 added the -PairSamples write case for a run within 90 seconds of the last sample.
+# Issue #1118 replaced the task goldens with hand-derived step goldens and the stored states
+# with version-2 documents; item mode and parameter sets are in Get-EpicProgressReport.ItemMode.Tests.ps1.
 
 BeforeAll {
     $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1'
@@ -107,36 +109,75 @@ Describe 'Invoke-EpicProgressReport' {
         $script:livePlan = "### Phase 0 - Setup`n- [x] [P0-T1] Read.`n### Phase 1 - Build`n- [ ] [P1-T1] a.`n- [ ] [P1-T2] b.`n- [ ] [P1-T3] c.`n- [ ] [P1-T4] d."
         $script:checkpointJson = '{"features":[{"issue_num":12,"branch_name":"feature/alpha","merge_status":"merged"},{"issue_num":12345,"branch_name":"feature/beta","merge_status":"in_progress"}]}'
 
+        # Hand-derived step goldens. No item has a checkpoint, so stage_timing is absent:
+        # #12 is merged, so all 10 item steps (8 non-execution types plus 2 tasks) are done.
+        # #12345 has a prepared plan (research, spec, plan done), a checked task (preflight
+        # done, 1 of 5 tasks), and PR #8 (pr done): 6 of 13. #77 has a prepared plan: 3 of 11.
+        # The integration-pr epic step remains: 19 of 35 steps (54.3%). No sample exists, so
+        # every type uses its default: preflight 1 x 10 + execution 7 x 5 + review 2 x 14 +
+        # pr 1 x 3 + ci 2 x 17 + merge 2 x 5 + integration-pr 1 x 45 = 165 min (2.75 h). Wave
+        # 2 holds 56 min and wave 3 64 min, plus 45 min of epic steps: also 165 min.
         $script:expectedTldr = @(
-            '**TL;DR:** Epic #42 is at 3 of 10 tasks (30%). 1 of 3 features are done. #12345 is running (1 of 5).'
-            '**Elapsed:** 3 h 00 min, with about 10 hours left on the wave-parallel estimate. **Weekly** quota is at 42.5%.'
-            '**Avg Velocity:** 1 tasks / hr. **Recent Velocity:** n/a tasks / hr since last check-in. (SD of recent velocity: n/a, from 0 intervals)'
-            '**Estimated time remaining:** 09:30 hrs (range needs 3 or more check-in intervals)'
+            '**TL;DR:** Epic #42 is at 19 of 35 steps (54.3%). 1 of 3 features are done. #12345 is running (6 of 13 steps).'
+            '**Elapsed:** 3 h 00 min, with about 2.8 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at 42.5%.'
+            '**Now:** no step is in progress. 10 of 10 types use defaults.'
+            '**Estimated time remaining:** 2 h 45 min by type (sum); 2 h 45 min wave-parallel.'
         )
+        $defaultLines = @(
+            'research 13', 'spec 6', 'plan 11', 'preflight 10', 'execution 5', 'review 14', 'pr 3', 'ci 17', 'merge 5', 'integration-pr 45' | ForEach-Object {
+                $type, $minutes = $_ -split ' '
+                "$($type): no measured duration; default $minutes min"
+            })
         $script:expectedFull = @(
             ''
             '## Epic #42 example-epic: status at 12:00 UTC, Jan 5'
             ''
-            '**Elapsed:** 3 h 00 min since 09:00 UTC. **Progress:** 3 of 10 tasks complete, **30%**.'
+            '**Elapsed:** 3 h 00 min since 09:00 UTC. **Progress:** 19 of 35 steps complete, **54.3%**.'
             ''
             '| State | Features |'
             '|---|---|'
             '| Completed | #12 |'
-            '| Running | #12345 (wave 2, large): 1 of 5 tasks (20%). Now at: Phase 1 - Build. PR #8 OPEN. |'
-            '| Pending, wave 3 | #77 (3) |'
+            '| Running | #12345 (wave 2, large): 6 of 13 steps (46%). Now at: Phase 1 - Build. PR #8 OPEN. |'
+            '| Blocked | None |'
+            '| Pending, wave 3 | #77 (11) |'
             ''
-            '| Wave | Children | Tasks | Done |'
+            '| Wave | Children | Steps | Done |'
             '|---|---|---|---|'
-            '| 1 | 1 | 2 | 2 |'
-            '| 2 | 1 | 5 | 1 |'
-            '| 3 | 1 | 3 | 0 |'
-            '| **Total** | **3** | **10** | **3** |'
+            '| 1 | 1 | 10 | 10 |'
+            '| 2 | 1 | 13 | 6 |'
+            '| 3 | 1 | 11 | 3 |'
+            '| Epic | 0 | 1 | 0 |'
+            '| **Total** | **3** | **35** | **19** |'
             ''
-            "**Velocity:** 1 tasks per hour (one child's pace). **Remaining:** 7 tasks."
-            '- Straight line, no parallelism: about 7 h 00 min (upper bound).'
-            '- Wave-parallel (longest chain 7 tasks plus about 1.25 h per open wave for review and CI): about **9 h 30 min**.'
+            '| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |'
+            '|---|---|---|---|---|---|---|---|'
+            '| research | 3 | 0 | 0 | 0 | 0 h 13 min (default) | 0 | 0 h 00 min |'
+            '| spec | 3 | 0 | 0 | 0 | 0 h 06 min (default) | 0 | 0 h 00 min |'
+            '| plan | 3 | 0 | 0 | 0 | 0 h 11 min (default) | 0 | 0 h 00 min |'
+            '| preflight | 2 | 0 | 1 | 0 | 0 h 10 min (default) | 0 | 0 h 10 min |'
+            '| execution | 3 | 0 | 7 | 0 | 0 h 05 min (default) | 0 | 0 h 35 min |'
+            '| review | 1 | 0 | 2 | 0 | 0 h 14 min (default) | 0 | 0 h 28 min |'
+            '| pr | 2 | 0 | 1 | 0 | 0 h 03 min (default) | 0 | 0 h 03 min |'
+            '| ci | 1 | 0 | 2 | 0 | 0 h 17 min (default) | 0 | 0 h 34 min |'
+            '| merge | 1 | 0 | 2 | 0 | 0 h 05 min (default) | 0 | 0 h 10 min |'
+            '| integration-pr | 0 | 0 | 1 | 0 | 0 h 45 min (default) | 0 | 0 h 45 min |'
+            '| **Total** | **19** | **0** | **16** | **0** | | **0** | **2 h 45 min** |'
+            ''
+            $defaultLines
+            '**Unmapped and composite stage time:** none.'
             "**Weekly quota (active account):** 42.5% used, +42.5 points since the epic started. This pool also covers the other runs in this session, so it is not the epic's cost alone."
         )
+        # A version-2 store whose anchors match the fixture plans: P0-T1 of #12345 is checked, #77 has none.
+        $script:anchorItems = '"items":{"12345":{"plans":{"plan.md":{"checked":["P0-T1"],"lastTickUnixSeconds":1767610000}},"blockedSinceUnixSeconds":null},"77":{"plans":{"plan.md":{"checked":[],"lastTickUnixSeconds":1767610000}},"blockedSinceUnixSeconds":null}}'
+
+        function Get-TestStateText {
+            # A version-2 state document with the given start, baseline, weekly baseline, sample offsets, and done count.
+            param([long] $Start = 1767603600, [int] $BaselineDone = 0, [double] $Weekly = 0, [int[]] $Offset = @(), [int] $Done = 19, [string] $Extra = '')
+            $samples = @($Offset | ForEach-Object { "{`"ts`":$($script:fixedNowUnix - $_),`"done`":$Done}" }) -join ','
+            $tail = ''
+            if ($Extra) { $tail = ",$Extra" }
+            "{`"version`":2,`"unit`":`"steps`",`"startUnixSeconds`":$Start,`"baselineDone`":$BaselineDone,`"baselineWeeklyPct`":$Weekly,`"samples`":[$samples]$tail}"
+        }
 
         function Get-TestReportLine {
             param([hashtable] $Extra = @{})
@@ -253,7 +294,7 @@ Describe 'Invoke-EpicProgressReport' {
 
         Should -Invoke Read-EpicProgressFile -Times 1 -Exactly -ParameterFilter { $Path -eq $script:livePlanPath }
         $script:gitCalls | Should -Not -Contain "show $($script:integration):docs/b/plan.md"
-        $lines | Should -Contain '| Running | #12345 (wave 2, large): 1 of 5 tasks (20%). Now at: Phase 1 - Build. PR #8 OPEN. |'
+        $lines | Should -Contain '| Running | #12345 (wave 2, large): 6 of 13 steps (46%). Now at: Phase 1 - Build. PR #8 OPEN. |'
     }
 
     It 'prints n/a quota when cswap is not installed' {
@@ -280,7 +321,7 @@ Describe 'Invoke-EpicProgressReport' {
         $lines = Get-TestReportLine
 
         Should -Invoke Invoke-GhExe -Times 0 -Exactly
-        $lines | Should -Contain '| Running | #12345 (wave 2, large): 1 of 5 tasks (20%). Now at: Phase 1 - Build. |'
+        $lines | Should -Contain '| Running | #12345 (wave 2, large): 5 of 13 steps (38%). Now at: Phase 1 - Build. |'
         $lines | Should -Contain '| Completed | #12 |'
     }
 
@@ -289,7 +330,7 @@ Describe 'Invoke-EpicProgressReport' {
 
         $lines = Get-TestReportLine
 
-        $lines | Should -Contain '| Running | #12345 (wave 2, large): 1 of 5 tasks (20%). Now at: Phase 1 - Build. |'
+        $lines | Should -Contain '| Running | #12345 (wave 2, large): 5 of 13 steps (38%). Now at: Phase 1 - Build. |'
     }
 
     It 'treats an unparseable state file as empty' {
@@ -332,17 +373,21 @@ Describe 'Invoke-EpicProgressReport' {
         $script:stateWrites.Count | Should -Be 1
         $script:stateWrites[0].Path | Should -Be $script:statePath
         $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        $written.version | Should -Be 2
+        $written.unit | Should -Be 'steps'
         @($written.samples).Count | Should -Be 1
         $written.samples[0].ts | Should -Be $script:fixedNowUnix
-        $written.samples[0].done | Should -Be 3
+        # 19 done steps (see the golden comment).
+        $written.samples[0].done | Should -Be 19
         # 1767603600 is the fixture start, 2026-01-05T09:00:00Z.
         $written.startUnixSeconds | Should -Be 1767603600
         $written.baselineDone | Should -Be 0
     }
 
     It 'does not write the state file within 90 seconds of the last sample' {
+        # A version-2 store whose newest sample is 50 s old and whose anchors match the fixture plans.
         $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
-        $script:fileText[$script:statePath] = "[{`"ts`":$($script:fixedNowUnix - 50),`"done`":3}]"
+        $script:fileText[$script:statePath] = Get-TestStateText -Offset @(50) -Extra $script:anchorItems
 
         $null = Get-TestReportLine
 
@@ -374,7 +419,7 @@ Describe 'Invoke-EpicProgressReport' {
     It 'clears stored samples and writes the resolved baseline with -ResetBaseline' {
         # The stored start (08:00 UTC), baseline done, and samples are discarded; the weekly baseline is kept.
         $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
-        $script:fileText[$script:statePath] = "{`"version`":1,`"startUnixSeconds`":1767600000,`"baselineDone`":1,`"baselineWeeklyPct`":12.5,`"samples`":[{`"ts`":$($script:fixedNowUnix - 600),`"done`":2},{`"ts`":$($script:fixedNowUnix - 30),`"done`":3}]}"
+        $script:fileText[$script:statePath] = Get-TestStateText -Start 1767600000 -BaselineDone 1 -Weekly 12.5 -Offset @(600, 30) -Done 18
         $arguments = $script:reportParameter.Clone()
         $arguments.Remove('StartUtc')
         $arguments['ResetBaseline'] = $true
@@ -385,17 +430,37 @@ Describe 'Invoke-EpicProgressReport' {
         $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
         @($written.samples).Count | Should -Be 1
         $written.samples[0].ts | Should -Be $script:fixedNowUnix
-        $written.samples[0].done | Should -Be 3
+        $written.samples[0].done | Should -Be 19
         $written.startUnixSeconds | Should -Be $script:fixedNowUnix
-        $written.baselineDone | Should -Be 3
+        $written.baselineDone | Should -Be 19
         $written.baselineWeeklyPct | Should -Be 12.5
+    }
+
+    It 'keeps the durations ledger and anchors with -ResetBaseline' {
+        # Decision D10: the reset clears the samples and the blocked span of #77 and keeps the
+        # review duration and the tick anchors.
+        $duration = '"durations":{"review":[{"key":"12|review|1","type":"review","seconds":780,"source":"stage_timing","approx":false,"recorded":1767600000}]}'
+        $items = $script:anchorItems.Replace('"77":{"plans":{"plan.md":{"checked":[],"lastTickUnixSeconds":1767610000}},"blockedSinceUnixSeconds":null}', '"77":{"plans":{"plan.md":{"checked":[],"lastTickUnixSeconds":1767610000}},"blockedSinceUnixSeconds":1767612000}')
+        $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
+        $script:fileText[$script:statePath] = Get-TestStateText -Offset @(600) -Extra "$duration,$items"
+
+        $null = Get-TestReportLine -Extra @{ ResetBaseline = $true }
+
+        $script:stateWrites.Count | Should -Be 1
+        $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        @($written.durations.review).Count | Should -Be 1
+        $written.durations.review[0].seconds | Should -Be 780
+        @($written.items.'12345'.plans.'plan.md'.checked) | Should -Be @('P0-T1')
+        $written.items.'12345'.plans.'plan.md'.lastTickUnixSeconds | Should -Be 1767610000
+        $written.items.'77'.plans.'plan.md'.lastTickUnixSeconds | Should -Be 1767610000
+        $written.items.'77'.blockedSinceUnixSeconds | Should -BeNullOrEmpty
+        @($written.samples).Count | Should -Be 1
     }
 
     It 'rewrites the stored samples in pairs with -PairSamples' {
         # The sample rule adds now to the four stored samples; pairing keeps now, now - 600 and now - 1200.
         $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
-        $stored = @(1200, 900, 600, 300 | ForEach-Object { "{`"ts`":$($script:fixedNowUnix - $_),`"done`":2}" }) -join ','
-        $script:fileText[$script:statePath] = "{`"version`":1,`"startUnixSeconds`":1767603600,`"baselineDone`":0,`"baselineWeeklyPct`":0,`"samples`":[$stored]}"
+        $script:fileText[$script:statePath] = Get-TestStateText -Offset @(1200, 900, 600, 300) -Done 18
 
         $null = Get-TestReportLine -Extra @{ PairSamples = $true; Mode = 'TLDR' }
 
@@ -405,11 +470,10 @@ Describe 'Invoke-EpicProgressReport' {
     }
 
     It 'pairs and writes the stored samples with -PairSamples within 90 seconds of the last sample' {
-        # The newest stored sample is 30 seconds old, so the sample rule adds nothing and only the -PairSamples term of the write condition in Invoke-EpicProgressReport causes the write.
+        # The newest stored sample is 30 seconds old and the anchors match, so only the -PairSamples term of the write condition in Invoke-EpicProgressReport causes the write.
         $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
-        $stored = @(1230, 930, 630, 330, 30 | ForEach-Object { "{`"ts`":$($script:fixedNowUnix - $_),`"done`":2}" }) -join ','
         # 1767600000 is the stored start, 2026-01-05T08:00:00Z, which differs from the fixture -StartUtc.
-        $script:fileText[$script:statePath] = "{`"version`":1,`"startUnixSeconds`":1767600000,`"baselineDone`":1,`"baselineWeeklyPct`":12.5,`"samples`":[$stored]}"
+        $script:fileText[$script:statePath] = Get-TestStateText -Start 1767600000 -BaselineDone 1 -Weekly 12.5 -Offset @(1230, 930, 630, 330, 30) -Extra $script:anchorItems
         $arguments = $script:reportParameter.Clone()
         $arguments.Remove('StartUtc')
         $arguments['PairSamples'] = $true
@@ -435,45 +499,35 @@ Describe 'Invoke-EpicProgressReport' {
         Should -Invoke Invoke-GitExe -Times 0 -Exactly
     }
 
+    It 'rejects an unknown -StepDefaultMinutes type before any I/O' {
+        { Get-TestReportLine -Extra @{ StepDefaultMinutes = @{ deploy = 5 } } } | Should -Throw -ExpectedMessage "*key 'deploy' is not a step type*"
+
+        Should -Invoke Test-EpicProgressPath -Times 0 -Exactly
+        Should -Invoke Invoke-GitExe -Times 0 -Exactly
+    }
+
+    It 'rejects a non-positive -StepDefaultMinutes value before any I/O' {
+        { Get-TestReportLine -Extra @{ StepDefaultMinutes = @{ ci = 0 } } } | Should -Throw -ExpectedMessage "*value for 'ci' must be a number of minutes above 0*"
+
+        Should -Invoke Read-EpicProgressFile -Times 0 -Exactly
+        Should -Invoke Invoke-GitExe -Times 0 -Exactly
+    }
+
     It 'prints the Full golden for a legacy four-sample state' {
-        # Expected lines captured from the merged tool before any edit (evidence/baseline/full-golden-legacy-state.*.md).
+        # The legacy array (samples at now minus 10800, 7200, 3600, and 60 s with done 0 to 3)
+        # counted tasks, so it is migrated: the samples are discarded, the step goldens print,
+        # and one version-2 state is written with the current step count as its baseline.
         $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
-        # Legacy array: samples at fixed now minus 10800, 7200, 3600, and 60 seconds with done 0, 1, 2, and 3.
         $script:fileText[$script:statePath] = "[{`"ts`":$($script:fixedNowUnix - 10800),`"done`":0},{`"ts`":$($script:fixedNowUnix - 7200),`"done`":1},{`"ts`":$($script:fixedNowUnix - 3600),`"done`":2},{`"ts`":$($script:fixedNowUnix - 60),`"done`":3}]"
-        $expected = @(
-            '**TL;DR:** Epic #42 is at 3 of 10 tasks (30%). 1 of 3 features are done. #12345 is running (1 of 5).'
-            '**Elapsed:** 3 h 00 min, with about 10 hours left on the wave-parallel estimate. **Weekly** quota is at 42.5%.'
-            '**Avg Velocity:** 1 tasks / hr. **Recent Velocity:** 1 tasks / hr since last check-in. (SD of recent velocity: 0, from 3 intervals)'
-            '**Estimated time remaining:** 09:22 hrs to 09:39 hrs'
-            ''
-            '## Epic #42 example-epic: status at 12:00 UTC, Jan 5'
-            ''
-            '**Elapsed:** 3 h 00 min since 09:00 UTC. **Progress:** 3 of 10 tasks complete, **30%**.'
-            ''
-            '| State | Features |'
-            '|---|---|'
-            '| Completed | #12 |'
-            '| Running | #12345 (wave 2, large): 1 of 5 tasks (20%). Now at: Phase 1 - Build. PR #8 OPEN. |'
-            '| Pending, wave 3 | #77 (3) |'
-            ''
-            '| Wave | Children | Tasks | Done |'
-            '|---|---|---|---|'
-            '| 1 | 1 | 2 | 2 |'
-            '| 2 | 1 | 5 | 1 |'
-            '| 3 | 1 | 3 | 0 |'
-            '| **Total** | **3** | **10** | **3** |'
-            ''
-            "**Velocity:** 1 tasks per hour (one child's pace). **Remaining:** 7 tasks."
-            '- Straight line, no parallelism: about 7 h 00 min (upper bound).'
-            '- Wave-parallel (longest chain 7 tasks plus about 1.25 h per open wave for review and CI): about **9 h 30 min**.'
-            "**Weekly quota (active account):** 42.5% used, +42.5 points since the epic started. This pool also covers the other runs in this session, so it is not the epic's cost alone."
-        )
 
         $lines = Get-TestReportLine
 
-        $lines.Count | Should -Be 26
-        ($lines -join "`n") | Should -Be ($expected -join "`n")
-        $script:stateWrites.Count | Should -Be 0
+        $lines.Count | Should -Be ($script:expectedTldr.Count + $script:expectedFull.Count)
+        ($lines -join "`n") | Should -Be ((@($script:expectedTldr) + @($script:expectedFull)) -join "`n")
+        $script:stateWrites.Count | Should -Be 1
+        $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        $written.version | Should -Be 2
+        $written.baselineDone | Should -Be 19
     }
 }
 
