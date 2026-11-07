@@ -241,7 +241,7 @@ A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy with an enabled pro
 
 ### Phase 3 — Helper, Limits and Comparison
 
-- [ ] [P3-T1] Apply `## Design: Reader, View and Candidate Test` to `.claude/hooks/enforce-docs-complete-gate-target.ps1`, correct its header and comment-based help as `## Design: Limit Statement` states, and copy it byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate-target.ps1`.
+- [x] [P3-T1] Apply `## Design: Reader, View and Candidate Test` to `.claude/hooks/enforce-docs-complete-gate-target.ps1`, correct its header and comment-based help as `## Design: Limit Statement` states, and copy it byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate-target.ps1`.
   - The reader's help states the two new rules. The view's help states the removal of backslashes. The candidate's help states both forms and the evaluator rule.
   - Acceptance: the file parses; `@(Get-Content -LiteralPath .claude/hooks/enforce-docs-complete-gate-target.ps1).Count` is at most 500; the SHA-256 of the two copies is equal; the shared files show no diff against `MERGE_BASE`.
 - [ ] [P3-T2] Run branch-current Pester over `COMPOUND_SUITE`, `HELPER_SUITE`, `HOOK_SUITE`, `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1`, `tests/scripts/claude-hooks/PreToolUsePayload.Contract.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`, and write `FEATURE/evidence/regression-testing/gate-rows.<timestamp>.md`.

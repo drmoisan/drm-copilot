@@ -7,10 +7,10 @@
     enforce-epic-merge-gate-command.ps1. This file holds function definitions only and
     dot-sources nothing.
 
-    The design is a fail-closed allowlist. A command is first classified as a merge candidate by
-    a broad test, and a candidate reaches the selector lookup only when the whole command is
-    proven to be one plain gh pr merge. Every other candidate denies PR_UNRESOLVED, so a form
-    the grammar does not model can never lose its selector.
+    A command is first classified as a merge candidate by a test over its text. A candidate
+    reaches the selector lookup only when the reader accepts the whole command as one plain
+    gh pr merge, and every other candidate denies PR_UNRESOLVED. A command the candidate test
+    does not recognize is not gated, as the Residual limits paragraph of the hook header states.
 
     Pure string logic only: no disk, process, network, clock, or environment access.
 #>
@@ -28,6 +28,12 @@ function Read-DocsCompleteGatePlainCommand {
         literal word, or [n]>& followed by digits or a dash; digits directly before the operator
         are the file descriptor, as bash reads them. Redirections are removed from Words, and a
         word after a redirection is not plain. Any other character is not plain.
+
+        Two rules read the raw text, because the shared normalizer turns a backslash-newline into
+        a space before the scan. Bash does not continue a comment at a backslash, so a comment in
+        text holding a backslash-newline is not plain. Bash joins the two halves of a word split
+        by a backslash-newline, so a backslash-newline with a non-blank character on both sides
+        is not plain.
     .PARAMETER CommandText
         The Bash command text.
     .OUTPUTS
@@ -38,6 +44,8 @@ function Read-DocsCompleteGatePlainCommand {
     param([Parameter(Mandatory)] [AllowEmptyString()] [string] $CommandText)
 
     $notPlain = @{ IsPlain = $false; Words = @() }
+    if ([regex]::IsMatch($CommandText, '\S\\\r?\n\S')) { return $notPlain }
+    $hasContinuation = [regex]::IsMatch($CommandText, '\\\r?\n')
     $wordCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_./:=@%+,#-'
     $text = (ConvertTo-CommandLineNormalizedText -CommandText $CommandText).Trim()
     $words = [System.Collections.Generic.List[string]]::new()
@@ -49,7 +57,7 @@ function Read-DocsCompleteGatePlainCommand {
         $character = $text[$index]
         if ($character -eq ' ' -or $character -eq "`t") { $index++; continue }
         if ($character -eq '#') {
-            if ($awaitingTarget -or $text.IndexOf("`n", $index) -ge 0) { return $notPlain }
+            if ($awaitingTarget -or $hasContinuation -or $text.IndexOf("`n", $index) -ge 0) { return $notPlain }
             break
         }
         if (-not $awaitingTarget) {
@@ -112,8 +120,9 @@ function Get-DocsCompleteGateUnquotedView {
         Returns the unquoted text of a command.
     .DESCRIPTION
         Joins the MaskedText of every Read-CommandLineSegment record over the normalized text
-        with a space. Quoted spans and heredoc bodies are blank in this view; operators and
-        leading words do not affect it.
+        with a space, then removes every backslash, because bash drops the backslash of an escaped
+        character in a word and g\h runs gh. Quoted spans and heredoc bodies are blank in this
+        view; operators and leading words do not affect it.
     .PARAMETER CommandText
         The Bash command text.
     .OUTPUTS
@@ -124,21 +133,59 @@ function Get-DocsCompleteGateUnquotedView {
     param([Parameter(Mandatory)] [AllowEmptyString()] [string] $CommandText)
 
     $normalized = ConvertTo-CommandLineNormalizedText -CommandText $CommandText
-    return (@(Read-CommandLineSegment -CommandText $normalized | ForEach-Object { $_.MaskedText }) -join ' ')
+    return ((@(Read-CommandLineSegment -CommandText $normalized | ForEach-Object { $_.MaskedText }) -join ' ').Replace('\', ''))
+}
+
+function Test-DocsCompleteGateMergeText {
+    <#
+    .SYNOPSIS
+        Reports whether text holds the words of a gh merge.
+    .DESCRIPTION
+        True when Text holds the whole words gh, pr, merge in that order, or the whole words gh,
+        api in that order while Test-EpicMergeGateApiMutationText is true for MutationText. The
+        words match in any case.
+    .PARAMETER Text
+        The text searched for the words.
+    .PARAMETER MutationText
+        The text searched for a merge mutation or endpoint. It can differ from Text because a
+        merge endpoint or mutation name is usually quoted.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $Text,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $MutationText
+    )
+
+    $options = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::CultureInvariant -bor [System.Text.RegularExpressions.RegexOptions]::Singleline
+    if ([regex]::IsMatch($Text, '(?<![\w-])gh(?![\w-]).*(?<![\w-])pr(?![\w-]).*(?<![\w-])merge(?![\w-])', $options)) { return $true }
+    if ([regex]::IsMatch($Text, '(?<![\w-])gh(?![\w-]).*(?<![\w-])api(?![\w-])', $options)) {
+        return (Test-EpicMergeGateApiMutationText -Text $MutationText)
+    }
+    return $false
 }
 
 function Test-DocsCompleteGateMergeCandidate {
     <#
     .SYNOPSIS
-        Reports whether a command may merge a pull request.
+        Reports whether the text of a command reads as a gh merge.
     .DESCRIPTION
         Decides in this order. A plain command whose first word is gh is read with the structural
         walk: on a match it is a candidate unless its operands are --disable-auto only, and on any
         other outcome Test-EpicMergeGateCommandInScope decides, because the walk does not read
-        gh api. Otherwise that predicate being true means candidate. Otherwise the unquoted view
-        decides: it is a candidate when it holds the whole words gh, pr, merge in that order, or
-        gh, api in that order while the normalized text, with its quotes intact, names a merge
-        mutation or endpoint. A merge endpoint or mutation name is usually quoted.
+        gh api. Otherwise that predicate being true means candidate.
+
+        Otherwise the text decides, for two forms of the command: the raw text, and the raw text
+        with each backslash-newline deleted. A comment ending in a backslash needs the first form
+        and a split word needs the second. In each form the view is the unquoted view, and the
+        spelled text is the normalized text with every single quote, double quote and backslash
+        removed, so it includes quoted spans and heredoc bodies. The command is a candidate when
+        Test-DocsCompleteGateMergeText is true for the view, with the spelled text as its mutation
+        text, or when the view holds an evaluator word and that test is true for the spelled text.
+        The evaluator words are whole words in any case: sh, bash, zsh, dash, ksh, pwsh,
+        powershell, eval, source.
     .PARAMETER CommandText
         The Bash command text.
     .OUTPUTS
@@ -159,11 +206,13 @@ function Test-DocsCompleteGateMergeCandidate {
     }
     if (Test-EpicMergeGateCommandInScope -CommandText $CommandText) { return $true }
 
-    $view = Get-DocsCompleteGateUnquotedView -CommandText $CommandText
-    $options = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::CultureInvariant -bor [System.Text.RegularExpressions.RegexOptions]::Singleline
-    if ([regex]::IsMatch($view, '(?<![\w-])gh(?![\w-]).*(?<![\w-])pr(?![\w-]).*(?<![\w-])merge(?![\w-])', $options)) { return $true }
-    if ([regex]::IsMatch($view, '(?<![\w-])gh(?![\w-]).*(?<![\w-])api(?![\w-])', $options)) {
-        return (Test-EpicMergeGateApiMutationText -Text (ConvertTo-CommandLineNormalizedText -CommandText $CommandText))
+    $evaluator = '(?<![\w-])(?:sh|bash|zsh|dash|ksh|pwsh|powershell|eval|source)(?![\w-])'
+    $options = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::CultureInvariant
+    foreach ($form in @($CommandText, [regex]::Replace($CommandText, '\\\r?\n', ''))) {
+        $view = Get-DocsCompleteGateUnquotedView -CommandText $form
+        $spelled = (ConvertTo-CommandLineNormalizedText -CommandText $form) -replace '[''"\\]', ''
+        if (Test-DocsCompleteGateMergeText -Text $view -MutationText $spelled) { return $true }
+        if ([regex]::IsMatch($view, $evaluator, $options) -and (Test-DocsCompleteGateMergeText -Text $spelled -MutationText $spelled)) { return $true }
     }
     return $false
 }
