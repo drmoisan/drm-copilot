@@ -51,7 +51,7 @@ No test suite runs in this phase.
   - Steps 1 to 3 and the `Rules:` list stay, so the evidence rule then applies to the gates.
   - `.claude/agents/staged-review.md` holds no test step, and `.codex/agents/staged-review.toml` holds none, so neither changes.
   - Acceptance: both copies hold `Invoke-PoshQCParallelTest`, `pytest -n auto`, and `debugging only`, neither holds `smallest applicable subset` or `repo-required full test suite`, and the copies are equal.
-- [ ] [P1-T2] Apply the debugging statement to `.github/agents/tdd-green.agent.md` and `.github/agents/tdd-red.agent.md`, reword the verification steps of `docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md`, and copy each file to its bundle.
+- [x] [P1-T2] Apply the debugging statement to `.github/agents/tdd-green.agent.md` and `.github/agents/tdd-red.agent.md`, reword the verification steps of `docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md`, and copy each file to its bundle.
   - In `## Execution Guidelines`, the statement follows the text of `tdd-green` step 2 `Run the failing test` and of `tdd-red` step 5 `Verify the test fails`. The step text stays, as the inputs direct.
   - In the bug template, task `[P4-T1]` becomes `Re-run the repro to confirm expected behavior`, and the test result stays with `[P4-T2]`.
   - In the same file, the sweep found the same class in task `[P2-T2]`. Its text after the `[expect-fail]` tag becomes `Run the parallel test gate to confirm the new regression test fails and captures the repro`. This matches the expect-fail example in `.github/agents/atomic_planning.agent.md`, whose acceptance is the gate failing on the new test.
