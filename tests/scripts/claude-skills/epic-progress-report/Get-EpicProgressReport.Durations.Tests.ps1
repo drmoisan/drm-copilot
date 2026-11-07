@@ -136,3 +136,114 @@ Describe 'Get-EpicProgressStageSample and Merge-EpicProgressDuration' {
         $result.Ledger['execution'][-1].key | Should -Be 'k1002'
     }
 }
+
+Describe 'Get-EpicProgressTickSample and Get-EpicProgressBlockedSecond' {
+    BeforeAll {
+        # Four tasks; P0-T1 was checked at the last tick (1000), and P0-T2 to P0-T4 are checked now (1900).
+        $script:batchPlan = "- [x] [P0-T1] a.`n- [x] [P0-T2] b.`n- [x] [P0-T3] c.`n- [x] [P0-T4] d."
+        $script:priorAnchor = [pscustomobject]@{ Checked = [string[]] @('P0-T1'); LastTickUnixSeconds = [long] 1000 }
+    }
+
+    It 'splits a batch of three newly checked tasks evenly over the interval' {
+        # (1900 - 1000 - 0) / 3 = 300 seconds per task.
+        $result = Get-EpicProgressTickSample -Issue '12' -PlanFile 'plan.md' -PlanText $script:batchPlan -Anchor $script:priorAnchor -NowUnixSeconds 1900
+
+        ($result.Sample.key -join ',') | Should -Be '12|exec|plan.md|P0-T2,12|exec|plan.md|P0-T3,12|exec|plan.md|P0-T4'
+        ($result.Sample.seconds -join ',') | Should -Be '300,300,300'
+        $result.Sample[0].source | Should -Be 'tick'
+        $result.Anchor.LastTickUnixSeconds | Should -Be 1900
+        ($result.Anchor.Checked -join ',') | Should -Be 'P0-T1,P0-T2,P0-T3,P0-T4'
+        $result.Changed | Should -BeTrue
+    }
+
+    It 'subtracts blocked seconds from the tick interval' {
+        # Blocked from 1300 to now inside the 1000..1900 interval: 600 s; (900 - 600) / 3 = 100 s.
+        $blocked = Get-EpicProgressBlockedSecond -BlockedSinceUnixSeconds 1300 -IntervalStartUnixSeconds 1000 -IntervalEndUnixSeconds 1900
+        $closedSpan = Get-EpicProgressBlockedSecond -BlockedSinceUnixSeconds 800 -BlockedUntilUnixSeconds 1200 -IntervalStartUnixSeconds 1000 -IntervalEndUnixSeconds 1900
+
+        $result = Get-EpicProgressTickSample -Issue '12' -PlanFile 'plan.md' -PlanText $script:batchPlan -Anchor $script:priorAnchor -NowUnixSeconds 1900 -BlockedSecond $blocked
+
+        $blocked | Should -Be 600
+        $closedSpan | Should -Be 200
+        Get-EpicProgressBlockedSecond -IntervalStartUnixSeconds 1000 -IntervalEndUnixSeconds 1900 | Should -Be 0
+        ($result.Sample.seconds -join ',') | Should -Be '100,100,100'
+    }
+
+    It 'seeds the anchor from the execution stage start' {
+        # No anchor; the execution stage opened at 400, and two tasks are checked at 1000: 300 s each.
+        $plan = "- [x] [P0-T1] a.`n- [x] [P0-T2] b.`n- [ ] [P0-T3] c."
+        $record = [pscustomobject]@{ Stage = 'execution'; Type = 'execution'; Attempt = 1; StartedUnixSeconds = 400; EndedUnixSeconds = $null }
+
+        $result = Get-EpicProgressTickSample -Issue '12' -PlanFile 'plan.md' -PlanText $plan -NowUnixSeconds 1000 -ExecutionRecord $record
+
+        ($result.Sample.seconds -join ',') | Should -Be '300,300'
+        $result.Anchor.LastTickUnixSeconds | Should -Be 1000
+    }
+
+    It 'seeds the anchor without a sample when no stage start is recorded' {
+        $result = Get-EpicProgressTickSample -Issue '12' -PlanFile 'plan.md' -PlanText $script:batchPlan -NowUnixSeconds 1000
+
+        $result.Sample.Count | Should -Be 0
+        $result.Changed | Should -BeTrue
+        $result.Anchor.LastTickUnixSeconds | Should -Be 1000
+        $result.Anchor.Checked.Count | Should -Be 4
+    }
+
+    It 'replaces tick samples with per-task samples when execution closes' {
+        # The stage ran 0..1200 for four tasks: 300 s per task replaces each tick sample.
+        $ticks = Get-EpicProgressTickSample -Issue '12' -PlanFile 'plan.md' -PlanText $script:batchPlan -Anchor $script:priorAnchor -NowUnixSeconds 1900
+        $ledger = (Merge-EpicProgressDuration -Ledger @{} -Sample $ticks.Sample).Ledger
+        $record = [pscustomobject]@{ Stage = 'execution'; Type = 'execution'; Attempt = 1; StartedUnixSeconds = 0; EndedUnixSeconds = 1200 }
+
+        $closed = Get-EpicProgressTickSample -Issue '12' -PlanFile 'plan.md' -PlanText $script:batchPlan -Anchor $ticks.Anchor -NowUnixSeconds 2000 -ExecutionRecord $record
+        $merged = Merge-EpicProgressDuration -Ledger $ledger -Sample $closed.Sample
+
+        $closed.Changed | Should -BeFalse
+        $merged.Changed | Should -BeTrue
+        $merged.Ledger['execution'].Count | Should -Be 4
+        (@($merged.Ledger['execution'] | ForEach-Object { "$($_.source):$($_.seconds)" }) | Sort-Object -Unique) | Should -Be 'stage_timing:300'
+    }
+}
+
+Describe 'Get-EpicProgressApproximateSample' {
+    It 'records an approximate main-sync sample from a sync row' {
+        # 2026-01-05T09:00:00Z (1767603600) to 10:00:00Z: 3600 s.
+        $row = ConvertFrom-Json -InputObject '{"issue_num":900,"worktree_created_at":"2026-01-05T09:00:00Z","merge_confirmed_at":"2026-01-05T10:00:00Z"}'
+
+        $result = Get-EpicProgressApproximateSample -Issue '900' -EpicRow $row -EpicIssue '42' -SyncRow
+
+        $result.Sample.Count | Should -Be 1
+        $result.Sample[0].key | Should -Be '42|main-sync|900|1767603600'
+        $result.Sample[0].type | Should -Be 'main-sync'
+        $result.Sample[0].seconds | Should -Be 3600
+        $result.Sample[0].source | Should -Be 'epic_row'
+        $result.Sample[0].approx | Should -BeTrue
+    }
+
+    It 'records an approximate merge sample from the last ci end' {
+        # The second ci attempt ends at 11:00; the merge is confirmed at 11:05: 300 s.
+        $checkpoint = ConvertFrom-Json -InputObject ('{"stage_timing":[' +
+            '{"stage":"ci","attempt":1,"started_at":"2026-01-05T10:00:00Z","ended_at":"2026-01-05T10:20:00Z"},' +
+            '{"stage":"ci","attempt":2,"started_at":"2026-01-05T10:40:00Z","ended_at":"2026-01-05T11:00:00Z"}]}')
+        $row = ConvertFrom-Json -InputObject '{"issue_num":12,"merge_confirmed_at":"2026-01-05T11:05:00Z"}'
+
+        $result = Get-EpicProgressApproximateSample -Issue '12' -Checkpoint $checkpoint -EpicRow $row
+
+        $result.Sample.Count | Should -Be 1
+        $result.Sample[0].key | Should -Be '12|merge|c0|1'
+        $result.Sample[0].seconds | Should -Be 300
+        $result.Sample[0].approx | Should -BeTrue
+    }
+
+    It 'records cycle entry differences as approximate composite time' {
+        # Cycle 1 entered 12:00, cycle 2 entered 13:30 (5400 s); cycle 2's audit is stamped 14:00 (1800 s).
+        $checkpoint = ConvertFrom-Json -InputObject ('{"remediation_loop":{"cycles":[' +
+            '{"entry_timestamp":"2026-01-05T12:00:00Z"},' +
+            '{"entry_timestamp":"2026-01-05T13:30:00Z","audit_paths":["docs/x/feature-audit.2026-01-05T14-00.md"]}]}}')
+
+        $result = Get-EpicProgressApproximateSample -Issue '12' -Checkpoint $checkpoint
+
+        $result.Sample.Count | Should -Be 0
+        (@($result.Unmapped | ForEach-Object { "$($_.Stage):$($_.Kind):$($_.Seconds):$($_.Source):$($_.Approx)" }) -join ',') | Should -Be 'remediation_cycle_1:composite:5400:cycle_entry:True,remediation_cycle_2:composite:1800:artifact_stamp:True'
+    }
+}
