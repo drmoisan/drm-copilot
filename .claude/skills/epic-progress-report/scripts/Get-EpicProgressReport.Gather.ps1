@@ -207,7 +207,11 @@ function Get-EpicProgressStepReport {
         For each item: the steps (Get-EpicProgressItemStep), the stage samples and unmapped
         time, the approximate samples, the blocked span (opened at the first blocked
         observation and cleared at the first unblocked one), and the batched-tick samples of
-        the plan and of each cycle plan (skipped for a merged item). ResetBaseline clears every
+        the plan and of each cycle plan (skipped for a merged item). After each plan file's tick
+        split, an in-progress execution step of that plan file that carries a start takes the
+        later of that start and the plan anchor's LastTickUnixSeconds (the anchor as updated by
+        this run), so the running task is timed from the last checked task rather than from the
+        start of the whole execution stage. ResetBaseline clears every
         blocked span and keeps the ledger and the anchors (decision D10). Unless NoEpicStep is
         set, the epic-level steps and the main-sync samples are added. The ledger is merged
         once, and the estimate is computed over every step; the wave-parallel figure combines
@@ -292,6 +296,12 @@ function Get-EpicProgressStepReport {
                 $tick = Get-EpicProgressTickSample -Issue $issue -PlanFile $planFile -PlanText $planTexts[$planFile] -Anchor $anchor -NowUnixSeconds $NowUnixSeconds -BlockedSecond $blocked -ExecutionRecord $stageForPlan
                 foreach ($sample in $tick.Sample) { $samples.Add($sample) }
                 if ($tick.Changed) { $entry.Plans[$planFile] = $tick.Anchor; $itemsChanged = $true }
+                # The in-progress task of this plan started at its last tick when that is later than the stage start.
+                $lastTick = [long] $entry.Plans[$planFile].LastTickUnixSeconds
+                $prefix = "$issue|exec|$planFile|"
+                foreach ($runningStep in @($steps | Where-Object { $_.Type -eq 'execution' -and $_.Status -eq 'in_progress' -and $null -ne $_.StartedUnixSeconds -and ([string] $_.Key).StartsWith($prefix) })) {
+                    $runningStep.StartedUnixSeconds = [math]::Max([long] $runningStep.StartedUnixSeconds, $lastTick)
+                }
             }
         }
         if ($record.Blockage.Blocked -and $null -eq $since) { $entry.BlockedSinceUnixSeconds = $NowUnixSeconds; $itemsChanged = $true }

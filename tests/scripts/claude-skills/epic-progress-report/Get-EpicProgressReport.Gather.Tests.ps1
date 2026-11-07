@@ -142,4 +142,44 @@ Describe 'Gather functions' {
         $report.Estimate.TotalSeconds | Should -Be (420 + 3600 + 300 + 2700)
         $report.WaveParallelSeconds | Should -Be (420 + 3600 + 300 + 2700)
     }
+
+    Context 'in-progress execution start' {
+        BeforeAll {
+            function Get-TestExecutionReport {
+                # One item with an open execution stage since 10:00 and P0-T1 of two tasks checked;
+                # the stored anchor holds P0-T1 at the given last tick, and the run is at 12:00.
+                param([long] $LastTick)
+                $checkpoint = ConvertFrom-Json -InputObject '{"stage_timing":[{"stage":"execution","attempt":1,"started_at":"2026-01-05T10:00:00Z","ended_at":null}]}'
+                $item = [pscustomobject]@{
+                    Issue = '12'; Wave = 1; Band = 'small'; Checkpoint = $checkpoint; EpicRow = $null
+                    PlanText = "- [x] [P0-T1] a.`n- [ ] [P0-T2] b."; PlanFile = 'plan.md'; CycleText = @{}; SpecExists = $true
+                    MergeStatus = 'worktree_created'; PrState = ''; PreparedPlan = $false; Blockage = (Get-EpicProgressBlockage -Checkpoint $checkpoint)
+                }
+                $state = ConvertFrom-EpicProgressStateText -Text ('{"version":2,"items":{"12":{"plans":{"plan.md":{"checked":["P0-T1"],"lastTickUnixSeconds":' + $LastTick + '}},"blockedSinceUnixSeconds":null}}}')
+                # 2026-01-05T12:00:00Z.
+                Get-EpicProgressStepReport -Item @($item) -EpicIssue '42' -State $state -NowUnixSeconds 1767614400 -Default (Resolve-EpicProgressStepDefault) -NoEpicStep
+            }
+        }
+
+        It 'starts the in-progress execution step at a later plan tick' {
+            # The last tick at 11:58 (1767614280) is later than the stage start at 10:00: 120 s elapsed.
+            $report = Get-TestExecutionReport -LastTick 1767614280
+
+            $running = @($report.Estimate.InProgress | Where-Object { $_.Type -eq 'execution' })
+            $running.Count | Should -Be 1
+            $running[0].ElapsedSeconds | Should -Be 120
+            # Against the 5-minute execution default.
+            $running[0].MedianSeconds | Should -Be 300
+            $running[0].OverMedian | Should -BeFalse
+        }
+
+        It 'keeps the execution stage start when the last tick is earlier' {
+            # The last tick at 09:00 (1767603600) is before the stage start at 10:00: 7200 s elapsed.
+            $report = Get-TestExecutionReport -LastTick 1767603600
+
+            $running = @($report.Estimate.InProgress | Where-Object { $_.Type -eq 'execution' })
+            $running.Count | Should -Be 1
+            $running[0].ElapsedSeconds | Should -Be 7200
+        }
+    }
 }
