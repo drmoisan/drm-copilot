@@ -66,7 +66,7 @@ No test suite runs in this phase.
   - The `.DESCRIPTION` narrowing paragraph states that the record in the three positions of P1-T1, and `Change: N/A` on a line carrying `Baseline: N/A - no pre-change run`, are not narrowing.
   - Existing tests, each unchanged: the `reports <Case>` row `a narrowing row`, `E4-ST7`, and the entry-point cases in `tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1`. Their inputs hold no rejected-section heading, no removed text, and no `.NET` text.
   - Acceptance: the function's definition text is equal in `.claude/hooks/validate-feature-review-coverage-rules.ps1` and the Codex hook, the Codex `CSharp` labels equal the Claude `CSharp` labels, and the bundle copy equals its source by hash.
-- [ ] [P1-T3] Create `tests/scripts/codex-hooks/feature-review-coverage-narrowing-parity.Tests.ps1`, which runs one case table against both hooks.
+- [x] [P1-T3] Create `tests/scripts/codex-hooks/feature-review-coverage-narrowing-parity.Tests.ps1`, which runs one case table against both hooks.
   - The suite follows `tests/scripts/codex-hooks/feature-review-coverage-floor-parity.Tests.ps1`: the same `BeforeAll` baseline mocks, and each hook dot-sourced in its own child scope. It creates no temporary file, so it also runs in the Linux hook-suite job.
   - `FRN-ACCEPT`, one `It` per surface and case, 16 in all. The audit text is the case line plus `<Language> coverage PASS`, and `Test-LanguageCoverageRow` returns `Ok` true. Cases:
     - `- PowerShell baseline coverage artifact: N/A - no pre-change run` and the TypeScript form.
