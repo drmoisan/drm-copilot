@@ -34,11 +34,20 @@ Describe 'enforce-python-batch-budget.ps1' {
         $PSDefaultParameterValues['Invoke-PythonBatchBudgetHook:ReadCheckpoint'] = { { param([string] $Path) [void] $Path; '' } }
     }
 
+    # Snapshot each environment value this suite assigns and restore it, rather than clearing it, so the
+    # suite leaves the process environment as it found it (issue #1096).
+    BeforeEach {
+        $script:PriorToolInput = $env:CLAUDE_TOOL_INPUT
+        $script:PriorSessionId = $env:CLAUDE_SESSION_ID
+        $script:PriorProdBudget = $env:CLAUDE_PYTHON_BUDGET_PROD
+        $script:PriorTestBudget = $env:CLAUDE_PYTHON_BUDGET_TEST
+    }
+
     AfterEach {
-        $env:CLAUDE_TOOL_INPUT = $null
-        $env:CLAUDE_SESSION_ID = $null
-        $env:CLAUDE_PYTHON_BUDGET_PROD = $null
-        $env:CLAUDE_PYTHON_BUDGET_TEST = $null
+        $env:CLAUDE_TOOL_INPUT = $script:PriorToolInput
+        $env:CLAUDE_SESSION_ID = $script:PriorSessionId
+        $env:CLAUDE_PYTHON_BUDGET_PROD = $script:PriorProdBudget
+        $env:CLAUDE_PYTHON_BUDGET_TEST = $script:PriorTestBudget
     }
 
     AfterAll {

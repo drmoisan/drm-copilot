@@ -299,7 +299,7 @@ Constraints:
   - python -m poetry run black .
   - python -m poetry run ruff check
   - python -m poetry run pyright
-  - python -m poetry run pytest \\
+  - python -m poetry run pytest -n auto \\
       --cov=scripts/dev_tools \\
       --cov-report=term-missing
 

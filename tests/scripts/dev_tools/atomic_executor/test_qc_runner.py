@@ -219,48 +219,50 @@ class TestQCRunnerFullLoop:
         assert pytest_env is not None
         assert pytest_env.get(runner.EXECUTOR_LOCK_BYPASS_ENV) == "1"
 
-
-class TestQCRunnerFilterHelpers:
-    """Tests for _filter_* helper methods."""
-
-    def test_filter_python_files_keeps_py_only(self, mem_fs_path: Path) -> None:
-        """_filter_python_files() keeps only .py files."""
-        runner = QCRunner(mem_fs_path)
-        files = ["src/module.py", "tests/test.py", "README.md", "config.yaml"]
-        result = runner._filter_python_files(
-            files
-        )  # pyright: ignore[reportPrivateUsage]
-        assert result == ["src/module.py", "tests/test.py"]
-
-    def test_filter_python_files_returns_empty_for_no_py(
-        self, mem_fs_path: Path
+    def test_full_loop_full_test_runs_xdist_workers(
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
-        """_filter_python_files() returns empty list when no .py files."""
-        runner = QCRunner(mem_fs_path)
-        files = ["README.md", "config.yaml", "data.json"]
-        result = runner._filter_python_files(
-            files
-        )  # pyright: ignore[reportPrivateUsage]
-        assert result == []
+        """The full_test command of run_full_loop_with_artifacts() passes -n auto."""
+        pytest_argv: list[str] = []
 
-    def test_filter_test_files_keeps_tests_only(self, mem_fs_path: Path) -> None:
-        """_filter_test_files() keeps only files in tests/ directories."""
-        runner = QCRunner(mem_fs_path)
-        files = [
-            "tests/test_module.py",
-            "src/tests/test_helper.py",
-            "src/module.py",
-            "test_outside.py",
-        ]
-        result = runner._filter_test_files(files)  # pyright: ignore[reportPrivateUsage]
-        assert result == ["tests/test_module.py", "src/tests/test_helper.py"]
+        def fake_run_and_record(*args: object, **kwargs: object) -> QCToolResult:
+            """Record the pytest argv and report success for every step."""
+            argv = kwargs.get("argv")
+            if isinstance(argv, list) and "pytest" in argv:
+                pytest_argv.extend(cast("list[str]", argv))
+            return QCToolResult(step="tool", returncode=0, output="")
 
-    def test_filter_test_files_requires_py_extension(self, mem_fs_path: Path) -> None:
-        """_filter_test_files() requires .py extension."""
+        def fake_diff_signature(
+            *args: object, **kwargs: object
+        ) -> tuple[tuple[str, str, str], ...]:
+            """Report an unchanged tree so the loop ends after one pass."""
+            return ()
+
         runner = QCRunner(mem_fs_path)
-        files = ["tests/test_module.py", "tests/README.md", "tests/data.json"]
-        result = runner._filter_test_files(files)  # pyright: ignore[reportPrivateUsage]
-        assert result == ["tests/test_module.py"]
+        monkeypatch.setattr(runner, "_diff_signature", fake_diff_signature)
+        monkeypatch.setattr(runner, "_run_and_record", fake_run_and_record)
+
+        # Map each toolchain step to an in-memory artifact path.
+        runner.run_full_loop_with_artifacts(
+            artifact_paths={
+                step: mem_fs_path / f"artifacts/{step}.txt"
+                for step in ("black", "ruff", "pyright", "pytest")
+            },
+            max_loops=1,
+        )
+
+        assert pytest_argv[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
+
+    def test_python_toolchain_pytest_command_runs_xdist_workers(self) -> None:
+        """PYTHON_TOOLCHAIN_COMMANDS["pytest"] carries -n auto and no stale flag."""
+        from scripts.dev_tools.atomic_executor.qc_toolchain import (
+            PYTHON_TOOLCHAIN_COMMANDS,
+        )
+
+        command = PYTHON_TOOLCHAIN_COMMANDS["pytest"]
+        assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert "--cov=src/lexile_corpus_tuner" not in command
 
 
 class TestQCRunnerRunScoped:
@@ -434,6 +436,8 @@ class TestQCRunnerRunFull:
             "poetry",
             "run",
             "pytest",
+            "-n",
+            "auto",
             "--color=no",
             "--cov=scripts/dev_tools",
             "--cov-report=xml",

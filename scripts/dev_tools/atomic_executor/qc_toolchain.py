@@ -48,6 +48,8 @@ PYTHON_TOOLCHAIN_COMMANDS: dict[str, list[str]] = {
         "poetry",
         "run",
         "pytest",
+        "-n",
+        "auto",
         "--color=no",
         "--cov=scripts/dev_tools",
         "--cov-report=term-missing",

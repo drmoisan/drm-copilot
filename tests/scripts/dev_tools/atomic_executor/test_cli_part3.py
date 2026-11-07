@@ -73,6 +73,7 @@ class TestPreflightQC:
         # Check key elements are present
         assert "Pre-flight QC Fix Required" in prompt
         assert str(mem_fs_path.as_posix()) in prompt
+        assert "poetry run pytest -n auto" in prompt
         assert "Black failed: file.py" in prompt
         assert "poetry run black" in prompt
         assert "poetry run ruff" in prompt
@@ -368,6 +369,12 @@ class TestPhaseEndQC:
             )
 
         monkeypatch.setattr("subprocess.run", mock_run)
+        # _resolve_executable rewrites argv[0] through shutil.which; returning the
+        # argument keeps argv bare so the npm branch of mock_run is reached.
+        monkeypatch.setattr(
+            "scripts.dev_tools.atomic_executor.cli_preflight.shutil.which",
+            lambda name: name,
+        )
 
         result = _run_preflight_qc_with_capture(
             Path.cwd(), expectations=expectations, toolchain=QCToolchain.TYPESCRIPT
@@ -375,6 +382,7 @@ class TestPhaseEndQC:
 
         assert result.success is True
         assert result.failed_step is None
+        assert "Expected Jest failures allowed" in result.output
 
     def test_preflight_expected_pass_wins(
         self,
@@ -535,6 +543,8 @@ _PYTEST_STEP = [
     "poetry",
     "run",
     "pytest",
+    "-n",
+    "auto",
     "--color=no",
     "--cov=scripts/dev_tools",
     "--cov-report=term-missing",
