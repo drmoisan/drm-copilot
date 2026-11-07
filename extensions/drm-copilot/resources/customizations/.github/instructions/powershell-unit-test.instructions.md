@@ -18,7 +18,7 @@ If there is any conflict between these documents, halt and notify the user.
 
 ## 1. Framework and Scope
 
-- **Testing framework:** All PowerShell tests must use **Pester** (v5.x).
+- **Testing framework:** All PowerShell tests must use **Pester** (v6.x).
 - Use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
 - **Agent execution requirement:** use the MCP server function `mcp_drmcopilotext_run_poshqc_test`. Do **not** use VS Code task wrappers as a substitute.
 - Keep tests compatible with PowerShell 7+.

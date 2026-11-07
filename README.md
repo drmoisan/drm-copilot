@@ -337,7 +337,7 @@ The repository defines a separate, fully specified quality toolchain for each su
 |---|---|---|---|---|---|
 | Python | Black | Ruff | Pyright (strict) | Pytest | pytest-cov |
 | TypeScript | Prettier | ESLint (typescript-eslint) | `tsc` | Vitest (Jest in the bundled extension) | c8 / coverage provider |
-| PowerShell | PoshQC `Invoke-Formatter` | PSScriptAnalyzer (PoshQC) | n/a | Pester v5 | Pester + kcov export |
+| PowerShell | PoshQC `Invoke-Formatter` | PSScriptAnalyzer (PoshQC) | n/a | Pester v6 | Pester + kcov export |
 | Modern C# (.NET 8+, No-COM) | CSharpier | .NET / Roslyn analyzers | Nullable reference types | MSTest + NSubstitute + FluentAssertions | XPlat Code Coverage |
 | Legacy VSTO C# (.NET Framework) | CSharpier | .NET analyzers via `msbuild` | Nullable via `msbuild` | MSTest via `vstest.console.exe` | `/EnableCodeCoverage` |
 | Bash / shell | shfmt | shellcheck | n/a | Bats | kcov |
@@ -369,7 +369,7 @@ Canonical rule: [.claude/rules/powershell.md](.claude/rules/powershell.md). All 
 
 - format: `mcp__drm-copilot__run_poshqc_format` (or `Invoke-PoshQCFormat`)
 - analyze: `mcp__drm-copilot__run_poshqc_analyze` (autofix: `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-- test (Pester v5): `mcp__drm-copilot__run_poshqc_test` (or `Invoke-PoshQCTest`)
+- test (Pester v6): `mcp__drm-copilot__run_poshqc_test` (or `Invoke-PoshQCTest`)
 - full suite: `mcp__drm-copilot__run_poshqc_suite`
 
 There is no type-check stage for PowerShell. Pester runs use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
