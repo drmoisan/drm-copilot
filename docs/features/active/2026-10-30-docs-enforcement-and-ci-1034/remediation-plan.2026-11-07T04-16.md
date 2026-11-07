@@ -270,7 +270,7 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
   - Acceptance: the SHA-256 of each target and the `git status --porcelain` output captured before and after the run are identical, and both comparisons are recorded.
 - [x] [P4-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the P4-T1 files and write `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
   - Acceptance: zero findings for each file, compared against P0-T3.
-- [ ] [P4-T3] Run one `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1` with `-Root` at the worktree root and the default `-WorkerCount`, and write `FEATURE/evidence/regression-testing/pester-parallel.<timestamp>.md`.
+- [x] [P4-T3] Run one `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1` with `-Root` at the worktree root and the default `-WorkerCount`, and write `FEATURE/evidence/regression-testing/pester-parallel.<timestamp>.md`.
   - The merged tree holds the upstream suites, so the total test count exceeds the cycle 2 figure.
   - Acceptance: `EXIT_CODE:` records the `ExitCode` property of the returned object and is 0; the artifact records `WorkerCount`, per-shard exit codes, and the test counts of `HOOK_SUITE`, `COMPOUND_SUITE`, `HELPER_SUITE`, `REVISION_SUITE` and `CLI_SUITE`; the merged `artifacts/pester/pester-junit.xml` reports zero failures and zero errors.
 - [ ] [P4-T4] Read per-file line coverage from the merged `artifacts/pester/powershell-coverage.xml` of P4-T3, without a further run, and write `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md`.
