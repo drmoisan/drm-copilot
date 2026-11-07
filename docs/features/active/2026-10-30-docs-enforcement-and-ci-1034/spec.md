@@ -513,7 +513,7 @@ member-set comparison). No criterion asserts a count. Percentages and line limit
 
 Epic criteria (from `### 900008 - docs-enforcement-and-ci`):
 
-- [x] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
+- [ ] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
 - [x] `surface-delta` reports an added CLI command with no ledger change and reports nothing when the ledger records it.
 - [x] The workflow template requires `pwsh` only.
 - [x] Mirror parity checks pass for the edited `feature-review` surfaces.

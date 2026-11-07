@@ -62,7 +62,7 @@ surface, a merge gate, and a review check that act on the tooling's results.
 
 Epic criteria:
 
-- [x] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
+- [ ] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
 - [x] `surface-delta` reports an added CLI command with no ledger change and reports nothing when the ledger records it.
 - [x] The workflow template requires `pwsh` only.
 - [x] Mirror parity checks pass for the edited `feature-review` surfaces.
@@ -70,8 +70,8 @@ Epic criteria:
 Story criteria (consistent with `spec.md` `## Acceptance Criteria`):
 
 - [x] With no profile, or with `completion_gates.integration_pr_gate.enabled` set to `false`, the hook allows every tested Bash command, including `gh pr merge` variants and `gh api` merge mutations, and makes no `gh` call.
-- [x] With the gate enabled, an integration-to-`main` merge is denied with `DOCS_COMPLETE_GATE_BLOCKED:` followed by `RECEIPT_ABSENT`, `RECEIPT_UNREADABLE`, `RECEIPT_MODE`, `RECEIPT_FAILING` or `RECEIPT_REVISION_MISMATCH` (naming both revisions) as applicable, and is allowed when the receipt passes and its revision equals the pull request `headRefOid`.
-- [x] With the gate enabled, the hook denies with `PROFILE_UNREADABLE`, `PR_UNRESOLVED`, `MATCH_HEAD_MISMATCH` or `RECEIPT_PATH_INVALID` in the corresponding conditions, and allows non-merge commands and merges that are not base `main` with an `epic/<slug>-integration` head.
+- [ ] With the gate enabled, an integration-to-`main` merge is denied with `DOCS_COMPLETE_GATE_BLOCKED:` followed by `RECEIPT_ABSENT`, `RECEIPT_UNREADABLE`, `RECEIPT_MODE`, `RECEIPT_FAILING` or `RECEIPT_REVISION_MISMATCH` (naming both revisions) as applicable, and is allowed when the receipt passes and its revision equals the pull request `headRefOid`.
+- [ ] With the gate enabled, the hook denies with `PROFILE_UNREADABLE`, `PR_UNRESOLVED`, `MATCH_HEAD_MISMATCH` or `RECEIPT_PATH_INVALID` in the corresponding conditions, and allows non-merge commands and merges that are not base `main` with an `epic/<slug>-integration` head.
 - [x] The hook is registered in `.claude/settings.json` and its byte-identical bundle copy, and the registered-hook contract suites (dependency guard completeness, imported-module output silence, no interpreter invocation, payload contract, dependency-failure prefixes, settings membership) pass with no new exemption.
 - [x] `surface-delta` exits 1 with `DOCS_SURFACE_UNLEDGERED_ADDITION` for an added `cli-command` element with no ledger change, and exits 0 with no `error` finding when the head ledger records that element.
 - [x] `surface-delta` reports unledgered changed elements, ignores `line_range`-only and `analysis_method`-only differences, treats an absent base snapshot as empty, rejects an option-like or `..` `-Base` with exit 2, and reports an unresolved base, a missing head snapshot and a stale head snapshot with their finding codes.
