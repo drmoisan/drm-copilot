@@ -54,11 +54,11 @@ Describe 'Parallel gate wording' {
         .PARAMETER SearchToken
             The tokens to look for.
         .OUTPUTS
-            [string[]] The tokens found in the text.
+            [System.Object[]] The tokens found in the text.
         #>
         function Get-PgwTokenHit {
             [CmdletBinding()]
-            [OutputType([string[]])]
+            [OutputType([System.Object[]])]
             param(
                 [Parameter(Mandatory = $true)]
                 [AllowEmptyString()]
@@ -175,11 +175,11 @@ Describe 'Parallel gate wording' {
             .PARAMETER Content
                 The text to search.
             .OUTPUTS
-                [string[]] The sweep tokens found in the text.
+                [System.Object[]] The sweep tokens found in the text.
             #>
             function Get-PgwSweepHit {
                 [CmdletBinding()]
-                [OutputType([string[]])]
+                [OutputType([System.Object[]])]
                 param(
                     [Parameter(Mandatory = $true)]
                     [AllowEmptyString()]
@@ -193,11 +193,11 @@ Describe 'Parallel gate wording' {
             .SYNOPSIS
                 Returns the repository-relative paths of the swept surface files.
             .OUTPUTS
-                [string[]] The relative paths, with forward slashes.
+                [System.Object[]] The relative paths, with forward slashes.
             #>
             function Get-PgwSweepFile {
                 [CmdletBinding()]
-                [OutputType([string[]])]
+                [OutputType([System.Object[]])]
                 param()
 
                 $files = foreach ($folder in $script:SweepRoot) {

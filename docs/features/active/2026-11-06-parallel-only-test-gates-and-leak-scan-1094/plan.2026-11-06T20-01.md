@@ -141,7 +141,7 @@ No production code changes in this phase. Negative tokens must not match the ret
 
 Cheap stages run first, so that a suite is not re-run for a formatting change. A fix re-runs the static stages and the gate that failed. The other gate re-runs only when the fix changes a file that gate exercises. Each pass writes new artifacts.
 
-- [ ] [P2-T1] Run format and analyze for `tests/scripts/claude-runtime` on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
+- [x] [P2-T1] Run format and analyze for `tests/scripts/claude-runtime` on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
   - Format output carries `Already formatted:` and `Formatted:` lines. A `Formatted:` line means a file changed: commit it and repeat this task. Analyzer findings come from the direct run over the P0-T2 file set, not an MCP summary.
   - Acceptance: zero `Formatted:` lines, a non-zero `Already formatted:` count, and zero analyzer findings, with `EXIT_CODE:` carrying both.
 - [ ] [P2-T2] Run Black in check mode, Ruff, Pyright, and `scripts/dev_tools/generate_codex_agent_variants.py` in `--check` mode, and write `<FEATURE>/evidence/qa-gates/python-black.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/python-ruff.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/python-pyright.<timestamp>.md`, and `<FEATURE>/evidence/qa-gates/codex-generator.<timestamp>.md`.
