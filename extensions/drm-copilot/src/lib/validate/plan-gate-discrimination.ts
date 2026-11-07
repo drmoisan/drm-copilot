@@ -3,7 +3,6 @@ import { extractPlanCommands, type PlanCommand } from "./plan-gate-commands";
 import { evaluateDocumentGates } from "./plan-gate-document";
 import { evaluateObservabilityGates } from "./plan-gate-observability";
 import {
-  BLOCKING_CHANNEL,
   covValues,
   emptyPlanGateReport,
   evaluateCovValue,
@@ -220,9 +219,7 @@ function evaluateLiteral(
     "tracked tree and is not quoted in the plan; the search returns zero " +
     "matches whatever the executor does. Quote the exact literal the task " +
     "will create, or assert a literal that exists.";
-  const channel =
-    G5_SEVERITY === BLOCKING_CHANNEL ? report.blocking : report.warnings;
-  channel.push(finding);
+  report.warnings.push(finding);
 }
 
 /**
