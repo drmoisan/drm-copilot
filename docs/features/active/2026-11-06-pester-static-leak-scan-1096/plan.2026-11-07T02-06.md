@@ -62,7 +62,7 @@ Remediation is a derivation from the first scan. The input is every `FINDING:` r
 
 Phase 0 follows `## Phase 0 Requirements` in `atomic-plan-contract`, with one owner-directed addition recorded as spec Decision 9: P0-T3 runs the Pester and pytest gates once after the static baselines and before any production or test edit. That contract is not edited by this item.
 
-- [ ] [P0-T1] Read the policy files in the `policy-compliance-order` order, including `.claude/rules/powershell.md`, `.claude/rules/python.md`, and `.claude/rules/ci-workflows.md`, then `<FEATURE>/spec.md`, and write `<FEATURE>/evidence/baseline/phase0-instructions-read.<timestamp>.md`.
+- [x] [P0-T1] Read the policy files in the `policy-compliance-order` order, including `.claude/rules/powershell.md`, `.claude/rules/python.md`, and `.claude/rules/ci-workflows.md`, then `<FEATURE>/spec.md`, and write `<FEATURE>/evidence/baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read, and `git branch --show-current` through `-C` prints `feature/pester-static-leak-scan-1096`.
 - [ ] [P0-T2] Capture the static baselines in `<FEATURE>/evidence/baseline/powershell-format.<timestamp>.md`, `powershell-analyze.<timestamp>.md`, `python-black.<timestamp>.md`, `python-ruff.<timestamp>.md`, and `python-pyright.<timestamp>.md`, in the same folder.
   - PowerShell format runs check-only through a no-op `-WriteFile` seam on the branch-current module. Analyzer findings come from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the `.ps1` and `.psm1` files of the `Get-PoshQCFileList -Root` file set, the filter `Invoke-PoshQCAnalyze` applies. Black runs in check mode.
