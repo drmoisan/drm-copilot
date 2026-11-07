@@ -176,7 +176,7 @@ P4-T1 lands every leak-scan addition. P4-T2 is the only commit that removes a se
 
 Cheap stages run first. A fix re-runs the static stage and the gate that failed; another gate re-runs only when the fix changes a file it exercises. Each pass writes new artifacts.
 
-- [ ] [P6-T1] Run the static stage on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `powershell-format.<timestamp>.md`, `powershell-analyze.<timestamp>.md`, `python-black.<timestamp>.md`, `python-ruff.<timestamp>.md`, `python-pyright.<timestamp>.md`, and `leak-scan.<timestamp>.md` under `<FEATURE>/evidence/qa-gates/`.
+- [x] [P6-T1] Run the static stage on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `powershell-format.<timestamp>.md`, `powershell-analyze.<timestamp>.md`, `python-black.<timestamp>.md`, `python-ruff.<timestamp>.md`, `python-pyright.<timestamp>.md`, and `leak-scan.<timestamp>.md` under `<FEATURE>/evidence/qa-gates/`.
   - Format output carries `Already formatted:` and `Formatted:` lines, counted case-sensitively from the line start, because a case-insensitive search for `Formatted:` also matches `Already formatted:`. A `Formatted:` line means a file changed: commit it and repeat this task. Analyzer findings come from the direct run over the `.ps1` and `.psm1` files of the `Get-PoshQCFileList -Root` file set. Black runs in check mode. The scan is `Invoke-PoshQCLeakScan -Root` over the repository with the committed allowlist.
   - Acceptance: zero `Formatted:` lines, a non-zero `Already formatted:` count, zero analyzer findings, and each `EXIT_CODE:` is 0.
 - [ ] [P6-T2] Run the Pester gate with one background `Invoke-PoshQCParallelTest` run and write `<FEATURE>/evidence/qa-gates/pester-parallel.<timestamp>.md`.
