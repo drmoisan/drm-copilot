@@ -169,7 +169,7 @@ Coverage freshness (resolved root is an item worktree other than the session roo
 - [x] `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, and `test_push_down_issue_824_follow_ups.py` pass, confirming byte-identical bundle mirrors and `core.json` entries for both new files.
 - [x] Every copy of `execution-environment/SKILL.md` states in `## Hook Execution Context` that the SubagentStop artifact and coverage hooks resolve the item worktree through `Resolve-HookTargetWorktree`, and the copies are byte-identical, verified by `test_push_down_claude_resource_contracts.py` and the mirror contract tests listed in the brief's `## Contract Tests That Pin Mirrored Files`.
 - [x] Restored test baseline: `Invoke-PoshQCParallelTest` and `pytest -n auto` show no new failures versus the Phase 0 baseline recorded under `<FEATURE>/evidence/baseline/`, changed lines show no coverage drop, and `subagentstop-target-worktree.ps1` and `validate-feature-review-coverage-freshness.ps1` each reach at least 85% line coverage in the gate run's `artifacts/pester/powershell-coverage.xml`.
-- [ ] CI-dependent: the CI Required Gate is green on the PR head SHA.
+- [x] CI-dependent: the CI Required Gate is green on the PR head SHA.
 
 ## Risks & Mitigations
 - Technical or operational risks: newly accepted absolute paths could be flagged in review; module or function state could leak between suites after moving the transcript readers and adding `Import-Module`; a test that reaches real `git` or the real worktree list would read the CI runner's state; in-flight reviews may newly block on an absent coverage report.
