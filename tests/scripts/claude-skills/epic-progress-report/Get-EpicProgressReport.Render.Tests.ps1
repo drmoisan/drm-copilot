@@ -180,4 +180,23 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
             $tldr[1] | Should -Be '**Elapsed:** 0 h 00 min, with about n/a hours left on the wave-parallel estimate. **Weekly** quota is at 42.5%.'
         }
     }
+
+    It 'prints no NaN or Infinity before the first task completes' {
+        # Issue #1093: done equals the baseline (0) three hours after the start, with three zero-rate intervals.
+        $features = @(
+            Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 4 -Done 0 -State 'Running'
+            Get-TestFeature -Issue '77' -Wave 2 -Band 'medium' -Total 3 -Done 0 -State 'Pending'
+        )
+        $samples = @(1000, 4600, 8200, 11800 | ForEach-Object { [pscustomobject]@{ ts = $_; done = 0 } })
+        $summary = Get-TestSummary -Feature $features -Sample $samples
+
+        $lines = @(Get-EpicProgressTldrLine -Summary $summary) + @(Get-EpicProgressFullLine -Summary $summary)
+
+        $summary.ElapsedHours | Should -BeGreaterThan 0
+        ($lines -join "`n") | Should -Not -Match 'NaN|Infinity'
+        $lines[1] | Should -Be '**Elapsed:** 3 h 00 min, with about n/a hours left on the wave-parallel estimate. **Weekly** quota is at 42.5%.'
+        $lines[3] | Should -Be '**Estimated time remaining:** n/a hrs to no upper bound (average velocity minus 2.05 SD is at or below 0.5 tasks / hr)'
+        $lines | Should -Contain '- Straight line, no parallelism: about n/a (upper bound).'
+        $lines | Should -Contain '- Wave-parallel (longest chain 7 tasks plus about 1.25 h per open wave for review and CI): about **n/a**.'
+    }
 }

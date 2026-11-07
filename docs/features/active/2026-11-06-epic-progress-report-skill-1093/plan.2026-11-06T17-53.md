@@ -83,7 +83,7 @@
   - Acceptance: the named case passes.
 - [x] [P2-T5] Add Metrics-suite cases `prints n/a hrs to no upper bound for zero-rate intervals` (three or more zero-rate intervals, average 0, SD 0, asserting the exact text `n/a hrs to no upper bound (average velocity minus 2.05 SD is at or below 0.5 tasks / hr)`) and `returns NaN for exactly 2 intervals and a finite value for 3 or more`.
   - Acceptance: both named cases pass with no production change (spec DEC-6).
-- [ ] [P2-T6] Add the Render-suite case `prints no NaN or Infinity before the first task completes`: done equals baseline, elapsed above 0, zero-rate samples; neither the TL;DR nor the Full lines contain `NaN` or `Infinity`, and the estimate values print `n/a`.
+- [x] [P2-T6] Add the Render-suite case `prints no NaN or Infinity before the first task completes`: done equals baseline, elapsed above 0, zero-rate samples; neither the TL;DR nor the Full lines contain `NaN` or `Infinity`, and the estimate values print `n/a`.
   - Acceptance: the named case passes with no production change.
 
 ### Phase 3 — Entry Wiring of State, Reset and Pairing
