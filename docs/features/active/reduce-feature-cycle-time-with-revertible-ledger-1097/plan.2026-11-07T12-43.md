@@ -1,0 +1,169 @@
+# reduce-feature-cycle-time-with-revertible-ledger - Plan (Stage G)
+
+- **Issue:** #1097
+- **Branch:** feature/reduce-feature-cycle-time
+- **Last Updated:** 2026-11-07T12-43
+- **Status:** Draft
+
+## Scope
+
+Stage G of `spec.md`, less evidence and the CI cross-check: the criteria tagged `[G]`, decisions D5 and D13, clarification K7, and `research/research.2026-11-06.md` section 4, re-derived against the tree after stages C, D, E, and E2 merged, after #1102 changed the review templates, and after stage R (`plan.2026-11-07T12-03.md`) added README `## Revert Order` and `ProcessReductionChain.Ledger.Tests.ps1`. Stage R lands first; this plan follows its revert order and keeps its chain test green.
+
+Hard limit (D13): no baseline task, baseline evidence, or baseline comparison is reduced, including the Phase 0 test-suite baseline and the final-gate comparison restored by E2. Mechanism: no line that holds baseline text is edited or removed; each reduction edits other lines or adds lines, and added text carries none of the baseline tokens defined in [P0-T4].
+
+Out of scope: `.claude/rules/`, `.github/instructions/`, the `execution-environment` brief (no fact it states changes), every hook and validator (Python, TypeScript, PowerShell), the four QA-gate skills and the engineer skills (they hold the static and test deltas against the baseline), production Python and TypeScript, Epic #1019 folders, and admitted plans.
+
+## Re-derived Dispositions (research section 4)
+
+| Requirement | Disposition | Re-derivation against the current tree |
+| --- | --- | --- |
+| Final-QC test-gate artifacts | Keep | E2 made them the post-change side of the `Phase 0 baseline` comparison (D12, D13), so the research row "Reduce" no longer applies to them |
+| Final-QC format, lint, type-check artifacts | Reduce: one static artifact per language instead of one per step; reviewers read it and do not re-run the checks | CI proves the checks on the head; the artifact is kept, not removed, because the QA-gate skills compare static results with the static baseline |
+| Repo-wide coverage totals | Reduce for Python only | CI enforces only the Python total (`Enforce Python coverage thresholds` in `_quality-checks.yml`); `pester.runsettings.psd1` sets `CoveragePercentTarget = 0`, and `jest.config.cjs` holds per-file thresholds only, so PowerShell and TypeScript repo-wide review rows stay. Repo-wide figures inside the baseline comparison stay for every language |
+| Scope listings | Reduce: the policy-audit `Code Under Test` list and the section 9 commit and file lists | The branch log and diff carry them; the required heading `## 9. Summary of Changes` stays |
+| Coverage artifact absent at review | Reduce: per-changed-file figures may be read from the committed final test-gate artifact | `artifacts/` is gitignored, so a concurrent reviewer may hold no local artifact; per-changed-file coverage is still required |
+| `evidence-and-timestamp-conventions` | Unchanged | Re-read: it states no final-QC per-step artifact requirement |
+| Baseline artifacts and comparison, per-changed-file coverage, changed-line regression, fail-before evidence, `preflight-fixes`, `self-review`, issue-update mirrors, AC check-off, `modified-workflow-needs-green-run` | Keep | Not edited; pinned by `LEC-KEPT-*` and `LEC-BASELINE-HELD-*` |
+
+## Design
+
+**G1. Static final-QC artifact.** The contract's short-path block 3 and `## Final QA Loop` state that the format, lint, and type-check results of one language are recorded in "one final-QC static artifact per language", carrying `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with each step's command, exit code, and finding count; each test gate keeps its own artifact. Reviewers read the static artifact and do not re-run format, lint, or type checks.
+
+**G2. CI cross-check (D5, K7).** The reviewer writes `## CI Cross-check` into the policy audit, after `## 7. Code Quality Checks`: a table `Check | Claimed outcome | Claimed figure | Head | Source`, one row per CI check whose result the review relies on (format, lint, type, and test checks of each changed language, and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total), outcome `pass` or `fail` from local evidence, head from `git log` of the reviewed branch. Under `review_mode: "concurrent"`, item 11 of the orchestrate join compares each row with `ci_gate` and `gh pr checks` at the live head. A mismatch is a row whose check is not reported, whose outcome differs (cancelled counts as `fail`), or whose head differs from the last `review_outcomes[]` `head_sha`. Each mismatch becomes a synthetic Blocking finding (`Remediability: autonomous`) in a new `remediation-inputs.<timestamp>.md`, and one `review_outcomes[]` entry `{verdict: "REMEDIATION_REQUIRED", head_sha, findings: [{remediability: "autonomous"}, ...]}` is appended, so the merge guard denies with `REVIEW_GATE_NOT_PASSED`. The cycle is never light and carries `Remediation-Mode: proportionate`. An absent or empty section is a reviewer contract error under Post-Review step 5. A sequential run records the table and S9 alone gates it. The control is policy-level (D10).
+
+**G3. Python repo-wide total.** Review surfaces keep every repo-wide threshold line and add: for Python the reviewer records the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total; a local artifact showing the Python total below a threshold is still FAIL, which keeps `validate-feature-review-coverage.ps1` consistent.
+
+**G4. Entry.** `docs/engineering/process-reductions/NNNN-less-evidence.md`, where `NNNN` is one above the highest number in both the README index and the entry file names at commit time (stage F's `0007` may precede it). One `### Revert Block` per edited region of each non-identical copy; byte-identical bundles and generated Codex variants take none (classified by `Get-ProcessReductionDerivedSource`). Revert step 1 states that the entry is reverted before any earlier entry whose `## Files Changed` names one of its paths (README `## Revert Order`); step 5 deletes `less-evidence-contract.Tests.ps1` and the two control cases are kept. `Merge commit: pending (PR #1097)` stands in until the orchestrator writes the PR number, as `0006` did.
+
+## Surfaces and Baseline-Adjacent Places
+
+`(B)` marks a byte-identical bundle copy; `(gen)` a generated Codex variant.
+
+| Surface | Edit | Baseline text beside it, unchanged |
+| --- | --- | --- |
+| `atomic-plan-contract` `.claude`, `.agents`, `.github` + 3 (B) | Short-path block 3 bullets "one final-QC artifact per QC command step" and "each final-QC step artifact" rewritten to G1; one sentence added to `## Final QA Loop` | Block 1 baseline bullets; block 3 bullet "compared with the `Phase 0 baseline` run of the same gate"; the step-4 coverage-evidence sentence; `## Coverage Evidence Contract` |
+| `.claude/agents/atomic-planner.md` + (B), `.codex/agents/atomic-planner.toml`, 5 (gen) + bundles | `Final phase` bullet gains the G1 clause | `Phase 0` bullet (`Phase 0 baseline`); Requirement 3 |
+| `.claude/agents/atomic-executor.md` + (B), `.codex/agents/atomic-executor.toml`, 5 (gen) + bundles | One G1 sentence after the `Phase 0 baseline` sentence of `## Toolchain Commands` | That sentence ("no per-file or repo-wide coverage drop") |
+| `feature-review-workflow` `.claude` + (B) | Step 4 cross-check bullet; step 5 items 1 to 3 read the static artifact; G3 bullet after "Repo-wide per language"; "If no coverage artifact exists" bullet accepts the committed test-gate artifact; `## Required Artifact Shapes` names the section | Modified-files bullet (`Phase 0 baseline`); `Baseline fields are read` bullet; step 8 coverage bullet |
+| `feature-review-workflow` `.agents` + (B) | Same edits; G3 bullet added after the mixed coverage-threshold bullet | The mixed bullet itself (repo-wide and `Phase 0 baseline` in one line), unchanged; step 8 bullets |
+| `feature-review-workflow` `.github` + (B) | Step 4 cross-check bullet; step 5 items 1 to 3 | Step 8 mixed bullet (repo-wide and `Phase 0 baseline`), unchanged |
+| `.claude/agents/feature-review.md` + (B), `.codex/agents/feature-review.toml` + bundle | `### Verification Procedure` step 3 repo-wide bullets get G3; step 4 accepts the committed test-gate artifact; cross-check bullet added | Modified-file bullet (`Phase 0 baseline`); `### Coverage Thresholds` list |
+| `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md` + (B) | `Code Under Test` becomes merge base and head; `CI-proven checks` paragraph after the Evidence rule; `## CI Cross-check` section; 4A.1 repo-wide clause gets G3; section 9 lists replaced by one instruction | Coverage Metrics table; Non-negotiable and Fail-closed rules; 1.2 baseline rows; 3A.1 `Tooling & Baseline`; section 10 Fail-closed reminder |
+| `docs/features/templates/policy_audit/AGENTS.md` + (B) | One cross-check bullet after the fail-closed block | Fail-closed bullets; `Fill in baseline coverage metrics` |
+| `orchestrate` `.claude`, `.agents` + 2 (B) | Item 11 appended to `## Concurrent Review and CI (review_mode)` (inside the `0002` block region) | None in that section |
+
+## Test Dispositions
+
+Found by searching `tests/` and `extensions/drm-copilot/test/` for each edited file name and each changed phrase.
+
+| Test | Disposition |
+| --- | --- |
+| `parallel-gate-wording.Tests.ps1` (`PGW-PLAN-*`, `REVIEW-*`, `EXEC-*`, `AUDIT-*`, `PGW-SWEEP-SURFACES`) | Unchanged: required tokens stay; new text carries no forbidden or sweep token |
+| `planning-contract-wording.Tests.ps1` (`PCW-*`) | Unchanged: no policy-read phrase is added; `stays valid` and the standing rule stay |
+| `concurrent-review-skill-contract.Tests.ps1` (`CRS-*`) | Unchanged: every pinned sentence stays and the section still precedes `## PR Creation Gate` |
+| `light-remediation-skill-contract.Tests.ps1` | Unchanged: light-path text is not edited |
+| `validate-feature-review-coverage*.Tests.ps1`, `test_validate_policy_audit_artifact.py`, `policy-audit-artifact.test.ts` | Unchanged: no hook or validator edit; required headings and checklist labels stay |
+| `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_codex_agent_wrapper_contracts.py`, Codex generator `--check` | Unchanged; satisfied by re-copying bundles and regenerating variants in [P2-T1] to [P2-T6] |
+| `EpicMergeGateReview.Cases.Helpers.ps1` consumers (`enforce-epic-merge-gate.ReviewGuard.Tests.ps1`, Codex `enforce-epic-merge-gate-review.Tests.ps1`) | Updated in [P1-T2]: one new shared row |
+| `OrchestratorStateConcurrentReview.Tests.ps1` | Updated in [P1-T2]: two new cases; corpus floor unchanged |
+| `ProcessReductionLedger.Index.Tests.ps1` (`PRL-REAL-LEDGER-AGREES`), `ProcessReductionChain.Ledger.Tests.ps1` (`PRC-LEDGER-CHAIN-HOLDS`, `PRC-LEDGER-NO-EXCEPTIONS`) | Unchanged; re-validate the new entry |
+| `ProcessReductionLedger.Replay.Tests.ps1` | Unchanged: the replayed hook is not edited |
+| `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1` | New in [P2-T7] |
+
+## Installed Assets (D9)
+
+On the branch: the repository template and `AGENTS.md`, their bundles under `extensions/drm-copilot/resources/templates/policy_audit/`, and every skill and agent copy. Installed MCP keeps serving the old template through `resolve_policy_audit_template_asset` (no `## CI Cross-check`, the old section 9 lists) until an extension release that carries the new bundle is installed, an owner action outside this item; no tag is pushed. Until then the reviewer adds the section and writes the reduced section 9 because `feature-review-workflow` says so.
+
+## Execution Terms
+
+- `FEATURE` is `docs/features/active/reduce-feature-cycle-time-with-revertible-ledger-1097`. `SCRATCH` resolves to `<session scratchpad>/issue-1097/g/`; artifacts record the token only. Evidence names carry the prefix `stage-g-`; a consumer selects the greatest `stage-g-<name>.*.md`.
+- Precondition: stage R's commits are on the branch (`scripts/dev-tools/ProcessReductionChain.psm1` and README `## Revert Order` exist); otherwise stop before [P0-T1] and report.
+- Tool routes, launchers, command-text restrictions, the batch budget, hook context, and CI shape come from the `execution-environment` skill. No production PowerShell or Python file is edited; helper scripts are PowerShell under `SCRATCH`.
+- Tests: one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run per gate, re-run only after a fix; no single-process, seeded-shuffle, reversed-order, or comparison run. TypeScript is out of scope, so no Jest run. No unqualified `poetry install`; if a gate cannot run, stop and report.
+- Commits: commit and push after each task, except that [P2-T1] to [P2-T9] leave their changes uncommitted and [P3-T4] commits them as one reduction commit. Gate evidence is committed separately. No tag, no history rewrite.
+- Failure outside the branch: a failing test whose file and subject are both absent from the diff from the merge base of `origin/main` and `HEAD`; it is recorded, not edited, and reported.
+
+## Implementation Plan (Atomic Tasks)
+
+### Phase 0 — Baseline Capture
+
+- [ ] [P0-T1] Capture the PowerShell static baseline of `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1` and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, writing `FEATURE/evidence/baseline/stage-g-powershell-static.<timestamp>.md`.
+  - PoshQC format in check mode and a direct analyzer run with the repository settings.
+  - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the files needing format and the finding count.
+- [ ] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the `Phase 0 baseline` and write `FEATURE/evidence/baseline/stage-g-powershell-test-baseline.<timestamp>.md`.
+  - `EXIT_CODE:` is the returned `ExitCode`. Output Summary: total, passed, failed from `artifacts/pester/pester-junit.xml` (shard reports when non-zero, naming each failing test); the counts of the `RGC-`, `OCR-`, `PRL-`, `PRC-`, `PGW-`, and `CRS-` suites; repo-wide line percentage from `artifacts/pester/powershell-coverage.xml`, or `coverage unavailable` after a failed run.
+  - Acceptance: every field and figure is present; none comes from MCP output.
+- [ ] [P0-T3] Run one `poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` from the worktree root with `PYTHONPATH` set to this worktree's `packages/discovery-runtime/src`, writing `FEATURE/evidence/baseline/stage-g-python-test-baseline.<timestamp>.md`.
+  - Output Summary: passed and failed counts, each failing test, the total line percentage from the `Stmts` and `Miss` columns of the `TOTAL` row, and the total branch percentage from the summed `BRF` and `BRH` records of `artifacts/python/lcov.info`.
+  - Acceptance: every field and figure is present.
+- [ ] [P0-T4] Before any edit, write `FEATURE/evidence/baseline/stage-g-baseline-text.<timestamp>.md` from a PowerShell script under `SCRATCH`.
+  - For every path in `## Surfaces and Baseline-Adjacent Places`, including bundles and generated variants: the lines, after line-ending normalization and in order, that match the case-insensitive pattern `baseline|regression|pre-change|Phase 0`, their count, and the SHA-256 of the joined list; the SHA-256 of the whole normalized file; and each path's class from `Get-ProcessReductionDerivedSource` (source, mirror of a named source, or `generated`).
+  - Acceptance: one record per path with its line count (zero allowed), both hashes, and its class; `EXIT_CODE:` 0.
+- [ ] [P0-T5] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` (`CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`) and write `FEATURE/evidence/baseline/stage-g-phase0-instructions-read.<timestamp>.md` with `Timestamp:`, `Policy Order:`, and the files read.
+  - This task is kept because the stop hook on `main` still requires it; under entry `0005` a plan that keeps it stays valid.
+  - Acceptance: the artifact exists with the three fields and names the four files.
+
+### Phase 1 — Spec Record and Control Cases
+
+- [ ] [P1-T1] Add clarification `K9` after `K8` under `## Clarifications` in `FEATURE/spec.md`, stating the re-derived dispositions of `## Re-derived Dispositions` (static artifact per language, Python-only repo-wide reduction, test-gate artifacts kept under D12 and D13). No acceptance criterion and no other text changes.
+  - Acceptance: `spec.md` holds one line beginning `- **K9.`; the task's commit adds that one line to `spec.md` and removes none.
+- [ ] [P1-T2] Add the synthetic cross-check cases to `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1` and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1` in one commit.
+  - `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1`: row `ci-cross-check-synthetic-after-pass` in `Get-EpicMergeGateReviewCaseRow`, outcomes `@($pass, {verdict REMEDIATION_REQUIRED, head_sha reviewed, findings one autonomous})`, expected `REVIEW_GATE_NOT_PASSED`, `NoProcess`; it runs as `RG-ci-cross-check-synthetic-after-pass` in `enforce-epic-merge-gate.ReviewGuard.Tests.ps1` and `RGC-ci-cross-check-synthetic-after-pass` in the Codex `enforce-epic-merge-gate-review.Tests.ps1`.
+  - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`: `OCR-CROSS-CHECK-SYNTHETIC-ENTRY-VALID` (`Get-OrchestratorStateRemediationLoopError` from `OrchestratorStateReceipts.psm1`, given the loop as `-Value`, returns no error for a PASS entry with empty `findings` followed by the synthetic entry) and `OCR-CROSS-CHECK-SYNTHETIC-ENTRY-BLOCKS-COMPLETION` (`Get-OrchestratorStateCompletionConcurrentReviewError` returns the verdict-PASS error under the key).
+  - Acceptance: the row and both cases exist; [P3-T2] proves them in both guard suites.
+
+### Phase 2 — Less-Evidence Reduction (uncommitted until [P3-T4])
+
+- [ ] [P2-T1] Apply G1 to `.claude/skills/atomic-plan-contract/SKILL.md`, `.agents/skills/atomic-plan-contract/SKILL.md`, and `.github/skills/atomic-plan-contract/SKILL.md`, each by hand, and re-copy each to its bundle.
+  - Acceptance: each of the six copies contains `one final-QC static artifact per language` and no `one final-QC artifact per QC command step`; [P2-T9] shows its baseline lines unchanged.
+- [ ] [P2-T2] Apply the G1 clauses to `.claude/agents/atomic-planner.md`, `.claude/agents/atomic-executor.md`, `.codex/agents/atomic-planner.toml`, and `.codex/agents/atomic-executor.toml`; re-copy the Claude bundles; run the Codex generator in module form, then with `--check`.
+  - Acceptance: the generator `--check` exits 0; each of the four sources contains `one final-QC static artifact per language`.
+- [ ] [P2-T3] Apply G1, G2 (reviewer side), G3, and the committed test-gate fallback to `.claude/skills/feature-review-workflow/SKILL.md`, `.agents/skills/feature-review-workflow/SKILL.md`, and `.github/skills/feature-review-workflow/SKILL.md` per the surfaces table, and re-copy the bundles.
+  - Acceptance: each of the six copies contains `## CI Cross-check`; the four `.claude` and `.agents` copies contain `Enforce Python coverage thresholds`.
+- [ ] [P2-T4] Apply G2 (reviewer side), G3, and the fallback to `### Verification Procedure` of `.claude/agents/feature-review.md` and `.codex/agents/feature-review.toml`, and re-copy both bundles.
+  - Acceptance: the four copies contain `## CI Cross-check` and `Enforce Python coverage thresholds`.
+- [ ] [P2-T5] Apply the template edits of the surfaces table to `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md` and `docs/features/templates/policy_audit/AGENTS.md`, and re-copy both to `extensions/drm-copilot/resources/templates/policy_audit/`.
+  - `## CI Cross-check` holds the G2 table header; section 9 keeps its heading and drops `### Commits in This PR/Branch` and `### Files Modified`; every required heading and checklist label of `validate_policy_audit_artifact.py` stays.
+  - Acceptance: both bundles are byte-identical to their sources; the template contains `| Check | Claimed outcome | Claimed figure | Head | Source |`.
+- [ ] [P2-T6] Append item 11 (`**CI cross-check.**`, G2 orchestrator side) to `## Concurrent Review and CI (review_mode)` of `.claude/skills/orchestrate/SKILL.md` and `.agents/skills/orchestrate/SKILL.md`, and re-copy both bundles.
+  - Acceptance: the section of each of the four copies contains `gh pr checks`, `REMEDIATION_REQUIRED`, `autonomous`, and `REVIEW_GATE_NOT_PASSED`; items 1 to 10 are unchanged.
+- [ ] [P2-T7] Create `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1` (read-only, whitespace-collapsed `Contains`, in the pattern of `parallel-gate-wording.Tests.ps1`).
+  - `LEC-STATIC-ARTIFACT-<Id>` (six contract copies, four planner and executor sources); `LEC-CROSS-CHECK-<Id>` (template and bundle, `AGENTS.md` and bundle, six workflow copies, four feature-review copies, four orchestrate copies read from their section); `LEC-PYTHON-TOTAL-<Id>` (the `.claude` and `.agents` workflow copies and bundles, the four feature-review copies, the template and bundle: `Enforce Python coverage thresholds`); `LEC-SCOPE-LISTING-<Id>` (template and bundle hold `## 9. Summary of Changes` and neither removed subsection); `LEC-BASELINE-HELD-<Id>` (contract: `Phase 0 baseline` and `no per-file or repo-wide coverage drop`; template: `Baseline Coverage Documented`, `No Coverage Regression`, `If any required baseline artifact`; `AGENTS.md`: `Fill in baseline coverage metrics`; workflow and feature-review copies: `regression on changed lines` and `Phase 0 baseline`; planner: `one parallel test-suite baseline run per gate`; executor: `no per-file or repo-wide coverage drop`); `LEC-KEPT-<Id>` (contract: `preflight-fixes.<timestamp>.md`, `self-review.<timestamp>.md`; workflow: `acceptance-criteria-tracking`, `Check off passing criteria`).
+  - Acceptance: the file exists and creates no file; [P3-T2] proves it.
+- [ ] [P2-T8] Create `docs/engineering/process-reductions/NNNN-less-evidence.md` per G4 and README `## Entry Format`, and add its `## Index` row with Status `Active`.
+  - `## Files Changed` lists every path of [P2-T1] to [P2-T7], each with its [P0-T4] class, and the README; `## Prior Text` holds the full prior text of each edited region of each source copy; `## Revert Signals` include cross-check mismatches per item, review findings citing missing static evidence, and Python total failures first seen in CI.
+  - Acceptance: `PRL-REAL-LEDGER-AGREES` and `PRC-LEDGER-CHAIN-HOLDS` pass in [P3-T2].
+- [ ] [P2-T9] Run the D13 check and the chain from scripts under `SCRATCH` and write `FEATURE/evidence/other/stage-g-baseline-text-check.<timestamp>.md`.
+  - Recompute the [P0-T4] line lists on the working tree and compare per path; run `Invoke-ProcessReductionChain` over `Read-ProcessReductionChainInput`; for each source path, apply the entry's blocks for that path in memory with `Invoke-ProcessReductionRevert` and confirm the result has the [P0-T4] whole-file hash.
+  - Output Summary: per path, the before and after count and hash and `equal` or `differs`; the chain error count; the per-block replay result.
+  - Acceptance: `EXIT_CODE:` is 0 only when every path is `equal`, the chain reports zero errors, and every replay matches.
+
+### Phase 3 — Final QA and Reduction Commit
+
+- [ ] [P3-T1] Format and analyze the two [P1-T2] files and `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1`, writing `FEATURE/evidence/qa-gates/stage-g-powershell-static.<timestamp>.md`, compared with the greatest `stage-g-powershell-static.*.md` baseline.
+  - A clean pass is `git status --porcelain` unchanged across the formatter and zero findings; a formatter change to a [P1-T2] file is committed alone, and one to the new test stays for [P3-T4].
+  - Acceptance: zero findings and no formatter change in the recorded pass.
+- [ ] [P3-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-g-powershell-test.<timestamp>.md`, compared with the greatest `stage-g-powershell-test-baseline.*.md`.
+  - Output Summary: the [P0-T2] fields, the `LEC-` count, and the comparison: no new failing test and no repo-wide drop; no production file changed, so no per-file row applies.
+  - Acceptance: zero failures; `RG-ci-cross-check-synthetic-after-pass`, `RGC-ci-cross-check-synthetic-after-pass`, and both `OCR-CROSS-CHECK-` cases passed; no drop.
+- [ ] [P3-T3] Run one `poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` with `PYTHONPATH` set as in [P0-T3], writing `FEATURE/evidence/qa-gates/stage-g-python-test.<timestamp>.md`, compared with the greatest `stage-g-python-test-baseline.*.md`.
+  - Acceptance: zero failures, including the push-down contract tests, and no total line or branch drop.
+- [ ] [P3-T4] Commit the reduction, with `docs/engineering/process-reductions/NNNN-less-evidence.md`, as one commit whose subject carries `reduction: NNNN`, containing exactly the paths of the entry's `## Files Changed` (which include the new test and the README) plus the entry file, and push.
+  - Acceptance: `git show --name-only` of that commit lists exactly that set; `git status --porcelain` shows none of those paths afterwards; no other commit on the branch carries the token.
+- [ ] [P3-T5] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+  - Rows include: the [P2-T9] check is `equal` for every path; the reduction is one commit with its entry; no rule, hook, validator, brief, Epic #1019 folder, or admitted plan is in the diff; `## Test Dispositions` holds; the D9 lag is stated in the entry.
+  - Acceptance: no FAIL row; a FAIL is fixed and the loop restarts from [P3-T1].
+
+## Size Justification
+
+The plan holds 21 tasks, one above the 20-task guideline, because [P0-T5] keeps the routine policy-read task that the planner stop hook on `main` still requires; the 20 design tasks are unchanged.
+
+## Pre-Mortem
+
+- Review checklists: [P3-T5] walks all three templates against the merge-base diff, with explicit rows for D13, the one-commit rule, and scope.
+- Coverage: no production file changes; [P3-T2] and [P3-T3] compare results and repo-wide totals with the `Phase 0 baseline` of [P0-T2] and [P0-T3].
+- Mirror parity: every non-identical copy is edited by hand and every bundle is re-copied in the same task; Codex variants are regenerated with `--check` in [P2-T2]; push-down tests run in [P3-T3]. The `execution-environment` brief is not edited: no CI job, required context, tool route, or batch-budget rule changes, and the new contract test is not added to its list, because that list lies inside a `0001` hunk region.
+- File size: every edited file is Markdown or TOML; the two edited test files and the new one stay under 500 logical lines.
+- Test isolation: the new suite reads tracked text only and creates no file; the new cases are in-memory. Gates are one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run, each re-run only after a fix; no Jest run, because no TypeScript file changes.
+- CI-only behavior: assertions collapse whitespace and use exact path case and `Join-Path`; no test reads `artifacts/`; the suites run in the Windows shards, and the `docs/engineering/` change forces a full CI run.
+- Evidence: every artifact is under `FEATURE/evidence/<kind>/` with write-time stamps; [P0-T4] and [P2-T9] record the D13 before and after state; `SCRATCH` appears as a token only.

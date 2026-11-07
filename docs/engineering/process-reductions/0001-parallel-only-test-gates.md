@@ -288,15 +288,17 @@ Paths of the #1096 landing. The six `execution-environment` copies listed above 
 
 `patches/0001-parallel-only-test-gates.patch` holds the reduction as one diff. It is `git diff --binary --no-renames` from the merge base of `origin/main` and the branch head, limited to the paths in `## Files Changed`.
 
-The check: `git apply -R --check` of the patch succeeds on the working tree. A failed check means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
+Rebased for stage R (issue #1097): the sections of `.claude/skills/execution-environment/SKILL.md` and its five copies were regenerated so that both images carry the `planning-contract-wording.Tests.ps1` line, which a stage E commit with no entry of its own added to the brief's contract-test list inside the context of the hunk that adds the `parallel-gate-wording.Tests.ps1` line. Their other hunks are unchanged apart from line numbers.
 
-The patch does not hold the edits of the #1096 landing. Those edits are carried only by their Revert Blocks in `## Prior Text`.
+Rebased over PR #1112 (issue #1096): the six brief sections were regenerated so that both images carry the three `Invoke-PoshQCLeakScan` bullets that PR #1112 added inside their hunks; their other hunks are unchanged apart from line numbers.
+
+The check: `git apply -R --check` of the patch succeeds on the tree after every later entry that touches the patch's paths is reverted, newest-first, as README `## Revert Order` states, and then this entry's later landings are reverted; it is not run on the live tree. A failed check on that tree means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
+
+The patch does not hold the edits of the #1096 landing. Those edits are carried only by their Revert Blocks in `## Prior Text`, under `### Later Landing: #1096`.
 
 ## Prior Text
 
 The two rules that carry the reduction each have blocks. `.claude/skills/execution-environment/SKILL.md` takes one block for the body of `## Test Isolation Checks`, because its five mirrors are byte-identical. The three `atomic-plan-contract` sources differ from one another, so each takes a block for its `Test isolation` sentence of the Pre-Mortem rule.
-
-The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionRevertBlock` reads only the first fence of each label in a block, so a file whose landing has separate hunks takes one block per hunk under the same path. A block whose `Prior` fence is empty removes test text that the landing added. Each `Prior` fence holds the text of `main` after PR #1108 (issue #1106), which removed the stale package coverage flag from the same commands, so a revert restores `--cov=scripts/dev_tools` as the only coverage source. The coverage-flag hunks of `.vscode/tasks.json` and `scripts/dev_tools/fix_all_branches_extra.py` match `main` after that change and take no block. The brief copies other than `.claude/skills/execution-environment/SKILL.md` take no block, because step 2 re-copies them.
 
 ### Revert Block: .claude/skills/execution-environment/SKILL.md
 
@@ -353,6 +355,10 @@ The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-
 ````Prior
 The `Test isolation` bullet names the isolation runs the plan performs: a seeded shuffled Jest run with the seed recorded, a reversed-order run of the new or changed Python test modules, and a seeded shuffled file-order run of the touched Pester suites with at least three seeds, each seed recorded.
 ````
+
+### Later Landing: #1096
+
+The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionRevertBlock` reads only the first fence of each label in a block, so a file whose landing has separate hunks takes one block per hunk under the same path. A block whose `Prior` fence is empty removes test text that the landing added. Each `Prior` fence holds the text of `main` after PR #1108 (issue #1106), which removed the stale package coverage flag from the same commands, so a revert restores `--cov=scripts/dev_tools` as the only coverage source. The coverage-flag hunks of `.vscode/tasks.json` and `scripts/dev_tools/fix_all_branches_extra.py` match `main` after that change and take no block. The brief copies other than `.claude/skills/execution-environment/SKILL.md` take no block, because step 2 re-copies them.
 
 ### Revert Block: .claude/skills/execution-environment/SKILL.md
 
@@ -911,7 +917,7 @@ def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
 
 ## Revert Steps
 
-1. Apply the blocks: revert entry `0006` (`0006-test-suite-baseline-restored.md`) first, because it restores baseline text inside hunks of this entry's patch, so this patch does not reverse-apply while `0006` is in place. Then run `git apply -R` of the patch when its check passes. Otherwise replace each `Current` with its `Prior`, which restores the core rule, and restore the other paths from the patch text. The blocks of the #1096 landing apply whether or not the patch check passes, because the patch does not hold them: replace each of their `Current` texts with its `Prior`.
+1. Apply the blocks: revert every later entry that names any path in `## Files Changed`, newest-first, as README `## Revert Order` states; then revert this entry's later landing under `### Later Landing: #1096` by replacing each of its `Current` texts with its `Prior`, because the patch does not hold it; then run `git apply -R` of the patch when its check passes. Otherwise replace each `Current` above that heading with its `Prior`, which restores the core rule, and restore the other paths from the patch text.
 2. Re-copy mirrors and bundles: copy `.claude/skills/execution-environment/SKILL.md` to its five copies, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md`. Copy each `atomic-plan-contract` source to its bundle copy: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md`.
 3. Regenerate Codex variants: run `scripts/dev_tools/generate_codex_agent_variants.py` in module form, then run it with `--check`.
 4. Restore pinned hashes: not applicable, because `parallel_orchestrator_surface_expectations.py` is outside the reduction path set.
