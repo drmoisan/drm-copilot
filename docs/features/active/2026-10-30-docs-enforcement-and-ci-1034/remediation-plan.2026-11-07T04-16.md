@@ -222,7 +222,7 @@ A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy with an enabled pro
 
 ### Phase 1 — Integration Merge
 
-- [ ] [P1-T1] Merge `EPIC_REF` into the branch with a merge commit, resolve `.claude/lib/docs/Invoke-DocsCommand.ps1` by keeping both sides, copy it byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/Invoke-DocsCommand.ps1`, and apply the matching case of `## Integration Merge: Effect on This Item`.
+- [x] [P1-T1] Merge `EPIC_REF` into the branch with a merge commit, resolve `.claude/lib/docs/Invoke-DocsCommand.ps1` by keeping both sides, copy it byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/Invoke-DocsCommand.ps1`, and apply the matching case of `## Integration Merge: Effect on This Item`.
   - Kept from upstream: every line of its `InvokeProcess` and context changes, verbatim. Kept from this item: the `surface-delta` row under `# --- 1034: surface-delta ---`, `Resolve-DocsContextRevision`, `Read-DocsContextRevisionText`, and the two members with their closures and description lines. `$invokeProcess` stays assigned above the two closures. Case C edits to `REVISION_SUITE` go in this commit.
   - A conflict in any other path stops the run as BLOCKED, because the inputs list only these two.
   - Acceptance: `git merge-base --is-ancestor EPIC_REF HEAD` exits 0; `HEAD` has two parents and the push is not forced; `CLI` holds no conflict marker and parses with no parser error; the SHA-256 of `CLI` and `CLI_BUNDLE` is equal.

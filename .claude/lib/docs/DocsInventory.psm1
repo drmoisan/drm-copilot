@@ -14,7 +14,9 @@
     unknown -Analyzer identifier, or one producing none of the selected element kinds: exit 2);
     list the source roots and apply Get-DocsInventorySelection; apply the aggregate bounds (exit
     3); read each selected file with ReadBytes into New-DocsCapturedInput -MaxBytes 1048576;
-    invoke each selected row with Invoke-DocsAnalyzer; build the snapshot with
+    invoke each selected row with Invoke-DocsAnalyzer, delegating the Python identifiers that
+    have a native row to Invoke-DocsPythonNativeInventory under -AnalysisMethod (auto, native
+    or scanner; issue #1031); build the snapshot with
     New-DocsInventorySnapshot and Context.UtcNow and self-validate it (a failure is a defect guard,
     exit 3); without -Write nothing is written, with -Write the indented snapshot text goes to
     artifact_paths.inventory_snapshot through WriteText (overwrite when the file exists, else
@@ -37,9 +39,11 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSchema.psm1')
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfile.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerRegistry.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsInventorySnapshot.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerPythonNative.psm1') -ErrorAction Stop
 
 $script:DocsInventoryCommandName = 'inventory'
 $script:DocsInventoryMaxInputBytes = 1048576
+$script:DocsInventoryAnalysisMethod = [string[]]@('auto', 'native', 'scanner')
 
 function Invoke-DocsContextMember {
     <#
@@ -178,11 +182,13 @@ function Invoke-DocsInventoryCommand {
     .SYNOPSIS
         Builds, and with -Write writes, the surface-inventory-snapshot for the profile.
     .DESCRIPTION
-        Options: Profile (value), Analyzer (multi), Revision (value), Write (switch). Exit 0:
+        Options: Profile (value), Analyzer (multi), Revision (value), Write (switch),
+        AnalysisMethod (value: auto, the default, native or scanner; issue #1031). Exit 0:
         snapshot built with no blocking diagnostic; 1: blocking diagnostics (one
         DOCS_INVENTORY_BLOCKING_DIAGNOSTIC each), or an absent or invalid profile (no snapshot);
         2: usage error (one DOCS_CLI_ARGUMENTS, result null); 3: runtime failure (one
-        DOCS_CLI_RUNTIME, result null).
+        DOCS_CLI_RUNTIME, result null), or -AnalysisMethod native with the native analyzers
+        unavailable (one DOCS_PYTHON_NATIVE_UNAVAILABLE, no write).
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -196,6 +202,8 @@ function Invoke-DocsInventoryCommand {
     $revision = Get-DocsInventoryArgumentValue -Argument $Argument -Name 'Revision' -Default $null
     [string[]] $analyzerIds = @(Get-DocsInventoryArgumentValue -Argument $Argument -Name 'Analyzer' -Default @())
     $write = [bool] (Get-DocsInventoryArgumentValue -Argument $Argument -Name 'Write' -Default $false)
+    $method = [string] (Get-DocsInventoryArgumentValue -Argument $Argument -Name 'AnalysisMethod' -Default 'auto')
+    if ($script:DocsInventoryAnalysisMethod -cnotcontains $method) { return New-DocsInventoryExitResult -ExitCode 2 -Message "AnalysisMethod '$method' is not one of auto, native, scanner." }
     if (-not (Test-DocsRelativePath -Path $profilePath)) { return New-DocsInventoryExitResult -ExitCode 2 -Message "Profile '$profilePath' is not a repository-relative path." }
     if ($null -ne $revision -and -not (Test-DocsFullRevision -Revision ([string] $revision))) { return New-DocsInventoryExitResult -ExitCode 2 -Message "Revision '$revision' is not a full object id (40 or 64 lowercase hex characters)." }
 
@@ -236,15 +244,33 @@ function Invoke-DocsInventoryCommand {
             $captured.Add((New-DocsCapturedInput -Path $path -Bytes $bytes -MaxBytes $script:DocsInventoryMaxInputBytes))
         }
 
-        $outputs = [System.Collections.Generic.List[object]]::new()
+        $registration = Get-DocsAnalyzerRegistration
+        [string[]] $nativeIds = @($registration | Where-Object { [string] $_.AnalysisMethod -ceq 'native' } | ForEach-Object { [string] $_.Id })
+        [string[]] $eligible = @($rows.Rows | Where-Object { $nativeIds -ccontains [string] $_.Id } | ForEach-Object { [string] $_.Id })
+        $invoked = [System.Collections.Generic.List[object]]::new()
+        $extra = [System.Collections.Generic.List[object]]::new()
+        foreach ($entry in @($selected.Diagnostics)) { if ($null -ne $entry) { $extra.Add($entry) } }
         foreach ($row in $rows.Rows) {
+            if ($eligible -ccontains [string] $row.Id) { continue }
             $result = Invoke-DocsAnalyzer -Registration $row -CapturedInput $captured.ToArray() -Selection $selection
             if (@($result.Findings).Count -gt 0) { return New-DocsInventoryExitResult -ExitCode 3 -Message "The analyzer '$($row.Id)' returned output outside the analyzer contract: $($result.Findings[0]['message'])" }
-            $outputs.Add(@{ Elements = $result.Elements; Diagnostics = $result.Diagnostics })
+            $invoked.Add(@{ Row = $row; Output = @{ Elements = $result.Elements; Diagnostics = $result.Diagnostics } })
         }
+        if ($eligible.Count -gt 0) {
+            $native = Invoke-DocsPythonNativeInventory -Registration $registration -CapturedInput $captured.ToArray() -Selection $selection -AnalyzerId $eligible -SourceRoot ([string[]]@($selection['source_roots'])) -AnalysisMethod $method -Context $Context
+            if ($null -ne $native.Finding) { return New-DocsCommandResult -Command $name -ExitCode 3 -Finding @($native.Finding) }
+            for ($index = 0; $index -lt @($native.Rows).Count; $index++) { $invoked.Add(@{ Row = $native.Rows[$index]; Output = $native.Outputs[$index] }) }
+            foreach ($entry in @($native.Diagnostics)) { if ($null -ne $entry) { $extra.Add($entry) } }
+        }
+        $sorted = [System.Collections.Generic.SortedDictionary[string, object]]::new([System.StringComparer]::Ordinal)
+        foreach ($entry in $invoked) { $sorted[[string] $entry['Row'].Id + "`n" + [string] $entry['Row'].AnalysisMethod] = $entry }
+        [object[]] $ordered = @($sorted.Values)
+        $snapshotRows = [object[]]@($ordered | ForEach-Object { $_['Row'] })
+        $outputs = [System.Collections.Generic.List[object]]::new()
+        foreach ($entry in $ordered) { $outputs.Add($entry['Output']) }
 
         $capturedAt = [datetime] (Invoke-DocsContextMember -Member $Context.UtcNow)
-        $snapshot = New-DocsInventorySnapshot -Profile $docsProfile -Revision $revision -Registration $rows.Rows -CapturedInput $captured.ToArray() -AnalyzerOutput $outputs.ToArray() -Diagnostic $selected.Diagnostics -CapturedAt $capturedAt
+        $snapshot = New-DocsInventorySnapshot -Profile $docsProfile -Revision $revision -Registration $snapshotRows -CapturedInput $captured.ToArray() -AnalyzerOutput $outputs.ToArray() -Diagnostic $extra.ToArray() -CapturedAt $capturedAt
         $snapshotText = ConvertTo-DocsJsonText -Value $snapshot -Indented
         $snapshotPath = [string] $docsProfile['artifact_paths']['inventory_snapshot']
         $validation = Test-DocsArtifactText -ArtifactKind 'surface-inventory-snapshot' -JsonText $snapshotText -ComposedSchemaSet $schemas -ArtifactPath $snapshotPath
