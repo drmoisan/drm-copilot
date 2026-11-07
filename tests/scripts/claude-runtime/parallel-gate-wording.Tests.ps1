@@ -17,6 +17,8 @@ BeforeDiscovery {
     $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
     $script:CopilotPesterForbidden = @('mcp_drmcopilotext_run_poshqc_test')
     $script:CopilotFocusedForbidden = @('-k slug_extraction')
+    $script:AuditRequired = @('N/A - no pre-change run', 'poetry run pytest -n auto', 'Invoke-PoshQCParallelTest')
+    $script:AuditForbidden = @('numeric baseline', 'Baseline (pre-development)', 'Invoke-PoshQCTest')
 }
 
 Describe 'Parallel gate wording' {
@@ -114,6 +116,10 @@ Describe 'Parallel gate wording' {
         @{ Id = 'COPILOT-PLANNING-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
         @{ Id = 'COPILOT-PS-PLANNING'; Path = '.github/agents/powershell-atomic-planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
         @{ Id = 'COPILOT-PS-PLANNING-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
+        @{ Id = 'AUDIT-TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
+        @{ Id = 'AUDIT-TEMPLATE-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
+        @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest'); Forbidden = @('Document baseline coverage') }
+        @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest'); Forbidden = @('Document baseline coverage') }
     ) {
         # Arrange
         $text = Get-PgwSurfaceText -RelativePath $Path
