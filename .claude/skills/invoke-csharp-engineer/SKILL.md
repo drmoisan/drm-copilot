@@ -1,6 +1,6 @@
 ---
 name: invoke-csharp-engineer
-description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
+description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
 ---
 
 # Implement C# Skill
@@ -28,7 +28,7 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 ## Output Paths
 
 - C# source and test files within the approved scope.
-- Static baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and final gate evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
 - This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
@@ -37,10 +37,10 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 The worker must return the following reporting block:
 
 1. Scope (exact file list).
-2. Baseline (CSharpier, .NET Analyzers, and Nullable Analysis findings).
+2. Baseline (CSharpier, .NET Analyzers, Nullable Analysis, xUnit, coverage status).
 3. Plan (design and test strategy).
 4. Diffs (patch-style or full-file replacements).
-5. QA Gate Results (CSharpier, .NET Analyzers, and Nullable Analysis deltas, failures in the single gate run, and per-file coverage against the thresholds, or clearly marked **unverified**).
+5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, xUnit, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 
 ## Delegation Identity Lines
 

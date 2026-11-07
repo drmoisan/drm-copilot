@@ -111,7 +111,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 - `test_push_down_issue_824_follow_ups.py`: pushed rules and skills name no consuming product.
 - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
 - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
-- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed serial-run wording.
 - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
 - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
 - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
@@ -145,7 +145,7 @@ These pass every validator rule and are found only by reading the plan against t
 - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
 - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
 - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
-- Per-file figures are read from the single gate run, and no earlier figure is compared.
+- Per-file figures are read from the single gate run and compared with the `Phase 0 baseline` run of the same gate; a new file has no pre-change run and is judged against the thresholds.
 - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
 
 ## Test Runtime

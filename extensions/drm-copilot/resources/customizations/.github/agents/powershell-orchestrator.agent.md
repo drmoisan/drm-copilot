@@ -14,7 +14,7 @@ handoffs:
     send: true
   - label: Small-scope implementation path
     agent: powershell-typed-engineer
-    prompt: "Estimate and confirm scope (1-3 production PowerShell files + corresponding tests). If confirmed, execute the constrained short-path implementation phase from the approved minimal-audit plan and return analyzer deltas, gate failures, and per-file coverage."
+    prompt: "Estimate and confirm scope (1-3 production PowerShell files + corresponding tests). If confirmed, execute the constrained short-path implementation phase from the approved minimal-audit plan and return analyzer/test/coverage deltas."
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
@@ -38,11 +38,11 @@ handoffs:
     send: true
   - label: Build PowerShell atomic plan (preflight all clear)
     agent: powershell-atomic-planning
-    prompt: "You are powershell-atomic-planning.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Delegate plan creation to `atomic_planner` (planning only).\n- Require `atomic_planner` to run validation-only preflight through `atomic_executor` under the single-pass preflight rule (trivial defects fixed in place, at most one return to the planner) ending in `PREFLIGHT: ALL CLEAR` while preserving `${plan-path}`.\n- Approved plans MUST include explicit static baseline tasks and final-QC coverage tasks for PowerShell when policy requires coverage; coverage MUST NOT be left as UNVERIFIED for PASS outcomes.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
+    prompt: "You are powershell-atomic-planning.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Delegate plan creation to `atomic_planner` (planning only).\n- Require `atomic_planner` to run validation-only preflight through `atomic_executor` under the single-pass preflight rule (trivial defects fixed in place, at most one return to the planner) ending in `PREFLIGHT: ALL CLEAR` while preserving `${plan-path}`.\n- Approved plans MUST include explicit coverage-bearing baseline (the `Phase 0 baseline`, one `Invoke-PoshQCParallelTest` run) and final-QC testing tasks for PowerShell when policy requires coverage; coverage MUST NOT be left as UNVERIFIED for PASS outcomes.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
     send: true
   - label: Execute approved PowerShell atomic plan
     agent: powershell_atomic_executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce PowerShell quality gates and DI/mocking constraints from agent policy.\n4) Complete final QA loop (format → analyze → test, plus coverage when enforced) and report analyzer deltas, gate failures, and per-file coverage; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When PowerShell coverage is required, execute coverage-enabled test commands and produce numeric per-file coverage results from the single gate run; if those metrics are missing, mark execution as remediation-required rather than PASS.\n6) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer deltas, gate failures, and per-file coverage\n- AC Status Summary\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce PowerShell quality gates and DI/mocking constraints from agent policy.\n4) Complete final QA loop (format → analyze → test, plus coverage when enforced) and report analyzer/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When PowerShell coverage is required, execute coverage-enabled test commands and produce numeric baseline/post/new-code coverage results (baseline from the Phase 0 baseline artifact, post-change and per-file values from the single gate run); if those metrics are missing, mark execution as remediation-required rather than PASS.\n6) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer/test/coverage deltas\n- AC Status Summary\n- updated plan checklist state"
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
@@ -216,7 +216,7 @@ Delegate to `powershell-typed-engineer` using handoff **Small-scope implementati
 Required delegation expectations:
 - implement only Phase 1 placeholder scope,
 - strict QA gates,
-- final analyzer deltas, gate failures, and per-file coverage,
+- final analyzer/test/coverage deltas,
 - completion report referencing `${feature-folder}` and approved `plan-path`.
 
 ### Step S7 — Validate delivery and post-QC documentation
@@ -314,7 +314,7 @@ Delegate to `powershell-atomic-planning` via handoff **Build PowerShell atomic p
 Hard enforcement for Step 4:
 - The planning route MUST be `powershell-atomic-planning -> atomic_planner -> atomic_executor` for preflight validation.
 - The planner MUST update `${plan-path}` in place and MUST NOT create additional `plan.*.md` files for revisions.
-- The approved plan MUST include explicit final-QC coverage capture tasks for PowerShell where policy requires coverage.
+- The approved plan MUST include explicit coverage capture tasks (baseline and final QC) for PowerShell where policy requires coverage.
 - Do not mark Step 4 complete until delegate output includes both a concrete `plan-path` and final `PREFLIGHT: ALL CLEAR`.
 
 ### Step 5 — Execute approved atomic plan
@@ -322,7 +322,7 @@ Hard enforcement for Step 4:
 Delegate to `powershell_atomic_executor` via handoff **Execute approved PowerShell atomic plan** using the Step 4 approved `plan-path`.
 
 Hard enforcement for Step 5:
-- Do not mark Step 5 complete until execution output includes execution summary, QA summary, analyzer deltas, gate failures, and per-file coverage, and numeric per-file coverage from the single gate run where policy requires them.
+- Do not mark Step 5 complete until execution output includes execution summary, QA summary, analyzer/test/coverage deltas, and numeric baseline/post/new-code coverage metrics where policy requires them.
 
 ### Step 6 — Post-implementation review
 

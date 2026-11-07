@@ -105,7 +105,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
 ````Current
 
 1) Baseline capture block
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
 - required artifacts:
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
 	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
@@ -116,7 +116,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
 
 1) Baseline capture block
 - policy reads in required order,
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
 - required artifacts:
 	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
@@ -131,7 +131,9 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
 
 Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
 
-Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+
+A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
 
 For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
 - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
@@ -144,7 +146,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these 
 
 Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
 
-Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+
+A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
 
 For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
 - `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
@@ -199,7 +203,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 ````Current
 
 1) Baseline capture block
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
 - required artifacts:
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
 	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
@@ -210,7 +214,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 1) Baseline capture block
 - policy reads in required order,
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
 - required artifacts:
 	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
@@ -225,7 +229,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
 
-Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+
+A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
 
 For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
 - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
@@ -238,7 +244,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these 
 
 Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
 
-Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+
+A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
 
 For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
 - `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
@@ -288,7 +296,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 ````Current
 1) Baseline capture block
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
 - required artifacts:
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
 
@@ -297,7 +305,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 ````Prior
 1) Baseline capture block
 - policy reads in required order,
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
 - required artifacts:
 	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
@@ -341,14 +349,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 ````Current
 - Sequential task numbering within each phase
-- Phase 0: baseline capture (language-specific static tool baselines; no test suite runs)
+- Phase 0: baseline capture (language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
 - Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
 
 ````
 
 ````Prior
 - Sequential task numbering within each phase
-- Phase 0: baseline capture (repo-policy reading tasks + language-specific static tool baselines; no test suite runs)
+- Phase 0: baseline capture (repo-policy reading tasks + language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
 - Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
 
 ````
@@ -357,14 +365,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 ````Current
 - Sequential task numbering within each phase
-- Phase 0: baseline capture (language-specific static tool baselines; no test suite runs)
+- Phase 0: baseline capture (language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
 - Final phase: full QA loop for each applicable language
 
 ````
 
 ````Prior
 - Sequential task numbering within each phase
-- Phase 0: baseline capture (repo-policy reading tasks + language-specific static tool baselines; no test suite runs)
+- Phase 0: baseline capture (repo-policy reading tasks + language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
 - Final phase: full QA loop for each applicable language
 
 ````
@@ -373,14 +381,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 ````Current
 - Tasks: `- [ ] [P#-T#]` with sequential per-phase IDs.
-- Phase 0 captures static baseline results per `evidence-and-timestamp-conventions`.
+- Phase 0 captures static baseline results and the `Phase 0 baseline` test-suite run per `evidence-and-timestamp-conventions`.
 - Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
 
 ````
 
 ````Prior
 - Tasks: `- [ ] [P#-T#]` with sequential per-phase IDs.
-- Phase 0 captures policy reads and static baseline results per `policy-compliance-order` and `evidence-and-timestamp-conventions`.
+- Phase 0 captures policy reads, static baseline results, and the `Phase 0 baseline` test-suite run per `policy-compliance-order` and `evidence-and-timestamp-conventions`.
 - Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
 
 ````
@@ -406,14 +414,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 ````Current
 - Task numbers are sequential within each phase.
 - Phase 0 exists.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
 ````Prior
 - Task numbers are sequential within each phase.
 - Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
@@ -438,14 +446,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 ````Current
 - Task numbers are sequential within each phase.
 - Phase 0 exists.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
 ````Prior
 - Task numbers are sequential within each phase.
 - Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
@@ -470,14 +478,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 ````Current
 - Task numbers are sequential within each phase.
 - Phase 0 exists.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
 ````Prior
 - Task numbers are sequential within each phase.
 - Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
@@ -502,14 +510,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 ````Current
 - Task numbers are sequential within each phase.
 - Phase 0 exists.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
 ````Prior
 - Task numbers are sequential within each phase.
 - Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 
 ````
 
@@ -709,14 +717,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 
 ````Current
 - If Phase 0 does not include:
-  - Static baseline capture for each language touched by the plan,
+  - Baseline capture for each language touched by the plan: static baselines and one `Phase 0 baseline` run of each test gate,
 
 ````
 
 ````Prior
 - If Phase 0 does not include:
   - Repo-policy reading tasks, AND
-  - Static baseline capture for each language touched by the plan,
+  - Baseline capture for each language touched by the plan: static baselines and one `Phase 0 baseline` run of each test gate,
 
 ````
 
@@ -724,14 +732,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 
 ````Current
 - Phase 0 exists and includes:
-  - Static baseline runs for each language touched
+  - Baseline runs for each language touched: static baselines and one `Phase 0 baseline` run of each test gate
 
 ````
 
 ````Prior
 - Phase 0 exists and includes:
   - Repo-policy reading
-  - Static baseline runs for each language touched
+  - Baseline runs for each language touched: static baselines and one `Phase 0 baseline` run of each test gate
 
 ````
 
@@ -739,14 +747,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 
 ````Current
 - If Phase 0 does not include:
-  - Static baseline capture for each language touched by the plan,
+  - Baseline capture for each language touched by the plan: static baselines and one `Phase 0 baseline` run of each test gate,
 
 ````
 
 ````Prior
 - If Phase 0 does not include:
   - Repo-policy reading tasks, AND
-  - Static baseline capture for each language touched by the plan,
+  - Baseline capture for each language touched by the plan: static baselines and one `Phase 0 baseline` run of each test gate,
 
 ````
 
@@ -754,14 +762,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan 
 
 ````Current
 - Phase 0 exists and includes:
-  - Static baseline runs for each language touched
+  - Baseline runs for each language touched: static baselines and one `Phase 0 baseline` run of each test gate
 
 ````
 
 ````Prior
 - Phase 0 exists and includes:
   - Repo-policy reading
-  - Static baseline runs for each language touched
+  - Baseline runs for each language touched: static baselines and one `Phase 0 baseline` run of each test gate
 
 ````
 

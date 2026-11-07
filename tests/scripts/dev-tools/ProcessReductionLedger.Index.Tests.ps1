@@ -151,6 +151,24 @@ Describe 'Committed ledger' {
         $result.RowCount | Should -Be @($ledger.Entries).Count
     }
 
+    It 'PRL-PARTIAL-REVERT-LINKED links the 0001 partial revert to entry 0006 in the index and both entries' {
+        # Arrange
+        $readme = Get-Content -Raw -LiteralPath (Join-Path $script:LedgerPath 'README.md')
+        $entry0001 = Get-Content -Raw -LiteralPath (Join-Path $script:LedgerPath '0001-parallel-only-test-gates.md')
+        $entry0006 = Get-Content -Raw -LiteralPath (Join-Path $script:LedgerPath '0006-test-suite-baseline-restored.md')
+
+        # Act
+        $row0001 = @($readme -split "`r?`n" | Where-Object { $_.StartsWith('| [0001](0001-parallel-only-test-gates.md) |') })
+        $partialRevert = Get-ProcessReductionSection -Text $entry0001 -Heading 'Partial Revert'
+        $summary0006 = Get-ProcessReductionSection -Text $entry0006 -Heading 'Summary'
+
+        # Assert
+        $row0001.Count | Should -Be 1 -Because 'the index holds one 0001 row'
+        $row0001[0] | Should -Match '\|\s*Partially reverted by 0006\s*\|\s*$' -Because 'the 0001 Status names the partial revert'
+        $partialRevert | Should -Match '0006-test-suite-baseline-restored\.md' -Because 'the 0001 Partial Revert section links entry 0006'
+        $summary0006 | Should -Match 'entry `0001`' -Because 'the 0006 summary names the entry it partially reverts'
+    }
+
     It 'PRL-README-EXAMPLE-IS-VALID validates the worked example and replays its first block' {
         $readme = Get-Content -Raw -LiteralPath (Join-Path $script:LedgerPath 'README.md')
         $section = Get-ProcessReductionSection -Text $readme -Heading 'Worked Example'

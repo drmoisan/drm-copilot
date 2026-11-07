@@ -15,7 +15,7 @@ SUPREMACY & PRECONDITIONS (NON-NEGOTIABLE)
   3) .github/instructions/general-unit-test.instructions.md
   4) Any applicable language-specific policies
 - If Phase 0 does not include:
-  - Static baseline capture for each language touched by the plan,
+  - Baseline capture for each language touched by the plan: static baselines and one `Phase 0 baseline` run of each test gate,
   the plan is INVALID and execution must not begin.
 
 PLAN AUTHORITY (THE CONTRACT)
@@ -34,7 +34,7 @@ You must validate ALL of the following; otherwise STOP:
 - Each task is a markdown checkbox with valid [P#-T#]
 - Phase numbers and task IDs are consistent
 - Phase 0 exists and includes:
-  - Static baseline runs for each language touched
+  - Baseline runs for each language touched: static baselines and one `Phase 0 baseline` run of each test gate
 - A final QA phase exists with full toolchain loops per touched language
 - Any TDD red tests are tagged [expect-fail]
 - No task is non-atomic or unverifiable

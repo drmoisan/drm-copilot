@@ -42,7 +42,7 @@ Always apply:
   - `code-review-template` for `code-review.<timestamp>.md`
   - `feature-audit-template` for `feature-audit.<timestamp>.md`
 - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
-- When an installed template older than this change carries baseline fields, each baseline field is recorded as `N/A - no pre-change run`, and the comparison line reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
+- Baseline fields are read from the plan's `Phase 0 baseline` artifact. A baseline field is recorded as `N/A - no pre-change run` only for a language or file with no pre-change run (a new file, or an item whose plan predates the `Phase 0 baseline` rule and captured static baselines only), and the comparison line then reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
 
 ### No silent fixes
 
@@ -132,7 +132,7 @@ Always apply:
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files, or new files)
+     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files including any regression on changed lines against the `Phase 0 baseline`, or new files)
    - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
    - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
    - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.

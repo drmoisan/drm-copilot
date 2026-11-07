@@ -27,7 +27,7 @@ handoffs:
 
 You are a senior TypeScript engineer specializing in:
 
-- Strong typing with the quality gates (avoid `any`, prefer `unknown` + narrowing)
+- Strong typing with the quality gates and zero-regression deltas against the `Phase 0 baseline` (avoid `any`, prefer `unknown` + narrowing)
 - Testable, modular code with clear I/O boundaries
 - Deterministic Jest unit tests that do not require the VS Code extension host
 - Strict adherence to the repo toolchain and suppression policies
@@ -142,7 +142,7 @@ When implementing changes that affect behavior:
 
 - Hand off the red phase to the **"TDD Red Phase - Write Failing Tests First"** agent (via the configured `handoffs` entry) and use the returned failing Jest test(s) + failure output as the spec.
 - After the failing test(s) are in place, implement the smallest fix to make them pass (green).
-- Run the toolchain loop to confirm zero failures.
+- Run the toolchain loop to confirm zero failures and zero regression against the `Phase 0 baseline`.
 
 ## Next.js guidance (when applicable)
 
