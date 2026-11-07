@@ -231,6 +231,13 @@ function Get-EpicProgressItemStep {
     foreach ($type in @('review', 'pr', 'ci')) { & $addTimed $type }
     $steps.Add((Get-EpicProgressStepRecord -Issue $issue -Type 'merge' -Status $(if ($merged) { 'done' } else { 'remaining' })))
     foreach ($cycleStep in $cycleSteps) { $steps.Add($cycleStep) }
+    # An open attempt beyond the initial steps (for example a re-audit) runs on the first step
+    # of its type that is not done, which then carries the attempt's start.
+    foreach ($open in @($records | Where-Object { $null -eq $_.EndedUnixSeconds -and $_.Type -notin @('composite', 'unmapped', 'execution') })) {
+        if (@($steps | Where-Object { $_.Type -eq $open.Type -and $_.Status -eq 'in_progress' -and $null -ne $_.StartedUnixSeconds }).Count -gt 0) { continue }
+        $openTarget = @($steps | Where-Object { $_.Type -eq $open.Type -and $_.Status -ne 'done' }) | Select-Object -First 1
+        if ($null -ne $openTarget) { $openTarget.Status = 'in_progress'; $openTarget.StartedUnixSeconds = $open.StartedUnixSeconds }
+    }
 
     $hasOpen = @($steps | Where-Object { $_.Status -eq 'in_progress' }).Count -gt 0
     $nextStep = [string] $checkpoint.next_step

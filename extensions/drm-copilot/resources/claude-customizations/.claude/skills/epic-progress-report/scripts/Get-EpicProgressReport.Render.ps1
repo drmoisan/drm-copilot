@@ -183,7 +183,9 @@ function Get-EpicProgressFullLine {
         $phase = ''
         if ($record.Phase) { $phase = " Now at: $($record.Phase)." }
         $share = Format-EpicProgressNumber -Value (100.0 * $record.Done / [math]::Max(1, $record.Total)) -Digits 0
-        $lines.Add("| Running | #$($record.Issue) (wave $($record.Wave), $($record.Band)): $($record.Done) of $($record.Total) steps ($share%).$phase$pullRequest |")
+        $where = "wave $($record.Wave)"
+        if ($record.Band) { $where = "$where, $($record.Band)" }
+        $lines.Add("| Running | #$($record.Issue) ($where): $($record.Done) of $($record.Total) steps ($share%).$phase$pullRequest |")
     }
     $blockedText = 'None'
     if ($Summary.Blocked.Count -gt 0) { $blockedText = ($Summary.Blocked | ForEach-Object { "#$($_.Issue) ($($_.BlockedReason))" }) -join ', ' }

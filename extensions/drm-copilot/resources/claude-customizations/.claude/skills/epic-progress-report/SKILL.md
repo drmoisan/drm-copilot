@@ -204,7 +204,8 @@ Full report contents:
 - `<completed>` is `None yet` or the completed issues; `<blocked>` is `None` or each blocked
   issue with its reason. In item mode the heading reads `## Item #<issue>: status at ...`.
 - One `Running` row per running feature, with ` Now at: <phase>.` and ` PR <state>.` when
-  present; one `Pending, wave <w>` row per wave with pending features.
+  present and `(wave <w>)` when the item has no band; one `Pending, wave <w>` row per wave
+  with pending features.
 - The `Epic` wave row appears when epic-level steps exist.
 - One per-type row per type that has a step, in catalog order. `<median>` is `H h MM min`,
   followed by `(default)` for a type without samples and `(approx)` when an approximate sample

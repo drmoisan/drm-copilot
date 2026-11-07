@@ -130,6 +130,21 @@ Describe 'Get-EpicProgressItemStep' {
         $running[0].StartedUnixSeconds | Should -Be 1767610800
     }
 
+    It 'marks an open re-audit attempt in progress on the cycle review step' {
+        # Review attempt 1 closed and attempt 2 (the cycle 1 re-audit) is open since 11:50
+        # (1767613800); the initial review keeps attempt 1 and the cycle review carries the start.
+        $json = '{"next_step":"remediation.cycle_1.reaudit","stage_timing":[' +
+        '{"stage":"review","attempt":1,"started_at":"2026-01-05T10:20:00Z","ended_at":"2026-01-05T10:35:00Z"},' +
+        '{"stage":"review","attempt":2,"started_at":"2026-01-05T11:50:00Z","ended_at":null}],' +
+        '"remediation_loop":{"cycles":[{"plan_path":"docs/x/remediation-plan.md","remediation_path":"light"}]}}'
+
+        $steps = @(Get-EpicProgressItemStep -Item (Get-TestItem -CheckpointJson $json -CycleText @{ 'docs/x/remediation-plan.md' = $script:cyclePlan }))
+
+        $reviews = @($steps | Where-Object { $_.Type -eq 'review' })
+        (@($reviews | ForEach-Object { "$($_.Cycle):$($_.Status)" }) -join ',') | Should -Be '0:done,1:in_progress'
+        $reviews[1].StartedUnixSeconds | Should -Be 1767613800
+    }
+
     It 'maps next_step to the in-progress step without stage_timing' {
         $initial = @(Get-EpicProgressItemStep -Item (Get-TestItem -CheckpointJson '{"next_step":"S9_ci_green"}'))
         $json = '{"next_step":"remediation.cycle_1.reaudit","remediation_loop":{"cycles":[{"plan_path":"docs/x/remediation-plan.md","remediation_path":"light"}]}}'

@@ -342,6 +342,8 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 2 of 4 steps (50%). None of the 1 features is done yet. #42 is running (2 of 4 steps).'
         $tldr[3] | Should -Be '**Estimated time remaining:** 0 h 31 min by type (sum); 0 h 31 min wave-parallel.'
         $full[1] | Should -Be '## Item #42: status at 12:00 UTC, Jan 5'
+        # A blank band prints the wave alone.
+        $full | Should -Contain '| Running | #42 (wave 1): 2 of 4 steps (50%). |'
     }
 
     It 'prints no velocity, SD or range line in either mode' {
