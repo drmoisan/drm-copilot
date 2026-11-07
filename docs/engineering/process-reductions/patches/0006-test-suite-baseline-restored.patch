@@ -521,15 +521,15 @@ index d10de62b0..3d5961104 100644
  5. Do not execute implementation; produce the plan only.
  
 diff --git a/.claude/agents/csharp-typed-engineer.md b/.claude/agents/csharp-typed-engineer.md
-index 59046e7a4..4fcc1d2b6 100644
+index d8901f505..dcfe45697 100644
 --- a/.claude/agents/csharp-typed-engineer.md
 +++ b/.claude/agents/csharp-typed-engineer.md
 @@ -1,7 +1,7 @@
  ---
  name: csharp-typed-engineer
  model: sonnet
--description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
-+description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
+-description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
++description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
  tools:
    - Read
    - Grep
@@ -537,8 +537,8 @@ index 59046e7a4..4fcc1d2b6 100644
  
  1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
  2. **Routing and scope** — apply `csharp-change-budget-router` to estimate scope, select direct vs orchestrator handoff mode, and enforce the 3 production + 3 test per-batch cap.
--3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, xUnit scenario-level test strategy, and NSubstitute mock strategy.
-+3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture (static baselines and the `Phase 0 baseline` test-suite run) and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, xUnit scenario-level test strategy, and NSubstitute mock strategy.
+-3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, MSTest scenario-level test strategy, and NSubstitute mock strategy.
++3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture (static baselines and the `Phase 0 baseline` test-suite run) and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, MSTest scenario-level test strategy, and NSubstitute mock strategy.
  4. **Implement in batches** — apply the approved plan. After each batch, run targeted `dotnet build` analyzer and nullable checks on touched projects. Test and coverage results come from the single gate run. A focused run of one test file to debug a specific failure is debugging only.
 -5. **Final QA gate** — apply `csharp-qa-gate` to run the full toolchain, compare static tool results against the static baseline, read test and coverage results from the single gate run, and produce the required reporting block before declaring completion.
 -6. **Evidence and handoff** — store static baseline and final gate evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when a gate fails.
@@ -587,7 +587,7 @@ index 15f23dac1..05f95e662 100644
  
  The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
 diff --git a/.claude/agents/powershell-typed-engineer.md b/.claude/agents/powershell-typed-engineer.md
-index 85a76d368..2d31388f6 100644
+index 72b2ca2a3..d88b2608d 100644
 --- a/.claude/agents/powershell-typed-engineer.md
 +++ b/.claude/agents/powershell-typed-engineer.md
 @@ -1,7 +1,7 @@
@@ -722,14 +722,14 @@ index a7ec457ed..d11135dbd 100644
  - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
  - `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
 diff --git a/.claude/skills/csharp-qa-gate/SKILL.md b/.claude/skills/csharp-qa-gate/SKILL.md
-index e13b36cfb..722127d82 100644
+index 452b72ab4..e5a6bebf7 100644
 --- a/.claude/skills/csharp-qa-gate/SKILL.md
 +++ b/.claude/skills/csharp-qa-gate/SKILL.md
 @@ -1,6 +1,6 @@
  ---
  name: csharp-qa-gate
--description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain (with architecture tests), compares static tool results against the static baseline, reads test and coverage results from the single gate run, and produces the required reporting block before the agent declares the change complete.
-+description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain (with architecture tests), compares static tool results and the test and coverage results of the single gate run against the Phase A baseline (the `Phase 0 baseline` of the plan), enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
+-description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain (with architecture tests), compares static tool results against the static baseline, reads test and coverage results from the single gate run, and produces the required reporting block before the agent declares the change complete.
++description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain (with architecture tests), compares static tool results and the test and coverage results of the single gate run against the Phase A baseline (the `Phase 0 baseline` of the plan), enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
  ---
  
  # C# QA Gate
@@ -746,7 +746,7 @@ index e13b36cfb..722127d82 100644
  Before invoking this gate, the agent must have:
  
 -- a static baseline record produced in Phase A, containing analyzer findings and compiler/nullable diagnostics for the in-scope files,
-+- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing analyzer findings and compiler/nullable diagnostics for the in-scope files and the xUnit pass/fail status and per-file coverage status of one test run,
++- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing analyzer findings and compiler/nullable diagnostics for the in-scope files and the MSTest pass/fail status and per-file coverage status of one test run,
  - the exact list of touched production and test files,
  - a clean working tree (all planned edits committed to the working copy).
  
@@ -762,10 +762,10 @@ index e13b36cfb..722127d82 100644
  
  - **Analyzer delta**: 0 new findings across the repository.
  - **Compiler / nullable delta**: 0 new diagnostics across the repository.
--- **xUnit gate**: zero failures in the single gate run.
+-- **MSTest gate**: zero failures in the single gate run.
 -- **Architecture tests**: zero failures in the `*.ArchitectureTests` project.
 -- **Per-file coverage**: every changed file meets the coverage thresholds, read from the single gate run, and new behavior is tested.
-+- **xUnit delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
++- **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
 +- **Architecture-test delta**: zero failures and 0 new failing facts in the `*.ArchitectureTests` project.
 +- **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
 +- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
@@ -780,7 +780,7 @@ index e13b36cfb..722127d82 100644
  
  1. **Scope** — exact file list touched in this change.
 -2. **Baseline** — analyzer and compiler/nullable findings recorded in Phase A.
-+2. **Baseline** — analyzer, compiler/nullable, xUnit, and coverage status recorded in Phase A.
++2. **Baseline** — analyzer, compiler/nullable, MSTest, and coverage status recorded in Phase A.
  3. **Plan** — design and test-strategy summary, referencing the approved plan.
  4. **Diffs** — patch-style or full-file replacements for scoped files only.
 -5. **QA Gate Results** — analyzer and compiler/nullable deltas, failures in the single gate run and the architecture tests, and per-file coverage against the thresholds. If any step could not be run, mark the corresponding line **unverified** and state why.
@@ -867,14 +867,14 @@ index 6428f841a..ff518e052 100644
     - Classify each blocking finding before triggering remediation: each receives one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). A published MCP runtime that lags the repository contract is classified `external_dependency`.
     - Trigger the remediation handoff only when at least one blocking finding is `autonomous`. When every blocking finding is non-remediable, write the remediation inputs with the `HALT_NON_REMEDIABLE` or `AWAITING_CI` verdict and create no remediation plan target.
 diff --git a/.claude/skills/invoke-csharp-engineer/SKILL.md b/.claude/skills/invoke-csharp-engineer/SKILL.md
-index c8a3ed3dd..cc6dfa036 100644
+index 2f19f43c4..36b244b4b 100644
 --- a/.claude/skills/invoke-csharp-engineer/SKILL.md
 +++ b/.claude/skills/invoke-csharp-engineer/SKILL.md
 @@ -1,6 +1,6 @@
  ---
  name: invoke-csharp-engineer
--description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
-+description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
+-description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
++description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
  ---
  
  # Implement C# Skill
@@ -892,11 +892,11 @@ index c8a3ed3dd..cc6dfa036 100644
  
  1. Scope (exact file list).
 -2. Baseline (CSharpier, .NET Analyzers, and Nullable Analysis findings).
-+2. Baseline (CSharpier, .NET Analyzers, Nullable Analysis, xUnit, coverage status).
++2. Baseline (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, coverage status).
  3. Plan (design and test strategy).
  4. Diffs (patch-style or full-file replacements).
 -5. QA Gate Results (CSharpier, .NET Analyzers, and Nullable Analysis deltas, failures in the single gate run, and per-file coverage against the thresholds, or clearly marked **unverified**).
-+5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, xUnit, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
++5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
  
  ## Delegation Identity Lines
  
@@ -1335,7 +1335,7 @@ index 9520d7670..c161f3c4c 100644
  5. Do not execute implementation; produce the plan only.
  
 diff --git a/.codex/agents/csharp-atomic-executor.toml b/.codex/agents/csharp-atomic-executor.toml
-index 79278de7a..801b7942b 100644
+index b5aebbc1f..c022e3160 100644
 --- a/.codex/agents/csharp-atomic-executor.toml
 +++ b/.codex/agents/csharp-atomic-executor.toml
 @@ -14,7 +14,7 @@ Core behavior:
@@ -1645,13 +1645,13 @@ index 111a6200f..4b50dfea2 100644
  - Do not create timestamped sibling plan files when an authoritative `plan-path` already exists.
  - Stop and report blocked state if the required `atomic-executor` handoff cannot be started, resumed, or completed.
 diff --git a/.codex/agents/powershell-di-unit-test-engineer.toml b/.codex/agents/powershell-di-unit-test-engineer.toml
-index 10bd330ba..c3949930b 100644
+index aea2ec050..d9a89f701 100644
 --- a/.codex/agents/powershell-di-unit-test-engineer.toml
 +++ b/.codex/agents/powershell-di-unit-test-engineer.toml
 @@ -1,5 +1,5 @@
  name = "powershell-di-unit-test-engineer"
--description = "Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates."
-+description = "Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates on the parallel test gates against the `Phase 0 baseline`."
+-description = "Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates."
++description = "Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates on the parallel test gates against the `Phase 0 baseline`."
  
  developer_instructions = """
  You are the Codex migration wrapper for the legacy GitHub Copilot agent Powershell DI Unit Test Engineer.agent.md.
@@ -1669,7 +1669,7 @@ index 21939df41..231b5d82f 100644
  
  Language-specific large-path chain:
 diff --git a/.codex/agents/powershell-typed-engineer-c1.toml b/.codex/agents/powershell-typed-engineer-c1.toml
-index 34ddfe3b5..be5c4c1aa 100644
+index 479747110..69718a9d9 100644
 --- a/.codex/agents/powershell-typed-engineer-c1.toml
 +++ b/.codex/agents/powershell-typed-engineer-c1.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -1705,7 +1705,7 @@ index 34ddfe3b5..be5c4c1aa 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/.codex/agents/powershell-typed-engineer-c2.toml b/.codex/agents/powershell-typed-engineer-c2.toml
-index 69d6239fc..a2ce59fe0 100644
+index f748c59e5..2a0b54598 100644
 --- a/.codex/agents/powershell-typed-engineer-c2.toml
 +++ b/.codex/agents/powershell-typed-engineer-c2.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -1741,7 +1741,7 @@ index 69d6239fc..a2ce59fe0 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/.codex/agents/powershell-typed-engineer-c3-elevated.toml b/.codex/agents/powershell-typed-engineer-c3-elevated.toml
-index 29eabe34f..acd387d95 100644
+index c91417823..0a0dc20b0 100644
 --- a/.codex/agents/powershell-typed-engineer-c3-elevated.toml
 +++ b/.codex/agents/powershell-typed-engineer-c3-elevated.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -1777,7 +1777,7 @@ index 29eabe34f..acd387d95 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/.codex/agents/powershell-typed-engineer-c3.toml b/.codex/agents/powershell-typed-engineer-c3.toml
-index 59773930f..114ba42aa 100644
+index b212b29cd..c45b877e8 100644
 --- a/.codex/agents/powershell-typed-engineer-c3.toml
 +++ b/.codex/agents/powershell-typed-engineer-c3.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -1813,7 +1813,7 @@ index 59773930f..114ba42aa 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/.codex/agents/powershell-typed-engineer-c4.toml b/.codex/agents/powershell-typed-engineer-c4.toml
-index 6f6061e3c..ee18b5861 100644
+index 5854517ff..571778851 100644
 --- a/.codex/agents/powershell-typed-engineer-c4.toml
 +++ b/.codex/agents/powershell-typed-engineer-c4.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -1849,7 +1849,7 @@ index 6f6061e3c..ee18b5861 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/.codex/agents/powershell-typed-engineer.toml b/.codex/agents/powershell-typed-engineer.toml
-index 4f4c6fad9..aef1a45dd 100644
+index f6287add4..bb66eba67 100644
 --- a/.codex/agents/powershell-typed-engineer.toml
 +++ b/.codex/agents/powershell-typed-engineer.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -2158,15 +2158,15 @@ index a89ccf690..654d19af5 100644
  - policy instructions conflict.
  
 diff --git a/.github/agents/Powershell DI Unit Test Engineer.agent.md b/.github/agents/Powershell DI Unit Test Engineer.agent.md
-index 4b480578b..843187d67 100644
+index 057751cc6..39865d6ca 100644
 --- a/.github/agents/Powershell DI Unit Test Engineer.agent.md	
 +++ b/.github/agents/Powershell DI Unit Test Engineer.agent.md	
 @@ -1,7 +1,7 @@
  ---
  name: PowerShell Unit Test + DI Refactor Expert (Guardrailed)
--description: Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates.
+-description: Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates.
 -argument-hint: "Provide the exact script/module under test + the failing tests (or desired behaviors). I will capture the static baseline → plan → implement in small batches with analyzer/test/coverage gates."
-+description: Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates.
++description: Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates.
 +argument-hint: "Provide the exact script/module under test + the failing tests (or desired behaviors). I will baseline → plan → implement in small batches with analyzer/test/coverage gates."
  tools:
    [vscode/runCommand, vscode/vscodeAPI, execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
@@ -2312,7 +2312,7 @@ index 0e6ed57ad..c6dfdf1f8 100644
  * If writing to a plan file, did you follow the path selection and update rules in §9?
  * Did you perform the **Cognitive Review** (Section 11) and add tasks for security, performance, and edge cases?
 diff --git a/.github/agents/csharp-atomic-executor.agent.md b/.github/agents/csharp-atomic-executor.agent.md
-index 810e0239b..5afeeb182 100644
+index 705d3772f..390bac4de 100644
 --- a/.github/agents/csharp-atomic-executor.agent.md
 +++ b/.github/agents/csharp-atomic-executor.agent.md
 @@ -85,7 +85,7 @@ During preflight (before [P0-T1]), resolve work mode from feature `issue.md` mar
@@ -2754,7 +2754,7 @@ index af1290de3..27667f9b4 100644
  ### Step 6 — Post-implementation review
  
 diff --git a/.github/agents/powershell-typed-engineer.agent.md b/.github/agents/powershell-typed-engineer.agent.md
-index d6e6bfc6b..f1b70bef7 100644
+index f6dacad07..b35c8754b 100644
 --- a/.github/agents/powershell-typed-engineer.agent.md
 +++ b/.github/agents/powershell-typed-engineer.agent.md
 @@ -1,7 +1,7 @@
@@ -2783,7 +2783,7 @@ index d6e6bfc6b..f1b70bef7 100644
      agent: feature_code_review_agent
 @@ -29,7 +29,7 @@ You are a senior PowerShell engineer specializing in:
  - **Idiomatic PowerShell design**: small cohesive scripts/modules, clear advanced functions, explicit parameter contracts, minimal surface area
- - **High testability**: deterministic, isolated **Pester v5** tests that run identically in Terminal and VS Code Test Explorer
+ - **High testability**: deterministic, isolated **Pester v6** tests that run identically in Terminal and VS Code Test Explorer
  - **Minimal DI seams**: thin seams for external executables and boundary dependencies (filesystem, env, clock) without introducing frameworks
 -- **Repo toolchain discipline**: Format → Analyze → Test (+ coverage) loop with the parallel test gates
 +- **Repo toolchain discipline**: Format → Analyze → Test (+ coverage) loop with zero-regression gates
@@ -3497,7 +3497,7 @@ index 512640e5f..10e75a12b 100644
 +
 +Not restored: every serial, single-process, seeded-shuffle, reversed-order, targeted, per-batch, or comparison run, the `Invoke-PoshQCTest` and bare `poetry run pytest` commands, and `## Test Isolation Checks`. This entry's `## Prior Text` blocks are unchanged by `0006`.
 diff --git a/docs/engineering/process-reductions/0005-policy-read-removal.md b/docs/engineering/process-reductions/0005-policy-read-removal.md
-index e45ecfa25..e8e9e16ff 100644
+index d04e1cb45..9be2a57e5 100644
 --- a/docs/engineering/process-reductions/0005-policy-read-removal.md
 +++ b/docs/engineering/process-reductions/0005-policy-read-removal.md
 @@ -105,7 +105,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
@@ -3833,7 +3833,7 @@ index 7f9c8ddd4..e9acf8916 100644
  ## Open Questions / Notes
  
 diff --git a/docs/features/templates/policy_audit/AGENTS.md b/docs/features/templates/policy_audit/AGENTS.md
-index efdf84935..f6f56fdc9 100644
+index ab9676d56..205dfd3b5 100644
 --- a/docs/features/templates/policy_audit/AGENTS.md
 +++ b/docs/features/templates/policy_audit/AGENTS.md
 @@ -56,7 +56,7 @@ When asked to perform a Policy Audit for a component, branch, or PR:
@@ -3871,7 +3871,7 @@ index efdf84935..f6f56fdc9 100644
     - Ensure the final audit document is consistent with the underlying evidence and toolchain output.
  
 diff --git a/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md b/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
-index 66953550e..1dd44bb1a 100644
+index d5eaab409..80b06864d 100644
 --- a/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
 +++ b/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
 @@ -30,8 +30,8 @@
@@ -4135,15 +4135,15 @@ index d10de62b0..3d5961104 100644
  5. Do not execute implementation; produce the plan only.
  
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/csharp-typed-engineer.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/csharp-typed-engineer.md
-index 59046e7a4..4fcc1d2b6 100644
+index d8901f505..dcfe45697 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/csharp-typed-engineer.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/csharp-typed-engineer.md
 @@ -1,7 +1,7 @@
  ---
  name: csharp-typed-engineer
  model: sonnet
--description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
-+description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
+-description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
++description: Project-scoped worker that implements and verifies C# changes within typed repository boundaries. Applies the CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
  tools:
    - Read
    - Grep
@@ -4151,8 +4151,8 @@ index 59046e7a4..4fcc1d2b6 100644
  
  1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
  2. **Routing and scope** — apply `csharp-change-budget-router` to estimate scope, select direct vs orchestrator handoff mode, and enforce the 3 production + 3 test per-batch cap.
--3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, xUnit scenario-level test strategy, and NSubstitute mock strategy.
-+3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture (static baselines and the `Phase 0 baseline` test-suite run) and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, xUnit scenario-level test strategy, and NSubstitute mock strategy.
+-3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 static baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, MSTest scenario-level test strategy, and NSubstitute mock strategy.
++3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture (static baselines and the `Phase 0 baseline` test-suite run) and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed class and module structure, minimal DI seams, MSTest scenario-level test strategy, and NSubstitute mock strategy.
  4. **Implement in batches** — apply the approved plan. After each batch, run targeted `dotnet build` analyzer and nullable checks on touched projects. Test and coverage results come from the single gate run. A focused run of one test file to debug a specific failure is debugging only.
 -5. **Final QA gate** — apply `csharp-qa-gate` to run the full toolchain, compare static tool results against the static baseline, read test and coverage results from the single gate run, and produce the required reporting block before declaring completion.
 -6. **Evidence and handoff** — store static baseline and final gate evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when a gate fails.
@@ -4201,7 +4201,7 @@ index 15f23dac1..05f95e662 100644
  
  The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md
-index 85a76d368..2d31388f6 100644
+index 72b2ca2a3..d88b2608d 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md
 @@ -1,7 +1,7 @@
@@ -4336,14 +4336,14 @@ index a7ec457ed..d11135dbd 100644
  - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
  - `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md
-index e13b36cfb..722127d82 100644
+index 452b72ab4..e5a6bebf7 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md
 @@ -1,6 +1,6 @@
  ---
  name: csharp-qa-gate
--description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain (with architecture tests), compares static tool results against the static baseline, reads test and coverage results from the single gate run, and produces the required reporting block before the agent declares the change complete.
-+description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain (with architecture tests), compares static tool results and the test and coverage results of the single gate run against the Phase A baseline (the `Phase 0 baseline` of the plan), enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
+-description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain (with architecture tests), compares static tool results against the static baseline, reads test and coverage results from the single gate run, and produces the required reporting block before the agent declares the change complete.
++description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain (with architecture tests), compares static tool results and the test and coverage results of the single gate run against the Phase A baseline (the `Phase 0 baseline` of the plan), enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
  ---
  
  # C# QA Gate
@@ -4360,7 +4360,7 @@ index e13b36cfb..722127d82 100644
  Before invoking this gate, the agent must have:
  
 -- a static baseline record produced in Phase A, containing analyzer findings and compiler/nullable diagnostics for the in-scope files,
-+- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing analyzer findings and compiler/nullable diagnostics for the in-scope files and the xUnit pass/fail status and per-file coverage status of one test run,
++- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing analyzer findings and compiler/nullable diagnostics for the in-scope files and the MSTest pass/fail status and per-file coverage status of one test run,
  - the exact list of touched production and test files,
  - a clean working tree (all planned edits committed to the working copy).
  
@@ -4376,10 +4376,10 @@ index e13b36cfb..722127d82 100644
  
  - **Analyzer delta**: 0 new findings across the repository.
  - **Compiler / nullable delta**: 0 new diagnostics across the repository.
--- **xUnit gate**: zero failures in the single gate run.
+-- **MSTest gate**: zero failures in the single gate run.
 -- **Architecture tests**: zero failures in the `*.ArchitectureTests` project.
 -- **Per-file coverage**: every changed file meets the coverage thresholds, read from the single gate run, and new behavior is tested.
-+- **xUnit delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
++- **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
 +- **Architecture-test delta**: zero failures and 0 new failing facts in the `*.ArchitectureTests` project.
 +- **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
 +- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
@@ -4394,7 +4394,7 @@ index e13b36cfb..722127d82 100644
  
  1. **Scope** — exact file list touched in this change.
 -2. **Baseline** — analyzer and compiler/nullable findings recorded in Phase A.
-+2. **Baseline** — analyzer, compiler/nullable, xUnit, and coverage status recorded in Phase A.
++2. **Baseline** — analyzer, compiler/nullable, MSTest, and coverage status recorded in Phase A.
  3. **Plan** — design and test-strategy summary, referencing the approved plan.
  4. **Diffs** — patch-style or full-file replacements for scoped files only.
 -5. **QA Gate Results** — analyzer and compiler/nullable deltas, failures in the single gate run and the architecture tests, and per-file coverage against the thresholds. If any step could not be run, mark the corresponding line **unverified** and state why.
@@ -4481,14 +4481,14 @@ index 6428f841a..ff518e052 100644
     - Classify each blocking finding before triggering remediation: each receives one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). A published MCP runtime that lags the repository contract is classified `external_dependency`.
     - Trigger the remediation handoff only when at least one blocking finding is `autonomous`. When every blocking finding is non-remediable, write the remediation inputs with the `HALT_NON_REMEDIABLE` or `AWAITING_CI` verdict and create no remediation plan target.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/invoke-csharp-engineer/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/invoke-csharp-engineer/SKILL.md
-index c8a3ed3dd..cc6dfa036 100644
+index 2f19f43c4..36b244b4b 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/invoke-csharp-engineer/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/invoke-csharp-engineer/SKILL.md
 @@ -1,6 +1,6 @@
  ---
  name: invoke-csharp-engineer
--description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
-+description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
+-description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and quality gates read from the single gate run.
++description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
  ---
  
  # Implement C# Skill
@@ -4506,11 +4506,11 @@ index c8a3ed3dd..cc6dfa036 100644
  
  1. Scope (exact file list).
 -2. Baseline (CSharpier, .NET Analyzers, and Nullable Analysis findings).
-+2. Baseline (CSharpier, .NET Analyzers, Nullable Analysis, xUnit, coverage status).
++2. Baseline (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, coverage status).
  3. Plan (design and test strategy).
  4. Diffs (patch-style or full-file replacements).
 -5. QA Gate Results (CSharpier, .NET Analyzers, and Nullable Analysis deltas, failures in the single gate run, and per-file coverage against the thresholds, or clearly marked **unverified**).
-+5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, xUnit, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
++5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
  
  ## Delegation Identity Lines
  
@@ -5580,7 +5580,7 @@ index 9520d7670..c161f3c4c 100644
  5. Do not execute implementation; produce the plan only.
  
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-executor.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-executor.toml
-index 79278de7a..801b7942b 100644
+index b5aebbc1f..c022e3160 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-executor.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-executor.toml
 @@ -14,7 +14,7 @@ Core behavior:
@@ -5890,13 +5890,13 @@ index 111a6200f..4b50dfea2 100644
  - Do not create timestamped sibling plan files when an authoritative `plan-path` already exists.
  - Stop and report blocked state if the required `atomic-executor` handoff cannot be started, resumed, or completed.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-di-unit-test-engineer.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-di-unit-test-engineer.toml
-index 10bd330ba..c3949930b 100644
+index aea2ec050..d9a89f701 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-di-unit-test-engineer.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-di-unit-test-engineer.toml
 @@ -1,5 +1,5 @@
  name = "powershell-di-unit-test-engineer"
--description = "Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates."
-+description = "Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates on the parallel test gates against the `Phase 0 baseline`."
+-description = "Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates."
++description = "Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates on the parallel test gates against the `Phase 0 baseline`."
  
  developer_instructions = """
  You are the Codex migration wrapper for the legacy GitHub Copilot agent Powershell DI Unit Test Engineer.agent.md.
@@ -5914,7 +5914,7 @@ index 21939df41..231b5d82f 100644
  
  Language-specific large-path chain:
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml
-index 34ddfe3b5..be5c4c1aa 100644
+index 479747110..69718a9d9 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -5950,7 +5950,7 @@ index 34ddfe3b5..be5c4c1aa 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml
-index 69d6239fc..a2ce59fe0 100644
+index f748c59e5..2a0b54598 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -5986,7 +5986,7 @@ index 69d6239fc..a2ce59fe0 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml
-index 29eabe34f..acd387d95 100644
+index c91417823..0a0dc20b0 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -6022,7 +6022,7 @@ index 29eabe34f..acd387d95 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml
-index 59773930f..114ba42aa 100644
+index b212b29cd..c45b877e8 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -6058,7 +6058,7 @@ index 59773930f..114ba42aa 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml
-index 6f6061e3c..ee18b5861 100644
+index 5854517ff..571778851 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -6094,7 +6094,7 @@ index 6f6061e3c..ee18b5861 100644
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml
-index 4f4c6fad9..aef1a45dd 100644
+index f6287add4..bb66eba67 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml
 @@ -29,7 +29,7 @@ Migration contract:
@@ -6403,15 +6403,15 @@ index a89ccf690..654d19af5 100644
  - policy instructions conflict.
  
 diff --git a/extensions/drm-copilot/resources/customizations/.github/agents/Powershell DI Unit Test Engineer.agent.md b/extensions/drm-copilot/resources/customizations/.github/agents/Powershell DI Unit Test Engineer.agent.md
-index 4b480578b..843187d67 100644
+index 057751cc6..39865d6ca 100644
 --- a/extensions/drm-copilot/resources/customizations/.github/agents/Powershell DI Unit Test Engineer.agent.md	
 +++ b/extensions/drm-copilot/resources/customizations/.github/agents/Powershell DI Unit Test Engineer.agent.md	
 @@ -1,7 +1,7 @@
  ---
  name: PowerShell Unit Test + DI Refactor Expert (Guardrailed)
--description: Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates.
+-description: Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and the parallel test gates.
 -argument-hint: "Provide the exact script/module under test + the failing tests (or desired behaviors). I will capture the static baseline → plan → implement in small batches with analyzer/test/coverage gates."
-+description: Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates.
++description: Plan + implement minimal DI seams and Pester v6 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates.
 +argument-hint: "Provide the exact script/module under test + the failing tests (or desired behaviors). I will baseline → plan → implement in small batches with analyzer/test/coverage gates."
  tools:
    [vscode/runCommand, vscode/vscodeAPI, execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
@@ -6557,7 +6557,7 @@ index 0e6ed57ad..c6dfdf1f8 100644
  * If writing to a plan file, did you follow the path selection and update rules in §9?
  * Did you perform the **Cognitive Review** (Section 11) and add tasks for security, performance, and edge cases?
 diff --git a/extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-executor.agent.md b/extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-executor.agent.md
-index 810e0239b..5afeeb182 100644
+index 705d3772f..390bac4de 100644
 --- a/extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-executor.agent.md
 +++ b/extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-executor.agent.md
 @@ -85,7 +85,7 @@ During preflight (before [P0-T1]), resolve work mode from feature `issue.md` mar
@@ -6999,7 +6999,7 @@ index af1290de3..27667f9b4 100644
  ### Step 6 — Post-implementation review
  
 diff --git a/extensions/drm-copilot/resources/customizations/.github/agents/powershell-typed-engineer.agent.md b/extensions/drm-copilot/resources/customizations/.github/agents/powershell-typed-engineer.agent.md
-index d6e6bfc6b..f1b70bef7 100644
+index f6dacad07..b35c8754b 100644
 --- a/extensions/drm-copilot/resources/customizations/.github/agents/powershell-typed-engineer.agent.md
 +++ b/extensions/drm-copilot/resources/customizations/.github/agents/powershell-typed-engineer.agent.md
 @@ -1,7 +1,7 @@
@@ -7028,7 +7028,7 @@ index d6e6bfc6b..f1b70bef7 100644
      agent: feature_code_review_agent
 @@ -29,7 +29,7 @@ You are a senior PowerShell engineer specializing in:
  - **Idiomatic PowerShell design**: small cohesive scripts/modules, clear advanced functions, explicit parameter contracts, minimal surface area
- - **High testability**: deterministic, isolated **Pester v5** tests that run identically in Terminal and VS Code Test Explorer
+ - **High testability**: deterministic, isolated **Pester v6** tests that run identically in Terminal and VS Code Test Explorer
  - **Minimal DI seams**: thin seams for external executables and boundary dependencies (filesystem, env, clock) without introducing frameworks
 -- **Repo toolchain discipline**: Format → Analyze → Test (+ coverage) loop with the parallel test gates
 +- **Repo toolchain discipline**: Format → Analyze → Test (+ coverage) loop with zero-regression gates
@@ -7776,7 +7776,7 @@ index 5d3451ef2..044fdd0d8 100644
  ## Rollback / Contingency
  
 diff --git a/extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md b/extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md
-index efdf84935..f6f56fdc9 100644
+index ab9676d56..205dfd3b5 100644
 --- a/extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md
 +++ b/extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md
 @@ -56,7 +56,7 @@ When asked to perform a Policy Audit for a component, branch, or PR:
@@ -7814,7 +7814,7 @@ index efdf84935..f6f56fdc9 100644
     - Ensure the final audit document is consistent with the underlying evidence and toolchain output.
  
 diff --git a/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md b/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
-index 66953550e..1dd44bb1a 100644
+index d5eaab409..80b06864d 100644
 --- a/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
 +++ b/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
 @@ -30,8 +30,8 @@

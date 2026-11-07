@@ -17,6 +17,8 @@ Kept from `0001`: one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` r
 
 Record decision: the partial revert is a new entry rather than a deletion of `0001`, so that reverting this entry re-applies the reduction. `0001` gains a `## Partial Revert` section and its index Status reads `Partially reverted by 0006`. No hook or validator changes: the review hooks keep accepting `N/A - no pre-change run`, which remains the record for a new file and for plans written before this rule. Measured Phase 0 cost of this stage's own baseline runs: `Invoke-PoshQCParallelTest` 429.61 s wall-clock on 8 workers, `pytest -n auto` 174.08 s, Jest about 10 s.
 
+Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed the C# test framework to MSTest and the Pester version to Pester v6 in twelve of these paths, the patch was regenerated so that it diffs from the 0001-state text carrying PR #1108's wording to the current text. The hunks are unchanged apart from those renames.
+
 ## Files Changed
 
 The list covers every path of the stored patch, with rename detection off.
@@ -241,7 +243,9 @@ The list covers every path of the stored patch, with rename detection off.
 
 ## Stored Patch
 
-`patches/0006-test-suite-baseline-restored.patch` holds the partial revert as one diff. It is `git diff --binary --no-renames` from the first parent of the partial-revert commit (the commit whose subject carries `reduction: 0006` and adds this entry) over the paths in `## Files Changed`.
+`patches/0006-test-suite-baseline-restored.patch` holds the partial revert as one diff. It was generated as `git diff --binary --no-renames` from the first parent of the partial-revert commit (the commit whose subject carries `reduction: 0006` and adds this entry) over the paths in `## Files Changed`.
+
+Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed the C# test framework to MSTest and the Pester version to Pester v6 in twelve of these paths, the patch was regenerated so that it diffs from the 0001-state text carrying PR #1108's wording to the current text. The hunks are unchanged apart from those renames.
 
 The check: `git apply -R --check` of the patch succeeds on the working tree. A failed check means the surrounding text has moved, and the `## Prior Text` blocks apply instead.
 
