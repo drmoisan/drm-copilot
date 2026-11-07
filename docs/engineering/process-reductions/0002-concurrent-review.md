@@ -5,7 +5,7 @@
 reduction: 0002
 Date: 2026-11-07
 Issue: #1097
-Merge commit: pending (PR #1097)
+Merge commit: pending (PR #1103)
 
 Moves the feature review from before pull-request creation to beside CI. A new run records `review_mode: "concurrent"`, opens its pull request after the local test run passes, and runs the review and CI at the same time. The merge waits for both. The number in the `Merge commit:` line is the canonical issue number, which stands in until the pull request exists. The orchestrator replaces it with the real pull request number right after PR creation.
 
