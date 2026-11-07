@@ -19,10 +19,16 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$EvidenceRoot = (Join-Path -Path $PSScriptRoot -ChildPath '../../docs/features')
+    [string]$EvidenceRoot
 )
 
 $ErrorActionPreference = 'Stop'
+
+# The default is resolved here rather than in the param block, so the line is measured by coverage.
+if (-not $PSBoundParameters.ContainsKey('EvidenceRoot')) {
+    $EvidenceRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../docs/features'
+}
+
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'StageTiming.psm1') -Force
 
 $evidence = @(Read-StageTimingEvidence -Root $EvidenceRoot)

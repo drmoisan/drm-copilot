@@ -24,6 +24,7 @@ import pytest
 import scripts.dev_tools.validate_orchestrator_state as state_validator
 from scripts.dev_tools.orchestration_handoff_contract import (
     HandoffContractError,
+    ProviderProvenance,
     raw_sha256,
     validate_provenance_bytes,
 )
@@ -190,6 +191,26 @@ def _source_with_stage_timing(case: FixtureCase) -> bytes:
     return json.dumps(parsed, indent=2).encode("utf-8")
 
 
+def _provenance_bound_to(case: FixtureCase, source_bytes: bytes) -> ProviderProvenance:
+    """Bind the fixture provenance to the SHA-256 of the given source bytes.
+
+    Args:
+        case (FixtureCase): The handoff direction whose provenance is reused.
+        source_bytes (bytes): The source checkpoint bytes the hash must bind.
+
+    Returns:
+        ProviderProvenance: Provenance whose hash and archive path match the bytes
+        and that lists no historical receipts.
+    """
+    digest = raw_sha256(source_bytes)
+    return replace(
+        build_envelope(case).source,
+        checkpoint_sha256=digest,
+        archive_path=f"artifacts/orchestration/handoffs/sources/sha256/{digest}.json",
+        receipt_references=(),
+    )
+
+
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
 def test_archived_source_bytes_carry_stage_timing_and_stay_hash_bound(
     case: FixtureCase,
@@ -197,11 +218,7 @@ def test_archived_source_bytes_carry_stage_timing_and_stay_hash_bound(
     """A source checkpoint with the key keeps it in the archive, hash bound."""
     # Arrange: bind the provenance to source bytes that carry the key.
     archived = _source_with_stage_timing(case)
-    provenance = replace(
-        build_envelope(case).source,
-        checkpoint_sha256=raw_sha256(archived),
-        receipt_references=(),
-    )
+    provenance = _provenance_bound_to(case, archived)
 
     # Act: validate the archived bytes against the bound hash.
     validate_provenance_bytes(provenance, archived, ())
@@ -217,11 +234,7 @@ def test_archive_without_stage_timing_fails_the_source_hash(case: FixtureCase) -
     # Arrange: provenance bound to bytes with the key, archive bytes without it.
     fixture = load_fixture(case)
     dropped, _ = fixture_bytes(case, fixture)
-    provenance = replace(
-        build_envelope(case).source,
-        checkpoint_sha256=raw_sha256(_source_with_stage_timing(case)),
-        receipt_references=(),
-    )
+    provenance = _provenance_bound_to(case, _source_with_stage_timing(case))
 
     # Act and assert: the hash of the bytes without the key does not match.
     with pytest.raises(HandoffContractError) as raised:
@@ -232,15 +245,9 @@ def test_archive_without_stage_timing_fails_the_source_hash(case: FixtureCase) -
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
 def test_destination_projection_omits_stage_timing(case: FixtureCase) -> None:
     """The destination projection copies no unknown key, so it omits the key."""
-    # Arrange: an envelope whose source checkpoint carries the key.
+    # Arrange: the projection input is the envelope and its facts only, so the
+    # source checkpoint text, with or without the key, never reaches the adapter.
     envelope = build_envelope(case)
-    envelope = replace(
-        envelope,
-        source=replace(
-            envelope.source,
-            checkpoint_sha256=raw_sha256(_source_with_stage_timing(case)),
-        ),
-    )
 
     # Act: project the destination checkpoint and validate its text.
     projection = case.adapter.project(envelope, projection_facts(envelope))
@@ -248,6 +255,7 @@ def test_destination_projection_omits_stage_timing(case: FixtureCase) -> None:
         json.dumps(projection.checkpoint, indent=2)
     )
 
-    # Assert: no key and no validation error naming it.
+    # Assert: no key anywhere in the projection and no validation error naming it.
     assert KEY not in projection.checkpoint
+    assert KEY not in json.dumps(projection.checkpoint)
     assert not _names_key(errors)
