@@ -3,9 +3,27 @@
     SubagentStop hook that validates feature-review coverage verdicts against the branch diff.
 
 .DESCRIPTION
-    Runs when the feature-review subagent terminates. Cross-checks the most recent
-    policy-audit.<timestamp>.md under docs/features/active/**/ against the PR context
-    summary at artifacts/pr_context.summary.txt and against existing coverage artifacts.
+    Runs when the feature-review subagent terminates. Cross-checks the policy audit that the
+    reviewer names in its final message (last_assistant_message) against the PR context
+    summary at artifacts/pr_context.summary.txt and against existing coverage artifacts
+    (issue #1114).
+
+    Target selection (feature-review-coverage-target.ps1):
+      - The policy-audit paths named in the message are extracted; an absolute path resolves
+        its item root through Resolve-HookTargetWorktree (hook-target-worktree.ps1), and a
+        relative path uses the session root (the repository holding this hook).
+      - Several audits of one feature folder select the greatest timestamp. Audits of
+        different folders, paths in different worktrees, a '..' segment, or a named audit
+        that does not exist beneath the item root block once. A message that names no audit
+        blocks once and asks for the policy-audit path; there is no recency fallback
+        (decision D2).
+      - The audit, the PR context summary, the root CLAUDE.md, and the coverage reports are
+        read beneath the item root.
+      - When the item root differs from the session root, the freshness decision of
+        validate-feature-review-coverage-freshness.ps1 blocks on an absent PR context
+        summary, an absent report for a changed language, a report older than the newest
+        item commit touching that language, or a failed git query. No freshness probe runs
+        when the item root is the session root (decision D1, as on Claude for issue #1105).
 
     Validation rules:
       - Enumerate languages that have changed files in the branch diff:
@@ -51,23 +69,14 @@
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'hook-target-worktree.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-freshness.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-freshness.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'feature-review-coverage-target.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-target.ps1' -ErrorRecord $_ }
 
 $ErrorActionPreference = 'Stop'
 
 function Get-RepoRoot {
     return Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-}
-
-function Get-LatestPolicyAudit {
-    [OutputType([System.IO.FileInfo])]
-    param([string]$RepoRoot)
-
-    $activeRoot = Join-Path $RepoRoot 'docs/features/active'
-    if (-not (Test-Path $activeRoot)) { return $null }
-
-    Get-ChildItem -Path $activeRoot -Recurse -File -Filter 'policy-audit.*.md' |
-        Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
 }
 
 function Get-ChangedLanguageSet {
@@ -309,20 +318,35 @@ try {
     $stopHookActive = [bool]$payload.stop_hook_active
 
     $repoRoot = Get-RepoRoot
-    $audit = Get-LatestPolicyAudit -RepoRoot $repoRoot
-    if (-not $audit) {
-        # No audit to validate. The existing SubagentStop artifact-presence hook covers this case.
+    $message = if ($payload.PSObject.Properties.Name -contains 'last_assistant_message') { $payload.last_assistant_message } else { $null }
+    $target = Resolve-CodexReviewCoverageTarget -Message $message -SessionRoot $repoRoot
+    if ($null -ne $target.ReasonCode) {
+        $reason = "Feature-review coverage validation cannot select the policy audit ($($target.ReasonCode)): $($target.Reason)"
+        Get-FeatureReviewCoverageContinuation -Reason $reason -StopHookActive $stopHookActive |
+            ConvertTo-Json -Compress -Depth 5 |
+                Write-Output
         exit 0
     }
 
-    $auditText = Get-Content -Path $audit.FullName -Raw
-    $changedLanguages = Get-ChangedLanguageSet -RepoRoot $repoRoot
+    $itemRoot = $target.ItemRoot
+    $auditPath = "$itemRoot/$($target.AuditRelativePath)"
+    $auditText = Get-Content -Path $auditPath -Raw
+    $changedLanguages = Get-ChangedLanguageSet -RepoRoot $itemRoot
+
+    $freshness = Get-FeatureReviewCoverageFreshnessDecision -WorktreeRoot $itemRoot -SessionRoot $repoRoot -Source $target.Source -ChangedLanguage $changedLanguages -GitInvoker { param($Root, $Pathspec) Invoke-CodexReviewCoverageGitLog -Root $Root -Pathspec $Pathspec }
+    if ($null -ne $freshness) {
+        $reason = "Feature-review coverage inputs in the item worktree are absent or stale.`n  - " + ($freshness.Reasons -join "`n  - ") + "`nAudit file: $auditPath"
+        Get-FeatureReviewCoverageContinuation -Reason $reason -StopHookActive $stopHookActive |
+            ConvertTo-Json -Compress -Depth 5 |
+                Write-Output
+        exit 0
+    }
 
     if ($changedLanguages.Count -eq 0) {
         exit 0
     }
 
-    $claudeMdPath = Join-Path $repoRoot 'CLAUDE.md'
+    $claudeMdPath = Join-Path $itemRoot 'CLAUDE.md'
     $claudeMdText = $null
     if (Test-Path -Path $claudeMdPath) { try { $claudeMdText = Get-Content -Path $claudeMdPath -Raw -ErrorAction Stop } catch { throw "root CLAUDE.md exists but could not be read ($(([string]$_.Exception.Message -split "`r?`n")[0])); coverage floors cannot be resolved, so the gate fails closed." } }
     $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMdText
@@ -330,7 +354,7 @@ try {
     $failures = [System.Collections.Generic.List[string]]::new()
 
     foreach ($lang in $changedLanguages.Keys) {
-        $repoPct = Get-LanguageRepoCoverage -RepoRoot $repoRoot -Language $lang
+        $repoPct = Get-LanguageRepoCoverage -RepoRoot $itemRoot -Language $lang
         $result = Test-LanguageCoverageRow -AuditText $auditText -Language $lang -RepoWidePct $repoPct -LineFloor $thresholds.Line
         if (-not $result.Ok) {
             $failures.Add($result.Reason)
@@ -340,7 +364,7 @@ try {
     if ($failures.Count -gt 0) {
         $header = "Feature-review coverage validation failed against branch diff."
         $body   = "  - " + ($failures -join "`n  - ")
-        $footer = "Audit file: $($audit.FullName)`nFix the policy-audit to carry an explicit PASS or FAIL verdict per language with changed files, and reflect repo-wide coverage below the governing line coverage floor ($($thresholds.Line)%) as FAIL."
+        $footer = "Audit file: $auditPath`nFix the policy-audit to carry an explicit PASS or FAIL verdict per language with changed files, and reflect repo-wide coverage below the governing line coverage floor ($($thresholds.Line)%) as FAIL."
         $reason = "{0}`n{1}`n{2}" -f $header, $body, $footer
         Get-FeatureReviewCoverageContinuation -Reason $reason -StopHookActive $stopHookActive |
             ConvertTo-Json -Compress -Depth 5 |

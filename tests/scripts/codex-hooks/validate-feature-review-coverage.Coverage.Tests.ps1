@@ -4,10 +4,13 @@
     Coverage tests for .codex/hooks/validate-feature-review-coverage.ps1 (issue #786).
 
 .DESCRIPTION
-    Exercises the audit locator, the changed-language reader, the LCOV and JaCoCo parsers, the
-    language dispatcher, the coverage-row rules, the continuation shape, and the entry point
-    with stdin redirected and restored in finally. File reads go through Pester mocks of
-    Test-Path, Get-ChildItem, and Get-Content; no test creates, renames, moves, or deletes a file.
+    Exercises the audit target selection, the changed-language reader, the LCOV and JaCoCo
+    parsers, the language dispatcher, the coverage-row rules, the continuation shape, and the
+    entry point with stdin redirected and restored in finally. File reads go through Pester mocks
+    of Test-Path, Get-ChildItem, and Get-Content; file times through a mock of
+    Get-FeatureReviewReportLastWriteUtc; git only through mocks of the issue #1114 wrappers, and the
+    git seam Invoke-CodexReviewCoverageGitExe throws in every entry row. No test creates, renames,
+    moves, or deletes a file.
 #>
 
 Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
@@ -64,6 +67,10 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             param([Parameter(Mandatory)] [string] $AuditPath, [bool] $StopHookActive = $false)
             return ([ordered]@{ hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $StopHookActive; last_assistant_message = "Review complete.`npolicy-audit-path: $AuditPath" } | ConvertTo-Json -Compress)
         }
+
+        # Single-item payloads name a relative audit, which resolves to the session root (no freshness probe).
+        $script:ReviewStopNamed = Get-CodexReviewStopPayload -AuditPath 'docs/features/active/f/policy-audit.2026-10-10T00-00.md'
+        $script:ReviewStopNamedActive = Get-CodexReviewStopPayload -AuditPath 'docs/features/active/f/policy-audit.2026-10-10T00-00.md' -StopHookActive $true
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
@@ -80,15 +87,24 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             Get-RepoRoot | Should -Not -BeNullOrEmpty
         }
 
-        It 'returns no audit when the active folder is absent' {
-            Mock Test-Path { $false }
-            Get-LatestPolicyAudit -RepoRoot '/synthetic-root/repo' | Should -BeNullOrEmpty
+        It '1114: selects the audit named by the reviewer beneath the session root' {
+            # Arrange
+            Mock Test-Path { $true }
+
+            # Act
+            $target = Resolve-CodexReviewCoverageTarget -Message 'policy-audit-path: docs/features/active/f/policy-audit.2026-10-10T00-00.md' -SessionRoot '/synthetic-root/repo'
+
+            # Assert
+            $target.ReasonCode | Should -BeNullOrEmpty
+            $target.ItemRoot | Should -Be '/synthetic-root/repo'
+            $target.Source | Should -Be 'SessionRoot'
+            $target.AuditRelativePath | Should -Be 'docs/features/active/f/policy-audit.2026-10-10T00-00.md'
         }
 
-        It 'returns the most recently written audit' {
-            Mock Test-Path { $true }
-            Mock Get-ChildItem { @([pscustomobject]@{ Name = 'old'; LastWriteTime = [datetime]'2026-01-01' }, [pscustomobject]@{ Name = 'new'; LastWriteTime = [datetime]'2026-02-01' }) }
-            (Get-LatestPolicyAudit -RepoRoot '/synthetic-root/repo').Name | Should -Be 'new'
+        It '1114: returns AUDIT_NOT_NAMED when the reviewer names no audit' {
+            $target = Resolve-CodexReviewCoverageTarget -Message 'Review complete; no artifact paths reported.' -SessionRoot '/synthetic-root/repo'
+            $target.ReasonCode | Should -Be 'AUDIT_NOT_NAMED'
+            $target.AuditRelativePath | Should -BeNullOrEmpty
         }
 
         It 'returns no language when the PR summary is absent' {
@@ -287,32 +303,47 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             $result.Stderr | Should -Match $Pattern
         }
 
-        It 'exits 0 when no policy audit exists' {
-            Mock Test-Path { $false }
-            (Invoke-CodexReviewEntry -Stdin $script:ReviewStop).ExitCode | Should -Be 0
+        It '1114: blocks once asking for the policy-audit path when the reviewer names none' {
+            # Arrange: the payload carries no last_assistant_message, so no audit is named (decision D2).
+            Mock Test-Path { $true }
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStop
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            $continuation = $result.Stdout | ConvertFrom-Json
+            $continuation.decision | Should -Be 'block'
+            $continuation.reason | Should -BeLike '*AUDIT_NOT_NAMED*policy-audit*'
+        }
+
+        It '1114: stops the continuation when no audit is named and the stop hook is active' {
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopActive
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            ($result.Stdout | ConvertFrom-Json).continue | Should -BeFalse
         }
 
         It 'exits 0 when the branch changes no tracked language' {
             Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('pr_context.summary.txt') }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { 'audit text' }
-            (Invoke-CodexReviewEntry -Stdin $script:ReviewStop).ExitCode | Should -Be 0
+            (Invoke-CodexReviewEntry -Stdin $script:ReviewStopNamed).ExitCode | Should -Be 0
         }
 
         It 'requests a continuation when a changed language lacks a verdict' {
             Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.info') -and -not ([string]$Path).EndsWith('.xml') }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { param($Path) if (([string]$Path).EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } else { 'Python coverage 90%' } }
-            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStop
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopNamed
             $result.ExitCode | Should -Be 0
             ($result.Stdout | ConvertFrom-Json).decision | Should -Be 'block'
         }
 
         It 'stops the continuation loop when a validator error occurs with the stop hook active' {
             Mock Test-Path { $true }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { throw 'simulated read failure' }
-            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopActive
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopNamedActive
             $result.ExitCode | Should -Be 0
             ($result.Stdout | ConvertFrom-Json).continue | Should -BeFalse
         }
@@ -320,11 +351,10 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
         It 'E4-TR7: with no CLAUDE.md figure an 80.5% line row fails against the 85% floor' -Tag 'E4-Regression', 'E4-TR7' {
             # Arrange: a Python change, an 80.5 percent LCOV report, and a root CLAUDE.md without coverage figures.
             Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.xml') }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:1000', 'LH:805') } elseif ($p.EndsWith('CLAUDE.md')) { 'Project notes without coverage figures.' } else { 'Python coverage PASS' } }
 
             # Act
-            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStop
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopNamed
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -336,11 +366,10 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
         It 'E4-TR8: a CLAUDE.md line floor of 70 lets a 72% row pass' {
             # Arrange: a Python change, a 72 percent LCOV report, and a root CLAUDE.md stating a 70 percent line floor.
             Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.xml') }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:100', 'LH:72') } elseif ($p.EndsWith('CLAUDE.md')) { 'Line coverage >= 70%' } else { 'Python coverage PASS' } }
 
             # Act
-            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStop
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopNamed
 
             # Assert
             $result.ExitCode | Should -Be 0 -Because $result.Stderr
@@ -353,9 +382,8 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
         ) {
             # Arrange: the root CLAUDE.md exists but its read throws.
             Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.xml') }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('CLAUDE.md')) { throw 'simulated read failure: access denied' } elseif ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:1000', 'LH:805') } else { 'Python coverage PASS' } }
-            $stdin = if ($Active) { $script:ReviewStopActive } else { $script:ReviewStop }
+            $stdin = if ($Active) { $script:ReviewStopNamedActive } else { $script:ReviewStopNamed }
 
             # Act
             $result = Invoke-CodexReviewEntry -Stdin $stdin
