@@ -73,7 +73,8 @@ function Invoke-FeatureReviewCoverageValidation {
         the session root, the PR context summary, the root CLAUDE.md, and the coverage reports are
         read beneath the item root only, after the freshness decision of
         validate-feature-review-coverage-freshness.ps1 passes. The session-root case is unchanged.
-        SessionRoot, ReadTranscriptHead, WorktreeListInvoker, and GitInvoker are test seams.
+        SessionRoot, ReadTranscriptHead, WorktreeListInvoker, CheckpointIssueReader, and GitInvoker
+        are test seams.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -82,6 +83,7 @@ function Invoke-FeatureReviewCoverageValidation {
         [AllowNull()] [AllowEmptyString()] [string] $SessionRoot,
         [scriptblock] $ReadTranscriptHead,
         [scriptblock] $WorktreeListInvoker,
+        [scriptblock] $CheckpointIssueReader,
         [scriptblock] $GitInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
@@ -117,9 +119,10 @@ function Invoke-FeatureReviewCoverageValidation {
             $targetArguments = @{ Envelope = $envelope.Envelope; AdvertisedPath = [string[]]@($advertised.Values | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }); SessionRoot = $root }
             if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
             if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+            if ($null -ne $CheckpointIssueReader) { $targetArguments['CheckpointIssueReader'] = $CheckpointIssueReader }
             $target = Resolve-SubagentStopTargetWorktree @targetArguments
             if ($null -ne $target.ReasonCode) {
-                $finding = @{ Message = "validate-feature-review-coverage: target worktree resolution returned $($target.ReasonCode) ($($target.Detail)); the review artifacts and coverage reports cannot be located, and the session root is not read. Report the item branch and canonical issue in the delegation prompt, or advertise absolute artifact paths inside the item worktree."; HasRepairable = $true; HasNonRepairable = $false }
+                $finding = @{ Message = "validate-feature-review-coverage: target worktree resolution returned $($target.ReasonCode) ($($target.Detail)); the review artifacts and coverage reports cannot be located, and the session root is not read. Name the item branch as the first branch: label in the delegation prompt, or give the canonical issue line of an item whose worktree checkpoint records that issue."; HasRepairable = $true; HasNonRepairable = $false }
                 break
             }
             $itemRoot = if (Test-SubagentStopSessionRoot -WorktreeRoot $target.WorktreeRoot -SessionRoot $root) { '' } else { [string]$target.WorktreeRoot }

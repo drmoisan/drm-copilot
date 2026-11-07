@@ -74,13 +74,15 @@ BeforeAll {
 
     function Invoke-CoverageCase {
         # Runs the hook entry function with an envelope advertising the given review paths.
-        param([string] $Prefix = '', [string] $Prompt = $script:Identity)
+        param([string] $Prefix = '', [string] $Prompt = $script:Identity, [switch] $StopHookActive, [scriptblock] $CheckpointIssueReader)
         $output = "Review complete.`npolicy-audit-path: $Prefix$script:Policy`ncode-review-path: $Prefix$script:Code`nfeature-audit-path: $Prefix$script:Feature`nremediation-inputs-path: $Prefix$script:Remediation"
         $raw = [ordered]@{
-            session_id = 'tw-1105'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false
+            session_id = 'tw-1105'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = [bool] $StopHookActive
             agent_transcript_path = 'transcripts/subagents/agent-1105.jsonl'; last_assistant_message = $output
         } | ConvertTo-Json -Compress
-        return Invoke-FeatureReviewCoverageValidation -InputText $raw -SessionRoot $script:SessionRoot -ReadTranscriptHead (Get-TranscriptReader -Prompt $Prompt) -WorktreeListInvoker $script:ListInvoker -GitInvoker $script:GitInvoker
+        $arguments = @{ InputText = $raw; SessionRoot = $script:SessionRoot; ReadTranscriptHead = (Get-TranscriptReader -Prompt $Prompt); WorktreeListInvoker = $script:ListInvoker; GitInvoker = $script:GitInvoker }
+        if ($null -ne $CheckpointIssueReader) { $arguments['CheckpointIssueReader'] = $CheckpointIssueReader }
+        return Invoke-FeatureReviewCoverageValidation @arguments
     }
 }
 
@@ -289,6 +291,48 @@ Describe 'validate-feature-review-coverage unresolved target worktree (issue #11
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*'
         Should -Invoke Get-ArtifactFileContent -Times 0 -Exactly
         Should -Invoke Get-JacocoRepoCoverage -Times 0 -Exactly
+    }
+
+    It 'gives a not-derivable message that keeps the stem and reason code and never advises absolute paths' {
+        # Arrange
+        Set-ArtifactTable -File (Get-ReviewTable -Prefix '')
+
+        # Act
+        $result = Invoke-CoverageCase -Prompt 'branch: bug/unknown-branch'
+
+        # Assert
+        $result.Message | Should -BeLike 'validate-feature-review-coverage:*TARGET_WORKTREE_NOT_DERIVABLE*'
+        $result.Message | Should -Not -BeLike '*absolute*'
+    }
+}
+
+Describe 'validate-feature-review-coverage gate-admitted prompts in a main-checkout session (issue #1105)' {
+    It 'passes an issue-line-only prompt whose checkpoint issue reader records the issue for the session root' {
+        # Arrange
+        Set-ArtifactTable -File (Get-ReviewTable -Prefix '')
+        $sessionRoot = $script:SessionRoot
+        $issueReader = { param($WorktreeRoot) if ($WorktreeRoot -eq $sessionRoot) { '1105' } else { $null } }.GetNewClosure()
+
+        # Act
+        $result = Invoke-CoverageCase -Prompt 'Canonical issue number for this feature is 1105.' -StopHookActive -CheckpointIssueReader $issueReader
+
+        # Assert
+        $result.Ok | Should -BeTrue -Because $result.Message
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Policy -and [string]::IsNullOrEmpty($Root) }
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Remediation -and [string]::IsNullOrEmpty($Root) }
+    }
+
+    It 'passes a prompt whose first branch label names the session branch and whose later label names the item branch' {
+        # Arrange
+        Set-ArtifactTable -File (Get-ReviewTable -Prefix '')
+
+        # Act
+        $result = Invoke-CoverageCase -Prompt "branch: main`nbase branch: bug/sample-1105" -StopHookActive
+
+        # Assert
+        $result.Ok | Should -BeTrue -Because $result.Message
+        Should -Invoke Get-ArtifactFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Policy -and [string]::IsNullOrEmpty($Root) }
+        Should -Invoke Get-ArtifactFileContent -Times 0 -Exactly -ParameterFilter { $Path -like "$script:ItemRoot/*" }
     }
 }
 
