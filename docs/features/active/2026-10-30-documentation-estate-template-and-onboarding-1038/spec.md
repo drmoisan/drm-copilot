@@ -146,7 +146,7 @@ link to code, schema and template paths, not to feature folders.
 - `consumer-onboarding.md`:
   - Required prerequisite: PowerShell 7.4 or later on PATH as `pwsh` (epic Q8 provisional default).
     Below 7.4 every subcommand exits 3 with `DOCS_RUNTIME_UNSUPPORTED`.
-  - Optional python pack: installing the python pack, with Python 3.10 or later available, enables
+  - Optional python pack: installing the python pack, with Python 3.11 or later available, enables
     the native Python analyzer for `python-cli`, `python-http`, `python-public-api` and
     `python-architecture` (D3). Without it `inventory` falls back to the PowerShell scanner and
     records `analysis_method: scanner`. `inventory -AnalysisMethod auto|native|scanner` (default
@@ -321,7 +321,7 @@ the end-to-end suite depends on its `-AnalysisMethod` option.
 | `init` options and `Get-DocsInitTemplate` rows; `init -Write` linter configuration set | 1020, 1021, 1034 | onboarding |
 | `check` options and result `{page_count, profile_path, roots}` | 1021 | command reference |
 | `inventory` options; analyzer identifiers; per-kind `line_range` rules | 1022 | end-to-end suite |
-| `-AnalysisMethod auto|native|scanner`; Python 3.10 floor; fallback rules; OQ-D statement | 1031 | end-to-end suite, onboarding |
+| `-AnalysisMethod auto|native|scanner`; Python 3.11 floor; fallback rules; OQ-D statement | 1031 | end-to-end suite, onboarding |
 | TypeScript and .NET scanners behind `inventory` (`analysis_method: scanner`) | 1033 | architecture page |
 | `coverage`, `update-ledger`, `validate` options; finding codes `DOCS_LEDGER_MISSING_DISPOSITION`, `DOCS_STALE_PAGE`, `DOCS_SNAPSHOT_UNPINNED`; receipt fields | 1023 | end-to-end suite, command reference |
 | `generate-reference` options, `result` keys `{mode, output_directory, pages, summary, unrendered}`, exit 1 on `REFERENCE_WRITE_CONFLICT`, exit 3 on write failure | 1024 | end-to-end suite, command reference |
@@ -365,6 +365,10 @@ where they differ:
   the merged 1023 names `DOCS_STALE_PAGE` and `DOCS_BOUND_PAGE_MISSING`, per the epic
   `### Ledger contracts from the PowerShell preparation of 1023 (binding)`, which supersedes the
   earlier names. Found by plan task P0-T5 on 2026-11-07.
+- Python floor (erratum, 2026-11-07): the native-analyzer floor is Python 3.11, per the 1031 owner
+  decision of 2026-11-04 and the merged `FLOOR = (3, 11)` in
+  `.claude/lib/docs/python/run_docs_python_native.py`, which supersedes 3.10. Found at feature
+  review on 2026-11-07.
 
 ## Owner Questions
 
@@ -390,7 +394,7 @@ Provisional defaults stand; this child does not wait on them.
 - [x] `command-reference.md` documents the exit codes 0 to 3 with `DOCS_CLI_ARGUMENTS`, `DOCS_CLI_RUNTIME` and `DOCS_RUNTIME_UNSUPPORTED`, the envelope keys `command`, `exit_code`, `findings`, `ok`, `result` with the schema path `schemas/docs/v1/docs-command-envelope.schema.json`, and states that `init`, `validate-profile` and `surface-delta` have no MCP tool, that `update_docs_ledger` is the only mutating tool, and that `validate_docs_artifacts` never persists a receipt.
 - [x] Every option spelling in the command-reference examples matches the merged dispatch row of its subcommand or the merged input table of its MCP tool, as recorded in the Phase 0 evidence.
 - [x] `consumer-onboarding.md` states the destination-repository prerequisite PowerShell 7.4 (Q8 provisional default) and that a lower version exits 3 with `DOCS_RUNTIME_UNSUPPORTED`, and `DocumentationEstateOnboarding.Tests.ps1` asserts the `7.4` statement is present.
-- [ ] `consumer-onboarding.md` states that the optional python pack, with Python 3.10 or later, enables the native Python analyzer (D3), that without it `inventory` falls back to the scanner and records `analysis_method: scanner`, the `-AnalysisMethod` choices, and that a push-down without a pack selection ships the inert helper; the documentation contract suite asserts the python pack statement is present.
+- [ ] `consumer-onboarding.md` states that the optional python pack, with Python 3.11 or later, enables the native Python analyzer (D3), that without it `inventory` falls back to the scanner and records `analysis_method: scanner`, the `-AnalysisMethod` choices, and that a push-down without a pack selection ships the inert helper; the documentation contract suite asserts the python pack statement is present.
 - [x] `consumer-onboarding.md` states that linting is optional (D4), names the configuration files `init -Write` writes, and states that `check` is the required page gate; the documentation contract suite asserts the optional-lint statement is present.
 - [x] `workflow.md` names the roles `docs-architect`, `docs-author`, `docs-reconciler`, `docs-coverage-reviewer`, the skills `documentation-workflow`, `docs-init`, `docs-inventory-surface`, `docs-plan-ia`, `docs-author-page`, `docs-reconcile-behavior`, `docs-review-coverage` and `docs-validate`, and the opt-in gate key `completion_gates.integration_pr_gate.enabled`.
 - [x] A positive control in `DocumentationEstateOnboarding.Tests.ps1` runs the membership check over an in-memory command reference missing one subcommand and the check fails naming that subcommand.
