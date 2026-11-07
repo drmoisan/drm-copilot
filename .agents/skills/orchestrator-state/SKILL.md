@@ -109,6 +109,10 @@ Derivation order. The verdict is a pure function of the findings' classes, evalu
 
 3. **Verdict matches its findings (R10).** When an outcome passes the membership checks, its `verdict` must equal the verdict that the derivation order yields for its findings' classes. A mismatch is a malformed outcome.
 
+## Concurrent-Review Key (review_mode)
+
+The top-level checkpoint key `review_mode` selects the concurrent run sequence. Only the exact string `concurrent`, compared ordinally, activates it; an absent key, `null`, `sequential`, a case variant, a number, and every other value mean sequential. Under the key, each `remediation_loop.review_outcomes[]` entry carries `head_sha`, the full lowercase head the review ran against. `## Concurrent Review and CI (review_mode)` in `.agents/skills/orchestrate/SKILL.md` defines the run sequence.
+
 ## Human-Interaction Scope and Backward Compatibility
 
 These invariants apply only when the checkpoint contains a top-level `human_interaction` block. A checkpoint with no `human_interaction` key (the existing checkpoint shape) is unaffected: it validates exactly as before and produces no new errors. The invariants are additive and support the autonomous-execution mandate documented in `.agents/skills/orchestrate/SKILL.md`.
