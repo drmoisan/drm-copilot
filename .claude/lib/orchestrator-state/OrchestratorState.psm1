@@ -313,11 +313,14 @@ function Get-OrchestratorStatePrCreationReadinessError {
     )
 
     $errors = [System.Collections.Generic.List[string]]::new()
+    $reviewMode = (Get-OrchestratorStateField -State $State -Name 'review_mode').Value
 
     # Reject an upstream step recorded as pending, blocked, or blocked_remediation_loop_limit; steps
     # 5-8 must have finished before the first PR of a branch is created.
     foreach ($key in $script:PR_CREATION_READY_STEP_KEYS) {
         $field = Get-OrchestratorStateField -State $State -Name $key
+        # Under review_mode concurrent the review runs beside CI and the merge guard holds the merge.
+        if ($key -ceq 'step7_status' -and $field.Value -ceq 'pending' -and $reviewMode -is [string] -and $reviewMode -ceq 'concurrent') { continue }
         if ($field.Present -and (@('pending', 'blocked', 'blocked_remediation_loop_limit') -contains $field.Value)) {
             $errors.Add("Checkpoint PR-creation readiness validation failed: $key is $($field.Value).")
         }

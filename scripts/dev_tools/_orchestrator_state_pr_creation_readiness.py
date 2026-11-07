@@ -104,6 +104,15 @@ def validate_orchestrator_state_pr_creation_readiness(
     # created.
     for key in PR_CREATION_READY_STEP_KEYS:
         value = state.get(key)
+        # Under `review_mode: concurrent` the review runs beside CI after the
+        # PR opens, so a pending review is expected here; the merge guard holds
+        # the merge until it passes. `blocked` and every other step still block.
+        if (
+            key == "step7_status"
+            and value == "pending"
+            and state.get("review_mode") == "concurrent"
+        ):
+            continue
         if value in PR_CREATION_BLOCKING_STEP_STATUS:
             errors.append(
                 f"Checkpoint PR-creation readiness validation failed: {key} is {value}."

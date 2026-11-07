@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Portable completion-gate checks C1, C2, C3, C4, C5, and C7.
+    Portable completion-gate checks C1, C2, C3, C4, C5, C7, and C8.
 
 .DESCRIPTION
     Destination-runtime PowerShell port of the `--require-complete` checks the
@@ -19,6 +19,7 @@
       C5.1  mandatory route phases, from a static map
       C7.1  preparation terminal next_step (value-gated, repr rendering)
       C7.2  preparation terminal step statuses (value-gated, repr rendering)
+      C8    last review outcome under review_mode concurrent (value-gated)
 
     Route gating for C3 and C4 is resolved through
     `OrchestratorStateRoutingMatrix.psm1`, implementing deviation PD-1: the gate
@@ -407,6 +408,52 @@ function Get-OrchestratorStatePreparationTerminalError {
     return $errors.ToArray()
 }
 
+function Get-OrchestratorStateCompletionConcurrentReviewError {
+    <#
+    .SYNOPSIS
+        Return the review-record error under review_mode concurrent (row C8).
+    .DESCRIPTION
+        Mirrors validate_concurrent_review_completion. Only the exact string concurrent
+        activates the check, and only the final review_outcomes element counts. The head
+        error is reported only when the verdict error does not apply. The check does no
+        git work: head currency stays with the merge guard.
+    .PARAMETER State
+        The parsed checkpoint object.
+    .OUTPUTS
+        System.String[] - zero or one error string.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [psobject] $State
+    )
+
+    $mode = (Get-CheckpointObjectMember -Owner $State -Name 'review_mode').Value
+    if (-not (($mode -is [string]) -and ($mode -ceq 'concurrent'))) {
+        return [string[]]@()
+    }
+
+    # A missing loop, a non-list value, an empty list, and a non-object last entry all
+    # leave $last unset, so each reports the verdict error.
+    $last = $null
+    $loop = (Get-CheckpointObjectMember -Owner $State -Name 'remediation_loop').Value
+    $outcomes = (Get-CheckpointObjectMember -Owner $loop -Name 'review_outcomes').Value
+    if ((Test-CheckpointListValue -Value $outcomes) -and $outcomes.Count -gt 0) {
+        $last = $outcomes[$outcomes.Count - 1]
+    }
+    $verdict = (Get-CheckpointObjectMember -Owner $last -Name 'verdict').Value
+    if (-not (($verdict -is [string]) -and ($verdict -ceq 'PASS'))) {
+        return [string[]]@('Checkpoint completion validation failed: review_mode concurrent requires a last review_outcomes entry with verdict PASS.')
+    }
+
+    $head = (Get-CheckpointObjectMember -Owner $last -Name 'head_sha').Value
+    if (-not (($head -is [string]) -and ($head -cmatch '\A[0-9a-f]{40}([0-9a-f]{24})?\z'))) {
+        return [string[]]@('Checkpoint completion validation failed: review_mode concurrent requires head_sha on the last review_outcomes entry.')
+    }
+    return [string[]]@()
+}
+
 # Each check family is exported individually so the completion entry point can
 # compose them in the Python reference's order; the gate-key helper stays private.
 Export-ModuleMember -Function `
@@ -415,4 +462,5 @@ Export-ModuleMember -Function `
     Get-OrchestratorStateCompletionPrGateError, `
     Get-OrchestratorStateCompletionCiGateError, `
     Get-OrchestratorStatePhaseCompletenessError, `
-    Get-OrchestratorStatePreparationTerminalError
+    Get-OrchestratorStatePreparationTerminalError, `
+    Get-OrchestratorStateCompletionConcurrentReviewError
