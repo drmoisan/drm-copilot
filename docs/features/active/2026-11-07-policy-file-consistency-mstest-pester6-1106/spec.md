@@ -129,7 +129,8 @@ One runner for every C# surface was not chosen. The modern profile is host-neutr
   - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows), `evidence/qa-gates/codex-generator-check.2026-11-07T15-01.md`, `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`
 - [x] No approved or emitted command, task, or argv list carries `--cov=src/lexile_corpus_tuner`; each former site targets `--cov=scripts/dev_tools`, the dead `pyproject.toml` per-file-ignore is removed, and `test_qc_runner.py` asserts the new argv.
   - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN-CODE), `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md` (test_qc_runner.py 24 passed)
-- [ ] The PR description states the D3 Python behavior change (coverage now targets an existing package).
+- [x] The PR description states the D3 Python behavior change (coverage now targets an existing package).
+  - Evidence: PR #1108 body, summary bullet "Python behavior change (D3)" and the D3 behavior-change section; verified with `gh pr view 1108` on 2026-11-07.
   - pending pr-author (text prepared in `evidence/other/pr-body-notes.2026-11-07T15-26.md`)
 - [x] Other-project example text (`lexile`, `gutenberg`) is replaced with neutral generic names in the D4 policy surfaces and their bundle copies; `clean_devcontainer.py` names and `LEXILE_TK_SCALE` are unchanged.
   - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (PTN- rows over lexile and gutenberg), `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md`
@@ -137,7 +138,8 @@ One runner for every C# surface was not chosen. The modern profile is host-neutr
   - Evidence: `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md` (29 pairs EQUAL, generator --check exit 0), `evidence/qa-gates/pytest-gate.2026-11-07T15-18.md` (Q4 contract suites pass)
 - [x] The `>= 90%` new-code coverage rule, the 85% line / 75% branch thresholds, and all parallel-only test command wording are byte-unchanged; same-line edits change only the named token.
   - Evidence: `evidence/qa-gates/parity-and-protected-regions.2026-11-07T15-13.md` (protected-token counts equal at MB and HEAD; same-line word diffs)
-- [ ] The owner authorization for editing canonical policy files is recorded in the orchestrator checkpoint and the PR body.
+- [x] The owner authorization for editing canonical policy files is recorded in the orchestrator checkpoint and the PR body.
+  - Evidence: checkpoint `owner_decisions`; PR #1108 body section `## Owner Authorization`; verified with `gh pr view 1108` on 2026-11-07.
   - pending pr-author (checkpoint record confirmed; PR-body text prepared in `evidence/other/pr-body-notes.2026-11-07T15-26.md`)
 - [x] `tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1` exists, passes, and its in-memory helper test fails on reintroduced forbidden text.
   - Evidence: `evidence/qa-gates/pester-gate.2026-11-07T15-25.md` (18 PTN- rows pass, including PTN-HELPER)
