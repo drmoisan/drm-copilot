@@ -50,6 +50,12 @@ The list covers every path of the stored patch, with rename detection off.
 - `.claude/skills/powershell-qa-gate/SKILL.md`: canonical
 - `.claude/skills/python-qa-gate/SKILL.md`: canonical
 - `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`: canonical
+- `.codex/agents/atomic-executor-c1.toml`: generated variant
+- `.codex/agents/atomic-executor-c2.toml`: generated variant
+- `.codex/agents/atomic-executor-c3-elevated.toml`: generated variant
+- `.codex/agents/atomic-executor-c3.toml`: generated variant
+- `.codex/agents/atomic-executor-c4.toml`: generated variant
+- `.codex/agents/atomic-executor.toml`: hand-edited Codex agent
 - `.codex/agents/atomic-planner-c1.toml`: generated variant
 - `.codex/agents/atomic-planner-c2.toml`: generated variant
 - `.codex/agents/atomic-planner-c3-elevated.toml`: generated variant
@@ -155,6 +161,12 @@ The list covers every path of the stored patch, with rename detection off.
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md`: bundle copy
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md`: bundle copy
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex-variants/csharp-legacy/agents/csharp-typed-engineer.toml`: hand-edited `csharp-legacy` bundle variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml`: bundle copy
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml`: bundle copy
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml`: bundle copy
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml`: bundle copy
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml`: bundle copy
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml`: bundle copy
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml`: bundle copy
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c2.toml`: bundle copy
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3-elevated.toml`: bundle copy
@@ -558,7 +570,7 @@ Baseline coverage is read from the plan's `Phase 0 baseline` artifact, one run o
 
 1. Apply the blocks: run `git apply -R` of `patches/0006-test-suite-baseline-restored.patch` when its check passes. Otherwise replace each `Current` fence with its `Prior` fence in the named file, and restore the other paths from the patch text. Reset the `0001` row Status in `README.md` to `Active`. Revert this entry before `0001`, because the restored text sits inside hunks of the `0001` patch; reverting this patch also removes the `0001` `## Partial Revert` section and restores the `0005` fences.
 2. Re-copy mirrors and bundles: copy `.claude/skills/execution-environment/SKILL.md` to its five copies; copy each `atomic-plan-contract`, `evidence-and-timestamp-conventions`, QA gate, review, planner, engineer, and handoff source, each Copilot agent and prompt, each hand-edited Codex agent without generated variants, and each template to its bundle path under `extensions/drm-copilot/resources/`; the `csharp-legacy` bundle variants are hand-edited and are restored from the patch text.
-3. Regenerate Codex variants: applicable, because the bases `.codex/agents/atomic-planner.toml`, `.codex/agents/csharp-typed-engineer.toml`, `.codex/agents/powershell-typed-engineer.toml`, and `.codex/agents/python-typed-engineer.toml` changed. Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form, then run it with `--check`.
+3. Regenerate Codex variants: applicable, because the bases `.codex/agents/atomic-executor.toml`, `.codex/agents/atomic-planner.toml`, `.codex/agents/csharp-typed-engineer.toml`, `.codex/agents/powershell-typed-engineer.toml`, and `.codex/agents/python-typed-engineer.toml` changed. Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form, then run it with `--check`.
 4. Restore pinned hashes: not applicable, because no pinned surface moved.
 5. Restore contract-test literals: the patch restores `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` (the 38 sweep tokens and the baseline-class forbidden tokens), `test_brief_passages_state_parallel_gate_facts`, and `test_codex_orchestrator_workflow_requires_large_path_evidence_gates`. Remove `PRL-PARTIAL-REVERT-LINKED` from `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`, which is outside the patch.
 6. Run the contract tests: run `parallel-gate-wording.Tests.ps1`, `ProcessReductionLedger.Index.Tests.ps1`, `planning-contract-wording.Tests.ps1`, `test_execution_environment_brief_contracts.py`, `test_codex_orchestration_contracts.py`, `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, and `test_copilot_bundle_copies_match_canonical`, inside the one `Invoke-PoshQCParallelTest` run and the one `pytest -n auto` run.

@@ -1130,6 +1130,84 @@ index c9afc8701..b1bdfa3d5 100644
  - Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
  - Evidence paths resolve to `<FEATURE>/evidence/<kind>/` per the non-overridable evidence path clause.
  - The plan is design-level per `## Design-Level Plan Contract (Mandatory)` in `atomic-plan-contract`, carries a `## Pre-Mortem` section, and ends with the final-phase self-review task. A proportionate plan covers only the listed findings and stays short.
+diff --git a/.codex/agents/atomic-executor-c1.toml b/.codex/agents/atomic-executor-c1.toml
+index 8434e2b32..aef18c2dd 100644
+--- a/.codex/agents/atomic-executor-c1.toml
++++ b/.codex/agents/atomic-executor-c1.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/.codex/agents/atomic-executor-c2.toml b/.codex/agents/atomic-executor-c2.toml
+index 0d81544b8..3810fb4cf 100644
+--- a/.codex/agents/atomic-executor-c2.toml
++++ b/.codex/agents/atomic-executor-c2.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/.codex/agents/atomic-executor-c3-elevated.toml b/.codex/agents/atomic-executor-c3-elevated.toml
+index 5d413fc3c..869fb2c35 100644
+--- a/.codex/agents/atomic-executor-c3-elevated.toml
++++ b/.codex/agents/atomic-executor-c3-elevated.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/.codex/agents/atomic-executor-c3.toml b/.codex/agents/atomic-executor-c3.toml
+index f7dd9caba..d3e4c01b6 100644
+--- a/.codex/agents/atomic-executor-c3.toml
++++ b/.codex/agents/atomic-executor-c3.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/.codex/agents/atomic-executor-c4.toml b/.codex/agents/atomic-executor-c4.toml
+index 155e4a211..e3c4ff605 100644
+--- a/.codex/agents/atomic-executor-c4.toml
++++ b/.codex/agents/atomic-executor-c4.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/.codex/agents/atomic-executor.toml b/.codex/agents/atomic-executor.toml
+index 8ec185f14..f275a5da6 100644
+--- a/.codex/agents/atomic-executor.toml
++++ b/.codex/agents/atomic-executor.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
 diff --git a/.codex/agents/atomic-planner-c1.toml b/.codex/agents/atomic-planner-c1.toml
 index 235e92426..bf8625fde 100644
 --- a/.codex/agents/atomic-planner-c1.toml
@@ -5297,6 +5375,84 @@ index 4cf91ca1a..587f3efbb 100644
  - the toolchain cannot be executed in the current environment (mark the change **unverified**),
  - orchestrator handoff mode is requested but the required context package is incomplete,
  - policy instructions conflict.
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml
+index 8434e2b32..aef18c2dd 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml
+index 0d81544b8..3810fb4cf 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml
+index 5d413fc3c..869fb2c35 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml
+index f7dd9caba..d3e4c01b6 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml
+index 155e4a211..e3c4ff605 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml
+index 8ec185f14..f275a5da6 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml
+@@ -96,6 +96,8 @@ Use the scoped tool patterns for quality gates:
+ 
+ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+ 
++The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
++
+ ## Scratch Location
+ 
+ Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml
 index 235e92426..bf8625fde 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml
@@ -7722,7 +7878,7 @@ index 66953550e..1dd44bb1a 100644
  ---
  
 diff --git a/tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1 b/tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1
-index 38ee6ccec..717e47537 100644
+index 38ee6ccec..aff2e574b 100644
 --- a/tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1
 +++ b/tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1
 @@ -1,24 +1,26 @@
@@ -7798,6 +7954,19 @@ index 38ee6ccec..717e47537 100644
          @{ Id = 'REVIEW-CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
          @{ Id = 'REVIEW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
          @{ Id = 'REVIEW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
+@@ -96,9 +98,9 @@ Describe 'Parallel gate wording' {
+         @{ Id = 'REVIEW-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
+         @{ Id = 'ADAPTER-AGENTS'; Path = '.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
+         @{ Id = 'ADAPTER-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
+-        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
+-        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
+-        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
++        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
++        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
++        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
+         @{ Id = 'EXEC-CODEX-POWERSHELL'; Path = '.codex/agents/powershell-atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = @('run_poshqc_test') }
+         @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
+         @{ Id = 'COPILOT-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
 @@ -126,8 +128,8 @@ Describe 'Parallel gate wording' {
          @{ Id = 'COPILOT-STAGED-REVIEW-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
          @{ Id = 'AUDIT-TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
