@@ -33,7 +33,7 @@
   - Acceptance: `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md` exists with `Timestamp:`, `Policy Order:` and the twelve files listed in that order.
 - [x] [P0-T2] Run the branch-current Pester route with coverage over `tests/scripts/claude-skills/epic-progress-report` and `tests/scripts/dev-tools` before any edit.
   - Acceptance: `<FEATURE>/evidence/remediation-baseline/pester-coverage.<timestamp>.md` records total, passed and failed counts from the JUnit file, per-container counts for the seven touched suites (the six suites under `tests/scripts/claude-skills/epic-progress-report/` and `tests/scripts/dev-tools/Get-EpicProgressReport.Tests.ps1`) with 163 passed and 0 failed among them and 35 passed in `ENTRY_SUITE`, and the per-file line coverage of the five `CANON` files and `scripts/dev-tools/Get-EpicProgressReport.ps1` read from `artifacts/pester/powershell-coverage.xml`.
-- [ ] [P0-T3] Record the physical line count of `ENTRY_SUITE` with `@(Get-Content -LiteralPath <path>).Count`.
+- [x] [P0-T3] Record the physical line count of `ENTRY_SUITE` with `@(Get-Content -LiteralPath <path>).Count`.
   - Acceptance: `<FEATURE>/evidence/remediation-baseline/file-size.<timestamp>.md` records the count `563`.
 
 ### Phase 1 — F1: Pairing Write Without a New Sample
