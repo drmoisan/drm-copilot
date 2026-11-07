@@ -201,7 +201,7 @@ Cheap stages run first. A fix re-runs the static stage and the gate that failed;
   - The commit that adds the P0-T3 artifacts precedes, in `git log` from the merge base through `-C`, every branch commit that changes a path outside `docs/features/`; the step exits non-zero otherwise.
   - Each box is checked only when the evidence in `## Acceptance Criteria Traceability` exists and passes. Both `CI-dependent:` criteria stay unchecked.
   - Acceptance: `EXIT_CODE: 0` from a step that exits non-zero on any match, every locally verifiable box is checked in both files, and both CI-dependent boxes are unchecked.
-- [ ] [P6-T7] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`.
+- [x] [P6-T7] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`.
   - The artifact has one PASS, FAIL, or N/A row per checklist item, and it uses none of the tokens P6-T6 scans for. It lists spec Decisions 1, 2, and 3 for the owner report, including `EXEMPT-COUNT:`. A FAIL row is fixed, the QA loop re-runs from P6-T1, and the self-review is rewritten.
   - Acceptance: the artifact holds no FAIL row.
 
