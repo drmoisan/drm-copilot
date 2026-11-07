@@ -73,6 +73,7 @@ BeforeAll {
         'validate-bash.ps1'                      = 'blocks dangerous Bash patterns; the workflow commands carry none and it reads no checkpoint'
         'enforce-promotion-mcp-only.ps1'         = 'blocks promotion-script bypass commands; the workflow runs none'
         'enforce-epic-merge-gate.ps1'            = 'gates pull-request merges; the workflow creates a pull request and does not merge one'
+        'enforce-docs-complete-gate.ps1'         = 'gates integration pull-request merges on a docs receipt; the workflow creates a pull request and does not merge one'
         'enforce-parallel-abandon-gate.ps1'      = 'gates the parallel abandon disposition; the workflow runs none'
         'check-python-test-purity.ps1'           = 'inspects Python unit-test files; the workflow writes none'
         'enforce-python-batch-budget.ps1'        = 'counts production Python files in a worktree; the workflow writes none'

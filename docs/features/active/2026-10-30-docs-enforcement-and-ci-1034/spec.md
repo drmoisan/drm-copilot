@@ -39,8 +39,8 @@ This child delivers four enforcement surfaces, all pushed down as PowerShell or 
    `DocsSurfaceDeltaCommands.psm1`, one dispatch row) that reports surface elements added or changed
    since a base revision that have no matching ledger change.
 3. An opt-in PreToolUse hook `.claude/hooks/enforce-docs-complete-gate.ps1` (with pure predicates in
-   `DocsCompleteGate.psm1`) that, when the consumer profile enables it, denies the epic
-   integration-to-`main` merge unless a passing persisted receipt pins the pull request head revision.
+   `DocsCompleteGate.psm1`) that, when the consumer profile enables it, denies a `gh` merge it reads of
+   the epic integration branch into `main` unless a passing persisted receipt pins the pull request head revision.
 4. A `## Documentation Surface Check` in the procedure-bearing `feature-review` surfaces that turns a
    surface change without a ledger change into a Blocking review finding.
 
@@ -81,10 +81,10 @@ In scope:
 
 - With no consumer profile, or a profile whose `completion_gates.integration_pr_gate.enabled` is
   `false` (the starter value written by `init`), the hook allows every Bash call and performs no `gh`
-  call.
-- With the gate enabled, the hook allows every Bash call that is not a `gh` merge or enqueue command,
-  and every merge whose pull request is not the epic integration-to-`main` merge. For the
-  integration-to-`main` merge it allows only when the persisted receipt at
+  call, except that an envelope anomaly or a failed import still denies.
+- With the gate enabled, the hook allows a Bash call whose text it does not read as a `gh` merge or enqueue
+  command, and a merge it resolves to a pull request that is not the epic integration-to-`main` merge. For
+  an integration-to-`main` merge it reads, it allows when the persisted receipt at
   `artifact_paths.validation_receipt` has `mode` `docs-complete`, `validation_result` `pass`, and
   `revision` equal (ordinal) to the pull request `headRefOid`; otherwise it denies with
   `DOCS_COMPLETE_GATE_BLOCKED: <REASON_CODE> ...` naming the reason.
@@ -230,7 +230,7 @@ warning stream at module scope.
 | Reason code | Condition |
 |---|---|
 | `RECEIPT_ABSENT` | No file at the receipt path |
-| `RECEIPT_UNREADABLE` | Text does not parse, or `artifact_kind` is not the receipt kind |
+| `RECEIPT_UNREADABLE` | A read failure on an existing file, or text does not parse, or `artifact_kind` is not the receipt kind |
 | `RECEIPT_MODE` | `mode` is not `docs-complete` |
 | `RECEIPT_FAILING` | `validation_result` is not `pass` |
 | `RECEIPT_REVISION_MISMATCH` | `revision` is not ordinally equal to the head revision; deny text names both revisions |
@@ -242,19 +242,19 @@ warning stream at module scope.
   guarded single-statement import per edge (including `DocsCompleteGate.psm1` and `HookPayload.psm1`),
   `Get-HookDependencyFailureDecision` first in the decision function, the dot-source early return, then
   the tail. Literal `Join-Path -Path $PSScriptRoot -ChildPath '<literal>'` only.
-- Reuse: `Test-EpicMergeGateCommandInScope` and `Get-EpicMergeGateSelectorPrNumber`
-  (`enforce-epic-merge-gate-command.ps1`), `Invoke-DocsOnlyGhExe` (`hook-docs-only-diff.ps1`, bounded,
-  never throws, `[scriptblock]` invoker seam), payload readers from `HookPayload.psm1`, and the
-  allow/deny decision JSON shape of the epic merge gate.
+- Reuse: `Test-EpicMergeGateCommandInScope`, through `Test-DocsCompleteGateMergeCandidate` in the helper
+  `enforce-docs-complete-gate-target.ps1` (`enforce-epic-merge-gate-command.ps1`), `Invoke-DocsOnlyGhExe`
+  (`hook-docs-only-diff.ps1`, bounded, never throws, `[scriptblock]` invoker seam), payload readers from
+  `HookPayload.psm1`, and the allow/deny decision JSON shape of the epic merge gate.
 - Decision order, in `Invoke-DocsCompleteGateDecision -ToolInputRaw`:
   1. Dependency-failure decision; then envelope anomaly denies (sibling convention).
-  2. No `command`, or `Test-EpicMergeGateCommandInScope` false: allow. No I/O.
+  2. No `command`, or `Test-DocsCompleteGateMergeCandidate` false: allow. No I/O.
   3. Read the profile through the file seam `Get-DocsCompleteGateFileText` at
      `docs/documentation-estate/docs-profile.json` under the root returned by the root seam. Absent
      profile or gate disabled: allow, with no `gh` call. `PROFILE_UNREADABLE`: deny.
-  4. One bounded `gh pr view [<N>] --json baseRefName,headRefName,headRefOid` through
-     `Invoke-DocsOnlyGhExe`. Unresolved: deny `PR_UNRESOLVED`. A `--match-head-commit` value that
-     differs from `headRefOid`: deny `MATCH_HEAD_MISMATCH`.
+  4. One bounded `gh pr view [<selector>] [--repo <value>] --json baseRefName,headRefName,headRefOid` through
+     `Invoke-DocsOnlyGhExe`, reached only by one plain `gh pr merge`; every other candidate denies `PR_UNRESOLVED`
+     with no `gh` call. Unresolved: deny `PR_UNRESOLVED`. A differing `--match-head-commit`: deny `MATCH_HEAD_MISMATCH`.
   5. Not the integration target: allow.
   6. Receipt path check, read through the file seam, and `Test-DocsCompleteGateReceipt` against
      `headRefOid`. Deny with the reason code, or allow.
@@ -262,9 +262,9 @@ warning stream at module scope.
   The prefix is added to `$script:ReasonPrefix` in `hook-dependency-failure.Claude.Tests.ps1`.
 - Head revision: the pull request `headRefOid`, never local `git rev-parse HEAD`, because the session
   worktree may hold a different commit than the pull request head.
-- Residual limits, recorded in the hook header: the profile and receipt are read from the local working
-  tree; ambient `GH_REPO` selects the repository; a push after the lookup is not observed; a GraphQL
-  mutation supplied from a file is not visible; a direct `git push` to `main` is outside `gh` scope.
+- Residual limits, recorded in the hook header. This hook reads command text and is not a shell parser. It is a policy-level control, not a security boundary and not a cryptographic one. What it establishes, and nothing beyond this: it looks up the selector of a command it reads as one plain `gh pr merge`, and with the gate enabled it denies `PR_UNRESOLVED` for these groups whichever pull request they name: the words `gh pr merge` or a `gh api` merge endpoint or mutation in the text the shared scanner reads as unquoted, including a compound command, a wrapper payload the shared predicate reads, a word split by a backslash or a backslash-newline, and a comment joined to a later command by a backslash-newline; and quoted or heredoc text holding those words beside an unquoted evaluator word (`sh`, `bash`, `zsh`, `dash`, `ksh`, `pwsh`, `powershell`, `eval`, `source`). The shared scanner keeps no comment state, reads `<<` as a heredoc opener wherever it appears, and does not nest double quotes inside a command substitution inside double quotes, so a merge line that bash runs can read as quoted or heredoc text and allow. The forms named are: a quote character in a `#` comment before and after the merge line (`# it's`); a heredoc opener `<<` in a `#` comment (`# a<<b`); a shift in arithmetic (`x=$((1<<4))`); and double quotes nested in a command substitution inside double quotes (`echo "$(git log -1 --format="%h"; gh pr merge 12)"`).
+  Outside what it can observe: any other way of causing a merge is not visible to it, and such a command allows. Known forms: other interpreters such as `python -c` and `node -e`; `curl` to the API; scripts on disk; computed command words (`$a$b pr merge 12`, `$(echo 'gh pr merge 12')`); a quoted command word outside the leading position; evaluators outside the named words (`trap`, `fish`, `.`); a `gh` alias; a mutation supplied from a file; a merge endpoint whose number is a variable; a direct `git push` to `main`; an ANSI-C quoted command word (`$'g\x68' pr merge 12`); arguments piped to `gh` through `xargs gh` (`printf 'pr\nmerge\n12\n' | xargs gh`); a shell alias holding the merge (`alias m='gh pr merge 12'`, then `m`); an encoded payload decoded with `base64 -d` and piped to `sh`; a branch merge through `gh api repos/o/r/merges`, which merges branches with no pull request; and forms not modelled. This list is not complete: the class is every form the text tests do not recognize, and a form missing from this list is not thereby denied.
+  Ambient state: the profile and receipt are read from the local working tree. An ambient `GH_REPO` or `GH_HOST`, and any directory or environment change made by an earlier Bash call, are not visible (`cd`, `builtin cd`, `env --chdir`, `GIT_DIR=`, `read GH_REPO`, bare `export GH_REPO`); the same forms inside the merge command are not plain and deny. A push after the lookup is not observed unless `--match-head-commit` is passed. Accepted false denies, which do not occur with the gate disabled or the profile absent: an unquoted mention (`echo gh pr merge 12`, `gh pr view 12 && git merge main`); a quoted mention beside an evaluator word, including a path ending in `.sh`; a compound or `gh api` merge of a non-integration pull request; a comment or a split word together with a backslash-newline in an otherwise plain merge; a `GET` on the merge endpoint; any `=value` spelling of `--disable-auto`.
 - Dependency failure: if a guarded import fails, the hook returns the standard dependency-failure deny
   decision required of every registered Claude hook. This applies to a broken installation, not to the
   disabled-gate default, because the hook and its library ship together in the core pack.
@@ -275,9 +275,9 @@ warning stream at module scope.
   one entry `{"type": "command", "command": "pwsh -NoProfile -File .claude/hooks/enforce-docs-complete-gate.ps1"}`
   in the existing `hooks.PreToolUse` group with `"matcher": "Bash"`, placed after
   `enforce-epic-merge-gate.ps1`. Both copies stay byte-identical.
-- `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: the hook and every
-  new `.claude/lib/docs/` file (PowerShell and data) are listed exactly once; each has a byte-identical
-  bundle copy.
+- `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: the hook, its helper
+  `enforce-docs-complete-gate-target.ps1` and every new `.claude/lib/docs/` file (PowerShell and data) are
+  listed exactly once; each has a byte-identical bundle copy.
 - The destination receives `.claude/settings.json` as a plain overwrite (no merge), so the registration
   arrives with the core pack. Receipt ignoring in the destination `.gitignore` is an onboarding item for
   900010.
@@ -351,14 +351,14 @@ Check semantics (evidence model: inspect pre-existing artifacts, do not rerun):
   contexts and mocked seams.
 - 1020, 1021 and 1023 code is not present on this branch; every upstream item is a contract. Execution
   starts only after those children merge into `epic/documentation-estate-tooling-integration`.
-- Batch budget: four production PowerShell files are created and two edited, each with a bundle copy;
-  execution runs in the item worktree under an exempt-route checkpoint.
+- Batch budget: five production PowerShell files are created, including the helper
+  `enforce-docs-complete-gate-target.ps1`, and two edited, each with a bundle copy; execution runs in the item worktree under an exempt-route checkpoint.
 - Test isolation: dot-sourcing the hook imports modules into the session; suites remove imported
   modules in `AfterAll`, and the touched suites run in three seeded shuffled file orders.
 - CI-only behavior: the Linux hook job is case-sensitive; tests use forward-slash relative paths and
   exact file-name case, and no test reads gitignored state or diffs against `origin/main`.
-- File size: each new production file stays under the 500-line guidance; the hook keeps payload, scope
-  and seams only, and pure logic lives in `DocsCompleteGate.psm1`.
+- File size: each new production file stays under the 500-line guidance; target reading moved to the helper `enforce-docs-complete-gate-target.ps1` when the hook reached the 500-line limit,
+  so the hook keeps payload, decision order and seams, and pure gate predicates live in `DocsCompleteGate.psm1`.
 
 ## Implementation Strategy
 
@@ -384,8 +384,8 @@ schema/config/data, test rows). No row is TypeScript or Python.
 | `.claude/lib/docs/templates/_docs-quality.yml` | schema/config/data (consumer workflow template) | YAML | D |
 | `.claude/lib/docs/Invoke-DocsCommand.ps1` (edit: one dispatch row; two context members if OQ-1 assigns them here) | pushed-down helper/lib | PowerShell | R1 |
 | `.claude/lib/docs/DocsProfileCommands.psm1` (edit: one `Get-DocsInitTemplate` row) | pushed-down helper/lib | PowerShell | R1 |
-| `.claude/hooks/enforce-docs-complete-gate.ps1` | hook | PowerShell | R1, D |
-| `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/**` and `.../.claude/hooks/enforce-docs-complete-gate.ps1` (byte copies of the rows above) | pushed-down helper/lib, hook, data (mirror) | PowerShell, YAML | R1, D |
+| `.claude/hooks/enforce-docs-complete-gate.ps1` and its helper `.claude/hooks/enforce-docs-complete-gate-target.ps1` | hook | PowerShell | R1, D |
+| `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/**`, `.../.claude/hooks/enforce-docs-complete-gate.ps1` and `.../.claude/hooks/enforce-docs-complete-gate-target.ps1` (byte copies of the rows above) | pushed-down helper/lib, hook, data (mirror) | PowerShell, YAML | R1, D |
 | `.claude/settings.json` and its bundle copy (edit) | schema/config/data | JSON | D |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit) | schema/config/data | JSON | D |
 | `.claude/agents/feature-review.md` and bundle copy (edit) | agent | Markdown | D |
@@ -513,45 +513,45 @@ member-set comparison). No criterion asserts a count. Percentages and line limit
 
 Epic criteria (from `### 900008 - docs-enforcement-and-ci`):
 
-- [ ] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
-- [ ] `surface-delta` reports an added CLI command with no ledger change and reports nothing when the ledger records it.
-- [ ] The workflow template requires `pwsh` only.
-- [ ] Mirror parity checks pass for the edited `feature-review` surfaces.
+- [x] With the gate disabled (default) the hook allows every call; enabled, it denies when the receipt is absent, failing, or pinned to another revision, and the deny text names the reason.
+- [x] `surface-delta` reports an added CLI command with no ledger change and reports nothing when the ledger records it.
+- [x] The workflow template requires `pwsh` only.
+- [x] Mirror parity checks pass for the edited `feature-review` surfaces.
 
 Testable criteria:
 
-- [ ] Gate disabled: for a missing profile and for a profile with `completion_gates.integration_pr_gate.enabled` set to `false`, `Invoke-DocsCompleteGateDecision` returns `permissionDecision` `allow` for every row of a command table that includes `gh pr merge` (bare, `--squash`, `--auto`, `--admin`), a `gh api` merge mutation and non-merge commands, and `Invoke-DocsOnlyGhExe` is invoked zero times (`tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`).
-- [ ] Gate enabled, integration-to-`main` pull request (mocked `gh pr view` returning base `main` and head `epic/<slug>-integration`): the hook denies with text beginning `DOCS_COMPLETE_GATE_BLOCKED:` and containing `RECEIPT_ABSENT` for no receipt file, `RECEIPT_UNREADABLE` for unparseable receipt text, `RECEIPT_MODE` for a mode other than `docs-complete`, `RECEIPT_FAILING` for `validation_result` other than `pass`, and `RECEIPT_REVISION_MISMATCH` naming both revisions for a receipt pinned to another revision; it allows when the receipt passes and its `revision` equals `headRefOid` (`enforce-docs-complete-gate.Tests.ps1`).
-- [ ] Gate enabled: the hook denies with `PROFILE_UNREADABLE` for an in-scope merge command when the profile text does not parse, with `PR_UNRESOLVED` when `gh pr view` fails, with `MATCH_HEAD_MISMATCH` when `--match-head-commit` differs from `headRefOid`, and with `RECEIPT_PATH_INVALID` when `artifact_paths.validation_receipt` is not a relative path; it allows non-merge commands and merges whose pull request is not base `main` with an `epic/<slug>-integration` head; a payload envelope anomaly denies (`enforce-docs-complete-gate.Tests.ps1`).
-- [ ] `DocsCompleteGate.psm1` predicates are covered with in-memory strings only: enabled-flag parsing (absent key, `false`, `true`, invalid JSON, duplicate key), the integration-target predicate (matching and non-matching base and head names), each receipt reason code, and ordinal revision equality including case and length mismatches (`tests/scripts/claude-lib/docs/DocsCompleteGate.Tests.ps1`).
-- [ ] `DocsCompleteGate.psm1` imports only `DocsJson.psm1` and `DocsSurface.psm1`, and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`, `hook-imported-modules-no-stdout.Tests.ps1` and `enforcement-hooks-no-python-invocation.Tests.ps1` pass with no new Design exemption and no edit to the S8 exemption assertion.
-- [ ] `.claude/settings.json` and its bundle copy each contain the entry `pwsh -NoProfile -File .claude/hooks/enforce-docs-complete-gate.ps1` in the `PreToolUse` group with matcher `Bash`, the two copies are byte-identical, and `tests/scripts/claude-runtime/claude-settings.Tests.ps1`, `tests/scripts/claude-hooks/PreToolUsePayload.Contract.Tests.ps1`, `hook-dependency-failure.Claude.Tests.ps1` (with the new `$script:ReasonPrefix` row) and `hook-dependency-failure.SpecialCases.Tests.ps1` pass.
-- [ ] For in-memory base and head snapshots where the head adds a `cli-command` element and the head ledger equals the base ledger, `surface-delta` exits 1 with a `DOCS_SURFACE_UNLEDGERED_ADDITION` finding naming that `element_id`; when the head ledger adds an entry for that element, it exits 0 with no `error` finding and `result.added` contains the element (`tests/scripts/claude-lib/docs/DocsSurfaceDelta.Tests.ps1` and `DocsSurfaceDeltaCommands.Tests.ps1`).
-- [ ] `Compare-DocsSurfaceSnapshot` and the finding builder report `DOCS_SURFACE_UNLEDGERED_CHANGE` for a changed `source_sha256` with no ledger or pin change and nothing when a pin for that element changes; report nothing for a `line_range`-only or `analysis_method`-only difference; treat a `$null` base snapshot as empty; report `DOCS_SURFACE_REMOVED_ENTRY_RETAINED` as a warning for a removed element whose ledger entry is unchanged; and produce identical output for seeded shuffled input orders, printing the seed on failure (`DocsSurfaceDelta.Tests.ps1`).
-- [ ] `Invoke-DocsSurfaceDeltaCommand` with an in-memory context exits 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` `null` for a `-Base` value beginning with `-` or containing `..`; exits 1 with `DOCS_SURFACE_BASE_UNRESOLVED` when `ResolveRevision` returns `$null`; exits 1 with `DOCS_SURFACE_SNAPSHOT_MISSING` for an absent head snapshot and `DOCS_SURFACE_SNAPSHOT_STALE` when an input digest differs from the working-tree bytes; and with `-Json` emits one canonical envelope whose `result` keys are `base_revision`, `added`, `changed` and `removed` (`DocsSurfaceDeltaCommands.Tests.ps1`).
-- [ ] When 1020's D5 amendment has landed, the `surface-delta -Json` output for each tested exit path validates against `schemas/docs/v1/docs-command-envelope.schema.json` (`DocsSurfaceDeltaCommands.Tests.ps1`).
-- [ ] `Invoke-DocsCommand.ps1` contains the `surface-delta` row directly under `# --- 900008: surface-delta ---`, `Test-DocsCommandTable` returns no finding, and `git diff <merge-base>..HEAD` of `Invoke-DocsCommand.ps1` and `DocsProfileCommands.psm1` shows only added lines under the 900008 anchors (plus, if OQ-1 assigns the edit to this child, added `ResolveRevision` and `ReadRevisionText` members in `New-DocsCommandContext`) and no changed or removed line.
-- [ ] If OQ-1 assigns the context extension to this child, `New-DocsCommandContext` exposes `ResolveRevision` and `ReadRevisionText` with the specified return values, every git call goes through a `[scriptblock]`-typed parameter with a bounded wait, and a test drives both members through an injected process stand-in without starting a process (`tests/scripts/claude-lib/docs/Invoke-DocsCommand.Tests.ps1` or a 900008 suite).
-- [ ] `Get-DocsInitTemplate` returns a row under the `# --- 900008: docs workflow ---` anchor mapping `templates/_docs-quality.yml` to `.github/workflows/_docs-quality.yml`; `init` without `-Write` lists that destination in `result.planned_writes` and writes nothing; `init -Write` writes the template bytes through the in-memory context; and an existing destination without `-Force` yields `DOCS_INIT_TARGET_EXISTS` (`tests/scripts/claude-lib/docs/DocsInitTemplate.DocsWorkflow.Tests.ps1`).
-- [ ] The template text sets `shell: pwsh` on every `run` step, invokes `.claude/lib/docs/Invoke-DocsCommand.ps1` with `-Command check` and with `-Command validate` and `docs-complete`, passes the revision through `env:` rather than inline `${{ }}` in `run:`, checks out with `fetch-depth: 0`, and contains none of the tokens `setup-python`, `setup-node`, `python`, `npm` or `node` and no linter step (`DocsInitTemplate.DocsWorkflow.Tests.ps1`).
-- [ ] The section `## Documentation Surface Check` is present in `.claude/agents/feature-review.md`, `.codex/agents/feature-review.toml`, `.agents/skills/feature-review/SKILL.md` and `.github/skills/feature-review-workflow/SKILL.md`, and each of their bundle copies under `extensions/drm-copilot/resources/` is SHA-256 identical to its source; `.github/agents/feature-review.agent.md` and the Codex `feature-reviewer*.toml` files are unchanged.
-- [ ] The mirror and push-down parity suites pass on the feature branch: `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_push_down_issue_824_follow_ups.py`, and `python -m scripts.dev_tools.generate_codex_agent_variants --check`; evidence records the SHA-256 comparison for the Copilot `feature-review-workflow` pair, for which no dedicated parity test was located.
-- [ ] Every new file under `.claude/lib/docs/` (PowerShell and the workflow template) and the hook is listed exactly once in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and is SHA-256 identical to its bundle copy; `tests/scripts/claude-lib/docs/Docs.Manifest.Tests.ps1`, `DocsNeutrality.Tests.ps1` and `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` pass.
-- [ ] Pester line coverage is at least 85% for each new PowerShell production file (`DocsSurfaceDelta.psm1`, `DocsSurfaceDeltaCommands.psm1`, `DocsCompleteGate.psm1`, `enforce-docs-complete-gate.ps1`), read from the PoshQC coverage report, with no production file excluded from measurement and no regression on changed lines of `Invoke-DocsCommand.ps1` and `DocsProfileCommands.psm1`; no branch-coverage gate applies to Pester; figures are recorded under `<FEATURE>/evidence/coverage/`.
-- [ ] No new production file exceeds 500 logical lines.
-- [ ] No Python or TypeScript file is added or modified (`git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`), and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
-- [ ] No test creates a temporary file: no new or edited test file contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`.
-- [ ] (CI-dependent) The hook suite passes in the `poshqc-linux-hooks` job, and the required `poshqc / PowerShell QC` and `quality-checks7 / Code Quality & Tests` checks pass on the pull request head.
+- [x] Gate disabled: for a missing profile and for a profile with `completion_gates.integration_pr_gate.enabled` set to `false`, `Invoke-DocsCompleteGateDecision` returns `permissionDecision` `allow` for every row of a command table that includes `gh pr merge` (bare, `--squash`, `--auto`, `--admin`), a `gh api` merge mutation and non-merge commands, and `Invoke-DocsOnlyGhExe` is invoked zero times (`tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`).
+- [x] Gate enabled, integration-to-`main` pull request (mocked `gh pr view` returning base `main` and head `epic/<slug>-integration`): the hook denies with text beginning `DOCS_COMPLETE_GATE_BLOCKED:` and containing `RECEIPT_ABSENT` for no receipt file, `RECEIPT_UNREADABLE` for unparseable receipt text, `RECEIPT_MODE` for a mode other than `docs-complete`, `RECEIPT_FAILING` for `validation_result` other than `pass`, and `RECEIPT_REVISION_MISMATCH` naming both revisions for a receipt pinned to another revision; it allows when the receipt passes and its `revision` equals `headRefOid` (`enforce-docs-complete-gate.Tests.ps1`).
+- [x] Gate enabled: the hook denies with `PROFILE_UNREADABLE` for an in-scope merge command when the profile text does not parse, with `PR_UNRESOLVED` when `gh pr view` fails, with `MATCH_HEAD_MISMATCH` when `--match-head-commit` differs from `headRefOid`, and with `RECEIPT_PATH_INVALID` when `artifact_paths.validation_receipt` is not a relative path; it allows non-merge commands and merges whose pull request is not base `main` with an `epic/<slug>-integration` head; a payload envelope anomaly denies (`enforce-docs-complete-gate.Tests.ps1`).
+- [x] `DocsCompleteGate.psm1` predicates are covered with in-memory strings only: enabled-flag parsing (absent key, `false`, `true`, invalid JSON, duplicate key), the integration-target predicate (matching and non-matching base and head names), each receipt reason code, and ordinal revision equality including case and length mismatches (`tests/scripts/claude-lib/docs/DocsCompleteGate.Tests.ps1`).
+- [x] `DocsCompleteGate.psm1` imports only `DocsJson.psm1` and `DocsSurface.psm1`, and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`, `hook-imported-modules-no-stdout.Tests.ps1` and `enforcement-hooks-no-python-invocation.Tests.ps1` pass with no new Design exemption and no edit to the S8 exemption assertion.
+- [x] `.claude/settings.json` and its bundle copy each contain the entry `pwsh -NoProfile -File .claude/hooks/enforce-docs-complete-gate.ps1` in the `PreToolUse` group with matcher `Bash`, the two copies are byte-identical, and `tests/scripts/claude-runtime/claude-settings.Tests.ps1`, `tests/scripts/claude-hooks/PreToolUsePayload.Contract.Tests.ps1`, `hook-dependency-failure.Claude.Tests.ps1` (with the new `$script:ReasonPrefix` row) and `hook-dependency-failure.SpecialCases.Tests.ps1` pass.
+- [x] For in-memory base and head snapshots where the head adds a `cli-command` element and the head ledger equals the base ledger, `surface-delta` exits 1 with a `DOCS_SURFACE_UNLEDGERED_ADDITION` finding naming that `element_id`; when the head ledger adds an entry for that element, it exits 0 with no `error` finding and `result.added` contains the element (`tests/scripts/claude-lib/docs/DocsSurfaceDelta.Tests.ps1` and `DocsSurfaceDeltaCommands.Tests.ps1`).
+- [x] `Compare-DocsSurfaceSnapshot` and the finding builder report `DOCS_SURFACE_UNLEDGERED_CHANGE` for a changed `source_sha256` with no ledger or pin change and nothing when a pin for that element changes; report nothing for a `line_range`-only or `analysis_method`-only difference; treat a `$null` base snapshot as empty; report `DOCS_SURFACE_REMOVED_ENTRY_RETAINED` as a warning for a removed element whose ledger entry is unchanged; and produce identical output for seeded shuffled input orders, printing the seed on failure (`DocsSurfaceDelta.Tests.ps1`).
+- [x] `Invoke-DocsSurfaceDeltaCommand` with an in-memory context exits 2 with exactly one `DOCS_CLI_ARGUMENTS` finding and `result` `null` for a `-Base` value beginning with `-` or containing `..`; exits 1 with `DOCS_SURFACE_BASE_UNRESOLVED` when `ResolveRevision` returns `$null`; exits 1 with `DOCS_SURFACE_SNAPSHOT_MISSING` for an absent head snapshot and `DOCS_SURFACE_SNAPSHOT_STALE` when an input digest differs from the working-tree bytes; and with `-Json` emits one canonical envelope whose `result` keys are `base_revision`, `added`, `changed` and `removed` (`DocsSurfaceDeltaCommands.Tests.ps1`).
+- [x] When 1020's D5 amendment has landed, the `surface-delta -Json` output for each tested exit path validates against `schemas/docs/v1/docs-command-envelope.schema.json` (`DocsSurfaceDeltaCommands.Tests.ps1`).
+- [x] `Invoke-DocsCommand.ps1` contains the `surface-delta` row directly under `# --- 900008: surface-delta ---`, `Test-DocsCommandTable` returns no finding, and `git diff <merge-base>..HEAD` of `Invoke-DocsCommand.ps1` and `DocsProfileCommands.psm1` shows only added lines under the 900008 anchors (plus, if OQ-1 assigns the edit to this child, added `ResolveRevision` and `ReadRevisionText` members in `New-DocsCommandContext`) and no changed or removed line.
+- [x] If OQ-1 assigns the context extension to this child, `New-DocsCommandContext` exposes `ResolveRevision` and `ReadRevisionText` with the specified return values, every git call goes through a `[scriptblock]`-typed parameter with a bounded wait, and a test drives both members through an injected process stand-in without starting a process (`tests/scripts/claude-lib/docs/Invoke-DocsCommand.Tests.ps1` or a 900008 suite).
+- [x] `Get-DocsInitTemplate` returns a row under the `# --- 900008: docs workflow ---` anchor mapping `templates/_docs-quality.yml` to `.github/workflows/_docs-quality.yml`; `init` without `-Write` lists that destination in `result.planned_writes` and writes nothing; `init -Write` writes the template bytes through the in-memory context; and an existing destination without `-Force` yields `DOCS_INIT_TARGET_EXISTS` (`tests/scripts/claude-lib/docs/DocsInitTemplate.DocsWorkflow.Tests.ps1`).
+- [x] The template text sets `shell: pwsh` on every `run` step, invokes `.claude/lib/docs/Invoke-DocsCommand.ps1` with `-Command check` and with `-Command validate` and `docs-complete`, passes the revision through `env:` rather than inline `${{ }}` in `run:`, checks out with `fetch-depth: 0`, and contains none of the tokens `setup-python`, `setup-node`, `python`, `npm` or `node` and no linter step (`DocsInitTemplate.DocsWorkflow.Tests.ps1`).
+- [x] The section `## Documentation Surface Check` is present in `.claude/agents/feature-review.md`, `.codex/agents/feature-review.toml`, `.agents/skills/feature-review/SKILL.md` and `.github/skills/feature-review-workflow/SKILL.md`, and each of their bundle copies under `extensions/drm-copilot/resources/` is SHA-256 identical to its source; `.github/agents/feature-review.agent.md` and the Codex `feature-reviewer*.toml` files are unchanged.
+- [x] The mirror and push-down parity suites pass on the feature branch: `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_push_down_issue_824_follow_ups.py`, and `python -m scripts.dev_tools.generate_codex_agent_variants --check`; evidence records the SHA-256 comparison for the Copilot `feature-review-workflow` pair, for which no dedicated parity test was located.
+- [x] Every new file under `.claude/lib/docs/` (PowerShell and the workflow template) and the hook is listed exactly once in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and is SHA-256 identical to its bundle copy; `tests/scripts/claude-lib/docs/Docs.Manifest.Tests.ps1`, `DocsNeutrality.Tests.ps1` and `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` pass.
+- [x] Pester line coverage is at least 85% for each new PowerShell production file (`DocsSurfaceDelta.psm1`, `DocsSurfaceDeltaCommands.psm1`, `DocsCompleteGate.psm1`, `enforce-docs-complete-gate.ps1`), read from the PoshQC coverage report, with no production file excluded from measurement and no regression on changed lines of `Invoke-DocsCommand.ps1` and `DocsProfileCommands.psm1`; no branch-coverage gate applies to Pester; figures are recorded under `<FEATURE>/evidence/qa-gates/`.
+- [x] No new production file exceeds 500 logical lines.
+- [x] No Python or TypeScript file is added or modified (`git diff --name-only <merge-base>..HEAD` lists no path ending in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`), and the plan's artifact classification table lists every created or edited file with its class, language and permitting rule.
+- [x] No test creates a temporary file: no new or edited test file contains `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`.
+- [x] (CI-dependent) The hook suite passes in the `poshqc-linux-hooks` job, and the required `poshqc / PowerShell QC` and `quality-checks7 / Code Quality & Tests` checks pass on the pull request head.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to Pester suites, contract tests or evidence files
+- [x] Acceptance criteria documented and mapped to Pester suites, contract tests or evidence files
 - [ ] Behavior matches acceptance criteria on PowerShell 7.4 or later on Windows and Linux
-- [ ] Edge cases covered: absent profile, invalid profile JSON, absent receipt, receipt revision case and length mismatch, `--match-head-commit` mismatch, unresolved base, absent base snapshot, stale snapshot, option-injection `-Base`
-- [ ] Touched suites pass in three seeded shuffled file-order runs and a fresh single-process run over `tests/scripts`, with evidence under `<FEATURE>/evidence/regression-testing/`
-- [ ] Toolchain pass completed (format, lint with PSScriptAnalyzer, architecture and contract tests, Pester) in a single clean pass
-- [ ] Forbidden-token scan with bracket-class patterns over every changed file reports no match
-- [ ] Evidence written under `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/<kind>/`
+- [x] Edge cases covered: absent profile, invalid profile JSON, absent receipt, receipt revision case and length mismatch, `--match-head-commit` mismatch, unresolved base, absent base snapshot, stale snapshot, option-injection `-Base`
+- [x] Touched suites pass in three seeded shuffled file-order runs and a fresh single-process run over `tests/scripts`, with evidence under `<FEATURE>/evidence/regression-testing/`
+- [x] Toolchain pass completed (format, lint with PSScriptAnalyzer, architecture and contract tests, Pester) in a single clean pass
+- [x] Forbidden-token scan with bracket-class patterns over every changed file reports no match
+- [x] Evidence written under `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/<kind>/`
 
 ## Seeded Test Conditions (from potential)
 
