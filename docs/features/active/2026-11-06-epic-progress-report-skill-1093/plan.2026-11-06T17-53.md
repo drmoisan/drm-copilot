@@ -139,7 +139,7 @@
 
 - [x] [P6-T1] Run the PoshQC formatter over the canonical folder, the forwarder, `SUITES`, the forwarder suite and the fixture. A clean pass logs `Already formatted:` for every file and no line beginning with `Formatted:`. When any file is reformatted, re-copy the affected canonical file to `BUNDLE`, re-run P5-T3's hash check, and restart this phase at P6-T1.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md` records one `Already formatted:` line per file and zero `Formatted:` lines.
-- [ ] [P6-T2] Run `Invoke-ScriptAnalyzer` with the PSSA settings file over the same files plus the five bundle copies.
+- [x] [P6-T2] Run `Invoke-ScriptAnalyzer` with the PSSA settings file over the same files plus the five bundle copies.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md` records 0 findings; any finding is fixed and the phase restarts at P6-T1.
 - [ ] [P6-T3] Run the branch-current Pester route with coverage over `tests/scripts/claude-skills/epic-progress-report` and `tests/scripts/dev-tools`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/pester-coverage.<timestamp>.md` records total, passed and failed counts (failed 0) with per-container counts for the seven touched suites, and per-file line coverage of at least 85 percent for each of the five `CANON` files and `scripts/dev-tools/Get-EpicProgressReport.ps1`.
