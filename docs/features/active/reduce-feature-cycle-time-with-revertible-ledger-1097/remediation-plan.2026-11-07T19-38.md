@@ -126,7 +126,7 @@ These were found by searching `tests/` for `Invoke-ProcessReductionChain`, `Get-
     - (d) The search for `000[2-6]` in `## Revert Steps` of `0001`, extracted with `Get-ProcessReductionSection`, returns no match.
   - Output Summary: each gate's result, and the equal, attributed, and unattributed counts compared with P0-T1 (119, 18, 0). Each count change is explained per path, for example the #1096 paths that the chain now reverts.
   - Acceptance: `EXIT_CODE:` is 0 only when all four gates pass and the unattributed count is 0.
-- [ ] [P2-T5] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+- [x] [P2-T5] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
   - Rows include:
     - Both sides of `0001` are kept, with no conflict marker anywhere.
     - The README rule, the module, and the tests agree, and the overlapping fixture is present.
