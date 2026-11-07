@@ -111,3 +111,81 @@ function Resolve-EpicProgressSetting {
         StatePath         = $state
     }
 }
+
+function ConvertFrom-EpicProgressStateText {
+    <#
+    .SYNOPSIS
+        Parse the state file text into StartUnixSeconds, BaselineDone, BaselineWeeklyPct, and Samples.
+    .DESCRIPTION
+        Accepts the version-1 object written by ConvertTo-EpicProgressStateJson and the legacy
+        JSON array of samples written by the issue #1080 tool (samples only, no baseline).
+        Blank text, unparseable text, any other JSON value, and an object whose version is
+        not 1 give the empty state. A version-1 field that is missing, null, or not a number
+        is absent: its value is $null. Samples is always an array.
+    .PARAMETER Text
+        The raw state file text; blank or null for no state file.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [AllowNull()] [string] $Text)
+
+    $state = [pscustomobject]@{ StartUnixSeconds = $null; BaselineDone = $null; BaselineWeeklyPct = $null; Samples = [object[]] @() }
+    if (-not (Test-EpicProgressJsonText -Json $Text)) { return $state }
+    $parsed = ConvertFrom-Json -InputObject $Text -NoEnumerate
+    if ($parsed -is [array]) {
+        $state.Samples = [object[]] @($parsed | Where-Object { $null -ne $_ })
+        return $state
+    }
+    if ($parsed -isnot [System.Management.Automation.PSCustomObject]) { return $state }
+    $names = $parsed.PSObject.Properties.Name
+    if (-not ($names -contains 'version') -or [string] $parsed.version -ne '1') { return $state }
+    if ($names -contains 'startUnixSeconds' -and $null -ne $parsed.startUnixSeconds) { $state.StartUnixSeconds = $parsed.startUnixSeconds -as [long] }
+    if ($names -contains 'baselineDone' -and $null -ne $parsed.baselineDone) { $state.BaselineDone = $parsed.baselineDone -as [int] }
+    if ($names -contains 'baselineWeeklyPct' -and $null -ne $parsed.baselineWeeklyPct) { $state.BaselineWeeklyPct = $parsed.baselineWeeklyPct -as [double] }
+    if ($names -contains 'samples' -and $null -ne $parsed.samples) {
+        $state.Samples = [object[]] @($parsed.samples | Where-Object { $null -ne $_ })
+    }
+    return $state
+}
+
+function ConvertTo-EpicProgressStateJson {
+    <#
+    .SYNOPSIS
+        Return the version-1 state document as JSON text.
+    .DESCRIPTION
+        The document holds version 1, startUnixSeconds, baselineDone, baselineWeeklyPct, and
+        samples, each sample with an integer 'ts' (Unix epoch seconds) and a 'done' count.
+        A sample without 'ts' is not written. Epoch seconds are used because ConvertFrom-Json
+        converts ISO date strings into local-time DateTime values.
+    .PARAMETER StartUnixSeconds
+        The start instant in Unix epoch seconds.
+    .PARAMETER BaselineDone
+        The checked task count at the start instant.
+    .PARAMETER BaselineWeeklyPct
+        The weekly quota percentage at the start instant.
+    .PARAMETER Sample
+        The retained samples (ts, done).
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [long] $StartUnixSeconds,
+        [Parameter(Mandatory = $true)] [int] $BaselineDone,
+        [Parameter(Mandatory = $true)] [double] $BaselineWeeklyPct,
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Sample
+    )
+
+    $written = [System.Collections.Generic.List[object]]::new()
+    foreach ($entry in $Sample) {
+        if ($null -eq $entry -or -not ($entry.PSObject.Properties.Name -contains 'ts')) { continue }
+        $written.Add([ordered]@{ ts = [long] $entry.ts; done = [int] $entry.done })
+    }
+    $document = [ordered]@{
+        version           = 1
+        startUnixSeconds  = $StartUnixSeconds
+        baselineDone      = $BaselineDone
+        baselineWeeklyPct = $BaselineWeeklyPct
+        samples           = [object[]] $written.ToArray()
+    }
+    return ConvertTo-Json -InputObject $document -Depth 4
+}

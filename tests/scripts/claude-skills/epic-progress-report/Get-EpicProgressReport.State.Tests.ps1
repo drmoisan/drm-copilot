@@ -103,3 +103,92 @@ Describe 'Resolve-EpicProgressSetting' {
         $setting.StatePath | Should -Be '/other-temp/samples.json'
     }
 }
+
+Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson' {
+    It 'reads a legacy sample array' {
+        # The issue #1080 tool wrote a bare JSON array of samples with no baseline.
+        $state = ConvertFrom-EpicProgressStateText -Text '[{"ts":1000,"done":3},{"ts":1600,"done":5}]'
+
+        $state.Samples.Count | Should -Be 2
+        ($state.Samples.ts -join ',') | Should -Be '1000,1600'
+        ($state.Samples.done -join ',') | Should -Be '3,5'
+        $state.StartUnixSeconds | Should -BeNullOrEmpty
+        $state.BaselineDone | Should -BeNullOrEmpty
+        $state.BaselineWeeklyPct | Should -BeNullOrEmpty
+    }
+
+    It 'reads a version-1 document' {
+        $text = '{"version":1,"startUnixSeconds":1767603600,"baselineDone":7,"baselineWeeklyPct":12.5,"samples":[{"ts":1767614400,"done":9}]}'
+
+        $state = ConvertFrom-EpicProgressStateText -Text $text
+
+        $state.StartUnixSeconds | Should -Be 1767603600
+        $state.BaselineDone | Should -Be 7
+        $state.BaselineWeeklyPct | Should -Be 12.5
+        $state.Samples.Count | Should -Be 1
+        $state.Samples[0].ts | Should -Be 1767614400
+        $state.Samples[0].done | Should -Be 9
+    }
+
+    It 'treats blank text as empty state' {
+        foreach ($text in @('', '   ', $null)) {
+            $state = ConvertFrom-EpicProgressStateText -Text $text
+
+            $state.Samples.Count | Should -Be 0
+            $state.StartUnixSeconds | Should -BeNullOrEmpty
+            $state.BaselineDone | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'treats unparseable text as empty state' {
+        foreach ($text in @('not json {', '42', '"text"')) {
+            $state = ConvertFrom-EpicProgressStateText -Text $text
+
+            $state.Samples.Count | Should -Be 0 -Because "'$text' is not a state document"
+            $state.StartUnixSeconds | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'treats an unknown version as empty state' {
+        $state = ConvertFrom-EpicProgressStateText -Text '{"version":2,"startUnixSeconds":1767603600,"baselineDone":7,"samples":[{"ts":1000,"done":1}]}'
+
+        $state.Samples.Count | Should -Be 0
+        $state.StartUnixSeconds | Should -BeNullOrEmpty
+        $state.BaselineDone | Should -BeNullOrEmpty
+        $state.BaselineWeeklyPct | Should -BeNullOrEmpty
+    }
+
+    It 'treats missing fields as absent' {
+        $state = ConvertFrom-EpicProgressStateText -Text '{"version":1,"baselineDone":null,"baselineWeeklyPct":"n/a"}'
+
+        $state.StartUnixSeconds | Should -BeNullOrEmpty
+        $state.BaselineDone | Should -BeNullOrEmpty
+        $state.BaselineWeeklyPct | Should -BeNullOrEmpty
+        $state.Samples.Count | Should -Be 0
+    }
+
+    It 'round-trips integer epoch seconds' {
+        $samples = @([pscustomobject]@{ ts = 1767610800; done = 2 }, [pscustomobject]@{ ts = 1767614400; done = 3 })
+
+        $json = ConvertTo-EpicProgressStateJson -StartUnixSeconds 1767603600 -BaselineDone 1 -BaselineWeeklyPct 0 -Sample $samples
+        $state = ConvertFrom-EpicProgressStateText -Text $json
+        $raw = ConvertFrom-Json -InputObject $json
+
+        $raw.version | Should -Be 1
+        $raw.startUnixSeconds | Should -BeOfType [long]
+        $raw.samples[0].ts | Should -BeOfType [long]
+        $json | Should -Not -Match '"ts":\s*"'
+        $state.StartUnixSeconds | Should -Be 1767603600
+        $state.BaselineDone | Should -Be 1
+        $state.BaselineWeeklyPct | Should -Be 0
+        ($state.Samples.ts -join ',') | Should -Be '1767610800,1767614400'
+        ($state.Samples.done -join ',') | Should -Be '2,3'
+    }
+
+    It 'writes a single sample as an array and skips samples without ts' {
+        $json = ConvertTo-EpicProgressStateJson -StartUnixSeconds 1 -BaselineDone 0 -BaselineWeeklyPct 0 -Sample @([pscustomobject]@{ done = 1 }, [pscustomobject]@{ ts = 5; done = 2 })
+
+        $json | Should -Match '"samples":\s*\['
+        (ConvertFrom-EpicProgressStateText -Text $json).Samples.Count | Should -Be 1
+    }
+}
