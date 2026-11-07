@@ -271,7 +271,7 @@ Other suites:
 
 ### Phase 3 — Documentation
 
-- [ ] [P3-T1] (N8, N9) Update the non-criterion hook design text of `FEATURE/spec.md`, with each edit keeping its physical line count.
+- [x] [P3-T1] (N8, N9) Update the non-criterion hook design text of `FEATURE/spec.md`, with each edit keeping its physical line count.
   - `### Hook` section of `enforce-docs-complete-gate.ps1`: the reuse list (`Test-EpicMergeGateCommandInScope` through `Test-DocsCompleteGateMergeCandidate`; `Get-EpicMergeGateSelectorPrNumber` is no longer used), decision step 2, decision step 4 (`gh pr view [<selector>] [--repo <value>]`, reached only by one plain `gh pr merge`), and the residual limits, which carry the full list of `## Design: Fail-Closed Allowlist`.
   - Reason-code table: the `RECEIPT_UNREADABLE` row adds a read failure on an existing file, and the `RECEIPT_ABSENT` row is unchanged in meaning.
   - `### Registration and push-down` core-pack bullet, the `## Constraints & Risks` batch-budget and file-size bullets, and the `## Artifact Classification` hook and bundle rows name `HELPER`. The file-size bullet states that target reading moved to a helper at the 500-line limit, which supersedes the wording that cycle 1 P2-T5 proposed.

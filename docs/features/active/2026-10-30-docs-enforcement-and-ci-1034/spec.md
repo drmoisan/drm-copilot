@@ -230,7 +230,7 @@ warning stream at module scope.
 | Reason code | Condition |
 |---|---|
 | `RECEIPT_ABSENT` | No file at the receipt path |
-| `RECEIPT_UNREADABLE` | Text does not parse, or `artifact_kind` is not the receipt kind |
+| `RECEIPT_UNREADABLE` | A read failure on an existing file, or text does not parse, or `artifact_kind` is not the receipt kind |
 | `RECEIPT_MODE` | `mode` is not `docs-complete` |
 | `RECEIPT_FAILING` | `validation_result` is not `pass` |
 | `RECEIPT_REVISION_MISMATCH` | `revision` is not ordinally equal to the head revision; deny text names both revisions |
@@ -242,19 +242,19 @@ warning stream at module scope.
   guarded single-statement import per edge (including `DocsCompleteGate.psm1` and `HookPayload.psm1`),
   `Get-HookDependencyFailureDecision` first in the decision function, the dot-source early return, then
   the tail. Literal `Join-Path -Path $PSScriptRoot -ChildPath '<literal>'` only.
-- Reuse: `Test-EpicMergeGateCommandInScope` and `Get-EpicMergeGateSelectorPrNumber`
-  (`enforce-epic-merge-gate-command.ps1`), `Invoke-DocsOnlyGhExe` (`hook-docs-only-diff.ps1`, bounded,
-  never throws, `[scriptblock]` invoker seam), payload readers from `HookPayload.psm1`, and the
-  allow/deny decision JSON shape of the epic merge gate.
+- Reuse: `Test-EpicMergeGateCommandInScope`, through `Test-DocsCompleteGateMergeCandidate` in the helper
+  `enforce-docs-complete-gate-target.ps1` (`enforce-epic-merge-gate-command.ps1`), `Invoke-DocsOnlyGhExe`
+  (`hook-docs-only-diff.ps1`, bounded, never throws, `[scriptblock]` invoker seam), payload readers from
+  `HookPayload.psm1`, and the allow/deny decision JSON shape of the epic merge gate.
 - Decision order, in `Invoke-DocsCompleteGateDecision -ToolInputRaw`:
   1. Dependency-failure decision; then envelope anomaly denies (sibling convention).
-  2. No `command`, or `Test-EpicMergeGateCommandInScope` false: allow. No I/O.
+  2. No `command`, or `Test-DocsCompleteGateMergeCandidate` false: allow. No I/O.
   3. Read the profile through the file seam `Get-DocsCompleteGateFileText` at
      `docs/documentation-estate/docs-profile.json` under the root returned by the root seam. Absent
      profile or gate disabled: allow, with no `gh` call. `PROFILE_UNREADABLE`: deny.
-  4. One bounded `gh pr view [<N>] --json baseRefName,headRefName,headRefOid` through
-     `Invoke-DocsOnlyGhExe`. Unresolved: deny `PR_UNRESOLVED`. A `--match-head-commit` value that
-     differs from `headRefOid`: deny `MATCH_HEAD_MISMATCH`.
+  4. One bounded `gh pr view [<selector>] [--repo <value>] --json baseRefName,headRefName,headRefOid` through
+     `Invoke-DocsOnlyGhExe`, reached only by one plain `gh pr merge`; every other candidate denies `PR_UNRESOLVED`
+     with no `gh` call. Unresolved: deny `PR_UNRESOLVED`. A differing `--match-head-commit`: deny `MATCH_HEAD_MISMATCH`.
   5. Not the integration target: allow.
   6. Receipt path check, read through the file seam, and `Test-DocsCompleteGateReceipt` against
      `headRefOid`. Deny with the reason code, or allow.
@@ -262,9 +262,9 @@ warning stream at module scope.
   The prefix is added to `$script:ReasonPrefix` in `hook-dependency-failure.Claude.Tests.ps1`.
 - Head revision: the pull request `headRefOid`, never local `git rev-parse HEAD`, because the session
   worktree may hold a different commit than the pull request head.
-- Residual limits, recorded in the hook header: the profile and receipt are read from the local working
-  tree; ambient `GH_REPO` selects the repository; a push after the lookup is not observed; a GraphQL
-  mutation supplied from a file is not visible; a direct `git push` to `main` is outside `gh` scope.
+- Residual limits, recorded in the hook header: the profile and receipt are read from the local working tree; an ambient `GH_REPO` or `GH_HOST`, and any directory or environment change made by an earlier Bash call, are not visible (`cd`, `builtin cd`, `env --chdir`, `GIT_DIR=`, `read GH_REPO`, bare `export GH_REPO`), and the same forms inside the merge command are not plain and deny; a `gh` alias is not visible; a mutation supplied from a file and a merge endpoint whose number is a variable are not admitted;
+  a form obfuscated with a quoted command word outside the leading position, a variable holding a command word, `eval` over assembled text, or a script file is not a candidate; an unquoted mention denies while the gate is enabled (`echo gh pr merge 12` and `gh pr view 12 && git merge main` deny `PR_UNRESOLVED`), a false deny that is accepted and that does not occur with the gate disabled or the profile absent; with the gate enabled, a merge in any form other than one plain `gh pr merge` denies `PR_UNRESOLVED` whichever pull request it names, including a `gh api` merge and a compound command on a non-integration pull request;
+  a `GET` on the merge endpoint is treated as a merge; any `=value` spelling of `--disable-auto`, including `--disable-auto=true`, is treated as a merge; a push after the lookup is not observed unless `--match-head-commit` is passed; a direct `git push` to `main` is outside `gh` scope.
 - Dependency failure: if a guarded import fails, the hook returns the standard dependency-failure deny
   decision required of every registered Claude hook. This applies to a broken installation, not to the
   disabled-gate default, because the hook and its library ship together in the core pack.
@@ -275,9 +275,9 @@ warning stream at module scope.
   one entry `{"type": "command", "command": "pwsh -NoProfile -File .claude/hooks/enforce-docs-complete-gate.ps1"}`
   in the existing `hooks.PreToolUse` group with `"matcher": "Bash"`, placed after
   `enforce-epic-merge-gate.ps1`. Both copies stay byte-identical.
-- `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: the hook and every
-  new `.claude/lib/docs/` file (PowerShell and data) are listed exactly once; each has a byte-identical
-  bundle copy.
+- `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: the hook, its helper
+  `enforce-docs-complete-gate-target.ps1` and every new `.claude/lib/docs/` file (PowerShell and data) are
+  listed exactly once; each has a byte-identical bundle copy.
 - The destination receives `.claude/settings.json` as a plain overwrite (no merge), so the registration
   arrives with the core pack. Receipt ignoring in the destination `.gitignore` is an onboarding item for
   900010.
@@ -351,14 +351,14 @@ Check semantics (evidence model: inspect pre-existing artifacts, do not rerun):
   contexts and mocked seams.
 - 1020, 1021 and 1023 code is not present on this branch; every upstream item is a contract. Execution
   starts only after those children merge into `epic/documentation-estate-tooling-integration`.
-- Batch budget: four production PowerShell files are created and two edited, each with a bundle copy;
-  execution runs in the item worktree under an exempt-route checkpoint.
+- Batch budget: five production PowerShell files are created, including the helper
+  `enforce-docs-complete-gate-target.ps1`, and two edited, each with a bundle copy; execution runs in the item worktree under an exempt-route checkpoint.
 - Test isolation: dot-sourcing the hook imports modules into the session; suites remove imported
   modules in `AfterAll`, and the touched suites run in three seeded shuffled file orders.
 - CI-only behavior: the Linux hook job is case-sensitive; tests use forward-slash relative paths and
   exact file-name case, and no test reads gitignored state or diffs against `origin/main`.
-- File size: each new production file stays under the 500-line guidance; the hook keeps payload, scope
-  and seams only, and pure logic lives in `DocsCompleteGate.psm1`.
+- File size: each new production file stays under the 500-line guidance; target reading moved to the helper `enforce-docs-complete-gate-target.ps1` when the hook reached the 500-line limit,
+  so the hook keeps payload, decision order and seams, and pure gate predicates live in `DocsCompleteGate.psm1`.
 
 ## Implementation Strategy
 
@@ -384,8 +384,8 @@ schema/config/data, test rows). No row is TypeScript or Python.
 | `.claude/lib/docs/templates/_docs-quality.yml` | schema/config/data (consumer workflow template) | YAML | D |
 | `.claude/lib/docs/Invoke-DocsCommand.ps1` (edit: one dispatch row; two context members if OQ-1 assigns them here) | pushed-down helper/lib | PowerShell | R1 |
 | `.claude/lib/docs/DocsProfileCommands.psm1` (edit: one `Get-DocsInitTemplate` row) | pushed-down helper/lib | PowerShell | R1 |
-| `.claude/hooks/enforce-docs-complete-gate.ps1` | hook | PowerShell | R1, D |
-| `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/**` and `.../.claude/hooks/enforce-docs-complete-gate.ps1` (byte copies of the rows above) | pushed-down helper/lib, hook, data (mirror) | PowerShell, YAML | R1, D |
+| `.claude/hooks/enforce-docs-complete-gate.ps1` and its helper `.claude/hooks/enforce-docs-complete-gate-target.ps1` | hook | PowerShell | R1, D |
+| `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/**`, `.../.claude/hooks/enforce-docs-complete-gate.ps1` and `.../.claude/hooks/enforce-docs-complete-gate-target.ps1` (byte copies of the rows above) | pushed-down helper/lib, hook, data (mirror) | PowerShell, YAML | R1, D |
 | `.claude/settings.json` and its bundle copy (edit) | schema/config/data | JSON | D |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit) | schema/config/data | JSON | D |
 | `.claude/agents/feature-review.md` and bundle copy (edit) | agent | Markdown | D |
