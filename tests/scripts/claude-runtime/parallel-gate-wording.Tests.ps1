@@ -11,6 +11,9 @@ BeforeDiscovery {
     $script:QaGateForbidden = @('Phase A baseline', 'Delta Requirements', 'zero-regression', 'baseline coverage', 'Targeted runs are allowed')
     $script:PowerShellQaGateForbidden = $script:QaGateForbidden + @('run_poshqc_test')
     $script:PythonQaGateForbidden = $script:QaGateForbidden + @('poetry run pytest --cov')
+    $script:ReviewRequired = @('debugging only', 'N/A - no pre-change run')
+    $script:ReviewForbidden = @('smallest relevant subset', 'regression on changed lines')
+    $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
 }
 
 Describe 'Parallel gate wording' {
@@ -80,6 +83,12 @@ Describe 'Parallel gate wording' {
         @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only'); Forbidden = $script:PythonQaGateForbidden }
         @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only'); Forbidden = $script:PythonQaGateForbidden }
         @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only'); Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'REVIEW-CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
+        @{ Id = 'REVIEW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
+        @{ Id = 'REVIEW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
+        @{ Id = 'REVIEW-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
+        @{ Id = 'REVIEW-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
+        @{ Id = 'REVIEW-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
     ) {
         # Arrange
         $text = Get-PgwSurfaceText -RelativePath $Path
