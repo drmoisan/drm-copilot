@@ -484,8 +484,16 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
 
     It 'contains no recovered hardcoded value' {
         $forbidden = @('documentation-estate-tooling', '1019', '/workspaces', '2026-11-04T13:55')
+        # The five canonical files, the scripts/dev-tools forwarder, and the skill text (issue #1093).
+        $canonicalFolder = Split-Path -Path $script:scriptPath -Parent
+        $scanPaths = @($script:productionPaths) + @(
+            (Join-Path -Path $PSScriptRoot -ChildPath '../../../../scripts/dev-tools/Get-EpicProgressReport.ps1')
+            (Join-Path -Path (Split-Path -Path $canonicalFolder -Parent) -ChildPath 'SKILL.md')
+        )
 
-        foreach ($path in $script:productionPaths) {
+        $scanPaths.Count | Should -Be 7
+        foreach ($path in $scanPaths) {
+            Test-Path -LiteralPath $path -PathType Leaf | Should -BeTrue -Because "$path must exist"
             $text = Get-Content -LiteralPath $path -Raw
             foreach ($token in $forbidden) {
                 $text.Contains($token) | Should -BeFalse -Because "$path must not contain '$token'"
