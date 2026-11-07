@@ -43,11 +43,11 @@ Out of scope: `execution-environment` and `atomic-plan-contract` (they wait on #
 
 - [x] [P0-T1] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md` for PowerShell and Python test scope, and write `FEATURE/evidence/baseline/phase0-instructions-read.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and the list of files read.
-- [ ] [P0-T2] Capture the PowerShell baseline with one `Invoke-PoshQCParallelTest` run and write `FEATURE/evidence/baseline/powershell-test.<timestamp>.md`.
+- [x] [P0-T2] Capture the PowerShell baseline with one `Invoke-PoshQCParallelTest` run and write `FEATURE/evidence/baseline/powershell-test.<timestamp>.md`.
   - Output Summary: total and failed test counts from `artifacts/pester/pester-junit.xml`, and the repo-wide line percentage from `Get-PoshQCCoverageLineSummary` over `artifacts/pester/powershell-coverage.xml`.
   - When `ExitCode` is non-zero: read counts from `artifacts/pester/parallel/shard-<i>/pester-junit.xml`, or that directory's `shard.log` when a JUnit file is absent or truncated, take the percentage from `Merge-PoshQCCoverageReport` over the shard coverage files, and name each failing test in the artifact. The run is not repeated.
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with numeric counts and a numeric percentage, read from files and not from MCP output.
-- [ ] [P0-T3] Capture the Python contract baseline with one `pytest -n auto` run over the contract modules in `tests/scripts/dev_tools/` and write `FEATURE/evidence/baseline/python-contract-tests.<timestamp>.md`.
+- [x] [P0-T3] Capture the Python contract baseline with one `pytest -n auto` run over the contract modules in `tests/scripts/dev_tools/` and write `FEATURE/evidence/baseline/python-contract-tests.<timestamp>.md`.
   - Acceptance: the artifact carries the four fields, with the passed and failed counts of the run's summary in `Output Summary:`. No Python production file changes, so this baseline carries no coverage figure.
 
 ### Phase 1 — Ledger, Helpers, and Tests
