@@ -214,8 +214,191 @@ function Invoke-ProcessReductionRevert {
     return $live.Substring(0, $first) + $prior + $live.Substring($first + $current.Length)
 }
 
+function Get-ProcessReductionPlainLine {
+    <#
+    .SYNOPSIS
+        Returns the lines of the text that lie outside every fence.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text
+    )
+
+    $rows = @(Get-ProcessReductionLine -Text $Text)
+    return @($rows | Where-Object { $_.Role -ceq 'Text' } | ForEach-Object { $_.Text })
+}
+
+function Get-ProcessReductionEntryNumber {
+    <#
+    .SYNOPSIS
+        Returns the NNNN of an entry file name, or $null outside NNNN-<short-name>.md.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Name
+    )
+
+    if ($Name -cmatch '^(?<number>[0-9]{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$') {
+        return $Matches['number']
+    }
+
+    return $null
+}
+
+function Get-ProcessReductionSummaryError {
+    <#
+    .SYNOPSIS
+        Returns the errors of the reduction token and Merge commit line of a Summary.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string]$Summary,
+        [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyString()][string]$Number
+    )
+
+    $lines = @(Get-ProcessReductionPlainLine -Text $Summary)
+    if ($Number -and $lines -cnotcontains "reduction: $Number") {
+        "## Summary must carry the line 'reduction: $Number'."
+    }
+
+    $mergeLines = @($lines | Where-Object { $_ -cmatch '^Merge commit:' })
+    if ($mergeLines.Count -ne 1) {
+        "## Summary must carry exactly one 'Merge commit:' line; found $($mergeLines.Count)."
+    } elseif ($mergeLines[0] -cnotmatch '^Merge commit: (?:pending \(PR #[1-9][0-9]*\)|[0-9a-f]{7,40})$') {
+        "## Summary line '$($mergeLines[0])' is neither 'Merge commit: pending (PR #N)' nor a commit identifier."
+    }
+}
+
+function Get-ProcessReductionPriorTextError {
+    <#
+    .SYNOPSIS
+        Returns the errors of the Revert Block subsections of a Prior Text section.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string]$PriorText
+    )
+
+    $blocks = @(Get-ProcessReductionRevertBlock -Text $PriorText)
+    if ($blocks.Count -eq 0) {
+        '## Prior Text must hold at least one revert block.'
+    }
+
+    foreach ($block in $blocks) {
+        if ([string]::IsNullOrEmpty($block.Current)) {
+            "Revert block '$($block.Path)' needs a non-empty Current fence."
+        }
+        if ($null -eq $block.Prior) {
+            "Revert block '$($block.Path)' needs a Prior fence."
+        }
+    }
+}
+
+function Get-ProcessReductionRevertStepError {
+    <#
+    .SYNOPSIS
+        Returns the errors of the six ordered labels of a Revert Steps section.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string]$RevertSteps
+    )
+
+    $labels = @(
+        'Apply the blocks',
+        'Re-copy mirrors and bundles',
+        'Regenerate Codex variants',
+        'Restore pinned hashes',
+        'Restore contract-test literals',
+        'Run the contract tests'
+    )
+    $comparison = [System.StringComparison]::OrdinalIgnoreCase
+    $position = 0
+    foreach ($label in $labels) {
+        $found = $RevertSteps.IndexOf($label, $position, $comparison)
+        if ($found -ge 0) {
+            $position = $found + $label.Length
+        } elseif ($RevertSteps.IndexOf($label, $comparison) -ge 0) {
+            "## Revert Steps names '$label' out of order."
+        } else {
+            "## Revert Steps must name '$label'."
+        }
+    }
+}
+
+function Test-ProcessReductionEntry {
+    <#
+    .SYNOPSIS
+        Checks the structure of one ledger entry and returns IsValid, Errors, and PatchPath.
+
+    .DESCRIPTION
+        Name is the entry file name. PatchPath is the patches/<entry stem>.patch path that
+        a Stored Patch section names, or $null.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text
+    )
+
+    $errorList = [System.Collections.Generic.List[string]]::new()
+    $number = Get-ProcessReductionEntryNumber -Name $Name
+    if ($null -eq $number) {
+        $errorList.Add("Entry name '$Name' is not NNNN-<short-name>.md.")
+    }
+
+    $sections = @{}
+    foreach ($title in @('Summary', 'Reason and Evidence', 'Files Changed', 'Revert Steps', 'Revert Signals')) {
+        $sections[$title] = Get-ProcessReductionSection -Text $Text -Heading $title
+        if ($null -eq $sections[$title]) {
+            $errorList.Add("Required section '## $title' is missing.")
+        } elseif ([string]::IsNullOrWhiteSpace($sections[$title])) {
+            $errorList.Add("Required section '## $title' is empty.")
+        }
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($sections['Summary'])) {
+        $errorList.AddRange([string[]]@(Get-ProcessReductionSummaryError -Summary $sections['Summary'] -Number $number))
+    }
+    if (-not [string]::IsNullOrWhiteSpace($sections['Revert Steps'])) {
+        $errorList.AddRange([string[]]@(Get-ProcessReductionRevertStepError -RevertSteps $sections['Revert Steps']))
+    }
+
+    $priorText = Get-ProcessReductionSection -Text $Text -Heading 'Prior Text'
+    $storedPatch = Get-ProcessReductionSection -Text $Text -Heading 'Stored Patch'
+    if ($null -eq $priorText -and $null -eq $storedPatch) {
+        $errorList.Add("An entry needs '## Prior Text' or '## Stored Patch'.")
+    }
+    if ($null -ne $priorText) {
+        if ([string]::IsNullOrWhiteSpace($priorText)) {
+            $errorList.Add("Required section '## Prior Text' is empty.")
+        } else {
+            $errorList.AddRange([string[]]@(Get-ProcessReductionPriorTextError -PriorText $priorText))
+        }
+    }
+
+    $patchPath = $null
+    if ($null -ne $storedPatch) {
+        $expectedPatch = 'patches/{0}.patch' -f [System.IO.Path]::GetFileNameWithoutExtension($Name)
+        if ($storedPatch -cmatch ('(?<![\w./-])' + [regex]::Escape($expectedPatch) + '(?![\w./-])')) {
+            $patchPath = $expectedPatch
+        } else {
+            $errorList.Add("## Stored Patch must name '$expectedPatch'.")
+        }
+    }
+
+    return [pscustomobject]@{ IsValid = $errorList.Count -eq 0; Errors = $errorList.ToArray(); PatchPath = $patchPath }
+}
+
 Export-ModuleMember -Function @(
     'Get-ProcessReductionSection',
     'Get-ProcessReductionRevertBlock',
-    'Invoke-ProcessReductionRevert'
+    'Invoke-ProcessReductionRevert',
+    'Test-ProcessReductionEntry'
 )
