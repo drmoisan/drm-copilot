@@ -440,9 +440,58 @@ function Invoke-ProcessReductionChain {
     return [pscustomobject]@{ IsValid = $errorList.Count -eq 0; Errors = $errorList.ToArray(); FinalText = $state }
 }
 
+function Read-ProcessReductionChainInput {
+    <#
+    .SYNOPSIS
+        Reads the ledger, its stored patches, and the live text of every path they name.
+
+    .DESCRIPTION
+        The one read seam of this module; it writes nothing. Returns Entries, PatchText, and
+        LiveText ($null for a missing file) over every path a block or patch section names,
+        each entry file, and each mapped source path, as Invoke-ProcessReductionChain takes.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][string]$RepositoryRoot,
+        [string]$LedgerPath = 'docs/engineering/process-reductions'
+    )
+
+    $ledgerRoot = Join-Path -Path $RepositoryRoot -ChildPath $LedgerPath
+    $ledger = Read-ProcessReductionLedger -LedgerPath $ledgerRoot
+    $paths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $patchText = @{}
+    foreach ($patchName in @($ledger.PatchNames)) {
+        $patchText[$patchName] = [string](Get-Content -LiteralPath (Join-Path -Path $ledgerRoot -ChildPath "patches/$patchName") -Raw)
+        @(Get-ProcessReductionPatchHunk -PatchText $patchText[$patchName]) | ForEach-Object { [void]$paths.Add($_.Path) }
+    }
+    foreach ($entry in @($ledger.Entries)) {
+        [void]$paths.Add("$LedgerPath/$($entry.Name)")
+        $priorText = Get-ProcessReductionSection -Text $entry.Text -Heading 'Prior Text'
+        if ($null -ne $priorText) {
+            @(Get-ProcessReductionRevertBlock -Text $priorText) | ForEach-Object { [void]$paths.Add($_.Path) }
+        }
+    }
+    foreach ($path in @($paths)) {
+        $source = Get-ProcessReductionMappedSource -Path $path
+        if ($null -ne $source) {
+            [void]$paths.Add($source)
+        }
+    }
+
+    $liveText = @{}
+    foreach ($path in $paths) {
+        $fullPath = Join-Path -Path $RepositoryRoot -ChildPath $path
+        $liveText[$path] = if (Test-Path -LiteralPath $fullPath -PathType Leaf) { [string](Get-Content -LiteralPath $fullPath -Raw) } else { $null }
+    }
+
+    return [pscustomobject]@{ Entries = @($ledger.Entries); PatchText = $patchText; LiveText = $liveText; LedgerPath = $LedgerPath }
+}
+
 Export-ModuleMember -Function @(
     'Get-ProcessReductionPatchHunk',
     'Invoke-ProcessReductionHunkRevert',
     'Get-ProcessReductionDerivedSource',
-    'Invoke-ProcessReductionChain'
+    'Invoke-ProcessReductionChain',
+    'Read-ProcessReductionChainInput'
 )

@@ -348,3 +348,37 @@ Describe 'Invoke-ProcessReductionChain' {
         $result.Errors[0] | Should -BeExactly '0001-a.md: docs/a.md: the file is absent at this step.'
     }
 }
+
+Describe 'Read-ProcessReductionChainInput' {
+    It 'PRC-READ-COLLECTS-INPUT reads patch-only, block-only, and mapped source paths, with $null for a missing file' {
+        InModuleScope ProcessReductionChain {
+            # Arrange: mock bodies build their own text, because they do not see test variables
+            $bundle = 'extensions/drm-copilot/resources/customizations/.github/prompts/p.prompt.md'
+            Mock Read-ProcessReductionLedger {
+                $fence = '`' * 4
+                $text = "## Prior Text`n`n### Revert Block: docs/block-only.md`n`n${fence}Current`nnew`n${fence}`n`n${fence}Prior`nold`n${fence}`n"
+                [pscustomobject]@{ IndexText = ''; Entries = @([pscustomobject]@{ Name = '0001-a.md'; Text = $text }); PatchNames = @('0001-a.patch') }
+            }
+            Mock Test-Path { $LiteralPath -notlike '*missing*' }
+            Mock Get-Content {
+                $path = 'extensions/drm-copilot/resources/customizations/.github/prompts/p.prompt.md'
+                "diff --git a/$path b/$path`n--- a/$path`n+++ b/$path`n@@ -1 +1 @@`n-old`n+new`ndiff --git a/docs/missing.md b/docs/missing.md`n--- a/docs/missing.md`n+++ b/docs/missing.md`n@@ -1 +1 @@`n-old`n+new"
+            } -ParameterFilter { $LiteralPath -like '*.patch' }
+            Mock Get-Content { 'live ' + ($LiteralPath -replace '\\', '/') } -ParameterFilter { $LiteralPath -notlike '*.patch' }
+
+            # Act
+            $chainInput = Read-ProcessReductionChainInput -RepositoryRoot 'repo-root'
+
+            # Assert
+            @($chainInput.Entries).Count | Should -Be 1
+            $chainInput.PatchText['0001-a.patch'] | Should -BeLike "diff --git a/$bundle*"
+            $chainInput.LiveText[$bundle] | Should -BeLike "live repo-root*/$bundle"
+            $chainInput.LiveText['docs/block-only.md'] | Should -BeLike 'live repo-root*/docs/block-only.md'
+            $chainInput.LiveText['.github/prompts/p.prompt.md'] | Should -BeLike 'live repo-root*/.github/prompts/p.prompt.md' -Because 'the mapped source of a bundle path is read'
+            $chainInput.LiveText['docs/engineering/process-reductions/0001-a.md'] | Should -BeLike 'live repo-root*'
+            $chainInput.LiveText.ContainsKey('docs/missing.md') | Should -BeTrue
+            $chainInput.LiveText['docs/missing.md'] | Should -BeNullOrEmpty
+            Should -Invoke Read-ProcessReductionLedger -Times 1 -Exactly -ParameterFilter { $LedgerPath -like 'repo-root*process-reductions' }
+        }
+    }
+}
