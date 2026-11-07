@@ -20,6 +20,10 @@
     visible in the command text; gh and git run in the repository root, so a cd made by an
     earlier shell call is not visible either; a push after the lookup can change the head
     unless --match-head-commit is passed; and the control is policy-level, not cryptographic.
+
+    Review guard (issue #1097): under review_mode concurrent, enforce-epic-merge-gate-review.ps1
+    runs before every allow branch, with gh and git in the repository root, and denies a merge with
+    no passing review at a current head. Without the key it is inert and starts no process.
 #>
 [CmdletBinding()]
 param()
@@ -35,6 +39,8 @@ try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-Ho
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-command.ps1' -ErrorRecord $_ }
 # Shared docs-only diff classification and the merge-side docs-only exemption (issue #927).
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
+# Review guard under review_mode concurrent, byte-identical to the Claude copy (issue #1097).
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
 
 # Reason codes for the standalone-merge authorization branch (issue #670), spelled
 # byte-identically to the Claude helpers file. Each of the four assignments below is the only
@@ -152,12 +158,25 @@ function Invoke-CodexEpicMergeDecision {
         return $null
     }
 
+    $prNumber = Get-CodexMergeCommandPrNumber -Command $command
     $child = ConvertFrom-CodexMergeJson -Raw $ChildCheckpointRaw -Name 'child checkpoint' -Optional
+
+    # Review guard (issue #1097): inert without review_mode concurrent, so it precedes every allow branch.
+    $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $child -CommandPrNumber $prNumber -GhRoot $RepositoryRoot -GitRoot $RepositoryRoot
+    if ($reviewDecision.Denied) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = $reviewDecision.Reason
+            }
+        }
+    }
+
     if (Test-CodexChildMergeReady -Checkpoint $child) {
         return $null
     }
     $epic = ConvertFrom-CodexMergeJson -Raw $EpicCheckpointRaw -Name 'epic checkpoint' -Optional
-    $prNumber = Get-CodexMergeCommandPrNumber -Command $command
     if (Test-CodexEpicMergeReady -Checkpoint $epic -CommandPrNumber $prNumber) {
         return $null
     }
