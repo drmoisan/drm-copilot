@@ -61,20 +61,20 @@ The owner split this item on 2026-11-07. #1094 is the parallel-only test gate ch
 
 ### Locally verifiable criteria
 
-- [ ] No skill, agent, or template text in the repository requires a serial, single-process, seeded-shuffle, reversed-order, comparison, or pre-change test-suite baseline run. Measured as stated in Decision 1 of `spec.md`: no skill, agent, or template text requires such a run or names a serial command as a validation gate, and the brief states that the parallel gates govern where a policy file names a toolchain test command. The residual limit in `## Constraints & Risks` of `spec.md` applies: the deferred Python tools and VS Code aggregates still invoke a serial command until #1096.
-- [ ] The branch diff changes no file under `.claude/rules/` or `.github/instructions/`, no bundle copy of those files, and neither `.agents/skills/powershell` nor `.agents/skills/python`.
-- [ ] The branch diff changes no file under `.github/workflows/` or `scripts/powershell/PoshQC/`, and does not change `.vscode/tasks.json`, the Python tools named in `### 2. Out of scope` of `spec.md`, or the policy-audit validators.
-- [ ] `## Test Isolation Checks` states the parallel gates, names no leak scan, and all mirrored copies match.
-- [ ] The `## Test Runtime`, `## CI-Only Failure Classes`, and `## PowerShell Route and PoshQC MCP Limits` passages of the brief carry the changes listed in `### 1. Parallel-only test gates` of `spec.md`, in every mirrored copy, and `## CI-Only Failure Classes` names no scan.
-- [ ] The Pre-Mortem `Test isolation` bullet of `atomic-plan-contract` states the parallel gates, names no leak scan, and names no removed run, in every mirrored copy.
-- [ ] No plan-contract or review text requires a comparison run, and the brief states that a focused run of one test file is debugging only and is never a gate or evidence.
-- [ ] Static tool baselines remain required, and skill, agent, and template text reads coverage from the single gate run against the thresholds, in every mirrored copy.
-- [ ] The policy-audit template requires no pre-change run, its retained baseline fields record `N/A - no pre-change run`, and a contract test shows that an audit filled in that way passes the unchanged policy-audit validators.
-- [ ] Every editable surface in table A3 of the research, except `scripts/dev_tools/fix_all_branches.py`, no longer names a serial command as a validation gate, and tool-permission entries in those surfaces are unchanged.
-- [ ] The contract tests pass against the new wording and fail if the removed requirements are reintroduced, in any mirrored copy.
-- [ ] `test_execution_environment_fact_is_unchanged_across_copies` filters on the parts relative to `REPO_ROOT` and passes in a checkout under `.claude/worktrees/`.
-- [ ] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures.
-- [ ] The validation evidence for this item comes from the parallel gates, and cites no single-process, seeded-shuffle, reversed-order, comparison, or focused run.
+- [x] No skill, agent, or template text in the repository requires a serial, single-process, seeded-shuffle, reversed-order, comparison, or pre-change test-suite baseline run. Measured as stated in Decision 1 of `spec.md`: no skill, agent, or template text requires such a run or names a serial command as a validation gate, and the brief states that the parallel gates govern where a policy file names a toolchain test command. The residual limit in `## Constraints & Risks` of `spec.md` applies: the deferred Python tools and VS Code aggregates still invoke a serial command until #1096.
+- [x] The branch diff changes no file under `.claude/rules/` or `.github/instructions/`, no bundle copy of those files, and neither `.agents/skills/powershell` nor `.agents/skills/python`.
+- [x] The branch diff changes no file under `.github/workflows/` or `scripts/powershell/PoshQC/`, and does not change `.vscode/tasks.json`, the Python tools named in `### 2. Out of scope` of `spec.md`, or the policy-audit validators.
+- [x] `## Test Isolation Checks` states the parallel gates, names no leak scan, and all mirrored copies match.
+- [x] The `## Test Runtime`, `## CI-Only Failure Classes`, and `## PowerShell Route and PoshQC MCP Limits` passages of the brief carry the changes listed in `### 1. Parallel-only test gates` of `spec.md`, in every mirrored copy, and `## CI-Only Failure Classes` names no scan.
+- [x] The Pre-Mortem `Test isolation` bullet of `atomic-plan-contract` states the parallel gates, names no leak scan, and names no removed run, in every mirrored copy.
+- [x] No plan-contract or review text requires a comparison run, and the brief states that a focused run of one test file is debugging only and is never a gate or evidence.
+- [x] Static tool baselines remain required, and skill, agent, and template text reads coverage from the single gate run against the thresholds, in every mirrored copy.
+- [x] The policy-audit template requires no pre-change run, its retained baseline fields record `N/A - no pre-change run`, and a contract test shows that an audit filled in that way passes the unchanged policy-audit validators.
+- [x] Every editable surface in table A3 of the research, except `scripts/dev_tools/fix_all_branches.py`, no longer names a serial command as a validation gate, and tool-permission entries in those surfaces are unchanged.
+- [x] The contract tests pass against the new wording and fail if the removed requirements are reintroduced, in any mirrored copy.
+- [x] `test_execution_environment_fact_is_unchanged_across_copies` filters on the parts relative to `REPO_ROOT` and passes in a checkout under `.claude/worktrees/`.
+- [x] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures.
+- [x] The validation evidence for this item comes from the parallel gates, and cites no single-process, seeded-shuffle, reversed-order, comparison, or focused run.
 
 ### CI-dependent criteria
 
