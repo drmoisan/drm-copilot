@@ -92,7 +92,7 @@ Terms: `<FEATURE>` is `docs/features/active/2026-11-06-pester-static-leak-scan-1
 
 A fix re-runs P3-T1 and the gate that failed; another gate re-runs only when the fix changes a file it exercises. Each pass writes new artifacts.
 
-- [ ] [P3-T1] Run the static stage on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `powershell-format.<timestamp>.md`, `powershell-analyze.<timestamp>.md`, `python-black.<timestamp>.md`, `python-ruff.<timestamp>.md`, `python-pyright.<timestamp>.md`, and `leak-scan.<timestamp>.md` under `<FEATURE>/evidence/qa-gates/`.
+- [x] [P3-T1] Run the static stage on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `powershell-format.<timestamp>.md`, `powershell-analyze.<timestamp>.md`, `python-black.<timestamp>.md`, `python-ruff.<timestamp>.md`, `python-pyright.<timestamp>.md`, and `leak-scan.<timestamp>.md` under `<FEATURE>/evidence/qa-gates/`.
   - Format output carries `Already formatted:` and `Formatted:` lines, counted case-sensitively from the line start. A `Formatted:` line means a file changed: commit it and repeat this task. Analyzer, Black, and scan run as in P0-T3.
   - Acceptance: zero `Formatted:` lines, a non-zero `Already formatted:` count, zero analyzer findings, and each `EXIT_CODE:` is 0.
 - [ ] [P3-T2] Run the Pester gate with one background `Invoke-PoshQCParallelTest` run and write `<FEATURE>/evidence/qa-gates/pester-parallel.<timestamp>.md`.
