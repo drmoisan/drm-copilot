@@ -11,23 +11,30 @@
     weekly quota.
 
     The pure logic lives in Get-EpicProgressReport.Logic.ps1, which this script
-    dot-sources. Every I/O call goes through a wrapper function in this script. When gh
-    or cswap is not installed, or prints no parseable output, the report still prints:
-    the pull-request state is empty and the quota is n/a.
+    dot-sources and which dot-sources the State, Metrics, and Render files. Every I/O call
+    goes through a wrapper function in this script. When gh or cswap is not installed, or
+    prints no parseable output, the report still prints: the pull-request state is empty
+    and the quota is n/a.
 
-    A check-in sample (Unix time and done count) is kept in the state file at -StatePath
+    The state file at -StatePath keeps the start instant, the baseline done count, the
+    weekly baseline, and the check-in samples (Unix time and done count). A sample is added
     when the previous sample is at least 90 seconds old; the recent velocity and its
-    standard deviation are computed from those samples.
+    standard deviation are computed from those samples. The state file is read before the
+    first git call. The legacy sample array written by earlier versions is still read.
 
-    The entry-point block at the bottom is skipped when the file is dot-sourced.
+    This file is the canonical script of the /epic-progress-report skill. The entry-point
+    block at the bottom is skipped when the file is dot-sourced.
 
 .PARAMETER EpicFolder
     Mandatory. The epic folder name under docs/features/epics/. It is also the epic name
     printed in the status heading.
 
 .PARAMETER StartUtc
-    Mandatory. The instant from which elapsed time and average velocity are measured;
+    Optional. The instant from which elapsed time and average velocity are measured;
     converted to UTC. A start after the current instant counts as zero elapsed time.
+    Resolution: the passed value, else now when -ResetBaseline is given, else the start
+    stored in the state file. With none of these the script stops with an error before any
+    git call. A passed value is persisted with the next state write.
 
 .PARAMETER EpicIssue
     The epic issue number printed in the report. Default: the number on the first
@@ -53,15 +60,18 @@
     artifacts/orchestration/epic-orchestrator-state.json under the repository root.
 
 .PARAMETER StatePath
-    The state file that keeps the check-in samples. Default:
-    epic-progress-<EpicFolder>.json under the system temporary directory, never inside the
-    repository.
+    The state file that keeps the start, the baselines, and the check-in samples. Default:
+    .claude/state/epic-progress-<EpicFolder>.json under the repository root, a gitignored
+    location that survives a container stop with the checkout. The directory is created
+    when missing.
 
 .PARAMETER BaselineDone
-    The number of tasks already complete at -StartUtc. Default: 0.
+    The number of tasks already complete at the start. Resolution: the passed value, else
+    the current done count when -ResetBaseline is given, else the stored value, else 0.
 
 .PARAMETER BaselineWeeklyPct
-    The weekly quota percentage at -StartUtc. Default: 0.
+    The weekly quota percentage at the start. Resolution: the passed value, else the stored
+    value, else 0. -ResetBaseline does not change it.
 
 .PARAMETER WaveOverheadHours
     The review and CI hours added per open wave in the wave-parallel estimate.
@@ -85,20 +95,28 @@
     command: each run halves the samples again. Cannot be combined with -ResetBaseline.
 
 .EXAMPLE
-    pwsh -NoProfile -File scripts/dev-tools/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -Mode TLDR
+    pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -BaselineDone 40 -Mode TLDR
 
     Prints the TL;DR block for the epic in docs/features/epics/example-epic/, measuring
-    from 09:00 UTC with no baseline tasks.
+    from 09:00 UTC and counting 40 tasks as complete at the start; both values are stored
+    for later runs.
 
 .EXAMPLE
-    pwsh -NoProfile -File scripts/dev-tools/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -BaselineDone 40 -EpicIssue 12
+    pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 -EpicFolder example-epic -EpicIssue 12
 
-    Prints the full report for epic issue 12, counting 40 tasks as complete at the start.
+    Prints the full report for epic issue 12 with the start and baseline read from the
+    state file.
+
+.EXAMPLE
+    pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 -EpicFolder example-epic -ResetBaseline
+
+    Restarts the measurement now after a pause: the stored samples are discarded and the
+    current done count becomes the baseline.
 
 .NOTES
     The tool is read-only toward the repository and GitHub: it runs only git fetch, git
     show, git worktree list, and gh pr list, and the only file it writes is the state file
-    at -StatePath (issue #1080).
+    at -StatePath (issues #1080 and #1093).
 #>
 
 [CmdletBinding()]
@@ -284,14 +302,15 @@ function Invoke-EpicProgressReport {
         Wiring only. Runs git with exactly 'fetch -q origin', 'worktree list --porcelain',
         and 'show <IntegrationBranch>:<path>'; runs 'gh pr list' only when gh is installed
         and 'cswap list --json' only when cswap is installed; treats an unparseable
-        checkpoint or state file as empty; writes the state file only when the sample set
-        changed. When 'git fetch -q origin' exits with a non-zero code, writes a warning
+        checkpoint or state file as empty; reads the state file and resolves the start before
+        the first git call; writes the state file only when the sample set changed or
+        ResetBaseline or PairSamples is given. When 'git fetch -q origin' exits with a non-zero code, writes a warning
         naming the code and continues with the last fetched state of the integration branch.
         Returns the TL;DR lines, followed by the Full lines unless Mode is TLDR.
     .PARAMETER EpicFolder
         The epic folder name; also the epic name in the status heading.
     .PARAMETER StartUtc
-        The start instant.
+        The start instant; when not passed, resolved by Resolve-EpicProgressBaseline.
     .PARAMETER EpicIssue
         The epic issue number; blank to read it from the kickoff file.
     .PARAMETER IntegrationBranch
@@ -305,15 +324,19 @@ function Invoke-EpicProgressReport {
     .PARAMETER StatePath
         The state file path; blank for the default under .claude/state of the repository root.
     .PARAMETER BaselineDone
-        The tasks already complete at StartUtc.
+        The tasks already complete at the start; when not passed, resolved from the reset or the state.
     .PARAMETER BaselineWeeklyPct
-        The weekly quota percentage at StartUtc.
+        The weekly quota percentage at the start; when not passed, resolved from the state.
     .PARAMETER WaveOverheadHours
         The hours added per open wave.
     .PARAMETER SampleCap
         The maximum number of samples kept.
     .PARAMETER Mode
         TLDR or Full.
+    .PARAMETER ResetBaseline
+        Discard the stored samples, restart the baseline now, and write the state.
+    .PARAMETER PairSamples
+        Pair the samples after the sample rule and write the state.
     #>
     [CmdletBinding()]
     [OutputType([string[]])]
