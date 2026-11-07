@@ -41,7 +41,7 @@
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Capture the format baseline of the five `SKILLDIR` scripts and the six `TESTDIR` test files with `Invoke-PoshQCFormat` in check-only form (a no-op `-WriteFile` scriptblock, so nothing is rewritten); write `FEATURE/evidence/baseline/format-baseline.<timestamp>.md`.
+- [x] [P0-T1] Capture the format baseline of the five `SKILLDIR` scripts and the six `TESTDIR` test files with `Invoke-PoshQCFormat` in check-only form (a no-op `-WriteFile` scriptblock, so nothing is rewritten); write `FEATURE/evidence/baseline/format-baseline.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; the summary records the count of `Formatted: ` lines (would-change files, each named) and of `Already formatted: ` lines; `git status --porcelain` shows no source change after the step.
 - [ ] [P0-T2] Capture the PSScriptAnalyzer baseline of the same eleven files with `Invoke-ScriptAnalyzer` and `scripts/powershell/PoshQC/settings/pssa.settings.psd1`; write `FEATURE/evidence/baseline/pssa-baseline.<timestamp>.md`.
   - Acceptance: the four fields are present; the summary lists the finding count per file with rule names (zero is a valid result).
