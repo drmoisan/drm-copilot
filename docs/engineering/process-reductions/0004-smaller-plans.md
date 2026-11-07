@@ -5,7 +5,7 @@
 reduction: 0004
 Date: 2026-11-07
 Issue: #1097
-Merge commit: pending (PR #1097)
+Merge commit: pending (PR #1110)
 
 Adds a `**Task target.**` bullet to `## Design-Level Plan Contract (Mandatory)` of the planning contract: a plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks, and the `**Size guideline.**` bullet, with the limit the validator enforces, is not changed. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
 

@@ -5,7 +5,7 @@
 reduction: 0005
 Date: 2026-11-07
 Issue: #1097
-Merge commit: pending (PR #1097)
+Merge commit: pending (PR #1110)
 
 Removes the routine Phase 0 policy-read task and its `phase0-instructions-read.md` artifact as a planning requirement. The planner stop hook no longer reports `Phase 0 must include a policy-read task.`, the planning contract states that Phase 0 carries no routine policy-read task and that a plan that keeps one stays valid, and the planner agents, the remediation handoff skill, the Copilot executors, orchestrators, and planners, both `execute-hard-lock` prompts, the feature plan template, and the architecture document drop the requirement. Only the requirement is removed: `policy-compliance-order` is unchanged and agents still follow policy. Every baseline requirement is unchanged. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
 
