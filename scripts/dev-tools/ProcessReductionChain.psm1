@@ -166,7 +166,63 @@ function Invoke-ProcessReductionHunkRevert {
     return $result -join "`n"
 }
 
+function Get-ProcessReductionMappedSource {
+    <#
+    .SYNOPSIS
+        Returns the source path a mirror or bundle path maps to by the fixed rules, or $null.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+
+    if ($Path -cmatch '^extensions/drm-copilot/resources/(?:claude-customizations|codex-and-agents-customizations|customizations)/(?<rest>.+)$') {
+        return $Matches['rest']
+    }
+    if ($Path -cmatch '^extensions/drm-copilot/resources/(?:feature-templates|templates)/(?<rest>.+)$') {
+        return 'docs/features/templates/' + $Matches['rest']
+    }
+    if ($Path -cmatch '^\.(?:agents|github)/skills/(?<name>[^/]+)/SKILL\.md$') {
+        return '.claude/skills/' + $Matches['name'] + '/SKILL.md'
+    }
+
+    return $null
+}
+
+function Get-ProcessReductionDerivedSource {
+    <#
+    .SYNOPSIS
+        Returns the source of a derived path, 'generated' for a generated Codex variant, or $null.
+
+    .DESCRIPTION
+        A mapped path is derived only when its live text equals its source's after line-ending
+        normalization; otherwise it is a source. Revert steps 2 and 3 re-create a derived path.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][AllowEmptyCollection()][hashtable]$LiveText
+    )
+
+    if ($Path -cmatch '^(?:extensions/drm-copilot/resources/codex-and-agents-customizations/)?\.codex/agents/[^/]+-(?:c[1-4]|c3-elevated)\.toml$') {
+        return 'generated'
+    }
+
+    $source = Get-ProcessReductionMappedSource -Path $Path
+    if ($null -eq $source -or $null -eq $LiveText[$Path] -or $null -eq $LiveText[$source]) {
+        return $null
+    }
+    if ((ConvertTo-ProcessReductionChainLf -Text $LiveText[$Path]) -cne (ConvertTo-ProcessReductionChainLf -Text $LiveText[$source])) {
+        return $null
+    }
+
+    return $source
+}
+
 Export-ModuleMember -Function @(
     'Get-ProcessReductionPatchHunk',
-    'Invoke-ProcessReductionHunkRevert'
+    'Invoke-ProcessReductionHunkRevert',
+    'Get-ProcessReductionDerivedSource'
 )

@@ -147,3 +147,32 @@ Describe 'Invoke-ProcessReductionHunkRevert' {
         { Invoke-ProcessReductionHunkRevert -Text "present`n" -Hunk $hunk } | Should -Throw -ExpectedMessage $Pattern
     }
 }
+
+Describe 'Get-ProcessReductionDerivedSource' {
+    It 'PRC-DERIVED-MAPS-<Case> returns <Expected>' -ForEach @(
+        @{ Case = 'CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/x/SKILL.md'; Source = '.claude/skills/x/SKILL.md'; Same = $true; Expected = '.claude/skills/x/SKILL.md' },
+        @{ Case = 'AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/x/SKILL.md'; Source = '.agents/skills/x/SKILL.md'; Same = $true; Expected = '.agents/skills/x/SKILL.md' },
+        @{ Case = 'GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/prompts/p.prompt.md'; Source = '.github/prompts/p.prompt.md'; Same = $true; Expected = '.github/prompts/p.prompt.md' },
+        @{ Case = 'FEATURE-TEMPLATES'; Path = 'extensions/drm-copilot/resources/feature-templates/bug/plan.md'; Source = 'docs/features/templates/bug/plan.md'; Same = $true; Expected = 'docs/features/templates/bug/plan.md' },
+        @{ Case = 'TEMPLATES'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md'; Source = 'docs/features/templates/policy_audit/AGENTS.md'; Same = $true; Expected = 'docs/features/templates/policy_audit/AGENTS.md' },
+        @{ Case = 'AGENTS-SKILL-MIRROR'; Path = '.agents/skills/x/SKILL.md'; Source = '.claude/skills/x/SKILL.md'; Same = $true; Expected = '.claude/skills/x/SKILL.md' },
+        @{ Case = 'GITHUB-SKILL-MIRROR'; Path = '.github/skills/x/SKILL.md'; Source = '.claude/skills/x/SKILL.md'; Same = $true; Expected = '.claude/skills/x/SKILL.md' },
+        @{ Case = 'GENERATED-VARIANT'; Path = '.codex/agents/atomic-planner-c3-elevated.toml'; Source = ''; Same = $false; Expected = 'generated' },
+        @{ Case = 'GENERATED-BUNDLE-COPY'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c2.toml'; Source = ''; Same = $false; Expected = 'generated' },
+        @{ Case = 'NON-IDENTICAL-COPY'; Path = '.agents/skills/x/SKILL.md'; Source = '.claude/skills/x/SKILL.md'; Same = $false; Expected = $null },
+        @{ Case = 'MISSING-SOURCE'; Path = '.agents/skills/codex-only/SKILL.md'; Source = ''; Same = $false; Expected = $null },
+        @{ Case = 'UNMAPPED'; Path = '.codex/agents/atomic-planner.toml'; Source = ''; Same = $false; Expected = $null }
+    ) {
+        # Arrange: a CRLF copy still counts as identical after line-ending normalization
+        $liveText = @{ $Path = "line one`r`nline two`r`n" }
+        if ($Source) {
+            $liveText[$Source] = if ($Same) { "line one`nline two`n" } else { "line one`nother`n" }
+        }
+
+        # Act
+        $result = Get-ProcessReductionDerivedSource -Path $Path -LiveText $liveText
+
+        # Assert
+        Should -ActualValue $result -Be $Expected
+    }
+}
