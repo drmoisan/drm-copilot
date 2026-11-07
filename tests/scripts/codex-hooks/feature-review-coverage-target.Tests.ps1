@@ -84,6 +84,45 @@ Describe 'Get-CodexReviewPolicyAuditPath (issue #1114)' {
         @($result.Paths).Count | Should -Be 0
     }
 
+    It '1114: extracts a labelled absolute path whose root contains a space' {
+        $absolute = '/synthetic root/repo/' + $script:AuditA
+        $result = Get-CodexReviewPolicyAuditPath -Message ('policy-audit-path: ' + $absolute)
+        @($result.Paths) | Should -Be @($absolute)
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It '1114: extracts a backticked absolute path whose root contains a space' {
+        $absolute = '/synthetic root/repo/' + $script:AuditA
+        $result = Get-CodexReviewPolicyAuditPath -Message "The audit is ``$absolute``, see it."
+        @($result.Paths) | Should -Be @($absolute)
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It '1114: extracts a sentence-final path followed by a period' {
+        $result = Get-CodexReviewPolicyAuditPath -Message "The reviewer wrote $($script:AuditA)."
+        @($result.Paths) | Should -Be @($script:AuditA)
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It '1114: extracts a path followed by a colon' {
+        $result = Get-CodexReviewPolicyAuditPath -Message "$($script:AuditA): reviewed"
+        @($result.Paths) | Should -Be @($script:AuditA)
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It '1114: returns AUDIT_PATH_TRAVERSAL for a .. path with two segments below the feature folder' {
+        $result = Get-CodexReviewPolicyAuditPath -Message 'docs/features/active/2026-11-07-item-a-1114/../other/policy-audit.2026-11-07T20-00.md'
+        $result.ReasonCode | Should -Be 'AUDIT_PATH_TRAVERSAL'
+        $result.Reason | Should -BeLike "*'..' segment*"
+        @($result.Paths).Count | Should -Be 0
+    }
+
+    It '1114: extracts both paths from one labelled line that carries two audits' {
+        $result = Get-CodexReviewPolicyAuditPath -Message "policy-audit-path: $script:AuditA and $script:AuditB"
+        @($result.Paths) | Should -Be @($script:AuditA, $script:AuditB)
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
     It '1114: returns no path for a <Case> message' -ForEach @(
         @{ Case = 'null'; Message = $null }
         @{ Case = 'non-string'; Message = 42 }
@@ -196,6 +235,22 @@ Describe 'Resolve-CodexReviewCoverageTarget (issue #1114)' {
         $result.ItemRoot | Should -BeNullOrEmpty
         $result.Reason | Should -BeLike "*$script:ItemRoot*"
         $result.Reason | Should -BeLike "*$script:OtherRoot*"
+    }
+
+    It '1114: resolves a labelled absolute audit path whose root contains a space' {
+        # Arrange: the item worktree is registered under a root that contains a space.
+        $spaceRoot = '/synthetic root/repo'
+        $porcelain = "worktree $script:SessionRoot`nbranch refs/heads/main`n`nworktree $spaceRoot`nbranch refs/heads/bug/item-a`n"
+        Mock Get-CodexReviewCoverageWorktreeList { $porcelain }.GetNewClosure()
+
+        # Act
+        $result = Resolve-CodexReviewCoverageTarget -Message ('policy-audit-path: ' + $spaceRoot + '/' + $script:AuditA) -SessionRoot $script:SessionRoot
+
+        # Assert
+        $result.ReasonCode | Should -BeNullOrEmpty
+        $result.ItemRoot | Should -Be $spaceRoot
+        $result.Source | Should -Be 'FilePath'
+        $result.AuditRelativePath | Should -Be $script:AuditA
     }
 
     It '1114: returns AUDIT_PATH_TRAVERSAL for a path with a .. segment' {
