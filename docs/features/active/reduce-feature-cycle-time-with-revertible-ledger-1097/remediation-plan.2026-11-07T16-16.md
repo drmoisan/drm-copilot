@@ -70,7 +70,7 @@ Premise corrections, each read against the tree:
 
 ### Phase 1 — Remediation Edits
 
-- [ ] [P1-T1] Merge `origin/main` into the branch in one merge commit that resolves the ten conflicted files per the region table, and write `FEATURE/evidence/other/stage-f1-merge-resolution.<timestamp>.md`.
+- [x] [P1-T1] Merge `origin/main` into the branch in one merge commit that resolves the ten conflicted files per the region table, and write `FEATURE/evidence/other/stage-f1-merge-resolution.<timestamp>.md`.
   - Merge: fetch `origin`, then `git merge origin/main` from the worktree; the commit message names PR #1108 and issue #1106. The commit holds no ledger edit. Conflicted files: `.claude/agents/csharp-typed-engineer.md`, `.claude/skills/csharp-qa-gate/SKILL.md`, `.claude/skills/invoke-csharp-engineer/SKILL.md`, `.codex/agents/powershell-di-unit-test-engineer.toml`, `.github/agents/Powershell DI Unit Test Engineer.agent.md`, and the five bundle copies under `extensions/drm-copilot/resources/`. Any further conflicted path found by `git status` is resolved the same way and recorded.
   - Resolve each region per the table: #1108's wording and the E2 restored baseline and comparison lines both stay.
   - Sweep: for each file #1108 changed that also holds lines this branch added (the added lines of the stored `0006` patch), derive the renamed token pairs from #1108's diff of that file and rename the stale tokens (`xUnit` to `MSTest`, `Pester v5` to `Pester v6`) in this branch's added lines only. The artifact lists each file, the pair, and the count.
