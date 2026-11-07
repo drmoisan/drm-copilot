@@ -7,7 +7,7 @@ Date: 2026-11-07
 Issue: #1097
 Merge commit: bad886e304990d26af56d6bcabc9d543518492e9
 
-Adds a third remediation path for small review findings. When the review finds at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`, in a review-opened cycle whose prior cycle was not light, the reviewer writes `Remediation-Path: light` and a `## Light Fix Tasks` section, and the orchestrator runs one `atomic-executor` delegation over the inputs file with no `atomic-planner` delegation and no preflight. The checkpoint records `remediation_path: "light"`, and invariant 8 replaces invariant 2 for that cycle in all three validators. The `Merge commit:` line held the canonical issue number as a stand-in until the pull request existed, then the pull request number, and now holds the merge commit.
+Adds a third remediation path for small review findings. When the review finds at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`, in a review-opened cycle whose prior cycle was not light, the reviewer writes `Remediation-Path: light` and a `## Light Fix Tasks` section, and the orchestrator runs one `atomic-executor` delegation over the inputs file with no `atomic-planner` delegation and no preflight. The checkpoint records `remediation_path: "light"`, and invariant 8 replaces invariant 2 for that cycle in all three validators. The `Merge commit:` line held the canonical issue number as a stand-in until the pull request existed, then the pull request number, and now holds the merge commit. The ordinal key read of review item N1, which makes the PowerShell validator match the light-path keys exactly as Python and TypeScript do, landed in a later commit, which updated this entry.
 
 ## Reason and Evidence
 
@@ -19,11 +19,14 @@ Research section 5 of `docs/features/active/reduce-feature-cycle-time-with-rever
 - `scripts/dev_tools/_orchestrator_state_remediation_loop.py`
 - `tests/scripts/dev_tools/test_orchestrator_state_light_cycle.py`, new
 - `tests/scripts/dev_tools/test_orchestrator_state_remediation_loop_parity.py`, the corpus floor
-- `tests/fixtures/orchestrator_state_remediation_loop/` (fourteen corpus files, new): `light_valid_accepted.json`, `light_three_findings_accepted.json`, `light_design_scope.json`, `light_absent_scope.json`, `light_four_findings.json`, `light_consecutive_light.json`, `light_preflight_present.json`, `light_opened_by_absent.json`, `light_opened_by_halt_outcome.json`, `light_non_autonomous_finding.json`, `full_no_preflight_fails_invariant_2.json`, `full_with_preflight_and_scope_accepted.json`, `path_value_case_variant.json`, `path_value_null.json`
+- `tests/fixtures/orchestrator_state_remediation_loop/` (sixteen corpus files, new): `light_valid_accepted.json`, `light_three_findings_accepted.json`, `light_design_scope.json`, `light_absent_scope.json`, `light_four_findings.json`, `light_consecutive_light.json`, `light_preflight_present.json`, `light_opened_by_absent.json`, `light_opened_by_halt_outcome.json`, `light_non_autonomous_finding.json`, `full_no_preflight_fails_invariant_2.json`, `full_with_preflight_and_scope_accepted.json`, `path_value_case_variant.json`, `path_value_null.json`, `light_path_key_case_variant.json`, `light_scope_key_case_variant.json`
 - `.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1`
 - `.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1`
 - `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1`, a byte-identical bundle copy
 - `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1`, a byte-identical bundle copy
+- `.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1`, the ordinal key read of review item N1 (`Get-CheckpointObjectOrdinalMember`)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1`, a byte-identical bundle copy
+- `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCheckpointValue.Tests.ps1`, the `Checkpoint ordinal member accessor` rows
 - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateLightCycle.Tests.ps1`, new
 - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRemediationLoop.Parity.Tests.ps1`, the corpus floor
 - `extensions/drm-copilot/src/lib/validate/orchestrator-state-light-cycle.ts`, new
@@ -234,7 +237,7 @@ import {
     # preflight cannot satisfy it. An exact light cycle runs no preflight and is
     # checked by invariant 8 instead.
     $executionStatus = (Get-CheckpointObjectMember -Owner $Cycle -Name 'execution_status').Value
-    $remediationPath = (Get-CheckpointObjectMember -Owner $Cycle -Name 'remediation_path').Value
+    $remediationPath = (Get-CheckpointObjectOrdinalMember -Owner $Cycle -Name 'remediation_path').Value
     $isLightCycle = ($remediationPath -is [string]) -and ([string]$remediationPath -ceq 'light')
     if (-not $isLightCycle -and $executionStatus -is [string] -and
 
@@ -326,7 +329,7 @@ function Get-RemediationLightCycleError {
     for ($index = 0; $index -lt $cycleItems.Count; $index++) {
         $item = $cycleItems[$index]
         if (-not (Test-CheckpointObjectValue -Value $item)) { continue }
-        $member = Get-CheckpointObjectMember -Owner $item -Name $script:REMEDIATION_PATH_KEY
+        $member = Get-CheckpointObjectOrdinalMember -Owner $item -Name $script:REMEDIATION_PATH_KEY
         if (-not $member.Present) { continue }
 
         # Rule 1 routes by exact value: full has no further rule, and anything other
@@ -340,16 +343,16 @@ function Get-RemediationLightCycleError {
         }
 
         $prefix = "Checkpoint remediation cycle #$index remediation_path is light but"
-        if ((Get-CheckpointObjectMember -Owner $item -Name 'preflight').Present) {
+        if ((Get-CheckpointObjectOrdinalMember -Owner $item -Name 'preflight').Present) {
             $errors.Add("$prefix the cycle carries preflight.")
         }
 
-        $opened = Get-CheckpointObjectMember -Owner $item -Name $script:OPENED_BY_REVIEW_KEY
+        $opened = Get-CheckpointObjectOrdinalMember -Owner $item -Name $script:OPENED_BY_REVIEW_KEY
         if (-not $opened.Present -or -not (Test-RemediationOpenedByReview -OpenedByReview $opened.Value -Outcomes $Outcomes)) {
             $errors.Add("$prefix opened_by_review does not name its opening review.")
         } else {
             $outcome = @($Outcomes)[[int]$opened.Value]
-            $findings = (Get-CheckpointObjectMember -Owner $outcome -Name 'findings').Value
+            $findings = (Get-CheckpointObjectOrdinalMember -Owner $outcome -Name 'findings').Value
             $findingList = @()
             if (Test-CheckpointListValue -Value $findings) { $findingList = @($findings) }
             if ($findingList.Count -gt $script:LIGHT_FINDING_LIMIT) {
@@ -362,7 +365,7 @@ function Get-RemediationLightCycleError {
                 for ($findingIndex = 0; $findingIndex -lt $findingList.Count; $findingIndex++) {
                     $finding = $findingList[$findingIndex]
                     $value = $null
-                    if (Test-CheckpointObjectValue -Value $finding) { $value = (Get-CheckpointObjectMember -Owner $finding -Name $key).Value }
+                    if (Test-CheckpointObjectValue -Value $finding) { $value = (Get-CheckpointObjectOrdinalMember -Owner $finding -Name $key).Value }
                     if (-not (($value -is [string]) -and ([string]$value -ceq $required))) {
                         $suffix = if ($key -ceq 'remediability') { 'is not autonomous.' } else { 'scope is not contained.' }
                         $errors.Add("$prefix finding #$findingIndex $suffix")
@@ -373,7 +376,7 @@ function Get-RemediationLightCycleError {
 
         # Rule 7: two light cycles may not run back to back.
         if ($index -gt 0 -and (Test-CheckpointObjectValue -Value $cycleItems[$index - 1])) {
-            $priorPath = (Get-CheckpointObjectMember -Owner $cycleItems[$index - 1] -Name $script:REMEDIATION_PATH_KEY).Value
+            $priorPath = (Get-CheckpointObjectOrdinalMember -Owner $cycleItems[$index - 1] -Name $script:REMEDIATION_PATH_KEY).Value
             if (($priorPath -is [string]) -and ([string]$priorPath -ceq $script:LIGHT_REMEDIATION_PATH)) {
                 $errors.Add("$prefix the prior cycle is light.")
             }
@@ -813,10 +816,116 @@ Light cycles. A remediation cycle recorded with `Remediation-Mode: light` has no
 
 ````
 
+### Revert Block: .claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1
+
+````Current
+function Get-CheckpointObjectOrdinalMember {
+    <#
+    .SYNOPSIS
+        Read a member from a deserialized JSON object by ordinal name comparison.
+    .DESCRIPTION
+        Same contract as Get-CheckpointObjectMember, except that a member is present
+        only when a property name equals Name ordinally, as a Python dict or a
+        TypeScript object key lookup does. Get-CheckpointObjectMember matches names
+        without regard to case, which PowerShell property access does by default, so
+        keys introduced for the light remediation path (issue #1097, review item N1)
+        read through this function to keep the three runtimes in agreement. A
+        non-object owner reports the member as absent rather than throwing.
+    .PARAMETER Owner
+        The deserialized JSON value expected to be an object. May be $null.
+    .PARAMETER Name
+        The member name to read, compared ordinally.
+    .OUTPUTS
+        System.Collections.Hashtable with keys Present (bool) and Value (object).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Owner,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    if (-not (Test-CheckpointObjectValue -Value $Owner)) {
+        return @{ Present = $false; Value = $null }
+    }
+
+    foreach ($property in $Owner.PSObject.Properties) {
+        if ($property.Name -ceq $Name) {
+            return @{ Present = $true; Value = $property.Value }
+        }
+    }
+    return @{ Present = $false; Value = $null }
+}
+
+function Get-CheckpointOrdinalSortedName {
+
+````
+
+````Prior
+function Get-CheckpointOrdinalSortedName {
+
+````
+
+### Revert Block: .claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1
+
+````Current
+    Get-CheckpointObjectOrdinalMember, `
+    Get-CheckpointOrdinalSortedName, `
+
+````
+
+````Prior
+    Get-CheckpointOrdinalSortedName, `
+
+````
+
+### Revert Block: tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCheckpointValue.Tests.ps1
+
+````Current
+Describe 'Checkpoint ordinal member accessor' {
+    # Issue #1097 review item N1: Python and TypeScript read keys ordinally, so the
+    # light-path keys must not match a case variant in PowerShell either.
+
+    It 'reports an exactly named member as present with its value' {
+        $result = Get-CheckpointObjectOrdinalMember -Owner ('{"scope":"contained"}' | ConvertFrom-Json) -Name 'scope'
+        $result.Present | Should -BeTrue
+        $result.Value | Should -Be 'contained'
+    }
+
+    It 'reports a member whose name differs only in case as absent' {
+        $result = Get-CheckpointObjectOrdinalMember -Owner ('{"Scope":"contained"}' | ConvertFrom-Json) -Name 'scope'
+        $result.Present | Should -BeFalse
+        $result.Value | Should -BeNullOrEmpty
+    }
+
+    It 'reports a present null member as present with a null value' {
+        $result = Get-CheckpointObjectOrdinalMember -Owner ('{"remediation_path":null}' | ConvertFrom-Json) -Name 'remediation_path'
+        $result.Present | Should -BeTrue
+        $result.Value | Should -BeNullOrEmpty
+    }
+
+    It 'reports a member as absent when the owner is not an object' {
+        (Get-CheckpointObjectOrdinalMember -Owner 'scalar' -Name 'scope').Present | Should -BeFalse
+    }
+}
+
+Describe 'Ordinal key sorting' {
+
+````
+
+````Prior
+Describe 'Ordinal key sorting' {
+
+````
+
 ## Revert Steps
 
-1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, in the order of this entry. Then delete `scripts/dev_tools/_orchestrator_state_light_cycle.py`, `extensions/drm-copilot/src/lib/validate/orchestrator-state-light-cycle.ts`, the five new test files `tests/scripts/dev_tools/test_orchestrator_state_light_cycle.py`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-light-cycle.test.ts`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateLightCycle.Tests.ps1`, `tests/scripts/claude-hooks/validate-executor-output.LightRemediation.Tests.ps1`, and `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`, and the fourteen corpus rows listed under `## Files Changed`.
-2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1`, `.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1`, `.claude/skills/feature-review-workflow/SKILL.md`, `.claude/agents/feature-review.md`, `.claude/skills/orchestrate/SKILL.md`, `.claude/agents/orchestrator.md`, `.claude/agents/atomic-executor.md`, and `.claude/rules/orchestrator-state.md` under `claude-customizations/`; `.agents/skills/feature-review-workflow/SKILL.md`, `.agents/skills/feature-review/SKILL.md`, `.agents/skills/orchestrate/SKILL.md`, and `.agents/skills/orchestrator-state/SKILL.md` under `codex-and-agents-customizations/`; and `.github/skills/feature-review-workflow/SKILL.md` under `customizations/`. For the deferred wording and review item N4, also copy `.claude/skills/atomic-plan-contract/SKILL.md` and `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` under `claude-customizations/`; `.agents/skills/atomic-plan-contract/SKILL.md` and `.agents/skills/remediation-handoff-atomic-planner/SKILL.md` under `codex-and-agents-customizations/`; and `.github/skills/atomic-plan-contract/SKILL.md`, `.github/skills/remediation-handoff-atomic-planner/SKILL.md`, and `.github/agents/orchestrator.agent.md` under `customizations/`; then copy `.claude/skills/execution-environment/SKILL.md` to its five byte-identical copies: `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, and the three bundle copies under `claude-customizations/`, `codex-and-agents-customizations/`, and `customizations/`.
+1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, in the order of this entry. Then delete `scripts/dev_tools/_orchestrator_state_light_cycle.py`, `extensions/drm-copilot/src/lib/validate/orchestrator-state-light-cycle.ts`, the five new test files `tests/scripts/dev_tools/test_orchestrator_state_light_cycle.py`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-light-cycle.test.ts`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateLightCycle.Tests.ps1`, `tests/scripts/claude-hooks/validate-executor-output.LightRemediation.Tests.ps1`, and `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`, and the sixteen corpus rows listed under `## Files Changed`.
+2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1`, `.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1`, `.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1`, `.claude/skills/feature-review-workflow/SKILL.md`, `.claude/agents/feature-review.md`, `.claude/skills/orchestrate/SKILL.md`, `.claude/agents/orchestrator.md`, `.claude/agents/atomic-executor.md`, and `.claude/rules/orchestrator-state.md` under `claude-customizations/`; `.agents/skills/feature-review-workflow/SKILL.md`, `.agents/skills/feature-review/SKILL.md`, `.agents/skills/orchestrate/SKILL.md`, and `.agents/skills/orchestrator-state/SKILL.md` under `codex-and-agents-customizations/`; and `.github/skills/feature-review-workflow/SKILL.md` under `customizations/`. For the deferred wording and review item N4, also copy `.claude/skills/atomic-plan-contract/SKILL.md` and `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` under `claude-customizations/`; `.agents/skills/atomic-plan-contract/SKILL.md` and `.agents/skills/remediation-handoff-atomic-planner/SKILL.md` under `codex-and-agents-customizations/`; and `.github/skills/atomic-plan-contract/SKILL.md`, `.github/skills/remediation-handoff-atomic-planner/SKILL.md`, and `.github/agents/orchestrator.agent.md` under `customizations/`; then copy `.claude/skills/execution-environment/SKILL.md` to its five byte-identical copies: `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, and the three bundle copies under `claude-customizations/`, `codex-and-agents-customizations/`, and `customizations/`.
 3. Regenerate Codex variants: applicable, because the base agent `.codex/agents/atomic-executor.toml` changed. Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form to rewrite the variants and their bundle copies, then run it with `--check`.
 4. Restore pinned hashes: not applicable, because no pinned surface moved.
 5. Restore contract-test literals: set the corpus floor back to 41 in `tests/scripts/dev_tools/test_orchestrator_state_remediation_loop_parity.py` (`MINIMUM_CORPUS_COUNT`), `extensions/drm-copilot/test/lib/validate/orchestrator-state-remediation-loop-parity.test.ts` (`MINIMUM_CORPUS_COUNT`), and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRemediationLoop.Parity.Tests.ps1` (`$MinimumCorpusCount`). Remove the `PCW-LIGHT-WORDING`, `PCW-BRIEF-LIGHT-ROUTE`, `PCW-BRIEF-LIGHT-CONTRACT-TEST`, and `PCW-MODE-LIGHT` row groups from `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`.

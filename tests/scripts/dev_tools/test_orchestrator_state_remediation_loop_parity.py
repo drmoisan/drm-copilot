@@ -41,7 +41,7 @@ CORPUS_SUFFIX = ".json"
 
 # Floor on corpus size. An empty or partially matched glob would make every
 # parametrized case below disappear and the suite would pass vacuously.
-MINIMUM_CORPUS_COUNT = 55
+MINIMUM_CORPUS_COUNT = 57
 
 # Family filter restated from the spec: every remediation-family message
 # contains this substring.
