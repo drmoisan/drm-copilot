@@ -106,7 +106,7 @@ These were found by searching `tests/` for `Invoke-ProcessReductionChain`, `Get-
   - Scope: `scripts/dev-tools/ProcessReductionChain.psm1`, `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, and `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`. Run PoshQC format in check mode (no-op writer) and the direct analyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
   - Observation beyond the exit code: the formatter reports `Formatted: 0` for each file, `git status --porcelain` over the three files is empty afterwards, and the analyzer reports 0 findings. A needed format change is applied and committed, and the loop restarts here.
   - Acceptance: zero analyzer findings and no format change, compared with the P0-T1 static state.
-- [ ] [P2-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-r-cycle3-powershell-test.<timestamp>.md`.
+- [x] [P2-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-r-cycle3-powershell-test.<timestamp>.md`.
   - Read counts from `artifacts/pester/pester-junit.xml` (or from `artifacts/pester/parallel/shard-<i>/` when `ExitCode` is non-zero) and line coverage from `artifacts/pester/powershell-coverage.xml`, then compare with the P0-T1 artifact.
   - Output Summary: total, passed, and failed counts; the counts of the two `ProcessReductionChain` suites and the three `ProcessReductionLedger` suites; repo-wide line percentage; the per-file percentage of `ProcessReductionChain.psm1` and `ProcessReductionLedger.psm1`; and the comparison.
   - Acceptance:
