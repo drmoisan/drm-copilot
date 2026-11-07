@@ -110,7 +110,7 @@ Static stages run first, so that a suite is not re-run for a formatting change. 
   - The artifact records JSON totals, lcov totals, and the three per-root rows, whatever the outcome.
   - Acceptance: `EXIT_CODE: 0`, zero failures and errors, and JSON and lcov totals at or above 85% line and 75% branch.
   - Coverage stop: if the totals stay below either threshold, `packages/discovery-runtime/src` still measures 0%, or a test fails only under this import path, then the totals depend on something besides that import path. The step exits non-zero, the artifact lists the per-root figures, and the executor stops and returns to the orchestrator. Nothing is excluded: no `source` or `omit` change, no `# pragma`, and no further run.
-- [ ] [P2-T7] Check branch scope and evidence content and write `<FEATURE>/evidence/qa-gates/scope-check.<timestamp>.md`.
+- [x] [P2-T7] Check branch scope and evidence content and write `<FEATURE>/evidence/qa-gates/scope-check.<timestamp>.md`.
   - Scope uses `git diff --name-only` from the merge base, with `git status --porcelain` as its companion. Neither may list a path in `## Execution Rules` under **Scope**. Every `tools:` entry is unchanged in the diff of the agent files against the merge base.
   - Evidence: a case-insensitive scan of `<FEATURE>/evidence/baseline/`, `<FEATURE>/evidence/remediation-baseline/`, `<FEATURE>/evidence/regression-testing/`, and `<FEATURE>/evidence/qa-gates/`, with tokens assembled at run time so the artifact cannot match itself, finds no host path and none of `single-process`, `seeded`, `shuffled`, `reversed-order`, `comparison run`, and `focused run`.
   - Acceptance: `EXIT_CODE: 0`, from a step that exits non-zero on any match.
