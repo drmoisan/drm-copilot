@@ -12,6 +12,8 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-executor-output.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
     function Get-TranscriptReader {
         # Returns a ReadTranscriptHead seam that serves one user entry with the given prompt text.
@@ -37,6 +39,10 @@ BeforeAll {
     $script:TranscriptPath = 'transcripts/subagents/agent-1.jsonl'
     $script:UncheckedPlan = [string[]]@('### Phase 0 - Baseline', '- [ ] [P0-T1] Read policy for `docs/features/active/foo/spec.md`.')
     $script:CheckedPlan = [string[]]@('### Phase 0 - Baseline', '- [x] [P0-T1] Read policy for `docs/features/active/foo/spec.md`.', '- [ ] [P0-T2] Baseline.')
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'Test-IsPreflightRun (issue #964)' {
