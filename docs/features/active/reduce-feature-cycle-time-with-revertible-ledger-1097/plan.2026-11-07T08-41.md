@@ -81,7 +81,7 @@ Found by searching `tests/` and `extensions/drm-copilot/test/` for `no test suit
 - [x] [P0-T3] Run one `poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` from the worktree root with `PYTHONPATH` set to this worktree's `packages/discovery-runtime/src`, and write `FEATURE/evidence/baseline/stage-e2-python-test-baseline.<timestamp>.md`.
   - Output Summary: passed and failed counts, each failing test named, the counts of the two Python test files of [P0-T1], and the total line and branch percentages from the terminal table and the `BRF`/`BRH` records of `artifacts/python/lcov.info`.
   - Acceptance: the artifact holds every field and the figures.
-- [ ] [P0-T4] In `extensions/drm-copilot/`, run one `node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary` and write `FEATURE/evidence/baseline/stage-e2-typescript-test-baseline.<timestamp>.md`.
+- [x] [P0-T4] In `extensions/drm-copilot/`, run one `node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary` and write `FEATURE/evidence/baseline/stage-e2-typescript-test-baseline.<timestamp>.md`.
   - Output Summary: passed and failed counts, each failing test named, the count of `policy-audit-artifact.test.ts`, and the text-summary line and branch totals.
   - Acceptance: the artifact holds every field and the figures.
 - [ ] [P0-T5] Derive the baseline-part inventory into `FEATURE/evidence/other/stage-e2-baseline-inventory.<timestamp>.md` from a script under `SCRATCH` reading `docs/engineering/process-reductions/patches/0001-parallel-only-test-gates.patch`.
