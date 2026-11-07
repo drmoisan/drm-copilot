@@ -62,8 +62,8 @@ def test_codex_orchestrator_workflow_requires_large_path_evidence_gates() -> Non
     )
     assert (
         "Do not mark Step 8 complete until execution output includes "
-        "execution summary, QA summary, lint/type/test/coverage deltas, "
-        "and numeric baseline/post/new-code coverage metrics where policy "
+        "execution summary, QA summary, lint and type-check deltas, and "
+        "numeric per-file coverage from the single gate run where policy "
         "requires them." in skill_text
     )
     assert (

@@ -42,11 +42,20 @@ Always apply:
   - `code-review-template` for `code-review.<timestamp>.md`
   - `feature-audit-template` for `feature-audit.<timestamp>.md`
 - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
+- When an installed template older than this change carries baseline fields, each baseline field is recorded as `N/A - no pre-change run`, and the comparison line reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
 
 ### No silent fixes
 
 - Do not clean up code during review.
 - If checks fail, document the failure and include exact remediation guidance.
+
+### Process-reduction ledger
+
+- This rule applies only when `docs/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
+- A change that reduces evidence, plan tasks, gates, or review process adds its ledger entry in the same commit, in the format of that folder's `README.md`.
+- A branch diff that makes such a reduction with no entry is a Blocking finding.
+- The reviewer confirms from the branch log that each reduction is its own commit, with the `reduction: NNNN` token in its subject.
+- One-off waivers for a single item are not entries.
 
 ### Work-mode acceptance-criteria contract
 
@@ -105,13 +114,13 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      4. tests
      5. coverage (mandatory for every language that has changed files)
         - TypeScript: `npm run test:unit:coverage` → artifact: `coverage/lcov.info`
-        - Python: `poetry run pytest --cov` → artifact: `artifacts/python/lcov.info`
-        - PowerShell: `mcp__drm-copilot__run_poshqc_test` → artifact: `artifacts/pester/powershell-coverage.xml`
+        - Python: `poetry run pytest -n auto --cov-report=term-missing --cov` → artifact: `artifacts/python/lcov.info`
+        - PowerShell: one `Invoke-PoshQCParallelTest` run → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
-        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured); modified files must also show no regression on changed lines. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
+        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
         - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
-   - Run the smallest relevant subset first when the repo policy permits it.
+   - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
 
 6. **Produce the code review**
@@ -142,10 +151,14 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files including any regression on changed lines, or new files)
+     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files, or new files)
      - coverage artifact absent for any language that has changed files
    - Classify each blocking finding before triggering remediation: every blocking finding receives one `Remediability` class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated).
    - Trigger remediation only for `autonomous` findings. When no blocking finding is `autonomous`, write the remediation inputs, report `HALT_NON_REMEDIABLE` (at least one `external_dependency`, `policy_hold`, or `human_decision_required` finding) or `AWAITING_CI` (every finding `awaiting_ci`) with `REMEDIATION_PLAN: NONE`, create no remediation plan target, and do not hand off to `atomic-planner`.
+   - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
+   - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
+   - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.
+   - The remediation plan target stays for both paths, because this review contract requires it.
    - Create `remediation-inputs.<timestamp>.md` first.
    - Create the target remediation plan file from the canonical plan template.
    - Hand off plan creation through `remediation-handoff-atomic-planner`.

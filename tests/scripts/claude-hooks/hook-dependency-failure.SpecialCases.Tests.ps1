@@ -11,7 +11,8 @@
     check of the module that imports it at run time (FR-7.3). C5 and C6 cover the D2 mermaid
     exemption, C7 the validate-bash token (D4), and C8 a SubagentStop validator that sets
     $ErrorActionPreference = 'Stop' when both the helper and a dependency fail (FR-3.3). C9 proves
-    the merge gate denies when its green-CI sibling fails to load (issue #997). Hooks run
+    the merge gate denies when its green-CI sibling fails to load (issue #997), and C10 does the
+    same for its review guard sibling (issue #1097). Hooks run
     through the & route or are dot-sourced inside the It; no test creates, renames, moves, or
     deletes a file.
 #>
@@ -259,5 +260,20 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         $reason = Get-DenyReason -Result $result
         $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         $reason.Contains('enforce-epic-merge-gate-green-ci.ps1') | Should -BeTrue -Because $reason
+    }
+
+    It 'C10: denies through the merge gate when enforce-epic-merge-gate-review.ps1 fails to load' {
+        Mock Import-Module { }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-review.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-review.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
+        try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
+        finally { Initialize-HookDependencyState }
+        $reason = Get-DenyReason -Result $result
+        $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
+        $reason.Contains('enforce-epic-merge-gate-review.ps1') | Should -BeTrue -Because $reason
     }
 }

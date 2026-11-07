@@ -1,0 +1,10 @@
+{
+  "name": "no-remediation-loop",
+  "notes": "The key without a remediation loop has no last entry.",
+  "checkpoint": {
+    "review_mode": "concurrent"
+  },
+  "expected_errors": [
+    "Checkpoint completion validation failed: review_mode concurrent requires a last review_outcomes entry with verdict PASS."
+  ]
+}

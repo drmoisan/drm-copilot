@@ -30,7 +30,7 @@ All filenames must include a timestamp in ISO-8601 format `yyyy-MM-ddTHH-mm` (e.
 1. `policy-audit.<timestamp>.md`
    - A completed Policy Audit document based on the repo's policy-audit template and the policy_audit template guidance.
    - Must include PASS/PARTIAL/FAIL (or equivalent) statuses with concrete evidence (commands run, outputs, file references).
-   - For languages in scope with mandatory coverage policy, MUST include numeric baseline/post/new-code coverage values and command evidence; `UNVERIFIED` is not allowed for a PASS verdict.
+   - For languages in scope with mandatory coverage policy, MUST include numeric per-file coverage values from the single gate run and command evidence; `UNVERIFIED` is not allowed for a PASS verdict.
 
 2. `code-review.<timestamp>.md`
    - A feature-level code review relative to the base branch, emphasizing strongly typed Python best practices and repo compliance.

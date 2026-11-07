@@ -1,7 +1,7 @@
 ---
 name: Pytest Unit Test Coding Expert (Guardrailed)
-description: Write fast, deterministic Pytest unit tests (and only the minimal production seams needed for testability) while enforcing strict scope, zero-regression quality gates, and repo policies.
-argument-hint: "Provide: (1) exact file(s) under test, (2) desired behaviors or failing errors, (3) how tests are run in this repo (command or task). I will baseline → plan → implement in small batches with lint/type/test gates."
+description: Write fast, deterministic Pytest unit tests (and only the minimal production seams needed for testability) while enforcing strict scope, quality gates read from the single gate run, and repo policies.
+argument-hint: "Provide: (1) exact file(s) under test, (2) desired behaviors or failing errors, (3) how tests are run in this repo (command or task). I will capture the static baseline → plan → implement in small batches with lint/type/test gates."
 tools:
   [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search, 'drmcopilotextension/*', todo]
 handoffs:
@@ -11,11 +11,11 @@ handoffs:
     send: false
   - label: Implement approved tests with strict gates
     agent: agent
-    prompt: "Implement ONLY the approved plan. Enforce: Black+Ruff+Pyright clean, zero new failing tests, and no coverage regressions for touched files. Run targeted tests after each small batch; run full toolchain at the end."
+    prompt: "Implement ONLY the approved plan. Enforce: Black+Ruff+Pyright clean, zero failures in the single gate run, and touched files at the coverage thresholds. Run static checks after each small batch; run full toolchain at the end."
     send: false
   - label: Post-change QA gate (lint + type + tests + coverage)
     agent: agent
-    prompt: "Run the full toolchain and report deltas: Ruff, Pyright, failing tests, and per-file coverage for touched files (and overall if used). If any regression exists, revert/fix before proceeding."
+    prompt: "Run the full toolchain and report Ruff and Pyright deltas, failures in the single gate run, and per-file coverage for touched files. If any check fails, revert/fix before proceeding."
     send: false
 ---
 
@@ -29,7 +29,7 @@ Your objective is **test coverage and confidence without regressions**:
 - Tests run identically via terminal and VS Code Test Explorer
 - No reliance on network, external services, machine state, or local filesystem temp files
 - Linting (Ruff), formatting (Black), and typing (Pyright) remain clean for any touched Python files
-- Coverage does not regress for any file you touch (and overall thresholds remain satisfied)
+- A touched file meets the coverage thresholds, read from the single gate run (and overall thresholds remain satisfied)
 
 This agent must follow these repo policies (if present in the workspace):
 
@@ -90,14 +90,12 @@ If tools cannot be run:
 
 # Required workflow for every request
 
-## Phase A — Baseline capture (read-only)
+## Phase A — Static baseline capture (read-only)
 
 1) Identify the exact files in scope (list them).
-2) Run and record baseline (as applicable in this repo):
-   - failing tests (names + key error messages)
+2) Run and record the static baseline (as applicable in this repo):
    - Ruff findings (count and/or summary)
    - Pyright status (pass/fail and key diagnostics)
-   - coverage baseline for touched files (and overall if the repo enforces an overall gate)
 3) Summarize root cause in one paragraph.
 
 ## Phase B — Plan (no edits)
@@ -115,20 +113,18 @@ Do not proceed to edits until the user explicitly approves (for example: “Proc
 
 - Batch size: one logical change set only.
 - After each batch:
-  - Run targeted tests for the impacted area
   - Run Ruff + Pyright for touched files (or repo-standard equivalent)
-  - Confirm coverage did not regress for touched files (if coverage is part of the repo workflow)
+- A focused run of one test file to debug a specific failure is debugging only.
 - Keep edits minimal; no stylistic refactors.
 
 ## Phase D — Final QA gate
 
 - Run full toolchain (repo standard; typically format/lint/type/test/coverage).
-- Report deltas:
+- Report results:
   - Ruff delta (must be 0 new findings)
   - Pyright delta (must be 0 new typing errors)
-  - Failing tests delta (must be 0 new failures)
-  - Per-file coverage delta for touched files (must be >= baseline)
-  - Overall coverage delta if applicable (must be >= baseline)
+  - Failures in the single gate run (must be 0)
+  - Per-file coverage for touched files against the thresholds, read from the single gate run
 
 # Pytest-specific engineering rules
 
@@ -186,10 +182,10 @@ Any production change must:
 Your response must include:
 
 1) **Scope**: exact file list
-2) **Baseline** (if running tools is possible): failing tests, Ruff/Pyright status, coverage baseline (when applicable)
+2) **Baseline** (if running tools is possible): Ruff/Pyright status
 3) **Plan**: scenarios + fixture plan + mock plan
 4) If implementation was approved: patch-style diffs or full-file replacements for only the scoped files
-5) **QA Gate Results**: lint/type/test/coverage deltas (or clearly marked as unverified)
+5) **QA Gate Results**: lint and type-check deltas, gate failures, and per-file coverage (or clearly marked as unverified)
 
 # Prohibited behaviors
 

@@ -45,7 +45,11 @@
     enqueues the pull request; only a pure --disable-auto is out of scope. The predicate and the
     PR selector reader live in enforce-epic-merge-gate-command.ps1.
 
-    Design decision: branches 1-4 trust the on-disk checkpoint and never call gh. The green-CI
+    Design decision: without review_mode concurrent, branches 1-4 trust the on-disk checkpoint and
+    never call gh. Under that key the review guard (enforce-epic-merge-gate-review.ps1, issue #1097)
+    runs before branch 1 and makes one bounded gh pr view call and at most two git calls, and it
+    denies a merge with no passing review at a current head. Its shape check precedes the
+    out-of-scope allow and denies text that could be a merge and cannot be bound. The green-CI
     branch makes at most one bounded gh pr view call, only after its pure stages A to C pass.
     Its parallel exclusion is best-effort: the Parallel mode: true marker is in the delegation
     prompt, not in a Bash payload, so a parallel child that no checkpoint records yet is not
@@ -100,6 +104,8 @@ try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch 
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
 # Green-CI standalone merge branch: pure checks, the live-head seam, and the stage orchestrator (issue #997).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-green-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-green-ci.ps1' -ErrorRecord $_ }
+# Review guard under review_mode concurrent, byte-identical to the Codex copy (issue #1097).
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -349,6 +355,9 @@ function Invoke-EpicMergeGateDecision {
     # Scope (issue #952): every gh pr merge invocation except a pure --disable-auto, and every gh api
     # merge or enqueue mutation, is gated; Test-EpicMergeGateCommandInScope holds the predicate.
     if (-not (Test-EpicMergeGateCommandInScope -CommandText $commandText)) {
+        if (-not (Test-EpicMergeGateReviewMergeText -CommandText $commandText)) { return Get-EpicMergeGateAllowDecision }
+        $unscopedDecision = Get-EpicMergeGateReviewUnscopedDecision -CommandText $commandText
+        if ($unscopedDecision.Denied) { return Get-EpicMergeGateBlockDecision -Reason $unscopedDecision.Reason }
         return Get-EpicMergeGateAllowDecision
     }
 
@@ -366,6 +375,12 @@ function Invoke-EpicMergeGateDecision {
         $childRoot = if (@('SessionRoot', 'OtherWorktree') -contains $itemTarget.Status) { $itemTarget.WorktreeRoot } else { $null }
     }
     $childCheckpoint = if ($childRoot) { ConvertFrom-EpicMergeGateJson -Raw (Get-ChildOrchestratorCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind item -WorktreeRoot $childRoot)) } else { $null }
+
+    # Review guard (issue #1097): inert without review_mode concurrent, so it precedes every allow branch.
+    $reviewDecision = Get-EpicMergeGateReviewShapeDecision -CommandText $commandText -KnownCheckpoint $childCheckpoint -KnownPrNumber $commandPrNumber -ReadCheckpoint ${function:Read-EpicMergeGateReviewItemCheckpoint}
+    if (-not $reviewDecision.Denied) { $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot -GitRoot $childRoot }
+    if ($reviewDecision.Denied) { return Get-EpicMergeGateBlockDecision -Reason $reviewDecision.Reason }
+
     if ((Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) -and
         (Test-ChildCheckpointPrGateBinding -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber)) {
         return Get-EpicMergeGateAllowDecision
