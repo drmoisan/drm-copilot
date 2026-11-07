@@ -72,7 +72,7 @@ No test suite runs in this phase.
   - `5.1-Beast-adjusted`: workflow step 8, `Run tests after each change`, becomes static checks after each change and the single gate run when the change is complete, with the debugging statement.
   - `gpt-5-beast-mode`: in `## Workflow (concise)`, `Implement` runs **problems** only after each edit, and `Verify` runs the single gate run and re-runs it only after a fix.
   - Acceptance: each file holds `single gate run`, none holds `maintained or improved`, `running tests frequently`, `Run tests after each`, or `relevant tests using`, and each equals its bundle copy.
-- [ ] [P1-T5] Add the RF-1 and RF-2 sweep tokens to `$script:SweepToken` in `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, and update `PGW-SWEEP-HELPER`.
+- [x] [P1-T5] Add the RF-1 and RF-2 sweep tokens to `$script:SweepToken` in `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, and update `PGW-SWEEP-HELPER`.
   - The 12 new tokens are `does not regress`, `compared to baseline`, `no decrease in coverage`, `maintained or improved`, `targeted Pester`, `targeted Pytest`, `targeted xUnit`, `targeted MSTest`, `targeted tests`, `run tests after each`, `relevant tests using`, and `running tests frequently`.
   - None matches the debugging statement, `Targeted runs` in the QA-gate skills, `targeted verification evidence`, or a retained policy-audit anchor. At planning time, a search of every sweep root found them only in files P1-T1 to P1-T4 edit and their generated variants.
   - `PGW-SWEEP-HELPER` asserts a count of 33, and its `-Because` text names 33 tokens. `$script:SweepExclusion` is unchanged.

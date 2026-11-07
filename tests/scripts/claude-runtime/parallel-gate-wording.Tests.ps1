@@ -142,7 +142,10 @@ Describe 'Parallel gate wording' {
                 'captured baseline', 'Phase A baseline', 'coverage baseline', '>= baseline', 'baseline/post',
                 'regression on changed lines', 'regressed from baseline', 'test deltas', 'coverage deltas',
                 'failing tests delta', 'failing-test delta', 'failing-tests delta', 'Pester delta', 'Pytest delta',
-                'xUnit delta', 'Delta Requirements'
+                'xUnit delta', 'Delta Requirements', 'does not regress', 'compared to baseline',
+                'no decrease in coverage', 'maintained or improved', 'targeted Pester', 'targeted Pytest',
+                'targeted xUnit', 'targeted MSTest', 'targeted tests', 'run tests after each',
+                'relevant tests using', 'running tests frequently'
             )
 
             $resources = 'extensions/drm-copilot/resources'
@@ -240,7 +243,7 @@ Describe 'Parallel gate wording' {
                 })
 
             # Assert
-            $tokens.Count | Should -Be 21 -Because 'the plan names 21 sweep tokens'
+            $tokens.Count | Should -Be 33 -Because 'the plan names 33 sweep tokens'
             $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
         }
     }
