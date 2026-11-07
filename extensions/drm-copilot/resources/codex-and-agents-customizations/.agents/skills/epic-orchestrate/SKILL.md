@@ -70,11 +70,11 @@ fetch the current remote integration tip. Create every child worktree from that 
 
 Before each wave launches, run `git fetch origin main` and then
 `git rev-list --count <integration>..origin/main`. A zero count proceeds directly to the wave.
-A non-zero count runs the main-sync as a dedicated chore child item (the `epic-852-main-sync` /
-PR #882 pattern) whose branch starts from the integration tip, merges `origin/main` with a merge
-commit, and opens a PR into the integration branch; that PR must merge before the wave launches.
-Record the sync child's `features[]` row before its launch, and do not reuse a manifest child's
-issue number for it. Run at most one main-sync child per wave, then re-fetch the integration tip.
+A non-zero count means `origin/main` has commits the integration branch lacks. Before the wave
+launches, `epic-orchestrator` merges `origin/main` into the integration branch
+(`git merge --no-ff origin/main`, resolving any conflicts; no rebase, no force-push), pushes the
+integration branch, re-fetches the integration tip, and launches the wave. Commits that reach
+`origin/main` afterwards are picked up by the next wave's check or by the final integration PR.
 
 Launch all ready children in one bounded parallel wave. Before each launch, persist the
 epic-child topology receipt, reviewed complexity assessment, delegation receipt, and Codex
