@@ -281,7 +281,7 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
   - Acceptance: zero failures, with the passed count recorded.
 - [x] [P4-T7] Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` and write `FEATURE/evidence/qa-gates/codex-generator-check.<timestamp>.md`.
   - Acceptance: exit code 0.
-- [ ] [P4-T8] Run the Jest test of P0-T8 of `FEATURE/plan.2026-10-30T18-40.md` in `extensions/drm-copilot/` and write `FEATURE/evidence/qa-gates/jest-manifest.<timestamp>.md`.
+- [x] [P4-T8] Run the Jest test of P0-T8 of `FEATURE/plan.2026-10-30T18-40.md` in `extensions/drm-copilot/` and write `FEATURE/evidence/qa-gates/jest-manifest.<timestamp>.md`.
   - Acceptance: zero failures, with the passed count recorded.
 - [ ] [P4-T9] Write `FEATURE/evidence/qa-gates/scope-check.<timestamp>.md` from `git diff --name-only MERGE_BASE HEAD` and `git diff --name-only MERGE_COMMIT HEAD`, together with `git status --porcelain`, re-deriving `MERGE_BASE` first.
   - Acceptance: the paths changed since `MERGE_COMMIT` outside `FEATURE/` are a subset of `HOOK`, `HOOK_BUNDLE`, `HELPER`, `HELPER_BUNDLE`, `COMPOUND_SUITE` and `HELPER_SUITE`; over the whole branch from `MERGE_BASE`, no path ends in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`, no path is under `.github/workflows/` or `.codex/hooks/`, and every path outside `FEATURE/` appears in `## Artifact Classification` of `FEATURE/plan.2026-10-30T18-40.md`; `git status --porcelain` is empty.
