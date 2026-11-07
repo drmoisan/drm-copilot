@@ -4,14 +4,22 @@
 
 .DESCRIPTION
     Dot-sourced by enforce-epic-merge-gate.ps1 in both runtimes; this file is byte-identical in the
-    Claude and Codex hook folders. Each gate calls Get-EpicMergeGateReviewDecision with the
-    per-feature checkpoint it read, before any allow branch, so a checkpoint that carries the key
-    cannot reach an allow branch without a passing review at a current head.
+    Claude and Codex hook folders. Each gate calls Get-EpicMergeGateReviewShapeDecision and then
+    Get-EpicMergeGateReviewDecision with the per-feature checkpoint it read, before any allow
+    branch. Under the key, a command the gates read reaches no allow branch without a passing review
+    at a current head, and text that could be a merge and cannot be bound is denied.
 
     The key is the top-level checkpoint key review_mode. Only the exact string concurrent activates
     the guard, compared ordinally; an absent key, null, sequential, a case variant, a number, and
     every other non-string value mean sequential, and the guard then starts no process and denies
     nothing. Test-EpicMergeGateReviewModeConcurrent holds that predicate.
+
+    Shape step, before the out-of-scope allow and the order below: text that could be a merge
+    (Test-EpicMergeGateReviewMergeText) and is not one plain gh pr merge of one number
+    (Get-EpicMergeGateReviewBoundPrNumber) is denied with REVIEW_GATE_HEAD_UNRESOLVED, before any
+    process, when a checkpoint the gate can read carries the key. Without the key the decision is
+    unchanged. On Claude an unbound command also reads the session and the item of each number in
+    its text; that read is best-effort, so a failure sees no key and never denies.
 
     Evaluation order; the first match ends it:
       1. The checkpoint is absent or the key is not exactly concurrent: inert, no process.
@@ -45,12 +53,23 @@
     push after the lookup can change the head unless the command passes --match-head-commit. The
     CI full run requirement of the join is skill-level, because a docs-only head passes CI Required
     Gate. The authorization path reads no CI result, so the required CI Required Gate context is the
-    control there.
+    control there. A text scan cannot read a script file, encoded or run-time composed text, a gh
+    alias or shell function from an earlier call, or an endpoint held in a variable. The PowerShell
+    tool, mcp__* tools, and the Codex shell_command tool are not gated, because the gates are
+    registered for Bash only. A queued auto-merge fires with no command. A direct push to the base
+    is not a pull-request merge. A number-less merge text sees only the session checkpoint. Under
+    the key the rule is fail-closed, so prose naming pr merge is denied in any command.
 
 .NOTES
     Compatible with PowerShell 7+. This file dot-sources nothing and imports no module. It calls, at
-    run time only, Invoke-DocsOnlyGhExe and Invoke-DocsOnlyGitExe (hook-docs-only-diff.ps1), which
-    the gate loads before it calls this file's functions and which bound each call and never throw.
+    run time only, Invoke-DocsOnlyGhExe, Invoke-DocsOnlyGitExe, and ConvertFrom-DocsOnlyNameList
+    (hook-docs-only-diff.ps1), which the gate loads before it calls this file's functions and of
+    which the two process wrappers bound each call and never throw. It also calls
+    Read-CommandLineInvocationSegment, ConvertTo-CommandLineNormalizedText, Get-CommandLineGlobalOption,
+    Get-CommandLineStructuralWalk, and Test-CommandLineTokenLiteral (hook-command-invocation.ps1 and
+    its siblings), and Test-EpicMergeGateApiMutationText and Get-EpicMergeGateSelectorPrNumber
+    (enforce-epic-merge-gate-command.ps1). Read-EpicMergeGateReviewItemCheckpoint and
+    Get-EpicMergeGateReviewUnscopedDecision are Claude-only: the Codex gate passes no reader.
     The Claude gate runs gh in the session worktree and git in the item worktree; the Codex gate
     runs both in the repository root.
 #>

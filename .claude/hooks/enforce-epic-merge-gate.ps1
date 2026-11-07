@@ -48,7 +48,8 @@
     Design decision: without review_mode concurrent, branches 1-4 trust the on-disk checkpoint and
     never call gh. Under that key the review guard (enforce-epic-merge-gate-review.ps1, issue #1097)
     runs before branch 1 and makes one bounded gh pr view call and at most two git calls, and it
-    denies a merge with no passing review at a current head. The green-CI
+    denies a merge with no passing review at a current head. Its shape check precedes the
+    out-of-scope allow and denies text that could be a merge and cannot be bound. The green-CI
     branch makes at most one bounded gh pr view call, only after its pure stages A to C pass.
     Its parallel exclusion is best-effort: the Parallel mode: true marker is in the delegation
     prompt, not in a Bash payload, so a parallel child that no checkpoint records yet is not

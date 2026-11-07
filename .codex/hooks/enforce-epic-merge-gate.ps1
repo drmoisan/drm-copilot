@@ -23,7 +23,8 @@
 
     Review guard (issue #1097): under review_mode concurrent, enforce-epic-merge-gate-review.ps1
     runs before every allow branch, with gh and git in the repository root, and denies a merge with
-    no passing review at a current head. Without the key it is inert and starts no process.
+    no passing review at a current head. Its shape check precedes the out-of-scope allow and denies
+    text that could be a merge and cannot be bound. Without the key it is inert and starts no process.
 #>
 [CmdletBinding()]
 param()

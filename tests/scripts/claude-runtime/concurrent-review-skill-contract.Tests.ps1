@@ -159,6 +159,11 @@ Describe 'parallel skill, rule, and agent concurrent review text (issue #1097)' 
         Assert-ConcurrentReviewToken -Text $section -Token '`review_mode`', '`head_sha`', 'Only the final `review_outcomes[]` element counts', 'requires a last review_outcomes entry with verdict PASS.', 'requires head_sha on the last review_outcomes entry.', 'REVIEW_GATE_NOT_PASSED', 'REVIEW_GATE_HEAD_STALE', 'REVIEW_GATE_HEAD_UNRESOLVED', 'D10', 'D9', 'policy-level', 'a checkpoint without the key validates exactly as before'
     }
 
+    It 'CRS-RULE-DISCLOSES-UNREAD-MERGE-FORMS (<Copy>)' -ForEach $script:RuleCopy {
+        $section = Get-ConcurrentReviewSection -Copy $Copy -Heading '## Concurrent-Review Scope and Backward Compatibility'
+        Assert-ConcurrentReviewToken -Text $section -Token 'a script file performing the merge cannot be read', 'the Claude PowerShell tool', '`shell_command`', 'An already-queued auto-merge fires with no command', '`gh pr merge <PR> --disable-auto`', 'prose containing `pr merge` is denied in any command', 'a failed read sees no key'
+    }
+
     It 'CRS-AGENT-DOCUMENTS-HEAD-SHA (<Copy>)' -ForEach $script:AgentCopy {
         $section = Get-ConcurrentReviewSection -Copy $Copy -Heading '### Remediation Loop Checkpoint Shape'
         Assert-ConcurrentReviewToken -Text $section -Token '`review_mode: "concurrent"`', '`head_sha`', '`## Concurrent Review and CI (review_mode)`'
