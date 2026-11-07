@@ -17,7 +17,7 @@ Output Summary: no FAIL row and no open Minor. Every B-row is restored on every 
 | B7 review surfaces (12 files) | PASS | `Phase 0 baseline` in 12 of 12, including `feature-review.toml` and its bundle; `debugging only` kept; PGW-REVIEW rows passed |
 | B8 QA gates (6 sources, 6 bundles, 2 `csharp-legacy` variants) | PASS | `Delta Requirements (Zero-Regression Hard Gate)` restored with the single gate run; `Targeted runs are allowed` absent; PGW-QA rows passed |
 | B9 planner, executor, engineers, handoff, orchestrator-workflow, Codex bases and variants | PASS | `Phase 0 baseline` in 20 of 20 sources and variants checked; generator `--check` exit 0; the 20 generated variants carry the text; `test_codex_orchestrator_workflow_requires_large_path_evidence_gates` passed |
-| B10 Copilot family and Codex counterparts | PASS | 22 Copilot files edited, each with its bundle, and 15 Codex counterparts; 21 of the 22 carry `Phase 0 baseline`; `epic-review.agent.md` restores only the `coverage delta` alternative proof and names no baseline run; `test_copilot_bundle_copies_match_canonical` passed |
+| B10 Copilot family and Codex counterparts | PASS | 22 Copilot files edited, each with its bundle, and 11 hand-edited Codex counterparts with their bundles; 21 of the 22 carry `Phase 0 baseline`; `epic-review.agent.md` restores only the `coverage delta` alternative proof and names no baseline run; `test_copilot_bundle_copies_match_canonical` passed |
 | B11 plan templates and bundles | PASS | `Phase 0 baseline` in 6 of 6; the bug template's two run-shape tasks unchanged |
 
 ## Parallel-Only Rule Rows
