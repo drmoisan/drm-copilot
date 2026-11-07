@@ -252,7 +252,7 @@ A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy with an enabled pro
 - [x] [P3-T4] Rewrite the `Residual limits` paragraph of `.claude/hooks/enforce-docs-complete-gate.ps1`, correct its `.SYNOPSIS` and `.DESCRIPTION` opening as `## Design: Limit Statement` states, and copy the file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
   - Only comment-based help changes in this file.
   - Acceptance: the file parses; `@(Get-Content -LiteralPath .claude/hooks/enforce-docs-complete-gate.ps1).Count` is at most 500; the SHA-256 of the two copies is equal.
-- [ ] [P3-T5] Update the sentences of `FEATURE/spec.md` that `## Design: Limit Statement` lists, each edit keeping its physical line count, and carry the limit statement in the residual-limits bullet of `### Hook`.
+- [x] [P3-T5] Update the sentences of `FEATURE/spec.md` that `## Design: Limit Statement` lists, each edit keeping its physical line count, and carry the limit statement in the residual-limits bullet of `### Hook`.
   - `SPEC_BEFORE` is the output of `git rev-parse HEAD` captured when this task starts.
   - Acceptance: the file's physical line count equals its count at `SPEC_BEFORE`, `## Acceptance Criteria` keeps its position, and `git diff SPEC_BEFORE -- FEATURE/spec.md` together with `git status --porcelain -- FEATURE/spec.md` shows no change to any line of that section.
 - [ ] [P3-T6] Run `## Comparison Set` against the corrected hook under `SCRATCH/compare/` and write `FEATURE/evidence/regression-testing/bash-comparison.<timestamp>.md`.

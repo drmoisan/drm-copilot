@@ -39,8 +39,8 @@ This child delivers four enforcement surfaces, all pushed down as PowerShell or 
    `DocsSurfaceDeltaCommands.psm1`, one dispatch row) that reports surface elements added or changed
    since a base revision that have no matching ledger change.
 3. An opt-in PreToolUse hook `.claude/hooks/enforce-docs-complete-gate.ps1` (with pure predicates in
-   `DocsCompleteGate.psm1`) that, when the consumer profile enables it, denies the epic
-   integration-to-`main` merge unless a passing persisted receipt pins the pull request head revision.
+   `DocsCompleteGate.psm1`) that, when the consumer profile enables it, denies a `gh` merge it reads of
+   the epic integration branch into `main` unless a passing persisted receipt pins the pull request head revision.
 4. A `## Documentation Surface Check` in the procedure-bearing `feature-review` surfaces that turns a
    surface change without a ledger change into a Blocking review finding.
 
@@ -82,9 +82,9 @@ In scope:
 - With no consumer profile, or a profile whose `completion_gates.integration_pr_gate.enabled` is
   `false` (the starter value written by `init`), the hook allows every Bash call and performs no `gh`
   call.
-- With the gate enabled, the hook allows every Bash call that is not a `gh` merge or enqueue command,
-  and every merge whose pull request is not the epic integration-to-`main` merge. For the
-  integration-to-`main` merge it allows only when the persisted receipt at
+- With the gate enabled, the hook allows a Bash call whose text it does not read as a `gh` merge or enqueue
+  command, and a merge it resolves to a pull request that is not the epic integration-to-`main` merge. For
+  an integration-to-`main` merge it reads, it allows when the persisted receipt at
   `artifact_paths.validation_receipt` has `mode` `docs-complete`, `validation_result` `pass`, and
   `revision` equal (ordinal) to the pull request `headRefOid`; otherwise it denies with
   `DOCS_COMPLETE_GATE_BLOCKED: <REASON_CODE> ...` naming the reason.
@@ -262,9 +262,9 @@ warning stream at module scope.
   The prefix is added to `$script:ReasonPrefix` in `hook-dependency-failure.Claude.Tests.ps1`.
 - Head revision: the pull request `headRefOid`, never local `git rev-parse HEAD`, because the session
   worktree may hold a different commit than the pull request head.
-- Residual limits, recorded in the hook header: the profile and receipt are read from the local working tree; an ambient `GH_REPO` or `GH_HOST`, and any directory or environment change made by an earlier Bash call, are not visible (`cd`, `builtin cd`, `env --chdir`, `GIT_DIR=`, `read GH_REPO`, bare `export GH_REPO`), and the same forms inside the merge command are not plain and deny; a `gh` alias is not visible; a mutation supplied from a file and a merge endpoint whose number is a variable are not admitted;
-  a form obfuscated with a quoted command word outside the leading position, a variable holding a command word, `eval` over assembled text, or a script file is not a candidate; an unquoted mention denies while the gate is enabled (`echo gh pr merge 12` and `gh pr view 12 && git merge main` deny `PR_UNRESOLVED`), a false deny that is accepted and that does not occur with the gate disabled or the profile absent; with the gate enabled, a merge in any form other than one plain `gh pr merge` denies `PR_UNRESOLVED` whichever pull request it names, including a `gh api` merge and a compound command on a non-integration pull request;
-  a `GET` on the merge endpoint is treated as a merge; any `=value` spelling of `--disable-auto`, including `--disable-auto=true`, is treated as a merge; a push after the lookup is not observed unless `--match-head-commit` is passed; a direct `git push` to `main` is outside `gh` scope.
+- Residual limits, recorded in the hook header. This hook reads command text and is not a shell parser. It is a policy-level control, not a security boundary and not a cryptographic one. What it establishes, and nothing beyond this: it looks up the selector of a command it reads as one plain `gh pr merge`, and with the gate enabled it denies `PR_UNRESOLVED` for these groups whichever pull request they name: the words `gh pr merge` or a `gh api` merge endpoint or mutation in the unquoted text, including a compound command, a wrapper payload the shared predicate reads, a word split by a backslash or a backslash-newline, and a comment joined to a later command by a backslash-newline; and quoted or heredoc text holding those words beside an unquoted evaluator word (`sh`, `bash`, `zsh`, `dash`, `ksh`, `pwsh`, `powershell`, `eval`, `source`).
+  Outside what it can observe: any other way of causing a merge is not visible to it, and such a command allows. Known forms: other interpreters such as `python -c` and `node -e`; `curl` to the API; scripts on disk; computed command words (`$a$b pr merge 12`, `$(echo 'gh pr merge 12')`); a quoted command word outside the leading position; evaluators outside the named words (`trap`, `fish`, `.`); a `gh` alias; a mutation supplied from a file; a merge endpoint whose number is a variable; a direct `git push` to `main`; and forms not modelled. This list is not complete: the class is every form the text tests do not recognize, and a form missing from this list is not thereby denied.
+  Ambient state: the profile and receipt are read from the local working tree. An ambient `GH_REPO` or `GH_HOST`, and any directory or environment change made by an earlier Bash call, are not visible (`cd`, `builtin cd`, `env --chdir`, `GIT_DIR=`, `read GH_REPO`, bare `export GH_REPO`); the same forms inside the merge command are not plain and deny. A push after the lookup is not observed unless `--match-head-commit` is passed. Accepted false denies, which do not occur with the gate disabled or the profile absent: an unquoted mention (`echo gh pr merge 12`, `gh pr view 12 && git merge main`); a quoted mention beside an evaluator word, including a path ending in `.sh`; a compound or `gh api` merge of a non-integration pull request; a comment or a split word together with a backslash-newline in an otherwise plain merge; a `GET` on the merge endpoint; any `=value` spelling of `--disable-auto`.
 - Dependency failure: if a guarded import fails, the hook returns the standard dependency-failure deny
   decision required of every registered Claude hook. This applies to a broken installation, not to the
   disabled-gate default, because the hook and its library ship together in the core pack.
