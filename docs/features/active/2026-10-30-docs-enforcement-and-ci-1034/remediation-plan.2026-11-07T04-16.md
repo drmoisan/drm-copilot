@@ -279,7 +279,7 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
   - Acceptance: every pair is equal, and `git diff MERGE_BASE HEAD -- .claude/hooks/hook-command-scanner.ps1 .claude/hooks/hook-command-invocation.ps1 .claude/hooks/hook-command-payload.ps1 .claude/hooks/enforce-epic-merge-gate-command.ps1` is empty.
 - [x] [P4-T6] Run one Pytest with `--strict-markers --strict-config -n auto` over the module set of P0-T6 of `FEATURE/plan.2026-10-30T18-40.md` under `tests/scripts/dev_tools/`, and write `FEATURE/evidence/qa-gates/python-contracts.<timestamp>.md`.
   - Acceptance: zero failures, with the passed count recorded.
-- [ ] [P4-T7] Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` and write `FEATURE/evidence/qa-gates/codex-generator-check.<timestamp>.md`.
+- [x] [P4-T7] Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` and write `FEATURE/evidence/qa-gates/codex-generator-check.<timestamp>.md`.
   - Acceptance: exit code 0.
 - [ ] [P4-T8] Run the Jest test of P0-T8 of `FEATURE/plan.2026-10-30T18-40.md` in `extensions/drm-copilot/` and write `FEATURE/evidence/qa-gates/jest-manifest.<timestamp>.md`.
   - Acceptance: zero failures, with the passed count recorded.
