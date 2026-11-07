@@ -5,7 +5,7 @@
 .DESCRIPTION
     The orchestrator main session commits one evidence file per issue, named
     stage-timing.<timestamp>.json, that holds a JSON object with 'issue-num' (a string of
-    decimal digits) and 'stage_timing' (a list of entries with 'stage', 'attempt',
+    decimal digits, or an integer of 1 or more that is read as the same issue) and 'stage_timing' (a list of entries with 'stage', 'attempt',
     'started_at', and 'ended_at'; 'ended_at' is null while a stage is open). This module reads
     those files, computes per-issue stage totals and per-stage medians, and renders them as text.
 
@@ -117,8 +117,12 @@ function ConvertFrom-StageTimingText {
 
     $issueProperty = $root.PSObject.Properties['issue-num']
     $issue = if ($null -ne $issueProperty) { $issueProperty.Value } else { $null }
+    if (($issue -is [long] -or $issue -is [int]) -and $issue -ge 1) {
+        $issue = ([long]$issue).ToString([System.Globalization.CultureInfo]::InvariantCulture)
+    }
+
     if ($issue -isnot [string] -or [string]::IsNullOrWhiteSpace($issue)) {
-        return [pscustomobject]@{ Ok = $false; Reason = 'issue-num is missing or blank'; Issue = ''; Entries = @() }
+        return [pscustomobject]@{ Ok = $false; Reason = 'issue-num is missing, blank, or not a string or a positive integer'; Issue = ''; Entries = @() }
     }
 
     $listProperty = $root.PSObject.Properties['stage_timing']
@@ -227,7 +231,7 @@ function Get-StageTimingSummary {
     .DESCRIPTION
         Pure. Takes the Name and Text objects of Read-StageTimingEvidence. Per issue only the
         file with the greatest leaf name counts. A file whose text is not valid JSON, whose root
-        is not an object, whose issue-num is blank, or whose stage_timing is not a list is
+        is not an object, whose issue-num is blank or not a string or positive integer, or whose stage_timing is not a list is
         skipped with a reason; so is an entry with a blank stage, an invalid attempt, an
         unparsable time, or an ended_at before its started_at. Open entries are counted and
         excluded from totals. A stage reaches the medians only through issues that hold at

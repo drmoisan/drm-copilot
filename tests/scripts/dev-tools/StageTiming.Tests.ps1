@@ -7,6 +7,7 @@ BeforeAll {
     $script:fixtureRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../fixtures/dev-tools/stage-timing'
     $script:wallClockLabel = 'Figures are wall-clock time and include queueing; they are not agent time.'
     $script:mergeLabel = 'The merge stage is not captured.'
+    $script:issueNumReason = 'issue-num is missing, blank, or not a string or a positive integer'
 
     function Get-TestClosedEntryJson {
         # One closed entry that starts at 01:00:00Z on 2026-01-02 plus the offset and lasts Seconds.
@@ -233,8 +234,90 @@ Describe 'Get-StageTimingSummary skips what it cannot read' {
         )
 
         @($summary.SkippedFiles).Count | Should -Be 2
-        $summary.SkippedFiles[0].Reason | Should -Be 'issue-num is missing or blank'
-        $summary.SkippedFiles[1].Reason | Should -Be 'issue-num is missing or blank'
+        $summary.SkippedFiles[0].Reason | Should -Be $script:issueNumReason
+        $summary.SkippedFiles[1].Reason | Should -Be $script:issueNumReason
+    }
+
+    It 'STR-INTEGER-ISSUE-NUM-READ-AS-STRING-ISSUE' {
+        # An integer issue-num reads as its decimal string, and a string file and an integer file for
+        # one issue select as one issue (the greater file name wins).
+        $entry = Get-TestClosedEntryJson -Stage 'S5_x' -Attempt 1 -Seconds 60
+        $integerOnly = Get-TestTextItem -Name 'stage-timing.2026-01-02T00-00.json' -Text ('{"issue-num":9001,"stage_timing":[' + $entry + ']}')
+        $older = Get-TestEvidenceItem -Name 'stage-timing.2026-01-02T00-01.json' -Issue '9002' -EntryJson @($entry)
+        $newer = Get-TestTextItem -Name 'stage-timing.2026-01-02T00-02.json' -Text ('{"issue-num":9002,"stage_timing":[' + $entry + ',' + (Get-TestClosedEntryJson -Stage 'S5_x' -Attempt 2 -Seconds 30 -StartOffsetSeconds 600) + ']}')
+
+        $single = Get-StageTimingSummary -Evidence @($integerOnly)
+        $mixed = Get-StageTimingSummary -Evidence @($older, $newer)
+
+        @($single.SkippedFiles).Count | Should -Be 0
+        $single.Issues[0].Issue | Should -Be '9001'
+        @($mixed.Issues).Count | Should -Be 1
+        $mixed.Issues[0].Issue | Should -Be '9002'
+        $mixed.Issues[0].Attempts | Should -Be 2
+    }
+
+    It 'STR-NON-POSITIVE-OR-FRACTIONAL-ISSUE-NUM-SKIPPED' -ForEach @(
+        @{ Json = '0' },
+        @{ Json = '-3' },
+        @{ Json = '1.5' },
+        @{ Json = 'true' }
+    ) {
+        $summary = Get-StageTimingSummary -Evidence @(
+            (Get-TestTextItem -Name 'stage-timing.2026-01-02T00-00.json' -Text ('{"issue-num":' + $Json + ',"stage_timing":[]}'))
+        )
+
+        @($summary.SkippedFiles).Count | Should -Be 1
+        $summary.SkippedFiles[0].Reason | Should -Be $script:issueNumReason
+        @($summary.Issues).Count | Should -Be 0
+    }
+
+    It 'STR-MISSING-STARTED-AT-ENTRY-SKIPPED' {
+        $text = '{"issue-num":"9001","stage_timing":[{"stage":"S5_x","attempt":1,"ended_at":null}]}'
+
+        $summary = Get-StageTimingSummary -Evidence @((Get-TestTextItem -Name 'stage-timing.2026-01-02T00-00.json' -Text $text))
+
+        @($summary.SkippedEntries).Count | Should -Be 1
+        $summary.SkippedEntries[0].Stage | Should -Be 'S5_x'
+        $summary.SkippedEntries[0].Reason | Should -Be 'started_at is not an ISO-8601 time'
+    }
+
+    It 'STR-MISSING-STAGE-OR-ATTEMPT-ENTRY-SKIPPED' {
+        # An entry with no stage key and an entry with no attempt key are each skipped with their reason.
+        $text = '{"issue-num":"9001","stage_timing":[' +
+        '{"attempt":1,"started_at":"2026-01-02T01:00:00Z","ended_at":null},' +
+        '{"stage":"S5_x","started_at":"2026-01-02T01:00:00Z","ended_at":null}]}'
+
+        $summary = Get-StageTimingSummary -Evidence @((Get-TestTextItem -Name 'stage-timing.2026-01-02T00-00.json' -Text $text))
+
+        @($summary.SkippedEntries).Count | Should -Be 2
+        $summary.SkippedEntries[0].Reason | Should -Be 'stage is missing or blank'
+        $summary.SkippedEntries[1].Reason | Should -Be 'attempt is not an integer of 1 or more'
+        @($summary.Issues).Count | Should -Be 0
+    }
+
+    It 'STR-STAGE-WITH-ONLY-OPEN-ENTRIES-ABSENT-FROM-MEDIANS' {
+        # A stage whose entries are all open is listed under Issues but has no median.
+        $item = Get-TestEvidenceItem -Name 'stage-timing.2026-01-02T00-00.json' -Issue '9001' -EntryJson @(
+            (Get-TestRawEntryJson -Stage 'S5_x' -Attempt 1 -StartJson '"2026-01-02T05:00:00Z"' -EndJson 'null')
+        )
+
+        $summary = Get-StageTimingSummary -Evidence @($item)
+
+        @($summary.Issues).Count | Should -Be 1
+        $summary.Issues[0].OpenCount | Should -Be $summary.Issues[0].Attempts
+        @($summary.Stages).Count | Should -Be 0
+    }
+
+    It 'STR-ISSUE-ROWS-ORDER-SHORTER-ID-FIRST' {
+        # Issue 99 sorts before issue 100 although ordinal order places 100 first, whatever the input order.
+        $short = Get-TestEvidenceItem -Name 'stage-timing.2026-01-02T00-00.json' -Issue '99' -EntryJson @((Get-TestClosedEntryJson -Stage 'S5_x' -Attempt 1 -Seconds 60))
+        $long = Get-TestEvidenceItem -Name 'stage-timing.2026-01-02T00-01.json' -Issue '100' -EntryJson @((Get-TestClosedEntryJson -Stage 'S5_x' -Attempt 1 -Seconds 60))
+
+        $forward = Get-StageTimingSummary -Evidence @($short, $long)
+        $reverse = Get-StageTimingSummary -Evidence @($long, $short)
+
+        (@($forward.Issues | ForEach-Object { $_.Issue }) -join ',') | Should -Be '99,100'
+        (@($reverse.Issues | ForEach-Object { $_.Issue }) -join ',') | Should -Be '99,100'
     }
 
     It 'STR-STAGE-TIMING-NOT-A-LIST-SKIPPED' {
