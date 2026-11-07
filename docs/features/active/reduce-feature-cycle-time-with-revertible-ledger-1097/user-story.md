@@ -84,9 +84,9 @@ The tag on each criterion names the delivery stage that owes it, as defined in `
 - [x] [R] `ProcessReductionChain.Ledger.Tests.ps1` reverts every committed entry newest-first in memory with no exception, skip list, or allowed-error list, and its end-state check finds each created path absent and each pre-image of the oldest entry present.
 - [x] [R] No new structure-checker rule is added; the chain test is the check, and it runs on every full CI run in the PowerShell shards.
 - [x] [R] The chain compares only revert-block and hunk regions, so an edit outside every region keeps it green and an edit inside a region fails it until the same commit updates the entry's record, as the stage R rebase of the `0001` brief hunk shows.
-- [ ] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
-- [ ] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
-- [ ] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
+- [x] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
+- [x] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
+- [x] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
 - [ ] [G] The evidence requirements marked Reduce in research section 4 are removed from the skills and templates, and those marked Keep remain.
 - [ ] [G] The reviewer writes `## CI Cross-check`, and a mismatch at the join becomes a synthetic Blocking finding that blocks merge, as in K7.
 - [ ] [G] The less-evidence reduction lands as its own commit with its entry.
