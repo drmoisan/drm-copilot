@@ -14,6 +14,8 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-executor-output.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
     function Get-TranscriptReader {
         # Returns a ReadTranscriptHead seam that serves one user entry with the given prompt text.
@@ -55,6 +57,10 @@ BeforeAll {
     $script:TranscriptPath = 'transcripts/subagents/agent-1.jsonl'
     $script:CompleteOutput = "$script:PlanPath`nCommands Run: Invoke-PoshQCParallelTest`nPowerShell toolchain: PASS`n### AC Status Summary`n- Total AC items: 0"
     $script:StopOutput = "$script:PlanPath`nBLOCKED at preflight (before [P0-T1])`nPlan delta: the fix needs a new file outside its named location."
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'Get-ExecutorOutputBlockDecision for a light remediation run (issue #1097)' {

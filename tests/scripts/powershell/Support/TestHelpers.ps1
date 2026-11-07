@@ -1,4 +1,4 @@
-function global:Import-ScriptFunction {
+function Import-ScriptFunction {
     param(
         [Parameter(Mandatory = $true)][string]$Path,
         [Parameter(Mandatory = $true)][string]$Name

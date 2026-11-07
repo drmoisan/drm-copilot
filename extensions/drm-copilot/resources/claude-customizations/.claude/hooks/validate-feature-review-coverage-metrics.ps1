@@ -15,13 +15,19 @@
 #>
 
 function Get-ArtifactFileContent {
+    # Reads a file; a non-empty Root joins Path beneath that worktree root (issue #1105).
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
         [Parameter(Mandatory = $true)]
-        [string] $Path
+        [string] $Path,
+
+        [AllowNull()] [AllowEmptyString()] [string] $Root
     )
 
+    if (-not [string]::IsNullOrWhiteSpace($Root)) {
+        $Path = (($Root -replace '\\', '/').TrimEnd('/')) + '/' + $Path
+    }
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return @{ Exists = $false; Text = $null; Lines = @() }
     }
@@ -46,14 +52,16 @@ function Get-FeatureReviewClaudeMdText {
         Returns a hashtable with Text and ReadError. An absent file yields Text = $null and
         ReadError = $null, so the caller applies the default floors. A file that exists but
         cannot be read yields Text = $null and ReadError set to the first line of the
-        exception message, so the caller fails closed. The function never throws.
+        exception message, so the caller fails closed. The function never throws. A non-empty
+        Root reads the CLAUDE.md of that worktree (issue #1105); without it the process-relative
+        file is read.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param()
+    param([AllowNull()] [AllowEmptyString()] [string] $Root)
 
     try {
-        $file = Get-ArtifactFileContent -Path 'CLAUDE.md'
+        $file = if ([string]::IsNullOrWhiteSpace($Root)) { Get-ArtifactFileContent -Path 'CLAUDE.md' } else { Get-ArtifactFileContent -Path 'CLAUDE.md' -Root $Root }
         return @{ Text = $file.Text; ReadError = $null }
     }
     catch {
@@ -130,14 +138,16 @@ function Get-JacocoBranchCoverage {
 }
 
 function Get-LanguageBranchCoverage {
+    # A non-empty Root reads the report beneath that worktree root (issue #1105).
     [OutputType([Nullable[double]])]
-    param([string]$Language)
+    param([string]$Language, [AllowNull()] [AllowEmptyString()] [string] $Root)
 
+    $prefix = if ([string]::IsNullOrWhiteSpace($Root)) { '' } else { (($Root -replace '\\', '/').TrimEnd('/')) + '/' }
     switch ($Language) {
-        'TypeScript' { return Get-LcovBranchCoverage -Path 'coverage/lcov.info' }
-        'Python' { return Get-LcovBranchCoverage -Path 'artifacts/python/lcov.info' }
-        'PowerShell' { return Get-JacocoBranchCoverage -Path 'artifacts/pester/powershell-coverage.xml' }
-        'CSharp' { return Get-JacocoBranchCoverage -Path 'artifacts/csharp/coverage.xml' }
+        'TypeScript' { return Get-LcovBranchCoverage -Path ($prefix + 'coverage/lcov.info') }
+        'Python' { return Get-LcovBranchCoverage -Path ($prefix + 'artifacts/python/lcov.info') }
+        'PowerShell' { return Get-JacocoBranchCoverage -Path ($prefix + 'artifacts/pester/powershell-coverage.xml') }
+        'CSharp' { return Get-JacocoBranchCoverage -Path ($prefix + 'artifacts/csharp/coverage.xml') }
     }
     return $null
 }
@@ -165,16 +175,19 @@ function Get-JacocoRepoCoverage {
 }
 
 function Get-LanguageRepoCoverage {
+    # A non-empty Root reads the report beneath that worktree root (issue #1105).
     [OutputType([Nullable[double]])]
     param(
-        [string]$Language
+        [string]$Language,
+        [AllowNull()] [AllowEmptyString()] [string] $Root
     )
 
+    $prefix = if ([string]::IsNullOrWhiteSpace($Root)) { '' } else { (($Root -replace '\\', '/').TrimEnd('/')) + '/' }
     switch ($Language) {
-        'TypeScript' { return Get-LcovRepoCoverage -Path 'coverage/lcov.info' }
-        'Python' { return Get-LcovRepoCoverage -Path 'artifacts/python/lcov.info' }
-        'PowerShell' { return Get-JacocoRepoCoverage -Path 'artifacts/pester/powershell-coverage.xml' }
-        'CSharp' { return Get-JacocoRepoCoverage -Path 'artifacts/csharp/coverage.xml' }
+        'TypeScript' { return Get-LcovRepoCoverage -Path ($prefix + 'coverage/lcov.info') }
+        'Python' { return Get-LcovRepoCoverage -Path ($prefix + 'artifacts/python/lcov.info') }
+        'PowerShell' { return Get-JacocoRepoCoverage -Path ($prefix + 'artifacts/pester/powershell-coverage.xml') }
+        'CSharp' { return Get-JacocoRepoCoverage -Path ($prefix + 'artifacts/csharp/coverage.xml') }
     }
     return $null
 }

@@ -58,9 +58,13 @@ Describe 'enforce-epic-child-worktree-binding.ps1 resolves the live branch on a 
             $savedEnvironment = @{}
             foreach ($name in $script:ChildGuardEnvNames) {
                 $savedEnvironment[$name] = [System.Environment]::GetEnvironmentVariable($name)
-                [System.Environment]::SetEnvironmentVariable($name, $null)
             }
             try {
+                # The variables are cleared inside the try, so the finally restores them even when a
+                # clear fails part way (issue #1096).
+                foreach ($name in $script:ChildGuardEnvNames) {
+                    [System.Environment]::SetEnvironmentVariable($name, $null)
+                }
                 [System.Console]::SetIn([System.IO.StringReader]::new($PayloadRaw))
                 [System.Console]::SetError($errorWriter)
                 $stdout = & $script:HookPath

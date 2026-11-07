@@ -117,6 +117,8 @@ if (-not $subModuleCache) {
 foreach ($subModuleName in @(
         'PoshQC.FileDiscovery.psm1',
         'PoshQC.ScanConfig.psm1',
+        'PoshQC.LeakScan.psm1',
+        'PoshQC.LeakAllowlist.psm1',
         'PoshQC.Coverage.psm1',
         'PoshQC.Analyzer.psm1',
         'PoshQC.Shard.psm1',
@@ -161,6 +163,7 @@ Export-ModuleMember -Function @(
     'Merge-PoshQCJunitReport',
     'ConvertTo-PoshQCShardWeight',
     'Export-PoshQCShardWeight',
-    'Invoke-PoshQCParallelTest'
+    'Invoke-PoshQCParallelTest',
+    'Invoke-PoshQCLeakScan'
 ) -Alias @('Install-PoshQCTools')
 
